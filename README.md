@@ -9,13 +9,13 @@
 
 > The bot is made up of 3 foundational classes: the Red Army, the Proletariat, and the Revolutionaries.
 
+> Communes are claimed rooms
+
 > The Red Army is in charge of defence and offense.
 
 > The Proletariat are in charge of producing and distributing resources
 
 > The Revolutionaries are in charge of establishing future communes, and rebuilding destroyed communes.
-
-> Communes are claimed rooms
 
 ## Flowchart and information
 
