@@ -2,7 +2,7 @@
 
 ![the internationale](https://i.ibb.co/K5XGK5t/Group-2.png)
 
-![made with communism](https://i.ibb.co/sCKMtvq/Group-1-6.png)
+![made with communism](https://i.ibb.co/6BcyfxZ/Group-1-7.png)
 
 ## About
 
