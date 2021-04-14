@@ -20,6 +20,23 @@ The Proletariat are in charge of producing and distributing resources
 
 The Revolutionaries are in charge of establishing future communes, and rebuilding destroyed communes.
 ```
+## Progress
+
+- [x] Automate spawning
+- [x] Operate in multiple rooms
+- [x] Remote mining
+- [x] Primitive defence code
+- [x] Operation of multiple spawns in a room
+- [x] Automated road placement
+- [x] Automated base construction and room planning
+- [x] Market buy and sell
+- [x] Produce boosts
+- [x] Attacker dous
+- [x] distribute resources when room under attack
+- [ ] Creep boosting
+- [ ] Automated wall and rampart placement
+- [ ] 
+
 ## Flowchart and more information
 
 https://www.figma.com/file/V2GQYIqNXkntW3Rgp19ris/The-Proletarian-Commune-Screeps
