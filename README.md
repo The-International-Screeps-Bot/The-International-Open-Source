@@ -1,9 +1,9 @@
 # The Internationale - a fully automated Screeps bot
-
+```
 ![the internationale](https://i.ibb.co/K5XGK5t/Group-2.png)
 
 ![made with communism](https://i.ibb.co/6BcyfxZ/Group-1-7.png)
-
+```
 ## About
 ```
 The theme of this bot is based around communism.
