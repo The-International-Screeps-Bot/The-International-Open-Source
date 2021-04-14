@@ -1,2 +1,2 @@
 # The-Internationale-Screeps-Bot
-![forthebadge](https://i.ibb.co/9m0xbs4/Group-1-5.png)
+![forthebadge](https://i.ibb.co/sCKMtvq/Group-1-6.png)
