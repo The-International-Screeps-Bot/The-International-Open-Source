@@ -1,5 +1,8 @@
 # The Internationale - a fully automated Screeps bot
-![forthebadge](https://i.ibb.co/sCKMtvq/Group-1-6.png)
+
+![the internationale](https://i.ibb.co/K5XGK5t/Group-2.png)
+
+![made with communism](https://i.ibb.co/sCKMtvq/Group-1-6.png)
 
 ## About
 
