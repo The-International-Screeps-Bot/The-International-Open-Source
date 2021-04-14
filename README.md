@@ -3,7 +3,7 @@
 
 ## Goal
 
-> sdfsdf
+> The goal of The Internationale is to establish a fully autonomous communism zone in shard 2.
 
 ## Flowchart and information
 
