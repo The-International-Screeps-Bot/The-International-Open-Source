@@ -37,7 +37,7 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [ ] Spawning of power creeps
 - [ ] Power creep operations
 - [ ] Creep boosting
-- [ ] Automated wall and rampart placement
+- [x] Automated wall and rampart placement
 - [ ] Power bank collection
 - [ ] Commodity collection
 - [ ] Automated scouting
