@@ -41,6 +41,8 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [ ] Commodity collection
 - [ ] Automated scouting
 - [ ] Factory operations
+- [ ] Automated intel on enemies
+- [ ] Automated attacking
 
 ## Flowchart and more information
 
