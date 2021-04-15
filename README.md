@@ -48,6 +48,7 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [ ] Automated recording of viable rooms to claim
 - [ ] Automated claiming of rooms
 - [ ] Automated recording of viable remote harvesting rooms
+- [ ] Add room and map visuals to display important information
 
 ## Flowchart and more information
 
