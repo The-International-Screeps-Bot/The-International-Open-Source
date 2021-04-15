@@ -43,6 +43,10 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [ ] Factory operations
 - [ ] Automated intel on enemies
 - [ ] Automated attacking
+- [ ] Different room blueprints depending on room
+- [ ] Automated recording of viable rooms to claim
+- [ ] Automated claiming of rooms
+- [ ] Automated recording of viable remote harvesting rooms
 
 ## Flowchart and more information
 
