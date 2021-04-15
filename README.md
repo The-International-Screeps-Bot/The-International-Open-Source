@@ -22,8 +22,8 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 ```
 ## Progress
 
-- [x] Automate spawning
-- [x] Operate in multiple rooms
+- [x] Automated spawning
+- [x] Claim and operation of multiple rooms
 - [x] Remote mining
 - [x] Primitive defence code
 - [x] Operation of multiple spawns in a room
@@ -33,9 +33,14 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [x] Produce boosts
 - [x] Attacker dous
 - [x] distribute resources when room under attack
+- [ ] Spawning of power creeps
+- [ ] Power creep operations
 - [ ] Creep boosting
 - [ ] Automated wall and rampart placement
-- [ ] 
+- [ ] Power bank collection
+- [ ] Commodity collection
+- [ ] Automated scouting
+- [ ] Factory operations
 
 ## Flowchart and more information
 
