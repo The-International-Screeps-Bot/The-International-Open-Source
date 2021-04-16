@@ -28,7 +28,7 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [x] Claim and operation of multiple rooms
 - [x] Remote mining
 - [x] Primitive defence code
-- [x] Operation of multiple spawns in a room
+- [ ] Operation of multiple spawns in a room
 - [x] Automated road placement
 - [x] Automated base construction and room planning
 - [x] Market buy and sell
