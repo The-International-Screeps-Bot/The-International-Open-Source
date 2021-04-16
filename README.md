@@ -61,4 +61,3 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 ## Flowchart and more information
 
 https://www.figma.com/file/V2GQYIqNXkntW3Rgp19ris/The-Proletarian-Commune-Screeps
-
