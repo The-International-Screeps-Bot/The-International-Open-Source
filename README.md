@@ -49,6 +49,13 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [ ] Automated claiming of rooms
 - [ ] Automated recording of viable remote harvesting rooms
 - [ ] Add room and map visuals to display important information
+- [ ] Power creep offensive capabilities
+- [ ] Automatic safemode when boosted attackers
+- [ ] Advanced targeting for towers
+- [ ] Recording and predicting for like attackers
+- [ ] Assisting of defending rooms in case of power creep assisted attack
+- [ ] Weighting of rooms from economic to military depending on recent history and neighbours
+- [ ] Communication and coordination between rooms about global stage, economy, threats
 
 ## Flowchart and more information
 
