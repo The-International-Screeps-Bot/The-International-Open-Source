@@ -62,6 +62,7 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [ ] Spawn specific defender creeps depending on attackers
 - [ ] Determine if boosting is necessary for defenders
 - [ ] Have defenders move to ramparts near attackers
+- [ ] Spawn new civilian creeps when TTL is less than time to spawn
 
 ## Flowchart and more information
 
