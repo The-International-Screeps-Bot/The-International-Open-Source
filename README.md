@@ -34,7 +34,7 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [x] Automatic market buy and sell orders
 - [x] Produce boosts
 - [x] Attacker dous
-- [x] distribute resources when room under attack
+- [ ] Have resources come into terminal when room under attack
 - [ ] Spawning of power creeps
 - [ ] Power creep operations
 - [ ] Creep boosting
