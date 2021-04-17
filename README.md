@@ -59,6 +59,9 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [ ] Communication and coordination between rooms about global stage, economy, threats
 - [ ] Advanced pathing to avoid rooms with known threats
 - [ ] Have nearest rooms establish and claim rooms
+- [ ] Spawn specific defender creeps depending on attackers
+- [ ] Determine if boosting is necessary for defenders
+- [ ] Have defenders move to ramparts near attackers
 
 ## Flowchart and more information
 
