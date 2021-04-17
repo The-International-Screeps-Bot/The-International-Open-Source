@@ -58,6 +58,7 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [ ] Weighting of rooms from economic to military depending on recent history and neighbours
 - [ ] Communication and coordination between rooms about global stage, economy, threats
 - [ ] Advanced pathing to avoid rooms with known threats
+- [ ] Have nearest rooms establish and claim rooms
 
 ## Flowchart and more information
 
