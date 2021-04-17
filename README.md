@@ -31,7 +31,7 @@ The Revolutionaries are in charge of establishing future communes, and rebuildin
 - [ ] Operation of multiple spawns in a room
 - [x] Automated road placement
 - [x] Automated base construction and room planning
-- [x] Market buy and sell
+- [x] Automatic market buy and sell orders
 - [x] Produce boosts
 - [x] Attacker dous
 - [x] distribute resources when room under attack
