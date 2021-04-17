@@ -1,7 +1,7 @@
 module.exports = {
     run: function spawns() {
 
-        let rolesList = ["harvester1", "harvester2", "baseHauler", "containerHauler", "generalHauler", "upgrader", "builder", "repairer", "wallRepairer", "claimer", "spawnBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "serf", "remoteDefender", "remoteBuilder", "bigBoyMember", "bigBoyLeader", "remoteHarvester", "remoteHauler", "reserver"]
+        let rolesList = ["harvester1", "harvester2", "baseHauler", "containerHauler", "generalHauler", "upgrader", "builder", "repairer", "wallRepairer", "claimer", "spawnBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "serf", "remoteDefender", "remoteBuilder", "bigBoyMember", "bigBoyLeader", "remoteHarvester1", "remoteHarvester2", "remoteHauler", "reserver"]
         let creepsOfRole = {}
         let creepCount = Memory.creepCount
 
@@ -776,7 +776,7 @@ module.exports = {
                             creepCount["harvester1"]++
                         } else if (creepsOfRole[["harvester2", room.name]] < room.memory.minimumNumberOfHarvesters2) {
 
-                            name = spawn.createCreep(harvesterBodyResult, 'H, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester1"], { role: 'harvester2', working: false, target: 2, roomFrom: room.name });
+                            name = spawn.createCreep(harvesterBodyResult, 'H, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester2"], { role: 'harvester2', working: false, target: 2, roomFrom: room.name });
 
                             creepCount["harvester2"]++
                         } else if (creepsOfRole[["generalHauler", room.name]] < room.memory.minimumNumberOfGeneralHaulers) {
@@ -879,42 +879,24 @@ module.exports = {
                             } else {
 
                                 for (let remoteRoom of remoteRooms) {
-                                    
-                                    if (stage <= 2) {
                                         
-                                        var numberOfRemoteHarvesters = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester' && c.memory.remoteRoom == remoteRoom.name)
-    
-                                        if (numberOfRemoteHarvesters < room.memory.minimumNumberOfRemoteHarvesters * remoteRoom.sources * 2) {
-    
-                                            name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester"], { role: 'remoteHarvester', remoteRoom: remoteRoom.name, roomFrom: room.name });
-    
-                                            creepCount["remoteHarvester"]++
-                                        }
-                                    }
-                                    else {
+                                        var numberOfRemoteHarvesters1 = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester1' && c.memory.remoteRoom == remoteRoom.name)
                                         
-                                        var numberOfRemoteHarvesters = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester' && c.memory.remoteRoom == remoteRoom.name)
+                                        var numberOfRemoteHarvesters2 = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester2' && c.memory.remoteRoom == remoteRoom.name)
     
-                                        if (numberOfRemoteHarvesters < room.memory.minimumNumberOfRemoteHarvesters * remoteRoom.sources) {
+                                        if (numberOfRemoteHarvesters1 < room.memory.minimumNumberOfRemoteHarvesters1  * remoteRoom.sources) {
     
-                                            name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester"], { role: 'remoteHarvester', remoteRoom: remoteRoom.name, roomFrom: room.name });
+                                            name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester1"], { role: 'remoteHarvester1', remoteRoom: remoteRoom.name, roomFrom: room.name });
     
-                                            creepCount["remoteHarvester"]++
+                                            creepCount["remoteHarvester1"]++
                                         }
-                                    }
-                                    if (stage <= 4) {
+                                        else if (numberOfRemoteHarvesters2 < room.memory.minimumNumberOfRemoteHarvesters2 * remoteRoom.sources) {
     
-                                        var numberOfRemoteHaulers = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHauler' && c.memory.remoteRoom == remoteRoom.name)
+                                            name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester2"], { role: 'remoteHarvester2', remoteRoom: remoteRoom.name, roomFrom: room.name });
     
-                                        if (numberOfRemoteHaulers < room.memory.minimumNumberOfRemoteHaulers * remoteRoom.sources * 2) {
-    
-                                            name = spawn.createCreep(remoteHaulerBodyResult, 'RHau, ' + "T" + remoteHaulerBodyTier + ", " + creepCount["remoteHauler"], { role: 'remoteHauler', remoteRoom: remoteRoom.name, fullEnergy: false, roomFrom: room.name });
-    
-                                            creepCount["remoteHauler"]++
+                                            creepCount["remoteHarvester2"]++
                                         }
-                                    }
-                                    else {
-                                        
+    
                                         var numberOfRemoteHaulers = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHauler' && c.memory.remoteRoom == remoteRoom.name)
     
                                         if (numberOfRemoteHaulers < room.memory.minimumNumberOfRemoteHaulers * remoteRoom.sources) {
@@ -923,24 +905,26 @@ module.exports = {
     
                                             creepCount["remoteHauler"]++
                                         }
-                                    }
-                                    var numberOfReservers = _.sum(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.remoteRoom == remoteRoom.name)
-
-                                    if (numberOfReservers < room.memory.minimumNumberOfReservers) {
-
-                                        name = spawn.createCreep(reserverBodyResult, 'Rs, ' + "T" + reserverBodyTier + ", " + creepCount["reserver"], { role: 'reserver', remoteRoom: remoteRoom.name, roomFrom: room.name });
-
-                                        creepCount["reserver"]++
+                                        
+                                        var numberOfReservers = _.sum(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.remoteRoom == remoteRoom.name)
+    
+                                        if (numberOfReservers < room.memory.minimumNumberOfReservers) {
+    
+                                            name = spawn.createCreep(reserverBodyResult, 'Rs, ' + "T" + reserverBodyTier + ", " + creepCount["reserver"], { role: 'reserver', remoteRoom: remoteRoom.name, roomFrom: room.name });
+    
+                                            creepCount["reserver"]++
                                     }
                                 }
                             }
                         }
                     }
                 }
-
-                var minRemoteHarvesters = room.memory.minimumNumberOfRemoteHarvesters = remoteRoomsNumber
-                var minRemoteHaulers = room.memory.minimumNumberOfRemoteHaulers = remoteRoomsNumber
-                var minReservers = room.memory.minimumNumberOfReservers = remoteRoomsNumber
+                
+                var minRemoteHarvesters1 = room.memory.minimumNumberOfRemoteHarvesters1 = 1
+                var minRemoteHarvesters2 = room.memory.minimumNumberOfRemoteHarvesters1 = 1
+                var minRemoteHaulers = room.memory.minimumNumberOfRemoteHaulers = 1
+                var minReservers = room.memory.minimumNumberOfReservers = 1
+                
                 var minRemoteBuilders = room.memory.minimumNumberOfRemoteBuilders = 1
                 var minRemoteDefenders = room.memory.minimumNumberOfRemoteDefenders = 1
 
@@ -973,9 +957,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfRemoteDefenders = 0
 
-                    minRemoteHarvesters
+                    minRemoteHarvesters1 * 2
+                    
+                    minRemoteHarvesters2 * 2
 
-                    minRemoteHaulers
+                    minRemoteHaulers * 2
 
                     room.memory.minimumNumberOfReservers = 0
 
@@ -1016,9 +1002,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfRemoteDefenders = 0
 
-                    minRemoteHarvesters
+                    minRemoteHarvesters1 * 2
 
-                    minRemoteHaulers
+                    minRemoteHarvesters2 * 2
+                    
+                    minRemoteHaulers * 2
 
                     room.memory.minimumNumberOfReservers = 0
 
@@ -1059,9 +1047,11 @@ module.exports = {
 
                     minRemoteDefenders
 
-                    minRemoteHarvesters
+                    minRemoteHarvesters1
 
-                    minRemoteHaulers
+                    minRemoteHarvesters2 * 2
+
+                    minRemoteHaulers * 2
 
                     minReservers
 
@@ -1097,7 +1087,7 @@ module.exports = {
                         room.memory.minimumNumberOfUpgraders = 2
                     } else {
 
-                        room.memory.minimumNumberOfUpgraders = 1
+                        room.memory.minimumNumberOfUpgraders = 2
                     }
 
                     room.memory.minimumNumberOfSpawnBuilders = 4
@@ -1108,9 +1098,11 @@ module.exports = {
 
                     minRemoteDefenders
 
-                    minRemoteHarvesters
+                    minRemoteHarvesters1
 
-                    minRemoteHaulers
+                    minRemoteHarvesters2 * 2
+
+                    minRemoteHaulers * 2
 
                     minReservers
 
@@ -1157,7 +1149,9 @@ module.exports = {
 
                     minRemoteDefenders
 
-                    minRemoteHarvesters
+                    minRemoteHarvesters1
+
+                    minRemoteHarvesters2
 
                     minRemoteHaulers
 
@@ -1202,7 +1196,9 @@ module.exports = {
 
                     minRemoteDefenders
 
-                    minRemoteHarvesters
+                    minRemoteHarvesters1
+
+                    minRemoteHarvesters2
 
                     minRemoteHaulers
 
@@ -1246,7 +1242,9 @@ module.exports = {
 
                     minRemoteDefenders
 
-                    minRemoteHarvesters
+                    minRemoteHarvesters1
+
+                    minRemoteHarvesters2
 
                     minRemoteHaulers
 
@@ -1294,7 +1292,9 @@ module.exports = {
 
                     minRemoteDefenders
 
-                    minRemoteHarvesters
+                    minRemoteHarvesters1
+
+                    minRemoteHarvesters2
 
                     minRemoteHaulers
 

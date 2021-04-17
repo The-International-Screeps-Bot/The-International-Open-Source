@@ -4,45 +4,78 @@ module.exports = {
 
         var remoteRoom = creep.memory.remoteRoom
 
-
         if (remoteRoom == creep.room.name) {
 
             creep.room.memory.stage = "remoteRoom";
 
-            let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
-            let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
-
             let source1 = Game.getObjectById(creep.room.memory.source1)
             let source2 = Game.getObjectById(creep.room.memory.source2)
+            
+            if (source1 == null) {
 
-            if (sourceContainer1) {
+                let sources = creep.room.find(FIND_SOURCES)[0]
+    
+                creep.room.memory.source1 = sources.id
+    
+            }
+            else if (source2 == null) {
 
-                creep.say("⛏️ 1")
-
-                if (creep.harvest(source1) == ERR_NOT_IN_RANGE) {
-
-                    creep.moveTo(sourceContainer1, { reusePath: 50 }, { visualizePathStyle: { stroke: '#ffffff' } })
-
+                let sources = creep.room.find(FIND_SOURCES)[1]
+                
+                if (source2) {
+                
+                creep.room.memory.source2 = sources.id
                 }
-            } else if (sourceContainer2) {
+            }
 
-                creep.say("⛏️ 2")
-
-                if (creep.harvest(source2) == ERR_NOT_IN_RANGE) {
-
-                    creep.moveTo(sourceContainer2, { reusePath: 50 }, { visualizePathStyle: { stroke: '#ffffff' } })
-
+            if (creep.memory.role == "remoteHarvester1") {
+                
+                let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
+                
+                if (sourceContainer1) {
+    
+                    creep.say("⛏️ 1")
+    
+                    if (creep.pos.inRangeTo(sourceContainer1, 0)) {
+    
+                        creep.harvest(source1)
+    
+                    } else {
+    
+                        creep.moveTo(sourceContainer1, { reusePath: 50 })
+    
+                    }
+                } else {
+    
+                    creep.moveTo(source1, { reusePath: 50 })
+                    creep.harvest(source1);
+                    creep.say("⛏️ 3")
+    
                 }
-            } else {
-
-                var altSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
-
-                creep.say("⛏️ 3")
-
-                if (creep.harvest(altSource) == ERR_NOT_IN_RANGE) {
-
-                    creep.moveTo(altSource, { reusePath: 50 }, { visualizePathStyle: { stroke: '#ffffff' } });
-
+            } 
+            else if (creep.memory.role == "remoteHarvester2") {
+                
+                let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
+                
+                if (sourceContainer2) {
+    
+                    creep.say("⛏️ 2")
+    
+                    if (creep.pos.inRangeTo(sourceContainer2, 0)) {
+    
+                        creep.harvest(source2)
+    
+                    } else {
+    
+                        creep.moveTo(sourceContainer2, { reusePath: 50 })
+    
+                    }
+                } else {
+    
+                    creep.moveTo(source2, { reusePath: 50 })
+                    creep.harvest(source2);
+                    creep.say("⛏️ 4")
+    
                 }
             }
 
@@ -83,11 +116,13 @@ module.exports = {
             
             if (sources.length == 2) {
                 
-                Game.rooms[creep.memory.roomFrom].memory.remoteRooms.sources = 2
-            }
-            else {
-                
-                Game.rooms[creep.memory.roomFrom].memory.remoteRooms.sources = 1
+                for (let remoteRoom of Game.rooms[creep.memory.roomFrom].memory.remoteRooms) {
+                    
+                    if (remoteRoom.name == creep.room.name) {
+                        
+                        remoteRoom.sources = 2
+                    }
+                }
             }
         } else {
 

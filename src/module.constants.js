@@ -212,7 +212,7 @@ module.exports = {
                 function rooms() {
 
                     //let unfilteredRemoteRooms = ["E25N3"]
-                    let unfilteredRemoteRooms = ["E28N12", "E28N14", "E28N16", "E28N18", "E29N17", "E27N12"]
+                    let unfilteredRemoteRooms = ["E28N12", "E28N14", "E28N16", "E28N18", "E29N17"]
                     let remoteRooms = []
 
                     for (let remoteRoom of unfilteredRemoteRooms) {

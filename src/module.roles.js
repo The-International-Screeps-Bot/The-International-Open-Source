@@ -23,7 +23,8 @@ module.exports = {
         roles["scout"] = require("role.scout")
         roles["serf"] = require("role.serf")
         roles["remoteDefender"] = require("role.remoteDefender")
-        roles["remoteHarvester"] = require("role.remoteHarvester")
+        roles["remoteHarvester1"] = require("role.remoteHarvester")
+        roles["remoteHarvester2"] = require("role.remoteHarvester")
         roles["remoteHauler"] = require("role.remoteHauler")
         roles["remoteBuilder"] = require("role.remoteBuilder")
         roles["bigBoyLeader"] = require("role.bigBoy")
@@ -50,7 +51,8 @@ module.exports = {
         cpuUsage["scout"]
         cpuUsage["serf"]
         cpuUsage["remoteDefender"]
-        cpuUsage["remoteHarvester"]
+        cpuUsage["remoteHarvester1"]
+        cpuUsage["remoteHarvester2"]
         cpuUsage["remoteHauler"]
         cpuUsage["remoteBuilder"]
         cpuUsage["bigBoy"]
@@ -58,6 +60,7 @@ module.exports = {
         for (let name in Game.creeps) {
 
             let creep = Game.creeps[name]
+            //creep.suicide()
 
             roles[creep.memory.role].run(creep)
 

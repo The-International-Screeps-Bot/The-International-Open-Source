@@ -11,7 +11,7 @@ module.exports = {
 
                 let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)
 
-                if (room.name == "E26N3") {
+                if (room) {
 
                     for (let cSite of roomConstructionSite) {
 
@@ -328,8 +328,14 @@ module.exports = {
 
                                     //console.log(pos.x + "," + pos.y)
                                     //console.log(structureType)
-
-                                    room.createConstructionSite(pos.x, pos.y, structureType);
+                                    if (room.memory.stage <= 4 && structureType == "road") {
+                                        
+                                        
+                                    }
+                                    else {
+                                        
+                                    room.createConstructionSite(pos.x, pos.y, structureType)
+                                    }
                                     /*
                                     if (structureType == "road") {
                                         
@@ -441,12 +447,16 @@ module.exports = {
                         }
                     }
                 }
-
-                sourcePath()
-                controllerPath()
-                mineralPath()
-                //towerPath()
-                remotePath()
+                
+                if (room.memory.stage >= 4) {
+                
+                    sourcePath()
+                    controllerPath()
+                    mineralPath()
+                    //towerPath()
+                    remotePath()
+                
+                }
 
                 function sourcePath() {
 
@@ -509,7 +519,7 @@ module.exports = {
                     let origin = room.find(FIND_MY_SPAWNS)[0]
 
                     let goal = _.map([room.controller], function(controller) {
-                        return { pos: controller.pos, range: 1 }
+                        return { pos: controller.pos, range: 2 }
                     })
 
                     if (origin && goal) {
@@ -627,11 +637,13 @@ module.exports = {
 
                                 var path = PathFinder.search(origin.pos, goal, {
                                     plainCost: 2,
-
+                                    
                                     roomCallback: function(roomName) {
 
-                                        let room = Game.rooms[object.name]
-
+                                        let room = Game.rooms[roomName]
+                                        
+                                        if (room) {
+                                        
                                         let costs = new PathFinder.CostMatrix
 
                                         room.find(FIND_STRUCTURES).forEach(function(struct) {
@@ -647,6 +659,7 @@ module.exports = {
                                         })
 
                                         return costs
+                                        }
                                     }
                                 }).path
 

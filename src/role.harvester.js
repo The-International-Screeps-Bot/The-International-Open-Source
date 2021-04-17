@@ -1,18 +1,10 @@
 module.exports = {
     run: function(creep) {
 
-        let source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-
-        let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
-        let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
-
-        let sourceLink1 = Game.getObjectById(creep.room.memory.sourceLink1)
-        let sourceLink2 = Game.getObjectById(creep.room.memory.sourceLink2)
-
         let source1 = Game.getObjectById(creep.room.memory.source1)
         let source2 = Game.getObjectById(creep.room.memory.source2)
 
-        if (!source1 && !source2) {
+        if (source1 == null && source2 == null) {
 
             let sources = creep.room.find(FIND_SOURCES)
 
@@ -22,13 +14,16 @@ module.exports = {
         }
 
         if (creep.memory.role == "harvester1") {
+            
+            let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
+            
             if (sourceContainer1) {
 
                 creep.say("⛏️ 1")
 
                 if (creep.pos.inRangeTo(sourceContainer1, 0)) {
 
-                    creep.harvest(source)
+                    creep.harvest(source1)
 
                 } else {
 
@@ -43,24 +38,26 @@ module.exports = {
 
             }
             if (creep.store[RESOURCE_ENERGY] >= creep.store.getCapacity() - 10) {
+                
+                let sourceLink1 = Game.getObjectById(creep.room.memory.sourceLink1)
+                
                 if (sourceLink1) {
 
                     creep.transfer(sourceLink1, RESOURCE_ENERGY)
 
-                } else if (sourceContainer1) {
-
-                    creep.transfer(sourceContainer1, RESOURCE_ENERGY)
-
                 }
             }
         } else if (creep.memory.role == "harvester2") {
+            
+            let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
+            
             if (sourceContainer2) {
 
                 creep.say("⛏️ 2")
 
                 if (creep.pos.inRangeTo(sourceContainer2, 0)) {
 
-                    creep.harvest(source)
+                    creep.harvest(source2)
 
                 } else {
 
@@ -75,13 +72,12 @@ module.exports = {
 
             }
             if (creep.store[RESOURCE_ENERGY] >= creep.store.getCapacity() - 10) {
+                
+                let sourceLink2 = Game.getObjectById(creep.room.memory.sourceLink2)
+                
                 if (sourceLink2) {
 
                     creep.transfer(sourceLink2, RESOURCE_ENERGY)
-
-                } else if (sourceContainer2) {
-
-                    creep.transfer(sourceContainer2, RESOURCE_ENERGY)
 
                 }
             }
