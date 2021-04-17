@@ -1,0 +1,1324 @@
+module.exports = {
+    run: function spawns() {
+
+        let rolesList = ["harvester1", "harvester2", "baseHauler", "containerHauler", "generalHauler", "upgrader", "builder", "repairer", "wallRepairer", "claimer", "spawnBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "serf", "remoteDefender", "remoteBuilder", "bigBoyMember", "bigBoyLeader", "remoteHarvester", "remoteHauler", "reserver"]
+        let creepsOfRole = {}
+        let creepCount = Memory.creepCount
+
+        for (let name in Game.creeps) {
+
+            var creep = Game.creeps[name]
+
+            var creepValues = _.chunk([creep.memory.role, creep.memory.roomFrom], 2)
+
+            if (!creepsOfRole[creepValues]) {
+
+                creepsOfRole[creepValues] = 1
+            } else {
+
+                creepsOfRole[creepValues]++
+            }
+
+            //console.log(creep.memory.role + ", " + creepsOfRole[creepValues])
+
+        }
+        for (let role of rolesList) {
+
+            if (Memory.creepCount != null) {
+                if (Memory.creepCount[role] == null) {
+
+                    Memory.creepCount[role] = 0
+                }
+            } else {
+
+                Memory.creepCount = []
+            }
+        }
+
+        _.forEach(Game.rooms, function(room) {
+            if (room.controller && room.controller.my) {
+
+                for (let role of rolesList) {
+
+                    if (!creepsOfRole[[role, room.name]]) {
+
+                        creepsOfRole[[role, room.name]] = 0
+                    }
+                }
+
+                let creepsInRoom = room.find(FIND_MY_CREEPS);
+
+                var target1 = room.find(FIND_HOSTILE_CREEPS, {
+                    filter: (c) => c.owner.username !== "cplive" && c.owner.username !== "Brun1L" && c.owner.username !== "Invader"
+                });
+
+                let boostedSquads = false
+                let squadType = "ranged"
+                    //let squadType = "dismantle"
+                    //let squadType = "attack
+
+                //let claimerTarget = "E18S1"
+                let claimerTarget = undefined
+                    //let builderTarget = "E18S1"
+                let builderTarget = undefined
+
+                let target2 = Game.flags.AR;
+                let target3 = Game.flags.RA;
+                let target4 = Game.flags.S;
+                var target5 = Game.flags.H;
+                let target6 = Game.flags.BB;
+                let target7 = Game.flags.BR;
+                let target8 = Game.flags.RDP;
+                let target9 = Game.flags.R;
+                let roomMineral = room.find(FIND_MINERALS)[0].mineralAmount > 0;
+                let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES);
+
+                let stage = room.memory.stage
+
+                if (room.energyCapacityAvailable >= 12300) {
+
+                    room.memory.stage = 8
+
+                } else if (room.energyCapacityAvailable >= 5300) {
+
+                    room.memory.stage = 7
+
+                } else if (room.energyCapacityAvailable >= 2300) {
+
+                    room.memory.stage = 6
+
+                } else if (room.energyCapacityAvailable >= 1800) {
+
+                    room.memory.stage = 5
+
+                } else if (room.energyCapacityAvailable >= 1300) {
+
+                    room.memory.stage = 4
+
+                } else if (room.energyCapacityAvailable >= 800) {
+
+                    room.memory.stage = 3
+
+                } else if (room.energyCapacityAvailable >= 550) {
+
+                    room.memory.stage = 2
+
+                } else if (room.energyCapacityAvailable >= 300) {
+
+                    room.memory.stage = 1
+
+                }
+
+                //console.log(room.energyCapacityAvailable)
+
+                /*
+                RCL 1: 300
+
+                RCL 2: 550
+
+                RCL 3: 800
+
+                RCL 4: 1, 300
+
+                RCL 5: 1, 800
+
+                RCL 6: 2, 300
+
+                RCL 7: 5, 600
+
+                RCL 8: 12, 900
+                */
+
+                /*
+                    var target1 = (FIND_HOSTILE_CREEPS, {
+                    filter: function(object) {
+                        return object.getActiveBodyparts(HEAL) == 4;
+                    }
+                });
+                */
+                //console.log(roomConstructionSite.length + ", " + spawn.room.name)
+                /*
+                var ally = spawn.room.find(FIND_HOSTILE_CREEPS, {
+                    filter: (c) => c.owner.username === "Brun1L"
+                });
+
+                var myRamparts = spawn.room.find(FIND_MY_STRUCTURES, {
+                    filter: (s) => s.structureType == STRUCTURE_RAMPART
+                })
+
+                if (myRamparts && ally.length > 0) {
+
+                    for (let rampart of myRamparts) {
+
+                            rampart.setPublic(true)
+
+                    }
+                }
+                else {
+                    for (let rampart of myRamparts) {
+                        
+                            rampart.setPublic(false)
+                            
+                    }
+                }
+                */
+
+                let remoteRooms = room.memory.remoteRooms
+                let remoteRoomsNumber = 0
+
+                if (remoteRooms) {
+
+                    remoteRoomsNumber = room.memory.remoteRooms.length
+                }
+
+                var roomFix = room.memory.roomFix
+                var freeEnergy = room.energyAvailable
+                var capacityEnergy = room.energyCapacityAvailable
+
+                roomFix = false
+
+                if (creepsOfRole[["harvester1", room.name]] + creepsOfRole[["harvester2", room.name]] < 1 || creepsOfRole[["baseHauler", room.name]] + creepsOfRole[["containerHauler", room.name]] + creepsOfRole[["generalHauler", room.name]] < 1) {
+
+                    roomFix = true
+
+                }
+
+                let rawSpawns = room.memory.spawns
+
+                if (rawSpawns == null) {
+
+                    rawSpawns = []
+                }
+
+                let mySpawns = []
+
+                for (let spawns of rawSpawns) {
+
+                    let spawn = Game.getObjectById(spawns)
+                    mySpawns.push(spawn)
+
+                }
+
+                for (spawn of mySpawns) {
+
+                    if (spawn.spawning) {
+                        var spawningCreep = Game.creeps[spawn.spawning.name]
+                        spawn.room.visual.text(
+                            '🛠️' + spawningCreep.memory.role,
+                            spawn.pos.x,
+                            spawn.pos.y - 2, { align: 'center' })
+                    }
+
+                    var name = undefined
+
+                    if (roomFix == true) {
+                        //freeEnergy Hauler
+                        if (stage <= 1) {
+
+                            let haulerBodyAmount = Math.floor(freeEnergy / 100)
+                            let haulerBody = []
+
+                            var haulerBodyTier = 0
+
+                            for (let i = 0; i < haulerBodyAmount; i++) {
+
+                                haulerBody.push(CARRY, MOVE)
+                                haulerBodyTier++
+
+                            }
+                            var haulerBodyResult = haulerBody
+                        } else {
+
+                            let haulerBodyAmount = Math.floor(freeEnergy / 150)
+                            let haulerBody = []
+
+                            var haulerBodyTier = 0
+
+                            for (let i = 0; i < haulerBodyAmount; i++) {
+
+                                haulerBody.push(CARRY, CARRY, MOVE)
+                                haulerBodyTier++
+
+                            }
+                            var haulerBodyResult = haulerBody.slice(0, 36)
+                        }
+                        //freeEnergy Harvester
+                        if (stage <= 5) {
+
+                            let harvesterBodyAmount = Math.floor(freeEnergy / 250)
+                            let harvesterBody = []
+
+                            var haulerBodyTier = 0
+
+                            for (let i = 0; i < harvesterBodyAmount; i++) {
+
+                                harvesterBody.push(WORK, WORK, MOVE)
+                                harvesterBodyTier++
+
+                            }
+                            var harvesterBodyResult = harvesterBody.slice(0, 12)
+                        } else {
+
+                            let harvesterBodyAmount = Math.floor((freeEnergy - 150) / 250)
+                            let harvesterBody = [CARRY, CARRY, MOVE]
+
+                            var haulerBodyTier = 0
+
+                            for (let i = 0; i < harvesterBodyAmount; i++) {
+
+                                harvesterBody.push(WORK, WORK, MOVE)
+                                harvesterBodyTier++
+
+                            }
+                            var harvesterBodyResult = harvesterBody.slice(0, 15)
+                        }
+                    } else {
+                        //Hauler
+                        if (stage <= 1) {
+
+                            let haulerBodyAmount = Math.floor(capacityEnergy / 100)
+                            let haulerBody = []
+
+                            var haulerBodyTier = 0
+
+                            for (let i = 0; i < haulerBodyAmount; i++) {
+
+                                haulerBody.push(CARRY, MOVE)
+                                haulerBodyTier++
+
+                            }
+                            var haulerBodyResult = haulerBody
+                        } else {
+
+                            let haulerBodyAmount = Math.floor(capacityEnergy / 150)
+                            let haulerBody = []
+
+                            var haulerBodyTier = 0
+
+                            for (let i = 0; i < haulerBodyAmount; i++) {
+
+                                haulerBody.push(CARRY, CARRY, MOVE)
+                                haulerBodyTier++
+
+                            }
+                            var haulerBodyResult = haulerBody.slice(0, 36)
+                        }
+                        //Harvester
+                        if (stage <= 2) {
+
+                            let harvesterBodyAmount = Math.floor((capacityEnergy - 50) / 150)
+                            let harvesterBody = [MOVE]
+
+                            var harvesterBodyTier = 0
+
+                            for (let i = 0; i < harvesterBodyAmount; i++) {
+
+                                harvesterBody.push(WORK)
+                                harvesterBodyTier++
+
+                            }
+                            var harvesterBodyResult = harvesterBody
+                        } else if (stage <= 5) {
+
+                            let harvesterBodyAmount = Math.floor(capacityEnergy / 250)
+                            let harvesterBody = []
+
+                            var harvesterBodyTier = 0
+
+                            for (let i = 0; i < harvesterBodyAmount; i++) {
+
+                                harvesterBody.push(WORK, WORK, MOVE)
+                                harvesterBodyTier++
+
+                            }
+                            var harvesterBodyResult = harvesterBody.slice(0, 12)
+                        } else {
+
+                            let harvesterBodyAmount = Math.floor((capacityEnergy - 150) / 250)
+                            let harvesterBody = [CARRY, CARRY, MOVE]
+
+                            var harvesterBodyTier = 0
+
+                            for (let i = 0; i < harvesterBodyAmount; i++) {
+
+                                harvesterBody.push(WORK, WORK, MOVE)
+                                harvesterBodyTier++
+
+                            }
+                            var harvesterBodyResult = harvesterBody.slice(0, 15)
+                        }
+                        //Upgrader
+                        if (stage == 1) {
+
+                            let upgraderBodyAmount = Math.floor(capacityEnergy / 250)
+                            let upgraderBody = []
+
+                            var upgraderBodyTier = 0
+
+                            for (let i = 0; i < upgraderBodyAmount; i++) {
+
+                                upgraderBody.push(WORK, MOVE, CARRY, MOVE)
+                                upgraderBodyTier++
+
+                            }
+                            var upgraderBodyResult = upgraderBody
+                        } else if (stage == 2) {
+
+                            let upgraderBodyAmount = Math.floor(capacityEnergy / 550)
+                            let upgraderBody = []
+
+                            var upgraderBodyTier = 0
+
+                            for (let i = 0; i < upgraderBodyAmount; i++) {
+
+                                upgraderBody.push(WORK, WORK, MOVE, WORK, CARRY, MOVE, CARRY, MOVE)
+                                upgraderBodyTier++
+
+                            }
+                            var upgraderBodyResult = upgraderBody
+                        } else {
+
+                            let upgraderBodyAmount = Math.floor((capacityEnergy - 150) / 250)
+                            let upgraderBody = [CARRY, CARRY, MOVE]
+
+                            var upgraderBodyTier = 0
+
+                            for (let i = 0; i < upgraderBodyAmount; i++) {
+
+                                upgraderBody.push(WORK, WORK, MOVE)
+                                upgraderBodyTier++
+
+                            }
+                            var upgraderBodyResult = upgraderBody.slice(0, 24)
+                        }
+                        //Builder
+                        if (stage == 1) {
+
+                            let builderBodyAmount = Math.floor(capacityEnergy / 250)
+                            let builderBody = []
+
+                            var builderBodyTier = 0
+
+                            for (let i = 0; i < builderBodyAmount; i++) {
+
+                                builderBody.push(WORK, MOVE, CARRY, MOVE)
+                                builderBodyTier++
+
+                            }
+                            var builderBodyResult = builderBody
+                        } else if (stage == 2) {
+
+                            let builderBodyAmount = Math.floor(capacityEnergy / 550)
+                            let builderBody = []
+
+                            var builderBodyTier = 0
+
+                            for (let i = 0; i < builderBodyAmount; i++) {
+
+                                builderBody.push(WORK, WORK, MOVE, WORK, CARRY, MOVE, CARRY, MOVE)
+                                builderBodyTier++
+
+                            }
+                            var builderBodyResult = builderBody
+                        } else {
+
+                            let builderBodyAmount = Math.floor(capacityEnergy / 200)
+                            let builderBody = []
+
+                            var builderBodyTier = 0
+
+                            for (let i = 0; i < builderBodyAmount; i++) {
+
+                                builderBody.push(WORK, CARRY, MOVE)
+                                builderBodyTier++
+
+                            }
+                            var builderBodyResult = builderBody.slice(0, 24)
+                        }
+                        //Spawn Builder
+                        if (stage >= 1) {
+
+                            let spawnBuilderBodyAmount = Math.floor(capacityEnergy / 250)
+                            let spawnBuilderBody = []
+
+                            var spawnBuilderBodyTier = 0
+
+                            for (let i = 0; i < spawnBuilderBodyAmount; i++) {
+
+                                spawnBuilderBody.push(WORK, MOVE, CARRY, MOVE)
+                                spawnBuilderBodyTier++
+
+                            }
+                            var spawnBuilderBodyResult = spawnBuilderBody.slice(0, 36)
+                        }
+                        //Remote Builder
+                        if (stage >= 1) {
+
+                            let remoteBuilderBodyAmount = Math.floor(capacityEnergy / 250)
+                            let remoteBuilderBody = []
+
+                            var remoteBuilderBodyTier = 0
+
+                            for (let i = 0; i < remoteBuilderBodyAmount; i++) {
+
+                                remoteBuilderBody.push(WORK, MOVE, CARRY, MOVE)
+                                remoteBuilderBodyTier++
+
+                            }
+                            var remoteBuilderBodyResult = remoteBuilderBody.slice(0, 20)
+                        }
+                        //Wall Repairer
+                        if (stage >= 1) {
+
+                            let wallRepairerBodyAmount = Math.floor(capacityEnergy / 250)
+                            let wallRepairerBody = []
+
+                            var wallRepairerBodyTier = 0
+
+                            for (let i = 0; i < wallRepairerBodyAmount; i++) {
+
+                                wallRepairerBody.push(WORK, MOVE, CARRY, MOVE)
+                                wallRepairerBodyTier++
+
+                            }
+                            var wallRepairerBodyResult = wallRepairerBody.slice(0, 50)
+                        }
+                        //Remote Harvester
+                        if (stage <= 3) {
+
+                            let remoteHarvesterBodyAmount = Math.floor(capacityEnergy / 150)
+                            let remoteHarvesterBody = []
+
+                            var remoteHarvesterBodyTier = 0
+
+                            for (let i = 0; i < remoteHarvesterBodyAmount; i++) {
+
+                                remoteHarvesterBody.push(WORK, MOVE)
+                                remoteHarvesterBodyTier++
+
+                            }
+                            var remoteHarvesterBodyResult = remoteHarvesterBody
+                        } else {
+
+                            let remoteHarvesterBodyAmount = Math.floor(capacityEnergy / 250)
+                            let remoteHarvesterBody = []
+
+                            var remoteHarvesterBodyTier = 0
+
+                            for (let i = 0; i < remoteHarvesterBodyAmount; i++) {
+
+                                remoteHarvesterBody.push(WORK, WORK, MOVE)
+                                remoteHarvesterBodyTier++
+
+                            }
+                            var remoteHarvesterBodyResult = remoteHarvesterBody.slice(0, 12)
+                        }
+                        //Remote Lorry
+                        if (stage <= 3) {
+
+                            let remoteHaulerBodyAmount = Math.floor(capacityEnergy / 100)
+                            let remoteHaulerBody = []
+
+                            var remoteHaulerBodyTier = 0
+
+                            for (let i = 0; i < remoteHaulerBodyAmount; i++) {
+
+                                remoteHaulerBody.push(CARRY, MOVE)
+                                remoteHaulerBodyTier++
+
+                            }
+                            var remoteHaulerBodyResult = remoteHaulerBody
+                        } else {
+
+                            let remoteHaulerBodyAmount = Math.floor(capacityEnergy / 150)
+                            let remoteHaulerBody = []
+
+                            var remoteHaulerBodyTier = 0
+
+                            for (let i = 0; i < remoteHaulerBodyAmount; i++) {
+
+                                remoteHaulerBody.push(CARRY, CARRY, MOVE)
+                                remoteHaulerBodyTier++
+
+                            }
+                            var remoteHaulerBodyResult = remoteHaulerBody.slice(0, 48)
+                        }
+                        //Reserver
+                        if (stage >= 3) {
+
+                            let reserverBodyAmount = Math.floor(capacityEnergy / 700)
+                            let reserverBody = []
+
+                            var reserverBodyTier = 0
+
+                            for (let i = 0; i < reserverBodyAmount; i++) {
+
+                                reserverBody.push(CLAIM, MOVE, MOVE)
+                                reserverBodyTier++
+
+                            }
+                            var reserverBodyResult = reserverBody.slice(0, 6)
+                        }
+                        //Remote Defender
+                        if (stage >= 3) {
+
+                            let remoteDefenderBodyAmount = Math.floor(capacityEnergy / 130)
+                            let remoteDefenderBody = []
+
+                            var remoteDefenderBodyTier = 0
+
+                            for (let i = 0; i < remoteDefenderBodyAmount; i++) {
+
+                                remoteDefenderBody.push(ATTACK, MOVE)
+                                remoteDefenderBodyTier++
+
+                            }
+                            var remoteDefenderBodyResult = remoteDefenderBody.slice(0, 30)
+                        }
+                        //Miner
+                        if (stage >= 6) {
+
+                            let minerBodyAmount = Math.floor(capacityEnergy / 450)
+                            let minerBody = []
+
+                            var minerBodyTier = 0
+
+                            for (let i = 0; i < minerBodyAmount; i++) {
+
+                                minerBody.push(WORK, WORK, MOVE, WORK, CARRY, MOVE)
+                                minerBodyTier++
+
+                            }
+                            var minerBodyResult = minerBody.slice(0, 48)
+                        }
+                        //Serf
+                        if (stage >= 7) {
+
+                            let serfBodyAmount = 3 //Math.floor((capacityEnergy - 50) / 250)
+                            let serfBody = [MOVE]
+
+                            var serfBodyTier = 0
+
+                            for (let i = 0; i < serfBodyAmount; i++) {
+
+                                serfBody.push(CARRY, CARRY, CARRY, CARRY, CARRY)
+                                serfBodyTier++
+
+                            }
+                            var serfBodyResult = serfBody.slice(0, 16)
+                        }
+                        //Ranged Defender
+                        if (stage >= 1) {
+
+                            let rangedDefenderBodyAmount = Math.floor(capacityEnergy / 150)
+                            let rangedDefenderBody = []
+
+                            var rangedDefenderBodyTier = 0
+
+                            for (let i = 0; i < rangedDefenderBodyAmount; i++) {
+
+                                rangedDefenderBody.push(RANGED_ATTACK, MOVE)
+                                rangedDefenderBodyTier++
+
+                            }
+                            var rangedDefenderBodyResult = rangedDefenderBody.slice(0, 50)
+                        }
+                        if (squadType == "ranged") {
+                            if (stage <= 7) {
+
+                                let bigBoyLeaderBodyAmount = 1 //Math.floor(capacityEnergy / 200)
+                                let bigBoyLeaderBody = []
+
+                                var bigBoyLeaderBodyTier = 0
+
+                                for (let i = 0; i < bigBoyLeaderBodyAmount; i++) {
+
+                                    bigBoyLeaderBody.push(RANGED_ATTACK, MOVE)
+                                    bigBoyLeaderBodyTier++
+
+                                }
+                                var bigBoyLeaderBodyResult = bigBoyLeaderBody.slice(0, 50)
+
+                                //Big Boy Member
+                                let bigBoyMemberBodyAmount = 1 //Math.floor(capacityEnergy / 300)
+                                let bigBoyMemberBody = []
+
+                                var bigBoyMemberBodyTier = 0
+
+                                for (let i = 0; i < bigBoyMemberBodyAmount; i++) {
+
+                                    bigBoyMemberBody.push(HEAL, MOVE)
+                                    bigBoyMemberBodyTier++
+
+                                }
+                                var bigBoyMemberBodyResult = bigBoyMemberBody.slice(0, 50)
+                            }
+                            //Big Boy Leader
+                            else if (stage == 8) {
+
+                                let bigBoyLeaderBodyAmount = 1 //Math.floor(capacityEnergy / 5500)
+                                let bigBoyLeaderBody = []
+
+                                var bigBoyLeaderBodyTier = 0
+
+                                for (let i = 0; i < bigBoyLeaderBodyAmount; i++) {
+
+                                    bigBoyLeaderBody.push(RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    bigBoyLeaderBodyTier++
+
+                                }
+                                var bigBoyLeaderBodyResult = bigBoyLeaderBody.slice(0, 50)
+
+                                //Big Boy Member
+                                let bigBoyMemberBodyAmount = 1 //Math.floor(capacityEnergy / 7500)
+                                let bigBoyMemberBody = []
+
+                                var bigBoyMemberBodyTier = 0
+
+                                for (let i = 0; i < bigBoyMemberBodyAmount; i++) {
+
+                                    bigBoyMemberBody.push(HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    bigBoyMemberBodyTier++
+
+                                }
+                                var bigBoyMemberBodyResult = bigBoyMemberBody.slice(0, 50)
+                            }
+                        } else if (squadType == "dismantle") {
+                            //Big Boy Leader
+                            if (stage == 8) {
+
+                                let bigBoyLeaderBodyAmount = 1 //Math.floor(capacityEnergy / 5500)
+                                let bigBoyLeaderBody = []
+
+                                var bigBoyLeaderBodyTier = 0
+
+                                for (let i = 0; i < bigBoyLeaderBodyAmount; i++) {
+
+                                    bigBoyLeaderBody.push(WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    bigBoyLeaderBodyTier++
+
+                                }
+                                var bigBoyLeaderBodyResult = bigBoyLeaderBody.slice(0, 50)
+
+                                //Big Boy Member
+                                let bigBoyMemberBodyAmount = 1 //Math.floor(capacityEnergy / 7500)
+                                let bigBoyMemberBody = []
+
+                                var bigBoyMemberBodyTier = 0
+
+                                for (let i = 0; i < bigBoyMemberBodyAmount; i++) {
+
+                                    bigBoyMemberBody.push(HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    bigBoyMemberBodyTier++
+
+                                }
+                                var bigBoyMemberBodyResult = bigBoyMemberBody.slice(0, 50)
+                            }
+                        } else if (squadType == "attack") {
+                            //Big Boy Leader
+                            if (stage == 8) {
+
+                                let bigBoyLeaderBodyAmount = 1 //Math.floor(capacityEnergy / 5500)
+                                let bigBoyLeaderBody = []
+
+                                var bigBoyLeaderBodyTier = 0
+
+                                for (let i = 0; i < bigBoyLeaderBodyAmount; i++) {
+
+                                    bigBoyLeaderBody.push(ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    bigBoyLeaderBodyTier++
+
+                                }
+                                var bigBoyLeaderBodyResult = bigBoyLeaderBody.slice(0, 50)
+
+                                //Big Boy Member
+                                let bigBoyMemberBodyAmount = 1 //Math.floor(capacityEnergy / 7500)
+                                let bigBoyMemberBody = []
+
+                                var bigBoyMemberBodyTier = 0
+
+                                for (let i = 0; i < bigBoyMemberBodyAmount; i++) {
+
+                                    bigBoyMemberBody.push(HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    bigBoyMemberBodyTier++
+
+                                }
+                                var bigBoyMemberBodyResult = bigBoyMemberBody.slice(0, 50)
+                            }
+                        }
+                    }
+
+                    //console.log(room.memory.minimumNumberOfSpawnBuilders)
+                    //If not enough energy for normal spawning
+
+                    if (roomFix == true) {
+
+                        console.log("Not enough creeps, " + room.name)
+
+                        if (creepsOfRole[["baseHauler", room.name]] + creepsOfRole[["containerHauler", room.name]] + creepsOfRole[["generalHauler", room.name]] < 1) {
+
+                            name = spawn.createCreep(haulerBodyResult, 'rfGH, ' + "T" + haulerBodyTier + ", " + creepCount["generalHauler"], { role: 'generalHauler', fullEnergy: false, roomFrom: room.name });
+
+                            creepCount["generalHauler"]++
+
+                        } else if (creepsOfRole[["harvester1", room.name]] < 1) {
+
+                            name = spawn.createCreep(harvesterBodyResult, 'rfH, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester1"], { role: 'harvester1', working: false, target: 1, roomFrom: room.name });
+
+                            creepCount["harvester1"]++
+                        }
+                    } else {
+
+                        if (creepsOfRole[["harvester1", room.name]] < room.memory.minimumNumberOfHarvesters1) {
+
+                            name = spawn.createCreep(harvesterBodyResult, 'H, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester1"], { role: 'harvester1', working: false, target: 1, roomFrom: room.name });
+
+                            creepCount["harvester1"]++
+                        } else if (creepsOfRole[["harvester2", room.name]] < room.memory.minimumNumberOfHarvesters2) {
+
+                            name = spawn.createCreep(harvesterBodyResult, 'H, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester1"], { role: 'harvester2', working: false, target: 2, roomFrom: room.name });
+
+                            creepCount["harvester2"]++
+                        } else if (creepsOfRole[["generalHauler", room.name]] < room.memory.minimumNumberOfGeneralHaulers) {
+
+                            name = spawn.createCreep(haulerBodyResult, 'GH, ' + "T" + haulerBodyTier + ", " + creepCount["generalHauler"], { role: 'generalHauler', fullEnergy: false, roomFrom: room.name });
+
+                            creepCount["generalHauler"]++
+                        } else if (creepsOfRole[["baseHauler", room.name]] < room.memory.minimumNumberOfBaseHaulers) {
+
+                            name = spawn.createCreep(haulerBodyResult, 'BH, ' + "T" + haulerBodyTier + ", " + creepCount["baseHauler"], { role: 'baseHauler', fullEnergy: false, roomFrom: room.name });
+
+                            creepCount["baseHauler"]++
+                        } else if (creepsOfRole[["containerHauler", room.name]] < room.memory.minimumNumberOfContainerHaulers) {
+
+                            name = spawn.createCreep(haulerBodyResult, 'CH, ' + "T" + haulerBodyTier + ", " + creepCount["containerHauler"], { role: 'containerHauler', fullEnergy: false, roomFrom: room.name });
+
+                            creepCount["containerHauler"]++
+                        } else if (creepsOfRole[["serf", room.name]] < room.memory.minimumNumberOfSerfs) {
+
+                            name = spawn.createCreep(serfBodyResult, 'Se, ' + "T" + serfBodyTier + ", " + creepCount["serf"], { role: 'serf', working: false, roomFrom: room.name });
+
+                            creepCount["serf"]++
+                        } else if (creepsOfRole[["upgrader", room.name]] < room.memory.minimumNumberOfUpgraders) {
+
+                            name = spawn.createCreep(upgraderBodyResult, 'Ug, ' + "T" + upgraderBodyTier + ", " + creepCount["upgrader"], { role: 'upgrader', upgrading: false, roomFrom: room.name });
+
+                            creepCount["upgrader"]++
+                        } else if (creepsOfRole[["repairer", room.name]] < room.memory.minimumNumberOfRepairers) {
+
+                            name = spawn.createCreep(builderBodyResult, 'Re, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', repairing: false, roomFrom: room.name });
+
+                            creepCount["repairer"]++
+                        } else if (creepsOfRole[["builder", room.name]] < room.memory.minimumNumberOfBuilders && roomConstructionSite.length >= 1) {
+
+                            name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["builder"], { role: 'builder', building: false, roomFrom: room.name });
+
+                            creepCount["builder"]++
+                        } else if (creepsOfRole[["rangedDefender", room.name]] < room.memory.minimumNumberOfRangedDefenders && target1.length > 0) {
+
+                            name = spawn.createCreep(rangedDefenderBodyResult, 'RaD, ' + "T" + rangedDefenderBodyTier + ", " + creepCount["rangedDefender"], { role: 'rangedDefender', working: false, roomFrom: room.name });
+
+                            creepCount["rangedDefender"]++
+                        } else if (creepsOfRole[["wallRepairer", room.name]] < room.memory.minimumNumberOfWallRepairers) {
+
+                            name = spawn.createCreep(wallRepairerBodyResult, 'WR, ' + "T" + wallRepairerBodyTier + ", " + creepCount["wallRepairer"], { role: 'wallRepairer', working: false, roomFrom: room.name });
+
+                            creepCount["wallRepairer"]++
+                        } else if (creepsOfRole[["scientist", room.name]] < room.memory.minimumNumberOfScientists) {
+
+                            name = spawn.createCreep([CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], 'Si, ' + "T" + 1 + ", " + creepCount["scientist"], { role: 'scientist', emptyStore: true, roomFrom: room.name });
+
+                            creepCount["scientist"]++
+                        } else if (creepsOfRole[["miner", room.name]] < room.memory.minimumNumberOfMiners && roomMineral) {
+
+                            name = spawn.createCreep(minerBodyResult, 'Mi, ' + "T" + minerBodyTier + ", " + creepCount["miner"], { role: 'miner', mining: true, roomFrom: room.name });
+
+                            creepCount["miner"]++
+                        } else if (creepsOfRole[["robber", room.name]] < room.memory.minimumNumberOfRobbers && target9) {
+
+                            name = spawn.createCreep(remoteHaulerBodyResult, 'Ro, ' + "T" + robberBodyTier + ", " + creepCount["robber"], { role: 'robber', working: false, roomFrom: room.name });
+
+                            creepCount["robber"]++
+                        } else if (creepsOfRole[["remoteDefender", room.name]] < room.memory.minimumNumberOfRemoteDefenders) {
+
+                            name = spawn.createCreep(remoteDefenderBodyResult, 'ReD, ' + "T" + remoteDefenderBodyTier + ", " + creepCount["remoteDefender"], { role: 'remoteDefender', roomFrom: room.name });
+
+                            creepCount["remoteDefender"]++
+                        } else if (creepsOfRole[["scout", room.name]] < room.memory.minimumNumberOfScouts && target4 != undefined) {
+
+                            name = spawn.createCreep([MOVE], 'Sc, ' + "T" + 1 + ", " + creepCount["scout"], { role: 'scout', working: false, roomFrom: room.name });
+
+                            creepCount["scout"]++
+                        } else if (creepsOfRole[["claimer", room.name]] < 1 && claimerTarget) {
+
+                            name = spawn.createCreep([CLAIM, MOVE], 'Ca, ' + "T" + 1 + ", " + creepCount["claimer"], { role: 'claimer', target: claimerTarget, roomFrom: room.name });
+
+                            creepCount["claimer"]++
+                        } else if (creepsOfRole[["spawnBuilder", room.name]] < room.memory.minimumNumberOfSpawnBuilders && builderTarget) {
+
+                            name = spawn.createCreep(spawnBuilderBodyResult, 'SB, ' + "T" + spawnBuilderBodyTier + ", " + creepCount["spawnBuilder"], { role: 'spawnBuilder', building: false, target: builderTarget, roomFrom: room.name });
+
+                            creepCount["spawnBuilder"]++
+                        } else if (creepsOfRole[["remoteBuilder", room.name]] < room.memory.minimumNumberOfRemoteBuilders) {
+
+                            name = spawn.createCreep(remoteBuilderBodyResult, 'RB, ' + "T" + remoteBuilderBodyTier + ", " + creepCount["remoteBuilder"], { role: 'remoteBuilder', roomFrom: room.name });
+
+                            creepCount["remoteBuilder"]++
+                        } else {
+
+                            if (creepsOfRole[["bigBoyLeader", room.name]] < room.memory.minimumNumberOfBigBoyLeaders && target6) {
+
+                                name = spawn.createCreep(bigBoyLeaderBodyResult, 'BBL, ' + "T" + bigBoyLeaderBodyTier + ", " + squadType + ", " + creepCount["bigBoyLeader"], { role: 'bigBoyLeader', squadType: squadType, attacking: false, roomFrom: room.name });
+
+                                creepCount["bigBoyLeader"]++
+                            } else if (creepsOfRole[["bigBoyMember", room.name]] < room.memory.minimumNumberOfBigBoyMembers && target6) {
+
+                                name = spawn.createCreep(bigBoyMemberBodyResult, 'BBM, ' + "T" + bigBoyMemberBodyTier + ", " + squadType + ", " + creepCount["bigBoyMember"], { role: 'bigBoyMember', squadType: squadType, attacking: false, roomFrom: room.name });
+
+                                creepCount["bigBoyMember"]++
+                            } else {
+
+                                for (let remoteRoom of remoteRooms) {
+                                    
+                                    if (stage <= 2) {
+                                        
+                                        var numberOfRemoteHarvesters = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester' && c.memory.remoteRoom == remoteRoom.name)
+    
+                                        if (numberOfRemoteHarvesters < room.memory.minimumNumberOfRemoteHarvesters * remoteRoom.sources * 2) {
+    
+                                            name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester"], { role: 'remoteHarvester', remoteRoom: remoteRoom.name, roomFrom: room.name });
+    
+                                            creepCount["remoteHarvester"]++
+                                        }
+                                    }
+                                    else {
+                                        
+                                        var numberOfRemoteHarvesters = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester' && c.memory.remoteRoom == remoteRoom.name)
+    
+                                        if (numberOfRemoteHarvesters < room.memory.minimumNumberOfRemoteHarvesters * remoteRoom.sources) {
+    
+                                            name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester"], { role: 'remoteHarvester', remoteRoom: remoteRoom.name, roomFrom: room.name });
+    
+                                            creepCount["remoteHarvester"]++
+                                        }
+                                    }
+                                    if (stage <= 4) {
+    
+                                        var numberOfRemoteHaulers = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHauler' && c.memory.remoteRoom == remoteRoom.name)
+    
+                                        if (numberOfRemoteHaulers < room.memory.minimumNumberOfRemoteHaulers * remoteRoom.sources * 2) {
+    
+                                            name = spawn.createCreep(remoteHaulerBodyResult, 'RHau, ' + "T" + remoteHaulerBodyTier + ", " + creepCount["remoteHauler"], { role: 'remoteHauler', remoteRoom: remoteRoom.name, fullEnergy: false, roomFrom: room.name });
+    
+                                            creepCount["remoteHauler"]++
+                                        }
+                                    }
+                                    else {
+                                        
+                                        var numberOfRemoteHaulers = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHauler' && c.memory.remoteRoom == remoteRoom.name)
+    
+                                        if (numberOfRemoteHaulers < room.memory.minimumNumberOfRemoteHaulers * remoteRoom.sources) {
+    
+                                            name = spawn.createCreep(remoteHaulerBodyResult, 'RHau, ' + "T" + remoteHaulerBodyTier + ", " + creepCount["remoteHauler"], { role: 'remoteHauler', remoteRoom: remoteRoom.name, fullEnergy: false, roomFrom: room.name });
+    
+                                            creepCount["remoteHauler"]++
+                                        }
+                                    }
+                                    var numberOfReservers = _.sum(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.remoteRoom == remoteRoom.name)
+
+                                    if (numberOfReservers < room.memory.minimumNumberOfReservers) {
+
+                                        name = spawn.createCreep(reserverBodyResult, 'Rs, ' + "T" + reserverBodyTier + ", " + creepCount["reserver"], { role: 'reserver', remoteRoom: remoteRoom.name, roomFrom: room.name });
+
+                                        creepCount["reserver"]++
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var minRemoteHarvesters = room.memory.minimumNumberOfRemoteHarvesters = remoteRoomsNumber
+                var minRemoteHaulers = room.memory.minimumNumberOfRemoteHaulers = remoteRoomsNumber
+                var minReservers = room.memory.minimumNumberOfReservers = remoteRoomsNumber
+                var minRemoteBuilders = room.memory.minimumNumberOfRemoteBuilders = 1
+                var minRemoteDefenders = room.memory.minimumNumberOfRemoteDefenders = 1
+
+                var squads = 1
+
+                var minBigBoyLeaders = room.memory.minimumNumberOfBigBoyLeaders = squads
+                var minBigBoyMembers = room.memory.minimumNumberOfBigBoyMembers = creepsOfRole[["bigBoyLeader", room.name]]
+
+                //RCL 1
+                if (stage == 1) {
+                    room.memory.minimumNumberOfHarvesters1 = 3
+
+                    room.memory.minimumNumberOfHarvesters2 = 3
+
+                    room.memory.minimumNumberOfBaseHaulers = 2
+
+                    room.memory.minimumNumberOfContainerHaulers = 2
+
+                    room.memory.minimumNumberOfGeneralHaulers = 0
+
+                    room.memory.minimumNumberOfBuilders = 3
+
+                    room.memory.minimumNumberOfUpgraders = 4
+
+                    room.memory.minimumNumberOfSpawnBuilders = 4
+
+                    room.memory.minimumNumberOfRepairers = 1
+
+                    room.memory.minimumNumberOfWallRepairers = 0
+
+                    room.memory.minimumNumberOfRemoteDefenders = 0
+
+                    minRemoteHarvesters
+
+                    minRemoteHaulers
+
+                    room.memory.minimumNumberOfReservers = 0
+
+                    room.memory.minimumNumberOfRemoteBuilders = 0
+
+                    room.memory.minimumNumberOfBigBoyMembers = 0
+
+                    room.memory.minimumNumberOfBigBoyLeaders = 0
+
+                    room.memory.minimumNumberOfRangedDefenders = 0
+
+                    room.memory.minimumNumberOfMiners = 0
+
+                    room.memory.minimumNumberOfScouts = 1
+
+                }
+                //RCL 2
+                if (stage == 2) {
+                    room.memory.minimumNumberOfHarvesters1 = 1
+
+                    room.memory.minimumNumberOfHarvesters2 = 1
+
+                    room.memory.minimumNumberOfBaseHaulers = 2
+
+                    room.memory.minimumNumberOfContainerHaulers = 2
+
+                    room.memory.minimumNumberOfGeneralHaulers = 0
+
+                    room.memory.minimumNumberOfBuilders = 3
+
+                    room.memory.minimumNumberOfUpgraders = 3
+
+                    room.memory.minimumNumberOfSpawnBuilders = 4
+
+                    room.memory.minimumNumberOfRepairers = 1
+
+                    room.memory.minimumNumberOfWallRepairers = 1
+
+                    room.memory.minimumNumberOfRemoteDefenders = 0
+
+                    minRemoteHarvesters
+
+                    minRemoteHaulers
+
+                    room.memory.minimumNumberOfReservers = 0
+
+                    minRemoteBuilders
+
+                    room.memory.minimumNumberOfRangedDefenders = 2
+
+                    room.memory.minimumNumberOfMiners = 0
+
+                    minBigBoyMembers
+
+                    minBigBoyLeaders
+
+                    room.memory.minimumNumberOfScouts = 1
+
+                }
+                //RCL 3
+                if (stage == 3) {
+                    room.memory.minimumNumberOfHarvesters1 = 1
+
+                    room.memory.minimumNumberOfHarvesters2 = 1
+
+                    room.memory.minimumNumberOfBaseHaulers = 2
+
+                    room.memory.minimumNumberOfContainerHaulers = 1
+
+                    room.memory.minimumNumberOfGeneralHaulers = 0
+
+                    room.memory.minimumNumberOfBuilders = 2
+
+                    room.memory.minimumNumberOfUpgraders = 3
+
+                    room.memory.minimumNumberOfSpawnBuilders = 4
+
+                    room.memory.minimumNumberOfRepairers = 0
+
+                    room.memory.minimumNumberOfWallRepairers = 1
+
+                    minRemoteDefenders
+
+                    minRemoteHarvesters
+
+                    minRemoteHaulers
+
+                    minReservers
+
+                    minRemoteBuilders
+
+                    room.memory.minimumNumberOfRangedDefenders = 2
+
+                    room.memory.minimumNumberOfMiners = 0
+
+                    minBigBoyMembers
+
+                    minBigBoyLeaders
+
+                    room.memory.minimumNumberOfScouts = 1
+
+                }
+                //RCL 4
+                if (stage == 4) {
+                    room.memory.minimumNumberOfHarvesters1 = 1
+
+                    room.memory.minimumNumberOfHarvesters2 = 1
+
+                    room.memory.minimumNumberOfBaseHaulers = 2
+
+                    room.memory.minimumNumberOfContainerHaulers = 1
+
+                    room.memory.minimumNumberOfGeneralHaulers = 0
+
+                    room.memory.minimumNumberOfBuilders = 1
+
+                    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000) {
+
+                        room.memory.minimumNumberOfUpgraders = 2
+                    } else {
+
+                        room.memory.minimumNumberOfUpgraders = 1
+                    }
+
+                    room.memory.minimumNumberOfSpawnBuilders = 4
+
+                    room.memory.minimumNumberOfRepairers = 0
+
+                    room.memory.minimumNumberOfWallRepairers = 1
+
+                    minRemoteDefenders
+
+                    minRemoteHarvesters
+
+                    minRemoteHaulers
+
+                    minReservers
+
+                    minRemoteBuilders
+
+                    room.memory.minimumNumberOfRangedDefenders = 2
+
+                    room.memory.minimumNumberOfMiners = 0
+
+                    minBigBoyMembers
+
+                    minBigBoyLeaders
+
+                    room.memory.minimumNumberOfScouts = 1
+
+                }
+                //RCL 5
+                if (stage == 5) {
+                    room.memory.minimumNumberOfHarvesters1 = 1
+
+                    room.memory.minimumNumberOfHarvesters2 = 1
+
+                    room.memory.minimumNumberOfBaseHaulers = 2
+
+                    room.memory.minimumNumberOfContainerHaulers = 1
+
+                    room.memory.minimumNumberOfGeneralHaulers = 0
+
+                    room.memory.minimumNumberOfBuilders = 1
+
+                    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000) {
+
+                        room.memory.minimumNumberOfUpgraders = 2
+                    } else {
+
+                        room.memory.minimumNumberOfUpgraders = 1
+                    }
+
+                    room.memory.minimumNumberOfSpawnBuilders = 4
+
+                    room.memory.minimumNumberOfRepairers = 0
+
+                    room.memory.minimumNumberOfWallRepairers = 1
+
+                    minRemoteDefenders
+
+                    minRemoteHarvesters
+
+                    minRemoteHaulers
+
+                    minReservers
+
+                    minRemoteBuilders
+
+                    room.memory.minimumNumberOfRobbers = 3
+
+                    room.memory.minimumNumberOfRangedDefenders = 2
+
+                    room.memory.minimumNumberOfMiners = 0
+
+                    minBigBoyMembers
+
+                    minBigBoyLeaders
+
+                    room.memory.minimumNumberOfScouts = 1
+
+                }
+                //RCL 6
+                if (stage == 6) {
+                    room.memory.minimumNumberOfHarvesters1 = 1
+
+                    room.memory.minimumNumberOfHarvesters2 = 1
+
+                    room.memory.minimumNumberOfBaseHaulers = 2
+
+                    room.memory.minimumNumberOfContainerHaulers = 1
+
+                    room.memory.minimumNumberOfGeneralHaulers = 0
+
+                    room.memory.minimumNumberOfBuilders = 1
+
+                    room.memory.minimumNumberOfUpgraders = 1
+
+                    room.memory.minimumNumberOfSpawnBuilders = 4
+
+                    room.memory.minimumNumberOfRepairers = 0
+
+                    room.memory.minimumNumberOfWallRepairers = 1
+
+                    minRemoteDefenders
+
+                    minRemoteHarvesters
+
+                    minRemoteHaulers
+
+                    minReservers
+
+                    minRemoteBuilders
+
+                    room.memory.minimumNumberOfRobbers = 3
+
+                    room.memory.minimumNumberOfRangedDefenders = 2
+
+                    room.memory.minimumNumberOfMiners = 1
+
+                    minBigBoyMembers
+
+                    minBigBoyLeaders
+
+                    room.memory.minimumNumberOfScouts = 1
+                }
+                //RCL 7
+                if (stage == 7) {
+                    room.memory.minimumNumberOfHarvesters1 = 1
+
+                    room.memory.minimumNumberOfHarvesters2 = 1
+
+                    room.memory.minimumNumberOfBaseHaulers = 2
+
+                    room.memory.minimumNumberOfContainerHaulers = 0
+
+                    room.memory.minimumNumberOfGeneralHaulers = 0
+
+                    room.memory.minimumNumberOfBuilders = 1
+
+                    room.memory.minimumNumberOfUpgraders = 1
+
+                    room.memory.minimumNumberOfSpawnBuilders = 4
+
+                    room.memory.minimumNumberOfRepairers = 0
+
+                    room.memory.minimumNumberOfWallRepairers = 1
+
+                    minRemoteDefenders
+
+                    minRemoteHarvesters
+
+                    minRemoteHaulers
+
+                    minReservers
+
+                    minRemoteBuilders
+
+                    room.memory.minimumNumberOfRobbers = 3
+
+                    room.memory.minimumNumberOfRangedDefenders = 2
+
+                    room.memory.minimumNumberOfMiners = 1
+
+                    room.memory.minimumNumberOfScientists = 1
+
+                    room.memory.minimumNumberOfSerfs = 1
+
+                    minBigBoyMembers
+
+                    minBigBoyLeaders
+
+                    room.memory.minimumNumberOfScouts = 1
+                }
+                //RCL 8
+                if (stage == 8) {
+                    room.memory.minimumNumberOfHarvesters1 = 1
+
+                    room.memory.minimumNumberOfHarvesters2 = 1
+
+                    room.memory.minimumNumberOfBaseHaulers = 2
+
+                    room.memory.minimumNumberOfContainerHaulers = 0
+
+                    room.memory.minimumNumberOfGeneralHaulers = 0
+
+                    room.memory.minimumNumberOfBuilders = 1
+
+                    room.memory.minimumNumberOfUpgraders = 1
+
+                    room.memory.minimumNumberOfSpawnBuilders = 4
+
+                    room.memory.minimumNumberOfRepairers = 0
+
+                    room.memory.minimumNumberOfWallRepairers = 1
+
+                    minRemoteDefenders
+
+                    minRemoteHarvesters
+
+                    minRemoteHaulers
+
+                    minReservers
+
+                    minRemoteBuilders
+
+                    room.memory.minimumNumberOfRobbers = 3
+
+                    room.memory.minimumNumberOfRangedDefenders = 2
+
+                    room.memory.minimumNumberOfMiners = 1
+
+                    room.memory.minimumNumberOfScientists = 1
+
+                    room.memory.minimumNumberOfSerfs = 1
+
+                    minBigBoyMembers
+
+                    minBigBoyLeaders
+
+                    room.memory.minimumNumberOfScouts = 1
+                }
+            }
+        })
+    }
+};
