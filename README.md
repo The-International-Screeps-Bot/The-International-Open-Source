@@ -8,20 +8,9 @@
 
 ## About
 ```
-The theme of this bot is based around communism.
-
-The goal of The Internationale is to establish a fully autonomous communism zone in shard 2.
-
-The bot is made up of 3 foundational classes: the Red Army, the Proletariat, and the Revolutionaries.
-
-Communes are claimed rooms.
-
-The Red Army is in charge of defence and offense.
-
-The Proletariat are in charge of producing and distributing resources.
-
-The Revolutionaries are in charge of establishing future communes, and rebuilding destroyed communes.
+The Internationale is my bot for the MMO server, thematically based after communist aesthetics. The goal of The Internationale is to set up a fully autonomous communism zone in shard 2. Owned rooms are called communes, offensive and defensive forces are called the Red Army, economic workers are known as The Proletariat, and The Revolutionaries establish new communes and rebuild destroyed ones.
 ```
+
 ## Progress
 
 - [x] Automated spawning
