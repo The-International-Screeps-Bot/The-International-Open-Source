@@ -7,9 +7,9 @@
 [![forthebadge](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)](https://forthebadge.com)
 
 ## About
-```
+
 The Internationale is my bot for the MMO server, thematically based after communist aesthetics. The goal of The Internationale is to set up a fully autonomous communism zone in shard 2. Owned rooms are called communes, offensive and defensive forces are called the Red Army, economic workers are known as The Proletariat, and The Revolutionaries establish new communes and rebuild destroyed ones.
-```
+
 
 ## Progress
 
