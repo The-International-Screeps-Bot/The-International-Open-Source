@@ -163,4 +163,20 @@ Base:
 constants find a spot where serf can go, save it in memory
 
     //-----------------------------------------------------------------------------------------------
+    
+Upkeep costs:
+
+    0.001 / tick / road, plains
+    1000 roads / energy
+    
+    0.005 / tick / road, swamp
+    5000 roads / energy
+    
+    0.1 / tick / container
+    10 containers / energy
+    
+    0.03 / tick / rampart
+    300 ramparts / energy
+
+
     */

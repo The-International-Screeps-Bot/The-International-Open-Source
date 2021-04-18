@@ -884,13 +884,13 @@ module.exports = {
                                         
                                         var numberOfRemoteHarvesters2 = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester2' && c.memory.remoteRoom == remoteRoom.name)
     
-                                        if (numberOfRemoteHarvesters1 < room.memory.minimumNumberOfRemoteHarvesters1  * remoteRoom.sources) {
+                                        if (numberOfRemoteHarvesters1 < room.memory.minimumNumberOfRemoteHarvesters1) {
     
                                             name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester1"], { role: 'remoteHarvester1', remoteRoom: remoteRoom.name, roomFrom: room.name });
     
                                             creepCount["remoteHarvester1"]++
                                         }
-                                        else if (numberOfRemoteHarvesters2 < room.memory.minimumNumberOfRemoteHarvesters2 * remoteRoom.sources) {
+                                        else if (remoteRoom.sources == 2 && numberOfRemoteHarvesters2 < room.memory.minimumNumberOfRemoteHarvesters2) {
     
                                             name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester2"], { role: 'remoteHarvester2', remoteRoom: remoteRoom.name, roomFrom: room.name });
     
@@ -921,7 +921,7 @@ module.exports = {
                 }
                 
                 var minRemoteHarvesters1 = room.memory.minimumNumberOfRemoteHarvesters1 = 1
-                var minRemoteHarvesters2 = room.memory.minimumNumberOfRemoteHarvesters1 = 1
+                var minRemoteHarvesters2 = room.memory.minimumNumberOfRemoteHarvesters2 = 1
                 var minRemoteHaulers = room.memory.minimumNumberOfRemoteHaulers = 1
                 var minReservers = room.memory.minimumNumberOfReservers = 1
                 

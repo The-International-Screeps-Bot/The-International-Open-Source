@@ -4,7 +4,7 @@ module.exports = {
         let source1 = Game.getObjectById(creep.room.memory.source1)
         let source2 = Game.getObjectById(creep.room.memory.source2)
 
-        if (source1 == null && source2 == null) {
+        if (!source1 && !source2) {
 
             let sources = creep.room.find(FIND_SOURCES)
 
