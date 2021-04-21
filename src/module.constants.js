@@ -1,5 +1,42 @@
 module.exports = {
     run: function constants() {
+        
+        global()
+        
+        function global() {
+            
+            if (Memory.global == null || !Memory.global) {
+                        
+                    Memory.global = {}
+            }
+            else if (Memory.global.establishedRooms == null || !Memory.global.establishedRooms) {
+                        
+                    Memory.global.establishedRooms = 0
+            }
+            
+            if (Memory.global.globalStage == null || !Memory.global.globalStage) {
+                        
+                Memory.global.globalStage = 0
+            }
+            
+            if (Memory.global.establishedRooms >= 10 && Memory.global.globalStage) {
+                
+                Memory.global.globalStage = 3
+            }
+            else if (Memory.global.establishedRooms >= 3 && Memory.global.globalStage) {
+                
+                Memory.global.globalStage = 2
+            }
+            else if (Memory.global.establishedRooms >= 1 && Memory.global.globalStage) {
+                
+                Memory.global.globalStage = 1
+            }
+            else if (Memory.global.globalStage) {
+                
+                Memory.global.globalStage = 0
+            }
+        }
+        
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my && room.controller.level >= 1) {
 
@@ -13,7 +50,7 @@ module.exports = {
                 spawns()
                 terminals()
                 rooms()
-                    //global() 
+                roomGlobal() 
 
                 /*
                 if (room.name == "E28N13") {
@@ -37,16 +74,19 @@ module.exports = {
                     for (let container of containers) {
 
                         var source = room.find(FIND_SOURCES);
+                        
+                        let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
+                        let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
 
                         if (container.pos.inRangeTo(container.room.controller, 2)) {
 
                             container.room.memory.controllerContainer = container.id
 
-                        } else if (container.pos.inRangeTo(source[0], 1)) {
+                        } else if (sourceContainer1 == null && container.pos.inRangeTo(source[0], 1)) {
 
                             container.room.memory.sourceContainer1 = container.id
 
-                        } else if (container.pos.inRangeTo(source[1], 1)) {
+                        } else if (sourceContainer2 == null && container.pos.inRangeTo(source[1], 1)) {
 
                             container.room.memory.sourceContainer2 = container.id
 
@@ -179,39 +219,20 @@ module.exports = {
 
                 function terminals() {
 
-
-
+                    
                 }
 
-                function global() {
-
-                    let establishedRooms
-                    let rcl8 = false
-
-                    for (rooms in Game.rooms) {
-
-                        if (rooms.memory.stage >= 6) {
-
-                            establishedRooms++
-                        }
-                        if (rooms.memory.stage == 8) {
-
-                            rcl8 = true
-                        }
-                    }
-                    if (establishedRooms >= 2) {
-
-                        Memory.globalStage = 2
-                    }
-                    if (establishedRooms >= 2 && rcl8 == true) {
-
-                        Memory.globalStage = 3
+                function roomGlobal() {
+                    
+                    if (room.memory.stage == 8) {
+                        
+                        Memory.global.establishedRooms += 1
                     }
                 }
 
                 function rooms() {
 
-                    //let unfilteredRemoteRooms = ["E25N3"]
+                    //let unfilteredRemoteRooms = ["E25N3", "E26N3", "E32N4", "E26N2", "E22S2", "E22S4", "E23S4", "E21S2"]
                     let unfilteredRemoteRooms = ["E28N12", "E28N14", "E28N16", "E28N18", "E29N17"]
                     let remoteRooms = []
 
@@ -222,7 +243,7 @@ module.exports = {
                         if (targetRoomDistance == 1) {
 
                             //console.log(spawn.room.name + " - " + targetRoom + ", " + targetRoomDistance)
-                            remoteRooms.push({name: remoteRoom, sources: 1, builderNeed: null, enemy: null, distance: targetRoomDistance})
+                            remoteRooms.push({name: remoteRoom, sources: 1, roads: null, builderNeed: null, enemy: null, distance: targetRoomDistance})
 
                         }
                     }

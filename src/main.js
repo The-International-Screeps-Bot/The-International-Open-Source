@@ -1,8 +1,7 @@
 require("prototype.tower")
 require("prototype.terminal")
-require("prototype.roomVisuals")
 let cleanMemory = require("module.cleanMemory")
-let visuals = ("")
+let visuals = ("module.roomVisuals")
 let spawns = require("module.spawning")
 let roles = require("module.roles")
 let constants = require("module.constants")
@@ -39,7 +38,7 @@ module.exports.loop = function() {
 
             console.log("cleanMemory: " + Game.cpu.getUsed().toFixed(2))
 
-            if (Game.time % 2 == 0) {
+            if (Game.time % 10 == 0) {
 
                 construction.run(construction)
             }
@@ -167,16 +166,16 @@ constants find a spot where serf can go, save it in memory
 Upkeep costs:
 
     0.001 / tick / road, plains
-    1000 roads / energy
+    1000 roads = 1 energy
     
     0.005 / tick / road, swamp
-    5000 roads / energy
+    500 roads = 1 energy
     
     0.1 / tick / container
-    10 containers / energy
+    10 containers = 1 energy
     
     0.03 / tick / rampart
-    300 ramparts / energy
+    300 ramparts = 1 energy
 
 
     */

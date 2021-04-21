@@ -56,13 +56,15 @@ module.exports = {
 
             if (creep.memory.role == "remoteHarvester1") {
                 
+                let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
+                
                 if (sourceContainer1 != null) {
     
                     creep.say("⛏️ 1")
     
                     if (creep.pos.inRangeTo(sourceContainer1, 0)) {
     
-                        creep.harvest(source1)
+                        creep.harvest(closestSource)
     
                     } else {
     
@@ -79,13 +81,15 @@ module.exports = {
             } 
             else if (creep.memory.role == "remoteHarvester2") {
                 
+                let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
+                
                 if (sourceContainer2 != null) {
     
                     creep.say("⛏️ 2")
     
                     if (creep.pos.inRangeTo(sourceContainer2, 0)) {
     
-                        creep.harvest(source2)
+                        creep.harvest(closestSource)
     
                     } else {
     

@@ -16,6 +16,7 @@ module.exports = {
         if (creep.memory.role == "harvester1") {
             
             let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
+            let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
             
             if (sourceContainer1) {
 
@@ -23,7 +24,7 @@ module.exports = {
 
                 if (creep.pos.inRangeTo(sourceContainer1, 0)) {
 
-                    creep.harvest(source1)
+                    creep.harvest(closestSource)
 
                 } else {
 
@@ -50,6 +51,7 @@ module.exports = {
         } else if (creep.memory.role == "harvester2") {
             
             let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
+            let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
             
             if (sourceContainer2) {
 
@@ -57,7 +59,7 @@ module.exports = {
 
                 if (creep.pos.inRangeTo(sourceContainer2, 0)) {
 
-                    creep.harvest(source2)
+                    creep.harvest(closestSource)
 
                 } else {
 

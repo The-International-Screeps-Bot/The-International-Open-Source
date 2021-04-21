@@ -6,7 +6,7 @@ StructureTerminal.prototype.market = function() {
     var hydrogenNeed = false
     var oxygenNeed = false
 
-    if (this.room.name != "W17N54" && this.store[RESOURCE_HYDROGEN] >= 2500 && Game.rooms["W17N54"].terminal.store[RESOURCE_HYDROGEN] <= 25000) {
+    if (this.room.name != "W1N1" && this.store[RESOURCE_HYDROGEN] >= 2500 && Game.rooms["W1N1"] && Game.rooms["W1N1"].terminal && Game.rooms["W1N1"].terminal.store[RESOURCE_HYDROGEN] <= 25000) {
 
         hydrogenNeed = true
 
@@ -16,7 +16,7 @@ StructureTerminal.prototype.market = function() {
         Game.rooms[this.room.name].terminal.send(RESOURCE_HYDROGEN, 25000, 'W17N54', 'Hydrogen');
 
     }
-    if (this.room.name != "W17N54" && this.store[RESOURCE_OXYGEN] >= 2500 && Game.rooms["W17N54"].terminal.store[RESOURCE_OXYGEN] <= 25000) {
+    if (this.room.name != "W1N1" && this.store[RESOURCE_OXYGEN] >= 2500 && Game.rooms["W1N1"] && Game.rooms["W1N1"].terminal && Game.rooms["W1N1"].terminal.store[RESOURCE_OXYGEN] <= 25000) {
 
         oxygenNeed = true
 

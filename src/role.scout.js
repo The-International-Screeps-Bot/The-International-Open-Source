@@ -1,5 +1,19 @@
 module.exports = {
     run: function(creep) {
+        
+        //list of rooms with Game.map
+        
+        //determine rooms that are 10 or less away from home room (do so in module.constants)
+        
+        //scout find room that was checked longest ago
+        
+        //scout move to room
+        
+        //scout record information
+        
+        //scout record tick room was scouted
+        
+        //restart loop
 
         creep.memory.goal = creep.pos.findClosestByRange(FIND_MY_SPAWNS).id
             //creep.memory.goal = creep.room.controller.id

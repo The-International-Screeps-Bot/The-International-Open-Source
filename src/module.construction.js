@@ -5,8 +5,9 @@ module.exports = {
             //destroySite()
             //destroyRoad()
             //destroyStructure()
+                
             remoteSourcePath()
-
+            
             function destroySite() {
 
                 let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)
@@ -26,7 +27,7 @@ module.exports = {
                     filter: s => s.structureType == STRUCTURE_ROAD
                 })
 
-                if (room.name == "E24N1") {
+                if (room.name == "E28N13") {
 
                     for (let road of roads) {
 
