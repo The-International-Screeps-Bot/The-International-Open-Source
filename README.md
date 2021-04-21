@@ -34,7 +34,7 @@ The Internationale is my bot for the MMO server, thematically based after commun
 - [ ] Factory operations
 - [ ] Automated intel on enemies
 - [ ] Automated attacking
-- [ ] Different room blueprints depending on room
+- [ ] Different, functional room blueprints depending on room size and shape
 - [ ] Automated recording of viable rooms to claim
 - [ ] Automated claiming of rooms
 - [ ] Automated recording of viable remote harvesting rooms
@@ -45,13 +45,13 @@ The Internationale is my bot for the MMO server, thematically based after commun
 - [ ] Recording and predicting for like attackers
 - [ ] Assisting of defending rooms in case of power creep assisted attack
 - [ ] Weighting of rooms from economic to military depending on recent history and neighbours
-- [ ] Communication and coordination between rooms about global stage, economy, threats
+- [x] Communication and coordination between rooms about global stage, economy, threats
 - [ ] Advanced pathing to avoid rooms with known threats
-- [ ] Have nearest rooms establish and claim rooms
+- [x] Have nearest rooms establish and claim rooms
 - [ ] Spawn specific defender creeps depending on attackers
 - [ ] Determine if boosting is necessary for defenders
 - [ ] Have defenders move to ramparts near attackers
-- [ ] Spawn new civilian creeps when TTL is less than time to spawn
+- [x] Spawn new civilian creeps when TTL is less than time to spawn
 
 ## Flowchart and more information
 
