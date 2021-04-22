@@ -1,5 +1,19 @@
 module.exports = {
     run: function(creep) {
+        
+        if (creep.memory.roomFrom && creep.room.name != creep.memory.roomFrom) {
+
+                const route = Game.map.findRoute(creep.room.name, creep.memory.roomFrom);
+
+                if (route.length > 0) {
+
+                    creep.say(creep.memory.roomFrom)
+
+                    const exit = creep.pos.findClosestByRange(route[0].exit);
+                    creep.moveTo(exit);
+                }
+            }
+        
         if (creep.memory.working == true && creep.carry.energy == 0) {
 
             creep.memory.working = false;

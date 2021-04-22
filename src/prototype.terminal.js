@@ -52,7 +52,7 @@ StructureTerminal.prototype.market = function() {
         }
     })
     for (let resource in this.store) {
-        if (orderBlacklist.indexOf(resource) == -1 && this.store[resource] >= 20000 && Object.keys(Game.market.orders).length < 300) {
+        if (orderBlacklist.indexOf(resource) == -1 && this.store[resource] >= 20000 && Object.keys(Game.market.orders).length < 300 && resource != RESOURCE_ENERGY) {
 
             let resourceHistory = Game.market.getHistory(resource);
             let sellPrice = resourceHistory[0]["avgPrice"] * 0.6
@@ -61,6 +61,21 @@ StructureTerminal.prototype.market = function() {
 
             console.log("Terminal " + this.room.name + " wants to make a sell order for: " + resource)
             Game.market.createOrder({ type: ORDER_SELL, resourceType: resource, price: sellPrice, totalAmount: 15000, roomName: this.room.name });
+
+        }
+    }
+    
+    if (Memory.global.establishedRooms <= 3 && Game.market.credits >= 100000 && this.store[RESOURCE_ENERGY] <= 100000) {
+        
+        console.log(RESOURCE_ENERGY + ", " + this.room.name)
+
+        let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= 1 && order.amount >= (120000 - this.store.getUsedCapacity([RESOURCE_ENERGY])))
+
+        if (buyOrders[0]) {
+
+            console.log("Found order for: " + RESOURCE_ENERGY + ", " + this.room + ", " + buyOrders[0]["id"] + ", " + buyOrders[0].amount)
+            console.log(120000 - this.store[RESOURCE_ENERGY])
+            Game.market.deal(buyOrders[0]["id"], 50000 - this.store.getUsedCapacity([RESOURCE_ENERGY]), this.room.name)
 
         }
     }
@@ -120,13 +135,13 @@ StructureTerminal.prototype.market = function() {
 
                 for (let filteredResource of filteredMinerals) {
 
-                    console.log(filteredResource + ", " + this.room.name)
+                    //console.log(filteredResource + ", " + this.room.name)
 
                     let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == filteredResource && order.price < 1 && order.amount >= (6000 - this.store.getUsedCapacity([filteredResource])))
 
                     if (buyOrders[0]) {
 
-                        console.log("Found order for: " + filteredResource + this.room + buyOrders[0]["id"])
+                        console.log("Found order for: " + filteredResource + ", " + this.room + ", " + buyOrders[0]["id"] + ", " + buyOrders[0].amount)
                         Game.market.deal(buyOrders[0]["id"], 6000 - this.store.getUsedCapacity([filteredResource]), this.room.name)
 
                     }

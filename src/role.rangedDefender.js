@@ -2,6 +2,19 @@ var AttackWhitelist = ["cplive"];
 
 module.exports = {
     run: function(creep) {
+        
+        if (creep.memory.roomFrom && creep.room.name != creep.memory.roomFrom) {
+
+                const route = Game.map.findRoute(creep.room.name, creep.memory.roomFrom);
+
+                if (route.length > 0) {
+
+                    creep.say(creep.memory.roomFrom)
+
+                    const exit = creep.pos.findClosestByRange(route[0].exit);
+                    creep.moveTo(exit);
+                }
+            }
 
         var enemyCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
             filter: (c) => {

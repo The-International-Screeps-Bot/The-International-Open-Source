@@ -26,7 +26,8 @@ module.exports = {
                     */
 
                     if (leader.pos.inRangeTo(member, 1) || leaderIsEdge || memberIsEdge) {
-
+               
+                        leader.say("Broke")
                         leader.memory.attacking = true
 
                     } else {
@@ -46,8 +47,10 @@ module.exports = {
                         let squadTarget
                         let flag = Game.flags.BB
 
+                        if (leader.room == flag.room) {
+
                         let injuredCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                            filter: (c) => c.owner.username == "cplive" && c.owner.username == "Brun1L" && c.owner.username == "mrmartinstreet" && c.owner.username == "Source Keeper"
+                            filter: (c) => c.owner.username == "cplive" && c.owner.username == "Brun1L" && c.owner.username == "mrmartinstreet"
                         })
 
                         if (injuredCreep && creep.moveTo(injuredCreep) != ERR_NO_PATH) {
@@ -64,28 +67,37 @@ module.exports = {
                         }
                         else {
                             
-                            creep.heal(creep)
+                            member.heal(leader)
                         }
 
-                        let hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                            filter: (c) => c.owner.username !== "cplive" && c.owner.username !== "Brun1L" && c.owner.username !== "mrmartinstreet" && c.owner.username !== "Source Keeper"
+                        let hostile = leader.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                            filter: (c) => c.owner.username !== "Brun1L" && c.owner.username !== "mrmartinstreet" && c.owner.username !== "Source Keeper" && c.owner.username != "Orlet" && c.owner.username != "slowmotionghost" && c.owner.username != "SBense"
                         })
 
-                        if (hostile && leader.moveTo(hostile) != ERR_NO_PATH) {
+                        if (hostile) {
 
                             leader.say("Hostile")
 
                             if (leader.pos.inRangeTo(hostile, 2)) {
 
-                                creep.rangedAttack(hostile)
+                                leader.rangedAttack(hostile)
                             } else {
 
-                                creep.rangedAttack(hostile)
-                                leader.moveTo(hostile)
+                                leader.rangedAttack(hostile)
+                            }
+                            
+                            if (leader.pos.inRangeTo(hostile, 1)) {
+                                
+                                leader.rangedMassAttack(hostile)
+                            }
+                            else {
+                                
+                                leader.rangedAttack(hostile)
+                                leader.moveTo(hostile, { visualizePathStyle: { stroke: '#ffffff' } })
                             }
                         } else {
 
-                            let enemySpawn = creep.pos.findClosestByRange(FIND_HOSTILE_SPAWNS, {
+                            let enemySpawn = leader.pos.findClosestByRange(FIND_HOSTILE_SPAWNS, {
                                 filter: (c) => c.owner.username !== "cplive" && c.owner.username !== "Brun1L" && c.owner.username !== "mrmartinstreet" && c.owner.username !== "Source Keeper"
                             })
 
@@ -95,14 +107,50 @@ module.exports = {
 
                                 if (leader.pos.inRangeTo(enemySpawn, 2)) {
 
-                                    creep.rangedAttack(enemySpawn)
+                                leader.rangedAttack(enemySpawn)
                                 } else {
-
-                                    creep.rangedAttack(enemySpawn)
-                                    leader.moveTo(enemySpawn)
+    
+                                    leader.rangedAttack(enemySpawn)
                                 }
-                            } else {
+                                
+                                if (leader.pos.inRangeTo(enemySpawn, 1)) {
+                                    
+                                    leader.rangedMassAttack(enemySpawn)
+                                }
+                                else {
+                                    
+                                    leader.rangedAttack(enemySpawn)
+                                    leader.moveTo(enemySpawn, { visualizePathStyle: { stroke: '#ffffff' } })
+                                }
+                            }  else {
 
+                            let enemyStructure = leader.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+                                filter: (c) => c.owner.username !== "cplive" && c.owner.username !== "Brun1L" && c.owner.username !== "mrmartinstreet" && c.owner.username !== "Source Keeper" && c.structureType != STRUCTURE_CONTROLLER
+                            })
+
+                            if (enemyStructure && leader.moveTo(enemySpawn) != ERR_NO_PATH) {
+
+                                leader.say("Enemy Structure")
+
+                                if (leader.pos.inRangeTo(enemyStructure, 2)) {
+
+                                leader.rangedAttack(enemyStructure)
+                                } else {
+    
+                                    leader.rangedAttack(enemyStructure)
+                                }
+                                
+                                if (leader.pos.inRangeTo(enemyStructure, 1)) {
+                                    
+                                    leader.rangedMassAttack(enemyStructure)
+                                }
+                                else {
+                                    
+                                    leader.rangedAttack(enemyStructure)
+                                    leader.moveTo(enemyStructure, { visualizePathStyle: { stroke: '#ffffff' } })
+                                }
+                            } else if (leader.room == flag.room) {
+                                
                                 let enemyBarricade = leader.pos.findClosestByPath(FIND_STRUCTURES, {
                                     filter: s => s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART
                                 })
@@ -110,28 +158,44 @@ module.exports = {
                                 if (enemyBarricade && leader.room == flag.room) {
 
                                     leader.say("Main Target")
+                                    
+                                    let mainTarget = Game.getObjectById(leader.room.memory.mainTarget)
+                                    
+                                    if (!mainTarget) {
+                                        
+                                        leader.room.memory.mainTarget = enemyBarricade.id
+                                    }
+                                    else {
+                                        
+                                        leader.room.visual.circle(mainTarget.pos, {
+                                            fill: 'transparent',
+                                            radius: 0.8,
+                                            stroke: '#39A0ED',
+                                            strokeWidth: 0.125
+                                        });
 
-                                    if (leader.memory.mainTarget) {
+                                        if (leader.pos.inRangeTo(mainTarget, 2)) {
 
-                                        if (leader.pos.inRangeTo(leader.memory.mainTarget, 2)) {
-
-                                            creep.rangedAttack(leader.memory.mainTarget)
+                                            creep.rangedAttack(mainTarget)
                                         } else {
 
-                                            creep.rangedAttack(leader.memory.mainTarget)
-                                            leader.moveTo(leader.memory.mainTarget)
+                                            creep.rangedAttack(mainTarget)
+                                            leader.moveTo(mainTarget)
                                         }
-                                    } else {
-
-                                        leader.memory.mainTarget = enemyBarricade
                                     }
-                                } else {
-
-                                    leader.say("BB")
-
-                                    leader.moveTo(flag, { reusePath: 50 })
+                                }
                                 }
                             }
+                        }
+                    }
+                        else {
+                            
+                            leader.say("BB")
+                                    
+                                    if (!leader.pos.inRangeTo(flag, 2)) {
+                                    
+                                        leader.moveTo(flag, { visualizePathStyle: { stroke: '#ffffff' } }, { reusePath: 50 })
+                                    }
                         }
                     }
                 }

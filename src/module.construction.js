@@ -27,7 +27,7 @@ module.exports = {
                     filter: s => s.structureType == STRUCTURE_ROAD
                 })
 
-                if (room.name == "E28N13") {
+                if (room.name == "E31N14") {
 
                     for (let road of roads) {
 
@@ -329,13 +329,17 @@ module.exports = {
 
                                     //console.log(pos.x + "," + pos.y)
                                     //console.log(structureType)
-                                    if (room.memory.stage <= 4 && structureType == "road") {
-                                        
-                                        
-                                    }
-                                    else {
-                                        
-                                    room.createConstructionSite(pos.x, pos.y, structureType)
+                                    
+                                    if (room.controller.level >= 4) {
+
+                                        if (structureType != "road") {
+
+                                            room.createConstructionSite(pos.x, pos.y, structureType);
+                                        }
+                                    } 
+                                    if (structureType != "road") {
+
+                                        room.createConstructionSite(pos.x, pos.y, structureType);
                                     }
                                     /*
                                     if (structureType == "road") {

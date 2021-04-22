@@ -12,6 +12,7 @@ module.exports = {
         roles["upgrader"] = require('role.upgrader')
         roles["builder"] = require('role.builder')
         roles["repairer"] = require('role.repairer')
+        roles["upgradeHauler"] = require("role.upgradeHauler")
         roles["wallRepairer"] = require('role.wallRepairer')
         roles["claimer"] = require('role.claimer')
         roles["spawnBuilder"] = require('role.spawnBuilder')
@@ -40,6 +41,7 @@ module.exports = {
         cpuUsage["upgrader"]
         cpuUsage["builder"]
         cpuUsage["repairer"]
+        cpuUsage["upgradeHauler"]
         cpuUsage["wallRepairer"]
         cpuUsage["claimer"]
         cpuUsage["spawnBuilder"]

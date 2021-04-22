@@ -4,6 +4,19 @@ var roleUpgrader = require('role.upgrader');
 
 module.exports = {
     run: function(creep) {
+        
+        if (creep.memory.roomFrom && creep.room.name != creep.memory.roomFrom) {
+
+                const route = Game.map.findRoute(creep.room.name, creep.memory.roomFrom);
+
+                if (route.length > 0) {
+
+                    creep.say(creep.memory.roomFrom)
+
+                    const exit = creep.pos.findClosestByRange(route[0].exit);
+                    creep.moveTo(exit);
+                }
+            }
 
         var structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax

@@ -29,7 +29,7 @@ module.exports = {
         }
 
         let hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-            filter: (c) => c.owner.username !== "cplive" && c.owner.username !== "Brun1L" && c.owner.username !== "mrmartinstreet"
+            filter: (c) => c.owner.username != "Q13214" && c.owner.username != "Brun1L" && c.owner.username != "mrmartinstreet" && c.owner.username != "Orlet" && c.owner.username != "slowmotionghost"
         })
 
         let hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
