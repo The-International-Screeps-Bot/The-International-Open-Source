@@ -944,7 +944,7 @@ module.exports = {
                             name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["builder"], { role: 'builder', building: false, roomFrom: room.name });
 
                             creepCount["builder"]++
-                        } else if (creepsOfRole[["repairer", room.name]] < room.memory.minimumNumberOfRepairers && repairerNeed) {
+                        } else if (creepsOfRole[["repairer", room.name]] < room.memory.minimumNumberOfRepairers && repairerNeed == true) {
 
                             name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', repairing: false, roomFrom: room.name });
 
