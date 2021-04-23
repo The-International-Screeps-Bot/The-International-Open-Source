@@ -30,7 +30,7 @@ The Internationale is my bot for the MMO server, thematically based after commun
 - [x] Automated wall and rampart placement
 - [ ] Power bank collection
 - [ ] Commodity collection
-- [ ] Automated scouting
+- [x] Automated scouting
 - [ ] Factory operations
 - [ ] Automated intel on enemies
 - [ ] Automated attacking
