@@ -20,10 +20,15 @@ module.exports = {
         if (!source1 && !source2) {
 
             let sources = creep.room.find(FIND_SOURCES)
-
-            creep.room.memory.source1 = sources[0].id
-            creep.room.memory.source2 = sources[1].id
-
+            
+            if (sources[0]) {
+            
+                creep.room.memory.source1 = sources[0].id
+            }
+            if (sources[1]) {
+            
+                creep.room.memory.source2 = sources[1].id
+            }
         }
 
         if (creep.memory.role == "harvester1") {
