@@ -10,7 +10,7 @@ module.exports = {
                 var sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
                 var sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
-                if (sourceLink1 && controllerLink && sourceLink1.store[RESOURCE_ENERGY] >= 790 && controllerLink.store[RESOURCE_ENERGY] <= 400 && fullStorage) {
+                if (sourceLink1 && controllerLink && sourceLink1.store[RESOURCE_ENERGY] >= 790 && controllerLink.store[RESOURCE_ENERGY] <= 400 && (fullStorage || (Memory.global.globalStage == 0 && room.storage.store[RESOURCE_ENERGY] >= 5000))) {
 
                     sourceLink1.transferEnergy(controllerLink);
 
@@ -19,7 +19,7 @@ module.exports = {
                     sourceLink1.transferEnergy(baseLink);
 
                 }
-                if (sourceLink2 && controllerLink && sourceLink2.store[RESOURCE_ENERGY] >= 790 && controllerLink.store[RESOURCE_ENERGY] <= 400 && fullStorage) {
+                if (sourceLink2 && controllerLink && sourceLink2.store[RESOURCE_ENERGY] >= 790 && controllerLink.store[RESOURCE_ENERGY] <= 400 && (fullStorage || (Memory.global.globalStage == 0 && room.storage.store[RESOURCE_ENERGY] >= 5000))) {
 
                     sourceLink2.transferEnergy(controllerLink);
 

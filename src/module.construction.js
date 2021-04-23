@@ -86,6 +86,17 @@ module.exports = {
 
                                     }
                                 })
+                                room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
+                                    if (struct.structureType === STRUCTURE_ROAD) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 1)
+
+                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
+
+                                    }
+                                })
 
                                 return costs
 
@@ -330,17 +341,19 @@ module.exports = {
                                     //console.log(pos.x + "," + pos.y)
                                     //console.log(structureType)
                                     
-                                    if (room.controller.level >= 4) {
-
-                                        if (structureType != "road") {
-
-                                            room.createConstructionSite(pos.x, pos.y, structureType);
-                                        }
-                                    } 
-                                    if (structureType != "road") {
-
+                                    if (structureType == "road" && room.controller.level <= 5) {
+                                        
+                                        
+                                    }
+                                    else if (structureType == "link" && room.controller.level <= 7) {
+                                        
+                                        
+                                    }
+                                    else {
+                                        
                                         room.createConstructionSite(pos.x, pos.y, structureType);
                                     }
+                                    
                                     /*
                                     if (structureType == "road") {
                                         
@@ -453,7 +466,7 @@ module.exports = {
                     }
                 }
                 
-                if (room.controller.level >= 4) {
+                if (room.controller.level >= 5) {
                 
                     sourcePath()
                     controllerPath()
@@ -502,6 +515,17 @@ module.exports = {
 
                                         }
                                     })
+                                    room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
+                                    if (struct.structureType === STRUCTURE_ROAD) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 1)
+
+                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
+
+                                    }
+                                })
 
                                     return costs
 
@@ -551,6 +575,17 @@ module.exports = {
 
                                     }
                                 })
+                                room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
+                                    if (struct.structureType === STRUCTURE_ROAD) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 1)
+
+                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
+
+                                    }
+                                })
 
                                 return costs
 
@@ -589,6 +624,17 @@ module.exports = {
                                 let costs = new PathFinder.CostMatrix
 
                                 room.find(FIND_STRUCTURES).forEach(function(struct) {
+                                    if (struct.structureType === STRUCTURE_ROAD) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 1)
+
+                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
+
+                                    }
+                                })
+                                room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
                                     if (struct.structureType === STRUCTURE_ROAD) {
 
                                         costs.set(struct.pos.x, struct.pos.y, 1)
@@ -660,6 +706,17 @@ module.exports = {
 
                                                 costs.set(struct.pos.x, struct.pos.y, 0xff)
 
+                                            }
+                                        })
+                                        room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
+                                            if (struct.structureType === STRUCTURE_ROAD) {
+        
+                                                costs.set(struct.pos.x, struct.pos.y, 1)
+        
+                                            } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+        
+                                                costs.set(struct.pos.x, struct.pos.y, 0xff)
+        
                                             }
                                         })
 

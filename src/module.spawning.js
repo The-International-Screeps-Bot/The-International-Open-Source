@@ -151,7 +151,18 @@ module.exports = {
                 }
 
                 let roomMineral = room.find(FIND_MINERALS)[0].mineralAmount > 0
+                let roomExtractor = room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_EXTRACTOR
+                })[0]
                 let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)
+                let repairStructure = room.find(FIND_STRUCTURES, {
+                    filter: s => (s.structureType == STRUCTURE_ROAD && s.structureType == STRUCTURE_CONTAINER) && s.hits < s.hitsMax * 0.5
+                })
+                
+                if (repairStructure[0]) {
+                    
+                    var repairerNeed = true
+                }
 
                 let stage = room.memory.stage
 
@@ -254,6 +265,20 @@ module.exports = {
                 var roomFix = room.memory.roomFix
                 var freeEnergy = room.energyAvailable
                 var capacityEnergy = room.energyCapacityAvailable
+                
+                if (Game.getObjectById(room.memory.towers) != null && Game.getObjectById(room.memory.towers).length >= 1) {
+                    
+                    var towerTrue = true
+                }
+                
+                let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
+                let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
+                let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
+                
+                let baseLink = Game.getObjectById(room.memory.baseLink)
+                let controllerLink = Game.getObjectById(room.memory.controllerLink)
+                let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
+                let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
                 roomFix = false
 
@@ -451,7 +476,7 @@ module.exports = {
 
                             for (let i = 0; i < upgraderBodyAmount; i++) {
 
-                                upgraderBody.push(WORK, WORK, MOVE, WORK, CARRY, MOVE, CARRY, MOVE)
+                                upgraderBody.push()
                                 upgraderBodyTier++
 
                             }
@@ -496,20 +521,6 @@ module.exports = {
                             for (let i = 0; i < builderBodyAmount; i++) {
 
                                 builderBody.push(WORK, MOVE, CARRY, MOVE)
-                                builderBodyTier++
-
-                            }
-                            var builderBodyResult = builderBody
-                        } else if (stage == 2) {
-
-                            let builderBodyAmount = Math.floor(capacityEnergy / 550)
-                            let builderBody = []
-
-                            var builderBodyTier = 0
-
-                            for (let i = 0; i < builderBodyAmount; i++) {
-
-                                builderBody.push(WORK, WORK, MOVE, WORK, CARRY, MOVE, CARRY, MOVE)
                                 builderBodyTier++
 
                             }
@@ -933,6 +944,11 @@ module.exports = {
                             name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["builder"], { role: 'builder', building: false, roomFrom: room.name });
 
                             creepCount["builder"]++
+                        } else if (creepsOfRole[["repairer", room.name]] < room.memory.minimumNumberOfRepairers && repairerNeed) {
+
+                            name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', repairing: false, roomFrom: room.name });
+
+                            creepCount["repairer"]++
                         } else if (creepsOfRole[["rangedDefender", room.name]] < room.memory.minimumNumberOfRangedDefenders && target1.length > 0) {
 
                             name = spawn.createCreep(rangedDefenderBodyResult, 'RaD, ' + "T" + rangedDefenderBodyTier + ", " + creepCount["rangedDefender"], { role: 'rangedDefender', working: false, roomFrom: room.name });
@@ -953,7 +969,7 @@ module.exports = {
                             name = spawn.createCreep([CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], 'Si, ' + "T" + 1 + ", " + creepCount["scientist"], { role: 'scientist', emptyStore: true, roomFrom: room.name });
 
                             creepCount["scientist"]++
-                        } else if (creepsOfRole[["miner", room.name]] < room.memory.minimumNumberOfMiners && roomMineral) {
+                        } else if (creepsOfRole[["miner", room.name]] < room.memory.minimumNumberOfMiners && roomMineral && roomExtractor) {
 
                             name = spawn.createCreep(minerBodyResult, 'Mi, ' + "T" + minerBodyTier + ", " + creepCount["miner"], { role: 'miner', mining: true, roomFrom: room.name });
 
@@ -1065,6 +1081,28 @@ module.exports = {
                 if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000) {
                     
                     room.memory.minimumNumberOfUpgraderHaulers = 3
+                    room.memory.minimumNumberOfUpgraders = 4
+                }
+                else {
+                    
+                    
+                }
+                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000) {
+                    
+                    room.memory.minimumNumberOfUpgraders = 2
+                }
+                else {
+                    
+                    
+                }
+                
+                if (towerTrue) {
+                    
+                    room.memory.minimumNumberOfRepairers = 1
+                }
+                else {
+                    
+                    room.memory.minimumNumberOfRepairers = 0
                 }
 
                 //RCL 1
@@ -1210,17 +1248,7 @@ module.exports = {
 
                     room.memory.minimumNumberOfBuilders = 1
 
-                    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000) {
-
-                        room.memory.minimumNumberOfUpgraders = 3
-                    } else {
-
-                        room.memory.minimumNumberOfUpgraders = 2
-                    }
-                    if (Memory.global.globalStage == 0) {
-                        
-                        room.memory.minimumNumberOfUpgraders = 3
-                    }
+                    room.memory.minimumNumberOfUpgraders = 2
 
                     room.memory.minimumNumberOfSpawnBuilders = 4
 
@@ -1263,17 +1291,7 @@ module.exports = {
 
                     room.memory.minimumNumberOfBuilders = 1
 
-                    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000) {
-
-                        room.memory.minimumNumberOfUpgraders = 2
-                    } else {
-
-                        room.memory.minimumNumberOfUpgraders = 1
-                    }
-                    if (Memory.global.globalStage == 0) {
-                        
-                        room.memory.minimumNumberOfUpgraders = 2
-                    }
+                    room.memory.minimumNumberOfUpgraders = 2
 
                     room.memory.minimumNumberOfSpawnBuilders = 4
 
@@ -1318,14 +1336,7 @@ module.exports = {
 
                     room.memory.minimumNumberOfBuilders = 1
 
-                    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000) {
-
-                        room.memory.minimumNumberOfUpgraders = 2
-                    } else 
-                    if (Memory.global.globalStage == 0) {
-                        
-                        room.memory.minimumNumberOfUpgraders = 2
-                    }
+                    room.memory.minimumNumberOfUpgraders = 1
 
                     room.memory.minimumNumberOfSpawnBuilders = 4
 
@@ -1369,13 +1380,7 @@ module.exports = {
 
                     room.memory.minimumNumberOfBuilders = 1
 
-                    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000) {
-
-                        room.memory.minimumNumberOfUpgraders = 2
-                    } else {
-
-                        room.memory.minimumNumberOfUpgraders = 1
-                    }
+                    room.memory.minimumNumberOfUpgraders = 1
 
                     room.memory.minimumNumberOfSpawnBuilders = 4
 

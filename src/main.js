@@ -19,12 +19,14 @@ module.exports.loop = function() {
 
             //profiler.wrap(function() {
             //Game.profiler.profile(1000)
-
-            /*
-            if (Game.cpu.bucket == 10000) {
-                Game.cpu.generatePixel();
+            
+            if (Game.shard.name == "shard2") {
+                
+                if (Game.cpu.bucket == 10000) {
+                    Game.cpu.generatePixel();
+                }  
             }
-            */
+            
             roles.run(roles)
 
             console.log("roles: " + Game.cpu.getUsed().toFixed(2))
@@ -54,7 +56,7 @@ module.exports.loop = function() {
 
                 }*/
 
-            if (Game.time % 1 == 0) {
+            if (Game.time % 10 == 0) {
 
                 var terminals = _.filter(Game.structures, s => s.structureType == STRUCTURE_TERMINAL);
 
@@ -97,6 +99,7 @@ module.exports.loop = function() {
             console.log("spawns: " + Game.cpu.getUsed().toFixed(2))
 
             console.log('--------------------------------------------------------')
+            console.log("                Time: " + Game.time)
             console.log("              Creeps: " + Object.keys(Memory.creeps).length)
             console.log("       Market Offers: " + Object.keys(Game.market.orders).length)
             console.log("          CPU Bucket: " + Game.cpu.bucket)

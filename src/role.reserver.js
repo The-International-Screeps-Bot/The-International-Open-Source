@@ -11,7 +11,7 @@ module.exports = {
                 creep.say("Reserving")
                 if (Game.time % 500 == 0) {
 
-                    //output an integer from 1-4
+                    //output an integer from 1-6
                     let signType = Math.floor(Math.random(7) * 10)
 
                     //console.log(signType)
