@@ -453,7 +453,7 @@ module.exports = {
                     }
                 }
                 
-                if (room.memory.stage >= 4) {
+                if (room.controller.level >= 4) {
                 
                     sourcePath()
                     controllerPath()

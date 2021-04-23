@@ -79,30 +79,6 @@ module.exports = {
                 })
             }
         }
-        
-        let attackRoom
-        let attackRoomFound = false
-        
-        if (target6 && attackRoomFound == false) {
-            for (let maxDistance = 1; maxDistance <= 12 && !communeEstablisher; maxDistance++) {
-
-                 _.forEach(Game.rooms, function(room) {
-
-                    if (room.controller && room.controller.my && room.controller.level >= 3) {
-                        
-                        let distance = Game.map.getRoomLinearDistance(target6.pos.roomName, room.name)
-        
-                        if (distance < maxDistance) {
-        
-                            attackRoom = room
-                            attackRoomFound = true
-                            console.log("AR, d " + distance + "D " + maxDistance + "R " + room.name)
-                            return
-                        }
-                    }return
-                })
-            }
-        }
 
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my) {
@@ -601,7 +577,7 @@ module.exports = {
                             var remoteBuilderBodyResult = remoteBuilderBody.slice(0, 20)
                         }
                         //Wall Repairer
-                        if (stage >= 4) {
+                        if (stage == 4) {
 
                             let wallRepairerBodyAmount = Math.floor(capacityEnergy / 250)
                             let wallRepairerBody = []
@@ -614,7 +590,7 @@ module.exports = {
                                 wallRepairerBodyTier++
 
                             }
-                            var wallRepairerBodyResult = wallRepairerBody.slice(0, 50)
+                            var wallRepairerBodyResult = wallRepairerBody.slice(0, 24)
                         }
                         else if (stage >= 5) {
 
@@ -629,7 +605,7 @@ module.exports = {
                                 wallRepairerBodyTier++
 
                             }
-                            var wallRepairerBodyResult = wallRepairerBody.slice(0, 50)
+                            var wallRepairerBodyResult = wallRepairerBody.slice(0, 24)
                         }
                         //Remote Harvester
                         if (stage <= 3) {
@@ -1014,16 +990,16 @@ module.exports = {
                             creepCount["remoteBuilder"]++
                         } else {
 
-                            if (creepsOfRole[["bigBoyMember", room.name]] < room.memory.minimumNumberOfBigBoyMembers && target6 && room == attackRoom) {
-
-                                name = spawn.createCreep(bigBoyMemberBodyResult, 'BBM, ' + "T" + bigBoyMemberBodyTier + ", " + squadType + ", " + creepCount["bigBoyMember"], { role: 'bigBoyMember', squadType: squadType, attacking: false, roomFrom: room.name });
-
-                                creepCount["bigBoyMember"]++
-                            } else if (creepsOfRole[["bigBoyLeader", room.name]] < creepsOfRole[["bigBoyMember", room.name]] && target6 && room == attackRoom) {
+                            if (creepsOfRole[["bigBoyLeader", room.name]] < creepsOfRole[["bigBoyMember", room.name]] && target6) {
 
                                 name = spawn.createCreep(bigBoyLeaderBodyResult, 'BBL, ' + "T" + bigBoyLeaderBodyTier + ", " + squadType + ", " + creepCount["bigBoyLeader"], { role: 'bigBoyLeader', squadType: squadType, attacking: false, roomFrom: room.name });
 
                                 creepCount["bigBoyLeader"]++
+                            } else if (creepsOfRole[["bigBoyMember", room.name]] < room.memory.minimumNumberOfBigBoyMembers && target6) {
+
+                                name = spawn.createCreep(bigBoyMemberBodyResult, 'BBM, ' + "T" + bigBoyMemberBodyTier + ", " + squadType + ", " + creepCount["bigBoyMember"], { role: 'bigBoyMember', squadType: squadType, attacking: false, roomFrom: room.name });
+
+                                creepCount["bigBoyMember"]++
                             } else {
 
                                 for (let remoteRoom of remoteRooms) {
@@ -1075,8 +1051,13 @@ module.exports = {
                 
                 var minRemoteBuilders = room.memory.minimumNumberOfRemoteBuilders = 1
                 var minRemoteDefenders = room.memory.minimumNumberOfRemoteDefenders = 1
-
-                var squads = 1
+                
+                var squads = 0
+                
+                if (room.name == "E18S1") {
+                    
+                    squads = 4
+                }
 
                 var minBigBoyLeaders = room.memory.minimumNumberOfBigBoyLeaders = squads
                 var minBigBoyMembers = room.memory.minimumNumberOfBigBoyMembers = squads
@@ -1147,7 +1128,7 @@ module.exports = {
 
                     room.memory.minimumNumberOfSpawnBuilders = 4
 
-                    room.memory.minimumNumberOfWallRepairers = 1
+                    room.memory.minimumNumberOfWallRepairers = 0
 
                     room.memory.minimumNumberOfRemoteDefenders = 0
 
@@ -1190,7 +1171,7 @@ module.exports = {
 
                     room.memory.minimumNumberOfSpawnBuilders = 4
 
-                    room.memory.minimumNumberOfWallRepairers = 1
+                    room.memory.minimumNumberOfWallRepairers = 0
 
                     minRemoteDefenders
 
@@ -1340,10 +1321,7 @@ module.exports = {
                     if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000) {
 
                         room.memory.minimumNumberOfUpgraders = 2
-                    } else {
-
-                        room.memory.minimumNumberOfUpgraders = 1
-                    }
+                    } else 
                     if (Memory.global.globalStage == 0) {
                         
                         room.memory.minimumNumberOfUpgraders = 2
@@ -1397,10 +1375,6 @@ module.exports = {
                     } else {
 
                         room.memory.minimumNumberOfUpgraders = 1
-                    }
-                    if (Memory.global.globalStage == 0) {
-                        
-                        room.memory.minimumNumberOfUpgraders = 2
                     }
 
                     room.memory.minimumNumberOfSpawnBuilders = 4

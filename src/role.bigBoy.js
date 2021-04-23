@@ -156,10 +156,10 @@ module.exports = {
                                 })
 
                                 if (enemyBarricade && leader.room == flag.room) {
-
-                                    leader.say("Main Target")
                                     
                                     let mainTarget = Game.getObjectById(leader.room.memory.mainTarget)
+                                    
+                                    leader.say("MT: " + mainTarget.pos.x + ", " + mainTarget.pos.y)
                                     
                                     if (!mainTarget) {
                                         

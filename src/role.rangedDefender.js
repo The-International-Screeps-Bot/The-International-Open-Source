@@ -1,5 +1,3 @@
-var AttackWhitelist = ["cplive"];
-
 module.exports = {
     run: function(creep) {
         
@@ -34,6 +32,20 @@ module.exports = {
                 target = rampart
                 return
             }
+        }
+        
+        if (!creep.pos.inRangeTo(target, 0)) {
+            
+            creep.moveTo(target, {reusePath: 50})
+        }
+        
+        if (creep.pos.inRangeTo(enemyCreep, 1)) {
+            
+            creep.rangedMassAttack(enemyCreep)
+        }
+        else if (creep.pos.inRangeTo(enemyCreep, 3)) {
+            
+            creep.rangedAttack(enemyCreep)
         }
     }
 };
