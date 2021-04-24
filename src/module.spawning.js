@@ -1457,12 +1457,12 @@ module.exports = {
                 
                 if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000) {
                     
-                    room.memory.minimumNumberOfUpgraderHaulers = 2
+                    room.memory.minimumNumberOfUpgradeHaulers = 2
                     room.memory.minimumNumberOfUpgraders = 3
                 }
                 else {
                     
-                    room.memory.minimumNumberOfUpgraderHaulers = 0
+                    room.memory.minimumNumberOfUpgradeHaulers = 0
                 }
             }
         })
