@@ -909,6 +909,21 @@ module.exports = {
                             name = spawn.createCreep(harvesterBodyResult, 'H, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester1"], { role: 'harvester1', working: false, target: 1, roomFrom: room.name });
 
                             creepCount["harvester1"]++
+                        } else if (creepsOfRole[["generalHauler", room.name]] < 1) {
+
+                            name = spawn.createCreep(haulerBodyResult, 'GH, ' + "T" + haulerBodyTier + ", " + creepCount["generalHauler"], { role: 'generalHauler', fullEnergy: false, roomFrom: room.name });
+
+                            creepCount["generalHauler"]++
+                        } else if (creepsOfRole[["baseHauler", room.name]] < 1) {
+
+                            name = spawn.createCreep(haulerBodyResult, 'BH, ' + "T" + haulerBodyTier + ", " + creepCount["baseHauler"], { role: 'baseHauler', fullEnergy: false, roomFrom: room.name });
+
+                            creepCount["baseHauler"]++
+                        } else if (creepsOfRole[["containerHauler", room.name]] < room.memory.minimumNumberOfContainerHaulers) {
+
+                            name = spawn.createCreep(haulerBodyResult, 'CH, ' + "T" + haulerBodyTier + ", " + creepCount["containerHauler"], { role: 'containerHauler', fullEnergy: false, roomFrom: room.name });
+
+                            creepCount["containerHauler"]++
                         } else if (creepsOfRole[["harvester2", room.name]] < room.memory.minimumNumberOfHarvesters2) {
 
                             name = spawn.createCreep(harvesterBodyResult, 'H, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester2"], { role: 'harvester2', working: false, target: 2, roomFrom: room.name });
@@ -924,11 +939,6 @@ module.exports = {
                             name = spawn.createCreep(haulerBodyResult, 'BH, ' + "T" + haulerBodyTier + ", " + creepCount["baseHauler"], { role: 'baseHauler', fullEnergy: false, roomFrom: room.name });
 
                             creepCount["baseHauler"]++
-                        } else if (creepsOfRole[["containerHauler", room.name]] < room.memory.minimumNumberOfContainerHaulers) {
-
-                            name = spawn.createCreep(haulerBodyResult, 'CH, ' + "T" + haulerBodyTier + ", " + creepCount["containerHauler"], { role: 'containerHauler', fullEnergy: false, roomFrom: room.name });
-
-                            creepCount["containerHauler"]++
                         } else if (creepsOfRole[["serf", room.name]] < room.memory.minimumNumberOfSerfs) {
 
                             name = spawn.createCreep(serfBodyResult, 'Se, ' + "T" + serfBodyTier + ", " + creepCount["serf"], { role: 'serf', working: false, roomFrom: room.name });
