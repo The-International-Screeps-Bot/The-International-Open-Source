@@ -79,36 +79,9 @@ StructureTerminal.prototype.market = function() {
             let buyAmount = 120000 - this.store.getUsedCapacity([RESOURCE_ENERGY])
             let buyCost = Game.market.calcTransactionCost(buyAmount, this.room.name, buyOrders[0].roomName)
             
-            console.log(buyCost + "BC")
+            //console.log(buyCost + "BC")
             
-            /*
-            let i = 0
-            
-            if (Game.time % 10 == 0) {
-            while (i == 0) {
-                
-                console.log(buyAmount + this.room.name)
-                
-                let r = 0
-                
-                if (this.store[RESOURCE_ENERGY] <= 1000) {
-                    
-                    i++
-                }
-                else if (buyCost <= this.store[RESOURCE_ENERGY]) {
-                
-                    Game.market.deal(buyOrders[0]["id"], buyAmount, this.room.name)
-                    i++
-                }
-                else {
-                    
-                    r += 10
-                    buyAmount -= 1000
-                }
-            }
-        }
-        */
-            for (let i = 120000; i >= buyCost && i > 0; i -= 1000) {
+            for (let i = 120000; i > 0; i -= 1000) {
                 
                 console.log(i)
                 Game.market.deal(buyOrders[0]["id"], i, this.room.name)
