@@ -25,7 +25,7 @@ module.exports = {
             }
             if (creep.memory.fullEnergy == true) {
 
-                let controllerLink = Game.getObjectById(creep.room.controllerLink)
+                let controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
                 
                 if (controllerLink != null && controllerLink.store[RESOURCE_ENERGY] <= 100) {
                     
