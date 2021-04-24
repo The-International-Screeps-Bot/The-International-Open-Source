@@ -65,7 +65,7 @@ StructureTerminal.prototype.market = function() {
         }
     }
     
-    if (Memory.global.establishedRooms <= 3  && Game.market.credits >= 100000 && this.store[RESOURCE_ENERGY] <= 100000) {
+    if (Memory.global.establishedRooms <= 3/*  && Game.market.credits >= 100000 && this.store[RESOURCE_ENERGY] <= 100000*/) {
         
         console.log(RESOURCE_ENERGY + ", " + this.room.name)
 
@@ -75,15 +75,27 @@ StructureTerminal.prototype.market = function() {
 
             console.log("Found order for: " + RESOURCE_ENERGY + ", " + this.room + ", " + buyOrders[0]["id"] + ", " + buyOrders[0].amount + buyOrders[0].roomName)
             console.log(120000 - this.store[RESOURCE_ENERGY])
+            
             let buyAmount = 120000 - this.store.getUsedCapacity([RESOURCE_ENERGY])
-            let buyCost = Game.market.calcTransactionCost(this.room.name, buyOrders[0].room)
+            let buyCost = Game.market.calcTransactionCost(buyAmount, this.room.name, buyOrders[0].roomName)
+            
+            //console.log(buyCost)
+            
+            /*
             let i = 0
             
-            while (i < 0) {
+            if (Game.time % 10 == 0) {
+            while (i == 0) {
+                
+                console.log(buyAmount + this.room.name)
                 
                 let r = 0
-            
-                if (buyCost <= terminal.store[RESOURCE_ENERGY]) {
+                
+                if (this.store[RESOURCE_ENERGY] <= 1000) {
+                    
+                    i++
+                }
+                else if (buyCost <= this.store[RESOURCE_ENERGY]) {
                 
                     Game.market.deal(buyOrders[0]["id"], buyAmount, this.room.name)
                     i++
@@ -91,8 +103,14 @@ StructureTerminal.prototype.market = function() {
                 else {
                     
                     r += 10
-                    buyAmount = 120000 - r - this.store.getUsedCapacity([RESOURCE_ENERGY])
+                    buyAmount -= 1000
                 }
+            }
+        }
+        */
+            for (let i = 120000; i >= buyCost && i > 0; i -= 1000) {
+                
+                Game.market.deal(buyOrders[0]["id"], i, this.room.name)
             }
         }
     }
