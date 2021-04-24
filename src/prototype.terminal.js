@@ -55,7 +55,7 @@ StructureTerminal.prototype.market = function() {
         if (orderBlacklist.indexOf(resource) == -1 && this.store[resource] >= 20000 && Object.keys(Game.market.orders).length < 300 && resource != RESOURCE_ENERGY) {
 
             let resourceHistory = Game.market.getHistory(resource);
-            let sellPrice = resourceHistory[0]["avgPrice"] * 0.6
+            let sellPrice = resourceHistory[0]["avgPrice"] * 0.7
             console.log("SP: " + sellPrice + ", " + resource);
             //console.log(orderBlacklist)
 
