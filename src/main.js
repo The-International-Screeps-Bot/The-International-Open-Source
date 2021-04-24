@@ -56,7 +56,7 @@ module.exports.loop = function() {
 
                 }*/
 
-            if (Game.time % 10 == 0) {
+            if (Game.time % 1 == 0) {
 
                 var terminals = _.filter(Game.structures, s => s.structureType == STRUCTURE_TERMINAL);
 

@@ -75,7 +75,7 @@ StructureTerminal.prototype.market = function() {
 
             console.log("Found order for: " + RESOURCE_ENERGY + ", " + this.room + ", " + buyOrders[0]["id"] + ", " + buyOrders[0].amount)
             console.log(120000 - this.store[RESOURCE_ENERGY])
-            Game.market.deal(buyOrders[0]["id"], 50000 - this.store.getUsedCapacity([RESOURCE_ENERGY]), this.room.name)
+            Game.market.deal(buyOrders[0]["id"], 5000 - this.store.getUsedCapacity([RESOURCE_ENERGY]), this.room.name)
 
         }
     }
