@@ -79,7 +79,7 @@ StructureTerminal.prototype.market = function() {
             let buyAmount = 120000 - this.store.getUsedCapacity([RESOURCE_ENERGY])
             let buyCost = Game.market.calcTransactionCost(buyAmount, this.room.name, buyOrders[0].roomName)
             
-            //console.log(buyCost)
+            console.log(buyCost + "BC")
             
             /*
             let i = 0
