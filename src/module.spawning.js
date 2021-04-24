@@ -469,14 +469,14 @@ module.exports = {
                             var upgraderBodyResult = upgraderBody
                         } else if (stage == 2) {
 
-                            let upgraderBodyAmount = Math.floor(capacityEnergy / 550)
+                            let upgraderBodyAmount = Math.floor(capacityEnergy / 250)
                             let upgraderBody = []
 
                             var upgraderBodyTier = 0
 
                             for (let i = 0; i < upgraderBodyAmount; i++) {
 
-                                upgraderBody.push()
+                                upgraderBody.push(WORK, MOVE, CARRY, MOVE)
                                 upgraderBodyTier++
 
                             }
