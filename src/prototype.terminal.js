@@ -55,7 +55,7 @@ StructureTerminal.prototype.market = function() {
         if (orderBlacklist.indexOf(resource) == -1 && this.store[resource] >= 20000 && Object.keys(Game.market.orders).length < 300 && resource != RESOURCE_ENERGY) {
 
             let resourceHistory = Game.market.getHistory(resource);
-            let sellPrice = resourceHistory[0]["avgPrice"] * 0.7
+            let sellPrice = resourceHistory[0]["avgPrice"] * 0.8
             console.log("SP: " + sellPrice + ", " + resource);
             //console.log(orderBlacklist)
 
@@ -69,25 +69,27 @@ StructureTerminal.prototype.market = function() {
         
         //console.log(RESOURCE_ENERGY + ", " + this.room.name)
 
-        let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= 1 && order.amount >= (120000 - this.store.getUsedCapacity([RESOURCE_ENERGY])))
+        let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= 1 && order.amount >= (150000 - this.store.getUsedCapacity([RESOURCE_ENERGY])))
 
         if (buyOrders[0]) {
 
             //console.log("Found order for: " + RESOURCE_ENERGY + ", " + this.room + ", " + buyOrders[0]["id"] + ", " + buyOrders[0].amount + buyOrders[0].roomName)
             //console.log(120000 - this.store[RESOURCE_ENERGY])
             
-            let buyAmount = 120000 - this.store.getUsedCapacity([RESOURCE_ENERGY])
+            let buyAmount = 150000 - this.store.getUsedCapacity([RESOURCE_ENERGY])
             let buyCost = Game.market.calcTransactionCost(buyAmount, this.room.name, buyOrders[0].roomName)
             
             //console.log(buyCost + "BC")
             
-            for (let i = 120000; i > 0; i -= 1000) {
+            for (let i = 150000; i > 0; i -= 1000) {
                 
                 console.log(i)
                 Game.market.deal(buyOrders[0]["id"], i, this.room.name)
             }
         }
     }
+
+    let commodities = []
 
     let gameResources = ["XUH2O", "XUHO2", "XKH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2", "UH2O", "UHO2", "KH2O", "KHO2", "LH2O", "LHO2", "ZH2O", "ZHO2", "GH2O", "GHO2", "UH", "UO", "KH", "KO", "LH", "LO", "ZH", "ZO", "GH", "GO", "OH", "ZK", "UL", "G", "OH", "ZK", "UL", "G", "H", "O", "U", "K", "L", "Z", "X"]
 

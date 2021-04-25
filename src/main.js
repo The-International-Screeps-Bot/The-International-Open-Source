@@ -119,13 +119,7 @@ Market:
 
     Game.rooms['W17N52'].terminal.send(RESOURCE_ENERGY, 30000, 'W17N54','Reason')
 
-    Game.market.createOrder({
-        type: ORDER_SELL,
-        resourceType: RESOURCE_GHODIUM,
-        price: 9.95,
-        totalAmount: 10000,
-        roomName: "W1N1"   
-    })
+    Game.market.createOrder({type: ORDER_SELL, resourceType: PIXEL, price: 1000, totalAmount: 750, roomName: "E25N2"})
     
     //-----------------------------------------------------------------------------------------------
 

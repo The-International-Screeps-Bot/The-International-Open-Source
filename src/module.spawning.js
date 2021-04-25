@@ -156,13 +156,8 @@ module.exports = {
                 })[0]
                 let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)
                 let repairStructure = room.find(FIND_STRUCTURES, {
-                    filter: s => (s.structureType == STRUCTURE_ROAD && s.structureType == STRUCTURE_CONTAINER) && s.hits < s.hitsMax * 0.5
+                    filter: s => (s.structureType == STRUCTURE_ROAD && s.structureType == STRUCTURE_CONTAINER) && s.hits < s.hitsMax * 0.35
                 })
-                
-                if (repairStructure[0]) {
-                    
-                    var repairerNeed = true
-                }
 
                 let stage = room.memory.stage
 
@@ -954,7 +949,7 @@ module.exports = {
                             name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["builder"], { role: 'builder', building: false, roomFrom: room.name });
 
                             creepCount["builder"]++
-                        } else if (creepsOfRole[["repairer", room.name]] < room.memory.minimumNumberOfRepairers && repairerNeed == true) {
+                        } else if (creepsOfRole[["repairer", room.name]] < room.memory.minimumNumberOfRepairers && repairStructure) {
 
                             name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', repairing: false, roomFrom: room.name });
 
@@ -1098,7 +1093,7 @@ module.exports = {
                     
                 }
                 
-                if (towerTrue) {
+                if (stage <= 3) {
                     
                     room.memory.minimumNumberOfRepairers = 1
                 }
