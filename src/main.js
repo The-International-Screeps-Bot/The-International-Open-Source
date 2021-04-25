@@ -131,17 +131,17 @@ module.exports.loop = function() {
                 
                 if (cpu <= cpuTotal * 0.3) {
                     
-                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(11, 218, 32, 1);">CPU: ` + Game.cpu.getUsed().toFixed(2) + " / " + Game.cpu.limit + `</th>`
+                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(11, 218, 32, 1);">CPU: ` + Game.cpu.getUsed().toFixed(2) + " / " + Game.cpu.limit + " (%" + ((Game.cpu.getUsed() / Game.cpu.limit) * 100).toFixed(0) + ")" + `</th>`
                     return cpuMessage
                 }
                 else if (cpu <= cpuTotal * 0.7) {
                     
-                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(243, 235, 18, 1);">CPU: ` + Game.cpu.getUsed().toFixed(2) + " / " + Game.cpu.limit + `</th>`
+                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(243, 235, 18, 1);">CPU: ` + Game.cpu.getUsed().toFixed(2) + " / " + Game.cpu.limit + " (%" + ((Game.cpu.getUsed() / Game.cpu.limit) * 100).toFixed(0) + ")" + `</th>`
                     return cpuMessage
                 }
                 else {
                     
-                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(243, 40, 18, 1);">CPU: ` + Game.cpu.getUsed().toFixed(2) + " / " + Game.cpu.limit + `</th>`
+                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(243, 40, 18, 1);">CPU: ` + Game.cpu.getUsed().toFixed(2) + " / " + Game.cpu.limit + " (%" + ((Game.cpu.getUsed() / Game.cpu.limit) * 100).toFixed(0) + ")" + `</th>`
                     return cpuMessage
                 }
             }
