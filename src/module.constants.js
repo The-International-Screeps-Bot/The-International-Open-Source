@@ -2,6 +2,9 @@ module.exports = {
     run: function constants() {
         
         global()
+
+        let totalEnergy = 0
+        Memory.global.roomCount = 0
         
         function global() {
             
@@ -39,6 +42,8 @@ module.exports = {
         
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my && room.controller.level >= 1) {
+                
+                Memory.global.roomCount++
 
                 //console.log("a")
 
@@ -50,7 +55,7 @@ module.exports = {
                 spawns()
                 terminals()
                 rooms()
-                roomGlobal() 
+                myResources()
 
                 /*
                 if (room.name == "E28N13") {
@@ -261,7 +266,41 @@ module.exports = {
 
                     room.memory.remoteRooms = remoteRooms
                 }
+                function myResources() {
+                    
+                    if (room.storage) {
+                        
+                        var storageEnergy = room.storage.store[RESOURCE_ENERGY]
+                    }
+                    else {
+                        
+                        var storageEnergy = 0
+                    }
+                    if (room.terminal) {
+                        
+                        var terminalEnergy = room.terminal.store[RESOURCE_ENERGY]
+                    }
+                    else {
+                        
+                        var terminalEnergy = 0
+                    }
+                    
+                    room.memory.totalEnergy = storageEnergy + terminalEnergy
+                    
+                    console.log(room.memory.totalEnergy)
+                    
+                    totalEnergy += room.memory.totalEnergy
+                }
             }
         })
+        
+        if (Memory.global.totalEnergy == null) {
+            
+            Memory.global.totalEnergy = 0
+        }
+        
+        Memory.global.totalEnergy = totalEnergy
+        
+        //console.log(Memory.global.totalEnergy)
     }
 };

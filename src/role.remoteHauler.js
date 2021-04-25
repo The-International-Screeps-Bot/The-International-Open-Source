@@ -138,7 +138,7 @@ module.exports = {
                         filter: s => s.structureType == STRUCTURE_CONTAINER
                     })
 
-                    if (containers.length >= 3 && links.length < 3 && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
+                    if (containers.length >= 3 && links.length < 3 && controllerContainer && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
 
                         creep.say("cC1")
 
