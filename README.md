@@ -1,6 +1,6 @@
 # The Internationale - a fully automated Screeps bot
 
-![the internationale](https://i.ibb.co/K5XGK5t/Group-2.png)
+![The Internationale](https://i.ibb.co/K5XGK5t/Group-2.png)
 
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/open-source.svg)](https://forthebadge.com)
@@ -10,6 +10,9 @@
 
 The Internationale is my bot for the MMO server, thematically based after communist aesthetics. The goal of The Internationale is to set up a fully autonomous communism zone in shard 2. Owned rooms are called communes, offensive and defensive forces are called the Red Army, economic workers are known as the Proletariat, and the Revolutionaries establish new communes and rebuild destroyed ones.
 
+The bot is not meant for use or forking, please do not use it as such. It is simply intented to provide experienced and new players a reference for when they get stuck, need inspiration, or want to laugh at some terrible code. The bot is intended to be automated, but can perform manual actions via the console, and has an information panel showing progress, events, economy and military, as well as, if intergrated, the current state and events allies are undergoing.
+
+![Information Panel](https://i.ibb.co/QNJNh2K/unknown.png)
 
 ## Progress
 
