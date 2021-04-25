@@ -1450,11 +1450,11 @@ module.exports = {
                     room.memory.minimumNumberOfScouts = 1
                 }
                 
-                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000) {
+                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000 && stage <= 7) {
                     
                     room.memory.minimumNumberOfUpgraders = 2
                 }
-                if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000) {
+                if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000 && stage <= 7) {
                     
                     room.memory.minimumNumberOfUpgradeHaulers = 2
                     room.memory.minimumNumberOfUpgraders = 3

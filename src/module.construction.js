@@ -66,9 +66,10 @@ module.exports = {
                     const cm = new PathFinder.CostMatrix()
                     
                     let anchorPoint = room.memory.anchorPoint
-                    var anchorPoints = []
     
-                    if (room.memory.anchorPoint == null) {    
+                    if (anchorPoint == null) {    
+                        
+                        var anchorPoints = []
                     
                         var dt = distanceTransform(walkablePixelsForRoom(roomName));
                         displayCostMatrix(roomName, cm, anchorPoints);
@@ -193,6 +194,7 @@ module.exports = {
                                             vis.text((array[x * 50 + y]).toFixed(0), x, y, { font: 0.3 })
     
                                             anchorPoints.push(new RoomPosition(x, y, room.name))
+                                            console.log(anchorPoints)
                                         }
                                     }
                                 }
