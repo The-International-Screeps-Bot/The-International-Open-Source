@@ -53,6 +53,7 @@ The Internationale is my bot for the MMO server, thematically based after commun
 - [ ] Have defenders move to ramparts near attackers
 - [x] Spawn new civilian creeps when TTL is less than time to spawn
 - [ ] Add a GUI for performing manual actions from the console
+- [ ] Information panel to provide information about the development of the bot
 
 ## Flowchart and more information
 
