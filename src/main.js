@@ -104,8 +104,6 @@ module.exports.loop = function() {
                 
                 let i = 0
                 
-                
-                
                 _.forEach(Game.rooms, function (room) {
                     
                     if (room.controller && room.controller.my) {
@@ -124,6 +122,58 @@ module.exports.loop = function() {
                        
                 }
             }
+            
+            function cpuMessage() {
+                
+                let cpuMessage
+                let cpu = Game.cpu.getUsed()
+                let cpuTotal = Game.cpu.limit
+                
+                if (cpu <= cpuTotal * 0.3) {
+                    
+                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(11, 218, 32, 1);">CPU: ` + Game.cpu.getUsed().toFixed(2) + " / " + Game.cpu.limit + `</th>`
+                    return cpuMessage
+                }
+                else if (cpu <= cpuTotal * 0.7) {
+                    
+                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(243, 235, 18, 1);">CPU: ` + Game.cpu.getUsed().toFixed(2) + " / " + Game.cpu.limit + `</th>`
+                    return cpuMessage
+                }
+                else {
+                    
+                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(243, 40, 18, 1);">CPU: ` + Game.cpu.getUsed().toFixed(2) + " / " + Game.cpu.limit + `</th>`
+                    return cpuMessage
+                }
+            }
+            
+            function cpuBucketMessage() {
+                
+                let cpuMessage
+                let cpu = Game.cpu.bucket
+                let cpuTotal = 10000
+                
+                if (cpu >= cpuTotal * 0.7) {
+                    
+                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(11, 218, 32, 1);">CPU Bucket: ` + Game.cpu.bucket + `</th>`
+                    return cpuMessage
+                }
+                else if (cpu >= cpuTotal * 0.3) {
+                    
+                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(243, 235, 18, 1);">CPU Bucket: ` + Game.cpu.bucket + `</th>`
+                    return cpuMessage
+                }
+                else {
+                    
+                    cpuMessage = `<th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; color: rgba(243, 40, 18, 1);">CPU Bucket: ` + Game.cpu.bucket + `</th>`
+                    return cpuMessage
+                }
+            }
+            
+            function energyAmount() {
+                
+                let energyAmount = `<th style="text-align: center; padding: 5px 0; color: #FFD180;">Total Energy: ` + (Memory.global.totalEnergy / 1000).toFixed(0) + "k"+ `</th>`
+                return energyAmount
+            }
 
             console.log('--------------------------------------------------------')
             console.log(`
@@ -136,58 +186,57 @@ module.exports.loop = function() {
                     <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Allies</th>
                 </tr>
                 <tr>
-                    <th style="text-align: center; padding: 10px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Stage: ` + Memory.global.globalStage + `, Time: ` + Game.time % 10 + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Total Energy: ` + (Memory.global.totalEnergy / 1000).toFixed(0) + "k"+ `</th>
-                    <th style="text-align: center; padding: 10px 0;">Last Defence: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Total CR: ` + (Game.market.credits / 1000).toFixed(2) + "k" + `</th>
-                    <th style="text-align: center; padding: 10px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Alles: ` + allyList.run(allyList) + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Stage: ` + Memory.global.globalStage + ` <br /> Time: ` + Game.time % 10 + `</th>
+                    ` + energyAmount() + `
+                    <th style="text-align: center; padding: 5px 0;">Last Defence: ` + "x ticks ago, room y" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Total CR: ` + (Game.market.credits / 1000).toFixed(0) + "k" + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Alles: ` + allyList.run(allyList) + `</th>
                 </tr>
                 <tr style="background: #333">
-                    <th style="text-align: center; padding: 10px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Creeps: ` + Object.keys(Memory.creeps).length + " (" + Math.floor(Object.keys(Memory.creeps).length / myRoomsNumber()) + " / room)" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Total Boosts: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Last Attack: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Market Offers: ` + Object.keys(Game.market.orders).length + `</th>
-                    <th style="text-align: center; padding: 10px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Economy Need: ` + "true / false" + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Creeps: ` + Object.keys(Memory.creeps).length + " (" + Math.floor(Object.keys(Memory.creeps).length / myRoomsNumber()) + " / room)" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Total Boosts: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Last Attack: ` + "x ticks ago, room y" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Market Offers: ` + Object.keys(Game.market.orders).length + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Economy Need: ` + "true / false" + `</th>
                 </tr>
                 <tr>
-                    <th style="text-align: center; padding: 10px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">CPU: ` + Game.cpu.getUsed().toFixed(2) + " / " + Game.cpu.limit + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Military Need: ` + "true / false" + `</th>
+                    ` + cpuMessage() + `
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Military Need: ` + "true / false" + `</th>
                 </tr>
                 <tr style="background: #333">
-                    <th style="text-align: center; padding: 10px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">CPU Bucket: ` + Game.cpu.bucket + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Trade Need: ` + "true / false" + `</th>
+                    ` + cpuBucketMessage() + `
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Trade Need: ` + "true / false" + `</th>
                 </tr>
                 <tr>
-                    <th style="text-align: center; padding: 10px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Rooms: ` + Memory.global.roomCount + " (" + Memory.global.establishedRooms + " Established)" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Rooms: ` + Memory.global.roomCount + " / " + Game.gcl.level + " (%" + (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(0) + " GCL)" + ` <br /> ` + "(" + Memory.global.establishedRooms + " Established)" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Time: ` + "x" + `</th>
                 </tr>
             </table>
             `)
-            console.log('--------------------------------------------------------')
             
                 /*
                 <tr>
-                    <th style="text-align: center; padding: 10px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Time: ` + "x" + `</th>
                 </tr>
                 <tr style="background: #333">
-                    <th style="text-align: center; padding: 10px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 10px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Time: ` + "x" + `</th>
                 </tr>
                 */
             

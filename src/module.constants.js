@@ -287,7 +287,7 @@ module.exports = {
                     
                     room.memory.totalEnergy = storageEnergy + terminalEnergy
                     
-                    console.log(room.memory.totalEnergy)
+                    //console.log(room.memory.totalEnergy)
                     
                     totalEnergy += room.memory.totalEnergy
                 }
