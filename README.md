@@ -38,12 +38,12 @@ The Internationale is my bot for the MMO server, thematically based after commun
 - [ ] Automated recording of viable rooms to claim
 - [ ] Automated claiming of rooms
 - [ ] Automated recording of viable remote harvesting rooms
-- [ ] Add room and map visuals to display important information
+- [x] Add room and map visuals to display important information
 - [ ] Power creep offensive capabilities
 - [ ] Automatic safemode when boosted attackers
 - [ ] Advanced targeting for towers
 - [ ] Recording and predicting for like attackers
-- [ ] Assisting of defending rooms in case of power creep assisted attack
+- [ ] Assisting of defending rooms using safe rooms in case of power creep assisted attack
 - [ ] Weighting of rooms from economic to military depending on recent history and neighbours
 - [x] Communication and coordination between rooms about global stage, economy, threats
 - [ ] Advanced pathing to avoid rooms with known threats
