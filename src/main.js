@@ -97,13 +97,40 @@ module.exports.loop = function() {
             spawns.run(spawns)
 
             console.log("spawns: " + Game.cpu.getUsed().toFixed(2))
+            
+            function myRoomsNumber() {
+                
+                let i = 0
+                
+                
+                
+                _.forEach(Game.rooms, function (room) {
+                    
+                    if (room.controller && room.controller.my) {
+                        
+                        i++
+                    }
+                })
+                
+                return i
+            }
 
             console.log('--------------------------------------------------------')
-            console.log("                Time: " + Game.time)
-            console.log("              Creeps: " + Object.keys(Memory.creeps).length)
+            console.log("                Time: " + Game.time % 10)
+            console.log("              Creeps: " + Object.keys(Memory.creeps).length + " (" + Math.floor(Object.keys(Memory.creeps).length / myRoomsNumber()) + " / room)")
             console.log("       Market Offers: " + Object.keys(Game.market.orders).length)
             console.log("          CPU Bucket: " + Game.cpu.bucket)
             console.log("                 CPU: " + Game.cpu.getUsed().toFixed(2))
+            console.log(`
+            <div style="dislay: flex; flex-direction: row; background: rgba(255, 255, 255, 0.15); padding: 12px; border-radius: 6px; width: 90vw; box-shadow: rgba(0, 0, 0, 0.19) 0 12px 30px 0;">
+                <div style="width: 25%;">
+                    <div style="color:green; background: white; width: 20%;">Text</div>
+                </div>
+                <div style="width: 25%;">
+                    <div style="color:green; background: white; width: 20%;">Text</div>
+                </div>
+            </div>
+            `)
             console.log('--------------------------------------------------------')
                 //});
         }
