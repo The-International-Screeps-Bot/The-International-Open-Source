@@ -57,7 +57,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [x] Spawn new civilian creeps when TTL is less than time to spawn
 - [ ] Add a GUI for performing manual actions from the console
 - [x] Information panel to provide information about the development of the bot
-- [ ] Communication with allies
+- [ ] Communication with allies via the public segment
 
 ## Flowchart and more information
 
