@@ -55,38 +55,34 @@ module.exports = {
 
                 function doDistanceTransform() {
 
-                    let ticks = 0
-                    let totalCpu = 0
-                    let totalTime = 0
+                    let ticks = 0;
+                    let totalCpu = 0;
+                    let totalTime = 0;
 
-                    let roomName = room.name
-                    let time = (new Date()).getMilliseconds()
-                    let cpu = Game.cpu.getUsed
-                    
-                    const cm = new PathFinder.CostMatrix()
-                    
+                    let roomName = room.name;
+                    let time = (new Date()).getMilliseconds();
+                    let cpu = Game.cpu.getUsed();
+                    time = (new Date()).getMilliseconds() - time;
+                    cpu = Game.cpu.getUsed() - cpu;
+                    ticks++;
+                    totalCpu += cpu;
+                    totalTime += time;
+
+                    var anchorPoints = []
                     let anchorPoint = room.memory.anchorPoint
-    
-                    if (anchorPoint == null) {    
-                        
-                        var anchorPoints = []
-                    
-                        var dt = distanceTransform(walkablePixelsForRoom(roomName));
+                    let cm = new PathFinder.CostMatrix()
+
+                    if (anchorPoint == null) {
+
+                        var dt = distanceTransform(walkablePixelsForRoom(roomName)); // a bare Uint8Array
+                        cm._bits = dt; // now we have a real CostMatrix for future use
                         displayCostMatrix(roomName, cm, anchorPoints);
                         filterAnchorPoints(anchorPoints)
                     }
                     
-                    cm._bits = dt
-                    
                     roomPlanner(roomName, cm, anchorPoint)
-                    
-                    time = (new Date()).getMilliseconds() - time
-                    cpu = Game.cpu.getUsed() - cpu
-                    ticks++
-                    totalCpu += cpu
-                    totalTime += time
-                    console.log(`dt for ${roomName} took ${time}ms (avg ${totalTime/ticks}) ${cpu}cpu (avg ${totalCpu/ticks})`)
 
+                    console.log(`dt for ${roomName} took ${time}ms (avg ${totalTime/ticks}) ${cpu}cpu (avg ${totalCpu/ticks})`)
                     /**
                         @param {Number[2500]} array - one entry per square in the room
                         @param {Number} oob - value used for pixels outside image bounds
@@ -194,7 +190,6 @@ module.exports = {
                                             vis.text((array[x * 50 + y]).toFixed(0), x, y, { font: 0.3 })
     
                                             anchorPoints.push(new RoomPosition(x, y, room.name))
-                                            console.log(anchorPoints)
                                         }
                                     }
                                 }
