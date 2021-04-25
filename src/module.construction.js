@@ -64,7 +64,6 @@ module.exports = {
                     let cpu = Game.cpu.getUsed
                     
                     const cm = new PathFinder.CostMatrix()
-                    cm._bits = dt
                     
                     let anchorPoint = room.memory.anchorPoint
                     var anchorPoints = []
@@ -75,6 +74,8 @@ module.exports = {
                         displayCostMatrix(roomName, cm, anchorPoints);
                         filterAnchorPoints(anchorPoints)
                     }
+                    
+                    cm._bits = dt
                     
                     roomPlanner(roomName, cm, anchorPoint)
                     
