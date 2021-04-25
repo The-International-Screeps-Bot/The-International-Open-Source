@@ -334,8 +334,10 @@ module.exports = {
             
                 room.visual.text(controller.level, controller.pos.x, controller.pos.y - 1, { align: 'center' });
             
-                room.visual.text((storage.store[RESOURCE_ENERGY] / 1000).toFixed(0) + "k", storage.pos.x, storage.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center' });
-            
+                if (storage) {
+                    
+                    room.visual.text((storage.store[RESOURCE_ENERGY] / 1000).toFixed(0) + "k", storage.pos.x, storage.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center' });
+                }
                 if (terminal) {
             
                     room.visual.text((_.sum(terminal.store) / 1000).toFixed(0) + "k", terminal.pos.x, terminal.pos.y - 1, { align: 'center' });
