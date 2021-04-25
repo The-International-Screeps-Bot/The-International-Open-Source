@@ -122,14 +122,18 @@ module.exports.loop = function() {
             console.log("          CPU Bucket: " + Game.cpu.bucket)
             console.log("                 CPU: " + Game.cpu.getUsed().toFixed(2))
             console.log(`
-            <div style="dislay: flex; flex-direction: row; background: rgba(255, 255, 255, 0.15); padding: 12px; border-radius: 6px; width: 90vw; box-shadow: rgba(0, 0, 0, 0.19) 0 12px 30px 0;">
-                <div style="width: 25%;">
-                    <div style="color:green; background: white; width: 20%;">Text</div>
-                </div>
-                <div style="width: 25%;">
-                    <div style="color:green; background: white; width: 20%;">Text</div>
-                </div>
-            </div>
+            <table style="background: rgba(255, 255, 255, 0.15); padding: 12px; border-radius: 2px; width: 90vw; box-shadow: rgba(255, 255, 255, 0.15) 0 0 0 7px; overflow: hidden; font-family: sans-serif; margin-top: -150px;">
+                <tr style="background: rgba(44, 97, 242, 1);">
+                    <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">General</th>
+                    <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px;">Economy</th>
+                    <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px;">Military</th>
+                    <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px;">Market</th>
+                    <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Allies</th>
+                </tr>
+                <tr style="width: 25%;">
+                    <th style="text-align: center; padding: 10px 0;">Time: <script>console.log(Game.time)</script></th>
+                </tr>
+            </table>
             `)
             console.log('--------------------------------------------------------')
                 //});

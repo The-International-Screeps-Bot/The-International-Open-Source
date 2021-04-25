@@ -904,7 +904,7 @@ module.exports = {
                             name = spawn.createCreep(harvesterBodyResult, 'H, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester1"], { role: 'harvester1', working: false, target: 1, roomFrom: room.name });
 
                             creepCount["harvester1"]++
-                        } else if (creepsOfRole[["generalHauler", room.name]] < 1) {
+                        } else if (creepsOfRole[["generalHauler", room.name]] < room.memory.minimumNumberOfGeneralHaulers * 0.5) {
 
                             name = spawn.createCreep(haulerBodyResult, 'GH, ' + "T" + haulerBodyTier + ", " + creepCount["generalHauler"], { role: 'generalHauler', fullEnergy: false, roomFrom: room.name });
 
