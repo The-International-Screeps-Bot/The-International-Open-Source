@@ -68,7 +68,7 @@ module.exports = {
                     let anchorPoint = room.memory.anchorPoint
                     var anchorPoints = []
     
-                    if (anchorPoint == null) {    
+                    if (room.memory.anchorPoint == null) {    
                     
                         var dt = distanceTransform(walkablePixelsForRoom(roomName));
                         displayCostMatrix(roomName, cm, anchorPoints);
