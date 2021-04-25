@@ -1082,16 +1082,6 @@ module.exports = {
 
                 var minBigBoyLeaders = room.memory.minimumNumberOfBigBoyLeaders = squads
                 var minBigBoyMembers = room.memory.minimumNumberOfBigBoyMembers = squads
-
-                
-                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000) {
-                    
-                    room.memory.minimumNumberOfUpgraders = 2
-                }
-                else {
-                    
-                    
-                }
                 
                 if (stage <= 3) {
                     
@@ -1460,6 +1450,10 @@ module.exports = {
                     room.memory.minimumNumberOfScouts = 1
                 }
                 
+                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000) {
+                    
+                    room.memory.minimumNumberOfUpgraders = 2
+                }
                 if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000) {
                     
                     room.memory.minimumNumberOfUpgradeHaulers = 2
