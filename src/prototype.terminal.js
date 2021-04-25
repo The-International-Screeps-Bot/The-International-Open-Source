@@ -69,19 +69,19 @@ StructureTerminal.prototype.market = function() {
         
         //console.log(RESOURCE_ENERGY + ", " + this.room.name)
 
-        let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= 1 && order.amount >= (150000 - this.store.getUsedCapacity([RESOURCE_ENERGY])))
+        let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= 1 && order.amount >= (120000 - this.store.getUsedCapacity([RESOURCE_ENERGY])))
 
         if (buyOrders[0]) {
 
             //console.log("Found order for: " + RESOURCE_ENERGY + ", " + this.room + ", " + buyOrders[0]["id"] + ", " + buyOrders[0].amount + buyOrders[0].roomName)
             //console.log(120000 - this.store[RESOURCE_ENERGY])
             
-            let buyAmount = 150000 - this.store.getUsedCapacity([RESOURCE_ENERGY])
+            let buyAmount = 120000 - this.store.getUsedCapacity([RESOURCE_ENERGY])
             let buyCost = Game.market.calcTransactionCost(buyAmount, this.room.name, buyOrders[0].roomName)
             
             //console.log(buyCost + "BC")
             
-            for (let i = 150000; i > 0; i -= 1000) {
+            for (let i = 120000; i > 0; i -= 1000) {
                 
                 console.log(i)
                 Game.market.deal(buyOrders[0]["id"], i, this.room.name)

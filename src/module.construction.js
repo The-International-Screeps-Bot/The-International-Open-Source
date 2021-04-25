@@ -676,7 +676,7 @@ module.exports = {
     
                                     //console.log(JSON.stringify(path))
                                     
-                                    new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+                                    //new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
                                 
                                     for (let i = 0; i < path.length; i++) {
                                         
