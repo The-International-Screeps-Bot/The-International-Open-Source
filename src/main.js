@@ -177,7 +177,7 @@ module.exports.loop = function() {
 
             console.log('--------------------------------------------------------')
             console.log(`
-            <table style="background: rgba(255, 255, 255, 0.12); padding: 12px; border-radius: 2px; width: 90vw; box-shadow: rgba(255, 255, 255, 0.12) 0 0 0 7px; overflow: hidden; font-family: sans-serif; margin-left: 5px;">
+            <table style="background: rgba(255, 255, 255, 0.1); padding: 6px; border-radius: 4px; width: 90vw; border-collapse: initial; box-shadow: rgba(0, 0, 0, 0.18) 0 12px 30px 0; overflow: hidden; font-family: sans-serif; margin-left: 10px;">
                 <tr style="background: rgba(44, 97, 242, 1);">
                     <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">General</th>
                     <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px;">Economy</th>
