@@ -31,40 +31,10 @@ module.exports = {
         roles["bigBoyLeader"] = require("role.bigBoy")
         roles["bigBoyMember"] = require("role.bigBoy")
 
-        let cpuUsage = {}
-
-        cpuUsage["harvester1"]
-        cpuUsage["harvester2"]
-        cpuUsage["generalHauler"]
-        cpuUsage["baseHauler"]
-        cpuUsage["containerHauler"]
-        cpuUsage["upgrader"]
-        cpuUsage["builder"]
-        cpuUsage["repairer"]
-        cpuUsage["upgradeHauler"]
-        cpuUsage["wallRepairer"]
-        cpuUsage["claimer"]
-        cpuUsage["spawnBuilder"]
-        cpuUsage["rangedDefender"]
-        cpuUsage["miner"]
-        cpuUsage["scientist"]
-        cpuUsage["reserver"]
-        cpuUsage["robber"]
-        cpuUsage["scout"]
-        cpuUsage["serf"]
-        cpuUsage["remoteDefender"]
-        cpuUsage["remoteHarvester1"]
-        cpuUsage["remoteHarvester2"]
-        cpuUsage["remoteHauler"]
-        cpuUsage["remoteBuilder"]
-        cpuUsage["bigBoy"]
-
         for (let name in Game.creeps) {
 
             let creep = Game.creeps[name]
             //creep.suicide()
-            
-            //console.log(creep.body.length * 3)
             
             if (creep.ticksToLive <= creep.body.length * 3) {
                 
@@ -73,7 +43,7 @@ module.exports = {
 
             roles[creep.memory.role].run(creep)
 
-            console.log(creep.memory.role + ": " + Game.cpu.getUsed().toFixed(2))
+            //console.log(creep.memory.role + ": " + Game.cpu.getUsed().toFixed(2))
         }
     }
 };
