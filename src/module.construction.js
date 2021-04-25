@@ -436,7 +436,7 @@ module.exports = {
 
                                             room.createConstructionSite(pos.x, pos.y, structureType);
                                         }
-                                    } else if (room.controller.level >= 6) {
+                                    } else if (room.controller.level >= 6 && room.storage.store[RESOURCE_ENERGY] >= 20000) {
 
                                         room.createConstructionSite(pos.x, pos.y, structureType);
                                     }
