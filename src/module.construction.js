@@ -55,23 +55,17 @@ module.exports = {
 
                 function doDistanceTransform() {
 
-                    let ticks = 0;
-                    let totalCpu = 0;
-                    let totalTime = 0;
+                    let ticks = 0
+                    let totalCpu = 0
+                    let totalTime = 0
 
-                    let roomName = room.name;
-                    let time = (new Date()).getMilliseconds();
-                    let cpu = Game.cpu.getUsed();
-                     // a bare Uint8Array
-                    const cm = new PathFinder.CostMatrix();
-                    cm._bits = dt; // now we have a real CostMatrix for future use
-                    time = (new Date()).getMilliseconds() - time;
-                    cpu = Game.cpu.getUsed() - cpu;
-                    ticks++;
-                    totalCpu += cpu;
-                    totalTime += time;
-                    console.log(`dt for ${roomName} took ${time}ms (avg ${totalTime/ticks}) ${cpu}cpu (avg ${totalCpu/ticks})`);
-
+                    let roomName = room.name
+                    let time = (new Date()).getMilliseconds()
+                    let cpu = Game.cpu.getUsed
+                    
+                    const cm = new PathFinder.CostMatrix()
+                    cm._bits = dt
+                    
                     let anchorPoint = room.memory.anchorPoint
                     var anchorPoints = []
     
@@ -83,6 +77,13 @@ module.exports = {
                     }
                     
                     roomPlanner(roomName, cm, anchorPoint)
+                    
+                    time = (new Date()).getMilliseconds() - time
+                    cpu = Game.cpu.getUsed() - cpu
+                    ticks++
+                    totalCpu += cpu
+                    totalTime += time
+                    console.log(`dt for ${roomName} took ${time}ms (avg ${totalTime/ticks}) ${cpu}cpu (avg ${totalCpu/ticks})`)
 
                     /**
                         @param {Number[2500]} array - one entry per square in the room
@@ -161,7 +162,7 @@ module.exports = {
     
                             const array = costMatrix._bits;
     
-                            var max = _.max(array);
+                            //var max = _.max(array);
     
                             for (var x = 0; x < 50; ++x) {
                                 for (var y = 0; y < 50; ++y) {
@@ -277,11 +278,11 @@ module.exports = {
                                     //console.log(pos.x + "," + pos.y)
                                     //console.log(structureType)
                                     
-                                    if (structureType == "road" && room.controller.level <= 5) {
+                                    if (structureType == "road" && room.controller.level <= 4) {
                                         
                                         
                                     }
-                                    else if (structureType == "link" && room.controller.level <= 7) {
+                                    else if (structureType == "link" && room.controller.level <= 6) {
                                         
                                         
                                     }
