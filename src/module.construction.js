@@ -5,8 +5,6 @@ module.exports = {
             //destroySite()
             //destroyRoad()
             //destroyStructure()
-                
-            remoteSourcePath()
             
             function destroySite() {
 
@@ -51,73 +49,6 @@ module.exports = {
                 }
             }
 
-            function remoteSourcePath() {
-                if (room.memory.stage == "remoteRoom") {
-
-                    let origin = room.find(FIND_SOURCES)[0]
-
-                    let source2 = room.find(FIND_SOURCES)[1]
-
-                    if (source2) {
-
-                        let goal = _.map([source2], function(source) {
-                            return { pos: source.pos, range: 1 }
-                        })
-
-                        var path = PathFinder.search(origin.pos, goal, {
-                            plainCost: 2,
-
-                            roomCallback: function(roomName) {
-
-                                let room = Game.rooms[roomName]
-
-                                if (!room) return
-
-                                let costs = new PathFinder.CostMatrix
-
-                                room.find(FIND_STRUCTURES).forEach(function(struct) {
-                                    if (struct.structureType === STRUCTURE_ROAD) {
-
-                                        costs.set(struct.pos.x, struct.pos.y, 1)
-
-                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
-
-                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
-
-                                    }
-                                })
-                                room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
-                                    if (struct.structureType === STRUCTURE_ROAD) {
-
-                                        costs.set(struct.pos.x, struct.pos.y, 1)
-
-                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
-
-                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
-
-                                    }
-                                })
-
-                                return costs
-
-                            }
-                        }).path
-
-                        //console.log(JSON.stringify(path))
-
-                        //new RoomVisual().poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
-
-                        for (let value of path) {
-                            
-                            if (Game.rooms[value.roomName]) {
-                            
-                                Game.rooms[value.roomName].createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
-                            }
-                        }
-                    }
-                }
-            }
-
             if (room.controller && room.controller.my) {
 
                 doDistanceTransform()
@@ -131,7 +62,7 @@ module.exports = {
                     let roomName = room.name;
                     let time = (new Date()).getMilliseconds();
                     let cpu = Game.cpu.getUsed();
-                    var dt = distanceTransform(walkablePixelsForRoom(roomName)); // a bare Uint8Array
+                     // a bare Uint8Array
                     const cm = new PathFinder.CostMatrix();
                     cm._bits = dt; // now we have a real CostMatrix for future use
                     time = (new Date()).getMilliseconds() - time;
@@ -141,10 +72,17 @@ module.exports = {
                     totalTime += time;
                     console.log(`dt for ${roomName} took ${time}ms (avg ${totalTime/ticks}) ${cpu}cpu (avg ${totalCpu/ticks})`);
 
+                    let anchorPoint = room.memory.anchorPoint
                     var anchorPoints = []
-
-                    displayCostMatrix(roomName, cm, anchorPoints);
-                    filterAnchorPoints(anchorPoints)
+    
+                    if (!anchorPoint) {    
+                    
+                        var dt = distanceTransform(walkablePixelsForRoom(roomName));
+                        displayCostMatrix(roomName, cm, anchorPoints);
+                        filterAnchorPoints(anchorPoints)
+                    }
+                    
+                    roomPlanner(roomName, cm, anchorPoint)
 
                     /**
                         @param {Number[2500]} array - one entry per square in the room
@@ -156,117 +94,115 @@ module.exports = {
                         it to a high value (e.g., 255) for this. Set oob to 0 to treat out of bounds
                         as background pixels.
                     */
-                    function distanceTransform(array, oob = 255) {
-                        // Variables to represent the 3x3 neighborhood of a pixel.
-                        var A, B, C;
-                        var D, E, F;
-                        var G, H, I;
-
-                        var n, value;
-                        for (n = 0; n < 2500; n++) {
-                            if (array[n] !== 0) {
-                                A = array[n - 51];
-                                B = array[n - 1];
-                                D = array[n - 50];
-                                G = array[n - 49];
-                                if (n % 50 == 0) { A = oob;
-                                    B = oob; }
-                                if (n % 50 == 49) { G = oob; }
-                                if (~~(n / 50) == 0) { A = oob;
-                                    D = oob;
-                                    G = oob; }
-
-                                array[n] = (Math.min(A, B, D, G, 254) + 1);
-                            }
-                        }
-
-                        for (n = 2499; n >= 0; n--) {;
-                            C = array[n + 49];;
-                            E = array[n];
-                            F = array[n + 50];;
-                            H = array[n + 1];
-                            I = array[n + 51];
-                            if (n % 50 == 0) { C = oob; }
-                            if (n % 50 == 49) { H = oob;
-                                I = oob; }
-                            if (~~(n / 50) == 49) { C = oob;
-                                F = oob;
-                                I = oob; }
-
-                            value = Math.min(C + 1, E, F + 1, H + 1, I + 1);
-                            array[n] = (value);
-                        }
-
-                        return array;
-                    }
-
-                    /**
-                        @param {string} roomName
-                        @return {Number[2500]}
-                    */
-                    function walkablePixelsForRoom(roomName) {
-                        var array = new Uint8Array(2500);
-                        for (var x = 0; x < 50; ++x) {
-                            for (var y = 0; y < 50; ++y) {
-                                if (Game.map.getRoomTerrain(roomName).get(x, y) == '0' || Game.map.getRoomTerrain(roomName).get(x, y) == '2') {
-                                    array[x * 50 + y] = 1;
-                                } else {
-                                    array[x * 50 + y] = 0;
+                        function distanceTransform(array, oob = 255) {
+                            // Variables to represent the 3x3 neighborhood of a pixel.
+                            var A, B, C;
+                            var D, E, F;
+                            var G, H, I;
+    
+                            var n, value;
+                            for (n = 0; n < 2500; n++) {
+                                if (array[n] !== 0) {
+                                    A = array[n - 51];
+                                    B = array[n - 1];
+                                    D = array[n - 50];
+                                    G = array[n - 49];
+                                    if (n % 50 == 0) { A = oob;
+                                        B = oob; }
+                                    if (n % 50 == 49) { G = oob; }
+                                    if (~~(n / 50) == 0) { A = oob;
+                                        D = oob;
+                                        G = oob; }
+    
+                                    array[n] = (Math.min(A, B, D, G, 254) + 1);
                                 }
                             }
+    
+                            for (n = 2499; n >= 0; n--) {;
+                                C = array[n + 49];;
+                                E = array[n];
+                                F = array[n + 50];;
+                                H = array[n + 1];
+                                I = array[n + 51];
+                                if (n % 50 == 0) { C = oob; }
+                                if (n % 50 == 49) { H = oob;
+                                    I = oob; }
+                                if (~~(n / 50) == 49) { C = oob;
+                                    F = oob;
+                                    I = oob; }
+    
+                                value = Math.min(C + 1, E, F + 1, H + 1, I + 1);
+                                array[n] = (value);
+                            }
+    
+                            return array;
                         }
-                        return array;
-                    }
-
-                    function displayCostMatrix(roomName, costMatrix) {
-                        var vis = Game.rooms[roomName].visual;
-
-                        const array = costMatrix._bits;
-
-                        var max = _.max(array);
-
-                        for (var x = 0; x < 50; ++x) {
-                            for (var y = 0; y < 50; ++y) {
-                                var value = array[x * 50 + y];
-                                if (value > 0) {
-                                    /*
-                                    vis.circle(x, y, {radius:array[x*50+y] / 10, fill: "green"})
-                                    vis.text((array[x*50+y]).toFixed(0), x, y, {font: 0.3})
-                                    */
+    
+                        /**
+                            @param {string} roomName
+                            @return {Number[2500]}
+                        */
+                        function walkablePixelsForRoom(roomName) {
+                            var array = new Uint8Array(2500);
+                            for (var x = 0; x < 50; ++x) {
+                                for (var y = 0; y < 50; ++y) {
+                                    if (Game.map.getRoomTerrain(roomName).get(x, y) == '0' || Game.map.getRoomTerrain(roomName).get(x, y) == '2') {
+                                        array[x * 50 + y] = 1;
+                                    } else {
+                                        array[x * 50 + y] = 0;
+                                    }
                                 }
-                                if (value >= 7) {
-
-                                    let exits = room.find(FIND_EXIT)
-                                    let tooClose = false
-
-                                    for (let exit of exits) {
-                                        if (exit.getRangeTo(x, y) < 10) {
-
-                                            tooClose = true
-                                            break
+                            }
+                            return array;
+                        }
+    
+                        function displayCostMatrix(roomName, costMatrix) {
+                            var vis = Game.rooms[roomName].visual;
+    
+                            const array = costMatrix._bits;
+    
+                            var max = _.max(array);
+    
+                            for (var x = 0; x < 50; ++x) {
+                                for (var y = 0; y < 50; ++y) {
+                                    var value = array[x * 50 + y];
+                                    if (value > 0) {
+                                        /*
+                                        vis.circle(x, y, {radius:array[x*50+y] / 10, fill: "green"})
+                                        vis.text((array[x*50+y]).toFixed(0), x, y, {font: 0.3})
+                                        */
+                                    }
+                                    if (value >= 7) {
+    
+                                        let exits = room.find(FIND_EXIT)
+                                        let tooClose = false
+    
+                                        for (let exit of exits) {
+                                            if (exit.getRangeTo(x, y) < 10) {
+    
+                                                tooClose = true
+                                                break
+                                            }
+                                        }
+                                        if (tooClose == false) {
+    
+    
+                                            vis.circle(x, y, { radius: array[x * 50 + y] / 10, fill: "green" })
+                                            vis.text((array[x * 50 + y]).toFixed(0), x, y, { font: 0.3 })
+    
+                                            anchorPoints.push(new RoomPosition(x, y, room.name))
                                         }
                                     }
-                                    if (tooClose == false) {
-
-
-                                        vis.circle(x, y, { radius: array[x * 50 + y] / 10, fill: "green" })
-                                        vis.text((array[x * 50 + y]).toFixed(0), x, y, { font: 0.3 })
-
-                                        anchorPoints.push(new RoomPosition(x, y, room.name))
-                                    }
                                 }
                             }
                         }
-                    }
-
-                    function filterAnchorPoints(anchorPoints) {
-
-                        let startPoint = room.controller.pos
-
-                        let anchorPoint = startPoint.findClosestByRange(anchorPoints)
-
-                        roomPlanner(roomName, cm, anchorPoint)
-                    }
+    
+                        function filterAnchorPoints(anchorPoints) {
+    
+                            let startPoint = room.controller.pos
+    
+                            room.memory.anchorPoint = startPoint.findClosestByRange(anchorPoints)
+                        }
 
                     function roomPlanner(roomName, costMatrix, anchorPoint) {
 
@@ -480,11 +416,9 @@ module.exports = {
 
                     let sources = room.find(FIND_SOURCES)
 
-                    for (let i = 0; i < sources.length; i++) {
+                    for (let inactiveSource of sources) {
 
                         let origin = room.find(FIND_MY_SPAWNS)[0]
-
-                        let inactiveSource = room.find(FIND_SOURCES)[i]
 
                         let goal = _.map([inactiveSource], function(source) {
                             return { pos: source.pos, range: 1 }
@@ -533,11 +467,15 @@ module.exports = {
                             }).path
 
                             new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
-
-                            //console.log(getawaypath)
-                            for (let value of path) {
-
-                                room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD);
+                            
+                            for (let i = 0; i < path.length; i++) {
+                                
+                                let value = path[i - 1]
+                                
+                                if (value) {
+                                
+                                    room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
+                                }
                             }
                         }
                     }
@@ -593,12 +531,16 @@ module.exports = {
                         }).path
 
                         new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
-
-                        //console.log(getawaypath)
-                        for (let value of path) {
-
-                            room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD);
-                        }
+                            
+                            for (let i = 0; i < path.length; i++) {
+                                
+                                let value = path[i]
+                                
+                                if (value) {
+                                
+                                    room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
+                                }
+                            }
                     }
                 }
 
@@ -652,12 +594,16 @@ module.exports = {
                         }).path
 
                         new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
-
-                        //console.log(getawaypath)
-                        for (let value of path) {
-
-                            room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD);
-                        }
+                            
+                            for (let i = 0; i < path.length; i++) {
+                                
+                                let value = path[i - 1]
+                                
+                                if (value) {
+                                
+                                    room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
+                                }
+                            }
                     }
                 }
 
@@ -675,71 +621,71 @@ module.exports = {
                         remoteRoom = Game.rooms[object.name]
 
                         if (remoteRoom) {
+                            
+                            sources = remoteRoom.find(FIND_SOURCES)
+                            
+                            for (let inactiveSource of sources) {
 
-                            let origin = room.find(FIND_MY_SPAWNS)[0]
-
-                            let inactiveSource = remoteRoom.find(FIND_SOURCES)
-
-                            let goal = _.map(inactiveSource, function(source) {
-                                return { pos: source.pos, range: 1 }
-                            })
-
-                            if (origin && goal) {
-
-                                var path = PathFinder.search(origin.pos, goal, {
-                                    plainCost: 2,
-                                    
-                                    roomCallback: function(roomName) {
-
-                                        let room = Game.rooms[roomName]
+                                let origin = room.find(FIND_MY_SPAWNS)[0]
+        
+                                let goal = _.map([inactiveSource], function(source) {
+                                    return { pos: source.pos, range: 1 }
+                                })
+        
+                                //console.log(JSON.stringify(goal))
+                                if (origin && goal) {
+    
+                                    var path = PathFinder.search(origin.pos, goal, {
+                                        plainCost: 2,
                                         
-                                        if (room) {
-                                        
-                                        let costs = new PathFinder.CostMatrix
-
-                                        room.find(FIND_STRUCTURES).forEach(function(struct) {
-                                            if (struct.structureType === STRUCTURE_ROAD) {
-
-                                                costs.set(struct.pos.x, struct.pos.y, 1)
-
-                                            } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
-
-                                                costs.set(struct.pos.x, struct.pos.y, 0xff)
-
+                                        roomCallback: function(roomName) {
+    
+                                            let room = Game.rooms[roomName]
+                                            
+                                            if (room) {
+                                            
+                                            let costs = new PathFinder.CostMatrix
+    
+                                            room.find(FIND_STRUCTURES).forEach(function(struct) {
+                                                if (struct.structureType === STRUCTURE_ROAD) {
+    
+                                                    costs.set(struct.pos.x, struct.pos.y, 1)
+    
+                                                } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+    
+                                                    costs.set(struct.pos.x, struct.pos.y, 0xff)
+    
+                                                }
+                                            })
+                                            room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
+                                                if (struct.structureType === STRUCTURE_ROAD) {
+            
+                                                    costs.set(struct.pos.x, struct.pos.y, 1)
+            
+                                                } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+            
+                                                    costs.set(struct.pos.x, struct.pos.y, 0xff)
+            
+                                                }
+                                            })
+    
+                                            return costs
                                             }
-                                        })
-                                        room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
-                                            if (struct.structureType === STRUCTURE_ROAD) {
-        
-                                                costs.set(struct.pos.x, struct.pos.y, 1)
-        
-                                            } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
-        
-                                                costs.set(struct.pos.x, struct.pos.y, 0xff)
-        
-                                            }
-                                        })
-
-                                        return costs
                                         }
-                                    }
-                                }).path
-
-                                //console.log(JSON.stringify(path))
-
-                                for (let value of path) {
-                                    //new RoomVisual(origin.room).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+                                    }).path
+    
+                                    //console.log(JSON.stringify(path))
                                     
-                                    if (Game.rooms[value.roomName]) {
+                                    new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+                                
+                                    for (let i = 0; i < path.length; i++) {
                                         
-                                        new RoomVisual(Game.rooms[value.roomName]).circle(value.x, value.y, {
-                                            fill: 'transparent',
-                                            radius: 0.8,
-                                            stroke: '#39A0ED',
-                                            strokeWidth: 0.125
-                                        })
-                                    
-                                    Game.rooms[value.roomName].createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
+                                        let value = path[i - 1]
+                                        
+                                        if (value) {
+                                        
+                                            Game.rooms[value.roomName].createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
+                                        }
                                     }
                                 }
                             }

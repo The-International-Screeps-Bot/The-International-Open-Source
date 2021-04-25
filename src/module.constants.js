@@ -243,7 +243,7 @@ module.exports = {
                     }
                     else if (Game.shard.name == "screepsplus1") {
                     
-                        var unfilteredRemoteRooms = ["E28N12", "E28N14", "E28N16", "E28N18", "E29N17"]
+                        var unfilteredRemoteRooms = ["E28N12", "E28N14", "E28N16", "E28N18", "E29N17", "E31N15", "E32N14"]
                     }
                     else {
                         

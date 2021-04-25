@@ -65,7 +65,7 @@ StructureTerminal.prototype.market = function() {
         }
     }
     
-    if (Memory.global.establishedRooms <= 3  && Game.market.credits >= 100000 && this.store[RESOURCE_ENERGY] <= 100000) {
+    if (Memory.global.establishedRooms < 3  && Game.market.credits >= 100000 && this.store[RESOURCE_ENERGY] <= 100000) {
         
         //console.log(RESOURCE_ENERGY + ", " + this.room.name)
 
