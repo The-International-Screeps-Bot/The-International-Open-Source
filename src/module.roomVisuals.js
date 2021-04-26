@@ -260,7 +260,7 @@ module.exports = {
                         room.visual.circle(sourceContainer1.pos, {
                             fill: 'transparent',
                             radius: 0.8,
-                            stroke: '#39A0ED',
+                            stroke: '#2DF0C9',
                             strokeWidth: 0.125
                         })
                     }
@@ -278,7 +278,7 @@ module.exports = {
                         room.visual.circle(controllerContainer.pos, {
                             fill: 'transparent',
                             radius: 0.8,
-                            stroke: '#2DF0C9',
+                            stroke: '#39A0ED',
                             strokeWidth: 0.125
                         })
                     }
@@ -298,7 +298,7 @@ module.exports = {
                         room.visual.circle(sourceLink1.pos, {
                             fill: 'transparent',
                             radius: 0.8,
-                            stroke: '#39A0ED',
+                            stroke: '#2DF0C9',
                             strokeWidth: 0.125
                         })
                     }
@@ -316,7 +316,7 @@ module.exports = {
                         room.visual.circle(controllerLink.pos, {
                             fill: 'transparent',
                             radius: 0.8,
-                            stroke: '#2DF0C9',
+                            stroke: '#39A0ED',
                             strokeWidth: 0.125
                         })
                     }
@@ -325,7 +325,7 @@ module.exports = {
                         room.visual.circle(baseLink.pos, {
                             fill: 'transparent',
                             radius: 0.8,
-                            stroke: '#2DF0C9',
+                            stroke: '#39A0ED',
                             strokeWidth: 0.125
                         })
                     }
@@ -340,7 +340,7 @@ module.exports = {
                 }
                 if (terminal) {
             
-                    room.visual.text((_.sum(terminal.store) / 1000).toFixed(0) + "k", terminal.pos.x, terminal.pos.y - 1, { align: 'center' });
+                    room.visual.text((terminal.store[RESOURCE_ENERGY] / 1000).toFixed(0) + "k", terminal.pos.x, terminal.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center' });
             
                 }
             

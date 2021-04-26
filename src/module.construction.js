@@ -401,15 +401,10 @@ module.exports = {
                     }
                 }
                 
-                if (room.controller.level >= 5) {
-                
-                    sourcePath()
-                    controllerPath()
-                    mineralPath()
-                    //towerPath()
-                    remotePath()
-                
-                }
+                sourcePath()
+                controllerPath()
+                mineralPath()
+                remotePath()
 
                 function sourcePath() {
 
@@ -470,10 +465,15 @@ module.exports = {
                             for (let i = 0; i < path.length; i++) {
                                 
                                 let value = path[i - 1]
+                                let normalValue = path[i]
                                 
-                                if (value) {
+                                if (value && room.controller.level >= 5) {
                                 
                                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
+                                }
+                                if (normalValue && i + 1 == path.length) {
+                                    
+                                    room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                                 }
                             }
                         }
@@ -533,11 +533,16 @@ module.exports = {
                             
                             for (let i = 0; i < path.length; i++) {
                                 
-                                let value = path[i]
+                                let value = path[i - 1]
+                                let normalValue = path[i]
                                 
-                                if (value) {
+                                if (value && room.controller.level >= 5) {
                                 
                                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
+                                }
+                                if (normalValue && i + 1 == path.length) {
+                                    
+                                    room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                                 }
                             }
                     }
@@ -597,10 +602,15 @@ module.exports = {
                             for (let i = 0; i < path.length; i++) {
                                 
                                 let value = path[i - 1]
+                                let normalValue = path[i]
                                 
-                                if (value) {
+                                if (value && room.controller.level >= 5) {
                                 
                                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
+                                }
+                                if (normalValue && i + 1 == path.length) {
+                                    
+                                    room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                                 }
                             }
                     }
@@ -650,7 +660,7 @@ module.exports = {
     
                                                     costs.set(struct.pos.x, struct.pos.y, 1)
     
-                                                } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                                } else if (struct.structureType !== STRUCTURE_RAMPART) {
     
                                                     costs.set(struct.pos.x, struct.pos.y, 0xff)
     
@@ -661,7 +671,7 @@ module.exports = {
             
                                                     costs.set(struct.pos.x, struct.pos.y, 1)
             
-                                                } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                                } else if (struct.structureType !== STRUCTURE_RAMPART) {
             
                                                     costs.set(struct.pos.x, struct.pos.y, 0xff)
             
@@ -676,14 +686,19 @@ module.exports = {
                                     //console.log(JSON.stringify(path))
                                     
                                     //new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
-                                
+                                    
                                     for (let i = 0; i < path.length; i++) {
-                                        
+                                
                                         let value = path[i - 1]
+                                        let normalValue = path[i]
                                         
-                                        if (value) {
+                                        if (value && room.controller.level >= 5) {
                                         
                                             Game.rooms[value.roomName].createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
+                                        }
+                                        if (normalValue && i + 1 == path.length) {
+                                            
+                                            Game.rooms[value.roomName].createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                                         }
                                     }
                                 }
