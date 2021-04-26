@@ -49,8 +49,10 @@ module.exports = {
                     let rawSecondaryLabs = room.memory.secondaryLabs
     
                     for (let labs of rawPrimaryLabs) {
-    
+                        
                         let lab = Game.getObjectById(labs)
+                        
+                        if (lab != null) {
                         
                         room.visual.circle(lab.pos, {
                                 fill: 'transparent',
@@ -58,10 +60,13 @@ module.exports = {
                                 stroke: '#39A0ED',
                                 strokeWidth: 0.125
                             })
+                        }
                     }
                     for (let labs of rawSecondaryLabs) {
-    
+                        
                         let lab = Game.getObjectById(labs)
+                        
+                        if (lab != null) {
                         
                         room.visual.circle(lab.pos, {
                                 fill: 'transparent',
@@ -69,6 +74,7 @@ module.exports = {
                                 stroke: '#2DF0C9',
                                 strokeWidth: 0.125
                             })
+                        }
                     }
                     
                     //Minerals

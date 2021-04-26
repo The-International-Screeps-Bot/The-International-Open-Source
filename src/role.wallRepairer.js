@@ -68,32 +68,6 @@ module.exports = {
             }
         } else {
 
-            var controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
-            var controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
-
-            if (controllerContainer && controllerContainer.store[RESOURCE_ENERGY] >= 500) {
-
-                wallRepairerGetEnergy()
-
-            } else if (controllerLink && controllerLink.store[RESOURCE_ENERGY] >= 100) {
-
-                wallRepairerGetEnergy()
-
-            } else if (creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] >= 275000) {
-
-                wallRepairerGetEnergy()
-            } else {
-
-                creep.say("W")
-
-                if (creep.room.storage) {
-
-                    creep.moveTo(creep.room.storage, { reusePath: 50 })
-                }
-            }
-
-            function wallRepairerGetEnergy() {
-
                 var containers = creep.room.find(FIND_STRUCTURES, {
                     filter: (s) => s.structureType == STRUCTURE_CONTAINER
                 })
@@ -145,7 +119,6 @@ module.exports = {
                         }
                     }
                 }
-            }
         }
     }
 };

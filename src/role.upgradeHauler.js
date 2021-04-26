@@ -27,7 +27,7 @@ module.exports = {
 
                 let controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
                 
-                if (controllerLink != null && controllerLink.store[RESOURCE_ENERGY] <= 100) {
+                if (controllerLink != null) {
                     
                     if (creep.transfer(controllerLink, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                         

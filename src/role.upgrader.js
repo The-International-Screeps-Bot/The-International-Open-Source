@@ -36,12 +36,16 @@ module.exports = {
             creep.say("🔋")
 
             var controller = creep.room.controller
-
+            /*
             if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
 
                 creep.moveTo(controller, { reusePath: 50 })
 
             }
+            */
+            
+            creep.controllerUpgrade(controller)
+            
             if (creep.store[RESOURCE_ENERGY] <= 10) {
 
                 creep.say("W")

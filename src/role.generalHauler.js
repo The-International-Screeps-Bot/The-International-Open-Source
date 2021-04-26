@@ -42,20 +42,21 @@ module.exports = {
             } else {
 
                 let structure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                    filter: (s) => (s.structureType == STRUCTURE_SPAWN ||
-                            s.structureType == STRUCTURE_EXTENSION) &&
-                        s.energy < s.energyCapacity
-                })
-
-                if (structure) {
-
+                        filter: (s) => (s.structureType == STRUCTURE_SPAWN ||
+                                s.structureType == STRUCTURE_EXTENSION ||
+                                s.structureType == STRUCTURE_TOWER && s.store[RESOURCE_ENERGY] < 710) &&
+                            s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY)
+                    })
+                    
                     creep.say("➡️")
-
-                    if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                        creep.moveTo(structure, { reusePath: 50 });
+                    if (structure) {
+                        
+                        if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            
+                            creep.moveTo(structure, {reusePath: 50})
+                        }
                     }
-                } else {
+                    else {
 
                     let tower = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
                         filter: s => s.structureType == STRUCTURE_TOWER && s.energy < 710
