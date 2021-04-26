@@ -17,9 +17,9 @@ Creep.prototype.transferResource = function(target) {
 Creep.prototype.controllerUpgrade = function(controller) {
 
     creep = this
-    /*
+    
     if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
 
     creep.moveTo(controller, { reusePath: 50 })
-    }*/
+    }
 };
