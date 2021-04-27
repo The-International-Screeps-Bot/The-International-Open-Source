@@ -59,6 +59,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [x] Information panel to provide information about the development of the bot
 - [ ] Communication with allies via the public segment
 - [ ] Create a task manager to avoid creeps switching tasks halfway through
+- [ ] Make the task manager track and tell creeps what jobs to do
 
 ## Flowchart and more information
 
