@@ -54,7 +54,7 @@ module.exports = {
 
             creep.say("S")
 
-            if (storage && storage.store[RESOURCE_ENERGY] >= 5000) {
+            if (storage && storage.store[RESOURCE_ENERGY] >= 10000) {
                 if (creep.withdraw(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
 
                     creep.say("S")

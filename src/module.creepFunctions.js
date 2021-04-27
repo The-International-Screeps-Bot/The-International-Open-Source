@@ -14,13 +14,22 @@ Creep.prototype.transferResource = function(target) {
 
     
 }
-Creep.prototype.controllerUpgrade = function(controller) {
+Creep.prototype.constructionBuild = function(target) {
 
     creep = this
     
-    if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
+    if (creep.build(target) == ERR_NOT_IN_RANGE) {
 
-    creep.moveTo(controller, { reusePath: 50 })
+    creep.moveTo(target, { reusePath: 50 })
+    }
+}
+Creep.prototype.controllerUpgrade = function(target) {
+
+    creep = this
+    
+    if (creep.upgradeController(target) == ERR_NOT_IN_RANGE) {
+
+    creep.moveTo(target, { reusePath: 50 })
     }
 }
 Creep.prototype.roadPathing = function(origin, goal) {
@@ -60,6 +69,10 @@ Creep.prototype.roadPathing = function(origin, goal) {
 
                                     }
                                 })
+        room.find(FIND_CREEPS).forEach(function(creep) {
+          costs.set(creep.pos.x, creep.pos.y, 0xff);
+        });
+
 
 
             return costs
@@ -102,6 +115,9 @@ Creep.prototype.offRoadPathing = function(origin, goal) {
 
                                     }
                                 })
+            room.find(FIND_CREEPS).forEach(function(creep) {
+              costs.set(creep.pos.x, creep.pos.y, 0xff);
+            });
 
 
             return costs
@@ -114,4 +130,8 @@ Creep.prototype.offRoadPathing = function(origin, goal) {
     creep.moveByPath(creep.memory.path)
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+}
+Creep.prototype.flee = function(target) {
+
+    
 }
