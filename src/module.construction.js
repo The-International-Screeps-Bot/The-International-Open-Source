@@ -55,18 +55,20 @@ module.exports = {
 
                 function doDistanceTransform() {
 
-                    let ticks = 0;
-                    let totalCpu = 0;
-                    let totalTime = 0;
+                    let ticks = 0
+                    let totalCpu = 0
+                    let totalTime = 0
 
-                    let roomName = room.name;
-                    let time = (new Date()).getMilliseconds();
-                    let cpu = Game.cpu.getUsed();
-                    time = (new Date()).getMilliseconds() - time;
-                    cpu = Game.cpu.getUsed() - cpu;
-                    ticks++;
-                    totalCpu += cpu;
-                    totalTime += time;
+                    let roomName = room.name
+                    /*
+                    let time = (new Date()).getMilliseconds()
+                    let cpu = Game.cpu.getUsed()
+                    time = (new Date()).getMilliseconds() - time
+                    cpu = Game.cpu.getUsed() - cpu
+                    ticks++
+                    totalCpu += cpu
+                    totalTime += time
+                    */
 
                     var anchorPoints = []
                     let anchorPoint = room.memory.anchorPoint
@@ -74,15 +76,13 @@ module.exports = {
 
                     if (anchorPoint == null) {
 
-                        var dt = distanceTransform(walkablePixelsForRoom(roomName)); // a bare Uint8Array
-                        cm._bits = dt; // now we have a real CostMatrix for future use
-                        displayCostMatrix(roomName, cm, anchorPoints);
+                        var dt = distanceTransform(walkablePixelsForRoom(roomName))
+                        cm._bits = dt
+                        displayCostMatrix(roomName, cm, anchorPoints)
                         filterAnchorPoints(anchorPoints)
                     }
                     
                     roomPlanner(roomName, cm, anchorPoint)
-
-                    console.log(`dt for ${roomName} took ${time}ms (avg ${totalTime/ticks}) ${cpu}cpu (avg ${totalCpu/ticks})`)
                     /**
                         @param {Number[2500]} array - one entry per square in the room
                         @param {Number} oob - value used for pixels outside image bounds
