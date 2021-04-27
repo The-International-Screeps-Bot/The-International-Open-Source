@@ -610,7 +610,7 @@ module.exports = {
                                 }
                                 if (normalValue && i + 1 == path.length) {
                                     
-                                    room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
+                                    //room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                                 }
                             }
                     }

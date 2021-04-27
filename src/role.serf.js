@@ -1,5 +1,3 @@
-let creepFunctions = require("module.creepFunctions")
-
 module.exports = {
     run: function(creep) {
         

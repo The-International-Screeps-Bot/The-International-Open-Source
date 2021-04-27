@@ -29,7 +29,7 @@ module.exports.loop = function() {
                 }  
             }
             
-            roles.run(roles)
+            roles.run()
 
             console.log("roles: " + Game.cpu.getUsed().toFixed(2))
 
@@ -37,19 +37,19 @@ module.exports.loop = function() {
 
             if (Game.time % 10 == 0) {
 
-                cleanMemory.run(cleanMemory)
+                cleanMemory.run()
             }
 
             console.log("cleanMemory: " + Game.cpu.getUsed().toFixed(2))
 
             if (Game.time % 100 == 0) {
 
-                construction.run(construction)
+                construction.run()
             }
 
             console.log("construction: " + Game.cpu.getUsed().toFixed(2))
 
-            visuals.run(visuals)
+            visuals.run()
             console.log("visuals: " + Game.cpu.getUsed().toFixed(2))
 
             if (Game.time % 1 == 0) {
@@ -67,17 +67,17 @@ module.exports.loop = function() {
 
             if (Game.time % 1 == 0) {
 
-                constants.run(constants)
+                constants.run()
 
             }
 
             console.log("constants: " + Game.cpu.getUsed().toFixed(2))
 
-            links.run(links)
+            links.run()
 
             console.log("links: " + Game.cpu.getUsed().toFixed(2))
 
-            labs.run(labs)
+            labs.run()
 
             console.log("labs: " + Game.cpu.getUsed().toFixed(2))
 
@@ -94,7 +94,7 @@ module.exports.loop = function() {
 
             console.log("spawns: " + Game.cpu.getUsed().toFixed(2))
             
-            logging.run(logging)
+            logging.run()
             
             //console.log("logging: " + Game.cpu.getUsed().toFixed(2))
             
@@ -167,5 +167,46 @@ Upkeep costs:
     0.03 / tick / rampart
     300 ramparts = 1 energy
 
+    Useful Constants:
+    
+        Body Costs:
+        
+            MOVE: 50
+            WORK: 100
+            ATTACK: 80
+            CARRY: 50
+            HEAL: 250
+            RANGED_ATTACK: 150
+            TOUGH: 10
+            CLAIM: 600
+    
+        Part Stats:
+    
+            HEAL: 12
+            RANGED_HEAL: 4
+            RANGED_ATTACK: 10
+            ATTACK: 30
+            DISMANTLE: 50
+            
+        T3 Boosts:
+        
+            catalyzed utrium acid	 + 	60	ATTACK	+300% attack effectiveness
+            catalyzed utrium alkalide	 + 	60	WORK	+600% harvest effectiveness
+            catalyzed keanium acid	 + 	60	CARRY	+150 capacity
+            catalyzed keanium alkalide	 + 	60	RANGED_ATTACK	+300% rangedAttack and rangedMassAttack effectiveness
+            catalyzed lemergium acid	 + 	65	WORK	+100% repair and build effectiveness without increasing the energy cost
+            catalyzed lemergium alkalide	 + 	60	HEAL	+300% heal and rangedHeal effectiveness
+            catalyzed zynthium acid	 + 	160	WORK	+300% dismantle effectiveness
+            catalyzed zynthium alkalide	 + 	60	MOVE	+300% fatigue decrease speed
+            catalyzed ghodium acid	 + 	80	WORK	+100% upgradeController effectiveness without increasing the energy cost
+            catalyzed ghodium alkalide	 + 	150	TOUGH	-70% damage taken
+            
+        Important T3 Boosts:
+        
+            catalyzed zynthium alkalide:	   	+300% fatigue decrease speed   
+            catalyzed ghodium alkalide:  	-70% damage taken                                                      
+            catalyzed utrium acid:        	+300% attack effectiveness                                             
+            catalyzed lemergium alkalide:    +300% heal and rangedHeal effectiveness                                        
+            catalyzed keanium alkalide:	 + 	60	RANGED_ATTACK	+300% rangedAttack and rangedMassAttack effectiveness                             
 
     */

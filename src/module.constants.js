@@ -12,9 +12,13 @@ module.exports = {
                         
                     Memory.global = {}
             }
-            else if (Memory.global.establishedRooms == null || !Memory.global.establishedRooms) {
+            if (Memory.global.establishedRooms == null || !Memory.global.establishedRooms) {
                         
                     Memory.global.establishedRooms = 0
+            }
+            if (Memory.global.hasBoosts == null || !Memory.global.hasBoosts) {
+                        
+                    Memory.global.hasBoosts = []
             }
             
             if (Memory.global.globalStage == null || !Memory.global.globalStage) {
@@ -55,7 +59,8 @@ module.exports = {
                 spawns()
                 terminals()
                 rooms()
-                myResources()
+                myResources
+                haveBoosts()
 
                 /*
                 if (room.name == "E28N13") {
@@ -290,6 +295,37 @@ module.exports = {
                     //console.log(room.memory.totalEnergy)
                     
                     totalEnergy += room.memory.totalEnergy
+                }
+                function haveBoosts() {
+                    
+                    var hasBoosts = false
+                    let t3Boosts = ["XUH2O", "XUHO2", "XKH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2"]
+                    let importantBoosts = ["a"]
+                    
+                    if (room.storage && room.terminal) {
+                        
+                        let i = 0
+                        
+                        while (i < importantBoosts.length) {
+                            
+                            if (room.storage.store[importantBoosts[i]] || room.terminal.store[importantBoosts[i]]) {
+                                
+                                i++
+                            }
+                            if (i == importantBoosts.length) {
+                                
+                                hasBoots = true
+                                
+                                break
+                            }
+                            else {
+                                
+                                break
+                            }
+                        }
+                    }
+                    room.memory.hasBoosts = true
+                    Memory.global.hasBoosts.push(true)
                 }
             }
         })

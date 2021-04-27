@@ -38,14 +38,16 @@ module.exports = {
             let creep = Game.creeps[name]
             //creep.suicide()
             
-            if (creep.ticksToLive <= creep.body.length * 3) {
-                
-                creep.memory.dying = true
+            if (creep && creep.memory.role) {
+                if (creep.ticksToLive <= creep.body.length * 3) {
+                    
+                    creep.memory.dying = true
+                }
+    
+                roles[creep.memory.role].run(creep)
+    
+                //console.log(creep.memory.role + ": " + Game.cpu.getUsed().toFixed(2))
             }
-
-            roles[creep.memory.role].run(creep)
-
-            //console.log(creep.memory.role + ": " + Game.cpu.getUsed().toFixed(2))
         }
     }
 };

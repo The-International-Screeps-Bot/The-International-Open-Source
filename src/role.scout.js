@@ -1,3 +1,5 @@
+let pathing = require("module.pathing")
+
 module.exports = {
     run: function(creep) {
         
@@ -164,8 +166,6 @@ module.exports = {
                     
                     creep.room.memory.stage = "emptyRoom"
                 }
-    
-                let pathing = require("module.pathing")
     
                 creep.pathing(origin, goal)
             }

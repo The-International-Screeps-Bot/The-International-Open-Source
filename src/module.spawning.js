@@ -703,7 +703,8 @@ module.exports = {
                                 remoteDefenderBodyTier++
 
                             }
-                            var remoteDefenderBodyResult = remoteDefenderBody.slice(0, 30)
+                            remoteDefenderBody.push(HEAL, MOVE)
+                            var remoteDefenderBodyResult = remoteDefenderBody.slice(0, 20)
                         }
                         //Miner
                         if (stage >= 6) {
