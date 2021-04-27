@@ -27,9 +27,7 @@ module.exports = {
 
             creep.say("Hello world")
 
-            let pathing = require("module.pathing")
-
-            creep.pathing(origin, goal)
+            creep.offRoadPathing(origin, goal)
         }
     }
 };

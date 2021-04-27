@@ -1,7 +1,7 @@
-let pathing = require("module.pathing")
-
 module.exports = {
     run: function(creep) {
+        
+        creep.say("Broke")
         
         //list of rooms with Game.map
         
@@ -34,36 +34,42 @@ module.exports = {
                         Memory.rooms[room] = {}
                     }
                 
-                    targetRoomsArray.push({name: room, scoutTick: Memory.rooms[room].scoutTick})
+                    targetRoomsArray.push(room)
                 }
             }
             
-            for (let i = 0; i < targetRoomsArray.length; i++) {
+            for (let i = 0; i < targetRoomsArray.length; i++) { creep.say("tRA")
                 
                 let room = targetRoomsArray[i]
                 
-                if (!room.scoutTick) {
-                    
-                    targetRoom = room.name
-                    break
-                }
-                else if (i == targetRoomsArray.length) {
-                    
-                    min = true
-                }
+                    if (!Memory.rooms[room].scoutTick) {
+                        
+                        targetRoom = room.name
+                        break
+                    }
+                    else if (i + 1 == targetRoomsArray.length) {
+                        
+                        min = true
+                    }
             }
             
-            if (min == true) {
+            if (min == true) { creep.say("min")
                 
-                lowestScoutTick = _.min(targetRoomsArray.scoutTick, function(scoutRoom) {
-                    return scoutRoom.scoutTick
-                })
+                let targetRoomsArrayScoutTick = []
                 
                 for (let room of targetRoomsArray) {
                     
-                    if (lowestScoutTick == room.scoutTick) {
+                    targetRoomsArrayScoutTick.push(Memory.rooms[room].scoutTick)
+                }
+                
+                lowestScoutTick = _.min(targetRoomsArrayScoutTick, function (tick) { return tick })
+                //console.log(lowestScoutTick)
+                
+                for (let room in Memory.rooms) {
+                    
+                    if (Memory.rooms[room].scoutTick == lowestScoutTick) {
                         
-                        targetRoom = room.name
+                        targetRoom = room
                         break
                     }
                 }
@@ -155,9 +161,9 @@ module.exports = {
                 
                 creep.room.memory.scoutTick = Game.time
                 
-                if (creep.room.controller) { console.log(creep.room.controller.owner)
+                if (creep.room.controller) {
                     
-                    if (!creep.room.controller.my && creep.room.controller.owner) {
+                    if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username != "x") {
                     
                         creep.room.memory.stage = "enemyRoom"
                     }
@@ -167,7 +173,7 @@ module.exports = {
                     creep.room.memory.stage = "emptyRoom"
                 }
     
-                creep.pathing(origin, goal)
+                creep.roadPathing(origin, goal)
             }
         }
     }

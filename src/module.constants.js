@@ -18,7 +18,7 @@ module.exports = {
             }
             if (Memory.global.hasBoosts == null || !Memory.global.hasBoosts) {
                         
-                    Memory.global.hasBoosts = []
+                    Memory.global.hasBoosts = 0
             }
             
             if (Memory.global.globalStage == null || !Memory.global.globalStage) {
@@ -59,15 +59,8 @@ module.exports = {
                 spawns()
                 terminals()
                 rooms()
-                myResources
+                myResources()
                 haveBoosts()
-
-                /*
-                if (room.name == "E28N13") {
-                    
-                    let structures = room.find(FIND_)
-                }
-                */
 
                 function sources() {
 
@@ -324,11 +317,17 @@ module.exports = {
                             }
                         }
                     }
-                    room.memory.hasBoosts = true
-                    Memory.global.hasBoosts.push(true)
+                    if (hasBoosts == true) {
+                    
+                        room.memory.hasBoosts = true
+                    }
                 }
             }
         })
+        
+        var roomsWithBoosts = _.filter(Game.rooms, function (room) { return room.memory.hasBoosts == true})
+        
+        Memory.global.hasBoosts = roomsWithBoosts
         
         if (Memory.global.totalEnergy == null) {
             

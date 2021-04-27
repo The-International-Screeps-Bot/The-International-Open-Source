@@ -42,10 +42,20 @@ module.exports = {
                 //let squadType = "dismantle"
                 //let squadType = "attack
 
-                //let claimerTarget = "E31N14"
-                let claimerTarget = undefined
-                //let builderTarget = "E31N14"
-                let builderTarget = undefined
+                if (Game.shard.name == "shard2") {
+                        
+                    var claimerTarget = "E36S1"
+                    //var claimerTarget = undefined
+                    var builderTarget = "E36S1"
+                    //var builderTarget = undefined
+                }
+                else {
+
+                    //var claimerTarget = "E31N14"
+                    var claimerTarget = undefined
+                    //var builderTarget = "E31N14"
+                    var builderTarget = undefined
+                }
 
                 let target2 = Game.flags.AR
                 let target3 = Game.flags.RA
