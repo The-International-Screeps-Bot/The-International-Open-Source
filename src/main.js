@@ -90,7 +90,7 @@ module.exports.loop = function() {
 
             console.log("towers: " + Game.cpu.getUsed().toFixed(2))
 
-            spawns.run(spawns)
+            spawns.run()
 
             console.log("spawns: " + Game.cpu.getUsed().toFixed(2))
             

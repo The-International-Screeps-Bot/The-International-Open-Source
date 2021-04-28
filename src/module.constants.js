@@ -293,7 +293,10 @@ module.exports = {
                     
                     var hasBoosts = false
                     let t3Boosts = ["XUH2O", "XUHO2", "XKH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2"]
-                    let importantBoosts = ["a"]
+                    let importantBoosts = ["XUH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2"]
+                    let attackBoosts = ["XUH2O", "XKHO2", "XLHO2", "XZH2O", "XGHO2", "XZHO2"]
+                    let defendBoosts = ["XUH2O", "XKHO2", "XLH2O", "XZHO2"]
+                    let economyBoosts = ["XGH2O"]
                     
                     if (room.storage && room.terminal) {
                         

@@ -42,10 +42,7 @@ module.exports = {
 
                 target = Game.getObjectById(creep.memory.target)
 
-                if (creep.repair(target) == ERR_NOT_IN_RANGE) {
-
-                    creep.moveTo(target, { reusePath: 50 })
-                }
+                creep.wallRepair(target)
             } else {
 
                 creep.say("Broken")
