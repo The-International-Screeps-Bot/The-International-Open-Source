@@ -1,4 +1,4 @@
-let tower = require("prototype.tower")
+let towers = require("module.towers")
 let terminal = require("prototype.terminal")
 let cleanMemory = require("module.cleanMemory")
 let visuals = require("module.roomVisuals")
@@ -81,12 +81,7 @@ module.exports.loop = function() {
 
             console.log("labs: " + Game.cpu.getUsed().toFixed(2))
 
-            var towers = _.filter(Game.structures, s => s.structureType == STRUCTURE_TOWER);
-
-            for (let tower of towers) {
-
-                tower.defend()
-            }
+            towers.run()
 
             console.log("towers: " + Game.cpu.getUsed().toFixed(2))
 
