@@ -73,16 +73,20 @@ module.exports = {
                     var anchorPoints = []
                     let anchorPoint = room.memory.anchorPoint
                     let cm = new PathFinder.CostMatrix()
-
-                    if (anchorPoint == null) {
-
-                        var dt = distanceTransform(walkablePixelsForRoom(roomName))
-                        cm._bits = dt
-                        displayCostMatrix(roomName, cm, anchorPoints)
-                        filterAnchorPoints(anchorPoints)
-                    }
                     
-                    roomPlanner(roomName, cm, anchorPoint)
+                    if (Game.time % 100 == 0) {
+                        if (anchorPoint == null) {
+    
+                            var dt = distanceTransform(walkablePixelsForRoom(roomName))
+                            cm._bits = dt
+                            displayCostMatrix(roomName, cm, anchorPoints)
+                            filterAnchorPoints(anchorPoints)
+                        }
+                    }
+                    if (Game.time % 100 == 0) {
+                    
+                        roomPlanner(roomName, cm, anchorPoint)
+                    }
                     /**
                         @param {Number[2500]} array - one entry per square in the room
                         @param {Number} oob - value used for pixels outside image bounds
@@ -289,31 +293,28 @@ module.exports = {
                                         room.createConstructionSite(pos.x, pos.y, structureType);
                                     }
                                     
-                                    /*
+                                    
                                     if (structureType == "road") {
                                         
                                         room.visual.circle(pos.x, pos.y, {
-                                            fill: 'transparent',
-                                            radius: 0.4,
-                                            stroke: '#FCFEFF',
+                                            fill: '#FCFEFF',
+                                            radius: 0.2,
                                             strokeWidth: 0.125
                                         })
                                     }
                                     else if (structureType == "extension") {
                                         
                                         room.visual.circle(pos.x, pos.y, {
-                                            fill: 'transparent',
-                                            radius: 0.4,
-                                            stroke: '#F4E637',
+                                            fill: '#F4E637',
+                                            radius: 0.2,
                                             strokeWidth: 0.125
                                         })
                                     }
                                     else if (structureType == "tower") {
                                         
                                         room.visual.circle(pos.x, pos.y, {
-                                            fill: 'transparent',
-                                            radius: 0.4,
-                                            stroke: '#FE411E',
+                                            fill: '#FE411E',
+                                            radius: 0.2,
                                             strokeWidth: 0.125
                                         })
                                     }
@@ -329,31 +330,28 @@ module.exports = {
                                     else if (structureType == "spawn") {
                                         
                                         room.visual.circle(pos.x, pos.y, {
-                                            fill: 'transparent',
-                                            radius: 0.4,
-                                            stroke: '#FE8F00',
+                                            fill: '#FE8F00',
+                                            radius: 0.2,
                                             strokeWidth: 0.125
                                         })
                                     }
                                     else if (structureType == "lab") {
                                         
                                         room.visual.circle(pos.x, pos.y, {
-                                            fill: 'transparent',
-                                            radius: 0.4,
-                                            stroke: '#B6B7B8',
+                                            fill: '#B6B7B8',
+                                            radius: 0.2,
                                             strokeWidth: 0.125
                                         })
                                     }
                                     else {
                                         
                                         room.visual.circle(pos.x, pos.y, {
-                                            fill: 'transparent',
-                                            radius: 0.4,
-                                            stroke: '#B03CBD',
+                                            fill: '#B03CBD',
+                                            radius: 0.2,
                                             strokeWidth: 0.125
                                         })
                                     }
-                                    */
+                                    
                                 })
                             })
                             _.forEach(Object.keys(barriers), function(structureType) {
@@ -375,36 +373,37 @@ module.exports = {
 
                                         room.createConstructionSite(pos.x, pos.y, structureType);
                                     }
-                                    /*
+                                    
                                     if (structureType == "rampart") {
                                         
                                         room.visual.circle(pos.x, pos.y, {
-                                            fill: 'transparent',
-                                            radius: 0.4,
-                                            stroke: '#FCFEFF',
+                                            fill: '#4def52',
+                                            radius: 0.2,
                                             strokeWidth: 0.125
                                         })
                                     }
                                     else {
                                         
                                         room.visual.circle(pos.x, pos.y, {
-                                            fill: 'transparent',
-                                            radius: 0.4,
-                                            stroke: '#B03CBD',
+                                            fill: '#FCFEFF',
+                                            radius: 0.2,
                                             strokeWidth: 0.125
                                         })
                                     }
-                                    */
+                                    
                                 })
                             })
                         }
                     }
                 }
                 
-                sourcePath()
-                controllerPath()
-                mineralPath()
-                remotePath()
+                if (Game.time % 100 == 0) {
+                
+                    sourcePath()
+                    controllerPath()
+                    mineralPath()
+                    remotePath()
+                }
 
                 function sourcePath() {
 

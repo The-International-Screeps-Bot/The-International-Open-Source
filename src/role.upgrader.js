@@ -20,7 +20,7 @@ module.exports = {
 
             creep.say("🔋")
 
-            var target = creep.room.controller
+            let target = creep.room.controller
             
             creep.controllerUpgrade(target)
             
@@ -88,7 +88,7 @@ module.exports = {
                     creep.energyWithdraw(target)
             } else {
 
-                var droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
                     filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
                 });
 

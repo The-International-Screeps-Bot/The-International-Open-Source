@@ -42,14 +42,12 @@ module.exports.loop = function() {
 
             console.log("cleanMemory: " + Game.cpu.getUsed().toFixed(2))
 
-            if (Game.time % 100 == 0) {
-
-                construction.run()
-            }
+            construction.run()
 
             console.log("construction: " + Game.cpu.getUsed().toFixed(2))
 
             visuals.run()
+            
             console.log("visuals: " + Game.cpu.getUsed().toFixed(2))
 
             if (Game.time % 1 == 0) {
