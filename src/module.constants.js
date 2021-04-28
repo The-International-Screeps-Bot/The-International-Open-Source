@@ -1,6 +1,38 @@
 module.exports = {
     run: function constants() {
         
+        for (let room in Memory.rooms) { console.log(room)
+            
+            if (room && room.memory) {
+                if (room.memory.stage != null) {
+                    if (room.memory.stage >= 1) {
+                
+                        Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, {fill: '#2DF0C9', opacity: 0.25})
+                    }
+                    else if (room.memory.stage == "enemyRoom") {
+                        
+                        Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, {fill: '#FE411E', opacity: 0.25})
+                    }
+                    else if (room.memory.stage == "remoteRoom") {
+                        
+                         Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, {fill: '#39A0ED', opacity: 0.25})
+                    }
+                    else if (room.memory.stage == "invaderRoom") {
+                        
+                        Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, {fill: '#DA2F2F', opacity: 0.25})
+                    }
+                    else if (room.memory.stage == "emptyRoom") {
+                        
+                        Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, {fill: '#DA2F2F', opacity: 0.25})
+                    }
+                }
+                else {
+                    
+                    Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, {fill: '#F4E637', opacity: 0.25})
+                }
+            }
+        }
+        
         global()
 
         let totalEnergy = 0

@@ -126,22 +126,6 @@ module.exports = {
                         }
                     }
                 })
-                
-                //My
-                Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, {fill: '#2DF0C9', opacity: 0.25})
-                /*
-                //Remote
-                Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, {fill: '#39A0ED', opacity: 0.25})
-                
-                //Unkown
-                Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, {fill: '#F4E637', opacity: 0.25})
-                
-                //Enemy
-                Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, {fill: '#FE411E', opacity: 0.25})
-                
-                //Invader
-                Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, {fill: '#DA2F2F', opacity: 0.25})
-                */
 
                 for (let role of rolesList) {
 

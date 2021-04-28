@@ -38,7 +38,7 @@ module.exports = {
                     else {
                         
                         let logisticStructure = room.find(FIND_STRUCTURES, {
-                                filter: (s) => s.hits < s.hitsMax * 0.5 && s.structureType == STRUCTURE_ROAD && s.structureType == STRUCTURE_CONTAINER
+                                filter: (s) => s.hits < s.hitsMax * 0.5 && s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_CONTAINER
                         })[0]
                         
                         if (logisticStructure) {
