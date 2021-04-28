@@ -40,7 +40,7 @@ module.exports = {
                         let target = controllerLink
                         
                         creep.energyWithdraw(target)
-                    } else if (!creep.pos.isNearTo(creep.room.controller)) {
+                    } else if (!creep.pos.isNearTo(controllerLink)) {
                         
                         creep.memory.origin = creep.pos
                         
@@ -61,7 +61,7 @@ module.exports = {
                         let target = controllerContainer
                         
                         creep.energyWithdraw(target)
-                    } else if (!creep.pos.isNearTo(creep.room.controller)) {
+                    } else if (!creep.pos.isNearTo(controllerContainer)) {
 
                         creep.memory.origin = creep.pos
                         

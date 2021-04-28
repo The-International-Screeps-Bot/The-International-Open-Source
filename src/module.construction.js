@@ -685,12 +685,12 @@ module.exports = {
     
                                     //console.log(JSON.stringify(path))
                                     
-                                    //new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
-                                    
                                     for (let i = 0; i < path.length; i++) {
                                 
                                         let value = path[i - 1]
                                         let normalValue = path[i]
+                                        
+                                        new RoomVisual(Game.rooms[normalValue.roomName]).circle(normalValue.x, normalValue.y, { stroke: '#fff', opacity: .1, })
                                         
                                         if (value && room.controller.level >= 5) {
                                         
