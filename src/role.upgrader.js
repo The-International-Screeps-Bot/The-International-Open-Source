@@ -9,14 +9,14 @@ module.exports = {
 
         if (controllerContainer || controllerLink) {
 
-            creep.memory.upgrading = "constant"
+            creep.memory.hasEnergy = "constant"
 
         }
         else {
             
             creep.hasEnergy()
         }
-        if (creep.memory.upgrading == true || creep.memory.upgrading == "constant") {
+        if (creep.memory.hasEnergy == true || creep.memory.hasEnergy == "constant") {
 
             creep.say("🔋")
 

@@ -1,9 +1,11 @@
 module.exports = {
     run: function constants() {
         
-        for (let room in Memory.rooms) { console.log(room)
+        //Instead I should be having the scouts create the map visuals the export them. This doesn't work as Memory.rooms is an object of room names, not of room objects
+        
+        for (let room in Memory.rooms) {
             
-            if (room && room.memory) {
+            if (room && room.stage) {
                 if (room.memory.stage != null) {
                     if (room.memory.stage >= 1) {
                 
