@@ -32,7 +32,7 @@ module.exports = {
 
                 creep.say("W")
 
-                if (controllerLink && creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] >= 80000)) {
+                if (controllerLink && creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] >= 80000) {
                     if (controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
 
                         creep.say("🔋 CL")
