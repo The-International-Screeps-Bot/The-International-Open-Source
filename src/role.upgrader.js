@@ -32,7 +32,7 @@ module.exports = {
 
                 creep.say("W")
 
-                if (controllerLink && creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] >= 80000) {
+                if (controllerLink && (creep.room.controller.level >= 7 || (creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] >= 80000))) {
                     if (controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
 
                         creep.say("🔋 CL")
@@ -47,7 +47,7 @@ module.exports = {
                         let origin = creep.memory.origin
                         
                         let goal = _.map([controllerLink], function(target) {
-                            return { pos: target.pos, range: 3 }
+                            return { pos: target.pos, range: 1 }
                         })
                         
                         creep.intraRoomPathing(origin, goal)
@@ -68,7 +68,7 @@ module.exports = {
                         let origin = creep.memory.origin
                         
                         let goal = _.map([controllerContainer], function(target) {
-                            return { pos: target.pos, range: 3 }
+                            return { pos: target.pos, range: 1 }
                         })
                         
                         creep.intraRoomPathing(origin, goal)

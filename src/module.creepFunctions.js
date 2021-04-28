@@ -60,7 +60,7 @@ Creep.prototype.pickupDroppedEnergy = function(target) {
         let origin = creep.memory.origin
     
         let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 3 }
+            return { pos: target.pos, range: 1 }
         })
         
         creep.intraRoomPathing(origin, goal)
@@ -77,24 +77,7 @@ Creep.prototype.energyWithdraw = function(target) {
         let origin = creep.memory.origin
     
         let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 3 }
-        })
-        
-        creep.intraRoomPathing(origin, goal)
-    }
-}
-Creep.prototype.energyWithdraw = function(target) {
-    
-    creep = this
-
-    if (creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            
-        creep.memory.origin = creep.pos
-    
-        let origin = creep.memory.origin
-    
-        let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 3 }
+            return { pos: target.pos, range: 1 }
         })
         
         creep.intraRoomPathing(origin, goal)
@@ -111,7 +94,7 @@ Creep.prototype.energyTransfer = function(target) {
         let origin = creep.memory.origin
     
         let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 3 }
+            return { pos: target.pos, range: 1 }
         })
         
         creep.intraRoomPathing(origin, goal)
