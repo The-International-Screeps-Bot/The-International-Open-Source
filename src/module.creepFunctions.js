@@ -1,5 +1,41 @@
 let allyList = require("module.allyList")
 
+
+Creep.prototype.barricadesFindAndRepair = function() {
+    
+    var barricades = creep.room.find(FIND_STRUCTURES, {
+                filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
+            })
+
+            let target = creep.memory.target
+            target = undefined
+
+            if (creep.memory.target) {
+
+                target = Game.getObjectById(creep.memory.target)
+
+                creep.repairBarricades(target)
+            } else {
+
+                creep.say("Broken")
+            }
+
+            for (let quota = 10000; quota < 3000000; quota += 50000) {
+
+                creep.memory.quota = quota
+
+                for (let barricade of barricades) {
+
+                    if (barricade.hits < quota) {
+
+                        target = barricade.id
+                        creep.memory.target = target
+
+                        return;
+                    }
+                }
+            }
+}
 Creep.prototype.getMyPart = function(partType) {
     
     creep = this
@@ -117,11 +153,28 @@ Creep.prototype.checkRoom = function() {
         }
     }
 }
-Creep.prototype.wallRepair = function(target) {
+Creep.prototype.repairBarricades = function(target) {
 
     creep = this
     
     if (creep.repair(target) == ERR_NOT_IN_RANGE) {
+            
+        creep.memory.origin = creep.pos
+    
+        let origin = creep.memory.origin
+    
+        let goal = _.map([target], function(target) {
+            return { pos: target.pos, range: 3 }
+        })
+        
+        creep.intraRoomPathing(origin, goal)
+    }
+}
+Creep.prototype.repairLogisticStructures = function(target) {
+
+    creep = this
+    
+    if (creep.build(target) == ERR_NOT_IN_RANGE) {
             
         creep.memory.origin = creep.pos
     

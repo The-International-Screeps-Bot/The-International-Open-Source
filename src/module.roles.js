@@ -46,7 +46,7 @@ module.exports = {
     
                 roles[creep.memory.role].run(creep)
     
-                //console.log(creep.memory.role + ": " + Game.cpu.getUsed().toFixed(2))
+                console.log(creep.memory.role + ": " + Game.cpu.getUsed().toFixed(2))
             }
         }
     }

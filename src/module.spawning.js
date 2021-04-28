@@ -946,12 +946,12 @@ module.exports = {
                             creepCount["builder"]++
                         } else if (creepsOfRole[["repairer", room.name]] < room.memory.minimumNumberOfRepairers && repairStructure) {
 
-                            name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', repairing: false, roomFrom: room.name });
+                            name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', hasEnergy: false, roomFrom: room.name });
 
                             creepCount["repairer"]++
                         } else if (creepsOfRole[["rangedDefender", room.name]] < room.memory.minimumNumberOfRangedDefenders && target1.length > 0) {
 
-                            name = spawn.createCreep(rangedDefenderBodyResult, 'RaD, ' + "T" + rangedDefenderBodyTier + ", " + creepCount["rangedDefender"], { role: 'rangedDefender', working: false, roomFrom: room.name });
+                            name = spawn.createCreep(rangedDefenderBodyResult, 'RaD, ' + "T" + rangedDefenderBodyTier + ", " + creepCount["rangedDefender"], { role: 'rangedDefender', roomFrom: room.name });
 
                             creepCount["rangedDefender"]++
                         } else if (creepsOfRole[["upgradeHauler", room.name]] < room.memory.minimumNumberOfUpgradeHaulers) {
@@ -961,7 +961,7 @@ module.exports = {
                             creepCount["upgradeHauler"]++
                         } else if (creepsOfRole[["wallRepairer", room.name]] < room.memory.minimumNumberOfWallRepairers) {
 
-                            name = spawn.createCreep(wallRepairerBodyResult, 'WR, ' + "T" + wallRepairerBodyTier + ", " + creepCount["wallRepairer"], { role: 'wallRepairer', working: false, roomFrom: room.name });
+                            name = spawn.createCreep(wallRepairerBodyResult, 'WR, ' + "T" + wallRepairerBodyTier + ", " + creepCount["wallRepairer"], { role: 'wallRepairer', hasEnergy: false, roomFrom: room.name });
 
                             creepCount["wallRepairer"]++
                         } else if (creepsOfRole[["scientist", room.name]] < room.memory.minimumNumberOfScientists && Memory.global.globalStage >= 1) {
