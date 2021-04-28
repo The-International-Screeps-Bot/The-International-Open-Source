@@ -42,7 +42,7 @@ module.exports.loop = function() {
 
             console.log("cleanMemory: " + Game.cpu.getUsed().toFixed(2))
 
-            if (Game.time % 10 == 0) {
+            if (Game.time % 100 == 0) {
 
                 construction.run()
             }

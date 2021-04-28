@@ -660,7 +660,7 @@ module.exports = {
     
                                                     costs.set(struct.pos.x, struct.pos.y, 1)
     
-                                                } else if (struct.structureType !== STRUCTURE_RAMPART) {
+                                                } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
     
                                                     costs.set(struct.pos.x, struct.pos.y, 0xff)
     
@@ -671,7 +671,7 @@ module.exports = {
             
                                                     costs.set(struct.pos.x, struct.pos.y, 1)
             
-                                                } else if (struct.structureType !== STRUCTURE_RAMPART) {
+                                                } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
             
                                                     costs.set(struct.pos.x, struct.pos.y, 0xff)
             
@@ -690,13 +690,15 @@ module.exports = {
                                         let value = path[i - 1]
                                         let normalValue = path[i]
                                         
-                                        new RoomVisual(Game.rooms[normalValue.roomName]).circle(normalValue.x, normalValue.y, { stroke: '#fff', opacity: .1, })
+                                        //new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476" })
                                         
                                         if (value && room.controller.level >= 5) {
                                         
                                             Game.rooms[value.roomName].createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                                         }
                                         if (normalValue && i + 1 == path.length) {
+                                            
+                                            //new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "red" })
                                             
                                             Game.rooms[value.roomName].createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                                         }
