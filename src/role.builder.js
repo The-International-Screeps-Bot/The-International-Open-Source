@@ -43,11 +43,11 @@ module.exports = {
                     
                     creep.searchSourceContainers()
                     
-                    if (container != null) {
+                    if (creep.container != null && creep.container) {
                         
                         creep.say("SC")
                         
-                        let target = container
+                        let target = creep.container
                         
                         creep.energyWithdraw(target)
                     }

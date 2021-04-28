@@ -1,14 +1,22 @@
 let allyList = require("module.allyList")
 
+Creep.prototype.getMyPart = function(partType) {
+    
+    creep = this
+    
+    creep.parts = creep.getActiveBodyparts(WORK)
+    
+    return creep.parts
+}
 Creep.prototype.roomHostile = function() {
     
     creep = this
     
     let hostiles = creep.room.find(FIND_HOSTILE_CREEPS)
     
-    let roomHostiles = _.isEqual(hostiles, allyList)
+    creep.roomHostiles = _.isEqual(hostiles, allyList)
     
-    return roomHostiles
+    return creep.roomHostiles
 }
 Creep.prototype.fleeHostileRoom = function() {
     
@@ -40,6 +48,40 @@ Creep.prototype.hasEnergy = function() {
                 creep.memory.hasEnergy = true;
     
             }
+}
+Creep.prototype.pickupDroppedEnergy = function(target) {
+    
+    creep = this
+
+    if (creep.pickup(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            
+        creep.memory.origin = creep.pos
+    
+        let origin = creep.memory.origin
+    
+        let goal = _.map([target], function(target) {
+            return { pos: target.pos, range: 3 }
+        })
+        
+        creep.intraRoomPathing(origin, goal)
+    }
+}
+Creep.prototype.energyWithdraw = function(target) {
+    
+    creep = this
+
+    if (creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            
+        creep.memory.origin = creep.pos
+    
+        let origin = creep.memory.origin
+    
+        let goal = _.map([target], function(target) {
+            return { pos: target.pos, range: 3 }
+        })
+        
+        creep.intraRoomPathing(origin, goal)
+    }
 }
 Creep.prototype.energyWithdraw = function(target) {
     
@@ -147,8 +189,8 @@ Creep.prototype.searchSourceContainers = function() {
     
     creep = this
     
-    let sourceContainer1 = Game.getObjectById(sourceContainer1)
-                    let sourceContainer2 = Game.getObjectById(sourceContainer2)
+    let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
+                    let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
                     
                     let containerTarget = [sourceContainer1, sourceContainer2]
                     
@@ -158,6 +200,7 @@ Creep.prototype.searchSourceContainers = function() {
                     if (container != null) {
                         if (container.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
 
+                            creep.container = container
                             break
                         }
                     } else {

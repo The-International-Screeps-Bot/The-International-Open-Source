@@ -952,7 +952,7 @@ module.exports = {
                             creepCount["serf"]++
                         } else if (creepsOfRole[["upgrader", room.name]] < room.memory.minimumNumberOfUpgraders) {
 
-                            name = spawn.createCreep(upgraderBodyResult, 'Ug, ' + "T" + upgraderBodyTier + ", " + creepCount["upgrader"], { role: 'upgrader', upgrading: false, roomFrom: room.name });
+                            name = spawn.createCreep(upgraderBodyResult, 'Ug, ' + "T" + upgraderBodyTier + ", " + creepCount["upgrader"], { role: 'upgrader', hasEnergy: false, roomFrom: room.name });
 
                             creepCount["upgrader"]++
                         } else if (creepsOfRole[["builder", room.name]] < room.memory.minimumNumberOfBuilders && roomConstructionSite.length >= 1) {

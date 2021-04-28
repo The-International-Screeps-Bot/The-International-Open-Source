@@ -1,18 +1,7 @@
 module.exports = {
     run: function(creep) {
         
-        if (creep.memory.roomFrom && creep.room.name != creep.memory.roomFrom) {
-
-                const route = Game.map.findRoute(creep.room.name, creep.memory.roomFrom);
-
-                if (route.length > 0) {
-
-                    creep.say(creep.memory.roomFrom)
-
-                    const exit = creep.pos.findClosestByRange(route[0].exit);
-                    creep.moveTo(exit);
-                }
-            }
+        creep.checkRoom()
 
         var controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
 
@@ -22,14 +11,10 @@ module.exports = {
 
             creep.memory.upgrading = "constant"
 
-        } else if (creep.memory.upgrading == true && creep.carry.energy == 0) {
-
-            creep.memory.upgrading = false;
-
-        } else if (creep.memory.upgrading == false && creep.carry.energy == creep.carryCapacity) {
-
-            creep.memory.upgrading = true;
-
+        }
+        else {
+            
+            creep.hasEnergy()
         }
         if (creep.memory.upgrading == true || creep.memory.upgrading == "constant") {
 
@@ -39,23 +24,33 @@ module.exports = {
             
             creep.controllerUpgrade(target)
             
-            if (creep.store[RESOURCE_ENERGY] <= 10) {
+            let partType = WORK
+            
+            creep.getMyPart(partType)
+            
+            if (creep.store[RESOURCE_ENERGY] <= creep.parts) {
 
                 creep.say("W")
 
-                if (controllerLink && (creep.room.controller.level >= 7 || creep.room.terminal.store[RESOURCE_ENERGY] >= 80000)) {
+                if (controllerLink && (creep.room.controller.level >= 7 || (creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] >= 80000))) {
                     if (controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
 
                         creep.say("🔋 CL")
 
-                        if (creep.withdraw(controllerLink, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                            creep.moveTo(controllerLink, { reusePath: 50 })
-
-                        }
-                    } else {
-
-                        creep.moveTo(controllerLink)
+                        let target = controllerLink
+                        
+                        creep.energyWithdraw(target)
+                    } else if (!creep.pos.isNearTo(creep.room.controller)) {
+                        
+                        creep.memory.origin = creep.pos
+                        
+                        let origin = creep.memory.origin
+                        
+                        let goal = _.map([controllerLink], function(target) {
+                            return { pos: target.pos, range: 3 }
+                        })
+                        
+                        creep.intraRoomPathing(origin, goal)
 
                     }
                 } else if (controllerContainer) {
@@ -63,55 +58,34 @@ module.exports = {
 
                         creep.say("🔋 CL")
 
-                        if (creep.withdraw(controllerContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        let target = controllerContainer
+                        
+                        creep.energyWithdraw(target)
+                    } else if (!creep.pos.isNearTo(creep.room.controller)) {
 
-                            creep.moveTo(controllerContainer, { reusePath: 50 })
-
-                        }
-                    } else {
-
-                        creep.moveTo(controllerContainer)
-
+                        creep.memory.origin = creep.pos
+                        
+                        let origin = creep.memory.origin
+                        
+                        let goal = _.map([controllerContainer], function(target) {
+                            return { pos: target.pos, range: 3 }
+                        })
+                        
+                        creep.intraRoomPathing(origin, goal)
                     }
                 }
             }
         } else {
 
-            var containers = creep.room.find(FIND_STRUCTURES, {
-                filter: (s) => s.structureType == STRUCTURE_CONTAINER
-            })
-
-            var links = creep.room.find(FIND_MY_STRUCTURES, {
-                filter: (s) => s.structureType == STRUCTURE_LINK
-            })
-
-            if (links.length >= 3 && controllerLink && controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
-
-                creep.say("CL")
-
-                if (creep.withdraw(controllerLink, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                    creep.moveTo(controllerLink, { reusePath: 50 });
-                }
-            } else if (controllerContainer && controllerContainer.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
-
-                creep.say("CC")
-
-                if (creep.withdraw(controllerContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                    creep.moveTo(controllerContainer, { reusePath: 50 });
-                }
-            } else if (containers.length >= 2) {
-
-                creep.say("🛄" + containers.length)
-                for (let container of containers) {
-                    if (container.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
-                        if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                            creep.moveTo(container, { reusePath: 50 });
-                        }
-                    }
-                }
+            creep.searchSourceContainers()
+                    
+                if (creep.container != null && creep.container) {
+                        
+                    creep.say("SC")
+                        
+                    let target = creep.container
+                        
+                    creep.energyWithdraw(target)
             } else {
 
                 var droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
@@ -121,12 +95,10 @@ module.exports = {
                 if (droppedResources) {
 
                     creep.say("💡")
+                    
+                    target = droppedResources
 
-                    if (creep.pickup(droppedResources) == ERR_NOT_IN_RANGE) {
-
-                        creep.moveTo(droppedResources, { reusePath: 50 })
-
-                    }
+                    creep.pickupDroppedEnergy(target)
                 }
             }
         }
