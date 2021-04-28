@@ -43,7 +43,7 @@ Creep.prototype.hasEnergy = function() {
     
                 creep.memory.hasEnergy = false;
     
-            } else if (creep.memory.building == false && creep.carry.energy == creep.carryCapacity) {
+            } else if (creep.memory.hasEnergy == false && creep.carry.energy == creep.carryCapacity) {
     
                 creep.memory.hasEnergy = true;
     
