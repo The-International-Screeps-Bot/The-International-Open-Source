@@ -980,7 +980,7 @@ module.exports = {
                             creepCount["miner"]++
                         } else if (creepsOfRole[["robber", room.name]] < room.memory.minimumNumberOfRobbers && target9) {
 
-                            name = spawn.createCreep(remoteHaulerBodyResult, 'Ro, ' + "T" + robberBodyTier + ", " + creepCount["robber"], { role: 'robber', working: false, roomFrom: room.name });
+                            name = spawn.createCreep(remoteHaulerBodyResult, 'Ro, ' + "T" + robberBodyTier + ", " + creepCount["robber"], { role: 'robber', hasEnergy: false, roomFrom: room.name });
 
                             creepCount["robber"]++
                         } else if (creepsOfRole[["remoteDefender", room.name]] < room.memory.minimumNumberOfRemoteDefenders && remoteEnemy == true) {
@@ -1295,7 +1295,7 @@ module.exports = {
 
                     minRemoteBuilders
 
-                    room.memory.minimumNumberOfRobbers = 3
+                    room.memory.minimumNumberOfRobbers = 0
 
                     room.memory.minimumNumberOfRangedDefenders = 2
 
@@ -1340,7 +1340,7 @@ module.exports = {
 
                     minRemoteBuilders
 
-                    room.memory.minimumNumberOfRobbers = 3
+                    room.memory.minimumNumberOfRobbers = 1
 
                     room.memory.minimumNumberOfRangedDefenders = 2
 
@@ -1384,7 +1384,7 @@ module.exports = {
 
                     minRemoteBuilders
 
-                    room.memory.minimumNumberOfRobbers = 3
+                    room.memory.minimumNumberOfRobbers = 1
 
                     room.memory.minimumNumberOfRangedDefenders = 2
 
@@ -1432,7 +1432,7 @@ module.exports = {
 
                     minRemoteBuilders
 
-                    room.memory.minimumNumberOfRobbers = 3
+                    room.memory.minimumNumberOfRobbers = 1
 
                     room.memory.minimumNumberOfRangedDefenders = 2
 

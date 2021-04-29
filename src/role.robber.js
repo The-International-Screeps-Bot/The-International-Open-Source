@@ -1,5 +1,8 @@
 module.exports = {
     run: function(creep) {
+        
+        
+        /*
 
         if (creep.carry.energy == creep.carryCapacity) {
 
@@ -65,5 +68,6 @@ module.exports = {
 
             }
         }
+        */
     }
 };
