@@ -1,3 +1,5 @@
+let taskManager = require("module.taskManager")
+
 module.exports = {
     run: function spawns() {
 
@@ -92,6 +94,8 @@ module.exports = {
 
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my) {
+                
+                taskManager.run(room, creepsOfRole)
                 
                 let remoteBuilderNeed = false
 
