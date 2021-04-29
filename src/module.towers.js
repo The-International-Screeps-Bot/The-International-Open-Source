@@ -7,9 +7,28 @@ module.exports = {
                     filter: s => s.structureType == STRUCTURE_TOWER
                 })
                     
-                let hostile = room.find(FIND_HOSTILE_CREEPS)[0]
+                let hostile = room.find(FIND_HOSTILE_CREEPS, {
+                    filter: (c) => c.owner.username !== "cplive" && c.owner.username !== "Brun1L"
+                })[0]
                 
-                if (hostile) {
+                let injuredCreep = room.find(FIND_MY_CREEPS, {
+                        filter: creep => creep.hits < creep.hitsMax * 1
+                    })[0]
+                    
+                if (injuredCreep) {
+                    for (let tower of towers) {
+                            
+                        if (tower.energy > (tower.energyCapacity * .25)) {
+                                
+                            tower.heal(injuredCreep)
+                                
+                            room.visual.text("🩺 ", tower.pos.x + 1, tower.pos.y, { align: 'left' })
+                        }
+                    }
+                }
+                else {
+                    
+                    if (hostile) {
                     
                     for (let tower of towers) {
                      
@@ -19,23 +38,6 @@ module.exports = {
                     }
                 }
                 else {
-                    
-                    let injuredCreep = room.find(FIND_MY_CREEPS, {
-                        filter: creep => creep.hits < creep.hitsMax * 1
-                    })[0]
-                    
-                    if (injuredCreep) {
-                        for (let tower of towers) {
-                            
-                            if (tower.energy > (tower.energyCapacity * .25)) {
-                                
-                                tower.heal(injuredCreep)
-                                
-                                room.visual.text("🩺 ", tower.pos.x + 1, tower.pos.y, { align: 'left' })
-                            }
-                        }
-                    }
-                    else {
                         
                         let logisticStructure = room.find(FIND_STRUCTURES, {
                                 filter: (s) =>  (s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_CONTAINER) & s.hits < s.hitsMax * 0.5

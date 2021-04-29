@@ -358,7 +358,7 @@ module.exports = {
                         } else {
 
                             let harvesterBodyAmount = Math.floor((freeEnergy - 150) / 250)
-                            let harvesterBody = [CARRY, CARRY, MOVE]
+                            let harvesterBody = []
 
                             var haulerBodyTier = 0
 
@@ -739,7 +739,7 @@ module.exports = {
                         //Ranged Defender
                         if (stage >= 1) {
 
-                            let rangedDefenderBodyAmount = Math.floor(capacityEnergy / 150)
+                            let rangedDefenderBodyAmount = Math.floor(capacityEnergy / 200)
                             let rangedDefenderBody = []
 
                             var rangedDefenderBodyTier = 0
@@ -953,7 +953,7 @@ module.exports = {
                             name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', hasEnergy: false, roomFrom: room.name });
 
                             creepCount["repairer"]++
-                        } else if (creepsOfRole[["rangedDefender", room.name]] < room.memory.minimumNumberOfRangedDefenders && target1.length > 0) {
+                        } else if (creepsOfRole[["rangedDefender", room.name]] < 1/*room.memory.minimumNumberOfRangedDefenders*/ && target1[0]) {
 
                             name = spawn.createCreep(rangedDefenderBodyResult, 'RaD, ' + "T" + rangedDefenderBodyTier + ", " + creepCount["rangedDefender"], { role: 'rangedDefender', roomFrom: room.name });
 

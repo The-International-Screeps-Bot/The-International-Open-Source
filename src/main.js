@@ -99,7 +99,7 @@ module.exports.loop = function() {
 
 Market:
 
-    Game.market.cancelOrder("orderid")
+    Game.market.cancelOrder("608a4639ab6e627365d521e9")
 
     Game.market.deal('6010553cbfbe5cb167da78a1', 1200, "W17N54")
 
