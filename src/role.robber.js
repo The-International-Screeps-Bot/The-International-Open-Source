@@ -1,6 +1,40 @@
 module.exports = {
     run: function(creep) {
         
+        creep.hasEnergy()
+        
+        if (creep.memory.hasEnergy == true) {
+            
+            let storage = creep.room.storage
+                
+                if (storage) {
+                    
+                    creep.say("S <= 400k")
+                    
+                    let target = storage
+                    
+                    if (target.store[RESOURCE_ENERGY] <= 400000) {
+                        
+                        creep.energyTransfer(target)
+                    }
+                }
+        }
+        else {
+            
+            let terminal = creep.room.terminal
+                
+                if (terminal) {
+                    
+                    creep.say("T >= 150k")
+                    
+                    let target = terminal
+                    
+                    if (target.store[RESOURCE_ENERGY] >= 150000) {
+                        
+                        creep.energyWithdraw(target)
+                    }
+                }
+        }
         
         /*
 
