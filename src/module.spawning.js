@@ -357,7 +357,7 @@ module.exports = {
                             var harvesterBodyResult = harvesterBody.slice(0, 12)
                         } else {
 
-                            let harvesterBodyAmount = Math.floor((freeEnergy - 150) / 250)
+                            let harvesterBodyAmount = Math.floor(freeEnergy / 250)
                             let harvesterBody = []
 
                             var haulerBodyTier = 0
