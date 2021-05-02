@@ -46,10 +46,10 @@ module.exports = {
 
                 if (Game.shard.name == "shard2") {
                         
-                    //var claimerTarget = "E36S1"
-                    var claimerTarget = undefined
-                    //var builderTarget = "E36S1"
-                    var builderTarget = undefined
+                    var claimerTarget = "E33S2"
+                    //var claimerTarget = undefined
+                    var builderTarget = "E33S2"
+                    //var builderTarget = undefined
                 }
                 else {
 
