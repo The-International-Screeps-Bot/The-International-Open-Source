@@ -45,7 +45,7 @@ module.exports = {
             creep.heal(injuredSelf)
 
         }
-        if (hostile || hostileStructure) {
+        if (creep.room.name != creep.memory.roomFrom && (hostile || hostileStructure)) {
 
             if (hostile) {
 
@@ -72,7 +72,35 @@ module.exports = {
                 creep.room.memory.enemy = false
 
             }
-        } else {
+        }
+        else {
+            
+            let enemyCreep = hostile
+                    
+                    creep.say("No Enemy")
+                    
+                    if (creep.room.name == creep.memory.roomFrom && enemyCreep) {
+                        
+                        creep.say("Enemy")
+                    
+                        let target = enemyCreep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            filter: s => s.structureType == STRUCTURE_RAMPART
+                        })
+                    
+                        if (target) { 
+                            
+                            creep.say("Rampart")
+                            
+                            let origin = creep.pos
+                            
+                            let goal = target
+                            
+                            creep.rampartPathing(origin, goal)
+                            
+                            creep.attack(enemyCreep)
+                        }
+                    }
+        else {
             if (creep.memory.target == creep.memory.roomFrom) {
 
                 target = creep.memory.roomFrom
@@ -96,12 +124,11 @@ module.exports = {
                     }
                 } else if (creep.room.name == target) {
 
-                    creep.say(target)
-
-                    let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
-
-                    creep.moveTo(spawn)
-
+                        creep.say(target)
+    
+                        let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
+    
+                        creep.moveTo(spawn)
                 }
             } else {
 
@@ -120,6 +147,7 @@ module.exports = {
 
                 }
 
+                }
             }
         }
     }

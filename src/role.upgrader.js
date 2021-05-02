@@ -24,11 +24,7 @@ module.exports = {
             
             creep.controllerUpgrade(target)
             
-            let partType = WORK
-            
-            creep.getMyPart(partType)
-            
-            if (creep.store[RESOURCE_ENERGY] <= creep.parts) {
+            if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
 
                 creep.say("W")
 

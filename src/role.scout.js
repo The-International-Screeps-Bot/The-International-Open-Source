@@ -83,10 +83,8 @@ module.exports = {
             creep.room.memory.scoutTick = Game.time
         
             creep.memory.goal = new RoomPosition(25, 25, targetRoom)
-            
-            creep.memory.origin = creep.pos
     
-            let origin = creep.memory.origin
+            let origin = creep.pos
     
             let goal = _.map([creep.memory.goal], function(target) {
                 return { pos: creep.memory.goal, range: 1 }

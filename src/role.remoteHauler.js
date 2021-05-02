@@ -23,15 +23,8 @@ module.exports = {
                 creep.say("🛄")
 
                 if (container) {
-                    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                        creep.moveTo(container, { reusePath: 50 }, { visualizePathStyle: { stroke: '#ffffff' } })
-                            /*
-                            const path = creep.room.findPath(creep.pos, container.pos, { maxOps: 200 })
-                        
-                            creep.moveByPath(path)
-                        */
-                    }
+                    
+                    creep.energyWithdraw(container)
                 } else {
 
                     var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -41,31 +34,21 @@ module.exports = {
                     creep.say("🛄")
 
                     if (container) {
-                        if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                            creep.moveTo(container, { reusePath: 50 }, { visualizePathStyle: { stroke: '#ffffff' } })
-                                /*
-                            const path = creep.room.findPath(creep.pos, container.pos, { maxOps: 200 })
                         
-                            creep.moveByPath(path)
-                        */
-                        }
+                        creep.energyWithdraw(container)
                     } else {
 
-                        var droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                        let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
                             filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
-                        })
-
-                        creep.say("💡")
-
-                        if (creep.pickup(droppedResources) == ERR_NOT_IN_RANGE) {
-
-                            creep.moveTo(droppedResources, { reusePath: 50 }, { visualizePathStyle: { stroke: '#ffffff' } })
-                                /*
-                            const path = creep.room.findPath(creep.pos, container.pos, { maxOps: 200 })
-                        
-                            creep.moveByPath(path)
-                        */
+                        });
+        
+                        if (droppedResources) {
+        
+                            creep.say("💡")
+                            
+                            target = droppedResources
+        
+                            creep.pickupDroppedEnergy(target)
                         } else {
 
                             var source = creep.pos.findClosestByRange(FIND_SOURCES)
@@ -73,8 +56,13 @@ module.exports = {
                             creep.say("🔦");
                             if (!creep.pos.inRangeTo(source, 2)) {
 
-                                creep.moveTo(source, { reusePath: 50 })
-
+                                let origin = creep.pos
+        
+                                let goal = _.map([source], function(target) {
+                                    return { pos: creep.memory.goal, range: 1 }
+                                })
+                                
+                                creep.intraRoomPathing(origin, goal)
                             }
                         }
                     }
@@ -83,15 +71,16 @@ module.exports = {
 
                 creep.memory.target = remoteRoom;
 
-                const route = Game.map.findRoute(creep.room, remoteRoom);
-
-                if (route.length > 0) {
-
-                    creep.say(remoteRoom)
-
-                    const exit = creep.pos.findClosestByRange(route[0].exit);
-                    creep.moveTo(exit);
-                }
+                creep.memory.goal = new RoomPosition(25, 25, remoteRoom)
+    
+                let origin = creep.pos
+        
+                let goal = _.map([creep.memory.goal], function(target) {
+                    return { pos: creep.memory.goal, range: 1 }
+                })
+                
+                creep.roadPathing(origin, goal)
+                
             }
         } else {
 
@@ -99,19 +88,15 @@ module.exports = {
 
             if (creep.room.name != creep.memory.roomFrom) {
 
-                creep.say(creep.memory.target)
-
-                creep.memory.target = creep.memory.roomFrom
-
-                const route = Game.map.findRoute(creep.room, creep.memory.target);
-
-                if (route.length > 0) {
-
-                    creep.say(creep.memory.target)
-
-                    const exit = creep.pos.findClosestByRange(route[0].exit);
-                    creep.moveTo(exit);
-                }
+                creep.memory.goal = new RoomPosition(25, 25, creep.memory.roomFrom)
+    
+                let origin = creep.pos
+        
+                let goal = _.map([creep.memory.goal], function(target) {
+                    return { pos: creep.memory.goal, range: 1 }
+                })
+                
+                creep.roadPathing(origin, goal)
             } else {
 
                 var storage = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
@@ -122,10 +107,7 @@ module.exports = {
 
                     creep.say("RL S1");
 
-                    if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                        creep.moveTo(storage, { reusePath: 50 });
-                    }
+                    creep.energyTransfer(storage)
                 } else {
 
                     var controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
@@ -142,11 +124,7 @@ module.exports = {
 
                         creep.say("cC1")
 
-                        if (creep.transfer(controllerContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                            creep.moveTo(controllerContainer, { reusePath: 50 });
-
-                        }
+                        creep.energyTransfer(controllerContainer)
                     } else {
 
                         var storage = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
@@ -161,18 +139,12 @@ module.exports = {
 
                             creep.say("RL S2");
 
-                            if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                                creep.moveTo(storage, { reusePath: 50 });
-                            }
+                            creep.energyTransfer(storage)
                         } else if (terminal) {
 
                             creep.say("RL T");
 
-                            if (creep.transfer(terminal, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                                creep.moveTo(terminal, { reusePath: 50 });
-                            }
+                            creep.energyTransfer(terminal)
                         } else {
 
                             let structure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
@@ -185,10 +157,7 @@ module.exports = {
 
                                 creep.say("➡️")
 
-                                if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-
-                                    creep.moveTo(structure, { reusePath: 50 });
-                                }
+                                creep.energyTransfer(structure)
                             } else {
 
                                 let spawns = creep.pos.findClosestByRange(FIND_MY_SPAWNS)

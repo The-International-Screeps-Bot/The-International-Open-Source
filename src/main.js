@@ -1,5 +1,5 @@
 let towers = require("module.towers")
-let terminal = require("prototype.terminal")
+let terminals = require("module.terminals")
 let cleanMemory = require("module.cleanMemory")
 let visuals = require("module.roomVisuals")
 let spawns = require("module.spawning")
@@ -49,16 +49,10 @@ module.exports.loop = function() {
             visuals.run()
             
             console.log("visuals: " + Game.cpu.getUsed().toFixed(2))
+            
+            if (Game.time % 10 == 0) {
 
-            if (Game.time % 1 == 0) {
-
-                var terminals = _.filter(Game.structures, s => s.structureType == STRUCTURE_TERMINAL);
-
-                for (let terminal of terminals) {
-
-                    terminal.market()
-
-                }
+                terminals.run()
             }
 
             console.log("terminals: " + Game.cpu.getUsed().toFixed(2))
@@ -200,6 +194,60 @@ Upkeep costs:
             catalyzed ghodium alkalide:  	-70% damage taken                                                      
             catalyzed utrium acid:        	+300% attack effectiveness                                             
             catalyzed lemergium alkalide:    +300% heal and rangedHeal effectiveness                                        
-            catalyzed keanium alkalide:	 + 	60	RANGED_ATTACK	+300% rangedAttack and rangedMassAttack effectiveness                             
+            catalyzed keanium alkalide:	 + 	60	RANGED_ATTACK	+300% rangedAttack and rangedMassAttack effectiveness
+            
+        Downgrade Timers:
+        
+            RCL1: 20,000
+            
+            RCL2: 10,000
+            
+            RCL3: 20,000
+            
+            RCL4: 40,000
+            
+            RCL5: 80,000
+            
+            RCL6: 120,000
+            
+            RCL7: 150,000
+            
+            RCL8: 200,000
+            
+    //-----------------------------------------------------------------------------------------------
+            
+Notes:
+
+    Improved upgrader code:
+    
+        if all creeps needed are spawned; and 75% of extensions are filled; and there is no storage all secondary tasks be transport to controllerLink or controllerContainer
+        
+        else if all creeps are spawned; and 75% of extensions are filled; and there is a storage; and the storage has more than 50k energy; and there is not 4 links and global stage of 0 / there are not 2 links and global stage of more than 0 have one hauler's task be controlelrLink or controllerContainer
+        
+        else if all creeps are spawned; and 75% of extensions are filled; and there is a storage; and the storage has more than 300k energy; and there is not 4 links and global stage of 0 / there are not 2 links and global stage of more than 0 have all secondary tasks be controllerLink or controllerContainer
+        
+        else if downgrade timer is less than 90% of max downgrade timer, make one task to give energy to controllerLink or controllerContainer
+        
+    Spawn que and multiple spawns:
+    
+        if less than requested creeps in room + creeps in room memory spawn que add a creep to the spawn que
+        
+        if creep in spawn que, loop through spawns in room. Have spawns spawn spawn que first item in array.
+        
+    Power bank logic:
+    
+        if scout spots a power bank record power bank as true in room; and the power bank has enough ttl; and there is an RCL 8 room close enough to harvest; and there aren't enemy creeps with attack / heal / rangedAttack have the scout record in the nearby RCL 8 room memory powerBank: { active: true, roomName: scout.room.name }
+        
+    Deposit logic:
+    
+        a
+        
+    Squad code logic:
+    
+        a
+        
+    
+    
+    
 
     */

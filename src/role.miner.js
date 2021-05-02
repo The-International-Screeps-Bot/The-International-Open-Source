@@ -1,18 +1,7 @@
 module.exports = {
     run: function(creep) {
         
-        if (creep.memory.roomFrom && creep.room.name != creep.memory.roomFrom) {
-
-                const route = Game.map.findRoute(creep.room.name, creep.memory.roomFrom);
-
-                if (route.length > 0) {
-
-                    creep.say(creep.memory.roomFrom)
-
-                    const exit = creep.pos.findClosestByRange(route[0].exit);
-                    creep.moveTo(exit);
-                }
-            }
+        creep.checkRoom()
 
         let target = creep.pos.findClosestByRange(FIND_MINERALS)
         let mineral = creep.memory.mineral = target.mineralType
@@ -35,8 +24,12 @@ module.exports = {
 
             if (creep.harvest(target) == ERR_NOT_IN_RANGE) {
 
-                creep.moveTo(target, { reusePath: 50 })
-
+                let origin = creep.pos
+                let goal = _.map([target], function(target) {
+                    return { pos: target.pos, range: 1 }
+                })
+                    
+                creep.intraRoomPathing(origin, goal)
             }
         } else {
 
@@ -46,8 +39,12 @@ module.exports = {
 
             if (terminal /* && _.sum(terminal.store) <= 250000*/ && creep.transfer(terminal, mineral) == ERR_NOT_IN_RANGE) {
 
-                creep.moveTo(terminal, { reusePath: 50 })
-
+                let origin = creep.pos
+                let goal = _.map([terminal], function(target) {
+                    return { pos: target.pos, range: 1 }
+                })
+                    
+                creep.intraRoomPathing(origin, goal)
             }
         }
     }

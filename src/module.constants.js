@@ -98,8 +98,20 @@ module.exports = {
 
                 function sources() {
 
+                    let sources = room.find(FIND_SOURCES)
+                    
+                    let source1 = Game.getObjectById(room.memory.source1)
+                    let source2 = Game.getObjectById(room.memory.source2)
+                    
+                    if (source1 == null) {
 
+                        room.memory.source1 = sources[0].id
 
+                    } else if (source2 == null) {
+
+                        room.memory.source2 = sources[1].id
+
+                    }
                 }
 
                 function containers() {
@@ -110,22 +122,24 @@ module.exports = {
 
                     for (let container of containers) {
 
-                        var source = room.find(FIND_SOURCES);
+                        let source1 = Game.getObjectById(room.memory.source1)
+                        let source2 = Game.getObjectById(room.memory.source2)
                         
+                        let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
                         let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
                         let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
 
-                        if (container.pos.inRangeTo(container.room.controller, 2)) {
+                        if (controllerContainer == null && container.pos.inRangeTo(room.controller, 2)) {
 
-                            container.room.memory.controllerContainer = container.id
+                            room.memory.controllerContainer = container.id
 
-                        } else if (sourceContainer1 == null && container.pos.inRangeTo(source[0], 1)) {
+                        } else if (sourceContainer1 == null && source1 && container.pos.inRangeTo(source1, 1)) {
 
-                            container.room.memory.sourceContainer1 = container.id
+                            room.memory.sourceContainer1 = container.id
 
-                        } else if (sourceContainer2 == null && container.pos.inRangeTo(source[1], 1)) {
+                        } else if (sourceContainer2 == null && source2 && container.pos.inRangeTo(source2, 1)) {
 
-                            container.room.memory.sourceContainer2 = container.id
+                            room.memory.sourceContainer2 = container.id
 
                         }
                     }
@@ -136,14 +150,14 @@ module.exports = {
 
                     var labs = room.find(FIND_STRUCTURES, {
                         filter: s => s.structureType == STRUCTURE_LAB
-                    });
+                    })
 
                     var primaryLabs = []
                     var secondaryLabs = []
 
                     for (let lab of labs) {
 
-                        var nearbyLab = lab.pos.findInRange(labs, 1);
+                        var nearbyLab = lab.pos.findInRange(labs, 1)
 
                         var controller = room.controller
 
@@ -275,7 +289,7 @@ module.exports = {
                     }
                     else if (Game.shard.name == "screepsplus1") {
                     
-                        var unfilteredRemoteRooms = ["a"]// = ["E28N12", "E28N14", "E28N16", "E28N18", "E29N17", "E31N15", "E32N14", "E32N15", "E29N13"]
+                        var unfilteredRemoteRooms = ["E28N12", "E28N14", "E28N16", "E28N18", "E29N17", "E31N15", "E32N14", "E32N15", "E29N13"]
                     }
                     else {
                         

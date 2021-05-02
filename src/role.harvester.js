@@ -1,40 +1,12 @@
 module.exports = {
     run: function(creep) {
         
-        if (creep.memory.roomFrom && creep.room.name != creep.memory.roomFrom) {
-
-                const route = Game.map.findRoute(creep.room.name, creep.memory.roomFrom);
-
-                if (route.length > 0) {
-
-                    creep.say(creep.memory.roomFrom)
-
-                    const exit = creep.pos.findClosestByRange(route[0].exit);
-                    creep.moveTo(exit);
-                }
-            }
-
-        let source1 = Game.getObjectById(creep.room.memory.source1)
-        let source2 = Game.getObjectById(creep.room.memory.source2)
-
-        if (!source1 && !source2) {
-
-            let sources = creep.room.find(FIND_SOURCES)
-            
-            if (sources[0]) {
-            
-                creep.room.memory.source1 = sources[0].id
-            }
-            if (sources[1]) {
-            
-                creep.room.memory.source2 = sources[1].id
-            }
-        }
+        creep.checkRoom()
 
         if (creep.memory.role == "harvester1") {
             
             let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
-            let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
+            let source1 = Game.getObjectById(creep.room.memory.source1)
             
             if (sourceContainer1) {
 
@@ -42,34 +14,43 @@ module.exports = {
 
                 if (creep.pos.inRangeTo(sourceContainer1, 0)) {
 
-                    creep.harvest(closestSource)
+                    creep.harvest(source1)
 
                 } else {
-
-                    creep.moveTo(sourceContainer1, { reusePath: 50 })
+                    
+                    let origin = creep.pos
+                    let goal = _.map([sourceContainer1], function(target) {
+                        return { pos: target.pos, range: 0 }
+                    })
+                    
+                    creep.intraRoomPathing(origin, goal)
 
                 }
-            } else {
-
-                creep.moveTo(source1, { reusePath: 50 })
-                creep.harvest(source1);
-                creep.say("⛏️ 3")
-
             }
-            if (creep.store[RESOURCE_ENERGY] >= creep.store.getCapacity() - 10) {
+            else {
                 
-                let sourceLink1 = Game.getObjectById(creep.room.memory.sourceLink1)
+                creep.say("⛏️ 3")
                 
-                if (sourceLink1) {
+                if (creep.pos.inRangeTo(source1, 1)) {
 
-                    creep.transfer(sourceLink1, RESOURCE_ENERGY)
+                    
+                    creep.harvest(source1)
+
+                } else {
+                    
+                    let origin = creep.pos
+                    let goal = _.map([source1], function(target) {
+                        return { pos: target.pos, range: 1 }
+                    })
+                    
+                    creep.intraRoomPathing(origin, goal)
 
                 }
             }
         } else if (creep.memory.role == "harvester2") {
             
             let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
-            let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
+            let source2 = Game.getObjectById(creep.room.memory.source2)
             
             if (sourceContainer2) {
 
@@ -77,29 +58,53 @@ module.exports = {
 
                 if (creep.pos.inRangeTo(sourceContainer2, 0)) {
 
-                    creep.harvest(closestSource)
+                    creep.harvest(source2)
 
                 } else {
-
-                    creep.moveTo(sourceContainer2, { reusePath: 50 })
+                    
+                    let origin = creep.pos
+                    let goal = _.map([sourceContainer2], function(target) {
+                        return { pos: target.pos, range: 0 }
+                    })
+                    
+                    creep.intraRoomPathing(origin, goal)
 
                 }
-            } else {
-
-                creep.moveTo(source2, { reusePath: 50 })
-                creep.harvest(source2);
-                creep.say("⛏️ 4")
-
             }
-            if (creep.store[RESOURCE_ENERGY] >= creep.store.getCapacity() - 10) {
+            else {
                 
-                let sourceLink2 = Game.getObjectById(creep.room.memory.sourceLink2)
+                creep.say("⛏️ 4")
                 
-                if (sourceLink2) {
+                if (creep.pos.inRangeTo(source2, 1)) {
 
-                    creep.transfer(sourceLink2, RESOURCE_ENERGY)
+                    
+                    creep.harvest(source2)
+
+                } else {
+                    
+                    let origin = creep.pos
+                    let goal = _.map([source2], function(target) {
+                        return { pos: target.pos, range: 1 }
+                    })
+                    
+                    creep.intraRoomPathing(origin, goal)
 
                 }
+            }
+        }
+        
+        let baseLink = Game.getObjectById(creep.room.memory.baseLink)
+        
+        if (baseLink != null && creep.store.getUsedCapacity() <= creep.myParts("work") * 2) {
+                
+            let sourceLink1 = Game.getObjectById(creep.room.memory.sourceLink1)
+            let sourceLink2 = Game.getObjectById(creep.room.memory.sourceLink2)
+                
+            let closestLink = creep.pos.findClosestByRange([sourceLink1, sourceLink2])
+                
+              if (closestLink && closestLink.store[RESOURCE_ENERGY] < 800) {
+
+                creep.transfer(closestLink, RESOURCE_ENERGY)
             }
         }
     }

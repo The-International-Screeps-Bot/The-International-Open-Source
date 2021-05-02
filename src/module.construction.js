@@ -403,51 +403,50 @@ module.exports = {
                 
                 if (Game.time % 100 == 0) {
                 
-                    sourcePath()
+                    source1Path()
+                    source2Path()
                     controllerPath()
                     mineralPath()
                     remotePath()
                     placeExtractor()
                 }
 
-                function sourcePath() {
+                function source1Path() {
 
-                    let sources = room.find(FIND_SOURCES)
+                    let source1 = Game.getObjectById(room.memory.source1)
+                    let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
+                    
+                    let origin = room.find(FIND_MY_SPAWNS)[0]
 
-                    for (let inactiveSource of sources) {
+                    let goal = _.map([source1], function(source) {
+                        return { pos: source.pos, range: 1 }
+                    })
 
-                        let origin = room.find(FIND_MY_SPAWNS)[0]
+                    if (origin && goal) {
 
-                        let goal = _.map([inactiveSource], function(source) {
-                            return { pos: source.pos, range: 1 }
-                        })
+                        var path = PathFinder.search(origin.pos, goal, {
+                            plainCost: 2,
 
-                        //console.log(JSON.stringify(goal))
-                        if (origin && goal) {
+                            roomCallback: function(roomName) {
 
-                            var path = PathFinder.search(origin.pos, goal, {
-                                plainCost: 2,
+                                let room = Game.rooms[roomName]
 
-                                roomCallback: function(roomName) {
+                                if (!room) return
 
-                                    let room = Game.rooms[roomName]
+                                let costs = new PathFinder.CostMatrix
 
-                                    if (!room) return
+                                room.find(FIND_STRUCTURES).forEach(function(struct) {
+                                    if (struct.structureType === STRUCTURE_ROAD) {
 
-                                    let costs = new PathFinder.CostMatrix
+                                        costs.set(struct.pos.x, struct.pos.y, 1)
 
-                                    room.find(FIND_STRUCTURES).forEach(function(struct) {
-                                        if (struct.structureType === STRUCTURE_ROAD) {
+                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
 
-                                            costs.set(struct.pos.x, struct.pos.y, 1)
+                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
 
-                                        } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
-
-                                            costs.set(struct.pos.x, struct.pos.y, 0xff)
-
-                                        }
-                                    })
-                                    room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
+                                    }
+                                })
+                                room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
                                     if (struct.structureType === STRUCTURE_ROAD) {
 
                                         costs.set(struct.pos.x, struct.pos.y, 1)
@@ -459,12 +458,12 @@ module.exports = {
                                     }
                                 })
 
-                                    return costs
+                                return costs
 
-                                }
-                            }).path
+                            }
+                        }).path
 
-                            new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+                        new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
                             
                             for (let i = 0; i < path.length; i++) {
                                 
@@ -475,12 +474,81 @@ module.exports = {
                                 
                                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                                 }
-                                if (normalValue && i + 1 == path.length) {
+                                if (sourceContainer1 == null && normalValue && i + 1 == path.length) {
                                     
                                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                                 }
                             }
-                        }
+                    }
+                }
+                function source2Path() {
+
+                    let source2 = Game.getObjectById(room.memory.source2)
+                    let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
+                    
+                    let origin = room.find(FIND_MY_SPAWNS)[0]
+
+                    let goal = _.map([source2], function(source) {
+                        return { pos: source.pos, range: 1 }
+                    })
+
+                    if (origin && goal) {
+
+                        var path = PathFinder.search(origin.pos, goal, {
+                            plainCost: 2,
+
+                            roomCallback: function(roomName) {
+
+                                let room = Game.rooms[roomName]
+
+                                if (!room) return
+
+                                let costs = new PathFinder.CostMatrix
+
+                                room.find(FIND_STRUCTURES).forEach(function(struct) {
+                                    if (struct.structureType === STRUCTURE_ROAD) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 1)
+
+                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
+
+                                    }
+                                })
+                                room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
+                                    if (struct.structureType === STRUCTURE_ROAD) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 1)
+
+                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+
+                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
+
+                                    }
+                                })
+
+                                return costs
+
+                            }
+                        }).path
+
+                        new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+                            
+                            for (let i = 0; i < path.length; i++) {
+                                
+                                let value = path[i - 1]
+                                let normalValue = path[i]
+                                
+                                if (value && room.controller.level >= 5) {
+                                
+                                    room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
+                                }
+                                if (sourceContainer2 == null && normalValue && i + 1 == path.length) {
+                                    
+                                    room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
+                                }
+                            }
                     }
                 }
 
@@ -696,11 +764,11 @@ module.exports = {
                                         
                                         //new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476" })
                                         
-                                        if (value && room.controller.level >= 5) {
+                                        if (value && value.roomName && room.controller.level >= 5) {
                                         
                                             Game.rooms[value.roomName].createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                                         }
-                                        if (normalValue && i + 1 == path.length) {
+                                        if (normalValue && normalValue.roomName && i + 1 == path.length) {
                                             
                                             //new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "red" })
                                             
