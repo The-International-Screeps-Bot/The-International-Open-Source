@@ -22,6 +22,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [x] Remote mining
 - [x] Primitive defence code
 - [ ] Operation of multiple spawns in a room
+- [ ] Spawn que
 - [x] Automated road placement
 - [x] Automated base construction and room planning
 - [x] Automatic market buy and sell orders
@@ -54,7 +55,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [x] Have nearest rooms establish and claim rooms
 - [ ] Spawn specific defender creeps depending on attackers
 - [ ] Determine if boosting is necessary for defenders
-- [ ] Have defenders move to ramparts near attackers
+- [x] Have defenders move to ramparts near attackers
 - [x] Spawn new civilian creeps when TTL is less than time to spawn
 - [ ] Add a GUI for performing manual actions from the console
 - [x] Information panel to provide information about the development of the bot
