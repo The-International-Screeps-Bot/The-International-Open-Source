@@ -41,7 +41,20 @@ module.exports = {
         let bases = ["OH", "ZK", "UL", "G"]
         let minerals = ["H", "O", "U", "K", "L", "Z", "X"]
 
-        //let resource = [{outputResource: "", primaryResource: "", secondaryResource: ""},]
+        let reactions = {
+            bases: {
+                "OH": {reactant1: "", reactant2: ""},
+            },
+            t1Boosts: {
+                
+            },
+            t2Boosts: {
+                
+            },
+            t3Boosts: {
+                
+            }
+        }
 
         let labProductionAmount = 20000
         let labProductionType = undefined

@@ -4,7 +4,7 @@ module.exports = {
         creep.checkRoom()
 
         let enemyCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-            filter: (c) => c.owner.username !== "cplive" && c.owner.username !== "Brun1L" && c.owner.username !== "Invader"
+            filter: (c) => c.owner.username !== "cplive" && c.owner.username !== "Brun1L"
         })
         
         creep.say("No Enemy")
@@ -20,9 +20,21 @@ module.exports = {
             if (target) { 
                 
                 creep.say("Rampart")
+                
+                let origin = creep.pos
+                
+                let goal = target
+                
+                creep.rampartPathing(origin, goal)
+                
+                if (enemyCreep.pos.isNearTo(creep)) {
+                    
+                    creep.rangedMassAttack(enemyCreep)
+                }
+                else {
             
-                creep.attack(enemyCreep)
-                creep.moveTo(target)
+                creep.rangedAttack(enemyCreep)
+                }
             }
         }
         

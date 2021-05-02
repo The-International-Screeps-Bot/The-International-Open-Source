@@ -407,6 +407,7 @@ module.exports = {
                     controllerPath()
                     mineralPath()
                     remotePath()
+                    placeExtractor()
                 }
 
                 function sourcePath() {
@@ -708,6 +709,22 @@ module.exports = {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+                function placeExtractor() {
+                    
+                    let extractors = room.find(FIND_MY_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_EXTRACTOR
+                    })
+                    
+                    if (room.memory.stage >= 6 && !extractors[0]) {
+                        
+                        let mineral = room.find(FIND_MINERALS)[0]
+                        
+                        if (mineral) {
+                            
+                            room.createConstructionSite(mineral.pos, STRUCTURE_EXTRACTOR)
                         }
                     }
                 }
