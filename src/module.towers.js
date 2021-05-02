@@ -32,7 +32,7 @@ module.exports = {
                     
                     for (let tower of towers) {
                      
-                        //tower.attack(hostile)
+                        tower.attack(hostile)
                         
                         room.visual.text("⚔️ ", tower.pos.x + 1, tower.pos.y, { align: 'left' })
                     }

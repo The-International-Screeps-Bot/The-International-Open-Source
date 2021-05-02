@@ -77,6 +77,10 @@ module.exports = {
         }
         
         if (targetRoom) {
+            
+            creep.say(targetRoom)
+                
+            creep.room.memory.scoutTick = Game.time
         
             creep.memory.goal = new RoomPosition(25, 25, targetRoom)
             
@@ -156,16 +160,16 @@ module.exports = {
                         }
                     }
                     */
-    
-                creep.say(targetRoom)
-                
-                creep.room.memory.scoutTick = Game.time
                 
                 if (creep.room.controller) {
                     
                     if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username != "x") {
                     
                         creep.room.memory.stage = "enemyRoom"
+                    }
+                    else if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username == "x") {
+                    
+                        creep.room.memory.stage = "allyRoom"
                     }
                 }
                 else {
