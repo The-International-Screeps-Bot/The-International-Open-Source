@@ -9,7 +9,7 @@ module.exports = {
             filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5
         })
 
-        if (!structure) {
+        if (!lowLogisticStructure) {
 
             roleBuilder.run(creep)
 
@@ -19,7 +19,7 @@ module.exports = {
     
                 creep.say("🔧")
                 
-                target = lowLogisticStructure
+                let target = lowLogisticStructure
     
                 creep.repairLogisticStructures(target)
             }
