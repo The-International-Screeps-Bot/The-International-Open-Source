@@ -306,7 +306,7 @@ Creep.prototype.roadPathing = function(origin, goal) {
 
     creep.moveByPath(creep.memory.path)
 
-    new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+    //new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
 Creep.prototype.offRoadPathing = function(origin, goal) {
     
@@ -351,7 +351,7 @@ Creep.prototype.offRoadPathing = function(origin, goal) {
 
     creep.moveByPath(creep.memory.path)
 
-    new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+    //new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
 Creep.prototype.intraRoomPathing = function(origin, goal) {
     

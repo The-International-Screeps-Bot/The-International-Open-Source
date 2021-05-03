@@ -1,5 +1,3 @@
-let taskManager = require("module.taskManager")
-
 module.exports = {
     run: function spawns() {
 
@@ -275,7 +273,7 @@ module.exports = {
 
                 roomFix = false
 
-                if (creepsOfRole[["harvester1", room.name]] + creepsOfRole[["harvester2", room.name]] < 1 || creepsOfRole[["baseHauler", room.name]] + creepsOfRole[["containerHauler", room.name]] + creepsOfRole[["generalHauler", room.name]] < 1) {
+                if (creepsOfRole[["harvester1", room.name]] + creepsOfRole[["harvester2", room.name]] < 1 || creepsOfRole[["baseHauler", room.name]] + creepsOfRole[["containerHauler", room.name]] + creepsOfRole[["generalHauler", room.name]] < 2) {
 
                     roomFix = true
 
@@ -309,7 +307,7 @@ module.exports = {
 
                     var name = undefined
 
-                    if (roomFix == true) {
+                    if (roomFix == true && freeEnergy >= 300) {
                         //freeEnergy Hauler
                         if (stage <= 4) {
 
