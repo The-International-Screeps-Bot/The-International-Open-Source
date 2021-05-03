@@ -46,9 +46,9 @@ module.exports = {
 
                 if (Game.shard.name == "shard2") {
                         
-                    var claimerTarget = "E33S2"
+                    var claimerTarget = "E33N2"
                     //var claimerTarget = undefined
-                    var builderTarget = "E33S2"
+                    var builderTarget = "E33N2"
                     //var builderTarget = undefined
                 }
                 else {
@@ -895,6 +895,13 @@ module.exports = {
                             name = spawn.createCreep(harvesterBodyResult, 'rfH, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester1"], { role: 'harvester1', working: false, target: 1, roomFrom: room.name });
 
                             creepCount["harvester1"]++
+                        }
+                        else if (creepsOfRole[["baseHauler", room.name]] + creepsOfRole[["containerHauler", room.name]] + creepsOfRole[["generalHauler", room.name]] < 2) {
+
+                            name = spawn.createCreep(haulerBodyResult, 'rfGH, ' + "T" + haulerBodyTier + ", " + creepCount["generalHauler"], { role: 'generalHauler', fullEnergy: false, roomFrom: room.name });
+
+                            creepCount["generalHauler"]++
+
                         }
                     } else {
 
