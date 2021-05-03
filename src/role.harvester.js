@@ -8,7 +8,7 @@ module.exports = {
             let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
             let source1 = Game.getObjectById(creep.room.memory.source1)
             
-            if (sourceContainer1) {
+            if (sourceContainer1 != null && source1 != null) {
 
                 creep.say("⛏️ 1")
 
@@ -31,7 +31,7 @@ module.exports = {
                 
                 creep.say("⛏️ 3")
                 
-                if (source1 != null && creep.pos.inRangeTo(source1, 1)) {
+                if (creep.pos.inRangeTo(source1, 1)) {
 
                     
                     creep.harvest(source1)
@@ -52,7 +52,7 @@ module.exports = {
             let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
             let source2 = Game.getObjectById(creep.room.memory.source2)
             
-            if (sourceContainer2) {
+            if (sourceContainer2 != null && source2 != null) {
 
                 creep.say("⛏️ 2")
 
@@ -75,7 +75,7 @@ module.exports = {
                 
                 creep.say("⛏️ 4")
                 
-                if (source2 != null && creep.pos.inRangeTo(source2, 1)) {
+                if (creep.pos.inRangeTo(source2, 1)) {
 
                     
                     creep.harvest(source2)
