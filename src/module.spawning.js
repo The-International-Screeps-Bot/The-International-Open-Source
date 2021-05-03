@@ -1,3 +1,6 @@
+let taskManager = require("module.taskManager")
+let trafficManager = require("module.trafficManager")
+
 module.exports = {
     run: function spawns() {
 
