@@ -31,7 +31,7 @@ module.exports = {
                 
                 creep.say("⛏️ 3")
                 
-                if (creep.pos.inRangeTo(source1, 1)) {
+                if (source1 != null && creep.pos.inRangeTo(source1, 1)) {
 
                     
                     creep.harvest(source1)
@@ -75,7 +75,7 @@ module.exports = {
                 
                 creep.say("⛏️ 4")
                 
-                if (creep.pos.inRangeTo(source2, 1)) {
+                if (source2 != null && creep.pos.inRangeTo(source2, 1)) {
 
                     
                     creep.harvest(source2)
