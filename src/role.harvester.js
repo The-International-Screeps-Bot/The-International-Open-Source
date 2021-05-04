@@ -27,7 +27,7 @@ module.exports = {
 
                 }
             }
-            else {
+            else if (source1 != null) {
                 
                 creep.say("⛏️ 3")
                 
@@ -71,7 +71,7 @@ module.exports = {
 
                 }
             }
-            else {
+            else if (source2 != null) {
                 
                 creep.say("⛏️ 4")
                 
@@ -108,4 +108,4 @@ module.exports = {
             }
         }
     }
-};
+}
