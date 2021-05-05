@@ -38,9 +38,7 @@ module.exports = {
                         creep.energyWithdraw(target)
                     } else if (!creep.pos.isNearTo(controllerLink)) {
                         
-                        creep.memory.origin = creep.pos
-                        
-                        let origin = creep.memory.origin
+                        let origin = creep.pos
                         
                         let goal = _.map([controllerLink], function(target) {
                             return { pos: target.pos, range: 1 }
@@ -58,10 +56,8 @@ module.exports = {
                         
                         creep.energyWithdraw(target)
                     } else if (!creep.pos.isNearTo(controllerContainer)) {
-
-                        creep.memory.origin = creep.pos
                         
-                        let origin = creep.memory.origin
+                        let origin = creep.pos
                         
                         let goal = _.map([controllerContainer], function(target) {
                             return { pos: target.pos, range: 1 }
