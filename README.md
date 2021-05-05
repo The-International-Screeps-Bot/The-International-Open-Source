@@ -63,6 +63,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [ ] Create a task manager to avoid creeps switching tasks halfway through
 - [ ] Make the task manager track and tell creeps what jobs to do
 - [ ] Track remote room attacks from enemy players and run logic to abolish it, defend it, or leave it as is
+- [ ] Create GCL temples using if there is excess energy
 
 ## Flowchart and more information
 
