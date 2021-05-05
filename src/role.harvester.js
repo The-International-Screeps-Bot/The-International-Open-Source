@@ -96,13 +96,12 @@ module.exports = {
         let baseLink = Game.getObjectById(creep.room.memory.baseLink)
         
         if (baseLink != null && creep.store.getUsedCapacity() <= creep.myParts("work") * 2) {
-                
             let sourceLink1 = Game.getObjectById(creep.room.memory.sourceLink1)
             let sourceLink2 = Game.getObjectById(creep.room.memory.sourceLink2)
                 
             let closestLink = creep.pos.findClosestByRange([sourceLink1, sourceLink2])
                 
-              if (closestLink && closestLink.store[RESOURCE_ENERGY] < 800) {
+            if (closestLink && closestLink.store[RESOURCE_ENERGY] < 800) {
 
                 creep.transfer(closestLink, RESOURCE_ENERGY)
             }

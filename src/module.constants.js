@@ -116,9 +116,9 @@ module.exports = {
 
                 function containers() {
 
-                    var containers = room.find(FIND_STRUCTURES, {
+                    let containers = room.find(FIND_STRUCTURES, {
                         filter: s => s.structureType == STRUCTURE_CONTAINER
-                    });
+                    })
 
                     for (let container of containers) {
 
@@ -143,12 +143,11 @@ module.exports = {
 
                         }
                     }
-
                 }
 
                 function labs() {
 
-                    var labs = room.find(FIND_STRUCTURES, {
+                    let labs = room.find(FIND_STRUCTURES, {
                         filter: s => s.structureType == STRUCTURE_LAB
                     })
 
@@ -197,39 +196,35 @@ module.exports = {
 
                 function links() {
 
-                    var links = room.find(FIND_STRUCTURES, {
-                        filter: (s) => s.structureType == STRUCTURE_LINK
-                    });
-
-                    var source = room.find(FIND_SOURCES);
-
-                    var storage = room.storage
-
-                    var controller = room.controller
+                    let links = room.find(FIND_MY_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_LINK
+                    })
 
                     for (let link of links) {
-                        if (storage) {
-                            if (link.pos.inRangeTo(storage, 2)) {
 
-                                link.room.memory.baseLink = link.id
-                            }
-                        }
-                        if (controller.pos.inRangeTo(link, 2)) {
+                        let source1 = Game.getObjectById(room.memory.source1)
+                        let source2 = Game.getObjectById(room.memory.source2)
+                        
+                        let controllerLink = Game.getObjectById(room.memory.controllerLink)
+                        let baseLink = Game.getObjectById(room.memory.baseLink)
+                        let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
+                        let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
-                            link.room.memory.controllerLink = link.id
+                        if (controllerLink == null && link.pos.inRangeTo(room.controller, 2)) {
 
-                        } else if (source) {
-                            if (link.pos.inRangeTo(source, 2)) {
+                            room.memory.controllerLink = link.id
 
-                                link.room.memory.sourceLink1 = link.id
+                        } else if (baseLink == null && source2 && storage && link.pos.inRangeTo(storage, 1)) {
 
-                            }
-                        } else if (source) {
-                            if (link.pos.inRangeTo(source, 2)) {
+                            room.memory.baseLink = link.id
 
-                                link.room.memory.sourceLink2 = link.id
+                        } else if (sourceLink1 == null && source1 && link.pos.inRangeTo(source1, 2)) {
 
-                            }
+                            room.memory.sourceLink1 = link.id
+
+                        } else if (sourceLink2 == null && source2 && link.pos.inRangeTo(source2, 2)) {
+
+                            room.memory.sourceLink2 = link.id
                         }
                     }
                 }
