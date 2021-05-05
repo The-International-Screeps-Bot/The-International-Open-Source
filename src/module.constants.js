@@ -214,7 +214,7 @@ module.exports = {
 
                             room.memory.controllerLink = link.id
 
-                        } else if (baseLink == null && source2 && storage && link.pos.inRangeTo(storage, 1)) {
+                        } else if (baseLink == null && source2 && room.storage && link.pos.inRangeTo(room.storage, 1)) {
 
                             room.memory.baseLink = link.id
 

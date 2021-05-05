@@ -2,8 +2,20 @@ module.exports = {
     run: function(creep) {
         
         creep.checkRoom()
+        
+        let baseLink = Game.getObjectById(creep.room.memory.baseLink)
 
         if (creep.memory.role == "harvester1") {
+        
+            if (baseLink != null && creep.store.getUsedCapacity() >= 100 - creep.myParts("work")) {
+                
+                let sourceLink1 = Game.getObjectById(creep.room.memory.sourceLink1)
+                    
+                if (sourceLink1 != null && sourceLink1.store[RESOURCE_ENERGY] < 800) { console.log(creep.transfer(sourceLink1, RESOURCE_ENERGY))
+    
+                    creep.transfer(sourceLink1, RESOURCE_ENERGY)
+                }
+            }
             
             let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
             let source1 = Game.getObjectById(creep.room.memory.source1)
@@ -49,6 +61,16 @@ module.exports = {
             }
         } else if (creep.memory.role == "harvester2") {
             
+            if (baseLink != null && creep.store.getUsedCapacity() >= 100 - creep.myParts("work")) {
+                
+                let sourceLink2 = Game.getObjectById(creep.room.memory.sourceLink2)
+                    
+                if (sourceLink2 != null && sourceLink2.store[RESOURCE_ENERGY] < 800) {
+    
+                    creep.transfer(sourceLink2, RESOURCE_ENERGY)
+                }
+            }
+            
             let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
             let source2 = Game.getObjectById(creep.room.memory.source2)
             
@@ -90,20 +112,6 @@ module.exports = {
                     creep.intraRoomPathing(origin, goal)
 
                 }
-            }
-        }
-        
-        let baseLink = Game.getObjectById(creep.room.memory.baseLink)
-        
-        if (baseLink != null && creep.store.getUsedCapacity() <= creep.myParts("work") * 2) {
-            let sourceLink1 = Game.getObjectById(creep.room.memory.sourceLink1)
-            let sourceLink2 = Game.getObjectById(creep.room.memory.sourceLink2)
-                
-            let closestLink = creep.pos.findClosestByRange([sourceLink1, sourceLink2])
-                
-            if (closestLink && closestLink.store[RESOURCE_ENERGY] < 800) {
-
-                creep.transfer(closestLink, RESOURCE_ENERGY)
             }
         }
     }
