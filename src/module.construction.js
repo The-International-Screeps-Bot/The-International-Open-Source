@@ -409,6 +409,7 @@ module.exports = {
                     mineralPath()
                     remotePath()
                     placeExtractor()
+                    removeUneeded()
                 }
 
                 function source1Path() {
@@ -612,7 +613,10 @@ module.exports = {
                                 
                                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                                 }
-                                if (normalValue && i + 1 == path.length) {
+                                
+                                let baseLink = Game.getObjectById(room.memory.baseLink)
+                                
+                                if (baseLink == null && normalValue && i + 1 == path.length) {
                                     
                                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                                 }
@@ -794,6 +798,16 @@ module.exports = {
                             
                             room.createConstructionSite(mineral.pos, STRUCTURE_EXTRACTOR)
                         }
+                    }
+                }
+                function removeUneeded() {
+                    
+                    let baseLink = Game.getObjectById(room.memory.baseLink)
+                    let controllerContainer = Game.getObjectById(room.memory.baseLink)
+                    
+                    if (baseLink != null && controllerContainer != null) {
+                        
+                        controllerContainer.destroy()
                     }
                 }
             }
