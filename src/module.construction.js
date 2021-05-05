@@ -803,9 +803,10 @@ module.exports = {
                 function removeUneeded() {
                     
                     let baseLink = Game.getObjectById(room.memory.baseLink)
-                    let controllerContainer = Game.getObjectById(room.memory.baseLink)
+                    let controllerLink = Game.getObjectById(room.memory.controllerLink)
+                    let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
                     
-                    if (baseLink != null && controllerContainer != null) {
+                    if (baseLink != null && controllerLink != null && controllerContainer != null) {
                         
                         controllerContainer.destroy()
                     }
