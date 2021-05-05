@@ -159,11 +159,11 @@ module.exports = {
 
                 let stage = room.memory.stage
 
-                if (room.energyCapacityAvailable >= 12300) {
+                if (room.energyCapacityAvailable >= 9900 && room.controller.level == 8) {
 
                     room.memory.stage = 8
 
-                } else if (room.energyCapacityAvailable >= 5300) {
+                } else if (room.energyCapacityAvailable >= 9900) {
 
                     room.memory.stage = 7
 
