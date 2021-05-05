@@ -31,7 +31,6 @@ module.exports = {
 
             if (Memory.creepCount != null) {
                 if (Memory.creepCount[role] == null) {
-
                     Memory.creepCount[role] = 0
                 }
             } else {
@@ -722,20 +721,11 @@ module.exports = {
                             var minerBodyResult = minerBody.slice(0, 48)
                         }
                         //Serf
-                        if (stage >= 7) {
+                        if (room.memory.baseLink != null) {
 
-                            let serfBodyAmount = 3 //Math.floor((capacityEnergy - 50) / 250)
-                            let serfBody = [MOVE]
+                            var serfBodyResult = [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]
 
-                            var serfBodyTier = 0
-
-                            for (let i = 0; i < serfBodyAmount; i++) {
-
-                                serfBody.push(CARRY, CARRY, CARRY, CARRY, CARRY)
-                                serfBodyTier++
-
-                            }
-                            var serfBodyResult = serfBody.slice(0, 16)
+                            var serfBodyTier = 1
                         }
                         //Ranged Defender
                         if (stage >= 1) {
@@ -943,7 +933,7 @@ module.exports = {
                             creepCount["baseHauler"]++
                         } else if (creepsOfRole[["serf", room.name]] < room.memory.minimumNumberOfSerfs) {
 
-                            name = spawn.createCreep(serfBodyResult, 'Se, ' + "T" + serfBodyTier + ", " + creepCount["serf"], { role: 'serf', working: false, roomFrom: room.name });
+                            name = spawn.createCreep(serfBodyResult, 'Se, ' + "T" + serfBodyTier + ", " + creepCount["serf"], { role: 'serf', hasEnergy: false, roomFrom: room.name });
 
                             creepCount["serf"]++
                         } else if (creepsOfRole[["upgrader", room.name]] < room.memory.minimumNumberOfUpgraders) {

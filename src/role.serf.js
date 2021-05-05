@@ -3,18 +3,11 @@ module.exports = {
         
         //Not on a if full / not full basis, but instead commands. If baseLink is full, run baseLink function. If power spawn is empty and we have energy and power in storage or terminal, fill it. Etc.
         
-        creep.pathing(origin, goal)
+        creep.checkRoom()
         
-        if (creep.memory.working == true && creep.carry.energy == 0) {
+        creep.hasEnergy()
 
-            creep.memory.working = false;
-
-        } else if (creep.memory.working == false && creep.carry.energy == creep.carryCapacity) {
-
-            creep.memory.working = true;
-        }
-
-        if (creep.memory.working == false) {
+        if (creep.memory.hasEnergy == false) {
 
             var baseLink = Game.getObjectById(creep.room.memory.baseLink)
 

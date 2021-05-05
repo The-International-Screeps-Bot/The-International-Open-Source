@@ -4,6 +4,8 @@ module.exports = {
     run: function(creep) {
         
         creep.checkRoom()
+        
+        creep.hasEnergy()
 
         var lowLogisticStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5
