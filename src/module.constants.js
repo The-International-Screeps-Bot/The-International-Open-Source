@@ -86,7 +86,7 @@ module.exports = {
                 terminals()
                 rooms()
                 myResources()
-                haveBoosts()
+                hasBoosts()
 
                 function sources() {
 
@@ -148,12 +148,12 @@ module.exports = {
 
                     for (let lab of labs) {
 
-                        var nearbyLab = lab.pos.findInRange(labs, 1)
+                        var nearbyLab = lab.pos.findInRange(labs, 2)
 
                         var controller = room.controller
 
                         if (controller.level == 7) {
-                            if (nearbyLab.length == 3) {
+                            if (nearbyLab.length == labs.length && primaryLabs.length < 2) {
 
                                 lab.room.visual.circle(lab.pos, {
                                     fill: 'transparent',
@@ -169,7 +169,7 @@ module.exports = {
 
                             }
                         } else if (controller.level == 8) {
-                            if (nearbyLab.length == 6) {
+                            if (nearbyLab.length == labs.length && primaryLabs.length < 2) {
 
                                 primaryLabs.push(lab.id)
 
@@ -322,7 +322,7 @@ module.exports = {
                     totalEnergy += room.memory.totalEnergy
                 }
 
-                function haveBoosts() {
+                function hasBoosts() {
 
                     var hasBoosts = false
                     let t3Boosts = ["XUH2O", "XUHO2", "XKH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2"]
