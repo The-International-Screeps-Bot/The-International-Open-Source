@@ -290,7 +290,7 @@ module.exports = {
                         if (targetRoomDistance == 1) {
 
                             //console.log(spawn.room.name + " - " + targetRoom + ", " + targetRoomDistance)
-                            remoteRooms.push({ name: remoteRoom, sources: 1, roads: null, builderNeed: null, enemy: null, distance: targetRoomDistance })
+                            remoteRooms.push({ name: remoteRoom, sources: 1, roads: undefined, builderNeed: undefined, enemy: undefined, distance: undefined })
 
                         }
                     }
