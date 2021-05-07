@@ -51,7 +51,7 @@ module.exports = {
             }
         } else {
 
-            if (creep.pos != stationaryPos) {
+            if (creep.pos.x != stationaryPos.x || creep.pos.y != stationaryPos.y) {
 
                 let origin = creep.pos
 
