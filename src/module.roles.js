@@ -45,7 +45,12 @@ module.exports = {
                     creep.memory.dying = true
                 }
 
-                roles[creep.memory.role].run(creep)
+                try {
+                    roles[creep.memory.role].run(creep)
+                } catch (error) {
+
+                    creep.suicide()
+                }
 
                 console.log(creep.memory.role + ": " + Game.cpu.getUsed().toFixed(2))
             }
