@@ -44,7 +44,7 @@ module.exports = {
 
                             break
                         }
-                        if (i == requiredStructures.length) {
+                        if (i + 1 == requiredStructures.length) {
 
                             creep.room.memory.stationaryPos = position
                         }
