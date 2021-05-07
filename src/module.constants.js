@@ -285,9 +285,9 @@ module.exports = {
 
                     let remoteRoomNames = []
 
-                    for (let room of room.memory.remoteRooms) {
+                    for (let object of room.memory.remoteRooms) {
 
-                        remoteRoomNames.push(room.name)
+                        remoteRoomNames.push(object.name)
                     }
 
                     let remoteRooms = []
