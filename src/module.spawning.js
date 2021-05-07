@@ -257,9 +257,9 @@ module.exports = {
                     remoteRoomsNumber = room.memory.remoteRooms.length
                 }
 
-                var roomFix = room.memory.roomFix
-                var freeEnergy = room.energyAvailable
-                var capacityEnergy = room.energyCapacityAvailable
+                let roomFix = room.memory.roomFix
+                let freeEnergy = room.energyAvailable
+                let capacityEnergy = room.energyCapacityAvailable
 
                 if (Game.getObjectById(room.memory.towers) != null && Game.getObjectById(room.memory.towers).length >= 1) {
 
@@ -275,11 +275,14 @@ module.exports = {
                 let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
                 let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
-                roomFix = false
+                if (roomFix == null) {
 
-                if (creepsOfRole[["harvester1", room.name]] + creepsOfRole[["harvester2", room.name]] < 1 || creepsOfRole[["baseHauler", room.name]] + creepsOfRole[["containerHauler", room.name]] + creepsOfRole[["generalHauler", room.name]] < 2) {
+                    room.memory.roomFix = false
+                }
 
-                    roomFix = true
+                if (creepsOfRole[["harvester1", room.name]] + creepsOfRole[["harvester2", room.name]] == 0 || creepsOfRole[["baseHauler", room.name]] + creepsOfRole[["containerHauler", room.name]] + creepsOfRole[["generalHauler", room.name]] == 0) {
+
+                    room.memory.roomFix = true
 
                 }
 
@@ -892,6 +895,8 @@ module.exports = {
 
                             creepCount["generalHauler"]++
 
+                        } else {
+                            room.memory.roomFix = false
                         }
                     } else {
 

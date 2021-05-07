@@ -1,3 +1,5 @@
+const { indexOf } = require("lodash");
+
 module.exports = {
     run: function constants() {
 
@@ -281,16 +283,23 @@ module.exports = {
 
                     }
 
+                    let remoteRoomNames = []
+
+                    for (let room of room.memory.remoteRooms) {
+
+                        remoteRoomNames.push(room.name)
+                    }
+
                     let remoteRooms = []
 
                     for (let remoteRoom of unfilteredRemoteRooms) {
 
                         var targetRoomDistance = Game.map.getRoomLinearDistance(room.name, remoteRoom)
 
-                        if (targetRoomDistance == 1) {
+                        if (targetRoomDistance == 1 && remoteRoomNames.indexOf(remoteRoom) === -1) {
 
                             //console.log(spawn.room.name + " - " + targetRoom + ", " + targetRoomDistance)
-                            remoteRooms.push({ name: remoteRoom, sources: 1, roads: undefined, builderNeed: undefined, enemy: undefined, distance: undefined })
+                            remoteRooms.push({ name: remoteRoom, sources: 1, roads: false, builderNeed: false, enemy: false, distance: undefined })
 
                         }
                     }
