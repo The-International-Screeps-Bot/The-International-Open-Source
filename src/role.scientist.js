@@ -1,18 +1,18 @@
 module.exports = {
     run: function(creep) {
-        
+
         if (creep.memory.roomFrom && creep.room.name != creep.memory.roomFrom) {
 
-                const route = Game.map.findRoute(creep.room.name, creep.memory.roomFrom);
+            const route = Game.map.findRoute(creep.room.name, creep.memory.roomFrom);
 
-                if (route.length > 0) {
+            if (route.length > 0) {
 
-                    creep.say(creep.memory.roomFrom)
+                creep.say(creep.memory.roomFrom)
 
-                    const exit = creep.pos.findClosestByRange(route[0].exit);
-                    creep.moveTo(exit);
-                }
+                const exit = creep.pos.findClosestByRange(route[0].exit);
+                creep.moveTo(exit);
             }
+        }
 
         var terminal = creep.room.terminal
 
@@ -43,18 +43,26 @@ module.exports = {
 
         let reactions = {
             bases: {
-                "OH": {reactant1: "", reactant2: ""},
+                "OH": { reactant1: "", reactant2: "" },
             },
             t1Boosts: {
-                
+
             },
             t2Boosts: {
-                
+
             },
             t3Boosts: {
-                
+
             }
         }
+
+        //if tertairyLabs exist and they don't have 2000 boost in each, when current task is done fill the labs
+
+        // for each resource in reactions if number of resource is below x, creep.memory.resource is resource
+
+        // until resource is x * 1.5 make sure primaryLabs have reactants 1 and 2, and secondaryLabs have resource
+
+        //if secondaryLabs have 500+ resource, withdraw and deposit in terminal, or if past 200k storage deposit in storage if below 900k
 
         let labProductionAmount = 20000
         let labProductionType = undefined
