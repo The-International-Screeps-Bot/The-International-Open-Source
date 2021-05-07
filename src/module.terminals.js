@@ -49,7 +49,7 @@ module.exports = {
                         }
                     }
 
-                    if (Memory.global.establishedRooms < 3 && Game.market.credits >= 100000 && terminal.store[RESOURCE_ENERGY] <= 100000) {
+                    if (Memory.global.globalStage == 0 && Game.market.credits >= 100000 && terminal.store[RESOURCE_ENERGY] <= 100000) {
 
                         //console.log(RESOURCE_ENERGY + ", " + terminal.room.name)
 
@@ -84,7 +84,7 @@ module.exports = {
 
                             let batterySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_BATTERY && order.price <= 11 && order.amount >= (batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])))
 
-                            if (batterySellOffers[0]) {
+                            if (terminal.store[RESOURCE_BATTERY] < batteryQuota && batterySellOffers[0]) {
 
                                 //console.log("Found order for: " + RESOURCE_BATTERY + ", " + terminal.room + ", " + batterySellOffers[0]["id"] + ", " + batterySellOffers[0].amount + batterySellOffers[0].roomName)
                                 //console.log(batteryQuota - terminal.store[RESOURCE_BATTERY])
