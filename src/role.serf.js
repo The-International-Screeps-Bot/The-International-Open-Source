@@ -17,7 +17,7 @@ module.exports = {
         // for every requiredStructure until if number of structures == i return stationaryPoint
 
         let unfilteredRequiredStructures = [baseLink, terminal, storage, factory]
-        let requiredStructures
+        let requiredStructures = []
 
         for (let structure of unfilteredRequiredStructures) {
 
