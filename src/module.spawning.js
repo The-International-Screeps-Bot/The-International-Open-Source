@@ -965,7 +965,9 @@ module.exports = {
                             name = spawn.createCreep(barricadeUpgraderBodyResult, 'BR, ' + "T" + barricadeUpgraderBodyTier + ", " + creepCount["barricadeUpgrader"], { role: 'barricadeUpgrader', isFull: false, roomFrom: room.name });
 
                             creepCount["barricadeUpgrader"]++
-                        } else if (creepsOfRole[["scientist", room.name]] < room.memory.minimumNumberOfScientists && Memory.global.globalStage >= 1) {
+                        } else if (creepsOfRole[["scientist", room.name]] < room.memory.minimumNumberOfScientists
+                            /* && Memory.global.globalStage >= 1*/
+                        ) {
 
                             name = spawn.createCreep([CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], 'Si, ' + "T" + 1 + ", " + creepCount["scientist"], { role: 'scientist', emptyStore: true, roomFrom: room.name });
 
