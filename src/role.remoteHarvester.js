@@ -1,4 +1,3 @@
-var AttackWhitelist = ["cplive", "marvintmb", "slowmotionghost", "Q13214", "mrmartinstreet", "brun1l"];
 module.exports = {
     run: function(creep) {
 
@@ -107,12 +106,12 @@ module.exports = {
             //targets
             var hostileCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                 filter: (c) => {
-                    return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (getActiveBodyparts(ATTACK) != 0 || getActiveBodyparts(RANGED_ATTACK) != 0));
+                    return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) == 0 || c.getActiveBodyparts(RANGED_ATTACK) == 0))
                 }
             })
             var hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
                 filter: (c) => {
-                    return (allyList.indexOf(c.owner.username.toLowerCase()) === -1);
+                    return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
                 }
             })
 

@@ -1,18 +1,17 @@
 module.exports = {
 
     creep.checkRoom()
-    
-    creep.hasEnergy()
-    
+
+    creep.isFull()
+
     const primaryTask = creep.memory.primaryTask
     const secondaryTask = creep.memory.secondaryTask
-    
-    if (creep.memory.hasEnergy == true) {
-        
-        
-    }
-    else {
-        
-        
+
+    if (creep.memory.isFull == true) {
+
+
+    } else {
+
+
     }
 };

@@ -140,7 +140,7 @@ module.exports = {
 
                 var hostileAttacker = room.find(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
-                        return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (getActiveBodyparts(ATTACK) != 0 || getActiveBodyparts(RANGED_ATTACK) != 0 || getActiveBodyparts(WORK) != 0));
+                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) == 0 || c.getActiveBodyparts(RANGED_ATTACK) == 0 || c.getActiveBodyparts(WORK) == 0))
                     }
                 })[0]
 
@@ -931,22 +931,22 @@ module.exports = {
                             creepCount["baseHauler"]++
                         } else if (creepsOfRole[["serf", room.name]] < room.memory.minimumNumberOfSerfs) {
 
-                            name = spawn.createCreep(serfBodyResult, 'Se, ' + "T" + serfBodyTier + ", " + creepCount["serf"], { role: 'serf', hasEnergy: false, roomFrom: room.name });
+                            name = spawn.createCreep(serfBodyResult, 'Se, ' + "T" + serfBodyTier + ", " + creepCount["serf"], { role: 'serf', isFull: false, roomFrom: room.name });
 
                             creepCount["serf"]++
                         } else if (creepsOfRole[["upgrader", room.name]] < room.memory.minimumNumberOfUpgraders) {
 
-                            name = spawn.createCreep(upgraderBodyResult, 'Ug, ' + "T" + upgraderBodyTier + ", " + creepCount["upgrader"], { role: 'upgrader', hasEnergy: false, roomFrom: room.name });
+                            name = spawn.createCreep(upgraderBodyResult, 'Ug, ' + "T" + upgraderBodyTier + ", " + creepCount["upgrader"], { role: 'upgrader', isFull: false, roomFrom: room.name });
 
                             creepCount["upgrader"]++
                         } else if (creepsOfRole[["builder", room.name]] < room.memory.minimumNumberOfBuilders && roomConstructionSite.length >= 1) {
 
-                            name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["builder"], { role: 'builder', hasEnergy: false, roomFrom: room.name });
+                            name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["builder"], { role: 'builder', isFull: false, roomFrom: room.name });
 
                             creepCount["builder"]++
                         } else if (creepsOfRole[["repairer", room.name]] < room.memory.minimumNumberOfRepairers && repairStructure) {
 
-                            name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', hasEnergy: false, roomFrom: room.name });
+                            name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', isFull: false, roomFrom: room.name });
 
                             creepCount["repairer"]++
                         } else if (creepsOfRole[["rangedDefender", room.name]] < 1 /*room.memory.minimumNumberOfRangedDefenders*/ && hostileAttacker) {
@@ -961,7 +961,7 @@ module.exports = {
                             creepCount["upgradeHauler"]++
                         } else if (creepsOfRole[["wallRepairer", room.name]] < room.memory.minimumNumberOfWallRepairers) {
 
-                            name = spawn.createCreep(wallRepairerBodyResult, 'WR, ' + "T" + wallRepairerBodyTier + ", " + creepCount["wallRepairer"], { role: 'wallRepairer', hasEnergy: false, roomFrom: room.name });
+                            name = spawn.createCreep(wallRepairerBodyResult, 'WR, ' + "T" + wallRepairerBodyTier + ", " + creepCount["wallRepairer"], { role: 'wallRepairer', isFull: false, roomFrom: room.name });
 
                             creepCount["wallRepairer"]++
                         } else if (creepsOfRole[["scientist", room.name]] < room.memory.minimumNumberOfScientists && Memory.global.globalStage >= 1) {
@@ -976,7 +976,7 @@ module.exports = {
                             creepCount["miner"]++
                         } else if (creepsOfRole[["robber", room.name]] < room.memory.minimumNumberOfRobbers && target9) {
 
-                            name = spawn.createCreep(remoteHaulerBodyResult, 'Ro, ' + "T" + robberBodyTier + ", " + creepCount["robber"], { role: 'robber', hasEnergy: false, roomFrom: room.name });
+                            name = spawn.createCreep(remoteHaulerBodyResult, 'Ro, ' + "T" + robberBodyTier + ", " + creepCount["robber"], { role: 'robber', isFull: false, roomFrom: room.name });
 
                             creepCount["robber"]++
                         } else if (creepsOfRole[["remoteDefender", room.name]] < room.memory.minimumNumberOfRemoteDefenders && remoteEnemy == true) {

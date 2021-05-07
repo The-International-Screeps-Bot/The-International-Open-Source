@@ -9,12 +9,14 @@ module.exports = {
 
                 let hostile = room.find(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
-                        return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && getActiveBodyparts(ATTACK) == 0 && getActiveBodyparts(RANGED_ATTACK) == 0);
+                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) == 0 || c.getActiveBodyparts(RANGED_ATTACK) == 0 || c.getActiveBodyparts(WORK) == 0))
                     }
                 })[0]
 
-                let injuredCreep = room.find(FIND_MY_CREEPS, {
-                    filter: creep => creep.hits < creep.hitsMax * 1
+                let injuredCreep = room.find(FIND_CREEPS, {
+                    filter: (c) => {
+                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) >= 0 && creep.hits < creep.hitsMax * 1)
+                    }
                 })[0]
 
                 if (injuredCreep) {

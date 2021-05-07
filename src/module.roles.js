@@ -1,4 +1,5 @@
 let creepFunctions = require("module.creepFunctions")
+let allyList = require("module.allyList")
 
 module.exports = {
     run: function roles() {
@@ -36,16 +37,16 @@ module.exports = {
         for (let name in Game.creeps) {
 
             let creep = Game.creeps[name]
-            //creep.suicide()
-            
+                //creep.suicide()
+
             if (creep && creep.memory.role) {
                 if (creep.ticksToLive <= creep.body.length * 3) {
-                    
+
                     creep.memory.dying = true
                 }
-    
+
                 roles[creep.memory.role].run(creep)
-    
+
                 console.log(creep.memory.role + ": " + Game.cpu.getUsed().toFixed(2))
             }
         }

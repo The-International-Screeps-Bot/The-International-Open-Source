@@ -1,6 +1,6 @@
 module.exports = {
     run: function(creep) {
-        
+
         creep.checkRoom()
 
         var controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
@@ -9,21 +9,20 @@ module.exports = {
 
         if (controllerContainer || controllerLink) {
 
-            creep.memory.hasEnergy = "constant"
+            creep.memory.isFull = "constant"
 
+        } else {
+
+            creep.isFull()
         }
-        else {
-            
-            creep.hasEnergy()
-        }
-        if (creep.memory.hasEnergy == true || creep.memory.hasEnergy == "constant") {
+        if (creep.memory.isFull == true || creep.memory.isFull == "constant") {
 
             creep.say("🔋")
 
             let target = creep.room.controller
-            
+
             creep.controllerUpgrade(target)
-            
+
             if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
 
                 creep.say("W")
@@ -34,16 +33,16 @@ module.exports = {
                         creep.say("🔋 CL")
 
                         let target = controllerLink
-                        
+
                         creep.energyWithdraw(target)
                     } else if (!creep.pos.isNearTo(controllerLink)) {
-                        
+
                         let origin = creep.pos
-                        
+
                         let goal = _.map([controllerLink], function(target) {
                             return { pos: target.pos, range: 1 }
                         })
-                        
+
                         creep.intraRoomPathing(origin, goal)
 
                     }
@@ -53,16 +52,16 @@ module.exports = {
                         creep.say("🔋 CC")
 
                         let target = controllerContainer
-                        
+
                         creep.energyWithdraw(target)
                     } else if (!creep.pos.isNearTo(controllerContainer)) {
-                        
+
                         let origin = creep.pos
-                        
+
                         let goal = _.map([controllerContainer], function(target) {
                             return { pos: target.pos, range: 1 }
                         })
-                        
+
                         creep.intraRoomPathing(origin, goal)
                     }
                 }
@@ -70,14 +69,14 @@ module.exports = {
         } else {
 
             creep.searchSourceContainers()
-                    
-                if (creep.container != null && creep.container) {
-                        
-                    creep.say("SC")
-                        
-                    let target = creep.container
-                        
-                    creep.energyWithdraw(target)
+
+            if (creep.container != null && creep.container) {
+
+                creep.say("SC")
+
+                let target = creep.container
+
+                creep.energyWithdraw(target)
             } else {
 
                 let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
@@ -87,7 +86,7 @@ module.exports = {
                 if (droppedResources) {
 
                     creep.say("💡")
-                    
+
                     target = droppedResources
 
                     creep.pickupDroppedEnergy(target)

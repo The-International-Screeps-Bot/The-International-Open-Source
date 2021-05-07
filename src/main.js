@@ -1,5 +1,6 @@
 let towers = require("module.towers")
 let terminals = require("module.terminals")
+let factories = require("module.factories")
 let cleanMemory = require("module.cleanMemory")
 let visuals = require("module.roomVisuals")
 let spawns = require("module.spawning")
@@ -21,14 +22,14 @@ module.exports.loop = function() {
 
             //profiler.wrap(function() {
             //Game.profiler.profile(1000)
-            
+
             if (Game.shard.name == "shard2") {
-                
+
                 if (Game.cpu.bucket == 10000) {
                     Game.cpu.generatePixel();
-                }  
+                }
             }
-            
+
             roles.run()
 
             console.log("roles: " + Game.cpu.getUsed().toFixed(2))
@@ -47,15 +48,23 @@ module.exports.loop = function() {
             console.log("construction: " + Game.cpu.getUsed().toFixed(2))
 
             visuals.run()
-            
+
             console.log("visuals: " + Game.cpu.getUsed().toFixed(2))
-            
+
             if (Game.time % 10 == 0) {
 
                 terminals.run()
             }
 
             console.log("terminals: " + Game.cpu.getUsed().toFixed(2))
+
+            if (Game.time % 1 == 0) {
+
+                factories.run()
+
+            }
+
+            console.log("factories: " + Game.cpu.getUsed().toFixed(2))
 
             if (Game.time % 1 == 0) {
 
@@ -80,12 +89,12 @@ module.exports.loop = function() {
             spawns.run()
 
             console.log("spawns: " + Game.cpu.getUsed().toFixed(2))
-            
+
             logging.run()
-            
+
             //console.log("logging: " + Game.cpu.getUsed().toFixed(2))
-            
-                //});
+
+            //});
         }
     }
     /*
