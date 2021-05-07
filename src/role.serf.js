@@ -100,28 +100,28 @@ module.exports = {
                     }
                 } else {
 
-                    if (terminalWithdrawBattery) {
+                    if (factoryWithdrawEnergy) {
 
                         if (creep.memory.isFull == true) {
 
-                            creep.transfer(factory, RESOURCE_BATTERY)
-                            terminalWithdrawBattery = false
+                            creep.transfer(terminal, RESOURCE_ENERGY)
+                            factoryWithdrawEnergy = false
+
                         } else {
 
-                            creep.withdraw(terminal, RESOURCE_BATTERY)
+                            creep.withdraw(factory, RESOURCE_ENERGY)
                         }
                     } else {
 
-                        if (factoryWithdrawEnergy) {
+                        if (terminalWithdrawBattery) {
 
                             if (creep.memory.isFull == true) {
 
-                                creep.transfer(terminal, RESOURCE_ENERGY)
-                                factoryWithdrawEnergy = false
-
+                                creep.transfer(factory, RESOURCE_BATTERY)
+                                terminalWithdrawBattery = false
                             } else {
 
-                                creep.withdraw(factory, RESOURCE_ENERGY)
+                                creep.withdraw(terminal, RESOURCE_BATTERY)
                             }
                         }
                     }
