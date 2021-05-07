@@ -64,9 +64,9 @@ module.exports = {
 
                 creep.hasResource()
 
-                let withdrawBaseLink
-                let terminalWithdrawBattery
-                let factoryWithdrawEnergy
+                const withdrawBaseLink = creep.memory.withdrawBaseLink
+                const terminalWithdrawBattery = creep.memory.terminalWithdrawBattery
+                const factoryWithdrawEnergy = creep.memory.factoryWithdrawEnergy
 
                 if (baseLink != null && baseLink.store[RESOURCE_ENERGY] >= 700 && storage && storage.store[RESOURCE_ENERGY] <= 200000 && terminal && terminal.store[RESOURCE_ENERGY] <= 100000 && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
 
