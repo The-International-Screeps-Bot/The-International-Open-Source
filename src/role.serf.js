@@ -76,7 +76,7 @@ module.exports = {
 
                     terminalWithdrawBattery = true
                 }
-                if (terminal && factory && terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800) {
+                if (terminal && factory && terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 && factory.store[RESOURCE_ENERGY] >= 800) {
 
                     factoryWithdrawEnergy = true
                 }
