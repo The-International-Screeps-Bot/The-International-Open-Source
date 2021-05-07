@@ -11,16 +11,16 @@ module.exports = {
         for (let name in Game.creeps) {
 
             var creep = Game.creeps[name]
-    
+
             if (creep.memory.dying != true) {
-            
+
                 var creepValues = _.chunk([creep.memory.role, creep.memory.roomFrom], 2)
-    
+
                 if (!creepsOfRole[creepValues]) {
-    
+
                     creepsOfRole[creepValues] = 1
                 } else {
-    
+
                     creepsOfRole[creepValues]++
                 }
             }
@@ -38,50 +38,49 @@ module.exports = {
                 Memory.creepCount = []
             }
         }
-        
-                let boostedSquads = false
-                let squadType = "ranged"
-                //let squadType = "dismantle"
-                //let squadType = "attack
 
-                if (Game.shard.name == "shard2") {
-                        
-                    //var claimerTarget = "E33N2"
-                    var claimerTarget = undefined
-                    //var builderTarget = "E33N2"
-                    var builderTarget = undefined
-                }
-                else {
+        let boostedSquads = false
+        let squadType = "ranged"
+            //let squadType = "dismantle"
+            //let squadType = "attack
 
-                    //var claimerTarget = "E31N14"
-                    var claimerTarget = undefined
-                    //var builderTarget = "E31N14"
-                    var builderTarget = undefined
-                }
+        if (Game.shard.name == "shard2") {
 
-                let target2 = Game.flags.AR
-                let target3 = Game.flags.RA
-                let target4 = Game.flags.S
-                var target5 = Game.flags.H
-                let target6 = Game.flags.BB
-                let target7 = Game.flags.BR
-                let target8 = Game.flags.RDP
-                let target9 = Game.flags.R
-                
-                let communeEstablisher
-                let communeEstablisherFound = false
-        
+            //var claimerTarget = "E33N2"
+            var claimerTarget = undefined
+                //var builderTarget = "E33N2"
+            var builderTarget = undefined
+        } else {
+
+            //var claimerTarget = "E31N14"
+            var claimerTarget = undefined
+                //var builderTarget = "E31N14"
+            var builderTarget = undefined
+        }
+
+        let target2 = Game.flags.AR
+        let target3 = Game.flags.RA
+        let target4 = Game.flags.S
+        var target5 = Game.flags.H
+        let target6 = Game.flags.BB
+        let target7 = Game.flags.BR
+        let target8 = Game.flags.RDP
+        let target9 = Game.flags.R
+
+        let communeEstablisher
+        let communeEstablisherFound = false
+
         if (builderTarget && communeEstablisherFound == false) {
             for (let maxDistance = 1; maxDistance <= 12 && !communeEstablisher; maxDistance++) {
 
-                 _.forEach(Game.rooms, function(room) {
+                _.forEach(Game.rooms, function(room) {
 
                     if (room.controller && room.controller.my && room.memory.stage >= 3) {
-                        
+
                         let distance = Game.map.getRoomLinearDistance(builderTarget, room.name)
-        
+
                         if (distance < maxDistance) {
-        
+
                             communeEstablisher = room
                             communeEstablisherFound = true
                             console.log("BT, d " + distance + "D " + maxDistance + "R " + room.name)
@@ -94,37 +93,37 @@ module.exports = {
 
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my) {
-                
+
                 taskManager.run(room, creepsOfRole)
-                
+
                 let remoteBuilderNeed = false
 
                 _.forEach(Game.rooms, function(myRooms) {
-        
+
                     if (myRooms.memory.builderNeed == true && myRooms.memory.myRoom != false) {
-        
+
                         //console.log("true")
                         let remoteRoomDistance = Game.map.getRoomLinearDistance(room.name, myRooms.name)
-        
+
                         if (remoteRoomDistance == 1) {
-        
+
                             remoteBuilderNeed = true
                             return
                         }
                     }
                 })
-                
+
                 let remoteEnemy = false
-        
+
                 _.forEach(Game.rooms, function(myRooms) {
-        
+
                     if (myRooms.memory.enemy == true && myRooms.memory.myRoom != false) {
-        
+
                         //console.log("true")
                         let remoteRoomDistance = Game.map.getRoomLinearDistance(room.name, myRooms.name)
-        
+
                         if (remoteRoomDistance == 1) {
-        
+
                             remoteEnemy = true
                             return
                         }
@@ -139,13 +138,15 @@ module.exports = {
                     }
                 }
 
-                var target1 = room.find(FIND_HOSTILE_CREEPS, {
-                    filter: (c) => c.owner.username !== "cplive" && c.owner.username !== "Brun1L" && c.owner.username !== "Invader"
-                })
-                
-                if (target1[0]) {
-                    
-                    remoteEnemy = true   
+                var hostileAttacker = room.find(FIND_HOSTILE_CREEPS, {
+                    filter: (c) => {
+                        return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (getActiveBodyparts(ATTACK) != 0 || getActiveBodyparts(RANGED_ATTACK) != 0 || getActiveBodyparts(WORK) != 0));
+                    }
+                })[0]
+
+                if (hostileAttacker) {
+
+                    remoteEnemy = true
                 }
 
                 let roomMineral = room.find(FIND_MINERALS)[0].mineralAmount > 0
@@ -214,7 +215,7 @@ module.exports = {
                 */
 
                 /*
-                    var target1 = (FIND_HOSTILE_CREEPS, {
+                    var hostileAttacker = (FIND_HOSTILE_CREEPS, {
                     filter: function(object) {
                         return object.getActiveBodyparts(HEAL) == 4;
                     }
@@ -258,16 +259,16 @@ module.exports = {
                 var roomFix = room.memory.roomFix
                 var freeEnergy = room.energyAvailable
                 var capacityEnergy = room.energyCapacityAvailable
-                
+
                 if (Game.getObjectById(room.memory.towers) != null && Game.getObjectById(room.memory.towers).length >= 1) {
-                    
+
                     var towerTrue = true
                 }
-                
+
                 let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
                 let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
                 let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
-                
+
                 let baseLink = Game.getObjectById(room.memory.baseLink)
                 let controllerLink = Game.getObjectById(room.memory.controllerLink)
                 let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
@@ -532,8 +533,7 @@ module.exports = {
 
                             }
                             var builderBodyResult = builderBody.slice(0, 24)
-                        }
-                        else {
+                        } else {
 
                             let builderBodyAmount = Math.floor(capacityEnergy / 200)
                             let builderBody = []
@@ -595,8 +595,7 @@ module.exports = {
 
                             }
                             var wallRepairerBodyResult = wallRepairerBody.slice(0, 24)
-                        }
-                        else if (stage >= 5) {
+                        } else if (stage >= 5) {
 
                             let wallRepairerBodyAmount = Math.floor(capacityEnergy / 200)
                             let wallRepairerBody = []
@@ -886,8 +885,7 @@ module.exports = {
                             name = spawn.createCreep(harvesterBodyResult, 'rfH, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester1"], { role: 'harvester1', working: false, target: 1, roomFrom: room.name });
 
                             creepCount["harvester1"]++
-                        }
-                        else if (creepsOfRole[["baseHauler", room.name]] + creepsOfRole[["containerHauler", room.name]] + creepsOfRole[["generalHauler", room.name]] < 2) {
+                        } else if (creepsOfRole[["baseHauler", room.name]] + creepsOfRole[["containerHauler", room.name]] + creepsOfRole[["generalHauler", room.name]] < 2) {
 
                             name = spawn.createCreep(haulerBodyResult, 'rfGH, ' + "T" + haulerBodyTier + ", " + creepCount["generalHauler"], { role: 'generalHauler', fullEnergy: false, roomFrom: room.name });
 
@@ -951,7 +949,7 @@ module.exports = {
                             name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', hasEnergy: false, roomFrom: room.name });
 
                             creepCount["repairer"]++
-                        } else if (creepsOfRole[["rangedDefender", room.name]] < 1/*room.memory.minimumNumberOfRangedDefenders*/ && target1[0]) {
+                        } else if (creepsOfRole[["rangedDefender", room.name]] < 1 /*room.memory.minimumNumberOfRangedDefenders*/ && hostileAttacker) {
 
                             name = spawn.createCreep(rangedDefenderBodyResult, 'RaD, ' + "T" + rangedDefenderBodyTier + ", " + creepCount["rangedDefender"], { role: 'rangedDefender', roomFrom: room.name });
 
@@ -1021,71 +1019,69 @@ module.exports = {
                             } else {
 
                                 for (let remoteRoom of remoteRooms) {
-                                        
-                                        var numberOfRemoteHarvesters1 = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester1' && c.memory.remoteRoom == remoteRoom.name && creep.memory.dying != true)
-                                        
-                                        var numberOfRemoteHarvesters2 = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester2' && c.memory.remoteRoom == remoteRoom.name && creep.memory.dying != true)
-    
-                                        if (numberOfRemoteHarvesters1 < room.memory.minimumNumberOfRemoteHarvesters1) {
-    
-                                            name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester1"], { role: 'remoteHarvester1', remoteRoom: remoteRoom.name, target: 1, roomFrom: room.name });
-    
-                                            creepCount["remoteHarvester1"]++
-                                        }
-                                        else if (remoteRoom.sources == 2 && numberOfRemoteHarvesters2 < room.memory.minimumNumberOfRemoteHarvesters2) {
-    
-                                            name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester2"], { role: 'remoteHarvester2', remoteRoom: remoteRoom.name, target: 2, roomFrom: room.name });
-    
-                                            creepCount["remoteHarvester2"]++
-                                        }
-    
-                                        var numberOfRemoteHaulers = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHauler' && c.memory.remoteRoom == remoteRoom.name && creep.memory.dying != true)
-    
-                                        if (numberOfRemoteHaulers < room.memory.minimumNumberOfRemoteHaulers * remoteRoom.sources) {
-    
-                                            name = spawn.createCreep(remoteHaulerBodyResult, 'RHau, ' + "T" + remoteHaulerBodyTier + ", " + creepCount["remoteHauler"], { role: 'remoteHauler', remoteRoom: remoteRoom.name, fullEnergy: false, roomFrom: room.name });
-    
-                                            creepCount["remoteHauler"]++
-                                        }
-                                        
-                                        var numberOfReservers = _.sum(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.remoteRoom == remoteRoom.name && creep.memory.dying != true)
-    
-                                        if (numberOfReservers < room.memory.minimumNumberOfReservers) {
-    
-                                            name = spawn.createCreep(reserverBodyResult, 'Rs, ' + "T" + reserverBodyTier + ", " + creepCount["reserver"], { role: 'reserver', remoteRoom: remoteRoom.name, roomFrom: room.name });
-    
-                                            creepCount["reserver"]++
+
+                                    var numberOfRemoteHarvesters1 = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester1' && c.memory.remoteRoom == remoteRoom.name && creep.memory.dying != true)
+
+                                    var numberOfRemoteHarvesters2 = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester2' && c.memory.remoteRoom == remoteRoom.name && creep.memory.dying != true)
+
+                                    if (numberOfRemoteHarvesters1 < room.memory.minimumNumberOfRemoteHarvesters1) {
+
+                                        name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester1"], { role: 'remoteHarvester1', remoteRoom: remoteRoom.name, target: 1, roomFrom: room.name });
+
+                                        creepCount["remoteHarvester1"]++
+                                    } else if (remoteRoom.sources == 2 && numberOfRemoteHarvesters2 < room.memory.minimumNumberOfRemoteHarvesters2) {
+
+                                        name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester2"], { role: 'remoteHarvester2', remoteRoom: remoteRoom.name, target: 2, roomFrom: room.name });
+
+                                        creepCount["remoteHarvester2"]++
+                                    }
+
+                                    var numberOfRemoteHaulers = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHauler' && c.memory.remoteRoom == remoteRoom.name && creep.memory.dying != true)
+
+                                    if (numberOfRemoteHaulers < room.memory.minimumNumberOfRemoteHaulers * remoteRoom.sources) {
+
+                                        name = spawn.createCreep(remoteHaulerBodyResult, 'RHau, ' + "T" + remoteHaulerBodyTier + ", " + creepCount["remoteHauler"], { role: 'remoteHauler', remoteRoom: remoteRoom.name, fullEnergy: false, roomFrom: room.name });
+
+                                        creepCount["remoteHauler"]++
+                                    }
+
+                                    var numberOfReservers = _.sum(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.remoteRoom == remoteRoom.name && creep.memory.dying != true)
+
+                                    if (numberOfReservers < room.memory.minimumNumberOfReservers) {
+
+                                        name = spawn.createCreep(reserverBodyResult, 'Rs, ' + "T" + reserverBodyTier + ", " + creepCount["reserver"], { role: 'reserver', remoteRoom: remoteRoom.name, roomFrom: room.name });
+
+                                        creepCount["reserver"]++
                                     }
                                 }
                             }
                         }
                     }
                 }
-                
+
                 var minRemoteHarvesters1 = room.memory.minimumNumberOfRemoteHarvesters1 = 1
                 var minRemoteHarvesters2 = room.memory.minimumNumberOfRemoteHarvesters2 = 1
                 var minRemoteHaulers = room.memory.minimumNumberOfRemoteHaulers = 1
                 var minReservers = room.memory.minimumNumberOfReservers = 1
-                
+
                 var minRemoteBuilders = room.memory.minimumNumberOfRemoteBuilders = 1
                 var minRemoteDefenders = room.memory.minimumNumberOfRemoteDefenders = 1
-                
+
                 var squads = 0
-                
+
                 if (room.name == "E18S1") {
-                    
+
                     squads = 4
                 }
 
                 var minBigBoyLeaders = room.memory.minimumNumberOfBigBoyLeaders = squads
                 var minBigBoyMembers = room.memory.minimumNumberOfBigBoyMembers = squads
-                
+
                 if (stage <= 3) {
-                    
+
                     room.memory.minimumNumberOfRepairers = 1
-                }
-                else {
-                    
+                } else {
+
                     room.memory.minimumNumberOfRepairers = 0
                 }
 
@@ -1112,7 +1108,7 @@ module.exports = {
                     room.memory.minimumNumberOfRemoteDefenders = 0
 
                     minRemoteHarvesters1 * 2
-                    
+
                     minRemoteHarvesters2 * 2
 
                     minRemoteHaulers * 2
@@ -1157,7 +1153,7 @@ module.exports = {
                     minRemoteHarvesters1 * 2
 
                     minRemoteHarvesters2 * 2
-                    
+
                     minRemoteHaulers * 2
 
                     room.memory.minimumNumberOfReservers = 0
@@ -1446,18 +1442,17 @@ module.exports = {
 
                     room.memory.minimumNumberOfScouts = 1
                 }
-                
+
                 if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000 && stage <= 7) {
-                    
+
                     room.memory.minimumNumberOfUpgraders = 2
                 }
                 if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000 && stage <= 7) {
-                    
+
                     room.memory.minimumNumberOfUpgradeHaulers = 2
                     room.memory.minimumNumberOfUpgraders = 3
-                }
-                else {
-                    
+                } else {
+
                     room.memory.minimumNumberOfUpgradeHaulers = 0
                 }
             }

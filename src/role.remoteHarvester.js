@@ -107,12 +107,12 @@ module.exports = {
             //targets
             var hostileCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                 filter: (c) => {
-                    return (AttackWhitelist.indexOf(c.owner.username.toLowerCase()) === -1 && getActiveBodyparts(ATTACK) == 0 && getActiveBodyparts(RANGED_ATTACK) == 0);
+                    return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (getActiveBodyparts(ATTACK) != 0 || getActiveBodyparts(RANGED_ATTACK) != 0));
                 }
             })
             var hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
                 filter: (c) => {
-                    return (AttackWhitelist.indexOf(c.owner.username.toLowerCase()) === -1);
+                    return (allyList.indexOf(c.owner.username.toLowerCase()) === -1);
                 }
             })
 

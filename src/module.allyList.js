@@ -1,7 +1,8 @@
 module.exports = {
     run: function allyList() {
-        
-        let allyList = ["XY", "ZE", "E3"]
+
+        let allyList = ["slowmotionghost", "Q13214", "mrmartinstreet"]
+
         return allyList
     }
 };
