@@ -64,7 +64,24 @@ module.exports = {
 
                 creep.isFull()
 
+                let withdrawBaseLink
+                let terminalWithdrawBattery
+                let factoryWithdrawEnergy
+
                 if (baseLink != null && baseLink.store[RESOURCE_ENERGY] >= 700 && storage && storage.store[RESOURCE_ENERGY] <= 200000 && terminal && terminal.store[RESOURCE_ENERGY] <= 100000 && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
+
+                    withdrawBaseLink = true
+                }
+                if (terminal && factory && factory.store.getUsedCapacity() <= factory.store.getCapacity() - 800 && factory.store[RESOURCE_BATTERY] <= 2000 && terminal.store[RESOURCE_BATTERY] >= 800) {
+
+                    terminalWithdrawBattery = true
+                }
+                if (terminal && factory && terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800) {
+
+                    factoryWithdrawEnergy = true
+                }
+
+                if (withdrawBaseLink) {
 
                     if (creep.memory.isFull == true) {
 
@@ -78,10 +95,11 @@ module.exports = {
                     } else {
 
                         creep.withdraw(baseLink, RESOURCE_ENERGY)
+                        withdrawBaseLink = false
                     }
                 } else {
 
-                    if (terminal && factory && factory.store.getUsedCapacity() <= factory.store.getCapacity() - 800 && factory.store[RESOURCE_BATTERY] <= 2000 && terminal.store[RESOURCE_BATTERY] >= 800) {
+                    if (terminalWithdrawBattery) {
 
                         if (creep.memory.isFull == true) {
 
@@ -89,10 +107,11 @@ module.exports = {
                         } else {
 
                             creep.withdraw(terminal, RESOURCE_BATTERY)
+                            terminalWithdrawBattery = false
                         }
                     } else {
 
-                        if (terminal && factory && terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800) {
+                        if (factoryWithdrawEnergy) {
 
                             if (creep.memory.isFull == true) {
 
@@ -100,67 +119,12 @@ module.exports = {
                             } else {
 
                                 creep.withdraw(factory, RESOURCE_ENERGY)
+                                factoryWithdrawEnergy = false
                             }
                         }
                     }
                 }
             }
-            /*
-            If storage is too full
-
-            if powerspawn needs filling
-
-            if room.memory.nukeRequest is true
-            */
-
-
-            /*
-            if (creep.pos != stationaryPos) {
-
-                let origin = creep.pos
-
-                let goal = _.map([stationaryPos], function(target) {
-                    return { pos: target, range: 0 }
-                })
-
-                creep.intraRoomPathing(origin, goal)
-            }
-
-            if (creep.memory.isFull == false && stationaryPos != null && baseLink != null && terminal && storage && creep.pos.inRangeTo(baseLink, 1) && creep.pos.inRangeTo(terminal, 1) && creep.pos.inRangeTo(storage, 1)) {
-
-                if (baseLink.store[RESOURCE_ENERGY] >= 700) {
-
-                    creep.say("BL")
-
-                    creep.withdraw(baseLink, RESOURCE_ENERGY)
-                } else {
-
-                    if (terminal && terminal.store[RESOURCE_ENERGY] >= 125000) {
-
-                        creep.withdraw(terminal, RESOURCE_ENERGY)
-                    } else if (terminal.store[RESOURCE_BATTERY] >= 800) {
-
-                        creep.withdraw(terminal, RESOURCE_BATTERY)
-                    }
-                }
-            } else {
-
-                /*
-                let powerSpawn = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_POWER_SPAWN
-                })
-                
-                if (powerSpawn && (powerSpawn)
-                */
-            /*
-
-            let storage = creep.room.storage
-
-            if (storage && storage.store[RESOURCE_ENERGY] <= 400000) {
-
-                creep.transfer(storage, RESOURCE_ENERGY)
-            } 
-            */
         }
     }
 };
