@@ -70,15 +70,15 @@ module.exports = {
 
                 if (baseLink != null && baseLink.store[RESOURCE_ENERGY] >= 700 && storage && storage.store[RESOURCE_ENERGY] <= 200000 && terminal && terminal.store[RESOURCE_ENERGY] <= 100000 && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
 
-                    withdrawBaseLink = true
+                    creep.memory.withdrawBaseLink = true
                 }
                 if (terminal && factory && terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 && factory.store[RESOURCE_ENERGY] >= 800) {
 
-                    factoryWithdrawEnergy = true
+                    creep.memory.factoryWithdrawEnergy = true
                 }
                 if (terminal && factory && factory.store.getUsedCapacity() <= factory.store.getCapacity() - 800 && factory.store[RESOURCE_BATTERY] <= 2000 && terminal.store[RESOURCE_BATTERY] >= 800) {
 
-                    terminalWithdrawBattery = true
+                    creep.memory.terminalWithdrawBattery = true
                 }
 
                 if (withdrawBaseLink) {
@@ -88,11 +88,11 @@ module.exports = {
                         if (storage.store[RESOURCE_ENERGY] <= 200000) {
 
                             creep.transfer(storage, RESOURCE_ENERGY)
-                            withdrawBaseLink = false
+                            creep.memory.withdrawBaseLink = false
                         } else if (terminal.store[RESOURCE_ENERGY] <= 100000) {
 
                             creep.transfer(storage, RESOURCE_ENERGY)
-                            withdrawBaseLink = false
+                            creep.memory.withdrawBaseLink = false
                         }
                     } else {
 
@@ -105,7 +105,7 @@ module.exports = {
                         if (creep.memory.isFull == true) {
 
                             creep.transfer(terminal, RESOURCE_ENERGY)
-                            factoryWithdrawEnergy = false
+                            creep.memory.factoryWithdrawEnergy = false
 
                         } else {
 
@@ -118,7 +118,7 @@ module.exports = {
                             if (creep.memory.isFull == true) {
 
                                 creep.transfer(factory, RESOURCE_BATTERY)
-                                terminalWithdrawBattery = false
+                                creep.memory.terminalWithdrawBattery = false
                             } else {
 
                                 creep.withdraw(terminal, RESOURCE_BATTERY)
