@@ -10,7 +10,7 @@ module.exports = {
         let storage = creep.room.storage
         let factory = creep.room.find(FIND_MY_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_FACTORY
-        })
+        })[0]
 
         // requiredStructures = array listed structures that are not null of undefined
 

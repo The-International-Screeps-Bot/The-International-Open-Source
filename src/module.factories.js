@@ -5,7 +5,7 @@ module.exports = {
 
                 let factory = room.find(FIND_MY_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_FACTORY
-                })
+                })[0]
 
                 if (factory) {
                     if (factory.store.getUsedCapacity() != factory.store.getCapacity() && factory.cooldown == 0) {
