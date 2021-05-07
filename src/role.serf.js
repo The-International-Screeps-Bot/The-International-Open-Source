@@ -72,13 +72,13 @@ module.exports = {
 
                     withdrawBaseLink = true
                 }
-                if (terminal && factory && factory.store.getUsedCapacity() <= factory.store.getCapacity() - 800 && factory.store[RESOURCE_BATTERY] <= 2000 && terminal.store[RESOURCE_BATTERY] >= 800) {
-
-                    terminalWithdrawBattery = true
-                }
                 if (terminal && factory && terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 && factory.store[RESOURCE_ENERGY] >= 800) {
 
                     factoryWithdrawEnergy = true
+                }
+                if (terminal && factory && factory.store.getUsedCapacity() <= factory.store.getCapacity() - 800 && factory.store[RESOURCE_BATTERY] <= 2000 && terminal.store[RESOURCE_BATTERY] >= 800) {
+
+                    terminalWithdrawBattery = true
                 }
 
                 if (withdrawBaseLink) {
