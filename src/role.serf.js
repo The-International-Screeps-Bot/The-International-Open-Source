@@ -88,14 +88,15 @@ module.exports = {
                         if (storage.store[RESOURCE_ENERGY] <= 200000) {
 
                             creep.transfer(storage, RESOURCE_ENERGY)
+                            withdrawBaseLink = false
                         } else if (terminal.store[RESOURCE_ENERGY] <= 100000) {
 
                             creep.transfer(storage, RESOURCE_ENERGY)
+                            withdrawBaseLink = false
                         }
                     } else {
 
                         creep.withdraw(baseLink, RESOURCE_ENERGY)
-                        withdrawBaseLink = false
                     }
                 } else {
 
@@ -104,10 +105,10 @@ module.exports = {
                         if (creep.memory.isFull == true) {
 
                             creep.transfer(factory, RESOURCE_BATTERY)
+                            terminalWithdrawBattery = false
                         } else {
 
                             creep.withdraw(terminal, RESOURCE_BATTERY)
-                            terminalWithdrawBattery = false
                         }
                     } else {
 
@@ -116,10 +117,11 @@ module.exports = {
                             if (creep.memory.isFull == true) {
 
                                 creep.transfer(terminal, RESOURCE_ENERGY)
+                                factoryWithdrawEnergy = false
+
                             } else {
 
                                 creep.withdraw(factory, RESOURCE_ENERGY)
-                                factoryWithdrawEnergy = false
                             }
                         }
                     }
