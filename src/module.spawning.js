@@ -5,7 +5,7 @@ let allyList = require("module.allyList")
 module.exports = {
     run: function spawns() {
 
-        let rolesList = ["harvester1", "harvester2", "baseHauler", "containerHauler", "generalHauler", "upgrader", "builder", "repairer", "upgradeHauler", "barricadeUpgrader", "claimer", "revolutionaryBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "stationaryHarvester", "communeDefender", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
+        let rolesList = ["harvester1", "harvester2", "baseHauler", "containerHauler", "generalHauler", "upgrader", "builder", "repairer", "upgradeHauler", "barricadeUpgrader", "claimer", "revolutionaryBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
         let creepsOfRole = {}
         let creepCount = Memory.creepCount
 
@@ -720,12 +720,12 @@ module.exports = {
                             }
                             var minerBodyResult = minerBody.slice(0, 48)
                         }
-                        //stationaryHarvester
+                        //stationaryHauler
                         if (room.memory.baseLink != null) {
 
-                            var stationaryHarvesterBodyResult = [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]
+                            var stationaryHaulerBodyResult = [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]
 
-                            var stationaryHarvesterBodyTier = 1
+                            var stationaryHaulerBodyTier = 1
                         }
                         //Ranged Defender
                         if (stage >= 1) {
@@ -930,11 +930,11 @@ module.exports = {
                             name = spawn.createCreep(haulerBodyResult, 'BH, ' + "T" + haulerBodyTier + ", " + creepCount["baseHauler"], { role: 'baseHauler', fullEnergy: false, roomFrom: room.name });
 
                             creepCount["baseHauler"]++
-                        } else if (creepsOfRole[["stationaryHarvester", room.name]] < room.memory.minimumNumberOfstationaryHarvesters) {
+                        } else if (creepsOfRole[["stationaryHauler", room.name]] < room.memory.minimumNumberOfstationaryHaulers) {
 
-                            name = spawn.createCreep(stationaryHarvesterBodyResult, 'Se, ' + "T" + stationaryHarvesterBodyTier + ", " + creepCount["stationaryHarvester"], { role: 'stationaryHarvester', isFull: false, roomFrom: room.name });
+                            name = spawn.createCreep(stationaryHaulerBodyResult, 'Se, ' + "T" + stationaryHaulerBodyTier + ", " + creepCount["stationaryHauler"], { role: 'stationaryHauler', isFull: false, roomFrom: room.name });
 
-                            creepCount["stationaryHarvester"]++
+                            creepCount["stationaryHauler"]++
                         } else if (creepsOfRole[["upgrader", room.name]] < room.memory.minimumNumberOfUpgraders) {
 
                             name = spawn.createCreep(upgraderBodyResult, 'Ug, ' + "T" + upgraderBodyTier + ", " + creepCount["upgrader"], { role: 'upgrader', isFull: false, roomFrom: room.name });
@@ -1387,7 +1387,7 @@ module.exports = {
 
                     room.memory.minimumNumberOfScientists = 1
 
-                    room.memory.minimumNumberOfstationaryHarvesters = 1
+                    room.memory.minimumNumberOfstationaryHaulers = 1
 
                     minantifaSupporters
 
@@ -1435,7 +1435,7 @@ module.exports = {
 
                     room.memory.minimumNumberOfScientists = 1
 
-                    room.memory.minimumNumberOfstationaryHarvesters = 1
+                    room.memory.minimumNumberOfstationaryHaulers = 1
 
                     minantifaSupporters
 
