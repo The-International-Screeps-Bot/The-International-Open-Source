@@ -1,5 +1,6 @@
 let taskManager = require("module.taskManager")
 let trafficManager = require("module.trafficManager")
+let allyList = require("module.allyList")
 
 module.exports = {
     run: function spawns() {

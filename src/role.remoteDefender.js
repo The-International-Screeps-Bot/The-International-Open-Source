@@ -1,3 +1,5 @@
+let allyList = require("module.allyList")
+
 module.exports = {
     run: function(creep) {
 

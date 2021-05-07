@@ -1,3 +1,5 @@
+let allyList = require("module.allyList")
+
 module.exports = {
     run: function towers() {
         _.forEach(Game.rooms, function(room) {
