@@ -5,7 +5,7 @@ let allyList = require("module.allyList")
 module.exports = {
     run: function spawns() {
 
-        let rolesList = ["harvester1", "harvester2", "baseHauler", "containerHauler", "generalHauler", "upgrader", "builder", "repairer", "upgradeHauler", "wallRepairer", "claimer", "spawnBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "serf", "remoteDefender", "remoteBuilder", "bigBoyMember", "bigBoyLeader"]
+        let rolesList = ["harvester1", "harvester2", "baseHauler", "containerHauler", "generalHauler", "upgrader", "builder", "repairer", "upgradeHauler", "barricadeUpgrader", "claimer", "revolutionaryBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "stationaryHarvester", "communeDefender", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
         let creepsOfRole = {}
         let creepCount = Memory.creepCount
 
@@ -552,18 +552,18 @@ module.exports = {
                         //Spawn Builder
                         if (stage >= 1) {
 
-                            let spawnBuilderBodyAmount = Math.floor(capacityEnergy / 250)
-                            let spawnBuilderBody = []
+                            let revolutionaryBuilderBodyAmount = Math.floor(capacityEnergy / 250)
+                            let revolutionaryBuilderBody = []
 
-                            var spawnBuilderBodyTier = 0
+                            var revolutionaryBuilderBodyTier = 0
 
-                            for (let i = 0; i < spawnBuilderBodyAmount; i++) {
+                            for (let i = 0; i < revolutionaryBuilderBodyAmount; i++) {
 
-                                spawnBuilderBody.push(WORK, MOVE, CARRY, MOVE)
-                                spawnBuilderBodyTier++
+                                revolutionaryBuilderBody.push(WORK, MOVE, CARRY, MOVE)
+                                revolutionaryBuilderBodyTier++
 
                             }
-                            var spawnBuilderBodyResult = spawnBuilderBody.slice(0, 36)
+                            var revolutionaryBuilderBodyResult = revolutionaryBuilderBody.slice(0, 36)
                         }
                         //Remote Builder
                         if (stage >= 1) {
@@ -584,32 +584,32 @@ module.exports = {
                         //Wall Repairer
                         if (stage == 4) {
 
-                            let wallRepairerBodyAmount = Math.floor(capacityEnergy / 250)
-                            let wallRepairerBody = []
+                            let barricadeUpgraderBodyAmount = Math.floor(capacityEnergy / 250)
+                            let barricadeUpgraderBody = []
 
-                            var wallRepairerBodyTier = 0
+                            var barricadeUpgraderBodyTier = 0
 
-                            for (let i = 0; i < wallRepairerBodyAmount; i++) {
+                            for (let i = 0; i < barricadeUpgraderBodyAmount; i++) {
 
-                                wallRepairerBody.push(WORK, MOVE, CARRY, MOVE)
-                                wallRepairerBodyTier++
+                                barricadeUpgraderBody.push(WORK, MOVE, CARRY, MOVE)
+                                barricadeUpgraderBodyTier++
 
                             }
-                            var wallRepairerBodyResult = wallRepairerBody.slice(0, 24)
+                            var barricadeUpgraderBodyResult = barricadeUpgraderBody.slice(0, 24)
                         } else if (stage >= 5) {
 
-                            let wallRepairerBodyAmount = Math.floor(capacityEnergy / 200)
-                            let wallRepairerBody = []
+                            let barricadeUpgraderBodyAmount = Math.floor(capacityEnergy / 200)
+                            let barricadeUpgraderBody = []
 
-                            var wallRepairerBodyTier = 0
+                            var barricadeUpgraderBodyTier = 0
 
-                            for (let i = 0; i < wallRepairerBodyAmount; i++) {
+                            for (let i = 0; i < barricadeUpgraderBodyAmount; i++) {
 
-                                wallRepairerBody.push(WORK, CARRY, MOVE)
-                                wallRepairerBodyTier++
+                                barricadeUpgraderBody.push(WORK, CARRY, MOVE)
+                                barricadeUpgraderBodyTier++
 
                             }
-                            var wallRepairerBodyResult = wallRepairerBody.slice(0, 24)
+                            var barricadeUpgraderBodyResult = barricadeUpgraderBody.slice(0, 24)
                         }
                         //Remote Harvester
                         if (stage <= 3) {
@@ -690,19 +690,19 @@ module.exports = {
                         //Remote Defender
                         if (stage >= 3) {
 
-                            let remoteDefenderBodyAmount = Math.floor(capacityEnergy / 130)
-                            let remoteDefenderBody = []
+                            let communeDefenderBodyAmount = Math.floor(capacityEnergy / 130)
+                            let communeDefenderBody = []
 
-                            var remoteDefenderBodyTier = 0
+                            var communeDefenderBodyTier = 0
 
-                            for (let i = 0; i < remoteDefenderBodyAmount; i++) {
+                            for (let i = 0; i < communeDefenderBodyAmount; i++) {
 
-                                remoteDefenderBody.push(ATTACK, MOVE)
-                                remoteDefenderBodyTier++
+                                communeDefenderBody.push(ATTACK, MOVE)
+                                communeDefenderBodyTier++
 
                             }
-                            remoteDefenderBody.push(HEAL, MOVE)
-                            var remoteDefenderBodyResult = remoteDefenderBody.slice(0, 20)
+                            communeDefenderBody.push(HEAL, MOVE)
+                            var communeDefenderBodyResult = communeDefenderBody.slice(0, 20)
                         }
                         //Miner
                         if (stage >= 6) {
@@ -720,12 +720,12 @@ module.exports = {
                             }
                             var minerBodyResult = minerBody.slice(0, 48)
                         }
-                        //Serf
+                        //stationaryHarvester
                         if (room.memory.baseLink != null) {
 
-                            var serfBodyResult = [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]
+                            var stationaryHarvesterBodyResult = [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]
 
-                            var serfBodyTier = 1
+                            var stationaryHarvesterBodyTier = 1
                         }
                         //Ranged Defender
                         if (stage >= 1) {
@@ -746,129 +746,129 @@ module.exports = {
                         if (squadType == "ranged") {
                             if (stage <= 7) {
 
-                                let bigBoyLeaderBodyAmount = 1 //Math.floor(capacityEnergy / 200)
-                                let bigBoyLeaderBody = []
+                                let antifaAssaulterBodyAmount = 1 //Math.floor(capacityEnergy / 200)
+                                let antifaAssaulterBody = []
 
-                                var bigBoyLeaderBodyTier = 0
+                                var antifaAssaulterBodyTier = 0
 
-                                for (let i = 0; i < bigBoyLeaderBodyAmount; i++) {
+                                for (let i = 0; i < antifaAssaulterBodyAmount; i++) {
 
-                                    bigBoyLeaderBody.push(RANGED_ATTACK, MOVE)
-                                    bigBoyLeaderBodyTier++
+                                    antifaAssaulterBody.push(RANGED_ATTACK, MOVE)
+                                    antifaAssaulterBodyTier++
 
                                 }
-                                var bigBoyLeaderBodyResult = bigBoyLeaderBody.slice(0, 50)
+                                var antifaAssaulterBodyResult = antifaAssaulterBody.slice(0, 50)
 
                                 //Big Boy Member
-                                let bigBoyMemberBodyAmount = 1 //Math.floor(capacityEnergy / 300)
-                                let bigBoyMemberBody = []
+                                let antifaSupporterBodyAmount = 1 //Math.floor(capacityEnergy / 300)
+                                let antifaSupporterBody = []
 
-                                var bigBoyMemberBodyTier = 0
+                                var antifaSupporterBodyTier = 0
 
-                                for (let i = 0; i < bigBoyMemberBodyAmount; i++) {
+                                for (let i = 0; i < antifaSupporterBodyAmount; i++) {
 
-                                    bigBoyMemberBody.push(HEAL, MOVE)
-                                    bigBoyMemberBodyTier++
+                                    antifaSupporterBody.push(HEAL, MOVE)
+                                    antifaSupporterBodyTier++
 
                                 }
-                                var bigBoyMemberBodyResult = bigBoyMemberBody.slice(0, 50)
+                                var antifaSupporterBodyResult = antifaSupporterBody.slice(0, 50)
                             }
                             //Big Boy Leader
                             else if (stage == 8) {
 
-                                let bigBoyLeaderBodyAmount = 1 //Math.floor(capacityEnergy / 5500)
-                                let bigBoyLeaderBody = []
+                                let antifaAssaulterBodyAmount = 1 //Math.floor(capacityEnergy / 5500)
+                                let antifaAssaulterBody = []
 
-                                var bigBoyLeaderBodyTier = 0
+                                var antifaAssaulterBodyTier = 0
 
-                                for (let i = 0; i < bigBoyLeaderBodyAmount; i++) {
+                                for (let i = 0; i < antifaAssaulterBodyAmount; i++) {
 
-                                    bigBoyLeaderBody.push(RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
-                                    bigBoyLeaderBodyTier++
+                                    antifaAssaulterBody.push(RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    antifaAssaulterBodyTier++
 
                                 }
-                                var bigBoyLeaderBodyResult = bigBoyLeaderBody.slice(0, 50)
+                                var antifaAssaulterBodyResult = antifaAssaulterBody.slice(0, 50)
 
                                 //Big Boy Member
-                                let bigBoyMemberBodyAmount = 1 //Math.floor(capacityEnergy / 7500)
-                                let bigBoyMemberBody = []
+                                let antifaSupporterBodyAmount = 1 //Math.floor(capacityEnergy / 7500)
+                                let antifaSupporterBody = []
 
-                                var bigBoyMemberBodyTier = 0
+                                var antifaSupporterBodyTier = 0
 
-                                for (let i = 0; i < bigBoyMemberBodyAmount; i++) {
+                                for (let i = 0; i < antifaSupporterBodyAmount; i++) {
 
-                                    bigBoyMemberBody.push(HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
-                                    bigBoyMemberBodyTier++
+                                    antifaSupporterBody.push(HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    antifaSupporterBodyTier++
 
                                 }
-                                var bigBoyMemberBodyResult = bigBoyMemberBody.slice(0, 50)
+                                var antifaSupporterBodyResult = antifaSupporterBody.slice(0, 50)
                             }
                         } else if (squadType == "dismantle") {
                             //Big Boy Leader
                             if (stage == 8) {
 
-                                let bigBoyLeaderBodyAmount = 1 //Math.floor(capacityEnergy / 5500)
-                                let bigBoyLeaderBody = []
+                                let antifaAssaulterBodyAmount = 1 //Math.floor(capacityEnergy / 5500)
+                                let antifaAssaulterBody = []
 
-                                var bigBoyLeaderBodyTier = 0
+                                var antifaAssaulterBodyTier = 0
 
-                                for (let i = 0; i < bigBoyLeaderBodyAmount; i++) {
+                                for (let i = 0; i < antifaAssaulterBodyAmount; i++) {
 
-                                    bigBoyLeaderBody.push(WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
-                                    bigBoyLeaderBodyTier++
+                                    antifaAssaulterBody.push(WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    antifaAssaulterBodyTier++
 
                                 }
-                                var bigBoyLeaderBodyResult = bigBoyLeaderBody.slice(0, 50)
+                                var antifaAssaulterBodyResult = antifaAssaulterBody.slice(0, 50)
 
                                 //Big Boy Member
-                                let bigBoyMemberBodyAmount = 1 //Math.floor(capacityEnergy / 7500)
-                                let bigBoyMemberBody = []
+                                let antifaSupporterBodyAmount = 1 //Math.floor(capacityEnergy / 7500)
+                                let antifaSupporterBody = []
 
-                                var bigBoyMemberBodyTier = 0
+                                var antifaSupporterBodyTier = 0
 
-                                for (let i = 0; i < bigBoyMemberBodyAmount; i++) {
+                                for (let i = 0; i < antifaSupporterBodyAmount; i++) {
 
-                                    bigBoyMemberBody.push(HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
-                                    bigBoyMemberBodyTier++
+                                    antifaSupporterBody.push(HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    antifaSupporterBodyTier++
 
                                 }
-                                var bigBoyMemberBodyResult = bigBoyMemberBody.slice(0, 50)
+                                var antifaSupporterBodyResult = antifaSupporterBody.slice(0, 50)
                             }
                         } else if (squadType == "attack") {
                             //Big Boy Leader
                             if (stage == 8) {
 
-                                let bigBoyLeaderBodyAmount = 1 //Math.floor(capacityEnergy / 5500)
-                                let bigBoyLeaderBody = []
+                                let antifaAssaulterBodyAmount = 1 //Math.floor(capacityEnergy / 5500)
+                                let antifaAssaulterBody = []
 
-                                var bigBoyLeaderBodyTier = 0
+                                var antifaAssaulterBodyTier = 0
 
-                                for (let i = 0; i < bigBoyLeaderBodyAmount; i++) {
+                                for (let i = 0; i < antifaAssaulterBodyAmount; i++) {
 
-                                    bigBoyLeaderBody.push(ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
-                                    bigBoyLeaderBodyTier++
+                                    antifaAssaulterBody.push(ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    antifaAssaulterBodyTier++
 
                                 }
-                                var bigBoyLeaderBodyResult = bigBoyLeaderBody.slice(0, 50)
+                                var antifaAssaulterBodyResult = antifaAssaulterBody.slice(0, 50)
 
                                 //Big Boy Member
-                                let bigBoyMemberBodyAmount = 1 //Math.floor(capacityEnergy / 7500)
-                                let bigBoyMemberBody = []
+                                let antifaSupporterBodyAmount = 1 //Math.floor(capacityEnergy / 7500)
+                                let antifaSupporterBody = []
 
-                                var bigBoyMemberBodyTier = 0
+                                var antifaSupporterBodyTier = 0
 
-                                for (let i = 0; i < bigBoyMemberBodyAmount; i++) {
+                                for (let i = 0; i < antifaSupporterBodyAmount; i++) {
 
-                                    bigBoyMemberBody.push(HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
-                                    bigBoyMemberBodyTier++
+                                    antifaSupporterBody.push(HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE)
+                                    antifaSupporterBodyTier++
 
                                 }
-                                var bigBoyMemberBodyResult = bigBoyMemberBody.slice(0, 50)
+                                var antifaSupporterBodyResult = antifaSupporterBody.slice(0, 50)
                             }
                         }
                     }
 
-                    //console.log(room.memory.minimumNumberOfSpawnBuilders)
+                    //console.log(room.memory.minimumNumberOfrevolutionaryBuilders)
                     //If not enough energy for normal spawning
 
                     if (roomFix == true) {
@@ -930,11 +930,11 @@ module.exports = {
                             name = spawn.createCreep(haulerBodyResult, 'BH, ' + "T" + haulerBodyTier + ", " + creepCount["baseHauler"], { role: 'baseHauler', fullEnergy: false, roomFrom: room.name });
 
                             creepCount["baseHauler"]++
-                        } else if (creepsOfRole[["serf", room.name]] < room.memory.minimumNumberOfSerfs) {
+                        } else if (creepsOfRole[["stationaryHarvester", room.name]] < room.memory.minimumNumberOfstationaryHarvesters) {
 
-                            name = spawn.createCreep(serfBodyResult, 'Se, ' + "T" + serfBodyTier + ", " + creepCount["serf"], { role: 'serf', isFull: false, roomFrom: room.name });
+                            name = spawn.createCreep(stationaryHarvesterBodyResult, 'Se, ' + "T" + stationaryHarvesterBodyTier + ", " + creepCount["stationaryHarvester"], { role: 'stationaryHarvester', isFull: false, roomFrom: room.name });
 
-                            creepCount["serf"]++
+                            creepCount["stationaryHarvester"]++
                         } else if (creepsOfRole[["upgrader", room.name]] < room.memory.minimumNumberOfUpgraders) {
 
                             name = spawn.createCreep(upgraderBodyResult, 'Ug, ' + "T" + upgraderBodyTier + ", " + creepCount["upgrader"], { role: 'upgrader', isFull: false, roomFrom: room.name });
@@ -960,11 +960,11 @@ module.exports = {
                             name = spawn.createCreep(haulerBodyResult, 'UH, ' + "T" + haulerBodyTier + ", " + creepCount["upgradeHauler"], { role: 'upgradeHauler', fullEnergy: false, roomFrom: room.name });
 
                             creepCount["upgradeHauler"]++
-                        } else if (creepsOfRole[["wallRepairer", room.name]] < room.memory.minimumNumberOfWallRepairers) {
+                        } else if (creepsOfRole[["barricadeUpgrader", room.name]] < room.memory.minimumNumberOfbarricadeUpgraders) {
 
-                            name = spawn.createCreep(wallRepairerBodyResult, 'WR, ' + "T" + wallRepairerBodyTier + ", " + creepCount["wallRepairer"], { role: 'wallRepairer', isFull: false, roomFrom: room.name });
+                            name = spawn.createCreep(barricadeUpgraderBodyResult, 'WR, ' + "T" + barricadeUpgraderBodyTier + ", " + creepCount["barricadeUpgrader"], { role: 'barricadeUpgrader', isFull: false, roomFrom: room.name });
 
-                            creepCount["wallRepairer"]++
+                            creepCount["barricadeUpgrader"]++
                         } else if (creepsOfRole[["scientist", room.name]] < room.memory.minimumNumberOfScientists && Memory.global.globalStage >= 1) {
 
                             name = spawn.createCreep([CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], 'Si, ' + "T" + 1 + ", " + creepCount["scientist"], { role: 'scientist', emptyStore: true, roomFrom: room.name });
@@ -980,11 +980,11 @@ module.exports = {
                             name = spawn.createCreep(remoteHaulerBodyResult, 'Ro, ' + "T" + robberBodyTier + ", " + creepCount["robber"], { role: 'robber', isFull: false, roomFrom: room.name });
 
                             creepCount["robber"]++
-                        } else if (creepsOfRole[["remoteDefender", room.name]] < room.memory.minimumNumberOfRemoteDefenders && remoteEnemy == true) {
+                        } else if (creepsOfRole[["communeDefender", room.name]] < room.memory.minimumNumberOfcommuneDefenders && remoteEnemy == true) {
 
-                            name = spawn.createCreep(remoteDefenderBodyResult, 'ReD, ' + "T" + remoteDefenderBodyTier + ", " + creepCount["remoteDefender"], { role: 'remoteDefender', roomFrom: room.name });
+                            name = spawn.createCreep(communeDefenderBodyResult, 'ReD, ' + "T" + communeDefenderBodyTier + ", " + creepCount["communeDefender"], { role: 'communeDefender', roomFrom: room.name });
 
-                            creepCount["remoteDefender"]++
+                            creepCount["communeDefender"]++
                         } else if (creepsOfRole[["scout", room.name]] < room.memory.minimumNumberOfScouts && target4 != undefined) {
 
                             name = spawn.createCreep([MOVE], 'Sc, ' + "T" + 1 + ", " + creepCount["scout"], { role: 'scout', working: false, roomFrom: room.name });
@@ -995,11 +995,11 @@ module.exports = {
                             name = spawn.createCreep([CLAIM, MOVE], 'Ca, ' + "T" + 1 + ", " + creepCount["claimer"], { role: 'claimer', target: claimerTarget, roomFrom: room.name });
 
                             creepCount["claimer"]++
-                        } else if (creepsOfRole[["spawnBuilder", room.name]] < room.memory.minimumNumberOfSpawnBuilders && builderTarget && room == communeEstablisher) {
+                        } else if (creepsOfRole[["revolutionaryBuilder", room.name]] < room.memory.minimumNumberOfrevolutionaryBuilders && builderTarget && room == communeEstablisher) {
 
-                            name = spawn.createCreep(spawnBuilderBodyResult, 'SB, ' + "T" + spawnBuilderBodyTier + ", " + creepCount["spawnBuilder"], { role: 'spawnBuilder', building: false, target: builderTarget, roomFrom: room.name });
+                            name = spawn.createCreep(revolutionaryBuilderBodyResult, 'SB, ' + "T" + revolutionaryBuilderBodyTier + ", " + creepCount["revolutionaryBuilder"], { role: 'revolutionaryBuilder', building: false, target: builderTarget, roomFrom: room.name });
 
-                            creepCount["spawnBuilder"]++
+                            creepCount["revolutionaryBuilder"]++
                         } else if (creepsOfRole[["remoteBuilder", room.name]] < room.memory.minimumNumberOfRemoteBuilders && remoteBuilderNeed == true) {
 
                             name = spawn.createCreep(remoteBuilderBodyResult, 'RB, ' + "T" + remoteBuilderBodyTier + ", " + creepCount["remoteBuilder"], { role: 'remoteBuilder', roomFrom: room.name });
@@ -1007,16 +1007,16 @@ module.exports = {
                             creepCount["remoteBuilder"]++
                         } else {
 
-                            if (creepsOfRole[["bigBoyLeader", room.name]] < creepsOfRole[["bigBoyMember", room.name]] && target6) {
+                            if (creepsOfRole[["antifaAssaulter", room.name]] < creepsOfRole[["antifaSupporter", room.name]] && target6) {
 
-                                name = spawn.createCreep(bigBoyLeaderBodyResult, 'BBL, ' + "T" + bigBoyLeaderBodyTier + ", " + squadType + ", " + creepCount["bigBoyLeader"], { role: 'bigBoyLeader', squadType: squadType, attacking: false, roomFrom: room.name });
+                                name = spawn.createCreep(antifaAssaulterBodyResult, 'BBL, ' + "T" + antifaAssaulterBodyTier + ", " + squadType + ", " + creepCount["antifaAssaulter"], { role: 'antifaAssaulter', squadType: squadType, attacking: false, roomFrom: room.name });
 
-                                creepCount["bigBoyLeader"]++
-                            } else if (creepsOfRole[["bigBoyMember", room.name]] < room.memory.minimumNumberOfBigBoyMembers && target6) {
+                                creepCount["antifaAssaulter"]++
+                            } else if (creepsOfRole[["antifaSupporter", room.name]] < room.memory.minimumNumberOfantifaSupporters && target6) {
 
-                                name = spawn.createCreep(bigBoyMemberBodyResult, 'BBM, ' + "T" + bigBoyMemberBodyTier + ", " + squadType + ", " + creepCount["bigBoyMember"], { role: 'bigBoyMember', squadType: squadType, attacking: false, roomFrom: room.name });
+                                name = spawn.createCreep(antifaSupporterBodyResult, 'BBM, ' + "T" + antifaSupporterBodyTier + ", " + squadType + ", " + creepCount["antifaSupporter"], { role: 'antifaSupporter', squadType: squadType, attacking: false, roomFrom: room.name });
 
-                                creepCount["bigBoyMember"]++
+                                creepCount["antifaSupporter"]++
                             } else {
 
                                 for (let remoteRoom of remoteRooms) {
@@ -1066,7 +1066,7 @@ module.exports = {
                 var minReservers = room.memory.minimumNumberOfReservers = 1
 
                 var minRemoteBuilders = room.memory.minimumNumberOfRemoteBuilders = 1
-                var minRemoteDefenders = room.memory.minimumNumberOfRemoteDefenders = 1
+                var mincommuneDefenders = room.memory.minimumNumberOfcommuneDefenders = 1
 
                 var squads = 0
 
@@ -1075,8 +1075,8 @@ module.exports = {
                     squads = 4
                 }
 
-                var minBigBoyLeaders = room.memory.minimumNumberOfBigBoyLeaders = squads
-                var minBigBoyMembers = room.memory.minimumNumberOfBigBoyMembers = squads
+                var minantifaAssaulters = room.memory.minimumNumberOfantifaAssaulters = squads
+                var minantifaSupporters = room.memory.minimumNumberOfantifaSupporters = squads
 
                 if (stage <= 3) {
 
@@ -1102,11 +1102,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfUpgraders = 4
 
-                    room.memory.minimumNumberOfSpawnBuilders = 4
+                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
 
-                    room.memory.minimumNumberOfWallRepairers = 0
+                    room.memory.minimumNumberOfbarricadeUpgraders = 0
 
-                    room.memory.minimumNumberOfRemoteDefenders = 0
+                    room.memory.minimumNumberOfcommuneDefenders = 0
 
                     minRemoteHarvesters1 * 2
 
@@ -1118,9 +1118,9 @@ module.exports = {
 
                     room.memory.minimumNumberOfRemoteBuilders = 0
 
-                    room.memory.minimumNumberOfBigBoyMembers = 0
+                    room.memory.minimumNumberOfantifaSupporters = 0
 
-                    room.memory.minimumNumberOfBigBoyLeaders = 0
+                    room.memory.minimumNumberOfantifaAssaulters = 0
 
                     room.memory.minimumNumberOfRangedDefenders = 0
 
@@ -1145,11 +1145,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfUpgraders = 3
 
-                    room.memory.minimumNumberOfSpawnBuilders = 4
+                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
 
-                    room.memory.minimumNumberOfWallRepairers = 0
+                    room.memory.minimumNumberOfbarricadeUpgraders = 0
 
-                    room.memory.minimumNumberOfRemoteDefenders = 0
+                    room.memory.minimumNumberOfcommuneDefenders = 0
 
                     minRemoteHarvesters1 * 2
 
@@ -1165,9 +1165,9 @@ module.exports = {
 
                     room.memory.minimumNumberOfMiners = 0
 
-                    minBigBoyMembers
+                    minantifaSupporters
 
-                    minBigBoyLeaders
+                    minantifaAssaulters
 
                     room.memory.minimumNumberOfScouts = 1
 
@@ -1188,11 +1188,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfUpgraders = 3
 
-                    room.memory.minimumNumberOfSpawnBuilders = 4
+                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
 
-                    room.memory.minimumNumberOfWallRepairers = 0
+                    room.memory.minimumNumberOfbarricadeUpgraders = 0
 
-                    minRemoteDefenders
+                    mincommuneDefenders
 
                     minRemoteHarvesters1
 
@@ -1208,9 +1208,9 @@ module.exports = {
 
                     room.memory.minimumNumberOfMiners = 0
 
-                    minBigBoyMembers
+                    minantifaSupporters
 
-                    minBigBoyLeaders
+                    minantifaAssaulters
 
                     room.memory.minimumNumberOfScouts = 1
 
@@ -1231,11 +1231,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfUpgraders = 2
 
-                    room.memory.minimumNumberOfSpawnBuilders = 4
+                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
 
-                    room.memory.minimumNumberOfWallRepairers = 1
+                    room.memory.minimumNumberOfbarricadeUpgraders = 1
 
-                    minRemoteDefenders
+                    mincommuneDefenders
 
                     minRemoteHarvesters1
 
@@ -1251,9 +1251,9 @@ module.exports = {
 
                     room.memory.minimumNumberOfMiners = 0
 
-                    minBigBoyMembers
+                    minantifaSupporters
 
-                    minBigBoyLeaders
+                    minantifaAssaulters
 
                     room.memory.minimumNumberOfScouts = 1
 
@@ -1274,11 +1274,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfUpgraders = 2
 
-                    room.memory.minimumNumberOfSpawnBuilders = 4
+                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
 
-                    room.memory.minimumNumberOfWallRepairers = 1
+                    room.memory.minimumNumberOfbarricadeUpgraders = 1
 
-                    minRemoteDefenders
+                    mincommuneDefenders
 
                     minRemoteHarvesters1
 
@@ -1296,9 +1296,9 @@ module.exports = {
 
                     room.memory.minimumNumberOfMiners = 0
 
-                    minBigBoyMembers
+                    minantifaSupporters
 
-                    minBigBoyLeaders
+                    minantifaAssaulters
 
                     room.memory.minimumNumberOfScouts = 1
 
@@ -1319,11 +1319,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfUpgraders = 1
 
-                    room.memory.minimumNumberOfSpawnBuilders = 4
+                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
 
-                    room.memory.minimumNumberOfWallRepairers = 1
+                    room.memory.minimumNumberOfbarricadeUpgraders = 1
 
-                    minRemoteDefenders
+                    mincommuneDefenders
 
                     minRemoteHarvesters1
 
@@ -1341,9 +1341,9 @@ module.exports = {
 
                     room.memory.minimumNumberOfMiners = 1
 
-                    minBigBoyMembers
+                    minantifaSupporters
 
-                    minBigBoyLeaders
+                    minantifaAssaulters
 
                     room.memory.minimumNumberOfScouts = 1
                 }
@@ -1363,11 +1363,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfUpgraders = 1
 
-                    room.memory.minimumNumberOfSpawnBuilders = 4
+                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
 
-                    room.memory.minimumNumberOfWallRepairers = 1
+                    room.memory.minimumNumberOfbarricadeUpgraders = 1
 
-                    minRemoteDefenders
+                    mincommuneDefenders
 
                     minRemoteHarvesters1
 
@@ -1387,11 +1387,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfScientists = 1
 
-                    room.memory.minimumNumberOfSerfs = 1
+                    room.memory.minimumNumberOfstationaryHarvesters = 1
 
-                    minBigBoyMembers
+                    minantifaSupporters
 
-                    minBigBoyLeaders
+                    minantifaAssaulters
 
                     room.memory.minimumNumberOfScouts = 1
                 }
@@ -1411,11 +1411,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfUpgraders = 1
 
-                    room.memory.minimumNumberOfSpawnBuilders = 4
+                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
 
-                    room.memory.minimumNumberOfWallRepairers = 1
+                    room.memory.minimumNumberOfbarricadeUpgraders = 1
 
-                    minRemoteDefenders
+                    mincommuneDefenders
 
                     minRemoteHarvesters1
 
@@ -1435,11 +1435,11 @@ module.exports = {
 
                     room.memory.minimumNumberOfScientists = 1
 
-                    room.memory.minimumNumberOfSerfs = 1
+                    room.memory.minimumNumberOfstationaryHarvesters = 1
 
-                    minBigBoyMembers
+                    minantifaSupporters
 
-                    minBigBoyLeaders
+                    minantifaAssaulters
 
                     room.memory.minimumNumberOfScouts = 1
                 }
