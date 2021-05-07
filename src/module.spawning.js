@@ -932,7 +932,7 @@ module.exports = {
                             creepCount["baseHauler"]++
                         } else if (creepsOfRole[["stationaryHauler", room.name]] < room.memory.minimumNumberOfstationaryHaulers) {
 
-                            name = spawn.createCreep(stationaryHaulerBodyResult, 'Se, ' + "T" + stationaryHaulerBodyTier + ", " + creepCount["stationaryHauler"], { role: 'stationaryHauler', isFull: false, roomFrom: room.name });
+                            name = spawn.createCreep(stationaryHaulerBodyResult, 'SH, ' + "T" + stationaryHaulerBodyTier + ", " + creepCount["stationaryHauler"], { role: 'stationaryHauler', isFull: false, roomFrom: room.name });
 
                             creepCount["stationaryHauler"]++
                         } else if (creepsOfRole[["upgrader", room.name]] < room.memory.minimumNumberOfUpgraders) {
@@ -962,7 +962,7 @@ module.exports = {
                             creepCount["upgradeHauler"]++
                         } else if (creepsOfRole[["barricadeUpgrader", room.name]] < room.memory.minimumNumberOfbarricadeUpgraders) {
 
-                            name = spawn.createCreep(barricadeUpgraderBodyResult, 'WR, ' + "T" + barricadeUpgraderBodyTier + ", " + creepCount["barricadeUpgrader"], { role: 'barricadeUpgrader', isFull: false, roomFrom: room.name });
+                            name = spawn.createCreep(barricadeUpgraderBodyResult, 'BR, ' + "T" + barricadeUpgraderBodyTier + ", " + creepCount["barricadeUpgrader"], { role: 'barricadeUpgrader', isFull: false, roomFrom: room.name });
 
                             creepCount["barricadeUpgrader"]++
                         } else if (creepsOfRole[["scientist", room.name]] < room.memory.minimumNumberOfScientists && Memory.global.globalStage >= 1) {
@@ -982,7 +982,7 @@ module.exports = {
                             creepCount["robber"]++
                         } else if (creepsOfRole[["communeDefender", room.name]] < room.memory.minimumNumberOfcommuneDefenders && remoteEnemy == true) {
 
-                            name = spawn.createCreep(communeDefenderBodyResult, 'ReD, ' + "T" + communeDefenderBodyTier + ", " + creepCount["communeDefender"], { role: 'communeDefender', roomFrom: room.name });
+                            name = spawn.createCreep(communeDefenderBodyResult, 'CD, ' + "T" + communeDefenderBodyTier + ", " + creepCount["communeDefender"], { role: 'communeDefender', roomFrom: room.name });
 
                             creepCount["communeDefender"]++
                         } else if (creepsOfRole[["scout", room.name]] < room.memory.minimumNumberOfScouts && target4 != undefined) {
@@ -1009,12 +1009,12 @@ module.exports = {
 
                             if (creepsOfRole[["antifaAssaulter", room.name]] < creepsOfRole[["antifaSupporter", room.name]] && target6) {
 
-                                name = spawn.createCreep(antifaAssaulterBodyResult, 'BBL, ' + "T" + antifaAssaulterBodyTier + ", " + squadType + ", " + creepCount["antifaAssaulter"], { role: 'antifaAssaulter', squadType: squadType, attacking: false, roomFrom: room.name });
+                                name = spawn.createCreep(antifaAssaulterBodyResult, 'antifaAssaulter, ' + "T" + antifaAssaulterBodyTier + ", " + squadType + ", " + creepCount["antifaAssaulter"], { role: 'antifaAssaulter', squadType: squadType, attacking: false, roomFrom: room.name });
 
                                 creepCount["antifaAssaulter"]++
                             } else if (creepsOfRole[["antifaSupporter", room.name]] < room.memory.minimumNumberOfantifaSupporters && target6) {
 
-                                name = spawn.createCreep(antifaSupporterBodyResult, 'BBM, ' + "T" + antifaSupporterBodyTier + ", " + squadType + ", " + creepCount["antifaSupporter"], { role: 'antifaSupporter', squadType: squadType, attacking: false, roomFrom: room.name });
+                                name = spawn.createCreep(antifaSupporterBodyResult, 'antifaSupporter, ' + "T" + antifaSupporterBodyTier + ", " + squadType + ", " + creepCount["antifaSupporter"], { role: 'antifaSupporter', squadType: squadType, attacking: false, roomFrom: room.name });
 
                                 creepCount["antifaSupporter"]++
                             } else {
