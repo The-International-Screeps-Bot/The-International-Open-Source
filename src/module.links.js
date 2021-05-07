@@ -8,20 +8,20 @@ module.exports = {
                 let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
                 let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
-                if (sourceLink1 && controllerLink && sourceLink1.store[RESOURCE_ENERGY] >= 790 && controllerLink.store[RESOURCE_ENERGY] <= 400 && ((room.storage.store[RESOURCE_ENERGY] >= 250000) || (Memory.global.globalStage == 0 && room.storage.store[RESOURCE_ENERGY] >= 5000))) {
+                if (sourceLink1 && controllerLink && sourceLink1.store[RESOURCE_ENERGY] >= 790 && controllerLink.store[RESOURCE_ENERGY] <= 400 && ((room.storage.store[RESOURCE_ENERGY] >= 250000) || (Memory.global.globalStage == 0 && room.storage.store[RESOURCE_ENERGY] >= 15000))) {
 
                     sourceLink1.transferEnergy(controllerLink);
 
-                } else if (sourceLink1 && baseLink && sourceLink1.store[RESOURCE_ENERGY] >= 790 && baseLink.store[RESOURCE_ENERGY] <= 400) {
+                } else if (sourceLink1 && baseLink && sourceLink1.store[RESOURCE_ENERGY] >= 790 && baseLink.store[RESOURCE_ENERGY] <= 700) {
 
                     sourceLink1.transferEnergy(baseLink);
 
                 }
-                if (sourceLink2 && controllerLink && sourceLink2.store[RESOURCE_ENERGY] >= 790 && controllerLink.store[RESOURCE_ENERGY] <= 400 && ((room.storage && room.storage.store[RESOURCE_ENERGY] >= 250000) || (Memory.global.globalStage == 0 && room.storage.store[RESOURCE_ENERGY] >= 5000))) {
+                if (sourceLink2 && controllerLink && sourceLink2.store[RESOURCE_ENERGY] >= 790 && controllerLink.store[RESOURCE_ENERGY] <= 400 && ((room.storage && room.storage.store[RESOURCE_ENERGY] >= 250000) || (Memory.global.globalStage == 0 && room.storage.store[RESOURCE_ENERGY] >= 15000))) {
 
                     sourceLink2.transferEnergy(controllerLink);
 
-                } else if (sourceLink2 && baseLink && sourceLink2.store[RESOURCE_ENERGY] >= 790 && baseLink.store[RESOURCE_ENERGY] <= 400) {
+                } else if (sourceLink2 && baseLink && sourceLink2.store[RESOURCE_ENERGY] >= 790 && baseLink.store[RESOURCE_ENERGY] <= 700) {
 
                     sourceLink2.transferEnergy(baseLink);
 
