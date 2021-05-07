@@ -1,8 +1,6 @@
 module.exports = {
     run: function(creep) {
 
-        creep.checkRoom()
-
         creep.isFull()
 
         if (creep.memory.isFull == true) {

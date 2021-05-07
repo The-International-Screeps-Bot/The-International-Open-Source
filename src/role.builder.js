@@ -3,8 +3,6 @@ var roleUpgrader = require('role.upgrader');
 module.exports = {
     run: function(creep) {
 
-        creep.checkRoom()
-
         let constructionSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
 
         if (!constructionSite) {

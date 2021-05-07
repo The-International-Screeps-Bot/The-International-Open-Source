@@ -1,8 +1,6 @@
 module.exports = {
     run: function(creep) {
 
-        creep.checkRoom()
-
         var controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
 
         var controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
