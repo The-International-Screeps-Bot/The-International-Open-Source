@@ -62,7 +62,7 @@ module.exports = {
                 creep.intraRoomPathing(origin, goal)
             } else {
 
-                creep.isFull()
+                creep.hasResource()
 
                 let withdrawBaseLink
                 let terminalWithdrawBattery

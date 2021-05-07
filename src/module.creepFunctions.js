@@ -92,6 +92,20 @@ Creep.prototype.isFull = function() {
 
     }
 }
+Creep.prototype.hasResource = function() {
+
+    creep = this
+
+    if (creep.store.getUsedCapacity() == 0) {
+
+        creep.memory.isFull = false;
+
+    } else if (creep.store.getUsedCapacity() >= 1) {
+
+        creep.memory.isFull = true;
+
+    }
+}
 Creep.prototype.pickupDroppedEnergy = function(target) {
 
     creep = this
