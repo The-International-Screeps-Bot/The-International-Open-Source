@@ -1452,8 +1452,8 @@ module.exports = {
                 }
                 if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000 && stage <= 7) {
 
-                    room.memory.minimumNumberOfUpgradeHaulers = 2
-                    room.memory.minimumNumberOfUpgraders = 3
+                    room.memory.minimumNumberOfUpgradeHaulers = 1
+                    room.memory.minimumNumberOfUpgraders = 2
                 } else {
 
                     room.memory.minimumNumberOfUpgradeHaulers = 0
