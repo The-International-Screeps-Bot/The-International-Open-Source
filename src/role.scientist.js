@@ -56,6 +56,8 @@ module.exports = {
             }
         }
 
+        // creep.hasResource()
+
         //if tertairyLabs exist and they don't have 2000 boost in each, when current task is done fill the labs
 
         // for each resource in reactions if number of resource is below x, creep.memory.resource is resource

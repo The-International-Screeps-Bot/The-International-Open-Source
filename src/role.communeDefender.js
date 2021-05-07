@@ -31,7 +31,7 @@ module.exports = {
 
         let hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
             filter: (c) => {
-                return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) == 0 || c.getActiveBodyparts(RANGED_ATTACK) == 0))
+                return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) != 0 || c.getActiveBodyparts(RANGED_ATTACK) != 0))
             }
         })
 
