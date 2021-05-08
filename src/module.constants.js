@@ -306,8 +306,6 @@ module.exports = {
                             }
                         }
                     }
-
-                    room.memory.remoteRooms = remoteRooms
                 }
 
                 function myResources() {
