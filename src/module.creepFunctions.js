@@ -443,7 +443,7 @@ Creep.prototype.rampartPathing = function(origin, goal) {
 
                     costs.set(struct.pos.x, struct.pos.y, 5)
 
-                } else if (struct.structureType !== STRUCTURE_CONTAINER) {
+                } else if (struct.structureType !== STRUCTURE_CONTAINER && struct.structureType != STRUCTURE_RAMPART) {
 
                     costs.set(struct.pos.x, struct.pos.y, 0xff)
 

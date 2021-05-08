@@ -49,7 +49,7 @@ module.exports = {
                     roles[creep.memory.role].run(creep)
                 } catch {
 
-                    creep.suicide()
+                    //creep.suicide()
                 }
 
                 console.log(creep.memory.role + ": " + Game.cpu.getUsed().toFixed(2))
