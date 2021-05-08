@@ -289,18 +289,20 @@ module.exports = {
 
                         remoteRoomNames.push(object.name)
                     }
+                    if (!remoteRooms) {
 
-                    let remoteRooms = []
+                        var remoteRooms = []
+                    }
 
                     for (let remoteRoom of unfilteredRemoteRooms) {
 
                         var targetRoomDistance = Game.map.getRoomLinearDistance(room.name, remoteRoom)
 
-                        if (targetRoomDistance == 1 && remoteRoomNames.indexOf(remoteRoom) === -1) {
+                        if (targetRoomDistance == 1) {
+                            if (remoteRoomNames.indexOf(remoteRoom) === -1) {
 
-                            //console.log(spawn.room.name + " - " + targetRoom + ", " + targetRoomDistance)
-                            remoteRooms.push({ name: remoteRoom, sources: 1, roads: false, builderNeed: false, enemy: false, distance: null })
-
+                                remoteRooms.push({ name: remoteRoom, sources: 1, roads: false, builderNeed: false, enemy: false, distance: null })
+                            }
                         }
                     }
 

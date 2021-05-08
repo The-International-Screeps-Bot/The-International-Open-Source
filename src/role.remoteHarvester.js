@@ -142,11 +142,11 @@ module.exports = {
 
             if (sources.length == 2) {
 
-                for (let remoteRoom of Game.rooms[creep.memory.roomFrom].memory.remoteRooms) {
+                for (let object of Game.rooms[creep.memory.roomFrom].memory.remoteRooms) {
 
-                    if (remoteRoom.name == creep.room.name) {
+                    if (object.name == creep.room.name) {
 
-                        remoteRoom.sources = 2
+                        object.sources = 2
                     }
                 }
             }
