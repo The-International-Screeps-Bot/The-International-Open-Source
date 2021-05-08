@@ -306,14 +306,6 @@ module.exports = {
 
                 for (spawn of mySpawns) {
 
-                    if (spawn.spawning) {
-                        var spawningCreep = Game.creeps[spawn.spawning.name]
-                        spawn.room.visual.text(
-                            '🛠️' + spawningCreep.memory.role,
-                            spawn.pos.x,
-                            spawn.pos.y - 2, { align: 'center' })
-                    }
-
                     var name = undefined
 
                     if (roomFix == true && freeEnergy >= 300) {
@@ -899,7 +891,7 @@ module.exports = {
 
                         } else if (creepsOfRole[["harvester2", room.name]] < 1) {
 
-                            name = spawn.createCreep(harvesterBodyResult, 'rfH, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester2"], { role: 'harvester1', working: false, target: 2, roomFrom: room.name });
+                            name = spawn.createCreep(harvesterBodyResult, 'rfH, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester2"], { role: 'harvester2', working: false, target: 2, roomFrom: room.name });
 
                             creepCount["harvester2"]++
                         } else if (creepsOfRole[["baseHauler", room.name]] + creepsOfRole[["containerHauler", room.name]] + creepsOfRole[["generalHauler", room.name]] < 3) {
