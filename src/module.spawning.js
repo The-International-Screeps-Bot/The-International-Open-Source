@@ -141,14 +141,9 @@ module.exports = {
 
                 var hostileAttacker = room.find(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
-                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) != 0 || c.getActiveBodyparts(RANGED_ATTACK) != 0 || c.getActiveBodyparts(WORK) != 0))
+                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && c.owner.username != "Invader" && (c.getActiveBodyparts(ATTACK) != 0 || c.getActiveBodyparts(RANGED_ATTACK) != 0 || c.getActiveBodyparts(WORK) != 0))
                     }
                 })[0]
-
-                if (hostileAttacker) {
-
-                    remoteEnemy = true
-                }
 
                 let roomMineral = room.find(FIND_MINERALS)[0].mineralAmount > 0
                 let roomExtractor = room.find(FIND_STRUCTURES, {
