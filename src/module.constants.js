@@ -289,9 +289,10 @@ module.exports = {
 
                         remoteRoomNames.push(object.name)
                     }
-                    if (!remoteRooms) {
 
-                        var remoteRooms = []
+                    if (room.memory.remoteRooms == null) {
+
+                        room.memory.remoteRooms = []
                     }
 
                     for (let remoteRoom of unfilteredRemoteRooms) {
@@ -301,7 +302,7 @@ module.exports = {
                         if (targetRoomDistance == 1) {
                             if (remoteRoomNames.indexOf(remoteRoom) === -1) {
 
-                                remoteRooms.push({ name: remoteRoom, sources: 1, roads: false, builderNeed: false, enemy: false, distance: null })
+                                room.memory.remoteRooms.push({ name: remoteRoom, sources: 1, roads: false, builderNeed: false, enemy: false, distance: null })
                             }
                         }
                     }
