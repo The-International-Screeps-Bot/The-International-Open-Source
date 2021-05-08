@@ -1,97 +1,98 @@
 module.exports = {
     run: function(creep) {
-        
+
         creep.say("Broke")
-        
+
         //list of rooms with Game.map
-        
+
         //determine rooms that are 10 or less away from home room (do so in module.constants)
-        
+
         //scout find room that was checked longest ago
-        
+
         //scout move to room
-        
+
         //scout record information
-        
+
         //scout record tick room was scouted
-        
+
         //restart loop
-        
+
         let targetRooms = Game.map.describeExits(creep.room.name)
         let targetRoomsArray = []
         let min
         let targetRoom
-        
+
         if (!targetRoom) {
             for (let i = 0; i <= 7; i++) {
-    
+
                 let room = targetRooms[i]
-                
+
                 if (room) {
-                    
+
                     if (!Memory.rooms[room]) {
-                        
+
                         Memory.rooms[room] = {}
                     }
-                
+
                     targetRoomsArray.push(room)
                 }
             }
-            
-            for (let i = 0; i < targetRoomsArray.length; i++) { creep.say("tRA")
-                
+
+            for (let i = 0; i < targetRoomsArray.length; i++) {
+                creep.say("tRA")
+
                 let room = targetRoomsArray[i]
-                
-                    if (!Memory.rooms[room].scoutTick) {
-                        
-                        targetRoom = room
-                        break
-                    }
-                    else if (i + 1 == targetRoomsArray.length) {
-                        
-                        min = true
-                    }
+
+                if (!Memory.rooms[room].scoutTick) {
+
+                    targetRoom = room
+                    break
+                } else if (i + 1 == targetRoomsArray.length) {
+
+                    min = true
+                }
             }
-            
-            if (min == true) { creep.say("min")
-                
+
+            if (min == true) {
+                creep.say("min")
+
                 let targetRoomsArrayScoutTick = []
-                
+
                 for (let room of targetRoomsArray) {
-                    
+
                     targetRoomsArrayScoutTick.push(Memory.rooms[room].scoutTick)
                 }
-                
-                lowestScoutTick = _.min(targetRoomsArrayScoutTick, function (tick) { return tick })
-                //console.log(lowestScoutTick)
-                
+
+                lowestScoutTick = _.min(targetRoomsArrayScoutTick, function(tick) { return tick })
+                    //console.log(lowestScoutTick)
+
                 for (let room in Memory.rooms) {
-                    
+
                     if (Memory.rooms[room].scoutTick == lowestScoutTick) {
-                        
+
                         targetRoom = room
                         break
                     }
                 }
             }
         }
-        
+
         if (targetRoom) {
-            
+
             creep.say(targetRoom)
-                
+
             creep.room.memory.scoutTick = Game.time
-        
+
             creep.memory.goal = new RoomPosition(25, 25, targetRoom)
-    
+
             let origin = creep.pos
-    
+
             let goal = _.map([creep.memory.goal], function(target) {
                 return { pos: creep.memory.goal, range: 1 }
             })
-    
+
             if (goal) {
-                    /*
+                /*
                     if (creep.room.controller) {
                         
                         if (creep.pos.inRangeTo(creep.room.controller, 1)) {
@@ -158,23 +159,29 @@ module.exports = {
                         }
                     }
                     */
-                
+
                 if (creep.room.controller) {
-                    
-                    if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username != "x") {
-                    
-                        creep.room.memory.stage = "enemyRoom"
+
+                    var targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memeory.roomFrom)
+
+                    console.log(creep.room.controller.reservation.owner + creep.room.name)
+                    if (targetRoomDistance == 1 && !reservation) {
+
+
                     }
-                    else if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username == "x") {
-                    
+
+                    if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username != "x") {
+
+                        creep.room.memory.stage = "enemyRoom"
+                    } else if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username == "x") {
+
                         creep.room.memory.stage = "allyRoom"
                     }
-                }
-                else {
-                    
+                } else {
+
                     creep.room.memory.stage = "emptyRoom"
                 }
-    
+
                 creep.roadPathing(origin, goal)
             }
         }

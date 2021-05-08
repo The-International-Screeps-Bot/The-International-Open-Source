@@ -139,11 +139,18 @@ module.exports = {
                     }
                 }
 
-                var hostileAttacker = room.find(FIND_HOSTILE_CREEPS, {
+                let hostileAttacker = room.find(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
                         return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && c.owner.username != "Invader" && (c.getActiveBodyparts(ATTACK) != 0 || c.getActiveBodyparts(RANGED_ATTACK) != 0 || c.getActiveBodyparts(WORK) != 0))
                     }
                 })[0]
+
+                if (hostileAttacker) {
+                    console.log("Attack!!")
+
+                    Memory.global.lastDefence.time = Game.time
+                    Memory.global.lastDefence.room = room.name
+                }
 
                 let roomMineral = room.find(FIND_MINERALS)[0].mineralAmount > 0
                 let roomExtractor = room.find(FIND_STRUCTURES, {
@@ -987,9 +994,9 @@ module.exports = {
                             name = spawn.createCreep(communeDefenderBodyResult, 'CD, ' + "T" + communeDefenderBodyTier + ", " + creepCount["communeDefender"], { role: 'communeDefender', roomFrom: room.name });
 
                             creepCount["communeDefender"]++
-                        } else if (creepsOfRole[["scout", room.name]] < room.memory.minimumNumberOfScouts && target4 != undefined) {
+                        } else if (creepsOfRole[["scout", room.name]] < room.memory.minimumNumberOfScouts && target4) {
 
-                            name = spawn.createCreep([MOVE], 'Sc, ' + "T" + 1 + ", " + creepCount["scout"], { role: 'scout', working: false, roomFrom: room.name });
+                            name = spawn.createCreep([MOVE], 'Sc, ' + "T" + 1 + ", " + creepCount["scout"], { role: 'scout', roomFrom: room.name });
 
                             creepCount["scout"]++
                         } else if (creepsOfRole[["claimer", room.name]] < 1 && claimerTarget && room == communeEstablisher) {
@@ -999,7 +1006,7 @@ module.exports = {
                             creepCount["claimer"]++
                         } else if (creepsOfRole[["revolutionaryBuilder", room.name]] < room.memory.minimumNumberOfrevolutionaryBuilders && builderTarget && room == communeEstablisher) {
 
-                            name = spawn.createCreep(revolutionaryBuilderBodyResult, 'SB, ' + "T" + revolutionaryBuilderBodyTier + ", " + creepCount["revolutionaryBuilder"], { role: 'revolutionaryBuilder', building: false, target: builderTarget, roomFrom: room.name });
+                            name = spawn.createCreep(revolutionaryBuilderBodyResult, 'SB, ' + "T" + revolutionaryBuilderBodyTier + ", " + creepCount["revolutionaryBuilder"], { role: 'revolutionaryBuilder', isFull: false, target: builderTarget, roomFrom: room.name });
 
                             creepCount["revolutionaryBuilder"]++
                         } else if (creepsOfRole[["remoteBuilder", room.name]] < room.memory.minimumNumberOfRemoteBuilders && remoteBuilderNeed == true) {
