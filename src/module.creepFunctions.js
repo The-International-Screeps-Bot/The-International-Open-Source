@@ -310,7 +310,6 @@ Creep.prototype.roadPathing = function(origin, goal) {
             });
 
 
-
             return costs
 
         }

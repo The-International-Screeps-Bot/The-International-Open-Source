@@ -83,13 +83,13 @@ module.exports = {
 
             creep.room.memory.scoutTick = Game.time
 
-            creep.memory.goal = new RoomPosition(25, 25, targetRoom)
-
             let origin = creep.pos
 
-            let goal = _.map([creep.memory.goal], function(target) {
-                return { pos: creep.memory.goal, range: 1 }
+            let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(target) {
+                return { pos: target, range: 1 }
             })
+
+            creep.offRoadPathing(origin, goal)
 
             if (goal) {
                 /*
@@ -181,8 +181,6 @@ module.exports = {
 
                     creep.room.memory.stage = "emptyRoom"
                 }
-
-                creep.roadPathing(origin, goal)
             }
         }
     }

@@ -35,6 +35,8 @@ module.exports = {
 
         }
 
+
+        let importantBoosts = ["XUH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2"]
         let t3Boosts = ["XUH2O", "XUHO2", "XKH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2"]
         let t2Boosts = ["UH2O", "UHO2", "KH2O", "KHO2", "LH2O", "LHO2", "ZH2O", "ZHO2", "GH2O", "GHO2"]
         let t1Boosts = ["UH", "UO", "KH", "KO", "LH", "LO", "ZH", "ZO", "GH", "GO"]
@@ -42,17 +44,135 @@ module.exports = {
         let minerals = ["H", "O", "U", "K", "L", "Z", "X"]
 
         let reactions = {
-            bases: {
-                "OH": { reactant1: "", reactant2: "" },
+            H: {
+                O: "OH",
+                L: "LH",
+                K: "KH",
+                U: "UH",
+                Z: "ZH",
+                G: "GH"
             },
-            t1Boosts: {
-
+            O: {
+                H: "OH",
+                L: "LO",
+                K: "KO",
+                U: "UO",
+                Z: "ZO",
+                G: "GO"
             },
-            t2Boosts: {
-
+            Z: {
+                K: "ZK",
+                H: "ZH",
+                O: "ZO"
             },
-            t3Boosts: {
-
+            L: {
+                U: "UL",
+                H: "LH",
+                O: "LO"
+            },
+            K: {
+                Z: "ZK",
+                H: "KH",
+                O: "KO"
+            },
+            G: {
+                H: "GH",
+                O: "GO"
+            },
+            U: {
+                L: "UL",
+                H: "UH",
+                O: "UO"
+            },
+            OH: {
+                UH: "UH2O",
+                UO: "UHO2",
+                ZH: "ZH2O",
+                ZO: "ZHO2",
+                KH: "KH2O",
+                KO: "KHO2",
+                LH: "LH2O",
+                LO: "LHO2",
+                GH: "GH2O",
+                GO: "GHO2"
+            },
+            X: {
+                UH2O: "XUH2O",
+                UHO2: "XUHO2",
+                LH2O: "XLH2O",
+                LHO2: "XLHO2",
+                KH2O: "XKH2O",
+                KHO2: "XKHO2",
+                ZH2O: "XZH2O",
+                ZHO2: "XZHO2",
+                GH2O: "XGH2O",
+                GHO2: "XGHO2"
+            },
+            ZK: {
+                UL: "G"
+            },
+            UL: {
+                ZK: "G"
+            },
+            LH: {
+                OH: "LH2O"
+            },
+            ZH: {
+                OH: "ZH2O"
+            },
+            GH: {
+                OH: "GH2O"
+            },
+            KH: {
+                OH: "KH2O"
+            },
+            UH: {
+                OH: "UH2O"
+            },
+            LO: {
+                OH: "LHO2"
+            },
+            ZO: {
+                OH: "ZHO2"
+            },
+            KO: {
+                OH: "KHO2"
+            },
+            UO: {
+                OH: "UHO2"
+            },
+            GO: {
+                OH: "GHO2"
+            },
+            LH2O: {
+                X: "XLH2O"
+            },
+            KH2O: {
+                X: "XKH2O"
+            },
+            ZH2O: {
+                X: "XZH2O"
+            },
+            UH2O: {
+                X: "XUH2O"
+            },
+            GH2O: {
+                X: "XGH2O"
+            },
+            LHO2: {
+                X: "XLHO2"
+            },
+            UHO2: {
+                X: "XUHO2"
+            },
+            KHO2: {
+                X: "XKHO2"
+            },
+            ZHO2: {
+                X: "XZHO2"
+            },
+            GHO2: {
+                X: "XGHO2"
             }
         }
 
