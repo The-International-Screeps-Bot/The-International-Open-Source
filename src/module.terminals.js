@@ -36,7 +36,7 @@ module.exports = {
                         }
                     })
                     for (let resource in terminal.store) {
-                        if (orderBlacklist.indexOf(resource) == -1 && terminal.store[resource] >= 25000 && Object.keys(Game.market.orders).length < 300 && resource != RESOURCE_ENERGY) {
+                        if (orderBlacklist.indexOf(resource) == -1 && terminal.store[resource] >= 20000 && Object.keys(Game.market.orders).length < 300 && resource != RESOURCE_ENERGY) {
 
                             let resourceHistory = Game.market.getHistory(resource);
                             let sellPrice = resourceHistory[0]["avgPrice"] * 0.95
@@ -44,7 +44,7 @@ module.exports = {
                             //console.log(orderBlacklist)
 
                             console.log("Terminal " + room.name + " wants to make a sell order for: " + resource)
-                            Game.market.createOrder({ type: ORDER_SELL, resourceType: resource, price: sellPrice, totalAmount: 15000, roomName: room.name });
+                            Game.market.createOrder({ type: ORDER_SELL, resourceType: resource, price: sellPrice, totalAmount: 10000, roomName: room.name });
 
                         }
                     }
