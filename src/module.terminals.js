@@ -60,10 +60,10 @@ module.exports = {
                         if (factory) {
 
                             let energyResourceHistory = Game.market.getHistory([RESOURCE_ENERGY]);
-                            let energyMaxPrice = energyResourceHistory[0]["avgPrice"] * 1.1
+                            let energyMaxPrice = energyResourceHistory[0]["avgPrice"] * 1.3
 
                             let batteryResourceHistory = Game.market.getHistory([RESOURCE_BATTERY]);
-                            let batteryMaxPrice = batteryResourceHistory[0]["avgPrice"] * 1.1
+                            let batteryMaxPrice = batteryResourceHistory[0]["avgPrice"] * 1.3
 
                             let energyQuota = 50000 // 50k
 
@@ -109,7 +109,7 @@ module.exports = {
                         } else {
 
                             let energyResourceHistory = Game.market.getHistory([RESOURCE_ENERGY]);
-                            let energyMaxPrice = energyResourceHistory[0]["avgPrice"] * 1.1
+                            let energyMaxPrice = energyResourceHistory[0]["avgPrice"] * 1.3
 
                             let energyQuota = 100000 // 100k
 
