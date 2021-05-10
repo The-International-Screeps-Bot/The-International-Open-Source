@@ -38,7 +38,7 @@ module.exports = {
                     for (let resource in terminal.store) {
                         if (orderBlacklist.indexOf(resource) == -1 && terminal.store[resource] >= 20000 && Object.keys(Game.market.orders).length < 300 && resource != RESOURCE_ENERGY) {
 
-                            let resourceHistory = Game.market.getHistory(resource);
+                            let resourceHistory = Game.market.getHistory(resource)
                             let sellPrice = resourceHistory[0]["avgPrice"] * 0.95
                             console.log("SP: " + sellPrice + ", " + resource);
                             //console.log(orderBlacklist)
@@ -59,10 +59,10 @@ module.exports = {
 
                         if (factory) {
 
-                            let energyResourceHistory = Game.market.getHistory([RESOURCE_ENERGY]);
+                            let energyResourceHistory = Game.market.getHistory(RESOURCE_ENERGY)
                             let energyMaxPrice = energyResourceHistory[0]["avgPrice"] * 1.3
 
-                            let batteryResourceHistory = Game.market.getHistory([RESOURCE_BATTERY]);
+                            let batteryResourceHistory = Game.market.getHistory(RESOURCE_BATTERY)
                             let batteryMaxPrice = batteryResourceHistory[0]["avgPrice"] * 1.3
 
                             let energyQuota = 50000 // 50k
@@ -108,7 +108,7 @@ module.exports = {
                             }
                         } else {
 
-                            let energyResourceHistory = Game.market.getHistory([RESOURCE_ENERGY]);
+                            let energyResourceHistory = Game.market.getHistory(RESOURCE_ENERGY)
                             let energyMaxPrice = energyResourceHistory[0]["avgPrice"] * 1.3
 
                             let energyQuota = 100000 // 100k
