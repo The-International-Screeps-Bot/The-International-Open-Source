@@ -150,10 +150,10 @@ module.exports = {
                 let roomExtractor = room.find(FIND_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_EXTRACTOR
                 })[0]
-                let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)
+                let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)[0]
                 let repairStructure = room.find(FIND_STRUCTURES, {
                     filter: s => (s.structureType == STRUCTURE_ROAD && s.structureType == STRUCTURE_CONTAINER) && s.hits < s.hitsMax * 0.5
-                })
+                })[0]
 
                 let stage = room.memory.stage
 
@@ -339,6 +339,11 @@ module.exports = {
                 if (target9 && stage >= 4 /**/ ) {
 
                     minCreeps["robber"] = 2
+                }
+
+                if (repairStructure) {
+
+                    minCreeps["repairer"] = 1
                 }
 
                 if (claimerTarget && room == communeEstablisher) {
