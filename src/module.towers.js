@@ -9,12 +9,6 @@ module.exports = {
                     filter: s => s.structureType == STRUCTURE_TOWER
                 })
 
-                let hostile = room.find(FIND_HOSTILE_CREEPS, {
-                    filter: (c) => {
-                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) != 0 || c.getActiveBodyparts(RANGED_ATTACK) != 0 || c.getActiveBodyparts(WORK) != 0))
-                    }
-                })[0]
-
                 let injuredCreep = room.find(FIND_CREEPS, {
                     filter: (c) => {
                         return (allyList.run().indexOf(c.owner.username.toLowerCase()) >= 0 && creep.hits < creep.hitsMax * 1)
@@ -33,6 +27,12 @@ module.exports = {
                     }
                 } else {
 
+                    let hostile = room.find(FIND_HOSTILE_CREEPS, {
+                        filter: (c) => {
+                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) != 0 || c.getActiveBodyparts(RANGED_ATTACK) != 0 || c.getActiveBodyparts(WORK) != 0))
+                        }
+                    })[0]
+
                     if (hostile) {
 
                         for (let tower of towers) {
@@ -44,7 +44,7 @@ module.exports = {
                     } else {
 
                         let logisticStructure = room.find(FIND_STRUCTURES, {
-                            filter: (s) => (s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_CONTAINER) & s.hits < s.hitsMax * 0.5
+                            filter: (s) => (s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_CONTAINER) & s.hits < s.hitsMax * 0.1
                         })[0]
 
                         if (logisticStructure) {

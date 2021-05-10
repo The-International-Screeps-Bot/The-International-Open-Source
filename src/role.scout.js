@@ -91,8 +91,7 @@ module.exports = {
 
             creep.offRoadPathing(origin, goal)
 
-            if (goal) {
-                /*
+            /*
                     if (creep.room.controller) {
                         
                         if (creep.pos.inRangeTo(creep.room.controller, 1)) {
@@ -160,27 +159,26 @@ module.exports = {
                     }
                     */
 
-                if (creep.room.controller) {
+            if (creep.room.controller) {
 
-                    var targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memeory.roomFrom)
+                var targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memeory.roomFrom)
 
-                    console.log(creep.room.controller.reservation.owner + creep.room.name)
-                    if (targetRoomDistance == 1 && !reservation) {
+                console.log(creep.room.controller.reservation + creep.room.name)
+                if (targetRoomDistance == 1 && !reservation) {
 
 
-                    }
-
-                    if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username != "x") {
-
-                        creep.room.memory.stage = "enemyRoom"
-                    } else if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username == "x") {
-
-                        creep.room.memory.stage = "allyRoom"
-                    }
-                } else {
-
-                    creep.room.memory.stage = "emptyRoom"
                 }
+
+                if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username != "x") {
+
+                    creep.room.memory.stage = "enemyRoom"
+                } else if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username == "x") {
+
+                    creep.room.memory.stage = "allyRoom"
+                }
+            } else {
+
+                creep.room.memory.stage = "emptyRoom"
             }
         }
     }

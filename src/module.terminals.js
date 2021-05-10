@@ -59,9 +59,15 @@ module.exports = {
 
                         if (factory) {
 
+                            let resourceHistory = Game.market.getHistory([RESOURCE_ENERGY]);
+                            let energyMaxPrice = resourceHistory[0]["avgPrice"] * 1.1
+
+                            let resourceHistory = Game.market.getHistory([RESOURCE_BATTERY]);
+                            let batteryMaxPrice = resourceHistory[0]["avgPrice"] * 1.1
+
                             let energyQuota = 50000 // 50k
 
-                            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= 1 && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
+                            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= energyMaxPrice && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
 
                             if (energySellOffers[0]) {
 
@@ -82,7 +88,7 @@ module.exports = {
 
                             let batteryQuota = 10000 // 10k
 
-                            let batterySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_BATTERY && order.price <= 11 && order.amount >= (batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])))
+                            let batterySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_BATTERY && order.price <= batteryMaxPrice && order.amount >= (batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])))
 
                             if (terminal.store[RESOURCE_BATTERY] < batteryQuota && batterySellOffers[0]) {
 
@@ -102,9 +108,12 @@ module.exports = {
                             }
                         } else {
 
+                            let resourceHistory = Game.market.getHistory([RESOURCE_ENERGY]);
+                            let energyMaxPrice = resourceHistory[0]["avgPrice"] * 1.1
+
                             let energyQuota = 100000 // 100k
 
-                            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= 1 && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
+                            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= energyMaxPrice && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
 
                             if (energySellOffers[0]) {
 

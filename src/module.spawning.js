@@ -59,13 +59,7 @@ module.exports = {
             var builderTarget = undefined
         }
 
-        let target2 = Game.flags.AR
-        let target3 = Game.flags.RA
         let target4 = Game.flags.S
-        var target5 = Game.flags.H
-        let target6 = Game.flags.BB
-        let target7 = Game.flags.BR
-        let target8 = Game.flags.RDP
         let target9 = Game.flags.R
 
         let communeEstablisher
@@ -158,7 +152,7 @@ module.exports = {
                 })[0]
                 let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)
                 let repairStructure = room.find(FIND_STRUCTURES, {
-                    filter: s => (s.structureType == STRUCTURE_ROAD && s.structureType == STRUCTURE_CONTAINER) && s.hits < s.hitsMax * 0.35
+                    filter: s => (s.structureType == STRUCTURE_ROAD && s.structureType == STRUCTURE_CONTAINER) && s.hits < s.hitsMax * 0.5
                 })
 
                 let stage = room.memory.stage
@@ -195,6 +189,258 @@ module.exports = {
 
                     room.memory.stage = 1
 
+                }
+
+                let minCreeps = {}
+
+                for (let role of rolesList) {
+
+                    minCreeps[role] = 0
+                }
+
+                //RCL 1
+                if (stage == 1) {
+
+                    minCreeps["harvester1"] = 3
+
+                    minCreeps["harveser2"] = 3
+
+                    minCreeps["baseHauler"] = 2
+
+                    minCreeps["containerHauler"] = 2
+
+                    minCreeps["upgrader"] = 3
+                }
+                //RCL 2
+                if (stage == 2) {
+
+                    minCreeps["harvester1"] = 1
+
+                    minCreeps["harveser2"] = 1
+
+                    minCreeps["baseHauler"] = 2
+
+                    minCreeps["containerHauler"] = 2
+
+                    minCreeps["upgrader"] = 3
+                }
+                //RCL 3
+                if (stage == 3) {
+
+                    minCreeps["harvester1"] = 1
+
+                    minCreeps["harveser2"] = 1
+
+                    minCreeps["baseHauler"] = 2
+
+                    minCreeps["containerHauler"] = 2
+
+                    minCreeps["upgrader"] = 3
+
+                    minCreeps["barricadeUpgrader"] = 1
+                }
+                //RCL 4
+                if (stage == 4) {
+
+                    minCreeps["harvester1"] = 1
+
+                    minCreeps["harveser2"] = 1
+
+                    minCreeps["baseHauler"] = 2
+
+                    minCreeps["containerHauler"] = 2
+
+                    minCreeps["upgrader"] = 3
+
+                    minCreeps["barricadeUpgrader"] = 1
+                }
+                //RCL 5
+                if (stage == 5) {
+                    minCreeps["harvester1"] = 1
+
+                    minCreeps["harveser2"] = 1
+
+                    minCreeps["baseHauler"] = 2
+
+                    minCreeps["containerHauler"] = 1
+
+                    minCreeps["upgrader"] = 2
+
+                    minCreeps["barricadeUpgrader"] = 1
+                }
+                //RCL 6
+                if (stage == 6) {
+                    minCreeps["harvester1"] = 1
+
+                    minCreeps["harveser2"] = 1
+
+                    minCreeps["baseHauler"] = 2
+
+                    minCreeps["containerHauler"] = 1
+
+                    minCreeps["upgrader"] = 1
+
+                    minCreeps["barricadeUpgrader"] = 1
+                }
+                //RCL 7
+                if (stage == 7) {
+                    minCreeps["harvester1"] = 1
+
+                    minCreeps["harveser2"] = 1
+
+                    minCreeps["baseHauler"] = 2
+
+                    minCreeps["containerHauler"] = 1
+
+                    minCreeps["upgrader"] = 1
+
+                    minCreeps["stationaryHauler"] = 1
+
+                    minCreeps["barricadeUpgrader"] = 1
+
+                    minCreeps["scientist"] = 1
+                }
+                //RCL 8
+                if (stage == 8) {
+                    minCreeps["harvester1"] = 1
+
+                    minCreeps["harveser2"] = 1
+
+                    minCreeps["baseHauler"] = 2
+
+                    minCreeps["containerHauler"] = 1
+
+                    minCreeps["upgrader"] = 1
+
+                    minCreeps["stationaryHauler"] = 1
+
+                    minCreeps["barricadeUpgrader"] = 1
+
+                    minCreeps["scientist"] = 1
+                }
+
+                let squads = 0
+
+                if (room.name == "E18S1") {
+
+                    squads = 4
+                }
+                if (Game.flags.BB /*&& attackRoom == room*/ ) {
+
+                    minCreeps["antifaAssaulters"] = squads
+                    minCreeps["antifaSupporters"] = minCreeps["antifaAssaulters"]
+                }
+
+                if (hostileAttacker && stage >= 2) {
+
+                    minCreeps["rangedDefender"] = 2
+                }
+
+                if (target9 && stage >= 4 /**/ ) {
+
+                    minCreeps["robber"] = 2
+                }
+
+                if (claimerTarget && room == communeEstablisher) {
+
+                    minCreeps["claimer"] = 1
+                }
+
+                if (builderTarget && room == communeEstablisher) {
+
+                    minCreeps["revolutionaryBuilder"] = 4
+                }
+
+                if (roomExtractor && roomMineral && Memory.global.globalStage >= 1) {
+
+                    minCreeps["miner"] = 1
+                }
+
+                if (target4) {
+
+                    minCreeps["scout"] = 1
+                }
+
+                if (roomConstructionSite) {
+
+                    if (stage <= 2) {
+
+                        minCreeps["builder"] = 3
+                    } else if (stage <= 5) {
+
+                        minCreeps["builder"] = 2
+                    } else {
+
+                        minCreeps["builder"] = 1
+                    }
+                }
+
+                if (remoteBuilderNeed && stage >= 4) {
+
+                    minCreeps["remoteBuilder"] = 1
+                }
+
+                if (remoteEnemy && stage >= 3) {
+
+                    minCreeps["communeDefender"] = 1
+                }
+
+                if (room.memory.remoteRooms[0]) {
+
+                    if (stage <= 2) {
+                        minCreeps["remoteHarvester1"] = 2
+
+                        minCreeps["remoteHarvester2"] = 2
+
+                        minCreeps["remoteHauler"] = 2
+                    } else if (stage <= 4) {
+                        minCreeps["remoteHarvester1"] = 1
+
+                        minCreeps["remoteHarvester2"] = 1
+
+                        minCreeps["remoteHauler"] = 2
+
+                        minCreeps["reserver"] = 1
+                    } else if (stage <= 6) {
+                        minCreeps["remoteHarvester1"] = 1
+
+                        minCreeps["remoteHarvester2"] = 1
+
+                        minCreeps["remoteHauler"] = 2
+
+                        minCreeps["reserver"] = 1
+                    } else {
+                        minCreeps["remoteHarvester1"] = 1
+
+                        minCreeps["remoteHarvester2"] = 1
+
+                        minCreeps["remoteHauler"] = 1
+
+                        minCreeps["reserver"] = 1
+                    }
+                }
+
+                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000 && stage <= 7) {
+
+                    minCreeps["upgrader"] = 2
+                }
+                if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000 && stage <= 7) {
+
+                    minCreeps["upgraderHauler"] = 1
+                    minCreeps["upgrader"] = 2
+                }
+
+                if (!requiredCreeps) {
+
+                    var requiredCreeps = {}
+                }
+
+                for (let role of rolesList) {
+
+                    if (minCreeps[role] > creepsOfRole[[role, room.name]]) {
+
+                        console.log(role + ", " + (minCreeps[role] - creepsOfRole[[role, room.name]]) + ", " + room.name)
+                    }
                 }
 
                 //console.log(room.energyCapacityAvailable)
@@ -905,126 +1151,121 @@ module.exports = {
                         }
                     } else {
 
-                        if (creepsOfRole[["harvester1", room.name]] < room.memory.minimumNumberOfHarvesters1) {
+                        if (creepsOfRole[["harvester1", room.name]] < minCreeps["harvester1"]) {
 
                             name = spawn.createCreep(harvesterBodyResult, 'H, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester1"], { role: 'harvester1', working: false, target: 1, roomFrom: room.name });
 
                             creepCount["harvester1"]++
-                        } else if (creepsOfRole[["generalHauler", room.name]] < room.memory.minimumNumberOfGeneralHaulers * 0.5) {
-
-                            name = spawn.createCreep(haulerBodyResult, 'GH, ' + "T" + haulerBodyTier + ", " + creepCount["generalHauler"], { role: 'generalHauler', fullEnergy: false, roomFrom: room.name });
-
-                            creepCount["generalHauler"]++
-                        } else if (creepsOfRole[["baseHauler", room.name]] < 1) {
+                        } else if (creepsOfRole[["baseHauler", room.name]] < minCreeps["baseHauler"] * 0.5) {
 
                             name = spawn.createCreep(haulerBodyResult, 'BH, ' + "T" + haulerBodyTier + ", " + creepCount["baseHauler"], { role: 'baseHauler', fullEnergy: false, roomFrom: room.name });
 
                             creepCount["baseHauler"]++
-                        } else if (creepsOfRole[["containerHauler", room.name]] < room.memory.minimumNumberOfContainerHaulers) {
+                        } else if (creepsOfRole[["containerHauler", room.name]] < Math.floor(minCreeps["containerHauler"] * 0.5)) {
 
                             name = spawn.createCreep(haulerBodyResult, 'CH, ' + "T" + haulerBodyTier + ", " + creepCount["containerHauler"], { role: 'containerHauler', fullEnergy: false, roomFrom: room.name });
 
                             creepCount["containerHauler"]++
-                        } else if (creepsOfRole[["harvester2", room.name]] < room.memory.minimumNumberOfHarvesters2) {
+                        } else if (creepsOfRole[["harvester2", room.name]] < minCreeps["harvester2"]) {
 
                             name = spawn.createCreep(harvesterBodyResult, 'H, ' + "T" + harvesterBodyTier + ", " + creepCount["harvester2"], { role: 'harvester2', working: false, target: 2, roomFrom: room.name });
 
                             creepCount["harvester2"]++
-                        } else if (creepsOfRole[["generalHauler", room.name]] < room.memory.minimumNumberOfGeneralHaulers) {
-
-                            name = spawn.createCreep(haulerBodyResult, 'GH, ' + "T" + haulerBodyTier + ", " + creepCount["generalHauler"], { role: 'generalHauler', fullEnergy: false, roomFrom: room.name });
-
-                            creepCount["generalHauler"]++
-                        } else if (creepsOfRole[["baseHauler", room.name]] < room.memory.minimumNumberOfBaseHaulers) {
+                        } else if (creepsOfRole[["baseHauler", room.name]] < minCreeps["baseHauler"]) {
 
                             name = spawn.createCreep(haulerBodyResult, 'BH, ' + "T" + haulerBodyTier + ", " + creepCount["baseHauler"], { role: 'baseHauler', fullEnergy: false, roomFrom: room.name });
 
                             creepCount["baseHauler"]++
-                        } else if (creepsOfRole[["stationaryHauler", room.name]] < room.memory.minimumNumberOfstationaryHaulers) {
+                        } else if (creepsOfRole[["containerHauler", room.name]] < minCreeps["containerHauler"]) {
+
+                            name = spawn.createCreep(haulerBodyResult, 'CH, ' + "T" + haulerBodyTier + ", " + creepCount["containerHauler"], { role: 'containerHauler', fullEnergy: false, roomFrom: room.name });
+
+                            creepCount["containerHauler"]++
+                        } else if (creepsOfRole[["stationaryHauler", room.name]] < minCreeps["stationaryHauler"]) {
 
                             name = spawn.createCreep(stationaryHaulerBodyResult, 'SH, ' + "T" + stationaryHaulerBodyTier + ", " + creepCount["stationaryHauler"], { role: 'stationaryHauler', isFull: false, roomFrom: room.name });
 
                             creepCount["stationaryHauler"]++
-                        } else if (creepsOfRole[["upgrader", room.name]] < room.memory.minimumNumberOfUpgraders) {
+                        } else if (creepsOfRole[["upgrader", room.name]] < minCreeps["upgrader"]) {
 
                             name = spawn.createCreep(upgraderBodyResult, 'Ug, ' + "T" + upgraderBodyTier + ", " + creepCount["upgrader"], { role: 'upgrader', isFull: false, roomFrom: room.name });
 
                             creepCount["upgrader"]++
-                        } else if (creepsOfRole[["builder", room.name]] < room.memory.minimumNumberOfBuilders && roomConstructionSite.length >= 1) {
+                        } else if (creepsOfRole[["builder", room.name]] < minCreeps["builder"]) {
 
                             name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["builder"], { role: 'builder', isFull: false, roomFrom: room.name });
 
                             creepCount["builder"]++
-                        } else if (creepsOfRole[["repairer", room.name]] < room.memory.minimumNumberOfRepairers && repairStructure) {
+                        } else if (creepsOfRole[["repairer", room.name]] < minCreeps["repairer"]) {
 
                             name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', isFull: false, roomFrom: room.name });
 
                             creepCount["repairer"]++
-                        } else if (creepsOfRole[["rangedDefender", room.name]] < 1 /*room.memory.minimumNumberOfRangedDefenders*/ && hostileAttacker) {
+                        } else if (creepsOfRole[["rangedDefender", room.name]] < minCreeps["rangedDefender"] /*room.memory.minimumNumberOfRangedDefenders*/ && hostileAttacker) {
 
                             name = spawn.createCreep(rangedDefenderBodyResult, 'RaD, ' + "T" + rangedDefenderBodyTier + ", " + creepCount["rangedDefender"], { role: 'rangedDefender', roomFrom: room.name });
 
                             creepCount["rangedDefender"]++
-                        } else if (creepsOfRole[["upgradeHauler", room.name]] < room.memory.minimumNumberOfUpgradeHaulers) {
+                        } else if (creepsOfRole[["upgradeHauler", room.name]] < minCreeps["upgradeHauler"]) {
 
                             name = spawn.createCreep(haulerBodyResult, 'UH, ' + "T" + haulerBodyTier + ", " + creepCount["upgradeHauler"], { role: 'upgradeHauler', fullEnergy: false, roomFrom: room.name });
 
                             creepCount["upgradeHauler"]++
-                        } else if (creepsOfRole[["barricadeUpgrader", room.name]] < room.memory.minimumNumberOfbarricadeUpgraders) {
+                        } else if (creepsOfRole[["barricadeUpgrader", room.name]] < minCreeps["barricadeUpgrader"]) {
 
                             name = spawn.createCreep(barricadeUpgraderBodyResult, 'BR, ' + "T" + barricadeUpgraderBodyTier + ", " + creepCount["barricadeUpgrader"], { role: 'barricadeUpgrader', isFull: false, roomFrom: room.name });
 
                             creepCount["barricadeUpgrader"]++
-                        } else if (creepsOfRole[["scientist", room.name]] < room.memory.minimumNumberOfScientists
+                        } else if (creepsOfRole[["scientist", room.name]] < minCreeps["scientist"]
                             /* && Memory.global.globalStage >= 1*/
                         ) {
 
                             name = spawn.createCreep([CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], 'Si, ' + "T" + 1 + ", " + creepCount["scientist"], { role: 'scientist', emptyStore: true, roomFrom: room.name });
 
                             creepCount["scientist"]++
-                        } else if (creepsOfRole[["miner", room.name]] < room.memory.minimumNumberOfMiners && roomMineral && roomExtractor && Memory.global.globalStage >= 1) {
+                        } else if (creepsOfRole[["miner", room.name]] < minCreeps["miner"]) {
 
                             name = spawn.createCreep(minerBodyResult, 'Mi, ' + "T" + minerBodyTier + ", " + creepCount["miner"], { role: 'miner', mining: true, roomFrom: room.name });
 
                             creepCount["miner"]++
-                        } else if (creepsOfRole[["robber", room.name]] < room.memory.minimumNumberOfRobbers && target9) {
+                        } else if (creepsOfRole[["robber", room.name]] < minCreeps["robber"]) {
 
-                            name = spawn.createCreep(remoteHaulerBodyResult, 'Ro, ' + "T" + robberBodyTier + ", " + creepCount["robber"], { role: 'robber', isFull: false, roomFrom: room.name });
+                            name = spawn.createCreep(remoteHaulerBodyResult, 'Ro, ' + "T" + remoteHaulerBodyTier + ", " + creepCount["robber"], { role: 'robber', isFull: false, roomFrom: room.name });
 
                             creepCount["robber"]++
-                        } else if (creepsOfRole[["communeDefender", room.name]] < room.memory.minimumNumberOfcommuneDefenders && remoteEnemy == true) {
+                        } else if (creepsOfRole[["communeDefender", room.name]] < minCreeps["communeDefender"]) {
 
                             name = spawn.createCreep(communeDefenderBodyResult, 'CD, ' + "T" + communeDefenderBodyTier + ", " + creepCount["communeDefender"], { role: 'communeDefender', roomFrom: room.name });
 
                             creepCount["communeDefender"]++
-                        } else if (creepsOfRole[["scout", room.name]] < room.memory.minimumNumberOfScouts && target4) {
+                        } else if (creepsOfRole[["scout", room.name]] < minCreeps["scout"]) {
 
                             name = spawn.createCreep([MOVE], 'Sc, ' + "T" + 1 + ", " + creepCount["scout"], { role: 'scout', roomFrom: room.name });
 
                             creepCount["scout"]++
-                        } else if (creepsOfRole[["claimer", room.name]] < 1 && claimerTarget && room == communeEstablisher) {
+                        } else if (creepsOfRole[["claimer", room.name]]) {
 
                             name = spawn.createCreep([CLAIM, MOVE], 'Ca, ' + "T" + 1 + ", " + creepCount["claimer"], { role: 'claimer', target: claimerTarget, roomFrom: room.name });
 
                             creepCount["claimer"]++
-                        } else if (creepsOfRole[["revolutionaryBuilder", room.name]] < room.memory.minimumNumberOfrevolutionaryBuilders && builderTarget && room == communeEstablisher) {
+                        } else if (creepsOfRole[["revolutionaryBuilder", room.name]] < minCreeps["revolutionaryBuilder"]) {
 
                             name = spawn.createCreep(revolutionaryBuilderBodyResult, 'SB, ' + "T" + revolutionaryBuilderBodyTier + ", " + creepCount["revolutionaryBuilder"], { role: 'revolutionaryBuilder', isFull: false, target: builderTarget, roomFrom: room.name });
 
                             creepCount["revolutionaryBuilder"]++
-                        } else if (creepsOfRole[["remoteBuilder", room.name]] < room.memory.minimumNumberOfRemoteBuilders && remoteBuilderNeed == true) {
+                        } else if (creepsOfRole[["remoteBuilder", room.name]] < minCreeps["remoteBuilder"]) {
 
                             name = spawn.createCreep(remoteBuilderBodyResult, 'RB, ' + "T" + remoteBuilderBodyTier + ", " + creepCount["remoteBuilder"], { role: 'remoteBuilder', roomFrom: room.name });
 
                             creepCount["remoteBuilder"]++
                         } else {
 
-                            if (creepsOfRole[["antifaAssaulter", room.name]] < creepsOfRole[["antifaSupporter", room.name]] && target6) {
+                            if (creepsOfRole[["antifaAssaulter", room.name]] < minCreeps["antifaAssaulter"]) {
 
                                 name = spawn.createCreep(antifaAssaulterBodyResult, 'antifaAssaulter, ' + "T" + antifaAssaulterBodyTier + ", " + squadType + ", " + creepCount["antifaAssaulter"], { role: 'antifaAssaulter', squadType: squadType, attacking: false, roomFrom: room.name });
 
                                 creepCount["antifaAssaulter"]++
-                            } else if (creepsOfRole[["antifaSupporter", room.name]] < room.memory.minimumNumberOfantifaSupporters && target6) {
+                            } else if (creepsOfRole[["antifaSupporter", room.name]] < minCreeps["antifaSupporter"]) {
 
                                 name = spawn.createCreep(antifaSupporterBodyResult, 'antifaSupporter, ' + "T" + antifaSupporterBodyTier + ", " + squadType + ", " + creepCount["antifaSupporter"], { role: 'antifaSupporter', squadType: squadType, attacking: false, roomFrom: room.name });
 
@@ -1037,12 +1278,12 @@ module.exports = {
 
                                     var numberOfRemoteHarvesters2 = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHarvester2' && c.memory.remoteRoom == remoteRoom.name && creep.memory.dying != true)
 
-                                    if (numberOfRemoteHarvesters1 < room.memory.minimumNumberOfRemoteHarvesters1) {
+                                    if (numberOfRemoteHarvesters1 < minCreeps["remoteHarvester1"]) {
 
                                         name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester1"], { role: 'remoteHarvester1', remoteRoom: remoteRoom.name, target: 1, roomFrom: room.name });
 
                                         creepCount["remoteHarvester1"]++
-                                    } else if (remoteRoom.sources == 2 && numberOfRemoteHarvesters2 < room.memory.minimumNumberOfRemoteHarvesters2) {
+                                    } else if (remoteRoom.sources == 2 && numberOfRemoteHarvesters2 < minCreeps["remoteHarvester2"]) {
 
                                         name = spawn.createCreep(remoteHarvesterBodyResult, 'RHa, ' + "T" + remoteHarvesterBodyTier + ", " + creepCount["remoteHarvester2"], { role: 'remoteHarvester2', remoteRoom: remoteRoom.name, target: 2, roomFrom: room.name });
 
@@ -1051,7 +1292,7 @@ module.exports = {
 
                                     var numberOfRemoteHaulers = _.sum(Game.creeps, (c) => c.memory.role == 'remoteHauler' && c.memory.remoteRoom == remoteRoom.name && creep.memory.dying != true)
 
-                                    if (numberOfRemoteHaulers < room.memory.minimumNumberOfRemoteHaulers * remoteRoom.sources) {
+                                    if (numberOfRemoteHaulers < minCreeps["remoteHauler"] * remoteRoom.sources) {
 
                                         name = spawn.createCreep(remoteHaulerBodyResult, 'RHau, ' + "T" + remoteHaulerBodyTier + ", " + creepCount["remoteHauler"], { role: 'remoteHauler', remoteRoom: remoteRoom.name, fullEnergy: false, roomFrom: room.name });
 
@@ -1060,7 +1301,7 @@ module.exports = {
 
                                     var numberOfReservers = _.sum(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.remoteRoom == remoteRoom.name && creep.memory.dying != true)
 
-                                    if (numberOfReservers < room.memory.minimumNumberOfReservers) {
+                                    if (numberOfReservers < minCreeps["reserver"]) {
 
                                         name = spawn.createCreep(reserverBodyResult, 'Rs, ' + "T" + reserverBodyTier + ", " + creepCount["reserver"], { role: 'reserver', remoteRoom: remoteRoom.name, roomFrom: room.name });
 
@@ -1070,403 +1311,6 @@ module.exports = {
                             }
                         }
                     }
-                }
-
-                var minRemoteHarvesters1 = room.memory.minimumNumberOfRemoteHarvesters1 = 1
-                var minRemoteHarvesters2 = room.memory.minimumNumberOfRemoteHarvesters2 = 1
-                var minRemoteHaulers = room.memory.minimumNumberOfRemoteHaulers = 1
-                var minReservers = room.memory.minimumNumberOfReservers = 1
-
-                var minRemoteBuilders = room.memory.minimumNumberOfRemoteBuilders = 1
-                var mincommuneDefenders = room.memory.minimumNumberOfcommuneDefenders = 1
-
-                var squads = 0
-
-                if (room.name == "E18S1") {
-
-                    squads = 4
-                }
-
-                var minantifaAssaulters = room.memory.minimumNumberOfantifaAssaulters = squads
-                var minantifaSupporters = room.memory.minimumNumberOfantifaSupporters = squads
-
-                if (stage <= 3) {
-
-                    room.memory.minimumNumberOfRepairers = 1
-                } else {
-
-                    room.memory.minimumNumberOfRepairers = 0
-                }
-
-                //RCL 1
-                if (stage == 1) {
-                    room.memory.minimumNumberOfHarvesters1 = 3
-
-                    room.memory.minimumNumberOfHarvesters2 = 3
-
-                    room.memory.minimumNumberOfBaseHaulers = 2
-
-                    room.memory.minimumNumberOfContainerHaulers = 2
-
-                    room.memory.minimumNumberOfGeneralHaulers = 0
-
-                    room.memory.minimumNumberOfBuilders = 3
-
-                    room.memory.minimumNumberOfUpgraders = 4
-
-                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
-
-                    room.memory.minimumNumberOfbarricadeUpgraders = 0
-
-                    room.memory.minimumNumberOfcommuneDefenders = 0
-
-                    minRemoteHarvesters1 * 2
-
-                    minRemoteHarvesters2 * 2
-
-                    minRemoteHaulers * 2
-
-                    room.memory.minimumNumberOfReservers = 0
-
-                    room.memory.minimumNumberOfRemoteBuilders = 0
-
-                    room.memory.minimumNumberOfantifaSupporters = 0
-
-                    room.memory.minimumNumberOfantifaAssaulters = 0
-
-                    room.memory.minimumNumberOfRangedDefenders = 0
-
-                    room.memory.minimumNumberOfMiners = 0
-
-                    room.memory.minimumNumberOfScouts = 1
-
-                }
-                //RCL 2
-                if (stage == 2) {
-                    room.memory.minimumNumberOfHarvesters1 = 1
-
-                    room.memory.minimumNumberOfHarvesters2 = 1
-
-                    room.memory.minimumNumberOfBaseHaulers = 2
-
-                    room.memory.minimumNumberOfContainerHaulers = 2
-
-                    room.memory.minimumNumberOfGeneralHaulers = 0
-
-                    room.memory.minimumNumberOfBuilders = 3
-
-                    room.memory.minimumNumberOfUpgraders = 3
-
-                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
-
-                    room.memory.minimumNumberOfbarricadeUpgraders = 0
-
-                    room.memory.minimumNumberOfcommuneDefenders = 0
-
-                    minRemoteHarvesters1 * 2
-
-                    minRemoteHarvesters2 * 2
-
-                    minRemoteHaulers * 2
-
-                    room.memory.minimumNumberOfReservers = 0
-
-                    minRemoteBuilders
-
-                    room.memory.minimumNumberOfRangedDefenders = 2
-
-                    room.memory.minimumNumberOfMiners = 0
-
-                    minantifaSupporters
-
-                    minantifaAssaulters
-
-                    room.memory.minimumNumberOfScouts = 1
-
-                }
-                //RCL 3
-                if (stage == 3) {
-                    room.memory.minimumNumberOfHarvesters1 = 1
-
-                    room.memory.minimumNumberOfHarvesters2 = 1
-
-                    room.memory.minimumNumberOfBaseHaulers = 2
-
-                    room.memory.minimumNumberOfContainerHaulers = 1
-
-                    room.memory.minimumNumberOfGeneralHaulers = 0
-
-                    room.memory.minimumNumberOfBuilders = 2
-
-                    room.memory.minimumNumberOfUpgraders = 3
-
-                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
-
-                    room.memory.minimumNumberOfbarricadeUpgraders = 0
-
-                    mincommuneDefenders
-
-                    minRemoteHarvesters1
-
-                    minRemoteHarvesters2 * 2
-
-                    minRemoteHaulers * 2
-
-                    minReservers
-
-                    minRemoteBuilders
-
-                    room.memory.minimumNumberOfRangedDefenders = 2
-
-                    room.memory.minimumNumberOfMiners = 0
-
-                    minantifaSupporters
-
-                    minantifaAssaulters
-
-                    room.memory.minimumNumberOfScouts = 1
-
-                }
-                //RCL 4
-                if (stage == 4) {
-                    room.memory.minimumNumberOfHarvesters1 = 1
-
-                    room.memory.minimumNumberOfHarvesters2 = 1
-
-                    room.memory.minimumNumberOfBaseHaulers = 2
-
-                    room.memory.minimumNumberOfContainerHaulers = 2
-
-                    room.memory.minimumNumberOfGeneralHaulers = 0
-
-                    room.memory.minimumNumberOfBuilders = 1
-
-                    room.memory.minimumNumberOfUpgraders = 2
-
-                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
-
-                    room.memory.minimumNumberOfbarricadeUpgraders = 1
-
-                    mincommuneDefenders
-
-                    minRemoteHarvesters1
-
-                    minRemoteHarvesters2 * 2
-
-                    minRemoteHaulers * 2
-
-                    minReservers
-
-                    minRemoteBuilders
-
-                    room.memory.minimumNumberOfRangedDefenders = 2
-
-                    room.memory.minimumNumberOfMiners = 0
-
-                    minantifaSupporters
-
-                    minantifaAssaulters
-
-                    room.memory.minimumNumberOfScouts = 1
-
-                }
-                //RCL 5
-                if (stage == 5) {
-                    room.memory.minimumNumberOfHarvesters1 = 1
-
-                    room.memory.minimumNumberOfHarvesters2 = 1
-
-                    room.memory.minimumNumberOfBaseHaulers = 2
-
-                    room.memory.minimumNumberOfContainerHaulers = 1
-
-                    room.memory.minimumNumberOfGeneralHaulers = 0
-
-                    room.memory.minimumNumberOfBuilders = 1
-
-                    room.memory.minimumNumberOfUpgraders = 2
-
-                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
-
-                    room.memory.minimumNumberOfbarricadeUpgraders = 1
-
-                    mincommuneDefenders
-
-                    minRemoteHarvesters1
-
-                    minRemoteHarvesters2
-
-                    minRemoteHaulers
-
-                    minReservers
-
-                    minRemoteBuilders
-
-                    room.memory.minimumNumberOfRobbers = 0
-
-                    room.memory.minimumNumberOfRangedDefenders = 2
-
-                    room.memory.minimumNumberOfMiners = 0
-
-                    minantifaSupporters
-
-                    minantifaAssaulters
-
-                    room.memory.minimumNumberOfScouts = 1
-
-                }
-                //RCL 6
-                if (stage == 6) {
-                    room.memory.minimumNumberOfHarvesters1 = 1
-
-                    room.memory.minimumNumberOfHarvesters2 = 1
-
-                    room.memory.minimumNumberOfBaseHaulers = 2
-
-                    room.memory.minimumNumberOfContainerHaulers = 1
-
-                    room.memory.minimumNumberOfGeneralHaulers = 0
-
-                    room.memory.minimumNumberOfBuilders = 1
-
-                    room.memory.minimumNumberOfUpgraders = 1
-
-                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
-
-                    room.memory.minimumNumberOfbarricadeUpgraders = 1
-
-                    mincommuneDefenders
-
-                    minRemoteHarvesters1
-
-                    minRemoteHarvesters2
-
-                    minRemoteHaulers
-
-                    minReservers
-
-                    minRemoteBuilders
-
-                    room.memory.minimumNumberOfRobbers = 1
-
-                    room.memory.minimumNumberOfRangedDefenders = 2
-
-                    room.memory.minimumNumberOfMiners = 1
-
-                    minantifaSupporters
-
-                    minantifaAssaulters
-
-                    room.memory.minimumNumberOfScouts = 1
-                }
-                //RCL 7
-                if (stage == 7) {
-                    room.memory.minimumNumberOfHarvesters1 = 1
-
-                    room.memory.minimumNumberOfHarvesters2 = 1
-
-                    room.memory.minimumNumberOfBaseHaulers = 2
-
-                    room.memory.minimumNumberOfContainerHaulers = 0
-
-                    room.memory.minimumNumberOfGeneralHaulers = 0
-
-                    room.memory.minimumNumberOfBuilders = 1
-
-                    room.memory.minimumNumberOfUpgraders = 1
-
-                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
-
-                    room.memory.minimumNumberOfbarricadeUpgraders = 1
-
-                    mincommuneDefenders
-
-                    minRemoteHarvesters1
-
-                    minRemoteHarvesters2
-
-                    minRemoteHaulers
-
-                    minReservers
-
-                    minRemoteBuilders
-
-                    room.memory.minimumNumberOfRobbers = 1
-
-                    room.memory.minimumNumberOfRangedDefenders = 2
-
-                    room.memory.minimumNumberOfMiners = 1
-
-                    room.memory.minimumNumberOfScientists = 1
-
-                    room.memory.minimumNumberOfstationaryHaulers = 1
-
-                    minantifaSupporters
-
-                    minantifaAssaulters
-
-                    room.memory.minimumNumberOfScouts = 1
-                }
-                //RCL 8
-                if (stage == 8) {
-                    room.memory.minimumNumberOfHarvesters1 = 1
-
-                    room.memory.minimumNumberOfHarvesters2 = 1
-
-                    room.memory.minimumNumberOfBaseHaulers = 2
-
-                    room.memory.minimumNumberOfContainerHaulers = 0
-
-                    room.memory.minimumNumberOfGeneralHaulers = 0
-
-                    room.memory.minimumNumberOfBuilders = 1
-
-                    room.memory.minimumNumberOfUpgraders = 1
-
-                    room.memory.minimumNumberOfrevolutionaryBuilders = 4
-
-                    room.memory.minimumNumberOfbarricadeUpgraders = 1
-
-                    mincommuneDefenders
-
-                    minRemoteHarvesters1
-
-                    minRemoteHarvesters2
-
-                    minRemoteHaulers
-
-                    minReservers
-
-                    minRemoteBuilders
-
-                    room.memory.minimumNumberOfRobbers = 1
-
-                    room.memory.minimumNumberOfRangedDefenders = 2
-
-                    room.memory.minimumNumberOfMiners = 1
-
-                    room.memory.minimumNumberOfScientists = 1
-
-                    room.memory.minimumNumberOfstationaryHaulers = 1
-
-                    minantifaSupporters
-
-                    minantifaAssaulters
-
-                    room.memory.minimumNumberOfScouts = 1
-                }
-
-                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000 && stage <= 7) {
-
-                    room.memory.minimumNumberOfUpgraders = 2
-                }
-                if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000 && stage <= 7) {
-
-                    room.memory.minimumNumberOfUpgradeHaulers = 1
-                    room.memory.minimumNumberOfUpgraders = 2
-                } else {
-
-                    room.memory.minimumNumberOfUpgradeHaulers = 0
                 }
             }
         })
