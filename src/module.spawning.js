@@ -47,9 +47,9 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            var claimerTarget = "E33N2"
+            var claimerTarget = "E32N3"
                 //var claimerTarget = undefined
-            var builderTarget = "E33N2"
+            var builderTarget = "E32N3"
                 //var builderTarget = undefined
         } else {
 
@@ -431,7 +431,7 @@ module.exports = {
                 }
                 if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000 && stage <= 7) {
 
-                    minCreeps["upgraderHauler"] = 1
+                    minCreeps["upgradeHauler"] = 1
                     minCreeps["upgrader"] = 2
                 }
 
