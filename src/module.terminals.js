@@ -5,6 +5,27 @@ module.exports = {
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my && room.controller.level >= 1) {
 
+                function avgPrice(resource) {
+                    let resourceHistory = Game.market.getHistory(resource)
+                    let avgPrices = []
+                    let totalPrice = 0
+
+                    for (let object of resourceHistory) {
+
+                        avgPrices.push(object.avgPrice)
+                    }
+                    for (let price of avgPrices) {
+
+                        totalPrice += price
+                    }
+
+                    let avg = totalPrice / avgPrices.length * 1.2
+                    console.log(avg)
+
+                    return avg
+                }
+                avgPrice(RESOURCE_ENERGY)
+
                 let terminal = room.terminal
 
                 if (terminal) {
@@ -61,7 +82,26 @@ module.exports = {
 
                         if (factory) {
 
-                            console.log(avgPrice(RESOURCE_ENERGY))
+                            let batteryQuota = 10000 // 10k
+
+                            let batterySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_BATTERY && order.price <= avgPrice(RESOURCE_BATTERY) && order.amount >= (batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])))
+
+                            if (terminal.store[RESOURCE_BATTERY] < batteryQuota && batterySellOffers[0]) {
+
+                                //console.log("Found order for: " + RESOURCE_BATTERY + ", " + terminal.room + ", " + batterySellOffers[0]["id"] + ", " + batterySellOffers[0].amount + batterySellOffers[0].roomName)
+                                //console.log(batteryQuota - terminal.store[RESOURCE_BATTERY])
+
+                                let buyAmount = batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])
+                                let buyCost = Game.market.calcTransactionCost(buyAmount, room.name, batterySellOffers[0].roomName)
+
+                                //console.log(buyCost + "BC")
+
+                                for (let i = batteryQuota; i > 0; i -= 1000) {
+
+                                    console.log(i)
+                                    Game.market.deal(batterySellOffers[0]["id"], i, room.name)
+                                }
+                            }
 
                             let energyQuota = 50000 // 50k
 
@@ -81,27 +121,6 @@ module.exports = {
 
                                     console.log(i)
                                     Game.market.deal(energySellOffers[0]["id"], i, room.name)
-                                }
-                            }
-
-                            let batteryQuota = 10000 // 10k
-
-                            let batterySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_BATTERY && order.price <= avgPrice(RESOURCE_BATTERY) && order.amount >= (batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])))
-
-                            if (terminal.store[RESOURCE_BATTERY] < batteryQuota && batterySellOffers[0]) {
-
-                                //console.log("Found order for: " + RESOURCE_BATTERY + ", " + terminal.room + ", " + batterySellOffers[0]["id"] + ", " + batterySellOffers[0].amount + batterySellOffers[0].roomName)
-                                //console.log(batteryQuota - terminal.store[RESOURCE_BATTERY])
-
-                                let buyAmount = batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])
-                                let buyCost = Game.market.calcTransactionCost(buyAmount, room.name, batterySellOffers[0].roomName)
-
-                                //console.log(buyCost + "BC")
-
-                                for (let i = batteryQuota; i > 0; i -= 1000) {
-
-                                    console.log(i)
-                                    Game.market.deal(batterySellOffers[0]["id"], i, room.name)
                                 }
                             }
                         } else {
