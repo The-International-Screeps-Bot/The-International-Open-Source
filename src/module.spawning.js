@@ -427,12 +427,12 @@ module.exports = {
 
                 if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000 && stage <= 7) {
 
-                    minCreeps["upgrader"] = +1
+                    minCreeps["upgrader"] += 1
                 }
                 if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000 && stage <= 7) {
 
                     minCreeps["upgradeHauler"] = 1
-                    minCreeps["upgrader"] = +2
+                    minCreeps["upgrader"] += 2
                 }
 
                 if (!requiredCreeps) {
