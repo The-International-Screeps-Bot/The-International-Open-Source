@@ -1,3 +1,5 @@
+let otherFunctions = require("module.otherFunctions")
+
 module.exports = {
     run: function terminals() {
         _.forEach(Game.rooms, function(room) {
@@ -59,15 +61,11 @@ module.exports = {
 
                         if (factory) {
 
-                            let energyResourceHistory = Game.market.getHistory(RESOURCE_ENERGY)
-                            let energyMaxPrice = energyResourceHistory[0]["avgPrice"] * 1.3
-
-                            let batteryResourceHistory = Game.market.getHistory(RESOURCE_BATTERY)
-                            let batteryMaxPrice = batteryResourceHistory[0]["avgPrice"] * 1.3
+                            console.log(avgPrice(RESOURCE_ENERGY))
 
                             let energyQuota = 50000 // 50k
 
-                            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= energyMaxPrice && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
+                            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= avgPrice(RESOURCE_ENERGY) && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
 
                             if (energySellOffers[0]) {
 
@@ -88,7 +86,7 @@ module.exports = {
 
                             let batteryQuota = 10000 // 10k
 
-                            let batterySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_BATTERY && order.price <= batteryMaxPrice && order.amount >= (batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])))
+                            let batterySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_BATTERY && order.price <= avgPrice(RESOURCE_BATTERY) && order.amount >= (batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])))
 
                             if (terminal.store[RESOURCE_BATTERY] < batteryQuota && batterySellOffers[0]) {
 
@@ -108,12 +106,9 @@ module.exports = {
                             }
                         } else {
 
-                            let energyResourceHistory = Game.market.getHistory(RESOURCE_ENERGY)
-                            let energyMaxPrice = energyResourceHistory[0]["avgPrice"] * 1.3
-
                             let energyQuota = 100000 // 100k
 
-                            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= energyMaxPrice && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
+                            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= avgPrice(RESOURCE_ENERGY) && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
 
                             if (energySellOffers[0]) {
 
