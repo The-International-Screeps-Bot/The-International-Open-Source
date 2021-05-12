@@ -1,6 +1,7 @@
 let taskManager = require("module.taskManager")
 let trafficManager = require("module.trafficManager")
-let allyList = require("module.allyList")
+let allyList = require("module.allyList");
+const { property, flatten } = require("lodash");
 
 module.exports = {
     run: function spawns() {
@@ -90,6 +91,8 @@ module.exports = {
             if (room.controller && room.controller.my) {
 
                 taskManager.run(room, creepsOfRole)
+
+                /*Integral values for spawning considerations*/
 
                 let remoteBuilderNeed = false
 
@@ -190,6 +193,8 @@ module.exports = {
                     room.memory.stage = 1
 
                 }
+
+                /*Minimum creeps definitions*/
 
                 let minCreeps = {}
 
@@ -444,7 +449,8 @@ module.exports = {
 
                     if (minCreeps[role] > creepsOfRole[[role, room.name]]) {
 
-                        console.log(role + ", " + (minCreeps[role] - creepsOfRole[[role, room.name]]) + ", " + room.name)
+                        requiredCreeps = minCreeps[role] - creepsOfRole[[role, room.name]]
+                        console.log(role + ", " + requiredCreeps + ", " + room.name)
                     }
                 }
 
@@ -511,8 +517,6 @@ module.exports = {
                 }
 
                 let roomFix = room.memory.roomFix
-                let freeEnergy = room.energyAvailable
-                let capacityEnergy = room.energyCapacityAvailable
 
                 if (Game.getObjectById(room.memory.towers) != null && Game.getObjectById(room.memory.towers).length >= 1) {
 
@@ -558,6 +562,80 @@ module.exports = {
                 for (spawn of mySpawns) {
 
                     var name = undefined
+
+                    /*Creep spawn variables*/
+
+                    let freeEnergy = room.energyAvailable
+                    let capacityEnergy = room.energyCapacityAvailable
+
+                    function roleValues(parts, role, name) {
+
+                        let body = []
+                        let bodyTier = 0
+
+                        if (roomFix) {
+
+                            var energyType = freeEnergy
+                        } else {
+
+                            var energyType = capacityEnergy
+                        }
+
+                        for (let object of parts) {
+                            if (stage >= object.stage) {
+
+                                let bodyAmount = Math.floor((energyType - object.defaultCost) / object.extraCost)
+
+                                if (object.defaultParts) {
+
+                                    body.push(object.defaultParts)
+                                }
+
+                                for (let i = 0; i < bodyAmount; i++) {
+
+                                    body.push(object.extraParts)
+                                    bodyTier++
+
+                                }
+
+                                body = _.flatten(body)
+
+                                break
+                            }
+                        }
+
+                        return {
+                            body: body,
+                            tier: bodyTier,
+                            role: role,
+                            name: name
+                        }
+                    }
+
+                    //if (roomFix == true) {
+
+                    var generalHaulerBody = roleValues(
+                        [{
+                                stage: 5,
+                                defaultParts: [""],
+                                defaultCost: 100,
+                                extraParts: ["MOVE", "MOVE", "CARRY"],
+                                extraCost: 150
+                            },
+                            {
+                                stage: 1,
+                                defaultParts: [""],
+                                defaultCost: 100,
+                                extraParts: ["MOVE", "MOVE", "CARRY"],
+                                extraCost: 100
+                            },
+                        ],
+                        "generalHauler",
+                        "GH")
+
+                    console.log(JSON.stringify(generalHaulerBody) + ", " + room.name)
+
+                    //} else {}
 
                     if (roomFix == true && freeEnergy >= 300) {
                         //freeEnergy Hauler
@@ -1119,6 +1197,7 @@ module.exports = {
                     //console.log(room.memory.minimumNumberOfrevolutionaryBuilders)
                     //If not enough energy for normal spawning
 
+                    /*Creep spawning*/
                     if (roomFix == true) {
 
                         console.log("Not enough creeps, " + room.name)
@@ -1206,7 +1285,8 @@ module.exports = {
                             name = spawn.createCreep(builderBodyResult, 'Bd, ' + "T" + builderBodyTier + ", " + creepCount["repairer"], { role: 'repairer', isFull: false, roomFrom: room.name });
 
                             creepCount["repairer"]++
-                        } else if (creepsOfRole[["rangedDefender", room.name]] < minCreeps["rangedDefender"] /*room.memory.minimumNumberOfRangedDefenders*/ && hostileAttacker) {
+                        } else if (creepsOfRole[["rangedDefender", room.name]] < minCreeps["rangedDefender"] /*room.memory.minimumNumberOfRangedDefenders*/ &&
+                            hostileAttacker) {
 
                             name = spawn.createCreep(rangedDefenderBodyResult, 'RaD, ' + "T" + rangedDefenderBodyTier + ", " + creepCount["rangedDefender"], { role: 'rangedDefender', roomFrom: room.name });
 

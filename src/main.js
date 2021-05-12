@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 let towers = require("module.towers")
 let terminals = require("module.terminals")
 let factories = require("module.factories")
