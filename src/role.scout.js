@@ -1,21 +1,7 @@
+let construction = require("module.construction")
+
 module.exports = {
     run: function(creep) {
-
-        creep.say("Broke")
-
-        //list of rooms with Game.map
-
-        //determine rooms that are 10 or less away from home room (do so in module.constants)
-
-        //scout find room that was checked longest ago
-
-        //scout move to room
-
-        //scout record information
-
-        //scout record tick room was scouted
-
-        //restart loop
 
         let targetRooms = Game.map.describeExits(creep.room.name)
         let targetRoomsArray = []
@@ -89,96 +75,125 @@ module.exports = {
                 return { pos: target, range: 1 }
             })
 
-            creep.offRoadPathing(origin, goal)
+            let controller = creep.room.controller
 
-            /*
-                    if (creep.room.controller) {
-                        
-                        if (creep.pos.inRangeTo(creep.room.controller, 1)) {
-                    
-                            if (creep.room.controller.my) {
-                            
-                                creep.signController(creep.room.controller, "A commune of The Internationale. Bourgeoisie not welcome here.")
-                            }
-                            else if (creep.room.controller) {
-                                
-                                //output an integer from 1-6
-                                let signType = Math.floor(Math.random(7) * 10)
-            
-                                //console.log(signType)
-            
-                                if (signType == 1) {
-            
-                                    if (creep.signController(creep.room.controller, "The top 1% have more money than the poorest 4.5 billion") == ERR_NOT_IN_RANGE) {
-            
-                                        creep.moveTo(creep.room.controller)
-            
-                                    }
-                                } else if (signType == 2) {
-            
-                                    if (creep.signController(creep.room.controller, "McDonalds workers in the US make $10/hour. In Denmark, as a result of unions, they make $22/hour") == ERR_NOT_IN_RANGE) {
-            
-                                        creep.moveTo(creep.room.controller)
-            
-                                    }
-                                } else if (signType == 3) {
-            
-                                    if (creep.signController(creep.room.controller, "We have democracy in our policial system, why do we not have it in our companies?") == ERR_NOT_IN_RANGE) {
-            
-                                        creep.moveTo(creep.room.controller)
-            
-                                    }
-                                } else if (signType == 4) {
-            
-                                    if (creep.signController(creep.room.controller, "Workers of the world, unite!") == ERR_NOT_IN_RANGE) {
-            
-                                        creep.moveTo(creep.room.controller)
-            
-                                    }
-                                } else if (signType == 5) {
-            
-                                    if (creep.signController(creep.room.controller, "Real democracy requires democracy in the workplace - Richard Wolff") == ERR_NOT_IN_RANGE) {
-            
-                                        creep.moveTo(creep.room.controller)
-            
-                                    }
-                                } else if (signType == 6) {
-            
-                                    if (creep.signController(creep.room.controller, "Adults spend a combined 13 years of their life under a dictatorship: the workplace") == ERR_NOT_IN_RANGE) {
-            
-                                        creep.moveTo(creep.room.controller)
-            
-                                    }
-                                }
+            if (controller) {
+
+                if (!controller.sign || controller.sign.username != "MarvinTMB" && !controller.reservation) {
+                    creep.say("Signing")
+
+                    if (creep.pos.inRangeTo(controller, 1)) {
+
+                        if (controller.my) {
+
+                            creep.signController(controller, "A commune of The Internationale. Bourgeoisie not welcome here.")
+                        }
+
+                        //output an integer from 1-6
+                        let signType = Math.floor(Math.random(7) * 10)
+
+                        if (signType == 1) {
+
+                            if (creep.signController(controller, "The top 1% have more money than the poorest 4.5 billion") == ERR_NOT_IN_RANGE) {}
+                        } else if (signType == 2) {
+
+                            if (creep.signController(controller, "McDonalds workers in the US make $10/hour. In Denmark, as a result of unions, they make $22/hour") == ERR_NOT_IN_RANGE) {}
+                        } else if (signType == 3) {
+
+                            if (creep.signController(controller, "We have democracy in our policial system, why do we not have it in our companies?") == ERR_NOT_IN_RANGE) {}
+                        } else if (signType == 4) {
+
+                            if (creep.signController(controller, "Workers of the world, unite!") == ERR_NOT_IN_RANGE) {}
+                        } else if (signType == 5) {
+
+                            if (creep.signController(controller, "Real democracy requires democracy in the workplace - Richard Wolff") == ERR_NOT_IN_RANGE) {}
+                        } else if (signType == 6) {
+
+                            if (creep.signController(controller, "Adults spend a combined 13 years of their life under a dictatorship: the workplace") == ERR_NOT_IN_RANGE) {}
+                        }
+                    } else {
+
+                        creep.intraRoomPathing(creep.pos, controller)
+                    }
+                } else {
+
+                    let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memory.roomFrom)
+
+                    if (targetRoomDistance == 1 && !controller.owner && !controller.reservation) {
+
+                        let sources = creep.room.find(FIND_SOURCES).length
+
+                        let duplicateRoom = false
+
+                        for (let object of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
+
+                            if (object.name == creep.room.name) {
+
+                                duplicateRoom = true
+                                break
                             }
                         }
-                        else {
-                            
-                            creep.moveTo(controller, {reusePath: 50})
+
+                        if (duplicateRoom == false) {
+
+                            Memory.rooms[creep.memory.roomFrom].remoteRooms.push({ name: creep.room.name, sources: sources, roads: false, builderNeed: false, enemy: false, distance: null })
                         }
                     }
-                    */
 
-            if (creep.room.controller) {
+                    let newCommune = false
 
-                var targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memeory.roomFrom)
+                    if (creep.room.find(FIND_SOURCES).length == 2 && Game.gcl < Memory.global.communesCount && room.memory.claim != "notViable") {
 
-                console.log(creep.room.controller.reservation + creep.room.name)
-                if (targetRoomDistance == 1 && !reservation) {
+                        let nearbyCommune = false
 
+                        for (let commune of Memory.global.communes) {
 
-                }
+                            let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, commune)
 
-                if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username != "x") {
+                            if (targetRoomDistance <= 1) {
 
-                    creep.room.memory.stage = "enemyRoom"
-                } else if (!creep.room.controller.my && creep.room.controller.owner && creep.room.controller.owner.username == "x") {
+                                nearbyCommune = true
+                            }
+                        }
 
-                    creep.room.memory.stage = "allyRoom"
+                        if (nearbyCommune == false) {
+
+                            construction.run()
+                            if (anchorPoints[0]) {
+
+                                newCommune = true
+                            } else {
+
+                                room.memory.claim = "notViable"
+                            }
+                        } else {
+
+                            room.memory.claim = "notViable"
+                        }
+                    }
+
+                    if (!controller.my && controller.owner && controller.owner.username.indexOf(allyList) >= 0) {
+
+                        creep.room.memory.stage = "allyRoom"
+                    } else {
+
+                        creep.room.memory.stage = "enemyRoom"
+                    }
+
+                    if (!controller.my && !controller.owner) {
+
+                        creep.room.memory.stage = "neutralRoom"
+                    }
+                    if (newCommune == false) {
+
+                        creep.offRoadPathing(origin, goal)
+                    }
                 }
             } else {
 
                 creep.room.memory.stage = "emptyRoom"
+
+                creep.offRoadPathing(origin, goal)
             }
         }
     }

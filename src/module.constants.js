@@ -35,7 +35,8 @@ module.exports = {
         global()
 
         let totalEnergy = 0
-        Memory.global.roomCount = 0
+        Memory.global.communesCount = 0
+        Memory.global.communes = []
 
         function global() {
 
@@ -75,18 +76,20 @@ module.exports = {
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my && room.controller.level >= 1) {
 
-                Memory.global.roomCount++
+                Memory.global.communesCount++
 
-                    //console.log("a")
+                    Memory.global.communes.push(room.name)
 
-                    sources()
+                //console.log("a")
+
+                sources()
                 containers()
                 labs()
                 links()
                 towers()
                 spawns()
-                terminals()
                 rooms()
+                terminals()
                 myResources()
                 hasBoosts()
 
@@ -257,6 +260,14 @@ module.exports = {
 
                 }
 
+                function rooms() {
+
+                    if (!room.memory.remoteRooms) {
+
+                        room.memory.remoteRooms = []
+                    }
+                }
+
                 function terminals() {
 
 
@@ -267,44 +278,6 @@ module.exports = {
                     if (room.memory.stage == 8) {
 
                         Memory.global.establishedRooms += 1
-                    }
-                }
-
-                function rooms() {
-
-                    if (Game.shard.name == "shard2") {
-
-                        var unfilteredRemoteRooms = ["E25N3", "E26N3", "E32N4", "E22S2", "E22S4", "E23S4", "E21S2", "E34N2", "E34N1"]
-                    } else if (Game.shard.name == "screepsplus1") {
-
-                        var unfilteredRemoteRooms = ["E28N12", "E28N14", "E28N16", "E28N18", "E29N17", "E31N15", "E32N14", "E32N15", "E29N13"]
-                    } else {
-
-
-                    }
-
-                    let remoteRoomNames = []
-
-                    for (let object of room.memory.remoteRooms) {
-
-                        remoteRoomNames.push(object.name)
-                    }
-
-                    if (room.memory.remoteRooms == null) {
-
-                        room.memory.remoteRooms = []
-                    }
-
-                    for (let remoteRoom of unfilteredRemoteRooms) {
-
-                        var targetRoomDistance = Game.map.getRoomLinearDistance(room.name, remoteRoom)
-
-                        if (targetRoomDistance == 1) {
-                            if (remoteRoomNames.indexOf(remoteRoom) === -1) {
-
-                                room.memory.remoteRooms.push({ name: remoteRoom, sources: 1, roads: false, builderNeed: false, enemy: false, distance: null })
-                            }
-                        }
                     }
                 }
 
@@ -374,13 +347,6 @@ module.exports = {
 
         Memory.global.hasBoosts = roomsWithBoosts
 
-        if (Memory.global.totalEnergy == null) {
-
-            Memory.global.totalEnergy = 0
-        }
-
-        Memory.global.totalEnergy = totalEnergy
-
-        //console.log(Memory.global.totalEnergy)
+        Memory.stats.totalEnergy = totalEnergy
     }
 };

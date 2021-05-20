@@ -14,16 +14,16 @@ module.exports = {
             }
         }
 
-        if (creep.memory.fullEnergy == true && creep.carry.energy == 0) {
+        if (creep.memory.isFull == true && creep.carry.energy == 0) {
 
-            creep.memory.fullEnergy = false;
+            creep.memory.isFull = false;
 
-        } else if (creep.memory.fullEnergy == false && creep.carry.energy == creep.carryCapacity) {
+        } else if (creep.memory.isFull == false && creep.carry.energy == creep.carryCapacity) {
 
-            creep.memory.fullEnergy = true;
+            creep.memory.isFull = true;
 
         }
-        if (creep.memory.fullEnergy == true) {
+        if (creep.memory.isFull == true) {
 
             let lowTower = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
                 filter: (s) => (s.structureType == STRUCTURE_TOWER) && s.energy < 500
@@ -42,21 +42,20 @@ module.exports = {
             } else {
 
                 let structure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                        filter: (s) => (s.structureType == STRUCTURE_SPAWN ||
-                                s.structureType == STRUCTURE_EXTENSION ||
-                                s.structureType == STRUCTURE_TOWER && s.store[RESOURCE_ENERGY] < 710) &&
-                            s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY)
-                    })
-                    
-                    creep.say("➡️")
-                    if (structure) {
-                        
-                        if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            
-                            creep.moveTo(structure, {reusePath: 50})
-                        }
+                    filter: (s) => (s.structureType == STRUCTURE_SPAWN ||
+                            s.structureType == STRUCTURE_EXTENSION ||
+                            s.structureType == STRUCTURE_TOWER && s.store[RESOURCE_ENERGY] < 710) &&
+                        s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY)
+                })
+
+                creep.say("➡️")
+                if (structure) {
+
+                    if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+
+                        creep.moveTo(structure, { reusePath: 50 })
                     }
-                    else {
+                } else {
 
                     let tower = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
                         filter: s => s.structureType == STRUCTURE_TOWER && s.energy < 710

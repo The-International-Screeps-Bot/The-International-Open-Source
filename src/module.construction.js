@@ -74,19 +74,16 @@ module.exports = {
                     let anchorPoint = room.memory.anchorPoint
                     let cm = new PathFinder.CostMatrix()
 
-                    if (Game.time % 100 == 0) {
-                        if (anchorPoint == null) {
+                    if (anchorPoint == null) {
 
-                            var dt = distanceTransform(walkablePixelsForRoom(roomName))
-                            cm._bits = dt
-                            displayCostMatrix(roomName, cm, anchorPoints)
-                            filterAnchorPoints(anchorPoints)
-                        }
+                        var dt = distanceTransform(walkablePixelsForRoom(roomName))
+                        cm._bits = dt
+                        displayCostMatrix(roomName, cm, anchorPoints)
+                        filterAnchorPoints(anchorPoints)
                     }
-                    if (Game.time % 100 == 0) {
 
-                        roomPlanner(roomName, cm, anchorPoint)
-                    }
+                    roomPlanner(roomName, cm, anchorPoint)
+
                     /**
                         @param {Number[2500]} array - one entry per square in the room
                         @param {Number} oob - value used for pixels outside image bounds
@@ -399,16 +396,13 @@ module.exports = {
                     }
                 }
 
-                if (Game.time % 100 == 0) {
-
-                    source1Path()
-                    source2Path()
-                    controllerPath()
-                    mineralPath()
-                    remotePath()
-                    placeExtractor()
-                    removeUneeded()
-                }
+                source1Path()
+                source2Path()
+                controllerPath()
+                mineralPath()
+                remotePath()
+                placeExtractor()
+                removeUneeded()
 
                 function source1Path() {
 

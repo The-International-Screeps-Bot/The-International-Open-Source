@@ -12,6 +12,7 @@ module.exports = {
 
         // requiredStructures = array listed structures that are not null of undefined
 
+
         // for every requiredStructure until if number of structures == i return stationaryPoint
 
         let unfilteredRequiredStructures = [baseLink, terminal, storage, factory]
@@ -64,11 +65,7 @@ module.exports = {
 
                 creep.hasResource()
 
-                const withdrawBaseLink = creep.memory.withdrawBaseLink
-                const terminalWithdrawBattery = creep.memory.terminalWithdrawBattery
-                const factoryWithdrawEnergy = creep.memory.factoryWithdrawEnergy
-
-                if (baseLink != null && baseLink.store[RESOURCE_ENERGY] >= 700 && storage && storage.store[RESOURCE_ENERGY] <= 200000 && terminal && terminal.store[RESOURCE_ENERGY] <= 100000 && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
+                if (baseLink != null && baseLink.store[RESOURCE_ENERGY] >= 700 && ((storage && storage.store[RESOURCE_ENERGY] <= 200000) || (terminal && terminal.store[RESOURCE_ENERGY] <= 100000)) && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
 
                     creep.memory.withdrawBaseLink = true
                 }
@@ -80,18 +77,31 @@ module.exports = {
 
                     creep.memory.terminalWithdrawBattery = true
                 }
+                creep.say("AAA")
+                    //if (storage && storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink != null && controllerLink.store[RESOURCE_ENERGY] <= 400) {
+
+                //creep.memory.transferControllerLink = true
+                //}
+
+                creep.say("BBB")
+
+                const withdrawBaseLink = creep.memory.withdrawBaseLink
+                const terminalWithdrawBattery = creep.memory.terminalWithdrawBattery
+                const factoryWithdrawEnergy = creep.memory.factoryWithdrawEnergy
+                const transferControllerLink = creep.memory.transferControllerLink
 
                 if (withdrawBaseLink) {
 
                     if (creep.memory.isFull == true) {
 
-                        if (storage.store[RESOURCE_ENERGY] <= 200000) {
+                        if (storage.store[RESOURCE_ENERGY] <= 210000) {
 
                             creep.transfer(storage, RESOURCE_ENERGY)
                             creep.memory.withdrawBaseLink = false
-                        } else if (terminal.store[RESOURCE_ENERGY] <= 100000) {
 
-                            creep.transfer(storage, RESOURCE_ENERGY)
+                        } else if (terminal.store.getUsedCapacity() < 300000 - 800) {
+
+                            creep.transfer(terminal, RESOURCE_ENERGY)
                             creep.memory.withdrawBaseLink = false
                         }
                     } else {
@@ -122,6 +132,18 @@ module.exports = {
                             } else {
 
                                 creep.withdraw(terminal, RESOURCE_BATTERY)
+                            }
+                        } else {
+
+                            if (transferControllerLink) {
+
+                                if (creep.memory.isFull == true) {
+
+                                    creep.transfer(baseLink, RESOURCE_ENERGY)
+                                } else {
+
+                                    creep.widthdraw(storage, RESOURCE_ENERGY)
+                                }
                             }
                         }
                     }

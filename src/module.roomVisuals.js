@@ -386,11 +386,9 @@ module.exports = {
 
                         room.visual.text(spawn.spawning.remainingTime, spawn.pos.x, spawn.pos.y - 1, { align: 'center' })
 
-                        var spawningCreep = Game.creeps[spawn.spawning.name]
-                        room.visual.text(spawningCreep.memory.role, spawn.pos.x, spawn.pos.y - 2, { align: 'center' })
+                        room.visual.text(spawn.spawning.name, spawn.pos.x, spawn.pos.y - 2, { align: 'center' })
 
                     }
-
                 }
                 for (let source of sources) {
 

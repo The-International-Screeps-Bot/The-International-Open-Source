@@ -1,5 +1,3 @@
-var _ = require('lodash');
-
 let towers = require("module.towers")
 let terminals = require("module.terminals")
 let factories = require("module.factories")
@@ -12,6 +10,7 @@ let labs = require("module.labs")
 let links = require("module.links")
 let construction = require("module.construction")
 
+let stats = require("module.stats")
 let logging = require("module.logging")
 
 const profiler = require('screeps-profiler')
@@ -32,12 +31,6 @@ module.exports.loop = function() {
                 }
             }
 
-            roles.run()
-
-            console.log("roles: " + Game.cpu.getUsed().toFixed(2))
-
-            console.log('--------------------------------------------------------')
-
             if (Game.time % 10 == 0) {
 
                 cleanMemory.run()
@@ -45,7 +38,20 @@ module.exports.loop = function() {
 
             console.log("cleanMemory: " + Game.cpu.getUsed().toFixed(2))
 
-            construction.run()
+            stats.run()
+
+            console.log("stats: " + Game.cpu.getUsed().toFixed(2))
+
+            roles.run()
+
+            console.log("roles: " + Game.cpu.getUsed().toFixed(2))
+
+            console.log('--------------------------------------------------------')
+
+            if (Game.time % 100 == 0) {
+
+                construction.run()
+            }
 
             console.log("construction: " + Game.cpu.getUsed().toFixed(2))
 
@@ -93,6 +99,8 @@ module.exports.loop = function() {
             console.log("spawns: " + Game.cpu.getUsed().toFixed(2))
 
             logging.run()
+
+            Memory.stats.cpuUsage = Game.cpu.getUsed().toFixed(2)
 
             //console.log("logging: " + Game.cpu.getUsed().toFixed(2))
 
@@ -209,21 +217,39 @@ Upkeep costs:
             
         Downgrade Timers:
         
-            RCL1: 20,000
+            RCL 1: 20,000
             
-            RCL2: 10,000
+            RCL 2: 10,000
             
-            RCL3: 20,000
+            RCL 3: 20,000
             
-            RCL4: 40,000
+            RCL 4: 40,000
             
-            RCL5: 80,000
+            RCL 5: 80,000
             
-            RCL6: 120,000
+            RCL 6: 120,000
             
-            RCL7: 150,000
+            RCL 7: 150,000
             
-            RCL8: 200,000
+            RCL 8: 200,000
+
+        RCL Values:
+
+            RCL 1: 300
+
+            RCL 2: 550
+
+            RCL 3: 800
+
+            RCL 4: 1, 300
+
+            RCL 5: 1, 800
+
+            RCL 6: 2, 300
+
+            RCL 7: 5, 600
+
+            RCL 8: 12, 900
             
     //-----------------------------------------------------------------------------------------------
             

@@ -1,6 +1,5 @@
 let allyList = require("module.allyList")
 
-
 Creep.prototype.barricadesFindAndRepair = function() {
 
     var barricades = creep.room.find(FIND_STRUCTURES, {
@@ -51,6 +50,15 @@ Creep.prototype.myParts = function(partType) {
     }
     return partsAmount
 }
+Creep.prototype.findEnergyHarvested = function(source) {
+
+    creep = this
+
+    let energyHarvested = source.energy - source.energy + creep.myParts("work")
+
+    creep.say("⛏️ " + energyHarvested)
+    Memory.stats.energyHarvested += energyHarvested
+}
 Creep.prototype.roomHostile = function() {
 
     creep = this
@@ -96,11 +104,11 @@ Creep.prototype.hasResource = function() {
 
     creep = this
 
-    if (creep.store.getUsedCapacity() == 0) {
+    if (creep.store.getUsedCapacity() === 0) {
 
         creep.memory.isFull = false;
 
-    } else if (creep.store.getUsedCapacity() >= 1) {
+    } else {
 
         creep.memory.isFull = true;
 
@@ -229,7 +237,7 @@ Creep.prototype.controllerUpgrade = function(target) {
 
     creep = this
 
-    if (creep.upgradeController(target) == ERR_NOT_IN_RANGE) {
+    if (!creep.pos.inRangeTo(creep.room.controller, 3)) {
 
         creep.memory.origin = creep.pos
 
@@ -240,7 +248,12 @@ Creep.prototype.controllerUpgrade = function(target) {
         })
 
         creep.intraRoomPathing(origin, goal)
+    } else if (creep.upgradeController(target) == 0) {
+
+        creep.say("🔋 " + creep.myParts("work"))
+        Memory.stats.controlPoints += creep.myParts("work")
     }
+
 }
 Creep.prototype.searchSourceContainers = function() {
 
@@ -353,8 +366,6 @@ Creep.prototype.offRoadPathing = function(origin, goal) {
             room.find(FIND_CREEPS).forEach(function(creep) {
                 costs.set(creep.pos.x, creep.pos.y, 0xff);
             });
-
-
             return costs
 
         }
@@ -364,7 +375,7 @@ Creep.prototype.offRoadPathing = function(origin, goal) {
 
     creep.moveByPath(creep.memory.path)
 
-    //new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+    new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
 Creep.prototype.intraRoomPathing = function(origin, goal) {
 
@@ -419,6 +430,34 @@ Creep.prototype.intraRoomPathing = function(origin, goal) {
     creep.moveByPath(creep.memory.path)
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+}
+Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
+
+    let allowedRooms = {
+        [from.roomName]: true
+    };
+    Game.map.findRoute(from.roomName, to.roomName, {
+        routeCallback(roomName) {
+            if (MemoryStore.rooms[roomName].stage == "enemyRoom") {
+                return Infinity
+            } else {
+
+                return 1
+            }
+        }
+    }).forEach(function(info) {
+        allowedRooms[info.room] = true;
+    });
+
+    let ret = PathFinder.search(origin, goal, {
+        roomCallback(roomName) {
+            if (!allowedRooms[roomName]) {
+                return false;
+            }
+        }
+    });
+
+    console.log(ret.path);
 }
 Creep.prototype.rampartPathing = function(origin, goal) {
 

@@ -38,6 +38,8 @@ module.exports = {
 
             let creep = Game.creeps[name]
 
+            //creep.suicide()
+
             if (creep && creep.memory.role) {
                 if (creep.ticksToLive <= creep.body.length * 3) {
 

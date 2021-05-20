@@ -3,16 +3,16 @@ module.exports = {
 
         var remoteRoom = creep.memory.remoteRoom
 
-        if (creep.memory.fullEnergy == true && creep.carry.energy == 0) {
+        if (creep.memory.isFull == true && creep.carry.energy == 0) {
 
-            creep.memory.fullEnergy = false;
+            creep.memory.isFull = false;
 
-        } else if (creep.memory.fullEnergy == false && creep.carry.energy == creep.carryCapacity) {
+        } else if (creep.memory.isFull == false && creep.carry.energy == creep.carryCapacity) {
 
-            creep.memory.fullEnergy = true;
+            creep.memory.isFull = true;
 
         }
-        if (creep.memory.fullEnergy == false) {
+        if (creep.memory.isFull == false) {
 
             if (creep.room.name == remoteRoom) {
 

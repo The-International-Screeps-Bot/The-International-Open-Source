@@ -15,15 +15,7 @@ module.exports = {
 
             creep.say("BS")
 
-            const route = Game.map.findRoute(creep.room.name, target);
-
-            if (route.length > 0) {
-
-                creep.say(target)
-
-                const exit = creep.pos.findClosestByRange(route[0].exit)
-                creep.moveTo(exit);
-            }
+            creep.onlySafeRoomPathing(creep.room.name, target)
         } else {
 
             var constructionSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);

@@ -28,7 +28,7 @@ module.exports = {
                 if (controllerLink && (creep.room.memory.stage >= 7 || (creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] >= 80000))) {
                     if (controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
 
-                        creep.say("🔋 CL")
+                        //creep.say("🔋 CL")
 
                         let target = controllerLink
 
@@ -47,7 +47,7 @@ module.exports = {
                 } else if (controllerContainer) {
                     if (controllerContainer.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
 
-                        creep.say("🔋 CC")
+                        //creep.say("🔋 CC")
 
                         let target = controllerContainer
 
