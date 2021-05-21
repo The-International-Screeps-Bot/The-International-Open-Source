@@ -51,21 +51,30 @@ module.exports = {
 
 
         let boostedSquads = false
+
         let squadType = "ranged"
-            //let squadType = "dismantle"
-            //let squadType = "attack
+
+        //let squadType = "dismantle"
+
+        //let squadType = "attack
 
         if (Game.shard.name == "shard2") {
 
-            //var claimerTarget = "E32N3"
-            var claimerTarget = undefined
-                //var builderTarget = "E32N3"
-            var builderTarget = undefined
+            var claimerTarget = "E32N3"
+
+            //var claimerTarget = undefined
+
+            var builderTarget = "E32N3"
+
+            //var builderTarget = undefined
         } else {
 
             //var claimerTarget = "E31N14"
+
             var claimerTarget = undefined
-                //var builderTarget = "E31N14"
+
+            //var builderTarget = "E31N14"
+
             var builderTarget = undefined
         }
 

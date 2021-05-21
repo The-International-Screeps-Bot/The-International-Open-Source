@@ -158,7 +158,7 @@ module.exports = {
 
                         if (nearbyCommune == false) {
 
-                            construction.run()
+                            //construction.run()
                             if (anchorPoints[0]) {
 
                                 newCommune = true

@@ -715,6 +715,7 @@ module.exports = {
 
                                     var path = PathFinder.search(origin.pos, goal, {
                                         plainCost: 2,
+                                        maxOps: 10000,
 
                                         roomCallback: function(roomName) {
 
