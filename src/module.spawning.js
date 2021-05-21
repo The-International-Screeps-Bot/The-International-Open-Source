@@ -60,22 +60,22 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            var claimerTarget = "E32N3"
+            //var claimerTarget = "E32N3"
 
-            //var claimerTarget = undefined
+            var claimerTarget
 
-            var builderTarget = "E32N3"
+            //var builderTarget = "E32N3"
 
-            //var builderTarget = undefined
+            var builderTarget
         } else {
 
             //var claimerTarget = "E31N14"
 
-            var claimerTarget = undefined
+            var claimerTarget
 
             //var builderTarget = "E31N14"
 
-            var builderTarget = undefined
+            var builderTarget
         }
 
         let target4 = Game.flags.S
@@ -355,7 +355,7 @@ module.exports = {
 
                             minCreeps["builder"] = 2
                         }
-                    } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000) {
+                    } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 40000) {
 
                         if (stage <= 5) {
 
@@ -377,7 +377,7 @@ module.exports = {
                         minCreeps["upgrader"] = 2
                     }
                 } else
-                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 20000) {
+                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000) {
 
                     if (stage <= 5) {
 
@@ -392,7 +392,7 @@ module.exports = {
 
                     minCreeps["barricadeUpgrader"] = 1
 
-                } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 40000) {
+                } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 50000) {
 
                     minCreeps["barricadeUpgrader"] = 1
                 }
