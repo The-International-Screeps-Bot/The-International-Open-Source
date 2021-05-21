@@ -7,7 +7,7 @@ module.exports = {
 
         if (creep.memory.role == "harvester1") {
 
-            if (baseLink != null && creep.store.getUsedCapacity() >= 100 - creep.myParts("work")) {
+            if (baseLink != null && creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.myParts("work")) {
 
                 let sourceLink1 = Game.getObjectById(creep.room.memory.sourceLink1)
 
