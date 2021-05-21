@@ -142,7 +142,7 @@ module.exports = {
 
                     let newCommune = false
 
-                    if (creep.room.find(FIND_SOURCES).length == 2 && Game.gcl < Memory.global.communesCount && room.memory.claim != "notViable") {
+                    if (creep.room.find(FIND_SOURCES).length == 2 && Game.gcl < Memory.global.communes.length && room.memory.claim != "notViable") {
 
                         let nearbyCommune = false
 

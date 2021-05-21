@@ -48,7 +48,7 @@ module.exports = {
 
         function energyAmount() {
 
-            let energyAmount = `<th style="text-align: center; padding: 5px 0; color: #FFD180;">Total Energy: ` + (Memory.global.totalEnergy / 1000).toFixed(0) + "k" + `</th>`
+            let energyAmount = `<th style="text-align: center; padding: 5px 0; color: #FFD180;">Total Energy: ` + (Memory.stats.totalEnergy / 1000).toFixed(0) + "k" + `</th>`
             return energyAmount
         }
 
@@ -141,14 +141,14 @@ module.exports = {
                     <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Military Need: ` + "true / false" + `</th>
                 </tr>
                 <tr style="background: #333">
-                    ` + cpuBucketMessage() + `
+                    ` + cpuBucketMessage() + ` 
                     <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
                     <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
                     <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
                     <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Trade Need: ` + "true / false" + `</th>
                 </tr>
                 <tr>
-                    <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Rooms: ` + Memory.global.communesCount + " / " + Game.gcl.level + " (%" + (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(0) + " GCL)" + ` <br /> ` + "(" + Memory.global.establishedRooms + " Established)" + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Rooms: ` + Memory.global.communes.length + " / " + Game.gcl.level + " (%" + (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(0) + " GCL)" + ` <br /> ` + "(" + Memory.global.establishedRooms + " Established)" + `</th>
                     <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
                     <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
                     <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
