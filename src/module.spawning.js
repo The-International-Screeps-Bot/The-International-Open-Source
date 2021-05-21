@@ -311,7 +311,7 @@ module.exports = {
 
                         minCreeps["baseHauler"] = 2
 
-                        minCreeps["containerHauler"] = 1
+                        minCreeps["containerHauler"] = 0
 
                         minCreeps["stationaryHauler"] = 1
 
@@ -325,7 +325,7 @@ module.exports = {
 
                         minCreeps["baseHauler"] = 2
 
-                        minCreeps["containerHauler"] = 1
+                        minCreeps["containerHauler"] = 0
 
                         minCreeps["stationaryHauler"] = 1
 
