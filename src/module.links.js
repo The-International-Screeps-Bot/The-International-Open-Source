@@ -12,7 +12,7 @@ module.exports = {
 
                     sourceLink1.transferEnergy(controllerLink)
 
-                    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000) {
+                    if (Memory.global.globalStage > 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000) {
 
                         sourceLink1.transferEnergy(controllerLink)
 
@@ -28,7 +28,7 @@ module.exports = {
                 if (sourceLink2 != null && controllerLink != null && sourceLink2.store[RESOURCE_ENERGY] >= 790 && controllerLink.store[RESOURCE_ENERGY] <= 400) {
 
                     sourceLink2.transferEnergy(controllerLink)
-                    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000) {
+                    if (Memory.global.globalStage > 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000) {
 
                         sourceLink2.transferEnergy(controllerLink)
 
