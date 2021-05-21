@@ -21,8 +21,8 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [x] Claim and operation of multiple rooms
 - [x] Remote mining
 - [x] Primitive defence code
-- [ ] Operation of multiple spawns in a room
-- [ ] Spawn que
+- [x] Operation of multiple spawns in a room
+- [x] Spawn que
 - [x] Automated road placement
 - [x] Automated base construction and room planning
 - [x] Automatic market buy and sell orders
@@ -42,7 +42,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [ ] Different, functional room blueprints depending on room size and shape
 - [ ] Automated recording of viable rooms to claim
 - [ ] Automated claiming of rooms
-- [ ] Automated recording of viable remote harvesting rooms
+- [x] Automated recording of viable remote harvesting rooms
 - [x] Add room and map visuals to display important information
 - [ ] Power creep offensive capabilities
 - [ ] Automatic safemode when boosted attackers
@@ -63,7 +63,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [ ] Create a task manager to avoid creeps switching tasks halfway through
 - [ ] Make the task manager track and tell creeps what jobs to do
 - [ ] Track remote room attacks from enemy players and run logic to abolish it, defend it, or leave it as is
-- [ ] Create GCL temples if there is excess energy
+- [ ] Create GCL temples if there is excess energy and proper globalStage
 
 ## Flowchart and more information
 
