@@ -355,7 +355,7 @@ module.exports = {
 
                             minCreeps["builder"] = 2
                         }
-                    } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 40000) {
+                    } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000) {
 
                         if (stage <= 5) {
 
@@ -377,7 +377,7 @@ module.exports = {
                         minCreeps["upgrader"] = 2
                     }
                 } else
-                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000) {
+                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 40000) {
 
                     if (stage <= 5) {
 
