@@ -64,7 +64,3 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [ ] Make the task manager track and tell creeps what jobs to do
 - [ ] Track remote room attacks from enemy players and run logic to abolish it, defend it, or leave it as is
 - [ ] Create GCL temples if there is excess energy and proper globalStage
-
-## Flowchart and more information
-
-https://www.figma.com/file/V2GQYIqNXkntW3Rgp19ris/The-Internationale-Screeps-bot?node-id=0%3A1
