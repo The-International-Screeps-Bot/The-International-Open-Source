@@ -404,11 +404,19 @@ module.exports = {
                 placeExtractor()
                 removeUneeded()
 
-                function source1Path() {
+                let baseLink = Game.getObjectById(room.memory.baseLink)
+                let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
+                let controllerLink = Game.getObjectById(room.memory.controllerLink)
 
-                    let source1 = Game.getObjectById(room.memory.source1)
-                    let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
-                    let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
+                let source1 = Game.getObjectById(room.memory.source1)
+                let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
+                let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
+
+                let source2 = Game.getObjectById(room.memory.source2)
+                let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
+                let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
+
+                function source1Path() {
 
                     let origin = room.find(FIND_MY_SPAWNS)[0]
 
@@ -468,7 +476,7 @@ module.exports = {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
-                            if (sourceContainer1 == null && sourceLink1 == null && normalValue && i + 1 == path.length) {
+                            if (sourceContainer1 == null && sourceLink1 == null && baseLink == null && normalValue && i + 1 == path.length) {
 
                                 room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                             }
@@ -477,10 +485,6 @@ module.exports = {
                 }
 
                 function source2Path() {
-
-                    let source2 = Game.getObjectById(room.memory.source2)
-                    let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
-                    let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
                     let origin = room.find(FIND_MY_SPAWNS)[0]
 
@@ -540,7 +544,7 @@ module.exports = {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
-                            if (sourceContainer2 == null && sourceLink2 == null && normalValue && i + 1 == path.length) {
+                            if (sourceContainer2 == null && sourceLink2 == null && baseLink == null && normalValue && i + 1 == path.length) {
 
                                 room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                             }
@@ -549,9 +553,6 @@ module.exports = {
                 }
 
                 function controllerPath() {
-
-                    let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
-                    let controllerLink = Game.getObjectById(room.memory.controllerLink)
 
                     let origin = room.find(FIND_MY_SPAWNS)[0]
 
@@ -801,25 +802,15 @@ module.exports = {
 
                 function removeUneeded() {
 
-                    let baseLink = Game.getObjectById(room.memory.baseLink)
-                    let controllerLink = Game.getObjectById(room.memory.controllerLink)
-                    let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
-
                     if (baseLink != null && controllerLink != null && controllerContainer != null) {
 
                         controllerContainer.destroy()
                     }
 
-                    let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
-                    let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
-
                     if (sourceContainer1 != null && sourceLink1 != null) {
 
                         sourceContainer1.destroy()
                     }
-
-                    let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
-                    let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
                     if (sourceContainer2 != null && sourceLink2 != null) {
 
