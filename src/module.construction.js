@@ -806,6 +806,22 @@ module.exports = {
 
                         controllerContainer.destroy()
                     }
+
+                    let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
+                    let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
+
+                    if (sourceContainer1 != null && sourceLink1 != null) {
+
+                        sourceContainer1.destroy()
+                    }
+
+                    let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
+                    let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
+
+                    if (sourceContainer2 != null && sourceLink2 != null) {
+
+                        sourceContainer2.destroy()
+                    }
                 }
             }
         })

@@ -41,7 +41,7 @@ module.exports = {
             //creep.suicide()
 
             if (creep && creep.memory.role) {
-                if (creep.ticksToLive <= creep.body.length * 3) {
+                if (creep.ticksToLive <= creep.body.length * 3 + 10) {
 
                     creep.memory.dying = true
                 }

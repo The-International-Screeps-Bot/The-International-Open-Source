@@ -8,35 +8,32 @@ module.exports = {
                 let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
                 let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
-                if (sourceLink1 != null && controllerLink != null && sourceLink1.store[RESOURCE_ENERGY] >= 790 && controllerLink.store[RESOURCE_ENERGY] <= 400) {
+                if (sourceLink1 != null && controllerLink != null && sourceLink1.store[RESOURCE_ENERGY] >= 790) {
 
-                    sourceLink1.transferEnergy(controllerLink)
-
-                    if (Memory.global.globalStage > 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000) {
+                    if (Memory.global.globalStage > 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink.store[RESOURCE_ENERGY] <= 400) {
 
                         sourceLink1.transferEnergy(controllerLink)
 
-                    } else if (Memory.global.globalStage == 0 && room.storage.store[RESOURCE_ENERGY] >= 30000) {
+                    } else if (Memory.global.globalStage == 0 && room.storage.store[RESOURCE_ENERGY] >= 30000 && controllerLink.store[RESOURCE_ENERGY] <= 400) {
 
                         sourceLink1.transferEnergy(controllerLink)
 
-                    } else if (sourceLink1 != null && baseLink != null && sourceLink1.store[RESOURCE_ENERGY] >= 790 && baseLink.store[RESOURCE_ENERGY] <= 700) {
+                    } else if (sourceLink1 != null && baseLink != null && baseLink.store[RESOURCE_ENERGY] <= 700) {
 
                         sourceLink1.transferEnergy(baseLink)
                     }
                 }
-                if (sourceLink2 != null && controllerLink != null && sourceLink2.store[RESOURCE_ENERGY] >= 790 && controllerLink.store[RESOURCE_ENERGY] <= 400) {
+                if (sourceLink2 != null && controllerLink != null && sourceLink2.store[RESOURCE_ENERGY] >= 790) {
 
-                    sourceLink2.transferEnergy(controllerLink)
-                    if (Memory.global.globalStage > 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000) {
-
-                        sourceLink2.transferEnergy(controllerLink)
-
-                    } else if (Memory.global.globalStage == 0 && room.storage.store[RESOURCE_ENERGY] >= 30000) {
+                    if (Memory.global.globalStage > 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink.store[RESOURCE_ENERGY] <= 400) {
 
                         sourceLink2.transferEnergy(controllerLink)
 
-                    } else if (sourceLink2 != null && baseLink != null && sourceLink2.store[RESOURCE_ENERGY] >= 790 && baseLink.store[RESOURCE_ENERGY] <= 700) {
+                    } else if (Memory.global.globalStage == 0 && room.storage.store[RESOURCE_ENERGY] >= 30000 && controllerLink.store[RESOURCE_ENERGY] <= 400) {
+
+                        sourceLink2.transferEnergy(controllerLink)
+
+                    } else if (sourceLink2 != null && baseLink != null && baseLink.store[RESOURCE_ENERGY] <= 700) {
 
                         sourceLink2.transferEnergy(baseLink)
                     }
