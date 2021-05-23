@@ -408,6 +408,7 @@ module.exports = {
 
                     let source1 = Game.getObjectById(room.memory.source1)
                     let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
+                    let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
 
                     let origin = room.find(FIND_MY_SPAWNS)[0]
 
@@ -467,7 +468,7 @@ module.exports = {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
-                            if (sourceContainer1 == null && normalValue && i + 1 == path.length) {
+                            if (sourceContainer1 == null && sourceLink1 == null && normalValue && i + 1 == path.length) {
 
                                 room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                             }
@@ -479,6 +480,7 @@ module.exports = {
 
                     let source2 = Game.getObjectById(room.memory.source2)
                     let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
+                    let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
                     let origin = room.find(FIND_MY_SPAWNS)[0]
 
@@ -538,7 +540,7 @@ module.exports = {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
-                            if (sourceContainer2 == null && normalValue && i + 1 == path.length) {
+                            if (sourceContainer2 == null && sourceLink2 == null && normalValue && i + 1 == path.length) {
 
                                 room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                             }
@@ -547,6 +549,9 @@ module.exports = {
                 }
 
                 function controllerPath() {
+
+                    let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
+                    let controllerLink = Game.getObjectById(room.memory.controllerLink)
 
                     let origin = room.find(FIND_MY_SPAWNS)[0]
 
@@ -607,9 +612,7 @@ module.exports = {
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
 
-                            let baseLink = Game.getObjectById(room.memory.baseLink)
-
-                            if (baseLink == null && normalValue && i + 1 == path.length) {
+                            if (controllerContainer == null && controllerLink == null && normalValue && i + 1 == path.length) {
 
                                 room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                             }
