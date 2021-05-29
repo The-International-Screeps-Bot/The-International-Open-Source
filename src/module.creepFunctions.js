@@ -1,5 +1,18 @@
 let allyList = require("module.allyList")
 
+Creep.prototype.findRemoteRoom = function() {
+
+    if (!creep.memory.remoteRoom) {
+
+        for (let remoteRoom of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
+
+            if (remoteRoom.creepsOfRole[creep.memory.role] < remoteRoom.minCreeps[creep.memory.role]) {
+
+                creep.memory.remoteRoom = remoteRoom
+            }
+        }
+    }
+}
 Creep.prototype.barricadesFindAndRepair = function() {
 
     var barricades = creep.room.find(FIND_STRUCTURES, {
@@ -116,13 +129,14 @@ Creep.prototype.hasResource = function() {
 }
 Creep.prototype.pickupDroppedEnergy = function(target) {
 
-    creep = this
+    if (creep.pos.isNearTo(target)) {
 
-    if (creep.pickup(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+        creep.pickup(target, RESOURCE_ENERGY)
+        return 0
 
-        creep.memory.origin = creep.pos
+    } else {
 
-        let origin = creep.memory.origin
+        let origin = creep.pos
 
         let goal = _.map([target], function(target) {
             return { pos: target.pos, range: 1 }
@@ -133,13 +147,14 @@ Creep.prototype.pickupDroppedEnergy = function(target) {
 }
 Creep.prototype.energyWithdraw = function(target) {
 
-    creep = this
+    if (creep.pos.isNearTo(target)) {
 
-    if (creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+        creep.withdraw(target, RESOURCE_ENERGY)
+        return 0
 
-        creep.memory.origin = creep.pos
+    } else {
 
-        let origin = creep.memory.origin
+        let origin = creep.pos
 
         let goal = _.map([target], function(target) {
             return { pos: target.pos, range: 1 }
@@ -150,13 +165,14 @@ Creep.prototype.energyWithdraw = function(target) {
 }
 Creep.prototype.energyTransfer = function(target) {
 
-    creep = this
+    if (creep.pos.isNearTo(target)) {
 
-    if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+        creep.transfer(target, RESOURCE_ENERGY)
+        return 0
 
-        creep.memory.origin = creep.pos
+    } else {
 
-        let origin = creep.memory.origin
+        let origin = creep.pos
 
         let goal = _.map([target], function(target) {
             return { pos: target.pos, range: 1 }
@@ -188,9 +204,7 @@ Creep.prototype.repairBarricades = function(target) {
 
     if (creep.repair(target) == ERR_NOT_IN_RANGE) {
 
-        creep.memory.origin = creep.pos
-
-        let origin = creep.memory.origin
+        let origin = creep.pos
 
         let goal = _.map([target], function(target) {
             return { pos: target.pos, range: 3 }
@@ -199,15 +213,13 @@ Creep.prototype.repairBarricades = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-Creep.prototype.repairLogisticStructures = function(target) {
+Creep.prototype.repairStructure = function(target) {
 
     creep = this
 
-    if (creep.build(target) == ERR_NOT_IN_RANGE) {
+    if (creep.repair(target) == ERR_NOT_IN_RANGE) {
 
-        creep.memory.origin = creep.pos
-
-        let origin = creep.memory.origin
+        let origin = creep.pos
 
         let goal = _.map([target], function(target) {
             return { pos: target.pos, range: 3 }
@@ -222,9 +234,7 @@ Creep.prototype.constructionBuild = function(target) {
 
     if (creep.build(target) == ERR_NOT_IN_RANGE) {
 
-        creep.memory.origin = creep.pos
-
-        let origin = creep.memory.origin
+        let origin = creep.pos
 
         let goal = _.map([target], function(target) {
             return { pos: target.pos, range: 3 }
@@ -235,13 +245,9 @@ Creep.prototype.constructionBuild = function(target) {
 }
 Creep.prototype.controllerUpgrade = function(target) {
 
-    creep = this
-
     if (!creep.pos.inRangeTo(creep.room.controller, 3)) {
 
-        creep.memory.origin = creep.pos
-
-        let origin = creep.memory.origin
+        let origin = creep.pos
 
         let goal = _.map([target], function(target) {
             return { pos: target.pos, range: 3 }

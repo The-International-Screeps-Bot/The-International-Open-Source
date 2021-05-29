@@ -5,10 +5,11 @@ let allyList = require("module.allyList");
 module.exports = {
     run: function spawns() {
 
-        let rolesList = ["harvester1", "generalHauler", "baseHauler", "containerHauler", "harvester2", "upgrader", "builder", "repairer", "upgradeHauler", "barricadeUpgrader", "claimer", "revolutionaryBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
+        let rolesList = ["harvester1", "harvester2", "hauler", "upgrader", "builder", "repairer", "upgradeHauler", "barricadeUpgrader", "claimer", "revolutionaryBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
         let remoteRoles = ["remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver"]
 
         let creepsOfRole = {}
+        let haulers = []
 
         for (let name in Game.creeps) {
 
@@ -24,6 +25,11 @@ module.exports = {
                 } else {
 
                     creepsOfRole[creepValues]++
+                }
+
+                if (creep.memory.role == "hauler") {
+
+                    haulers.push({ creep: creep, roomFrom: creep.memory.roomFrom })
                 }
 
                 let remoteCreepValues = 1
@@ -108,7 +114,7 @@ module.exports = {
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my) {
 
-                taskManager.run(room, creepsOfRole)
+                taskManager.run(room, haulers)
 
                 /*Integral values for spawning considerations*/
 
@@ -174,7 +180,7 @@ module.exports = {
                 let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)[0]
 
                 let repairStructure = room.find(FIND_STRUCTURES, {
-                    filter: s => (s.structureType == STRUCTURE_ROAD && s.structureType == STRUCTURE_CONTAINER) && s.hits < s.hitsMax * 0.5
+                    filter: s => (s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_CONTAINER) && s.hits < s.hitsMax * 0.5
                 })[0]
 
                 if (Game.getObjectById(room.memory.towers) != null && Game.getObjectById(room.memory.towers).length >= 1) {
@@ -251,9 +257,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 3
 
-                        minCreeps["baseHauler"] = 2
-
-                        minCreeps["containerHauler"] = 2
+                        minCreeps["hauler"] = 4
                         break
                     case 2:
 
@@ -261,7 +265,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["baseHauler"] = 2
+                        minCreeps["hauler"] = 4
                         break
                     case 3:
 
@@ -269,9 +273,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["baseHauler"] = 2
-
-                        minCreeps["containerHauler"] = 2
+                        minCreeps["hauler"] = 3
                         break
                     case 4:
 
@@ -279,9 +281,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["baseHauler"] = 2
-
-                        minCreeps["containerHauler"] = 2
+                        minCreeps["hauler"] = 3
                         break
                     case 5:
 
@@ -289,9 +289,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["baseHauler"] = 2
-
-                        minCreeps["containerHauler"] = 1
+                        minCreeps["hauler"] = 3
                         break
                     case 6:
 
@@ -299,9 +297,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["baseHauler"] = 2
-
-                        minCreeps["containerHauler"] = 1
+                        minCreeps["hauler"] = 3
                         break
                     case 7:
 
@@ -309,9 +305,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["baseHauler"] = 2
-
-                        minCreeps["containerHauler"] = 0
+                        minCreeps["hauler"] = 2
 
                         minCreeps["stationaryHauler"] = 1
 
@@ -323,9 +317,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["baseHauler"] = 2
-
-                        minCreeps["containerHauler"] = 0
+                        minCreeps["hauler"] = 2
 
                         minCreeps["stationaryHauler"] = 1
 
@@ -492,16 +484,15 @@ module.exports = {
 
                 let roomFixMessage = ""
 
-                if (creepsOfRole[["harvester1", room.name]] + creepsOfRole[["harvester2", room.name]] == 0 || creepsOfRole[["baseHauler", room.name]] + creepsOfRole[["containerHauler", room.name]] + creepsOfRole[["generalHauler", room.name]] == 0) {
+                if (creepsOfRole[["harvester1", room.name]] + creepsOfRole[["harvester2", room.name]] == 0 || creepsOfRole[["hauler", room.name]] == 0) {
 
                     room.memory.roomFix = true
 
-                    minCreeps["generalHauler"] = 1
                     roomFixMessage = "rf"
 
                     console.log(room.name + ": roomFix true")
 
-                } else if (requiredCreeps["harvester1"] + requiredCreeps["harvester2"] + requiredCreeps["baseHualer"] + requiredCreeps["containerHauler"] == 0) {
+                } else if (requiredCreeps["harvester1"] + requiredCreeps["harvester2"] + requiredCreeps["hauler"] == 0) {
 
                     room.memory.roomFix = false
                 }
@@ -584,7 +575,7 @@ module.exports = {
                     }
                 }
 
-                let generalHaulerBody = roleValues(
+                var haulerBody = roleValues(
                     [{
                             stage: 5,
                             defaultParts: [],
@@ -602,7 +593,7 @@ module.exports = {
                             sliceAmount: 50
                         }
                     ],
-                    "generalHauler")
+                    "hauler")
 
                 let harvester1Body = roleValues(
                     [{
@@ -611,7 +602,7 @@ module.exports = {
                             defaultCost: 50,
                             extraParts: [WORK, WORK, MOVE],
                             extraCost: 250,
-                            sliceAmount: 15
+                            sliceAmount: 13
                         },
                         {
                             stage: 5,
@@ -643,11 +634,11 @@ module.exports = {
                 let harvester2Body = roleValues(
                     [{
                             stage: 6,
-                            defaultParts: [CARRY, CARRY, MOVE],
+                            defaultParts: [CARRY],
                             defaultCost: 150,
                             extraParts: [WORK, WORK, MOVE],
                             extraCost: 250,
-                            sliceAmount: 15
+                            sliceAmount: 13
                         },
                         {
                             stage: 5,
@@ -675,46 +666,6 @@ module.exports = {
                         }
                     ],
                     "harvester2")
-
-                let baseHaulerBody = roleValues(
-                    [{
-                            stage: 5,
-                            defaultParts: [],
-                            defaultCost: 0,
-                            extraParts: [CARRY, CARRY, MOVE],
-                            extraCost: 150,
-                            sliceAmount: 36
-                        },
-                        {
-                            stage: 1,
-                            defaultParts: [],
-                            defaultCost: 0,
-                            extraParts: [CARRY, MOVE],
-                            extraCost: 100,
-                            sliceAmount: 50
-                        }
-                    ],
-                    "baseHauler")
-
-                let containerHaulerBody = roleValues(
-                    [{
-                            stage: 5,
-                            defaultParts: [],
-                            defaultCost: 0,
-                            extraParts: [CARRY, CARRY, MOVE],
-                            extraCost: 150,
-                            sliceAmount: 36
-                        },
-                        {
-                            stage: 1,
-                            defaultParts: [],
-                            defaultCost: 0,
-                            extraParts: [CARRY, MOVE],
-                            extraCost: 100,
-                            sliceAmount: 50
-                        }
-                    ],
-                    "containerHauler")
 
                 let upgraderBody = roleValues(
                     [{
@@ -1010,7 +961,7 @@ module.exports = {
                         "antifaSupporter")
                 }
 
-                let bodies = [harvester1Body, generalHaulerBody, baseHaulerBody, containerHaulerBody, harvester2Body, upgraderBody, builderBody, repairerBody, upgradeHaulerBody, barricadeUpgraderBody, claimerBody, revolutionaryBuilderBody, rangedDefenderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
+                let bodies = [harvester1Body, harvester2Body, haulerBody, upgraderBody, builderBody, repairerBody, upgradeHaulerBody, barricadeUpgraderBody, claimerBody, revolutionaryBuilderBody, rangedDefenderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
 
                 for (let role in requiredCreeps) {
 
@@ -1046,9 +997,7 @@ module.exports = {
                                     memory: {
                                         role: bodyRole.role,
                                         isFull: false,
-                                        roomFrom: room.name,
-                                        remoteRoom: "remoteRoom",
-                                        target: "target"
+                                        roomFrom: room.name
                                     }
                                 })
 

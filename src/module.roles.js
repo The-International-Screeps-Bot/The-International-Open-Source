@@ -9,9 +9,6 @@ module.exports = {
         // import modules
         roles["harvester1"] = require('role.harvester')
         roles["harvester2"] = require('role.harvester')
-        roles["generalHauler"] = require('role.generalHauler')
-        roles["baseHauler"] = require('role.baseHauler')
-        roles["containerHauler"] = require('role.containerHauler')
         roles["upgrader"] = require('role.upgrader')
         roles["builder"] = require('role.builder')
         roles["repairer"] = require('role.repairer')

@@ -5,14 +5,14 @@ module.exports = {
 
         var controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
 
-        if (controllerContainer || controllerLink) {
+        creep.isFull()
+
+        if (controllerContainer != null || (controllerLink != null && creep.room.memory.stage >= 6)) {
 
             creep.memory.isFull = "constant"
 
-        } else {
-
-            creep.isFull()
         }
+
         if (creep.memory.isFull == true || creep.memory.isFull == "constant") {
 
             creep.say("🔋")
@@ -30,9 +30,8 @@ module.exports = {
 
                         //creep.say("🔋 CL")
 
-                        let target = controllerLink
+                        creep.energyWithdraw(controllerLink)
 
-                        creep.energyWithdraw(target)
                     } else if (!creep.pos.isNearTo(controllerLink)) {
 
                         let origin = creep.pos
@@ -49,9 +48,8 @@ module.exports = {
 
                         //creep.say("🔋 CC")
 
-                        let target = controllerContainer
+                        creep.energyWithdraw(controllerContainer)
 
-                        creep.energyWithdraw(target)
                     } else if (!creep.pos.isNearTo(controllerContainer)) {
 
                         let origin = creep.pos
@@ -85,9 +83,7 @@ module.exports = {
 
                     creep.say("💡")
 
-                    target = droppedResources
-
-                    creep.pickupDroppedEnergy(target)
+                    creep.pickupDroppedEnergy(droppedResources)
                 }
             }
         }

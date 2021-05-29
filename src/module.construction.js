@@ -25,7 +25,7 @@ module.exports = {
                     filter: s => s.structureType == STRUCTURE_ROAD
                 })
 
-                if (room.name == "E31N14") {
+                if (room.name == "E28N13") {
 
                     for (let road of roads) {
 
@@ -37,14 +37,18 @@ module.exports = {
             function destroyStructure() {
 
                 let roads = room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_TOWER
+                })
+
+                let barricades = room.find(FIND_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART
                 })
 
                 if (room) {
 
-                    for (let road of roads) {
+                    for (let structure of barricades) {
 
-                        road.destroy()
+                        structure.destroy()
                     }
                 }
             }
@@ -82,7 +86,7 @@ module.exports = {
                         filterAnchorPoints(anchorPoints)
                     }
 
-                    roomPlanner(roomName, cm, anchorPoint)
+                    roomPlanner(roomName, anchorPoint)
 
                     /**
                         @param {Number[2500]} array - one entry per square in the room
@@ -175,12 +179,12 @@ module.exports = {
                             for (var y = 0; y < 50; ++y) {
                                 var value = array[x * 50 + y];
                                 if (value > 0) {
-                                    /*
-                                    vis.circle(x, y, {radius:array[x*50+y] / 10, fill: "green"})
-                                    vis.text((array[x*50+y]).toFixed(0), x, y, {font: 0.3})
-                                    */
+
+                                    vis.circle(x, y, { radius: array[x * 50 + y] / 10, fill: "green" })
+                                    vis.text((array[x * 50 + y]).toFixed(0), x, y, { font: 0.3 })
+
                                 }
-                                if (value >= 7) {
+                                if (value >= 6) {
 
                                     let exits = room.find(FIND_EXIT)
                                     let tooClose = false
@@ -212,197 +216,158 @@ module.exports = {
                         room.memory.anchorPoint = startPoint.findClosestByRange(anchorPoints)
                     }
 
-                    function roomPlanner(roomName, costMatrix, anchorPoint) {
+                    function roomPlanner(roomName, anchorPoint) {
 
                         var vis = Game.rooms[roomName].visual;
 
                         if (anchorPoint && anchorPoint != null) {
 
-                            vis.rect(anchorPoint.x - 6.5, anchorPoint.y - 6.5, 13, 13, { fill: "transparent", stroke: "#45C476" })
+                            vis.rect(anchorPoint.x - 5.5, anchorPoint.y - 5.5, 11, 11, { fill: "transparent", stroke: "#45C476" })
 
                             vis.rect(anchorPoint.x - 0.5, anchorPoint.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476", strokeWidth: "0.15" })
 
                             //console.log(anchorPoint.x + "," + anchorPoint.y)
 
                             let base = {
-                                "road": {
-                                    "pos": [{ "x": 1, "y": 2 }, { "x": 2, "y": 1 }, { "x": 3, "y": 1 }, { "x": 4, "y": 1 }, { "x": 5, "y": 1 }, { "x": 6, "y": 1 }, { "x": 7, "y": 2 }, { "x": 8, "y": 1 }, { "x": 13, "y": 2 }, { "x": 1, "y": 5 }, { "x": 1, "y": 6 }, { "x": 13, "y": 6 }, { "x": 13, "y": 5 }, { "x": 13, "y": 4 }, { "x": 13, "y": 3 }, { "x": 7, "y": 7 }, { "x": 7, "y": 6 }, { "x": 7, "y": 5 }, { "x": 7, "y": 4 }, { "x": 7, "y": 3 }, { "x": 1, "y": 7 }, { "x": 13, "y": 7 }, { "x": 9, "y": 1 }, { "x": 10, "y": 1 }, { "x": 11, "y": 1 }, { "x": 12, "y": 1 }, { "x": 1, "y": 4 }, { "x": 1, "y": 3 }, { "x": 8, "y": 8 }, { "x": 9, "y": 8 }, { "x": 10, "y": 8 }, { "x": 11, "y": 8 }, { "x": 12, "y": 8 }, { "x": 13, "y": 9 }, { "x": 13, "y": 10 }, { "x": 13, "y": 11 }, { "x": 11, "y": 12 }, { "x": 10, "y": 12 }, { "x": 9, "y": 12 }, { "x": 8, "y": 12 }, { "x": 6, "y": 12 }, { "x": 5, "y": 12 }, { "x": 4, "y": 12 }, { "x": 3, "y": 12 }, { "x": 1, "y": 10 }, { "x": 1, "y": 9 }, { "x": 1, "y": 11 }, { "x": 2, "y": 12 }, { "x": 12, "y": 12 }, { "x": 9, "y": 9 }, { "x": 9, "y": 10 }, { "x": 9, "y": 11 }, { "x": 5, "y": 8 }, { "x": 6, "y": 8 }, { "x": 4, "y": 9 }, { "x": 3, "y": 10 }, { "x": 7, "y": 8 }, { "x": 7, "y": 11 }, { "x": 2, "y": 8 }]
-                                },
-                                "storage": {
-                                    "pos": [{ "x": 8, "y": 9 }]
-                                },
-                                "link": {
-                                    "pos": [{ "x": 7, "y": 9 }]
-                                },
-                                "terminal": {
-                                    "pos": [{ "x": 6, "y": 9 }]
-                                },
-                                "lab": {
-                                    "pos": [{ "x": 5, "y": 9 }, { "x": 5, "y": 10 }, { "x": 4, "y": 10 }, { "x": 4, "y": 11 }, { "x": 3, "y": 11 }, { "x": 2, "y": 10 }, { "x": 2, "y": 9 }, { "x": 3, "y": 9 }, { "x": 3, "y": 8 }, { "x": 4, "y": 8 }]
-                                },
-                                "tower": {
-                                    "pos": [{ "x": 10, "y": 6 }, { "x": 10, "y": 3 }, { "x": 4, "y": 3 }, { "x": 4, "y": 6 }, { "x": 12, "y": 11 }, { "x": 2, "y": 11 }]
-                                },
-                                "extension": {
-                                    "pos": [{ "x": 8, "y": 3 }, { "x": 8, "y": 2 }, { "x": 12, "y": 3 }, { "x": 12, "y": 2 }, { "x": 11, "y": 4 }, { "x": 10, "y": 4 }, { "x": 9, "y": 4 }, { "x": 8, "y": 4 }, { "x": 8, "y": 5 }, { "x": 12, "y": 4 }, { "x": 12, "y": 5 }, { "x": 9, "y": 2 }, { "x": 11, "y": 2 }, { "x": 9, "y": 5 }, { "x": 10, "y": 5 }, { "x": 11, "y": 5 }, { "x": 8, "y": 6 }, { "x": 12, "y": 6 }, { "x": 8, "y": 7 }, { "x": 9, "y": 7 }, { "x": 12, "y": 7 }, { "x": 11, "y": 7 }, { "x": 6, "y": 6 }, { "x": 6, "y": 5 }, { "x": 5, "y": 5 }, { "x": 4, "y": 5 }, { "x": 3, "y": 5 }, { "x": 2, "y": 5 }, { "x": 2, "y": 4 }, { "x": 3, "y": 4 }, { "x": 4, "y": 4 }, { "x": 5, "y": 4 }, { "x": 6, "y": 4 }, { "x": 6, "y": 3 }, { "x": 6, "y": 2 }, { "x": 5, "y": 2 }, { "x": 2, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 2 }, { "x": 2, "y": 6 }, { "x": 2, "y": 7 }, { "x": 3, "y": 7 }, { "x": 6, "y": 7 }, { "x": 5, "y": 7 }, { "x": 12, "y": 9 }, { "x": 12, "y": 10 }, { "x": 10, "y": 11 }, { "x": 11, "y": 11 }]
-                                },
-                                "spawn": {
-                                    "pos": [{ "x": 11, "y": 9 }, { "x": 10, "y": 10 }, { "x": 8, "y": 10 }]
-                                },
-                                "observer": {
-                                    "pos": [{ "x": 5, "y": 11 }]
-                                },
-                                "powerSpawn": {
-                                    "pos": [{ "x": 6, "y": 11 }]
-                                },
-                                "factory": {
-                                    "pos": [{ "x": 8, "y": 11 }]
-                                },
-                                "nuker": {
-                                    "pos": [{ "x": 6, "y": 10 }]
-                                }
-                                /*,
-                                                        "container": {
-                                                            "pos": [{ "x": 10, "y": 9 }, { "x": 10, "y": 7 }, { "x": 10, "y": 2 }, { "x": 4, "y": 2 }, { "x": 4, "y": 7 }]
-                                                        }*/
+                                "road": { "pos": [{ "x": 0, "y": 8 }, { "x": 0, "y": 5 }, { "x": 0, "y": 4 }, { "x": 0, "y": 3 }, { "x": 0, "y": 2 }, { "x": 0, "y": 1 }, { "x": 1, "y": 0 }, { "x": 2, "y": 0 }, { "x": 3, "y": 0 }, { "x": 4, "y": 0 }, { "x": 5, "y": 0 }, { "x": 7, "y": 0 }, { "x": 8, "y": 0 }, { "x": 9, "y": 0 }, { "x": 0, "y": 9 }, { "x": 10, "y": 0 }, { "x": 0, "y": 10 }, { "x": 0, "y": 7 }, { "x": 0, "y": 6 }, { "x": 6, "y": 0 }, { "x": 0, "y": 11 }, { "x": 1, "y": 12 }, { "x": 2, "y": 12 }, { "x": 3, "y": 12 }, { "x": 4, "y": 12 }, { "x": 5, "y": 12 }, { "x": 6, "y": 12 }, { "x": 7, "y": 12 }, { "x": 8, "y": 12 }, { "x": 9, "y": 12 }, { "x": 10, "y": 12 }, { "x": 12, "y": 10 }, { "x": 12, "y": 9 }, { "x": 12, "y": 8 }, { "x": 12, "y": 7 }, { "x": 12, "y": 6 }, { "x": 12, "y": 5 }, { "x": 12, "y": 4 }, { "x": 12, "y": 3 }, { "x": 12, "y": 2 }, { "x": 12, "y": 1 }, { "x": 11, "y": 12 }, { "x": 12, "y": 11 }, { "x": 11, "y": 0 }, { "x": 2, "y": 5 }, { "x": 3, "y": 4 }, { "x": 2, "y": 2 }, { "x": 4, "y": 3 }, { "x": 3, "y": 3 }, { "x": 4, "y": 4 }, { "x": 5, "y": 2 }, { "x": 5, "y": 5 }, { "x": 6, "y": 6 }, { "x": 9, "y": 2 }, { "x": 10, "y": 3 }, { "x": 11, "y": 4 }, { "x": 7, "y": 5 }, { "x": 7, "y": 4 }, { "x": 7, "y": 2 }, { "x": 7, "y": 3 }, { "x": 7, "y": 1 }, { "x": 2, "y": 7 }, { "x": 3, "y": 7 }, { "x": 7, "y": 7 }, { "x": 10, "y": 7 }, { "x": 11, "y": 6 }, { "x": 10, "y": 9 }, { "x": 9, "y": 8 }, { "x": 8, "y": 8 }, { "x": 7, "y": 9 }, { "x": 9, "y": 6 }, { "x": 6, "y": 7 }, { "x": 1, "y": 6 }, { "x": 5, "y": 9 }, { "x": 5, "y": 10 }, { "x": 5, "y": 11 }, { "x": 5, "y": 8 }, { "x": 4, "y": 8 }, { "x": 3, "y": 9 }, { "x": 4, "y": 7 }, { "x": 5, "y": 7 }, { "x": 8, "y": 7 }, { "x": 9, "y": 7 }, { "x": 7, "y": 6 }, { "x": 11, "y": 5 }] },
+                                "storage": { "pos": [{ "x": 8, "y": 6 }] },
+                                "link": { "pos": [{ "x": 10, "y": 5 }] },
+                                "terminal": { "pos": [{ "x": 10, "y": 6 }] },
+                                "lab": { "pos": [{ "x": 9, "y": 1 }, { "x": 10, "y": 1 }, { "x": 10, "y": 2 }, { "x": 11, "y": 2 }, { "x": 11, "y": 3 }, { "x": 8, "y": 2 }, { "x": 8, "y": 3 }, { "x": 9, "y": 3 }, { "x": 9, "y": 4 }, { "x": 10, "y": 4 }] },
+                                "tower": { "pos": [{ "x": 8, "y": 1 }, { "x": 1, "y": 7 }, { "x": 11, "y": 7 }, { "x": 9, "y": 10 }, { "x": 3, "y": 1 }, { "x": 3, "y": 10 }] },
+                                "extension": { "pos": [{ "x": 1, "y": 2 }, { "x": 1, "y": 3 }, { "x": 2, "y": 3 }, { "x": 2, "y": 1 }, { "x": 3, "y": 2 }, { "x": 4, "y": 2 }, { "x": 5, "y": 1 }, { "x": 1, "y": 1 }, { "x": 5, "y": 3 }, { "x": 6, "y": 2 }, { "x": 6, "y": 3 }, { "x": 6, "y": 1 }, { "x": 1, "y": 5 }, { "x": 1, "y": 4 }, { "x": 2, "y": 4 }, { "x": 2, "y": 6 }, { "x": 3, "y": 6 }, { "x": 3, "y": 5 }, { "x": 4, "y": 5 }, { "x": 4, "y": 6 }, { "x": 5, "y": 6 }, { "x": 5, "y": 4 }, { "x": 6, "y": 4 }, { "x": 6, "y": 5 }, { "x": 11, "y": 8 }, { "x": 11, "y": 9 }, { "x": 11, "y": 10 }, { "x": 10, "y": 10 }, { "x": 8, "y": 10 }, { "x": 7, "y": 10 }, { "x": 6, "y": 10 }, { "x": 4, "y": 1 }, { "x": 4, "y": 10 }, { "x": 4, "y": 9 }, { "x": 2, "y": 10 }, { "x": 2, "y": 9 }, { "x": 2, "y": 8 }, { "x": 3, "y": 8 }, { "x": 8, "y": 9 }, { "x": 9, "y": 9 }, { "x": 10, "y": 8 }] },
+                                "spawn": { "pos": [{ "x": 6, "y": 8 }, { "x": 7, "y": 8 }, { "x": 6, "y": 9 }] },
+                                "observer": { "pos": [{ "x": 11, "y": 1 }] },
+                                "powerSpawn": { "pos": [{ "x": 1, "y": 8 }] },
+                                "factory": { "pos": [{ "x": 8, "y": 5 }] },
+                                "nuker": { "pos": [{ "x": 8, "y": 4 }] }
                             }
 
+
                             let barriers = {
-                                "constructedWall": {
-                                    "pos": [{ "x": 1, "y": 2 }, { "x": 2, "y": 1 }, { "x": 4, "y": 1 }, { "x": 6, "y": 1 }, { "x": 8, "y": 1 }, { "x": 10, "y": 1 }, { "x": 12, "y": 1 }, { "x": 1, "y": 12 }, { "x": 1, "y": 10 }, { "x": 1, "y": 8 }, { "x": 1, "y": 6 }, { "x": 1, "y": 4 }, { "x": 14, "y": 1 }, { "x": 16, "y": 1 }, { "x": 18, "y": 1 }, { "x": 19, "y": 2 }, { "x": 19, "y": 4 }, { "x": 19, "y": 6 }, { "x": 19, "y": 8 }, { "x": 19, "y": 12 }, { "x": 19, "y": 10 }, { "x": 1, "y": 16 }, { "x": 1, "y": 14 }, { "x": 1, "y": 18 }, { "x": 2, "y": 19 }, { "x": 4, "y": 19 }, { "x": 6, "y": 19 }, { "x": 8, "y": 19 }, { "x": 10, "y": 19 }, { "x": 12, "y": 19 }, { "x": 14, "y": 19 }, { "x": 16, "y": 19 }, { "x": 18, "y": 19 }, { "x": 19, "y": 18 }, { "x": 19, "y": 16 }, { "x": 19, "y": 14 }, { "x": 18, "y": 17 }, { "x": 17, "y": 18 }, { "x": 18, "y": 15 }, { "x": 18, "y": 13 }, { "x": 18, "y": 11 }, { "x": 18, "y": 9 }, { "x": 18, "y": 7 }, { "x": 18, "y": 5 }, { "x": 18, "y": 3 }, { "x": 17, "y": 2 }, { "x": 15, "y": 2 }, { "x": 13, "y": 2 }, { "x": 11, "y": 2 }, { "x": 9, "y": 2 }, { "x": 7, "y": 2 }, { "x": 5, "y": 2 }, { "x": 3, "y": 2 }, { "x": 2, "y": 3 }, { "x": 2, "y": 5 }, { "x": 2, "y": 7 }, { "x": 2, "y": 9 }, { "x": 2, "y": 11 }, { "x": 2, "y": 13 }, { "x": 2, "y": 15 }, { "x": 2, "y": 17 }, { "x": 3, "y": 18 }, { "x": 5, "y": 18 }, { "x": 7, "y": 18 }, { "x": 9, "y": 18 }, { "x": 11, "y": 18 }, { "x": 13, "y": 18 }, { "x": 15, "y": 18 }]
-                                },
-                                "rampart": {
-                                    "pos": [{ "x": 13, "y": 1 }, { "x": 1, "y": 13 }, { "x": 1, "y": 11 }, { "x": 1, "y": 9 }, { "x": 1, "y": 7 }, { "x": 1, "y": 5 }, { "x": 1, "y": 3 }, { "x": 1, "y": 1 }, { "x": 3, "y": 1 }, { "x": 5, "y": 1 }, { "x": 7, "y": 1 }, { "x": 9, "y": 1 }, { "x": 11, "y": 1 }, { "x": 19, "y": 1 }, { "x": 17, "y": 1 }, { "x": 15, "y": 1 }, { "x": 1, "y": 15 }, { "x": 1, "y": 17 }, { "x": 1, "y": 19 }, { "x": 3, "y": 19 }, { "x": 5, "y": 19 }, { "x": 7, "y": 19 }, { "x": 9, "y": 19 }, { "x": 11, "y": 19 }, { "x": 13, "y": 19 }, { "x": 19, "y": 3 }, { "x": 19, "y": 5 }, { "x": 19, "y": 7 }, { "x": 19, "y": 9 }, { "x": 19, "y": 11 }, { "x": 19, "y": 13 }, { "x": 19, "y": 15 }, { "x": 19, "y": 17 }, { "x": 19, "y": 19 }, { "x": 17, "y": 19 }, { "x": 15, "y": 19 }, { "x": 18, "y": 18 }, { "x": 18, "y": 16 }, { "x": 16, "y": 18 }, { "x": 14, "y": 18 }, { "x": 12, "y": 18 }, { "x": 10, "y": 18 }, { "x": 8, "y": 18 }, { "x": 6, "y": 18 }, { "x": 4, "y": 18 }, { "x": 2, "y": 18 }, { "x": 18, "y": 14 }, { "x": 18, "y": 12 }, { "x": 18, "y": 10 }, { "x": 18, "y": 8 }, { "x": 18, "y": 6 }, { "x": 18, "y": 4 }, { "x": 18, "y": 2 }, { "x": 2, "y": 16 }, { "x": 2, "y": 14 }, { "x": 2, "y": 12 }, { "x": 2, "y": 10 }, { "x": 2, "y": 8 }, { "x": 2, "y": 6 }, { "x": 2, "y": 4 }, { "x": 2, "y": 2 }, { "x": 4, "y": 2 }, { "x": 6, "y": 2 }, { "x": 8, "y": 2 }, { "x": 10, "y": 2 }, { "x": 12, "y": 2 }, { "x": 14, "y": 2 }, { "x": 16, "y": 2 }]
-                                }
+                                "rampart": { "pos": [{ "x": 1, "y": 17 }, { "x": 17, "y": 1 }, { "x": 2, "y": 1 }, { "x": 3, "y": 1 }, { "x": 4, "y": 1 }, { "x": 5, "y": 1 }, { "x": 6, "y": 1 }, { "x": 7, "y": 1 }, { "x": 8, "y": 1 }, { "x": 9, "y": 1 }, { "x": 10, "y": 1 }, { "x": 11, "y": 1 }, { "x": 12, "y": 1 }, { "x": 13, "y": 1 }, { "x": 14, "y": 1 }, { "x": 15, "y": 1 }, { "x": 16, "y": 1 }, { "x": 1, "y": 2 }, { "x": 1, "y": 3 }, { "x": 1, "y": 4 }, { "x": 1, "y": 5 }, { "x": 1, "y": 6 }, { "x": 1, "y": 7 }, { "x": 1, "y": 8 }, { "x": 1, "y": 9 }, { "x": 1, "y": 10 }, { "x": 1, "y": 11 }, { "x": 1, "y": 12 }, { "x": 1, "y": 13 }, { "x": 1, "y": 14 }, { "x": 1, "y": 15 }, { "x": 1, "y": 16 }, { "x": 1, "y": 18 }, { "x": 18, "y": 1 }, { "x": 19, "y": 2 }, { "x": 19, "y": 3 }, { "x": 19, "y": 4 }, { "x": 19, "y": 5 }, { "x": 19, "y": 6 }, { "x": 19, "y": 7 }, { "x": 19, "y": 8 }, { "x": 19, "y": 9 }, { "x": 19, "y": 10 }, { "x": 19, "y": 11 }, { "x": 19, "y": 12 }, { "x": 19, "y": 13 }, { "x": 19, "y": 14 }, { "x": 19, "y": 15 }, { "x": 19, "y": 16 }, { "x": 19, "y": 17 }, { "x": 19, "y": 18 }, { "x": 18, "y": 19 }, { "x": 17, "y": 19 }, { "x": 16, "y": 19 }, { "x": 15, "y": 19 }, { "x": 14, "y": 19 }, { "x": 13, "y": 19 }, { "x": 12, "y": 19 }, { "x": 11, "y": 19 }, { "x": 10, "y": 19 }, { "x": 9, "y": 19 }, { "x": 8, "y": 19 }, { "x": 7, "y": 19 }, { "x": 6, "y": 19 }, { "x": 5, "y": 19 }, { "x": 4, "y": 19 }, { "x": 3, "y": 19 }, { "x": 2, "y": 19 }, { "x": 2, "y": 2 }, { "x": 18, "y": 2 }, { "x": 18, "y": 18 }, { "x": 2, "y": 18 }] },
+                                "constructedWall": { "pos": [{ "x": 2, "y": 0 }, { "x": 4, "y": 0 }, { "x": 6, "y": 0 }, { "x": 8, "y": 0 }, { "x": 10, "y": 0 }, { "x": 12, "y": 0 }, { "x": 14, "y": 0 }, { "x": 16, "y": 0 }, { "x": 18, "y": 0 }, { "x": 0, "y": 2 }, { "x": 20, "y": 2 }, { "x": 20, "y": 4 }, { "x": 20, "y": 6 }, { "x": 20, "y": 8 }, { "x": 20, "y": 10 }, { "x": 20, "y": 12 }, { "x": 20, "y": 14 }, { "x": 20, "y": 16 }, { "x": 20, "y": 18 }, { "x": 18, "y": 20 }, { "x": 16, "y": 20 }, { "x": 14, "y": 20 }, { "x": 12, "y": 20 }, { "x": 10, "y": 20 }, { "x": 8, "y": 20 }, { "x": 6, "y": 20 }, { "x": 4, "y": 20 }, { "x": 2, "y": 20 }, { "x": 0, "y": 18 }, { "x": 0, "y": 16 }, { "x": 0, "y": 14 }, { "x": 0, "y": 12 }, { "x": 0, "y": 10 }, { "x": 0, "y": 8 }, { "x": 0, "y": 6 }, { "x": 0, "y": 4 }, { "x": 1, "y": 1 }, { "x": 19, "y": 1 }, { "x": 19, "y": 19 }, { "x": 1, "y": 19 }, { "x": 27, "y": 14 }] }
                             }
+
 
                             _.forEach(Object.keys(base), function(structureType) {
                                 _.forEach(base[structureType].pos, function(pos) {
 
-                                    pos.x += anchorPoint.x - 7
-                                    pos.y += anchorPoint.y - 7
+                                    pos.x += anchorPoint.x - 6
+                                    pos.y += anchorPoint.y - 6
 
-                                    //console.log(pos.x + "," + pos.y)
-                                    //console.log(structureType)
+                                    if (!room.getTerrain().get(pos.x, pos.y) == TERRAIN_MASK_WALL) {
 
-                                    if (structureType == "road" && room.controller.level <= 4) {
-
-
-                                    } else if (structureType == "link" && room.controller.level <= 6) {
+                                        if (structureType == "road" && room.controller.level <= 4) {
 
 
-                                    } else if (structureType == "spawn" && room.find(FIND_MY_SPAWNS).length >= 1) {
+                                        } else if (structureType == "link" && room.controller.level <= 6) {
 
 
-                                    } else {
+                                        } else if (structureType == "spawn" && room.find(FIND_MY_SPAWNS).length >= 1) {
 
-                                        room.createConstructionSite(pos.x, pos.y, structureType);
+
+                                        } else {
+
+                                            room.createConstructionSite(pos.x, pos.y, structureType);
+                                        }
+
+
+                                        if (structureType == "road") {
+
+                                            room.visual.circle(pos.x, pos.y, {
+                                                fill: '#FCFEFF',
+                                                radius: 0.2,
+                                                strokeWidth: 0.125
+                                            })
+                                        } else if (structureType == "extension") {
+
+                                            room.visual.circle(pos.x, pos.y, {
+                                                fill: '#F4E637',
+                                                radius: 0.2,
+                                                strokeWidth: 0.125
+                                            })
+                                        } else if (structureType == "tower") {
+
+                                            room.visual.circle(pos.x, pos.y, {
+                                                fill: '#FE411E',
+                                                radius: 0.2,
+                                                strokeWidth: 0.125
+                                            })
+                                        } else if (structureType == "container") {
+
+                                            room.visual.circle(pos.x, pos.y, {
+                                                fill: 'transparent',
+                                                radius: 0.4,
+                                                stroke: '#747575',
+                                                strokeWidth: 0.125
+                                            })
+                                        } else if (structureType == "spawn") {
+
+                                            room.visual.circle(pos.x, pos.y, {
+                                                fill: '#FE8F00',
+                                                radius: 0.2,
+                                                strokeWidth: 0.125
+                                            })
+                                        } else if (structureType == "lab") {
+
+                                            room.visual.circle(pos.x, pos.y, {
+                                                fill: '#B6B7B8',
+                                                radius: 0.2,
+                                                strokeWidth: 0.125
+                                            })
+                                        } else {
+
+                                            room.visual.circle(pos.x, pos.y, {
+                                                fill: '#B03CBD',
+                                                radius: 0.2,
+                                                strokeWidth: 0.125
+                                            })
+                                        }
                                     }
-
-
-                                    if (structureType == "road") {
-
-                                        room.visual.circle(pos.x, pos.y, {
-                                            fill: '#FCFEFF',
-                                            radius: 0.2,
-                                            strokeWidth: 0.125
-                                        })
-                                    } else if (structureType == "extension") {
-
-                                        room.visual.circle(pos.x, pos.y, {
-                                            fill: '#F4E637',
-                                            radius: 0.2,
-                                            strokeWidth: 0.125
-                                        })
-                                    } else if (structureType == "tower") {
-
-                                        room.visual.circle(pos.x, pos.y, {
-                                            fill: '#FE411E',
-                                            radius: 0.2,
-                                            strokeWidth: 0.125
-                                        })
-                                    } else if (structureType == "container") {
-
-                                        room.visual.circle(pos.x, pos.y, {
-                                            fill: 'transparent',
-                                            radius: 0.4,
-                                            stroke: '#747575',
-                                            strokeWidth: 0.125
-                                        })
-                                    } else if (structureType == "spawn") {
-
-                                        room.visual.circle(pos.x, pos.y, {
-                                            fill: '#FE8F00',
-                                            radius: 0.2,
-                                            strokeWidth: 0.125
-                                        })
-                                    } else if (structureType == "lab") {
-
-                                        room.visual.circle(pos.x, pos.y, {
-                                            fill: '#B6B7B8',
-                                            radius: 0.2,
-                                            strokeWidth: 0.125
-                                        })
-                                    } else {
-
-                                        room.visual.circle(pos.x, pos.y, {
-                                            fill: '#B03CBD',
-                                            radius: 0.2,
-                                            strokeWidth: 0.125
-                                        })
-                                    }
-
                                 })
                             })
+
                             _.forEach(Object.keys(barriers), function(structureType) {
                                 _.forEach(barriers[structureType].pos, function(pos) {
 
                                     pos.x += anchorPoint.x - 10
                                     pos.y += anchorPoint.y - 10
 
-                                    //console.log(pos.x + "," + pos.y)
-                                    //console.log(structureType)
+                                    if (!room.getTerrain().get(pos.x, pos.y) == TERRAIN_MASK_WALL) {
 
-                                    if (room.controller.level >= 2 && room.controller.level <= 5) {
+                                        if (room.controller.level >= 2 && room.controller.level <= 5) {
 
-                                        if (structureType != "rampart") {
+                                            if (structureType != "rampart") {
+
+                                                room.createConstructionSite(pos.x, pos.y, structureType);
+                                            }
+                                        } else if (room.controller.level >= 6 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 20000) {
 
                                             room.createConstructionSite(pos.x, pos.y, structureType);
                                         }
-                                    } else if (room.controller.level >= 6 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 20000) {
 
-                                        room.createConstructionSite(pos.x, pos.y, structureType);
+                                        if (structureType == "rampart") {
+
+                                            room.visual.circle(pos.x, pos.y, {
+                                                fill: '#4def52',
+                                                radius: 0.2,
+                                                strokeWidth: 0.125
+                                            })
+                                        } else {
+
+                                            room.visual.circle(pos.x, pos.y, {
+                                                fill: '#FCFEFF',
+                                                radius: 0.2,
+                                                strokeWidth: 0.125
+                                            })
+                                        }
                                     }
-
-                                    if (structureType == "rampart") {
-
-                                        room.visual.circle(pos.x, pos.y, {
-                                            fill: '#4def52',
-                                            radius: 0.2,
-                                            strokeWidth: 0.125
-                                        })
-                                    } else {
-
-                                        room.visual.circle(pos.x, pos.y, {
-                                            fill: '#FCFEFF',
-                                            radius: 0.2,
-                                            strokeWidth: 0.125
-                                        })
-                                    }
-
                                 })
                             })
                         }
                     }
                 }
-
-                source1Path()
-                source2Path()
-                controllerPath()
-                mineralPath()
-                remotePath()
-                placeExtractor()
-                removeUneeded()
 
                 let baseLink = Game.getObjectById(room.memory.baseLink)
                 let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
@@ -415,6 +380,14 @@ module.exports = {
                 let source2 = Game.getObjectById(room.memory.source2)
                 let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
                 let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
+
+                source1Path()
+                source2Path()
+                controllerPath()
+                mineralPath()
+                remotePath()
+                placeExtractor()
+                removeUneeded()
 
                 function source1Path() {
 
@@ -476,7 +449,7 @@ module.exports = {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
-                            if (sourceContainer1 == null && sourceLink1 == null && baseLink == null && normalValue && i + 1 == path.length) {
+                            if (sourceContainer1 == null && normalValue && i + 1 == path.length) {
 
                                 room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                             }
@@ -544,7 +517,7 @@ module.exports = {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
-                            if (sourceContainer2 == null && sourceLink2 == null && baseLink == null && normalValue && i + 1 == path.length) {
+                            if (sourceContainer2 == null && normalValue && i + 1 == path.length) {
 
                                 room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                             }
@@ -766,11 +739,11 @@ module.exports = {
 
                                         //new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476" })
 
-                                        if (value && value.roomName && value.x && value.y && room.controller.level >= 5) {
+                                        if (value && value.roomName && value.x && value.y && room.controller.level >= 5 && Game.rooms[value.roomName]) {
 
                                             Game.rooms[value.roomName].createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                                         }
-                                        if (normalValue && normalValue.roomName && normalValue.x && normalValue.y && i + 1 == path.length) {
+                                        if (normalValue && normalValue.roomName && normalValue.x && normalValue.y && i + 1 == path.length && Game.rooms[value.roomName]) {
 
                                             //new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "red" })
 

@@ -158,7 +158,9 @@ module.exports = {
 
                         if (nearbyCommune == false) {
 
-                            //construction.run()
+                            creep.intraRoomPathing(creep.pos, controller)
+
+                            //run cost matrix
                             if (anchorPoints[0]) {
 
                                 newCommune = true
