@@ -226,7 +226,21 @@ module.exports = {
                 }
             } else {
 
-                if (creep.advancedTransfer(powerSpawn, resource.type) == 0) {
+                if (creep.store.getUsedCapacity(resource.type) == creep.store.getUsedCapacity()) {
+                    if (creep.advancedTransfer(powerSpawn, resource.type) == 0) {
+
+                        creep.memory.task = undefined
+                    }
+                } else {
+
+                    creep.memory.task = "deliverToStorage"
+                }
+            }
+        } else if (task == "deliverToStorage" && storage) {
+
+            for (let resource in creep.store) {
+
+                if (creep.advancedTransfer(storage, resource) == 0) {
 
                     creep.memory.task = undefined
                 }
@@ -237,10 +251,7 @@ module.exports = {
 
             if (creep.memory.isFull && storage) {
 
-                for (let resource in creep.store) {
-
-                    creep.advancedTransfer(storage, resource)
-                }
+                creep.memory.task = "deliverToStorage"
             }
         }
     }
