@@ -204,7 +204,7 @@ module.exports = {
             }
         } else if (task == "fillPowerSpawn" && powerSpawn) {
 
-            if (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) < powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
+            if (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) != powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
 
                 var resource = { type: RESOURCE_ENERGY, amount: powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) - powerSpawn.store.getCapacity(RESOURCE_ENERGY) }
             } else {
@@ -226,7 +226,10 @@ module.exports = {
                 }
             } else {
 
-                creep.advancedTransfer(powerSpawn, resource.type)
+                if (creep.advancedTransfer(powerSpawn, resource.type) == 0) {
+
+                    creep.memory.task = undefined
+                }
             }
         } else {
 
@@ -236,7 +239,10 @@ module.exports = {
 
                 for (let resource in creep.store) {
 
-                    creep.advancedTransfer(storage, resource)
+                    if (creep.advancedTransfer(storage, resource) == 0) {
+
+                        creep.memory.task = undefined
+                    }
                 }
             }
         }
