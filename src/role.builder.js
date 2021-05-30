@@ -30,7 +30,7 @@ module.exports = {
 
                     let target = terminal
 
-                    creep.energyWithdraw(target)
+                    creep.advancedWithdraw(target)
                 } else {
 
                     let storage = creep.room.storage
@@ -43,7 +43,7 @@ module.exports = {
 
                         if (target.store[RESOURCE_ENERGY] >= 10000) {
 
-                            creep.energyWithdraw(target)
+                            creep.advancedWithdraw(target)
                         }
                     } else {
 
@@ -55,7 +55,7 @@ module.exports = {
 
                             let target = creep.container
 
-                            creep.energyWithdraw(target)
+                            creep.advancedWithdraw(target)
                         } else {
 
                             let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {

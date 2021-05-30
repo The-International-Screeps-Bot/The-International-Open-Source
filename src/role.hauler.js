@@ -20,6 +20,14 @@ module.exports = {
 
         let controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
 
+        let droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+            filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity()
+        })
+
+        let powerSpawn = creep.room.find(FIND_MY_STRUCTURES, {
+            filter: s => s.structureType == STRUCTURE_POWER_SPAWN
+        })[0]
+
         let task = creep.memory.task
 
         if (task == "deliverFromStorage" && storage) {
@@ -28,12 +36,12 @@ module.exports = {
 
             if (creep.memory.isFull == false) {
 
-                creep.energyWithdraw(storage)
+                creep.advancedWithdraw(storage)
             } else {
 
                 if (lowTower) {
 
-                    if (creep.energyTransfer(lowTower) == 0) {
+                    if (creep.advancedTransfer(lowTower) == 0) {
 
                         creep.memory.task = undefined
                     }
@@ -41,13 +49,13 @@ module.exports = {
 
                     if (essentialStructure) {
 
-                        if (creep.energyTransfer(essentialStructure) == 0) {
+                        if (creep.advancedTransfer(essentialStructure) == 0) {
 
                             creep.memory.task = undefined
                         }
                     } else {
 
-                        if (creep.energyTransfer(storage) == 0) {
+                        if (creep.advancedTransfer(storage) == 0) {
 
                             creep.memory.task = undefined
                         }
@@ -60,11 +68,11 @@ module.exports = {
 
             if (creep.memory.isFull == false) {
 
-                creep.energyWithdraw(storage)
+                creep.advancedWithdraw(storage)
 
             } else {
 
-                if (creep.energyTransfer(controllerContainer) == 0) {
+                if (creep.advancedTransfer(controllerContainer) == 0) {
 
                     creep.memory.task = undefined
                 }
@@ -75,36 +83,36 @@ module.exports = {
 
             if (creep.memory.isFull == false) {
 
-                creep.energyWithdraw(sourceContainer1)
+                creep.advancedWithdraw(sourceContainer1)
             } else {
 
                 if (lowTower) {
 
-                    if (creep.energyTransfer(lowTower) == 0) {
+                    if (creep.advancedTransfer(lowTower) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (essentialStructure) {
 
-                    if (creep.energyTransfer(essentialStructure) == 0) {
+                    if (creep.advancedTransfer(essentialStructure) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
 
-                    if (creep.energyTransfer(storage) == 0) {
+                    if (creep.advancedTransfer(storage) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
 
-                    if (creep.energyTransfer(controllerContainer) == 0) {
+                    if (creep.advancedTransfer(controllerContainer) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (storage) {
 
-                    if (creep.energyTransfer(storage) == 0) {
+                    if (creep.advancedTransfer(storage) == 0) {
 
                         creep.memory.task = undefined
                     }
@@ -116,88 +124,108 @@ module.exports = {
 
             if (creep.memory.isFull == false) {
 
-                creep.energyWithdraw(sourceContainer2)
+                creep.advancedWithdraw(sourceContainer2)
             } else {
 
                 if (lowTower) {
 
-                    if (creep.energyTransfer(lowTower) == 0) {
+                    if (creep.advancedTransfer(lowTower) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (essentialStructure) {
 
-                    if (creep.energyTransfer(essentialStructure) == 0) {
+                    if (creep.advancedTransfer(essentialStructure) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
 
-                    if (creep.energyTransfer(storage) == 0) {
+                    if (creep.advancedTransfer(storage) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
 
-                    if (creep.energyTransfer(controllerContainer) == 0) {
+                    if (creep.advancedTransfer(controllerContainer) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (storage) {
 
-                    if (creep.energyTransfer(storage) == 0) {
+                    if (creep.advancedTransfer(storage) == 0) {
 
                         creep.memory.task = undefined
                     }
                 }
             }
-        } else if (task == "droppedEnergy") {
+        } else if (task == "droppedEnergy" && droppedEnergy) {
 
             creep.isFull()
 
             if (creep.memory.isFull == false) {
 
-                let droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-                    filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity()
-                })
+                creep.pickupDroppedEnergy(droppedEnergy)
 
-                if (droppedEnergy) {
-
-                    creep.pickupDroppedEnergy(droppedEnergy)
-                }
             } else {
 
                 if (lowTower) {
 
-                    if (creep.energyTransfer(lowTower) == 0) {
+                    if (creep.advancedTransfer(lowTower) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (essentialStructure) {
 
-                    if (creep.energyTransfer(essentialStructure) == 0) {
+                    if (creep.advancedTransfer(essentialStructure) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
 
-                    if (creep.energyTransfer(storage) == 0) {
+                    if (creep.advancedTransfer(storage) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
 
-                    if (creep.energyTransfer(controllerContainer) == 0) {
+                    if (creep.advancedTransfer(controllerContainer) == 0) {
 
                         creep.memory.task = undefined
                     }
                 } else if (storage) {
 
-                    if (creep.energyTransfer(storage) == 0) {
+                    if (creep.advancedTransfer(storage) == 0) {
 
                         creep.memory.task = undefined
                     }
                 }
+            }
+        } else if (task == "fillPowerSpawn" && powerSpawn) {
+
+            if (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) < powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
+
+                var resource = { type: RESOURCE_ENERGY, amount: powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) - powerSpawn.store.getCapacity(RESOURCE_ENERGY) }
+            } else {
+
+                var resource = { type: RESOURCE_POWER, amount: powerSpawn.store.getUsedCapacity(RESOURCE_POWER) - powerSpawn.store.getCapacity(RESOURCE_POWER) }
+            }
+
+            creep.isFull()
+
+            if (creep.memory.isFull == false) {
+
+                if (terminal && terminal.store[resource.type] >= resource.amount) {
+
+                    creep.advancedWithdraw(terminal, resource.type)
+
+                } else if (storage && storage.store[resource.type] >= resource.amount) {
+
+                    creep.advancedWithdraw(terminal, resource.type)
+                }
+            } else {
+
+                creep.advancedTransfer(powerSpawn, resource.type)
             }
         } else {
 
@@ -205,7 +233,7 @@ module.exports = {
 
             if (creep.memory.isFull && storage) {
 
-                creep.energyTransfer(storage)
+                creep.advancedTransfer(storage)
             }
         }
     }

@@ -146,6 +146,23 @@ module.exports = {
                 }
             }
 
+            let powerSpawn = room.find(FIND_MY_STRUCTURES, {
+                filter: s => s.structureType == STRUCTURE_POWER_SPAWN
+            })[0]
+
+            if (powerSpawn && (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) < powerSpawn.store.getCapacity(RESOURCE_ENERGY) ||
+                    powerSpawn.store.getUsedCapacity(RESOURCE_POWER) < powerSpawn.store.getCapacity(RESOURCE_POWER)) &&
+                ((terminal && terminal.store[RESOURCE_POWER] >= powerSpawn.store.getUsedCapacity(RESOURCE_POWER) - powerSpawn.store.getCapacity(RESOURCE_POWER) &&
+                        terminal.store[RESOURCE_ENERGY] >= powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) - powerSpawn.store.getCapacity(RESOURCE_ENERGY)) ||
+                    (storage && storage.store[RESOURCE_POWER] >= powerSpawn.store.getUsedCapacity(RESOURCE_POWER) - powerSpawn.store.getCapacity(RESOURCE_POWER) &&
+                        storage.store[RESOURCE_ENERGY] >= powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) - powerSpawn.store.getCapacity(RESOURCE_ENERGY)))) {
+
+                if (!findCreepWithTask("fillPowerSpawn", 1) && findCreepWithoutTask()) {
+
+                    findCreepWithoutTask().memory.task = "fillPowerSpawn"
+                }
+            }
+
             for (let object of haulers) {
 
                 if (object.roomFrom == room.name) {

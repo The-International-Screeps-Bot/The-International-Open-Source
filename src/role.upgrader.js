@@ -30,7 +30,7 @@ module.exports = {
 
                         //creep.say("🔋 CL")
 
-                        creep.energyWithdraw(controllerLink)
+                        creep.advancedWithdraw(controllerLink)
 
                     } else if (!creep.pos.isNearTo(controllerLink)) {
 
@@ -48,7 +48,7 @@ module.exports = {
 
                         //creep.say("🔋 CC")
 
-                        creep.energyWithdraw(controllerContainer)
+                        creep.advancedWithdraw(controllerContainer)
 
                     } else if (!creep.pos.isNearTo(controllerContainer)) {
 
@@ -72,7 +72,7 @@ module.exports = {
 
                 let target = creep.container
 
-                creep.energyWithdraw(target)
+                creep.advancedWithdraw(target)
             } else {
 
                 let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {

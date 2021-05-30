@@ -114,7 +114,7 @@ Market:
 
     Game.market.cancelOrder("608cf1bbab6e62255a81b72e")
 
-    Game.market.deal('6010553cbfbe5cb167da78a1', 1200, "W17N54")
+    Game.market.deal('609d1bb45df65e23335ad5a1', 1200, "W17N54")
 
     Game.rooms['W17N52'].terminal.send(RESOURCE_ENERGY, 30000, 'W17N54','Reason')
 

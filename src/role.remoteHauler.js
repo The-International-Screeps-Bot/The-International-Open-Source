@@ -24,7 +24,7 @@ module.exports = {
 
                 if (container) {
 
-                    creep.energyWithdraw(container)
+                    creep.advancedWithdraw(container)
                 } else {
 
                     var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -35,7 +35,7 @@ module.exports = {
 
                     if (container) {
 
-                        creep.energyWithdraw(container)
+                        creep.advancedWithdraw(container)
                     } else {
 
                         let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
@@ -107,7 +107,7 @@ module.exports = {
 
                     creep.say("RL S1");
 
-                    creep.energyTransfer(storage)
+                    creep.advancedTransfer(storage)
                 } else {
 
                     var controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
@@ -124,7 +124,7 @@ module.exports = {
 
                         creep.say("cC1")
 
-                        creep.energyTransfer(controllerContainer)
+                        creep.advancedTransfer(controllerContainer)
                     } else {
 
                         var storage = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
@@ -139,12 +139,12 @@ module.exports = {
 
                             creep.say("RL S2");
 
-                            creep.energyTransfer(storage)
+                            creep.advancedTransfer(storage)
                         } else if (terminal) {
 
                             creep.say("RL T");
 
-                            creep.energyTransfer(terminal)
+                            creep.advancedTransfer(terminal)
                         } else {
 
                             let structure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
@@ -157,7 +157,7 @@ module.exports = {
 
                                 creep.say("➡️")
 
-                                creep.energyTransfer(structure)
+                                creep.advancedTransfer(structure)
                             } else {
 
                                 let spawns = creep.pos.findClosestByRange(FIND_MY_SPAWNS)

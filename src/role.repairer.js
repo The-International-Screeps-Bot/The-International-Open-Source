@@ -24,7 +24,7 @@ module.exports = {
 
                 if (target.store[RESOURCE_ENERGY] >= 5000) {
 
-                    creep.energyWithdraw(target)
+                    creep.advancedWithdraw(target)
                 }
             } else {
 
@@ -36,7 +36,7 @@ module.exports = {
 
                     let target = creep.container
 
-                    creep.energyWithdraw(target)
+                    creep.advancedWithdraw(target)
                 }
             }
         }
