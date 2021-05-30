@@ -206,10 +206,10 @@ module.exports = {
 
             if (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) != powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
 
-                var resource = { type: RESOURCE_ENERGY, amount: powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) - powerSpawn.store.getCapacity(RESOURCE_ENERGY) }
+                var resource = { type: RESOURCE_ENERGY, amount: powerSpawn.store.getCapacity(RESOURCE_ENERGY) - powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) }
             } else {
 
-                var resource = { type: RESOURCE_POWER, amount: powerSpawn.store.getUsedCapacity(RESOURCE_POWER) - powerSpawn.store.getCapacity(RESOURCE_POWER) }
+                var resource = { type: RESOURCE_POWER, amount: powerSpawn.store.getCapacity(RESOURCE_POWER) - powerSpawn.store.getUsedCapacity(RESOURCE_POWER) }
             }
 
             creep.hasResource()
@@ -222,7 +222,7 @@ module.exports = {
 
                 } else if (storage && storage.store[resource.type] >= resource.amount) {
 
-                    creep.advancedWithdraw(terminal, resource.type)
+                    creep.advancedWithdraw(storage, resource.type)
                 }
             } else {
 
