@@ -29,14 +29,14 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [x] Produce boosts
 - [x] Attacker dous
 - [ ] Have resources come into terminal when room under attack
-- [ ] Spawning of power creeps
-- [ ] Power creep operations
+- [x] Spawning of power creeps
+- [x] Power creep operations
 - [ ] Creep boosting
 - [x] Automated wall and rampart placement
 - [ ] Power bank collection
 - [ ] Commodity collection
 - [x] Automated scouting
-- [ ] Factory operations
+- [x] Factory operations
 - [ ] Automated intel on enemies
 - [ ] Automated attacking
 - [ ] Different, functional room blueprints depending on room size and shape
@@ -60,7 +60,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [ ] Add a GUI for performing manual actions from the console
 - [x] Information panel to provide information about the development of the bot
 - [ ] Communication with allies via the public segment
-- [ ] Create a task manager to avoid creeps switching tasks halfway through
-- [ ] Make the task manager track and tell creeps what jobs to do
+- [x] Create a task manager to avoid creeps switching tasks halfway through
+- [x] Make the task manager track and tell creeps what jobs to do
 - [ ] Track remote room attacks from enemy players and run logic to abolish it, defend it, or leave it as is
 - [ ] Create GCL temples if there is excess energy and proper globalStage
