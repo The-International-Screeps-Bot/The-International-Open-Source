@@ -151,8 +151,8 @@ module.exports = {
                 filter: s => s.structureType == STRUCTURE_POWER_SPAWN
             })[0]
 
-            if (powerSpawn && (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) < powerSpawn.store.getCapacity(RESOURCE_ENERGY) ||
-                    powerSpawn.store.getUsedCapacity(RESOURCE_POWER) < powerSpawn.store.getCapacity(RESOURCE_POWER)) &&
+            if (powerSpawn && (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) < powerSpawn.store.getCapacity(RESOURCE_ENERGY) * 0.5 ||
+                    powerSpawn.store.getUsedCapacity(RESOURCE_POWER) < powerSpawn.store.getCapacity(RESOURCE_POWER) * 0.5) &&
                 ((terminal && terminal.store[RESOURCE_POWER] >= powerSpawn.store.getUsedCapacity(RESOURCE_POWER) - powerSpawn.store.getCapacity(RESOURCE_POWER) &&
                         terminal.store[RESOURCE_ENERGY] >= powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) - powerSpawn.store.getCapacity(RESOURCE_ENERGY)) ||
                     (storage && storage.store[RESOURCE_POWER] >= powerSpawn.store.getUsedCapacity(RESOURCE_POWER) - powerSpawn.store.getCapacity(RESOURCE_POWER) &&

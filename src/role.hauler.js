@@ -239,10 +239,7 @@ module.exports = {
 
                 for (let resource in creep.store) {
 
-                    if (creep.advancedTransfer(storage, resource) == 0) {
-
-                        creep.memory.task = undefined
-                    }
+                    creep.advancedTransfer(storage, resource)
                 }
             }
         }
