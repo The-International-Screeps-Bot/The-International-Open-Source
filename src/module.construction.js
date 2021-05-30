@@ -256,7 +256,7 @@ module.exports = {
                                     pos.x += anchorPoint.x - 6
                                     pos.y += anchorPoint.y - 6
 
-                                    if (!room.getTerrain().get(pos.x, pos.y) == TERRAIN_MASK_WALL) {
+                                    if (room.getTerrain().get(pos.x, pos.y) != TERRAIN_MASK_WALL) {
 
                                         if (structureType == "road" && room.controller.level <= 4) {
 
@@ -334,7 +334,7 @@ module.exports = {
                                     pos.x += anchorPoint.x - 10
                                     pos.y += anchorPoint.y - 10
 
-                                    if (!room.getTerrain().get(pos.x, pos.y) == TERRAIN_MASK_WALL) {
+                                    if (room.getTerrain().get(pos.x, pos.y) != TERRAIN_MASK_WALL) {
 
                                         if (room.controller.level >= 2 && room.controller.level <= 5) {
 

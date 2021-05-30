@@ -13,7 +13,7 @@ module.exports = {
         })
 
         let storage = creep.room.storage
-        let terminal = room.terminal
+        let terminal = creep.room.terminal
 
         let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
         let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
