@@ -154,9 +154,10 @@ Creep.prototype.advancedWithdraw = function(target, resource) {
 
     if (creep.pos.isNearTo(target)) {
 
-        creep.withdraw(target, resource)
-        return 0
+        if (creep.withdraw(target, resource) == 0) {
 
+            return 0
+        }
     } else {
 
         let origin = creep.pos
@@ -177,8 +178,10 @@ Creep.prototype.advancedTransfer = function(target, resource) {
 
     if (creep.pos.isNearTo(target)) {
 
-        creep.transfer(target, resource)
-        return 0
+        if (creep.transfer(target, resource) == 0) {
+
+            return 0
+        }
 
     } else {
 
