@@ -204,14 +204,12 @@ module.exports = {
             }
         } else if (task == "fillPowerSpawn" && powerSpawn) {
 
-            let resource
-
             if (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) != powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
 
-                resource = { type: RESOURCE_ENERGY, amount: powerSpawn.store.getCapacity(RESOURCE_ENERGY) - powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) }
+                var resource = { type: RESOURCE_ENERGY, amount: powerSpawn.store.getCapacity(RESOURCE_ENERGY) - powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) }
             } else {
 
-                resource = { type: RESOURCE_POWER, amount: powerSpawn.store.getCapacity(RESOURCE_POWER) - powerSpawn.store.getUsedCapacity(RESOURCE_POWER) }
+                var resource = { type: RESOURCE_POWER, amount: powerSpawn.store.getCapacity(RESOURCE_POWER) - powerSpawn.store.getUsedCapacity(RESOURCE_POWER) }
             }
 
             creep.hasResource()
@@ -240,9 +238,9 @@ module.exports = {
             }
         } else if (task == "deliverToStorage" && storage) {
 
-            let resource = Object.keys(creep.store)[0]
+            let resourceType = Object.keys(creep.store)[0]
 
-            creep.advancedTransfer(storage, resource)
+            creep.advancedTransfer(storage, resourceType)
 
             if (creep.store.getUsedCapacity() == 0) {
 

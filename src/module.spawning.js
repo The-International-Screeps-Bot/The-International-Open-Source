@@ -26,14 +26,14 @@ module.exports = {
 
                     creepsOfRole[creepValues]++
                 }
-
-                if (creep.memory.role == "hauler") {
-
-                    haulers.push({ creep: creep, roomFrom: creep.memory.roomFrom })
-                }
-
-                let remoteCreepValues = 1
             }
+
+            if (creep.memory.role == "hauler") {
+
+                haulers.push({ creep: creep, roomFrom: creep.memory.roomFrom })
+            }
+
+            let remoteCreepValues = 1
         }
 
         if (Memory.creepCount == null) {
