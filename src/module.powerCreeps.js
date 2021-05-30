@@ -8,6 +8,14 @@ module.exports = {
 
             let creep = Game.powerCreeps[name]
 
+            if (creep.room.controller.isPowerEnabled == false) {
+
+                if (creep.enableRoom(creep.room.controller) == ERR_NOT_IN_RANGE) {
+
+                    creep.moveTo(creep.room.controller)
+                }
+            }
+
             let powerSpawn = creep.room.find(FIND_MY_STRUCTURES, {
                 filter: s => s.structureType == STRUCTURE_POWER_SPAWN
             })[0]
@@ -26,7 +34,7 @@ module.exports = {
 
             creep.isFull()
 
-            if (creep.isFull) {
+            if (creep.memory.isFull) {
 
                 if (creep.room.terminal) {
 
@@ -43,12 +51,12 @@ module.exports = {
                 }
             } else {
 
-                if (powerSPawn && !creep.pos.isNearTo(powerSpawn)) {
+                creep.usePower(PWR_GENERATE_OPS)
+
+                if (powerSpawn && !creep.pos.isNearTo(powerSpawn)) {
 
                     creep.intraRoomPathing(creep.pos, powerSpawn)
                 }
-
-                creep.usePower(PWR_GENERATE_OPS)
             }
         }
     }
