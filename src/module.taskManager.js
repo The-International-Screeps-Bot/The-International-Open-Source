@@ -96,6 +96,7 @@ module.exports = {
             })
 
             let storage = room.storage
+            let terminal = room.terminal
 
             let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
             let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
