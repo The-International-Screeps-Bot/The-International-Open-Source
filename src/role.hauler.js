@@ -227,6 +227,7 @@ module.exports = {
             } else {
 
                 if (creep.store.getUsedCapacity(resource.type) == creep.store.getUsedCapacity()) {
+
                     if (creep.advancedTransfer(powerSpawn, resource.type) == 0) {
 
                         creep.memory.task = undefined
@@ -236,23 +237,19 @@ module.exports = {
                     creep.memory.task = "deliverToStorage"
                 }
             }
-        } else if (task == "deliverToStorage" && storage) {
-
-            let resourceType = Object.keys(creep.store)[0]
-
-            creep.advancedTransfer(storage, resourceType)
-
-            if (creep.store.getUsedCapacity() == 0) {
-
-                creep.memory.task = undefined
-            }
-        } else {
+        } else if (!task || task == "deliverToStorage") {
 
             creep.hasResource()
 
             if (creep.memory.isFull && storage) {
 
-                creep.memory.task = "deliverToStorage"
+                for (let resourceType in creep.store) {
+
+                    creep.advancedTransfer(storage, resourceType)
+                }
+            } else {
+
+                creep.memory.task = undefined
             }
         }
     }

@@ -5,11 +5,13 @@ let cleanMemory = require("module.cleanMemory")
 let visuals = require("module.roomVisuals")
 let spawns = require("module.spawning")
 let powerSpawns = require("module.powerSpawning")
-let roles = require("module.roles")
 let constants = require("module.constants")
 let labs = require("module.labs")
 let links = require("module.links")
 let construction = require("module.construction")
+
+let roles = require("module.roles")
+let powerCreeps = require("module.powerCreeps")
 
 let stats = require("module.stats")
 let logging = require("module.logging")
@@ -46,6 +48,10 @@ module.exports.loop = function() {
             roles.run()
 
             console.log("roles: " + Game.cpu.getUsed().toFixed(2))
+
+            powerCreeps.run()
+
+            console.log("powerCreeps: " + Game.cpu.getUsed().toFixed(2))
 
             console.log('--------------------------------------------------------')
 

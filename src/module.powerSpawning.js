@@ -8,6 +8,7 @@ module.exports = {
 
             if (powerSpawn) {
 
+                //Game.powerCreeps['1'].spawn(powerSpawn);
                 powerSpawn.processPower()
             }
         })

@@ -160,7 +160,7 @@ module.exports = {
 
                 if (!findCreepWithTask("fillPowerSpawn", 1) && findCreepWithoutTask()) {
 
-                    findCreepWithoutTask().memory.task = "fillPowerSpawn"
+                    //findCreepWithoutTask().memory.task = "fillPowerSpawn"
                 }
             }
 
