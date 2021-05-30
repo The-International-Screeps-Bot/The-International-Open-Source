@@ -240,10 +240,11 @@ module.exports = {
 
             for (let resource in creep.store) {
 
-                if (creep.advancedTransfer(storage, resource) == 0) {
+                creep.memory.task = undefined
+            }
+            if (creep.store.getUsedCapacity() == 0) {
 
-                    creep.memory.task = undefined
-                }
+                creep.memory.task = undefined
             }
         } else {
 
