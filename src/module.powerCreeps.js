@@ -1,7 +1,12 @@
+let creepFunctions = require("module.powerCreepFunctions")
+let allyList = require("module.allyList")
+
 module.exports = {
     run: function powerCreeps() {
 
-        for (let creep of Game.powerCreeps) {
+        for (let name in Game.powerCreeps) {
+
+            let creep = Game.powerCreeps[name]
 
             let powerSpawn = creep.room.find(FIND_MY_STRUCTURES, {
                 filter: s => s.structureType == STRUCTURE_POWER_SPAWN
