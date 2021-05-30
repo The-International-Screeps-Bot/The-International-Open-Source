@@ -212,7 +212,7 @@ module.exports = {
                 var resource = { type: RESOURCE_POWER, amount: powerSpawn.store.getUsedCapacity(RESOURCE_POWER) - powerSpawn.store.getCapacity(RESOURCE_POWER) }
             }
 
-            creep.isFull()
+            creep.hasResource()
 
             if (creep.memory.isFull == false) {
 
@@ -234,7 +234,10 @@ module.exports = {
 
             if (creep.memory.isFull && storage) {
 
-                creep.advancedTransfer(storage)
+                for (let resource in creep.store) {
+
+                    creep.advancedTransfer(storage, resource)
+                }
             }
         }
     }

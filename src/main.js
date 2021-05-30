@@ -4,6 +4,7 @@ let factories = require("module.factories")
 let cleanMemory = require("module.cleanMemory")
 let visuals = require("module.roomVisuals")
 let spawns = require("module.spawning")
+let powerSpawns = require("module.powerSpawning")
 let roles = require("module.roles")
 let constants = require("module.constants")
 let labs = require("module.labs")
@@ -89,6 +90,10 @@ module.exports.loop = function() {
             labs.run()
 
             console.log("labs: " + Game.cpu.getUsed().toFixed(2))
+
+            powerSpawns.run()
+
+            console.log("powerSpawns: " + Game.cpu.getUsed().toFixed(2))
 
             towers.run()
 
