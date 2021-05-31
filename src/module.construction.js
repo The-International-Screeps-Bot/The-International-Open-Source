@@ -782,12 +782,12 @@ module.exports = {
 
                     if (sourceContainer1 != null && sourceLink1 != null) {
 
-                        sourceContainer1.destroy()
+                        //sourceContainer1.destroy()
                     }
 
                     if (sourceContainer2 != null && sourceLink2 != null) {
 
-                        sourceContainer2.destroy()
+                        //sourceContainer2.destroy()
                     }
                 }
             }
