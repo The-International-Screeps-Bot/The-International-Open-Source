@@ -35,7 +35,6 @@ module.exports = {
         global()
 
         let totalEnergy = 0
-        Memory.global.communes.length = 0
         Memory.global.communes = []
 
         function global() {
@@ -76,9 +75,7 @@ module.exports = {
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my && room.controller.level >= 1) {
 
-                Memory.global.communes.length++
-
-                    Memory.global.communes.push(room.name)
+                Memory.global.communes.push(room.name)
 
                 //console.log("a")
 

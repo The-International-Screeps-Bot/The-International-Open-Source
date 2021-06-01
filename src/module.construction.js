@@ -388,7 +388,7 @@ module.exports = {
                 source2Path()
                 controllerPath()
                 mineralPath()
-                remotePath()
+                    //remotePath()
                 placeExtractor()
                 removeUneeded()
 
