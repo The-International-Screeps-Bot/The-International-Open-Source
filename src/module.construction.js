@@ -338,13 +338,10 @@ module.exports = {
 
                                     if (room.getTerrain().get(pos.x, pos.y) != TERRAIN_MASK_WALL) {
 
-                                        if (room.controller.level >= 2 && room.controller.level <= 5) {
+                                        if (room.controller.level < 6) {
 
-                                            if (structureType != "rampart") {
 
-                                                room.createConstructionSite(pos.x, pos.y, structureType);
-                                            }
-                                        } else if (room.controller.level >= 6 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 20000) {
+                                        } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 40000) {
 
                                             room.createConstructionSite(pos.x, pos.y, structureType);
                                         }
