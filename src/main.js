@@ -20,103 +20,101 @@ const profiler = require('screeps-profiler')
 
 //profiler.enable();
 module.exports.loop = function() {
+
+        console.log("start: " + Game.cpu.getUsed().toFixed(2))
+
+        //profiler.wrap(function() {
+        //Game.profiler.profile(1000)
+
+        if (Game.shard.name == "shard2") {
+
+            if (Game.cpu.bucket == 10000) {
+                Game.cpu.generatePixel();
+            }
+        }
+
+        if (Game.time % 10 == 0) {
+
+            cleanMemory.run()
+        }
+
+        console.log("cleanMemory: " + Game.cpu.getUsed().toFixed(2))
+
+        stats.run()
+
+        console.log("stats: " + Game.cpu.getUsed().toFixed(2))
+
+        roles.run()
+
+        console.log("roles: " + Game.cpu.getUsed().toFixed(2))
+
+        powerCreeps.run()
+
+        console.log("powerCreeps: " + Game.cpu.getUsed().toFixed(2))
+
+        console.log('--------------------------------------------------------')
+
+        if (Game.time % 100 == 0) {
+
+            construction.run()
+        }
+
+        console.log("construction: " + Game.cpu.getUsed().toFixed(2))
+
+        visuals.run()
+
+        console.log("visuals: " + Game.cpu.getUsed().toFixed(2))
+
+        if (Game.time % 10 == 0) {
+
+            terminals.run()
+        }
+
+        console.log("terminals: " + Game.cpu.getUsed().toFixed(2))
+
         if (Game.time % 1 == 0) {
 
-            console.log("start: " + Game.cpu.getUsed().toFixed(2))
+            factories.run()
 
-            //profiler.wrap(function() {
-            //Game.profiler.profile(1000)
-
-            if (Game.shard.name == "shard2") {
-
-                if (Game.cpu.bucket == 10000) {
-                    Game.cpu.generatePixel();
-                }
-            }
-
-            if (Game.time % 10 == 0) {
-
-                cleanMemory.run()
-            }
-
-            console.log("cleanMemory: " + Game.cpu.getUsed().toFixed(2))
-
-            stats.run()
-
-            console.log("stats: " + Game.cpu.getUsed().toFixed(2))
-
-            roles.run()
-
-            console.log("roles: " + Game.cpu.getUsed().toFixed(2))
-
-            powerCreeps.run()
-
-            console.log("powerCreeps: " + Game.cpu.getUsed().toFixed(2))
-
-            console.log('--------------------------------------------------------')
-
-            if (Game.time % 100 == 0) {
-
-                construction.run()
-            }
-
-            console.log("construction: " + Game.cpu.getUsed().toFixed(2))
-
-            visuals.run()
-
-            console.log("visuals: " + Game.cpu.getUsed().toFixed(2))
-
-            if (Game.time % 10 == 0) {
-
-                terminals.run()
-            }
-
-            console.log("terminals: " + Game.cpu.getUsed().toFixed(2))
-
-            if (Game.time % 1 == 0) {
-
-                factories.run()
-
-            }
-
-            console.log("factories: " + Game.cpu.getUsed().toFixed(2))
-
-            if (Game.time % 1 == 0) {
-
-                constants.run()
-
-            }
-
-            console.log("constants: " + Game.cpu.getUsed().toFixed(2))
-
-            links.run()
-
-            console.log("links: " + Game.cpu.getUsed().toFixed(2))
-
-            labs.run()
-
-            console.log("labs: " + Game.cpu.getUsed().toFixed(2))
-
-            powerSpawns.run()
-
-            console.log("powerSpawns: " + Game.cpu.getUsed().toFixed(2))
-
-            towers.run()
-
-            console.log("towers: " + Game.cpu.getUsed().toFixed(2))
-
-            spawns.run()
-
-            console.log("spawns: " + Game.cpu.getUsed().toFixed(2))
-
-            logging.run()
-
-            Memory.stats.cpuUsage = Game.cpu.getUsed().toFixed(2)
-
-            //console.log("logging: " + Game.cpu.getUsed().toFixed(2))
-
-            //});
         }
+
+        console.log("factories: " + Game.cpu.getUsed().toFixed(2))
+
+        if (Game.time % 1 == 0) {
+
+            constants.run()
+
+        }
+
+        console.log("constants: " + Game.cpu.getUsed().toFixed(2))
+
+        links.run()
+
+        console.log("links: " + Game.cpu.getUsed().toFixed(2))
+
+        labs.run()
+
+        console.log("labs: " + Game.cpu.getUsed().toFixed(2))
+
+        powerSpawns.run()
+
+        console.log("powerSpawns: " + Game.cpu.getUsed().toFixed(2))
+
+        towers.run()
+
+        console.log("towers: " + Game.cpu.getUsed().toFixed(2))
+
+        spawns.run()
+
+        console.log("spawns: " + Game.cpu.getUsed().toFixed(2))
+
+        logging.run()
+
+        Memory.stats.cpuUsage = Game.cpu.getUsed().toFixed(2)
+
+        //console.log("logging: " + Game.cpu.getUsed().toFixed(2))
+
+        //});
     }
     /*
     //-----------------------------------------------------------------------------------------------

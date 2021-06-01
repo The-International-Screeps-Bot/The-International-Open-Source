@@ -36,25 +36,6 @@ module.exports = {
             let remoteCreepValues = 1
         }
 
-        if (Memory.creepCount == null) {
-
-            Memory.creepCount = {}
-        }
-
-        for (let role of rolesList) {
-
-            if (Memory.creepCount[role] == null) {
-                Memory.creepCount[role] = 0
-            }
-        }
-
-        for (let role of remoteRoles) {
-
-            if (Memory.creepCount[role] == null) {
-                Memory.creepCount[role] = 0
-            }
-        }
-
 
         let boostedSquads = false
 
@@ -991,9 +972,9 @@ module.exports = {
 
                             let testSpawn = spawn.spawnCreep(bodyRole.body, bodyRole.role, { dryRun: true })
 
-                            if (testSpawn == 0) {
+                            if (testSpawn == 0 && freeEnergy >= 300) {
 
-                                spawn.spawnCreep(bodyRole.body, (roomFixMessage + bodyRole.role + ", T" + bodyRole.tier + ", " + Memory.creepCount[role]), {
+                                spawn.spawnCreep(bodyRole.body, (roomFixMessage + bodyRole.role + ", T" + bodyRole.tier + ", " + Game.time), {
                                     memory: {
                                         role: bodyRole.role,
                                         isFull: false,
@@ -1002,7 +983,6 @@ module.exports = {
                                 })
 
                                 requiredCreeps[role] - 1
-                                Memory.creepCount[role] + 1
 
                                 Memory.stats.energySpentOnCreeps += bodyRole.defaultCost + bodyRole.extraCost
 
