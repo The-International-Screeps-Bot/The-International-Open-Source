@@ -970,25 +970,32 @@ module.exports = {
 
                         for (spawn of mySpawns) {
 
-                            let testSpawn = spawn.spawnCreep(bodyRole.body, bodyRole.role, { dryRun: true })
+                            doSpawn()
 
-                            if (testSpawn == 0 && freeEnergy >= 300) {
+                            function doSpawn() {
 
-                                spawn.spawnCreep(bodyRole.body, (roomFixMessage + bodyRole.role + ", T" + bodyRole.tier + ", " + Game.time), {
-                                    memory: {
-                                        role: bodyRole.role,
-                                        isFull: false,
-                                        roomFrom: room.name
-                                    }
-                                })
+                                let testSpawn = spawn.spawnCreep(bodyRole.body, bodyRole.role, { dryRun: true })
 
-                                requiredCreeps[role] - 1
+                                if (testSpawn == 0 && freeEnergy >= 300) {
 
-                                Memory.stats.energySpentOnCreeps += bodyRole.defaultCost + bodyRole.extraCost
+                                    spawn.spawnCreep(bodyRole.body, (roomFixMessage + bodyRole.role + ", T" + bodyRole.tier + ", " + Game.time), {
+                                        memory: {
+                                            role: bodyRole.role,
+                                            isFull: false,
+                                            roomFrom: room.name
+                                        }
+                                    })
 
-                            } else if (testSpawn != -4) {
+                                    requiredCreeps[role] - 1
 
-                                console.log("Failed to spawn: " + testSpawn + ", " + bodyRole.role + ", " + bodyRole.body.length + ", " + bodyRole.tier)
+                                    Memory.stats.energySpentOnCreeps += bodyRole.defaultCost + bodyRole.extraCost
+
+                                    return
+
+                                } else if (testSpawn != -4) {
+
+                                    console.log("Failed to spawn: " + testSpawn + ", " + bodyRole.role + ", " + bodyRole.body.length + ", " + bodyRole.tier)
+                                }
                             }
                         }
                     }
