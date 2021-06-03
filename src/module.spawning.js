@@ -1,6 +1,7 @@
 let taskManager = require("module.taskManager")
 let trafficManager = require("module.trafficManager")
 let allyList = require("module.allyList");
+const { indexOf } = require("lodash");
 
 module.exports = {
     run: function spawns() {
@@ -450,7 +451,6 @@ module.exports = {
                     if (minCreeps[role] > creepsOfRole[[role, room.name]]) {
 
                         requiredCreeps[role] = minCreeps[role] - creepsOfRole[[role, room.name]]
-                        creepsOfRole[[role, room.name]] - 1
 
                         console.log(role + ", " + requiredCreeps[role] + ", " + room.name)
                     }
@@ -944,35 +944,23 @@ module.exports = {
 
                 let bodies = [harvester1Body, harvester2Body, haulerBody, upgraderBody, builderBody, repairerBody, upgradeHaulerBody, barricadeUpgraderBody, claimerBody, revolutionaryBuilderBody, rangedDefenderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
 
+                let i = 0
+
                 for (let role in requiredCreeps) {
 
-                    let correctBody = _.filter(bodies, function(body) { return body.role === role })
+                    i++
 
-                    let bodyRole = correctBody[0]
+                    if (i <= room.memory.spawns.length) {
 
-                    if (bodyRole.role == role && freeEnergy >= 300 && requiredCreeps[role] && requiredCreeps[role] > 0) {
+                        let correctBody = _.filter(bodies, function(body) { return body.role == role })
 
-                        let rawSpawns = room.memory.spawns
+                        let bodyRole = correctBody[0]
 
-                        if (rawSpawns == null) {
+                        if (bodyRole.role == role && freeEnergy >= 300 && requiredCreeps[role] && requiredCreeps[role] > 0) {
 
-                            rawSpawns = []
-                        }
+                            for (let spawns of room.memory.spawns) {
 
-                        let mySpawns = []
-
-                        for (let spawns of rawSpawns) {
-
-                            let spawn = Game.getObjectById(spawns)
-                            mySpawns.push(spawn)
-
-                        }
-
-                        for (spawn of mySpawns) {
-
-                            doSpawn()
-
-                            function doSpawn() {
+                                let spawn = Game.getObjectById(spawns)
 
                                 let testSpawn = spawn.spawnCreep(bodyRole.body, bodyRole.role, { dryRun: true })
 
@@ -989,8 +977,6 @@ module.exports = {
                                     requiredCreeps[role] - 1
 
                                     Memory.stats.energySpentOnCreeps += bodyRole.defaultCost + bodyRole.extraCost
-
-                                    return
 
                                 } else if (testSpawn != -4) {
 

@@ -32,7 +32,7 @@ Creep.prototype.barricadesFindAndRepair = function() {
         creep.say("Broken")
     }
 
-    for (let quota = 10000; quota < 3000000; quota += 50000) {
+    for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
 
         creep.memory.quota = quota
 

@@ -7,7 +7,7 @@ module.exports = {
 
         if (creep.memory.role == "harvester1") {
 
-            if (baseLink != null && creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.myParts("work")) {
+            if (baseLink != null && creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.myParts("work") * 2) {
 
                 let sourceLink1 = Game.getObjectById(creep.room.memory.sourceLink1)
 
@@ -67,7 +67,7 @@ module.exports = {
             }
         } else if (creep.memory.role == "harvester2") {
 
-            if (baseLink != null && creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.myParts("work")) {
+            if (baseLink != null && creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.myParts("work") * 2) {
 
                 let sourceLink2 = Game.getObjectById(creep.room.memory.sourceLink2)
 

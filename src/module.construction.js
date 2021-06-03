@@ -41,7 +41,7 @@ module.exports = {
                 })
 
                 let barricades = room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART
+                    filter: s => s.structureType == STRUCTURE_WALL
                 })
 
                 if (room) {
