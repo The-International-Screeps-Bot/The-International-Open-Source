@@ -104,7 +104,7 @@ module.exports = {
 
             let controllerLink = Game.getObjectById(room.memory.controllerLink)
 
-            if (storage && storage.store[RESOURCE_ENERGY] >= findHaulersOfRoom()[0].store.getCapacity() && lowTowers[0] || essentialStructures[0]) {
+            if (storage && storage.store[RESOURCE_ENERGY] >= findHaulersOfRoom()[0].store.getCapacity() && (lowTowers[0] || essentialStructures[0])) {
 
                 if (!findCreepWithTask("deliverFromStorage", 2) && findCreepWithoutTask()) {
 
