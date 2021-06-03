@@ -616,7 +616,7 @@ module.exports = {
                     [{
                             stage: 6,
                             defaultParts: [CARRY],
-                            defaultCost: 150,
+                            defaultCost: 50,
                             extraParts: [WORK, WORK, MOVE],
                             extraCost: 250,
                             sliceAmount: 13
