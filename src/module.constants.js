@@ -204,19 +204,19 @@ module.exports = {
                         let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
                         let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
-                        if (controllerLink == null && link.pos.inRangeTo(room.controller, 2)) {
+                        if (link.pos.inRangeTo(room.controller, 2)) {
 
                             room.memory.controllerLink = link.id
 
-                        } else if (baseLink == null && source2 && room.storage && link.pos.inRangeTo(room.storage, 1)) {
+                        } else if (source2 && room.storage && link.pos.inRangeTo(room.storage, 2)) {
 
                             room.memory.baseLink = link.id
 
-                        } else if (sourceLink1 == null && source1 && link.pos.inRangeTo(source1, 2)) {
+                        } else if (source1 && link.pos.inRangeTo(source1, 2)) {
 
                             room.memory.sourceLink1 = link.id
 
-                        } else if (sourceLink2 == null && source2 && link.pos.inRangeTo(source2, 2)) {
+                        } else if (source2 && link.pos.inRangeTo(source2, 2)) {
 
                             room.memory.sourceLink2 = link.id
                         }

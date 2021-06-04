@@ -289,8 +289,6 @@ module.exports = {
 
                         minCreeps["hauler"] = 2
 
-                        minCreeps["stationaryHauler"] = 1
-
                         minCreeps["scientist"] = 1
                         break
                     case 8:
@@ -300,8 +298,6 @@ module.exports = {
                         minCreeps["harvester2"] = 1
 
                         minCreeps["hauler"] = 2
-
-                        minCreeps["stationaryHauler"] = 1
 
                         minCreeps["scientist"] = 1
                         break
@@ -351,7 +347,8 @@ module.exports = {
                         minCreeps["upgrader"] = 2
                     }
                 } else
-                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 40000) {
+                if (room.storage &&
+                    room.storage.store[RESOURCE_ENERGY] >= 40000) {
 
                     if (stage <= 5) {
 
@@ -366,9 +363,18 @@ module.exports = {
 
                     minCreeps["barricadeUpgrader"] = 1
 
-                } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 50000) {
+                } else if (room.storage &&
+                    room.storage.store[RESOURCE_ENERGY] >= 50000) {
 
                     minCreeps["barricadeUpgrader"] = 1
+                }
+
+                if (controllerLink != null &&
+                    baseLink != null &&
+                    sourceLink1 != null &&
+                    sourceLink2 != null) {
+
+                    minCreeps["stationaryHauler"] = 1
                 }
 
                 if (hostileAttacker && stage >= 2) {

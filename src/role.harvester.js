@@ -1,8 +1,6 @@
 module.exports = {
     run: function(creep) {
 
-        creep.checkRoom()
-
         let baseLink = Game.getObjectById(creep.room.memory.baseLink)
 
         if (creep.memory.role == "harvester1") {
