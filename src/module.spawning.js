@@ -5,7 +5,7 @@ let allyList = require("module.allyList");
 module.exports = {
     run: function spawns() {
 
-        let rolesList = ["harvester1", "harvester2", "hauler", "upgrader", "builder", "repairer", "upgradeHauler", "barricadeUpgrader", "claimer", "revolutionaryBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
+        let rolesList = ["harvester1", "hauler", "harvester2", "upgrader", "builder", "repairer", "upgradeHauler", "barricadeUpgrader", "claimer", "revolutionaryBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
         let remoteRoles = ["remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver"]
 
         let creepsOfRole = {}
@@ -47,11 +47,11 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            var claimerTarget = "E32N3"
+            var claimerTarget = "E33N2"
 
             //var claimerTarget
 
-            var builderTarget = "E32N3"
+            var builderTarget = "E33N2"
 
             //var builderTarget
         } else {
@@ -950,7 +950,7 @@ module.exports = {
                         "antifaSupporter")
                 }
 
-                let bodies = [harvester1Body, harvester2Body, haulerBody, upgraderBody, builderBody, repairerBody, upgradeHaulerBody, barricadeUpgraderBody, claimerBody, revolutionaryBuilderBody, rangedDefenderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
+                let bodies = [harvester1Body, haulerBody, harvester2Body, upgraderBody, builderBody, repairerBody, upgradeHaulerBody, barricadeUpgraderBody, claimerBody, revolutionaryBuilderBody, rangedDefenderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
 
                 let i = 0
 
