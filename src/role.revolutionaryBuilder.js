@@ -30,17 +30,12 @@ module.exports = {
             if (!constructionSite) {
 
                 roleUpgrader.run(creep);
-
             }
-            if (creep.memory.isFull) {
+            if (creep.memory.isFull == true) {
 
                 creep.say("🚧")
 
-                if (creep.build(constructionSite) == ERR_NOT_IN_RANGE) {
-
-                    creep.moveTo(constructionSite, { reusePath: 50 });
-
-                }
+                creep.constructionBuild(constructionSite)
             } else {
 
                 var containers = creep.room.find(FIND_STRUCTURES, {

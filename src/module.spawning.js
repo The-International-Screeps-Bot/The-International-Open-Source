@@ -47,13 +47,13 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            //var claimerTarget = "E32N3"
+            var claimerTarget = "E32N3"
 
-            var claimerTarget
+            //var claimerTarget
 
-            //var builderTarget = "E32N3"
+            var builderTarget = "E32N3"
 
-            var builderTarget
+            //var builderTarget
         } else {
 
             var claimerTarget = "E25N11"
