@@ -2,10 +2,7 @@ module.exports = {
     // a function to run the logic for this role
     run: function(creep) {
 
-        var origin = creep.pos
-        var goal = _.map([new RoomPosition(25, 25, creep.memory.target)], function(pos) {
-            return { pos: pos, range: 1 }
-        })
+        creep.memory.target = Memory.global.claimerTarget
 
         if (creep.room.name == creep.memory.target) {
 
@@ -24,7 +21,11 @@ module.exports = {
 
             creep.say("Hello world")
 
-            creep.onlySafeRoomPathing(origin, goal)
+            let goal = _.map([new RoomPosition(25, 25, creep.memory.target)], function(pos) {
+                return { pos: pos, range: 1 }
+            })
+
+            creep.offRoadPathing(creep.pos, goal)
         }
     }
 };

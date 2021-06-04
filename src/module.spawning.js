@@ -1,7 +1,6 @@
 let taskManager = require("module.taskManager")
 let trafficManager = require("module.trafficManager")
 let allyList = require("module.allyList");
-const { indexOf } = require("lodash");
 
 module.exports = {
     run: function spawns() {
@@ -57,14 +56,17 @@ module.exports = {
             var builderTarget
         } else {
 
-            //var claimerTarget = "E31N14"
+            var claimerTarget = "E25N11"
 
-            var claimerTarget
+            //var claimerTarget
 
-            //var builderTarget = "E31N14"
+            var builderTarget = "E25N11"
 
-            var builderTarget
+            //var builderTarget
         }
+
+        Memory.global.claimerTarget = claimerTarget
+        Memory.global.builderTarget = builderTarget
 
         let target4 = Game.flags.S
         let target9 = Game.flags.R

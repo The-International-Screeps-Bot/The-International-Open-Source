@@ -2,6 +2,7 @@ var roleUpgrader = require('role.upgrader');
 module.exports = {
     run: function(creep) {
 
+        creep.memory.target = Memory.global.builderTarget
         var target = creep.memory.target
 
         let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
@@ -13,9 +14,13 @@ module.exports = {
 
         } else if (creep.room.name != target) {
 
+            let goal = _.map([new RoomPosition(25, 25, creep.memory.target)], function(pos) {
+                return { pos: pos, range: 1 }
+            })
+
             creep.say("BS")
 
-            creep.onlySafeRoomPathing(creep.room.name, target)
+            creep.offRoadPathing(creep.pos, goal)
         } else {
 
             var constructionSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
