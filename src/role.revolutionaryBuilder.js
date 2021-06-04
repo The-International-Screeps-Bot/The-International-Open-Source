@@ -23,22 +23,16 @@ module.exports = {
             creep.offRoadPathing(creep.pos, goal)
         } else {
 
+            creep.isFull()
+
             var constructionSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
 
-            if (constructionSite == undefined) {
+            if (!constructionSite) {
 
                 roleUpgrader.run(creep);
 
-            } else if (creep.memory.building == true && creep.carry.energy == 0) {
-
-                creep.memory.building = false;
-
-            } else if (creep.memory.building == false && creep.carry.energy == creep.carryCapacity) {
-
-                creep.memory.building = true;
-
             }
-            if (creep.memory.building == true && constructionSite) {
+            if (creep.memory.isFull) {
 
                 creep.say("🚧")
 
@@ -47,7 +41,7 @@ module.exports = {
                     creep.moveTo(constructionSite, { reusePath: 50 });
 
                 }
-            } else if (constructionSite) {
+            } else {
 
                 var containers = creep.room.find(FIND_STRUCTURES, {
                     filter: (s) => s.structureType == STRUCTURE_CONTAINER
