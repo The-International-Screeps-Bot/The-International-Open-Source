@@ -79,42 +79,44 @@ module.exports = {
 
             if (controller) {
 
-                if (!controller.sign || controller.sign.username != "MarvinTMB" && !controller.reservation) {
+                if ((!controller.sign || controller.sign.username != "MarvinTMB") && !controller.reservation) {
+
                     creep.say("Signing")
 
-                    if (creep.pos.inRangeTo(controller, 1)) {
+                    let goal = _.map([controller], function(controller) {
+                        return { pos: controller.pos, range: 1 }
+                    })
 
-                        if (controller.my) {
+                    creep.intraRoomPathing(creep.pos, goal)
 
-                            creep.signController(controller, "A commune of The Internationale. Bourgeoisie not welcome here.")
-                        }
+                    if (controller.my) {
 
+                        creep.signController(controller, "A commune of The Internationale. Bourgeoisie not welcome here.")
+                    } else {
                         //output an integer from 1-6
                         let signType = Math.floor(Math.random(7) * 10)
 
                         if (signType == 1) {
 
-                            if (creep.signController(controller, "The top 1% have more money than the poorest 4.5 billion") == ERR_NOT_IN_RANGE) {}
+                            creep.signController(controller, "The top 1% have more money than the poorest 4.5 billion")
                         } else if (signType == 2) {
 
-                            if (creep.signController(controller, "McDonalds workers in the US make $10/hour. In Denmark, as a result of unions, they make $22/hour") == ERR_NOT_IN_RANGE) {}
+                            creep.signController(controller, "McDonalds workers in the US make $10/hour. In Denmark, as a result of unions, they make $22/hour")
                         } else if (signType == 3) {
 
-                            if (creep.signController(controller, "We have democracy in our policial system, why do we not have it in our companies?") == ERR_NOT_IN_RANGE) {}
+                            creep.signController(controller, "We have democracy in our policial system, why do we not have it in our companies?")
                         } else if (signType == 4) {
 
-                            if (creep.signController(controller, "Workers of the world, unite!") == ERR_NOT_IN_RANGE) {}
+                            creep.signController(controller, "Workers of the world, unite!")
                         } else if (signType == 5) {
 
-                            if (creep.signController(controller, "Real democracy requires democracy in the workplace - Richard Wolff") == ERR_NOT_IN_RANGE) {}
+                            creep.signController(controller, "Real democracy requires democracy in the workplace - Richard Wolff")
                         } else if (signType == 6) {
 
-                            if (creep.signController(controller, "Adults spend a combined 13 years of their life under a dictatorship: the workplace") == ERR_NOT_IN_RANGE) {}
+                            creep.signController(controller, "Adults spend a combined 13 years of their life under a dictatorship: the workplace")
                         }
-                    } else {
-
-                        creep.intraRoomPathing(creep.pos, controller)
                     }
+
                 } else {
 
                     let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memory.roomFrom)
@@ -158,7 +160,11 @@ module.exports = {
 
                         if (nearbyCommune == false) {
 
-                            creep.intraRoomPathing(creep.pos, controller)
+                            let goal = _.map([controller], function(controller) {
+                                return { pos: controller.pos, range: 1 }
+                            })
+
+                            creep.intraRoomPathing(creep.pos, goal)
 
                             //run cost matrix
                             if (anchorPoints[0]) {
