@@ -21,102 +21,160 @@ const profiler = require('screeps-profiler')
 //profiler.enable();
 module.exports.loop = function() {
 
-        console.log("start: " + Game.cpu.getUsed().toFixed(2))
+    let cpuUsed = Game.cpu.getUsed().toFixed(2)
 
-        //profiler.wrap(function() {
-        //Game.profiler.profile(1000)
+    console.log("start: " + cpuUsed)
 
-        if (Game.shard.name == "shard2") {
+    cpuUsed = Game.cpu.getUsed()
 
-            if (Game.cpu.bucket == 10000) {
-                Game.cpu.generatePixel();
-            }
+    if (Game.shard.name == "shard2") {
+
+        if (Game.cpu.bucket == 10000) {
+            Game.cpu.generatePixel();
         }
-
-        if (Game.time % 10 == 0) {
-
-            cleanMemory.run()
-        }
-
-        console.log("cleanMemory: " + Game.cpu.getUsed().toFixed(2))
-
-        stats.run()
-
-        console.log("stats: " + Game.cpu.getUsed().toFixed(2))
-
-        roles.run()
-
-        console.log("roles: " + Game.cpu.getUsed().toFixed(2))
-
-        powerCreeps.run()
-
-        console.log("powerCreeps: " + Game.cpu.getUsed().toFixed(2))
-
-        console.log('--------------------------------------------------------')
-
-        if (Game.time % 100 == 0) {
-
-            construction.run()
-        }
-
-        console.log("construction: " + Game.cpu.getUsed().toFixed(2))
-
-        visuals.run()
-
-        console.log("visuals: " + Game.cpu.getUsed().toFixed(2))
-
-        if (Game.time % 10 == 0) {
-
-            terminals.run()
-        }
-
-        console.log("terminals: " + Game.cpu.getUsed().toFixed(2))
-
-        if (Game.time % 1 == 0) {
-
-            factories.run()
-
-        }
-
-        console.log("factories: " + Game.cpu.getUsed().toFixed(2))
-
-        if (Game.time % 1 == 0) {
-
-            constants.run()
-
-        }
-
-        console.log("constants: " + Game.cpu.getUsed().toFixed(2))
-
-        links.run()
-
-        console.log("links: " + Game.cpu.getUsed().toFixed(2))
-
-        labs.run()
-
-        console.log("labs: " + Game.cpu.getUsed().toFixed(2))
-
-        powerSpawns.run()
-
-        console.log("powerSpawns: " + Game.cpu.getUsed().toFixed(2))
-
-        towers.run()
-
-        console.log("towers: " + Game.cpu.getUsed().toFixed(2))
-
-        spawns.run()
-
-        console.log("spawns: " + Game.cpu.getUsed().toFixed(2))
-
-        logging.run()
-
-        Memory.stats.cpuUsage = Game.cpu.getUsed().toFixed(2)
-
-        //console.log("logging: " + Game.cpu.getUsed().toFixed(2))
-
-        //});
     }
-    /*
+
+    if (Game.time % 10 == 0) {
+
+        cleanMemory.run()
+    }
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("cleanMemory: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    stats.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("stats: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    roles.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("roles: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    powerCreeps.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("powerCreeps: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    console.log('--------------------------------------------------------')
+
+    if (Game.time % 100 == 0) {
+
+        construction.run()
+    }
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("construction: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    visuals.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("visuals: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    if (Game.time % 10 == 0) {
+
+        terminals.run()
+    }
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("terminals: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    if (Game.time % 1 == 0) {
+
+        factories.run()
+
+    }
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("factories: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    if (Game.time % 1 == 0) {
+
+        constants.run()
+
+    }
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("constants: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    links.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("links: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    labs.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("labs: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    powerSpawns.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("powerSpawns: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    towers.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("towers: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    spawns.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("spawns: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    logging.run()
+
+    Memory.stats.cpuUsage = Game.cpu.getUsed().toFixed(2)
+
+}
+
+/*
+
+----------[NOTES]----------
+
     //-----------------------------------------------------------------------------------------------
 
 Market:
@@ -260,39 +318,4 @@ Upkeep costs:
 
             RCL 8: 12, 900
             
-    //-----------------------------------------------------------------------------------------------
-            
-Notes:
-
-    Improved upgrader code:
-    
-        if all creeps needed are spawned; and 75% of extensions are filled; and there is no storage all secondary tasks be transport to controllerLink or controllerContainer
-        
-        else if all creeps are spawned; and 75% of extensions are filled; and there is a storage; and the storage has more than 50k energy; and there is not 4 links and global stage of 0 / there are not 2 links and global stage of more than 0 have one hauler's task be controlelrLink or controllerContainer
-        
-        else if all creeps are spawned; and 75% of extensions are filled; and there is a storage; and the storage has more than 300k energy; and there is not 4 links and global stage of 0 / there are not 2 links and global stage of more than 0 have all secondary tasks be controllerLink or controllerContainer
-        
-        else if downgrade timer is less than 90% of max downgrade timer, make one task to give energy to controllerLink or controllerContainer
-        
-    Spawn que and multiple spawns:
-    
-        if less than requested creeps in room + creeps in room memory spawn que add a creep to the spawn que
-        
-        if creep in spawn que, loop through spawns in room. Have spawns spawn spawn que first item in array.
-        
-    Power bank logic:
-    
-        if scout spots a power bank record power bank as true in room; and the power bank has enough ttl; and there is an RCL 8 room close enough to harvest; and there aren't enemy creeps with attack / heal / rangedAttack have the scout record in the nearby RCL 8 room memory powerBank: { active: true, roomName: scout.room.name }
-        
-    Deposit logic:
-    
-        a
-        
-    Squad code logic:
-    
-        a
-        
-    
-    
-    
     */

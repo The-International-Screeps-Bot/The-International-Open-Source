@@ -31,7 +31,11 @@ module.exports = {
         roles["antifaAssaulter"] = require("module.antifa")
         roles["antifaSupporter"] = require("module.antifa")
 
+        let cpuUsed = Game.cpu.getUsed()
+
         for (let name in Game.creeps) {
+
+            cpuUsed = Game.cpu.getUsed()
 
             let creep = Game.creeps[name]
 
@@ -50,7 +54,9 @@ module.exports = {
                     //creep.suicide()
                 }
 
-                console.log(creep.memory.role + ": " + Game.cpu.getUsed().toFixed(2))
+                cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+                console.log(creep.memory.role + ": " + cpuUsed)
             }
         }
     }
