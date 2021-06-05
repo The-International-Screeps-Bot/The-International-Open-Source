@@ -25,7 +25,7 @@ module.exports = {
                     filter: s => s.structureType == STRUCTURE_ROAD
                 })
 
-                if (room.name == "E28N13") {
+                if (room.name == "E25N13") {
 
                     for (let road of roads) {
 
@@ -37,16 +37,16 @@ module.exports = {
             function destroyStructure() {
 
                 let roads = room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_TOWER
+                    filter: s => s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_TOWER || s.structureType == STRUCTURE_TERMINAL
                 })
 
                 let barricades = room.find(FIND_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_WALL
                 })
 
-                if (room) {
+                if (room.name == "E25N11") {
 
-                    for (let structure of barricades) {
+                    for (let structure of roads) {
 
                         structure.destroy()
                     }

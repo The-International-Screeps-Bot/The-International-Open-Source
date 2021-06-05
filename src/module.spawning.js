@@ -47,22 +47,22 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            var claimerTarget = "E33N2"
+            //var claimerTarget = "E33N2"
 
-            //var claimerTarget
+            var claimerTarget
 
-            var builderTarget = "E33N2"
+            //var builderTarget = "E33N2"
 
-            //var builderTarget
+            var builderTarget
         } else {
 
-            var claimerTarget = "E25N11"
+            //var claimerTarget = "E25N11"
 
-            //var claimerTarget
+            var claimerTarget
 
-            var builderTarget = "E25N11"
+            //var builderTarget = "E25N11"
 
-            //var builderTarget
+            var builderTarget
         }
 
         Memory.global.claimerTarget = claimerTarget
@@ -146,31 +146,30 @@ module.exports = {
                     filter: (c) => {
                         return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && c.owner.username != "Invader" && (c.getActiveBodyparts(ATTACK) != 0 || c.getActiveBodyparts(RANGED_ATTACK) != 0 || c.getActiveBodyparts(WORK) != 0))
                     }
-                })[0]
+                })
 
-                if (hostileAttacker) {
+                if (hostileAttacker.length > 0) {
                     console.log("Attack!!")
 
                     Memory.global.lastDefence.time = Game.time
                     Memory.global.lastDefence.room = room.name
                 }
 
-                let roomMineral = room.find(FIND_MINERALS)[0].mineralAmount > 0
+                let roomMineral = room.find(FIND_MINERALS).mineralAmount > 0
 
                 let roomExtractor = room.find(FIND_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_EXTRACTOR
-                })[0]
+                })
 
-                let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)[0]
+                let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)
 
                 let repairStructure = room.find(FIND_STRUCTURES, {
                     filter: s => (s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_CONTAINER) && s.hits < s.hitsMax * 0.5
-                })[0]
+                })
 
-                if (Game.getObjectById(room.memory.towers) != null && Game.getObjectById(room.memory.towers).length >= 1) {
-
-                    var towerTrue = true
-                }
+                let barricadesToUpgrade = room.find(FIND_MY_STRUCTURES, {
+                    filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < s.hitsMax * 0.9
+                })
 
                 let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
                 let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
@@ -191,11 +190,11 @@ module.exports = {
 
                 let stage = room.memory.stage
 
-                if (room.energyCapacityAvailable >= 9900) {
+                if (room.energyCapacityAvailable >= 9100) {
 
                     room.memory.stage = 8
 
-                } else if (room.energyCapacityAvailable >= 5100) {
+                } else if (room.energyCapacityAvailable >= 4700) {
 
                     room.memory.stage = 7
 
@@ -317,7 +316,7 @@ module.exports = {
                     minCreeps["antifaSupporters"] = minCreeps["antifaAssaulters"]
                 }
 
-                if (roomConstructionSite) {
+                if (roomConstructionSite.length > 0) {
                     if (!room.storage) {
 
                         if (stage <= 2) {
@@ -348,9 +347,8 @@ module.exports = {
 
                         minCreeps["upgrader"] = 2
                     }
-                } else
-                if (room.storage &&
-                    room.storage.store[RESOURCE_ENERGY] >= 40000) {
+                } else if (room.storage &&
+                    room.storage.store[RESOURCE_ENERGY] >= 50000) {
 
                     if (stage <= 5) {
 
@@ -361,14 +359,16 @@ module.exports = {
                     }
                 }
 
-                if (!room.storage) {
+                if (barricadesToUpgrade.length > 0) {
+                    if (!room.storage) {
 
-                    minCreeps["barricadeUpgrader"] = 1
+                        minCreeps["barricadeUpgrader"] = 1
 
-                } else if (room.storage &&
-                    room.storage.store[RESOURCE_ENERGY] >= 50000) {
+                    } else if (room.storage &&
+                        room.storage.store[RESOURCE_ENERGY] >= 40000) {
 
-                    minCreeps["barricadeUpgrader"] = 1
+                        minCreeps["barricadeUpgrader"] = 1
+                    }
                 }
 
                 if (controllerLink != null &&
@@ -379,7 +379,7 @@ module.exports = {
                     minCreeps["stationaryHauler"] = 1
                 }
 
-                if (hostileAttacker && stage >= 2) {
+                if (hostileAttacker.length > 0 && stage >= 2) {
 
                     minCreeps["rangedDefender"] = 2
                 }
@@ -389,7 +389,7 @@ module.exports = {
                     minCreeps["robber"] = 2
                 }
 
-                if (repairStructure) {
+                if (repairStructure.length > 0) {
 
                     minCreeps["repairer"] = 1
                 }
@@ -404,7 +404,7 @@ module.exports = {
                     minCreeps["revolutionaryBuilder"] = 4
                 }
 
-                if (roomExtractor && roomMineral && Memory.global.globalStage >= 1) {
+                if (roomExtractor.length > 0 && roomMineral.length > 0 && Memory.global.globalStage >= 1) {
 
                     minCreeps["miner"] = 1
                 }
