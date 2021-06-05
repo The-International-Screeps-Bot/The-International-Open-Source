@@ -1,4 +1,5 @@
 let construction = require("module.construction")
+let allyList = require("module.allyList")
 
 module.exports = {
     run: function(creep) {
@@ -69,21 +70,15 @@ module.exports = {
 
             creep.room.memory.scoutTick = Game.time
 
-            let origin = creep.pos
-
-            let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(target) {
-                return { pos: target, range: 1 }
-            })
-
             let controller = creep.room.controller
 
             if (controller) {
 
-                if ((!controller.sign || controller.sign.username != "MarvinTMB") && (!controller.owner.username || controller.owner.username == "MarvinTMB")) {
+                if ((!controller.sign || controller.sign.username != "MarvinTMB") && (!controller.owner || controller.owner.username == "MarvinTMB")) {
 
                     creep.say("Signing")
 
-                    let goal = _.map([controller], function(controller) {
+                    goal = _.map([controller], function(controller) {
                         return { pos: controller.pos, range: 1 }
                     })
 
@@ -144,7 +139,7 @@ module.exports = {
 
                     let newCommune = false
 
-                    if (creep.room.find(FIND_SOURCES).length == 2 && Game.gcl < Memory.global.communes.length && room.memory.claim != "notViable") {
+                    if (creep.room.find(FIND_SOURCES).length == 2 && Game.gcl < Memory.global.communes.length && room.memory.claim != "notViable" && !controller.owner) {
 
                         let nearbyCommune = false
 
@@ -194,12 +189,20 @@ module.exports = {
                     }
                     if (newCommune == false) {
 
+                        let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
+                            return { pos: pos, range: 1 }
+                        })
+
                         creep.offRoadPathing(creep.pos, goal)
                     }
                 }
             } else {
 
                 creep.room.memory.stage = "emptyRoom"
+
+                let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
+                    return { pos: pos, range: 1 }
+                })
 
                 creep.offRoadPathing(creep.pos, goal)
             }

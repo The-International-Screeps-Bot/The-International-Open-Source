@@ -15,75 +15,39 @@ Creep.prototype.findRemoteRoom = function() {
 }
 Creep.prototype.barricadesFindAndRepair = function() {
 
-        var barricades = creep.room.find(FIND_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
+    var barricades = creep.room.find(FIND_STRUCTURES, {
+        filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
+    })
+
+    let target = creep.memory.target
+    target = undefined
+
+    if (creep.memory.target) {
+
+        target = Game.getObjectById(creep.memory.target)
+
+        creep.repairBarricades(target)
+    } else {
+
+        creep.say("No target")
+    }
+
+    for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
+
+        creep.memory.quota = quota + creep.myParts("work") * 500
+
+        let barricade = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota + creep.myParts("work") * 500
         })
 
-        let target = creep.memory.target
-        target = undefined
+        if (barricade) {
 
-        if (creep.memory.target) {
+            creep.memory.target = barricade.id
 
-            target = Game.getObjectById(creep.memory.target)
-
-            creep.repairBarricades(target)
-        } else {
-
-            creep.say("No target")
-        }
-
-        for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
-
-            creep.memory.quota = quota + creep.myParts("work") * 500
-
-            let barricade = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota + creep.myParts("work") * 500
-            })
-
-            if (barricade) {
-
-                creep.memory.target = barricade.id
-
-                return
-            }
+            return
         }
     }
-    /*
-    Creep.prototype.barricadesFindAndRepair = function() {
-        
-            var     barricades = creep.room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
-            })
-        
-                let target = creep.memory.target
-            target = undefined
-        
-            if (creep.memory.target) {
-        
-                target = Game.getObjectById(creep.memory.target)
-        
-                    creep.repairBarricades(target)
-            } else {
-        
-                    creep.say("No target")
-            }
-        
-            for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
-        
-                creep.memory.quota = quota
-        
-                for (let barricade of barricades) {
-        
-                    if (barricade.hits < quota) {
-        
-                            target = barricade.id
-                        creep.memory.target = target
-        
-                            return;
-                        }
-                    }
-                }
-                } */
+}
 Creep.prototype.myParts = function(partType) {
 
     creep = this
