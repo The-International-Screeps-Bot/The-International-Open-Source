@@ -288,7 +288,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["hauler"] = 2
+                        minCreeps["hauler"] = 1
 
                         minCreeps["scientist"] = 1
                         break
@@ -298,7 +298,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["hauler"] = 2
+                        minCreeps["hauler"] = 1
 
                         minCreeps["scientist"] = 1
                         break
@@ -566,6 +566,13 @@ module.exports = {
 
                 var haulerBody = roleValues(
                     [{
+                            stage: 7,
+                            defaultParts: [],
+                            defaultCost: 0,
+                            extraParts: [CARRY, CARRY, MOVE],
+                            extraCost: 150,
+                            sliceAmount: 48
+                        }, {
                             stage: 5,
                             defaultParts: [],
                             defaultCost: 0,

@@ -79,7 +79,7 @@ module.exports = {
 
             if (controller) {
 
-                if ((!controller.sign || controller.sign.username != "MarvinTMB") && !controller.reservation) {
+                if ((!controller.sign || controller.sign.username != "MarvinTMB") && (!controller.owner.username || controller.owner.username == "MarvinTMB")) {
 
                     creep.say("Signing")
 
@@ -194,14 +194,14 @@ module.exports = {
                     }
                     if (newCommune == false) {
 
-                        creep.offRoadPathing(origin, goal)
+                        creep.offRoadPathing(creep.pos, goal)
                     }
                 }
             } else {
 
                 creep.room.memory.stage = "emptyRoom"
 
-                creep.offRoadPathing(origin, goal)
+                creep.offRoadPathing(creep.pos, goal)
             }
         }
     }
