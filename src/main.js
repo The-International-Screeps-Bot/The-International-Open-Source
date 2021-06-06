@@ -45,6 +45,26 @@ module.exports.loop = function() {
 
     cpuUsed = Game.cpu.getUsed()
 
+    if (Game.time % 1 == 0) {
+
+        constants.run()
+
+    }
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("constants: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
+    stats.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("stats: " + cpuUsed)
+
+    cpuUsed = Game.cpu.getUsed()
+
     roles.run()
 
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
@@ -102,26 +122,6 @@ module.exports.loop = function() {
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
 
     console.log("factories: " + cpuUsed)
-
-    cpuUsed = Game.cpu.getUsed()
-
-    if (Game.time % 1 == 0) {
-
-        constants.run()
-
-    }
-
-    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
-
-    console.log("constants: " + cpuUsed)
-
-    cpuUsed = Game.cpu.getUsed()
-
-    stats.run()
-
-    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
-
-    console.log("stats: " + cpuUsed)
 
     cpuUsed = Game.cpu.getUsed()
 
