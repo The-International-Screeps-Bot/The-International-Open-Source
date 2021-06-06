@@ -78,7 +78,11 @@ module.exports = {
                     creep.memory.terminalWithdrawBattery = true
                 }
                 creep.say("AAA")
-                    //if (storage && storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink != null && controllerLink.store[RESOURCE_ENERGY] <= 400) {
+                if (storage && storage.store[RESOURCE_ENERGY] >= 120000 && terminal.store[RESOURCE_ENERGY] < 120000) {
+
+                    creep.memory.storageToTerminal = true
+                }
+                //if (storage && storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink != null && controllerLink.store[RESOURCE_ENERGY] <= 400) {
 
                 //creep.memory.transferControllerLink = true
                 //}
@@ -89,6 +93,7 @@ module.exports = {
                 const terminalWithdrawBattery = creep.memory.terminalWithdrawBattery
                 const factoryWithdrawEnergy = creep.memory.factoryWithdrawEnergy
                 const transferControllerLink = creep.memory.transferControllerLink
+                const storageToTerminal = creep.memory.storageToTerminal
 
                 if (withdrawBaseLink) {
 
@@ -143,6 +148,18 @@ module.exports = {
                                 } else {
 
                                     creep.widthdraw(storage, RESOURCE_ENERGY)
+                                }
+                            } else {
+
+                                if (storageToTerminal) {
+
+                                    if (creep.memory.isFull == true) {
+
+                                        creep.transfer(terminal, RESOURCE_ENERGY)
+                                    } else {
+
+                                        creep.widthdraw(storage, RESOURCE_ENERGY)
+                                    }
                                 }
                             }
                         }

@@ -266,9 +266,6 @@ module.exports = {
                                         } else if (structureType == "link" && room.controller.level <= 6) {
 
 
-                                        } else if (structureType == "spawn" && room.find(FIND_MY_SPAWNS).length >= 1) {
-
-
                                         } else {
 
                                             room.createConstructionSite(pos.x, pos.y, structureType);
