@@ -4,7 +4,6 @@ module.exports = {
     run: function(creep) {
 
         creep.memory.target = Memory.global.builderTarget
-        const target = creep.memory.target
 
         let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
 
@@ -13,26 +12,26 @@ module.exports = {
             const direction = creep.pos.getDirectionTo(25, 25)
             creep.move(direction);
 
-        } else if (creep.room.name != target) {
+        } else if (creep.room.name != creep.memory.target) {
 
-            let goal = _.map([new RoomPosition(25, 25, target)], function(pos) {
+            let goal = _.map([new RoomPosition(25, 25, creep.memory.target)], function(pos) {
                 return { pos: pos, range: 1 }
             })
 
-            creep.say("BC " + target)
+            creep.say("BC " + creep.memory.target)
 
             creep.offRoadPathing(creep.pos, goal)
         } else {
 
             creep.isFull()
 
+            let constructionSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES)
+
             if (creep.memory.isFull == true) {
 
                 creep.say("🚧")
 
-                target = constructionSite
-
-                creep.constructionBuild(target)
+                creep.constructionBuild(constructionSite)
             } else {
 
                 let terminal = creep.room.terminal
@@ -41,9 +40,7 @@ module.exports = {
 
                     creep.say("T >= 50k")
 
-                    let target = terminal
-
-                    creep.advancedWithdraw(target)
+                    creep.advancedWithdraw(terminal)
                 } else {
 
                     let storage = creep.room.storage
@@ -52,11 +49,9 @@ module.exports = {
 
                         creep.say("S 10k")
 
-                        let target = storage
+                        if (storage.store[RESOURCE_ENERGY] >= 10000) {
 
-                        if (target.store[RESOURCE_ENERGY] >= 10000) {
-
-                            creep.advancedWithdraw(target)
+                            creep.advancedWithdraw(storage)
                         }
                     } else {
 
@@ -66,9 +61,7 @@ module.exports = {
 
                             creep.say("SC")
 
-                            let target = creep.container
-
-                            creep.advancedWithdraw(target)
+                            creep.advancedWithdraw(creep.container)
                         } else {
 
                             let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
@@ -79,9 +72,7 @@ module.exports = {
 
                                 creep.say("💡")
 
-                                target = droppedResources
-
-                                creep.pickupDroppedEnergy(target)
+                                creep.pickupDroppedEnergy(droppedResources)
                             } else {
 
                                 let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
@@ -101,7 +92,6 @@ module.exports = {
                                         })
 
                                         creep.intraRoomPathing(creep.pos, goal)
-
                                     }
                                 }
                             }

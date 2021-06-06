@@ -8,54 +8,60 @@ module.exports = {
 
             let creep = Game.powerCreeps[name]
 
-            if (creep.room.controller.isPowerEnabled == false) {
+            if (creep.ticksToLive) {
+                if (creep.room.controller.isPowerEnabled == false) {
 
-                if (creep.enableRoom(creep.room.controller) == ERR_NOT_IN_RANGE) {
+                    if (creep.enableRoom(creep.room.controller) == ERR_NOT_IN_RANGE) {
 
-                    creep.moveTo(creep.room.controller)
+                        creep.moveTo(creep.room.controller)
+                    }
                 }
-            }
 
-            let powerSpawn = creep.room.find(FIND_MY_STRUCTURES, {
-                filter: s => s.structureType == STRUCTURE_POWER_SPAWN
-            })[0]
+                let powerSpawn = creep.room.find(FIND_MY_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_POWER_SPAWN
+                })[0]
 
-            if (creep.ticksToLive <= 1000 && powerSpawn) {
+                if (creep.ticksToLive <= 1000 && powerSpawn) {
 
-                if (creep.pos.isNearTo(powerSpawn)) {
+                    if (creep.pos.isNearTo(powerSpawn)) {
 
-                    creep.renew(powerSpawn)
+                        creep.renew(powerSpawn)
 
+                    } else {
+
+                        creep.intraRoomPathing(creep.pos, powerSpawn)
+                    }
+                }
+
+                creep.isFull()
+
+                if (creep.memory.isFull) {
+
+                    if (creep.room.terminal) {
+
+                        for (let resourceType in creep.store) {
+
+                            creep.advancedTransfer(creep.room.terminal, resourceType)
+                        }
+                    } else if (creep.room.storage) {
+
+                        for (let resourceType in creep.store) {
+
+                            creep.advancedTransfer(creep.room.terminal, resourceType)
+                        }
+                    }
                 } else {
 
-                    creep.intraRoomPathing(creep.pos, powerSpawn)
-                }
-            }
+                    creep.usePower(PWR_GENERATE_OPS)
 
-            creep.isFull()
+                    if (powerSpawn && !creep.pos.isNearTo(powerSpawn)) {
 
-            if (creep.memory.isFull) {
+                        let goal = _.map([powerSpawn], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
 
-                if (creep.room.terminal) {
-
-                    for (let resourceType in creep.store) {
-
-                        creep.advancedTransfer(creep.room.terminal, resourceType)
+                        creep.intraRoomPathing(creep.pos, goal)
                     }
-                } else if (creep.room.storage) {
-
-                    for (let resourceType in creep.store) {
-
-                        creep.advancedTransfer(creep.room.terminal, resourceType)
-                    }
-                }
-            } else {
-
-                creep.usePower(PWR_GENERATE_OPS)
-
-                if (powerSpawn && !creep.pos.inRangeTo(powerSpawn, 2)) {
-
-                    creep.intraRoomPathing(creep.pos, powerSpawn)
                 }
             }
         }

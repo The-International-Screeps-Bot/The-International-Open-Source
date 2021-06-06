@@ -3,7 +3,7 @@ var roleUpgrader = require('role.upgrader');
 module.exports = {
     run: function(creep) {
 
-        let constructionSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
+        let constructionSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES)
 
         if (!constructionSite) {
 
@@ -17,9 +17,7 @@ module.exports = {
 
                 creep.say("🚧")
 
-                target = constructionSite
-
-                creep.constructionBuild(target)
+                creep.constructionBuild(constructionSite)
             } else {
 
                 let terminal = creep.room.terminal
@@ -28,9 +26,7 @@ module.exports = {
 
                     creep.say("T >= 50k")
 
-                    let target = terminal
-
-                    creep.advancedWithdraw(target)
+                    creep.advancedWithdraw(terminal)
                 } else {
 
                     let storage = creep.room.storage
@@ -53,9 +49,7 @@ module.exports = {
 
                             creep.say("SC")
 
-                            let target = creep.container
-
-                            creep.advancedWithdraw(target)
+                            creep.advancedWithdraw(creep.container)
                         } else {
 
                             let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
@@ -66,9 +60,7 @@ module.exports = {
 
                                 creep.say("💡")
 
-                                target = droppedResources
-
-                                creep.pickupDroppedEnergy(target)
+                                creep.pickupDroppedEnergy(droppedResources)
                             }
                         }
                     }
