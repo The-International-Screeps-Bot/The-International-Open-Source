@@ -4,7 +4,7 @@ module.exports = {
     run: function(creep) {
 
         creep.memory.target = Memory.global.builderTarget
-        var target = creep.memory.target
+        const target = creep.memory.target
 
         let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
 
@@ -15,16 +15,100 @@ module.exports = {
 
         } else if (creep.room.name != target) {
 
-            let goal = _.map([new RoomPosition(25, 25, creep.memory.target)], function(pos) {
+            let goal = _.map([new RoomPosition(25, 25, target)], function(pos) {
                 return { pos: pos, range: 1 }
             })
 
-            creep.say("BC " + creep.memory.target)
+            creep.say("BC " + target)
 
             creep.offRoadPathing(creep.pos, goal)
         } else {
 
-            roleBuilder.run(creep)
+            creep.isFull()
+
+            if (creep.memory.isFull == true) {
+
+                creep.say("🚧")
+
+                target = constructionSite
+
+                creep.constructionBuild(target)
+            } else {
+
+                let terminal = creep.room.terminal
+
+                if (terminal && terminal.store[RESOURCE_ENERGY] >= 50000) {
+
+                    creep.say("T >= 50k")
+
+                    let target = terminal
+
+                    creep.advancedWithdraw(target)
+                } else {
+
+                    let storage = creep.room.storage
+
+                    if (storage) {
+
+                        creep.say("S 10k")
+
+                        let target = storage
+
+                        if (target.store[RESOURCE_ENERGY] >= 10000) {
+
+                            creep.advancedWithdraw(target)
+                        }
+                    } else {
+
+                        creep.searchSourceContainers()
+
+                        if (creep.container != null && creep.container) {
+
+                            creep.say("SC")
+
+                            let target = creep.container
+
+                            creep.advancedWithdraw(target)
+                        } else {
+
+                            let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                                filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
+                            });
+
+                            if (droppedResources) {
+
+                                creep.say("💡")
+
+                                target = droppedResources
+
+                                creep.pickupDroppedEnergy(target)
+                            } else {
+
+                                let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
+
+                                if (closestSource) {
+
+                                    if (creep.pos.inRangeTo(closestSource, 1)) {
+
+                                        if (creep.harvest(closestSource) == 0) {
+
+                                            creep.findEnergyHarvested(closestSource)
+                                        }
+                                    } else {
+
+                                        let goal = _.map([closestSource], function(target) {
+                                            return { pos: target.pos, range: 0 }
+                                        })
+
+                                        creep.intraRoomPathing(creep.pos, goal)
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 };

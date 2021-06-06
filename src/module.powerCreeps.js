@@ -53,7 +53,7 @@ module.exports = {
 
                 creep.usePower(PWR_GENERATE_OPS)
 
-                if (powerSpawn && !creep.pos.isNearTo(powerSpawn)) {
+                if (powerSpawn && !creep.pos.inRangeTo(powerSpawn, 2)) {
 
                     creep.intraRoomPathing(creep.pos, powerSpawn)
                 }

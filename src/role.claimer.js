@@ -3,8 +3,9 @@ module.exports = {
     run: function(creep) {
 
         creep.memory.target = Memory.global.claimerTarget
+        const target = creep.memory.target
 
-        if (creep.room.name == creep.memory.target) {
+        if (creep.room.name == target) {
 
             if (creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE) {
 
@@ -19,9 +20,9 @@ module.exports = {
             }
         } else {
 
-            creep.say("NC " + creep.memory.target)
+            creep.say("NC " + target)
 
-            let goal = _.map([new RoomPosition(25, 25, creep.memory.target)], function(pos) {
+            let goal = _.map([new RoomPosition(25, 25, target)], function(pos) {
                 return { pos: pos, range: 1 }
             })
 
