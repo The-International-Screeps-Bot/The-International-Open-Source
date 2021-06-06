@@ -27,6 +27,8 @@ Creep.prototype.barricadesFindAndRepair = function() {
 
         if (barricade && barricade.hits < quota + creep.myParts("work") * 500) {
 
+            creep.say((quota + creep.myParts("work") * 500) / 1000 + "k")
+
             creep.repairBarricades(barricade)
 
             return
