@@ -47,13 +47,13 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            var claimerTarget = "E36S1"
+            //var claimerTarget = "E36S1"
 
-            //var claimerTarget
+            var claimerTarget
 
-            var builderTarget = "E36S1"
+            //var builderTarget = "E36S1"
 
-            //var builderTarget
+            var builderTarget
         } else {
 
             //var claimerTarget = "E25N11"
@@ -971,7 +971,7 @@ module.exports = {
 
                         let bodyRole = correctBody[0]
 
-                        if (bodyRole.role == role && freeEnergy >= 300 && requiredCreeps[role] && requiredCreeps[role] > 0) {
+                        if (bodyRole.role == role && freeEnergy >= 300) {
 
                             for (let spawns of room.memory.spawns) {
 
@@ -979,7 +979,7 @@ module.exports = {
 
                                 let testSpawn = spawn.spawnCreep(bodyRole.body, bodyRole.role, { dryRun: true })
 
-                                if (testSpawn == 0 && freeEnergy >= 300) {
+                                if (testSpawn == 0) {
 
                                     spawn.spawnCreep(bodyRole.body, (roomFixMessage + bodyRole.role + ", T" + bodyRole.tier + ", " + Game.time), {
                                         memory: {

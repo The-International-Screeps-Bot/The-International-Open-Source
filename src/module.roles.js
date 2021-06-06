@@ -49,7 +49,7 @@ module.exports = {
 
                 try {
                     roles[creep.memory.role].run(creep)
-                } catch {
+                } catch (err) {
 
                     //creep.suicide()
                 }
