@@ -9,7 +9,7 @@ module.exports = {
             if (creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE) {
 
                 creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#ffffff' } }, { reusePath: 50 });
-                creep.say("Claiming!");
+                creep.say("Claiming");
 
             }
             if (creep.signController(creep.room.controller, "A commune of The Internationale. Bourgeoisie not welcome here.") == ERR_NOT_IN_RANGE) {
@@ -19,7 +19,7 @@ module.exports = {
             }
         } else {
 
-            creep.say("Hello world")
+            creep.say("NC " + creep.memory.target)
 
             let goal = _.map([new RoomPosition(25, 25, creep.memory.target)], function(pos) {
                 return { pos: pos, range: 1 }

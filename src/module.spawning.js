@@ -47,11 +47,11 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            //var claimerTarget = "E33N2"
+            //var claimerTarget = "E36S1"
 
             var claimerTarget
 
-            //var builderTarget = "E33N2"
+            //var builderTarget = "E36S1"
 
             var builderTarget
         } else {
@@ -248,7 +248,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["hauler"] = 4
+                        minCreeps["hauler"] = 5
                         break
                     case 3:
 
@@ -256,7 +256,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["hauler"] = 3
+                        minCreeps["hauler"] = 4
                         break
                     case 4:
 
@@ -411,7 +411,7 @@ module.exports = {
 
                 if (target4) {
 
-                    minCreeps["scout"] = 2
+                    minCreeps["scout"] = 1
                 }
 
                 if (remoteBuilderNeed && stage >= 4) {
