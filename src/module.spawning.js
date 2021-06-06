@@ -379,7 +379,7 @@ module.exports = {
                     minCreeps["stationaryHauler"] = 1
                 }
 
-                if (hostileAttacker.length > 0 && stage >= 2) {
+                if (hostileAttacker.length > 0) {
 
                     minCreeps["rangedDefender"] = 2
                 }
