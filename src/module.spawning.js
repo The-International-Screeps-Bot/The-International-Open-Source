@@ -144,7 +144,7 @@ module.exports = {
 
                 let hostileAttacker = room.find(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
-                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && c.owner.username != "Invader" && (c.getActiveBodyparts(ATTACK) != 0 || c.getActiveBodyparts(RANGED_ATTACK) != 0 || c.getActiveBodyparts(WORK) != 0))
+                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && c.owner.username != "Invader" && (c.getActiveBodyparts(ATTACK) != 0 || c.getActiveBodyparts(RANGED_ATTACK) != 0 || c.getActiveBodyparts(WORK) != 0 || c.getActiveBodyparts(CARRY) != 0))
                     }
                 })
 
@@ -666,11 +666,11 @@ module.exports = {
                 let upgraderBody = roleValues(
                     [{
                             stage: 8,
-                            defaultParts: [CARRY, CARRY, MOVE],
-                            defaultCost: 150,
+                            defaultParts: [CARRY, CARRY],
+                            defaultCost: 100,
                             extraParts: [WORK, WORK, MOVE],
                             extraCost: 250,
-                            sliceAmount: 24
+                            sliceAmount: 5
                         },
                         {
                             stage: 3,
