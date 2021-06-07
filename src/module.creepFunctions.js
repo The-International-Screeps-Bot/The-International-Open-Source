@@ -21,13 +21,15 @@ Creep.prototype.barricadesFindAndRepair = function() {
 
     for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
 
+        quota += +creep.myParts("work") * 500
+
         let barricade = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
         })
 
-        if (barricade && barricade.hits < quota + creep.myParts("work") * 500) {
+        if (barricade) {
 
-            creep.say((quota + creep.myParts("work") * 500) / 1000 + "k")
+            creep.say(quota / 1000 + "k")
 
             creep.repairBarricades(barricade)
 
