@@ -147,7 +147,7 @@ module.exports = {
                                     creep.transfer(baseLink, RESOURCE_ENERGY)
                                 } else {
 
-                                    creep.widthdraw(storage, RESOURCE_ENERGY)
+                                    creep.withdraw(storage, RESOURCE_ENERGY)
                                 }
                             } else {
 
@@ -156,9 +156,11 @@ module.exports = {
                                     if (creep.memory.isFull == true) {
 
                                         creep.transfer(terminal, RESOURCE_ENERGY)
+                                        creep.memory.storageToTerminal = false
+
                                     } else {
 
-                                        creep.widthdraw(storage, RESOURCE_ENERGY)
+                                        creep.withdraw(storage, RESOURCE_ENERGY)
                                     }
                                 }
                             }

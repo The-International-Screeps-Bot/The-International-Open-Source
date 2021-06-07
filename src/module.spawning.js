@@ -47,10 +47,12 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            var newCommune = "E36S1"
+            //var newCommune = "E31S4"
+            var newCommune
         } else {
 
             //var newCommune = "E29N11"
+            var newCommune
         }
 
         let attackRoom

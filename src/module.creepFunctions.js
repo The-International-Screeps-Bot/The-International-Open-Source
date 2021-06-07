@@ -21,7 +21,7 @@ Creep.prototype.barricadesFindAndRepair = function() {
 
     for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
 
-        quota += +creep.myParts("work") * 500
+        quota += creep.myParts("work") * 500
 
         let barricade = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
@@ -445,7 +445,7 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
     creep = this
 
     let allowedRooms = {
-        [origin]: true
+        [origin.roomName]: true
     };
     Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
         routeCallback(roomName) {
@@ -471,8 +471,9 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
 
             if (!room) return
 
-            if (!allowedRooms[roomName]) {
-                return
+            if (allowedRooms[roomName] === undefined) {
+
+                return false
             }
 
             let costs = new PathFinder.CostMatrix
