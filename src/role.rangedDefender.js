@@ -36,7 +36,7 @@ module.exports = {
 
                 creep.rangedAttack(enemyCreep)
 
-                if (!creep.pos.inRangeTo(enemyCreep, 3)) {
+                if (!creep.pos.inRangeTo(enemyCreep, 2)) {
 
                     let goal = _.map([enemyCreep], function(target) {
                         return { pos: target.pos, range: 1 }
