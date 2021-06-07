@@ -3,7 +3,7 @@ var roleBuilder = require('role.builder');
 module.exports = {
     run: function(creep) {
 
-        creep.memory.target = Memory.global.builderTarget
+        creep.memory.target = Memory.global.newCommune
 
         let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
 
@@ -91,7 +91,7 @@ module.exports = {
                                             return { pos: target.pos, range: 0 }
                                         })
 
-                                        creep.intraRoomPathing(creep.pos, goal)
+                                        creep.onlySafeRoomPathing(creep.pos, goal)
                                     }
                                 }
                             }

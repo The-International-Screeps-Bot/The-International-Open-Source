@@ -442,12 +442,16 @@ Creep.prototype.intraRoomPathing = function(origin, goal) {
 }
 Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
 
+    creep = this
+
     let allowedRooms = {
-        [from.roomName]: true
+        [origin]: true
     };
-    Game.map.findRoute(from.roomName, to.roomName, {
+    Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
         routeCallback(roomName) {
-            if (MemoryStore.rooms[roomName].stage == "enemyRoom") {
+
+            if (Memory.rooms[roomName].stage == "enemyRoom" && Memory.rooms[roomName].attackTarget != true) {
+
                 return Infinity
             } else {
 
@@ -456,17 +460,50 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
         }
     }).forEach(function(info) {
         allowedRooms[info.room] = true;
-    });
+    })
 
-    let ret = PathFinder.search(origin, goal, {
-        roomCallback(roomName) {
+    var path = PathFinder.search(origin, goal, {
+        plainCost: 1,
+
+        roomCallback: function(roomName) {
+
+            let room = Game.rooms[roomName]
+
+            if (!room) return
+
             if (!allowedRooms[roomName]) {
-                return false;
+                return
             }
-        }
-    });
 
-    console.log(ret.path);
+            let costs = new PathFinder.CostMatrix
+
+            room.find(FIND_STRUCTURES).forEach(function(struct) {
+                if (struct.structureType !== STRUCTURE_ROAD && struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+
+                    costs.set(struct.pos.x, struct.pos.y, 0xff)
+
+                }
+            })
+            room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
+                if (struct.structureType !== STRUCTURE_ROAD && struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+
+                    costs.set(struct.pos.x, struct.pos.y, 0xff)
+
+                }
+            })
+            room.find(FIND_CREEPS).forEach(function(creep) {
+                costs.set(creep.pos.x, creep.pos.y, 0xff);
+            });
+            return costs
+
+        }
+    }).path
+
+    creep.memory.path = path
+
+    creep.moveByPath(creep.memory.path)
+
+    new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
 Creep.prototype.rampartPathing = function(origin, goal) {
 

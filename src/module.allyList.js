@@ -1,7 +1,7 @@
 module.exports = {
     run: function allyList() {
 
-        let allyList = ["slowmotionghost", "q13214", "mrmartinstreet", "orlet", "BarryOSeven"]
+        let allyList = ["q13214", "mrmartinstreet", "orlet", "barryoseven"]
 
         return allyList
     }

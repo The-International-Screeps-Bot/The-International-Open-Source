@@ -47,52 +47,46 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            //var claimerTarget = "E36S1"
-
-            var claimerTarget
-
-            //var builderTarget = "E36S1"
-
-            var builderTarget
+            var newCommune = "E36S1"
         } else {
 
-            //var claimerTarget = "E25N11"
-
-            var claimerTarget
-
-            //var builderTarget = "E25N11"
-
-            var builderTarget
+            //var newCommune = "E29N11"
         }
 
-        Memory.global.claimerTarget = claimerTarget
-        Memory.global.builderTarget = builderTarget
+        let attackRoom
 
-        let target4 = Game.flags.S
-        let target9 = Game.flags.R
+        Memory.global.newCommune = newCommune
 
-        let communeEstablisher
-        let communeEstablisherFound = false
+        let communeEstablisher = findCommuneEstablisher()
 
-        if (builderTarget && communeEstablisherFound == false) {
-            for (let maxDistance = 1; maxDistance <= 12 && !communeEstablisher; maxDistance++) {
+        function findCommuneEstablisher() {
+            if (newCommune) {
 
-                _.forEach(Game.rooms, function(room) {
+                for (let maxDistance = 1; maxDistance <= 12; maxDistance++) {
 
-                    if (room.controller && room.controller.my && room.memory.stage >= 3) {
+                    for (let room of Object.keys(Game.rooms)) {
 
-                        let distance = Game.map.getRoomLinearDistance(builderTarget, room.name)
+                        room = Game.rooms[room]
 
-                        if (distance < maxDistance) {
+                        if (room.controller && room.controller.my && room.memory.stage >= 3) {
 
-                            communeEstablisher = room
-                            communeEstablisherFound = true
-                            console.log("BT, d " + distance + "D " + maxDistance + "R " + room.name)
-                            return
+                            let distance = Game.map.getRoomLinearDistance(newCommune, room.name)
+
+                            if (distance < maxDistance) {
+
+                                console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
+
+                                return room
+                            }
                         }
                     }
-                })
+                }
             }
+        }
+
+        function findAttackingRooms() {
+
+
         }
 
         _.forEach(Game.rooms, function(room) {
@@ -384,7 +378,7 @@ module.exports = {
                     minCreeps["rangedDefender"] = 2
                 }
 
-                if (target9 && stage >= 4 /**/ ) {
+                if (Game.flags.R && stage >= 4 /**/ ) {
 
                     minCreeps["robber"] = 2
                 }
@@ -394,12 +388,12 @@ module.exports = {
                     minCreeps["repairer"] = 1
                 }
 
-                if (claimerTarget && room == communeEstablisher) {
+                if (newCommune && room == communeEstablisher) {
 
                     minCreeps["claimer"] = 1
                 }
 
-                if (builderTarget && room == communeEstablisher) {
+                if (newCommune && room == communeEstablisher) {
 
                     minCreeps["revolutionaryBuilder"] = 4
                 }
@@ -409,7 +403,7 @@ module.exports = {
                     minCreeps["miner"] = 1
                 }
 
-                if (target4) {
+                if (Game.flags.S) {
 
                     minCreeps["scout"] = 1
                 }
