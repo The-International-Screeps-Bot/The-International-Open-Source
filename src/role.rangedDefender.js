@@ -32,42 +32,23 @@ module.exports = {
 
                     creep.rangedAttack(enemyCreep)
                 }
-            }
-        }
+            } else {
 
-        /*
-        let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_RAMPART
-        })
-
-        for (let rampart of ramparts) {
-
-            if (enemyCreep && rampart.pos.inRangeTo(enemyCreep, 2)) {
-
-                target = rampart
-                break
-            }
-        }
-        if (target && enemyCreep) {
-        
-            if (!creep.pos.inRangeTo(target, 0)) {
-                
-                creep.moveTo(target, {reusePath: 50})
-            }
-            
-            if (creep.pos.inRangeTo(enemyCreep, 1)) {
-                
-                creep.rangedMassAttack(enemyCreep)
-            }
-            else if (creep.pos.inRangeTo(enemyCreep, 2)) {
-                
                 creep.rangedAttack(enemyCreep)
-            }
-            else if (creep.pos.inRangeTo(enemyCreep, 3)) {
-                
-                creep.rangedAttack(enemyCreep)
+
+                if (!creep.pos.inRangeTo(enemyCreep, 3)) {
+
+                    let goal = _.map([enemyCreep], function(target) {
+                        return { pos: target.pos, range: 1 }
+                    })
+
+                    creep.intraRoomPathing(creep.pos, goal)
+                }
+                if (creep.pos.isNearTo(enemyCreep)) {
+
+                    creep.rangedMassAttack(enemyCreep)
+                }
             }
         }
-        */
     }
 };
