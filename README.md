@@ -51,13 +51,12 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [ ] Assisting of defending rooms using safe rooms in case of power creep assisted attack
 - [ ] Weighting of rooms from economic to military depending on recent history and neighbours
 - [x] Communication and coordination between rooms about global stage, economy, threats
-- [ ] Advanced pathing to avoid rooms with known threats
+- [x] Advanced pathing to avoid rooms with known threats
 - [x] Have nearest rooms establish and claim rooms
 - [ ] Spawn specific defender creeps depending on attackers
-- [ ] Determine if boosting is necessary for defenders
+- [ ] Determine if boosting is necessary for defenders or attackers
 - [x] Have defenders move to ramparts near attackers
 - [x] Spawn new civilian creeps when TTL is less than time to spawn
-- [ ] Add a GUI for performing manual actions from the console
 - [x] Information panel to provide information about the development of the bot
 - [ ] Communication with allies via the public segment
 - [x] Create a task manager to avoid creeps switching tasks halfway through
