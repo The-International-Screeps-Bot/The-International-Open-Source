@@ -88,7 +88,7 @@ module.exports = {
                                     } else {
 
                                         let goal = _.map([closestSource], function(target) {
-                                            return { pos: target.pos, range: 0 }
+                                            return { pos: target.pos, range: 1 }
                                         })
 
                                         creep.onlySafeRoomPathing(creep.pos, goal)
