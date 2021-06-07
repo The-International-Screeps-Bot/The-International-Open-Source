@@ -45,6 +45,10 @@ module.exports.loop = function() {
 
     cpuUsed = Game.cpu.getUsed()
 
+    stats.run()
+
+    cpuUsed = Game.cpu.getUsed()
+
     if (Game.time % 1 == 0) {
 
         constants.run()
@@ -54,10 +58,6 @@ module.exports.loop = function() {
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
 
     console.log("constants: " + cpuUsed)
-
-    cpuUsed = Game.cpu.getUsed()
-
-    stats.run()
 
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
 
