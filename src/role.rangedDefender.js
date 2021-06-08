@@ -1,8 +1,12 @@
+let allyList = require("module.allyList")
+
 module.exports = {
     run: function(creep) {
 
         let enemyCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-            filter: (c) => c.owner.username !== "cplive" && c.owner.username !== "Brun1L"
+            filter: (c) => {
+                return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || body.some(i => i.type === CARRY)))
+            }
         })
 
         creep.say("No Enemy")

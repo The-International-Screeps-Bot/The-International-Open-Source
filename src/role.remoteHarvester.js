@@ -178,7 +178,7 @@ module.exports = {
             //targets
             var hostileCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                 filter: (c) => {
-                    return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) != 0 || c.getActiveBodyparts(RANGED_ATTACK) != 0))
+                    return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK)))
                 }
             })
             var hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
