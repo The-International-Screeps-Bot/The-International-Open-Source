@@ -42,18 +42,14 @@ module.exports = {
 
                 if (lowTower) {
 
-                    if (creep.advancedTransfer(lowTower) == 0) {
+                    creep.advancedTransfer(lowTower)
 
-                        creep.memory.task = undefined
-                    }
                 } else {
 
                     if (essentialStructure) {
 
-                        if (creep.advancedTransfer(essentialStructure) == 0) {
+                        creep.advancedTransfer(essentialStructure)
 
-                            creep.memory.task = undefined
-                        }
                     } else {
 
                         if (creep.advancedTransfer(storage) == 0) {
