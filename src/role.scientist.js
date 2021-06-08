@@ -3299,15 +3299,17 @@ module.exports = {
                     } else if (creep.memory.target == false) {
 
                         creep.say("T")
-                        creep.moveTo(terminal, { reusePath: 50 })
+                        creep.isFull()
 
-                        if (creep.pos.isNearTo(terminal) && creep.store.getUsedCapacity() > 0) {
-
+                        if (creep.memory.isFull) {
                             for (let resources in creep.store) {
 
-                                creep.transfer(terminal, resources)
+                                creep.advancedTransfer(terminal, resources)
 
                             }
+                        } else {
+
+                            creep.intraRoomPathing(creep.pos, primaryLab[0])
                         }
                     }
                 }

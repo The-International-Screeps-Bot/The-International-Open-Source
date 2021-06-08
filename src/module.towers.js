@@ -29,11 +29,11 @@ module.exports = {
 
                     let hostile = room.find(FIND_HOSTILE_CREEPS, {
                         filter: (c) => {
-                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || body.some(i => i.type === CARRY)))
+                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CARRY)))
                         }
                     })[0]
 
-                    if (hostile && (hostile.pos.inRangeTo(tower, 10) || hostile.hits < hostile.hitsMax * 0.75)) {
+                    if (hostile && (hostile.pos.inRangeTo(room.find(FIND_MY_SPAWNS)[0], 15) || hostile.hits < hostile.hitsMax * 0.75)) {
 
                         for (let tower of towers) {
 
