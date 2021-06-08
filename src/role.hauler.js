@@ -214,11 +214,11 @@ module.exports = {
 
                 if (terminal && terminal.store[resource.type] >= resource.amount) {
 
-                    creep.advancedWithdraw(terminal, resource.type, amount)
+                    creep.advancedWithdraw(terminal, resource.type, resource.amount)
 
                 } else if (storage && storage.store[resource.type] >= resource.amount) {
 
-                    creep.advancedWithdraw(storage, resource.type, amount)
+                    creep.advancedWithdraw(storage, resource.type, resource.amount)
                 }
             } else {
 

@@ -165,20 +165,16 @@ Creep.prototype.advancedWithdraw = function(target, resource, amount) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-Creep.prototype.advancedTransfer = function(target, resource, amount) {
+Creep.prototype.advancedTransfer = function(target, resource) {
 
     if (!resource) {
 
         resource = RESOURCE_ENERGY
     }
-    if (!amount) {
-
-        amount = creep.store.getCapacity()
-    }
 
     if (creep.pos.isNearTo(target)) {
 
-        creep.transfer(target, resource, [amount])
+        creep.transfer(target, resource)
         return 0
 
     } else {
