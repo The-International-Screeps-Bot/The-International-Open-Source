@@ -163,14 +163,6 @@ module.exports = {
                     findCreepWithoutTask().memory.task = "fillPowerSpawn"
                 }
             }
-
-            for (let object of haulers) {
-
-                if (object.roomFrom == room.name) {
-
-                    roleHauler.run(object.creep)
-                }
-            }
         }
     }
 };
