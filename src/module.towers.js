@@ -33,7 +33,7 @@ module.exports = {
                         }
                     })[0]
 
-                    if (hostile) {
+                    if (hostile && (hostile.pos.inRangeTo(tower, 10) || hostile.hits < hostile.hitsMax * 0.75)) {
 
                         for (let tower of towers) {
 

@@ -431,10 +431,12 @@ Creep.prototype.intraRoomPathing = function(origin, goal) {
             room.find(FIND_CREEPS).forEach(function(creep) {
                 costs.set(creep.pos.x, creep.pos.y, 0xff);
             });
+            room.find(FIND_POWER_CREEPS).forEach(function(creep) {
+                costs.set(creep.pos.x, creep.pos.y, 0xff);
+            });
 
 
             return costs
-
         }
     }).path
 
@@ -499,8 +501,11 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
             room.find(FIND_CREEPS).forEach(function(creep) {
                 costs.set(creep.pos.x, creep.pos.y, 0xff);
             });
-            return costs
+            room.find(FIND_POWER_CREEPS).forEach(function(creep) {
+                costs.set(creep.pos.x, creep.pos.y, 0xff);
+            });
 
+            return costs
         }
     }).path
 
@@ -556,7 +561,9 @@ Creep.prototype.rampartPathing = function(origin, goal) {
             room.find(FIND_CREEPS).forEach(function(creep) {
                 costs.set(creep.pos.x, creep.pos.y, 0xff);
             });
-
+            room.find(FIND_POWER_CREEPS).forEach(function(creep) {
+                costs.set(creep.pos.x, creep.pos.y, 0xff);
+            });
 
             return costs
 
@@ -603,10 +610,11 @@ Creep.prototype.creepFlee = function(origin, target) {
             room.find(FIND_CREEPS).forEach(function(creep) {
                 costs.set(creep.pos.x, creep.pos.y, 0xff);
             });
-
+            room.find(FIND_POWER_CREEPS).forEach(function(creep) {
+                costs.set(creep.pos.x, creep.pos.y, 0xff);
+            });
 
             return costs
-
         }
     }).path
 
