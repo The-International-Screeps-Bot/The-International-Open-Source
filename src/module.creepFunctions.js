@@ -138,16 +138,20 @@ Creep.prototype.pickupDroppedEnergy = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-Creep.prototype.advancedWithdraw = function(target, resource) {
+Creep.prototype.advancedWithdraw = function(target, resource, amount) {
 
     if (!resource) {
 
-        var resource = RESOURCE_ENERGY
+        resource = RESOURCE_ENERGY
+    }
+    if (!amount) {
+
+        amount = creep.store.getCapacity()
     }
 
     if (creep.pos.isNearTo(target)) {
 
-        creep.withdraw(target, resource)
+        creep.withdraw(target, resource, [amount])
         return 0
 
     } else {
@@ -161,16 +165,20 @@ Creep.prototype.advancedWithdraw = function(target, resource) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-Creep.prototype.advancedTransfer = function(target, resource) {
+Creep.prototype.advancedTransfer = function(target, resource, amount) {
 
     if (!resource) {
 
-        var resource = RESOURCE_ENERGY
+        resource = RESOURCE_ENERGY
+    }
+    if (!amount) {
+
+        amount = creep.store.getCapacity()
     }
 
     if (creep.pos.isNearTo(target)) {
 
-        creep.transfer(target, resource)
+        creep.transfer(target, resource, [amount])
         return 0
 
     } else {
