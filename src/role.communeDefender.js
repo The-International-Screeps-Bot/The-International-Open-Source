@@ -135,11 +135,23 @@ module.exports = {
 
                         if (rampart) {
 
-                            goal = _.map([rampart], function(target) {
-                                return { pos: target.pos, range: 0 }
+                            let goal = _.map([rampart], function(target) {
+                                return { pos: target.pos, range: 1 }
                             })
 
                             creep.intraRoomPathing(creep.pos, goal)
+                        } else {
+
+                            let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
+
+                            if (spawn) {
+
+                                let goal = _.map([spawn], function(target) {
+                                    return { pos: target.pos, range: 1 }
+                                })
+
+                                creep.intraRoomPathing(creep.pos, goal)
+                            }
                         }
                     }
                 } else {

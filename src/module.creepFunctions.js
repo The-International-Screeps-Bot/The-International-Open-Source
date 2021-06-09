@@ -503,7 +503,7 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
     Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
         routeCallback(roomName) {
 
-            if (Memory.rooms[roomName].stage == "enemyRoom") {
+            if (Memory.rooms[roomName].stage == "enemyRoom" || Memory.rooms[roomName].stage == "keeperRoom") {
 
                 allowedRooms[roomName] = false
             } else {

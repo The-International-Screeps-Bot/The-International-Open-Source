@@ -198,13 +198,29 @@ module.exports = {
                 }
             } else {
 
-                creep.room.memory.stage = "emptyRoom"
-
-                let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
-                    return { pos: pos, range: 1 }
+                let keeperLair = room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_KEEPER_LAIR
                 })
 
-                creep.offRoadPathing(creep.pos, goal)
+                if (keeperLair.length > 0) {
+
+                    creep.room.memory.stage = "keeperRoom"
+
+                    let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
+                        return { pos: pos, range: 1 }
+                    })
+
+                    creep.offRoadPathing(creep.pos, goal)
+                } else {
+
+                    creep.room.memory.stage = "emptyRoom"
+
+                    let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
+                        return { pos: pos, range: 1 }
+                    })
+
+                    creep.offRoadPathing(creep.pos, goal)
+                }
             }
         }
     }
