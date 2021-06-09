@@ -23,42 +23,17 @@ module.exports = {
 
             if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
 
-                creep.say("W")
-
                 if (controllerLink && (controllerContainer == null || controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity())) {
                     if (controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
 
-                        //creep.say("🔋 CL")
-
-                        creep.advancedWithdraw(controllerLink)
-
-                    } else if (!creep.pos.isNearTo(controllerLink)) {
-
-                        let origin = creep.pos
-
-                        let goal = _.map([controllerLink], function(target) {
-                            return { pos: target.pos, range: 1 }
-                        })
-
-                        creep.intraRoomPathing(origin, goal)
+                        creep.advancedWithdraw(controllerLink, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
 
                     }
                 } else if (controllerContainer) {
                     if (controllerContainer.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
 
-                        //creep.say("🔋 CC")
+                        creep.advancedWithdraw(controllerContainer, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
 
-                        creep.advancedWithdraw(controllerContainer)
-
-                    } else if (!creep.pos.isNearTo(controllerContainer)) {
-
-                        let origin = creep.pos
-
-                        let goal = _.map([controllerContainer], function(target) {
-                            return { pos: target.pos, range: 1 }
-                        })
-
-                        creep.intraRoomPathing(origin, goal)
                     }
                 }
             }
