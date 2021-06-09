@@ -51,8 +51,8 @@ module.exports = {
             var newCommune
         } else {
 
-            //var newCommune = "E29N11"
-            var newCommune
+            var newCommune = "E29N11"
+                //var newCommune
         }
 
         let attackRoom

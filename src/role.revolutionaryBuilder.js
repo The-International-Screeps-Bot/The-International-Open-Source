@@ -20,7 +20,7 @@ module.exports = {
 
             creep.say("BC " + creep.memory.target)
 
-            creep.offRoadPathing(creep.pos, goal)
+            creep.onlySafeRoomPathing(creep.pos, goal)
         } else {
 
             creep.isFull()
@@ -91,7 +91,7 @@ module.exports = {
                                             return { pos: target.pos, range: 1 }
                                         })
 
-                                        creep.onlySafeRoomPathing(creep.pos, goal)
+                                        creep.intraRoomPathing(creep.pos, goal)
                                     }
                                 }
                             }

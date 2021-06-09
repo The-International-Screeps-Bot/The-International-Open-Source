@@ -496,22 +496,24 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
     creep = this
 
     let allowedRooms = {
-        [origin.roomName]: true
-    };
+        [origin.roomName]: true,
+        [goal[0].pos.roomName]: true
+    }
+
     Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
         routeCallback(roomName) {
 
-            if (Memory.rooms[roomName].stage == "enemyRoom" && Memory.rooms[roomName].attackTarget != true) {
+            if (Memory.rooms[roomName].stage == "enemyRoom") {
 
-                return Infinity
+                allowedRooms[roomName] = false
             } else {
 
-                return 1
+                allowedRooms[roomName] = true
             }
         }
-    }).forEach(function(info) {
-        allowedRooms[info.room] = true;
     })
+
+    console.log(JSON.stringify(allowedRooms))
 
     var path = PathFinder.search(origin, goal, {
         plainCost: 1,
@@ -522,7 +524,7 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
 
             if (!room) return
 
-            if (allowedRooms[roomName] === undefined) {
+            if (allowedRooms[roomName] != true) {
 
                 return false
             }

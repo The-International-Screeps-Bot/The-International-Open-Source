@@ -336,7 +336,7 @@ module.exports = {
                     })
                 }
 
-                if (controller.progress != NaN) {
+                if (controller.progressTotal) {
 
                     room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 2, { align: 'center' });
                 }

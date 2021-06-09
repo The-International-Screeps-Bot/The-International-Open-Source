@@ -33,7 +33,7 @@ module.exports = {
                         }
                     })[0]
 
-                    if (hostile && (hostile.pos.inRangeTo(room.find(FIND_MY_SPAWNS)[0], 15) || hostile.hits < hostile.hitsMax * 0.75)) {
+                    if (hostile && room.find(FIND_MY_SPAWNS)[0] && (hostile.pos.inRangeTo(room.find(FIND_MY_SPAWNS)[0], 15) || hostile.hits < hostile.hitsMax * 0.75)) {
 
                         for (let tower of towers) {
 

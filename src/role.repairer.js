@@ -6,7 +6,7 @@ module.exports = {
         if (creep.memory.isFull == true) {
 
             let lowLogisticStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.75
+                filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits <= (s.hitsMax - creep.myParts("work") * 100)
             })
 
             creep.say("🔧")
