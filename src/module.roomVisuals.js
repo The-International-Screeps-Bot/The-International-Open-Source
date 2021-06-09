@@ -336,7 +336,10 @@ module.exports = {
                     })
                 }
 
-                room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 2, { align: 'center' });
+                if (controller.progress != NaN) {
+
+                    room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 2, { align: 'center' });
+                }
 
                 room.visual.text(controller.level, controller.pos.x, controller.pos.y - 1, { align: 'center' });
 
