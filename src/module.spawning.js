@@ -338,10 +338,10 @@ module.exports = {
 
                     if (stage <= 3) {
 
-                        minCreeps["upgrader"] = 3
+                        minCreeps["upgrader"] = 4
                     } else {
 
-                        minCreeps["upgrader"] = 2
+                        minCreeps["upgrader"] = 3
                     }
                 } else if (room.storage &&
                     room.storage.store[RESOURCE_ENERGY] >= 50000) {
