@@ -203,7 +203,7 @@ module.exports = {
 
                                     //console.log(filteredResource + ", " + terminal.room.name)
 
-                                    let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == filteredResource && order.price < 1 && order.amount >= (6000 - terminal.store.getUsedCapacity([filteredResource])))
+                                    let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == filteredResource && order.price < avgPrice(resourceType) * 1.2 && order.amount >= (6000 - terminal.store.getUsedCapacity([filteredResource])))
 
                                     if (buyOrders[0]) {
 
