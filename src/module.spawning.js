@@ -322,7 +322,7 @@ module.exports = {
 
                             minCreeps["builder"] = 2
                         }
-                    } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000) {
+                    } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 40000) {
 
                         if (stage <= 5) {
 
@@ -332,6 +332,11 @@ module.exports = {
                             minCreeps["builder"] = 1
                         }
                     }
+                }
+
+                if (room.controller.ticksToDowngrade <= 15000) {
+
+                    minCreeps["upgrader"] = 1
                 }
 
                 if (!room.storage) {
@@ -361,7 +366,7 @@ module.exports = {
                         minCreeps["barricadeUpgrader"] = 1
 
                     } else if (room.storage &&
-                        room.storage.store[RESOURCE_ENERGY] >= 40000) {
+                        room.storage.store[RESOURCE_ENERGY] >= 30000) {
 
                         minCreeps["barricadeUpgrader"] = 1
                     }

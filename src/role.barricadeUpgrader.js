@@ -22,7 +22,7 @@ module.exports = {
 
                 let target = storage
 
-                if (target.store[RESOURCE_ENERGY] >= 10000) {
+                if (target.store[RESOURCE_ENERGY] >= 30000) {
 
                     creep.advancedWithdraw(target)
                 }

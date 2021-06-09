@@ -22,7 +22,7 @@ module.exports = {
 
                 let terminal = creep.room.terminal
 
-                if (terminal && terminal.store[RESOURCE_ENERGY] >= 50000) {
+                if (terminal && terminal.store[RESOURCE_ENERGY] >= 30000) {
 
                     creep.say("T >= 50k")
 
@@ -37,7 +37,7 @@ module.exports = {
 
                         let target = storage
 
-                        if (target.store[RESOURCE_ENERGY] >= 10000) {
+                        if (target.store[RESOURCE_ENERGY] >= 35000) {
 
                             creep.advancedWithdraw(target)
                         }
