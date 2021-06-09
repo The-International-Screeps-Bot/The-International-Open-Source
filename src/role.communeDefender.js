@@ -129,9 +129,18 @@ module.exports = {
 
                         creep.say(target)
 
-                        let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
+                        let rampart = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            filter: s => s.structureType == STRUCTURE_RAMPART
+                        })
 
-                        creep.moveTo(spawn)
+                        if (rampart) {
+
+                            goal = _.map([rampart], function(target) {
+                                return { pos: target.pos, range: 0 }
+                            })
+
+                            creep.intraRoomPathing(creep.pos, goal)
+                        }
                     }
                 } else {
 
