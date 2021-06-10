@@ -514,7 +514,7 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
 
             if (!room) return
 
-            if (allowedRooms[roomName] != true) {
+            if (!allowedRooms[roomName]) {
 
                 return false
             }
