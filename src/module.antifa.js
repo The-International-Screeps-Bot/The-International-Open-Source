@@ -62,7 +62,9 @@ module.exports = {
                                 }
                             })
 
-                            if (hostile) {
+                            let hostileIsEdge = (hostile.pos.x <= 0 || hostile.pos.x >= 48 || hostile.pos.y <= 0 || hostile.pos.y >= 48)
+
+                            if (hostile && !hostileIsEdge) {
 
                                 leader.say("H")
 
