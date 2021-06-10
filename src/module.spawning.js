@@ -5,7 +5,7 @@ let allyList = require("module.allyList");
 module.exports = {
     run: function spawns() {
 
-        let rolesList = ["harvester1", "hauler", "harvester2", "upgrader", "builder", "repairer", "upgradeHauler", "barricadeUpgrader", "claimer", "revolutionaryBuilder", "rangedDefender", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
+        let rolesList = ["harvester1", "hauler", "harvester2", "upgrader", "builder", "repairer", "barricadeUpgrader", "rangedDefender", "upgradeHauler", "claimer", "revolutionaryBuilder", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
         let remoteRoles = ["remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver"]
 
         let creepsOfRole = {}
@@ -48,14 +48,23 @@ module.exports = {
         if (Game.shard.name == "shard2") {
 
             var newCommune = "E21N3"
-                //var newCommune
+
+            //var newCommune
+
+            //var attackTarget
+
+            var attackTarget
+
         } else {
 
             //var newCommune = "E29N11"
-            var newCommune
-        }
 
-        let attackRoom
+            var newCommune
+
+            var attackTarget = "E32N16"
+
+            //var attackTarget
+        }
 
         Memory.global.newCommune = newCommune
 
@@ -86,9 +95,36 @@ module.exports = {
             }
         }
 
+        Memory.global.attackTarget = attackTarget
+
+        let attackingRoom = findAttackingRooms()
+
         function findAttackingRooms() {
 
+            if (attackTarget) {
 
+                for (let stage = 8; stage != 0; stage--) {
+                    for (let maxDistance = 1; maxDistance <= 10; maxDistance++) {
+
+                        for (let room of Object.keys(Game.rooms)) {
+
+                            room = Game.rooms[room]
+
+                            if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.memory.totalEnergy && room.memory.totalEnergy >= 30000) {
+
+                                let distance = Game.map.getRoomLinearDistance(attackTarget, room.name)
+
+                                if (distance < maxDistance) {
+
+                                    console.log("AT, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
+
+                                    return room
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         _.forEach(Game.rooms, function(room) {
@@ -300,16 +336,10 @@ module.exports = {
                         break
                 }
 
-                let squads = 0
+                if (attackingRoom && attackingRoom == room) {
 
-                if (room.name == "E18S1") {
-
-                    squads = 4
-                }
-                if (Game.flags.BB /*&& attackRoom == room*/ ) {
-
-                    minCreeps["antifaAssaulters"] = squads
-                    minCreeps["antifaSupporters"] = minCreeps["antifaAssaulters"]
+                    minCreeps["antifaAssaulter"] = 3
+                    minCreeps["antifaSupporter"] = minCreeps["antifaAssaulter"]
                 }
 
                 if (roomConstructionSite.length > 0) {
@@ -894,22 +924,22 @@ module.exports = {
                     var antifaAssaulterBody = roleValues(
                         [{
                             stage: 1,
-                            defaultParts: [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE],
-                            defaultCost: 6000,
-                            extraParts: [],
-                            extraCost: 0,
-                            sliceAmount: 50
+                            defaultParts: [],
+                            defaultCost: 0,
+                            extraParts: [RANGED_ATTACK, MOVE],
+                            extraCost: 200,
+                            sliceAmount: 2
                         }],
                         "antifaAssaulter")
 
                     var antifaSupporterBody = roleValues(
                         [{
                             stage: 1,
-                            defaultParts: [HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE],
-                            defaultCost: 8000,
-                            extraParts: [],
-                            extraCost: 0,
-                            sliceAmount: 50
+                            defaultParts: [],
+                            defaultCost: 0,
+                            extraParts: [HEAL, MOVE],
+                            extraCost: 300,
+                            sliceAmount: 2
                         }],
                         "antifaSupporter")
                 } else if (squadType == "attack") {
@@ -958,7 +988,7 @@ module.exports = {
                         "antifaSupporter")
                 }
 
-                let bodies = [harvester1Body, haulerBody, harvester2Body, upgraderBody, builderBody, repairerBody, upgradeHaulerBody, barricadeUpgraderBody, claimerBody, revolutionaryBuilderBody, rangedDefenderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
+                let bodies = [harvester1Body, haulerBody, harvester2Body, upgraderBody, builderBody, repairerBody, barricadeUpgraderBody, rangedDefenderBody, upgradeHaulerBody, claimerBody, revolutionaryBuilderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
 
                 let i = 0
 

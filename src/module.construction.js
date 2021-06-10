@@ -335,10 +335,10 @@ module.exports = {
 
                                     if (room.getTerrain().get(pos.x, pos.y) != TERRAIN_MASK_WALL) {
 
-                                        if (room.controller.level < 6) {
+                                        if (room.memory.stage >= 5) {
 
 
-                                        } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 40000) {
+                                        } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000) {
 
                                             room.createConstructionSite(pos.x, pos.y, structureType);
                                         }
