@@ -72,16 +72,6 @@ PowerCreep.prototype.findEnergyHarvested = function(source) {
     creep.say("⛏️ " + energyHarvested)
     Memory.stats.energyHarvested += energyHarvested
 }
-PowerCreep.prototype.roomHostile = function() {
-
-    creep = this
-
-    let hostiles = creep.room.find(FIND_HOSTILE_CREEPS)
-
-    creep.roomHostiles = _.isEqual(hostiles, allyList)
-
-    return creep.roomHostiles
-}
 PowerCreep.prototype.fleeHostileRoom = function() {
 
     creep = this

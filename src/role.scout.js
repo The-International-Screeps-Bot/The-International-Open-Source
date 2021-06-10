@@ -74,7 +74,7 @@ module.exports = {
 
             if (controller) {
 
-                if ((!controller.sign || controller.sign.username != "MarvinTMB") && (!controller.owner || controller.owner.username == "MarvinTMB")) {
+                if ((!controller.sign || controller.sign.username != "MarvinTMB") && !controller.reservation && (!controller.owner || controller.owner.username == "MarvinTMB")) {
 
                     creep.say("Signing")
 
@@ -139,7 +139,7 @@ module.exports = {
 
                     let newCommune = false
 
-                    if (creep.room.find(FIND_SOURCES).length == 2 && Game.gcl < Memory.global.communes.length && room.memory.claim != "notViable" && !controller.owner) {
+                    if (creep.room.find(FIND_SOURCES).length == 2 && Game.gcl < Memory.global.communes.length && room.memory.claim != "notViable" && !controller.owner && !controller.reservation) {
 
                         let nearbyCommune = false
 
@@ -175,7 +175,7 @@ module.exports = {
                         }
                     }
 
-                    if (!controller.my && controller.owner && controller.owner.username.indexOf(allyList) >= 0) {
+                    if (!controller.my && controller.owner && allyList.run().indexOf(controller.owner.username.toLowerCase()) >= 0) {
 
                         creep.room.memory.stage = "allyRoom"
                     } else {
@@ -187,7 +187,7 @@ module.exports = {
 
                         creep.room.memory.stage = "neutralRoom"
                     }
-                    if (newCommune == false) {
+                    if (!newCommune) {
 
                         let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
                             return { pos: pos, range: 1 }

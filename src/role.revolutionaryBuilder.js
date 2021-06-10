@@ -75,7 +75,7 @@ module.exports = {
                                 creep.pickupDroppedEnergy(droppedResources)
                             } else {
 
-                                let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
+                                let closestSource = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE)
 
                                 if (closestSource) {
 

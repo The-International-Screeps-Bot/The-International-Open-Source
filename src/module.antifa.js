@@ -23,21 +23,32 @@ module.exports = {
                     let leaderIsEdge = (leader.pos.x <= 0 || leader.pos.x >= 48 || leader.pos.y <= 0 || leader.pos.y >= 48)
                     let memberIsEdge = (member.pos.x <= 0 || member.pos.x >= 49 || member.pos.y <= 0 || member.pos.y >= 49)
 
-                    if (leader.pos.isNearTo(member) || leaderIsEdge || memberIsEdge) {
+                    const target = leader.memory.target = Memory.global.attackTarget
+
+                    if (leader.room.name == leader.memory.roomFrom && leader.pos.getRangeTo(leader.pos.findClosestByRange(FIND_MY_SPAWNS)) < 8) {
+
+                        if (leader.room.name == leader.memory.roomFrom) {
+
+                            let goal = _.map([leader.pos.findClosestByRange(FIND_MY_SPAWNS)], function(target) {
+                                return { pos: target.pos, range: 8 }
+                            })
+
+                            leader.creepFlee(leader.pos, goal)
+                        }
+                    } else if (leader.pos.isNearTo(member) || leaderIsEdge || memberIsEdge) {
 
                         member.say("F")
 
-                        let direction = member.pos.getDirectionTo(leader)
-
-                        member.move(direction)
+                        member.moveTo(leader)
 
                         let squadTarget
-                        let target = creep.memory.target = Memory.global.attackTarget
 
                         if (leader.room.name == target) {
 
                             let injuredCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                                filter: (c) => c.owner.username == "cplive" && c.owner.username == "Brun1L" && c.owner.username == "mrmartinstreet"
+                                filter: (c) => {
+                                    return (allyList.run().indexOf(c.owner.username.toLowerCase()) >= 0)
+                                }
                             })
 
                             if (injuredCreep && creep.moveTo(injuredCreep) != ERR_NO_PATH) {
@@ -79,7 +90,7 @@ module.exports = {
                                         return { pos: target.pos, range: 3 }
                                     })
 
-                                    leader.creepFlee(creep.pos, goal)
+                                    leader.creepFlee(leader.pos, goal)
 
                                 } else if (leader.pos.inRangeTo(hostile, 1)) {
 
@@ -89,14 +100,14 @@ module.exports = {
                                         return { pos: target.pos, range: 3 }
                                     })
 
-                                    leader.creepFlee(creep.pos, goal)
+                                    leader.creepFlee(leader.pos, goal)
                                 } else {
 
                                     let goal = _.map([hostile], function(target) {
                                         return { pos: target.pos, range: 1 }
                                     })
 
-                                    leader.intraRoomPathing(creep.pos, goal)
+                                    leader.intraRoomPathing(leader.pos, goal)
                                 }
 
 
@@ -203,8 +214,8 @@ module.exports = {
 
                             leader.say("AT")
 
-                            let goal = _.map([new RoomPosition(25, 25, target)], function(target) {
-                                return { pos: target, range: 3 }
+                            goal = _.map([new RoomPosition(25, 25, target)], function(pos) {
+                                return { pos: pos, range: 3 }
                             })
 
                             leader.onlySafeRoomPathing(leader.pos, goal)
@@ -214,7 +225,12 @@ module.exports = {
                         leader.say("No M")
 
                         member.say("No L")
-                        member.moveTo(leader)
+
+                        goal = _.map([leader], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
+
+                        member.onlySafeRoomPathing(member.pos, goal)
 
                     }
                 }
