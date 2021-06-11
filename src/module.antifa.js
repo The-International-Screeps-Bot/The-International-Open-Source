@@ -2,6 +2,46 @@ let allyList = require("module.allyList")
 let creepFunctions = require("module.creepFunctions")
 
 module.exports = {
+    run: function() {
+
+        let antifaAssaulters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaAssaulter');
+        let antifaSupporters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaSupporter');
+
+        for (let assaulter of antifaAssaulters) {
+
+
+        }
+        for (let supporter of antifaSupporters) {
+
+
+        }
+
+        function findCreepWithoutTask(creep, collection) {
+
+            for (let assaulter of collection) {
+
+                if (assaulter.roomFrom == creep.room.name) {
+
+                    if (!assaulter.memory.task) {
+
+                        return assaulter
+                    }
+                }
+            }
+            return false
+        }
+
+
+    }
+}
+
+
+/*
+
+let allyList = require("module.allyList")
+let creepFunctions = require("module.creepFunctions")
+
+module.exports = {
     run: function(creep) {
         if (creep.memory.role == "antifaSupporter" || creep.memory.role == "antifaAssaulter") {
 
@@ -238,3 +278,4 @@ module.exports = {
         }
     }
 };
+*/

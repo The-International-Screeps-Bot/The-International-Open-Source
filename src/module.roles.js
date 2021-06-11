@@ -29,8 +29,8 @@ module.exports = {
         roles["remoteHarvester2"] = require("role.remoteHarvester")
         roles["remoteHauler"] = require("role.remoteHauler")
         roles["remoteBuilder"] = require("role.remoteBuilder")
-        roles["antifaAssaulter"] = require("module.antifa")
-        roles["antifaSupporter"] = require("module.antifa")
+
+        let antifa = require("module.antifa")
 
         let cpuUsed = Game.cpu.getUsed()
 
@@ -60,5 +60,7 @@ module.exports = {
                 console.log(creep.memory.role + ": " + cpuUsed)
             }
         }
+
+        antifa.run()
     }
 };
