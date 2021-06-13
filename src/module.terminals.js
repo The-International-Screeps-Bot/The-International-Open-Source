@@ -58,7 +58,7 @@ module.exports = {
                     for (let resource in terminal.store) {
                         if (orderBlacklist.indexOf(resource) == -1 && terminal.store[resource] >= 20000 && Object.keys(Game.market.orders).length < 300 && resource != RESOURCE_ENERGY) {
 
-                            let sellPrice = avgPrice(resource) * 0.9
+                            let sellPrice = avgPrice(resource) * 0.95
                             console.log("SP: " + sellPrice + ", " + resource);
                             //console.log(orderBlacklist)
 

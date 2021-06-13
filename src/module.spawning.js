@@ -61,9 +61,9 @@ module.exports = {
 
             var newCommune
 
-            //var attackTarget = "E31N17"
+            var attackTarget = "E28N12"
 
-            var attackTarget
+            //var attackTarget
         }
 
         Memory.global.newCommune = newCommune
@@ -338,7 +338,7 @@ module.exports = {
 
                 if (attackingRoom && attackingRoom == room) {
 
-                    minCreeps["antifaAssaulter"] = 3
+                    minCreeps["antifaAssaulter"] = 1
                     minCreeps["antifaSupporter"] = minCreeps["antifaAssaulter"]
                 }
 

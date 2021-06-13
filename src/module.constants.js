@@ -1,5 +1,3 @@
-const { indexOf } = require("lodash");
-
 module.exports = {
     run: function constants() {
 
@@ -86,6 +84,7 @@ module.exports = {
                 towers()
                 spawns()
                 rooms()
+                costMatrixes()
                 terminals()
                 myResources()
                 hasBoosts()
@@ -265,6 +264,101 @@ module.exports = {
                     }
                 }
 
+                function costMatrixes() {
+
+                    let cm = new PathFinder.CostMatrix
+
+                    let terrain = Game.map.getRoomTerrain(room.name)
+
+                    for (var x = -1; x < 50; ++x) {
+                        for (var y = -1; y < 50; ++y) {
+
+                            switch (terrain.get(x, y)) {
+
+                                case 0:
+
+                                    cm.set(x, y, 3)
+                                    break
+
+                                case TERRAIN_MASK_SWAMP:
+
+                                    cm.set(x, y, 8)
+                                    break
+
+                                case TERRAIN_MASK_WALL:
+
+                                    cm.set(x, y, 255)
+                                    break
+                            }
+                        }
+                    }
+
+                    let ramparts = room.find(FIND_MY_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_RAMPART
+                    })
+
+                    for (let rampart of ramparts) {
+
+                        cm.set(rampart.pos.x, rampart.pos.y, 3)
+                    }
+
+                    let roads = room.find(FIND_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_ROAD
+                    })
+
+                    for (let road of roads) {
+
+                        cm.set(road.pos.x, road.pos.y, 1)
+                    }
+
+                    let structures = room.find(FIND_STRUCTURES, {
+                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                    })
+
+                    for (let structure of structures) {
+
+                        if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                            cm.set(structure.pos.x, structure.pos.y, 255)
+                        }
+                    }
+
+                    for (var x = -1; x < 50; ++x) {
+                        for (var y = -1; y < 50; ++y) {
+
+                            let value = cm.get(x, y)
+
+                            let enableVisuals = false
+
+                            if (value && enableVisuals) {
+
+                                if (value == 1) {
+
+                                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "green", fill: "green" })
+                                        //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
+
+                                } else if (value == 3) {
+
+                                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#ffff66", fill: "#ffff66" })
+                                        //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
+
+                                } else if (value == 8) {
+
+                                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#0000ff", fill: "#0000ff" })
+                                        //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
+
+                                } else {
+
+                                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "red", fill: "red" })
+                                        //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
+                                }
+                            }
+                        }
+                    }
+
+                    room.memory.defaultCostMatrix = cm.serialize()
+                }
+
                 function terminals() {
 
 
@@ -346,4 +440,4 @@ module.exports = {
 
         Memory.stats.totalEnergy = totalEnergy
     }
-};
+}

@@ -396,7 +396,8 @@ module.exports = {
                     if (origin && goal) {
 
                         var path = PathFinder.search(origin.pos, goal, {
-                            plainCost: 2,
+                            plainCost: 3,
+                            maxRooms: 1,
 
                             roomCallback: function(roomName) {
 
@@ -404,33 +405,47 @@ module.exports = {
 
                                 if (!room) return
 
-                                let costs = new PathFinder.CostMatrix
+                                let cm
 
-                                room.find(FIND_STRUCTURES).forEach(function(struct) {
-                                    if (struct.structureType === STRUCTURE_ROAD) {
+                                if (room.memory.defaultCostMatrix) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 1)
+                                    cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
+                                } else {
 
-                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                    cm = new PathFinder.CostMatrix
 
-                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
+                                    let ramparts = room.find(FIND_MY_STRUCTURES, {
+                                        filter: s => s.structureType == STRUCTURE_RAMPART
+                                    })
 
+                                    for (let rampart of ramparts) {
+
+                                        cm.set(rampart.pos.x, rampart.pos.y, 3)
                                     }
-                                })
-                                room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
-                                    if (struct.structureType === STRUCTURE_ROAD) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 1)
+                                    let roads = room.find(FIND_STRUCTURES, {
+                                        filter: s => s.structureType == STRUCTURE_ROAD
+                                    })
 
-                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                    for (let road of roads) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
-
+                                        cm.set(road.pos.x, road.pos.y, 1)
                                     }
-                                })
 
-                                return costs
+                                    let structures = room.find(FIND_STRUCTURES, {
+                                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                    })
 
+                                    for (let structure of structures) {
+
+                                        if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                                            cm.set(structure.pos.x, structure.pos.y, 255)
+                                        }
+                                    }
+                                }
+
+                                return cm
                             }
                         }).path
 
@@ -464,7 +479,8 @@ module.exports = {
                     if (origin && goal) {
 
                         var path = PathFinder.search(origin.pos, goal, {
-                            plainCost: 2,
+                            plainCost: 3,
+                            maxRooms: 1,
 
                             roomCallback: function(roomName) {
 
@@ -472,33 +488,47 @@ module.exports = {
 
                                 if (!room) return
 
-                                let costs = new PathFinder.CostMatrix
+                                let cm
 
-                                room.find(FIND_STRUCTURES).forEach(function(struct) {
-                                    if (struct.structureType === STRUCTURE_ROAD) {
+                                if (room.memory.defaultCostMatrix) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 1)
+                                    cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
+                                } else {
 
-                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                    cm = new PathFinder.CostMatrix
 
-                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
+                                    let ramparts = room.find(FIND_MY_STRUCTURES, {
+                                        filter: s => s.structureType == STRUCTURE_RAMPART
+                                    })
 
+                                    for (let rampart of ramparts) {
+
+                                        cm.set(rampart.pos.x, rampart.pos.y, 3)
                                     }
-                                })
-                                room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
-                                    if (struct.structureType === STRUCTURE_ROAD) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 1)
+                                    let roads = room.find(FIND_STRUCTURES, {
+                                        filter: s => s.structureType == STRUCTURE_ROAD
+                                    })
 
-                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                    for (let road of roads) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
-
+                                        cm.set(road.pos.x, road.pos.y, 1)
                                     }
-                                })
 
-                                return costs
+                                    let structures = room.find(FIND_STRUCTURES, {
+                                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                    })
 
+                                    for (let structure of structures) {
+
+                                        if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                                            cm.set(structure.pos.x, structure.pos.y, 255)
+                                        }
+                                    }
+                                }
+
+                                return cm
                             }
                         }).path
 
@@ -532,7 +562,8 @@ module.exports = {
                     if (origin && goal) {
 
                         var path = PathFinder.search(origin.pos, goal, {
-                            plainCost: 2,
+                            plainCost: 3,
+                            maxRooms: 1,
 
                             roomCallback: function(roomName) {
 
@@ -540,33 +571,47 @@ module.exports = {
 
                                 if (!room) return
 
-                                let costs = new PathFinder.CostMatrix
+                                let cm
 
-                                room.find(FIND_STRUCTURES).forEach(function(struct) {
-                                    if (struct.structureType === STRUCTURE_ROAD) {
+                                if (room.memory.defaultCostMatrix) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 1)
+                                    cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
+                                } else {
 
-                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                    cm = new PathFinder.CostMatrix
 
-                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
+                                    let ramparts = room.find(FIND_MY_STRUCTURES, {
+                                        filter: s => s.structureType == STRUCTURE_RAMPART
+                                    })
 
+                                    for (let rampart of ramparts) {
+
+                                        cm.set(rampart.pos.x, rampart.pos.y, 3)
                                     }
-                                })
-                                room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
-                                    if (struct.structureType === STRUCTURE_ROAD) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 1)
+                                    let roads = room.find(FIND_STRUCTURES, {
+                                        filter: s => s.structureType == STRUCTURE_ROAD
+                                    })
 
-                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                    for (let road of roads) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
-
+                                        cm.set(road.pos.x, road.pos.y, 1)
                                     }
-                                })
 
-                                return costs
+                                    let structures = room.find(FIND_STRUCTURES, {
+                                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                    })
 
+                                    for (let structure of structures) {
+
+                                        if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                                            cm.set(structure.pos.x, structure.pos.y, 255)
+                                        }
+                                    }
+                                }
+
+                                return cm
                             }
                         }).path
 
@@ -601,7 +646,8 @@ module.exports = {
                     if (origin && goal) {
 
                         var path = PathFinder.search(origin.pos, goal, {
-                            plainCost: 2,
+                            plainCost: 3,
+                            maxRooms: 1,
 
                             roomCallback: function(roomName) {
 
@@ -609,33 +655,47 @@ module.exports = {
 
                                 if (!room) return
 
-                                let costs = new PathFinder.CostMatrix
+                                let cm
 
-                                room.find(FIND_STRUCTURES).forEach(function(struct) {
-                                    if (struct.structureType === STRUCTURE_ROAD) {
+                                if (room.memory.defaultCostMatrix) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 1)
+                                    cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
+                                } else {
 
-                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                    cm = new PathFinder.CostMatrix
 
-                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
+                                    let ramparts = room.find(FIND_MY_STRUCTURES, {
+                                        filter: s => s.structureType == STRUCTURE_RAMPART
+                                    })
 
+                                    for (let rampart of ramparts) {
+
+                                        cm.set(rampart.pos.x, rampart.pos.y, 3)
                                     }
-                                })
-                                room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
-                                    if (struct.structureType === STRUCTURE_ROAD) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 1)
+                                    let roads = room.find(FIND_STRUCTURES, {
+                                        filter: s => s.structureType == STRUCTURE_ROAD
+                                    })
 
-                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                    for (let road of roads) {
 
-                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
-
+                                        cm.set(road.pos.x, road.pos.y, 1)
                                     }
-                                })
 
-                                return costs
+                                    let structures = room.find(FIND_STRUCTURES, {
+                                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                    })
 
+                                    for (let structure of structures) {
+
+                                        if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                                            cm.set(structure.pos.x, structure.pos.y, 255)
+                                        }
+                                    }
+                                }
+
+                                return cm
                             }
                         }).path
 
