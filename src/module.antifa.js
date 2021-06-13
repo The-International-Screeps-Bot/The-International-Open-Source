@@ -16,14 +16,62 @@ module.exports = {
 
             let target
 
-            function squadHeal() {
+            function squadHeal(creep) {
 
+                let closestInjured = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                    filter: (c) => {
+                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) >= 0)
+                    }
+                })
 
+                if (closestInjured) {
+
+                    target = "closestInjured"
+
+                    creep.say("CI")
+
+                    if (supporter.pos.getRangeTo(closestInjured) > 1) {
+
+                        let goal = _.map([closestInjured], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
+
+                        supporter.rangedHeal(closestInjured)
+                    } else {
+
+                        supporter.heal(closestInjured)
+                    }
+                }
             }
 
-            function squadAttack() {
+            function squadHostile(creep) {
+
+                let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                    filter: (c) => {
+                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                    }
+                })
+
+                if (closestHostile && (closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+
+                    target = "closestHostile"
+
+                    creep.say("H")
+
+                    if (creep.pos.getRangeTo(closestHostile) < 3) {
 
 
+                    } else if (creep.pos.getRangeTo(closestHostile) <= 2) {
+
+                        creep.rangedMassAttack(closestHostile)
+
+                        let goal = _.map([closestHostile], function(target) {
+                            return { pos: target.pos, range: 3 }
+                        })
+
+                        creep.creepFlee(creep.pos, goal)
+                    }
+                }
             }
 
             if (creep.memory.supporter && !supporter) {
@@ -136,7 +184,7 @@ module.exports = {
 
                             for (let rampart of ramparts) {
 
-                                if (cm.get(rampart.pos) < 255) {
+                                if (cm && cm.get(rampart.x, rampart.y) < 255) {
 
                                     outerRampart = rampart
                                     break
@@ -339,21 +387,36 @@ module.exports = {
                     } else {
 
                         creep.say("NS")
+
+                        if (creepIsEdge) {
+
+                            let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
+                                return { pos: target, range: 1 }
+                            })
+
+                            creep.onlySafeRoomPathing(creep.pos, goal)
+                        } else {
+
+                            let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
+                                return { pos: target, range: 1 }
+                            })
+
+                            creep.onlySafeRoomPathing(creep.pos, goal)
+                        }
                     }
                 }
-            } else if (creep.room.name == Memory.global.attackTarget) {
-
-                let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                    return { pos: target, range: 1 }
-                })
-
-                creep.onlySafeRoomPathing(creep.pos, goal)
-
             } else {
 
                 if (creepIsEdge) {
 
                     let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
+                        return { pos: target, range: 1 }
+                    })
+
+                    creep.onlySafeRoomPathing(creep.pos, goal)
+                } else {
+
+                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
                         return { pos: target, range: 1 }
                     })
 
@@ -365,6 +428,8 @@ module.exports = {
 
             const inSquad = creep.memory.inSquad
             const assaulter = Game.creeps[creep.memory.assaulter]
+
+            let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 48 || creep.pos.y <= 0 || creep.pos.y >= 48)
 
             if (creep.memory.assaulter && !assaulter) {
 
@@ -402,18 +467,49 @@ module.exports = {
                     }
                 } else {
 
-                    if (findCreepWithoutTask(creep, antifaAssaulters)) {
+                    if (creepIsEdge) {
 
-                        creep.memory.assaulter = findCreepWithoutTask(creep, antifaAssaulters).name
-                        creep.memory.inSquad = true
+                        let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
+                            return { pos: target, range: 1 }
+                        })
 
-                        findCreepWithoutTask(creep, antifaAssaulters).memory.supporter = creep.name
-                        findCreepWithoutTask(creep, antifaAssaulters).memory.inSquad = true
-
+                        creep.onlySafeRoomPathing(creep.pos, goal)
                     } else {
 
-                        creep.say("NS")
+                        let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
+                            return { pos: target, range: 1 }
+                        })
+
+                        creep.onlySafeRoomPathing(creep.pos, goal)
                     }
+                }
+            }
+            if (findCreepWithoutTask(creep, antifaAssaulters)) {
+
+                creep.memory.assaulter = findCreepWithoutTask(creep, antifaAssaulters).name
+                creep.memory.inSquad = true
+
+                findCreepWithoutTask(creep, antifaAssaulters).memory.supporter = creep.name
+                findCreepWithoutTask(creep, antifaAssaulters).memory.inSquad = true
+
+            } else {
+
+                creep.say("NS")
+
+                if (creepIsEdge) {
+
+                    let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
+                        return { pos: target, range: 1 }
+                    })
+
+                    creep.onlySafeRoomPathing(creep.pos, goal)
+                } else {
+
+                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
+                        return { pos: target, range: 1 }
+                    })
+
+                    creep.onlySafeRoomPathing(creep.pos, goal)
                 }
             }
         }

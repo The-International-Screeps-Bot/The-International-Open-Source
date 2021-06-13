@@ -2,33 +2,34 @@ module.exports = {
     run: function constants() {
 
         //Instead I should be having the scouts create the map visuals the export them. This doesn't work as Memory.rooms is an object of room names, not of room objects
+        /*
+                for (let room in Memory.rooms) {
 
-        for (let room in Memory.rooms) {
+                    if (Memory.rooms[room] && Memory.rooms[room].stage) {
+                        if (room.memory.stage != null) {
+                            if (room.memory.stage >= 1) {
 
-            if (room && room.stage) {
-                if (room.memory.stage != null) {
-                    if (room.memory.stage >= 1) {
+                                Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#2DF0C9', opacity: 0.25 })
+                            } else if (room.memory.stage == "enemyRoom") {
 
-                        Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, { fill: '#2DF0C9', opacity: 0.25 })
-                    } else if (room.memory.stage == "enemyRoom") {
+                                Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#FE411E', opacity: 0.25 })
+                            } else if (room.memory.stage == "remoteRoom") {
 
-                        Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, { fill: '#FE411E', opacity: 0.25 })
-                    } else if (room.memory.stage == "remoteRoom") {
+                                Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#39A0ED', opacity: 0.25 })
+                            } else if (room.memory.stage == "invaderRoom") {
 
-                        Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, { fill: '#39A0ED', opacity: 0.25 })
-                    } else if (room.memory.stage == "invaderRoom") {
+                                Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#DA2F2F', opacity: 0.25 })
+                            } else if (room.memory.stage == "emptyRoom") {
 
-                        Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, { fill: '#DA2F2F', opacity: 0.25 })
-                    } else if (room.memory.stage == "emptyRoom") {
+                                Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#DA2F2F', opacity: 0.25 })
+                            }
+                        } else {
 
-                        Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, { fill: '#DA2F2F', opacity: 0.25 })
+                            Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, { fill: '#F4E637', opacity: 0.25 })
+                        }
                     }
-                } else {
-
-                    Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, { fill: '#F4E637', opacity: 0.25 })
                 }
-            }
-        }
+                */
 
         global()
 
@@ -323,34 +324,36 @@ module.exports = {
                         }
                     }
 
-                    for (var x = -1; x < 50; ++x) {
-                        for (var y = -1; y < 50; ++y) {
+                    let enableVisuals = false
 
-                            let value = cm.get(x, y)
+                    if (enableVisuals) {
+                        for (var x = -1; x < 50; ++x) {
+                            for (var y = -1; y < 50; ++y) {
 
-                            let enableVisuals = false
+                                let value = cm.get(x, y)
 
-                            if (value && enableVisuals) {
+                                if (value) {
 
-                                if (value == 1) {
+                                    if (value == 1) {
 
-                                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "green", fill: "green" })
-                                        //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
+                                        room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "green", fill: "green" })
+                                            //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
 
-                                } else if (value == 3) {
+                                    } else if (value == 3) {
 
-                                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#ffff66", fill: "#ffff66" })
-                                        //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
+                                        room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#ffff66", fill: "#ffff66" })
+                                            //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
 
-                                } else if (value == 8) {
+                                    } else if (value == 8) {
 
-                                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#0000ff", fill: "#0000ff" })
-                                        //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
+                                        room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#0000ff", fill: "#0000ff" })
+                                            //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
 
-                                } else {
+                                    } else {
 
-                                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "red", fill: "red" })
-                                        //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
+                                        room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "red", fill: "red" })
+                                            //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
+                                    }
                                 }
                             }
                         }

@@ -129,17 +129,36 @@ module.exports = {
 
                         creep.say(target)
 
-                        let rampart = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                        let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
                             filter: s => s.structureType == STRUCTURE_RAMPART
                         })
 
-                        if (rampart) {
+                        if (ramparts.length > 0) {
 
-                            let goal = _.map([rampart], function(target) {
-                                return { pos: target.pos, range: 1 }
-                            })
+                            let outerRampart
 
-                            creep.intraRoomPathing(creep.pos, goal)
+                            let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
+
+                            for (let rampart of ramparts) {
+
+                                if (cm && cm.get(rampart.x, rampart.y) < 255) {
+
+                                    outerRampart = rampart
+                                    break
+                                }
+                            }
+
+                            if (outerRampart) {
+
+                                let goal = _.map([outerRampart], function(target) {
+                                    return { pos: target.pos, range: 0 }
+                                })
+
+                                if (creep.fatigue == 0) {
+
+                                    creep.intraRoomPathing(creep.pos, goal)
+                                }
+                            }
                         } else {
 
                             let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
@@ -170,7 +189,6 @@ module.exports = {
                         creep.moveTo(exit)
 
                     }
-
                 }
             }
         }
