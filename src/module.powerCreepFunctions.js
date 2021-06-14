@@ -1,54 +1,92 @@
 let allyList = require("module.allyList")
 
-PowerCreep.prototype.findRemoteRoom = function() {
+Creep.prototype.findRemoteRoom = function() {
 
     if (!creep.memory.remoteRoom) {
 
         for (let remoteRoom of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
 
-            if (remoteRoom.creepsOfRole[creep.memory.role] < remoteRoom.minPowerCreeps[creep.memory.role]) {
+            if (remoteRoom.creepsOfRole[creep.memory.role] < remoteRoom.minCreeps[creep.memory.role]) {
 
                 creep.memory.remoteRoom = remoteRoom
             }
         }
     }
 }
-PowerCreep.prototype.barricadesFindAndRepair = function() {
 
-    var barricades = creep.room.find(FIND_STRUCTURES, {
-        filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
-    })
+Creep.prototype.barricadesFindAndRepair = function() {
 
-    let target = creep.memory.target
-    target = undefined
+        if (creep.memory.target) {
 
-    if (creep.memory.target) {
+            let barricade = Game.getObjectById(creep.memory.target)
 
-        target = Game.getObjectById(creep.memory.target)
+            if (barricade.hits < barricade.hitsMax && barricade.hits < (creep.memory.quota + creep.myParts("work") * 1000)) {
 
-        creep.repairBarricades(target)
-    } else {
+                creep.repairBarricades(barricade)
+            } else {
 
-        creep.say("Broken")
-    }
+                creep.memory.target = undefined
+            }
+        } else {
 
-    for (let quota = 10000; quota < 3000000; quota += 50000) {
+            var barricades = creep.room.find(FIND_STRUCTURES, {
+                filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
+            })
 
-        creep.memory.quota = quota
+            for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
 
-        for (let barricade of barricades) {
+                let barricade = creep.room.find(FIND_STRUCTURES, {
+                    filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
+                })
 
-            if (barricade.hits < quota) {
+                if (barricade.length > 0) {
 
-                target = barricade.id
-                creep.memory.target = target
+                    barricade = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                        filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
+                    })
 
-                return;
+                    creep.memory.target = barricade.id
+                    creep.memory.quota = quota
+
+                    return
+                } else {
+
+                    creep.say("No target")
+                }
             }
         }
     }
-}
-PowerCreep.prototype.myParts = function(partType) {
+    /*
+    Creep.prototype.barricadesFindAndRepair = function() {
+
+        var barricades = creep.room.find(FIND_STRUCTURES, {
+            filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
+        })
+
+        for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
+
+            quota += creep.myParts("work") * 500
+
+            let barricade = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
+            })
+
+            if (barricade) {
+
+                creep.say(quota / 1000 + "k")
+
+                creep.repairBarricades(barricade)
+
+                return
+            } else {
+
+                creep.say("No target")
+            }
+        }
+    }
+    */
+
+Creep.prototype.myParts = function(partType) {
 
     creep = this
 
@@ -63,7 +101,7 @@ PowerCreep.prototype.myParts = function(partType) {
     }
     return partsAmount
 }
-PowerCreep.prototype.findEnergyHarvested = function(source) {
+Creep.prototype.findEnergyHarvested = function(source) {
 
     creep = this
 
@@ -72,7 +110,7 @@ PowerCreep.prototype.findEnergyHarvested = function(source) {
     creep.say("⛏️ " + energyHarvested)
     Memory.stats.energyHarvested += energyHarvested
 }
-PowerCreep.prototype.fleeHostileRoom = function() {
+Creep.prototype.fleeHostileRoom = function() {
 
     creep = this
 
@@ -89,7 +127,7 @@ PowerCreep.prototype.fleeHostileRoom = function() {
         }
     }
 }
-PowerCreep.prototype.isFull = function() {
+Creep.prototype.isFull = function() {
 
     creep = this
 
@@ -103,7 +141,7 @@ PowerCreep.prototype.isFull = function() {
 
     }
 }
-PowerCreep.prototype.hasResource = function() {
+Creep.prototype.hasResource = function() {
 
     creep = this
 
@@ -117,7 +155,7 @@ PowerCreep.prototype.hasResource = function() {
 
     }
 }
-PowerCreep.prototype.pickupDroppedEnergy = function(target) {
+Creep.prototype.pickupDroppedEnergy = function(target) {
 
     if (creep.pos.isNearTo(target)) {
 
@@ -135,16 +173,20 @@ PowerCreep.prototype.pickupDroppedEnergy = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-PowerCreep.prototype.advancedWithdraw = function(target, resource) {
+Creep.prototype.advancedWithdraw = function(target, resource, amount) {
 
     if (!resource) {
 
-        var resource = RESOURCE_ENERGY
+        resource = RESOURCE_ENERGY
+    }
+    if (!amount || amount > creep.store.getCapacity()) {
+
+        amount = creep.store.getCapacity()
     }
 
     if (creep.pos.isNearTo(target)) {
 
-        creep.withdraw(target, resource)
+        creep.withdraw(target, resource, [amount])
         return 0
 
     } else {
@@ -158,11 +200,11 @@ PowerCreep.prototype.advancedWithdraw = function(target, resource) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-PowerCreep.prototype.advancedTransfer = function(target, resource) {
+Creep.prototype.advancedTransfer = function(target, resource) {
 
     if (!resource) {
 
-        var resource = RESOURCE_ENERGY
+        resource = RESOURCE_ENERGY
     }
 
     if (creep.pos.isNearTo(target)) {
@@ -181,7 +223,7 @@ PowerCreep.prototype.advancedTransfer = function(target, resource) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-PowerCreep.prototype.checkRoom = function() {
+Creep.prototype.checkRoom = function() {
 
     creep = this
 
@@ -198,7 +240,7 @@ PowerCreep.prototype.checkRoom = function() {
         }
     }
 }
-PowerCreep.prototype.repairBarricades = function(target) {
+Creep.prototype.repairBarricades = function(target) {
 
     creep = this
 
@@ -213,7 +255,7 @@ PowerCreep.prototype.repairBarricades = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-PowerCreep.prototype.repairStructure = function(target) {
+Creep.prototype.repairStructure = function(target) {
 
     creep = this
 
@@ -228,7 +270,7 @@ PowerCreep.prototype.repairStructure = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-PowerCreep.prototype.constructionBuild = function(target) {
+Creep.prototype.constructionBuild = function(target) {
 
     creep = this
 
@@ -243,7 +285,7 @@ PowerCreep.prototype.constructionBuild = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-PowerCreep.prototype.controllerUpgrade = function(target) {
+Creep.prototype.controllerUpgrade = function(target) {
 
     if (!creep.pos.inRangeTo(creep.room.controller, 3)) {
 
@@ -261,7 +303,7 @@ PowerCreep.prototype.controllerUpgrade = function(target) {
     }
 
 }
-PowerCreep.prototype.searchSourceContainers = function() {
+Creep.prototype.searchSourceContainers = function() {
 
     creep = this
 
@@ -287,7 +329,123 @@ PowerCreep.prototype.searchSourceContainers = function() {
         }
     }
 }
-PowerCreep.prototype.roadPathing = function(origin, goal) {
+Creep.prototype.findDamagePossible = function(creep, healers, towers) {
+
+    let distance = creep.pos.getRangeTo(creep.pos.findClosestByRange(towers))
+
+    let towerDamage = (C.TOWER_FALLOFF * (distance - C.TOWER_OPTIMAL_RANGE) / (C.TOWER_FALLOFF_RANGE - C.TOWER_OPTIMAL_RANGE)) * towers.length
+
+    let healAmount = 0
+
+    if (creep) {
+
+        for (let part of creep.body) {
+
+            if (part.type == TOUGH && part.boost) {
+
+                towerDamage = towerDamage * 0.3
+                break
+            }
+        }
+    }
+
+    if (healers.length > 0) {
+
+        for (let healer of healers) {
+
+            for (let part in healer.body) {
+
+                if (part.type == HEAL) {
+
+                    if (part.boost == RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE) {
+
+                        healAmount += 36
+
+                    } else if (part.boost == RESOURCE_LEMERGIUM_ALKALIDE) {
+
+                        healAmount += 24
+
+                    } else if (part.boost == RESOURCE_LEMERGIUM_OXIDE) {
+
+                        healAmount += 12
+                    }
+
+                    healAmount += 12
+                }
+            }
+        }
+    }
+
+    let damagePossible = towerDamage - healAmount
+
+    return damagePossible
+}
+Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTower, towerCount) {
+
+    let distance = creep.pos.getRangeTo(creep.pos.findClosestByRange(towers))
+
+    let towerDamage = (C.TOWER_FALLOFF * (distance - C.TOWER_OPTIMAL_RANGE) / (C.TOWER_FALLOFF_RANGE - C.TOWER_OPTIMAL_RANGE)) * towers.length
+
+    let healAmount = 0
+
+    if (creep) {
+
+        for (let part of creep.body) {
+
+            if (part.type == TOUGH && part.boost) {
+
+                towerDamage = towerDamage * 0.3
+                break
+            }
+        }
+    }
+
+    if (healers.length > 0) {
+
+        for (let healer of healers) {
+
+            for (let part in healer.body) {
+
+                if (part.type == HEAL) {
+
+                    if (part.boost == RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE) {
+
+                        healAmount += 36
+
+                    } else if (part.boost == RESOURCE_LEMERGIUM_ALKALIDE) {
+
+                        healAmount += 24
+
+                    } else if (part.boost == RESOURCE_LEMERGIUM_OXIDE) {
+
+                        healAmount += 12
+                    }
+
+                    healAmount += 12
+                }
+            }
+        }
+    }
+
+    let damagePossible = towerDamage - healAmount
+
+    let i = 0
+
+    while (damagePossible > 0 || i < 50) {
+
+        distance++
+
+    }
+
+    if (distance > 0) {
+
+        return distance
+    } else {
+
+        return false
+    }
+}
+Creep.prototype.roadPathing = function(origin, goal) {
 
     creep = this
 
@@ -340,7 +498,7 @@ PowerCreep.prototype.roadPathing = function(origin, goal) {
 
     //new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
-PowerCreep.prototype.offRoadPathing = function(origin, goal) {
+Creep.prototype.offRoadPathing = function(origin, goal) {
 
     creep = this
 
@@ -383,7 +541,7 @@ PowerCreep.prototype.offRoadPathing = function(origin, goal) {
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
-PowerCreep.prototype.intraRoomPathing = function(origin, goal) {
+Creep.prototype.intraRoomPathing = function(origin, goal) {
 
     creep = this
 
@@ -397,37 +555,67 @@ PowerCreep.prototype.intraRoomPathing = function(origin, goal) {
 
             if (!room) return
 
-            let costs = new PathFinder.CostMatrix
+            let cm
 
-            room.find(FIND_STRUCTURES).forEach(function(struct) {
-                if (struct.structureType === STRUCTURE_ROAD) {
+            if (room.memory.defaultCostMatrix) {
 
-                    costs.set(struct.pos.x, struct.pos.y, 1)
+                cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
 
-                } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                for (let creep of room.find(FIND_CREEPS)) {
 
-                    costs.set(struct.pos.x, struct.pos.y, 0xff)
-
+                    cm.set(creep.pos.x, creep.pos.y, 255)
                 }
-            })
-            room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
-                if (struct.structureType === STRUCTURE_ROAD) {
 
-                    costs.set(struct.pos.x, struct.pos.y, 1)
+                for (let creep of room.find(FIND_POWER_CREEPS)) {
 
-                } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
-
-                    costs.set(struct.pos.x, struct.pos.y, 0xff)
-
+                    cm.set(creep.pos.x, creep.pos.y, 255)
                 }
-            })
-            room.find(FIND_CREEPS).forEach(function(creep) {
-                costs.set(creep.pos.x, creep.pos.y, 0xff);
-            });
+            } else {
 
+                cm = new PathFinder.CostMatrix
 
-            return costs
+                let ramparts = room.find(FIND_MY_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_RAMPART
+                })
 
+                for (let rampart of ramparts) {
+
+                    cm.set(rampart.pos.x, rampart.pos.y, 3)
+                }
+
+                let roads = room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_ROAD
+                })
+
+                for (let road of roads) {
+
+                    cm.set(road.pos.x, road.pos.y, 1)
+                }
+
+                let structures = room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                })
+
+                for (let structure of structures) {
+
+                    if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                        cm.set(structure.pos.x, structure.pos.y, 255)
+                    }
+                }
+
+                for (let creep of room.find(FIND_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+
+                for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+            }
+
+            return cm
         }
     }).path
 
@@ -437,35 +625,121 @@ PowerCreep.prototype.intraRoomPathing = function(origin, goal) {
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
-PowerCreep.prototype.onlySafeRoomPathing = function(origin, goal) {
+Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
+
+    creep = this
 
     let allowedRooms = {
-        [from.roomName]: true
-    };
-    Game.map.findRoute(from.roomName, to.roomName, {
+        [origin.roomName]: true,
+        [goal[0].pos.roomName]: true
+    }
+
+    let route = Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
         routeCallback(roomName) {
-            if (MemoryStore.rooms[roomName].stage == "enemyRoom") {
-                return Infinity
+
+            if (Memory.rooms[roomName] && Memory.rooms[roomName].stage != "enemyRoom" && Memory.rooms[roomName].stage != "keeperRoom") {
+
+                allowedRooms[roomName] = true
+                return 1
+
             } else {
 
-                return 1
+                return Infinity
             }
         }
-    }).forEach(function(info) {
-        allowedRooms[info.room] = true;
-    });
+    })
 
-    let ret = PathFinder.search(origin, goal, {
-        roomCallback(roomName) {
-            if (!allowedRooms[roomName]) {
-                return false;
+    console.log("Route: " + JSON.stringify(route))
+
+    if (route.length > 0) {
+
+        let goal = _.map([new RoomPosition(25, 25, route[0].room)], function(pos) {
+            return { pos: pos, range: 1 }
+        })
+
+        var path = PathFinder.search(origin, goal, {
+            plainCost: 1,
+
+            roomCallback: function(roomName) {
+
+                let room = Game.rooms[roomName]
+
+                if (!room) return false
+
+                if (!allowedRooms[roomName]) return false
+
+                let cm
+
+                if (room.memory.defaultCostMatrix) {
+
+                    cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
+
+                    for (let creep of room.find(FIND_CREEPS)) {
+
+                        cm.set(creep.pos.x, creep.pos.y, 255)
+                    }
+
+                    for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                        cm.set(creep.pos.x, creep.pos.y, 255)
+                    }
+                } else {
+
+                    cm = new PathFinder.CostMatrix
+
+                    let ramparts = room.find(FIND_MY_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_RAMPART
+                    })
+
+                    for (let rampart of ramparts) {
+
+                        cm.set(rampart.pos.x, rampart.pos.y, 1)
+                    }
+
+                    let roads = room.find(FIND_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_ROAD
+                    })
+
+                    for (let road of roads) {
+
+                        cm.set(road.pos.x, road.pos.y, 1)
+                    }
+
+                    let structures = room.find(FIND_STRUCTURES, {
+                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                    })
+
+                    for (let structure of structures) {
+
+                        if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                            cm.set(structure.pos.x, structure.pos.y, 255)
+                        }
+                    }
+
+                    for (let creep of room.find(FIND_CREEPS)) {
+
+                        cm.set(creep.pos.x, creep.pos.y, 255)
+                    }
+
+                    for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                        cm.set(creep.pos.x, creep.pos.y, 255)
+                    }
+                }
+
+                return cm
             }
-        }
-    });
+        }).path
 
-    console.log(ret.path);
+        creep.memory.path = path
+
+        creep.moveByPath(creep.memory.path)
+
+        new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+    }
 }
-PowerCreep.prototype.rampartPathing = function(origin, goal) {
+Creep.prototype.rampartPathing = function(origin, goal) {
 
     creep = this
 
@@ -480,41 +754,42 @@ PowerCreep.prototype.rampartPathing = function(origin, goal) {
 
             if (!room) return
 
-            let costs = new PathFinder.CostMatrix
+            let cm
 
-            room.find(FIND_STRUCTURES).forEach(function(struct) {
-                if (struct.structureType === STRUCTURE_ROAD) {
+            cm = new PathFinder.CostMatrix
 
-                    costs.set(struct.pos.x, struct.pos.y, 5)
-
-                } else if (struct.structureType !== STRUCTURE_CONTAINER && struct.structureType != STRUCTURE_RAMPART) {
-
-                    costs.set(struct.pos.x, struct.pos.y, 0xff)
-
-                } else if (struct.structureType === STRUCTURE_RAMPART) {
-
-                    costs.set(struct.pos.x, struct.pos.y, 1)
-
-                }
+            let ramparts = room.find(FIND_MY_STRUCTURES, {
+                filter: s => s.structureType == STRUCTURE_RAMPART
             })
-            room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
-                if (struct.structureType === STRUCTURE_ROAD) {
 
-                    costs.set(struct.pos.x, struct.pos.y, 5)
+            for (let rampart of ramparts) {
 
-                } else if (struct.structureType !== STRUCTURE_CONTAINER && struct.structureType !== STRUCTURE_RAMPART) {
+                cm.set(rampart.pos.x, rampart.pos.y, 1)
+            }
 
-                    costs.set(struct.pos.x, struct.pos.y, 0xff)
-
-                }
+            let structures = room.find(FIND_STRUCTURES, {
+                filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
             })
-            room.find(FIND_CREEPS).forEach(function(creep) {
-                costs.set(creep.pos.x, creep.pos.y, 0xff);
-            });
 
+            for (let structure of structures) {
 
-            return costs
+                if (structure.structureType != STRUCTURE_CONTAINER) {
 
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
+            }
+
+            for (let creep of room.find(FIND_CREEPS)) {
+
+                cm.set(creep.pos.x, creep.pos.y, 255)
+            }
+
+            for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                cm.set(creep.pos.x, creep.pos.y, 255)
+            }
+
+            return cm
         }
     }).path
 
@@ -524,7 +799,7 @@ PowerCreep.prototype.rampartPathing = function(origin, goal) {
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
-PowerCreep.prototype.creepFlee = function(origin, target) {
+Creep.prototype.creepFlee = function(origin, target) {
 
     creep = this
 
@@ -539,29 +814,67 @@ PowerCreep.prototype.creepFlee = function(origin, target) {
 
             if (!room) return
 
-            let costs = new PathFinder.CostMatrix
+            let cm
 
-            room.find(FIND_STRUCTURES).forEach(function(struct) {
-                if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+            if (room.memory.defaultCostMatrix) {
 
-                    costs.set(struct.pos.x, struct.pos.y, 0xff)
+                cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
 
+                for (let creep of room.find(FIND_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
                 }
-            })
-            room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
-                if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
 
-                    costs.set(struct.pos.x, struct.pos.y, 0xff)
+                for (let creep of room.find(FIND_POWER_CREEPS)) {
 
+                    cm.set(creep.pos.x, creep.pos.y, 255)
                 }
-            })
-            room.find(FIND_CREEPS).forEach(function(creep) {
-                costs.set(creep.pos.x, creep.pos.y, 0xff);
-            });
+            } else {
 
+                cm = new PathFinder.CostMatrix
 
-            return costs
+                let ramparts = room.find(FIND_MY_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_RAMPART
+                })
 
+                for (let rampart of ramparts) {
+
+                    cm.set(rampart.pos.x, rampart.pos.y, 3)
+                }
+
+                let roads = room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_ROAD
+                })
+
+                for (let road of roads) {
+
+                    cm.set(road.pos.x, road.pos.y, 1)
+                }
+
+                let structures = room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                })
+
+                for (let structure of structures) {
+
+                    if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                        cm.set(structure.pos.x, structure.pos.y, 255)
+                    }
+                }
+
+                for (let creep of room.find(FIND_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+
+                for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+            }
+
+            return cm
         }
     }).path
 

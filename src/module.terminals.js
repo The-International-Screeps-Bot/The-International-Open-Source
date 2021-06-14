@@ -94,7 +94,6 @@ module.exports = {
 
                                 for (let i = batteryQuota; i > 0; i -= 1000) {
 
-                                    console.log(i)
                                     Game.market.deal(batterySellOffers[0]["id"], i, room.name)
                                 }
                             }
@@ -115,7 +114,6 @@ module.exports = {
 
                                 for (let i = energyQuota; i > 0; i -= 1000) {
 
-                                    console.log(i)
                                     Game.market.deal(energySellOffers[0]["id"], i, room.name)
                                 }
                             }
@@ -137,7 +135,6 @@ module.exports = {
 
                                 for (let i = energyQuota; i > 0; i -= 1000) {
 
-                                    console.log(i)
                                     Game.market.deal(energySellOffers[0]["id"], i, room.name)
                                 }
                             }

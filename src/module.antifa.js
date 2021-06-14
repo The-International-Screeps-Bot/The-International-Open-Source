@@ -289,15 +289,9 @@ module.exports = {
                                     return { pos: pos, range: 2 }
                                 })
 
-                                if (creep.fatigue == 0 && supporter.fatigue == 0) {
-
-                                    creep.onlySafeRoomPathing(creep.pos, goal)
-                                }
+                                creep.onlySafeRoomPathing(creep.pos, goal)
                             }
                         }
-                    } else {
-
-
                     }
                 } else {
 
@@ -467,21 +461,11 @@ module.exports = {
                     }
                 } else {
 
-                    if (creepIsEdge) {
+                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
+                        return { pos: target, range: 1 }
+                    })
 
-                        let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
-                            return { pos: target, range: 1 }
-                        })
-
-                        creep.onlySafeRoomPathing(creep.pos, goal)
-                    } else {
-
-                        let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                            return { pos: target, range: 1 }
-                        })
-
-                        creep.onlySafeRoomPathing(creep.pos, goal)
-                    }
+                    creep.onlySafeRoomPathing(creep.pos, goal)
                 }
             } else if (findCreepWithoutTask(creep, antifaAssaulters)) {
 
@@ -495,21 +479,11 @@ module.exports = {
 
                 creep.say("NS")
 
-                if (creepIsEdge) {
+                let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
+                    return { pos: target, range: 1 }
+                })
 
-                    let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
-                        return { pos: target, range: 1 }
-                    })
-
-                    creep.onlySafeRoomPathing(creep.pos, goal)
-                } else {
-
-                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                        return { pos: target, range: 1 }
-                    })
-
-                    creep.onlySafeRoomPathing(creep.pos, goal)
-                }
+                creep.onlySafeRoomPathing(creep.pos, goal)
             }
         }
 
