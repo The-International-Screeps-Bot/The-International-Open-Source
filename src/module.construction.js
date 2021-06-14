@@ -377,12 +377,32 @@ module.exports = {
                 let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
                 let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
-                source1Path()
-                source2Path()
-                controllerPath()
-                mineralPath()
-                    //remotePath()
-                placeExtractor()
+                let roomConstructionSites = room.find(FIND_CONSTRUCTION_SITES)
+
+                if (roomConstructionSites.length < 5) {
+
+                    if (room.memory.stage >= 5) {
+
+                        source1Path()
+                        source2Path()
+                        controllerPath()
+                    }
+
+                    if (room.memory.stage >= 6) {
+
+                        mineralPath()
+                    }
+
+                    if (room.memory.remoteRooms.length > 0) {
+
+                        //remotePath()
+                    }
+
+                    if (room.memory.stage >= 6) {
+
+                        placeExtractor()
+                    }
+                }
                 removeUneeded()
 
                 function source1Path() {
@@ -460,7 +480,7 @@ module.exports = {
                             let value = path[i - 1]
                             let normalValue = path[i]
 
-                            if (value && room.controller.level >= 5) {
+                            if (value) {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
@@ -547,7 +567,7 @@ module.exports = {
                             let value = path[i - 1]
                             let normalValue = path[i]
 
-                            if (value && room.controller.level >= 5) {
+                            if (value) {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
@@ -634,7 +654,7 @@ module.exports = {
                             let value = path[i - 1]
                             let normalValue = path[i]
 
-                            if (value && room.controller.level >= 5) {
+                            if (value) {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
@@ -722,7 +742,7 @@ module.exports = {
                             let value = path[i - 1]
                             let normalValue = path[i]
 
-                            if (value && room.controller.level >= 5) {
+                            if (value) {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
@@ -829,7 +849,7 @@ module.exports = {
 
                                         //new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476" })
 
-                                        if (value && value.roomName && value.x && value.y && room.controller.level >= 5 && Game.rooms[value.roomName]) {
+                                        if (value && value.roomName && value.x && value.y && Game.rooms[value.roomName]) {
 
                                             Game.rooms[value.roomName].createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                                         }
@@ -852,7 +872,7 @@ module.exports = {
                         filter: s => s.structureType == STRUCTURE_EXTRACTOR
                     })
 
-                    if (room.memory.stage >= 6 && !extractors[0]) {
+                    if (extractors.length < 0) {
 
                         let mineral = room.find(FIND_MINERALS)[0]
 

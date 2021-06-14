@@ -329,6 +329,122 @@ Creep.prototype.searchSourceContainers = function() {
         }
     }
 }
+Creep.prototype.findDamagePossible = function(creep, healers, towers) {
+
+    let distance = creep.pos.getRangeTo(creep.pos.findClosestByRange(towers))
+
+    let towerDamage = (C.TOWER_FALLOFF * (distance - C.TOWER_OPTIMAL_RANGE) / (C.TOWER_FALLOFF_RANGE - C.TOWER_OPTIMAL_RANGE)) * towers.length
+
+    let healAmount = 0
+
+    if (creep) {
+
+        for (let part of creep.body) {
+
+            if (part.type == TOUGH && part.boost) {
+
+                towerDamage = towerDamage * 0.3
+                break
+            }
+        }
+    }
+
+    if (healers.length > 0) {
+
+        for (let healer of healers) {
+
+            for (let part in healer.body) {
+
+                if (part.type == HEAL) {
+
+                    if (part.boost == RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE) {
+
+                        healAmount += 36
+
+                    } else if (part.boost == RESOURCE_LEMERGIUM_ALKALIDE) {
+
+                        healAmount += 24
+
+                    } else if (part.boost == RESOURCE_LEMERGIUM_OXIDE) {
+
+                        healAmount += 12
+                    }
+
+                    healAmount += 12
+                }
+            }
+        }
+    }
+
+    let damagePossible = towerDamage - healAmount
+
+    return damagePossible
+}
+Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTower, towerCount) {
+
+    let distance = creep.pos.getRangeTo(creep.pos.findClosestByRange(towers))
+
+    let towerDamage = (C.TOWER_FALLOFF * (distance - C.TOWER_OPTIMAL_RANGE) / (C.TOWER_FALLOFF_RANGE - C.TOWER_OPTIMAL_RANGE)) * towers.length
+
+    let healAmount = 0
+
+    if (creep) {
+
+        for (let part of creep.body) {
+
+            if (part.type == TOUGH && part.boost) {
+
+                towerDamage = towerDamage * 0.3
+                break
+            }
+        }
+    }
+
+    if (healers.length > 0) {
+
+        for (let healer of healers) {
+
+            for (let part in healer.body) {
+
+                if (part.type == HEAL) {
+
+                    if (part.boost == RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE) {
+
+                        healAmount += 36
+
+                    } else if (part.boost == RESOURCE_LEMERGIUM_ALKALIDE) {
+
+                        healAmount += 24
+
+                    } else if (part.boost == RESOURCE_LEMERGIUM_OXIDE) {
+
+                        healAmount += 12
+                    }
+
+                    healAmount += 12
+                }
+            }
+        }
+    }
+
+    let damagePossible = towerDamage - healAmount
+
+    let i = 0
+
+    while (damagePossible > 0 || i < 50) {
+
+        distance++
+
+    }
+
+    if (distance > 0) {
+
+        return distance
+    } else {
+
+        return false
+    }
+}
 Creep.prototype.roadPathing = function(origin, goal) {
 
     creep = this
