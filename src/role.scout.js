@@ -202,7 +202,7 @@ module.exports = {
                 }
             } else {
 
-                let keeperLair = room.find(FIND_STRUCTURES, {
+                let keeperLair = creep.room.find(FIND_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_KEEPER_LAIR
                 })
 
