@@ -483,8 +483,7 @@ module.exports = {
                         creep.onlySafeRoomPathing(creep.pos, goal)
                     }
                 }
-            }
-            if (findCreepWithoutTask(creep, antifaAssaulters)) {
+            } else if (findCreepWithoutTask(creep, antifaAssaulters)) {
 
                 creep.memory.assaulter = findCreepWithoutTask(creep, antifaAssaulters).name
                 creep.memory.inSquad = true

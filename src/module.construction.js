@@ -407,41 +407,44 @@ module.exports = {
 
                                 let cm
 
-                                if (room.memory.defaultCostMatrix) {
+                                cm = new PathFinder.CostMatrix
 
-                                    cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
-                                } else {
+                                let ramparts = room.find(FIND_MY_STRUCTURES, {
+                                    filter: s => s.structureType == STRUCTURE_RAMPART
+                                })
 
-                                    cm = new PathFinder.CostMatrix
+                                for (let rampart of ramparts) {
 
-                                    let ramparts = room.find(FIND_MY_STRUCTURES, {
-                                        filter: s => s.structureType == STRUCTURE_RAMPART
-                                    })
+                                    cm.set(rampart.pos.x, rampart.pos.y, 3)
+                                }
 
-                                    for (let rampart of ramparts) {
+                                let roadConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                                    filter: s => s.structureType == STRUCTURE_ROAD
+                                })
 
-                                        cm.set(rampart.pos.x, rampart.pos.y, 3)
-                                    }
+                                for (let roadSite of roadConstructionSites) {
 
-                                    let roads = room.find(FIND_STRUCTURES, {
-                                        filter: s => s.structureType == STRUCTURE_ROAD
-                                    })
+                                    cm.set(roadSite.pos.x, roadSite.pos.y, 1)
+                                }
 
-                                    for (let road of roads) {
+                                let roads = room.find(FIND_STRUCTURES, {
+                                    filter: s => s.structureType == STRUCTURE_ROAD
+                                })
 
-                                        cm.set(road.pos.x, road.pos.y, 1)
-                                    }
+                                for (let road of roads) {
 
-                                    let structures = room.find(FIND_STRUCTURES, {
-                                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
-                                    })
+                                    cm.set(road.pos.x, road.pos.y, 1)
+                                }
 
-                                    for (let structure of structures) {
+                                let structures = room.find(FIND_STRUCTURES, {
+                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                })
 
-                                        if (structure.structureType != STRUCTURE_CONTAINER) {
+                                for (let structure of structures) {
 
-                                            cm.set(structure.pos.x, structure.pos.y, 255)
-                                        }
+                                    if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                                        cm.set(structure.pos.x, structure.pos.y, 255)
                                     }
                                 }
 
@@ -490,41 +493,44 @@ module.exports = {
 
                                 let cm
 
-                                if (room.memory.defaultCostMatrix) {
+                                cm = new PathFinder.CostMatrix
 
-                                    cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
-                                } else {
+                                let ramparts = room.find(FIND_MY_STRUCTURES, {
+                                    filter: s => s.structureType == STRUCTURE_RAMPART
+                                })
 
-                                    cm = new PathFinder.CostMatrix
+                                for (let rampart of ramparts) {
 
-                                    let ramparts = room.find(FIND_MY_STRUCTURES, {
-                                        filter: s => s.structureType == STRUCTURE_RAMPART
-                                    })
+                                    cm.set(rampart.pos.x, rampart.pos.y, 3)
+                                }
 
-                                    for (let rampart of ramparts) {
+                                let roadConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                                    filter: s => s.structureType == STRUCTURE_ROAD
+                                })
 
-                                        cm.set(rampart.pos.x, rampart.pos.y, 3)
-                                    }
+                                for (let roadSite of roadConstructionSites) {
 
-                                    let roads = room.find(FIND_STRUCTURES, {
-                                        filter: s => s.structureType == STRUCTURE_ROAD
-                                    })
+                                    cm.set(roadSite.pos.x, roadSite.pos.y, 1)
+                                }
 
-                                    for (let road of roads) {
+                                let roads = room.find(FIND_STRUCTURES, {
+                                    filter: s => s.structureType == STRUCTURE_ROAD
+                                })
 
-                                        cm.set(road.pos.x, road.pos.y, 1)
-                                    }
+                                for (let road of roads) {
 
-                                    let structures = room.find(FIND_STRUCTURES, {
-                                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
-                                    })
+                                    cm.set(road.pos.x, road.pos.y, 1)
+                                }
 
-                                    for (let structure of structures) {
+                                let structures = room.find(FIND_STRUCTURES, {
+                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                })
 
-                                        if (structure.structureType != STRUCTURE_CONTAINER) {
+                                for (let structure of structures) {
 
-                                            cm.set(structure.pos.x, structure.pos.y, 255)
-                                        }
+                                    if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                                        cm.set(structure.pos.x, structure.pos.y, 255)
                                     }
                                 }
 
@@ -573,41 +579,44 @@ module.exports = {
 
                                 let cm
 
-                                if (room.memory.defaultCostMatrix) {
+                                cm = new PathFinder.CostMatrix
 
-                                    cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
-                                } else {
+                                let ramparts = room.find(FIND_MY_STRUCTURES, {
+                                    filter: s => s.structureType == STRUCTURE_RAMPART
+                                })
 
-                                    cm = new PathFinder.CostMatrix
+                                for (let rampart of ramparts) {
 
-                                    let ramparts = room.find(FIND_MY_STRUCTURES, {
-                                        filter: s => s.structureType == STRUCTURE_RAMPART
-                                    })
+                                    cm.set(rampart.pos.x, rampart.pos.y, 3)
+                                }
 
-                                    for (let rampart of ramparts) {
+                                let roadConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                                    filter: s => s.structureType == STRUCTURE_ROAD
+                                })
 
-                                        cm.set(rampart.pos.x, rampart.pos.y, 3)
-                                    }
+                                for (let roadSite of roadConstructionSites) {
 
-                                    let roads = room.find(FIND_STRUCTURES, {
-                                        filter: s => s.structureType == STRUCTURE_ROAD
-                                    })
+                                    cm.set(roadSite.pos.x, roadSite.pos.y, 1)
+                                }
 
-                                    for (let road of roads) {
+                                let roads = room.find(FIND_STRUCTURES, {
+                                    filter: s => s.structureType == STRUCTURE_ROAD
+                                })
 
-                                        cm.set(road.pos.x, road.pos.y, 1)
-                                    }
+                                for (let road of roads) {
 
-                                    let structures = room.find(FIND_STRUCTURES, {
-                                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
-                                    })
+                                    cm.set(road.pos.x, road.pos.y, 1)
+                                }
 
-                                    for (let structure of structures) {
+                                let structures = room.find(FIND_STRUCTURES, {
+                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                })
 
-                                        if (structure.structureType != STRUCTURE_CONTAINER) {
+                                for (let structure of structures) {
 
-                                            cm.set(structure.pos.x, structure.pos.y, 255)
-                                        }
+                                    if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                                        cm.set(structure.pos.x, structure.pos.y, 255)
                                     }
                                 }
 
@@ -657,41 +666,44 @@ module.exports = {
 
                                 let cm
 
-                                if (room.memory.defaultCostMatrix) {
+                                cm = new PathFinder.CostMatrix
 
-                                    cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
-                                } else {
+                                let ramparts = room.find(FIND_MY_STRUCTURES, {
+                                    filter: s => s.structureType == STRUCTURE_RAMPART
+                                })
 
-                                    cm = new PathFinder.CostMatrix
+                                for (let rampart of ramparts) {
 
-                                    let ramparts = room.find(FIND_MY_STRUCTURES, {
-                                        filter: s => s.structureType == STRUCTURE_RAMPART
-                                    })
+                                    cm.set(rampart.pos.x, rampart.pos.y, 3)
+                                }
 
-                                    for (let rampart of ramparts) {
+                                let roadConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                                    filter: s => s.structureType == STRUCTURE_ROAD
+                                })
 
-                                        cm.set(rampart.pos.x, rampart.pos.y, 3)
-                                    }
+                                for (let roadSite of roadConstructionSites) {
 
-                                    let roads = room.find(FIND_STRUCTURES, {
-                                        filter: s => s.structureType == STRUCTURE_ROAD
-                                    })
+                                    cm.set(roadSite.pos.x, roadSite.pos.y, 1)
+                                }
 
-                                    for (let road of roads) {
+                                let roads = room.find(FIND_STRUCTURES, {
+                                    filter: s => s.structureType == STRUCTURE_ROAD
+                                })
 
-                                        cm.set(road.pos.x, road.pos.y, 1)
-                                    }
+                                for (let road of roads) {
 
-                                    let structures = room.find(FIND_STRUCTURES, {
-                                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
-                                    })
+                                    cm.set(road.pos.x, road.pos.y, 1)
+                                }
 
-                                    for (let structure of structures) {
+                                let structures = room.find(FIND_STRUCTURES, {
+                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                })
 
-                                        if (structure.structureType != STRUCTURE_CONTAINER) {
+                                for (let structure of structures) {
 
-                                            cm.set(structure.pos.x, structure.pos.y, 255)
-                                        }
+                                    if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                                        cm.set(structure.pos.x, structure.pos.y, 255)
                                     }
                                 }
 
@@ -754,35 +766,52 @@ module.exports = {
 
                                             let room = Game.rooms[roomName]
 
-                                            if (room) {
+                                            if (!room) return
 
-                                                let costs = new PathFinder.CostMatrix
+                                            let cm
 
-                                                room.find(FIND_STRUCTURES).forEach(function(struct) {
-                                                    if (struct.structureType === STRUCTURE_ROAD) {
+                                            cm = new PathFinder.CostMatrix
 
-                                                        costs.set(struct.pos.x, struct.pos.y, 1)
+                                            let ramparts = room.find(FIND_MY_STRUCTURES, {
+                                                filter: s => s.structureType == STRUCTURE_RAMPART
+                                            })
 
-                                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                            for (let rampart of ramparts) {
 
-                                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
-
-                                                    }
-                                                })
-                                                room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
-                                                    if (struct.structureType === STRUCTURE_ROAD) {
-
-                                                        costs.set(struct.pos.x, struct.pos.y, 1)
-
-                                                    } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
-
-                                                        costs.set(struct.pos.x, struct.pos.y, 0xff)
-
-                                                    }
-                                                })
-
-                                                return costs
+                                                cm.set(rampart.pos.x, rampart.pos.y, 3)
                                             }
+
+                                            let roadConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                                                filter: s => s.structureType == STRUCTURE_ROAD
+                                            })
+
+                                            for (let roadSite of roadConstructionSites) {
+
+                                                cm.set(roadSite.pos.x, roadSite.pos.y, 1)
+                                            }
+
+                                            let roads = room.find(FIND_STRUCTURES, {
+                                                filter: s => s.structureType == STRUCTURE_ROAD
+                                            })
+
+                                            for (let road of roads) {
+
+                                                cm.set(road.pos.x, road.pos.y, 1)
+                                            }
+
+                                            let structures = room.find(FIND_STRUCTURES, {
+                                                filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                            })
+
+                                            for (let structure of structures) {
+
+                                                if (structure.structureType != STRUCTURE_CONTAINER) {
+
+                                                    cm.set(structure.pos.x, structure.pos.y, 255)
+                                                }
+                                            }
+
+                                            return cm
                                         }
                                     }).path
 
