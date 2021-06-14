@@ -397,6 +397,7 @@ module.exports = {
 
                         var path = PathFinder.search(origin.pos, goal, {
                             plainCost: 3,
+                            swampCost: 8,
                             maxRooms: 1,
 
                             roomCallback: function(roomName) {
@@ -483,6 +484,7 @@ module.exports = {
 
                         var path = PathFinder.search(origin.pos, goal, {
                             plainCost: 3,
+                            swampCost: 8,
                             maxRooms: 1,
 
                             roomCallback: function(roomName) {
@@ -569,6 +571,7 @@ module.exports = {
 
                         var path = PathFinder.search(origin.pos, goal, {
                             plainCost: 3,
+                            swampCost: 8,
                             maxRooms: 1,
 
                             roomCallback: function(roomName) {
@@ -656,6 +659,7 @@ module.exports = {
 
                         var path = PathFinder.search(origin.pos, goal, {
                             plainCost: 3,
+                            swampCost: 8,
                             maxRooms: 1,
 
                             roomCallback: function(roomName) {
@@ -759,7 +763,8 @@ module.exports = {
                                 if (origin && goal) {
 
                                     var path = PathFinder.search(origin.pos, goal, {
-                                        plainCost: 2,
+                                        plainCost: 3,
+                                        swampCost: 8,
                                         maxOps: 10000,
 
                                         roomCallback: function(roomName) {
