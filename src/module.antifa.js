@@ -293,8 +293,8 @@ module.exports = {
                                 }
                             } else {
 
-                                let goal = _.map([new RoomPosition(25, 25, Memory.global.attackTarget)], function(pos) {
-                                    return { pos: pos, range: 2 }
+                                let goal = _.map([creep.room.controller], function(target) {
+                                    return { pos: target.pos, range: 2 }
                                 })
 
                                 if (creep.fatigue == 0 && supporter.fatigue == 0) {
