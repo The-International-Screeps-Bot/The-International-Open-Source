@@ -338,7 +338,7 @@ module.exports = {
 
                 if (attackingRoom && attackingRoom == room) {
 
-                    minCreeps["antifaAssaulter"] = 1
+                    minCreeps["antifaAssaulter"] = 2
                     minCreeps["antifaSupporter"] = minCreeps["antifaAssaulter"]
                 }
 
