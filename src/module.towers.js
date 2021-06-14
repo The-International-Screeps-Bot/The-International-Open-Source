@@ -11,7 +11,7 @@ module.exports = {
 
                 let injuredCreep = room.find(FIND_CREEPS, {
                     filter: (c) => {
-                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) >= 0 && creep.hits < creep.hitsMax * 1)
+                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) >= 0 && creep.hits < creep.hitsMax * 0.75)
                     }
                 })[0]
 

@@ -358,7 +358,7 @@ module.exports = {
                                 }
                             })
 
-                            if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+                            if (1 == 2 && closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
 
                                 target = "closestHostile"
 
