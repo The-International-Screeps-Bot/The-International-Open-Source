@@ -51,9 +51,9 @@ module.exports = {
 
             var newCommune
 
-            // var attackTarget = "E28N9"
+            var attackTarget = "E28N9"
 
-            var attackTarget
+            //var attackTarget
 
         } else {
 

@@ -116,7 +116,11 @@ module.exports = {
 
                     let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memory.roomFrom)
 
-                    if (targetRoomDistance == 1 && !controller.owner && !controller.reservation) {
+                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(pos) {
+                        return { pos: pos, range: 1 }
+                    })
+
+                    if (targetRoomDistance == 1 && !controller.owner && !controller.reservation && creep.findSafeDistance(creep.pos, goal) <= 2) {
 
                         let sources = creep.room.find(FIND_SOURCES).length
 

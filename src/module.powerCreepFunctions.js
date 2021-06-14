@@ -1,12 +1,12 @@
 let allyList = require("module.allyList")
 
-Creep.prototype.findRemoteRoom = function() {
+PowerCreep.prototype.findRemoteRoom = function() {
 
     if (!creep.memory.remoteRoom) {
 
         for (let remoteRoom of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
 
-            if (remoteRoom.creepsOfRole[creep.memory.role] < remoteRoom.minCreeps[creep.memory.role]) {
+            if (remoteRoom.creepsOfRole[creep.memory.role] < remoteRoom.minPowerCreeps[creep.memory.role]) {
 
                 creep.memory.remoteRoom = remoteRoom
             }
@@ -14,7 +14,7 @@ Creep.prototype.findRemoteRoom = function() {
     }
 }
 
-Creep.prototype.barricadesFindAndRepair = function() {
+PowerCreep.prototype.barricadesFindAndRepair = function() {
 
         if (creep.memory.target) {
 
@@ -57,7 +57,7 @@ Creep.prototype.barricadesFindAndRepair = function() {
         }
     }
     /*
-    Creep.prototype.barricadesFindAndRepair = function() {
+    PowerCreep.prototype.barricadesFindAndRepair = function() {
 
         var barricades = creep.room.find(FIND_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
@@ -86,7 +86,7 @@ Creep.prototype.barricadesFindAndRepair = function() {
     }
     */
 
-Creep.prototype.myParts = function(partType) {
+PowerCreep.prototype.myParts = function(partType) {
 
     creep = this
 
@@ -101,7 +101,7 @@ Creep.prototype.myParts = function(partType) {
     }
     return partsAmount
 }
-Creep.prototype.findEnergyHarvested = function(source) {
+PowerCreep.prototype.findEnergyHarvested = function(source) {
 
     creep = this
 
@@ -110,7 +110,7 @@ Creep.prototype.findEnergyHarvested = function(source) {
     creep.say("⛏️ " + energyHarvested)
     Memory.stats.energyHarvested += energyHarvested
 }
-Creep.prototype.fleeHostileRoom = function() {
+PowerCreep.prototype.fleeHostileRoom = function() {
 
     creep = this
 
@@ -127,7 +127,7 @@ Creep.prototype.fleeHostileRoom = function() {
         }
     }
 }
-Creep.prototype.isFull = function() {
+PowerCreep.prototype.isFull = function() {
 
     creep = this
 
@@ -141,7 +141,7 @@ Creep.prototype.isFull = function() {
 
     }
 }
-Creep.prototype.hasResource = function() {
+PowerCreep.prototype.hasResource = function() {
 
     creep = this
 
@@ -155,7 +155,7 @@ Creep.prototype.hasResource = function() {
 
     }
 }
-Creep.prototype.pickupDroppedEnergy = function(target) {
+PowerCreep.prototype.pickupDroppedEnergy = function(target) {
 
     if (creep.pos.isNearTo(target)) {
 
@@ -173,7 +173,7 @@ Creep.prototype.pickupDroppedEnergy = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-Creep.prototype.advancedWithdraw = function(target, resource, amount) {
+PowerCreep.prototype.advancedWithdraw = function(target, resource, amount) {
 
     if (!resource) {
 
@@ -200,7 +200,7 @@ Creep.prototype.advancedWithdraw = function(target, resource, amount) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-Creep.prototype.advancedTransfer = function(target, resource) {
+PowerCreep.prototype.advancedTransfer = function(target, resource) {
 
     if (!resource) {
 
@@ -223,7 +223,7 @@ Creep.prototype.advancedTransfer = function(target, resource) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-Creep.prototype.checkRoom = function() {
+PowerCreep.prototype.checkRoom = function() {
 
     creep = this
 
@@ -240,7 +240,7 @@ Creep.prototype.checkRoom = function() {
         }
     }
 }
-Creep.prototype.repairBarricades = function(target) {
+PowerCreep.prototype.repairBarricades = function(target) {
 
     creep = this
 
@@ -255,7 +255,7 @@ Creep.prototype.repairBarricades = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-Creep.prototype.repairStructure = function(target) {
+PowerCreep.prototype.repairStructure = function(target) {
 
     creep = this
 
@@ -270,7 +270,7 @@ Creep.prototype.repairStructure = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-Creep.prototype.constructionBuild = function(target) {
+PowerCreep.prototype.constructionBuild = function(target) {
 
     creep = this
 
@@ -285,7 +285,7 @@ Creep.prototype.constructionBuild = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-Creep.prototype.controllerUpgrade = function(target) {
+PowerCreep.prototype.controllerUpgrade = function(target) {
 
     if (!creep.pos.inRangeTo(creep.room.controller, 3)) {
 
@@ -303,7 +303,7 @@ Creep.prototype.controllerUpgrade = function(target) {
     }
 
 }
-Creep.prototype.searchSourceContainers = function() {
+PowerCreep.prototype.searchSourceContainers = function() {
 
     creep = this
 
@@ -329,7 +329,7 @@ Creep.prototype.searchSourceContainers = function() {
         }
     }
 }
-Creep.prototype.findDamagePossible = function(creep, healers, towers) {
+PowerCreep.prototype.findDamagePossible = function(creep, healers, towers) {
 
     let distance = creep.pos.getRangeTo(creep.pos.findClosestByRange(towers))
 
@@ -380,7 +380,7 @@ Creep.prototype.findDamagePossible = function(creep, healers, towers) {
 
     return damagePossible
 }
-Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTower, towerCount) {
+PowerCreep.prototype.findClosestDistancePossible = function(creep, healers, closestTower, towerCount) {
 
     let distance = creep.pos.getRangeTo(creep.pos.findClosestByRange(towers))
 
@@ -445,7 +445,7 @@ Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTo
         return false
     }
 }
-Creep.prototype.roadPathing = function(origin, goal) {
+PowerCreep.prototype.roadPathing = function(origin, goal) {
 
     creep = this
 
@@ -498,7 +498,7 @@ Creep.prototype.roadPathing = function(origin, goal) {
 
     //new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
-Creep.prototype.offRoadPathing = function(origin, goal) {
+PowerCreep.prototype.offRoadPathing = function(origin, goal) {
 
     creep = this
 
@@ -541,7 +541,7 @@ Creep.prototype.offRoadPathing = function(origin, goal) {
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
-Creep.prototype.intraRoomPathing = function(origin, goal) {
+PowerCreep.prototype.intraRoomPathing = function(origin, goal) {
 
     creep = this
 
@@ -625,7 +625,7 @@ Creep.prototype.intraRoomPathing = function(origin, goal) {
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
-Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
+PowerCreep.prototype.onlySafeRoomPathing = function(origin, goal) {
 
     creep = this
 
@@ -739,7 +739,7 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
         new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
     }
 }
-Creep.prototype.rampartPathing = function(origin, goal) {
+PowerCreep.prototype.rampartPathing = function(origin, goal) {
 
     creep = this
 
@@ -799,7 +799,7 @@ Creep.prototype.rampartPathing = function(origin, goal) {
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
-Creep.prototype.creepFlee = function(origin, target) {
+PowerCreep.prototype.creepFlee = function(origin, target) {
 
     creep = this
 
