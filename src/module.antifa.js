@@ -58,8 +58,13 @@ module.exports = {
 
                     creep.say("H")
 
-                    if (creep.pos.getRangeTo(closestHostile) < 3) {
+                    if (creep.pos.getRangeTo(closestHostile) > 3) {
 
+                        let goal = _.map([closestHostile], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
+
+                        creep.intraRoomPathing(creep.pos, goal)
 
                     } else if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
@@ -70,6 +75,9 @@ module.exports = {
                         })
 
                         creep.creepFlee(creep.pos, goal)
+                    } else {
+
+                        creep.rangedAttack(closestHostile)
                     }
                 }
             }
@@ -122,14 +130,19 @@ module.exports = {
                                 }
                             })
 
-                            if (closestHostile && (closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+                            if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
 
                                 target = "closestHostile"
 
                                 creep.say("H")
 
-                                if (creep.pos.getRangeTo(closestHostile) < 3) {
+                                if (creep.pos.getRangeTo(closestHostile) > 3) {
 
+                                    let goal = _.map([closestHostile], function(target) {
+                                        return { pos: target.pos, range: 1 }
+                                    })
+
+                                    creep.intraRoomPathing(creep.pos, goal)
 
                                 } else if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
@@ -140,6 +153,9 @@ module.exports = {
                                     })
 
                                     creep.creepFlee(creep.pos, goal)
+                                } else {
+
+                                    creep.rangedAttack(closestHostile)
                                 }
                             } else {
 
@@ -248,14 +264,19 @@ module.exports = {
                                 }
                             })
 
-                            if (closestHostile && (closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+                            if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
 
                                 target = "closestHostile"
 
                                 creep.say("H")
 
-                                if (creep.pos.getRangeTo(closestHostile) < 3) {
+                                if (creep.pos.getRangeTo(closestHostile) > 3) {
 
+                                    let goal = _.map([closestHostile], function(target) {
+                                        return { pos: target.pos, range: 1 }
+                                    })
+
+                                    creep.intraRoomPathing(creep.pos, goal)
 
                                 } else if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
@@ -266,6 +287,9 @@ module.exports = {
                                     })
 
                                     creep.creepFlee(creep.pos, goal)
+                                } else {
+
+                                    creep.rangedAttack(closestHostile)
                                 }
                             } else {
 
@@ -334,14 +358,19 @@ module.exports = {
                                 }
                             })
 
-                            if (closestHostile && (closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+                            if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
 
                                 target = "closestHostile"
 
                                 creep.say("H")
 
-                                if (creep.pos.getRangeTo(closestHostile) < 3) {
+                                if (creep.pos.getRangeTo(closestHostile) > 3) {
 
+                                    let goal = _.map([closestHostile], function(target) {
+                                        return { pos: target.pos, range: 1 }
+                                    })
+
+                                    creep.intraRoomPathing(creep.pos, goal)
 
                                 } else if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
@@ -352,6 +381,9 @@ module.exports = {
                                     })
 
                                     creep.creepFlee(creep.pos, goal)
+                                } else {
+
+                                    creep.rangedAttack(closestHostile)
                                 }
                             } else {
 
