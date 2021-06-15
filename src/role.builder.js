@@ -24,7 +24,7 @@ module.exports = {
 
                 if (terminal && terminal.store[RESOURCE_ENERGY] >= 30000) {
 
-                    creep.say("T >= 50k")
+                    creep.say("T")
 
                     creep.advancedWithdraw(terminal)
                 } else {
@@ -33,7 +33,7 @@ module.exports = {
 
                     if (storage) {
 
-                        creep.say("S 10k")
+                        creep.say("S")
 
                         let target = storage
 

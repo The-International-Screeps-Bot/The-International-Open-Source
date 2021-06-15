@@ -18,7 +18,7 @@ module.exports = {
 
             if (storage) {
 
-                creep.say("S 10k")
+                creep.say("S")
 
                 let target = storage
 
