@@ -8,7 +8,7 @@ module.exports = {
 
             function destroySite() {
 
-                let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)
+                let roomConstructionSite = room.find(FIND_MY_CONSTRUCTION_SITES)
 
                 if (room) {
 
@@ -377,7 +377,7 @@ module.exports = {
                 let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
                 let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
-                let roomConstructionSites = room.find(FIND_CONSTRUCTION_SITES)
+                let roomConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES)
 
                 if (roomConstructionSites.length < 5) {
 
@@ -439,7 +439,7 @@ module.exports = {
                                     cm.set(rampart.pos.x, rampart.pos.y, 3)
                                 }
 
-                                let roadConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                                let roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                                     filter: s => s.structureType == STRUCTURE_ROAD
                                 })
 
@@ -526,7 +526,7 @@ module.exports = {
                                     cm.set(rampart.pos.x, rampart.pos.y, 3)
                                 }
 
-                                let roadConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                                let roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                                     filter: s => s.structureType == STRUCTURE_ROAD
                                 })
 
@@ -613,7 +613,7 @@ module.exports = {
                                     cm.set(rampart.pos.x, rampart.pos.y, 3)
                                 }
 
-                                let roadConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                                let roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                                     filter: s => s.structureType == STRUCTURE_ROAD
                                 })
 
@@ -701,7 +701,7 @@ module.exports = {
                                     cm.set(rampart.pos.x, rampart.pos.y, 3)
                                 }
 
-                                let roadConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                                let roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                                     filter: s => s.structureType == STRUCTURE_ROAD
                                 })
 
@@ -806,7 +806,7 @@ module.exports = {
                                                 cm.set(rampart.pos.x, rampart.pos.y, 3)
                                             }
 
-                                            let roadConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                                            let roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                                                 filter: s => s.structureType == STRUCTURE_ROAD
                                             })
 

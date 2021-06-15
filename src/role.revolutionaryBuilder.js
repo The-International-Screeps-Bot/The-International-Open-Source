@@ -25,7 +25,7 @@ module.exports = {
 
             creep.isFull()
 
-            let constructionSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES)
+            let constructionSite = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES)
 
             if (creep.memory.isFull == true) {
 

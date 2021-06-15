@@ -193,7 +193,7 @@ module.exports = {
                     filter: s => s.structureType == STRUCTURE_EXTRACTOR
                 })
 
-                let roomConstructionSite = room.find(FIND_CONSTRUCTION_SITES)
+                let roomConstructionSite = room.find(FIND_MY_CONSTRUCTION_SITES)
 
                 let repairStructure = room.find(FIND_STRUCTURES, {
                     filter: s => (s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_CONTAINER) && s.hits < s.hitsMax * 0.5

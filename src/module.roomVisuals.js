@@ -29,7 +29,7 @@ module.exports = {
 
                 var controller = room.controller
 
-                var constructionSites = room.find(FIND_CONSTRUCTION_SITES)
+                var constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES)
 
                 var spawns = room.find(FIND_MY_SPAWNS)
 

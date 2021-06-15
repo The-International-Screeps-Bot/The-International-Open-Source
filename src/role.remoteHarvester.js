@@ -187,7 +187,7 @@ module.exports = {
                 }
             })
 
-            var constructionSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES)
+            var constructionSite = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES)
 
             var structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5

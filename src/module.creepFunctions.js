@@ -471,7 +471,7 @@ Creep.prototype.roadPathing = function(origin, goal) {
 
                 }
             })
-            room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
+            room.find(FIND_MY_CONSTRUCTION_SITES).forEach(function(struct) {
                 if (struct.structureType === STRUCTURE_ROAD) {
 
                     costs.set(struct.pos.x, struct.pos.y, 1)
@@ -520,7 +520,7 @@ Creep.prototype.offRoadPathing = function(origin, goal) {
 
                 }
             })
-            room.find(FIND_CONSTRUCTION_SITES).forEach(function(struct) {
+            room.find(FIND_MY_CONSTRUCTION_SITES).forEach(function(struct) {
                 if (struct.structureType !== STRUCTURE_ROAD && struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
 
                     costs.set(struct.pos.x, struct.pos.y, 0xff)

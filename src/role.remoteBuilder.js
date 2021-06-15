@@ -49,7 +49,7 @@ module.exports = {
 
                 creep.say("F1")
 
-                var constructionSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES)
+                var constructionSite = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES)
 
                 if (constructionSite) {
 
