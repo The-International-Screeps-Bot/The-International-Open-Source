@@ -49,7 +49,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [x] Add room and map visuals to display important information
 - [ ] Power creep offensive capabilities
 - [ ] Automatic safemode when boosted attackers
-- [ ] Advanced targeting for towers
+- [x] Advanced targeting for towers
 - [ ] Recording and predicting for like attackers
 - [ ] Assisting of defending rooms using safe rooms in case of power creep assisted attack
 - [ ] Weighting of rooms from economic to military depending on recent history and neighbours
