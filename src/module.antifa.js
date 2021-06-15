@@ -7,6 +7,89 @@ module.exports = {
         let antifaAssaulters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaAssaulter');
         let antifaSupporters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaSupporter');
 
+        for (let creep of antifaSupporters) {
+
+            const inSquad = creep.memory.inSquad
+            const assaulter = Game.creeps[creep.memory.assaulter]
+
+            let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 48 || creep.pos.y <= 0 || creep.pos.y >= 48)
+
+            if (creep.memory.assaulter && !assaulter) {
+
+                creep.memory.assaulter = undefined
+                creep.memory.inSquad = false
+            }
+            if (assaulter) {
+                if (inSquad) {
+
+                    creep.say("IS")
+
+                    if (creep.room == assaulter.room) {
+
+                        if (creep.pos.isNearTo(assaulter)) {
+
+                            let direction = creep.pos.getDirectionTo(assaulter)
+                            creep.move(direction)
+
+                        } else {
+
+                            let goal = _.map([assaulter], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
+
+                            creep.intraRoomPathing(creep.pos, goal)
+
+                        }
+                    } else {
+
+                        let goal = _.map([assaulter], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
+
+                        creep.onlySafeRoomPathing(creep.pos, goal)
+                    }
+                } else {
+
+                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
+                        return { pos: target, range: 1 }
+                    })
+
+                    creep.onlySafeRoomPathing(creep.pos, goal)
+                }
+            } else if (findCreepWithoutTask(creep, antifaAssaulters)) {
+
+                creep.memory.assaulter = findCreepWithoutTask(creep, antifaAssaulters).name
+                creep.memory.inSquad = true
+
+                findCreepWithoutTask(creep, antifaAssaulters).memory.supporter = creep.name
+                findCreepWithoutTask(creep, antifaAssaulters).memory.inSquad = true
+
+            } else {
+
+                creep.say("NS")
+
+                let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
+                    return { pos: target, range: 1 }
+                })
+
+                creep.onlySafeRoomPathing(creep.pos, goal)
+            }
+        }
+
+        function findCreepWithoutTask(creep, collection) {
+
+            for (let assaulter of collection) {
+
+                if (assaulter.memory.roomFrom == creep.room.name) {
+
+                    if (!assaulter.memory.inSquad) {
+
+                        return assaulter
+                    }
+                }
+            }
+            return false
+        }
         for (let creep of antifaAssaulters) {
 
             const inSquad = creep.memory.inSquad
@@ -448,6 +531,7 @@ module.exports = {
                             })
 
                             creep.onlySafeRoomPathing(creep.pos, goal)
+
                         } else {
 
                             let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
@@ -467,6 +551,7 @@ module.exports = {
                     })
 
                     creep.onlySafeRoomPathing(creep.pos, goal)
+
                 } else {
 
                     let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
@@ -476,89 +561,6 @@ module.exports = {
                     creep.onlySafeRoomPathing(creep.pos, goal)
                 }
             }
-        }
-        for (let creep of antifaSupporters) {
-
-            const inSquad = creep.memory.inSquad
-            const assaulter = Game.creeps[creep.memory.assaulter]
-
-            let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 48 || creep.pos.y <= 0 || creep.pos.y >= 48)
-
-            if (creep.memory.assaulter && !assaulter) {
-
-                creep.memory.assaulter = undefined
-                creep.memory.inSquad = false
-            }
-            if (assaulter) {
-                if (inSquad) {
-
-                    creep.say("IS")
-
-                    if (creep.room == assaulter.room) {
-
-                        if (creep.pos.isNearTo(assaulter)) {
-
-                            let direction = creep.pos.getDirectionTo(assaulter)
-                            creep.move(direction)
-
-                        } else {
-
-                            let goal = _.map([assaulter], function(target) {
-                                return { pos: target.pos, range: 1 }
-                            })
-
-                            creep.intraRoomPathing(creep.pos, goal)
-
-                        }
-                    } else {
-
-                        let goal = _.map([assaulter], function(target) {
-                            return { pos: target.pos, range: 1 }
-                        })
-
-                        creep.onlySafeRoomPathing(creep.pos, goal)
-                    }
-                } else {
-
-                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                        return { pos: target, range: 1 }
-                    })
-
-                    creep.onlySafeRoomPathing(creep.pos, goal)
-                }
-            } else if (findCreepWithoutTask(creep, antifaAssaulters)) {
-
-                creep.memory.assaulter = findCreepWithoutTask(creep, antifaAssaulters).name
-                creep.memory.inSquad = true
-
-                findCreepWithoutTask(creep, antifaAssaulters).memory.supporter = creep.name
-                findCreepWithoutTask(creep, antifaAssaulters).memory.inSquad = true
-
-            } else {
-
-                creep.say("NS")
-
-                let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                    return { pos: target, range: 1 }
-                })
-
-                creep.onlySafeRoomPathing(creep.pos, goal)
-            }
-        }
-
-        function findCreepWithoutTask(creep, collection) {
-
-            for (let assaulter of collection) {
-
-                if (assaulter.memory.roomFrom == creep.room.name) {
-
-                    if (!assaulter.memory.inSquad) {
-
-                        return assaulter
-                    }
-                }
-            }
-            return false
         }
     }
 }
