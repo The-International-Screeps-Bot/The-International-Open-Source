@@ -84,13 +84,15 @@ module.exports = {
         Memory.stats.cpuBucket = Game.cpu.bucket
 
         //CONTROL POINTS
+        Memory.stats.gcl = Game.gcl.level
         Memory.stats.gclPercent = (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2)
 
         //SPECIFIC
         Memory.stats.cpuPerCreep = 0
         Memory.stats.cpuPerCommune = (Memory.stats.cpuUsage / Memory.global.communes.length).toFixed(2)
 
-        Memory.stats.memoryTotal = Math.floor(2097152 / 1000)
         Memory.stats.memoryUsed = Math.floor(JSON.stringify(Memory).length / 1000)
+
+        Memory.stats.credits = Game.market.credits
     }
 }

@@ -181,7 +181,6 @@ module.exports = {
                 })
 
                 if (hostileAttacker.length > 0) {
-                    console.log("Attack!!")
 
                     Memory.global.lastDefence.time = Game.time
                     Memory.global.lastDefence.room = room.name
