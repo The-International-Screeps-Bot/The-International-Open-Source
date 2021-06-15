@@ -47,23 +47,23 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            //var newCommune = "E21N3"
+            var newCommune = "E28N9"
 
-            var newCommune
+            // var newCommune
 
             var attackTarget = "E28N9"
 
-            //var attackTarget
+            // var attackTarget
 
         } else {
 
-            //var newCommune = "E29N11"
+            // var newCommune = "E29N11"
 
             var newCommune
 
             var attackTarget = "E29N11"
 
-            //var attackTarget
+            // var attackTarget
         }
 
         Memory.global.newCommune = newCommune

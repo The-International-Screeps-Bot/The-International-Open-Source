@@ -130,7 +130,7 @@ module.exports = {
                                 }
                             })
 
-                            if (1 == 2 && closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+                            if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
 
                                 target = "closestHostile"
 
@@ -157,7 +157,7 @@ module.exports = {
                                 }
                                 if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
-                                    let direction = creep.pos.getDirectionTo(assaulter)
+                                    let direction = creep.pos.getDirectionTo(supporter)
                                     creep.move(direction)
 
                                     let goal = _.map([closestHostile], function(target) {
@@ -273,7 +273,7 @@ module.exports = {
                                 }
                             })
 
-                            if (1 == 2 && closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+                            if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
 
                                 target = "closestHostile"
 
@@ -300,7 +300,7 @@ module.exports = {
                                 }
                                 if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
-                                    let direction = creep.pos.getDirectionTo(assaulter)
+                                    let direction = creep.pos.getDirectionTo(supporter)
                                     creep.move(direction)
 
                                     let goal = _.map([closestHostile], function(target) {
@@ -403,7 +403,7 @@ module.exports = {
                                 }
                                 if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
-                                    let direction = creep.pos.getDirectionTo(assaulter)
+                                    let direction = creep.pos.getDirectionTo(supporter)
                                     creep.move(direction)
 
                                     let goal = _.map([closestHostile], function(target) {
