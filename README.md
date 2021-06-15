@@ -19,6 +19,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 
 ## Progress
 
+- [x] Setup info to be displayed in Grafana
 - [x] Automated spawning
 - [x] Claim and operation of multiple rooms
 - [x] Remote mining
