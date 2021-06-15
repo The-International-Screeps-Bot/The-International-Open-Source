@@ -899,6 +899,15 @@ module.exports = {
 
                         //sourceContainer2.destroy()
                     }
+
+                    let walls = room.find(FIND_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_WALL
+                    })
+
+                    for (let structure of walls) {
+
+                        structure.destroy()
+                    }
                 }
             }
         })

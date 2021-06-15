@@ -3,9 +3,11 @@ let allyList = require("module.allyList")
 module.exports = {
     run: function(creep) {
 
+        creep.say("Broke")
+
         let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
             filter: (c) => {
-                return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || body.some(i => i.type === CARRY)))
+                return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL)))
             }
         })
 
@@ -37,6 +39,8 @@ module.exports = {
                     creep.rangedAttack(closestHostile)
                 }
             } else {
+
+                creep.say("NE")
 
                 if (!(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
 
