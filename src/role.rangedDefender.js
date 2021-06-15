@@ -3,7 +3,7 @@ let allyList = require("module.allyList")
 module.exports = {
     run: function(creep) {
 
-        let enemyCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+        let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
             filter: (c) => {
                 return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || body.some(i => i.type === CARRY)))
             }
@@ -11,11 +11,11 @@ module.exports = {
 
         creep.say("No Enemy")
 
-        if (enemyCreep) {
+        if (closestHostile) {
 
             creep.say("Enemy")
 
-            let target = enemyCreep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+            let target = closestHostile.pos.findClosestByRange(FIND_MY_STRUCTURES, {
                 filter: s => s.structureType == STRUCTURE_RAMPART
             })
 
@@ -29,28 +29,46 @@ module.exports = {
 
                 creep.rampartPathing(origin, goal)
 
-                if (enemyCreep.pos.isNearTo(creep)) {
+                if (closestHostile.pos.isNearTo(creep)) {
 
-                    creep.rangedMassAttack(enemyCreep)
+                    creep.rangedMassAttack(closestHostile)
                 } else {
 
-                    creep.rangedAttack(enemyCreep)
+                    creep.rangedAttack(closestHostile)
                 }
             } else {
 
-                creep.rangedAttack(enemyCreep)
+                if (!(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
 
-                if (!creep.pos.inRangeTo(enemyCreep, 2)) {
+                    creep.say("H")
 
-                    let goal = _.map([enemyCreep], function(target) {
-                        return { pos: target.pos, range: 1 }
-                    })
+                    if (creep.pos.getRangeTo(closestHostile) > 3) {
 
-                    creep.intraRoomPathing(creep.pos, goal)
-                }
-                if (creep.pos.isNearTo(enemyCreep)) {
+                        let goal = _.map([closestHostile], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
 
-                    creep.rangedMassAttack(enemyCreep)
+                        creep.intraRoomPathing(creep.pos, goal)
+
+                    } else {
+
+                        if (creep.pos.getRangeTo(closestHostile) == 1) {
+
+                            creep.rangedMassAttack()
+
+                        } else if (creep.pos.getRangeTo(closestHostile) <= 3) {
+
+                            creep.rangedAttack(closestHostile)
+                        }
+                    }
+                    if (creep.pos.getRangeTo(closestHostile) <= 2) {
+
+                        let goal = _.map([closestHostile], function(target) {
+                            return { pos: target.pos, range: 3 }
+                        })
+
+                        creep.creepFlee(creep.pos, goal)
+                    }
                 }
             }
         }
