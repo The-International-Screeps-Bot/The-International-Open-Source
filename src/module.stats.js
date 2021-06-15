@@ -70,6 +70,7 @@ module.exports = {
 
         //GENERAL
         Memory.stats.globalStage = Memory.global.globalStage
+        Memory.stats.communes = Memory.global.communes.length
         Memory.stats.establishedRooms = Memory.global.establishedRooms
         Memory.stats.totalCreeps = Object.keys(Memory.creeps).length
         Memory.stats.creepsPerRoom = (Object.keys(Memory.creeps).length / Memory.global.communes.length).toFixed(2)
@@ -88,5 +89,8 @@ module.exports = {
         //SPECIFIC
         Memory.stats.cpuPerCreep = 0
         Memory.stats.cpuPerCommune = (Memory.stats.cpuUsage / Memory.global.communes.length).toFixed(2)
+
+        Memory.stats.memoryTotal = Math.floor(2097152 / 1000)
+        Memory.stats.memoryUsed = Math.floor(JSON.stringify(Memory).length / 1000)
     }
 }
