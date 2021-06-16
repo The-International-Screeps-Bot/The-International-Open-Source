@@ -386,10 +386,11 @@ module.exports = {
                     if (stage == 1) {
 
                         minCreeps["upgrader"] = 6
-                    }
-                    if (stage <= 3) {
+
+                    } else if (stage <= 3) {
 
                         minCreeps["upgrader"] = 4
+
                     } else {
 
                         minCreeps["upgrader"] = 3
@@ -400,6 +401,7 @@ module.exports = {
                     if (stage <= 5) {
 
                         minCreeps["upgrader"] = 2
+
                     } else {
 
                         minCreeps["upgrader"] = 1

@@ -75,6 +75,18 @@ module.exports = {
                     }
                 }
             }
+        } else {
+
+            let spawn = creep.room.find(FIND_MY_SPAWNS)[0]
+
+            if (creep.pos.getRangeTo(spawn) >= 6) {
+
+                let goal = _.map([spawn], function(target) {
+                    return { pos: target.pos, range: 1 }
+                })
+
+                creep.intraRoomPathing(creep.pos, goal)
+            }
         }
     }
 };

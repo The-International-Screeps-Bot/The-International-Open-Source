@@ -28,12 +28,19 @@ module.exports = {
                         creep.advancedWithdraw(controllerLink, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
 
                     }
-                } else if (controllerContainer) {
-                    if (controllerContainer.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
+                } else if (controllerContainer && controllerContainer.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
 
-                        creep.advancedWithdraw(controllerContainer, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
+                    creep.advancedWithdraw(controllerContainer, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
 
-                    }
+                } else if (room.memory.stage <= 3) {
+
+                    creep.say("NE")
+
+                    let goal = _.map([target], function(target) {
+                        return { pos: target.pos, range: 2 }
+                    })
+
+                    creep.creepFlee(creep.pos, goal)
                 }
             }
         } else {
