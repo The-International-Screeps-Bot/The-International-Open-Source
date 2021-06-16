@@ -122,26 +122,26 @@ module.exports = {
 
             if (sourceContainer1 != null && sourceContainer1.store[RESOURCE_ENERGY] >= findHaulersOfRoom()[0].store.getCapacity()) {
 
-                if (!findCreepWithTask("sourceContainer1Full", 1) && findCreepWithoutTask() && !findCreepWithoutTask().memory.isFull) {
+                if (!findCreepWithTask("sourceContainer1Full", 1) && findCreepWithoutTask()) {
 
                     findCreepWithoutTask().memory.task = "sourceContainer1Full"
                 }
             }
             if (sourceContainer2 != null && sourceContainer2.store[RESOURCE_ENERGY] >= findHaulersOfRoom()[0].store.getCapacity()) {
 
-                if (!findCreepWithTask("sourceContainer2Full", 1) && findCreepWithoutTask() && !findCreepWithoutTask().memory.isFull) {
+                if (!findCreepWithTask("sourceContainer2Full", 1) && findCreepWithoutTask()) {
 
                     findCreepWithoutTask().memory.task = "sourceContainer2Full"
                 }
             }
 
             let droppedEnergy = room.find(FIND_DROPPED_RESOURCES, {
-                filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= findHaulersOfRoom()[0].store.getCapacity()
+                filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= findHaulersOfRoom()[0].store.getCapacity() * 0.5
             })
 
             if (droppedEnergy[0]) {
 
-                if (!findCreepWithTask("droppedEnergy", findHaulersOfRoom().length) && findCreepWithoutTask() && !findCreepWithoutTask().memory.isFull) {
+                if (!findCreepWithTask("droppedEnergy", findHaulersOfRoom().length) && findCreepWithoutTask()) {
 
                     findCreepWithoutTask().memory.task = "droppedEnergy"
                 }

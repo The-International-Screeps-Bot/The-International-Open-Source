@@ -10,7 +10,6 @@ module.exports = {
         if (controllerContainer != null || (controllerLink != null && creep.room.memory.stage >= 6)) {
 
             creep.memory.isFull = "constant"
-
         }
 
         if (creep.memory.isFull == true || creep.memory.isFull == "constant") {

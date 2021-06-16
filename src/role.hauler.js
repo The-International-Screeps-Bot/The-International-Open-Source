@@ -113,6 +113,9 @@ module.exports = {
 
                         creep.memory.task = undefined
                     }
+                } else {
+
+                    task = "noDeliveryPossible"
                 }
             }
         } else if (task == "sourceContainer2Full" && sourceContainer2 != null) {
@@ -154,6 +157,9 @@ module.exports = {
 
                         creep.memory.task = undefined
                     }
+                } else {
+
+                    task = "noDeliveryPossible"
                 }
             }
         } else if (task == "droppedEnergy" && droppedEnergy) {
@@ -196,6 +202,9 @@ module.exports = {
 
                         creep.memory.task = undefined
                     }
+                } else {
+
+                    task = "noDeliveryPossible"
                 }
             }
         } else if (task == "fillPowerSpawn" && powerSpawn) {
@@ -247,17 +256,20 @@ module.exports = {
 
                 creep.memory.task = undefined
             }
-        } else if (!task) {
+        } else if ((!task || task == "noDeliveryPossible") && storage) {
 
             if (creep.memory.isFull) {
 
                 let spawn = creep.room.find(FIND_MY_SPAWNS)[0]
 
-                let goal = _.map([spawn], function(target) {
-                    return { pos: target.pos, range: 4 }
-                })
+                if (creep.pos.getRangeTo(spawn) >= 4) {
 
-                creep.intraRoomPathing(creep.pos, goal)
+                    let goal = _.map([spawn], function(target) {
+                        return { pos: target.pos, range: 1 }
+                    })
+
+                    creep.intraRoomPathing(creep.pos, goal)
+                }
             }
         }
     }
