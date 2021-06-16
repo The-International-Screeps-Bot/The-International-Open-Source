@@ -477,7 +477,7 @@ module.exports = {
                             let value = path[i - 1]
                             let normalValue = path[i]
 
-                            if (value) {
+                            if (value && room.controller.level >= 5) {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
@@ -564,7 +564,7 @@ module.exports = {
                             let value = path[i - 1]
                             let normalValue = path[i]
 
-                            if (value) {
+                            if (value && room.controller.level >= 5) {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
@@ -651,7 +651,7 @@ module.exports = {
                             let value = path[i - 1]
                             let normalValue = path[i]
 
-                            if (value) {
+                            if (value && room.controller.level >= 5) {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
