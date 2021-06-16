@@ -381,12 +381,9 @@ module.exports = {
 
                 if (roomConstructionSites.length < 5) {
 
-                    if (room.memory.stage >= 5) {
-
-                        source1Path()
-                        source2Path()
-                        controllerPath()
-                    }
+                    source1Path()
+                    source2Path()
+                    controllerPath()
 
                     if (room.memory.stage >= 6) {
 
