@@ -176,13 +176,24 @@ module.exports = {
                     }
                 }
 
-                let hostileAttacker = room.find(FIND_HOSTILE_CREEPS, {
-                    filter: (c) => {
-                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && c.owner.username != "Invader" && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
-                    }
-                })
+                if (room.memory.stage && room.memory.stage < 3) {
 
-                if (hostileAttacker.length > 0) {
+                    var hostile = room.find(FIND_HOSTILE_CREEPS, {
+                        filter: (c) => {
+                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+                        }
+                    })
+
+                } else {
+
+                    var hostile = room.find(FIND_HOSTILE_CREEPS, {
+                        filter: (c) => {
+                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && c.owner.username != "Invader" && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+                        }
+                    })
+                }
+
+                if (hostile.length > 0) {
 
                     Memory.global.lastDefence.time = Game.time
                     Memory.global.lastDefence.room = room.name
@@ -415,7 +426,7 @@ module.exports = {
                     minCreeps["stationaryHauler"] = 1
                 }
 
-                if (hostileAttacker.length > 0) {
+                if (hostile.length > 0) {
 
                     minCreeps["rangedDefender"] = 2
                 }
