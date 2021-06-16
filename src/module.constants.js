@@ -1,35 +1,58 @@
 module.exports = {
     run: function constants() {
 
-        //Instead I should be having the scouts create the map visuals the export them. This doesn't work as Memory.rooms is an object of room names, not of room objects
-        /*
-                for (let room in Memory.rooms) {
+        for (let room in Memory.rooms) {
 
-                    if (Memory.rooms[room] && Memory.rooms[room].stage) {
-                        if (room.memory.stage != null) {
-                            if (room.memory.stage >= 1) {
+            if (Memory.rooms[room] && Memory.rooms[room].stage) {
+                if (Memory.rooms[room].stage) {
+                    if (Memory.rooms[room].stage >= 1) {
 
-                                Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#2DF0C9', opacity: 0.25 })
-                            } else if (room.memory.stage == "enemyRoom") {
+                        Game.map.visual.circle(new RoomPosition(8, 8, room), { radius: 8, fill: '#0008FF', opacity: 0.5 })
+                        Game.map.visual.text(Memory.rooms[room].stage, new RoomPosition(8, 8, room), { color: '#ffffff', fontSize: 8 })
 
-                                Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#FE411E', opacity: 0.25 })
-                            } else if (room.memory.stage == "remoteRoom") {
+                        Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#2DF0C9', opacity: 0.15 })
 
-                                Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#39A0ED', opacity: 0.25 })
-                            } else if (room.memory.stage == "invaderRoom") {
+                    } else if (Memory.rooms[room].stage == "enemyRoom") {
 
-                                Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#DA2F2F', opacity: 0.25 })
-                            } else if (room.memory.stage == "emptyRoom") {
+                        Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#FF0000', opacity: 0.25 })
 
-                                Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#DA2F2F', opacity: 0.25 })
-                            }
-                        } else {
+                    } else if (Memory.rooms[room].stage == "remoteRoom") {
 
-                            Game.map.visual.rect(new RoomPosition(0, 0, room.name), 50, 50, { fill: '#F4E637', opacity: 0.25 })
-                        }
+                        Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#39A0ED', opacity: 0.25 })
+
+                    } else if (Memory.rooms[room].stage == "keeperRoom") {
+
+                        Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#000000', opacity: 0.5 })
+
                     }
+                } else {
+
+                    Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#F4E637', opacity: 0.25 })
                 }
-                */
+            }
+        }
+
+        if (Memory.global.attackingRoom && Memory.global.attackTarget) {
+
+            Game.map.visual.line(new RoomPosition(25, 25, Memory.global.attackingRoom.name), new RoomPosition(25, 25, Memory.global.attackTarget), { width: 1.5, color: '#FE411E' })
+        }
+
+        if (Memory.global.attackTarget) {
+
+            Game.map.visual.circle(new RoomPosition(8, 8, Memory.global.attackTarget), { radius: 8, fill: '#FF0000', opacity: 0.5 })
+            Game.map.visual.text("AT", new RoomPosition(8, 8, Memory.global.attackTarget), { color: '#ffffff', fontSize: 8 })
+        }
+
+        if (Memory.global.communeEstablisher && Memory.global.newCommune) {
+
+            Game.map.visual.line(new RoomPosition(25, 25, Memory.global.communeEstablisher.name), new RoomPosition(25, 25, Memory.global.newCommune), { width: 1.5, color: '#2DF0C9' })
+        }
+
+        if (Memory.global.newCommune) {
+
+            Game.map.visual.circle(new RoomPosition(8, 8, Memory.global.newCommune), { radius: 8, fill: '#2DF0C9', opacity: 0.5 })
+            Game.map.visual.text("NC", new RoomPosition(8, 8, Memory.global.newCommune), { color: '#ffffff', fontSize: 8 })
+        }
 
         global()
 

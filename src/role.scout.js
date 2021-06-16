@@ -179,18 +179,39 @@ module.exports = {
                         }
                     }
 
-                    if (!controller.my && controller.owner && allyList.run().indexOf(controller.owner.username.toLowerCase()) >= 0) {
+                    if (!controller.my && controller.owner) {
+                        if (allyList.run().indexOf(controller.owner.username.toLowerCase()) >= 0) {
 
-                        creep.room.memory.stage = "allyRoom"
-                    } else {
+                            creep.room.memory.stage = "allyRoom"
+                            creep.room.memory.owner = controller.owner.username
+                            creep.room.memory.power = controller.level
 
-                        creep.room.memory.stage = "enemyRoom"
+                        } else {
+
+                            creep.room.memory.stage = "enemyRoom"
+                            creep.room.memory.owner = controller.owner.username
+                            creep.room.memory.power = controller.level
+                            creep.room.memory.threat = 0
+                        }
                     }
 
-                    if (!controller.my && !controller.owner) {
+                    if (controller.reservation && controller.reservation.username != "MarvinTMB") {
+
+                        if (allyList.run().indexOf(controller.reservation.username.toLowerCase()) >= 0) {
+
+                            creep.room.memory.stage = "allyReservation"
+
+                        } else {
+
+                            creep.room.memory.stage = "enemyReservation"
+                        }
+                    }
+                    if (!controller.owner) {
 
                         creep.room.memory.stage = "neutralRoom"
+
                     }
+
                     if (!newCommune) {
 
                         let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {

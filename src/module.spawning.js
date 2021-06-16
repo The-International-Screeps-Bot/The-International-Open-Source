@@ -69,6 +69,7 @@ module.exports = {
         Memory.global.newCommune = newCommune
 
         let communeEstablisher = findCommuneEstablisher()
+        Memory.global.communeEstablisher = communeEstablisher
 
         function findCommuneEstablisher() {
             if (newCommune) {
@@ -98,6 +99,7 @@ module.exports = {
         Memory.global.attackTarget = attackTarget
 
         let attackingRoom = findAttackingRooms()
+        Memory.global.attackingRoom = attackingRoom
 
         function findAttackingRooms() {
 

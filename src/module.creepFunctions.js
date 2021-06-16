@@ -793,8 +793,6 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
         })
     }
 
-    Game.map.visual.line(origin, goal[0].pos, { color: '#ff0000', lineStyle: 'dashed' });
-
     var path = PathFinder.search(origin, goal, {
         plainCost: 1,
 
