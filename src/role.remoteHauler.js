@@ -175,5 +175,7 @@ module.exports = {
                 }
             }
         }
+
+        creep.avoidEnemies()
     }
 };

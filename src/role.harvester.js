@@ -122,5 +122,7 @@ module.exports = {
                 }
             }
         }
+
+        creep.avoidEnemies()
     }
 }

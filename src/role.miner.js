@@ -1,6 +1,6 @@
 module.exports = {
     run: function(creep) {
-        
+
         creep.checkRoom()
 
         let target = creep.pos.findClosestByRange(FIND_MINERALS)
@@ -28,7 +28,7 @@ module.exports = {
                 let goal = _.map([target], function(target) {
                     return { pos: target.pos, range: 1 }
                 })
-                    
+
                 creep.intraRoomPathing(origin, goal)
             }
         } else {
@@ -43,9 +43,11 @@ module.exports = {
                 let goal = _.map([terminal], function(target) {
                     return { pos: target.pos, range: 1 }
                 })
-                    
+
                 creep.intraRoomPathing(origin, goal)
             }
         }
+
+        creep.avoidEnemies()
     }
 };

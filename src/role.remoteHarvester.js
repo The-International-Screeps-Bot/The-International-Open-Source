@@ -233,5 +233,7 @@ module.exports = {
                 creep.moveTo(exit);
             }
         }
+
+        creep.avoidEnemies()
     }
 };

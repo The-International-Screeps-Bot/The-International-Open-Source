@@ -344,6 +344,31 @@ Creep.prototype.searchSourceContainers = function() {
         }
     }
 }
+Creep.prototype.avoidEnemies = function() {
+
+    let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
+        filter: (c) => {
+            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) > 0 || c.getActiveBodyparts(RANGED_ATTACK) > 0))
+        }
+    })
+
+    if (hostiles.length > 0) {
+        for (let hostile of hostiles) {
+
+            if (creep.pos.getRangeTo(hostile) <= 6) {
+
+                creep.say("H! RUN RUN")
+
+                let goal = _.map([hostile], function(target) {
+                    return { pos: target.pos, range: 7 }
+                })
+
+                creep.creepFlee(creep.pos, goal)
+                break
+            }
+        }
+    }
+}
 Creep.prototype.findDamagePossible = function(creep, healers, towers) {
 
     let distance = creep.pos.getRangeTo(creep.pos.findClosestByRange(towers))
