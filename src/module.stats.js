@@ -6,41 +6,56 @@ module.exports = {
             Memory.stats = {}
         }
 
-        if (!Memory.stats.energyHarvested) {
+        /*
+                if (!Memory.stats.energyHarvested) {
 
-            Memory.stats.energyHarvested = 0
-        }
+                    Memory.stats.energyHarvested = 0
+                }
 
-        if (!Memory.stats.controlPoints) {
+                if (!Memory.stats.controlPoints) {
 
-            Memory.stats.controlPoints = 0
-        }
+                    Memory.stats.controlPoints = 0
+                }
 
-        if (!Memory.stats.energySpentOnCreeps) {
+                if (!Memory.stats.energySpentOnCreeps) {
 
-            Memory.stats.energySpentOnCreeps = 0
-        }
+                    Memory.stats.energySpentOnCreeps = 0
+                }
 
-        if (!Memory.stats.energyHarvestedPerRoom) {
+                if (!Memory.stats.energyHarvestedPerRoom) {
 
-            Memory.stats.energyHarvestedPerRoom = 0
-        }
+                    Memory.stats.energyHarvestedPerRoom = 0
+                }
 
-        if (!Memory.stats.controlPointsPerRoom) {
+                if (!Memory.stats.controlPointsPerRoom) {
 
-            Memory.stats.controlPointsPerRoom = 0
-        }
+                    Memory.stats.controlPointsPerRoom = 0
+                }
 
-        if (!Memory.stats.energySpentOnCreepsPerRoom) {
+                if (!Memory.stats.energySpentOnCreepsPerRoom) {
 
-            Memory.stats.energySpentOnCreepsPerRoom = 0
-        }
+                    Memory.stats.energySpentOnCreepsPerRoom = 0
+                }
+        */
+
+        // Creep Stats
 
         Memory.stats.energyHarvested = 0
         Memory.stats.energyHarvestedPerRoom = 0
 
         Memory.stats.controlPoints = 0
         Memory.stats.controlPointsPerRoom = 0
+
+        Memory.stats.energySpentOnConstruction = 0
+        Memory.stats.energySpentOnConstructionPerRoom = 0
+
+        Memory.stats.energySpentOnRepairs = 0
+        Memory.stats.energySpentOnRepairsPerRoom = 0
+
+        Memory.stats.energySpentOnBarricades = 0
+        Memory.stats.energySpentOnBarricadesPerRoom = 0
+
+        // Other Stats
 
         Memory.stats.energySpentOnCreeps = 0
         Memory.stats.energySpentOnCreepsPerRoom = 0

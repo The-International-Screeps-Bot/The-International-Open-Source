@@ -370,6 +370,10 @@ module.exports = {
 
                 if (!room.storage) {
 
+                    if (stage == 1) {
+
+                        minCreeps["upgrader"] = 6
+                    }
                     if (stage <= 3) {
 
                         minCreeps["upgrader"] = 4

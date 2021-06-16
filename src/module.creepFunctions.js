@@ -244,7 +244,7 @@ Creep.prototype.repairBarricades = function(target) {
 
     creep = this
 
-    if (creep.repair(target) == ERR_NOT_IN_RANGE) {
+    if (creep.pos.getRangeTo(target) > 3) {
 
         let origin = creep.pos
 
@@ -253,28 +253,38 @@ Creep.prototype.repairBarricades = function(target) {
         })
 
         creep.intraRoomPathing(origin, goal)
+
+    } else if (creep.repair(target) == 0) {
+
+        creep.say("🔧 " + creep.myParts("work"))
+        Memory.stats.energySpentOnBarricades += creep.myParts("work")
     }
 }
 Creep.prototype.repairStructure = function(target) {
 
     creep = this
 
-    if (creep.repair(target) == ERR_NOT_IN_RANGE) {
+    if (creep.pos.getRangeTo(target) > 3) {
 
         let origin = creep.pos
 
         let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 3 }
+            return { pos: target.pos, range: 1 }
         })
 
         creep.intraRoomPathing(origin, goal)
+
+    } else if (creep.repair(target) == 0) {
+
+        creep.say("🔧 " + creep.myParts("work"))
+        Memory.stats.energySpentOnRepairs += creep.myParts("work")
     }
 }
 Creep.prototype.constructionBuild = function(target) {
 
     creep = this
 
-    if (creep.build(target) == ERR_NOT_IN_RANGE) {
+    if (creep.pos.getRangeTo(target) > 3) {
 
         let origin = creep.pos
 
@@ -283,11 +293,16 @@ Creep.prototype.constructionBuild = function(target) {
         })
 
         creep.intraRoomPathing(origin, goal)
+
+    } else if (creep.build(target) == 0) {
+
+        creep.say("🚧 " + creep.myParts("work"))
+        Memory.stats.energySpentOnConstruction += creep.myParts("work")
     }
 }
 Creep.prototype.controllerUpgrade = function(target) {
 
-    if (!creep.pos.inRangeTo(creep.room.controller, 3)) {
+    if (creep.pos.getRangeTo(target) > 3) {
 
         let origin = creep.pos
 
@@ -296,12 +311,12 @@ Creep.prototype.controllerUpgrade = function(target) {
         })
 
         creep.intraRoomPathing(origin, goal)
+
     } else if (creep.upgradeController(target) == 0) {
 
         creep.say("🔋 " + creep.myParts("work"))
         Memory.stats.controlPoints += creep.myParts("work")
     }
-
 }
 Creep.prototype.searchSourceContainers = function() {
 
