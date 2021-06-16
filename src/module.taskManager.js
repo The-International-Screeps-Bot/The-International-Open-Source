@@ -122,14 +122,14 @@ module.exports = {
 
             if (sourceContainer1 != null && sourceContainer1.store[RESOURCE_ENERGY] >= findHaulersOfRoom()[0].store.getCapacity()) {
 
-                if (!findCreepWithTask("sourceContainer1Full", 1) && findCreepWithoutTask()) {
+                if (!findCreepWithTask("sourceContainer1Full", 1) && findCreepWithoutTask() && !findCreepWithoutTask().memory.isFull) {
 
                     findCreepWithoutTask().memory.task = "sourceContainer1Full"
                 }
             }
             if (sourceContainer2 != null && sourceContainer2.store[RESOURCE_ENERGY] >= findHaulersOfRoom()[0].store.getCapacity()) {
 
-                if (!findCreepWithTask("sourceContainer2Full", 1) && findCreepWithoutTask()) {
+                if (!findCreepWithTask("sourceContainer2Full", 1) && findCreepWithoutTask() && !findCreepWithoutTask().memory.isFull) {
 
                     findCreepWithoutTask().memory.task = "sourceContainer2Full"
                 }
@@ -141,7 +141,7 @@ module.exports = {
 
             if (droppedEnergy[0]) {
 
-                if (!findCreepWithTask("droppedEnergy", findHaulersOfRoom().length) && findCreepWithoutTask()) {
+                if (!findCreepWithTask("droppedEnergy", findHaulersOfRoom().length) && findCreepWithoutTask() && !findCreepWithoutTask().memory.isFull) {
 
                     findCreepWithoutTask().memory.task = "droppedEnergy"
                 }

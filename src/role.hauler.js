@@ -233,7 +233,7 @@ module.exports = {
                     creep.memory.task = "deliverToStorage"
                 }
             }
-        } else if (!task || task == "deliverToStorage") {
+        } else if ((!task || task == "deliverToStorage") && storage) {
 
             creep.hasResource()
 
@@ -246,6 +246,18 @@ module.exports = {
             } else {
 
                 creep.memory.task = undefined
+            }
+        } else if (!task) {
+
+            if (creep.memory.isFull) {
+
+                let spawn = creep.room.find(FIND_MY_SPAWNS)[0]
+
+                let goal = _.map([spawn], function(target) {
+                    return { pos: target.pos, range: 4 }
+                })
+
+                creep.intraRoomPathing(creep.pos, goal)
             }
         }
     }
