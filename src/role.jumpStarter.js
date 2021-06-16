@@ -55,6 +55,6 @@ module.exports = {
             }
         }
 
-        creep.avoidEnemies()
+        creep.avoidHostiles()
     }
 };

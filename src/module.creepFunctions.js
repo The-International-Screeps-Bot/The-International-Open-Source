@@ -344,7 +344,7 @@ Creep.prototype.searchSourceContainers = function() {
         }
     }
 }
-Creep.prototype.avoidEnemies = function() {
+Creep.prototype.avoidHostiles = function() {
 
     let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
         filter: (c) => {

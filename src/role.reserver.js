@@ -75,6 +75,6 @@ module.exports = {
             creep.roadPathing(origin, goal)
         }
 
-        creep.avoidEnemies()
+        creep.avoidHostiles()
     }
 };
