@@ -278,12 +278,12 @@ module.exports = {
 
                                 case 0:
 
-                                    cm.set(x, y, 3)
+                                    cm.set(x, y, 4)
                                     break
 
                                 case TERRAIN_MASK_SWAMP:
 
-                                    cm.set(x, y, 8)
+                                    cm.set(x, y, 24)
                                     break
 
                                 case TERRAIN_MASK_WALL:
@@ -292,6 +292,15 @@ module.exports = {
                                     break
                             }
                         }
+                    }
+
+                    let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+                        filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
+                    })
+
+                    for (let site of constructionSites) {
+
+                        cm.set(site.pos.x, site.pos.y, 255)
                     }
 
                     let ramparts = room.find(FIND_MY_STRUCTURES, {
@@ -313,15 +322,12 @@ module.exports = {
                     }
 
                     let structures = room.find(FIND_STRUCTURES, {
-                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                     })
 
                     for (let structure of structures) {
 
-                        if (structure.structureType != STRUCTURE_CONTAINER) {
-
-                            cm.set(structure.pos.x, structure.pos.y, 255)
-                        }
+                        cm.set(structure.pos.x, structure.pos.y, 255)
                     }
 
                     let enableVisuals = false
