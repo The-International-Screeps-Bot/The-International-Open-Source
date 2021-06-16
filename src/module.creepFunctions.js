@@ -518,6 +518,16 @@ Creep.prototype.roadPathing = function(origin, goal) {
 
                 cm = new PathFinder.CostMatrix
 
+                for (let creep of room.find(FIND_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+
+                for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+
                 let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                     filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
                 })
@@ -597,6 +607,16 @@ Creep.prototype.offRoadPathing = function(origin, goal) {
             } else {
 
                 cm = new PathFinder.CostMatrix
+
+                for (let creep of room.find(FIND_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+
+                for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
 
                 let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                     filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
@@ -678,6 +698,16 @@ Creep.prototype.intraRoomPathing = function(origin, goal) {
             } else {
 
                 cm = new PathFinder.CostMatrix
+
+                for (let creep of room.find(FIND_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+
+                for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
 
                 let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                     filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
@@ -763,6 +793,8 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
         })
     }
 
+    Game.map.visual.line(origin, goal[0].pos, { color: '#ff0000', lineStyle: 'dashed' });
+
     var path = PathFinder.search(origin, goal, {
         plainCost: 1,
 
@@ -792,6 +824,16 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
             } else {
 
                 cm = new PathFinder.CostMatrix
+
+                for (let creep of room.find(FIND_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+
+                for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
 
                 let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                     filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
@@ -886,6 +928,16 @@ Creep.prototype.rampartPathing = function(origin, goal) {
 
             cm = new PathFinder.CostMatrix
 
+            for (let creep of room.find(FIND_CREEPS)) {
+
+                cm.set(creep.pos.x, creep.pos.y, 255)
+            }
+
+            for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                cm.set(creep.pos.x, creep.pos.y, 255)
+            }
+
             let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                 filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
             })
@@ -965,6 +1017,16 @@ Creep.prototype.creepFlee = function(origin, target) {
             } else {
 
                 cm = new PathFinder.CostMatrix
+
+                for (let creep of room.find(FIND_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+
+                for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
 
                 let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                     filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
