@@ -249,7 +249,7 @@ Creep.prototype.repairBarricades = function(target) {
         let origin = creep.pos
 
         let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 1 }
+            return { pos: target.pos, range: 3 }
         })
 
         creep.intraRoomPathing(origin, goal)
@@ -269,7 +269,7 @@ Creep.prototype.repairStructure = function(target) {
         let origin = creep.pos
 
         let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 1 }
+            return { pos: target.pos, range: 3 }
         })
 
         creep.intraRoomPathing(origin, goal)
@@ -289,7 +289,7 @@ Creep.prototype.constructionBuild = function(target) {
         let origin = creep.pos
 
         let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 1 }
+            return { pos: target.pos, range: 3 }
         })
 
         creep.intraRoomPathing(origin, goal)
