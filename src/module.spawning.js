@@ -567,6 +567,7 @@ module.exports = {
                     let body = []
                     let bodyTier = 1
                     let sliceAmount
+                    let cost
 
                     for (let object of parts) {
 
@@ -584,6 +585,8 @@ module.exports = {
                         }
 
                         function getParts(energyType) {
+
+                            cost += object.defaultCost + object.extraCost
 
                             if (object.defaultParts[0]) {
 
@@ -755,7 +758,7 @@ module.exports = {
                             defaultCost: 0,
                             extraParts: [WORK, CARRY, MOVE],
                             extraCost: 200,
-                            sliceAmount: 24
+                            sliceAmount: 18
                         },
                         {
                             stage: 1,
@@ -1040,7 +1043,7 @@ module.exports = {
 
                                     requiredCreeps[role] - 1
 
-                                    Memory.stats.energySpentOnCreeps += bodyRole.defaultCost + bodyRole.extraCost
+                                    Memory.stats.energySpentOnCreeps += bodyRole.cost
 
                                 } else if (testSpawn != -4) {
 
@@ -1053,4 +1056,4 @@ module.exports = {
             }
         })
     }
-};
+}

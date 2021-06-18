@@ -1,3 +1,5 @@
+const { drop } = require("lodash");
+
 module.exports = {
     run: function(creep) {
 
@@ -162,7 +164,12 @@ module.exports = {
                     task = "noDeliveryPossible"
                 }
             }
-        } else if (task == "droppedEnergy" && droppedEnergy) {
+        } else if (task == "droppedEnergy") {
+
+            if (!droppedEnergy && !creep.memory.isFull) {
+
+                creep.memory.task = undefined
+            }
 
             creep.isFull()
 
