@@ -470,6 +470,6 @@ module.exports = {
 
         Memory.global.hasBoosts = roomsWithBoosts
 
-        Memory.stats.totalEnergy = totalEnergy
+        Memory.data.totalEnergy = totalEnergy
     }
 }

@@ -1043,7 +1043,7 @@ module.exports = {
 
                                     requiredCreeps[role] - 1
 
-                                    Memory.stats.energySpentOnCreeps += bodyRole.cost
+                                    Memory.data.energySpentOnCreeps += bodyRole.cost
 
                                 } else if (testSpawn != -4) {
 

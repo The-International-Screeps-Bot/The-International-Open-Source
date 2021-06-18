@@ -1,3 +1,5 @@
+let config = require("module.config")
+
 let towers = require("module.towers")
 let terminals = require("module.terminals")
 let factories = require("module.factories")
@@ -13,7 +15,7 @@ let construction = require("module.construction")
 let roles = require("module.roles")
 let powerCreeps = require("module.powerCreeps")
 
-let stats = require("module.stats")
+let data = require("module.data")
 let logging = require("module.logging")
 
 const profiler = require('screeps-profiler')
@@ -21,18 +23,32 @@ const profiler = require('screeps-profiler')
 //profiler.enable();
 module.exports.loop = function() {
 
-    let cpuUsed = Game.cpu.getUsed().toFixed(2)
-
-    console.log("start: " + cpuUsed)
-
-    cpuUsed = Game.cpu.getUsed()
-
     if (Game.shard.name == "shard2") {
 
         if (Game.cpu.bucket == 10000) {
             Game.cpu.generatePixel();
         }
     }
+
+    //
+
+    let cpuUsed = Game.cpu.getUsed().toFixed(2)
+
+    console.log("start: " + cpuUsed)
+
+    //
+
+    cpuUsed = Game.cpu.getUsed()
+
+    config.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("config: " + cpuUsed)
+
+    //
+
+    cpuUsed = Game.cpu.getUsed()
 
     if (Game.time % 10 == 0) {
 
@@ -43,9 +59,7 @@ module.exports.loop = function() {
 
     console.log("cleanMemory: " + cpuUsed)
 
-    cpuUsed = Game.cpu.getUsed()
-
-    stats.run()
+    //
 
     cpuUsed = Game.cpu.getUsed()
 
@@ -59,9 +73,7 @@ module.exports.loop = function() {
 
     console.log("constants: " + cpuUsed)
 
-    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
-
-    console.log("stats: " + cpuUsed)
+    //
 
     cpuUsed = Game.cpu.getUsed()
 
@@ -71,6 +83,8 @@ module.exports.loop = function() {
 
     console.log("roles: " + cpuUsed)
 
+    //
+
     cpuUsed = Game.cpu.getUsed()
 
     powerCreeps.run()
@@ -78,6 +92,8 @@ module.exports.loop = function() {
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
 
     console.log("powerCreeps: " + cpuUsed)
+
+    //
 
     cpuUsed = Game.cpu.getUsed()
 
@@ -92,6 +108,8 @@ module.exports.loop = function() {
 
     console.log("construction: " + cpuUsed)
 
+    //
+
     cpuUsed = Game.cpu.getUsed()
 
     visuals.run()
@@ -99,6 +117,8 @@ module.exports.loop = function() {
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
 
     console.log("visuals: " + cpuUsed)
+
+    //
 
     cpuUsed = Game.cpu.getUsed()
 
@@ -110,6 +130,8 @@ module.exports.loop = function() {
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
 
     console.log("terminals: " + cpuUsed)
+
+    //
 
     cpuUsed = Game.cpu.getUsed()
 
@@ -123,6 +145,8 @@ module.exports.loop = function() {
 
     console.log("factories: " + cpuUsed)
 
+    //
+
     cpuUsed = Game.cpu.getUsed()
 
     links.run()
@@ -130,6 +154,8 @@ module.exports.loop = function() {
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
 
     console.log("links: " + cpuUsed)
+
+    //
 
     cpuUsed = Game.cpu.getUsed()
 
@@ -139,6 +165,8 @@ module.exports.loop = function() {
 
     console.log("labs: " + cpuUsed)
 
+    //
+
     cpuUsed = Game.cpu.getUsed()
 
     powerSpawns.run()
@@ -146,6 +174,8 @@ module.exports.loop = function() {
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
 
     console.log("powerSpawns: " + cpuUsed)
+
+    //
 
     cpuUsed = Game.cpu.getUsed()
 
@@ -155,6 +185,8 @@ module.exports.loop = function() {
 
     console.log("towers: " + cpuUsed)
 
+    //
+
     cpuUsed = Game.cpu.getUsed()
 
     spawns.run()
@@ -163,11 +195,23 @@ module.exports.loop = function() {
 
     console.log("spawns: " + cpuUsed)
 
+    //
+
+    cpuUsed = Game.cpu.getUsed()
+
+    data.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("data: " + cpuUsed)
+
+    //
+
     cpuUsed = Game.cpu.getUsed()
 
     logging.run()
 
-    Memory.stats.cpuUsage = Game.cpu.getUsed().toFixed(2)
+    Memory.data.cpuUsage = Game.cpu.getUsed().toFixed(2)
 
 }
 

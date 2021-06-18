@@ -224,7 +224,7 @@ const Profiler = {
     },
 
     lines() {
-        const stats = Object.keys(Memory.profiler.map).map(functionName => {
+        const data = Object.keys(Memory.profiler.map).map(functionName => {
             const functionCalls = Memory.profiler.map[functionName];
             return {
                 name: functionName,
@@ -236,7 +236,7 @@ const Profiler = {
             return val2.totalTime - val1.totalTime;
         });
 
-        const lines = stats.map(data => {
+        const lines = data.map(data => {
             return [
                 data.calls,
                 data.totalTime.toFixed(1),

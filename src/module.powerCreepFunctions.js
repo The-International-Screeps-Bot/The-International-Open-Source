@@ -108,7 +108,7 @@ PowerCreep.prototype.findEnergyHarvested = function(source) {
     let energyHarvested = source.energy - source.energy + creep.myParts("work")
 
     creep.say("⛏️ " + energyHarvested)
-    Memory.stats.energyHarvested += energyHarvested
+    Memory.data.energyHarvested += energyHarvested
 }
 PowerCreep.prototype.fleeHostileRoom = function() {
 
@@ -299,7 +299,7 @@ PowerCreep.prototype.controllerUpgrade = function(target) {
     } else if (creep.upgradeController(target) == 0) {
 
         creep.say("🔋 " + creep.myParts("work"))
-        Memory.stats.controlPoints += creep.myParts("work")
+        Memory.data.controlPoints += creep.myParts("work")
     }
 
 }

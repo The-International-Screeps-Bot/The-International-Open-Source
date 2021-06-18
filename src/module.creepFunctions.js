@@ -108,7 +108,7 @@ Creep.prototype.findEnergyHarvested = function(source) {
     let energyHarvested = source.energy - source.energy + creep.myParts("work")
 
     creep.say("⛏️ " + energyHarvested)
-    Memory.stats.energyHarvested += energyHarvested
+    Memory.data.energyHarvested += energyHarvested
 }
 Creep.prototype.fleeHostileRoom = function() {
 
@@ -257,7 +257,7 @@ Creep.prototype.repairBarricades = function(target) {
     } else if (creep.repair(target) == 0) {
 
         creep.say("🔧 " + creep.myParts("work"))
-        Memory.stats.energySpentOnBarricades += creep.myParts("work")
+        Memory.data.energySpentOnBarricades += creep.myParts("work")
     }
 }
 Creep.prototype.repairStructure = function(target) {
@@ -277,7 +277,7 @@ Creep.prototype.repairStructure = function(target) {
     } else if (creep.repair(target) == 0) {
 
         creep.say("🔧 " + creep.myParts("work"))
-        Memory.stats.energySpentOnRepairs += creep.myParts("work")
+        Memory.data.energySpentOnRepairs += creep.myParts("work")
     }
 }
 Creep.prototype.constructionBuild = function(target) {
@@ -297,7 +297,7 @@ Creep.prototype.constructionBuild = function(target) {
     } else if (creep.build(target) == 0) {
 
         creep.say("🚧 " + creep.myParts("work"))
-        Memory.stats.energySpentOnConstruction += creep.myParts("work")
+        Memory.data.energySpentOnConstruction += creep.myParts("work")
     }
 }
 Creep.prototype.controllerUpgrade = function(target) {
@@ -315,7 +315,7 @@ Creep.prototype.controllerUpgrade = function(target) {
     } else if (creep.upgradeController(target) == 0) {
 
         creep.say("🔋 " + creep.myParts("work"))
-        Memory.stats.controlPoints += creep.myParts("work")
+        Memory.data.controlPoints += creep.myParts("work")
     }
 }
 Creep.prototype.searchSourceContainers = function() {
