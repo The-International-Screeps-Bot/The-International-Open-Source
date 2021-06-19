@@ -244,7 +244,7 @@ Creep.prototype.repairBarricades = function(target) {
 
     creep = this
 
-    creep.room.visual.text("🧱", target.pos, { align: 'center' })
+    creep.room.visual.text("🧱", target.pos.x, target.pos.y + 0.25, { align: 'center' })
 
     if (creep.pos.getRangeTo(target) > 3) {
 
@@ -267,7 +267,7 @@ Creep.prototype.repairStructure = function(target) {
 
     creep = this
 
-    creep.room.visual.text("🔧", target.pos, { align: 'center' })
+    creep.room.visual.text("🔧", target.pos.x, target.pos.y + 0.25, { align: 'center' })
 
     if (creep.pos.getRangeTo(target) > 3) {
 
@@ -291,7 +291,7 @@ Creep.prototype.constructionBuild = function(target) {
 
     creep = this
 
-    creep.room.visual.text("🚧", target.pos, { align: 'center' })
+    creep.room.visual.text("🚧", target.pos.x, target.pos.y + 0.25, { align: 'center' })
 
     if (creep.pos.getRangeTo(target) > 3) {
 
