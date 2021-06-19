@@ -47,9 +47,9 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            // var newCommune = "E21N3"
+            var newCommune = "E29N4"
 
-            var newCommune
+            //var newCommune
 
             // var attackTarget = "E28N9"
 

@@ -271,7 +271,6 @@ module.exports = {
                                         creep.onlySafeRoomPathing(creep.pos, goal)
                                     }
                                 }
-
                             } else {
 
                                 creep.say("F")

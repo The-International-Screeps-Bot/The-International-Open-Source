@@ -950,6 +950,15 @@ module.exports = {
 
                         structure.destroy()
                     }
+
+                    let notMyStructures = room.find(FIND_STRUCTURES, {
+                        filter: s => s.owner && !s.my
+                    })
+
+                    for (let structure of notMyStructures) {
+
+                        structure.destroy()
+                    }
                 }
             }
         })
