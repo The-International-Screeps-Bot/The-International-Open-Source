@@ -244,6 +244,8 @@ Creep.prototype.repairBarricades = function(target) {
 
     creep = this
 
+    creep.room.visual.text("🧱", target.pos, { align: 'center' })
+
     if (creep.pos.getRangeTo(target) > 3) {
 
         let origin = creep.pos
@@ -257,6 +259,7 @@ Creep.prototype.repairBarricades = function(target) {
     } else if (creep.repair(target) == 0) {
 
         creep.say("🔧 " + creep.myParts("work"))
+
         Memory.data.energySpentOnBarricades += creep.myParts("work")
     }
 }
@@ -264,6 +267,8 @@ Creep.prototype.repairStructure = function(target) {
 
     creep = this
 
+    creep.room.visual.text("🔧", target.pos, { align: 'center' })
+
     if (creep.pos.getRangeTo(target) > 3) {
 
         let origin = creep.pos
@@ -276,13 +281,17 @@ Creep.prototype.repairStructure = function(target) {
 
     } else if (creep.repair(target) == 0) {
 
+
         creep.say("🔧 " + creep.myParts("work"))
+
         Memory.data.energySpentOnRepairs += creep.myParts("work")
     }
 }
 Creep.prototype.constructionBuild = function(target) {
 
     creep = this
+
+    creep.room.visual.text("🚧", target.pos, { align: 'center' })
 
     if (creep.pos.getRangeTo(target) > 3) {
 
@@ -297,6 +306,7 @@ Creep.prototype.constructionBuild = function(target) {
     } else if (creep.build(target) == 0) {
 
         creep.say("🚧 " + creep.myParts("work"))
+
         Memory.data.energySpentOnConstruction += creep.myParts("work")
     }
 }

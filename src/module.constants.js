@@ -332,7 +332,7 @@ module.exports = {
 
                     for (let rampart of ramparts) {
 
-                        cm.set(rampart.pos.x, rampart.pos.y, 3)
+                        cm.set(rampart.pos.x, rampart.pos.y, 4)
                     }
 
                     let roads = room.find(FIND_STRUCTURES, {
@@ -368,17 +368,17 @@ module.exports = {
                                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "green", fill: "green" })
                                             //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
 
-                                    } else if (value == 3) {
+                                    } else if (value == 4) {
 
                                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#ffff66", fill: "#ffff66" })
                                             //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
 
-                                    } else if (value == 8) {
+                                    } else if (value == 24) {
 
                                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#0000ff", fill: "#0000ff" })
                                             //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
 
-                                    } else {
+                                    } else if (value >= 255) {
 
                                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "red", fill: "red" })
                                             //room.visual.text((value).toFixed(0), x, y, { font: 0.3 })
