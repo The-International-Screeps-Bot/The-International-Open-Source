@@ -896,22 +896,26 @@ Creep.prototype.findSafeDistance = function(origin, goal) {
     let creep = this
 
     let allowedRooms = {
-        [origin.roomName]: true,
-        [goal[0].pos.roomName]: true
+        [origin.roomName]: true
     }
 
     let route = Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
         routeCallback(roomName) {
 
-            if (Memory.rooms[roomName] && Memory.rooms[roomName].stage != "enemyRoom" && Memory.rooms[roomName].stage != "keeperRoom") {
+            if (roomName == goal[0].pos.roomName) {
 
                 allowedRooms[roomName] = true
                 return 1
 
-            } else {
-
-                return Infinity
             }
+            if (Memory.rooms[roomName] && (Memory.rooms[roomName].stage != "enemyRoom" && Memory.rooms[roomName].stage != "keeperRoom")) {
+
+                allowedRooms[roomName] = true
+                return 1
+
+            }
+
+            return Infinity
         }
     })
 

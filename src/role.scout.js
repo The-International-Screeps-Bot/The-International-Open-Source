@@ -114,6 +114,39 @@ module.exports = {
 
                 } else {
 
+                    if (!controller.my && controller.owner) {
+                        if (allyList.run().indexOf(controller.owner.username.toLowerCase()) >= 0) {
+
+                            creep.room.memory.stage = "allyRoom"
+                            creep.room.memory.owner = controller.owner.username
+                            creep.room.memory.power = controller.level
+
+                        } else {
+
+                            creep.room.memory.stage = "enemyRoom"
+                            creep.room.memory.owner = controller.owner.username
+                            creep.room.memory.power = controller.level
+                            creep.room.memory.threat = 0
+                        }
+                    }
+
+                    if (controller.reservation && controller.reservation.username != "MarvinTMB") {
+
+                        if (allyList.run().indexOf(controller.reservation.username.toLowerCase()) >= 0) {
+
+                            creep.room.memory.stage = "allyReservation"
+
+                        } else {
+
+                            creep.room.memory.stage = "enemyReservation"
+                        }
+                    }
+                    if (!controller.owner && creep.room.memory.stage != "remoteRoom") {
+
+                        creep.room.memory.stage = "neutralRoom"
+
+                    }
+
                     let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memory.roomFrom)
 
                     let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(pos) {
@@ -121,6 +154,8 @@ module.exports = {
                     })
 
                     if (targetRoomDistance == 1 && !controller.owner && !controller.reservation && creep.findSafeDistance(creep.pos, goal) <= 2) {
+
+                        creep.say("yes")
 
                         let sources = creep.room.find(FIND_SOURCES).length
 
@@ -181,39 +216,6 @@ module.exports = {
                         }
                     }
 
-                    if (!controller.my && controller.owner) {
-                        if (allyList.run().indexOf(controller.owner.username.toLowerCase()) >= 0) {
-
-                            creep.room.memory.stage = "allyRoom"
-                            creep.room.memory.owner = controller.owner.username
-                            creep.room.memory.power = controller.level
-
-                        } else {
-
-                            creep.room.memory.stage = "enemyRoom"
-                            creep.room.memory.owner = controller.owner.username
-                            creep.room.memory.power = controller.level
-                            creep.room.memory.threat = 0
-                        }
-                    }
-
-                    if (controller.reservation && controller.reservation.username != "MarvinTMB") {
-
-                        if (allyList.run().indexOf(controller.reservation.username.toLowerCase()) >= 0) {
-
-                            creep.room.memory.stage = "allyReservation"
-
-                        } else {
-
-                            creep.room.memory.stage = "enemyReservation"
-                        }
-                    }
-                    if (!controller.owner) {
-
-                        creep.room.memory.stage = "neutralRoom"
-
-                    }
-
                     if (!newCommune) {
 
                         let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
@@ -222,6 +224,8 @@ module.exports = {
 
                         creep.offRoadPathing(creep.pos, goal)
                     }
+
+
                 }
             } else {
 
