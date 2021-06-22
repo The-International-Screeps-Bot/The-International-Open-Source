@@ -433,13 +433,6 @@ module.exports = {
 
                         var terminalEnergy = room.terminal.store[RESOURCE_ENERGY]
 
-                        if (room.controller.level <= 7 && room.terminal.store[RESOURCE_ENERGY] < 100000) {
-
-                            if (Memory.global.needsEnergy.indexOf(room.name) == -1) {
-
-                                Memory.global.needsEnergy.push(room.name)
-                            }
-                        }
                     } else {
 
                         var terminalEnergy = 0
@@ -447,7 +440,21 @@ module.exports = {
 
                     room.memory.totalEnergy = storageEnergy + terminalEnergy
 
-                    //console.log(room.memory.totalEnergy)
+                    let index = Memory.global.needsEnergy.indexOf(room.name)
+
+                    if (room.controller.level <= 7 && (storageEnergy + terminalEnergy) <= 100000) {
+
+                        if (index == -1) {
+
+                            Memory.global.needsEnergy.push(room.name)
+                        }
+                    } else if (Memory.global.needsEnergy.length > 0) {
+
+                        if (index >= 0) {
+
+                            Memory.global.needsEnergy.splice(index, 1);
+                        }
+                    }
 
                     totalEnergy += room.memory.totalEnergy
                 }

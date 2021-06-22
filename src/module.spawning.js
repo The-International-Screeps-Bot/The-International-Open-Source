@@ -47,9 +47,9 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            var newCommune = "E15N3"
+            // var newCommune = "E15N3"
 
-            // var newCommune
+            var newCommune
 
             // var attackTarget = "E17N1"
 
@@ -420,10 +420,7 @@ module.exports = {
                     }
                 }
 
-                if (controllerLink != null &&
-                    baseLink != null &&
-                    sourceLink1 != null &&
-                    sourceLink2 != null) {
+                if (baseLink != null) {
 
                     minCreeps["stationaryHauler"] = 1
                 }
