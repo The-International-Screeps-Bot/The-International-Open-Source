@@ -456,7 +456,7 @@ module.exports = {
                         }
                     }
 
-                    totalEnergy += room.memory.totalEnergy
+                    totalEnergy += storageEnergy + terminalEnergy
                 }
 
                 function hasBoosts() {
@@ -501,6 +501,7 @@ module.exports = {
 
         Memory.global.hasBoosts = roomsWithBoosts
 
+        Memory.global.totalEnergy = totalEnergy
         Memory.data.totalEnergy = totalEnergy
     }
 }
