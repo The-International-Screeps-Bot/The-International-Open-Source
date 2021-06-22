@@ -153,9 +153,9 @@ module.exports = {
                         return { pos: pos, range: 1 }
                     })
 
-                    if (targetRoomDistance == 1 && !controller.owner && !controller.reservation && creep.findSafeDistance(creep.pos, goal) <= 2) {
+                    if (targetRoomDistance == 1 && !controller.owner && (!controller.reservation || controller.reservation == "Invader") && creep.findSafeDistance(creep.pos, goal) <= 2) {
 
-                        creep.say("yes")
+                        creep.say("remoteRoom")
 
                         let sources = creep.room.find(FIND_SOURCES).length
 
