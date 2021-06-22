@@ -435,7 +435,7 @@ module.exports = {
 
                         if (room.controller.level <= 7 && room.terminal.store[RESOURCE_ENERGY] < 100000) {
 
-                            if (Memory.global.needsEnergy.indexOf(room.name) >= 0) {
+                            if (Memory.global.needsEnergy.indexOf(room.name) == -1) {
 
                                 Memory.global.needsEnergy.push(room.name)
                             }

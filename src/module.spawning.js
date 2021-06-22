@@ -47,13 +47,13 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            // var newCommune = "E15N3"
+            var newCommune = "E15N3"
 
-            var newCommune
+            // var newCommune
 
-            var attackTarget = "E17N1"
+            // var attackTarget = "E17N1"
 
-            // var attackTarget
+            var attackTarget
 
         } else {
 
