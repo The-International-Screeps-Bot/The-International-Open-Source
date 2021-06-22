@@ -433,7 +433,7 @@ module.exports = {
 
                         var terminalEnergy = room.terminal.store[RESOURCE_ENERGY]
 
-                        if (room.controller.level <= 7 && terminal.store[RESOURCE_ENERGY] < 100000) {
+                        if (room.controller.level <= 7 && room.terminal.store[RESOURCE_ENERGY] < 100000) {
 
                             Memory.global.needsEnergy.push(room.name)
 
