@@ -4,18 +4,20 @@ module.exports = {
         //Not on a if full / not full basis, but instead commands. If baseLink is full, run baseLink function. If power spawn is empty and we have energy and power in storage or terminal, fill it. Etc.
 
         let baseLink = Game.getObjectById(creep.room.memory.baseLink)
+
         let terminal = creep.room.terminal
+
         let storage = creep.room.storage
+
         let factory = creep.room.find(FIND_MY_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_FACTORY
         })[0]
 
-        // requiredStructures = array listed structures that are not null of undefined
+        let nuker = creep.room.find(FIND_MY_STRUCTURES, {
+            filter: s => s.structureType == STRUCTURE_NUKER
+        })[0]
 
-
-        // for every requiredStructure until if number of structures == i return stationaryPoint
-
-        let unfilteredRequiredStructures = [baseLink, terminal, storage, factory]
+        let unfilteredRequiredStructures = [baseLink, terminal, storage, factory, nuker]
         let requiredStructures = []
 
         for (let structure of unfilteredRequiredStructures) {
@@ -65,10 +67,6 @@ module.exports = {
 
                 creep.hasResource()
 
-                let nuker = room.find(FIND_MY_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_NUKER
-                })
-
                 if (baseLink != null && baseLink.store[RESOURCE_ENERGY] >= 700 && ((storage && storage.store[RESOURCE_ENERGY] <= 400000) || (terminal && terminal.store[RESOURCE_ENERGY] <= 100000)) && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
 
                     creep.memory.withdrawBaseLink = true
@@ -81,7 +79,7 @@ module.exports = {
 
                     creep.memory.terminalWithdrawBattery = true
                 }
-                if (nuker.length > 0 && storage && storage.store[RESOURCE_ENERGY] >= 100000) {
+                if (nuker && storage && storage.store[RESOURCE_ENERGY] >= 100000) {
 
                     creep.memory.fillNuker = true
                 }
