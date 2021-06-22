@@ -137,6 +137,8 @@ module.exports = {
 
                         if (duplicateRoom == false) {
 
+                            creep.room.memory.stage = "remoteRoom"
+
                             Memory.rooms[creep.memory.roomFrom].remoteRooms.push({ name: creep.room.name, sources: sources, roads: false, builderNeed: false, enemy: false, distance: null })
                         }
                     }
