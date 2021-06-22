@@ -16,6 +16,13 @@ module.exports = {
 
                         Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#FF0000', opacity: 0.25 })
 
+                        if (Memory.rooms[room].power) {
+
+
+                            Game.map.visual.circle(new RoomPosition(8, 8, room), { radius: 8, fill: '#FF0000', opacity: 0.5 })
+                            Game.map.visual.text(Memory.rooms[room].power, new RoomPosition(8, 8, room), { color: '#ffffff', fontSize: 8 })
+
+                        }
                     } else if (Memory.rooms[room].stage == "remoteRoom") {
 
                         Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#39A0ED', opacity: 0.25 })
@@ -72,6 +79,11 @@ module.exports = {
             if (Memory.global.hasBoosts == null || !Memory.global.hasBoosts) {
 
                 Memory.global.hasBoosts = 0
+            }
+
+            if (Memory.global.needsEnergy == null || !Memory.global.needsEnergy) {
+
+                Memory.global.needsEnergy = []
             }
 
             if (Memory.global.globalStage == null || !Memory.global.globalStage) {
@@ -420,6 +432,12 @@ module.exports = {
                     if (room.terminal) {
 
                         var terminalEnergy = room.terminal.store[RESOURCE_ENERGY]
+
+                        if (room.controller.level <= 7 && terminal.store[RESOURCE_ENERGY] < 100000) {
+
+                            Memory.global.needsEnergy.push(room.name)
+
+                        }
                     } else {
 
                         var terminalEnergy = 0

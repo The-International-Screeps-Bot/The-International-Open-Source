@@ -99,8 +99,8 @@ module.exports = {
                     }
                 }
             }
-        }
 
-        creep.avoidHostiles()
+            creep.avoidHostiles()
+        }
     }
 };
