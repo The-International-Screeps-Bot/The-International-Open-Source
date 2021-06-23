@@ -4,6 +4,14 @@ let creepFunctions = require("module.creepFunctions")
 module.exports = {
     run: function() {
 
+        let squadType
+
+        let squadMode = 2
+
+        // let squadMode = 4
+
+        // let squadMode = 6
+
         if (Memory.global.attackTarget) {
 
             let antifaAssaulters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaAssaulter');

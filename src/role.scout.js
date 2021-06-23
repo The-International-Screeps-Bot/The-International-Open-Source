@@ -153,7 +153,7 @@ module.exports = {
                         return { pos: pos, range: 1 }
                     })
 
-                    if (targetRoomDistance == 1 && !controller.owner && (!controller.reservation || controller.reservation == "Invader") && creep.findSafeDistance(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"]) <= 2) {
+                    if (targetRoomDistance == 1 && !controller.owner && (!controller.reservation || controller.reservation.username == "Invader") && creep.findSafeDistance(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"]) <= 2) {
 
                         creep.room.memory.stage = "remoteRoom"
 
