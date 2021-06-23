@@ -160,15 +160,16 @@ module.exports = {
 
                                 if (fillNuker) {
 
-                                    if (storage.store[RESOURCE_ENERGY] <= 50000) {
-
-                                        creep.memory.fillNuker = false
-                                    }
                                     if (creep.memory.isFull == true) {
 
-                                        creep.transfer(nuker[0], RESOURCE_ENERGY)
+                                        creep.transfer(nuker, RESOURCE_ENERGY)
 
                                     } else {
+
+                                        if (storage.store[RESOURCE_ENERGY] <= 80000) {
+
+                                            creep.memory.fillNuker = false
+                                        }
 
                                         creep.withdraw(storage, RESOURCE_ENERGY)
                                     }
