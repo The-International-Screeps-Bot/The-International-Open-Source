@@ -892,7 +892,7 @@ module.exports = {
                         defaultParts: [],
                         defaultCost: 0,
                         extraParts: [CARRY, CARRY, MOVE],
-                        extraCost: 0,
+                        extraCost: 150,
                         sliceAmount: 36
                     }],
                     "upgradeHauler")
