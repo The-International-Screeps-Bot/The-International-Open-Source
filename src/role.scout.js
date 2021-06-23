@@ -157,22 +157,24 @@ module.exports = {
 
                         creep.say("remoteRoom")
 
+                        creep.room.memory.stage = "remoteRoom"
+
                         let sources = creep.room.find(FIND_SOURCES).length
 
-                        let duplicateRoom = false
+                        function checkDuplicate() {
 
-                        for (let object of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
+                            for (let object of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
 
-                            if (object.name == creep.room.name) {
+                                if (object.name == creep.room.name) {
 
-                                duplicateRoom = true
-                                break
+                                    return true
+                                }
                             }
+
+                            return false
                         }
 
-                        if (duplicateRoom == false) {
-
-                            creep.room.memory.stage = "remoteRoom"
+                        if (checkDuplicate()) {
 
                             Memory.rooms[creep.memory.roomFrom].remoteRooms.push({ name: creep.room.name, sources: sources, roads: false, builderNeed: false, enemy: false, distance: null })
                         }
