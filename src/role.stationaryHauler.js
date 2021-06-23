@@ -166,10 +166,11 @@ module.exports = {
                                     }
                                     if (creep.memory.isFull == true) {
 
-                                        creep.withdraw(storage, RESOURCE_ENERGY)
+                                        creep.transfer(nuker[0], RESOURCE_ENERGY)
+
                                     } else {
 
-                                        creep.transfer(nuker[0], RESOURCE_ENERGY)
+                                        creep.withdraw(storage, RESOURCE_ENERGY)
                                     }
                                 } else {
 
