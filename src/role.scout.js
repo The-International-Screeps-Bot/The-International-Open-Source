@@ -167,11 +167,11 @@ module.exports = {
 
                                 if (object.name == creep.room.name) {
 
-                                    return true
+                                    return false
                                 }
                             }
 
-                            return false
+                            return true
                         }
 
                         if (checkDuplicate()) {
@@ -226,8 +226,6 @@ module.exports = {
 
                         creep.offRoadPathing(creep.pos, goal)
                     }
-
-
                 }
             } else {
 
