@@ -380,6 +380,13 @@ module.exports = {
                         cm.set(structure.pos.x, structure.pos.y, 255)
                     }
 
+                    let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+
+                    for (let structure of enemyStructures) {
+
+                        cm.set(structure.pos.x, structure.pos.y, 255)
+                    }
+
                     let enableVisuals = false
 
                     if (enableVisuals) {

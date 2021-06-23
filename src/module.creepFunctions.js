@@ -573,6 +573,13 @@ Creep.prototype.roadPathing = function(origin, goal) {
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
                 }
+
+                let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+
+                for (let structure of enemyStructures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
             }
 
             return cm
@@ -660,6 +667,13 @@ Creep.prototype.offRoadPathing = function(origin, goal) {
                 })
 
                 for (let structure of structures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
+
+                let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+
+                for (let structure of enemyStructures) {
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
                 }
@@ -751,6 +765,13 @@ Creep.prototype.intraRoomPathing = function(origin, goal) {
                 })
 
                 for (let structure of structures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
+
+                let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+
+                for (let structure of enemyStructures) {
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
                 }
@@ -875,6 +896,13 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
                 })
 
                 for (let structure of structures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
+
+                let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+
+                for (let structure of enemyStructures) {
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
                 }
@@ -1072,6 +1100,13 @@ Creep.prototype.creepFlee = function(origin, target) {
                 })
 
                 for (let structure of structures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
+
+                let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+
+                for (let structure of enemyStructures) {
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
                 }
