@@ -61,19 +61,19 @@ module.exports = {
 
         if (Memory.global.attackTarget) {
 
-            Game.map.visual.circle(new RoomPosition(8, 50 - 8, Memory.global.attackTarget), { radius: 8, fill: '#FF0000', opacity: 0.5 })
-            Game.map.visual.text("AT", new RoomPosition(8, 50 - 8, Memory.global.attackTarget), { color: '#ffffff', fontSize: 8 })
+            Game.map.visual.circle(new RoomPosition(50 - 8, 8, Memory.global.attackTarget), { radius: 8, fill: '#FF0000', opacity: 0.5 })
+            Game.map.visual.text("AT", new RoomPosition(50 - 8, 8, Memory.global.attackTarget), { color: '#ffffff', fontSize: 8 })
         }
 
         if (Memory.global.communeEstablisher && Memory.global.newCommune) {
 
-            Game.map.visual.line(new RoomPosition(25, 25, Memory.global.communeEstablisher.name), new RoomPosition(25, 25, Memory.global.newCommune), { width: 2.5, color: '#2DF0C9', lineStyle: "dashed", opacity: 0.8 })
+            Game.map.visual.line(new RoomPosition(25, 25, Memory.global.communeEstablisher.name), new RoomPosition(25, 25, Memory.global.newCommune), { width: 2.5, color: '#00e600', lineStyle: "dashed", opacity: 0.8 })
         }
 
         if (Memory.global.newCommune) {
 
-            Game.map.visual.circle(new RoomPosition(8, 50 - 8, Memory.global.newCommune), { radius: 8, fill: '#2DF0C9', opacity: 0.5 })
-            Game.map.visual.text("NC", new RoomPosition(8, 50 - 8, Memory.global.newCommune), { color: '#ffffff', fontSize: 8 })
+            Game.map.visual.circle(new RoomPosition(50 - 8, 8, Memory.global.newCommune), { radius: 8, fill: '#00e600', opacity: 0.5 })
+            Game.map.visual.text("NC", new RoomPosition(50 - 8, 8, Memory.global.newCommune), { color: '#ffffff', fontSize: 8 })
         }
 
         global()
