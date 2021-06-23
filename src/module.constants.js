@@ -56,24 +56,24 @@ module.exports = {
 
         if (Memory.global.attackingRoom && Memory.global.attackTarget) {
 
-            Game.map.visual.line(new RoomPosition(25, 25, Memory.global.attackingRoom.name), new RoomPosition(25, 25, Memory.global.attackTarget), { width: 1.5, color: '#FE411E' })
+            Game.map.visual.line(new RoomPosition(25, 25, Memory.global.attackingRoom.name), new RoomPosition(25, 25, Memory.global.attackTarget), { width: 2.5, color: '#FE411E', lineStyle: "dashed" })
         }
 
         if (Memory.global.attackTarget) {
 
-            Game.map.visual.circle(new RoomPosition(8, 8, Memory.global.attackTarget), { radius: 8, fill: '#FF0000', opacity: 0.5 })
-            Game.map.visual.text("AT", new RoomPosition(8, 8, Memory.global.attackTarget), { color: '#ffffff', fontSize: 8 })
+            Game.map.visual.circle(new RoomPosition(8, 50 - 8, Memory.global.attackTarget), { radius: 8, fill: '#FF0000', opacity: 0.5 })
+            Game.map.visual.text("AT", new RoomPosition(8, 50 - 8, Memory.global.attackTarget), { color: '#ffffff', fontSize: 8 })
         }
 
         if (Memory.global.communeEstablisher && Memory.global.newCommune) {
 
-            Game.map.visual.line(new RoomPosition(25, 25, Memory.global.communeEstablisher.name), new RoomPosition(25, 25, Memory.global.newCommune), { width: 1.5, color: '#2DF0C9' })
+            Game.map.visual.line(new RoomPosition(25, 25, Memory.global.communeEstablisher.name), new RoomPosition(25, 25, Memory.global.newCommune), { width: 2.5, color: '#2DF0C9', lineStyle: "dashed" })
         }
 
         if (Memory.global.newCommune) {
 
-            Game.map.visual.circle(new RoomPosition(8, 8, Memory.global.newCommune), { radius: 8, fill: '#2DF0C9', opacity: 0.5 })
-            Game.map.visual.text("NC", new RoomPosition(8, 8, Memory.global.newCommune), { color: '#ffffff', fontSize: 8 })
+            Game.map.visual.circle(new RoomPosition(8, 50 - 8, Memory.global.newCommune), { radius: 8, fill: '#2DF0C9', opacity: 0.5 })
+            Game.map.visual.text("NC", new RoomPosition(8, 50 - 8, Memory.global.newCommune), { color: '#ffffff', fontSize: 8 })
         }
 
         global()
