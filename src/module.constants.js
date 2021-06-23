@@ -7,9 +7,9 @@ module.exports = {
                 if (Memory.rooms[room].stage) {
                     if (Memory.rooms[room].stage >= 1) {
 
-                        Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#2DF0C9', opacity: 0.25 })
+                        Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#00e600', opacity: 0.25 })
 
-                        Game.map.visual.circle(new RoomPosition(8, 8, room), { radius: 8, fill: '#0008FF', opacity: 0.5 })
+                        Game.map.visual.circle(new RoomPosition(8, 8, room), { radius: 8, fill: '#00e600', opacity: 0.5 })
                         Game.map.visual.text(Memory.rooms[room].stage, new RoomPosition(8, 8, room), { color: '#ffffff', fontSize: 8 })
 
                     } else if (Memory.rooms[room].stage == "enemyRoom") {
@@ -29,7 +29,7 @@ module.exports = {
 
                     } else if (Memory.rooms[room].stage == "remoteRoom") {
 
-                        Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#2DF0C9', opacity: 0.1 })
+                        Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#00e600', opacity: 0.1 })
 
                     } else if (Memory.rooms[room].stage == "keeperRoom") {
 
@@ -48,7 +48,7 @@ module.exports = {
 
                     } else {
 
-                        Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#F4E637', opacity: 0.25 })
+                        Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#F4E637', opacity: 0.05 })
                     }
                 }
             }
