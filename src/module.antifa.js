@@ -48,7 +48,7 @@ module.exports = {
                                 return { pos: target.pos, range: 1 }
                             })
 
-                            creep.onlySafeRoomPathing(creep.pos, goal)
+                            creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                         }
                     } else {
 
@@ -56,7 +56,7 @@ module.exports = {
                             return { pos: target, range: 1 }
                         })
 
-                        creep.onlySafeRoomPathing(creep.pos, goal)
+                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                     }
                 } else if (findCreepWithoutTask(creep, antifaAssaulters)) {
 
@@ -74,7 +74,7 @@ module.exports = {
                         return { pos: target, range: 1 }
                     })
 
-                    creep.onlySafeRoomPathing(creep.pos, goal)
+                    creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                 }
             }
 
@@ -268,7 +268,7 @@ module.exports = {
 
                                     if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                        creep.onlySafeRoomPathing(creep.pos, goal)
+                                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                     }
                                 }
                             } else {
@@ -410,7 +410,7 @@ module.exports = {
 
                                     if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                        creep.onlySafeRoomPathing(creep.pos, goal)
+                                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                     }
                                 }
 
@@ -424,7 +424,7 @@ module.exports = {
                                         return { pos: pos, range: 2 }
                                     })
 
-                                    creep.onlySafeRoomPathing(creep.pos, goal)
+                                    creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                 }
                             }
                         }
@@ -513,7 +513,7 @@ module.exports = {
 
                                     if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                        creep.onlySafeRoomPathing(creep.pos, goal)
+                                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                     }
                                 }
 
@@ -527,7 +527,7 @@ module.exports = {
                                         return { pos: target, range: 1 }
                                     })
 
-                                    creep.onlySafeRoomPathing(creep.pos, goal)
+                                    creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                 }
                             }
                         } else {
@@ -540,7 +540,7 @@ module.exports = {
                                     return { pos: target, range: 1 }
                                 })
 
-                                creep.onlySafeRoomPathing(creep.pos, goal)
+                                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
 
                             } else {
 
@@ -548,7 +548,7 @@ module.exports = {
                                     return { pos: target, range: 1 }
                                 })
 
-                                creep.onlySafeRoomPathing(creep.pos, goal)
+                                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                             }
                         }
                     }
@@ -560,7 +560,7 @@ module.exports = {
                             return { pos: target, range: 1 }
                         })
 
-                        creep.onlySafeRoomPathing(creep.pos, goal)
+                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
 
                     } else {
 
@@ -568,7 +568,7 @@ module.exports = {
                             return { pos: target, range: 1 }
                         })
 
-                        creep.onlySafeRoomPathing(creep.pos, goal)
+                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                     }
                 }
             }

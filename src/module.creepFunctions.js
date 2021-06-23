@@ -766,7 +766,7 @@ Creep.prototype.intraRoomPathing = function(origin, goal) {
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
-Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
+Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
 
     creep = this
 
@@ -783,7 +783,7 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
                 return 1
 
             }
-            if (Memory.rooms[roomName] && (Memory.rooms[roomName].stage != "enemyRoom" && Memory.rooms[roomName].stage != "keeperRoom")) {
+            if (Memory.rooms[roomName] && avoidStages.indexOf(Memory.rooms[roomName].stage) == -1) {
 
                 allowedRooms[roomName] = true
                 return 1
@@ -891,7 +891,7 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
 
-Creep.prototype.findSafeDistance = function(origin, goal) {
+Creep.prototype.findSafeDistance = function(origin, goal, avoidStages) {
 
     let creep = this
 
@@ -908,7 +908,7 @@ Creep.prototype.findSafeDistance = function(origin, goal) {
                 return 1
 
             }
-            if (Memory.rooms[roomName] && (Memory.rooms[roomName].stage != "enemyRoom" && Memory.rooms[roomName].stage != "keeperRoom")) {
+            if (Memory.rooms[roomName] && avoidStages.indexOf(Memory.rooms[roomName].stage) == -1) {
 
                 allowedRooms[roomName] = true
                 return 1
