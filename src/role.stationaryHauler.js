@@ -28,7 +28,7 @@ module.exports = {
             }
         }
 
-        const stationaryPos = creep.room.memory.stationaryPos
+        const stationaryPos = creep.memory.stationaryPos
 
         if (stationaryPos == null && requiredStructures[0]) {
 
@@ -47,7 +47,7 @@ module.exports = {
                         }
                         if (i + 1 == requiredStructures.length) {
 
-                            creep.room.memory.stationaryPos = position
+                            creep.memory.stationaryPos = position
                         }
                     }
                 }
