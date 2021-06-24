@@ -177,7 +177,7 @@ module.exports = {
 
                             Memory.rooms[creep.memory.roomFrom].remoteRooms.push({ name: creep.room.name, sources: sources, roads: false, builderNeed: false, enemy: false, distance: null })
                         }
-                    } else if (!controller.owner && (!controller.reservation || controller.reservation.username == "Invader")) {
+                    } else if (!controller.owner && (!controller.reservation || controller.reservation.username == "Invader") && creep.room.memory.stage != "remoteRoom") {
 
                         creep.room.memory.stage = "neutralRoom"
 
