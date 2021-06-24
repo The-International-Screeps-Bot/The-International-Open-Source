@@ -173,7 +173,7 @@ module.exports = {
                         if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
                             let goal = _.map([closestHostile], function(target) {
-                                return { pos: target.pos, range: 3 }
+                                return { pos: target.pos, range: 4 }
                             })
 
                             supporter.creepFlee(supporter.pos, goal)
@@ -260,7 +260,7 @@ module.exports = {
                                     if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
                                         let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 3 }
+                                            return { pos: target.pos, range: 4 }
                                         })
 
                                         supporter.creepFlee(supporter.pos, goal)
@@ -402,7 +402,7 @@ module.exports = {
                                     if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
                                         let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 3 }
+                                            return { pos: target.pos, range: 4 }
                                         })
 
                                         supporter.creepFlee(supporter.pos, goal)
@@ -505,7 +505,7 @@ module.exports = {
                                     if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
                                         let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 3 }
+                                            return { pos: target.pos, range: 4 }
                                         })
 
                                         supporter.creepFlee(supporter.pos, goal)
