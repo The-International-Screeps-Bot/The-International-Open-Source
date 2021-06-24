@@ -132,19 +132,20 @@ module.exports = {
 
                     if (controller.reservation && controller.reservation.username != "MarvinTMB") {
 
-                        if (allyList.run().indexOf(controller.reservation.username.toLowerCase()) >= 0) {
+                        creep.say("1")
+
+                        if (allyList.run().indexOf((controller.reservation.username).toLowerCase()) >= 0) {
+
+                            creep.say("2")
 
                             creep.room.memory.stage = "allyReservation"
 
                         } else {
 
+                            creep.say("3")
+
                             creep.room.memory.stage = "enemyReservation"
                         }
-                    }
-                    if (!controller.owner && creep.room.memory.stage != "remoteRoom") {
-
-                        creep.room.memory.stage = "neutralRoom"
-
                     }
 
                     let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memory.roomFrom)
@@ -214,6 +215,12 @@ module.exports = {
 
                             room.memory.claim = "notViable"
                         }
+                    }
+
+                    if (!controller.owner && (!controller.reservation || controller.reservation.username == "Invader") && creep.room.memory.stage != "remoteRoom") {
+
+                        creep.room.memory.stage = "neutralRoom"
+
                     }
 
                     if (!newCommune) {

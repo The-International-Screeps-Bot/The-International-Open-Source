@@ -815,8 +815,6 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
         }
     })
 
-    console.log("Route: " + JSON.stringify(route))
-
     if (route.length > 0) {
 
         goal = _.map([new RoomPosition(25, 25, route[0].room)], function(pos) {
