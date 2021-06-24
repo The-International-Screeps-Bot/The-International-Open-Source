@@ -47,13 +47,13 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            // var newCommune = "E29N4"
+            // var newCommune = "E15N3"
 
             var newCommune
 
-            // var attackTarget = "E28N9"
+            var attackTarget = "E22N12"
 
-            var attackTarget
+            //var attackTarget
 
         } else {
 
@@ -420,10 +420,7 @@ module.exports = {
                     }
                 }
 
-                if (controllerLink != null &&
-                    baseLink != null &&
-                    sourceLink1 != null &&
-                    sourceLink2 != null) {
+                if (baseLink != null) {
 
                     minCreeps["stationaryHauler"] = 1
                 }
@@ -895,7 +892,7 @@ module.exports = {
                         defaultParts: [],
                         defaultCost: 0,
                         extraParts: [CARRY, CARRY, MOVE],
-                        extraCost: 0,
+                        extraCost: 150,
                         sliceAmount: 36
                     }],
                     "upgradeHauler")

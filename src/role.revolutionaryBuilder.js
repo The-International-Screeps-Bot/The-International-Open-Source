@@ -20,7 +20,7 @@ module.exports = {
 
             creep.say("BC " + creep.memory.target)
 
-            creep.onlySafeRoomPathing(creep.pos, goal)
+            creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
         } else {
 
             creep.isFull()
@@ -99,8 +99,8 @@ module.exports = {
                     }
                 }
             }
-        }
 
-        creep.avoidHostiles()
+            creep.avoidHostiles()
+        }
     }
 };

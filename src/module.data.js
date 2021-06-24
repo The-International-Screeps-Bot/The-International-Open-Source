@@ -44,7 +44,7 @@ module.exports = {
         Memory.data.cpuPerCreep = 0
         Memory.data.cpuPerCommune = (Memory.data.cpuUsage / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.memoryUsed = Math.floor(JSON.stringify(Memory).length / 1000)
+        Memory.data.memoryUsed = Math.floor(RawMemory.get().length / 1000)
 
         Memory.data.credits = (Game.market.credits).toFixed(0)
     }

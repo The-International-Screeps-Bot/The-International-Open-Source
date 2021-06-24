@@ -4,18 +4,20 @@ module.exports = {
         //Not on a if full / not full basis, but instead commands. If baseLink is full, run baseLink function. If power spawn is empty and we have energy and power in storage or terminal, fill it. Etc.
 
         let baseLink = Game.getObjectById(creep.room.memory.baseLink)
+
         let terminal = creep.room.terminal
+
         let storage = creep.room.storage
+
         let factory = creep.room.find(FIND_MY_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_FACTORY
         })[0]
 
-        // requiredStructures = array listed structures that are not null of undefined
+        let nuker = creep.room.find(FIND_MY_STRUCTURES, {
+            filter: s => s.structureType == STRUCTURE_NUKER
+        })[0]
 
-
-        // for every requiredStructure until if number of structures == i return stationaryPoint
-
-        let unfilteredRequiredStructures = [baseLink, terminal, storage, factory]
+        let unfilteredRequiredStructures = [baseLink, terminal, storage, factory, nuker]
         let requiredStructures = []
 
         for (let structure of unfilteredRequiredStructures) {
@@ -26,7 +28,7 @@ module.exports = {
             }
         }
 
-        const stationaryPos = creep.room.memory.stationaryPos
+        const stationaryPos = creep.memory.stationaryPos
 
         if (stationaryPos == null && requiredStructures[0]) {
 
@@ -45,7 +47,7 @@ module.exports = {
                         }
                         if (i + 1 == requiredStructures.length) {
 
-                            creep.room.memory.stationaryPos = position
+                            creep.memory.stationaryPos = position
                         }
                     }
                 }
@@ -65,7 +67,7 @@ module.exports = {
 
                 creep.hasResource()
 
-                if (baseLink != null && baseLink.store[RESOURCE_ENERGY] >= 700 && ((storage && storage.store[RESOURCE_ENERGY] <= 200000) || (terminal && terminal.store[RESOURCE_ENERGY] <= 100000)) && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
+                if (baseLink != null && baseLink.store[RESOURCE_ENERGY] >= 700 && ((storage && storage.store[RESOURCE_ENERGY] <= 400000) || (terminal && terminal.store[RESOURCE_ENERGY] <= 100000)) && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
 
                     creep.memory.withdrawBaseLink = true
                 }
@@ -76,6 +78,10 @@ module.exports = {
                 if (terminal && factory && factory.store.getUsedCapacity() <= factory.store.getCapacity() - 800 && factory.store[RESOURCE_BATTERY] <= 2000 && terminal.store[RESOURCE_BATTERY] >= 800) {
 
                     creep.memory.terminalWithdrawBattery = true
+                }
+                if (nuker && storage && storage.store[RESOURCE_ENERGY] >= 100000) {
+
+                    creep.memory.fillNuker = true
                 }
                 creep.say("AAA")
                 if (storage && storage.store[RESOURCE_ENERGY] >= 120000 && terminal.store[RESOURCE_ENERGY] < 120000) {
@@ -92,6 +98,7 @@ module.exports = {
                 const withdrawBaseLink = creep.memory.withdrawBaseLink
                 const terminalWithdrawBattery = creep.memory.terminalWithdrawBattery
                 const factoryWithdrawEnergy = creep.memory.factoryWithdrawEnergy
+                const fillNuker = creep.memory.fillNuker
                 const transferControllerLink = creep.memory.transferControllerLink
                 const storageToTerminal = creep.memory.storageToTerminal
 
@@ -151,16 +158,34 @@ module.exports = {
                                 }
                             } else {
 
-                                if (storageToTerminal) {
+                                if (fillNuker) {
 
                                     if (creep.memory.isFull == true) {
 
-                                        creep.transfer(terminal, RESOURCE_ENERGY)
-                                        creep.memory.storageToTerminal = false
+                                        creep.transfer(nuker, RESOURCE_ENERGY)
 
                                     } else {
 
+                                        if (storage.store[RESOURCE_ENERGY] <= 80000) {
+
+                                            creep.memory.fillNuker = false
+                                        }
+
                                         creep.withdraw(storage, RESOURCE_ENERGY)
+                                    }
+                                } else {
+
+                                    if (storageToTerminal) {
+
+                                        if (creep.memory.isFull == true) {
+
+                                            creep.transfer(terminal, RESOURCE_ENERGY)
+                                            creep.memory.storageToTerminal = false
+
+                                        } else {
+
+                                            creep.withdraw(storage, RESOURCE_ENERGY)
+                                        }
                                     }
                                 }
                             }

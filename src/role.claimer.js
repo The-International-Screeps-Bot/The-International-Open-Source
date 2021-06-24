@@ -25,7 +25,7 @@ module.exports = {
                 return { pos: pos, range: 1 }
             })
 
-            creep.onlySafeRoomPathing(creep.pos, goal)
+            creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
         }
     }
 };

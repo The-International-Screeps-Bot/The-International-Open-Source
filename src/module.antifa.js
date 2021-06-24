@@ -4,6 +4,14 @@ let creepFunctions = require("module.creepFunctions")
 module.exports = {
     run: function() {
 
+        let squadType
+
+        let squadMode = 2
+
+        // let squadMode = 4
+
+        // let squadMode = 6
+
         if (Memory.global.attackTarget) {
 
             let antifaAssaulters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaAssaulter');
@@ -48,7 +56,7 @@ module.exports = {
                                 return { pos: target.pos, range: 1 }
                             })
 
-                            creep.onlySafeRoomPathing(creep.pos, goal)
+                            creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                         }
                     } else {
 
@@ -56,7 +64,7 @@ module.exports = {
                             return { pos: target, range: 1 }
                         })
 
-                        creep.onlySafeRoomPathing(creep.pos, goal)
+                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                     }
                 } else if (findCreepWithoutTask(creep, antifaAssaulters)) {
 
@@ -74,7 +82,7 @@ module.exports = {
                         return { pos: target, range: 1 }
                     })
 
-                    creep.onlySafeRoomPathing(creep.pos, goal)
+                    creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                 }
             }
 
@@ -164,14 +172,14 @@ module.exports = {
                         }
                         if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
-                            let direction = creep.pos.getDirectionTo(supporter)
-                            creep.move(direction)
-
                             let goal = _.map([closestHostile], function(target) {
                                 return { pos: target.pos, range: 3 }
                             })
 
                             supporter.creepFlee(supporter.pos, goal)
+
+                            let direction = creep.pos.getDirectionTo(supporter)
+                            creep.move(direction)
                         }
                     }
                 }
@@ -251,14 +259,14 @@ module.exports = {
                                     }
                                     if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
-                                        let direction = creep.pos.getDirectionTo(supporter)
-                                        creep.move(direction)
-
                                         let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 4 }
+                                            return { pos: target.pos, range: 3 }
                                         })
 
                                         supporter.creepFlee(supporter.pos, goal)
+
+                                        let direction = creep.pos.getDirectionTo(supporter)
+                                        creep.move(direction)
                                     }
                                 } else {
 
@@ -268,7 +276,7 @@ module.exports = {
 
                                     if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                        creep.onlySafeRoomPathing(creep.pos, goal)
+                                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                     }
                                 }
                             } else {
@@ -393,14 +401,14 @@ module.exports = {
                                     }
                                     if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
-                                        let direction = creep.pos.getDirectionTo(supporter)
-                                        creep.move(direction)
-
                                         let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 4 }
+                                            return { pos: target.pos, range: 3 }
                                         })
 
                                         supporter.creepFlee(supporter.pos, goal)
+
+                                        let direction = creep.pos.getDirectionTo(supporter)
+                                        creep.move(direction)
                                     }
                                 } else {
 
@@ -410,7 +418,7 @@ module.exports = {
 
                                     if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                        creep.onlySafeRoomPathing(creep.pos, goal)
+                                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                     }
                                 }
 
@@ -424,7 +432,7 @@ module.exports = {
                                         return { pos: pos, range: 2 }
                                     })
 
-                                    creep.onlySafeRoomPathing(creep.pos, goal)
+                                    creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                 }
                             }
                         }
@@ -496,14 +504,14 @@ module.exports = {
                                     }
                                     if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
-                                        let direction = creep.pos.getDirectionTo(supporter)
-                                        creep.move(direction)
-
                                         let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 4 }
+                                            return { pos: target.pos, range: 3 }
                                         })
 
                                         supporter.creepFlee(supporter.pos, goal)
+
+                                        let direction = creep.pos.getDirectionTo(supporter)
+                                        creep.move(direction)
                                     }
                                 } else {
 
@@ -513,7 +521,7 @@ module.exports = {
 
                                     if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                        creep.onlySafeRoomPathing(creep.pos, goal)
+                                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                     }
                                 }
 
@@ -527,7 +535,7 @@ module.exports = {
                                         return { pos: target, range: 1 }
                                     })
 
-                                    creep.onlySafeRoomPathing(creep.pos, goal)
+                                    creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                 }
                             }
                         } else {
@@ -540,7 +548,7 @@ module.exports = {
                                     return { pos: target, range: 1 }
                                 })
 
-                                creep.onlySafeRoomPathing(creep.pos, goal)
+                                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
 
                             } else {
 
@@ -548,7 +556,7 @@ module.exports = {
                                     return { pos: target, range: 1 }
                                 })
 
-                                creep.onlySafeRoomPathing(creep.pos, goal)
+                                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                             }
                         }
                     }
@@ -560,7 +568,7 @@ module.exports = {
                             return { pos: target, range: 1 }
                         })
 
-                        creep.onlySafeRoomPathing(creep.pos, goal)
+                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
 
                     } else {
 
@@ -568,7 +576,7 @@ module.exports = {
                             return { pos: target, range: 1 }
                         })
 
-                        creep.onlySafeRoomPathing(creep.pos, goal)
+                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                     }
                 }
             }

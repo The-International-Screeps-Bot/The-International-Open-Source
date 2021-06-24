@@ -573,6 +573,13 @@ Creep.prototype.roadPathing = function(origin, goal) {
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
                 }
+
+                let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+
+                for (let structure of enemyStructures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
             }
 
             return cm
@@ -660,6 +667,13 @@ Creep.prototype.offRoadPathing = function(origin, goal) {
                 })
 
                 for (let structure of structures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
+
+                let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+
+                for (let structure of enemyStructures) {
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
                 }
@@ -754,6 +768,13 @@ Creep.prototype.intraRoomPathing = function(origin, goal) {
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
                 }
+
+                let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+
+                for (let structure of enemyStructures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
             }
 
             return cm
@@ -766,7 +787,7 @@ Creep.prototype.intraRoomPathing = function(origin, goal) {
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
-Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
+Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
 
     creep = this
 
@@ -783,7 +804,7 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
                 return 1
 
             }
-            if (Memory.rooms[roomName] && (Memory.rooms[roomName].stage != "enemyRoom" && Memory.rooms[roomName].stage != "keeperRoom")) {
+            if (Memory.rooms[roomName] && avoidStages.indexOf(Memory.rooms[roomName].stage) == -1) {
 
                 allowedRooms[roomName] = true
                 return 1
@@ -793,8 +814,6 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
             return Infinity
         }
     })
-
-    console.log("Route: " + JSON.stringify(route))
 
     if (route.length > 0) {
 
@@ -878,6 +897,13 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
                 }
+
+                let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+
+                for (let structure of enemyStructures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
             }
 
             return cm
@@ -891,27 +917,31 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal) {
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
 
-Creep.prototype.findSafeDistance = function(origin, goal) {
+Creep.prototype.findSafeDistance = function(origin, goal, avoidStages) {
 
     let creep = this
 
     let allowedRooms = {
-        [origin.roomName]: true,
-        [goal[0].pos.roomName]: true
+        [origin.roomName]: true
     }
 
     let route = Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
         routeCallback(roomName) {
 
-            if (Memory.rooms[roomName] && Memory.rooms[roomName].stage != "enemyRoom" && Memory.rooms[roomName].stage != "keeperRoom") {
+            if (roomName == goal[0].pos.roomName) {
 
                 allowedRooms[roomName] = true
                 return 1
 
-            } else {
-
-                return Infinity
             }
+            if (Memory.rooms[roomName] && avoidStages.indexOf(Memory.rooms[roomName].stage) == -1) {
+
+                allowedRooms[roomName] = true
+                return 1
+
+            }
+
+            return Infinity
         }
     })
 
@@ -1071,6 +1101,13 @@ Creep.prototype.creepFlee = function(origin, target) {
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
                 }
+
+                let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+
+                for (let structure of enemyStructures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
             }
 
             return cm
@@ -1081,5 +1118,5 @@ Creep.prototype.creepFlee = function(origin, target) {
 
     creep.moveByPath(creep.memory.path)
 
-    new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#ff3300', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+    new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }

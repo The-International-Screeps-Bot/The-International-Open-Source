@@ -1,5 +1,3 @@
-const { drop } = require("lodash");
-
 module.exports = {
     run: function(creep) {
 
@@ -44,11 +42,15 @@ module.exports = {
 
                 if (lowTower) {
 
+                    creep.room.visual.text("⚡", lowTower.pos.x, lowTower.pos.y + 0.25, { align: 'center' })
+
                     creep.advancedTransfer(lowTower)
 
                 } else {
 
                     if (essentialStructure) {
+
+                        creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 
                         creep.advancedTransfer(essentialStructure)
 

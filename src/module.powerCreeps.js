@@ -37,18 +37,16 @@ module.exports = {
 
                 if (creep.memory.isFull) {
 
-                    if (creep.room.terminal) {
+                    let terminal = creep.room.terminal
+                    let storage = creep.room.storage
 
-                        for (let resourceType in creep.store) {
+                    if (terminal && terminal.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
 
-                            creep.advancedTransfer(creep.room.terminal, resourceType)
-                        }
-                    } else if (creep.room.storage) {
+                        creep.advancedTransfer(terminal, RESOURCE_OPS)
 
-                        for (let resourceType in creep.store) {
+                    } else if (storage && storage.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
 
-                            creep.advancedTransfer(creep.room.terminal, resourceType)
-                        }
+                        creep.advancedTransfer(storage, RESOURCE_OPS)
                     }
                 } else {
 
