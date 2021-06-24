@@ -68,7 +68,7 @@ module.exports = {
                         }
                     }
 
-                    if (Memory.global.globalStage == 0 && Game.market.credits >= 100000 && terminal.store[RESOURCE_ENERGY] <= 100000 && room.controller.level <= 7) {
+                    if (Memory.global.globalStage == 0 && Game.market.credits >= 100000 && terminal.store[RESOURCE_ENERGY] <= 100000) {
 
                         //console.log(RESOURCE_ENERGY + ", " + terminal.room.name)
 
@@ -141,16 +141,6 @@ module.exports = {
                         }
                     }
 
-                    if (room.controller.level == 8) {
-
-                        //Check if room needs to support another room
-
-                        if (Memory.global.needsEnergy.length > 0 && terminal.store[RESOURCE_ENERGY] >= 100000) {
-
-                            terminal.send(RESOURCE_ENERGY, 50000, Memory.global.needsEnergy[0], 'needsEnergy Fulfillment')
-                        }
-                    }
-
                     let commodities = []
 
                     let gameResources = ["XUH2O", "XUHO2", "XKH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2", "UH2O", "UHO2", "KH2O", "KHO2", "LH2O", "LHO2", "ZH2O", "ZHO2", "GH2O", "GHO2", "UH", "UO", "KH", "KO", "LH", "LO", "ZH", "ZO", "GH", "GO", "OH", "ZK", "UL", "G", "OH", "ZK", "UL", "G", "H", "O", "U", "K", "L", "Z", "X"]
@@ -165,6 +155,30 @@ module.exports = {
                         for (let resources of gameResources) {
 
                             for (let resource of t3Boosts) {
+
+                                if (resources == resource && terminal.store.getUsedCapacity([resource]) < 5000) {
+
+                                    //console.log(resources)
+
+                                }
+                            }
+                            for (let resource of t2Boosts) {
+
+                                if (resources == resource && terminal.store.getUsedCapacity([resource]) < 3000) {
+
+                                    //console.log(resources)
+
+                                }
+                            }
+                            for (let resource of t1Boosts) {
+
+                                if (resources == resource && terminal.store.getUsedCapacity([resource]) < 2000) {
+
+                                    //console.log(resources)
+
+                                }
+                            }
+                            for (let resource of bases) {
 
                                 if (resources == resource && terminal.store.getUsedCapacity([resource]) < 5000) {
 

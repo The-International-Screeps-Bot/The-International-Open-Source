@@ -114,66 +114,28 @@ module.exports = {
 
                 } else {
 
-                    if (!controller.my && controller.owner) {
-                        if (allyList.run().indexOf(controller.owner.username.toLowerCase()) >= 0) {
-
-                            creep.room.memory.stage = "allyRoom"
-                            creep.room.memory.owner = controller.owner.username
-                            creep.room.memory.power = controller.level
-
-                        } else {
-
-                            creep.room.memory.stage = "enemyRoom"
-                            creep.room.memory.owner = controller.owner.username
-                            creep.room.memory.power = controller.level
-                            creep.room.memory.threat = 0
-                        }
-                    }
-
-                    if (controller.reservation && controller.reservation.username != "MarvinTMB") {
-
-                        creep.say("1")
-
-                        if (allyList.run().indexOf((controller.reservation.username).toLowerCase()) >= 0) {
-
-                            creep.say("2")
-
-                            creep.room.memory.stage = "allyReservation"
-
-                        } else {
-
-                            creep.say("3")
-
-                            creep.room.memory.stage = "enemyReservation"
-                        }
-                    }
-
                     let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memory.roomFrom)
 
                     let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(pos) {
                         return { pos: pos, range: 1 }
                     })
 
-                    if (targetRoomDistance == 1 && !controller.owner && (!controller.reservation || controller.reservation.username == "Invader") && creep.findSafeDistance(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"]) <= 2) {
-
-                        creep.room.memory.stage = "remoteRoom"
+                    if (targetRoomDistance == 1 && !controller.owner && !controller.reservation && creep.findSafeDistance(creep.pos, goal) <= 2) {
 
                         let sources = creep.room.find(FIND_SOURCES).length
 
-                        function checkDuplicate() {
+                        let duplicateRoom = false
 
-                            for (let object of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
+                        for (let object of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
 
-                                if (object.name == creep.room.name) {
+                            if (object.name == creep.room.name) {
 
-                                    return false
-                                }
+                                duplicateRoom = true
+                                break
                             }
-
-                            return true
                         }
 
-                        if (checkDuplicate()) {
+                        if (duplicateRoom == false) {
 
                             Memory.rooms[creep.memory.roomFrom].remoteRooms.push({ name: creep.room.name, sources: sources, roads: false, builderNeed: false, enemy: false, distance: null })
                         }
@@ -217,7 +179,34 @@ module.exports = {
                         }
                     }
 
-                    if (!controller.owner && (!controller.reservation || controller.reservation.username == "Invader") && creep.room.memory.stage != "remoteRoom") {
+                    if (!controller.my && controller.owner) {
+                        if (allyList.run().indexOf(controller.owner.username.toLowerCase()) >= 0) {
+
+                            creep.room.memory.stage = "allyRoom"
+                            creep.room.memory.owner = controller.owner.username
+                            creep.room.memory.power = controller.level
+
+                        } else {
+
+                            creep.room.memory.stage = "enemyRoom"
+                            creep.room.memory.owner = controller.owner.username
+                            creep.room.memory.power = controller.level
+                            creep.room.memory.threat = 0
+                        }
+                    }
+
+                    if (controller.reservation && controller.reservation.username != "MarvinTMB") {
+
+                        if (allyList.run().indexOf(controller.reservation.username.toLowerCase()) >= 0) {
+
+                            creep.room.memory.stage = "allyReservation"
+
+                        } else {
+
+                            creep.room.memory.stage = "enemyReservation"
+                        }
+                    }
+                    if (!controller.owner) {
 
                         creep.room.memory.stage = "neutralRoom"
 

@@ -102,7 +102,5 @@ module.exports = {
             }
         }
         */
-
-        creep.avoidHostiles()
     }
 };
