@@ -258,7 +258,7 @@ Creep.prototype.repairBarricades = function(target) {
 
     } else if (creep.repair(target) == 0) {
 
-        creep.say("🔧 " + creep.myParts("work"))
+        creep.say("🧱 " + creep.myParts("work"))
 
         Memory.data.energySpentOnBarricades += creep.myParts("work")
     }
