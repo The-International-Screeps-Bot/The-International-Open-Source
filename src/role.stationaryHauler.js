@@ -83,7 +83,7 @@ module.exports = {
 
                     creep.memory.fillNukerEnergy = true
                 }
-                if (nuker && nuker.store[RESOURCE_GHODIUM] > 0 && ((storage && storage.store[RESOURCE_GHODIUM] >= 100000) || (terminal && terminal.store[RESOURCE_GHODIUM] >= 100000))) {
+                if (nuker && nuker.store[RESOURCE_GHODIUM] > 0 && ((storage && storage.store[RESOURCE_GHODIUM] >= nuker.store.getCapacity(RESOURCE_GHODIUM)) || (terminal && terminal.store[RESOURCE_GHODIUM] >= nuker.store.getCapacity(RESOURCE_GHODIUM)))) {
 
                     creep.memory.fullNukerGhodium = true
                 }
