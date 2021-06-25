@@ -149,7 +149,7 @@ module.exports = {
                 function nuke() {
 
                     let nuker = room.find(FIND_MY_STRUCTURES, {
-                        filter: s => s.structureType == STRCTURE_NUKER
+                        filter: s => s.structureType == STRUCTURE_NUKER
                     })[0]
 
                     if (nuker && room.name == "E25N2") {
