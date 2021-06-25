@@ -81,6 +81,23 @@ module.exports = {
             }
         }
 
+        nuke()
+
+        function nuke() {
+
+            let nuker = room.find(FIND_MY_STRUCTURES, {
+                filter: s => s.structureType == STRCTURE_NUKER
+            })[0]
+
+            if (nuker && room.name == "E25N2") {
+
+                if (nuker.store[RESOURCE_ENERGY] == nuker.store.getCapacity(RESOURCE_ENERGY) && nuker.store[RESOURCE_GHODIUM] == nuker.store.getCapacity(RESOURCE_GHODIUM)) {
+
+                    nuker.launchNuke(new RoomPosition(18, 24, 'E32N8'));
+                }
+            }
+        }
+
         global()
 
         let totalEnergy = 0

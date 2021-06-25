@@ -293,7 +293,7 @@ module.exports = {
 
                                 } else {
 
-                                    creep.say("W")
+                                    creep.say("🚬")
                                 }
                             }
                         } else {
