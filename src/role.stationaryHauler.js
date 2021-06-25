@@ -83,11 +83,10 @@ module.exports = {
 
                     creep.memory.fillNukerEnergy = true
                 }
-                if (nuker && nuker.store.getFreeCapacity(RESOURCE_GHODIUM) > 0 && ((storage && storage.store[RESOURCE_GHODIUM] >= nuker.store.getCapacity(RESOURCE_GHODIUM)) || (terminal && terminal.store[RESOURCE_GHODIUM] >= nuker.store.getCapacity(RESOURCE_GHODIUM)))) {
+                if (nuker && nuker.store.getFreeCapacity(RESOURCE_GHODIUM) > 0 && ((storage && storage.store[RESOURCE_GHODIUM] >= nuker.store.getFreeCapacity(RESOURCE_GHODIUM)) || (terminal && terminal.store[RESOURCE_GHODIUM] >= nuker.store.getFreeCapacity(RESOURCE_GHODIUM)))) {
 
-                    creep.memory.fullNukerGhodium = true
+                    creep.memory.fillNukerGhodium = true
                 }
-                creep.say("AAA")
                 if (storage && storage.store[RESOURCE_ENERGY] >= 120000 && terminal.store[RESOURCE_ENERGY] < 120000) {
 
                     creep.memory.storageToTerminal = true
@@ -97,8 +96,6 @@ module.exports = {
                 //creep.memory.transferControllerLink = true
                 //}
 
-                creep.say("BBB")
-
                 const withdrawBaseLink = creep.memory.withdrawBaseLink
 
                 const terminalWithdrawBattery = creep.memory.terminalWithdrawBattery
@@ -107,13 +104,17 @@ module.exports = {
 
                 const fillNukerEnergy = creep.memory.fillNukerEnergy
 
-                const fillNukerGhodium = creep.memory.fullNukerGhodium
+                const fillNukerGhodium = creep.memory.fillNukerGhodium
 
                 const transferControllerLink = creep.memory.transferControllerLink
 
                 const storageToTerminal = creep.memory.storageToTerminal
 
+                creep.say("🚬")
+
                 if (withdrawBaseLink) {
+
+                    creep.say("WBL")
 
                     if (creep.memory.isFull == true) {
 
@@ -135,6 +136,8 @@ module.exports = {
 
                     if (factoryWithdrawEnergy) {
 
+                        creep.say("FWE")
+
                         if (creep.memory.isFull == true) {
 
                             creep.transfer(terminal, RESOURCE_ENERGY)
@@ -148,6 +151,8 @@ module.exports = {
 
                         if (terminalWithdrawBattery) {
 
+                            creep.say("TWB")
+
                             if (creep.memory.isFull == true) {
 
                                 creep.transfer(factory, RESOURCE_BATTERY)
@@ -160,6 +165,8 @@ module.exports = {
 
                             if (transferControllerLink) {
 
+                                creep.say("TCL")
+
                                 if (creep.memory.isFull == true) {
 
                                     creep.transfer(baseLink, RESOURCE_ENERGY)
@@ -170,6 +177,8 @@ module.exports = {
                             } else {
 
                                 if (fillNukerEnergy) {
+
+                                    creep.say("FNE")
 
                                     if (creep.memory.isFull == true) {
 
@@ -196,22 +205,24 @@ module.exports = {
 
                                     if (fillNukerGhodium) {
 
+                                        creep.say("FNG")
+
                                         if (creep.memory.isFull == true) {
 
                                             creep.transfer(nuker, RESOURCE_GHODIUM)
 
                                         } else {
 
-                                            if ((storage.store[RESOURCE_GHODIUM] <= 80000 && terminal.store[RESOURCE_GHODIUM] <= 80000) || nuker.store[RESOURCE_GHODIUM] == nuker.store.getCapacity(RESOURCE_GHODIUM)) {
+                                            if ((storage.store[RESOURCE_GHODIUM] <= nuker.store.getFreeCapacity(RESOURCE_GHODIUM) && terminal.store[RESOURCE_GHODIUM] <= nuker.store.getFreeCapacity(RESOURCE_GHODIUM)) || nuker.store[RESOURCE_GHODIUM] == nuker.store.getCapacity(RESOURCE_GHODIUM)) {
 
                                                 creep.memory.fillNukerGhodium = false
                                             } else {
 
-                                                if (storage && storage.store[RESOURCE_GHODIUM] >= 100000) {
+                                                if (storage && storage.store[RESOURCE_GHODIUM] >= nuker.store.getFreeCapacity(RESOURCE_GHODIUM)) {
 
                                                     creep.withdraw(storage, RESOURCE_GHODIUM)
 
-                                                } else if (terminal && terminal.store[RESOURCE_GHODIUM] >= 100000) {
+                                                } else if (terminal && terminal.store[RESOURCE_GHODIUM] >= nuker.store.getFreeCapacity(RESOURCE_GHODIUM)) {
 
                                                     creep.withdraw(terminal, RESOURCE_GHODIUM)
                                                 }
@@ -220,6 +231,8 @@ module.exports = {
                                     } else {
 
                                         if (storageToTerminal) {
+
+                                            creep.say("STT")
 
                                             if (creep.memory.isFull == true) {
 
