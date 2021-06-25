@@ -43,39 +43,39 @@ module.exports = {
 
                 var mineral = minerals[0]
 
+                let rawPrimaryLabs = room.memory.primaryLabs
+                let rawSecondaryLabs = room.memory.secondaryLabs
+
+                for (let labs of rawPrimaryLabs) {
+
+                    let lab = Game.getObjectById(labs)
+
+                    if (lab != null) {
+
+                        room.visual.circle(lab.pos, {
+                            fill: 'transparent',
+                            radius: 0.8,
+                            stroke: '#39A0ED',
+                            strokeWidth: 0.125
+                        })
+                    }
+                }
+                for (let labs of rawSecondaryLabs) {
+
+                    let lab = Game.getObjectById(labs)
+
+                    if (lab != null) {
+
+                        room.visual.circle(lab.pos, {
+                            fill: 'transparent',
+                            radius: 0.8,
+                            stroke: '#2DF0C9',
+                            strokeWidth: 0.125
+                        })
+                    }
+                }
+
                 for (let lab of labs) {
-
-                    let rawPrimaryLabs = room.memory.primaryLabs
-                    let rawSecondaryLabs = room.memory.secondaryLabs
-
-                    for (let labs of rawPrimaryLabs) {
-
-                        let lab = Game.getObjectById(labs)
-
-                        if (lab != null) {
-
-                            room.visual.circle(lab.pos, {
-                                fill: 'transparent',
-                                radius: 0.8,
-                                stroke: '#39A0ED',
-                                strokeWidth: 0.125
-                            })
-                        }
-                    }
-                    for (let labs of rawSecondaryLabs) {
-
-                        let lab = Game.getObjectById(labs)
-
-                        if (lab != null) {
-
-                            room.visual.circle(lab.pos, {
-                                fill: 'transparent',
-                                radius: 0.8,
-                                stroke: '#2DF0C9',
-                                strokeWidth: 0.125
-                            })
-                        }
-                    }
 
                     //Minerals
                     if (lab.store[RESOURCE_HYDROGEN]) {
