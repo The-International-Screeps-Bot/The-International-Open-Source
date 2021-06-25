@@ -79,11 +79,11 @@ module.exports = {
 
                     creep.memory.terminalWithdrawBattery = true
                 }
-                if (nuker && nuker.store[RESOURCE_ENERGY] > 0 && ((storage && storage.store[RESOURCE_ENERGY] >= 100000) || (terminal && terminal.store[RESOURCE_ENERGY] >= 100000))) {
+                if (nuker && nuker.store.getFreeCapacity(RESOURCE_ENERGY) > 0 && ((storage && storage.store[RESOURCE_ENERGY] >= 100000) || (terminal && terminal.store[RESOURCE_ENERGY] >= 100000))) {
 
                     creep.memory.fillNukerEnergy = true
                 }
-                if (nuker && nuker.store[RESOURCE_GHODIUM] > 0 && ((storage && storage.store[RESOURCE_GHODIUM] >= nuker.store.getCapacity(RESOURCE_GHODIUM)) || (terminal && terminal.store[RESOURCE_GHODIUM] >= nuker.store.getCapacity(RESOURCE_GHODIUM)))) {
+                if (nuker && nuker.store.getFreeCapacity(RESOURCE_GHODIUM) > 0 && ((storage && storage.store[RESOURCE_GHODIUM] >= nuker.store.getCapacity(RESOURCE_GHODIUM)) || (terminal && terminal.store[RESOURCE_GHODIUM] >= nuker.store.getCapacity(RESOURCE_GHODIUM)))) {
 
                     creep.memory.fullNukerGhodium = true
                 }
