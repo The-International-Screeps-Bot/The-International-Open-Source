@@ -4,6 +4,7 @@ module.exports = {
             if (room.controller && room.controller.my && room.controller.level >= 1) {
 
                 function avgPrice(resource) {
+
                     let resourceHistory = Game.market.getHistory(resource)
                     let avgPrices = []
                     let totalPrice = 0
@@ -23,12 +24,19 @@ module.exports = {
                     return avg
                 }
 
+                function findOrders(orderType, resourceType) {
+
+                    let orders = Game.market.getAllOrders({ type: orderType, resourceType: resourceType })
+
+                    return orders
+                }
+
                 let terminal = room.terminal
 
                 if (terminal) {
 
                     var sellAll = false
-                    var orderBlacklist = []
+                    var orderBlacklist = [RESOURCE_ENERGY]
 
                     _.forEach(Game.market.orders, order => {
 
@@ -56,15 +64,29 @@ module.exports = {
                         }
                     })
                     for (let resource in terminal.store) {
-                        if (orderBlacklist.indexOf(resource) == -1 && terminal.store[resource] >= 20000 && Object.keys(Game.market.orders).length < 300 && resource != RESOURCE_ENERGY) {
 
-                            let sellPrice = avgPrice(resource) * 0.9
-                            console.log("SP: " + sellPrice + ", " + resource);
-                            //console.log(orderBlacklist)
+                        if (terminal.store[resource] >= 20000) {
+                            let buyOrder
 
-                            console.log("Terminal " + room.name + " wants to make a sell order for: " + resource)
-                            Game.market.createOrder({ type: ORDER_SELL, resourceType: resource, price: sellPrice, totalAmount: 10000, roomName: room.name });
+                            // First try to find a buy offer
+                            if (findOrders(ORDER_BUY, resource).length > 0) {
 
+                                for (let order of findOrders(ORDER_BUY, resource)) {
+
+                                    if (order) {
+
+                                        Game.market.deal(order.id, 10000, room.name)
+
+                                        buyOrder = true
+                                        break
+                                    }
+                                }
+                            }
+                            if (!buyOrder && orderBlacklist.indexOf(resource) == -1 && Object.keys(Game.market.orders).length < 300) {
+
+                                //console.log("Terminal " + room.name + " wants to make a sell order for: " + resource)
+                                Game.market.createOrder({ type: ORDER_SELL, resourceType: resource, price: avgPrice(resource) * 0.9, totalAmount: 10000, roomName: room.name });
+                            }
                         }
                     }
 
@@ -195,6 +217,17 @@ module.exports = {
 
                                     }
                                 }
+                            }
+                        }
+                        if (terminal.store[RESOURCE_POWER] < 6000) {
+
+                            let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_POWER && order.price < avgPrice(RESOURCE_POWER) * 1.2 && order.amount >= (6000 - terminal.store.getUsedCapacity(RESOURCE_POWER)))
+
+                            if (buyOrders[0]) {
+
+                                console.log("Found order for: " + RESOURCE_POWER + ", " + room + ", " + buyOrders[0]["id"] + ", " + buyOrders[0].amount)
+                                Game.market.deal(buyOrders[0]["id"], 6000 - terminal.store.getUsedCapacity([RESOURCE_POWER]), room.name)
+
                             }
                         }
                     }

@@ -1,5 +1,15 @@
 let allyList = require("module.allyList")
 
+
+Creep.prototype.isEdge = function() {
+
+    if (creep.pos.x <= 0 || creep.pos.x >= 48 || creep.pos.y <= 0 || creep.pos.y >= 48) {
+
+        return true
+    }
+
+    return false
+}
 Creep.prototype.findRemoteRoom = function() {
 
     if (!creep.memory.remoteRoom) {
@@ -1051,6 +1061,16 @@ Creep.prototype.creepFlee = function(origin, target) {
                 for (let creep of room.find(FIND_POWER_CREEPS)) {
 
                     cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+
+                for (var x = -1; x < 50; ++x) {
+                    for (var y = -1; y < 50; ++y) {
+
+                        if (x <= 0 || x >= 48 || y <= 0 || y >= 48) {
+
+                            cm.set(x, y, 255)
+                        }
+                    }
                 }
             } else {
 
