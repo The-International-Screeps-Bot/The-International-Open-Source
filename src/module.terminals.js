@@ -73,9 +73,16 @@ module.exports = {
 
                                 for (let order of findOrders(ORDER_BUY, resource)) {
 
-                                    if (order) {
+                                    if (order && order.price >= avgPrice(resource) * 0.9) {
 
-                                        Game.market.deal(order.id, 10000, room.name)
+                                        let buyAmount = 10000
+
+                                        if (order.amount < 10000) {
+
+                                            buyAmount = order.amount
+                                        }
+
+                                        Game.market.deal(order.id, buyAmount, room.name)
 
                                         buyOrder = true
                                         break
