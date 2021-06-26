@@ -31,7 +31,11 @@ module.exports = {
 
         let task = creep.memory.task
 
+        creep.say("🚬")
+
         if (task == "deliverFromStorage" && storage) {
+
+            creep.say("DFS")
 
             creep.isFull()
 
@@ -65,6 +69,8 @@ module.exports = {
             }
         } else if (task == "deliverToControllerContainer" && controllerContainer != null && storage) {
 
+            creep.say("DTCC")
+
             creep.isFull()
 
             if (creep.memory.isFull == false) {
@@ -79,6 +85,8 @@ module.exports = {
                 }
             }
         } else if (task == "sourceContainer1Full" && sourceContainer1 != null) {
+
+            creep.say("SC1F")
 
             creep.isFull()
 
@@ -124,6 +132,8 @@ module.exports = {
             }
         } else if (task == "sourceContainer2Full" && sourceContainer2 != null) {
 
+            creep.say("SC2F")
+
             creep.isFull()
 
             if (creep.memory.isFull == false) {
@@ -167,6 +177,8 @@ module.exports = {
                 }
             }
         } else if (task == "droppedEnergy") {
+
+            creep.say("DE")
 
             if (!droppedEnergy && !creep.memory.isFull) {
 
@@ -218,6 +230,8 @@ module.exports = {
             }
         } else if (task == "fillPowerSpawn" && powerSpawn) {
 
+            creep.say("FPS")
+
             if (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) != powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
 
                 var resource = { type: RESOURCE_ENERGY, amount: powerSpawn.store.getCapacity(RESOURCE_ENERGY) - powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) }
@@ -253,6 +267,8 @@ module.exports = {
             }
         } else if ((!task || task == "deliverToStorage") && storage) {
 
+            creep.say("DTS")
+
             creep.hasResource()
 
             if (creep.memory.isFull && storage) {
@@ -266,6 +282,8 @@ module.exports = {
                 creep.memory.task = undefined
             }
         } else if ((!task || task == "noDeliveryPossible") && storage) {
+
+            creep.say("NDP")
 
             if (creep.memory.isFull) {
 
