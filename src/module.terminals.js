@@ -239,11 +239,11 @@ module.exports = {
 
                     if (room.controller.level == 8) {
 
-                        if (terminal.store[RESOURCE_POWER] < 5000 && findOrders(ORDER_SELL, resource).length > 0) {
+                        if (terminal.store[RESOURCE_POWER] < 5000 && findOrders(ORDER_SELL, RESOURCE_POWER).length > 0) {
 
-                            for (let order of findOrders(ORDER_SELL, resource)) {
+                            for (let order of findOrders(ORDER_SELL, RESOURCE_POWER)) {
 
-                                if (order && order.price >= avgPrice(resource) * 0.9) {
+                                if (order && order.price >= avgPrice(RESOURCE_POWER) * 0.9) {
 
                                     let buyAmount = 6000
 

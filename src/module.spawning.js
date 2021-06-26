@@ -350,7 +350,7 @@ module.exports = {
 
                 if (attackingRoom && attackingRoom == room) {
 
-                    minCreeps["antifaAssaulter"] = 2
+                    minCreeps["antifaAssaulter"] = 5
                     minCreeps["antifaSupporter"] = minCreeps["antifaAssaulter"]
                 }
 
@@ -790,6 +790,13 @@ module.exports = {
 
                 let barricadeUpgraderBody = roleValues(
                     [{
+                            stage: 8,
+                            defaultParts: [],
+                            defaultCost: 0,
+                            extraParts: [WORK, CARRY, MOVE],
+                            extraCost: 200,
+                            sliceAmount: 30
+                        }, {
                             stage: 5,
                             defaultParts: [],
                             defaultCost: 0,
@@ -811,14 +818,61 @@ module.exports = {
 
                 let remoteBuilderBody = roleValues(
                     [{
-                        stage: 1,
+                        stage: 5,
                         defaultParts: [],
                         defaultCost: 0,
                         extraParts: [WORK, MOVE, CARRY, MOVE],
                         extraCost: 250,
-                        sliceAmount: 20
+                        sliceAmount: 24
                     }],
                     "remoteBuilder")
+
+                let remoteHarvesterBody = roleValues(
+                    [{
+                        stage: 5,
+                        defaultParts: [],
+                        defaultCost: 0,
+                        extraParts: [WORK, WORK, MOVE],
+                        extraCost: 250,
+                        sliceAmount: 12
+                    }, {
+                        stage: 1,
+                        defaultParts: [],
+                        defaultCost: 0,
+                        extraParts: [WORK, MOVE],
+                        extraCost: 150,
+                        sliceAmount: 16
+                    }],
+                    "remoteHarvester")
+
+                let remoteHaulerBody = roleValues(
+                    [{
+                        stage: 5,
+                        defaultParts: [],
+                        defaultCost: 0,
+                        extraParts: [CARRY, CARRY, MOVE],
+                        extraCost: 150,
+                        sliceAmount: 48
+                    }, {
+                        stage: 1,
+                        defaultParts: [],
+                        defaultCost: 0,
+                        extraParts: [CARRY, MOVE],
+                        extraCost: 100,
+                        sliceAmount: 50
+                    }],
+                    "remoteHauler")
+
+                let reserver = roleValues(
+                    [{
+                        stage: 1,
+                        defaultParts: [],
+                        defaultCost: 0,
+                        extraParts: [CLAIM, MOVE, MOVE],
+                        extraCost: 700,
+                        sliceAmount: 6
+                    }],
+                    "reserver")
 
                 let communeDefenderBody = roleValues(
                     [{
