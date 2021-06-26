@@ -42,7 +42,7 @@ module.exports = {
 
                 creep.say("NE")
 
-                if (!(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+                if (!(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
 
                     creep.say("H")
 

@@ -3,7 +3,7 @@ let allyList = require("module.allyList")
 
 Creep.prototype.isEdge = function() {
 
-    if (creep.pos.x <= 0 || creep.pos.x >= 48 || creep.pos.y <= 0 || creep.pos.y >= 48) {
+    if (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49) {
 
         return true
     }
@@ -1066,7 +1066,7 @@ Creep.prototype.creepFlee = function(origin, target) {
                 for (var x = -1; x < 50; ++x) {
                     for (var y = -1; y < 50; ++y) {
 
-                        if (x <= 0 || x >= 48 || y <= 0 || y >= 48) {
+                        if (x <= 0 || x >= 49 || y <= 0 || y >= 49) {
 
                             cm.set(x, y, 255)
                         }
@@ -1077,26 +1077,26 @@ Creep.prototype.creepFlee = function(origin, target) {
 
                             if (value == 1) {
 
-                                room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "green", fill: "green" })
+                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "green", fill: "green" })
                                     //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
 
                             } else if (value == 4) {
 
-                                room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#ffff66", fill: "#ffff66" })
+                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#ffff66", fill: "#ffff66" })
                                     //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
 
                             } else if (value == 24) {
 
-                                room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#0000ff", fill: "#0000ff" })
+                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#0000ff", fill: "#0000ff" })
                                     //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
 
                             } else if (value >= 255) {
 
-                                room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "red", fill: "red" })
+                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "red", fill: "red" })
                                     //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
                             } else {
 
-                                room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "39A0ED", fill: "red" })
+                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "39A0ED", fill: "red" })
                                     //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
                             }
                         }
@@ -1157,6 +1157,46 @@ Creep.prototype.creepFlee = function(origin, target) {
                 for (let structure of enemyStructures) {
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
+                }
+
+                for (var x = -1; x < 50; ++x) {
+                    for (var y = -1; y < 50; ++y) {
+
+                        if (x <= 0 || x >= 49 || y <= 0 || y >= 49) {
+
+                            cm.set(x, y, 255)
+                        }
+
+                        let value = cm.get(x, y)
+
+                        if (value) {
+
+                            if (value == 1) {
+
+                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "green", fill: "green" })
+                                    //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
+
+                            } else if (value == 4) {
+
+                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#ffff66", fill: "#ffff66" })
+                                    //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
+
+                            } else if (value == 24) {
+
+                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#0000ff", fill: "#0000ff" })
+                                    //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
+
+                            } else if (value >= 255) {
+
+                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "red", fill: "red" })
+                                    //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
+                            } else {
+
+                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "39A0ED", fill: "red" })
+                                    //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
+                            }
+                        }
+                    }
                 }
             }
 

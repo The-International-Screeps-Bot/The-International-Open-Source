@@ -22,7 +22,7 @@ module.exports = {
                 const inSquad = creep.memory.inSquad
                 const assaulter = Game.creeps[creep.memory.assaulter]
 
-                let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 48 || creep.pos.y <= 0 || creep.pos.y >= 48)
+                let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
 
                 if (creep.memory.assaulter && !assaulter) {
 
@@ -105,7 +105,7 @@ module.exports = {
                 const inSquad = creep.memory.inSquad
                 const supporter = Game.creeps[creep.memory.supporter]
 
-                let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 48 || creep.pos.y <= 0 || creep.pos.y >= 48)
+                let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
 
                 let target
 
@@ -145,7 +145,7 @@ module.exports = {
                         }
                     })
 
-                    if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+                    if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
 
                         target = "closestHostile"
 
@@ -232,7 +232,7 @@ module.exports = {
                                     }
                                 })
 
-                                if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+                                if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
 
                                     target = "closestHostile"
 
@@ -374,7 +374,7 @@ module.exports = {
                                     }
                                 })
 
-                                if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+                                if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
 
                                     target = "closestHostile"
 
@@ -477,7 +477,7 @@ module.exports = {
                                     }
                                 })
 
-                                if (1 == 2 && closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 48 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 48)) {
+                                if (1 == 2 && closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
 
                                     target = "closestHostile"
 
@@ -609,7 +609,7 @@ module.exports = {
 
                 if (leader && member) {
 
-                    let leaderIsEdge = (leader.pos.x <= 0 || leader.pos.x >= 48 || leader.pos.y <= 0 || leader.pos.y >= 48)
+                    let leaderIsEdge = (leader.pos.x <= 0 || leader.pos.x >= 49 || leader.pos.y <= 0 || leader.pos.y >= 49)
                     let memberIsEdge = (member.pos.x <= 0 || member.pos.x >= 49 || member.pos.y <= 0 || member.pos.y >= 49)
 
                     const target = leader.memory.target = Memory.global.attackTarget
@@ -662,7 +662,7 @@ module.exports = {
                                 }
                             })
 
-                            let hostileIsEdge = (hostile.pos.x <= 0 || hostile.pos.x >= 48 || hostile.pos.y <= 0 || hostile.pos.y >= 48)
+                            let hostileIsEdge = (hostile.pos.x <= 0 || hostile.pos.x >= 49 || hostile.pos.y <= 0 || hostile.pos.y >= 49)
 
                             if (hostile && !hostileIsEdge) {
 
