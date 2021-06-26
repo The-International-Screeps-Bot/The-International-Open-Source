@@ -199,7 +199,7 @@ module.exports = {
                     let bases = ["OH", "ZK", "UL", "G"]
                     let minerals = ["H", "O", "U", "K", "L", "Z", "X"]
 
-                    if (terminal.room.controller.level >= 7) {
+                    if (room.controller.level >= 7) {
                         for (let resources of minerals) {
 
                             for (let resource of t3Boosts) {
@@ -235,15 +235,28 @@ module.exports = {
                                 }
                             }
                         }
-                        if (terminal.store[RESOURCE_POWER] < 6000) {
+                    }
 
-                            let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_POWER && order.price < avgPrice(RESOURCE_POWER) * 1.2 && order.amount >= (6000 - terminal.store.getUsedCapacity(RESOURCE_POWER)))
+                    if (room.controller.level == 8) {
 
-                            if (buyOrders[0]) {
+                        if (terminal.store[RESOURCE_POWER] < 5000 && findOrders(ORDER_SELL, resource).length > 0) {
 
-                                console.log("Found order for: " + RESOURCE_POWER + ", " + room + ", " + buyOrders[0]["id"] + ", " + buyOrders[0].amount)
-                                Game.market.deal(buyOrders[0]["id"], 6000 - terminal.store.getUsedCapacity([RESOURCE_POWER]), room.name)
+                            for (let order of findOrders(ORDER_SELL, resource)) {
 
+                                if (order && order.price >= avgPrice(resource) * 0.9) {
+
+                                    let buyAmount = 6000
+
+                                    if (order.amount < 6000) {
+
+                                        buyAmount = order.amount
+                                    }
+
+                                    Game.market.deal(order.id, buyAmount, room.name)
+
+                                    buyOrder = true
+                                    break
+                                }
                             }
                         }
                     }
