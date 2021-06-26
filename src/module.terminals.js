@@ -3,6 +3,7 @@ module.exports = {
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my && room.controller.level >= 1) {
 
+                // Find the avg price of a resource
                 function avgPrice(resource) {
 
                     let resourceHistory = Game.market.getHistory(resource)
@@ -24,6 +25,7 @@ module.exports = {
                     return avg
                 }
 
+                // Find orders for an order type and resource type
                 function findOrders(orderType, resourceType) {
 
                     let orders = Game.market.getAllOrders({ type: orderType, resourceType: resourceType })
@@ -40,6 +42,7 @@ module.exports = {
 
                     _.forEach(Game.market.orders, order => {
 
+                        // Delete all orders if requested
                         if (sellAll == true) {
 
                             console.log("Terminal is deleting it all")
@@ -48,6 +51,7 @@ module.exports = {
                         } else {
                             for (let resource in terminal.store) {
 
+                                // If not resources left remove the order, otherwise put the resource type in the black list
                                 if (order.remainingAmount == 0) {
 
                                     console.log("Terminal " + room.name + " wants to delete order for:" + resource)
@@ -89,12 +93,19 @@ module.exports = {
                                     }
                                 }
                             }
+
+                            // If no buy orders make a sell order
                             if (!buyOrder && orderBlacklist.indexOf(resource) == -1 && Object.keys(Game.market.orders).length < 300) {
 
                                 //console.log("Terminal " + room.name + " wants to make a sell order for: " + resource)
                                 Game.market.createOrder({ type: ORDER_SELL, resourceType: resource, price: avgPrice(resource) * 0.9, totalAmount: 10000, roomName: room.name });
                             }
                         }
+                    }
+
+                    if (Game.resource.pixels > 10) {
+
+                        Game.market.createOrder({ type: ORDER_SELL, resourceType: PIXEL, price: avgPrice(pixels) * 0.9, totalAmount: Game.resource.pixels, roomName: "E25N2" })
                     }
 
                     if (Memory.global.globalStage == 0 && Game.market.credits >= 100000 && terminal.store[RESOURCE_ENERGY] <= 100000 && room.controller.level <= 7) {
@@ -181,8 +192,6 @@ module.exports = {
                     }
 
                     let commodities = []
-
-                    let gameResources = ["XUH2O", "XUHO2", "XKH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2", "UH2O", "UHO2", "KH2O", "KHO2", "LH2O", "LHO2", "ZH2O", "ZHO2", "GH2O", "GHO2", "UH", "UO", "KH", "KO", "LH", "LO", "ZH", "ZO", "GH", "GO", "OH", "ZK", "UL", "G", "OH", "ZK", "UL", "G", "H", "O", "U", "K", "L", "Z", "X"]
 
                     let t3Boosts = ["XUH2O", "XUHO2", "XKH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2"]
                     let t2Boosts = ["UH2O", "UHO2", "KH2O", "KHO2", "LH2O", "LHO2", "ZH2O", "ZHO2", "GH2O", "GHO2"]
