@@ -51,7 +51,7 @@ module.exports = {
 
             var newCommune
 
-            var attackTarget = "E22N12"
+            var attackTarget = "E32N8"
 
             //var attackTarget
 
@@ -350,7 +350,7 @@ module.exports = {
 
                 if (attackingRoom && attackingRoom == room) {
 
-                    minCreeps["antifaAssaulter"] = 8
+                    minCreeps["antifaAssaulter"] = 4
                     minCreeps["antifaSupporter"] = minCreeps["antifaAssaulter"]
                 }
 

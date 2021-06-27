@@ -412,16 +412,42 @@ module.exports = {
                                     }
                                 } else {
 
-                                    let goal = _.map([creep.room.controller], function(target) {
-                                        return { pos: target.pos, range: 2 }
+                                    let closestHostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+                                        filter: (c) => {
+                                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                                        }
                                     })
 
-                                    if (creep.fatigue == 0 && supporter.fatigue == 0) {
+                                    if (closestHostileStructure) {
 
-                                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
+                                        if (creep.pos.getRangeTo(closestHostileStructure) < 1) {
+
+                                            let goal = _.map([closestHostileStructure], function(target) {
+                                                return { pos: target.pos, range: 1 }
+                                            })
+
+                                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                                                creep.intraRoomPathing(creep.pos, goal)
+                                            }
+
+                                            creep.rangedAttack(closestHostileStructure)
+                                        } else {
+
+                                            creep.rangedMassAttack()
+                                        }
+                                    } else {
+
+                                        let goal = _.map([creep.room.controller], function(target) {
+                                            return { pos: target.pos, range: 2 }
+                                        })
+
+                                        if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                                            creep.intraRoomPathing(creep.pos, goal)
+                                        }
                                     }
                                 }
-
                             } else {
 
                                 creep.say("RF")
