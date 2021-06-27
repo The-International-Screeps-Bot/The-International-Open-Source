@@ -31,8 +31,6 @@ module.exports = {
 
         let task = creep.memory.task
 
-        creep.say("🚬")
-
         if (task == "deliverFromStorage" && storage) {
 
             creep.say("DFS")
@@ -278,6 +276,8 @@ module.exports = {
                     creep.advancedTransfer(storage, resourceType)
                 }
             } else {
+
+                creep.say("🚬")
 
                 creep.memory.task = undefined
             }

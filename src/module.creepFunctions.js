@@ -1166,36 +1166,6 @@ Creep.prototype.creepFlee = function(origin, target) {
 
                             cm.set(x, y, 255)
                         }
-
-                        let value = cm.get(x, y)
-
-                        if (value) {
-
-                            if (value == 1) {
-
-                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "green", fill: "green" })
-                                    //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
-
-                            } else if (value == 4) {
-
-                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#ffff66", fill: "#ffff66" })
-                                    //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
-
-                            } else if (value == 24) {
-
-                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "#0000ff", fill: "#0000ff" })
-                                    //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
-
-                            } else if (value >= 255) {
-
-                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "red", fill: "red" })
-                                    //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
-                            } else {
-
-                                creep.room.visual.rect(x - 0.5, y - 0.5, 1, 1, { opacity: 0.2, stroke: "39A0ED", fill: "red" })
-                                    //room.visual.text((value).toFixed(0), x, y + 0.25, { font: 0.3 })
-                            }
-                        }
                     }
                 }
             }
