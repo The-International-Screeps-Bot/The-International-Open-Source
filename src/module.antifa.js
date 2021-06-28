@@ -412,7 +412,7 @@ module.exports = {
                                     }
                                 } else {
 
-                                    let closestHostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+                                    let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
                                         filter: (c) => {
                                             return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
                                         }
@@ -420,7 +420,11 @@ module.exports = {
 
                                     if (closestHostileStructure) {
 
-                                        if (creep.pos.getRangeTo(closestHostileStructure) < 1) {
+                                        if (creep.pos.getRangeTo(closestHostileStructure) <= 1) {
+
+                                            creep.rangedMassAttack()
+
+                                        } else {
 
                                             let goal = _.map([closestHostileStructure], function(target) {
                                                 return { pos: target.pos, range: 1 }
@@ -432,9 +436,6 @@ module.exports = {
                                             }
 
                                             creep.rangedAttack(closestHostileStructure)
-                                        } else {
-
-                                            creep.rangedMassAttack()
                                         }
                                     } else {
 
