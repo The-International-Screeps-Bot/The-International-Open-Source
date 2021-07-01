@@ -43,9 +43,9 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            // var newCommune = "E22N12"
+            var newCommune = "E22N12"
 
-            var newCommune
+            // var newCommune
 
             var attackTarget = "E32N8"
 
@@ -1038,8 +1038,8 @@ module.exports = {
                             stage: 1,
                             defaultParts: [],
                             defaultCost: 50,
-                            extraParts: [],
-                            extraCost: 0,
+                            extraParts: [WORK, MOVE],
+                            extraCost: 150,
                             sliceAmount: 10
                         }],
                         "antifaAssaulter")
@@ -1049,8 +1049,8 @@ module.exports = {
                             stage: 1,
                             defaultParts: [],
                             defaultCost: 50,
-                            extraParts: [],
-                            extraCost: 0,
+                            extraParts: [HEAL, MOVE],
+                            extraCost: 300,
                             sliceAmount: 2
                         }],
                         "antifaSupporter")
