@@ -497,7 +497,7 @@ module.exports = {
 
                                     if (closestHostileStructure) {
 
-                                        attackStructure(structure)
+                                        attackStructure(closestHostileStructure)
 
                                     } else {
 
