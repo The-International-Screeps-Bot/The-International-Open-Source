@@ -94,7 +94,7 @@ module.exports = {
             }
             if (Memory.global.establishedRooms == null || !Memory.global.establishedRooms) {
 
-                Memory.global.establishedRooms = 0
+                Memory.global.establishedRooms = []
             }
             if (Memory.global.hasBoosts == null || !Memory.global.hasBoosts) {
 
@@ -111,13 +111,13 @@ module.exports = {
                 Memory.global.globalStage = 0
             }
 
-            if (Memory.global.establishedRooms >= 10 && Memory.global.globalStage) {
+            if (Memory.global.establishedRooms.length >= 10 && Memory.global.globalStage) {
 
                 Memory.global.globalStage = 3
-            } else if (Memory.global.establishedRooms >= 3 && Memory.global.globalStage) {
+            } else if (Memory.global.establishedRooms.length >= 3 && Memory.global.globalStage) {
 
                 Memory.global.globalStage = 2
-            } else if (Memory.global.establishedRooms >= 1 && Memory.global.globalStage) {
+            } else if (Memory.global.establishedRooms.length >= 1 && Memory.global.globalStage) {
 
                 Memory.global.globalStage = 1
             } else if (Memory.global.globalStage) {
@@ -458,9 +458,9 @@ module.exports = {
 
                 function roomGlobal() {
 
-                    if (room.memory.stage == 8) {
+                    if (room.memory.stage == 8 && Memory.global.establishedRooms.indexOf(room) == -1) {
 
-                        Memory.global.establishedRooms += 1
+                        Memory.global.establishedRooms.push(room)
                     }
                 }
 
