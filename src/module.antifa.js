@@ -61,6 +61,8 @@ module.exports = {
                         }
                     } else {
 
+                        creep.say("NS")
+
                         let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
                             return { pos: target, range: 1 }
                         })
@@ -77,7 +79,7 @@ module.exports = {
 
                 } else {
 
-                    creep.say("NS")
+                    creep.say("NA")
 
                     let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
                         return { pos: target, range: 1 }
@@ -624,7 +626,7 @@ module.exports = {
                                         return { pos: target, range: 1 }
                                     })
 
-                                    creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
+                                    creep.intraRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                 }
                             }
                         } else {
@@ -637,7 +639,7 @@ module.exports = {
                                     return { pos: target, range: 1 }
                                 })
 
-                                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
+                                creep.intraRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
 
                             } else {
 
@@ -657,7 +659,7 @@ module.exports = {
                             return { pos: target, range: 1 }
                         })
 
-                        creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
+                        creep.intraRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
 
                     } else {
 

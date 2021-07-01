@@ -195,9 +195,11 @@ module.exports = {
                     Memory.global.lastDefence.room = room.name
                 }
 
-                let roomMineral = room.find(FIND_MINERALS).mineralAmount > 0
+                let roomMineral = room.find(FIND_MINERALS, {
+                    filter: s => s.mineralAmount > 0
+                })
 
-                let roomExtractor = room.find(FIND_STRUCTURES, {
+                let roomExtractor = room.find(FIND_MY_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_EXTRACTOR
                 })
 
@@ -514,7 +516,7 @@ module.exports = {
 
                         requiredCreeps[role] = minCreeps[role] - creepsOfRole[[role, room.name]]
 
-                        console.log(role + ", " + requiredCreeps[role] + ", " + room.name)
+                        //console.log(role + ", " + requiredCreeps[role] + ", " + room.name)
                     }
                 }
 
@@ -980,7 +982,6 @@ module.exports = {
                         sliceAmount: 24
                     }],
                     "robber")
-
 
                 let scoutBody = roleValues(
                     [{

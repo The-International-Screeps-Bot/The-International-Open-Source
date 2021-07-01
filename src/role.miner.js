@@ -1,31 +1,18 @@
 module.exports = {
     run: function(creep) {
 
-        creep.checkRoom()
+        let mineral = creep.room.find(FIND_MINERALS)[0]
 
-        let target = creep.pos.findClosestByRange(FIND_MINERALS)
-        let mineral = creep.memory.mineral = target.mineralType
+        creep.isFull()
 
-        if (creep.memory.mining == true && creep.carryCapacity == _.sum(creep.carry)) {
-
-            creep.memory.mining = false;
-
-        }
-
-        if (creep.memory.mining == false && 0 == _.sum(creep.carry)) {
-
-            creep.memory.mining = true;
-
-        }
-
-        if (creep.memory.mining == true) {
+        if (creep.memory.isFull == false) {
 
             creep.say("⛏️");
 
-            if (creep.harvest(target) == ERR_NOT_IN_RANGE) {
+            if (creep.harvest(mineral) == ERR_NOT_IN_RANGE) {
 
                 let origin = creep.pos
-                let goal = _.map([target], function(target) {
+                let goal = _.map([mineral], function(target) {
                     return { pos: target.pos, range: 1 }
                 })
 
@@ -33,18 +20,21 @@ module.exports = {
             }
         } else {
 
-            var terminal = creep.room.terminal
+            let terminal = creep.room.terminal
+            let storage = creep.room.storage
 
-            creep.say(_.sum(creep.store) + " " + mineral)
+            if (terminal && terminal.store.getUsedCapacity() < terminal.store.getCapacity()) {
 
-            if (terminal /* && _.sum(terminal.store) <= 250000*/ && creep.transfer(terminal, mineral) == ERR_NOT_IN_RANGE) {
+                creep.say("T")
 
-                let origin = creep.pos
-                let goal = _.map([terminal], function(target) {
-                    return { pos: target.pos, range: 1 }
-                })
+                creep.advancedTransfer(terminal, mineral.mineralType)
 
-                creep.intraRoomPathing(origin, goal)
+            } else if (storage && storage.store.getUsedCapacity() < storage.store.getCapacity()) {
+
+                creep.say("S")
+
+                creep.advancedTransfer(storage, mineral.mineralType)
+
             }
         }
 

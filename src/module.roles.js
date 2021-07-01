@@ -49,10 +49,13 @@ module.exports = {
                 }
 
                 try {
+
                     roles[creep.memory.role].run(creep)
+
                 } catch (err) {
 
-                    //creep.suicide()
+                    creep.say("Err")
+                        //creep.suicide()
                 }
 
                 cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)

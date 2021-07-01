@@ -92,10 +92,9 @@ module.exports = {
 
                 Memory.global = {}
             }
-            if (Memory.global.establishedRooms == null || !Memory.global.establishedRooms) {
 
-                Memory.global.establishedRooms = []
-            }
+            Memory.global.establishedRooms = []
+
             if (Memory.global.hasBoosts == null || !Memory.global.hasBoosts) {
 
                 Memory.global.hasBoosts = 0
@@ -107,20 +106,6 @@ module.exports = {
             }
 
             if (Memory.global.globalStage == null || !Memory.global.globalStage) {
-
-                Memory.global.globalStage = 0
-            }
-
-            if (Memory.global.establishedRooms.length >= 10 && Memory.global.globalStage) {
-
-                Memory.global.globalStage = 3
-            } else if (Memory.global.establishedRooms.length >= 3 && Memory.global.globalStage) {
-
-                Memory.global.globalStage = 2
-            } else if (Memory.global.establishedRooms.length >= 1 && Memory.global.globalStage) {
-
-                Memory.global.globalStage = 1
-            } else if (Memory.global.globalStage) {
 
                 Memory.global.globalStage = 0
             }
@@ -341,6 +326,7 @@ module.exports = {
 
                     let cm = new PathFinder.CostMatrix
 
+                    /*
                     let terrain = Game.map.getRoomTerrain(room.name)
 
                     for (var x = -1; x < 50; ++x) {
@@ -350,21 +336,22 @@ module.exports = {
 
                                 case 0:
 
-                                    cm.set(x, y, 4)
+                                    //cm.set(x, y, 4)
                                     break
 
                                 case TERRAIN_MASK_SWAMP:
 
-                                    cm.set(x, y, 24)
+                                    //cm.set(x, y, 24)
                                     break
 
                                 case TERRAIN_MASK_WALL:
 
-                                    cm.set(x, y, 255)
+                                    //cm.set(x, y, 255)
                                     break
                             }
                         }
                     }
+                    */
 
                     let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                         filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
@@ -458,9 +445,9 @@ module.exports = {
 
                 function roomGlobal() {
 
-                    if (room.memory.stage == 8 && Memory.global.establishedRooms.indexOf(room) == -1) {
+                    if (room.memory.stage == 8 && Memory.global.establishedRooms.indexOf(room.name) == -1) {
 
-                        Memory.global.establishedRooms.push(room)
+                        Memory.global.establishedRooms.push(room.name)
                     }
                 }
 
@@ -547,5 +534,22 @@ module.exports = {
 
         Memory.global.totalEnergy = totalEnergy
         Memory.data.totalEnergy = totalEnergy
+
+        if (Memory.global.establishedRooms.length >= 10) {
+
+            Memory.global.globalStage = 3
+
+        } else if (Memory.global.establishedRooms.length >= 3) {
+
+            Memory.global.globalStage = 2
+
+        } else if (Memory.global.establishedRooms.length >= 1) {
+
+            Memory.global.globalStage = 1
+
+        } else {
+
+            Memory.global.globalStage = 0
+        }
     }
 }
