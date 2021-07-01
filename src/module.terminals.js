@@ -69,7 +69,8 @@ module.exports = {
                     })
                     for (let resource in terminal.store) {
 
-                        if (terminal.store[resource] >= 20000) {
+                        if (terminal.store[resource] >= 20000 && orderBlacklist.indexOf(resource) == -1) {
+
                             let buyOrder
 
                             // First try to find a buy offer
@@ -95,7 +96,7 @@ module.exports = {
                             }
 
                             // If no buy orders make a sell order
-                            if (!buyOrder && orderBlacklist.indexOf(resource) == -1 && Object.keys(Game.market.orders).length < 300) {
+                            if (!buyOrder && Object.keys(Game.market.orders).length < 300) {
 
                                 //console.log("Terminal " + room.name + " wants to make a sell order for: " + resource)
                                 Game.market.createOrder({ type: ORDER_SELL, resourceType: resource, price: avgPrice(resource) * 0.9, totalAmount: 10000, roomName: room.name });
