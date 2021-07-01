@@ -39,17 +39,13 @@ module.exports = {
 
         let boostedSquads = false
 
-        let squadType = "ranged"
-
-        //let squadType = "dismantle"
-
-        //let squadType = "attack
+        let squadType = "dismantle" // May be rangedAttack attack and dismantle
 
         if (Game.shard.name == "shard2") {
 
-            var newCommune = "E21S1"
+            // var newCommune = "E22N12"
 
-            //var newCommune
+            var newCommune
 
             var attackTarget = "E32N8"
 
@@ -1044,7 +1040,7 @@ module.exports = {
                             defaultCost: 50,
                             extraParts: [],
                             extraCost: 0,
-                            sliceAmount: 50
+                            sliceAmount: 10
                         }],
                         "antifaAssaulter")
 
@@ -1055,7 +1051,7 @@ module.exports = {
                             defaultCost: 50,
                             extraParts: [],
                             extraCost: 0,
-                            sliceAmount: 50
+                            sliceAmount: 2
                         }],
                         "antifaSupporter")
                 }

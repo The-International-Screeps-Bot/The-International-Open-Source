@@ -30,6 +30,7 @@ module.exports = {
                     creep.memory.inSquad = false
                 }
                 if (assaulter) {
+
                     if (inSquad) {
 
                         creep.say("IS")
@@ -102,6 +103,7 @@ module.exports = {
             }
             for (let creep of antifaAssaulters) {
 
+                const squadType = creep.memory.squadType
                 const inSquad = creep.memory.inSquad
                 const supporter = Game.creeps[creep.memory.supporter]
 
@@ -109,7 +111,7 @@ module.exports = {
 
                 let target
 
-                function squadHeal(creep) {
+                function healCreep(injuredCreep) {
 
                     let closestInjured = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                         filter: (c) => {
@@ -137,7 +139,7 @@ module.exports = {
                     }
                 }
 
-                function squadHostile(creep) {
+                function attackHostile(hostile) {
 
                     let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                         filter: (c) => {
@@ -184,6 +186,66 @@ module.exports = {
                     }
                 }
 
+                function attackStructure(structure) {
+
+                    if (squadType == "attack") {
+
+                        if (creep.pos.getRangeTo(structure) <= 1) {
+
+                            creep.attack(structure)
+
+                        } else {
+
+                            let goal = _.map([structure], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
+
+                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                                creep.intraRoomPathing(creep.pos, goal)
+                            }
+                        }
+                    }
+                    if (squadType == "dismantle") {
+
+                        if (creep.pos.getRangeTo(structure) <= 1) {
+
+                            creep.dismantle(structure)
+
+                        } else {
+
+                            let goal = _.map([structure], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
+
+                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                                creep.intraRoomPathing(creep.pos, goal)
+                            }
+                        }
+                    }
+                    if (squadType == "rangedAttack") {
+
+                        if (creep.pos.getRangeTo(structure) <= 1) {
+
+                            creep.rangedMassAttack()
+
+                        } else {
+
+                            let goal = _.map([structure], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
+
+                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                                creep.intraRoomPathing(creep.pos, goal)
+                            }
+
+                            creep.rangedAttack(structure)
+                        }
+                    }
+                }
+
                 if (creep.memory.supporter && !supporter) {
 
                     creep.memory.supporter = undefined
@@ -191,6 +253,21 @@ module.exports = {
                 }
                 if (supporter) {
 
+                    if (!creep.memory.squadType) {
+
+                        if (creep.body.some(i => i.type === ATTACK)) {
+
+                            creep.memory.squadType = "attack"
+
+                        } else if (creep.body.some(i => i.type === WORK)) {
+
+                            creep.memory.squadType = "dismantle"
+
+                        } else if (creep.body.some(i => i.type === RANGED_ATTACK)) {
+
+                            creep.memory.squadType = "rangedAttack"
+                        }
+                    }
                     if (creep.room.name == creep.memory.roomFrom) {
 
                         if (inSquad) {
@@ -420,23 +497,8 @@ module.exports = {
 
                                     if (closestHostileStructure) {
 
-                                        if (creep.pos.getRangeTo(closestHostileStructure) <= 1) {
+                                        attackStructure(structure)
 
-                                            creep.rangedMassAttack()
-
-                                        } else {
-
-                                            let goal = _.map([closestHostileStructure], function(target) {
-                                                return { pos: target.pos, range: 1 }
-                                            })
-
-                                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
-
-                                                creep.intraRoomPathing(creep.pos, goal)
-                                            }
-
-                                            creep.rangedAttack(closestHostileStructure)
-                                        }
                                     } else {
 
                                         let goal = _.map([creep.room.controller], function(target) {
