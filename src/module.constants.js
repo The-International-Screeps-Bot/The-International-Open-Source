@@ -141,6 +141,7 @@ module.exports = {
                 spawns()
                 rooms()
                 costMatrixes()
+                roomGlobal()
                 terminals()
                 myResources()
                 hasBoosts()

@@ -446,9 +446,21 @@ module.exports = {
                     minCreeps["revolutionaryBuilder"] = 4
                 }
 
-                if (roomExtractor.length > 0 && roomMineral.length > 0 && Memory.global.globalStage >= 1) {
+                if (room.storage) {
 
-                    minCreeps["miner"] = 1
+                    if (room.storage.store[RESOURCE_ENERGY] >= 35000) {
+
+                        if (roomExtractor.length > 0 && roomMineral.length > 0 && Memory.global.globalStage >= 1) {
+
+                            minCreeps["miner"] = 1
+                        }
+                    }
+                } else {
+
+                    if (roomExtractor.length > 0 && roomMineral.length > 0 && Memory.global.globalStage >= 1) {
+
+                        minCreeps["miner"] = 1
+                    }
                 }
 
                 if (Game.flags.S) {
@@ -955,13 +967,6 @@ module.exports = {
                         extraParts: [WORK, WORK, MOVE, WORK, CARRY, MOVE],
                         extraCost: 450,
                         sliceAmount: 50
-                    }, {
-                        stage: 1,
-                        defaultParts: [],
-                        defaultCost: 0,
-                        extraParts: [WORK, WORK, MOVE, WORK, CARRY, MOVE],
-                        extraCost: 450,
-                        sliceAmount: 24
                     }],
                     "miner")
 
