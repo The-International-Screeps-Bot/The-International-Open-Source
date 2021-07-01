@@ -190,7 +190,7 @@ module.exports = {
                                     let tooClose = false
 
                                     for (let exit of exits) {
-                                        if (exit.getRangeTo(x, y) < 10) {
+                                        if (exit.getRangeTo(x, y) < 11) {
 
                                             tooClose = true
                                             break
