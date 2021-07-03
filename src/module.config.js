@@ -8,6 +8,14 @@ module.exports = {
 
         // Creep data
 
+        Memory.data.mineralsHarvested = 0
+
+        Memory.data.boostsProduced = 0
+
+        Memory.data.powerHarvested = 0
+
+        Memory.data.commoditiesHarvested = 0
+
         Memory.data.energyHarvested = 0
         Memory.data.energyHarvestedPerRoom = 0
 

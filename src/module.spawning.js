@@ -5,8 +5,7 @@ let allyList = require("module.allyList");
 module.exports = {
     run: function spawns() {
 
-        let rolesList = ["harvester1", "hauler", "harvester2", "upgrader", "builder", "repairer", "barricadeUpgrader", "rangedDefender", "upgradeHauler", "claimer", "revolutionaryBuilder", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
-        let remoteRoles = ["remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver"]
+        let rolesList = ["harvester1", "hauler", "harvester2", "upgrader", "builder", "repairer", "barricadeUpgrader", "rangedDefender", "upgradeHauler", "claimer", "revolutionaryBuilder", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
 
         let creepsOfRole = {}
         let haulers = []
@@ -43,13 +42,13 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            // var newCommune = "E22N12"
+            // var newCommune = "E32N8"
 
             var newCommune
 
-            var attackTarget = "E32N8"
+            //var attackTarget = "E32N8"
 
-            //var attackTarget
+            var attackTarget
 
         } else {
 
@@ -57,9 +56,9 @@ module.exports = {
 
             var newCommune
 
-            var attackTarget = "E29N11"
+            //var attackTarget = "E29N11"
 
-            // var attackTarget
+            var attackTarget
         }
 
         Memory.global.newCommune = newCommune
@@ -483,15 +482,15 @@ module.exports = {
                 for (let object of room.memory.remoteRooms) {
 
                     if (stage <= 2) {
-                        minCreeps["remoteHarvester1"] += object.sources
+                        //minCreeps["remoteHarvester1"] += object.sources
 
-                        minCreeps["remoteHarvester2"] += object.sources
+                        //minCreeps["remoteHarvester2"] += object.sources
 
-                        minCreeps["remoteHauler"] += object.sources
+                        //minCreeps["remoteHauler"] += object.sources
                     }
                     if (stage >= 3) {
 
-                        minCreeps["reserver"] += 1
+                        //minCreeps["reserver"] += 1
                     }
                 }
 
@@ -837,7 +836,7 @@ module.exports = {
                     }],
                     "remoteBuilder")
 
-                let remoteHarvesterBody = roleValues(
+                let remoteHarvester1Body = roleValues(
                     [{
                         stage: 5,
                         defaultParts: [],
@@ -853,7 +852,25 @@ module.exports = {
                         extraCost: 150,
                         sliceAmount: 16
                     }],
-                    "remoteHarvester")
+                    "remoteHarvester1")
+
+                let remoteHarvester2Body = roleValues(
+                    [{
+                        stage: 5,
+                        defaultParts: [],
+                        defaultCost: 0,
+                        extraParts: [WORK, WORK, MOVE],
+                        extraCost: 250,
+                        sliceAmount: 12
+                    }, {
+                        stage: 1,
+                        defaultParts: [],
+                        defaultCost: 0,
+                        extraParts: [WORK, MOVE],
+                        extraCost: 150,
+                        sliceAmount: 16
+                    }],
+                    "remoteHarvester2")
 
                 let remoteHaulerBody = roleValues(
                     [{
@@ -873,7 +890,7 @@ module.exports = {
                     }],
                     "remoteHauler")
 
-                let reserver = roleValues(
+                let reserverBody = roleValues(
                     [{
                         stage: 1,
                         defaultParts: [],
@@ -1062,7 +1079,7 @@ module.exports = {
                         "antifaSupporter")
                 }
 
-                let bodies = [harvester1Body, haulerBody, harvester2Body, upgraderBody, builderBody, repairerBody, barricadeUpgraderBody, rangedDefenderBody, upgradeHaulerBody, claimerBody, revolutionaryBuilderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
+                let bodies = [harvester1Body, haulerBody, harvester2Body, upgraderBody, builderBody, repairerBody, barricadeUpgraderBody, rangedDefenderBody, upgradeHaulerBody, claimerBody, revolutionaryBuilderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteHarvester1Body, remoteHaulerBody, remoteHarvester2Body, reserverBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
 
                 let i = 0
 
