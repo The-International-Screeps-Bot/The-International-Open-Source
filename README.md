@@ -70,4 +70,4 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [x] Operation of nukers
 - [ ] Automated use of nukers
 - [ ] Squads morph size shape and amount depending on situation
-- [ ] Squads flee when overwhelmed or avoiding range of enemy
+- [x] Squads flee when overwhelmed or avoiding range of enemy
