@@ -164,12 +164,11 @@ module.exports = {
 
                     } else {
 
-                        let origin = creep.pos
                         let goal = _.map([source2], function(target) {
                             return { pos: target.pos, range: 1 }
                         })
 
-                        creep.intraRoomPathing(origin, goal)
+                        creep.intraRoomPathing(creep.pos, goal)
 
                     }
                 }

@@ -13,7 +13,11 @@ module.exports = {
 
                     if (creep.enableRoom(creep.room.controller) == ERR_NOT_IN_RANGE) {
 
-                        creep.moveTo(creep.room.controller)
+                        let goal = _.map([creep.room.controller], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
+
+                        creep.intraRoomPathing(creep.pos, goal)
                     }
                 }
 

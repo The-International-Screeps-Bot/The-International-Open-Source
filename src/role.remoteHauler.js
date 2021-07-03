@@ -160,14 +160,17 @@ module.exports = {
                                 creep.advancedTransfer(structure)
                             } else {
 
-                                let spawns = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
+                                let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
 
                                 creep.say("S")
 
-                                if (!creep.pos.isNearTo(spawns)) {
+                                if (spawn && creep.pos.getRangeTo(spawn) > 1) {
 
-                                    creep.moveTo(spawns, { reusePath: 50 })
+                                    let goal = _.map([spawn], function(target) {
+                                        return { pos: target.pos, range: 1 }
+                                    })
 
+                                    creep.intraRoomPathing(creep.pos, goal)
                                 }
                             }
                         }

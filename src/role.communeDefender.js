@@ -59,7 +59,11 @@ module.exports = {
 
                 if (creep.attack(hostile) == ERR_NOT_IN_RANGE) {
 
-                    creep.moveTo(hostile)
+                    let goal = _.map([hostile], function(target) {
+                        return { pos: target.pos, range: 1 }
+                    })
+
+                    creep.intraRoomPathing(creep.pos, goal)
 
                 }
             } else if (hostileStructure) {
@@ -69,7 +73,11 @@ module.exports = {
 
                 if (creep.attack(hostileStructure) == ERR_NOT_IN_RANGE) {
 
-                    creep.moveTo(hostileStructure)
+                    let goal = _.map([hostileStructure], function(target) {
+                        return { pos: target.pos, range: 1 }
+                    })
+
+                    creep.intraRoomPathing(creep.pos, goal)
 
                 }
             } else {

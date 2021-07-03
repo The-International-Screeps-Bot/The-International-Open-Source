@@ -51,8 +51,11 @@ module.exports = {
                 }
                 if (creep.reserveController(controller) == ERR_NOT_IN_RANGE) {
 
-                    creep.moveTo(controller)
+                    let goal = _.map([controller], function(target) {
+                        return { pos: target.pos, range: 1 }
+                    })
 
+                    creep.intraRoomPathing(creep.pos, goal)
                 }
             } else {
 

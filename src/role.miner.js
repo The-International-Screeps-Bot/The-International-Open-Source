@@ -11,12 +11,11 @@ module.exports = {
 
             if (creep.harvest(mineral) == ERR_NOT_IN_RANGE) {
 
-                let origin = creep.pos
                 let goal = _.map([mineral], function(target) {
                     return { pos: target.pos, range: 1 }
                 })
 
-                creep.intraRoomPathing(origin, goal)
+                creep.intraRoomPathing(creep.pos, goal)
             }
         } else {
 

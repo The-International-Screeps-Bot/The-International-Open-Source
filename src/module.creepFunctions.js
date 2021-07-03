@@ -120,23 +120,6 @@ Creep.prototype.findEnergyHarvested = function(source) {
     creep.say("⛏️ " + energyHarvested)
     Memory.data.energyHarvested += energyHarvested
 }
-Creep.prototype.fleeHostileRoom = function() {
-
-    creep = this
-
-    if (creep.memory.roomFrom && creep.room.name != creep.memory.roomFrom) {
-
-        const route = Game.map.findRoute(creep.room.name, creep.memory.roomFrom);
-
-        if (route.length > 0) {
-
-            creep.say(creep.memory.roomFrom)
-
-            const exit = creep.pos.findClosestByRange(route[0].exit);
-            creep.moveTo(exit);
-        }
-    }
-}
 Creep.prototype.isFull = function() {
 
     creep = this
@@ -231,23 +214,6 @@ Creep.prototype.advancedTransfer = function(target, resource) {
         })
 
         creep.intraRoomPathing(origin, goal)
-    }
-}
-Creep.prototype.checkRoom = function() {
-
-    creep = this
-
-    if (creep.memory.roomFrom && creep.room.name != creep.memory.roomFrom) {
-
-        const route = Game.map.findRoute(creep.room.name, creep.memory.roomFrom);
-
-        if (route.length > 0) {
-
-            creep.say(creep.memory.roomFrom)
-
-            const exit = creep.pos.findClosestByRange(route[0].exit);
-            creep.moveTo(exit);
-        }
     }
 }
 Creep.prototype.repairBarricades = function(target) {

@@ -32,12 +32,11 @@ module.exports = {
 
                 } else {
 
-                    let origin = creep.pos
                     let goal = _.map([sourceContainer1], function(target) {
                         return { pos: target.pos, range: 0 }
                     })
 
-                    creep.intraRoomPathing(origin, goal)
+                    creep.intraRoomPathing(creep.pos, goal)
 
                 }
             } else if (source1 != null) {
@@ -54,12 +53,11 @@ module.exports = {
 
                 } else {
 
-                    let origin = creep.pos
                     let goal = _.map([source1], function(target) {
                         return { pos: target.pos, range: 1 }
                     })
 
-                    creep.intraRoomPathing(origin, goal)
+                    creep.intraRoomPathing(creep.pos, goal)
 
                 }
             }
@@ -91,12 +89,11 @@ module.exports = {
 
                 } else {
 
-                    let origin = creep.pos
                     let goal = _.map([sourceContainer2], function(target) {
                         return { pos: target.pos, range: 0 }
                     })
 
-                    creep.intraRoomPathing(origin, goal)
+                    creep.intraRoomPathing(creep.pos, goal)
 
                 }
             } else if (source2 != null) {
@@ -112,12 +109,11 @@ module.exports = {
 
                 } else {
 
-                    let origin = creep.pos
                     let goal = _.map([source2], function(target) {
                         return { pos: target.pos, range: 1 }
                     })
 
-                    creep.intraRoomPathing(origin, goal)
+                    creep.intraRoomPathing(creep.pos, goal)
 
                 }
             }
