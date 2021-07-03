@@ -39,7 +39,8 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [ ] Power bank collection
 - [ ] Commodity collection
 - [x] Automated scouting
-- [x] Factory operations
+- [x] Basic factory operations
+- [ ] Commodity factory opperations
 - [ ] Automated intel on enemies
 - [ ] Automated attacking
 - [ ] Different, functional room blueprints depending on room size and shape
@@ -66,5 +67,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [x] Make the task manager track and tell creeps what jobs to do
 - [ ] Track remote room attacks from enemy players and run logic to abolish it, defend it, or leave it as is
 - [ ] Create GCL temples if there is excess energy and proper globalStage
-- [ ] Operation of nukers
-- [ ] squads morph size shape and amount depending on situation
+- [x] Operation of nukers
+- [ ] Automated use of nukers
+- [ ] Squads morph size shape and amount depending on situation
+- [ ] Squads flee when overwhelmed or avoiding range of enemy
