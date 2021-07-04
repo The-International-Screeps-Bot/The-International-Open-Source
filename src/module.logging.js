@@ -99,6 +99,18 @@ module.exports = {
 
         }
 
+        function constructionSitesLength() {
+
+            let CSites = 0
+
+            for (let object in Game.constructionSites) {
+
+                CSites++
+            }
+
+            return CSites
+        }
+
         console.log('--------------------------------------------------------')
         console.log(`
             <table style="background: rgba(255, 255, 255, 0.1); padding: 6px; border-radius: 4px; width: 90vw; border-collapse: initial; box-shadow: rgba(0, 0, 0, 0.18) 0 12px 30px 0; overflow: hidden; font-family: 'Roboto', sans-serif; margin-left: 10px;">
@@ -137,7 +149,7 @@ module.exports = {
                 <tr>
                     ` + cpuMessage() + `
                     <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
-                    <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                    <th style="text-align: center; padding: 5px 0;">Time: ` + "CSites: " + constructionSitesLength() + `</th>
                     <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
                     <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Military Need: ` + "true / false" + `</th>
                 </tr>

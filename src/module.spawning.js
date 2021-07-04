@@ -42,7 +42,7 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            // var newCommune = "E32N8"
+            //var newCommune = "E39S1"
 
             var newCommune
 

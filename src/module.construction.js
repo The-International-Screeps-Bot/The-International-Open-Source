@@ -3,8 +3,9 @@ module.exports = {
         _.forEach(Game.rooms, function(room) {
 
             //destroySite()
-            //destroyRoad()
+            //removeAllSites()
             //destroyStructure()
+            //resetRoom
 
             function destroySite() {
 
@@ -19,18 +20,11 @@ module.exports = {
                 }
             }
 
-            function destroyRoad() {
+            function removeAllSites() {
 
-                let roads = room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_ROAD
-                })
+                for (let site in Game.constructionSites) {
 
-                if (room.name == "E25N13") {
-
-                    for (let road of roads) {
-
-                        road.destroy()
-                    }
+                    site.remove()
                 }
             }
 
@@ -47,6 +41,21 @@ module.exports = {
                 if (room.name == "E25N11") {
 
                     for (let structure of roads) {
+
+                        structure.destroy()
+                    }
+                }
+            }
+
+            function resetRoom() {
+
+                let structures = room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType != STRUCTURE_SPAWN
+                })
+
+                if (room.name == "E25N11") {
+
+                    for (let structure of structures) {
 
                         structure.destroy()
                     }
@@ -268,7 +277,7 @@ module.exports = {
 
                                         } else {
 
-                                            room.createConstructionSite(pos.x, pos.y, structureType);
+                                            room.createConstructionSite(pos.x, pos.y, structureType)
                                         }
 
 
@@ -335,12 +344,9 @@ module.exports = {
 
                                     if (room.getTerrain().get(pos.x, pos.y) != TERRAIN_MASK_WALL) {
 
-                                        if (room.memory.stage >= 5) {
+                                        if (room.memory.stage >= 4 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000) {
 
-
-                                        } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000) {
-
-                                            room.createConstructionSite(pos.x, pos.y, structureType);
+                                            room.createConstructionSite(pos.x, pos.y, structureType)
                                         }
 
                                         if (structureType == "rampart") {
