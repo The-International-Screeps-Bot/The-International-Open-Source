@@ -1,36 +1,7 @@
 const roleHauler = require("role.hauler")
 
 module.exports = {
-    /*
-    task manager manages haulers tasks. Task manager filters haulers in room and find jobs that need filling. Jobs are added to the que, and removed when a creep commits to a task. If a creep is doing a task and is asked for a more important task, it finishes the existing task first. Creeps have a primaryTask and a seoncdaryTask, primary task is what the creep is doing, secondary task is what the creep will do when done. when primaryTask is compelte, it becomes secondaryTask and secondary task becomes undefined.
-    */
-    /*
-    task manager also manages harvesters, telling harvesters sources they may pick, then having them subtracted when a harvester chooses one
-    */
     run: function taskManger(room, haulers) {
-
-        //for haulers:
-
-        /*
-        -if energy structures aren't full check if there is a baseLink and sourceContainers
-
-        -If so
-        */
-
-        function communeBuilders() {
-
-
-        }
-
-        function remoteHarvesters() {
-
-
-        }
-
-        function harvesters() {
-
-
-        }
 
         function findHaulersOfRoom() {
 
@@ -101,6 +72,7 @@ module.exports = {
             let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
             let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
             let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
+            let mineralContainer = Game.getObjectById(room.memory.mineralContainer)
 
             let controllerLink = Game.getObjectById(room.memory.controllerLink)
 
@@ -161,6 +133,14 @@ module.exports = {
                 if (!findCreepWithTask("fillPowerSpawn", 1) && findCreepWithoutTask()) {
 
                     findCreepWithoutTask().memory.task = "fillPowerSpawn"
+                }
+            }
+
+            if (mineralContainer != null && mineralContainer.store.getUsedCapacity() >= findHaulersOfRoom()[0].store.getCapacity()) {
+
+                if (!findCreepWithTask("mineralContainer", 1) && findCreepWithoutTask()) {
+
+                    findCreepWithoutTask().memory.task = "mineralContainer"
                 }
             }
         }

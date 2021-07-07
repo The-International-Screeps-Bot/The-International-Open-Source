@@ -1,11 +1,11 @@
-let taskManager = require("module.taskManager")
+let haulerManager = require("module.haulerManager")
 let trafficManager = require("module.trafficManager")
 let allyList = require("module.allyList");
 
 module.exports = {
     run: function spawns() {
 
-        let remoteRoomCreeps
+        let remoteCreepsOfRole = {}
 
         let rolesList = ["harvester1", "hauler", "harvester2", "upgrader", "builder", "repairer", "barricadeUpgrader", "rangedDefender", "upgradeHauler", "claimer", "revolutionaryBuilder", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
 
@@ -134,7 +134,7 @@ module.exports = {
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my) {
 
-                taskManager.run(room, haulers)
+                haulerManager.run(room, haulers)
 
                 /*Integral values for spawning considerations*/
 

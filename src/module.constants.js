@@ -154,11 +154,11 @@ module.exports = {
                     let source1 = Game.getObjectById(room.memory.source1)
                     let source2 = Game.getObjectById(room.memory.source2)
 
-                    if (source1 == null) {
+                    if (source1 == null && sources[0]) {
 
                         room.memory.source1 = sources[0].id
 
-                    } else if (source2 == null) {
+                    } else if (source2 == null && sources[1]) {
 
                         room.memory.source2 = sources[1].id
 
@@ -175,10 +175,12 @@ module.exports = {
 
                         let source1 = Game.getObjectById(room.memory.source1)
                         let source2 = Game.getObjectById(room.memory.source2)
+                        let mineral = room.find(FIND_MINERALS)[0]
 
                         let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
                         let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
                         let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
+                        let mineralContainer = Game.getObjectById(room.memory.mineralContainer)
 
                         if (controllerContainer == null && container.pos.inRangeTo(room.controller, 2)) {
 
@@ -192,6 +194,9 @@ module.exports = {
 
                             room.memory.sourceContainer2 = container.id
 
+                        } else if (mineralContainer == null && mineral && container.pos.inRangeTo(mineral, 1)) {
+
+                            room.memory.mineralContainer = container.id
                         }
                     }
                 }

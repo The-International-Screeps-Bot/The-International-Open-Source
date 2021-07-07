@@ -374,6 +374,7 @@ module.exports = {
                 let baseLink = Game.getObjectById(room.memory.baseLink)
                 let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
                 let controllerLink = Game.getObjectById(room.memory.controllerLink)
+                let mineralContainer = Game.getObjectById(room.memory.mineralContainer)
 
                 let source1 = Game.getObjectById(room.memory.source1)
                 let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
@@ -785,9 +786,9 @@ module.exports = {
 
                                 room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                             }
-                            if (normalValue && i + 1 == path.length) {
+                            if (mineralContainer == null && normalValue && i + 1 == path.length) {
 
-                                //room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
+                                room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                             }
                         }
                     }
