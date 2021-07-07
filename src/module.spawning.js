@@ -5,6 +5,8 @@ let allyList = require("module.allyList");
 module.exports = {
     run: function spawns() {
 
+        let remoteRoomCreeps
+
         let rolesList = ["harvester1", "hauler", "harvester2", "upgrader", "builder", "repairer", "barricadeUpgrader", "rangedDefender", "upgradeHauler", "claimer", "revolutionaryBuilder", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
 
         let creepsOfRole = {}
@@ -30,6 +32,11 @@ module.exports = {
             if (creep.memory.role == "hauler") {
 
                 haulers.push({ creep: creep, roomFrom: creep.memory.roomFrom })
+            }
+
+            if (creep.memory.remoteRoom) {
+
+                Memory.rooms[creep.memory.remoteRoom].creepsOfRole[creep.memory.role] += 1
             }
 
             let remoteCreepValues = 1
@@ -811,7 +818,7 @@ module.exports = {
                             defaultCost: 0,
                             extraParts: [WORK, CARRY, MOVE],
                             extraCost: 200,
-                            sliceAmount: 24
+                            sliceAmount: 18
                         },
                         {
                             stage: 1,
