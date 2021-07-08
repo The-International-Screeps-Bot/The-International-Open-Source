@@ -228,6 +228,36 @@ module.exports = {
                     task = "noDeliveryPossible"
                 }
             }
+        } else if (task == "mineralContainerFull" && mineralContainer != null) {
+
+            creep.say("MCF")
+
+            let mineralType = creep.room.find(FIND_MINERALS)[0].mineralType
+
+            creep.isFull()
+
+            if (creep.memory.isFull == false) {
+
+                creep.advancedWithdraw(mineralContainer, mineralType)
+            } else {
+
+                if (terminal && terminal.store.getUsedCapacity() <= terminal.store.getCapacity()) {
+
+                    if (creep.advancedTransfer(terminal, mineralType) == 0) {
+
+                        creep.memory.task = undefined
+                    }
+                } else if (storage && storage.store.getUsedCapacity() <= storage.store.getCapacity()) {
+
+                    if (creep.advancedTransfer(storage, mineralType) == 0) {
+
+                        creep.memory.task = undefined
+                    }
+                } else {
+
+                    task = "noDeliveryPossible"
+                }
+            }
         } else if (task == "fillPowerSpawn" && powerSpawn) {
 
             creep.say("FPS")
@@ -263,36 +293,6 @@ module.exports = {
                 } else {
 
                     creep.memory.task = "deliverToStorage"
-                }
-            }
-        } else if (task == "mineralContainerFull" && mineralContainer != null) {
-
-            creep.say("MCF")
-
-            let mineralType = creep.room.find(FIND_MINERALS)[0].mineralType
-
-            creep.isFull()
-
-            if (creep.memory.isFull == false) {
-
-                creep.advancedWithdraw(mineralContainer, mineralType)
-            } else {
-
-                if (terminal && terminal.store.getUsedCapacity() <= terminal.store.getCapacity()) {
-
-                    if (creep.advancedTransfer(terminal, mineralType) == 0) {
-
-                        creep.memory.task = undefined
-                    }
-                } else if (storage && storage.store.getUsedCapacity() <= storage.store.getCapacity()) {
-
-                    if (creep.advancedTransfer(storage, mineralType) == 0) {
-
-                        creep.memory.task = undefined
-                    }
-                } else {
-
-                    task = "noDeliveryPossible"
                 }
             }
         } else if ((!task || task == "deliverToStorage") && storage) {

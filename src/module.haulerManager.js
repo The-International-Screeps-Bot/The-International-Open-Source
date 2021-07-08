@@ -119,6 +119,14 @@ module.exports = {
                 }
             }
 
+            if (mineralContainer != null && mineralContainer.store.getUsedCapacity() >= findHaulersOfRoom()[0].store.getCapacity()) {
+
+                if (!findCreepWithTask("mineralContainerFull", 1) && findCreepWithoutTask()) {
+
+                    findCreepWithoutTask().memory.task = "mineralContainerFull"
+                }
+            }
+
             let powerSpawn = room.find(FIND_MY_STRUCTURES, {
                 filter: s => s.structureType == STRUCTURE_POWER_SPAWN
             })[0]
@@ -126,21 +134,13 @@ module.exports = {
             if (powerSpawn && (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) < powerSpawn.store.getCapacity(RESOURCE_ENERGY) * 0.5 ||
                     powerSpawn.store.getUsedCapacity(RESOURCE_POWER) < powerSpawn.store.getCapacity(RESOURCE_POWER) * 0.5) &&
                 ((terminal && terminal.store[RESOURCE_POWER] - 100 >= powerSpawn.store.getFreeCapacity(RESOURCE_POWER) &&
-                        terminal.store[RESOURCE_ENERGY] - 80000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY)) ||
+                        terminal.store[RESOURCE_ENERGY] - 75000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY)) ||
                     (storage && storage.store[RESOURCE_POWER] - 100 >= powerSpawn.store.getFreeCapacity(RESOURCE_POWER) &&
-                        storage.store[RESOURCE_ENERGY] - 150000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY)))) {
+                        storage.store[RESOURCE_ENERGY] - 145000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY)))) {
 
                 if (!findCreepWithTask("fillPowerSpawn", 1) && findCreepWithoutTask()) {
 
                     findCreepWithoutTask().memory.task = "fillPowerSpawn"
-                }
-            }
-
-            if (mineralContainer != null && mineralContainer.store.getUsedCapacity() >= findHaulersOfRoom()[0].store.getCapacity()) {
-
-                if (!findCreepWithTask("mineralContainerFull", 1) && findCreepWithoutTask()) {
-
-                    findCreepWithoutTask().memory.task = "mineralContainerFull"
                 }
             }
         }
