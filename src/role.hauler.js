@@ -19,7 +19,7 @@ module.exports = {
         let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
         let controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
 
-        let mineralContainer = Game.getObjectById(room.memory.mineralContainer)
+        let mineralContainer = Game.getObjectById(creep.room.memory.mineralContainer)
 
         let controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
 
