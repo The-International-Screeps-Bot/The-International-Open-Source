@@ -597,14 +597,15 @@ module.exports = {
                                 bodyTier++
                             }
 
-                            let bodyAmount = Math.floor((energyType - object.defaultCost) / object.extraCost)
+                            var bodyAmount = Math.floor((energyType - object.defaultCost) / object.extraCost)
+
+                            bodyTier = bodyAmount
 
                             if (bodyAmount != Infinity) {
 
                                 for (let i = 0; i < bodyAmount; i++) {
 
                                     body.push(object.extraParts)
-                                    bodyTier++
                                 }
                             }
                         }
@@ -987,7 +988,7 @@ module.exports = {
                         stage: 8,
                         defaultParts: [],
                         defaultCost: 0,
-                        extraParts: [WORK, WORK, MOVE, WORK, CARRY, MOVE],
+                        extraParts: [WORK, WORK, WORK, WORK, MOVE],
                         extraCost: 450,
                         sliceAmount: 50
                     }],
