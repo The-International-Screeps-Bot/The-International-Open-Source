@@ -776,6 +776,13 @@ module.exports = {
 
                 let builderBody = roleValues(
                     [{
+                            stage: 8,
+                            defaultParts: [],
+                            defaultCost: 0,
+                            extraParts: [WORK, CARRY, MOVE],
+                            extraCost: 200,
+                            sliceAmount: 36
+                        }, {
                             stage: 5,
                             defaultParts: [],
                             defaultCost: 0,
