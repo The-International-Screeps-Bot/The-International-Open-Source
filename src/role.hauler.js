@@ -269,22 +269,24 @@ module.exports = {
 
             creep.say("MCF")
 
+            let mineralType = creep.room.find(FIND_MINERALS)[0].mineralType
+
             creep.isFull()
 
             if (creep.memory.isFull == false) {
 
-                creep.advancedWithdraw(mineralContainer)
+                creep.advancedWithdraw(mineralContainer, mineralType)
             } else {
 
-                if (terminal && terminal.getUsedCapacity() <= terminal.store.getCapacity()) {
+                if (terminal && terminal.store.getUsedCapacity() <= terminal.store.getCapacity()) {
 
-                    if (creep.advancedTransfer(terminal) == 0) {
+                    if (creep.advancedTransfer(terminal, mineralType) == 0) {
 
                         creep.memory.task = undefined
                     }
-                } else if (storage && storage.getUsedCapacity() <= storage.store.getCapacity()) {
+                } else if (storage && storage.store.getUsedCapacity() <= storage.store.getCapacity()) {
 
-                    if (creep.advancedTransfer(storage) == 0) {
+                    if (creep.advancedTransfer(storage, mineralType) == 0) {
 
                         creep.memory.task = undefined
                     }

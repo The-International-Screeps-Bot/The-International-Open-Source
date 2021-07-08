@@ -140,7 +140,7 @@ module.exports = {
 
                 if (!findCreepWithTask("mineralContainerFull", 1) && findCreepWithoutTask()) {
 
-                    findCreepWithoutTask().memory.task = "mineralContainer"
+                    findCreepWithoutTask().memory.task = "mineralContainerFull"
                 }
             }
         }

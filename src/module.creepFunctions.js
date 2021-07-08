@@ -126,7 +126,7 @@ Creep.prototype.isFull = function() {
 
     if (creep.store.getUsedCapacity() == 0) {
 
-        creep.memory.isFull = false;
+        creep.memory.isFull = false
 
     } else if (creep.store.getUsedCapacity() == creep.store.getCapacity()) {
 

@@ -8,6 +8,17 @@ module.exports = {
                 let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
                 let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
+                /*
+                    if (sourceLink1 != null) {
+
+                        if (controllerLink != null) {
+
+                            if (room.controller.ticksToDowngrade <= 15000)
+                        }
+                    }
+                */
+
+
                 if (sourceLink1 != null && controllerLink != null && sourceLink1.store[RESOURCE_ENERGY] >= 790) {
 
                     if (Memory.global.globalStage > 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink.store[RESOURCE_ENERGY] <= 200) {
