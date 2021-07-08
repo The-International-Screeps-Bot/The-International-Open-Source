@@ -19,6 +19,8 @@ module.exports = {
         let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
         let controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
 
+        let mineralContainer = Game.getObjectById(room.memory.mineralContainer)
+
         let controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
 
         let droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
@@ -261,6 +263,34 @@ module.exports = {
                 } else {
 
                     creep.memory.task = "deliverToStorage"
+                }
+            }
+        } else if (task == "mineralContainerFull" && mineralContainer != null) {
+
+            creep.say("MCF")
+
+            creep.isFull()
+
+            if (creep.memory.isFull == false) {
+
+                creep.advancedWithdraw(mineralContainer)
+            } else {
+
+                if (terminal && terminal.getUsedCapacity() <= terminal.store.getCapacity()) {
+
+                    if (creep.advancedTransfer(terminal) == 0) {
+
+                        creep.memory.task = undefined
+                    }
+                } else if (storage && storage.getUsedCapacity() <= storage.store.getCapacity()) {
+
+                    if (creep.advancedTransfer(storage) == 0) {
+
+                        creep.memory.task = undefined
+                    }
+                } else {
+
+                    task = "noDeliveryPossible"
                 }
             }
         } else if ((!task || task == "deliverToStorage") && storage) {

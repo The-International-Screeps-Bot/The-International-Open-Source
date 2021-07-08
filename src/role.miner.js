@@ -3,21 +3,34 @@ module.exports = {
 
         let mineral = creep.room.find(FIND_MINERALS)[0]
 
+        let mineralContainer = Game.getObjectById(room.memory.mineralContainer)
+
         creep.isFull()
 
         if (creep.memory.isFull == false) {
 
             creep.say("⛏️");
 
-            if (creep.harvest(mineral) == ERR_NOT_IN_RANGE) {
+            if (mineralContainer != null && creep.pos.getRangeTo(mineralContainer) != 0) {
 
-                let goal = _.map([mineral], function(target) {
+                let goal = _.map([mineralContainer], function(target) {
                     return { pos: target.pos, range: 1 }
                 })
 
                 creep.intraRoomPathing(creep.pos, goal)
+
+            } else {
+
+                if (creep.harvest(mineral) == ERR_NOT_IN_RANGE) {
+
+                    let goal = _.map([mineral], function(target) {
+                        return { pos: target.pos, range: 1 }
+                    })
+
+                    creep.intraRoomPathing(creep.pos, goal)
+                }
             }
-        } else {
+        } else if (mineralContainer == null) {
 
             let terminal = creep.room.terminal
             let storage = creep.room.storage

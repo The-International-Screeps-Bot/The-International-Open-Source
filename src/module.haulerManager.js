@@ -138,7 +138,7 @@ module.exports = {
 
             if (mineralContainer != null && mineralContainer.store.getUsedCapacity() >= findHaulersOfRoom()[0].store.getCapacity()) {
 
-                if (!findCreepWithTask("mineralContainer", 1) && findCreepWithoutTask()) {
+                if (!findCreepWithTask("mineralContainerFull", 1) && findCreepWithoutTask()) {
 
                     findCreepWithoutTask().memory.task = "mineralContainer"
                 }

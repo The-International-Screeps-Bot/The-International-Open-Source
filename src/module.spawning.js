@@ -205,6 +205,8 @@ module.exports = {
                     filter: s => s.mineralAmount > 0
                 })
 
+                let mineralContainer = Game.getObjectById(room.memory.mineralContainer)
+
                 let roomExtractor = room.find(FIND_MY_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_EXTRACTOR
                 })
@@ -454,21 +456,9 @@ module.exports = {
                     minCreeps["revolutionaryBuilder"] = 4
                 }
 
-                if (room.storage) {
+                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 35000 && mineralContainer != null && roomExtractor.length > 0 && roomMineral.length > 0 && Memory.global.globalStage >= 1) {
 
-                    if (room.storage.store[RESOURCE_ENERGY] >= 35000) {
-
-                        if (roomExtractor.length > 0 && roomMineral.length > 0 && Memory.global.globalStage >= 1) {
-
-                            minCreeps["miner"] = 1
-                        }
-                    }
-                } else {
-
-                    if (roomExtractor.length > 0 && roomMineral.length > 0 && Memory.global.globalStage >= 1) {
-
-                        minCreeps["miner"] = 1
-                    }
+                    minCreeps["miner"] = 1
                 }
 
                 if (Game.flags.S) {
