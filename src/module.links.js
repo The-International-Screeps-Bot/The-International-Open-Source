@@ -14,7 +14,14 @@ module.exports = {
 
                     for (let link of collection) {
 
-                        if (link && link != null && link.store.getUsedCapacity() >= link.store.getCapacity() - 10) {
+                        if (link && link != null && link.store[RESOURCE_ENERGY] >= 790) {
+
+                            room.visual.circle(link.pos, {
+                                fill: 'transparent',
+                                radius: 0.8,
+                                stroke: '#FFD180',
+                                strokeWidth: 0.125
+                            })
 
                             return link
                         }
@@ -27,22 +34,22 @@ module.exports = {
 
                     if (controllerLink != null) {
 
-                        if (controllerLink.store.getUsedCapacity() < controllerLink.store.getCapacity() * 0.5 && room.controller.ticksToDowngrade <= 15000) {
+                        if (controllerLink.store[RESOURCE_ENERGY] < 400 && room.controller.ticksToDowngrade <= 15000) {
 
                             findFullLink().transferEnergy(controllerLink)
-                        } else if (Memory.global.globalStage > 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink.store[RESOURCE_ENERGY] < 200) {
-
-                            findFullLink().transferEnergy(controllerLink)
-
-                        } else if (Memory.global.globalStage == 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000 && controllerLink.store[RESOURCE_ENERGY] < 400) {
+                        } else if (Memory.global.globalStage > 0 && room.storage && room.storage.store.getUsedCapacity() >= 200000 && controllerLink.store[RESOURCE_ENERGY] < 200) {
 
                             findFullLink().transferEnergy(controllerLink)
 
-                        } else if (sourceLink1 != null && baseLink != null && baseLink.store[RESOURCE_ENERGY] <= 700) {
+                        } else if (Memory.global.globalStage == 0 && room.storage && room.storage.store.getUsedCapacity() >= 30000 && controllerLink.store[RESOURCE_ENERGY] < 400) {
+
+                            findFullLink().transferEnergy(controllerLink)
+
+                        } else if (baseLink != null && baseLink.store[RESOURCE_ENERGY] < 700) {
 
                             findFullLink().transferEnergy(baseLink)
                         }
-                    } else if (baseLink != null && baseLink.store.getUsedCapacity() < 700) {
+                    } else if (baseLink != null && baseLink.store[RESOURCE_ENERGY] < 700) {
 
                         findFullLink().transferEnergy(baseLink)
                     }
