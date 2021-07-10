@@ -87,10 +87,11 @@ module.exports = {
 
                     creep.memory.fillNukerGhodium = true
                 }
-                if (storage && storage.store[RESOURCE_ENERGY] >= 120000 && terminal.store[RESOURCE_ENERGY] < 120000) {
+                if (storage && storage.store[RESOURCE_ENERGY] >= 120000 && terminal.store[RESOURCE_ENERGY] < 120000 && terminal.store.getFreeCapacity() >= creep.store.getCapacity()) {
 
                     creep.memory.storageToTerminal = true
                 }
+
                 //if (storage && storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink != null && controllerLink.store[RESOURCE_ENERGY] <= 400) {
 
                 //creep.memory.transferControllerLink = true
