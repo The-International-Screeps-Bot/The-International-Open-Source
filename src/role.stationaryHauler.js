@@ -119,12 +119,12 @@ module.exports = {
 
                     if (creep.memory.isFull == true) {
 
-                        if (storage.store[RESOURCE_ENERGY] <= 210000) {
+                        if (storage.store[RESOURCE_ENERGY] <= 250000 && storage.store.getUsedCapacity() < storage.store.getCapacity() - 800) {
 
                             creep.transfer(storage, RESOURCE_ENERGY)
                             creep.memory.withdrawBaseLink = false
 
-                        } else if (terminal.store.getUsedCapacity() < 300000 - 800) {
+                        } else if (terminal.store.getUsedCapacity() < terminal.store.getCapacity() - 800) {
 
                             creep.transfer(terminal, RESOURCE_ENERGY)
                             creep.memory.withdrawBaseLink = false

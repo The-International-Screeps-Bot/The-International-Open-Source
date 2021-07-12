@@ -131,16 +131,22 @@ module.exports = {
                 filter: s => s.structureType == STRUCTURE_POWER_SPAWN
             })[0]
 
-            if (powerSpawn && (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) < powerSpawn.store.getCapacity(RESOURCE_ENERGY) * 0.5 ||
-                    powerSpawn.store.getUsedCapacity(RESOURCE_POWER) < powerSpawn.store.getCapacity(RESOURCE_POWER) * 0.5) &&
-                ((terminal && terminal.store[RESOURCE_POWER] - 100 >= powerSpawn.store.getFreeCapacity(RESOURCE_POWER) &&
-                        terminal.store[RESOURCE_ENERGY] - 75000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY)) ||
-                    (storage && storage.store[RESOURCE_POWER] - 100 >= powerSpawn.store.getFreeCapacity(RESOURCE_POWER) &&
-                        storage.store[RESOURCE_ENERGY] - 145000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY)))) {
+            if (powerSpawn && powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) < powerSpawn.store.getCapacity(RESOURCE_ENERGY) * 0.5 &&
+                (terminal && terminal.store[RESOURCE_ENERGY] - 70000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY)) ||
+                (storage && storage.store[RESOURCE_ENERGY] - 1450000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY))) {
 
-                if (!findCreepWithTask("fillPowerSpawn", 1) && findCreepWithoutTask()) {
+                if (!findCreepWithTask("fillPowerSpawnEnergy", 1) && findCreepWithoutTask()) {
 
-                    findCreepWithoutTask().memory.task = "fillPowerSpawn"
+                    findCreepWithoutTask().memory.task = "fillPowerSpawnEnergy"
+                }
+            }
+            if (powerSpawn && powerSpawn.store.getUsedCapacity(RESOURCE_POWER) < powerSpawn.store.getCapacity(RESOURCE_POWER) * 0.5 &&
+                (terminal && terminal.store[RESOURCE_POWER] - 70000 >= powerSpawn.store.getFreeCapacity(RESOURCE_POWER)) ||
+                (storage && storage.store[RESOURCE_POWER] - 1450000 >= powerSpawn.store.getFreeCapacity(RESOURCE_POWER))) {
+
+                if (!findCreepWithTask("fillPowerSpawnPower", 1) && findCreepWithoutTask()) {
+
+                    findCreepWithoutTask().memory.task = "fillPowerSpawnPower"
                 }
             }
         }

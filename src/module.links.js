@@ -54,39 +54,6 @@ module.exports = {
                         findFullLink().transferEnergy(baseLink)
                     }
                 }
-
-                /*
-                                if (sourceLink1 != null && controllerLink != null && sourceLink1.store[RESOURCE_ENERGY] >= 790) {
-
-                                    if (Memory.global.globalStage > 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink.store[RESOURCE_ENERGY] <= 200) {
-
-                                        sourceLink1.transferEnergy(controllerLink)
-
-                                    } else if (Memory.global.globalStage == 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000 && controllerLink.store[RESOURCE_ENERGY] <= 400) {
-
-                                        sourceLink1.transferEnergy(controllerLink)
-
-                                    } else if (sourceLink1 != null && baseLink != null && baseLink.store[RESOURCE_ENERGY] <= 700) {
-
-                                        sourceLink1.transferEnergy(baseLink)
-                                    }
-                                }
-                                if (sourceLink2 != null && controllerLink != null && sourceLink2.store[RESOURCE_ENERGY] >= 790) {
-
-                                    if (Memory.global.globalStage > 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink.store[RESOURCE_ENERGY] <= 200) {
-
-                                        sourceLink2.transferEnergy(controllerLink)
-
-                                    } else if (Memory.global.globalStage == 0 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000 && controllerLink.store[RESOURCE_ENERGY] <= 400) {
-
-                                        sourceLink2.transferEnergy(controllerLink)
-
-                                    } else if (sourceLink2 != null && baseLink != null && baseLink.store[RESOURCE_ENERGY] <= 700) {
-
-                                        sourceLink2.transferEnergy(baseLink)
-                                    }
-                                }
-                                */
             }
         })
     }

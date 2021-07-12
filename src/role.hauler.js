@@ -258,41 +258,50 @@ module.exports = {
                     task = "noDeliveryPossible"
                 }
             }
-        } else if (task == "fillPowerSpawn" && powerSpawn) {
+        } else if (task == "fillPowerSpawnEnergy" && powerSpawn) {
 
-            creep.say("FPS")
-
-            if (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) != powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
-
-                var resource = { type: RESOURCE_ENERGY, amount: powerSpawn.store.getCapacity(RESOURCE_ENERGY) - powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) }
-            } else {
-
-                var resource = { type: RESOURCE_POWER, amount: powerSpawn.store.getCapacity(RESOURCE_POWER) - powerSpawn.store.getUsedCapacity(RESOURCE_POWER) }
-            }
+            creep.say("FPSE")
 
             creep.hasResource()
 
             if (creep.memory.isFull == false) {
 
-                if (terminal && terminal.store[resource.type] >= resource.amount) {
+                if (terminal && terminal.store[RESOURCE_ENERGY] >= powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
 
-                    creep.advancedWithdraw(terminal, resource.type, resource.amount)
+                    creep.advancedWithdraw(terminal, RESOURCE_ENERGY)
 
-                } else if (storage && storage.store[resource.type] >= resource.amount) {
+                } else if (storage && storage.store[RESOURCE_ENERGY] >= powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
 
-                    creep.advancedWithdraw(storage, resource.type, resource.amount)
+                    creep.advancedWithdraw(storage, RESOURCE_ENERGY)
                 }
             } else {
 
-                if (creep.store.getUsedCapacity(resource.type) == creep.store.getUsedCapacity()) {
+                if (creep.advancedTransfer(powerSpawn, RESOURCE_ENERGY) == 0) {
 
-                    if (creep.advancedTransfer(powerSpawn, resource.type) == 0) {
+                    creep.memory.task = undefined
+                }
+            }
+        } else if (task == "fillPowerSpawnPower" && powerSpawn) {
 
-                        creep.memory.task = undefined
-                    }
-                } else {
+            creep.say("FPSP")
 
-                    creep.memory.task = "deliverToStorage"
+            creep.hasResource()
+
+            if (creep.memory.isFull == false) {
+
+                if (terminal && terminal.store[RESOURCE_ENERGY] >= powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
+
+                    creep.advancedWithdraw(terminal, RESOURCE_ENERGY)
+
+                } else if (storage && storage.store[RESOURCE_ENERGY] >= powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
+
+                    creep.advancedWithdraw(storage, RESOURCE_ENERGY)
+                }
+            } else {
+
+                if (creep.advancedTransfer(powerSpawn, RESOURCE_ENERGY) == 0) {
+
+                    creep.memory.task = undefined
                 }
             }
         } else if ((!task || task == "deliverToStorage") && storage) {
