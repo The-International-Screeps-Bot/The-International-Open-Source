@@ -268,11 +268,11 @@ module.exports = {
 
                 if (terminal && terminal.store[RESOURCE_ENERGY] >= powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
 
-                    creep.advancedWithdraw(terminal, RESOURCE_ENERGY)
+                    creep.advancedWithdraw(terminal, RESOURCE_ENERGY, powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY))
 
                 } else if (storage && storage.store[RESOURCE_ENERGY] >= powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
 
-                    creep.advancedWithdraw(storage, RESOURCE_ENERGY)
+                    creep.advancedWithdraw(storage, RESOURCE_ENERGY, powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY))
                 }
             } else {
 
@@ -289,17 +289,17 @@ module.exports = {
 
             if (creep.memory.isFull == false) {
 
-                if (terminal && terminal.store[RESOURCE_ENERGY] >= powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
+                if (terminal && terminal.store[RESOURCE_POWER] >= powerSpawn.store.getCapacity(RESOURCE_POWER)) {
 
-                    creep.advancedWithdraw(terminal, RESOURCE_ENERGY)
+                    creep.advancedWithdraw(terminal, RESOURCE_POWER, powerSpawn.store.getFreeCapacity(RESOURCE_POWER))
 
-                } else if (storage && storage.store[RESOURCE_ENERGY] >= powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
+                } else if (storage && storage.store[RESOURCE_POWER] >= powerSpawn.store.getCapacity(RESOURCE_POWER)) {
 
-                    creep.advancedWithdraw(storage, RESOURCE_ENERGY)
+                    creep.advancedWithdraw(storage, RESOURCE_POWER, powerSpawn.store.getFreeCapacity(RESOURCE_POWER))
                 }
             } else {
 
-                if (creep.advancedTransfer(powerSpawn, RESOURCE_ENERGY) == 0) {
+                if (creep.advancedTransfer(powerSpawn, RESOURCE_POWER) == 0) {
 
                     creep.memory.task = undefined
                 }

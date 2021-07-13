@@ -133,9 +133,9 @@ module.exports = {
 
             if (powerSpawn && (terminal || storage)) {
 
-                if (powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) < powerSpawn.store.getCapacity(RESOURCE_ENERGY) * 0.5 &&
-                    (terminal.store[RESOURCE_ENERGY] - 70000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY)) ||
-                    (storage.store[RESOURCE_ENERGY] - 1450000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY))) {
+                if (powerSpawn.store[RESOURCE_ENERGY] < (powerSpawn.store.getCapacity(RESOURCE_ENERGY) * 0.5) &&
+                    (terminal.store[RESOURCE_ENERGY] - 70000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY) ||
+                        storage.store[RESOURCE_ENERGY] - 1450000 >= powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY))) {
 
                     if (!findCreepWithTask("fillPowerSpawnEnergy", 1) && findCreepWithoutTask()) {
 
@@ -143,9 +143,9 @@ module.exports = {
                     }
                 }
 
-                if (powerSpawn.store.getUsedCapacity(RESOURCE_POWER) < powerSpawn.store.getCapacity(RESOURCE_POWER) * 0.5 &&
-                    (terminal.store[RESOURCE_POWER] >= powerSpawn.store.getFreeCapacity(RESOURCE_POWER)) ||
-                    (storage.store[RESOURCE_POWER] >= powerSpawn.store.getFreeCapacity(RESOURCE_POWER))) {
+                if (powerSpawn.store[RESOURCE_POWER] < (powerSpawn.store.getCapacity(RESOURCE_POWER) * 0.5) &&
+                    (terminal.store[RESOURCE_POWER] >= powerSpawn.store.getFreeCapacity(RESOURCE_POWER) ||
+                        storage.store[RESOURCE_POWER] >= powerSpawn.store.getFreeCapacity(RESOURCE_POWER))) {
 
                     if (!findCreepWithTask("fillPowerSpawnPower", 1) && findCreepWithoutTask()) {
 

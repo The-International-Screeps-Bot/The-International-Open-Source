@@ -3,43 +3,57 @@ module.exports = {
 
         creep.isFull()
 
-        if (creep.memory.isFull == true) {
+        if (creep.memory.isFull) {
 
-            let lowLogisticStructures = creep.room.find(FIND_STRUCTURES, {
-                filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits <= (s.hitsMax - creep.myParts("work") * 100)
-            })
+            let structure = Game.getObjectById(creep.memory.target)
 
-            if (lowLogisticStructures.length > 0) {
+            if (structure) {
 
-                let lowLogisticStructure = creep.pos.findClosestByRange(lowLogisticStructures)
+                creep.repairStructure(structure)
 
-                creep.repairStructure(lowLogisticStructure)
+            } else {
+
+                let lowLogisticStructures = creep.room.find(FIND_STRUCTURES, {
+                    filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits <= (s.hitsMax - creep.myParts("work") * 100)
+                })
+
+                if (lowLogisticStructures.length > 0) {
+
+                    let lowLogisticStructure = creep.pos.findClosestByRange(lowLogisticStructures)
+
+                    creep.memory.target = lowLogisticStructure.id
+                }
             }
         } else {
 
             let storage = creep.room.storage
 
-            if (storage) {
+            if (storage && storage.store[RESOURCE_ENERGY] >= 5000) {
 
-                creep.say("S 5k")
+                creep.say("S")
 
-                let target = storage
+                creep.advancedWithdraw(storage)
 
-                if (target.store[RESOURCE_ENERGY] >= 5000) {
-
-                    creep.advancedWithdraw(target)
-                }
             } else {
 
-                creep.searchSourceContainers()
+                let terminal = creep.room.terminal
 
-                if (creep.container != null && creep.container) {
+                if (terminal && terminal.store[RESOURCE_ENERGY] >= 5000) {
 
-                    creep.say("SC")
+                    creep.say("T")
 
-                    let target = creep.container
+                    creep.advancedWithdraw(terminal)
 
-                    creep.advancedWithdraw(target)
+                } else {
+
+                    creep.searchSourceContainers()
+
+                    if (creep.container) {
+
+                        creep.say("SC")
+
+                        creep.advancedWithdraw(creep.container)
+                    }
                 }
             }
         }

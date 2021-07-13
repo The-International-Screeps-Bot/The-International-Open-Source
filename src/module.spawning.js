@@ -616,7 +616,8 @@ module.exports = {
                     return {
                         body: body,
                         tier: bodyTier,
-                        role: role
+                        role: role,
+                        cost: cost
                     }
                 }
 

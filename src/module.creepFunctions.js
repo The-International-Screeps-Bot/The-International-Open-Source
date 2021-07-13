@@ -26,48 +26,18 @@ Creep.prototype.findRemoteRoom = function() {
 
 Creep.prototype.barricadesFindAndRepair = function() {
 
-        if (creep.memory.target) {
+    if (creep.memory.target) {
 
-            let barricade = Game.getObjectById(creep.memory.target)
+        let barricade = Game.getObjectById(creep.memory.target)
 
-            if (barricade.hits < barricade.hitsMax && barricade.hits < (creep.memory.quota + creep.myParts("work") * 1000)) {
+        if (barricade.hits < barricade.hitsMax && barricade.hits < (creep.memory.quota + creep.myParts("work") * 1000)) {
 
-                creep.repairBarricades(barricade)
-            } else {
-
-                creep.memory.target = undefined
-            }
+            creep.repairBarricades(barricade)
         } else {
 
-            var barricades = creep.room.find(FIND_STRUCTURES, {
-                filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
-            })
-
-            for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
-
-                let barricade = creep.room.find(FIND_STRUCTURES, {
-                    filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
-                })
-
-                if (barricade.length > 0) {
-
-                    barricade = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
-                    })
-
-                    creep.memory.target = barricade.id
-                    creep.memory.quota = quota
-
-                    return
-                } else {
-
-                    creep.say("No target")
-                }
-            }
+            creep.memory.target = undefined
         }
-    }
-    /*
-    Creep.prototype.barricadesFindAndRepair = function() {
+    } else {
 
         var barricades = creep.room.find(FIND_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
@@ -75,26 +45,29 @@ Creep.prototype.barricadesFindAndRepair = function() {
 
         for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
 
-            quota += creep.myParts("work") * 500
-
-            let barricade = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+            let barricade = creep.room.find(FIND_STRUCTURES, {
                 filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
             })
 
-            if (barricade) {
+            if (barricade.length > 0) {
 
-                creep.say(quota / 1000 + "k")
+                barricade = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                    filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
+                })
 
                 creep.repairBarricades(barricade)
 
-                return
+                creep.memory.target = barricade.id
+                creep.memory.quota = quota
+
+                break
             } else {
 
                 creep.say("No target")
             }
         }
     }
-    */
+}
 
 Creep.prototype.myParts = function(partType) {
 
@@ -119,6 +92,15 @@ Creep.prototype.findEnergyHarvested = function(source) {
 
     creep.say("⛏️ " + energyHarvested)
     Memory.data.energyHarvested += energyHarvested
+}
+Creep.prototype.findMineralsHarvested = function(mineral) {
+
+    creep = this
+
+    let mineralsHarvested = mineral.amount - mineral.amount + creep.myParts("work")
+
+    creep.say("⛏️ " + mineralsHarvested)
+    Memory.data.mineralsHarvested += mineralsHarvested
 }
 Creep.prototype.isFull = function() {
 

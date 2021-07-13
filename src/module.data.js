@@ -19,7 +19,31 @@ module.exports = {
             }
         })
 
+        // Per Room
+
+        Memory.data.mineralsHarvestedPerRoom = (Memory.data.mineralsHarvested / mySpawns * 100).toFixed(2)
+
+        Memory.data.boostsProducedPerRoom = (Memory.data.boostsProduced / mySpawns * 100).toFixed(2)
+
+        Memory.data.powerHarvestedPerRoom = (Memory.data.powerHarvested / mySpawns * 100).toFixed(2)
+
+        Memory.data.commoditiesHarvestedPerRoom = (Memory.data.commoditiesHarvested / mySpawns * 100).toFixed(2)
+
+        Memory.data.energyHarvestedPerRoom = (Memory.data.energyHarvested / mySpawns * 100).toFixed(2)
+
+        Memory.data.controlPointsPerRoom = (Memory.data.controlPoints / mySpawns * 100).toFixed(2)
+
+        Memory.data.energySpentOnConstructionPerRoom = (Memory.data.energySpentOnConstruction / mySpawns * 100).toFixed(2)
+
+        Memory.data.energySpentOnRepairsPerRoom = (Memory.data.energySpentOnRepairs / mySpawns * 100).toFixed(2)
+
+        Memory.data.energySpentOnBarricadesPerRoom = (Memory.data.energySpentOnBarricades / mySpawns * 100).toFixed(2)
+
+        Memory.data.energySpentOnCreepsPerRoom = (Memory.data.energySpentOnCreeps / mySpawns * 100).toFixed(2)
+
         Memory.data.timeSpentSpawningPerRoom = (Memory.data.timeSpentSpawning / mySpawns * 100).toFixed(2)
+
+        Memory.data.energySpentOnPowerPerRoom = (Memory.data.energySpentOnPower / mySpawns * 100).toFixed(2)
 
         //GENERAL
         Memory.data.globalStage = Memory.global.globalStage
