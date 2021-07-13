@@ -56,8 +56,24 @@ module.exports = {
 
                         creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 
-                        creep.advancedTransfer(essentialStructure)
+                        if (creep.advancedTransfer(essentialStructure) == 0) {
 
+                            let structureToMoveTo = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                                filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
+                                        s.structureType == STRUCTURE_SPAWN ||
+                                        s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
+                                    s.energy < s.energyCapacity && s.id != essentialStructure.id
+                            })
+
+                            if (structureToMoveTo) {
+
+                                let goal = _.map([structureToMoveTo], function(target) {
+                                    return { pos: target.pos, range: 1 }
+                                })
+
+                                creep.intraRoomPathing(creep.pos, goal)
+                            }
+                        }
                     } else {
 
                         if (creep.advancedTransfer(storage) == 0) {
@@ -103,9 +119,27 @@ module.exports = {
                     }
                 } else if (essentialStructure) {
 
+                    creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
+
                     if (creep.advancedTransfer(essentialStructure) == 0) {
 
                         creep.memory.task = undefined
+
+                        let structureToMoveTo = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
+                                    s.structureType == STRUCTURE_SPAWN ||
+                                    s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
+                                s.energy < s.energyCapacity && s.id != essentialStructure.id
+                        })
+
+                        if (structureToMoveTo) {
+
+                            let goal = _.map([structureToMoveTo], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
+
+                            creep.intraRoomPathing(creep.pos, goal)
+                        }
                     }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
 
@@ -149,9 +183,27 @@ module.exports = {
                     }
                 } else if (essentialStructure) {
 
+                    creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
+
                     if (creep.advancedTransfer(essentialStructure) == 0) {
 
                         creep.memory.task = undefined
+
+                        let structureToMoveTo = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
+                                    s.structureType == STRUCTURE_SPAWN ||
+                                    s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
+                                s.energy < s.energyCapacity && s.id != essentialStructure.id
+                        })
+
+                        if (structureToMoveTo) {
+
+                            let goal = _.map([structureToMoveTo], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
+
+                            creep.intraRoomPathing(creep.pos, goal)
+                        }
                     }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
 
@@ -201,9 +253,27 @@ module.exports = {
                     }
                 } else if (essentialStructure) {
 
+                    creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
+
                     if (creep.advancedTransfer(essentialStructure) == 0) {
 
                         creep.memory.task = undefined
+
+                        let structureToMoveTo = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
+                                    s.structureType == STRUCTURE_SPAWN ||
+                                    s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
+                                s.energy < s.energyCapacity && s.id != essentialStructure.id
+                        })
+
+                        if (structureToMoveTo) {
+
+                            let goal = _.map([structureToMoveTo], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
+
+                            creep.intraRoomPathing(creep.pos, goal)
+                        }
                     }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
 
