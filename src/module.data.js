@@ -21,29 +21,29 @@ module.exports = {
 
         // Per Room
 
-        Memory.data.mineralsHarvestedPerRoom = (Memory.data.mineralsHarvested / mySpawns * 100).toFixed(2)
+        Memory.data.mineralsHarvestedPerRoom = (Memory.data.mineralsHarvested / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.boostsProducedPerRoom = (Memory.data.boostsProduced / mySpawns * 100).toFixed(2)
+        Memory.data.boostsProducedPerRoom = (Memory.data.boostsProduced / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.powerHarvestedPerRoom = (Memory.data.powerHarvested / mySpawns * 100).toFixed(2)
+        Memory.data.powerHarvestedPerRoom = (Memory.data.powerHarvested / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.commoditiesHarvestedPerRoom = (Memory.data.commoditiesHarvested / mySpawns * 100).toFixed(2)
+        Memory.data.powerProcessedPerRoom = (Memory.data.powerProcessed / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.energyHarvestedPerRoom = (Memory.data.energyHarvested / mySpawns * 100).toFixed(2)
+        Memory.data.commoditiesHarvestedPerRoom = (Memory.data.commoditiesHarvested / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.controlPointsPerRoom = (Memory.data.controlPoints / mySpawns * 100).toFixed(2)
+        Memory.data.energyHarvestedPerRoom = (Memory.data.energyHarvested / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.energySpentOnConstructionPerRoom = (Memory.data.energySpentOnConstruction / mySpawns * 100).toFixed(2)
+        Memory.data.controlPointsPerRoom = (Memory.data.controlPoints / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.energySpentOnRepairsPerRoom = (Memory.data.energySpentOnRepairs / mySpawns * 100).toFixed(2)
+        Memory.data.energySpentOnConstructionPerRoom = (Memory.data.energySpentOnConstruction / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.energySpentOnBarricadesPerRoom = (Memory.data.energySpentOnBarricades / mySpawns * 100).toFixed(2)
+        Memory.data.energySpentOnRepairsPerRoom = (Memory.data.energySpentOnRepairs / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.energySpentOnCreepsPerRoom = (Memory.data.energySpentOnCreeps / mySpawns * 100).toFixed(2)
+        Memory.data.energySpentOnBarricadesPerRoom = (Memory.data.energySpentOnBarricades / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.timeSpentSpawningPerRoom = (Memory.data.timeSpentSpawning / mySpawns * 100).toFixed(2)
+        Memory.data.energySpentOnCreepsPerRoom = (Memory.data.energySpentOnCreeps / Memory.global.communes.length).toFixed(2)
 
-        Memory.data.energySpentOnPowerPerRoom = (Memory.data.energySpentOnPower / mySpawns * 100).toFixed(2)
+        Memory.data.energySpentOnPowerPerRoom = (Memory.data.energySpentOnPower / Memory.global.communes.length).toFixed(2)
 
         //GENERAL
 

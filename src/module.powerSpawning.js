@@ -10,6 +10,10 @@ module.exports = {
 
                 //Game.powerCreeps['1'].spawn(powerSpawn);
                 powerSpawn.processPower()
+
+                Memory.data.energySpentOnPower += 50
+
+                Memory.data.powerProcessed += 1
             }
         })
     }

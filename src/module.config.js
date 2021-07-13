@@ -14,6 +14,8 @@ module.exports = {
 
         Memory.data.powerHarvested = 0
 
+        Memory.data.powerProcessed = 0
+
         Memory.data.commoditiesHarvested = 0
 
         Memory.data.energyHarvested = 0
