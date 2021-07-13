@@ -7,7 +7,7 @@ module.exports = {
 
             let structure = Game.getObjectById(creep.memory.target)
 
-            if (structure) {
+            if (structure && structure.hits < (structure.hitsMax - creep.myParts("work") * 100)) {
 
                 creep.repairStructure(structure)
 
