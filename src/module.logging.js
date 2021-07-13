@@ -48,7 +48,7 @@ module.exports = {
 
         function energyAmount() {
 
-            let energyAmount = `<th style="text-align: center; padding: 5px 0; color: #FFD180;">Total Energy: ` + (Memory.data.totalEnergy / 1000).toFixed(0) + "k" + `</th>`
+            let energyAmount = `<th style="text-align: center; padding: 5px 0; color: #FFD180;">Total Energy: ` + (Memory.global.totalEnergy / 1000).toFixed(0) + "k" + `</th>`
             return energyAmount
         }
 

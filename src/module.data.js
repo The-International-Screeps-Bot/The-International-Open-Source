@@ -46,30 +46,41 @@ module.exports = {
         Memory.data.energySpentOnPowerPerRoom = (Memory.data.energySpentOnPower / mySpawns * 100).toFixed(2)
 
         //GENERAL
+
         Memory.data.globalStage = Memory.global.globalStage
+
         Memory.data.communes = Memory.global.communes.length
+
         Memory.data.establishedRooms = Memory.global.establishedRooms
+
         Memory.data.totalCreeps = Object.keys(Memory.creeps).length
+
         Memory.data.creepsPerRoom = (Object.keys(Memory.creeps).length / Memory.global.communes.length).toFixed(2)
 
         //ECONOMY
+
         Memory.data.totalEnergy = Memory.global.totalEnergy
+
         Memory.data.marketOrders = Object.keys(Game.market.orders).length
-        Memory.data.credits = Game.market.credits.toFixed(2)
+
+        Memory.data.credits = (Game.market.credits).toFixed(2)
 
         //CPU
         Memory.data.cpuBucket = Game.cpu.bucket
 
-        //CONTROL POINTS
-        Memory.data.gcl = Game.gcl.level
-        Memory.data.gclPercent = (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2)
-
-        //SPECIFIC
-        Memory.data.cpuPerCreep = 0
         Memory.data.cpuPerCommune = (Memory.data.cpuUsage / Memory.global.communes.length).toFixed(2)
 
         Memory.data.memoryUsed = Math.floor(RawMemory.get().length / 1000)
 
-        Memory.data.credits = (Game.market.credits).toFixed(0)
+        Memory.data.cpuPerCreep = (Memory.data.cpuUsage / Memory.data.totalCreeps).toFixed(2)
+
+        //GCL
+
+        Memory.data.gcl = Game.gcl.level
+
+        Memory.data.gclPercent = (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2)
+
+        //SPECIFIC
+
     }
 }
