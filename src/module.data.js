@@ -13,7 +13,7 @@ module.exports = {
 
                     if (spawn.spawning) {
 
-                        Memory.data.timeSpentSpawning += 1
+                        Memory.data.timeSpentSpawningPerRoom += 1
                     }
                 }
             }
