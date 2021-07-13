@@ -241,13 +241,13 @@ module.exports = {
                 creep.advancedWithdraw(mineralContainer, mineralType)
             } else {
 
-                if (terminal && terminal.store.getUsedCapacity() <= terminal.store.getCapacity()) {
+                if (terminal && terminal.store.getUsedCapacity() <= (terminal.store.getCapacity() - creep.store.getUsedCapacity())) {
 
                     if (creep.advancedTransfer(terminal, mineralType) == 0) {
 
                         creep.memory.task = undefined
                     }
-                } else if (storage && storage.store.getUsedCapacity() <= storage.store.getCapacity()) {
+                } else if (storage && storage.store.getUsedCapacity() <= (storage.store.getCapacity() - creep.store.getUsedCapacity())) {
 
                     if (creep.advancedTransfer(storage, mineralType) == 0) {
 
