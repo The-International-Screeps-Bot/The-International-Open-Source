@@ -568,9 +568,9 @@ module.exports = {
                 function roleValues(parts, role) {
 
                     let body = []
-                    let bodyTier = 1
-                    let sliceAmount
-                    let cost
+                    let bodyTier = 0
+                    let sliceAmount = 0
+                    let cost = 0
 
                     for (let object of parts) {
 

@@ -97,7 +97,7 @@ Creep.prototype.findMineralsHarvested = function(mineral) {
 
     creep = this
 
-    let mineralsHarvested = mineral.amount - mineral.amount + creep.myParts("work")
+    let mineralsHarvested = mineral.mineralAmount - mineral.mineralAmount + creep.myParts("work")
 
     creep.say("⛏️ " + mineralsHarvested)
     Memory.data.mineralsHarvested += mineralsHarvested
