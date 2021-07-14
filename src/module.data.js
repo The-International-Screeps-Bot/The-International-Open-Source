@@ -13,13 +13,15 @@ module.exports = {
 
                     if (spawn.spawning) {
 
-                        Memory.data.timeSpentSpawningPerRoom += 1
+                        Memory.data.timeSpentSpawning += 1
                     }
                 }
             }
         })
 
         // Per Room
+
+        Memory.data.timeSpentSpawningPerRoom = (Memory.data.timeSpentSpawning / Memory.global.communes.length).toFixed(2)
 
         Memory.data.mineralsHarvestedPerRoom = (Memory.data.mineralsHarvested / Memory.global.communes.length).toFixed(2)
 

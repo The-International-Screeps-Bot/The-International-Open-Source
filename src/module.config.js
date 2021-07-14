@@ -30,7 +30,7 @@ module.exports = {
 
         // Other data
 
-        Memory.data.timeSpentSpawningPerRoom = 0
+        Memory.data.timeSpentSpawning = 0
 
         Memory.data.energySpentOnCreeps = 0
 
