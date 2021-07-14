@@ -5,11 +5,13 @@ let allyList = require("module.allyList");
 module.exports = {
     run: function spawns() {
 
-        let remoteCreepsOfRole = {}
+        let remoteRoles = ["remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver"]
 
         let rolesList = ["harvester1", "hauler", "harvester2", "upgrader", "builder", "repairer", "barricadeUpgrader", "rangedDefender", "upgradeHauler", "claimer", "revolutionaryBuilder", "miner", "scientist", "robber", "scout", "stationaryHauler", "communeDefender", "remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
 
+        let creepsOfRemoteRole = {}
         let creepsOfRole = {}
+
         let haulers = []
 
         for (let name in Game.creeps) {
@@ -18,7 +20,7 @@ module.exports = {
 
             if (creep.memory.dying != true) {
 
-                let creepValues = _.chunk([creep.memory.role, creep.memory.roomFrom], 2)
+                let creepValues = [creep.memory.role, creep.memory.roomFrom]
 
                 if (!creepsOfRole[creepValues]) {
 
@@ -27,19 +29,25 @@ module.exports = {
 
                     creepsOfRole[creepValues]++
                 }
+
+                if (creep.memory.remoteRoom) {
+
+                    let remoteCreepValues = [creep.memory.role, creep.memory.remoteRoom]
+
+                    if (!creepsOfRemoteRole[remoteCreepValues]) {
+
+                        creepsOfRemoteRole[remoteCreepValues] = 1
+                    } else {
+
+                        creepsOfRemoteRole[remoteCreepValues]++
+                    }
+                }
             }
 
             if (creep.memory.role == "hauler") {
 
                 haulers.push({ creep: creep, roomFrom: creep.memory.roomFrom })
             }
-
-            if (creep.memory.remoteRoom) {
-
-                Memory.rooms[creep.memory.remoteRoom].creepsOfRole[creep.memory.role] += 1
-            }
-
-            let remoteCreepValues = 1
         }
 
 
@@ -178,6 +186,18 @@ module.exports = {
                     }
                 }
 
+                for (let role of remoteRoles) {
+
+                    for (let remoteRoom of room.memory.remoteRooms) {
+
+                        if (!creepsOfRemoteRole[[role, remoteRoom.name]]) {
+
+                            creepsOfRemoteRole[[role, remoteRoom.name]] = 0
+                        }
+                    }
+                }
+
+
                 if (room.memory.stage && room.memory.stage < 3) {
 
                     var hostile = room.find(FIND_HOSTILE_CREEPS, {
@@ -230,13 +250,7 @@ module.exports = {
                 let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
                 let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
-                let remoteRooms = room.memory.remoteRooms
-                let remoteRoomsNumber = 0
-
-                if (remoteRooms) {
-
-                    remoteRoomsNumber = room.memory.remoteRooms.length
-                }
+                let remoteRoomsAmount = room.memory.remoteRooms.length
 
                 let stage = room.memory.stage
 
@@ -436,7 +450,7 @@ module.exports = {
                     minCreeps["rangedDefender"] = 2
                 }
 
-                if (Game.flags.R && stage >= 4 /**/ ) {
+                if (Game.flags.R && stage >= 4) {
 
                     minCreeps["robber"] = 2
                 }
@@ -479,15 +493,22 @@ module.exports = {
                 for (let object of room.memory.remoteRooms) {
 
                     if (stage <= 2) {
-                        //minCreeps["remoteHarvester1"] += object.sources
 
-                        //minCreeps["remoteHarvester2"] += object.sources
+                        minCreeps["remoteHarvester1"] += object.sources * 2
 
-                        //minCreeps["remoteHauler"] += object.sources
+                        minCreeps["remoteHarvester2"] += object.sources * 2
+
+                        minCreeps["remoteHauler"] += object.sources * 2
                     }
                     if (stage >= 3) {
 
-                        //minCreeps["reserver"] += 1
+                        minCreeps["reserver"] += 1
+
+                        minCreeps["remoteHarvester1"] += object.sources
+
+                        minCreeps["remoteHarvester2"] += object.sources
+
+                        minCreeps["remoteHauler"] += object.sources * 2
                     }
                 }
 
@@ -512,7 +533,7 @@ module.exports = {
 
                         requiredCreeps[role] = minCreeps[role] - creepsOfRole[[role, room.name]]
 
-                        //console.log(role + ", " + requiredCreeps[role] + ", " + room.name)
+                        //console.log(role +", "+ requiredCreeps[role] +", "+ room.name)
                     }
                 }
 
@@ -538,34 +559,45 @@ module.exports = {
                     room.memory.roomFix = false
                 }
 
-                /*
-                                var myRamparts = spawn.room.find(FIND_MY_STRUCTURES, {
-                                    filter: (s) => s.structureType == STRUCTURE_RAMPART
-                          })      
-        
-                        if (myRamparts && ally.length > 0) {
-        
-                            for (let rampart of myRamparts) {
-        
-                                    rampart.setPublic(true)
-        
-                            }
-                              }  
-                                else {
-                                    for (let rampart of myRamparts) {
-                                        
-                                            rampart.setPublic(false)
-                                            
-                            }        
-                             }   
-                                */
+                // Remote room creep requirements
+
+                if (!requiredRemoteCreeps) {
+
+                    var requiredRemoteCreeps = {}
+                }
+
+                for (let role of remoteRoles) {
+
+                    for (let remoteRoom of room.memory.remoteRooms) {
+
+                        if (Math.round(minCreeps[role] / remoteRoomsAmount) > creepsOfRemoteRole[[role, remoteRoom.name]]) {
+
+                            requiredRemoteCreeps[[role, remoteRoom.name]] = Math.round(minCreeps[role] / remoteRoomsAmount) - creepsOfRemoteRole[[role, remoteRoom.name]]
+
+                            //console.log(role + ", " + requiredRemoteCreeps[[role, remoteRoom.name]] + ", " + remoteRoom.name)
+                        }
+                    }
+                }
+
+                function findRemoteRoom(role) {
+
+                    for (let remoteRoom of room.memory.remoteRooms) {
+
+                        if (requiredRemoteCreeps[[role, remoteRoom.name]] > 0) {
+
+                            return remoteRoom.name
+                        }
+                    }
+
+                    return false
+                }
 
                 /*Creep spawn variables*/
 
                 let freeEnergy = room.energyAvailable
                 let capacityEnergy = room.energyCapacityAvailable
 
-                function roleValues(parts, role) {
+                function roleValues(parts, role, memoryAdditions) {
 
                     let body = []
                     let bodyTier = 0
@@ -613,10 +645,18 @@ module.exports = {
 
                     body = _.flattenDeep(body).slice(0, sliceAmount)
 
+                    let memory = { role: role, roomFrom: room.name }
+
+                    for (let property of Object.keys(memoryAdditions)) {
+
+                        memory[property] = memoryAdditions[property]
+                    }
+
                     return {
                         body: body,
                         tier: bodyTier,
                         role: role,
+                        memory: { memory },
                         cost: cost
                     }
                 }
@@ -646,7 +686,7 @@ module.exports = {
                             sliceAmount: 50
                         }
                     ],
-                    "hauler")
+                    "hauler", {})
 
                 let harvester1Body = roleValues(
                     [{
@@ -682,7 +722,7 @@ module.exports = {
                             sliceAmount: 9
                         }
                     ],
-                    "harvester1")
+                    "harvester1", {})
 
                 let harvester2Body = roleValues(
                     [{
@@ -718,7 +758,7 @@ module.exports = {
                             sliceAmount: 9
                         }
                     ],
-                    "harvester2")
+                    "harvester2", {})
 
                 let upgraderBody = roleValues(
                     [{
@@ -754,7 +794,7 @@ module.exports = {
                             sliceAmount: 25
                         }
                     ],
-                    "upgrader")
+                    "upgrader", {})
 
                 let repairerBody = roleValues(
                     [{
@@ -774,7 +814,7 @@ module.exports = {
                             sliceAmount: 24
                         }
                     ],
-                    "repairer")
+                    "repairer", {})
 
                 let builderBody = roleValues(
                     [{
@@ -801,7 +841,7 @@ module.exports = {
                             sliceAmount: 24
                         }
                     ],
-                    "builder")
+                    "builder", {})
 
                 let barricadeUpgraderBody = roleValues(
                     [{
@@ -829,7 +869,7 @@ module.exports = {
                         }
                     ],
                     "barricadeUpgrader",
-                    "BaU")
+                    "BaU", {})
 
                 let remoteBuilderBody = roleValues(
                     [{
@@ -840,7 +880,7 @@ module.exports = {
                         extraCost: 250,
                         sliceAmount: 24
                     }],
-                    "remoteBuilder")
+                    "remoteBuilder", {})
 
                 let remoteHarvester1Body = roleValues(
                     [{
@@ -858,7 +898,9 @@ module.exports = {
                         extraCost: 150,
                         sliceAmount: 16
                     }],
-                    "remoteHarvester1")
+                    "remoteHarvester1", {
+                        remoteRoom: findRemoteRoom("remoteHarvester1")
+                    })
 
                 let remoteHarvester2Body = roleValues(
                     [{
@@ -876,7 +918,9 @@ module.exports = {
                         extraCost: 150,
                         sliceAmount: 16
                     }],
-                    "remoteHarvester2")
+                    "remoteHarvester2", {
+                        remoteRoom: findRemoteRoom("remoteHarvester2")
+                    })
 
                 let remoteHaulerBody = roleValues(
                     [{
@@ -894,7 +938,9 @@ module.exports = {
                         extraCost: 100,
                         sliceAmount: 50
                     }],
-                    "remoteHauler")
+                    "remoteHauler", {
+                        remoteRoom: findRemoteRoom("remoteHauler")
+                    })
 
                 let reserverBody = roleValues(
                     [{
@@ -905,7 +951,9 @@ module.exports = {
                         extraCost: 700,
                         sliceAmount: 6
                     }],
-                    "reserver")
+                    "reserver", {
+                        remoteRoom: findRemoteRoom("reserver")
+                    })
 
                 let communeDefenderBody = roleValues(
                     [{
@@ -916,7 +964,7 @@ module.exports = {
                         extraCost: 130,
                         sliceAmount: 24
                     }],
-                    "communeDefender")
+                    "communeDefender", {})
 
                 let revolutionaryBuilderBody = roleValues(
                     [{
@@ -927,7 +975,7 @@ module.exports = {
                         extraCost: 250,
                         sliceAmount: 24
                     }],
-                    "revolutionaryBuilder")
+                    "revolutionaryBuilder", {})
 
                 let claimerBody = roleValues(
                     [{
@@ -938,7 +986,7 @@ module.exports = {
                         extraCost: 0,
                         sliceAmount: 3
                     }],
-                    "claimer")
+                    "claimer", {})
 
                 let rangedDefenderBody = roleValues(
                     [{
@@ -949,7 +997,7 @@ module.exports = {
                         extraCost: 220,
                         sliceAmount: 50
                     }],
-                    "rangedDefender")
+                    "rangedDefender", {})
 
                 let scientistBody = roleValues(
                     [{
@@ -960,7 +1008,7 @@ module.exports = {
                         extraCost: 0,
                         sliceAmount: 8
                     }],
-                    "scientist")
+                    "scientist", {})
 
                 let stationaryHaulerBody = roleValues(
                     [{
@@ -971,7 +1019,7 @@ module.exports = {
                         extraCost: 50,
                         sliceAmount: 17
                     }],
-                    "stationaryHauler")
+                    "stationaryHauler", {})
 
                 let upgradeHaulerBody = roleValues(
                     [{
@@ -982,7 +1030,7 @@ module.exports = {
                         extraCost: 150,
                         sliceAmount: 36
                     }],
-                    "upgradeHauler")
+                    "upgradeHauler", {})
 
                 let minerBody = roleValues(
                     [{
@@ -993,7 +1041,7 @@ module.exports = {
                         extraCost: 450,
                         sliceAmount: 50
                     }],
-                    "miner")
+                    "miner", {})
 
                 let robberBody = roleValues(
                     [{
@@ -1004,7 +1052,7 @@ module.exports = {
                         extraCost: 100,
                         sliceAmount: 24
                     }],
-                    "robber")
+                    "robber", {})
 
                 let scoutBody = roleValues(
                     [{
@@ -1015,7 +1063,7 @@ module.exports = {
                         extraCost: 0,
                         sliceAmount: 1
                     }],
-                    "scout")
+                    "scout", {})
 
                 if (squadType == "ranged") {
                     var antifaAssaulterBody = roleValues(
@@ -1027,7 +1075,7 @@ module.exports = {
                             extraCost: 200,
                             sliceAmount: 2
                         }],
-                        "antifaAssaulter")
+                        "antifaAssaulter", {})
 
                     var antifaSupporterBody = roleValues(
                         [{
@@ -1038,7 +1086,7 @@ module.exports = {
                             extraCost: 300,
                             sliceAmount: 2
                         }],
-                        "antifaSupporter")
+                        "antifaSupporter", {})
                 } else if (squadType == "attack") {
                     var antifaAssaulterBody = roleValues(
                         [{
@@ -1049,7 +1097,7 @@ module.exports = {
                             extraCost: 0,
                             sliceAmount: 50
                         }],
-                        "antifaAssaulter")
+                        "antifaAssaulter", {})
 
                     var antifaSupporterBody = roleValues(
                         [{
@@ -1060,7 +1108,7 @@ module.exports = {
                             extraCost: 0,
                             sliceAmount: 50
                         }],
-                        "antifaSupporter")
+                        "antifaSupporter", {})
                 } else if (squadType == "dismantle") {
                     var antifaAssaulterBody = roleValues(
                         [{
@@ -1071,7 +1119,7 @@ module.exports = {
                             extraCost: 150,
                             sliceAmount: 10
                         }],
-                        "antifaAssaulter")
+                        "antifaAssaulter", {})
 
                     var antifaSupporterBody = roleValues(
                         [{
@@ -1082,7 +1130,7 @@ module.exports = {
                             extraCost: 300,
                             sliceAmount: 2
                         }],
-                        "antifaSupporter")
+                        "antifaSupporter", {})
                 }
 
                 let bodies = [harvester1Body, haulerBody, harvester2Body, upgraderBody, builderBody, repairerBody, barricadeUpgraderBody, rangedDefenderBody, upgradeHaulerBody, claimerBody, revolutionaryBuilderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteHarvester1Body, remoteHaulerBody, remoteHarvester2Body, reserverBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
@@ -1109,13 +1157,7 @@ module.exports = {
 
                                 if (testSpawn == 0) {
 
-                                    spawn.spawnCreep(bodyRole.body, (roomFixMessage + bodyRole.role + ", T" + bodyRole.tier + ", " + Game.time), {
-                                        memory: {
-                                            role: bodyRole.role,
-                                            isFull: false,
-                                            roomFrom: room.name
-                                        }
-                                    })
+                                    spawn.spawnCreep(bodyRole.body, (roomFixMessage + bodyRole.role + ", T" + bodyRole.tier + ", " + Game.time), bodyRole.memory)
 
                                     requiredCreeps[role] - 1
 
@@ -1123,7 +1165,7 @@ module.exports = {
 
                                 } else if (testSpawn != -4) {
 
-                                    console.log("Failed to spawn: " + testSpawn + ", " + bodyRole.role + ", " + bodyRole.body.length + ", " + bodyRole.tier)
+                                    console.log("Failed to spawn: " + testSpawn + ", " + bodyRole.role + ", " + bodyRole.body.length + ", " + bodyRole.tier + " " + JSON.stringify(bodyRole.memory))
                                 }
                             }
                         }
