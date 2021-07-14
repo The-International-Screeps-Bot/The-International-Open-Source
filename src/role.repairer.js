@@ -5,24 +5,13 @@ module.exports = {
 
         if (creep.memory.isFull) {
 
-            let structure = Game.getObjectById(creep.memory.target)
+            let lowLogisticStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits <= (s.hitsMax - creep.myParts("work") * 100)
+            })
 
-            if (structure && structure.hits < (structure.hitsMax - creep.myParts("work") * 100)) {
+            if (lowLogisticStructure) {
 
-                creep.repairStructure(structure)
-
-            } else {
-
-                let lowLogisticStructures = creep.room.find(FIND_STRUCTURES, {
-                    filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits <= (s.hitsMax - creep.myParts("work") * 100)
-                })
-
-                if (lowLogisticStructures.length > 0) {
-
-                    let lowLogisticStructure = creep.pos.findClosestByRange(lowLogisticStructures)
-
-                    creep.memory.target = lowLogisticStructure.id
-                }
+                creep.repairStructure(lowLogisticStructure)
             }
         } else {
 
