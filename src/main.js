@@ -12,6 +12,8 @@ let labs = require("module.labs")
 let links = require("module.links")
 let construction = require("module.construction")
 
+let roomManager = require("roomManager")
+
 let roles = require("module.roles")
 let powerCreeps = require("module.powerCreeps")
 
@@ -194,6 +196,16 @@ module.exports.loop = function() {
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
 
     console.log("spawns: " + cpuUsed)
+
+    //
+
+    cpuUsed = Game.cpu.getUsed()
+
+    roomManager.run()
+
+    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+
+    console.log("roomManager: " + cpuUsed)
 
     //
 

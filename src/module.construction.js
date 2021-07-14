@@ -399,7 +399,7 @@ module.exports = {
 
                     if (room.memory.remoteRooms.length > 0) {
 
-                        //remotePath()
+                        remotePath()
                     }
 
                     if (room.memory.stage >= 6) {

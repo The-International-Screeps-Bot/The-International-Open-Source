@@ -1,8 +1,10 @@
 module.exports = {
-    run: function factories() {
-        _.forEach(Game.rooms, function(room) {
+    run: function() {
+        for (let roomName in Game.rooms) {
 
+            let room = Game.rooms[roomName]
 
-        })
+            console.log(room)
+        }
     }
 }
