@@ -69,17 +69,11 @@ module.exports = {
                 }
             } else {
 
-                creep.memory.target = remoteRoom;
-
-                creep.memory.goal = new RoomPosition(25, 25, remoteRoom)
-
-                let origin = creep.pos
-
-                let goal = _.map([creep.memory.goal], function(target) {
-                    return { pos: creep.memory.goal, range: 1 }
+                let goal = _.map([new RoomPosition(25, 25, remoteRoom)], function(target) {
+                    return { pos: target, range: 1 }
                 })
 
-                creep.roadPathing(origin, goal)
+                creep.roadPathing(creep.pos, goal)
 
             }
         } else {
@@ -88,15 +82,12 @@ module.exports = {
 
             if (creep.room.name != creep.memory.roomFrom) {
 
-                creep.memory.goal = new RoomPosition(25, 25, creep.memory.roomFrom)
-
-                let origin = creep.pos
-
-                let goal = _.map([creep.memory.goal], function(target) {
-                    return { pos: creep.memory.goal, range: 1 }
+                let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
+                    return { pos: target, range: 1 }
                 })
 
-                creep.roadPathing(origin, goal)
+                creep.roadPathing(creep.pos, goal)
+
             } else {
 
                 var storage = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {

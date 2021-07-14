@@ -5,7 +5,7 @@ module.exports = {
 
         var remoteRoom = creep.memory.remoteRoom
 
-        if (remoteRoom == creep.room.name) {
+        if (creep.room.name == remoteRoom) {
 
             creep.room.memory.stage = "remoteRoom";
 
@@ -57,17 +57,6 @@ module.exports = {
 
             if (creep.memory.role == "remoteHarvester1") {
 
-                if (baseLink != null && creep.store.getUsedCapacity() >= 100 - creep.myParts("work")) {
-
-                    let sourceLink1 = Game.getObjectById(creep.room.memory.sourceLink1)
-
-                    if (sourceLink1 != null && sourceLink1.store[RESOURCE_ENERGY] < 800) {
-                        console.log(creep.transfer(sourceLink1, RESOURCE_ENERGY))
-
-                        creep.transfer(sourceLink1, RESOURCE_ENERGY)
-                    }
-                }
-
                 let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
                 let source1 = Game.getObjectById(creep.room.memory.source1)
 
@@ -84,12 +73,11 @@ module.exports = {
 
                     } else {
 
-                        let origin = creep.pos
                         let goal = _.map([sourceContainer1], function(target) {
                             return { pos: target.pos, range: 0 }
                         })
 
-                        creep.intraRoomPathing(origin, goal)
+                        creep.intraRoomPathing(creep.pos, goal)
 
                     }
                 } else if (source1 != null) {
@@ -106,26 +94,15 @@ module.exports = {
 
                     } else {
 
-                        let origin = creep.pos
                         let goal = _.map([source1], function(target) {
                             return { pos: target.pos, range: 1 }
                         })
 
-                        creep.intraRoomPathing(origin, goal)
+                        creep.intraRoomPathing(creep.pos, goal)
 
                     }
                 }
             } else if (creep.memory.role == "remoteHarvester2") {
-
-                if (baseLink != null && creep.store.getUsedCapacity() >= 100 - creep.myParts("work")) {
-
-                    let sourceLink2 = Game.getObjectById(creep.room.memory.sourceLink2)
-
-                    if (sourceLink2 != null && sourceLink2.store[RESOURCE_ENERGY] < 800) {
-
-                        creep.transfer(sourceLink2, RESOURCE_ENERGY)
-                    }
-                }
 
                 let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
                 let source2 = Game.getObjectById(creep.room.memory.source2)
@@ -143,12 +120,11 @@ module.exports = {
 
                     } else {
 
-                        let origin = creep.pos
                         let goal = _.map([sourceContainer2], function(target) {
                             return { pos: target.pos, range: 0 }
                         })
 
-                        creep.intraRoomPathing(origin, goal)
+                        creep.intraRoomPathing(creep.pos, goal)
 
                     }
                 } else if (source2 != null) {
@@ -221,16 +197,11 @@ module.exports = {
             }
         } else {
 
-            creep.memory.target = remoteRoom
-            const route = Game.map.findRoute(creep.room, remoteRoom);
+            let goal = _.map([new RoomPosition(25, 25, remoteRoom)], function(pos) {
+                return { pos: pos, range: 1 }
+            })
 
-            if (route.length > 0) {
-
-                creep.say(creep.memory.target)
-
-                const exit = creep.pos.findClosestByRange(route[0].exit);
-                creep.moveTo(exit);
-            }
+            creep.roadPathing(creep.pos, goal)
         }
 
         creep.avoidHostiles()
