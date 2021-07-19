@@ -3,202 +3,161 @@ let allyList = require("module.allyList")
 module.exports = {
     run: function(creep) {
 
-        let target = creep.memory.roomFrom
+        const roomFrom = creep.memory.roomFrom
+        let remoteRoom
 
-        let remoteRooms = []
+        _.forEach(Game.rooms, function(unfilteredRoom) {
 
-        _.forEach(Game.rooms, function(myRooms) {
+            if (unfilteredRoom.memory.stage == "remoteRoom" && unfilteredRoom.memory.enemy == true) {
 
-            if (myRooms.memory.enemy == true && myRooms.memory.myRoom != false) {
-
-                //console.log("true")
-                let remoteRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, myRooms.name)
+                let remoteRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, unfilteredRoom.name)
 
                 if (remoteRoomDistance == 1) {
 
-                    creep.memory.target = myRooms.name
-                    remoteRooms.push(myRooms)
+                    creep.memory.target = unfilteredRoom.name
+                    remoteRooms = unfilteredRoom
 
                 }
             }
         })
 
-        if (remoteRooms.length == 0) {
+        if (remoteRoom) {
+            if (creep.room.name == remoteRoom) {
 
-            creep.memory.target = creep.memory.roomFrom
+                if (creep.hits < creep.hitsMax) {
 
-        }
-
-        let hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-            filter: (c) => {
-                return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK)))
-            }
-        })
-
-        let hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
-            filter: (c) => {
-                return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
-            }
-        })
-
-        let injuredSelf = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
-            filter: (s) => s.hits < s.hitsMax
-        })
-
-        if (injuredSelf) {
-
-            creep.heal(injuredSelf)
-
-        }
-        if (creep.room.name != creep.memory.roomFrom && (hostile || hostileStructure)) {
-
-            if (hostile) {
-
-                creep.say("H")
-                creep.rangedAttack(hostile)
-
-                if (creep.attack(hostile) == ERR_NOT_IN_RANGE) {
-
-                    let goal = _.map([hostile], function(target) {
-                        return { pos: target.pos, range: 1 }
-                    })
-
-                    creep.intraRoomPathing(creep.pos, goal)
-
+                    creep.heal(creep)
                 }
-            } else if (hostileStructure) {
 
-                creep.say("HS")
-                creep.rangedAttack(hostileStructure)
+                let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                    filter: (c) => {
+                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+                    }
+                })
 
-                if (creep.attack(hostileStructure) == ERR_NOT_IN_RANGE) {
+                if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
 
-                    let goal = _.map([hostileStructure], function(target) {
+                    creep.say("H")
+
+                    creep.attack(closestHostile)
+
+                    let goal = _.map([closestHostile], function(target) {
                         return { pos: target.pos, range: 1 }
                     })
 
                     creep.intraRoomPathing(creep.pos, goal)
 
+                } else {
+
+                    let hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+                        filter: (c) => {
+                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                        }
+                    })
+
+                    if (hostileStructure) {
+
+                        creep.say("H")
+
+                        creep.attack(hostileStructure)
+
+                        let goal = _.map([hostileStructure], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
+
+                        creep.intraRoomPathing(creep.pos, goal)
+
+                    } else {
+
+                        creep.room.memory.enemy = false
+                    }
                 }
             } else {
 
-                creep.room.memory.enemy = false
+                let goal = _.map([new RoomPosition(25, 25, remoteRoom)], function(target) {
+                    return { pos: target.pos, range: 24 }
+                })
 
+                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
             }
         } else {
+            if (creep.room.name == roomFrom) {
 
-            let enemyCreep = hostile
-
-            creep.say("No Enemy")
-
-            if (creep.room.name == creep.memory.roomFrom && enemyCreep) {
-
-                creep.say("Enemy")
-
-                let target = enemyCreep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_RAMPART
                 })
 
-                if (target) {
+                if (ramparts.length > 0) {
 
-                    creep.say("Rampart")
+                    let outerRampart
 
-                    let origin = creep.pos
+                    let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
 
-                    let goal = target
+                    for (let rampart of ramparts) {
 
-                    creep.rampartPathing(origin, goal)
+                        if (cm && cm.get(rampart.x, rampart.y) < 255) {
 
-                    creep.attack(enemyCreep)
-                }
-            } else {
-                if (creep.memory.target == creep.memory.roomFrom) {
-
-                    target = creep.memory.roomFrom
-
-                    if (creep.room.name != target) {
-
-                        creep.say("0")
-
-                        target = creep.memory.roomFrom
-
-                        let path = Game.map.findRoute(creep.room, target);
-                        creep.memory.path = path
-                        let route = creep.memory.path
-
-                        if (route.length > 0) {
-
-                            creep.say(target)
-
-                            const exit = creep.pos.findClosestByRange(route[0].exit)
-                            creep.moveTo(exit)
+                            outerRampart = rampart
+                            break
                         }
-                    } else if (creep.room.name == target) {
+                    }
 
-                        creep.say(target)
+                    if (outerRampart) {
 
-                        let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
-                            filter: s => s.structureType == STRUCTURE_RAMPART
+                        let goal = _.map([outerRampart], function(target) {
+                            return { pos: target.pos, range: 0 }
                         })
 
-                        if (ramparts.length > 0) {
+                        if (creep.fatigue == 0) {
 
-                            let outerRampart
-
-                            let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
-
-                            for (let rampart of ramparts) {
-
-                                if (cm && cm.get(rampart.x, rampart.y) < 255) {
-
-                                    outerRampart = rampart
-                                    break
-                                }
-                            }
-
-                            if (outerRampart) {
-
-                                let goal = _.map([outerRampart], function(target) {
-                                    return { pos: target.pos, range: 0 }
-                                })
-
-                                if (creep.fatigue == 0) {
-
-                                    creep.intraRoomPathing(creep.pos, goal)
-                                }
-                            }
-                        } else {
-
-                            let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
-
-                            if (spawn) {
-
-                                let goal = _.map([spawn], function(target) {
-                                    return { pos: target.pos, range: 1 }
-                                })
-
-                                creep.intraRoomPathing(creep.pos, goal)
-                            }
+                            creep.intraRoomPathing(creep.pos, goal)
                         }
                     }
                 } else {
 
-                    target = creep.memory.target
+                    let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
 
-                    let path = Game.map.findRoute(creep.room, target);
-                    creep.memory.path = path
-                    let route = creep.memory.path
+                    if (spawn && creep.pos.getRangeTo(spawn) > 5) {
 
-                    if (route.length > 0) {
+                        let goal = _.map([spawn], function(target) {
+                            return { pos: target.pos, range: 5 }
+                        })
 
-                        creep.say(target)
-
-                        const exit = creep.pos.findClosestByRange(route[0].exit)
-                        creep.moveTo(exit)
-
+                        creep.intraRoomPathing(creep.pos, goal)
                     }
+                }
+
+            } else {
+
+                let injuredCreep = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
+                    filter: (s) => s.hits < s.hitsMax
+                })
+
+                if (injuredCreep) {
+
+                    if (creep.pos.getRangeTo(injuredCreep) > 1) {
+
+                        creep.rangedHeal(injuredCreep)
+                    } else {
+
+                        creep.heal(injuredCreep)
+                    }
+
+                    let goal = _.map([injuredCreep], function(target) {
+                        return { pos: target.pos, range: 1 }
+                    })
+
+                    creep.intraRoomPathing(creep.pos, goal)
+
+                } else {
+
+                    let goal = _.map([new RoomPosition(25, 25, roomFrom)], function(target) {
+                        return { pos: target.pos, range: 24 }
+                    })
+
+                    creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
                 }
             }
         }
     }
-};
+}

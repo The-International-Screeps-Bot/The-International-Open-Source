@@ -3,11 +3,16 @@ let allyList = require("module.allyList")
 module.exports = {
     run: function(creep) {
 
-        var remoteRoom = creep.memory.remoteRoom
+        let remoteRoom = creep.memory.remoteRoom
 
         if (creep.room.name == remoteRoom) {
 
-            creep.room.memory.stage = "remoteRoom";
+            creep.room.memory.stage = "remoteRoom"
+
+            if (creep.room.controller.reservation && creep.room.controller.reservation.username != "Invader" && creep.room.controller.reservation.username != "MarvinTMB") {
+
+                creep.room.memory.stage = "enemyReservation"
+            }
 
             let source1 = Game.getObjectById(creep.room.memory.source1)
             let source2 = Game.getObjectById(creep.room.memory.source2)
@@ -197,11 +202,11 @@ module.exports = {
             }
         } else {
 
-            let goal = _.map([new RoomPosition(25, 25, remoteRoom)], function(pos) {
-                return { pos: pos, range: 1 }
+            let goal = _.map([new RoomPosition(25, 25, remoteRoom)], function(target) {
+                return { pos: target, range: 1 }
             })
 
-            creep.roadPathing(creep.pos, goal)
+            creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
         }
 
         creep.avoidHostiles()

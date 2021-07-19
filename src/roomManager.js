@@ -4,7 +4,7 @@ module.exports = {
 
             let room = Game.rooms[roomName]
 
-            console.log(room)
+
         }
     }
 }

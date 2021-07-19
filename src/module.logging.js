@@ -143,7 +143,7 @@ module.exports = {
                     <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Allies</th>
                 </tr>
                 <tr>
-                    <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Global Stage: ` + Memory.global.globalStage + ` <br /> Time: ` + Game.time % 10 + `</th>
+                    <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Global Stage: ` + Memory.global.globalStage + ` <br /> Time: ` + Game.time % 100 + `</th>
                     ` + energyAmount() + `
                     <th style="text-align: center; padding: 5px 0;">Last Defence: ` + lastDefence() + `</th>
                     <th style="text-align: center; padding: 5px 0;">Total CR: ` + (Game.market.credits / 1000).toFixed(0) + "k" + `</th>

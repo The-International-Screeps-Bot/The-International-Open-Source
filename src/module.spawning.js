@@ -57,9 +57,9 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            //var newCommune = "E39S1"
+            var newCommune = "E32N8"
 
-            var newCommune
+            //var newCommune
 
             //var attackTarget = "E32N8"
 
@@ -957,12 +957,19 @@ module.exports = {
 
                 let communeDefenderBody = roleValues(
                     [{
+                        stage: 6,
+                        defaultParts: [],
+                        defaultCost: 0,
+                        extraParts: [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, HEAL, MOVE],
+                        extraCost: 950,
+                        sliceAmount: 24
+                    }, {
                         stage: 1,
                         defaultParts: [],
                         defaultCost: 0,
                         extraParts: [ATTACK, MOVE],
                         extraCost: 130,
-                        sliceAmount: 24
+                        sliceAmount: 20
                     }],
                     "communeDefender", {})
 

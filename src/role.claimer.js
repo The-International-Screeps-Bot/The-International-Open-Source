@@ -24,6 +24,8 @@ module.exports = {
 
                 creep.intraRoomPathing(creep.pos, goal)
             }
+            creep.avoidHostiles()
+
         } else {
 
             creep.say("NC " + target)

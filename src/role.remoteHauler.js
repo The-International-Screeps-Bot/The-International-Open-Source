@@ -73,12 +73,9 @@ module.exports = {
                     return { pos: target, range: 1 }
                 })
 
-                creep.roadPathing(creep.pos, goal)
-
+                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
             }
         } else {
-
-            //console.log("Returning: " + creep.name)
 
             if (creep.room.name != creep.memory.roomFrom) {
 
@@ -86,7 +83,7 @@ module.exports = {
                     return { pos: target, range: 1 }
                 })
 
-                creep.roadPathing(creep.pos, goal)
+                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
 
             } else {
 
@@ -131,34 +128,67 @@ module.exports = {
                             creep.say("RL S2");
 
                             creep.advancedTransfer(storage)
+
                         } else if (terminal) {
 
                             creep.say("RL T");
 
                             creep.advancedTransfer(terminal)
+
                         } else {
 
-                            let structure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                                filter: (s) => (s.structureType == STRUCTURE_SPAWN ||
-                                        s.structureType == STRUCTURE_EXTENSION) &&
+                            let essentialStructure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                                filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
+                                        s.structureType == STRUCTURE_SPAWN ||
+                                        s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
                                     s.energy < s.energyCapacity
                             })
 
-                            if (structure) {
+                            if (essentialStructure) {
 
-                                creep.say("➡️")
+                                creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 
-                                creep.advancedTransfer(structure)
+                                if (creep.advancedTransfer(essentialStructure) == 0) {
+
+                                    let structureToMoveTo = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                                        filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
+                                                s.structureType == STRUCTURE_SPAWN ||
+                                                s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
+                                            s.energy < s.energyCapacity && s.id != essentialStructure.id
+                                    })
+
+                                    if (structureToMoveTo) {
+
+                                        if (structureToMoveTo.pos.getRangeTo(creep) > 1) {
+
+                                            let goal = _.map([structureToMoveTo], function(target) {
+                                                return { pos: target.pos, range: 1 }
+                                            })
+
+                                            creep.intraRoomPathing(creep.pos, goal)
+                                        }
+                                    } else {
+
+                                        if (storage) {
+
+                                            let goal = _.map([storage], function(target) {
+                                                return { pos: target.pos, range: 1 }
+                                            })
+
+                                            creep.intraRoomPathing(creep.pos, goal)
+                                        }
+                                    }
+                                }
                             } else {
 
                                 let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
 
                                 creep.say("S")
 
-                                if (spawn && creep.pos.getRangeTo(spawn) > 1) {
+                                if (spawn && creep.pos.getRangeTo(spawn) > 5) {
 
                                     let goal = _.map([spawn], function(target) {
-                                        return { pos: target.pos, range: 1 }
+                                        return { pos: target.pos, range: 5 }
                                     })
 
                                     creep.intraRoomPathing(creep.pos, goal)

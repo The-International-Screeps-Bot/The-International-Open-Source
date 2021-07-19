@@ -21,13 +21,14 @@ module.exports = {
             creep.say("BC " + creep.memory.target)
 
             creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
+
         } else {
 
             creep.isFull()
 
             let constructionSite = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES)
 
-            if (creep.memory.isFull == true) {
+            if (creep.memory.isFull) {
 
                 creep.say("🚧")
 
@@ -79,7 +80,7 @@ module.exports = {
 
                                 if (closestSource) {
 
-                                    if (creep.pos.inRangeTo(closestSource, 1)) {
+                                    if (creep.pos.getRangeTo(closestSource) <= 1) {
 
                                         if (creep.harvest(closestSource) == 0) {
 
@@ -92,6 +93,29 @@ module.exports = {
                                         })
 
                                         creep.intraRoomPathing(creep.pos, goal)
+                                    }
+                                } else {
+
+                                    if (!creep.room.controller.my) {
+
+                                        let rampart = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                                            filter: s => s.structureType == STRUCTURE_RAMPART
+                                        })
+
+                                        if (rampart) {
+
+                                            if (creep.pos.getRangeTo(rampart) <= 1) {
+
+                                                creep.dismantle(rampart)
+                                            } else {
+
+                                                let goal = _.map([rampart], function(target) {
+                                                    return { pos: target.pos, range: 1 }
+                                                })
+
+                                                creep.intraRoomPathing(creep.pos, goal)
+                                            }
+                                        }
                                     }
                                 }
                             }
