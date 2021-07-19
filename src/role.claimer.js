@@ -1,5 +1,4 @@
 module.exports = {
-    // a function to run the logic for this role
     run: function(creep) {
 
         const target = creep.memory.target = Memory.global.newCommune
@@ -24,6 +23,7 @@ module.exports = {
 
                 creep.intraRoomPathing(creep.pos, goal)
             }
+
             creep.avoidHostiles()
 
         } else {
@@ -31,7 +31,7 @@ module.exports = {
             creep.say("NC " + target)
 
             let goal = _.map([new RoomPosition(25, 25, target)], function(pos) {
-                return { pos: pos, range: 1 }
+                return { pos: pos, range: 24 }
             })
 
             creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])

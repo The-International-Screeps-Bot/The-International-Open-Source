@@ -1,139 +1,93 @@
 module.exports = {
     run: function(creep) {
 
-        var remoteRoom = creep.memory.remoteRoom
+        const remoteRoom = creep.memory.remoteRoom
+        const roomFrom = creep.memory.roomFrom
 
-        if (creep.memory.isFull == true && creep.carry.energy == 0) {
+        creep.isFull()
 
-            creep.memory.isFull = false;
-
-        } else if (creep.memory.isFull == false && creep.carry.energy == creep.carryCapacity) {
-
-            creep.memory.isFull = true;
-
-        }
-        if (creep.memory.isFull == false) {
+        if (creep.memory.isFull) {
 
             if (creep.room.name == remoteRoom) {
 
-                var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_CONTAINER && s.energy >= creep.store.getCapacity()
+                let container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] >= creep.store.getCapacity()
                 })
-
-                creep.say("🛄")
 
                 if (container) {
 
-                    creep.advancedWithdraw(container)
-                } else {
-
-                    var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] >= creep.store.getCapacity()
-                    })
-
                     creep.say("🛄")
 
-                    if (container) {
+                    creep.advancedWithdraw(container)
 
-                        creep.advancedWithdraw(container)
+                } else {
+
+                    let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                        filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
+                    });
+
+                    if (droppedResources) {
+
+                        creep.say("💡")
+
+                        creep.pickupDroppedEnergy(droppedResources)
+
                     } else {
 
-                        let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-                            filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
-                        });
+                        let closestSource = creep.pos.findClosestByRange(FIND_SOURCES)
 
-                        if (droppedResources) {
+                        creep.say("🔦")
 
-                            creep.say("💡")
+                        if (creep.pos.getRangeTo(closestSource) > 3) {
 
-                            target = droppedResources
+                            let goal = _.map([closestSource], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
 
-                            creep.pickupDroppedEnergy(target)
+                            creep.intraRoomPathing(creep.pos, goal)
                         } else {
 
-                            var source = creep.pos.findClosestByRange(FIND_SOURCES)
+                            let goal = _.map([closestSource], function(target) {
+                                return { pos: target.pos, range: 3 }
+                            })
 
-                            creep.say("🔦");
-                            if (!creep.pos.inRangeTo(source, 2)) {
-
-                                let origin = creep.pos
-
-                                let goal = _.map([source], function(target) {
-                                    return { pos: target.pos, range: 1 }
-                                })
-
-                                creep.intraRoomPathing(origin, goal)
-                            }
+                            creep.creepFlee(creep.pos, goal)
                         }
                     }
                 }
             } else {
 
                 let goal = _.map([new RoomPosition(25, 25, remoteRoom)], function(target) {
-                    return { pos: target, range: 1 }
+                    return { pos: target, range: 24 }
                 })
 
                 creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
             }
         } else {
 
-            if (creep.room.name != creep.memory.roomFrom) {
+            if (creep.room.name == roomFrom) {
 
-                let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                    return { pos: target, range: 1 }
-                })
+                if (creep.room.storage && storage.store[RESOURCE_ENERGY] < 40000 && storage.store.getCapacity() >= creep.store.getUsedCapacity()) {
 
-                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
+                    creep.say("S");
 
-            } else {
+                    creep.advancedTransfer(creep.room.storage)
 
-                var storage = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] <= 300000
-                });
-
-                if (storage) {
-
-                    creep.say("RL S1");
-
-                    creep.advancedTransfer(storage)
                 } else {
 
-                    var controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
+                    if (creep.room.storage && storage.store[RESOURCE_ENERGY] < 40000 && storage.store.getCapacity() >= creep.store.getUsedCapacity()) {
 
-                    let links = creep.room.find(FIND_MY_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_LINK
-                    })
+                        creep.say("S");
 
-                    let containers = creep.room.find(FIND_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_CONTAINER
-                    })
+                        creep.advancedTransfer(creep.room.storage)
 
-                    if (containers.length >= 3 && links.length < 3 && controllerContainer && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
-
-                        creep.say("cC1")
-
-                        creep.advancedTransfer(controllerContainer)
                     } else {
 
-                        var storage = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                            filter: s => s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] <= 500000
-                        });
+                        if (creep.room.terminal && terminal.store[RESOURCE_ENERGY] < 40000 && terminal.store.getCapacity() >= creep.store.getUsedCapacity()) {
 
-                        var terminal = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                            filter: s => s.structureType == STRUCTURE_TERMINAL && s.store[RESOURCE_ENERGY] <= 150000
-                        });
+                            creep.say("S");
 
-                        if (storage) {
-
-                            creep.say("RL S2");
-
-                            creep.advancedTransfer(storage)
-
-                        } else if (terminal) {
-
-                            creep.say("RL T");
-
-                            creep.advancedTransfer(terminal)
+                            creep.advancedTransfer(creep.room.terminal)
 
                         } else {
 
@@ -167,16 +121,6 @@ module.exports = {
 
                                             creep.intraRoomPathing(creep.pos, goal)
                                         }
-                                    } else {
-
-                                        if (storage) {
-
-                                            let goal = _.map([storage], function(target) {
-                                                return { pos: target.pos, range: 1 }
-                                            })
-
-                                            creep.intraRoomPathing(creep.pos, goal)
-                                        }
                                     }
                                 }
                             } else {
@@ -197,9 +141,16 @@ module.exports = {
                         }
                     }
                 }
+            } else {
+
+                let goal = _.map([new RoomPosition(25, 25, roomFrom)], function(target) {
+                    return { pos: target, range: 24 }
+                })
+
+                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
             }
         }
 
         creep.avoidHostiles()
     }
-};
+}

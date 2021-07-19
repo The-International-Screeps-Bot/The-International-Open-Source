@@ -35,5 +35,7 @@ module.exports = {
         Memory.data.energySpentOnCreeps = 0
 
         Memory.data.energySpentOnPower = 0
+
+        Memory.data.opsGenerated
     }
 }

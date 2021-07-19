@@ -57,13 +57,13 @@ module.exports = {
 
         if (Game.shard.name == "shard2") {
 
-            var newCommune = "E32N8"
+            //var newCommune = "E32N8"
 
-            //var newCommune
+            var newCommune
 
-            //var attackTarget = "E32N8"
+            var attackTarget = "E32N8"
 
-            var attackTarget
+            //var attackTarget
 
         } else {
 
@@ -1124,7 +1124,7 @@ module.exports = {
                             defaultCost: 50,
                             extraParts: [WORK, MOVE],
                             extraCost: 150,
-                            sliceAmount: 10
+                            sliceAmount: 20
                         }],
                         "antifaAssaulter", {})
 

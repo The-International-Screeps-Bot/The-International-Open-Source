@@ -14,6 +14,17 @@ module.exports = {
                 creep.room.memory.stage = "enemyReservation"
             }
 
+            let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
+
+            if (creepIsEdge) {
+
+                let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(pos) {
+                    return { pos: pos, range: 0 }
+                })
+
+                creep.intraRoomPathing(creep.pos, goal)
+            }
+
             let source1 = Game.getObjectById(creep.room.memory.source1)
             let source2 = Game.getObjectById(creep.room.memory.source2)
 
@@ -24,6 +35,7 @@ module.exports = {
                 creep.room.memory.source1 = sources.id
 
             }
+
             if (!source2) {
 
                 let sources = creep.room.find(FIND_SOURCES)[1]
@@ -155,25 +167,25 @@ module.exports = {
                 }
             }
 
-            //targets
-            var hostileCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+            let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                 filter: (c) => {
-                    return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK)))
+                    return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
                 }
             })
-            var hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+
+            let hostileStructure = creep.room.find(FIND_HOSTILE_STRUCTURES, {
                 filter: (c) => {
                     return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
                 }
             })
 
-            var constructionSite = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES)
+            var constructionSite = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
 
-            var structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+            var structure = creep.room.find(FIND_STRUCTURES, {
                 filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5
             })
 
-            if (hostileCreep || hostileStructure) {
+            if ((closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) || hostileStructure.length > 0) {
 
                 creep.room.memory.enemy = true
 
@@ -182,7 +194,7 @@ module.exports = {
                 creep.room.memory.enemy = false
 
             }
-            if (constructionSite || structure) {
+            if (constructionSite.length > 0 || structure.length > 0) {
 
                 creep.room.memory.builderNeed = true
 
@@ -202,8 +214,8 @@ module.exports = {
             }
         } else {
 
-            let goal = _.map([new RoomPosition(25, 25, remoteRoom)], function(target) {
-                return { pos: target, range: 1 }
+            let goal = _.map([new RoomPosition(25, 25, roomFrom)], function(target) {
+                return { pos: target, range: 24 }
             })
 
             creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
@@ -211,4 +223,4 @@ module.exports = {
 
         creep.avoidHostiles()
     }
-};
+}

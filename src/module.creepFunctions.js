@@ -239,7 +239,6 @@ Creep.prototype.repairStructure = function(target) {
 
     } else if (creep.repair(target) == 0) {
 
-
         creep.say("🔧 " + creep.myParts("work"))
 
         Memory.data.energySpentOnRepairs += creep.myParts("work")
