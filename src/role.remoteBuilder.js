@@ -103,10 +103,10 @@ module.exports = {
                         var source = creep.pos.findClosestByRange(FIND_SOURCES)
 
                         creep.say("🔦");
-                        if (creep.pos.getRangeTo(source) > 1) {
+                        if (creep.pos.getRangeTo(source) > 3) {
 
                             let goal = _.map([source], function(target) {
-                                return { pos: target.pos, range: 1 }
+                                return { pos: target.pos, range: 3 }
                             })
 
                             creep.intraRoomPathing(creep.pos, goal)

@@ -482,33 +482,33 @@ module.exports = {
 
                 if (remoteBuilderNeed && stage >= 4) {
 
-                    minCreeps["remoteBuilder"] = 1
+                    //minCreeps["remoteBuilder"] = 1
                 }
 
                 if (remoteEnemy && stage >= 3) {
 
-                    minCreeps["communeDefender"] = 1
+                    //minCreeps["communeDefender"] = 1
                 }
 
                 for (let object of room.memory.remoteRooms) {
 
                     if (stage <= 2) {
 
-                        minCreeps["remoteHarvester1"] += object.sources * 2
-
-                        minCreeps["remoteHarvester2"] += object.sources * 2
-
-                        minCreeps["remoteHauler"] += object.sources * 2
+                        //minCreeps["remoteHarvester1"] += object.sources * 2
+                        //
+                        //minCreeps["remoteHarvester2"] += object.sources * 2
+                        //
+                        //minCreeps["remoteHauler"] += object.sources * 2
                     }
                     if (stage >= 3) {
 
-                        minCreeps["reserver"] += 1
-
-                        minCreeps["remoteHarvester1"] += object.sources
-
-                        minCreeps["remoteHarvester2"] += object.sources
-
-                        minCreeps["remoteHauler"] += object.sources * 2
+                        //minCreeps["reserver"] += 1
+                        //
+                        //minCreeps["remoteHarvester1"] += object.sources
+                        //
+                        //minCreeps["remoteHarvester2"] += object.sources
+                        //
+                        //minCreeps["remoteHauler"] += object.sources * 2
                     }
                 }
 

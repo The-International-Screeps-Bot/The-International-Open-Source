@@ -3,7 +3,7 @@ let allyList = require("module.allyList")
 module.exports = {
     run: function(creep) {
 
-        let remoteRoom = creep.memory.remoteRoom
+        const remoteRoom = creep.memory.remoteRoom
 
         if (creep.room.name == remoteRoom) {
 
