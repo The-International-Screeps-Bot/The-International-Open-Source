@@ -76,7 +76,7 @@ module.exports = {
             } else {
 
                 let goal = _.map([new RoomPosition(25, 25, remoteRoom)], function(target) {
-                    return { pos: target.pos, range: 24 }
+                    return { pos: target, range: 24 }
                 })
 
                 creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])

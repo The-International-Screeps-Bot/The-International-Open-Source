@@ -515,7 +515,19 @@ module.exports = {
                                 }
                             } else {
 
-                                creep.say("RF")
+                                let closestHostile = creep.room.find(FIND_HOSTILE_CREEPS, {
+                                    filter: (c) => {
+                                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                                    }
+                                })
+
+                                let tower = creep.room.find(FIND_HOSTILE_STRUCTURES, {
+                                    filter: s => s.structureType == STRUCTURE_TOWER
+                                })
+
+                                if (closestHostile.length > 0 || tower.length > 0)
+
+                                    creep.say("RF")
 
                                 if (supporter.room != creep.room) {
 
