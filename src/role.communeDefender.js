@@ -10,16 +10,17 @@ module.exports = {
 
             if (unfilteredRoom.memory.stage == "remoteRoom" && unfilteredRoom.memory.enemy == true) {
 
-                let remoteRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, unfilteredRoom.name)
+                let remoteRoomDistance = Game.map.getRoomLinearDistance(creep.memory.roomFrom, unfilteredRoom.name)
 
                 if (remoteRoomDistance == 1) {
 
-                    creep.memory.target = unfilteredRoom.name
-                    remoteRooms = unfilteredRoom
+                    remoteRoom = unfilteredRoom.name
 
                 }
             }
         })
+
+        creep.memory.remoteRoom = remoteRoom
 
         if (remoteRoom) {
             if (creep.room.name == remoteRoom) {
@@ -83,6 +84,8 @@ module.exports = {
         } else {
             if (creep.room.name == roomFrom) {
 
+                creep.say("🚬")
+
                 let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_RAMPART
                 })
@@ -126,37 +129,16 @@ module.exports = {
                         creep.intraRoomPathing(creep.pos, goal)
                     }
                 }
-
             } else {
 
-                let injuredCreep = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
-                    filter: (s) => s.hits < s.hitsMax
+                creep.say("🚬")
+
+                let goal = _.map([new RoomPosition(25, 25, roomFrom)], function(target) {
+                    return { pos: target, range: 24 }
                 })
 
-                if (injuredCreep) {
+                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
 
-                    if (creep.pos.getRangeTo(injuredCreep) > 1) {
-
-                        creep.rangedHeal(injuredCreep)
-                    } else {
-
-                        creep.heal(injuredCreep)
-                    }
-
-                    let goal = _.map([injuredCreep], function(target) {
-                        return { pos: target.pos, range: 1 }
-                    })
-
-                    creep.intraRoomPathing(creep.pos, goal)
-
-                } else {
-
-                    let goal = _.map([new RoomPosition(25, 25, roomFrom)], function(target) {
-                        return { pos: target.pos, range: 24 }
-                    })
-
-                    creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
-                }
             }
         }
     }

@@ -7,18 +7,18 @@ module.exports = {
 
         _.forEach(Game.rooms, function(unfilteredRoom) {
 
-            if (unfilteredRoom.memory.stage == "remoteRoom" && unfilteredRoom.memory.enemy == true) {
+            if (unfilteredRoom.memory.stage == "remoteRoom" && unfilteredRoom.memory.builderNeed == true) {
 
-                let remoteRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, unfilteredRoom.name)
+                let remoteRoomDistance = Game.map.getRoomLinearDistance(creep.memory.roomFrom, unfilteredRoom.name)
 
                 if (remoteRoomDistance == 1) {
 
-                    creep.memory.target = unfilteredRoom.name
-                    remoteRooms = unfilteredRoom
-
+                    remoteRoom = unfilteredRoom.name
                 }
             }
         })
+
+        creep.memory.remoteRoom = remoteRoom
 
         if (remoteRoom) {
 
@@ -46,16 +46,17 @@ module.exports = {
 
                             creep.constructionBuild(constructionSite)
 
-                        } else if (creep.room.memory.builderNeed == true && !constructionSite && !structure) {
+                        } else if (creep.room.memory.builderNeed == true && !constructionSite && !lowLogisticStructure) {
+
+                            creep.memory.remoteRoom = false
 
                             creep.room.memory.builderNeed = false
-
                         }
                     }
                 } else {
 
                     let container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] >= creep.store.getCapacity()
+                        filter: s => s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()
                     })
 
                     if (container) {
@@ -67,7 +68,7 @@ module.exports = {
                     } else {
 
                         let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-                            filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
+                            filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getFreeCapacity() * 0.5
                         });
 
                         if (droppedResources) {
@@ -89,6 +90,7 @@ module.exports = {
                                 })
 
                                 creep.intraRoomPathing(creep.pos, goal)
+
                             } else {
 
                                 let goal = _.map([closestSource], function(target) {
@@ -102,19 +104,73 @@ module.exports = {
                 }
             } else {
 
+                creep.say(remoteRoom)
+
                 let goal = _.map([new RoomPosition(25, 25, remoteRoom)], function(target) {
-                    return { pos: target.pos, range: 24 }
+                    return { pos: target, range: 24 }
                 })
 
                 creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
             }
         } else {
+            if (creep.room.name == roomFrom) {
 
-            let goal = _.map([new RoomPosition(25, 25, roomFrom)], function(target) {
-                return { pos: target.pos, range: 24 }
-            })
+                creep.say("🚬")
 
-            creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
+                let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_RAMPART
+                })
+
+                if (ramparts.length > 0) {
+
+                    let outerRampart
+
+                    let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
+
+                    for (let rampart of ramparts) {
+
+                        if (cm && cm.get(rampart.x, rampart.y) < 255) {
+
+                            outerRampart = rampart
+                            break
+                        }
+                    }
+
+                    if (outerRampart) {
+
+                        let goal = _.map([outerRampart], function(target) {
+                            return { pos: target.pos, range: 0 }
+                        })
+
+                        if (creep.fatigue == 0) {
+
+                            creep.intraRoomPathing(creep.pos, goal)
+                        }
+                    }
+                } else {
+
+                    let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
+
+                    if (spawn && creep.pos.getRangeTo(spawn) > 5) {
+
+                        let goal = _.map([spawn], function(target) {
+                            return { pos: target.pos, range: 5 }
+                        })
+
+                        creep.intraRoomPathing(creep.pos, goal)
+                    }
+                }
+            } else {
+
+                creep.say("🚬")
+
+                let goal = _.map([new RoomPosition(25, 25, roomFrom)], function(target) {
+                    return { pos: target.pos, range: 24 }
+                })
+
+                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
+
+            }
         }
 
         creep.avoidHostiles()

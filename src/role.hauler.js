@@ -58,33 +58,30 @@ module.exports = {
 
                         if (creep.advancedTransfer(essentialStructure) == 0) {
 
-                            let structureToMoveTo = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            essentialStructuresAlt = creep.room.find(FIND_MY_STRUCTURES, {
                                 filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
                                         s.structureType == STRUCTURE_SPAWN ||
                                         s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
                                     s.energy < s.energyCapacity && s.id != essentialStructure.id
                             })
 
-                            if (structureToMoveTo) {
+                            let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
 
-                                if (structureToMoveTo.pos.getRangeTo(creep) > 1) {
+                            if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
 
-                                    let goal = _.map([structureToMoveTo], function(target) {
-                                        return { pos: target.pos, range: 1 }
-                                    })
+                                let goal = _.map([essentialStructureAlt], function(target) {
+                                    return { pos: target.pos, range: 1 }
+                                })
 
-                                    creep.intraRoomPathing(creep.pos, goal)
-                                }
-                            } else {
+                                creep.intraRoomPathing(creep.pos, goal)
 
-                                if (storage) {
+                            } else if (storage) {
 
-                                    let goal = _.map([storage], function(target) {
-                                        return { pos: target.pos, range: 1 }
-                                    })
+                                let goal = _.map([storage], function(target) {
+                                    return { pos: target.pos, range: 1 }
+                                })
 
-                                    creep.intraRoomPathing(creep.pos, goal)
-                                }
+                                creep.intraRoomPathing(creep.pos, goal)
                             }
                         }
                     } else {
@@ -121,7 +118,37 @@ module.exports = {
 
             if (creep.memory.isFull == false) {
 
-                creep.advancedWithdraw(sourceContainer1)
+                if (creep.advancedWithdraw(sourceContainer1) == 0) {
+
+                    if (lowTower) {
+
+                        let goal = _.map([lowTower], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
+
+                        creep.intraRoomPathing(creep.pos, goal)
+
+                    } else {
+                        if (essentialStructure) {
+
+                            let goal = _.map([essentialStructure], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
+
+                            creep.intraRoomPathing(creep.pos, goal)
+
+                        } else {
+                            if (storage) {
+
+                                let goal = _.map([storage], function(target) {
+                                    return { pos: target.pos, range: 1 }
+                                })
+
+                                creep.intraRoomPathing(creep.pos, goal)
+                            }
+                        }
+                    }
+                }
             } else {
 
                 if (lowTower) {
@@ -136,33 +163,30 @@ module.exports = {
 
                     if (creep.advancedTransfer(essentialStructure) == 0) {
 
-                        let structureToMoveTo = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                        essentialStructuresAlt = creep.room.find(FIND_MY_STRUCTURES, {
                             filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
                                     s.structureType == STRUCTURE_SPAWN ||
                                     s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
                                 s.energy < s.energyCapacity && s.id != essentialStructure.id
                         })
 
-                        if (structureToMoveTo) {
+                        let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
 
-                            if (structureToMoveTo.pos.getRangeTo(creep) > 1) {
+                        if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
 
-                                let goal = _.map([structureToMoveTo], function(target) {
-                                    return { pos: target.pos, range: 1 }
-                                })
+                            let goal = _.map([essentialStructureAlt], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
 
-                                creep.intraRoomPathing(creep.pos, goal)
-                            }
-                        } else {
+                            creep.intraRoomPathing(creep.pos, goal)
 
-                            if (storage) {
+                        } else if (storage) {
 
-                                let goal = _.map([storage], function(target) {
-                                    return { pos: target.pos, range: 1 }
-                                })
+                            let goal = _.map([storage], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
 
-                                creep.intraRoomPathing(creep.pos, goal)
-                            }
+                            creep.intraRoomPathing(creep.pos, goal)
                         }
                     }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
@@ -196,7 +220,35 @@ module.exports = {
 
             if (creep.memory.isFull == false) {
 
-                creep.advancedWithdraw(sourceContainer2)
+                if (creep.advancedWithdraw(sourceContainer2) == 0) {
+
+                    if (lowTower) {
+
+                        let goal = _.map([lowTower], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
+
+                        creep.intraRoomPathing(creep.pos, goal)
+                    } else {
+                        if (essentialStructure) {
+
+                            let goal = _.map([essentialStructure], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
+
+                            creep.intraRoomPathing(creep.pos, goal)
+                        } else {
+                            if (storage) {
+
+                                let goal = _.map([storage], function(target) {
+                                    return { pos: target.pos, range: 1 }
+                                })
+
+                                creep.intraRoomPathing(creep.pos, goal)
+                            }
+                        }
+                    }
+                }
             } else {
 
                 if (lowTower) {
@@ -211,33 +263,30 @@ module.exports = {
 
                     if (creep.advancedTransfer(essentialStructure) == 0) {
 
-                        let structureToMoveTo = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                        essentialStructuresAlt = creep.room.find(FIND_MY_STRUCTURES, {
                             filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
                                     s.structureType == STRUCTURE_SPAWN ||
                                     s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
                                 s.energy < s.energyCapacity && s.id != essentialStructure.id
                         })
 
-                        if (structureToMoveTo) {
+                        let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
 
-                            if (structureToMoveTo.pos.getRangeTo(creep) > 1) {
+                        if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
 
-                                let goal = _.map([structureToMoveTo], function(target) {
-                                    return { pos: target.pos, range: 1 }
-                                })
+                            let goal = _.map([essentialStructureAlt], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
 
-                                creep.intraRoomPathing(creep.pos, goal)
-                            }
-                        } else {
+                            creep.intraRoomPathing(creep.pos, goal)
 
-                            if (storage) {
+                        } else if (storage) {
 
-                                let goal = _.map([storage], function(target) {
-                                    return { pos: target.pos, range: 1 }
-                                })
+                            let goal = _.map([storage], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
 
-                                creep.intraRoomPathing(creep.pos, goal)
-                            }
+                            creep.intraRoomPathing(creep.pos, goal)
                         }
                     }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
@@ -292,33 +341,30 @@ module.exports = {
 
                     if (creep.advancedTransfer(essentialStructure) == 0) {
 
-                        let structureToMoveTo = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                        essentialStructuresAlt = creep.room.find(FIND_MY_STRUCTURES, {
                             filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
                                     s.structureType == STRUCTURE_SPAWN ||
                                     s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
                                 s.energy < s.energyCapacity && s.id != essentialStructure.id
                         })
 
-                        if (structureToMoveTo) {
+                        let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
 
-                            if (structureToMoveTo.pos.getRangeTo(creep) > 1) {
+                        if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
 
-                                let goal = _.map([structureToMoveTo], function(target) {
-                                    return { pos: target.pos, range: 1 }
-                                })
+                            let goal = _.map([essentialStructureAlt], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
 
-                                creep.intraRoomPathing(creep.pos, goal)
-                            }
-                        } else {
+                            creep.intraRoomPathing(creep.pos, goal)
 
-                            if (storage) {
+                        } else if (storage) {
 
-                                let goal = _.map([storage], function(target) {
-                                    return { pos: target.pos, range: 1 }
-                                })
+                            let goal = _.map([storage], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
 
-                                creep.intraRoomPathing(creep.pos, goal)
-                            }
+                            creep.intraRoomPathing(creep.pos, goal)
                         }
                     }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {

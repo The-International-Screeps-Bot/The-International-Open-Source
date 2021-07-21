@@ -36,6 +36,6 @@ module.exports = {
 
         Memory.data.energySpentOnPower = 0
 
-        Memory.data.opsGenerated
+        Memory.data.opsGenerated = 0
     }
 }

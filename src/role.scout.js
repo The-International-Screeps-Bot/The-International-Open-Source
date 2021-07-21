@@ -156,10 +156,6 @@ module.exports = {
 
                     if (targetRoomDistance == 1 && !controller.owner && (!controller.reservation || controller.reservation.username == "Invader") && creep.findSafeDistance(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"]) <= 2) {
 
-                        creep.room.memory.stage = "remoteRoom"
-
-                        let sources = creep.room.find(FIND_SOURCES).length
-
                         function checkDuplicate() {
 
                             for (let object of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
@@ -173,14 +169,17 @@ module.exports = {
                             return true
                         }
 
-                        if (checkDuplicate()) {
+                        if (checkDuplicate() && Math.floor(Memory.rooms[creep.memory.roomFrom].spawns.length * 2) > Memory.rooms[creep.memory.roomFrom].remoteRooms.length) {
+
+                            let sources = creep.room.find(FIND_SOURCES).length
 
                             Memory.rooms[creep.memory.roomFrom].remoteRooms.push({ name: creep.room.name, sources: sources, roads: false, builderNeed: false, enemy: false, distance: null })
+
+                            creep.room.memory.stage = "remoteRoom"
                         }
                     } else if (!controller.owner && (!controller.reservation || controller.reservation.username == "Invader") && creep.room.memory.stage != "remoteRoom") {
 
                         creep.room.memory.stage = "neutralRoom"
-
                     }
 
                     let newCommune = false

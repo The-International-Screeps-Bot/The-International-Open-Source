@@ -780,7 +780,8 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
     }
 
     var path = PathFinder.search(origin, goal, {
-        plainCost: 1,
+        plainCost: 3,
+        swampCost: 8,
 
         roomCallback: function(roomName) {
 
@@ -985,6 +986,7 @@ Creep.prototype.creepFlee = function(origin, target) {
 
     var path = PathFinder.search(origin, target, {
         plainCost: 1,
+        swampCost: 8,
         maxRooms: 1,
         flee: true,
 

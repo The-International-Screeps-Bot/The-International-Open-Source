@@ -20,27 +20,21 @@ module.exports = {
 
             if (creep.memory.dying != true) {
 
-                let creepValues = [creep.memory.role, creep.memory.roomFrom]
+                if (!creepsOfRole[[creep.memory.role, creep.memory.roomFrom]]) {
 
-                if (!creepsOfRole[creepValues]) {
-
-                    creepsOfRole[creepValues] = 1
-                } else {
-
-                    creepsOfRole[creepValues]++
+                    creepsOfRole[[creep.memory.role, creep.memory.roomFrom]] = 0
                 }
+
+                creepsOfRole[[creep.memory.role, creep.memory.roomFrom]] += 1
 
                 if (creep.memory.remoteRoom) {
 
-                    let remoteCreepValues = [creep.memory.role, creep.memory.remoteRoom]
+                    if (!creepsOfRemoteRole[[creep.memory.role, creep.memory.remoteRoom]]) {
 
-                    if (!creepsOfRemoteRole[remoteCreepValues]) {
-
-                        creepsOfRemoteRole[remoteCreepValues] = 1
-                    } else {
-
-                        creepsOfRemoteRole[remoteCreepValues]++
+                        creepsOfRemoteRole[[creep.memory.role, creep.memory.remoteRoom]] = 0
                     }
+
+                    creepsOfRemoteRole[[creep.memory.role, creep.memory.remoteRoom]] += 1
                 }
             }
 
@@ -49,7 +43,6 @@ module.exports = {
                 haulers.push({ creep: creep, roomFrom: creep.memory.roomFrom })
             }
         }
-
 
         let boostedSquads = false
 
@@ -197,6 +190,7 @@ module.exports = {
                     }
                 }
 
+                room.memory.remoteRooms = room.memory.remoteRooms.slice(0, Math.floor(room.memory.spawns.length * 2))
 
                 if (room.memory.stage && room.memory.stage < 3) {
 
@@ -352,7 +346,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["hauler"] = 1
+                        minCreeps["hauler"] = 2
 
                         minCreeps["scientist"] = 1
                         break
@@ -362,7 +356,7 @@ module.exports = {
 
                         minCreeps["harvester2"] = 1
 
-                        minCreeps["hauler"] = 1
+                        minCreeps["hauler"] = 2
 
                         minCreeps["scientist"] = 1
                         break
@@ -482,33 +476,36 @@ module.exports = {
 
                 if (remoteBuilderNeed && stage >= 4) {
 
-                    //minCreeps["remoteBuilder"] = 1
+                    minCreeps["remoteBuilder"] = 1
                 }
 
                 if (remoteEnemy && stage >= 3) {
 
-                    //minCreeps["communeDefender"] = 1
+                    minCreeps["communeDefender"] = 1
                 }
 
                 for (let object of room.memory.remoteRooms) {
 
                     if (stage <= 2) {
 
-                        //minCreeps["remoteHarvester1"] += object.sources * 2
-                        //
-                        //minCreeps["remoteHarvester2"] += object.sources * 2
-                        //
-                        //minCreeps["remoteHauler"] += object.sources * 2
+                        minCreeps["remoteHarvester1"] += object.sources
+
+                        minCreeps["remoteHarvester2"] += object.sources
+
+                        minCreeps["remoteHauler"] += object.sources * 2
                     }
                     if (stage >= 3) {
 
-                        //minCreeps["reserver"] += 1
-                        //
-                        //minCreeps["remoteHarvester1"] += object.sources
-                        //
-                        //minCreeps["remoteHarvester2"] += object.sources
-                        //
-                        //minCreeps["remoteHauler"] += object.sources * 2
+                        minCreeps["reserver"] += 1
+
+                        minCreeps["remoteHarvester1"] += object.sources
+
+                        if (object.sources == 2) {
+
+                            minCreeps["remoteHarvester2"] += object.sources
+                        }
+
+                        minCreeps["remoteHauler"] += object.sources
                     }
                 }
 
@@ -566,13 +563,40 @@ module.exports = {
                     var requiredRemoteCreeps = {}
                 }
 
+                let minRemoteCreeps = {}
+
+                for (let remoteRoom of room.memory.remoteRooms) {
+
+                    if (stage <= 2) {
+
+                        minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = remoteRoom.sources
+
+                        minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = remoteRoom.sources
+
+                        minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
+                    }
+                    if (stage >= 3) {
+
+                        minRemoteCreeps[["reserver", remoteRoom.name]] = 1
+
+                        minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = remoteRoom.sources
+
+                        if (remoteRoom.sources == 2) {
+
+                            minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = remoteRoom.sources
+                        }
+
+                        minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources
+                    }
+                }
+
                 for (let role of remoteRoles) {
 
                     for (let remoteRoom of room.memory.remoteRooms) {
 
-                        if (Math.round(minCreeps[role] / remoteRoomsAmount) > creepsOfRemoteRole[[role, remoteRoom.name]]) {
+                        if (minRemoteCreeps[[role, remoteRoom.name]] > creepsOfRemoteRole[[role, remoteRoom.name]]) {
 
-                            requiredRemoteCreeps[[role, remoteRoom.name]] = Math.round(minCreeps[role] / remoteRoomsAmount) - creepsOfRemoteRole[[role, remoteRoom.name]]
+                            requiredRemoteCreeps[[role, remoteRoom.name]] = minRemoteCreeps[[role, remoteRoom.name]] - creepsOfRemoteRole[[role, remoteRoom.name]]
 
                             //console.log(role + ", " + requiredRemoteCreeps[[role, remoteRoom.name]] + ", " + remoteRoom.name)
                         }

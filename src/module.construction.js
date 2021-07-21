@@ -3,9 +3,12 @@ module.exports = {
         _.forEach(Game.rooms, function(room) {
 
             //destroySite()
+
             //removeAllSites()
+
             //destroyStructure()
-            //resetRoom
+
+            //resetRoom()
 
             function destroySite() {
 
@@ -22,9 +25,11 @@ module.exports = {
 
             function removeAllSites() {
 
-                for (let site in Game.constructionSites) {
+                for (let value in Game.constructionSites) {
 
-                    site.remove()
+                    let cSite = Game.constructionSites[value]
+
+                    cSite.remove()
                 }
             }
 
@@ -399,7 +404,7 @@ module.exports = {
 
                     if (room.memory.remoteRooms.length > 0) {
 
-                        //remotePath()
+                        remotePath()
                     }
 
                     if (room.memory.stage >= 6) {
@@ -804,23 +809,22 @@ module.exports = {
 
                     let remoteRooms = room.memory.remoteRooms
 
-                    for (let object of remoteRooms) {
+                    for (let roomMemory of remoteRooms) {
 
-                        remoteRoom = Game.rooms[object.name]
+                        remoteRoom = Game.rooms[roomMemory.name]
 
                         if (remoteRoom) {
 
                             sources = remoteRoom.find(FIND_SOURCES)
 
-                            for (let inactiveSource of sources) {
+                            for (let source of sources) {
 
                                 let origin = room.find(FIND_MY_SPAWNS)[0]
 
-                                let goal = _.map([inactiveSource], function(source) {
+                                let goal = _.map([source], function(source) {
                                     return { pos: source.pos, range: 1 }
                                 })
 
-                                //console.log(JSON.stringify(goal))
                                 if (origin && goal) {
 
                                     var path = PathFinder.search(origin.pos, goal, {
@@ -892,6 +896,14 @@ module.exports = {
 
                                     //console.log(JSON.stringify(path))
 
+                                    let containerConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+                                        filter: s => s.structureType == STRUCTURE_CONTAINER
+                                    })
+
+                                    let containers = room.find(FIND_STRUCTURES, {
+                                        filter: s => s.structureType == STRUCTURE_CONTAINER
+                                    })
+
                                     for (let i = 0; i < path.length; i++) {
 
                                         let value = path[i - 1]
@@ -903,7 +915,8 @@ module.exports = {
 
                                             Game.rooms[value.roomName].createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                                         }
-                                        if (normalValue && normalValue.roomName && normalValue.x && normalValue.y && i + 1 == path.length && Game.rooms[value.roomName]) {
+
+                                        if (source.pos.findInRange(containerConstructionSites, 1) == 0 && source.pos.findInRange(containerConstructionSites, 1) == 0 && normalValue && normalValue.roomName && normalValue.x && normalValue.y && i + 1 == path.length && Game.rooms[value.roomName]) {
 
                                             //new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "red" })
 

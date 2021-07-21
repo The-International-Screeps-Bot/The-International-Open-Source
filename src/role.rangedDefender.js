@@ -17,19 +17,19 @@ module.exports = {
 
             creep.say("Enemy")
 
-            let target = closestHostile.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+            let rampart = closestHostile.pos.findClosestByRange(FIND_MY_STRUCTURES, {
                 filter: s => s.structureType == STRUCTURE_RAMPART
             })
 
-            if (target) {
+            if (rampart) {
 
                 creep.say("Rampart")
 
-                let origin = creep.pos
+                let goal = _.map([rampart], function(target) {
+                    return { pos: target.pos, range: 0 }
+                })
 
-                let goal = target
-
-                creep.rampartPathing(origin, goal)
+                creep.rampartPathing(creep.pos, goal)
 
                 if (closestHostile.pos.isNearTo(creep)) {
 
@@ -48,8 +48,8 @@ module.exports = {
 
                     if (creep.pos.getRangeTo(closestHostile) > 3) {
 
-                        let goal = _.map([closestHostile], function(target) {
-                            return { pos: target.pos, range: 1 }
+                        let goal = _.map([closestHostile], function(rampart) {
+                            return { pos: rampart.pos, range: 1 }
                         })
 
                         creep.intraRoomPathing(creep.pos, goal)
@@ -67,8 +67,8 @@ module.exports = {
                     }
                     if (creep.pos.getRangeTo(closestHostile) <= 2) {
 
-                        let goal = _.map([closestHostile], function(target) {
-                            return { pos: target.pos, range: 3 }
+                        let goal = _.map([closestHostile], function(rampart) {
+                            return { pos: rampart.pos, range: 3 }
                         })
 
                         creep.creepFlee(creep.pos, goal)
@@ -81,8 +81,8 @@ module.exports = {
 
             if (creep.pos.getRangeTo(spawn) >= 6) {
 
-                let goal = _.map([spawn], function(target) {
-                    return { pos: target.pos, range: 1 }
+                let goal = _.map([spawn], function(rampart) {
+                    return { pos: rampart.pos, range: 1 }
                 })
 
                 creep.intraRoomPathing(creep.pos, goal)

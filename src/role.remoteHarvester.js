@@ -179,12 +179,6 @@ module.exports = {
                 }
             })
 
-            var constructionSite = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
-
-            var structure = creep.room.find(FIND_STRUCTURES, {
-                filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5
-            })
-
             if ((closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) || hostileStructure.length > 0) {
 
                 creep.room.memory.enemy = true
@@ -192,12 +186,17 @@ module.exports = {
             } else {
 
                 creep.room.memory.enemy = false
-
             }
+
+            let constructionSite = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
+
+            let structure = creep.room.find(FIND_STRUCTURES, {
+                filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5
+            })
+
             if (constructionSite.length > 0 || structure.length > 0) {
 
                 creep.room.memory.builderNeed = true
-
             }
 
             let sources = creep.room.find(FIND_SOURCES)
@@ -214,7 +213,9 @@ module.exports = {
             }
         } else {
 
-            let goal = _.map([new RoomPosition(25, 25, roomFrom)], function(target) {
+            creep.say(remoteRoom)
+
+            let goal = _.map([new RoomPosition(25, 25, remoteRoom)], function(target) {
                 return { pos: target, range: 24 }
             })
 

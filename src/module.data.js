@@ -21,7 +21,7 @@ module.exports = {
 
         // Per Room
 
-        Memory.data.timeSpentSpawningPerRoom = (Memory.data.timeSpentSpawning * 100 / Memory.global.communes.length).toFixed(2)
+        Memory.data.avgTimeSpentSpawning = (Memory.data.timeSpentSpawning * 100 / mySpawns).toFixed(2)
 
         Memory.data.mineralsHarvestedPerRoom = (Memory.data.mineralsHarvested / Memory.global.communes.length).toFixed(2)
 

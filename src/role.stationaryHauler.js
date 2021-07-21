@@ -56,13 +56,11 @@ module.exports = {
 
             if (creep.pos.x != stationaryPos.x || creep.pos.y != stationaryPos.y) {
 
-                let origin = creep.pos
-
                 let goal = _.map([stationaryPos], function(target) {
                     return { pos: target, range: 0 }
                 })
 
-                creep.intraRoomPathing(origin, goal)
+                creep.intraRoomPathing(creep.pos, goal)
             } else {
 
                 creep.hasResource()

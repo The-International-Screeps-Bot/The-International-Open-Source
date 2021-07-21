@@ -73,6 +73,8 @@ module.exports = {
                                         tower.repair(logisticStructure)
 
                                         room.visual.text("🔧 ", tower.pos.x + 1, tower.pos.y, { align: 'left' })
+
+                                        Memory.data.energySpentOnRepairs += 10
                                     }
                                 }
                             } else {
@@ -89,6 +91,8 @@ module.exports = {
                                             tower.repair(lowRampart)
 
                                             room.visual.text("🔧 ", tower.pos.x + 1, tower.pos.y, { align: 'left' })
+
+                                            Memory.data.energySpentOnBarricades += 10
                                         }
                                     }
                                 }
