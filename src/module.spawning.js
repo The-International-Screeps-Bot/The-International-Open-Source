@@ -484,32 +484,35 @@ module.exports = {
                     minCreeps["communeDefender"] = 1
                 }
 
-                for (let object of room.memory.remoteRooms) {
+                for (let remoteRoom of room.memory.remoteRooms) {
 
                     if (stage <= 2) {
 
-                        minCreeps["remoteHarvester1"] += object.sources
+                        minCreeps["remoteHarvester1"] += 2
 
-                        minCreeps["remoteHarvester2"] += object.sources
+                        if (remoteRoom.sources == 2) {
 
-                        minCreeps["remoteHauler"] += object.sources * 2
+                            minCreeps["remoteHarvester2"] += 2
+                        }
+
+                        minCreeps["remoteHauler"] += remoteRoom.sources * 2
                     }
                     if (stage >= 3) {
 
                         minCreeps["reserver"] += 1
 
-                        minCreeps["remoteHarvester1"] += object.sources
+                        minCreeps["remoteHarvester1"] += 1
 
-                        if (object.sources == 2) {
+                        if (remoteRoom.sources == 2) {
 
-                            minCreeps["remoteHarvester2"] += object.sources
+                            minCreeps["remoteHarvester2"] += 1
                         }
 
-                        minCreeps["remoteHauler"] += object.sources
+                        minCreeps["remoteHauler"] += remoteRoom.sources
                     }
                 }
 
-                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 275000 && room.controller.level <= 7) {
+                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 175000 && room.controller.level <= 7) {
 
                     minCreeps["upgrader"] += 1
                 }
@@ -569,9 +572,12 @@ module.exports = {
 
                     if (stage <= 2) {
 
-                        minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = remoteRoom.sources
+                        minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 2
 
-                        minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = remoteRoom.sources
+                        if (remoteRoom.sources == 2) {
+
+                            minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 2
+                        }
 
                         minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
                     }
@@ -579,11 +585,11 @@ module.exports = {
 
                         minRemoteCreeps[["reserver", remoteRoom.name]] = 1
 
-                        minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = remoteRoom.sources
+                        minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 1
 
                         if (remoteRoom.sources == 2) {
 
-                            minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = remoteRoom.sources
+                            minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 1
                         }
 
                         minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources
