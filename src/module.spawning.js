@@ -508,7 +508,7 @@ module.exports = {
                             minCreeps["remoteHarvester2"] += 1
                         }
 
-                        minCreeps["remoteHauler"] += remoteRoom.sources
+                        minCreeps["remoteHauler"] += Math.floor(remoteRoom.sources * 1.5)
                     }
                 }
 
@@ -592,7 +592,7 @@ module.exports = {
                             minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 1
                         }
 
-                        minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources
+                        minRemoteCreeps[["remoteHauler", remoteRoom.name]] = Math.floor(remoteRoom.sources * 1.5)
                     }
                 }
 
