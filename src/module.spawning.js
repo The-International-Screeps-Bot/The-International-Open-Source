@@ -374,7 +374,7 @@ module.exports = {
                         minCreeps["antifaAssaulter"] = 4
                         minCreeps["antifaSupporter"] = minCreeps["antifaAssaulter"]
                     }
-                })
+                })()
 
                 if (roomConstructionSite.length > 0) {
                     if (!room.storage) {
@@ -525,7 +525,7 @@ module.exports = {
                             minCreeps["remoteHauler"] += Math.floor(remoteRoom.sources * 1.5)
                         }
                     }
-                })
+                })()
 
 
                 if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 175000 && room.controller.level <= 7) {
