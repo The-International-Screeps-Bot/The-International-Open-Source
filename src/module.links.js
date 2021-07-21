@@ -16,13 +16,6 @@ module.exports = {
 
                         if (link && link != null && link.store[RESOURCE_ENERGY] >= 790) {
 
-                            room.visual.circle(link.pos, {
-                                fill: 'transparent',
-                                radius: 0.8,
-                                stroke: '#FFD180',
-                                strokeWidth: 0.125
-                            })
-
                             return link
                         }
                     }
@@ -37,7 +30,7 @@ module.exports = {
                         if (controllerLink.store[RESOURCE_ENERGY] < 400 && room.controller.ticksToDowngrade <= 15000) {
 
                             findFullLink().transferEnergy(controllerLink)
-                        } else if (Memory.global.globalStage > 0 && room.storage && room.storage.store.getUsedCapacity() >= 200000 && controllerLink.store[RESOURCE_ENERGY] < 200) {
+                        } else if (room.storage && room.storage.store.getUsedCapacity() >= 175000 && controllerLink.store[RESOURCE_ENERGY] < 200) {
 
                             findFullLink().transferEnergy(controllerLink)
 

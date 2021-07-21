@@ -32,7 +32,7 @@ module.exports = {
 
                     creep.advancedWithdraw(controllerContainer, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
 
-                } else if (room.memory.stage <= 3) {
+                } else if (controllerLink == null) {
 
                     creep.say("NE")
 

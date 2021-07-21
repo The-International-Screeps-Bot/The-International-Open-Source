@@ -362,11 +362,19 @@ module.exports = {
                         break
                 }
 
-                if (attackingRoom && attackingRoom == room) {
+                (function() {
 
-                    minCreeps["antifaAssaulter"] = 4
-                    minCreeps["antifaSupporter"] = minCreeps["antifaAssaulter"]
-                }
+                    if (room.storage && room.storage.store[RESOURCE_ENERGY] <= 20000) {
+
+                        return
+                    }
+
+                    if (attackingRoom && attackingRoom == room) {
+
+                        minCreeps["antifaAssaulter"] = 4
+                        minCreeps["antifaSupporter"] = minCreeps["antifaAssaulter"]
+                    }
+                })
 
                 if (roomConstructionSite.length > 0) {
                     if (!room.storage) {
@@ -483,34 +491,42 @@ module.exports = {
 
                     minCreeps["communeDefender"] = 1
                 }
+                (function() {
 
-                for (let remoteRoom of room.memory.remoteRooms) {
+                    if (room.storage && room.storage.store[RESOURCE_ENERGY] <= 15000) {
 
-                    if (stage <= 2) {
-
-                        minCreeps["remoteHarvester1"] += 2
-
-                        if (remoteRoom.sources == 2) {
-
-                            minCreeps["remoteHarvester2"] += 2
-                        }
-
-                        minCreeps["remoteHauler"] += remoteRoom.sources * 2
+                        return
                     }
-                    if (stage >= 3) {
 
-                        minCreeps["reserver"] += 1
+                    for (let remoteRoom of room.memory.remoteRooms) {
 
-                        minCreeps["remoteHarvester1"] += 1
+                        if (stage <= 2) {
 
-                        if (remoteRoom.sources == 2) {
+                            minCreeps["remoteHarvester1"] += 2
 
-                            minCreeps["remoteHarvester2"] += 1
+                            if (remoteRoom.sources == 2) {
+
+                                minCreeps["remoteHarvester2"] += 2
+                            }
+
+                            minCreeps["remoteHauler"] += remoteRoom.sources * 2
                         }
+                        if (stage >= 3) {
 
-                        minCreeps["remoteHauler"] += Math.floor(remoteRoom.sources * 1.5)
+                            minCreeps["reserver"] += 1
+
+                            minCreeps["remoteHarvester1"] += 1
+
+                            if (remoteRoom.sources == 2) {
+
+                                minCreeps["remoteHarvester2"] += 1
+                            }
+
+                            minCreeps["remoteHauler"] += Math.floor(remoteRoom.sources * 1.5)
+                        }
                     }
-                }
+                })
+
 
                 if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 175000 && room.controller.level <= 7) {
 
