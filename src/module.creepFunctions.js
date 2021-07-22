@@ -267,17 +267,17 @@ Creep.prototype.constructionBuild = function(target) {
         Memory.data.energySpentOnConstruction += creep.myParts("work")
     }
 }
-Creep.prototype.controllerUpgrade = function(target) {
+Creep.prototype.controllerUpgrade = function(controller) {
 
-    if (creep.pos.getRangeTo(target) > 3) {
+    if (creep.pos.getRangeTo(controller) > 3) {
 
-        let goal = _.map([target], function(target) {
+        let goal = _.map([controller], function(target) {
             return { pos: target.pos, range: 1 }
         })
 
         creep.intraRoomPathing(creep.pos, goal)
 
-    } else if (creep.upgradeController(target) == 0) {
+    } else if (creep.upgradeController(controller) == 0) {
 
         creep.say("🔋 " + creep.myParts("work"))
         Memory.data.controlPoints += creep.myParts("work")

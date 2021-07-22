@@ -1,9 +1,15 @@
+var roleBuilder = require('role.builder');
 var roleUpgrader = require('role.upgrader');
 
 module.exports = {
     run: function(creep) {
 
-        creep.memory.target = Memory.global.newCommune
+        const newCommune = Memory.global.newCommune
+
+        if (!newCommune) {
+
+            roleBuilder.run(creep)
+        }
 
         let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
 
@@ -12,13 +18,13 @@ module.exports = {
             const direction = creep.pos.getDirectionTo(25, 25)
             creep.move(direction);
 
-        } else if (creep.room.name != creep.memory.target) {
+        } else if (creep.room.name != newCommune) {
 
-            let goal = _.map([new RoomPosition(25, 25, creep.memory.target)], function(pos) {
+            let goal = _.map([new RoomPosition(25, 25, newCommune)], function(pos) {
                 return { pos: pos, range: 1 }
             })
 
-            creep.say("BC " + creep.memory.target)
+            creep.say("BC " + newCommune)
 
             creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
 
