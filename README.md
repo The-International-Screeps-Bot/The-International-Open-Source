@@ -72,3 +72,4 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [ ] Squads morph size shape and amount depending on situation
 - [x] Squads flee when overwhelmed or avoiding range of enemy
 - [x] Haulers to manage mineral containers
+- [ ] Create a traffic manager
