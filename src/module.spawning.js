@@ -11,12 +11,20 @@ module.exports = {
 
         let creepsOfRemoteRole = {}
         let creepsOfRole = {}
+        let creepCollectionsOfRole = {}
 
         let haulers = []
 
         for (let name in Game.creeps) {
 
             let creep = Game.creeps[name]
+
+            if (!creepCollectionsOfRole[creep.memory.role]) {
+
+                creepCollectionsOfRole[creep.memory.role] = []
+            }
+
+            (creepCollectionsOfRole[creep.memory.role]).push({ name: creep.name, role: creep.memory.role, roomFrom: creep.memory.roomFrom })
 
             if (creep.memory.dying != true) {
 
@@ -54,9 +62,9 @@ module.exports = {
 
             var newCommune
 
-            var attackTarget = "E32N8"
+            //var attackTarget = "E32N8"
 
-            //var attackTarget
+            var attackTarget
 
         } else {
 
@@ -484,7 +492,7 @@ module.exports = {
 
                 if (remoteBuilderNeed && stage >= 4) {
 
-                    minCreeps["remoteBuilder"] = 1
+                    minCreeps["remoteBuilder"] = Math.floor(room.memory.remoteRooms.length / 3)
                 }
 
                 if (remoteEnemy && stage >= 3) {
