@@ -101,12 +101,7 @@ module.exports = {
 
         function getEstablishedRooms() {
 
-            if (Memory.global.establishedRooms != "") {
-
-                return Memory.global.establishedRooms
-            }
-
-            return "no"
+            return Memory.global.establishedRooms.length
         }
 
         console.log('--------------------------------------------------------')

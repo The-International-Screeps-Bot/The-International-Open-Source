@@ -1,4 +1,4 @@
-var roleBuilder = require('role.builder');
+var roleUpgrader = require('role.upgrader');
 
 module.exports = {
     run: function(creep) {
@@ -28,6 +28,10 @@ module.exports = {
 
             let constructionSite = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES)
 
+            if (!constructionSite) {
+
+                roleUpgrader.run(creep)
+            }
             if (creep.memory.isFull) {
 
                 creep.say("🚧")
