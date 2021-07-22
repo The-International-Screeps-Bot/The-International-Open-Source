@@ -825,6 +825,39 @@ module.exports = {
                                     return { pos: source.pos, range: 1 }
                                 })
 
+                                let avoidStages = ["enemyRoom", "keeperRoom", "enemyReservation"]
+
+                                let allowedRooms = {
+                                    [origin.roomName]: true
+                                }
+
+                                let route = Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
+                                    routeCallback(roomName) {
+
+                                        if (roomName == goal[0].pos.roomName) {
+
+                                            allowedRooms[roomName] = true
+                                            return 1
+
+                                        }
+                                        if (Memory.rooms[roomName] && avoidStages.indexOf(Memory.rooms[roomName].stage) == -1) {
+
+                                            allowedRooms[roomName] = true
+                                            return 1
+
+                                        }
+
+                                        return Infinity
+                                    }
+                                })
+
+                                if (route.length > 0) {
+
+                                    goal = _.map([new RoomPosition(25, 25, route[0].room)], function(pos) {
+                                        return { pos: pos, range: 1 }
+                                    })
+                                }
+
                                 if (origin && goal) {
 
                                     var path = PathFinder.search(origin.pos, goal, {
@@ -837,6 +870,8 @@ module.exports = {
                                             let room = Game.rooms[roomName]
 
                                             if (!room) return
+
+                                            if (!allowedRooms[roomName]) return false
 
                                             let cm
 

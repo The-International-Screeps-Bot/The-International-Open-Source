@@ -396,7 +396,7 @@ module.exports = {
             }
         } else if (task == "droppedEnergy") {
 
-            creep.say("DE")
+            creep.say("TS")
 
             if (!droppedEnergy) {
 
