@@ -11,14 +11,11 @@ module.exports = {
 
             creep.memory.isFull = "constant"
         }
-
-        if (creep.memory.isFull == true || creep.memory.isFull == "constant") {
+        if (creep.memory.isFull || creep.memory.isFull == "constant") {
 
             creep.say("🔋")
 
-            let target = creep.room.controller
-
-            creep.controllerUpgrade(target)
+            creep.controllerUpgrade(creep.room.controller)
 
             if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
 

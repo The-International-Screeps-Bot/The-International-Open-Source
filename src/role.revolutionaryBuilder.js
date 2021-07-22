@@ -26,17 +26,22 @@ module.exports = {
 
             creep.isFull()
 
-            let constructionSite = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES)
-
-            if (!constructionSite) {
-
-                roleUpgrader.run(creep)
-            }
             if (creep.memory.isFull) {
 
-                creep.say("🚧")
+                let constructionSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
 
-                creep.constructionBuild(constructionSite)
+                if (constructionSites.length > 0) {
+
+                    let constructionSite = creep.pos.findClosestByRange(constructionSites)
+
+                    creep.say("🚧")
+
+                    creep.constructionBuild(constructionSite)
+
+                } else {
+
+                    roleUpgrader.run(creep)
+                }
             } else {
 
                 let terminal = creep.room.terminal

@@ -271,13 +271,11 @@ Creep.prototype.controllerUpgrade = function(target) {
 
     if (creep.pos.getRangeTo(target) > 3) {
 
-        let origin = creep.pos
-
         let goal = _.map([target], function(target) {
             return { pos: target.pos, range: 1 }
         })
 
-        creep.intraRoomPathing(origin, goal)
+        creep.intraRoomPathing(creep.pos, goal)
 
     } else if (creep.upgradeController(target) == 0) {
 
