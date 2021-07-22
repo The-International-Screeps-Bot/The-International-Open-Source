@@ -480,7 +480,7 @@ module.exports = {
                     minCreeps["revolutionaryBuilder"] = 4
                 }
 
-                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 35000 && mineralContainer != null && roomExtractor.length > 0 && roomMineral.length > 0 && Memory.global.globalStage >= 1) {
+                if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 35000 && mineralContainer != null && roomExtractor.length > 0 && roomMineral.length > 0) {
 
                     minCreeps["miner"] = 1
                 }

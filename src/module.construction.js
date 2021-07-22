@@ -935,7 +935,7 @@ module.exports = {
                         filter: s => s.structureType == STRUCTURE_EXTRACTOR
                     })
 
-                    if (extractors.length < 0) {
+                    if (extractors.length == 0) {
 
                         let mineral = room.find(FIND_MINERALS)[0]
 
