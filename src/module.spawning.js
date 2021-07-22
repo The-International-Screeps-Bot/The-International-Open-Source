@@ -1,4 +1,4 @@
-let haulerManager = require("module.haulerManager")
+let taskManager = require("module.taskManager")
 let trafficManager = require("module.trafficManager")
 let allyList = require("module.allyList");
 
@@ -143,7 +143,7 @@ module.exports = {
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my) {
 
-                haulerManager.run(room, haulers)
+                taskManager.run(room, haulers)
 
                 /*Integral values for spawning considerations*/
 

@@ -24,7 +24,11 @@ module.exports = {
         let controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
 
         let droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-            filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity()
+            filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
+        })
+
+        let tombstone = creep.pos.findClosestByRange(FIND_TOMBSTONES, {
+            filter: (s) => s.store[RESOURCE_ENERGY] >= creep.store.getCapacity() * 0.5
         })
 
         let powerSpawn = creep.room.find(FIND_MY_STRUCTURES, {
@@ -312,11 +316,89 @@ module.exports = {
                     task = "noDeliveryPossible"
                 }
             }
+        } else if (task == "tombstone") {
+
+            creep.say("DE")
+
+            if (!tombstone || tombstone.store[RESOURCE_ENERGY] < creep.store.getCapacity()) {
+
+                creep.memory.task = undefined
+            }
+
+            creep.isFull()
+
+            if (!creep.memory.isFull) {
+
+                creep.advancedWithdraw(tombstone)
+
+            } else {
+
+                if (lowTower) {
+
+                    if (creep.advancedTransfer(lowTower) == 0) {
+
+                        creep.memory.task = undefined
+                    }
+                } else if (essentialStructure) {
+
+                    creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
+
+                    if (creep.advancedTransfer(essentialStructure) == 0) {
+
+                        essentialStructuresAlt = creep.room.find(FIND_MY_STRUCTURES, {
+                            filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
+                                    s.structureType == STRUCTURE_SPAWN ||
+                                    s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
+                                s.energy < s.energyCapacity && s.id != essentialStructure.id
+                        })
+
+                        let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
+
+                        if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
+
+                            let goal = _.map([essentialStructureAlt], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
+
+                            creep.intraRoomPathing(creep.pos, goal)
+
+                        } else if (storage) {
+
+                            let goal = _.map([storage], function(target) {
+                                return { pos: target.pos, range: 1 }
+                            })
+
+                            creep.intraRoomPathing(creep.pos, goal)
+                        }
+                    }
+                } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
+
+                    if (creep.advancedTransfer(storage) == 0) {
+
+                        creep.memory.task = undefined
+                    }
+                } else if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
+
+                    if (creep.advancedTransfer(controllerContainer) == 0) {
+
+                        creep.memory.task = undefined
+                    }
+                } else if (storage) {
+
+                    if (creep.advancedTransfer(storage) == 0) {
+
+                        creep.memory.task = undefined
+                    }
+                } else {
+
+                    task = "noDeliveryPossible"
+                }
+            }
         } else if (task == "droppedEnergy") {
 
             creep.say("DE")
 
-            if (!droppedEnergy && !creep.memory.isFull) {
+            if (!droppedEnergy) {
 
                 creep.memory.task = undefined
             }
