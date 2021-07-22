@@ -916,7 +916,7 @@ module.exports = {
                                             Game.rooms[value.roomName].createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                                         }
 
-                                        if (source.pos.findInRange(containerConstructionSites, 1) == 0 && source.pos.findInRange(containerConstructionSites, 1) == 0 && normalValue && normalValue.roomName && normalValue.x && normalValue.y && i + 1 == path.length && Game.rooms[value.roomName]) {
+                                        if (source.pos.findInRange(containerConstructionSites, 1) == 0 && source.pos.findInRange(containers) == 0 && normalValue && normalValue.roomName && normalValue.x && normalValue.y && i + 1 == path.length && Game.rooms[value.roomName]) {
 
                                             //new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "red" })
 
