@@ -1095,7 +1095,7 @@ module.exports = {
 
                 let minerBody = roleValues(
                     [{
-                        stage: 8,
+                        stage: 1,
                         defaultParts: [],
                         defaultCost: 0,
                         extraParts: [WORK, WORK, WORK, WORK, MOVE],
