@@ -25,11 +25,6 @@ module.exports = {
         if (remoteRoom) {
             if (creep.room.name == remoteRoom) {
 
-                if (creep.hits < creep.hitsMax) {
-
-                    creep.heal(creep)
-                }
-
                 let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
                         return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
@@ -69,6 +64,11 @@ module.exports = {
                         creep.intraRoomPathing(creep.pos, goal)
 
                     } else {
+
+                        if (creep.hits < creep.hitsMax) {
+
+                            creep.heal(creep)
+                        }
 
                         creep.room.memory.enemy = false
                     }
