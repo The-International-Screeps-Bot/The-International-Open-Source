@@ -3,6 +3,14 @@ module.exports = {
         _.forEach(Game.rooms, function(room) {
             if (room.controller && room.controller.my && room.controller.level >= 1) {
 
+                let colors = {
+                    blue: "",
+                    green: "",
+                    red: "",
+                    yellow: "",
+                    gray: "",
+                }
+
                 var labs = room.find(FIND_MY_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_LAB
                 });
@@ -254,7 +262,7 @@ module.exports = {
                 }
                 for (let container of containers) {
 
-                    room.visual.text(container.store[RESOURCE_ENERGY], container.pos.x, container.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center' })
+                    room.visual.text(container.store.getUsedCapacity(), container.pos.x, container.pos.y, { font: 0.5, backgroundColor: "#b4b4b4", backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
                 }
 
                 let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
@@ -291,7 +299,7 @@ module.exports = {
 
                 for (let link of links) {
 
-                    room.visual.text(link.store[RESOURCE_ENERGY], link.pos.x, link.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center' })
+                    room.visual.text(link.store[RESOURCE_ENERGY], link.pos.x, link.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
                 }
 
                 let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
@@ -338,58 +346,58 @@ module.exports = {
 
                 if (controller.progressTotal) {
 
-                    room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 2, { align: 'center' });
+                    room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 2, { align: 'center', opacity: "0.8" });
                 }
 
-                room.visual.text(controller.level, controller.pos.x, controller.pos.y - 1, { align: 'center' });
+                room.visual.text(controller.level, controller.pos.x, controller.pos.y - 1, { align: 'center', opacity: "0.8" });
 
                 if (storage) {
 
-                    room.visual.text((storage.store[RESOURCE_ENERGY] / 1000).toFixed(0) + "k", storage.pos.x, storage.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center' });
+                    room.visual.text((storage.store[RESOURCE_ENERGY] / 1000).toFixed(0) + "k", storage.pos.x, storage.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center', opacity: "0.8" });
                 }
                 if (terminal) {
 
-                    room.visual.text((terminal.store[RESOURCE_ENERGY] / 1000).toFixed(0) + "k", terminal.pos.x, terminal.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center' });
+                    room.visual.text((terminal.store[RESOURCE_ENERGY] / 1000).toFixed(0) + "k", terminal.pos.x, terminal.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center', opacity: "0.8" });
 
                 }
 
-                mineral.room.visual.text((mineral.mineralAmount / 1000).toFixed(0) + "k" + ", " + (mineral.ticksToRegeneration / 1000).toFixed(0) + "k", mineral.pos.x, mineral.pos.y - 1, { align: 'center' });
+                mineral.room.visual.text((mineral.mineralAmount / 1000).toFixed(0) + "k" + ", " + (mineral.ticksToRegeneration / 1000).toFixed(0) + "k", mineral.pos.x, mineral.pos.y - 1, { align: 'center', opacity: "0.8" });
 
                 if (mineral.density == 1) {
 
-                    mineral.room.visual.text("Low", mineral.pos.x, mineral.pos.y - 2, { align: 'center' });
+                    mineral.room.visual.text("Low", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
 
                 } else if (mineral.density == 2) {
 
-                    mineral.room.visual.text("Moderate", mineral.pos.x, mineral.pos.y - 2, { align: 'center' });
+                    mineral.room.visual.text("Moderate", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
 
                 } else if (mineral.density == 3) {
 
-                    mineral.room.visual.text("High", mineral.pos.x, mineral.pos.y - 2, { align: 'center' });
+                    mineral.room.visual.text("High", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
 
                 } else if (mineral.density == 4) {
 
-                    mineral.room.visual.text("Ultra", mineral.pos.x, mineral.pos.y - 2, { align: 'center' });
+                    mineral.room.visual.text("Ultra", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
 
                 }
 
                 for (let constructionSite of constructionSites) {
 
-                    room.visual.text("%" + (constructionSite.progress / constructionSite.progressTotal * 100).toFixed(0), constructionSite.pos.x, constructionSite.pos.y - 0.25, { font: 0.5, align: 'center' });
+                    room.visual.text("%" + (constructionSite.progress / constructionSite.progressTotal * 100).toFixed(0), constructionSite.pos.x, constructionSite.pos.y - 0.25, { font: 0.5, align: 'center', opacity: "0.8" });
 
                 }
                 for (let tower of towers) {
 
-                    room.visual.text(tower.store[RESOURCE_ENERGY], tower.pos.x, tower.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center' });
+                    room.visual.text(tower.store[RESOURCE_ENERGY], tower.pos.x, tower.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center', opacity: "0.8" });
 
                 }
                 for (let spawn of spawns) {
 
                     if (spawn.spawning) {
 
-                        room.visual.text(spawn.spawning.remainingTime, spawn.pos.x, spawn.pos.y - 1, { align: 'center' })
+                        room.visual.text(spawn.spawning.remainingTime, spawn.pos.x, spawn.pos.y - 1, { align: 'center', opacity: "0.8" })
 
-                        room.visual.text(spawn.spawning.name, spawn.pos.x, spawn.pos.y - 2, { align: 'center' })
+                        room.visual.text(Game.creeps[spawn.spawning.name].memory.role, spawn.pos.x, spawn.pos.y, { align: 'center' })
 
                     }
                 }
@@ -397,15 +405,15 @@ module.exports = {
 
                     if (source.ticksToRegeneration != undefined) {
 
-                        room.visual.text(source.ticksToRegeneration, source.pos.x, source.pos.y - 1, { align: 'center' });
+                        room.visual.text(source.ticksToRegeneration, source.pos.x, source.pos.y - 1, { align: 'center', opacity: "0.8" });
 
                     } else {
 
-                        room.visual.text("0", source.pos.x, source.pos.y - 1, { align: 'center' });
+                        room.visual.text("0", source.pos.x, source.pos.y - 1, { align: 'center', opacity: "0.8" });
 
                     }
 
-                    room.visual.text(source.energy, source.pos.x, source.pos.y - 2, { align: 'center' });
+                    room.visual.text(source.energy, source.pos.x, source.pos.y - 2, { align: 'center', opacity: "0.8" });
 
                 }
             }
