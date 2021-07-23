@@ -326,14 +326,14 @@ module.exports = {
             }
             if (creep.isFull()) {
 
-                task = "deliverToBest"
+                creep.memory.task = "deliverToBest"
             }
 
             creep.isFull()
 
             if (creep.advancedWithdraw(tombstone, RESOURCE_ENERGY) == 0) {
 
-                creep.memory.task == "deliverToBest"
+                creep.memory.task = "deliverToBest"
             }
         } else if (task == "droppedEnergy") {
 
@@ -345,7 +345,7 @@ module.exports = {
             }
             if (creep.isFull()) {
 
-                task = "deliverToBest"
+                creep.memory.task = "deliverToBest"
             }
 
 
