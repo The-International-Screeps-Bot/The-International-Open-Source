@@ -98,7 +98,7 @@ module.exports = {
 
                     for (let rampart of ramparts) {
 
-                        if (cm && cm.get(rampart.x, rampart.y) < 255) {
+                        if (cm && cm.get(rampart.pos.x, rampart.pos.y) < 255) {
 
                             outerRampart = rampart
                             break

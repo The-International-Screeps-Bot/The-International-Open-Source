@@ -449,6 +449,15 @@ module.exports = {
             }
         } else if (task == "deliverToBest") {
 
+            creep.say("DTB")
+
+            creep.isFull()
+
+            if (!creep.memory.isFull) {
+
+                creep.memory.task = undefined
+            }
+
             if (lowTower) {
 
                 if (creep.advancedTransfer(lowTower) == 0) {

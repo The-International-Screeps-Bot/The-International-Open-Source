@@ -112,7 +112,7 @@ Creep.prototype.isFull = function() {
 
     } else if (creep.store.getUsedCapacity() == creep.store.getCapacity()) {
 
-        creep.memory.isFull = true;
+        creep.memory.isFull = true
 
     }
 }
@@ -122,30 +122,28 @@ Creep.prototype.hasResource = function() {
 
     if (creep.store.getUsedCapacity() === 0) {
 
-        creep.memory.isFull = false;
+        creep.memory.isFull = false
 
     } else {
 
-        creep.memory.isFull = true;
+        creep.memory.isFull = true
 
     }
 }
-Creep.prototype.pickupDroppedEnergy = function(target) {
+Creep.prototype.pickupDroppedEnergy = function(resource) {
 
-    if (creep.pos.isNearTo(target)) {
+    if (creep.pos.getRangeTo(resource) <= 1) {
 
-        creep.pickup(target, RESOURCE_ENERGY)
+        creep.pickup(resource, RESOURCE_ENERGY)
         return 0
 
     } else {
 
-        let origin = creep.pos
-
-        let goal = _.map([target], function(target) {
+        let goal = _.map([resource], function(target) {
             return { pos: target.pos, range: 1 }
         })
 
-        creep.intraRoomPathing(origin, goal)
+        creep.intraRoomPathing(creep.pos, goal)
     }
 }
 Creep.prototype.advancedWithdraw = function(target, resource, amount) {
