@@ -68,12 +68,21 @@ module.exports = {
 
                             if (creep.usePower(PWR_GENERATE_OPS) == 0) {
 
+                                creep.say("Ops")
+
                                 Memory.data.opsGenerated += creep.powers[PWR_GENERATE_OPS].level
                             }
 
-                            creep.say("PS")
+                            function findPowers() {
+
+
+                            }
+
+                            creep.say("🚬")
 
                             if (powerSpawn && creep.pos.getRangeTo(powerSpawn) > 1) {
+
+                                creep.say("PS")
 
                                 let goal = _.map([powerSpawn], function(target) {
                                     return { pos: target.pos, range: 1 }

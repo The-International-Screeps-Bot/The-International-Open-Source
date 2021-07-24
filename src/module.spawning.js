@@ -492,7 +492,7 @@ module.exports = {
 
                 if (remoteBuilderNeed && stage >= 4) {
 
-                    minCreeps["remoteBuilder"] = Math.floor(room.memory.remoteRooms.length / 3)
+                    minCreeps["remoteBuilder"] = 1 + Math.round(room.memory.remoteRooms.length / 3)
                 }
 
                 if (remoteEnemy && stage >= 3) {
