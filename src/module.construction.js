@@ -869,7 +869,7 @@ module.exports = {
 
                                             let room = Game.rooms[roomName]
 
-                                            if (!room) return
+                                            if (!room) return false
 
                                             if (!allowedRooms[roomName]) return false
 
