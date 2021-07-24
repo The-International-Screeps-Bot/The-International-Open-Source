@@ -828,10 +828,10 @@ module.exports = {
                                 let avoidStages = ["enemyRoom", "keeperRoom", "enemyReservation"]
 
                                 let allowedRooms = {
-                                    [origin.roomName]: true
+                                    [origin.pos.roomName]: true
                                 }
 
-                                let route = Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
+                                let route = Game.map.findRoute(origin.pos.roomName, goal[0].pos.roomName, {
                                     routeCallback(roomName) {
 
                                         if (roomName == goal[0].pos.roomName) {
@@ -840,7 +840,7 @@ module.exports = {
                                             return 1
 
                                         }
-                                        if (Memory.rooms[roomName] && avoidStages.indexOf(Memory.rooms[roomName].stage) == -1) {
+                                        if (Memory.rooms[roomName] && avoidStages.includes(Memory.rooms[roomName].stage)) {
 
                                             allowedRooms[roomName] = true
                                             return 1
