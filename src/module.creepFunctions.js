@@ -385,67 +385,227 @@ Creep.prototype.findDamagePossible = function(creep, healers, towers) {
 }
 Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTower, towerCount) {
 
-    let distance = creep.pos.getRangeTo(creep.pos.findClosestByRange(towers))
+        let distance = creep.pos.getRangeTo(creep.pos.findClosestByRange(towers))
 
-    let towerDamage = (C.TOWER_FALLOFF * (distance - C.TOWER_OPTIMAL_RANGE) / (C.TOWER_FALLOFF_RANGE - C.TOWER_OPTIMAL_RANGE)) * towers.length
+        let towerDamage = (C.TOWER_FALLOFF * (distance - C.TOWER_OPTIMAL_RANGE) / (C.TOWER_FALLOFF_RANGE - C.TOWER_OPTIMAL_RANGE)) * towers.length
 
-    let healAmount = 0
+        let healAmount = 0
 
-    if (creep) {
+        if (creep) {
 
-        for (let part of creep.body) {
+            for (let part of creep.body) {
 
-            if (part.type == TOUGH && part.boost) {
+                if (part.type == TOUGH && part.boost) {
 
-                towerDamage = towerDamage * 0.3
-                break
-            }
-        }
-    }
-
-    if (healers.length > 0) {
-
-        for (let healer of healers) {
-
-            for (let part in healer.body) {
-
-                if (part.type == HEAL) {
-
-                    if (part.boost == RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE) {
-
-                        healAmount += 36
-
-                    } else if (part.boost == RESOURCE_LEMERGIUM_ALKALIDE) {
-
-                        healAmount += 24
-
-                    } else if (part.boost == RESOURCE_LEMERGIUM_OXIDE) {
-
-                        healAmount += 12
-                    }
-
-                    healAmount += 12
+                    towerDamage = towerDamage * 0.3
+                    break
                 }
             }
         }
+
+        if (healers.length > 0) {
+
+            for (let healer of healers) {
+
+                for (let part in healer.body) {
+
+                    if (part.type == HEAL) {
+
+                        if (part.boost == RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE) {
+
+                            healAmount += 36
+
+                        } else if (part.boost == RESOURCE_LEMERGIUM_ALKALIDE) {
+
+                            healAmount += 24
+
+                        } else if (part.boost == RESOURCE_LEMERGIUM_OXIDE) {
+
+                            healAmount += 12
+                        }
+
+                        healAmount += 12
+                    }
+                }
+            }
+        }
+
+        let damagePossible = towerDamage - healAmount
+
+        let i = 0
+
+        while (damagePossible > 0 || i < 50) {
+
+            distance++
+
+        }
+
+        if (distance > 0) {
+
+            return distance
+        } else {
+
+            return false
+        }
+    }
+    //creep.advancedPathing({ origin: creep, goal: structure, maxRooms: 1, plainCost: 1, swampCost: 9, defaultCostMatrix: creep.room.memory.defaultCostMatrix, avoidStages: true, flee: false })
+Creep.prototype.advancedPathing = function({ opts }) {
+
+    if (!opts.maxRooms) {
+
+        opts.maxRooms = 64
+    }
+    if (!opts.plainCost) {
+
+        opts.plainCost = 3
+    }
+    if (!opts.swampCost) {
+
+        opts.swampCost = 9
+    }
+    if (!opts.flee) {
+
+        opts.flee = false
     }
 
-    let damagePossible = towerDamage - healAmount
+    if (avoidStages.length > 0) {
 
-    let i = 0
+        var allowedRooms = {
+            [origin.roomName]: true
+        }
 
-    while (damagePossible > 0 || i < 50) {
+        let route = Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
+            routeCallback(roomName) {
 
-        distance++
+                if (roomName == goal[0].pos.roomName) {
 
+                    allowedRooms[roomName] = true
+                    return 1
+
+                }
+                if (Memory.rooms[roomName] && avoidStages.indexOf(Memory.rooms[roomName].stage) == -1) {
+
+                    allowedRooms[roomName] = true
+                    return 1
+
+                }
+
+                return Infinity
+            }
+        })
+
+        if (route.length > 0) {
+
+            goal = _.map([new RoomPosition(25, 25, route[0].room)], function(pos) {
+                return { pos: pos, range: 1 }
+            })
+        }
     }
 
-    if (distance > 0) {
+    var path = PathFinder.search(origin, goal, {
+        plainCost: 3,
+        swampCost: 8,
 
-        return distance
-    } else {
+        roomCallback: function(roomName) {
 
-        return false
+            let room = Game.rooms[roomName]
+
+            if (!room) {
+
+                return false
+            }
+
+            if (Object.keys(allowedRooms) > 0 && !allowedRooms[roomName]) {
+
+                return false
+            }
+
+            let cm
+
+            if (opts.defaultCostMatrix) {
+
+                cm = PathFinder.CostMatrix.deserialize(opts.defaultCostMatrix)
+
+                for (let creep of room.find(FIND_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+
+                for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+            } else {
+
+                cm = new PathFinder.CostMatrix
+
+                let constructionSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES, {
+                    filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
+                })
+
+                for (let site of constructionSites) {
+
+                    cm.set(site.pos.x, site.pos.y, 255)
+                }
+
+                let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_RAMPART
+                })
+
+                for (let rampart of ramparts) {
+
+                    cm.set(rampart.pos.x, rampart.pos.y, 3)
+                }
+
+                let roads = creep.room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_ROAD
+                })
+
+                for (let road of roads) {
+
+                    cm.set(road.pos.x, road.pos.y, 1)
+                }
+
+                let structures = creep.room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                })
+
+                for (let structure of structures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
+
+                let enemyStructures = creep.room.find(FIND_HOSTILE_STRUCTURES)
+
+                for (let structure of enemyStructures) {
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
+
+                for (let creep of room.find(FIND_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+
+                for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
+            }
+
+            return cm
+        }
+    }).path
+
+    //creep.memory.path = path
+
+    let direction = creep.pos.getDirectionTo(path[0])
+
+    creep.move(direction)
+
+    for (let pos of path) {
+
+        new RoomVisual(pos.roomName).rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { opacity: 0.2, stroke: "yellow", fill: "yellow" })
     }
 }
 Creep.prototype.roadPathing = function(origin, goal) {
@@ -770,9 +930,8 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
 
     if (route.length > 0) {
 
-        goal = _.map([new RoomPosition(25, 25, route[0].room)], function(pos) {
-            return { pos: pos, range: 1 }
-        })
+        goal = { pos: new RoomPosition(25, 25, route[(route.length - 1)].room), range: 1 }
+
     }
 
     var path = PathFinder.search(origin, goal, {
@@ -864,11 +1023,14 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
         }
     }).path
 
-    creep.memory.path = path
+    let direction = creep.pos.getDirectionTo(path[0])
 
-    creep.moveByPath(creep.memory.path)
+    creep.move(direction)
 
-    new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+    for (let pos of path) {
+
+        new RoomVisual(pos.roomName).rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { opacity: 0.2, stroke: "yellow", fill: "yellow" })
+    }
 }
 
 Creep.prototype.findSafeDistance = function(origin, goal, avoidStages) {

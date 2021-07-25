@@ -2,24 +2,62 @@ module.exports = {
     run: function construction() {
         _.forEach(Game.rooms, function(room) {
 
-            //destroySite()
+            destroySites("")
 
-            //removeAllSites()
+            destroyStructure("")
 
-            //destroyStructure()
+            resetRoom("")
 
-            //resetRoom()
+            removeAllSites()
 
-            function destroySite() {
+            removeAllStructures()
 
-                let roomConstructionSite = room.find(FIND_MY_CONSTRUCTION_SITES)
+            function destroySites(roomName) {
 
-                if (room) {
+                if (room.name != roomName) {
 
-                    for (let cSite of roomConstructionSite) {
+                    return
+                }
 
-                        cSite.remove()
-                    }
+                let roomConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES)
+
+                for (let cSite of roomConstructionSites) {
+
+                    cSite.remove()
+                }
+            }
+
+            function destroyStructure(roomName) {
+
+                if (room.name != roomName) {
+
+                    return
+                }
+
+                let structures = room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType != STRUCTURE_SPAWN
+                })
+
+                for (let structure of structures) {
+
+                    structure.destroy()
+                }
+            }
+
+            function resetRoom(roomName) {
+
+                if (room.name != roomName) {
+
+                    return
+                }
+
+                let structures = room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType != STRUCTURE_SPAWN
+                })
+
+                for (let structure of structures) {
+
+                    structure.destroy()
                 }
             }
 
@@ -33,37 +71,15 @@ module.exports = {
                 }
             }
 
-            function destroyStructure() {
-
-                let roads = room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_TOWER || s.structureType == STRUCTURE_TERMINAL
-                })
-
-                let barricades = room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_WALL
-                })
-
-                if (room.name == "E25N11") {
-
-                    for (let structure of roads) {
-
-                        structure.destroy()
-                    }
-                }
-            }
-
-            function resetRoom() {
+            function removeAllStructures() {
 
                 let structures = room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType != STRUCTURE_SPAWN
+                    filter: s => s.structureType == STRUCTURE_ROAD
                 })
 
-                if (room.name == "E25N11") {
+                for (let structure of structures) {
 
-                    for (let structure of structures) {
-
-                        structure.destroy()
-                    }
+                    structure.destroy()
                 }
             }
 
@@ -402,7 +418,7 @@ module.exports = {
                         mineralPath()
                     }
 
-                    if (room.memory.remoteRooms.length > 0) {
+                    if (room.controller.level >= 5 && room.memory.remoteRooms.length > 0) {
 
                         remotePath()
                     }
@@ -821,20 +837,18 @@ module.exports = {
 
                                 let origin = room.find(FIND_MY_SPAWNS)[0]
 
-                                let goal = _.map([source], function(source) {
-                                    return { pos: source.pos, range: 1 }
-                                })
+                                let goal = { pos: source.pos, range: 1 }
 
                                 let avoidStages = ["enemyRoom", "keeperRoom", "enemyReservation"]
 
                                 let allowedRooms = {
-                                    [origin.pos.roomName]: true
+                                    [room.name]: true
                                 }
 
-                                let route = Game.map.findRoute(origin.pos.roomName, goal[0].pos.roomName, {
+                                Game.map.findRoute(room.name, goal.pos.roomName, {
                                     routeCallback(roomName) {
 
-                                        if (roomName == goal[0].pos.roomName) {
+                                        if (roomName == goal.pos.roomName) {
 
                                             allowedRooms[roomName] = true
                                             return 1
@@ -850,13 +864,6 @@ module.exports = {
                                         return Infinity
                                     }
                                 })
-
-                                if (route.length > 0) {
-
-                                    goal = _.map([new RoomPosition(25, 25, route[0].room)], function(pos) {
-                                        return { pos: pos, range: 1 }
-                                    })
-                                }
 
                                 if (origin && goal) {
 
@@ -944,7 +951,7 @@ module.exports = {
                                         let value = path[i - 1]
                                         let normalValue = path[i]
 
-                                        //new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476" })
+                                        new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476" })
 
                                         if (value && value.roomName && value.x && value.y && Game.rooms[value.roomName]) {
 
@@ -953,7 +960,7 @@ module.exports = {
 
                                         if (source.pos.findInRange(containerConstructionSites, 1) == 0 && source.pos.findInRange(containers, 1) == 0 && normalValue && normalValue.roomName && normalValue.x && normalValue.y && i + 1 == path.length && Game.rooms[value.roomName]) {
 
-                                            //new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "red" })
+                                            new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "red" })
 
                                             Game.rooms[value.roomName].createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                                         }
@@ -1019,4 +1026,4 @@ module.exports = {
             }
         })
     }
-};
+}

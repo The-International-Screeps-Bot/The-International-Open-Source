@@ -54,7 +54,13 @@ module.exports = {
 
         let boostedSquads = false
 
-        let squadType = "dismantle" // May be rangedAttack attack and dismantle
+        let squadTypes = {
+            rangedAttack: "rangedAttack",
+            attack: "attack",
+            dismantle: "dismantle",
+        }
+
+        let squadType = squadTypes.rangedAttack // May be rangedAttack attack and dismantle
 
         if (Game.shard.name == "shard2") {
 
@@ -72,9 +78,9 @@ module.exports = {
 
             var newCommune
 
-            //var attackTarget = "E29N11"
+            var attackTarget = "E26N17"
 
-            var attackTarget
+            //var attackTarget
         }
 
         Memory.global.newCommune = newCommune
@@ -490,7 +496,7 @@ module.exports = {
                     minCreeps["scout"] = 1
                 }
 
-                if (remoteBuilderNeed && stage >= 4) {
+                /* if (remoteBuilderNeed && stage >= 4) {
 
                     minCreeps["remoteBuilder"] = 1 + Math.round(room.memory.remoteRooms.length / 3)
                 }
@@ -498,8 +504,8 @@ module.exports = {
                 if (remoteEnemy && stage >= 3) {
 
                     minCreeps["communeDefender"] = 1
-                }
-                (function() {
+                } */
+                /* (function() {
 
                     if (room.storage && room.storage.store[RESOURCE_ENERGY] <= 15000) {
 
@@ -533,7 +539,7 @@ module.exports = {
                             minCreeps["remoteHauler"] += Math.floor(remoteRoom.sources * 1.5)
                         }
                     }
-                })()
+                })() */
 
 
                 if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 175000 && room.controller.level <= 7) {
@@ -1126,7 +1132,7 @@ module.exports = {
                     }],
                     "scout", {})
 
-                if (squadType == "ranged") {
+                if (squadType == "rangedAttack") {
                     var antifaAssaulterBody = roleValues(
                         [{
                             stage: 1,
@@ -1134,7 +1140,7 @@ module.exports = {
                             defaultCost: 0,
                             extraParts: [RANGED_ATTACK, MOVE],
                             extraCost: 200,
-                            sliceAmount: 2
+                            sliceAmount: 6
                         }],
                         "antifaAssaulter", {})
 
@@ -1210,24 +1216,21 @@ module.exports = {
 
                         if (bodyRole.role == role && freeEnergy >= 300) {
 
-                            for (let spawns of room.memory.spawns) {
+                            let spawn = Game.getObjectById(room.memory.spawns[room.memory.spawns.length - 1])
 
-                                let spawn = Game.getObjectById(spawns)
+                            let testSpawn = spawn.spawnCreep(bodyRole.body, bodyRole.role, { dryRun: true })
 
-                                let testSpawn = spawn.spawnCreep(bodyRole.body, bodyRole.role, { dryRun: true })
+                            if (testSpawn == 0) {
 
-                                if (testSpawn == 0) {
+                                spawn.spawnCreep(bodyRole.body, (roomFixMessage + bodyRole.role + ", T" + bodyRole.tier + ", " + Game.time), bodyRole.memory)
 
-                                    spawn.spawnCreep(bodyRole.body, (roomFixMessage + bodyRole.role + ", T" + bodyRole.tier + ", " + Game.time), bodyRole.memory)
+                                requiredCreeps[role] - 1
 
-                                    requiredCreeps[role] - 1
+                                Memory.data.energySpentOnCreeps += bodyRole.cost
 
-                                    Memory.data.energySpentOnCreeps += bodyRole.cost
+                            } else if (testSpawn != -4) {
 
-                                } else if (testSpawn != -4) {
-
-                                    console.log("Failed to spawn: " + testSpawn + ", " + bodyRole.role + ", " + bodyRole.body.length + ", " + bodyRole.tier + " " + JSON.stringify(bodyRole.memory))
-                                }
+                                console.log("Failed to spawn: " + testSpawn + ", " + bodyRole.role + ", " + bodyRole.body.length + ", " + bodyRole.tier + " " + JSON.stringify(bodyRole.memory))
                             }
                         }
                     }

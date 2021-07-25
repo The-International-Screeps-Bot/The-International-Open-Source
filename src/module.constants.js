@@ -329,9 +329,8 @@ module.exports = {
 
                 function costMatrixes() {
 
-                    let cm = new PathFinder.CostMatrix
+                    /* let terrainCM = new PathFinder.CostMatrix
 
-                    /*
                     let terrain = Game.map.getRoomTerrain(room.name)
 
                     for (var x = -1; x < 50; ++x) {
@@ -356,7 +355,10 @@ module.exports = {
                             }
                         }
                     }
-                    */
+
+                    room.memory.terrainCM = cm.serialize() */
+
+                    let cm = new PathFinder.CostMatrix
 
                     let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                         filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
