@@ -8,9 +8,9 @@ module.exports = {
 
             resetRoom("")
 
-            removeAllSites()
+            //removeAllSites()
 
-            removeAllStructures()
+            //removeAllStructures()
 
             function destroySites(roomName) {
 
@@ -845,10 +845,10 @@ module.exports = {
                                     [room.name]: true
                                 }
 
-                                Game.map.findRoute(room.name, goal.pos.roomName, {
+                                Game.map.findRoute(room.name, goal.roomName, {
                                     routeCallback(roomName) {
 
-                                        if (roomName == goal.pos.roomName) {
+                                        if (roomName == goal.roomName) {
 
                                             allowedRooms[roomName] = true
                                             return 1
@@ -868,8 +868,8 @@ module.exports = {
                                 if (origin && goal) {
 
                                     var path = PathFinder.search(origin.pos, goal, {
-                                        plainCost: 3,
-                                        swampCost: 8,
+                                        plainCost: 4,
+                                        swampCost: 24,
                                         maxOps: 10000,
 
                                         roomCallback: function(roomName) {
@@ -908,7 +908,7 @@ module.exports = {
 
                                             for (let rampart of ramparts) {
 
-                                                cm.set(rampart.pos.x, rampart.pos.y, 3)
+                                                cm.set(rampart.pos.x, rampart.pos.y, 4)
                                             }
 
                                             let roads = room.find(FIND_STRUCTURES, {
@@ -921,22 +921,17 @@ module.exports = {
                                             }
 
                                             let structures = room.find(FIND_STRUCTURES, {
-                                                filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                                filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                                             })
 
                                             for (let structure of structures) {
 
-                                                if (structure.structureType != STRUCTURE_CONTAINER) {
-
-                                                    cm.set(structure.pos.x, structure.pos.y, 255)
-                                                }
+                                                cm.set(structure.pos.x, structure.pos.y, 255)
                                             }
 
                                             return cm
                                         }
                                     }).path
-
-                                    //console.log(JSON.stringify(path))
 
                                     let containerConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                                         filter: s => s.structureType == STRUCTURE_CONTAINER

@@ -457,11 +457,11 @@ Creep.prototype.advancedPathing = function({ opts }) {
     }
     if (!opts.plainCost) {
 
-        opts.plainCost = 3
+        opts.plainCost = 4
     }
     if (!opts.swampCost) {
 
-        opts.swampCost = 9
+        opts.swampCost = 24
     }
     if (!opts.flee) {
 
@@ -471,13 +471,13 @@ Creep.prototype.advancedPathing = function({ opts }) {
     if (avoidStages.length > 0) {
 
         var allowedRooms = {
-            [origin.roomName]: true
+            [origin.room.name]: true
         }
 
-        let route = Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
+        let route = Game.map.findRoute(origin.room.name, goal.pos.roomName, {
             routeCallback(roomName) {
 
-                if (roomName == goal[0].pos.roomName) {
+                if (roomName == goal.pos.roomName) {
 
                     allowedRooms[roomName] = true
                     return 1
@@ -502,7 +502,7 @@ Creep.prototype.advancedPathing = function({ opts }) {
         }
     }
 
-    var path = PathFinder.search(origin, goal, {
+    var path = PathFinder.search(origin.pos, goal, {
         plainCost: 3,
         swampCost: 8,
 
