@@ -442,8 +442,8 @@ module.exports = {
                     if (origin && goal) {
 
                         var path = PathFinder.search(origin.pos, goal, {
-                            plainCost: 3,
-                            swampCost: 8,
+                            plainCost: 4,
+                            swampCost: 24,
                             maxRooms: 1,
 
                             roomCallback: function(roomName) {
@@ -493,15 +493,12 @@ module.exports = {
                                 }
 
                                 let structures = room.find(FIND_STRUCTURES, {
-                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                                 })
 
                                 for (let structure of structures) {
 
-                                    if (structure.structureType != STRUCTURE_CONTAINER) {
-
-                                        cm.set(structure.pos.x, structure.pos.y, 255)
-                                    }
+                                    cm.set(structure.pos.x, structure.pos.y, 255)
                                 }
 
                                 return cm
@@ -538,8 +535,8 @@ module.exports = {
                     if (origin && goal) {
 
                         var path = PathFinder.search(origin.pos, goal, {
-                            plainCost: 3,
-                            swampCost: 8,
+                            plainCost: 4,
+                            swampCost: 24,
                             maxRooms: 1,
 
                             roomCallback: function(roomName) {
@@ -589,15 +586,12 @@ module.exports = {
                                 }
 
                                 let structures = room.find(FIND_STRUCTURES, {
-                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                                 })
 
                                 for (let structure of structures) {
 
-                                    if (structure.structureType != STRUCTURE_CONTAINER) {
-
-                                        cm.set(structure.pos.x, structure.pos.y, 255)
-                                    }
+                                    cm.set(structure.pos.x, structure.pos.y, 255)
                                 }
 
                                 return cm
@@ -634,8 +628,8 @@ module.exports = {
                     if (origin && goal) {
 
                         var path = PathFinder.search(origin.pos, goal, {
-                            plainCost: 3,
-                            swampCost: 8,
+                            plainCost: 4,
+                            swampCost: 24,
                             maxRooms: 1,
 
                             roomCallback: function(roomName) {
@@ -685,15 +679,12 @@ module.exports = {
                                 }
 
                                 let structures = room.find(FIND_STRUCTURES, {
-                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                                 })
 
                                 for (let structure of structures) {
 
-                                    if (structure.structureType != STRUCTURE_CONTAINER) {
-
-                                        cm.set(structure.pos.x, structure.pos.y, 255)
-                                    }
+                                    cm.set(structure.pos.x, structure.pos.y, 255)
                                 }
 
                                 return cm
@@ -731,8 +722,8 @@ module.exports = {
                     if (origin && goal) {
 
                         var path = PathFinder.search(origin.pos, goal, {
-                            plainCost: 3,
-                            swampCost: 8,
+                            plainCost: 4,
+                            swampCost: 24,
                             maxRooms: 1,
 
                             roomCallback: function(roomName) {
@@ -782,15 +773,12 @@ module.exports = {
                                 }
 
                                 let structures = room.find(FIND_STRUCTURES, {
-                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
+                                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                                 })
 
                                 for (let structure of structures) {
 
-                                    if (structure.structureType != STRUCTURE_CONTAINER) {
-
-                                        cm.set(structure.pos.x, structure.pos.y, 255)
-                                    }
+                                    cm.set(structure.pos.x, structure.pos.y, 255)
                                 }
 
                                 return cm
