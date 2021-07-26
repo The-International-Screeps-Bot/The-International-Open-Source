@@ -435,9 +435,7 @@ module.exports = {
 
                     let origin = room.find(FIND_MY_SPAWNS)[0]
 
-                    let goal = _.map([source1], function(source) {
-                        return { pos: source.pos, range: 1 }
-                    })
+                    let goal = { pos: source1.pos, range: 1 }
 
                     if (origin && goal) {
 
@@ -528,9 +526,7 @@ module.exports = {
 
                     let origin = room.find(FIND_MY_SPAWNS)[0]
 
-                    let goal = _.map([source2], function(source) {
-                        return { pos: source.pos, range: 1 }
-                    })
+                    let goal = { pos: source2.pos, range: 1 }
 
                     if (origin && goal) {
 
@@ -621,9 +617,7 @@ module.exports = {
 
                     let origin = room.find(FIND_MY_SPAWNS)[0]
 
-                    let goal = _.map([room.controller], function(controller) {
-                        return { pos: controller.pos, range: 2 }
-                    })
+                    let goal = { pos: room.controller.pos, range: 2 }
 
                     if (origin && goal) {
 
@@ -715,9 +709,7 @@ module.exports = {
 
                     let origin = room.find(FIND_MY_SPAWNS)[0]
 
-                    let goal = _.map(room.find(FIND_MINERALS), function(mineral) {
-                        return { pos: mineral.pos, range: 1 }
-                    })
+                    let goal = { pos: room.find(FIND_MINERALS).pos, range: 1 }
 
                     if (origin && goal) {
 
