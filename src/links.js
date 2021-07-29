@@ -31,7 +31,7 @@ function links(room) {
 
                 findFullLink().transferEnergy(controllerLink)
 
-            } else if (Memory.global.globalStage == 0 && room.storage && room.storage.store.getUsedCapacity() >= 30000 && controllerLink.store[RESOURCE_ENERGY] < 400) {
+            } else if (Memory.global.globalStage = 0 && room.storage && room.storage.store.getUsedCapacity() >= 30000 && controllerLink.store[RESOURCE_ENERGY] < 400) {
 
                 findFullLink().transferEnergy(controllerLink)
 

@@ -56,11 +56,6 @@ function config() {
     }
 
     Memory.global.needsEnergy = []
-
-    if (Memory.global.globalStage == null || !Memory.global.globalStage) {
-
-        Memory.global.globalStage = 0
-    }
 }
 
 module.exports = config

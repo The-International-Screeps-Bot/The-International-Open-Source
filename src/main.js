@@ -5,6 +5,8 @@ let roomManager = require("roomManager")
 
 let powerCreeps = require("module.powerCreeps")
 
+let informationManager = require("informationManager")
+
 let data = require("data")
 let logging = require("logging")
 
@@ -64,6 +66,8 @@ module.exports.loop = function() {
     console.log("powerCreeps: " + cpuUsed)
 
     //
+
+    informationManager()
 
     cpuUsed = Game.cpu.getUsed()
 

@@ -1,4 +1,4 @@
-let construction = require("module.construction")
+let construction = require("construction")
 let allyList = require("allyList")
 
 module.exports = {

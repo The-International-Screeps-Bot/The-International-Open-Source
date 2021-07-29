@@ -6,6 +6,8 @@ let powerCreeps = require("powerCreeps")
 let constants = require("constants")
 let visuals = require("visuals")
 let construction = require("construction")
+let defenseManager = require("defenseManager")
+let taskManager = require("taskManager")
 
 let spawns = require("spawns")
 let towers = require("towers")
@@ -44,11 +46,15 @@ function roomManager() {
             construction(room)
         }
 
+        taskManager(room, creeps.myCreeps)
+
         // Commune only scripts
 
         if (room.controller && room.controller.my) {
 
             constants(room, structures)
+
+            defenseManager(room, creeps.myCreeps)
 
             spawns(room, structures.spawns)
 
