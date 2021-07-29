@@ -22,90 +22,6 @@ function spawns(room, spawns) {
 
     let squadType = squadTypes.rangedAttack // May be rangedAttack attack and dismantle
 
-    if (Game.shard.name == "shard2") {
-
-        //var newCommune = "E32N8"
-
-        var newCommune
-
-        //var attackTarget = "E32N8"
-
-        var attackTarget
-
-    } else {
-
-        // var newCommune = "E29N11"
-
-        var newCommune
-
-        //var attackTarget = "E26N17"
-
-        var attackTarget
-    }
-
-    Memory.global.newCommune = newCommune
-
-    let communeEstablisher = findCommuneEstablisher()
-    Memory.global.communeEstablisher = communeEstablisher
-
-    function findCommuneEstablisher() {
-        if (newCommune) {
-
-            for (let maxDistance = 1; maxDistance <= 12; maxDistance++) {
-
-                for (let room of Object.keys(Game.rooms)) {
-
-                    room = Game.rooms[room]
-
-                    if (room.controller && room.controller.my && room.memory.stage >= 3) {
-
-                        let distance = Game.map.getRoomLinearDistance(newCommune, room.name)
-
-                        if (distance < maxDistance) {
-
-                            console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
-
-                            return room
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Memory.global.attackTarget = attackTarget
-
-    let attackingRoom = findAttackingRooms()
-    Memory.global.attackingRoom = attackingRoom
-
-    function findAttackingRooms() {
-
-        if (attackTarget) {
-
-            for (let stage = 8; stage != 0; stage--) {
-                for (let maxDistance = 1; maxDistance <= 10; maxDistance++) {
-
-                    for (let room of Object.keys(Game.rooms)) {
-
-                        room = Game.rooms[room]
-
-                        if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.memory.totalEnergy && room.memory.totalEnergy >= 30000) {
-
-                            let distance = Game.map.getRoomLinearDistance(attackTarget, room.name)
-
-                            if (distance < maxDistance) {
-
-                                console.log("AT, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
-
-                                return room
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     /*Integral values for spawning considerations*/
 
     let remoteBuilderNeed = false
@@ -320,7 +236,7 @@ function spawns(room, spawns) {
             return
         }
 
-        if (attackingRoom && attackingRoom == room) {
+        if (Memory.global.attackingRoom == room) {
 
             minCreeps["antifaAssaulter"] = 4
             minCreeps["antifaSupporter"] = minCreeps["antifaAssaulter"]
@@ -413,12 +329,12 @@ function spawns(room, spawns) {
         minCreeps["repairer"] = 1
     }
 
-    if (newCommune && room == communeEstablisher) {
+    if (Memory.global.communeEstablisher == communeEstablisher) {
 
         minCreeps["claimer"] = 1
     }
 
-    if (newCommune && room == communeEstablisher) {
+    if (Memory.global.communeEstablisher == communeEstablisher) {
 
         minCreeps["revolutionaryBuilder"] = 4
     }
