@@ -910,35 +910,28 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
         [origin.roomName]: true
     }
 
-    let route = Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
+    Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
         routeCallback(roomName) {
 
             if (roomName == goal[0].pos.roomName) {
 
                 allowedRooms[roomName] = true
                 return 1
-
             }
-            if (Memory.rooms[roomName] && avoidStages.indexOf(Memory.rooms[roomName].stage) == -1) {
+            if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName].stage)) {
 
                 allowedRooms[roomName] = true
                 return 1
-
             }
 
             return Infinity
         }
     })
 
-    if (route.length > 0) {
-
-        goal = { pos: new RoomPosition(25, 25, route[(route.length - 1)].room), range: 1 }
-
-    }
-
     var path = PathFinder.search(origin, goal, {
         plainCost: 3,
         swampCost: 8,
+        maxOps: 10000,
 
         roomCallback: function(roomName) {
 

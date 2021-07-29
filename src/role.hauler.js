@@ -464,7 +464,7 @@ module.exports = {
 
                     creep.memory.task = undefined
                 }
-            } else if (essentialStructure && creep.store[RESOURCE_ENERGY] >= essentialStructure.store.getFreeCapacity(RESOURCE_ENERGY)) {
+            } else if (essentialStructure) {
 
                 creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 

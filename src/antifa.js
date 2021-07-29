@@ -28,7 +28,7 @@ module.exports = {
                     creep.memory.assaulter = undefined
                     creep.memory.inSquad = false
                 }
-                if (assaulter) {
+                if (assaulter != null) {
 
                     if (inSquad) {
 
@@ -48,12 +48,11 @@ module.exports = {
                                 })
 
                                 creep.intraRoomPathing(creep.pos, goal)
-
                             }
                         } else {
 
                             let goal = _.map([assaulter], function(target) {
-                                return { pos: target.pos, range: 1 }
+                                return { pos: target.pos, range: 24 }
                             })
 
                             creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
@@ -63,7 +62,7 @@ module.exports = {
                         creep.say("NS")
 
                         let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                            return { pos: target, range: 1 }
+                            return { pos: target, range: 24 }
                         })
 
                         creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
@@ -81,7 +80,7 @@ module.exports = {
                     creep.say("NA")
 
                     let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                        return { pos: target, range: 1 }
+                        return { pos: target, range: 24 }
                     })
 
                     creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
@@ -245,7 +244,7 @@ module.exports = {
                     creep.memory.supporter = undefined
                     creep.memory.inSquad = false
                 }
-                if (supporter) {
+                if (supporter != null) {
 
                     if (!creep.memory.squadType) {
 
@@ -497,7 +496,7 @@ module.exports = {
                                     if (supporter.room != creep.room) {
 
                                         let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(pos) {
-                                            return { pos: pos, range: 2 }
+                                            return { pos: pos, range: 24 }
                                         })
 
                                         creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
@@ -594,7 +593,7 @@ module.exports = {
                                 } else {
 
                                     let goal = _.map([new RoomPosition(25, 25, Memory.global.attackTarget)], function(pos) {
-                                        return { pos: pos, range: 2 }
+                                        return { pos: pos, range: 24 }
                                     })
 
                                     if (creep.fatigue == 0 && supporter.fatigue == 0) {
@@ -631,7 +630,7 @@ module.exports = {
                             } else {
 
                                 let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                                    return { pos: target, range: 1 }
+                                    return { pos: target, range: 24 }
                                 })
 
                                 creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])

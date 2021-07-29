@@ -46,9 +46,9 @@ function globalManager() {
 
         var newCommune
 
-        var attackTarget = "E28N8"
+        //var attackTarget = "E28N8"
 
-        //var attackTarget
+        var attackTarget
 
     } else {
 
