@@ -1,4 +1,5 @@
 let mapVisuals = require("mapVisuals")
+let antifa = require("antifa")
 
 function globalManager() {
 
@@ -45,9 +46,9 @@ function globalManager() {
 
         var newCommune
 
-        //var attackTarget = "E32N8"
+        var attackTarget = "E28N8"
 
-        var attackTarget
+        //var attackTarget
 
     } else {
 
@@ -124,6 +125,7 @@ function globalManager() {
     }
 
     mapVisuals()
+    antifa.run()
 }
 
 module.exports = globalManager
