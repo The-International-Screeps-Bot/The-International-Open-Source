@@ -453,11 +453,11 @@ Creep.prototype.advancedPathing = function({ opts }) {
 
     if (!opts.plainCost) {
 
-        opts.plainCost = 4
+        opts.plainCost = 2
     }
     if (!opts.swampCost) {
 
-        opts.swampCost = 24
+        opts.swampCost = 6
     }
     if (!opts.avoidStages) {
 
@@ -498,8 +498,8 @@ Creep.prototype.advancedPathing = function({ opts }) {
     }
 
     var path = PathFinder.search(origin.pos, goal, {
-        plainCost: 3,
-        swampCost: 8,
+        plainCost: opts.plainCost,
+        swampCost: opts.swampCost,
         maxRooms: 1,
         maxOps: 100000,
 

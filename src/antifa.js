@@ -1,83 +1,64 @@
 let allyList = require("allyList")
 
-module.exports = {
-    run: function() {
+function antifa() {
 
-        let squadType
+    let squadType
 
-        let squadMode = 2
+    let squadMode = 2
 
-        // let squadMode = 4
+    // let squadMode = 4
 
-        // let squadMode = 6
+    // let squadMode = 6
 
-        if (Memory.global.attackTarget) {
+    if (Memory.global.attackTarget) {
 
-            let antifaAssaulters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaAssaulter');
-            let antifaSupporters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaSupporter');
+        let antifaAssaulters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaAssaulter');
+        let antifaSupporters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaSupporter');
 
-            for (let creep of antifaSupporters) {
+        for (let creep of antifaSupporters) {
 
-                const inSquad = creep.memory.inSquad
-                const assaulter = Game.creeps[creep.memory.assaulter]
+            const inSquad = creep.memory.inSquad
+            const assaulter = Game.creeps[creep.memory.assaulter]
 
-                let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
+            let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
 
-                if (creep.memory.assaulter && !assaulter) {
+            if (creep.memory.assaulter && !assaulter) {
 
-                    creep.memory.assaulter = undefined
-                    creep.memory.inSquad = false
-                }
-                if (assaulter != null) {
+                creep.memory.assaulter = undefined
+                creep.memory.inSquad = false
+            }
+            if (assaulter != null) {
 
-                    if (inSquad) {
+                if (inSquad) {
 
-                        creep.say("IS")
+                    creep.say("IS")
 
-                        if (creep.room == assaulter.room) {
+                    if (creep.room == assaulter.room) {
 
-                            if (creep.pos.isNearTo(assaulter)) {
+                        if (creep.pos.isNearTo(assaulter)) {
 
-                                let direction = creep.pos.getDirectionTo(assaulter)
-                                creep.move(direction)
+                            let direction = creep.pos.getDirectionTo(assaulter)
+                            creep.move(direction)
 
-                            } else {
-
-                                let goal = _.map([assaulter], function(target) {
-                                    return { pos: target.pos, range: 1 }
-                                })
-
-                                creep.intraRoomPathing(creep.pos, goal)
-                            }
                         } else {
 
                             let goal = _.map([assaulter], function(target) {
-                                return { pos: target.pos, range: 24 }
+                                return { pos: target.pos, range: 1 }
                             })
 
-                            creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                            creep.intraRoomPathing(creep.pos, goal)
                         }
                     } else {
 
-                        creep.say("NS")
-
-                        let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                            return { pos: target, range: 24 }
+                        let goal = _.map([assaulter], function(target) {
+                            return { pos: target.pos, range: 24 }
                         })
 
                         creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
                     }
-                } else if (findCreepWithoutTask(creep, antifaAssaulters)) {
-
-                    creep.memory.assaulter = findCreepWithoutTask(creep, antifaAssaulters).name
-                    creep.memory.inSquad = true
-
-                    findCreepWithoutTask(creep, antifaAssaulters).memory.supporter = creep.name
-                    findCreepWithoutTask(creep, antifaAssaulters).memory.inSquad = true
-
                 } else {
 
-                    creep.say("NA")
+                    creep.say("NS")
 
                     let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
                         return { pos: target, range: 24 }
@@ -85,539 +66,544 @@ module.exports = {
 
                     creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
                 }
+            } else if (findCreepWithoutTask(creep, antifaAssaulters)) {
+
+                creep.memory.assaulter = findCreepWithoutTask(creep, antifaAssaulters).name
+                creep.memory.inSquad = true
+
+                findCreepWithoutTask(creep, antifaAssaulters).memory.supporter = creep.name
+                findCreepWithoutTask(creep, antifaAssaulters).memory.inSquad = true
+
+            } else {
+
+                creep.say("NA")
+
+                let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
+                    return { pos: target, range: 24 }
+                })
+
+                creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
             }
+        }
 
-            function findCreepWithoutTask(creep, collection) {
+        function findCreepWithoutTask(creep, collection) {
 
-                for (let assaulter of collection) {
+            for (let assaulter of collection) {
 
-                    if (assaulter.memory.roomFrom == creep.room.name) {
+                if (assaulter.memory.roomFrom == creep.room.name) {
 
-                        if (!assaulter.memory.inSquad) {
+                    if (!assaulter.memory.inSquad) {
 
-                            return assaulter
-                        }
+                        return assaulter
                     }
                 }
-                return false
             }
-            for (let creep of antifaAssaulters) {
+            return false
+        }
+        for (let creep of antifaAssaulters) {
 
-                const squadType = creep.memory.squadType
-                const inSquad = creep.memory.inSquad
-                const supporter = Game.creeps[creep.memory.supporter]
+            const squadType = creep.memory.squadType
+            const inSquad = creep.memory.inSquad
+            const supporter = Game.creeps[creep.memory.supporter]
 
-                let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
+            let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
 
-                let target
+            let target
 
-                function healCreep(closestInjured) {
+            function healCreep(closestInjured) {
 
-                    if (closestInjured) {
+                if (closestInjured) {
 
-                        target = "closestInjured"
+                    target = "closestInjured"
 
-                        creep.say("CI")
+                    creep.say("CI")
 
-                        if (supporter.pos.getRangeTo(closestInjured) > 1) {
+                    if (supporter.pos.getRangeTo(closestInjured) > 1) {
 
-                            supporter.rangedHeal(closestInjured)
-                        } else {
-
-                            supporter.heal(closestInjured)
-                        }
+                        supporter.rangedHeal(closestInjured)
                     } else {
 
-                        supporter.heal(assaulter)
+                        supporter.heal(closestInjured)
                     }
+                } else {
+
+                    supporter.heal(assaulter)
                 }
+            }
 
-                function attackHostile(hostile) {
+            function attackHostile(hostile) {
 
-                    let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                        filter: (c) => {
-                            return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
-                        }
-                    })
-
-                    if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
-
-                        target = "closestHostile"
-
-                        creep.say("H")
-
-                        if (creep.pos.getRangeTo(closestHostile) > 3) {
-
-                            let goal = _.map([closestHostile], function(target) {
-                                return { pos: target.pos, range: 1 }
-                            })
-
-                            creep.intraRoomPathing(creep.pos, goal)
-
-                        } else {
-
-                            if (creep.pos.getRangeTo(closestHostile) == 1) {
-
-                                creep.rangedMassAttack()
-
-                            } else if (creep.pos.getRangeTo(closestHostile) <= 3) {
-
-                                creep.rangedAttack(closestHostile)
-                            }
-                        }
-                        if (creep.pos.getRangeTo(closestHostile) <= 2) {
-
-                            let goal = _.map([closestHostile], function(target) {
-                                return { pos: target.pos, range: 5 }
-                            })
-
-                            supporter.creepFlee(supporter.pos, goal)
-
-                            let direction = creep.pos.getDirectionTo(supporter)
-                            creep.move(direction)
-                        }
+                let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                    filter: (c) => {
+                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
                     }
-                }
+                })
 
-                function attackStructure(structure) {
+                if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
 
-                    if (squadType == "attack") {
+                    target = "closestHostile"
 
-                        if (creep.pos.getRangeTo(structure) <= 1) {
+                    creep.say("H")
 
-                            creep.attack(structure)
+                    if (creep.pos.getRangeTo(closestHostile) > 3) {
 
-                        } else {
+                        let goal = _.map([closestHostile], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
 
-                            let goal = _.map([structure], function(target) {
-                                return { pos: target.pos, range: 1 }
-                            })
+                        creep.intraRoomPathing(creep.pos, goal)
 
-                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
+                    } else {
 
-                                creep.intraRoomPathing(creep.pos, goal)
-                            }
-                        }
-                    }
-                    if (squadType == "dismantle") {
-
-                        if (creep.pos.getRangeTo(structure) <= 1) {
-
-                            creep.dismantle(structure)
-
-                        } else {
-
-                            let goal = _.map([structure], function(target) {
-                                return { pos: target.pos, range: 1 }
-                            })
-
-                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
-
-                                creep.intraRoomPathing(creep.pos, goal)
-                            }
-                        }
-                    }
-                    if (squadType == "rangedAttack") {
-
-                        if (creep.pos.getRangeTo(structure) <= 1) {
+                        if (creep.pos.getRangeTo(closestHostile) == 1) {
 
                             creep.rangedMassAttack()
 
-                        } else {
+                        } else if (creep.pos.getRangeTo(closestHostile) <= 3) {
 
-                            let goal = _.map([structure], function(target) {
-                                return { pos: target.pos, range: 1 }
+                            creep.rangedAttack(closestHostile)
+                        }
+                    }
+                    if (creep.pos.getRangeTo(closestHostile) <= 2) {
+
+                        let goal = _.map([closestHostile], function(target) {
+                            return { pos: target.pos, range: 5 }
+                        })
+
+                        supporter.creepFlee(supporter.pos, goal)
+
+                        let direction = creep.pos.getDirectionTo(supporter)
+                        creep.move(direction)
+                    }
+                }
+            }
+
+            function attackStructure(structure) {
+
+                if (squadType == "attack") {
+
+                    if (creep.pos.getRangeTo(structure) <= 1) {
+
+                        creep.attack(structure)
+
+                    } else {
+
+                        let goal = _.map([structure], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
+
+                        if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                            creep.intraRoomPathing(creep.pos, goal)
+                        }
+                    }
+                }
+                if (squadType == "dismantle") {
+
+                    if (creep.pos.getRangeTo(structure) <= 1) {
+
+                        creep.dismantle(structure)
+
+                    } else {
+
+                        let goal = _.map([structure], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
+
+                        if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                            creep.intraRoomPathing(creep.pos, goal)
+                        }
+                    }
+                }
+                if (squadType == "rangedAttack") {
+
+                    if (creep.pos.getRangeTo(structure) <= 1) {
+
+                        creep.rangedMassAttack()
+
+                    } else {
+
+                        let goal = _.map([structure], function(target) {
+                            return { pos: target.pos, range: 1 }
+                        })
+
+                        if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                            creep.intraRoomPathing(creep.pos, goal)
+                        }
+
+                        creep.rangedAttack(structure)
+                    }
+                }
+            }
+
+            if (creep.memory.supporter && !supporter) {
+
+                creep.memory.supporter = undefined
+                creep.memory.inSquad = false
+            }
+            if (supporter != null) {
+
+                if (!creep.memory.squadType) {
+
+                    if (creep.body.some(i => i.type === ATTACK)) {
+
+                        creep.memory.squadType = "attack"
+
+                    } else if (creep.body.some(i => i.type === WORK)) {
+
+                        creep.memory.squadType = "dismantle"
+
+                    } else if (creep.body.some(i => i.type === RANGED_ATTACK)) {
+
+                        creep.memory.squadType = "rangedAttack"
+                    }
+                }
+                if (creep.room.name == creep.memory.roomFrom) {
+
+                    if (inSquad) {
+
+                        creep.say("IS")
+
+                        if (creep.pos.isNearTo(supporter) || creepIsEdge) {
+
+                            creep.say("N")
+
+                            let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
+                                filter: creep => creep.my || allyList().indexOf(creep.owner.username.toLowerCase()) >= 0
                             })
 
-                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
+                            if (closestInjured) {
 
-                                creep.intraRoomPathing(creep.pos, goal)
+                                target = "closestInjured"
+
+                                healCreep(closestInjured)
                             }
 
-                            creep.rangedAttack(structure)
-                        }
-                    }
-                }
-
-                if (creep.memory.supporter && !supporter) {
-
-                    creep.memory.supporter = undefined
-                    creep.memory.inSquad = false
-                }
-                if (supporter != null) {
-
-                    if (!creep.memory.squadType) {
-
-                        if (creep.body.some(i => i.type === ATTACK)) {
-
-                            creep.memory.squadType = "attack"
-
-                        } else if (creep.body.some(i => i.type === WORK)) {
-
-                            creep.memory.squadType = "dismantle"
-
-                        } else if (creep.body.some(i => i.type === RANGED_ATTACK)) {
-
-                            creep.memory.squadType = "rangedAttack"
-                        }
-                    }
-                    if (creep.room.name == creep.memory.roomFrom) {
-
-                        if (inSquad) {
-
-                            creep.say("IS")
-
-                            if (creep.pos.isNearTo(supporter) || creepIsEdge) {
-
-                                creep.say("N")
-
-                                let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
-                                    filter: creep => creep.my || allyList().indexOf(creep.owner.username.toLowerCase()) >= 0
-                                })
-
-                                if (closestInjured) {
-
-                                    target = "closestInjured"
-
-                                    healCreep(closestInjured)
+                            let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                                filter: (c) => {
+                                    return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
                                 }
+                            })
 
-                                let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                                    filter: (c) => {
-                                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
-                                    }
-                                })
+                            if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
 
-                                if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
+                                target = "closestHostile"
 
-                                    target = "closestHostile"
+                                creep.say("H")
 
-                                    creep.say("H")
+                                if (creep.pos.getRangeTo(closestHostile) > 3) {
 
-                                    if (creep.pos.getRangeTo(closestHostile) > 3) {
-
-                                        let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 1 }
-                                        })
-
-                                        creep.intraRoomPathing(creep.pos, goal)
-
-                                    } else {
-
-                                        if (creep.pos.getRangeTo(closestHostile) == 1) {
-
-                                            creep.rangedMassAttack()
-
-                                        } else if (creep.pos.getRangeTo(closestHostile) <= 3) {
-
-                                            creep.rangedAttack(closestHostile)
-                                        }
-                                    }
-                                    if (creep.pos.getRangeTo(closestHostile) <= 2) {
-
-                                        let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 5 }
-                                        })
-
-                                        supporter.creepFlee(supporter.pos, goal)
-
-                                        let direction = creep.pos.getDirectionTo(supporter)
-                                        creep.move(direction)
-                                    }
-                                } else {
-
-                                    let goal = _.map([new RoomPosition(25, 25, Memory.global.attackTarget)], function(pos) {
-                                        return { pos: pos, range: 24 }
-                                    })
-
-                                    if (creep.fatigue == 0 && supporter.fatigue == 0) {
-
-                                        creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
-                                    }
-                                }
-                            } else {
-
-                                creep.say("F")
-
-                                if (creep.room.name == Memory.global.attackTarget) {
-
-                                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(pos) {
-                                        return { pos: pos, range: 24 }
+                                    let goal = _.map([closestHostile], function(target) {
+                                        return { pos: target.pos, range: 1 }
                                     })
 
                                     creep.intraRoomPathing(creep.pos, goal)
 
                                 } else {
 
-                                    creep.say("🚬")
+                                    if (creep.pos.getRangeTo(closestHostile) == 1) {
+
+                                        creep.rangedMassAttack()
+
+                                    } else if (creep.pos.getRangeTo(closestHostile) <= 3) {
+
+                                        creep.rangedAttack(closestHostile)
+                                    }
+                                }
+                                if (creep.pos.getRangeTo(closestHostile) <= 2) {
+
+                                    let goal = _.map([closestHostile], function(target) {
+                                        return { pos: target.pos, range: 5 }
+                                    })
+
+                                    supporter.creepFlee(supporter.pos, goal)
+
+                                    let direction = creep.pos.getDirectionTo(supporter)
+                                    creep.move(direction)
+                                }
+                            } else {
+
+                                let goal = _.map([new RoomPosition(25, 25, Memory.global.attackTarget)], function(pos) {
+                                    return { pos: pos, range: 24 }
+                                })
+
+                                if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
                                 }
                             }
                         } else {
 
-                            let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
-                                filter: s => s.structureType == STRUCTURE_RAMPART
-                            })
+                            creep.say("F")
 
-                            if (ramparts.length > 0) {
+                            if (creep.room.name == Memory.global.attackTarget) {
 
-                                let outerRampart
-
-                                let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
-
-                                for (let rampart of ramparts) {
-
-                                    if (cm && cm.get(rampart.pos.x, rampart.pos.y) < 255) {
-
-                                        outerRampart = rampart
-                                        break
-                                    }
-                                }
-
-                                if (outerRampart) {
-
-                                    let goal = _.map([outerRampart], function(target) {
-                                        return { pos: target.pos, range: 0 }
-                                    })
-
-                                    if (creep.fatigue == 0 && supporter.fatigue == 0) {
-
-                                        creep.intraRoomPathing(creep.pos, goal)
-                                    }
-                                }
-                            }
-                        }
-                    } else
-                    if (creep.room.name == Memory.global.attackTarget) {
-
-                        if (inSquad) {
-
-                            creep.say("IS")
-
-                            if (creep.pos.isNearTo(supporter) || creepIsEdge) {
-
-                                creep.say("N")
-
-                                let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
-                                    filter: creep => creep.my || allyList().indexOf(creep.owner.username.toLowerCase()) >= 0
+                                let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(pos) {
+                                    return { pos: pos, range: 24 }
                                 })
 
-                                if (closestInjured) {
+                                creep.intraRoomPathing(creep.pos, goal)
 
-                                    target = "closestInjured"
-
-                                    healCreep(closestInjured)
-                                } else {
-
-                                    supporter.heal(creep)
-                                }
-
-                                let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                                    filter: (c) => {
-                                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
-                                    }
-                                })
-
-                                if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
-
-                                    target = "closestHostile"
-
-                                    creep.say("H")
-
-                                    if (creep.pos.getRangeTo(closestHostile) > 3) {
-
-                                        let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 1 }
-                                        })
-
-                                        creep.intraRoomPathing(creep.pos, goal)
-
-                                    } else {
-
-                                        if (creep.pos.getRangeTo(closestHostile) == 1) {
-
-                                            creep.rangedMassAttack()
-
-                                        } else if (creep.pos.getRangeTo(closestHostile) <= 3) {
-
-                                            creep.rangedAttack(closestHostile)
-                                        }
-                                    }
-                                    if (creep.pos.getRangeTo(closestHostile) <= 2) {
-
-                                        let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 5 }
-                                        })
-
-                                        supporter.creepFlee(supporter.pos, goal)
-
-                                        let direction = creep.pos.getDirectionTo(supporter)
-                                        creep.move(direction)
-                                    }
-                                } else {
-
-                                    let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
-                                        filter: (c) => {
-                                            return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
-                                        }
-                                    })
-
-                                    if (closestHostileStructure) {
-
-                                        attackStructure(closestHostileStructure)
-
-                                    } else {
-
-                                        let goal = _.map([creep.room.controller], function(target) {
-                                            return { pos: target.pos, range: 2 }
-                                        })
-
-                                        if (creep.fatigue == 0 && supporter.fatigue == 0) {
-
-                                            creep.intraRoomPathing(creep.pos, goal)
-                                        }
-                                    }
-                                }
                             } else {
 
-                                let closestHostile = creep.room.find(FIND_HOSTILE_CREEPS, {
-                                    filter: (c) => {
-                                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
-                                    }
-                                })
-
-                                let tower = creep.room.find(FIND_HOSTILE_STRUCTURES, {
-                                    filter: s => s.structureType == STRUCTURE_TOWER
-                                })
-
-                                if (closestHostile.length > 0 || tower.length > 0) {
-
-                                    creep.say("RF")
-
-                                    if (supporter.room != creep.room) {
-
-                                        let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(pos) {
-                                            return { pos: pos, range: 24 }
-                                        })
-
-                                        creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
-                                    }
-                                } else {
-
-                                    let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
-                                        filter: (c) => {
-                                            return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
-                                        }
-                                    })
-
-                                    if (closestHostileStructure) {
-
-                                        attackStructure(closestHostileStructure)
-
-                                    } else {
-
-                                        let goal = _.map([creep.room.controller], function(target) {
-                                            return { pos: target.pos, range: 2 }
-                                        })
-
-                                        if (creep.fatigue == 0 && supporter.fatigue == 0) {
-
-                                            creep.intraRoomPathing(creep.pos, goal)
-                                        }
-                                    }
-                                }
+                                creep.say("🚬")
                             }
                         }
                     } else {
 
-                        if (inSquad) {
+                        let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
+                            filter: s => s.structureType == STRUCTURE_RAMPART
+                        })
 
-                            creep.say("IS")
+                        if (ramparts.length > 0) {
 
-                            if (creep.pos.isNearTo(supporter) || creepIsEdge) {
+                            let outerRampart
 
-                                creep.say("N")
+                            let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
 
-                                let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
-                                    filter: creep => creep.my || allyList().indexOf(creep.owner.username.toLowerCase()) >= 0
+                            for (let rampart of ramparts) {
+
+                                if (cm && cm.get(rampart.pos.x, rampart.pos.y) < 255) {
+
+                                    outerRampart = rampart
+                                    break
+                                }
+                            }
+
+                            if (outerRampart) {
+
+                                let goal = _.map([outerRampart], function(target) {
+                                    return { pos: target.pos, range: 0 }
                                 })
 
-                                if (closestInjured) {
+                                if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                    target = "closestInjured"
-
-                                    healCreep(closestInjured)
+                                    creep.intraRoomPathing(creep.pos, goal)
                                 }
+                            }
+                        }
+                    }
+                } else
+                if (creep.room.name == Memory.global.attackTarget) {
 
-                                let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                    if (inSquad) {
+
+                        creep.say("IS")
+
+                        if (creep.pos.isNearTo(supporter) || creepIsEdge) {
+
+                            creep.say("N")
+
+                            let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
+                                filter: creep => creep.my || allyList().indexOf(creep.owner.username.toLowerCase()) >= 0
+                            })
+
+                            if (closestInjured) {
+
+                                target = "closestInjured"
+
+                                healCreep(closestInjured)
+                            } else {
+
+                                supporter.heal(creep)
+                            }
+
+                            let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                                filter: (c) => {
+                                    return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                                }
+                            })
+
+                            if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
+
+                                target = "closestHostile"
+
+                                creep.say("H")
+
+                                if (creep.pos.getRangeTo(closestHostile) > 3) {
+
+                                    let goal = _.map([closestHostile], function(target) {
+                                        return { pos: target.pos, range: 1 }
+                                    })
+
+                                    creep.intraRoomPathing(creep.pos, goal)
+
+                                } else {
+
+                                    if (creep.pos.getRangeTo(closestHostile) == 1) {
+
+                                        creep.rangedMassAttack()
+
+                                    } else if (creep.pos.getRangeTo(closestHostile) <= 3) {
+
+                                        creep.rangedAttack(closestHostile)
+                                    }
+                                }
+                                if (creep.pos.getRangeTo(closestHostile) <= 2) {
+
+                                    let goal = _.map([closestHostile], function(target) {
+                                        return { pos: target.pos, range: 5 }
+                                    })
+
+                                    supporter.creepFlee(supporter.pos, goal)
+
+                                    let direction = creep.pos.getDirectionTo(supporter)
+                                    creep.move(direction)
+                                }
+                            } else {
+
+                                let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
                                     filter: (c) => {
                                         return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
                                     }
                                 })
 
-                                if (1 == 2 && closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
+                                if (closestHostileStructure) {
 
-                                    target = "closestHostile"
+                                    attackStructure(closestHostileStructure)
 
-                                    creep.say("H")
-
-                                    if (creep.pos.getRangeTo(closestHostile) > 3) {
-
-                                        let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 1 }
-                                        })
-
-                                        creep.intraRoomPathing(creep.pos, goal)
-
-                                    } else {
-
-                                        if (creep.pos.getRangeTo(closestHostile) == 1) {
-
-                                            creep.rangedMassAttack()
-
-                                        } else if (creep.pos.getRangeTo(closestHostile) <= 3) {
-
-                                            creep.rangedAttack(closestHostile)
-                                        }
-                                    }
-                                    if (creep.pos.getRangeTo(closestHostile) <= 2) {
-
-                                        let goal = _.map([closestHostile], function(target) {
-                                            return { pos: target.pos, range: 5 }
-                                        })
-
-                                        supporter.creepFlee(supporter.pos, goal)
-
-                                        let direction = creep.pos.getDirectionTo(supporter)
-                                        creep.move(direction)
-                                    }
                                 } else {
 
-                                    let goal = _.map([new RoomPosition(25, 25, Memory.global.attackTarget)], function(pos) {
-                                        return { pos: pos, range: 24 }
+                                    let goal = _.map([creep.room.controller], function(target) {
+                                        return { pos: target.pos, range: 2 }
                                     })
 
                                     if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                        creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                                        creep.intraRoomPathing(creep.pos, goal)
                                     }
-                                }
-
-                            } else {
-
-                                creep.say("F")
-
-                                if (creepIsEdge) {
-
-                                    let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
-                                        return { pos: target, range: 1 }
-                                    })
-
-                                    creep.intraRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
                                 }
                             }
                         } else {
 
-                            creep.say("NS")
+                            let closestHostile = creep.room.find(FIND_HOSTILE_CREEPS, {
+                                filter: (c) => {
+                                    return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                                }
+                            })
+
+                            let tower = creep.room.find(FIND_HOSTILE_STRUCTURES, {
+                                filter: s => s.structureType == STRUCTURE_TOWER
+                            })
+
+                            if (closestHostile.length > 0 || tower.length > 0) {
+
+                                creep.say("RF")
+
+                                if (supporter.room != creep.room) {
+
+                                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(pos) {
+                                        return { pos: pos, range: 24 }
+                                    })
+
+                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                                }
+                            } else {
+
+                                let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
+                                    filter: (c) => {
+                                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                                    }
+                                })
+
+                                if (closestHostileStructure) {
+
+                                    attackStructure(closestHostileStructure)
+
+                                } else {
+
+                                    let goal = _.map([creep.room.controller], function(target) {
+                                        return { pos: target.pos, range: 2 }
+                                    })
+
+                                    if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                                        creep.intraRoomPathing(creep.pos, goal)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+
+                    if (inSquad) {
+
+                        creep.say("IS")
+
+                        if (creep.pos.isNearTo(supporter) || creepIsEdge) {
+
+                            creep.say("N")
+
+                            let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
+                                filter: creep => creep.my || allyList().indexOf(creep.owner.username.toLowerCase()) >= 0
+                            })
+
+                            if (closestInjured) {
+
+                                target = "closestInjured"
+
+                                healCreep(closestInjured)
+                            }
+
+                            let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                                filter: (c) => {
+                                    return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                                }
+                            })
+
+                            if (1 == 2 && closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
+
+                                target = "closestHostile"
+
+                                creep.say("H")
+
+                                if (creep.pos.getRangeTo(closestHostile) > 3) {
+
+                                    let goal = _.map([closestHostile], function(target) {
+                                        return { pos: target.pos, range: 1 }
+                                    })
+
+                                    creep.intraRoomPathing(creep.pos, goal)
+
+                                } else {
+
+                                    if (creep.pos.getRangeTo(closestHostile) == 1) {
+
+                                        creep.rangedMassAttack()
+
+                                    } else if (creep.pos.getRangeTo(closestHostile) <= 3) {
+
+                                        creep.rangedAttack(closestHostile)
+                                    }
+                                }
+                                if (creep.pos.getRangeTo(closestHostile) <= 2) {
+
+                                    let goal = _.map([closestHostile], function(target) {
+                                        return { pos: target.pos, range: 5 }
+                                    })
+
+                                    supporter.creepFlee(supporter.pos, goal)
+
+                                    let direction = creep.pos.getDirectionTo(supporter)
+                                    creep.move(direction)
+                                }
+                            } else {
+
+                                let goal = _.map([new RoomPosition(25, 25, Memory.global.attackTarget)], function(pos) {
+                                    return { pos: pos, range: 24 }
+                                })
+
+                                if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                                }
+                            }
+
+                        } else {
+
+                            creep.say("F")
 
                             if (creepIsEdge) {
 
@@ -626,40 +612,55 @@ module.exports = {
                                 })
 
                                 creep.intraRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
-
-                            } else {
-
-                                let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                                    return { pos: target, range: 24 }
-                                })
-
-                                creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
                             }
                         }
-                    }
-                } else {
-
-                    if (creepIsEdge) {
-
-                        let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
-                            return { pos: target, range: 24 }
-                        })
-
-                        creep.intraRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
-
                     } else {
 
-                        let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                            return { pos: target, range: 24 }
-                        })
+                        creep.say("NS")
 
-                        creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                        if (creepIsEdge) {
+
+                            let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
+                                return { pos: target, range: 1 }
+                            })
+
+                            creep.intraRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
+
+                        } else {
+
+                            let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
+                                return { pos: target, range: 24 }
+                            })
+
+                            creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                        }
                     }
+                }
+            } else {
+
+                if (creepIsEdge) {
+
+                    let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
+                        return { pos: target, range: 24 }
+                    })
+
+                    creep.intraRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
+
+                } else {
+
+                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
+                        return { pos: target, range: 24 }
+                    })
+
+                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
                 }
             }
         }
     }
 }
+
+
+module.exports = antifa
 
 
 /*

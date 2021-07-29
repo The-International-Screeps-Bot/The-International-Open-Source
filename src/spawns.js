@@ -20,7 +20,7 @@ function spawns(room, spawns) {
         dismantle: "dismantle",
     }
 
-    let squadType = squadTypes.dismantle // May be rangedAttack attack and dismantle
+    let squadType = squadTypes.rangedAttack // May be rangedAttack attack and dismantle
 
     /*Integral values for spawning considerations*/
 
