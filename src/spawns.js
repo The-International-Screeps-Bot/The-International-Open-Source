@@ -1201,17 +1201,15 @@ function spawns(room, spawns) {
 
         for (let role in requiredCreeps) {
 
-            i++
+            let spawn = spawns[i]
 
-            if (i <= spawns.length) {
+            if (spawns) {
 
                 let correctBody = _.filter(bodies, function(body) { return body.role == role })
 
                 let bodyRole = correctBody[0]
 
                 if (bodyRole.role == role && freeEnergy >= 300) {
-
-                    let spawn = spawns[spawns.length - 1]
 
                     let testSpawn = spawn.spawnCreep(bodyRole.body, bodyRole.role, { dryRun: true })
 
@@ -1222,6 +1220,8 @@ function spawns(room, spawns) {
                         requiredCreeps[role] - 1
 
                         Memory.data.energySpentOnCreeps += bodyRole.cost
+
+                        i++
 
                     } else if (testSpawn != -4) {
 
