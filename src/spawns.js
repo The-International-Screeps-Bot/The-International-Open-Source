@@ -348,7 +348,7 @@ function spawns(room, spawns) {
 
     if (remoteBuilderNeed && stage >= 4) {
 
-        minCreeps["remoteBuilder"] = 1 + Math.round(room.memory.remoteRooms.length / 3)
+        minCreeps["remoteBuilder"] = 1 + Math.floor(room.memory.remoteRooms.length / 3)
     }
 
     if (remoteEnemy && stage >= 3) {

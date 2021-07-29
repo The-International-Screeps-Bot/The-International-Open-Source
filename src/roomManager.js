@@ -19,13 +19,15 @@ let powerSpawns = require("powerSpawns")
 
 function roomManager() {
 
-    let consoleMessage = ""
-
     let totalCpuUsed = Game.cpu.getUsed()
 
-    let cpuUsed = Game.cpu.getUsed()
+    let consoleMessage = ""
 
     for (let roomName in Game.rooms) {
+
+        let roomCpuUsed = Game.cpu.getUsed()
+
+        let cpuUsed = Game.cpu.getUsed()
 
         let room = Game.rooms[roomName]
 
@@ -75,12 +77,12 @@ function roomManager() {
 
             visuals(room, structures.spawns, structures.towers, structures.links, structures.labs, structures.containers)
         }
+        /*
+        Memory.data.roomManager[room.name].cpuUsage = Game.cpu.getUsed() - roomCpuUsed */
     }
 
-    Memory.data.roomManager[room.name].cpuUsage = Game.cpu.getUsed() - totalCpuUsed
-
     return {
-        cpuUsed: cpuUsed,
+        cpuUsed: totalCpuUsed,
     }
 }
 
