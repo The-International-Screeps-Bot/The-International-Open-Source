@@ -969,7 +969,7 @@ function spawns(room, spawns) {
                 defaultCost: 0,
                 extraParts: [RANGED_ATTACK, MOVE],
                 extraCost: 200,
-                sliceAmount: 2
+                sliceAmount: 10
             }],
             "antifaAssaulter", {})
 
@@ -980,7 +980,7 @@ function spawns(room, spawns) {
                 defaultCost: 0,
                 extraParts: [HEAL, MOVE],
                 extraCost: 300,
-                sliceAmount: 2
+                sliceAmount: 50
             }],
             "antifaSupporter", {})
     } else if (squadType == "attack") {

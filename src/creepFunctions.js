@@ -1038,18 +1038,20 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
         
         creep.move(direction) */
 
-    for (let pos of path) {
+    new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 
-        let room = Game.rooms[pos.roomName]
+    /*     for (let pos of path) {
 
-        if (room) {
+            let room = Game.rooms[pos.roomName]
 
-            room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { opacity: 0.2, stroke: "yellow", fill: "yellow" })
-        } else {
+            if (room) {
 
-            break
-        }
-    }
+                room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { opacity: 0.2, stroke: "yellow", fill: "yellow" })
+            } else {
+
+                break
+            }
+        } */
 }
 
 Creep.prototype.findSafeDistance = function(origin, goal, avoidStages) {
