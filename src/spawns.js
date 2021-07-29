@@ -1203,7 +1203,7 @@ function spawns(room, spawns) {
 
             let spawn = spawns[i]
 
-            if (spawns) {
+            if (spawn) {
 
                 let correctBody = _.filter(bodies, function(body) { return body.role == role })
 
