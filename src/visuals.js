@@ -1,13 +1,5 @@
 function visuals(room, spawns, towers, links, labs, containers) {
 
-    var walls = room.find(FIND_STRUCTURES, {
-        filter: (s) => s.structureType == STRUCTURE_WALL
-    });
-
-    var ramparts = room.find(FIND_MY_STRUCTURES, {
-        filter: (s) => s.structureType == STRUCTURE_RAMPART
-    });
-
     var controller = room.controller
 
     var constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES)

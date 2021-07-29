@@ -41,9 +41,13 @@ function importantStructures(room) {
         filter: s => s.structureType == STRUCTURE_POWER_SPAWN
     })[0]
 
+    let controller = room.controller
+
     let storage = room.storage
 
     let terminal = room.terminal
+
+    let mineral = room.find(FIND_MINERALS)[0]
 
     let structures = {
         spawns: spawns,

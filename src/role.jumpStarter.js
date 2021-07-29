@@ -13,15 +13,11 @@ module.exports = {
 
                     creep.findEnergyHarvested(closestSource)
                 }
-
             } else {
 
-                let goal = _.map([closestSource], function(target) {
-                    return { pos: target.pos, range: 1 }
-                })
+                let goal = { pos: closestSource.pos, range: 1 }
 
                 creep.intraRoomPathing(creep.pos, goal)
-
             }
         } else {
 
@@ -48,9 +44,7 @@ module.exports = {
 
                 } else {
 
-                    let storage = creep.room.storage
-
-                    creep.advancedTransfer(storage)
+                    creep.advancedTransfer(creep.room.storage)
                 }
             }
         }

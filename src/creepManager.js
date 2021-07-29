@@ -6,8 +6,7 @@ function creepManager(room, myCreeps) {
 
     // Import creep roles
 
-    roles["harvester1"] = require('role.harvester')
-    roles["harvester2"] = require('role.harvester')
+    roles["harvester"] = require('role.harvester')
     roles["hauler"] = require("role.hauler")
     roles["upgrader"] = require('role.upgrader')
     roles["builder"] = require('role.builder')

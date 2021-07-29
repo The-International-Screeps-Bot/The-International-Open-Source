@@ -213,8 +213,6 @@ function spawns(room, spawns) {
     let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
     let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
 
-    let remoteRoomsAmount = room.memory.remoteRooms.length
-
     let stage = room.memory.stage
 
     if (room.energyCapacityAvailable >= 9100) {
@@ -263,57 +261,43 @@ function spawns(room, spawns) {
     switch (stage) {
         case 1:
 
-            minCreeps["harvester1"] = 3
-
-            minCreeps["harvester2"] = 3
+            minCreeps["harvester"] = 6
 
             minCreeps["hauler"] = 4
             break
         case 2:
 
-            minCreeps["harvester1"] = 1
-
-            minCreeps["harvester2"] = 1
+            minCreeps["harvester"] = 2
 
             minCreeps["hauler"] = 5
             break
         case 3:
 
-            minCreeps["harvester1"] = 1
-
-            minCreeps["harvester2"] = 1
+            minCreeps["harvester"] = 2
 
             minCreeps["hauler"] = 4
             break
         case 4:
 
-            minCreeps["harvester1"] = 1
-
-            minCreeps["harvester2"] = 1
+            minCreeps["harvester"] = 2
 
             minCreeps["hauler"] = 3
             break
         case 5:
 
-            minCreeps["harvester1"] = 1
-
-            minCreeps["harvester2"] = 1
+            minCreeps["harvester"] = 2
 
             minCreeps["hauler"] = 3
             break
         case 6:
 
-            minCreeps["harvester1"] = 1
-
-            minCreeps["harvester2"] = 1
+            minCreeps["harvester"] = 2
 
             minCreeps["hauler"] = 3
             break
         case 7:
 
-            minCreeps["harvester1"] = 1
-
-            minCreeps["harvester2"] = 1
+            minCreeps["harvester"] = 2
 
             minCreeps["hauler"] = 2
 
@@ -321,9 +305,7 @@ function spawns(room, spawns) {
             break
         case 8:
 
-            minCreeps["harvester1"] = 1
-
-            minCreeps["harvester2"] = 1
+            minCreeps["harvester"] = 2
 
             minCreeps["hauler"] = 2
 
@@ -494,6 +476,10 @@ function spawns(room, spawns) {
         }
     })()
 
+    if (creep.memory.roomFix) {
+
+        minCreeps["jumpStarter"] = 2
+    }
 
     if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 175000 && room.controller.level <= 7) {
 
@@ -529,7 +515,7 @@ function spawns(room, spawns) {
 
     let roomFixMessage = ""
 
-    if (creepsOfRole[["harvester1", room.name]] + creepsOfRole[["harvester2", room.name]] == 0 || creepsOfRole[["hauler", room.name]] == 0) {
+    if (creepsOfRole[["harvester", room.name]] == 0 || creepsOfRole[["hauler", room.name]] == 0) {
 
         room.memory.roomFix = true
 
@@ -537,7 +523,7 @@ function spawns(room, spawns) {
 
         console.log(room.name + ": roomFix true")
 
-    } else if (requiredCreeps["harvester1"] + requiredCreeps["harvester2"] + requiredCreeps["hauler"] == 0) {
+    } else if (requiredCreeps["harvester"] > 1 && requiredCreeps["hauler"] > 1) {
 
         room.memory.roomFix = false
     }
@@ -674,6 +660,17 @@ function spawns(room, spawns) {
         }
     }
 
+    var jumpStarterBody = roleValues(
+        [{
+            stage: 1,
+            defaultParts: [],
+            defaultCost: 0,
+            extraParts: [WORK, MOVE, CARRY, MOVE],
+            extraCost: 250,
+            sliceAmount: 20
+        }],
+        "jumpStarter", {})
+
     var haulerBody = roleValues(
         [{
                 stage: 7,
@@ -701,7 +698,7 @@ function spawns(room, spawns) {
         ],
         "hauler", {})
 
-    let harvester1Body = roleValues(
+    let harvesterBody = roleValues(
         [{
                 stage: 6,
                 defaultParts: [CARRY],
@@ -735,43 +732,7 @@ function spawns(room, spawns) {
                 sliceAmount: 9
             }
         ],
-        "harvester1", {})
-
-    let harvester2Body = roleValues(
-        [{
-                stage: 6,
-                defaultParts: [CARRY],
-                defaultCost: 50,
-                extraParts: [WORK, WORK, MOVE],
-                extraCost: 250,
-                sliceAmount: 13
-            },
-            {
-                stage: 5,
-                defaultParts: [],
-                defaultCost: 0,
-                extraParts: [WORK, WORK, MOVE],
-                extraCost: 250,
-                sliceAmount: 12
-            },
-            {
-                stage: 3,
-                defaultParts: [],
-                defaultCost: 0,
-                extraParts: [WORK, WORK, MOVE],
-                extraCost: 250,
-                sliceAmount: 12
-            },
-            {
-                stage: 1,
-                defaultParts: [MOVE],
-                defaultCost: 50,
-                extraParts: [WORK],
-                extraCost: 100,
-                sliceAmount: 9
-            }
-        ],
-        "harvester2", {})
+        "harvester", {})
 
     let upgraderBody = roleValues(
         [{
@@ -1153,7 +1114,7 @@ function spawns(room, spawns) {
             "antifaSupporter", {})
     }
 
-    let bodies = [harvester1Body, haulerBody, harvester2Body, upgraderBody, builderBody, repairerBody, barricadeUpgraderBody, rangedDefenderBody, upgradeHaulerBody, claimerBody, revolutionaryBuilderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteHarvester1Body, remoteHaulerBody, remoteHarvester2Body, reserverBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
+    let bodies = [jumpStarterBody, harvesterBody, haulerBody, upgraderBody, builderBody, repairerBody, barricadeUpgraderBody, rangedDefenderBody, upgradeHaulerBody, claimerBody, revolutionaryBuilderBody, minerBody, scientistBody, robberBody, scoutBody, stationaryHaulerBody, communeDefenderBody, remoteHarvester1Body, remoteHaulerBody, remoteHarvester2Body, reserverBody, remoteBuilderBody, antifaSupporterBody, antifaAssaulterBody]
 
     let i = 0
 

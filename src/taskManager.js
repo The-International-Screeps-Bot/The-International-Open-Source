@@ -23,6 +23,9 @@ function taskManger(room, creeps) {
 
     function findCreepWithoutTask(collection) {
 
+        // Make it array based in future
+        // let creeps = []
+
         for (let creep of collection) {
 
             if (creep.memory.task == undefined) {
@@ -30,10 +33,30 @@ function taskManger(room, creeps) {
                 return creep
             }
         }
+
         return false
     }
 
     // Harvester
+
+    let harvesters = []
+
+    for (let creep of creeps) {
+
+        if (creep.memory.role == "harvester") {
+
+            harvesters.push(creep)
+        }
+    }
+
+    if (!findCreepsOfTask(harvesters, "source1", (harvesters.length / 2)) && findCreepWithoutTask(harvesters)) {
+
+        findCreepWithoutTask(harvesters).memory.task = "source1"
+
+    } else if (!findCreepsOfTask(harvesters, "source2", (harvesters.length / 2)) && findCreepWithoutTask(harvesters)) {
+
+        findCreepWithoutTask(harvesters).memory.task = "source2"
+    }
 
     // Haulers
 
