@@ -49,7 +49,10 @@ function roomManager() {
 
         if (room.controller && room.controller.my) {
 
-            constants(room, structures)
+            if (Game.time % 10 == 0) {
+
+                constants(room, structures)
+            }
 
             if (Game.time % 100 == 0) {
 

@@ -121,7 +121,7 @@ function globalManager() {
         }
     }
 
-    mapVisuals()
+    //mapVisuals()
     antifa()
 }
 
