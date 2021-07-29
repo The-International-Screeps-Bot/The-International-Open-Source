@@ -459,6 +459,10 @@ Creep.prototype.advancedPathing = function({ opts }) {
 
         opts.swampCost = 24
     }
+    if (!opts.avoidStages) {
+
+        opts.avoidStages = []
+    }
     if (!opts.flee) {
 
         opts.flee = false

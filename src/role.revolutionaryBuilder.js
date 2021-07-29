@@ -21,7 +21,7 @@ module.exports = {
         } else if (creep.room.name != newCommune) {
 
             let goal = _.map([new RoomPosition(25, 25, newCommune)], function(pos) {
-                return { pos: pos, range: 1 }
+                return { pos: pos, range: 24 }
             })
 
             creep.say("BC " + newCommune)

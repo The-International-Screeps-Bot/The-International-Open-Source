@@ -223,10 +223,10 @@ module.exports = {
                     if (!newCommune) {
 
                         let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
-                            return { pos: pos, range: 1 }
+                            return { pos: pos, range: 24 }
                         })
 
-                        creep.offRoadPathing(creep.pos, goal)
+                        creep.onlySafeRoomPathing(creep, goal, [])
                     }
                 }
             } else {
@@ -245,10 +245,10 @@ module.exports = {
                 }
 
                 let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
-                    return { pos: pos, range: 1 }
+                    return { pos: pos, range: 24 }
                 })
 
-                creep.onlySafeRoomPathing(creep, goal)
+                creep.onlySafeRoomPathing(creep, goal, [])
             }
         }
     }
