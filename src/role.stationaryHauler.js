@@ -119,12 +119,20 @@ module.exports = {
 
                         if (storage.store[RESOURCE_ENERGY] <= 250000 && storage.store.getUsedCapacity() < storage.store.getCapacity() - 800) {
 
-                            creep.transfer(storage, RESOURCE_ENERGY)
+                            for (let resource in creep.store) {
+
+                                creep.transfer(storage, resource)
+                            }
+
                             creep.memory.withdrawBaseLink = false
 
                         } else if (terminal.store.getUsedCapacity() < terminal.store.getCapacity() - 800) {
 
-                            creep.transfer(terminal, RESOURCE_ENERGY)
+                            for (let resource in creep.store) {
+
+                                creep.transfer(terminal, resource)
+                            }
+
                             creep.memory.withdrawBaseLink = false
                         }
                     } else {
@@ -139,7 +147,11 @@ module.exports = {
 
                         if (creep.memory.isFull == true) {
 
-                            creep.transfer(terminal, RESOURCE_ENERGY)
+                            for (let resource in creep.store) {
+
+                                creep.transfer(terminal, resource)
+                            }
+
                             creep.memory.factoryWithdrawEnergy = false
 
                         } else {
