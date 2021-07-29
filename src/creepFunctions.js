@@ -597,11 +597,13 @@ Creep.prototype.advancedPathing = function({ opts }) {
         }
     }).path
 
-    //creep.memory.path = path
+    creep.memory.path = path
 
-    let direction = creep.pos.getDirectionTo(path[0])
+    creep.moveByPath(path)
 
-    creep.move(direction)
+    /*     let direction = creep.pos.getDirectionTo(path[0])
+
+        creep.move(direction) */
 
     for (let pos of path) {
 
@@ -1022,6 +1024,8 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
             return cm
         }
     }).path
+
+    creep.memory.path = path
 
     creep.moveByPath(path)
 

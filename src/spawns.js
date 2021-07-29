@@ -320,7 +320,6 @@ function spawns(room, spawns) {
     }
 
     if (Game.flags.R && stage >= 4) {
-
         minCreeps["robber"] = 2
     }
 
@@ -970,7 +969,7 @@ function spawns(room, spawns) {
                 defaultCost: 0,
                 extraParts: [RANGED_ATTACK, MOVE],
                 extraCost: 200,
-                sliceAmount: 6
+                sliceAmount: 10
             }],
             "antifaAssaulter", {})
 
@@ -981,7 +980,7 @@ function spawns(room, spawns) {
                 defaultCost: 0,
                 extraParts: [HEAL, MOVE],
                 extraCost: 300,
-                sliceAmount: 2
+                sliceAmount: 50
             }],
             "antifaSupporter", {})
     } else if (squadType == "attack") {
@@ -1038,6 +1037,8 @@ function spawns(room, spawns) {
 
         let spawn = spawns[i]
 
+        i++
+
         if (spawn) {
 
             let correctBody = _.filter(bodies, function(body) { return body.role == role })
@@ -1055,8 +1056,6 @@ function spawns(room, spawns) {
                     requiredCreeps[role] - 1
 
                     Memory.data.energySpentOnCreeps += bodyRole.cost
-
-                    i++
 
                 } else if (testSpawn != -4) {
 
