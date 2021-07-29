@@ -239,21 +239,16 @@ module.exports = {
 
                     creep.room.memory.stage = "keeperRoom"
 
-                    let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
-                        return { pos: pos, range: 1 }
-                    })
-
-                    creep.offRoadPathing(creep.pos, goal)
                 } else {
 
                     creep.room.memory.stage = "emptyRoom"
-
-                    let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
-                        return { pos: pos, range: 1 }
-                    })
-
-                    creep.offRoadPathing(creep.pos, goal)
                 }
+
+                let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
+                    return { pos: pos, range: 1 }
+                })
+
+                creep.onlySafeRoomPathing(creep, goal)
             }
         }
     }

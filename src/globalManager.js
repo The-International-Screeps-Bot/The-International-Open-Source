@@ -56,9 +56,9 @@ function globalManager() {
 
         var newCommune
 
-        //var attackTarget = "E26N17"
+        var attackTarget = "E22N14"
 
-        var attackTarget
+        // var attackTarget
     }
 
     Memory.global.newCommune = newCommune

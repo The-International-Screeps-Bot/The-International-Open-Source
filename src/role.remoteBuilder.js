@@ -110,7 +110,7 @@ module.exports = {
                     return { pos: target, range: 24 }
                 })
 
-                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
+                creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
             }
         } else {
             if (creep.room.name == roomFrom) {
@@ -168,7 +168,7 @@ module.exports = {
                     return { pos: target, range: 24 }
                 })
 
-                creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
+                creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
 
             }
         }

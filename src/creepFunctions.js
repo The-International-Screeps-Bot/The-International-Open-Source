@@ -448,13 +448,9 @@ Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTo
             return false
         }
     }
-    //creep.advancedPathing({ origin: creep, goal: structure, maxRooms: 1, plainCost: 1, swampCost: 9, defaultCostMatrix: creep.room.memory.defaultCostMatrix, avoidStages: true, flee: false })
+    //creep.advancedPathing({ origin: creep.pos, goal: { structure.pos, range: 1}, plainCost: 1, swampCost: 9, defaultCostMatrix: creep.room.memory.defaultCostMatrix, avoidStages: true, flee: false })
 Creep.prototype.advancedPathing = function({ opts }) {
 
-    if (!opts.maxRooms) {
-
-        opts.maxRooms = 64
-    }
     if (!opts.plainCost) {
 
         opts.plainCost = 4
@@ -468,43 +464,40 @@ Creep.prototype.advancedPathing = function({ opts }) {
         opts.flee = false
     }
 
-    if (avoidStages.length > 0) {
+    var allowedRooms = {
+        [origin.pos.roomName]: true
+    }
 
-        var allowedRooms = {
-            [origin.room.name]: true
-        }
+    let route = Game.map.findRoute(origin.roomName, goal.pos.roomName, {
+        routeCallback(roomName) {
 
-        let route = Game.map.findRoute(origin.room.name, goal.pos.roomName, {
-            routeCallback(roomName) {
+            if (roomName == goal.pos.roomName) {
 
-                if (roomName == goal.pos.roomName) {
+                allowedRooms[roomName] = true
+                return 1
 
-                    allowedRooms[roomName] = true
-                    return 1
-
-                }
-                if (Memory.rooms[roomName] && avoidStages.indexOf(Memory.rooms[roomName].stage) == -1) {
-
-                    allowedRooms[roomName] = true
-                    return 1
-
-                }
-
-                return Infinity
             }
-        })
+            if (Memory.rooms[roomName] && !opts.avoidStages.includes(Memory.rooms[roomName])) {
 
-        if (route.length > 0) {
+                allowedRooms[roomName] = true
+                return 1
 
-            goal = _.map([new RoomPosition(25, 25, route[0].room)], function(pos) {
-                return { pos: pos, range: 1 }
-            })
+            }
+
+            return Infinity
         }
+    })
+
+    if (route.length > 0) {
+
+        goal = { pos: new RoomPosition(25, 25, route[0].room), range: 1 }
     }
 
     var path = PathFinder.search(origin.pos, goal, {
         plainCost: 3,
         swampCost: 8,
+        maxRooms: 1,
+        maxOps: 100000,
 
         roomCallback: function(roomName) {
 
@@ -906,129 +899,148 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
 
     creep = this
 
-    let allowedRooms = {
-        [origin.roomName]: true
+    var allowedRooms = {
+        [origin.room.name]: true
     }
 
-    Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
+    let route = Game.map.findRoute(origin.room.name, goal[0].pos.roomName, {
         routeCallback(roomName) {
 
             if (roomName == goal[0].pos.roomName) {
 
                 allowedRooms[roomName] = true
                 return 1
+
             }
-            if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName].stage)) {
+            if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName])) {
 
                 allowedRooms[roomName] = true
                 return 1
+
             }
 
             return Infinity
         }
     })
 
-    var path = PathFinder.search(origin, goal, {
-        plainCost: 3,
-        swampCost: 8,
-        maxOps: 10000,
+    if (route.length > 0) {
 
-        roomCallback: function(roomName) {
+        goal = { pos: new RoomPosition(25, 25, route[0].room), range: 1 }
+    }
 
-            let room = Game.rooms[roomName]
+    if (route.length > 0) {
 
-            if (!room) return false
+        var path = PathFinder.search(origin.pos, goal, {
+            plainCost: 3,
+            swampCost: 8,
+            maxRooms: 1,
+            maxOps: 10000,
 
-            if (!allowedRooms[roomName]) return false
+            roomCallback: function(roomName) {
 
-            let cm
+                let room = Game.rooms[roomName]
 
-            if (room.memory.defaultCostMatrix) {
+                if (!room) return false
 
-                cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
+                if (!allowedRooms[roomName]) return false
 
-                for (let creep of room.find(FIND_CREEPS)) {
+                let cm
 
-                    cm.set(creep.pos.x, creep.pos.y, 255)
+                if (room.memory.defaultCostMatrix) {
+
+                    cm = PathFinder.CostMatrix.deserialize(room.memory.defaultCostMatrix)
+
+                    for (let creep of room.find(FIND_CREEPS)) {
+
+                        cm.set(creep.pos.x, creep.pos.y, 255)
+                    }
+
+                    for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                        cm.set(creep.pos.x, creep.pos.y, 255)
+                    }
+                } else {
+
+                    cm = new PathFinder.CostMatrix
+
+                    let constructionSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES, {
+                        filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
+                    })
+
+                    for (let site of constructionSites) {
+
+                        cm.set(site.pos.x, site.pos.y, 255)
+                    }
+
+                    let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_RAMPART
+                    })
+
+                    for (let rampart of ramparts) {
+
+                        cm.set(rampart.pos.x, rampart.pos.y, 3)
+                    }
+
+                    let roads = creep.room.find(FIND_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_ROAD
+                    })
+
+                    for (let road of roads) {
+
+                        cm.set(road.pos.x, road.pos.y, 1)
+                    }
+
+                    let structures = creep.room.find(FIND_STRUCTURES, {
+                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                    })
+
+                    for (let structure of structures) {
+
+                        cm.set(structure.pos.x, structure.pos.y, 255)
+                    }
+
+                    let enemyStructures = creep.room.find(FIND_HOSTILE_STRUCTURES)
+
+                    for (let structure of enemyStructures) {
+
+                        cm.set(structure.pos.x, structure.pos.y, 255)
+                    }
+
+                    for (let creep of room.find(FIND_CREEPS)) {
+
+                        cm.set(creep.pos.x, creep.pos.y, 255)
+                    }
+
+                    for (let creep of room.find(FIND_POWER_CREEPS)) {
+
+                        cm.set(creep.pos.x, creep.pos.y, 255)
+                    }
                 }
 
-                for (let creep of room.find(FIND_POWER_CREEPS)) {
+                return cm
+            }
+        }).path
 
-                    cm.set(creep.pos.x, creep.pos.y, 255)
-                }
+        creep.memory.path = path
+
+        creep.moveByPath(path)
+
+        /*     let direction = creep.pos.getDirectionTo(path[0])
+            
+            creep.move(direction) */
+
+        for (let pos of path) {
+
+            let room = Game.rooms[pos.roomName]
+
+            if (room) {
+
+                room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { opacity: 0.2, stroke: "yellow", fill: "yellow" })
             } else {
 
-                cm = new PathFinder.CostMatrix
-
-                let constructionSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES, {
-                    filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
-                })
-
-                for (let site of constructionSites) {
-
-                    cm.set(site.pos.x, site.pos.y, 255)
-                }
-
-                let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_RAMPART
-                })
-
-                for (let rampart of ramparts) {
-
-                    cm.set(rampart.pos.x, rampart.pos.y, 3)
-                }
-
-                let roads = creep.room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_ROAD
-                })
-
-                for (let road of roads) {
-
-                    cm.set(road.pos.x, road.pos.y, 1)
-                }
-
-                let structures = creep.room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
-                })
-
-                for (let structure of structures) {
-
-                    cm.set(structure.pos.x, structure.pos.y, 255)
-                }
-
-                let enemyStructures = creep.room.find(FIND_HOSTILE_STRUCTURES)
-
-                for (let structure of enemyStructures) {
-
-                    cm.set(structure.pos.x, structure.pos.y, 255)
-                }
-
-                for (let creep of room.find(FIND_CREEPS)) {
-
-                    cm.set(creep.pos.x, creep.pos.y, 255)
-                }
-
-                for (let creep of room.find(FIND_POWER_CREEPS)) {
-
-                    cm.set(creep.pos.x, creep.pos.y, 255)
-                }
+                break
             }
-
-            return cm
         }
-    }).path
-
-    creep.memory.path = path
-
-    creep.moveByPath(path)
-
-    /*     let direction = creep.pos.getDirectionTo(path[0])
-        
-        creep.move(direction) */
-
-    for (let pos of path) {
-
-        new RoomVisual(pos.roomName).rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { opacity: 0.2, stroke: "yellow", fill: "yellow" })
     }
 }
 
@@ -1049,7 +1061,7 @@ Creep.prototype.findSafeDistance = function(origin, goal, avoidStages) {
                 return 1
 
             }
-            if (Memory.rooms[roomName] && avoidStages.indexOf(Memory.rooms[roomName].stage) == -1) {
+            if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName])) {
 
                 allowedRooms[roomName] = true
                 return 1

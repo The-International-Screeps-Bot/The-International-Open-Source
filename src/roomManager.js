@@ -37,11 +37,9 @@ function roomManager() {
 
         creepManager(room, creeps.myCreeps)
 
-        //taskManger(room, creeps.myCreeps)
+        taskManager(room, creeps.myCreeps)
 
         //trafficManager(room, creeps.myCreeps)
-
-        taskManager(room, creeps.myCreeps)
 
         // Commune only scripts
 
@@ -58,7 +56,7 @@ function roomManager() {
 
             spawns(room, structures.spawns)
 
-            towers(room, structures.towers)
+            towers(room, structures.towers, creeps)
 
             if (Game.time % 10 == 0) {
 

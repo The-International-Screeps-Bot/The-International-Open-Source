@@ -26,7 +26,7 @@ module.exports = {
 
             creep.say("BC " + newCommune)
 
-            creep.onlySafeRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
+            creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
 
         } else {
 

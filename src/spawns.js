@@ -20,7 +20,7 @@ function spawns(room, spawns) {
         dismantle: "dismantle",
     }
 
-    let squadType = squadTypes.rangedAttack // May be rangedAttack attack and dismantle
+    let squadType = squadTypes.dismantle // May be rangedAttack attack and dismantle
 
     /*Integral values for spawning considerations*/
 
@@ -1013,7 +1013,7 @@ function spawns(room, spawns) {
                 defaultCost: 50,
                 extraParts: [WORK, MOVE],
                 extraCost: 150,
-                sliceAmount: 20
+                sliceAmount: 2
             }],
             "antifaAssaulter", {})
 
