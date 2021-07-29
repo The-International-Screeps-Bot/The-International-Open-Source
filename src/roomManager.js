@@ -21,6 +21,8 @@ function roomManager() {
 
     let consoleMessage = ""
 
+    let totalCpuUsed = Game.cpu.getUsed()
+
     let cpuUsed = Game.cpu.getUsed()
 
     for (let roomName in Game.rooms) {
@@ -74,6 +76,8 @@ function roomManager() {
             visuals(room, structures.spawns, structures.towers, structures.links, structures.labs, structures.containers)
         }
     }
+
+    Memory.data.roomManager[room.name].cpuUsage = Game.cpu.getUsed() - totalCpuUsed
 
     return {
         cpuUsed: cpuUsed,

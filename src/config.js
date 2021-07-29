@@ -37,6 +37,8 @@ function config() {
 
     Memory.data.opsGenerated = 0
 
+    Memory.data.roomManager = {}
+
     // Global
 
     Memory.global.totalEnergy = 0
