@@ -73,8 +73,6 @@ function data() {
 
     Memory.data.memoryUsed = Math.floor(RawMemory.get().length / 1000)
 
-    Memory.data.cpuPerCreep = (Memory.data.cpuUsage / Memory.data.totalCreeps).toFixed(2)
-
     //GCL
 
     Memory.data.gcl = Game.gcl.level

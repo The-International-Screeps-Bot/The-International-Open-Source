@@ -1,4 +1,4 @@
-let creepFunctions = require("creepFunctions")
+require("creepFunctions")
 
 function creepManager(room, myCreeps) {
 
@@ -56,6 +56,8 @@ function creepManager(room, myCreeps) {
             console.log(creep.memory.role + ": " + cpuUsed)
         }
     }
+
+    Memory.cpuPerCreep += cpuUsed / myCreeps.length
 }
 
 module.exports = creepManager
