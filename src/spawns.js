@@ -329,12 +329,12 @@ function spawns(room, spawns) {
         minCreeps["repairer"] = 1
     }
 
-    if (Memory.global.communeEstablisher == communeEstablisher) {
+    if (Memory.global.communeEstablisher == room.name) {
 
         minCreeps["claimer"] = 1
     }
 
-    if (Memory.global.communeEstablisher == communeEstablisher) {
+    if (Memory.global.communeEstablisher == room.name) {
 
         minCreeps["revolutionaryBuilder"] = 4
     }
