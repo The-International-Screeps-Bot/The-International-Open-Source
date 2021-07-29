@@ -336,19 +336,36 @@ function antifa() {
                             }
                         } else {
 
-                            creep.say("F")
+                            let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
+                                filter: s => s.structureType == STRUCTURE_RAMPART
+                            })
 
-                            if (creep.room.name == Memory.global.attackTarget) {
+                            if (ramparts.length > 0) {
 
-                                let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(pos) {
-                                    return { pos: pos, range: 24 }
-                                })
+                                let outerRampart
 
-                                creep.intraRoomPathing(creep.pos, goal)
+                                let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
 
-                            } else {
+                                for (let rampart of ramparts) {
 
-                                creep.say("🚬")
+                                    if (cm && cm.get(rampart.pos.x, rampart.pos.y) < 255) {
+
+                                        outerRampart = rampart
+                                        break
+                                    }
+                                }
+
+                                if (outerRampart) {
+
+                                    let goal = _.map([outerRampart], function(target) {
+                                        return { pos: target.pos, range: 0 }
+                                    })
+
+                                    if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                                        creep.intraRoomPathing(creep.pos, goal)
+                                    }
+                                }
                             }
                         }
                     } else {
@@ -385,8 +402,7 @@ function antifa() {
                             }
                         }
                     }
-                } else
-                if (creep.room.name == Memory.global.attackTarget) {
+                } else if (creep.room.name == Memory.global.attackTarget) {
 
                     if (inSquad) {
 

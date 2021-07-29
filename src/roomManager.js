@@ -77,8 +77,9 @@ function roomManager() {
 
             visuals(room, structures.spawns, structures.towers, structures.links, structures.labs, structures.containers)
         }
-        /*
-        Memory.data.roomManager[room.name].cpuUsage = Game.cpu.getUsed() - roomCpuUsed */
+
+        Memory.data.roomManager[room.name] = {}
+        Memory.data.roomManager[room.name].cpuUsage = Game.cpu.getUsed() - roomCpuUsed
     }
 
     return {
