@@ -1,4 +1,4 @@
-let allyList = require("module.allyList")
+let allyList = require("allyList")
 let creepFunctions = require("module.creepFunctions")
 
 module.exports = {
@@ -138,7 +138,7 @@ module.exports = {
 
                     let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                         filter: (c) => {
-                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                            return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
                         }
                     })
 
@@ -274,7 +274,7 @@ module.exports = {
                                 creep.say("N")
 
                                 let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
-                                    filter: creep => creep.my || allyList.run().indexOf(creep.owner.username.toLowerCase()) >= 0
+                                    filter: creep => creep.my || allyList().indexOf(creep.owner.username.toLowerCase()) >= 0
                                 })
 
                                 if (closestInjured) {
@@ -286,7 +286,7 @@ module.exports = {
 
                                 let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                                     filter: (c) => {
-                                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
                                     }
                                 })
 
@@ -400,7 +400,7 @@ module.exports = {
                                 creep.say("N")
 
                                 let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
-                                    filter: creep => creep.my || allyList.run().indexOf(creep.owner.username.toLowerCase()) >= 0
+                                    filter: creep => creep.my || allyList().indexOf(creep.owner.username.toLowerCase()) >= 0
                                 })
 
                                 if (closestInjured) {
@@ -415,7 +415,7 @@ module.exports = {
 
                                 let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                                     filter: (c) => {
-                                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
                                     }
                                 })
 
@@ -459,7 +459,7 @@ module.exports = {
 
                                     let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
                                         filter: (c) => {
-                                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                                            return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
                                         }
                                     })
 
@@ -483,7 +483,7 @@ module.exports = {
 
                                 let closestHostile = creep.room.find(FIND_HOSTILE_CREEPS, {
                                     filter: (c) => {
-                                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
                                     }
                                 })
 
@@ -507,7 +507,7 @@ module.exports = {
 
                                     let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
                                         filter: (c) => {
-                                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                                            return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
                                         }
                                     })
 
@@ -540,7 +540,7 @@ module.exports = {
                                 creep.say("N")
 
                                 let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
-                                    filter: creep => creep.my || allyList.run().indexOf(creep.owner.username.toLowerCase()) >= 0
+                                    filter: creep => creep.my || allyList().indexOf(creep.owner.username.toLowerCase()) >= 0
                                 })
 
                                 if (closestInjured) {
@@ -552,7 +552,7 @@ module.exports = {
 
                                 let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                                     filter: (c) => {
-                                        return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
                                     }
                                 })
 
@@ -666,7 +666,7 @@ module.exports = {
 
 /*
         
-let allyList = require("module.allyList")
+let allyList = require("allyList")
         let creepFunctions = require("module.creepFunctions")
         
 module.exports = {
@@ -715,7 +715,7 @@ module.exports = {
         
                             let injuredCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                                         filter: (c) => {
-                                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) >= 0)
+                                            return (allyList().indexOf(c.owner.username.toLowerCase()) >= 0)
                                 }        
                               })      
         
@@ -737,7 +737,7 @@ module.exports = {
         
                             let hostile = leader.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                                         filter: (c) => {
-                                            return (allyList.run().indexOf(c.owner.username.toLowerCase()) === -1)
+                                            return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
                                   }      
                                })     
         

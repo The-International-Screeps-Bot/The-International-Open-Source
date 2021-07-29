@@ -1,5 +1,5 @@
 let creepFunctions = require("module.powerCreepFunctions")
-let allyList = require("module.allyList")
+let allyList = require("allyList")
 
 module.exports = {
     run: function powerCreeps() {

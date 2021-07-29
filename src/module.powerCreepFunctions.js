@@ -1,4 +1,4 @@
-let allyList = require("module.allyList")
+let allyList = require("allyList")
 
 PowerCreep.prototype.findRemoteRoom = function() {
 

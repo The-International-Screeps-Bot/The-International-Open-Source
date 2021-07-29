@@ -1,5 +1,5 @@
 const { last } = require("lodash");
-let allyList = require("module.allyList")
+let allyList = require("allyList")
 
 module.exports = {
     run: function logging() {
