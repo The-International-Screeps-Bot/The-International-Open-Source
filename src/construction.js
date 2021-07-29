@@ -8,7 +8,7 @@ function construction(room) {
 
     //removeAllSites()
 
-    //removeAllStructures()
+    removeAllStructures()
 
     function destroySites(roomName) {
 
@@ -72,7 +72,7 @@ function construction(room) {
     function removeAllStructures() {
 
         let structures = room.find(FIND_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_ROAD
+            filter: s => s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_CONTAINER
         })
 
         for (let structure of structures) {

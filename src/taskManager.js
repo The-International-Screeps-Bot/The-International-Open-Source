@@ -1,7 +1,5 @@
 function taskManger(room, creeps) {
 
-    console.log(Object.keys(creeps))
-
     function findCreepsOfTask(collection, task, requiredAmount) {
 
         let creepsWithTask = []
@@ -69,8 +67,6 @@ function taskManger(room, creeps) {
             haulers.push(creep)
         }
     }
-
-    console.log(haulers)
 
     if (haulers.length > 0) {
 
