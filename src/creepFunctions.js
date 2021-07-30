@@ -903,6 +903,8 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
 
     creep = this
 
+    avoidStages.push("allyRoom")
+
     var allowedRooms = {
         [origin.room.name]: true
     }

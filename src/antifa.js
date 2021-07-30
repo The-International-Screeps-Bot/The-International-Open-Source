@@ -110,8 +110,40 @@ function antifa() {
 
             function healCreep() {
 
-                let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
-                    filter: creep => creep.my || allyList().indexOf(creep.owner.username.toLowerCase()) >= 0
+                if (creep.hits < creep.hitsMax) {
+
+                    supporter.heal(creep)
+                } else if (supporter.hits < supporter.hitsMax) {
+
+                    supporter.heal(supporter)
+                } else {
+
+                    let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
+                        filter: (creep) => {
+                            return (creep.my || allyList().includes(creep.owner.username.toLowerCase()))
+                        }
+                    })
+
+                    if (closestInjured) {
+
+                        creep.say("CI")
+
+                        if (supporter.pos.getRangeTo(closestInjured) > 1) {
+
+                            supporter.rangedHeal(closestInjured)
+
+                        } else {
+
+                            supporter.heal(closestInjured)
+
+                        }
+                    }
+                }
+
+                /* let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
+                    filter: (creep) => {
+                        return (creep.my || allyList().includes(creep.owner.username.toLowerCase()))
+                    }
                 })
 
                 if (closestInjured) {
@@ -121,9 +153,24 @@ function antifa() {
                     if (supporter.pos.getRangeTo(closestInjured) > 1) {
 
                         supporter.rangedHeal(closestInjured)
-                    } else {
+
+                    } else if (supporter.pos.getRangeTo(closestInjured) <= 3) {
 
                         supporter.heal(closestInjured)
+
+                    } else {
+                        if (supporter.hits < supporter.hitsMax) {
+
+                            creep.say("HS")
+
+                            supporter.heal(supporter)
+
+                        } else {
+
+                            creep.say("HA")
+
+                            supporter.heal(assaulter)
+                        }
                     }
                 } else {
                     if (supporter.hits < supporter.hitsMax) {
@@ -138,10 +185,10 @@ function antifa() {
 
                         supporter.heal(assaulter)
                     }
-                }
+                } */
             }
 
-            function attackHostile(hostile) {
+            function attackHostile() {
 
                 let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
