@@ -52,7 +52,6 @@ function creepManager(room, myCreeps, creepCpuUsed) {
             }
 
             cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
-            totalCpuUsed += cpuUsed
 
             console.log(creep.memory.role + ": " + cpuUsed)
         }
