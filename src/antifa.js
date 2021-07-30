@@ -54,7 +54,7 @@ function antifa() {
                             return { pos: target.pos, range: 24 }
                         })
 
-                        creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                        creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
                     }
                 } else {
 
@@ -64,7 +64,7 @@ function antifa() {
                         return { pos: target, range: 24 }
                     })
 
-                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
                 }
             } else if (findCreepWithoutTask(creep, antifaAssaulters)) {
 
@@ -82,7 +82,7 @@ function antifa() {
                     return { pos: target, range: 24 }
                 })
 
-                creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
             }
         }
 
@@ -377,7 +377,7 @@ function antifa() {
 
                                 if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
                                 }
                             }
                         } else {
@@ -548,7 +548,7 @@ function antifa() {
                                         return { pos: pos, range: 24 }
                                     })
 
-                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
                                 }
                             } else {
 
@@ -638,7 +638,7 @@ function antifa() {
 
                                 if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
                                 }
                             }
 
@@ -665,7 +665,7 @@ function antifa() {
                                 return { pos: target, range: 1 }
                             })
 
-                            creep.intraRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
+                            creep.intraRoomPathing(creep.pos, goal)
 
                         } else {
 
@@ -673,7 +673,7 @@ function antifa() {
                                 return { pos: target, range: 24 }
                             })
 
-                            creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                            creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
                         }
                     }
                 }
@@ -685,7 +685,7 @@ function antifa() {
                         return { pos: target, range: 24 }
                     })
 
-                    creep.intraRoomPathing(creep.pos, goal, ["enemyRoom", "keeperRoom"])
+                    creep.intraRoomPathing(creep.pos, goal)
 
                 } else {
 
@@ -693,7 +693,7 @@ function antifa() {
                         return { pos: target, range: 24 }
                     })
 
-                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
+                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
                 }
             }
         }
