@@ -36,6 +36,7 @@ function roomManager() {
         let {
             creeps,
             structures,
+            specialStructures,
             costMatrixes,
         } = roomVariables(room)
 
@@ -74,7 +75,7 @@ function roomManager() {
 
             powerSpawns(structures.powerSpawn)
 
-            links(room, structures.links)
+            links(room, structures.labs, specialStructures.labs.primaryLabs, specialStructures.labs.secondaryLabs, specialStructures.labs.tertiaryLabs)
 
             labs(room, structures.labs)
 

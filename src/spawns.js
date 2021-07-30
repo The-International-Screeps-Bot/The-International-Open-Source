@@ -391,7 +391,7 @@ function spawns(room, spawns) {
         }
     })()
 
-    if (creep.memory.roomFix) {
+    if (room.memory.roomFix) {
 
         minCreeps["jumpStarter"] = 2
     }

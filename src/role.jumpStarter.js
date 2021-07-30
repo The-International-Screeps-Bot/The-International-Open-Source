@@ -3,21 +3,24 @@ module.exports = {
 
         creep.isFull()
 
-        if (creep.memory.isFull == true) {
+        if (!creep.memory.isFull) {
 
             let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
 
-            if (creep.pos.inRangeTo(closestSource, 1)) {
+            if (closestSource) {
 
-                if (creep.harvest(closestSource) == 0) {
+                creep.say("⛏️")
 
-                    creep.findEnergyHarvested(closestSource)
+                if (creep.pos.getRangeTo(closestSource) <= 1) {
+
+                    if (creep.harvest(closestSource) == 0) {
+
+                        creep.findEnergyHarvested(closestSource)
+                    }
+                } else {
+
+                    creep.advancedPathing({ origin: creep.pos, goal: { pos: closestSource.pos, range: 1 }, plainCost: false, swampCost: false, defaultCostMatrix: creep.room.memory.defaultCostMatrix, avoidStages: ["enemyRoom", "keeperRoom"], flee: false })
                 }
-            } else {
-
-                let goal = { pos: closestSource.pos, range: 1 }
-
-                creep.intraRoomPathing(creep.pos, goal)
             }
         } else {
 
@@ -51,4 +54,4 @@ module.exports = {
 
         creep.avoidHostiles()
     }
-};
+}

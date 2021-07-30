@@ -6,6 +6,7 @@ function creepManager(room, myCreeps) {
 
     // Import creep roles
 
+    roles["jumpStarter"] = require('role.jumpStarter')
     roles["harvester"] = require('role.harvester')
     roles["hauler"] = require("role.hauler")
     roles["upgrader"] = require('role.upgrader')
@@ -49,7 +50,7 @@ function creepManager(room, myCreeps) {
 
             } catch (err) {
 
-                creep.say("Err")
+                creep.say("❌")
             }
 
             cpuUsed = Game.cpu.getUsed() - cpuUsed

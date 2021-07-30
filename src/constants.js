@@ -4,7 +4,6 @@ function constants(room) {
 
     sources()
     containers()
-    labs()
     links()
     towers()
     spawns()
@@ -83,55 +82,6 @@ function constants(room) {
                 room.memory.mineralContainer = container.id
             }
         }
-    }
-
-    function labs() {
-
-        let labs = room.find(FIND_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_LAB
-        })
-
-        var primaryLabs = []
-        var secondaryLabs = []
-
-        for (let lab of labs) {
-
-            var nearbyLab = lab.pos.findInRange(labs, 2)
-
-            var controller = room.controller
-
-            if (controller.level == 7) {
-                if (nearbyLab.length == labs.length && primaryLabs.length < 2) {
-
-                    lab.room.visual.circle(lab.pos, {
-                        fill: 'transparent',
-                        radius: 0.8,
-                        stroke: '#39A0ED',
-                        strokeWidth: 0.125
-                    });
-                    primaryLabs.push(lab.id)
-
-                } else {
-
-                    secondaryLabs.push(lab.id)
-
-                }
-            } else if (controller.level == 8) {
-                if (nearbyLab.length == labs.length && primaryLabs.length < 2) {
-
-                    primaryLabs.push(lab.id)
-
-                } else {
-
-                    secondaryLabs.push(lab.id)
-
-                }
-            }
-        }
-
-        room.memory.primaryLabs = primaryLabs
-        room.memory.secondaryLabs = secondaryLabs
-
     }
 
     function links() {

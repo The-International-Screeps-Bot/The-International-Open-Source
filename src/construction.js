@@ -943,7 +943,7 @@ function construction(room) {
 
                     new RoomVisual(normalValue.roomName).rect(normalValue.x - 0.5, normalValue.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476" })
 
-                    if (value && value.roomName && value.x && value.y && Game.rooms[value.roomName] && value.roomName != room.name) {
+                    if (value && value.roomName && value.x && value.y && Game.rooms[value.roomName]) {
 
                         Game.rooms[value.roomName].createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                     }

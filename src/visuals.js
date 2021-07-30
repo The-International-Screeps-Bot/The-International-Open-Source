@@ -16,14 +16,13 @@ function visuals(room, spawns, towers, links, labs, containers) {
 
     var mineral = minerals[0]
 
-    let rawPrimaryLabs = room.memory.primaryLabs
-    let rawSecondaryLabs = room.memory.secondaryLabs
+    let primaryLabs = room.memory.primaryLabs
+    let secondaryLabs = room.memory.secondaryLabs
+    let tertiaryLabs = room.memory.secondaryLabs
 
-    for (let labs of rawPrimaryLabs) {
+    for (let lab of labs) {
 
-        let lab = Game.getObjectById(labs)
-
-        if (lab != null) {
+        if (primaryLabs.includes(lab)) {
 
             room.visual.circle(lab.pos, {
                 fill: 'transparent',
@@ -31,13 +30,7 @@ function visuals(room, spawns, towers, links, labs, containers) {
                 stroke: '#39A0ED',
                 strokeWidth: 0.125
             })
-        }
-    }
-    for (let labs of rawSecondaryLabs) {
-
-        let lab = Game.getObjectById(labs)
-
-        if (lab != null) {
+        } else if (secondaryLabs.includes(lab)) {
 
             room.visual.circle(lab.pos, {
                 fill: 'transparent',
@@ -45,11 +38,15 @@ function visuals(room, spawns, towers, links, labs, containers) {
                 stroke: '#2DF0C9',
                 strokeWidth: 0.125
             })
+        } else if (tertiaryLabs.includes(lab)) {
+
+            room.visual.circle(lab.pos, {
+                fill: 'transparent',
+                radius: 0.8,
+                stroke: '#2D0092',
+                strokeWidth: 0.125
+            })
         }
-    }
-
-    for (let lab of labs) {
-
         //Minerals
         if (lab.store[RESOURCE_HYDROGEN]) {
 

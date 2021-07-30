@@ -72,6 +72,43 @@ function importantStructures(room) {
     let sourceContainer2
     let sourceLink2
 
+    let primaryLabs = []
+    let secondaryLabs = []
+    let tertiaryLabs = []
+
+    for (let lab of labs) {
+
+        var nearbyLab = lab.pos.findInRange(labs, 2)
+
+        if (controller.level == 7) {
+            if (nearbyLab.length == labs.length && primaryLabs.length < 2) {
+
+                lab.room.visual.circle(lab.pos, {
+                    fill: 'transparent',
+                    radius: 0.8,
+                    stroke: '#39A0ED',
+                    strokeWidth: 0.125
+                });
+                primaryLabs.push(lab)
+
+            } else {
+
+                secondaryLabs.push(lab)
+
+            }
+        } else if (controller.level == 8) {
+            if (nearbyLab.length == labs.length && primaryLabs.length < 2) {
+
+                primaryLabs.push(lab)
+
+            } else {
+
+                secondaryLabs.push(lab)
+
+            }
+        }
+    }
+
     let specialStructures = {
         baseLink: baseLink,
         controllerContainer: controllerContainer,
@@ -80,6 +117,17 @@ function importantStructures(room) {
         sourceLink1: sourceLink1,
         sourceContainer2: sourceContainer2,
         sourceLink2: sourceLink2,
+        container: {
+
+        },
+        links: {
+
+        },
+        labs: {
+            primaryLabs: primaryLabs,
+            secondaryLabs: secondaryLabs,
+            tertiaryLabs: "tertiaryLabs",
+        }
     }
 
     let costMatrixes = {}
