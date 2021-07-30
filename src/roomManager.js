@@ -39,7 +39,7 @@ function roomManager() {
             costMatrixes,
         } = roomVariables(room)
 
-        creepManager(room, creeps.myCreeps, creepCpuUsed)
+        creepManager(room, creeps.myCreeps)
 
         taskManager(room, creeps.myCreeps)
 
