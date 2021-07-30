@@ -81,7 +81,7 @@ function spawns(room, spawns) {
 
         var hostile = room.find(FIND_HOSTILE_CREEPS, {
             filter: (c) => {
-                return (allyList().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+                return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
             }
         })
 
@@ -89,7 +89,7 @@ function spawns(room, spawns) {
 
         var hostile = room.find(FIND_HOSTILE_CREEPS, {
             filter: (c) => {
-                return (allyList().indexOf(c.owner.username.toLowerCase()) === -1 && c.owner.username != "Invader" && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+                return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && c.owner.username != "Invader" && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
             }
         })
     }
@@ -980,7 +980,7 @@ function spawns(room, spawns) {
                 defaultCost: 0,
                 extraParts: [HEAL, MOVE],
                 extraCost: 300,
-                sliceAmount: 50
+                sliceAmount: 10
             }],
             "antifaSupporter", {})
     } else if (squadType == "attack") {

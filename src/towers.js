@@ -4,7 +4,7 @@ function towers(room, towers, creeps) {
 
     let injuredCreep = room.find(FIND_CREEPS, {
         filter: (c) => {
-            return ((allyList().indexOf(c.owner.username.toLowerCase()) >= 0 || c.my) && c.hits < c.hitsMax * 0.75)
+            return ((allyList.indexOf(c.owner.username.toLowerCase()) >= 0 || c.my) && c.hits < c.hitsMax * 0.75)
         }
     })[0]
 
@@ -22,7 +22,7 @@ function towers(room, towers, creeps) {
 
         let injuredPowerCreep = room.find(FIND_POWER_CREEPS, {
             filter: (c) => {
-                return ((allyList().indexOf(c.owner.username.toLowerCase()) >= 0 || c.my) && c.hits < c.hitsMax * 0.99)
+                return ((allyList.indexOf(c.owner.username.toLowerCase()) >= 0 || c.my) && c.hits < c.hitsMax * 0.99)
             }
         })[0]
 
@@ -40,7 +40,7 @@ function towers(room, towers, creeps) {
 
             let hostile = room.find(FIND_HOSTILE_CREEPS, {
                 filter: (c) => {
-                    return (allyList().indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CARRY) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === HEAL)))
+                    return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CARRY) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === HEAL)))
                 }
             })[0]
 

@@ -120,7 +120,7 @@ function logging() {
                 ` + energyAmount() + `
                 <th style="text-align: center; padding: 5px 0;">Last Defence: ` + lastDefence() + `</th>
                 <th style="text-align: center; padding: 5px 0;">Total CR: ` + (Game.market.credits / 1000).toFixed(0) + "k" + `</th>
-                <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Alles: ` + allyList() + `</th>
+                <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Alles: ` + allyList + `</th>
             </tr>
             <tr style="background: #333">
                 <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Creeps: ` + Object.keys(Memory.creeps).length + " (" + Math.floor(Object.keys(Memory.creeps).length / myRoomsNumber()) + " / room)" + `</th>

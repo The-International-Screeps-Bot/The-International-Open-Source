@@ -19,16 +19,23 @@ function taskManger(room, creeps) {
         return true
     }
 
-    function findCreepWithoutTask(collection) {
+    function findCreepWithoutTask(collection, requiredAmount) {
 
-        // Make it array based in future
-        // let creeps = []
+        /*         let creeps = [] */
 
         for (let creep of collection) {
 
             if (creep.memory.task == undefined) {
 
                 return creep
+
+                /*
+                creeps.push(creep)
+                
+                if (creeps.length == requiredAmount) {
+
+                                    return creeps
+                                } */
             }
         }
 

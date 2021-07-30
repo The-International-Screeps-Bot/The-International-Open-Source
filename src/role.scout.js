@@ -115,7 +115,7 @@ module.exports = {
                 } else {
 
                     if (!controller.my && controller.owner) {
-                        if (allyList().indexOf(controller.owner.username.toLowerCase()) >= 0) {
+                        if (allyList.indexOf(controller.owner.username.toLowerCase()) >= 0) {
 
                             creep.room.memory.stage = "allyRoom"
                             creep.room.memory.owner = controller.owner.username
@@ -134,7 +134,7 @@ module.exports = {
 
                         creep.say("1")
 
-                        if (allyList().indexOf((controller.reservation.username).toLowerCase()) >= 0) {
+                        if (allyList.indexOf((controller.reservation.username).toLowerCase()) >= 0) {
 
                             creep.say("2")
 

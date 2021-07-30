@@ -1,13 +1,8 @@
-function allyList() {
-
-    let allyList = [
-        "q13214",
-        "mrmartinstreet",
-        "orlet",
-        "barryoseven"
-    ]
-
-    return allyList
-}
+let allyList = [
+    "q13214",
+    "orlet",
+    "barryoseven",
+    "nevercast"
+]
 
 module.exports = allyList

@@ -311,7 +311,7 @@ Creep.prototype.avoidHostiles = function() {
 
     let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
         filter: (c) => {
-            return (allyList().indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) > 0 || c.getActiveBodyparts(RANGED_ATTACK) > 0))
+            return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) > 0 || c.getActiveBodyparts(RANGED_ATTACK) > 0))
         }
     })
 

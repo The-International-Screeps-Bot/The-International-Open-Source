@@ -28,7 +28,8 @@ function creepManager(room, myCreeps) {
     roles["remoteHauler"] = require("role.remoteHauler")
     roles["remoteBuilder"] = require("role.remoteBuilder")
 
-    let cpuUsed = Game.cpu.getUsed()
+    let totalCpuUsed = 0
+    let cpuUsed
 
     for (let creep of myCreeps) {
 
@@ -52,12 +53,13 @@ function creepManager(room, myCreeps) {
             }
 
             cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
+            totalCpuUsed += cpuUsed
 
             console.log(creep.memory.role + ": " + cpuUsed)
         }
     }
 
-    Memory.cpuPerCreep += cpuUsed / myCreeps.length
+    Memory.data.cpuPerCreep += totalCpuUsed / myCreeps.length
 }
 
 module.exports = creepManager

@@ -120,7 +120,7 @@ function antifa() {
 
                     let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
                         filter: (creep) => {
-                            return (creep.my || allyList().includes(creep.owner.username.toLowerCase()))
+                            return (creep.my || allyList.includes(creep.owner.username.toLowerCase()))
                         }
                     })
 
@@ -142,7 +142,7 @@ function antifa() {
 
                 /* let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
                     filter: (creep) => {
-                        return (creep.my || allyList().includes(creep.owner.username.toLowerCase()))
+                        return (creep.my || allyList.includes(creep.owner.username.toLowerCase()))
                     }
                 })
 
@@ -192,7 +192,7 @@ function antifa() {
 
                 let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
-                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                        return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
                     }
                 })
 
@@ -329,7 +329,7 @@ function antifa() {
 
                             let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                                 filter: (c) => {
-                                    return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                                    return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
                                 }
                             })
 
@@ -462,7 +462,7 @@ function antifa() {
 
                             let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                                 filter: (c) => {
-                                    return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                                    return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
                                 }
                             })
 
@@ -506,7 +506,7 @@ function antifa() {
 
                                 let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
                                     filter: (c) => {
-                                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                                        return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
                                     }
                                 })
 
@@ -530,7 +530,7 @@ function antifa() {
 
                             let closestHostile = creep.room.find(FIND_HOSTILE_CREEPS, {
                                 filter: (c) => {
-                                    return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                                    return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
                                 }
                             })
 
@@ -554,7 +554,7 @@ function antifa() {
 
                                 let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
                                     filter: (c) => {
-                                        return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                                        return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
                                     }
                                 })
 
@@ -590,7 +590,7 @@ function antifa() {
 
                             let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                                 filter: (c) => {
-                                    return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                                    return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
                                 }
                             })
 
@@ -754,7 +754,7 @@ module.exports = {
         
                             let injuredCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                                         filter: (c) => {
-                                            return (allyList().indexOf(c.owner.username.toLowerCase()) >= 0)
+                                            return (allyList.indexOf(c.owner.username.toLowerCase()) >= 0)
                                 }        
                               })      
         
@@ -776,7 +776,7 @@ module.exports = {
         
                             let hostile = leader.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                                         filter: (c) => {
-                                            return (allyList().indexOf(c.owner.username.toLowerCase()) === -1)
+                                            return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
                                   }      
                                })     
         
