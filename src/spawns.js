@@ -421,7 +421,7 @@ function spawns(room, spawns) {
         }
     }
 
-    let roomFix = room.memory.roomFix
+    const roomFix = room.memory.roomFix
 
     if (roomFix == null) {
 
@@ -438,7 +438,7 @@ function spawns(room, spawns) {
 
         console.log(room.name + ": roomFix true")
 
-    } else if (requiredCreeps["harvester"] > 1 && requiredCreeps["hauler"] > 1) {
+    } else if (creepsOfRole["harvester"] > 1 && creepsOfRole["hauler"] > 1) {
 
         room.memory.roomFix = false
     }
@@ -969,7 +969,7 @@ function spawns(room, spawns) {
                 defaultCost: 0,
                 extraParts: [RANGED_ATTACK, MOVE],
                 extraCost: 200,
-                sliceAmount: 10
+                sliceAmount: 20
             }],
             "antifaAssaulter", {})
 
@@ -980,7 +980,7 @@ function spawns(room, spawns) {
                 defaultCost: 0,
                 extraParts: [HEAL, MOVE],
                 extraCost: 300,
-                sliceAmount: 10
+                sliceAmount: 50
             }],
             "antifaSupporter", {})
     } else if (squadType == "attack") {
