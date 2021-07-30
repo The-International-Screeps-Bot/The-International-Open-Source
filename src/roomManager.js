@@ -19,6 +19,8 @@ let powerSpawns = require("powerSpawns")
 
 function roomManager() {
 
+    let creepCpuUsed = 0
+
     let totalCpuUsed = Game.cpu.getUsed()
 
     let consoleMessage = ""
