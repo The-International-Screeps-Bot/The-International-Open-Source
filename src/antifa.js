@@ -12,6 +12,8 @@ function antifa(room, creeps) {
 
     if (Memory.global.attackTarget) {
 
+        // Define antifa creeps
+
         let antifaAssaulters = []
         let antifaSupporters = []
 

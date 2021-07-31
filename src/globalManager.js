@@ -59,6 +59,7 @@ function globalManager() {
     function findCommuneEstablisher() {
         if (!commands.newCommune) {
 
+            Memory.global.newCommune = undefined
             return
         }
 
@@ -92,6 +93,7 @@ function globalManager() {
 
         if (!commands.attackTarget) {
 
+            Memory.global.attackTarget = undefined
             return
         }
 

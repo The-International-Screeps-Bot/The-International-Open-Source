@@ -818,7 +818,7 @@ function construction(room) {
                 [room.name]: true
             }
 
-            Game.map.findRoute(room.name, goal.pos.roomName, {
+            let route = Game.map.findRoute(room.name, goal.pos.roomName, {
                 routeCallback(roomName) {
 
                     if (roomName == goal.pos.roomName) {
@@ -837,6 +837,11 @@ function construction(room) {
                     return Infinity
                 }
             })
+
+            if (!route || route == ERR_NO_PATH || route.length < 1) {
+
+                return
+            }
 
             if (origin && goal) {
 
