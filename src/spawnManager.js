@@ -1,21 +1,41 @@
-let roleOpts = require("creepOpts")
-let requiredCreeps = require("spawnRequests")
+let creepOpts = require("creepOpts")
+let spawnRequests = require("spawnRequests")
 
-function spawnManager(spawns) {
+function spawnManager(room, spawns) {
+
+    // Confirm there are spawns able to spawn creeps
+
+    let spawningSpawns = 0
+
+    for (let spawn of spawns) {
+
+        if (spawn.spawning) spawningSpawns++
+    }
+
+    if (spawningSpawns == spawns.length) return
+
+    let roomFixMessage = ""
+
+    if (room.memory.roomFix) roomFixMessage = "rf"
+
+    // Return values needed for spawning
+
+    let { roleOpts } = creepOpts(room)
+    let { requiredCreeps } = spawnRequests(room)
+
+    // Loop through requiredCreeps and try to spawn
 
     let i = 0
 
-    for (let role in requiredCreeps) {
+    for (let role of Object.keys(requiredCreeps)) {
 
         let spawn = spawns[i]
-
-        i++
 
         if (spawn) {
 
             let roleValues = roleOpts[role]
 
-            if (roleValues.role == role && freeEnergy >= 300) {
+            if (roleValues.role == role && room.energyCapacityAvailable >= 300) {
 
                 let testSpawn = spawn.spawnCreep(roleValues.body, roleValues.role, { dryRun: true })
 
@@ -32,6 +52,8 @@ function spawnManager(spawns) {
                     console.log("Failed to spawn: " + testSpawn + ", " + roleValues.role + ", " + roleValues.body.length + ", " + roleValues.tier + " " + JSON.stringify(roleValues.memory))
                 }
             }
+
+            i++
         }
     }
 }

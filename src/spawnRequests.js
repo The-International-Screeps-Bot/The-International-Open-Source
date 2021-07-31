@@ -8,18 +8,6 @@ let {
 
 function spawnRequests(room) {
 
-    let boostedSquads = false
-
-    let squadTypes = {
-        rangedAttack: "rangedAttack",
-        attack: "attack",
-        dismantle: "dismantle",
-    }
-
-    let squadType = squadTypes.rangedAttack // May be rangedAttack attack and dismantle
-
-    /*Integral values for spawning considerations*/
-
     let remoteBuilderNeed = false
 
     _.forEach(Game.rooms, function(myRooms) {
@@ -431,13 +419,9 @@ function spawnRequests(room) {
         room.memory.roomFix = false
     }
 
-    let roomFixMessage = ""
-
     if (creepsOfRole[["harvester", room.name]] == 0 || creepsOfRole[["hauler", room.name]] == 0) {
 
         room.memory.roomFix = true
-
-        roomFixMessage = "rf"
 
         console.log(room.name + ": roomFix true")
 

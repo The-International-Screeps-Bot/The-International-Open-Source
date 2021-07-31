@@ -1,6 +1,8 @@
-let requiredRemoteCreeps = require("spawnRequests")
+let spawnRequests = require("spawnRequests")
 
 function creepOpts(room) {
+
+    let requiredRemoteCreeps = spawnRequests(room)
 
     function findRemoteRoom(role) {
 
@@ -15,8 +17,21 @@ function creepOpts(room) {
         return false
     }
 
+    let boostedSquads = false
+
+    let squadTypes = {
+        rangedAttack: "rangedAttack",
+        attack: "attack",
+        dismantle: "dismantle",
+    }
+
+    let squadType = squadTypes.rangedAttack
+
     let freeEnergy = room.energyAvailable
     let capacityEnergy = room.energyCapacityAvailable
+
+    const roomFix = room.memory.roomFix
+    const stage = room.memory.stage
 
     function roleValues(parts, role, memoryAdditions) {
 
