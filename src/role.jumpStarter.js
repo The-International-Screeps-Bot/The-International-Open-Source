@@ -19,7 +19,15 @@ module.exports = {
                     }
                 } else {
 
-                    creep.advancedPathing({ origin: creep.pos, goal: { pos: closestSource.pos, range: 1 }, plainCost: false, swampCost: false, defaultCostMatrix: creep.room.memory.defaultCostMatrix, avoidStages: ["enemyRoom", "keeperRoom"], flee: false })
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: closestSource.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                        avoidStages: ["enemyRoom", "keeperRoom"],
+                        flee: false
+                    })
                 }
             }
         } else {

@@ -452,6 +452,8 @@ Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTo
 //creep.advancedPathing({ origin: creep.pos, goal: { pos: structure.pos, range: 1}, plainCost: false, swampCost: false, defaultCostMatrix: creep.room.memory.defaultCostMatrix, avoidStages: ["enemyRoom", "keeperRoom"], flee: false })
 Creep.prototype.advancedPathing = function(opts) {
 
+    let creep = this
+
     if (creep.fatigue > 0) {
 
         return
@@ -476,7 +478,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
     if (opts.origin.roomName != opts.goal.pos.roomName) {
 
-        let route = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
+        newRoute = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
             routeCallback(roomName) {
 
                 if (roomName == opts.goal.pos.roomName) {
@@ -487,23 +489,70 @@ Creep.prototype.advancedPathing = function(opts) {
                 if (Memory.rooms[roomName] && !opts.avoidStages.includes(Memory.rooms[roomName].stage)) {
 
                     return 1
-
                 }
 
                 return Infinity
             }
         })
 
-        if (route.length > 0) {
+        if (newRoute.length > 0) {
 
-            opts.goal = { pos: new RoomPosition(25, 25, route[0].room), range: 1 }
+            opts.goal = { pos: new RoomPosition(25, 25, newRoute[0].room), range: 24 }
+        }
+    }
+
+    if (opts.origin.roomName != opts.goal.pos.roomName) {
+
+        const route = creep.memory.route
+
+        if (!route) {
+            newRoute = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
+                routeCallback(roomName) {
+
+                    if (roomName == opts.goal.pos.roomName) {
+
+                        return 1
+
+                    }
+                    if (Memory.rooms[roomName] && !opts.avoidStages.includes(Memory.rooms[roomName].stage)) {
+
+                        return 1
+                    }
+
+                    return Infinity
+                }
+            })
+
+            if (newRoute.length > 0) {
+
+                creep.memory.route = newRoute
+            }
+        } else {
+
+            (function() {
+
+                for (let path of route) {
+
+                    let i = 0
+
+                    if (path.room == creep.room.name) {
+
+                        i++
+
+                        opts.goal = { pos: new RoomPosition(25, 25, route[i].room), range: 25 }
+                        return
+                    }
+                }
+
+                opts.goal = { pos: new RoomPosition(25, 25, route[0].room), range: 25 }
+            })
         }
     }
 
     var path = PathFinder.search(opts.origin, opts.goal, {
         plainCost: opts.plainCost,
         swampCost: opts.swampCost,
-        maxRooms: 1,
+        maxRooms: 2,
         maxOps: 100000,
         flee: opts.flee,
 

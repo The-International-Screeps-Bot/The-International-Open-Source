@@ -2,6 +2,7 @@ let roomVariables = require("roomVariables")
 
 let creepManager = require("creepManager")
 let powerCreeps = require("powerCreeps")
+let antifa = require("antifa")
 
 let constants = require("constants")
 let visuals = require("visuals")
@@ -43,6 +44,8 @@ function roomManager() {
         creepManager(room, creeps.myCreeps)
 
         taskManager(room, creeps.myCreeps)
+
+        antifa(room, creeps)
 
         //trafficManager(room, creeps.myCreeps)
 

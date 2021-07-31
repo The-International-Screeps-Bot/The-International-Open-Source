@@ -1,4 +1,4 @@
-function taskManger(room, creeps) {
+function taskManger(room, myCreeps) {
 
     function findCreepsOfTask(collection, task, requiredAmount) {
 
@@ -46,7 +46,7 @@ function taskManger(room, creeps) {
 
     let harvesters = []
 
-    for (let creep of creeps) {
+    for (let creep of myCreeps) {
 
         if (creep.memory.role == "harvester") {
 
@@ -67,7 +67,7 @@ function taskManger(room, creeps) {
 
     let haulers = []
 
-    for (let creep of creeps) {
+    for (let creep of myCreeps) {
 
         if (creep.memory.role == "hauler") {
 

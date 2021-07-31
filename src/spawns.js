@@ -1,16 +1,15 @@
 let allyList = require("allyList")
 let creepData = require("creepData")
+let {
+    rolesList,
+    remoteRoles,
+
+    creepsOfRole,
+    creepsOfRemoteRole,
+    creepCollectionsOfRole
+} = creepData()
 
 function spawns(room, spawns) {
-
-    let {
-        rolesList,
-        remoteRoles,
-
-        creepsOfRole,
-        creepsOfRemoteRole,
-        creepCollectionsOfRole
-    } = creepData()
 
     let boostedSquads = false
 

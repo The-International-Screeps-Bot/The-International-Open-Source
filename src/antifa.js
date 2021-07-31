@@ -1,6 +1,6 @@
 let allyList = require("allyList")
 
-function antifa() {
+function antifa(room, creeps) {
 
     let squadType
 
@@ -12,8 +12,20 @@ function antifa() {
 
     if (Memory.global.attackTarget) {
 
-        let antifaAssaulters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaAssaulter');
-        let antifaSupporters = _.filter(Game.creeps, (c) => c.memory.role == 'antifaSupporter');
+        let antifaAssaulters = []
+        let antifaSupporters = []
+
+        for (let creep of creeps.myCreeps) {
+
+            if (creep.memory.role == "antifaAssaulter") {
+
+                antifaAssaulters.push(creep)
+            }
+            if (creep.memory.role == "antifaSupporter") {
+
+                antifaSupporters.push(creep)
+            }
+        }
 
         for (let creep of antifaSupporters) {
 
@@ -50,21 +62,33 @@ function antifa() {
                         }
                     } else {
 
-                        let goal = _.map([assaulter], function(target) {
-                            return { pos: target.pos, range: 24 }
-                        })
-
-                        creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
+                        if (creep.fatigue == 0 && assaulter.fatigue == 0) {
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: assaulter.pos, range: 1 },
+                                plainCost: 1,
+                                swampCost: 6,
+                                defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
+                                flee: false
+                            })
+                        }
                     }
                 } else {
 
                     creep.say("NS")
 
-                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                        return { pos: target, range: 24 }
-                    })
-
-                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
+                    if (creep.fatigue == 0 && assaulter.fatigue == 0) {
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
+                            plainCost: 1,
+                            swampCost: 6,
+                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                            avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
+                            flee: false
+                        })
+                    }
                 }
             } else if (findCreepWithoutTask(creep, antifaAssaulters)) {
 
@@ -78,11 +102,17 @@ function antifa() {
 
                 creep.say("NA")
 
-                let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                    return { pos: target, range: 24 }
-                })
-
-                creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
+                if (creep.fatigue == 0) {
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
+                        plainCost: 1,
+                        swampCost: 6,
+                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                        avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
+                        flee: false
+                    })
+                }
             }
         }
 
@@ -275,8 +305,13 @@ function antifa() {
 
                     if (creep.pos.getRangeTo(structure) <= 1) {
 
-                        creep.rangedMassAttack()
+                        if (structure.owner) {
 
+                            creep.rangedMassAttack()
+                        } else {
+
+                            creep.rangedAttack(structure)
+                        }
                     } else {
 
                         let goal = _.map([structure], function(target) {
@@ -371,13 +406,17 @@ function antifa() {
                                 }
                             } else {
 
-                                let goal = _.map([new RoomPosition(25, 25, Memory.global.attackTarget)], function(pos) {
-                                    return { pos: pos, range: 24 }
-                                })
-
                                 if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
+                                    creep.advancedPathing({
+                                        origin: creep.pos,
+                                        goal: { pos: new RoomPosition(25, 25, Memory.global.attackTarget), range: 1 },
+                                        plainCost: 1,
+                                        swampCost: 6,
+                                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                        avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
+                                        flee: false
+                                    })
                                 }
                             }
                         } else {
@@ -393,6 +432,15 @@ function antifa() {
                                 let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
 
                                 for (let rampart of ramparts) {
+
+                                    let creeps = creep.room.find(FIND_CREEPS)
+
+                                    for (let creep of creeps) {
+
+                                        cm.set(creep.pos.x, creep.pos.y, 255)
+                                    }
+
+                                    cm.set(creep.pos.x, creep.pos.y, 1)
 
                                     if (cm && cm.get(rampart.pos.x, rampart.pos.y) < 255) {
 
@@ -427,6 +475,15 @@ function antifa() {
                             let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
 
                             for (let rampart of ramparts) {
+
+                                let creeps = creep.room.find(FIND_CREEPS)
+
+                                for (let creep of creeps) {
+
+                                    cm.set(creep.pos.x, creep.pos.y, 255)
+                                }
+
+                                cm.set(creep.pos.x, creep.pos.y, 1)
 
                                 if (cm && cm.get(rampart.pos.x, rampart.pos.y) < 255) {
 
@@ -505,9 +562,7 @@ function antifa() {
                             } else {
 
                                 let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
-                                    filter: (c) => {
-                                        return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
-                                    }
+                                    filter: s => s.structureType != STRUCTURE_CONTROLLER
                                 })
 
                                 if (closestHostileStructure) {
@@ -528,51 +583,13 @@ function antifa() {
                             }
                         } else {
 
-                            let closestHostile = creep.room.find(FIND_HOSTILE_CREEPS, {
-                                filter: (c) => {
-                                    return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
-                                }
+                            let goal = _.map([creep.room.controller], function(target) {
+                                return { pos: target.pos, range: 2 }
                             })
 
-                            let tower = creep.room.find(FIND_HOSTILE_STRUCTURES, {
-                                filter: s => s.structureType == STRUCTURE_TOWER
-                            })
+                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                            if (closestHostile.length > 0 || tower.length > 0) {
-
-                                creep.say("RF")
-
-                                if (supporter.room != creep.room) {
-
-                                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(pos) {
-                                        return { pos: pos, range: 24 }
-                                    })
-
-                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
-                                }
-                            } else {
-
-                                let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
-                                    filter: (c) => {
-                                        return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
-                                    }
-                                })
-
-                                if (closestHostileStructure) {
-
-                                    attackStructure(closestHostileStructure)
-
-                                } else {
-
-                                    let goal = _.map([creep.room.controller], function(target) {
-                                        return { pos: target.pos, range: 2 }
-                                    })
-
-                                    if (creep.fatigue == 0 && supporter.fatigue == 0) {
-
-                                        creep.intraRoomPathing(creep.pos, goal)
-                                    }
-                                }
+                                creep.intraRoomPathing(creep.pos, goal)
                             }
                         }
                     }
@@ -632,13 +649,17 @@ function antifa() {
                                 }
                             } else {
 
-                                let goal = _.map([new RoomPosition(25, 25, Memory.global.attackTarget)], function(pos) {
-                                    return { pos: pos, range: 24 }
-                                })
-
                                 if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
+                                    creep.advancedPathing({
+                                        origin: creep.pos,
+                                        goal: { pos: new RoomPosition(25, 25, Memory.global.attackTarget), range: 1 },
+                                        plainCost: 1,
+                                        swampCost: 6,
+                                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                        avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
+                                        flee: false
+                                    })
                                 }
                             }
 
@@ -669,11 +690,18 @@ function antifa() {
 
                         } else {
 
-                            let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                                return { pos: target, range: 24 }
-                            })
+                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                            creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
+                                    plainCost: 1,
+                                    swampCost: 6,
+                                    defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                    avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
+                                    flee: false
+                                })
+                            }
                         }
                     }
                 }
@@ -681,19 +709,32 @@ function antifa() {
 
                 if (creepIsEdge) {
 
-                    let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
-                        return { pos: target, range: 24 }
-                    })
+                    if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                    creep.intraRoomPathing(creep.pos, goal)
-
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: new RoomPosition(25, 25, creep.room.name), range: 1 },
+                            plainCost: 1,
+                            swampCost: 6,
+                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                            avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
+                            flee: false
+                        })
+                    }
                 } else {
 
-                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(target) {
-                        return { pos: target, range: 24 }
-                    })
+                    if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                    creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "allyRoom"])
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
+                            plainCost: 1,
+                            swampCost: 6,
+                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                            avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
+                            flee: false
+                        })
+                    }
                 }
             }
         }
