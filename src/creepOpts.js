@@ -2,7 +2,7 @@ let spawnRequests = require("spawnRequests")
 
 function creepOpts(room) {
 
-    let requiredRemoteCreeps = spawnRequests(room)
+    let { requiredRemoteCreeps } = spawnRequests(room)
 
     function findRemoteRoom(role) {
 

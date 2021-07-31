@@ -2,6 +2,9 @@ module.exports = {
     run: function(creep) {
 
         const remoteRoom = creep.memory.remoteRoom
+
+        if (!remoteRoom) return
+
         const roomFrom = creep.memory.roomFrom
 
         creep.isFull()

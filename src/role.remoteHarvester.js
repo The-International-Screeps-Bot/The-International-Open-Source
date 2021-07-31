@@ -5,6 +5,8 @@ module.exports = {
 
         const remoteRoom = creep.memory.remoteRoom
 
+        if (!remoteRoom) return
+
         if (creep.room.name == remoteRoom) {
 
             creep.room.memory.stage = "remoteRoom"

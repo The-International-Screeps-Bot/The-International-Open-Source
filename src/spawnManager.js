@@ -47,13 +47,13 @@ function spawnManager(room, spawns) {
 
                     Memory.data.energySpentOnCreeps += roleValues.cost
 
+                    i++
+
                 } else if (testSpawn != -4) {
 
                     console.log("Failed to spawn: " + testSpawn + ", " + roleValues.role + ", " + roleValues.body.length + ", " + roleValues.tier + " " + JSON.stringify(roleValues.memory))
                 }
             }
-
-            i++
         }
     }
 }

@@ -12,7 +12,6 @@ let taskManager = require("taskManager")
 
 let spawnManager = require("spawnManager")
 
-let spawns = require("spawns")
 let towers = require("towers")
 let links = require("links")
 let labs = require("labs")

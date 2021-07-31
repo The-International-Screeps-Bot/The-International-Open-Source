@@ -1,3 +1,4 @@
+let allyList = require("allyList")
 let creepData = require("creepData")
 let {
     rolesList,
@@ -7,38 +8,6 @@ let {
 } = creepData()
 
 function spawnRequests(room) {
-
-    let remoteBuilderNeed = false
-
-    _.forEach(Game.rooms, function(myRooms) {
-
-        if (myRooms.memory.builderNeed == true && myRooms.memory.myRoom != false) {
-
-            let remoteRoomDistance = Game.map.getRoomLinearDistance(room.name, myRooms.name)
-
-            if (remoteRoomDistance == 1) {
-
-                remoteBuilderNeed = true
-                return
-            }
-        }
-    })
-
-    let remoteEnemy = false
-
-    _.forEach(Game.rooms, function(myRooms) {
-
-        if (myRooms.memory.enemy == true && myRooms.memory.myRoom != false) {
-
-            let remoteRoomDistance = Game.map.getRoomLinearDistance(room.name, myRooms.name)
-
-            if (remoteRoomDistance == 1) {
-
-                remoteEnemy = true
-                return
-            }
-        }
-    })
 
     for (let role of rolesList) {
 
@@ -330,12 +299,12 @@ function spawnRequests(room) {
     minCreeps["scout"] = 1
 
 
-    if (remoteBuilderNeed && stage >= 4) {
+    if (stage >= 4) {
 
         minCreeps["remoteBuilder"] = 1 + Math.floor(room.memory.remoteRooms.length / 3)
     }
 
-    if (remoteEnemy && stage >= 3) {
+    if (stage >= 3) {
 
         minCreeps["communeDefender"] = 1
     }
