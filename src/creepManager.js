@@ -44,14 +44,16 @@ function creepManager(room, myCreeps) {
                 creep.memory.dying = true
             }
 
-            try {
+            roles[creep.memory.role].run(creep)
 
-                roles[creep.memory.role].run(creep)
+            /*             try {
 
-            } catch (err) {
+                            roles[creep.memory.role].run(creep)
 
-                creep.say("❌")
-            }
+                        } catch (err) {
+
+                            creep.say("❌")
+                        } */
 
             cpuUsed = Game.cpu.getUsed() - cpuUsed
             totalCpuUsed += cpuUsed

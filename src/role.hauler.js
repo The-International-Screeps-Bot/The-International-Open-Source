@@ -348,7 +348,6 @@ module.exports = {
                 creep.memory.task = "deliverToBest"
             }
 
-
             if (creep.pickupDroppedEnergy(droppedEnergy) == 0) {
 
                 creep.memory.task = "deliverToBest"

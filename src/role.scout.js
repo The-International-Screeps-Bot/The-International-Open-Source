@@ -222,11 +222,16 @@ module.exports = {
 
                     if (!newCommune) {
 
-                        let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
-                            return { pos: pos, range: 24 }
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: new RoomPosition(25, 25, targetRoom), range: 1 },
+                            plainCost: 1,
+                            swampCost: 6,
+                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 50,
                         })
-
-                        creep.onlySafeRoomPathing(creep, goal, [])
                     }
                 }
             } else {
@@ -244,11 +249,16 @@ module.exports = {
                     creep.room.memory.stage = "emptyRoom"
                 }
 
-                let goal = _.map([new RoomPosition(25, 25, targetRoom)], function(pos) {
-                    return { pos: pos, range: 24 }
+                creep.advancedPathing({
+                    origin: creep.pos,
+                    goal: { pos: new RoomPosition(25, 25, targetRoom), range: 1 },
+                    plainCost: 1,
+                    swampCost: 6,
+                    defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                    avoidStages: [],
+                    flee: false,
+                    cacheAmount: 50,
                 })
-
-                creep.onlySafeRoomPathing(creep, goal, [])
             }
         }
     }
