@@ -391,8 +391,15 @@ function spawns(room, spawns) {
     })()
 
     if (room.memory.roomFix) {
+        if (room.storage) {
+            if (room.storage.store[RESOURCE_ENERGY] < 1000) {
 
-        minCreeps["jumpStarter"] = 2
+                minCreeps["jumpStarter"] = 2
+            }
+        } else {
+
+            minCreeps["jumpStarter"] = 2
+        }
     }
 
     if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 175000 && room.controller.level <= 7) {
@@ -416,7 +423,7 @@ function spawns(room, spawns) {
 
             requiredCreeps[role] = minCreeps[role] - creepsOfRole[[role, room.name]]
 
-            //console.log(role +", "+ requiredCreeps[role] +", "+ room.name)
+            console.log(role + ", " + requiredCreeps[role] + ", " + room.name)
         }
     }
 

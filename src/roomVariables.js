@@ -1,8 +1,11 @@
 function importantStructures(room) {
 
+    let allCreeps = room.find(FIND_CREEPS)
+
     let myCreeps = room.find(FIND_MY_CREEPS)
 
     let creeps = {
+        allCreeps: allCreeps,
         myCreeps: myCreeps,
         /* allyCreeps: allyCreeps,
         hostileCreeps: hostileCreeps,
@@ -14,6 +17,8 @@ function importantStructures(room) {
         allyPowerCreeps: "",
         hostilePowerCreeps: "",
     }
+
+    let allStructures = room.find(FIND_STRUCTURES)
 
     let spawns = room.find(FIND_MY_SPAWNS)
 
@@ -50,6 +55,7 @@ function importantStructures(room) {
     let mineral = room.find(FIND_MINERALS)[0]
 
     let structures = {
+        allStructures: allStructures,
         spawns: spawns,
         links: links,
         labs: labs,
