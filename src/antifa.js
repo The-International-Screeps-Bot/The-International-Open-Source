@@ -709,7 +709,7 @@ function antifa(room, creeps) {
 
                 if (creepIsEdge) {
 
-                    if (creep.fatigue == 0 && supporter.fatigue == 0) {
+                    if (creep.fatigue == 0) {
 
                         creep.advancedPathing({
                             origin: creep.pos,
@@ -723,7 +723,7 @@ function antifa(room, creeps) {
                     }
                 } else {
 
-                    if (creep.fatigue == 0 && supporter.fatigue == 0) {
+                    if (creep.fatigue == 0) {
 
                         creep.advancedPathing({
                             origin: creep.pos,
