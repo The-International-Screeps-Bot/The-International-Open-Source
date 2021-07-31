@@ -70,7 +70,7 @@ function antifa(room, creeps) {
                                 goal: { pos: assaulter.pos, range: 1 },
                                 plainCost: 1,
                                 swampCost: 6,
-                                defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                defaultCostMatrix: false,
                                 avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
                                 flee: false
                             })
@@ -86,7 +86,7 @@ function antifa(room, creeps) {
                             goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
                             plainCost: 1,
                             swampCost: 6,
-                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                            defaultCostMatrix: false,
                             avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
                             flee: false
                         })
@@ -110,7 +110,7 @@ function antifa(room, creeps) {
                         goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
                         plainCost: 1,
                         swampCost: 6,
-                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                        defaultCostMatrix: false,
                         avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
                         flee: false
                     })
@@ -415,7 +415,7 @@ function antifa(room, creeps) {
                                         goal: { pos: new RoomPosition(25, 25, Memory.global.attackTarget), range: 1 },
                                         plainCost: 1,
                                         swampCost: 6,
-                                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                        defaultCostMatrix: false,
                                         avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
                                         flee: false
                                     })
@@ -431,7 +431,7 @@ function antifa(room, creeps) {
 
                                 let outerRampart
 
-                                let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
+                                let cm = PathFinder.CostMatrix.deserialize(false)
 
                                 for (let rampart of ramparts) {
 
@@ -474,7 +474,7 @@ function antifa(room, creeps) {
 
                             let outerRampart
 
-                            let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
+                            let cm = PathFinder.CostMatrix.deserialize(false)
 
                             for (let rampart of ramparts) {
 
@@ -658,7 +658,7 @@ function antifa(room, creeps) {
                                         goal: { pos: new RoomPosition(25, 25, Memory.global.attackTarget), range: 1 },
                                         plainCost: 1,
                                         swampCost: 6,
-                                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                        defaultCostMatrix: false,
                                         avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
                                         flee: false
                                     })
@@ -699,7 +699,7 @@ function antifa(room, creeps) {
                                     goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
                                     plainCost: 1,
                                     swampCost: 6,
-                                    defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                    defaultCostMatrix: false,
                                     avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
                                     flee: false
                                 })
@@ -718,7 +718,7 @@ function antifa(room, creeps) {
                             goal: { pos: new RoomPosition(25, 25, creep.room.name), range: 1 },
                             plainCost: 1,
                             swampCost: 6,
-                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                            defaultCostMatrix: false,
                             avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
                             flee: false
                         })
@@ -732,7 +732,7 @@ function antifa(room, creeps) {
                             goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
                             plainCost: 1,
                             swampCost: 6,
-                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                            defaultCostMatrix: false,
                             avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
                             flee: false
                         })

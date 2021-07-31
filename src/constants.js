@@ -203,15 +203,6 @@ function constants(room) {
             cm.set(site.pos.x, site.pos.y, 255)
         }
 
-        let ramparts = room.find(FIND_MY_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_RAMPART
-        })
-
-        for (let rampart of ramparts) {
-
-            cm.set(rampart.pos.x, rampart.pos.y, 4)
-        }
-
         let roads = room.find(FIND_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_ROAD
         })
@@ -226,13 +217,6 @@ function constants(room) {
         })
 
         for (let structure of structures) {
-
-            cm.set(structure.pos.x, structure.pos.y, 255)
-        }
-
-        let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
-
-        for (let structure of enemyStructures) {
 
             cm.set(structure.pos.x, structure.pos.y, 255)
         }

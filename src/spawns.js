@@ -3,10 +3,8 @@ let creepData = require("creepData")
 let {
     rolesList,
     remoteRoles,
-
     creepsOfRole,
-    creepsOfRemoteRole,
-    creepCollectionsOfRole
+    creepsOfRemoteRole
 } = creepData()
 
 function spawns(room, spawns) {

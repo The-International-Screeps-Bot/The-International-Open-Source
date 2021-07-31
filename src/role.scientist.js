@@ -186,7 +186,7 @@ module.exports = {
 
                 let task = creep.memory.task
 
-                if (primaryLabs.length > 0) {
+                if (primaryLabs.length == 2) {
 
 
                 }

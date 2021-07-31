@@ -89,6 +89,10 @@ module.exports = {
 
                     creep.memory.storageToTerminal = true
                 }
+                if (storage.store[RESOURCE_ENERGY] < 10000 && terminal.store[RESOURCE_ENERGY] > storage.store[RESOURCE_ENERGY]) {
+
+                    creep.memory.terminalToStorage = true
+                }
 
                 //if (storage && storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink != null && controllerLink.store[RESOURCE_ENERGY] <= 400) {
 
@@ -108,6 +112,8 @@ module.exports = {
                 const transferControllerLink = creep.memory.transferControllerLink
 
                 const storageToTerminal = creep.memory.storageToTerminal
+
+                const terminalToStorage = creep.memory.terminalToStorage
 
                 creep.say("🚬")
 
@@ -253,6 +259,22 @@ module.exports = {
                                             } else {
 
                                                 creep.withdraw(storage, RESOURCE_ENERGY)
+                                            }
+                                        } else {
+
+                                            if (terminalToStorage) {
+
+                                                creep.say("TTS")
+
+                                                if (creep.memory.isFull == true) {
+
+                                                    creep.transfer(storage, RESOURCE_ENERGY)
+                                                    creep.memory.terminalToStorage = false
+
+                                                } else {
+
+                                                    creep.withdraw(terminal, RESOURCE_ENERGY)
+                                                }
                                             }
                                         }
                                     }

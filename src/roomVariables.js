@@ -12,10 +12,19 @@ function importantStructures(room) {
         invaderCreeps: invaderCreeps, */
     }
 
+    let allPowerCreeps = room.find(FIND_POWER_CREEPS)
+
     let powerCreeps = {
+        allPowerCreeps: allPowerCreeps,
         myPowerCreeps: "",
         allyPowerCreeps: "",
         hostilePowerCreeps: "",
+    }
+
+    let allSites = room.find(FIND_CONSTRUCTION_SITES)
+
+    let constructionSites = {
+        allSites: allSites,
     }
 
     let allStructures = room.find(FIND_STRUCTURES)
@@ -140,6 +149,8 @@ function importantStructures(room) {
 
     return {
         creeps: creeps,
+        powerCreeps: powerCreeps,
+        constructionSites: constructionSites,
         structures: structures,
         specialStructures: specialStructures,
         costMatrixes,

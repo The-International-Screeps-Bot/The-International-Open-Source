@@ -6,18 +6,10 @@ function creepData() {
 
     let creepsOfRemoteRole = {}
     let creepsOfRole = {}
-    let creepCollectionsOfRole = {}
 
     for (let name in Game.creeps) {
 
         let creep = Game.creeps[name]
-
-        if (!creepCollectionsOfRole[creep.memory.role]) {
-
-            creepCollectionsOfRole[[creep.memory.role, creep.memory.roomFrom]] = []
-        }
-
-        creepCollectionsOfRole[[creep.memory.role, creep.memory.roomFrom]].push({ name: creep.name, role: creep.memory.role, roomFrom: creep.memory.roomFrom })
 
         if (creep.memory.dying != true) {
 
@@ -43,10 +35,8 @@ function creepData() {
     return {
         rolesList: rolesList,
         remoteRoles: remoteRoles,
-
         creepsOfRemoteRole: creepsOfRemoteRole,
-        creepsOfRole: creepsOfRole,
-        creepCollectionsOfRole: creepCollectionsOfRole,
+        creepsOfRole: creepsOfRole
     }
 }
 
