@@ -35,8 +35,8 @@ function creepData() {
     return {
         rolesList: rolesList,
         remoteRoles: remoteRoles,
+        creepsOfRole: creepsOfRole,
         creepsOfRemoteRole: creepsOfRemoteRole,
-        creepsOfRole: creepsOfRole
     }
 }
 

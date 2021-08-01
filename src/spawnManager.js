@@ -5,14 +5,16 @@ function spawnManager(room, spawns) {
 
     // Confirm there are spawns able to spawn creeps
 
-    let spawningSpawns = 0
+    let inactiveSpawns = []
 
     for (let spawn of spawns) {
 
-        if (spawn.spawning) spawningSpawns++
+        if (!spawn.spawning) inactiveSpawns.push(spawn)
     }
 
-    if (spawningSpawns == spawns.length) return
+    if (inactiveSpawns.length == 0) return
+
+    if (room.energyAvailable < 300) return
 
     let roomFixMessage = ""
 
@@ -23,40 +25,40 @@ function spawnManager(room, spawns) {
     let { roleOpts } = creepOpts(room)
     let { requiredCreeps } = spawnRequests(room)
 
-    console.log(JSON.stringify(requiredCreeps))
-
     // Loop through requiredCreeps and try to spawn
 
     let i = 0
 
-    for (let role of Object.keys(requiredCreeps)) {
+    for (let role in requiredCreeps) {
 
-        let spawn = spawns[i]
+        console.log("ROLE" + role)
 
-        if (spawn) {
+        if (requiredCreeps[role] == 0) continue
 
-            let roleValues = roleOpts[role]
+        let spawn = inactiveSpawns[i]
 
-            if (roleValues.role == role && room.energyCapacityAvailable >= 300) {
+        if (!spawn) break
 
-                let testSpawn = spawn.spawnCreep(roleValues.body, roleValues.role, { dryRun: true })
+        let roleValues = roleOpts[role]
 
-                if (testSpawn == 0) {
+        if (roleValues.role != role) break
 
-                    spawn.spawnCreep(roleValues.body, (roomFixMessage + roleValues.role + ", T" + roleValues.tier + ", " + Game.time), roleValues.memory)
+        let testSpawn = spawn.spawnCreep(roleValues.body, roleValues.role, { dryRun: true })
 
-                    requiredCreeps[role] - 1
+        if (testSpawn == 0) {
 
-                    Memory.data.energySpentOnCreeps += roleValues.cost
+            spawn.spawnCreep(roleValues.body, (roomFixMessage + roleValues.role + ", T" + roleValues.tier + ", " + Game.time), roleValues.memory)
 
-                    i++
+            requiredCreeps[role] - 1
 
-                } else if (testSpawn != -4) {
+            Memory.data.energySpentOnCreeps += roleValues.cost
 
-                    console.log("Failed to spawn: " + testSpawn + ", " + roleValues.role + ", " + roleValues.body.length + ", " + roleValues.tier + " " + JSON.stringify(roleValues.memory))
-                }
-            }
+        } else if (testSpawn != ERR_BUSY) {
+
+            console.log("Failed to spawn: " + testSpawn + ", " + roleValues.role + ", " + roleValues.body.length + ", " + roleValues.tier + " " + JSON.stringify(roleValues.memory))
         }
+
+        i++
     }
 }
 

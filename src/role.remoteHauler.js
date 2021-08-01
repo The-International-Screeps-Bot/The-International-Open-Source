@@ -3,7 +3,7 @@ module.exports = {
 
         const remoteRoom = creep.memory.remoteRoom
 
-        if (!remoteRoom) return
+        if (!remoteRoom) return false
 
         const roomFrom = creep.memory.roomFrom
 

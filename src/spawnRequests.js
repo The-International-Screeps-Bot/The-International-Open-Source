@@ -32,7 +32,7 @@ function spawnRequests(room) {
 
     if (room.memory.stage && room.memory.stage < 3) {
 
-        var hostile = room.find(FIND_HOSTILE_CREEPS, {
+        var hostiles = room.find(FIND_HOSTILE_CREEPS, {
             filter: (c) => {
                 return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
             }
@@ -40,14 +40,14 @@ function spawnRequests(room) {
 
     } else {
 
-        var hostile = room.find(FIND_HOSTILE_CREEPS, {
+        var hostiles = room.find(FIND_HOSTILE_CREEPS, {
             filter: (c) => {
                 return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && c.owner.username != "Invader" && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
             }
         })
     }
 
-    if (hostile.length > 0) {
+    if (hostiles.length > 0) {
 
         Memory.global.lastDefence.time = Game.time
         Memory.global.lastDefence.room = room.name
@@ -267,7 +267,7 @@ function spawnRequests(room) {
         minCreeps["stationaryHauler"] = 1
     }
 
-    if (hostile.length > 0) {
+    if (hostiles.length > 0) {
 
         minCreeps["rangedDefender"] = 2
     }
@@ -366,10 +366,7 @@ function spawnRequests(room) {
         minCreeps["upgrader"] += 2
     }
 
-    if (!requiredCreeps) {
-
-        var requiredCreeps = {}
-    }
+    let requiredCreeps = {}
 
     for (let role of rolesList) {
 
@@ -401,10 +398,7 @@ function spawnRequests(room) {
 
     // Remote room creep requirements
 
-    if (!requiredRemoteCreeps) {
-
-        var requiredRemoteCreeps = {}
-    }
+    let requiredRemoteCreeps = []
 
     let minRemoteCreeps = {}
 
