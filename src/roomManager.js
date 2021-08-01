@@ -10,7 +10,7 @@ let construction = require("construction")
 let defenseManager = require("defenseManager")
 let taskManager = require("taskManager")
 
-let spawns = require("spawns")
+let spawnManager = require("spawnManager")
 
 let towers = require("towers")
 let links = require("links")
@@ -68,7 +68,7 @@ function roomManager() {
 
             defenseManager(room, creeps)
 
-            spawns(room, structures.spawns)
+            spawnManager(room, structures.spawns)
 
             towers(room, structures.towers, creeps)
 
