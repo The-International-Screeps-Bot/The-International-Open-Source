@@ -47,7 +47,7 @@ function spawnManager(room, spawns) {
 
                 spawn.spawnCreep(roleValues.body, (roomFixMessage + roleValues.role + ", T" + roleValues.tier + ", " + Game.time), roleValues.memory)
 
-                /* requiredCreeps[role] - 1 */
+                requiredCreeps[role] - 1
 
                 Memory.data.energySpentOnCreeps += roleValues.cost
 
