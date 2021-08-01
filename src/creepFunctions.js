@@ -464,7 +464,7 @@ Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTo
     }
 }
 
-//creep.advancedPathing({ origin: creep.pos, goal: { pos: structure.pos, range: 1}, plainCost: false, swampCost: false, defaultCostMatrix: creep.room.memory.defaultCostMatrix, avoidStages: ["enemyRoom", "keeperRoom"], flee: false, cacheAmount: 2 })
+//creep.advancedPathing({ origin: creep.pos, goal: { pos: structure.pos, range: 1}, plainCost: false, swampCost: false, defaultCostMatrix: creep.room.memory.defaultCostMatrix, avoidStages: ["enemyRoom", "keeperRoom"], flee: false })
 Creep.prototype.advancedPathing = function(opts) {
 
     let creep = this
@@ -496,10 +496,6 @@ Creep.prototype.advancedPathing = function(opts) {
     if (!opts.flee) {
 
         opts.flee = false
-    }
-    if (!opts.cacheAmount) {
-
-        opts.cacheAmount = 10
     }
 
     if (opts.origin.roomName != opts.goal.pos.roomName) {

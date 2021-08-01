@@ -23,6 +23,8 @@ function spawnManager(room, spawns) {
     let { roleOpts } = creepOpts(room)
     let { requiredCreeps } = spawnRequests(room)
 
+    console.log(JSON.stringify(requiredCreeps))
+
     // Loop through requiredCreeps and try to spawn
 
     let i = 0

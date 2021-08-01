@@ -1,7 +1,5 @@
 function constants(room) {
 
-    Memory.global.communes.push(room.name)
-
     sources()
     containers()
     links()

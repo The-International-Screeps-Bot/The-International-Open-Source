@@ -54,6 +54,8 @@ function roomManager() {
 
         if (room.controller && room.controller.my) {
 
+            Memory.global.communes.push(room.name)
+
             if (Game.time % 10 == 0) {
 
                 constants(room, structures)
