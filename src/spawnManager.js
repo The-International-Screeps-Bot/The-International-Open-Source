@@ -12,9 +12,9 @@ function spawnManager(room, spawns) {
         if (!spawn.spawning) inactiveSpawns.push(spawn)
     }
 
-    if (inactiveSpawns.length == 0) return
+    /* if (inactiveSpawns.length == 0) return
 
-    if (room.energyAvailable < 300) return
+    if (room.energyAvailable < 300) return */
 
     let roomFixMessage = ""
 
@@ -31,9 +31,7 @@ function spawnManager(room, spawns) {
 
     for (let role in requiredCreeps) {
 
-        console.log("ROLE" + role)
-
-        if (requiredCreeps[role] == 0) continue
+        if (requiredCreeps[role] <= 0) continue
 
         let spawn = inactiveSpawns[i]
 
@@ -49,7 +47,7 @@ function spawnManager(room, spawns) {
 
             spawn.spawnCreep(roleValues.body, (roomFixMessage + roleValues.role + ", T" + roleValues.tier + ", " + Game.time), roleValues.memory)
 
-            requiredCreeps[role] - 1
+            /* requiredCreeps[role] - 1 */
 
             Memory.data.energySpentOnCreeps += roleValues.cost
 
