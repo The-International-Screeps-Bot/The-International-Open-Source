@@ -1,13 +1,14 @@
 let allyList = require("allyList")
 let creepData = require("creepData")
-let {
-    rolesList,
-    remoteRoles,
-    creepsOfRole,
-    creepsOfRemoteRole
-} = creepData()
 
 function spawnRequests(room) {
+
+    let {
+        rolesList,
+        remoteRoles,
+        creepsOfRole,
+        creepsOfRemoteRole
+    } = creepData()
 
     for (let role of rolesList) {
 

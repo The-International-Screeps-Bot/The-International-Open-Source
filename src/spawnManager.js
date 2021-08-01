@@ -3,10 +3,6 @@ let spawnRequests = require("spawnRequests")
 
 function spawnManager(room, spawns) {
 
-    // Return required creeps and update creepsOfRole
-
-    let { requiredCreeps } = spawnRequests(room)
-
     // Confirm there are spawns able to spawn creeps
 
     let inactiveSpawns = []
@@ -27,6 +23,8 @@ function spawnManager(room, spawns) {
     // Return values needed for spawning
 
     let { roleOpts } = creepOpts(room)
+
+    let { requiredCreeps } = spawnRequests(room)
 
     // Loop through requiredCreeps and try to spawn
 
