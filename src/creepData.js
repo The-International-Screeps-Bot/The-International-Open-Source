@@ -11,7 +11,7 @@ function creepData() {
 
         let creep = Game.creeps[name]
 
-        if (creep.memory.dying != true) {
+        if (!creep.memory.dying) {
 
             if (!creepsOfRole[[creep.memory.role, creep.memory.roomFrom]]) {
 

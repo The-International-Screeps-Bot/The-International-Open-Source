@@ -89,7 +89,7 @@ Creep.prototype.findEnergyHarvested = function(source) {
 
     creep = this
 
-    let energyHarvested = source.energy - source.energy + creep.myParts("work")
+    let energyHarvested = (source.energy - source.energy) + (creep.myParts("work") * 2)
 
     creep.say("⛏️ " + energyHarvested)
     Memory.data.energyHarvested += energyHarvested

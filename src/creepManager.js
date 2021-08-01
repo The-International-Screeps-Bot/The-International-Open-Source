@@ -46,19 +46,19 @@ function creepManager(room, myCreeps) {
 
             roles[creep.memory.role].run(creep)
 
-            /*             try {
+            /* try {
 
-                            roles[creep.memory.role].run(creep)
+                roles[creep.memory.role].run(creep)
 
-                        } catch (err) {
+            } catch (err) {
 
-                            creep.say("❌")
-                        } */
+                creep.say("❌")
+            } */
 
             cpuUsed = Game.cpu.getUsed() - cpuUsed
             totalCpuUsed += cpuUsed
 
-            console.log(creep.memory.role + ": " + (cpuUsed).toFixed(2))
+            //console.log(creep.memory.role + ": " + (cpuUsed).toFixed(2))
         }
     }
 

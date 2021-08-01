@@ -68,6 +68,10 @@ function roomManager() {
 
             defenseManager(room, creeps)
 
+            let spawnRequests = require("spawnRequests")
+
+            spawnRequests(room)
+
             spawnManager(room, structures.spawns)
 
             towers(room, structures.towers, creeps)
