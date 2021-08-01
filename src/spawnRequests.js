@@ -372,7 +372,10 @@ function spawnRequests(room) {
 
         requiredCreeps[role] = minCreeps[role] - creepsOfRole[[role, room.name]]
 
-        console.log(role + ", " + requiredCreeps[role] + ", " + room.name)
+        if (requiredCreeps[role] > 0) {
+
+            /* console.log(role + ", " + requiredCreeps[role] + ", " + room.name) */
+        }
     }
 
     const roomFix = room.memory.roomFix

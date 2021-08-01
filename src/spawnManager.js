@@ -12,9 +12,9 @@ function spawnManager(room, spawns) {
         if (!spawn.spawning) inactiveSpawns.push(spawn)
     }
 
-    /* if (inactiveSpawns.length == 0) return
+    if (inactiveSpawns.length == 0) return
 
-    if (room.energyAvailable < 300) return */
+    if (room.energyAvailable < 300) return
 
     let roomFixMessage = ""
 
@@ -31,32 +31,33 @@ function spawnManager(room, spawns) {
 
     for (let role in requiredCreeps) {
 
-        if (requiredCreeps[role] <= 0) continue
+        if (requiredCreeps[role] > 0) {
 
-        let spawn = inactiveSpawns[i]
+            let spawn = inactiveSpawns[i]
 
-        if (!spawn) break
+            if (!spawn) break
 
-        let roleValues = roleOpts[role]
+            let roleValues = roleOpts[role]
 
-        if (roleValues.role != role) break
+            if (roleValues.role != role) break
 
-        let testSpawn = spawn.spawnCreep(roleValues.body, roleValues.role, { dryRun: true })
+            let testSpawn = spawn.spawnCreep(roleValues.body, roleValues.role, { dryRun: true })
 
-        if (testSpawn == 0) {
+            if (testSpawn == 0) {
 
-            spawn.spawnCreep(roleValues.body, (roomFixMessage + roleValues.role + ", T" + roleValues.tier + ", " + Game.time), roleValues.memory)
+                spawn.spawnCreep(roleValues.body, (roomFixMessage + roleValues.role + ", T" + roleValues.tier + ", " + Game.time), roleValues.memory)
 
-            /* requiredCreeps[role] - 1 */
+                /* requiredCreeps[role] - 1 */
 
-            Memory.data.energySpentOnCreeps += roleValues.cost
+                Memory.data.energySpentOnCreeps += roleValues.cost
 
-        } else if (testSpawn != ERR_BUSY) {
+            } else if (testSpawn != ERR_BUSY) {
 
-            console.log("Failed to spawn: " + testSpawn + ", " + roleValues.role + ", " + roleValues.body.length + ", " + roleValues.tier + " " + JSON.stringify(roleValues.memory))
+                console.log("Failed to spawn: " + testSpawn + ", " + roleValues.role + ", " + roleValues.body.length + ", " + roleValues.tier + " " + JSON.stringify(roleValues.memory))
+            }
+
+            i++
         }
-
-        i++
     }
 }
 
