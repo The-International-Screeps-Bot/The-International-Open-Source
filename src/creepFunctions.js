@@ -625,6 +625,15 @@ Creep.prototype.advancedPathing = function(opts) {
 
                     cm = new PathFinder.CostMatrix
 
+                    let roads = creep.room.find(FIND_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_ROAD
+                    })
+
+                    for (let road of roads) {
+
+                        cm.set(road.pos.x, road.pos.y, 1)
+                    }
+
                     let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                         filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
                     })
@@ -641,15 +650,6 @@ Creep.prototype.advancedPathing = function(opts) {
                     for (let structure of structures) {
 
                         cm.set(structure.pos.x, structure.pos.y, 255)
-                    }
-
-                    let roads = creep.room.find(FIND_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_ROAD
-                    })
-
-                    for (let road of roads) {
-
-                        cm.set(road.pos.x, road.pos.y, 1)
                     }
 
                     for (let creep of creeps.allCreeps) {
