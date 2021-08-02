@@ -363,11 +363,11 @@ Creep.prototype.avoidHostiles = function() {
 
             if (creep.pos.getRangeTo(hostile) <= 6) {
 
-                creep.say("H! RUN RUN")
+                creep.say("H! R")
 
                 creep.advancedPathing({
                     origin: creep.pos,
-                    goal: { pos: target.pos, range: 7 },
+                    goal: { pos: hostile.pos, range: 7 },
                     plainCost: false,
                     swampCost: false,
                     defaultCostMatrix: creep.memory.defaultCostMatrix,
@@ -538,13 +538,13 @@ Creep.prototype.advancedPathing = function(opts) {
         opts.cacheAmount = 10
     }
 
-    const lastRoom = creep.memory.lastRoom
+    if (opts.origin.roomName != opts.goal.pos.roomName) {
 
-    if (opts.origin.roomName != opts.goal.pos.roomName || lastRoom != creep.room.name) {
+        creep.room.visual.rect(creep.pos.x - 0.5, creep.pos.y + 0.5, 1, 1, { stroke: '#AAF837', strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
 
         const route = creep.memory.route
 
-        if (!route) {
+        if (!route || route.length == 0) {
             newRoute = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
                 routeCallback(roomName) {
 
@@ -568,17 +568,27 @@ Creep.prototype.advancedPathing = function(opts) {
             }
         } else {
 
+            if (route[0].name != creep.room.name) {
+
+                creep.memory.route = route.slice(1, route.length + 1)
+            }
+
             if (route[0]) {
 
                 opts.goal = { pos: new RoomPosition(25, 25, route[0].room), range: 24 }
             }
         }
+
+        creep.memory.lastRoom = creep.room.name
     }
 
     const path = creep.memory.path
     const lastCache = Game.time
+    const lastRoom = creep.memory.lastRoom
 
     if (!path || path.length <= 1 || !lastRoom || creep.room.name != lastRoom || !lastCache || lastCache - Game.time > opts.cacheAmount) {
+
+        creep.room.visual.rect(creep.pos.x - 0.5, creep.pos.y - 0.5, 1, 1, { stroke: '#F4E637', strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
 
         let newPath = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost,
