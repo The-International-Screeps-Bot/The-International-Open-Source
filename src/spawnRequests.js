@@ -257,13 +257,12 @@ function spawnRequests(room) {
             minCreeps["barricadeUpgrader"] = 1
 
         } else {
-
-            if (room.storage.store[RESOURCE_ENERGY] >= 30000) {
-
-                minCreeps["barricadeUpgrader"] = 1
-            } else if (room.storage.store[RESOURCE_ENERGY] >= 200000) {
+            if (room.storage.store[RESOURCE_ENERGY] >= 200000) {
 
                 minCreeps["barricadeUpgrader"] = 3
+            } else if (room.storage.store[RESOURCE_ENERGY] >= 30000) {
+
+                minCreeps["barricadeUpgrader"] = 1
             }
         }
     }
@@ -307,7 +306,8 @@ function spawnRequests(room) {
 
     if (stage >= 4) {
 
-        minCreeps["remoteBuilder"] = 1 + Math.floor(room.memory.remoteRooms.length / 3)
+        /* minCreeps["remoteBuilder"] = 1 + Math.floor(room.memory.remoteRooms.length / 3) */
+        minCreeps["remoteBuilder"] = 1
     }
 
     if (stage >= 3) {
