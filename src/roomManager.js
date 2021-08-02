@@ -242,7 +242,7 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            if (Game.time % 10 == 0) {
+            if (Game.time % 100 == 0) {
 
                 roomPlanner(room)
             }
