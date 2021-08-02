@@ -16,7 +16,7 @@ function importantStructures(room) {
     let allPowerCreeps = room.find(FIND_POWER_CREEPS)
 
     let powerCreeps = {
-        allCreeps: allCreeps,
+        allCreeps: allPowerCreeps,
 
         myCreeps: "",
         allyCreeps: "",
