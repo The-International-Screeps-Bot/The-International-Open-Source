@@ -677,7 +677,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
         if (creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))) == 0) {
 
-            creep.memory.path = creep.memory.path.slice(1, path.length + 1)
+            creep.memory.path = creep.memory.path.slice(1, newPath.length + 1)
         }
     } else {
 

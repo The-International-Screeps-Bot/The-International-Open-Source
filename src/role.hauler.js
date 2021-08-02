@@ -161,7 +161,7 @@ module.exports = {
                         } else {
                             if (storage) {
 
-                                creep.storage({
+                                creep.advancedPathing({
                                     origin: creep.pos,
                                     goal: { pos: storage.pos, range: 1 },
                                     plainCost: false,
@@ -276,7 +276,7 @@ module.exports = {
                         } else {
                             if (storage) {
 
-                                creep.storage({
+                                creep.advancedPathing({
                                     origin: creep.pos,
                                     goal: { pos: storage.pos, range: 1 },
                                     plainCost: false,
@@ -526,7 +526,7 @@ module.exports = {
 
                     if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
 
-                        creep.storage({
+                        creep.advancedPathing({
                             origin: creep.pos,
                             goal: { pos: essentialStructureAlt.pos, range: 1 },
                             plainCost: false,
@@ -538,7 +538,7 @@ module.exports = {
                         })
                     } else if (storage) {
 
-                        creep.storage({
+                        creep.advancedPathing({
                             origin: storage.pos,
                             goal: { pos: storage.pos, range: 1 },
                             plainCost: false,
@@ -582,7 +582,7 @@ module.exports = {
 
                 if (creep.pos.getRangeTo(spawn) >= 4) {
 
-                    creep.storage({
+                    creep.advancedPathing({
                         origin: creep.pos,
                         goal: { pos: spawn.pos, range: 1 },
                         plainCost: false,
