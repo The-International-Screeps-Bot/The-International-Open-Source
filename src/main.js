@@ -49,7 +49,9 @@ module.exports.loop = function() {
 
     cpuUsed = Game.cpu.getUsed()
 
-    roomManager()
+    let { consoleMessage } = roomManager()
+
+    console.log(consoleMessage)
 
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
 

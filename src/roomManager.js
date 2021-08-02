@@ -28,17 +28,28 @@ function roomManager() {
 
     let totalCpuUsed = Game.cpu.getUsed()
 
-    let consoleMessage = ""
+    let consoleMessage = ``
 
     for (let roomName in Game.rooms) {
+
+        let room = Game.rooms[roomName]
+
+        // CPU tracking values
 
         let roomCpuUsed = Game.cpu.getUsed()
 
         let cpuUsed = Game.cpu.getUsed()
 
-        let room = Game.rooms[roomName]
+        consoleMessage += `
+        ` + room.name + `
+        --------------------------------------------------------
+        `
 
-        // All room scripts
+        // Run room scripts
+
+        //
+
+        cpuUsed = Game.cpu.getUsed()
 
         let {
             creeps,
@@ -49,11 +60,45 @@ function roomManager() {
             costMatrixes,
         } = roomVariables(room)
 
+        totalCpuUsed += Game.cpu.getUsed()
+        cpuUsed = Game.cpu.getUsed() - cpuUsed
+        consoleMessage += `roomVariables: ` + cpuUsed.toFixed(2) + `
+        `
+
+        //
+
+        cpuUsed = Game.cpu.getUsed()
+
         creepManager(room, creeps.myCreeps)
+
+        totalCpuUsed += Game.cpu.getUsed()
+        cpuUsed = Game.cpu.getUsed() - cpuUsed
+        consoleMessage += `creepManager: ` + cpuUsed.toFixed(2) + `
+        `
+
+        //
+
+        cpuUsed = Game.cpu.getUsed()
 
         taskManager(room, creeps.myCreeps)
 
+        totalCpuUsed += Game.cpu.getUsed()
+        cpuUsed = Game.cpu.getUsed() - cpuUsed
+        consoleMessage += `taskManager: ` + cpuUsed.toFixed(2) + `
+        `
+
+        //
+
+        cpuUsed = Game.cpu.getUsed()
+
         antifa(room, creeps)
+
+        totalCpuUsed += Game.cpu.getUsed()
+        cpuUsed = Game.cpu.getUsed() - cpuUsed
+        consoleMessage += `antifa: ` + cpuUsed.toFixed(2) + `
+        `
+
+        //
 
         //trafficManager(room, creeps.myCreeps)
 
@@ -63,47 +108,160 @@ function roomManager() {
 
             Memory.global.communes.push(room.name)
 
+            //
+
+            cpuUsed = Game.cpu.getUsed()
+
             if (Game.time % 10 == 0) {
 
                 constants(room, structures)
             }
+
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `constants: ` + cpuUsed.toFixed(2) + `
+            `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
 
             if (Game.time % 100 == 0) {
 
                 construction(room)
             }
 
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `construction: ` + cpuUsed.toFixed(2) + `
+            `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
+
             defenseManager(room, creeps)
 
-            let spawnRequests = require("spawnRequests")
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `defenseManager: ` + cpuUsed.toFixed(2) + `
+            `
 
-            spawnRequests(room)
+            //
+
+            cpuUsed = Game.cpu.getUsed()
 
             spawnManager(room, structures.spawns)
 
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `spawnManager: ` + cpuUsed.toFixed(2) + `
+            `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
+
             towers(room, structures.towers, creeps)
+
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `towers: ` + cpuUsed.toFixed(2) + `
+            `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
 
             if (Game.time % 10 == 0) {
 
                 terminals(room, structures.terminal)
             }
 
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `terminals: ` + cpuUsed.toFixed(2) + `
+            `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
+
             factories(structures.factory)
+
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `factories: ` + cpuUsed.toFixed(2) + `
+            `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
 
             powerSpawns(structures.powerSpawn)
 
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `powerSpawns: ` + cpuUsed.toFixed(2) + `
+            `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
+
             links(room, specialStructures.links)
+
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `links: ` + cpuUsed.toFixed(2) + `
+            `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
 
             labs(room, structures, specialStructures)
 
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `labs: ` + cpuUsed.toFixed(2) + `
+            `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
+
             findAnchor(room)
+
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `findAnchor: ` + cpuUsed.toFixed(2) + `
+            `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
 
             if (Game.time % 10 == 0) {
 
                 roomPlanner(room)
             }
 
-            //visuals(room, structures, specialStructures, constructionSites)
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `roomPlanner: ` + cpuUsed.toFixed(2) + `
+            `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
+
+            visuals(room, structures, specialStructures, constructionSites)
+
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `visuals: ` + cpuUsed.toFixed(2) + `
+            `
         }
 
         Memory.data.roomManager[room.name] = {}
