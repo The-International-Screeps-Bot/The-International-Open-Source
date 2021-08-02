@@ -31,7 +31,7 @@ Creep.prototype.barricadesFindAndRepair = function() {
 
         let barricade = Game.getObjectById(creep.memory.target)
 
-        if (barricade.hits < barricade.hitsMax && barricade.hits < (creep.memory.quota + creep.myParts("work") * 1000)) {
+        if (barricade && barricade.hits < barricade.hitsMax && barricade.hits < (creep.memory.quota + creep.myParts("work") * 1000)) {
 
             creep.repairBarricades(barricade)
         } else {
@@ -43,6 +43,8 @@ Creep.prototype.barricadesFindAndRepair = function() {
         var barricades = creep.room.find(FIND_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
         })
+
+        if (barricades.length == 0) return
 
         for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
 

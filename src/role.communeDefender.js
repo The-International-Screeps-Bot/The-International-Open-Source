@@ -92,28 +92,41 @@ module.exports = {
 
                 if (ramparts.length > 0) {
 
-                    let outerRampart
+                    let cm = PathFinder.CostMatrix.deserialize(false)
 
-                    let cm = PathFinder.CostMatrix.deserialize(creep.room.memory.defaultCostMatrix)
+                    let outerRamparts = []
 
                     for (let rampart of ramparts) {
 
+                        let creeps = creep.room.find(FIND_CREEPS)
+
+                        for (let creep of creeps) {
+
+                            cm.set(creep.pos.x, creep.pos.y, 255)
+                        }
+
+                        cm.set(creep.pos.x, creep.pos.y, 1)
+
                         if (cm && cm.get(rampart.pos.x, rampart.pos.y) < 255) {
 
-                            outerRampart = rampart
-                            break
+                            outerRamparts.push(rampart)
                         }
                     }
 
-                    if (outerRampart) {
+                    if (outerRamparts.length > 0) {
 
-                        let goal = _.map([outerRampart], function(target) {
-                            return { pos: target.pos, range: 0 }
-                        })
+                        let outerRampart = creep.pos.findClosestByRange(outerRamparts)
 
-                        if (creep.fatigue == 0) {
+                        if (outerRampart) {
 
-                            creep.intraRoomPathing(creep.pos, goal)
+                            let goal = _.map([outerRampart], function(target) {
+                                return { pos: target.pos, range: 0 }
+                            })
+
+                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
+
+                                creep.intraRoomPathing(creep.pos, goal)
+                            }
                         }
                     }
                 } else {

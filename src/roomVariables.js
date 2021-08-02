@@ -6,6 +6,7 @@ function importantStructures(room) {
 
     let creeps = {
         allCreeps: allCreeps,
+
         myCreeps: myCreeps,
         /* allyCreeps: allyCreeps,
         hostileCreeps: hostileCreeps,
@@ -16,6 +17,7 @@ function importantStructures(room) {
 
     let powerCreeps = {
         allPowerCreeps: allPowerCreeps,
+
         myPowerCreeps: "",
         allyPowerCreeps: "",
         hostilePowerCreeps: "",
@@ -23,8 +25,10 @@ function importantStructures(room) {
 
     let allSites = room.find(FIND_CONSTRUCTION_SITES)
 
+    let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
+
     let constructionSites = {
-        allSites: allSites,
+        mySites: mySites,
     }
 
     let allStructures = room.find(FIND_STRUCTURES)
@@ -55,16 +59,19 @@ function importantStructures(room) {
         filter: s => s.structureType == STRUCTURE_POWER_SPAWN
     })[0]
 
-    let controller = room.controller
-
     let storage = room.storage
 
     let terminal = room.terminal
 
+    let controller = room.controller
+
     let mineral = room.find(FIND_MINERALS)[0]
+
+    let sources = room.find(FIND_SOURCES)
 
     let structures = {
         allStructures: allStructures,
+
         spawns: spawns,
         links: links,
         labs: labs,
@@ -74,6 +81,10 @@ function importantStructures(room) {
         terminal: terminal,
         factory: factory,
         powerSpawn: powerSpawn,
+
+        controller: controller,
+        mineral: mineral,
+        sources: sources,
     }
 
     let baseLink

@@ -77,7 +77,7 @@ module.exports = {
 
                     creep.memory.storageToTerminal = true
                 }
-                if (storage.store[RESOURCE_ENERGY] < 10000 && terminal.store[RESOURCE_ENERGY] > storage.store[RESOURCE_ENERGY]) {
+                if (storage && storage.store[RESOURCE_ENERGY] < 10000 && terminal.store[RESOURCE_ENERGY] > storage.store[RESOURCE_ENERGY]) {
 
                     creep.memory.terminalToStorage = true
                 }

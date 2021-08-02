@@ -1,28 +1,18 @@
-function visuals(room, spawns, towers, links, labs, containers) {
+function visuals(room, structures, specialStructures, constructionSites) {
 
-    var controller = room.controller
+    var controller = structures.controller
 
-    var constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES)
+    var storage = structures.storage
 
-    var spawns = room.find(FIND_MY_SPAWNS)
+    var terminal = structures.terminal
 
-    var sources = room.find(FIND_SOURCES)
+    let primaryLabs = specialStructures.labs.primaryLabs
+    let secondaryLabs = specialStructures.labs.secondaryLabs
+    let tertiaryLabs = specialStructures.labs.secondaryLabs
 
-    var storage = room.storage
+    for (let lab of structures.labs) {
 
-    var terminal = room.terminal
-
-    var minerals = room.find(FIND_MINERALS)
-
-    var mineral = minerals[0]
-
-    let primaryLabs = room.memory.primaryLabs
-    let secondaryLabs = room.memory.secondaryLabs
-    let tertiaryLabs = room.memory.secondaryLabs
-
-    for (let lab of labs) {
-
-        if (primaryLabs.includes(lab)) {
+        if (primaryLabs && primaryLabs.includes(lab)) {
 
             room.visual.circle(lab.pos, {
                 fill: 'transparent',
@@ -30,7 +20,7 @@ function visuals(room, spawns, towers, links, labs, containers) {
                 stroke: '#39A0ED',
                 strokeWidth: 0.125
             })
-        } else if (secondaryLabs.includes(lab)) {
+        } else if (secondaryLabs && secondaryLabs.includes(lab)) {
 
             room.visual.circle(lab.pos, {
                 fill: 'transparent',
@@ -38,7 +28,7 @@ function visuals(room, spawns, towers, links, labs, containers) {
                 stroke: '#2DF0C9',
                 strokeWidth: 0.125
             })
-        } else if (tertiaryLabs.includes(lab)) {
+        } else if (tertiaryLabs && tertiaryLabs.includes(lab)) {
 
             room.visual.circle(lab.pos, {
                 fill: 'transparent',
@@ -222,7 +212,7 @@ function visuals(room, spawns, towers, links, labs, containers) {
 
         }
     }
-    for (let container of containers) {
+    for (let container of structures.containers) {
 
         room.visual.text(container.store.getUsedCapacity(), container.pos.x, container.pos.y, { font: 0.5, backgroundColor: "#b4b4b4", backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
     }
@@ -259,7 +249,7 @@ function visuals(room, spawns, towers, links, labs, containers) {
         })
     }
 
-    for (let link of links) {
+    for (let link of structures.links) {
 
         room.visual.text(link.store[RESOURCE_ENERGY], link.pos.x, link.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
     }
@@ -323,6 +313,8 @@ function visuals(room, spawns, towers, links, labs, containers) {
 
     }
 
+    let mineral = structures.mineral
+
     mineral.room.visual.text((mineral.mineralAmount / 1000).toFixed(0) + "k" + ", " + (mineral.ticksToRegeneration / 1000).toFixed(0) + "k", mineral.pos.x, mineral.pos.y - 1, { align: 'center', opacity: "0.8" });
 
     if (mineral.density == 1) {
@@ -343,17 +335,17 @@ function visuals(room, spawns, towers, links, labs, containers) {
 
     }
 
-    for (let constructionSite of constructionSites) {
+    for (let constructionSite of constructionSites.mySites) {
 
         room.visual.text("%" + (constructionSite.progress / constructionSite.progressTotal * 100).toFixed(0), constructionSite.pos.x, constructionSite.pos.y - 0.25, { font: 0.5, align: 'center', opacity: "0.8" });
 
     }
-    for (let tower of towers) {
+    for (let tower of structures.towers) {
 
         room.visual.text(tower.store[RESOURCE_ENERGY], tower.pos.x, tower.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center', opacity: "0.8" });
 
     }
-    for (let spawn of spawns) {
+    for (let spawn of structures.spawns) {
 
         if (spawn.spawning) {
 
@@ -363,7 +355,7 @@ function visuals(room, spawns, towers, links, labs, containers) {
 
         }
     }
-    for (let source of sources) {
+    for (let source of structures.sources) {
 
         if (source.ticksToRegeneration != undefined) {
 

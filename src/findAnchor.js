@@ -2,11 +2,13 @@ function findAnchor(room) {
 
     if (room.memory.anchorPoint) return true
 
+    if (room.memory.anchorPoint == false) return false
+
     let cm = new PathFinder.CostMatrix()
 
     var dt = distanceTransform(openSpaces())
     cm._bits = dt
-    let anchorPoint = displayCostMatrix(cm)
+    let anchorPointResult = displayCostMatrix(cm)
 
     /*
             the oob parameter is used so that if an object pixel is at the image boundary
@@ -92,6 +94,10 @@ function findAnchor(room) {
 
         const array = cm._bits;
 
+        let anchorPoints = []
+
+        findAnchorPoints()
+
         function findAnchorPoints() {
 
             // For open spaces
@@ -125,8 +131,6 @@ function findAnchor(room) {
             }
         }
 
-        let anchorPoints = findAnchorPoints()
-
         if (!anchorPoints || anchorPoints.length == 0) return false
 
         let startPoint = room.controller.pos
@@ -138,9 +142,12 @@ function findAnchor(room) {
         return anchorPoint
     }
 
-    return {
-        anchorPoint: anchorPoint
+    if (anchorPointResult == false) {
+
+        room.memory.anchorPoint = false
     }
+
+    return true
 }
 
 module.exports = findAnchor

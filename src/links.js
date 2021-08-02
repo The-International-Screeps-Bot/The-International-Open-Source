@@ -1,9 +1,9 @@
-function links(room) {
+function links(room, specialLinks) {
 
-    let controllerLink = Game.getObjectById(room.memory.controllerLink)
-    let baseLink = Game.getObjectById(room.memory.baseLink)
-    let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
-    let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
+    let controllerLink = specialLinks.controllerLink
+    let baseLink = specialLinks.baseLink
+    let sourceLink1 = specialLinks.sourceLink1
+    let sourceLink2 = specialLinks.sourceLink2
 
     function findFullLink() {
 

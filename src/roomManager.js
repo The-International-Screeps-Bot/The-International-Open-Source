@@ -5,8 +5,9 @@ let powerCreeps = require("powerCreeps")
 let antifa = require("antifa")
 
 let constants = require("constants")
-let visuals = require("visuals")
 let construction = require("construction")
+
+let findAnchor = require("findAnchor")
 let roomPlanner = require("roomPlanner")
 
 let defenseManager = require("defenseManager")
@@ -20,6 +21,8 @@ let labs = require("labs")
 let terminals = require("terminals")
 let factories = require("factories")
 let powerSpawns = require("powerSpawns")
+
+let visuals = require("visuals")
 
 function roomManager() {
 
@@ -39,7 +42,9 @@ function roomManager() {
 
         let {
             creeps,
+            powerCreeps,
             structures,
+            constructionSites,
             specialStructures,
             costMatrixes,
         } = roomVariables(room)
@@ -87,16 +92,18 @@ function roomManager() {
 
             powerSpawns(structures.powerSpawn)
 
-            links(room, structures.labs, specialStructures.labs.primaryLabs, specialStructures.labs.secondaryLabs, specialStructures.labs.tertiaryLabs)
+            links(room, specialStructures.links)
 
-            labs(room, structures.labs)
+            labs(room, structures, specialStructures)
+
+            findAnchor(room)
 
             if (Game.time % 10 == 0) {
 
                 roomPlanner(room)
             }
 
-            visuals(room, structures.spawns, structures.towers, structures.links, structures.labs, structures.containers)
+            //visuals(room, structures, specialStructures, constructionSites)
         }
 
         Memory.data.roomManager[room.name] = {}
