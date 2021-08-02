@@ -675,10 +675,10 @@ Creep.prototype.advancedPathing = function(opts) {
 
         if (!pos) return
 
-        creep.move(creep.pos.getDirectionTo(creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name)))))
+        if (creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))) == 0) {
 
-        creep.memory.path = creep.memory.path.slice(1, newPath.length + 1)
-
+            creep.memory.path = creep.memory.path.slice(1, path.length + 1)
+        }
     } else {
 
         let pos = path[0]
@@ -1351,3 +1351,4 @@ Creep.prototype.creepFlee = function(origin, target) {
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
+new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
