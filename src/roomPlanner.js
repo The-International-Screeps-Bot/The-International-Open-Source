@@ -129,9 +129,16 @@ function roomPlanner(room) {
 
                 if (room.getTerrain().get(pos.x, pos.y) != TERRAIN_MASK_WALL) {
 
-                    if (room.memory.stage >= 3 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 45000) {
+                    if (room.memory.stage >= 3) {
+                        if (room.storage) {
+                            if (room.storage.store[RESOURCE_ENERGY] >= 45000) {
 
-                        room.createConstructionSite(pos.x, pos.y, structureType)
+                                room.createConstructionSite(pos.x, pos.y, structureType)
+                            }
+                        } else {
+
+                            room.createConstructionSite(pos.x, pos.y, structureType)
+                        }
                     }
 
                     room.visual.circle(pos.x, pos.y, {

@@ -540,11 +540,12 @@ Creep.prototype.advancedPathing = function(opts) {
 
     if (opts.origin.roomName != opts.goal.pos.roomName) {
 
-        creep.room.visual.rect(creep.pos.x - 0.5, creep.pos.y + 0.5, 1, 1, { stroke: '#AAF837', strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
-
         const route = creep.memory.route
 
         if (!route || route.length == 0) {
+
+            creep.room.visual.text("New Route", creep.pos.x, creep.pos.y - 0.5, { color: '#AAF837' })
+
             newRoute = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
                 routeCallback(roomName) {
 
@@ -568,14 +569,14 @@ Creep.prototype.advancedPathing = function(opts) {
             }
         } else {
 
-            if (route[0].name != creep.room.name) {
+            if (route[0].room == creep.room.name) {
 
                 creep.memory.route = route.slice(1, route.length + 1)
             }
 
             if (route[0]) {
 
-                opts.goal = { pos: new RoomPosition(25, 25, route[0].room), range: 24 }
+                opts.goal = { pos: new RoomPosition(25, 25, route[0].room), range: 1 }
             }
         }
 
@@ -588,7 +589,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
     if (!path || path.length <= 1 || !lastRoom || creep.room.name != lastRoom || !lastCache || lastCache - Game.time > opts.cacheAmount) {
 
-        creep.room.visual.rect(creep.pos.x - 0.5, creep.pos.y - 0.5, 1, 1, { stroke: '#F4E637', strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
+        creep.room.visual.text("New Path", creep.pos.x, creep.pos.y + 0.5, { color: '#F4E637' })
 
         let newPath = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost,

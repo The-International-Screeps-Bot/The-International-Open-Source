@@ -37,12 +37,16 @@ module.exports = {
 
                     creep.attack(closestHostile)
 
-                    let goal = _.map([closestHostile], function(target) {
-                        return { pos: target.pos, range: 1 }
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: closestHostile.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: false,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
                     })
-
-                    creep.intraRoomPathing(creep.pos, goal)
-
                 } else {
 
                     let hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
@@ -57,12 +61,16 @@ module.exports = {
 
                         creep.attack(hostileStructure)
 
-                        let goal = _.map([hostileStructure], function(target) {
-                            return { pos: target.pos, range: 1 }
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: hostileStructure.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: false,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 10,
                         })
-
-                        creep.intraRoomPathing(creep.pos, goal)
-
                     } else {
 
                         if (creep.hits < creep.hitsMax) {
@@ -75,11 +83,16 @@ module.exports = {
                 }
             } else {
 
-                let goal = _.map([new RoomPosition(25, 25, remoteRoom)], function(target) {
-                    return { pos: target, range: 24 }
+                creep.advancedPathing({
+                    origin: creep.pos,
+                    goal: { pos: new RoomPosition(25, 25, remoteRoom), range: 1 },
+                    plainCost: false,
+                    swampCost: false,
+                    defaultCostMatrix: false,
+                    avoidStages: ["enemyRoom", "keeperRoom", "enemyReservation"],
+                    flee: false,
+                    cacheAmount: 10,
                 })
-
-                creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
             }
         } else {
             if (creep.room.name == roomFrom) {
@@ -119,14 +132,16 @@ module.exports = {
 
                         if (outerRampart) {
 
-                            let goal = _.map([outerRampart], function(target) {
-                                return { pos: target.pos, range: 0 }
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: outerRampart.pos, range: 0 },
+                                plainCost: false,
+                                swampCost: false,
+                                defaultCostMatrix: false,
+                                avoidStages: [],
+                                flee: false,
+                                cacheAmount: 10,
                             })
-
-                            if (creep.fatigue == 0 && supporter.fatigue == 0) {
-
-                                creep.intraRoomPathing(creep.pos, goal)
-                            }
                         }
                     }
                 } else {
@@ -135,23 +150,32 @@ module.exports = {
 
                     if (spawn && creep.pos.getRangeTo(spawn) > 5) {
 
-                        let goal = _.map([spawn], function(target) {
-                            return { pos: target.pos, range: 5 }
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: spawn.pos, range: 5 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: false,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 10,
                         })
-
-                        creep.intraRoomPathing(creep.pos, goal)
                     }
                 }
             } else {
 
                 creep.say("🚬")
 
-                let goal = _.map([new RoomPosition(25, 25, roomFrom)], function(target) {
-                    return { pos: target, range: 24 }
+                creep.advancedPathing({
+                    origin: creep.pos,
+                    goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
+                    plainCost: false,
+                    swampCost: false,
+                    defaultCostMatrix: false,
+                    avoidStages: ["enemyRoom", "keeperRoom", "enemyReservation"],
+                    flee: false,
+                    cacheAmount: 10,
                 })
-
-                creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom", "enemyReservation"])
-
             }
         }
     }

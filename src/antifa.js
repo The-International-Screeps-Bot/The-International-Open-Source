@@ -456,14 +456,16 @@ function antifa(room, creeps) {
 
                                     if (outerRampart) {
 
-                                        let goal = _.map([outerRampart], function(target) {
-                                            return { pos: target.pos, range: 0 }
+                                        creep.advancedPathing({
+                                            origin: creep.pos,
+                                            goal: { pos: outerRampart.pos, range: 0 },
+                                            plainCost: false,
+                                            swampCost: false,
+                                            defaultCostMatrix: false,
+                                            avoidStages: [],
+                                            flee: false,
+                                            cacheAmount: 10,
                                         })
-
-                                        if (creep.fatigue == 0 && supporter.fatigue == 0) {
-
-                                            creep.intraRoomPathing(creep.pos, goal)
-                                        }
                                     }
                                 }
                             }
@@ -503,14 +505,16 @@ function antifa(room, creeps) {
 
                                 if (outerRampart) {
 
-                                    let goal = _.map([outerRampart], function(target) {
-                                        return { pos: target.pos, range: 0 }
+                                    creep.advancedPathing({
+                                        origin: creep.pos,
+                                        goal: { pos: outerRampart.pos, range: 0 },
+                                        plainCost: false,
+                                        swampCost: false,
+                                        defaultCostMatrix: false,
+                                        avoidStages: [],
+                                        flee: false,
+                                        cacheAmount: 10,
                                     })
-
-                                    if (creep.fatigue == 0 && supporter.fatigue == 0) {
-
-                                        creep.intraRoomPathing(creep.pos, goal)
-                                    }
                                 }
                             }
                         }

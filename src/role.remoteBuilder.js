@@ -150,10 +150,6 @@ module.exports = {
 
                         if (outerRampart) {
 
-                            let goal = _.map([outerRampart], function(target) {
-                                return { pos: target.pos, range: 0 }
-                            })
-
                             creep.advancedPathing({
                                 origin: creep.pos,
                                 goal: { pos: outerRampart.pos, range: 0 },

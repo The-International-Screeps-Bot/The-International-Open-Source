@@ -4,7 +4,7 @@ function construction(room) {
 
     destroyStructure("")
 
-    //resetRoom("W8N3")
+    resetRoom("")
 
     //removeAllSites()
 
@@ -98,13 +98,15 @@ function construction(room) {
 
     if (roomConstructionSites.length < 5) {
 
-        source1Path()
-        source2Path()
-        controllerPath()
+        if (Game.time % 100 == 0) source1Path()
+
+        if (Game.time % 101 == 0) source2Path()
+
+        if (Game.time % 102 == 0) controllerPath()
 
         if (room.memory.stage >= 6) {
 
-            mineralPath()
+            if (Game.time % 103 == 0) mineralPath()
         }
 
         if (room.controller.level >= 5 && room.memory.remoteRooms.length > 0) {
@@ -115,18 +117,18 @@ function construction(room) {
 
                 if (remoteRoom) {
 
-                    remotePath(remoteRoom)
+                    if (Game.time % 104 == 0) remotePath(remoteRoom)
                 }
             }
         }
 
         if (room.memory.stage >= 6) {
 
-            placeExtractor()
+            if (Game.time % 100 == 0) placeExtractor()
         }
     }
 
-    removeUneeded()
+    if (Game.time % 100 == 0) removeUneeded()
 
     function source1Path() {
 

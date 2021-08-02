@@ -13,6 +13,8 @@ module.exports = {
             filter: s => s.structureType == STRUCTURE_FACTORY
         })[0]
 
+        /*
+
         let unfilteredRequiredStructures = [baseLink, terminal, storage, factory]
         let requiredStructures = []
 
@@ -57,158 +59,173 @@ module.exports = {
                 })
 
                 creep.intraRoomPathing(creep.pos, goal)
-            } else {
+            } */
 
-                creep.hasResource()
+        const anchorPoint = creep.room.memory.anchorPoint
 
-                if (baseLink != null && baseLink.store[RESOURCE_ENERGY] >= 700 && ((storage && storage.store[RESOURCE_ENERGY] <= 400000) || (terminal && terminal.store[RESOURCE_ENERGY] <= 100000)) && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
+        if (!anchorPoint) return
 
-                    creep.memory.withdrawBaseLink = true
-                }
-                if (terminal && factory && terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 && factory.store[RESOURCE_ENERGY] >= 800) {
+        if (creep.pos.x != anchorPoint.x && creep.pos.y != anchorPoint.y) {
 
-                    creep.memory.factoryWithdrawEnergy = true
-                }
-                if (terminal && factory && factory.store.getUsedCapacity() <= factory.store.getCapacity() - 800 && factory.store[RESOURCE_BATTERY] <= 2000 && terminal.store[RESOURCE_BATTERY] >= 800) {
+            creep.say("M A")
 
-                    creep.memory.terminalWithdrawBattery = true
-                }
-                if (storage && storage.store[RESOURCE_ENERGY] >= 120000 && terminal.store[RESOURCE_ENERGY] < 120000 && terminal.store.getFreeCapacity() >= creep.store.getCapacity()) {
+            creep.advancedPathing({
+                origin: creep.pos,
+                goal: { pos: anchorPoint, range: 0 },
+                plainCost: false,
+                swampCost: false,
+                defaultCostMatrix: creep.memory.defaultCostMatrix,
+                avoidStages: [],
+                flee: false,
+                cacheAmount: 10,
+            })
+        } else {
 
-                    creep.memory.storageToTerminal = true
-                }
-                if (storage && storage.store[RESOURCE_ENERGY] < 10000 && terminal.store[RESOURCE_ENERGY] > storage.store[RESOURCE_ENERGY]) {
+            creep.hasResource()
 
-                    creep.memory.terminalToStorage = true
-                }
+            if (baseLink != null && baseLink.store[RESOURCE_ENERGY] >= 700 && ((storage && storage.store[RESOURCE_ENERGY] <= 400000) || (terminal && terminal.store[RESOURCE_ENERGY] <= 100000)) && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
 
-                //if (storage && storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink != null && controllerLink.store[RESOURCE_ENERGY] <= 400) {
+                creep.memory.withdrawBaseLink = true
+            }
+            if (terminal && factory && terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 && factory.store[RESOURCE_ENERGY] >= 800) {
 
-                //creep.memory.transferControllerLink = true
-                //}
+                creep.memory.factoryWithdrawEnergy = true
+            }
+            if (terminal && factory && factory.store.getUsedCapacity() <= factory.store.getCapacity() - 800 && factory.store[RESOURCE_BATTERY] <= 2000 && terminal.store[RESOURCE_BATTERY] >= 800) {
 
-                const withdrawBaseLink = creep.memory.withdrawBaseLink
+                creep.memory.terminalWithdrawBattery = true
+            }
+            if (storage && storage.store[RESOURCE_ENERGY] >= 120000 && terminal && terminal.store[RESOURCE_ENERGY] < 120000 && terminal.store.getFreeCapacity() >= creep.store.getCapacity()) {
 
-                const terminalWithdrawBattery = creep.memory.terminalWithdrawBattery
+                creep.memory.storageToTerminal = true
+            }
+            if (storage && storage.store[RESOURCE_ENERGY] < 10000 && terminal && terminal.store[RESOURCE_ENERGY] > storage.store[RESOURCE_ENERGY]) {
 
-                const factoryWithdrawEnergy = creep.memory.factoryWithdrawEnergy
+                creep.memory.terminalToStorage = true
+            }
 
-                const fillNukerEnergy = creep.memory.fillNukerEnergy
+            //if (storage && storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink != null && controllerLink.store[RESOURCE_ENERGY] <= 400) {
 
-                const fillNukerGhodium = creep.memory.fillNukerGhodium
+            //creep.memory.transferControllerLink = true
+            //}
 
-                const transferControllerLink = creep.memory.transferControllerLink
+            const withdrawBaseLink = creep.memory.withdrawBaseLink
 
-                const storageToTerminal = creep.memory.storageToTerminal
+            const terminalWithdrawBattery = creep.memory.terminalWithdrawBattery
 
-                const terminalToStorage = creep.memory.terminalToStorage
+            const factoryWithdrawEnergy = creep.memory.factoryWithdrawEnergy
 
-                creep.say("🚬")
+            const transferControllerLink = creep.memory.transferControllerLink
 
-                if (withdrawBaseLink) {
+            const storageToTerminal = creep.memory.storageToTerminal
 
-                    creep.say("WBL")
+            const terminalToStorage = creep.memory.terminalToStorage
 
-                    if (creep.memory.isFull == true) {
+            creep.say("🚬")
 
-                        if (storage.store[RESOURCE_ENERGY] <= 250000 && storage.store.getUsedCapacity() < storage.store.getCapacity() - 800) {
+            if (withdrawBaseLink) {
 
-                            for (let resource in creep.store) {
+                creep.say("WBL")
 
-                                creep.transfer(storage, resource)
-                            }
+                if (creep.memory.isFull == true) {
 
-                            creep.memory.withdrawBaseLink = false
+                    if (storage.store[RESOURCE_ENERGY] <= 250000 && storage.store.getUsedCapacity() < storage.store.getCapacity() - 800) {
 
-                        } else if (terminal.store.getUsedCapacity() < terminal.store.getCapacity() - 800) {
+                        for (let resource in creep.store) {
 
-                            for (let resource in creep.store) {
-
-                                creep.transfer(terminal, resource)
-                            }
-
-                            creep.memory.withdrawBaseLink = false
+                            creep.transfer(storage, resource)
                         }
-                    } else {
 
-                        creep.withdraw(baseLink, RESOURCE_ENERGY)
+                        creep.memory.withdrawBaseLink = false
+
+                    } else if (terminal.store.getUsedCapacity() < terminal.store.getCapacity() - 800) {
+
+                        for (let resource in creep.store) {
+
+                            creep.transfer(terminal, resource)
+                        }
+
+                        creep.memory.withdrawBaseLink = false
                     }
                 } else {
 
-                    if (factoryWithdrawEnergy) {
+                    creep.withdraw(baseLink, RESOURCE_ENERGY)
+                }
+            } else {
 
-                        creep.say("FWE")
+                if (factoryWithdrawEnergy) {
+
+                    creep.say("FWE")
+
+                    if (creep.memory.isFull == true) {
+
+                        for (let resource in creep.store) {
+
+                            creep.transfer(terminal, resource)
+                        }
+
+                        creep.memory.factoryWithdrawEnergy = false
+
+                    } else {
+
+                        creep.withdraw(factory, RESOURCE_ENERGY)
+                    }
+                } else {
+
+                    if (terminalWithdrawBattery) {
+
+                        creep.say("TWB")
 
                         if (creep.memory.isFull == true) {
 
-                            for (let resource in creep.store) {
-
-                                creep.transfer(terminal, resource)
-                            }
-
-                            creep.memory.factoryWithdrawEnergy = false
-
+                            creep.transfer(factory, RESOURCE_BATTERY)
+                            creep.memory.terminalWithdrawBattery = false
                         } else {
 
-                            creep.withdraw(factory, RESOURCE_ENERGY)
+                            creep.withdraw(terminal, RESOURCE_BATTERY)
                         }
                     } else {
 
-                        if (terminalWithdrawBattery) {
+                        if (transferControllerLink) {
 
-                            creep.say("TWB")
+                            creep.say("TCL")
 
                             if (creep.memory.isFull == true) {
 
-                                creep.transfer(factory, RESOURCE_BATTERY)
-                                creep.memory.terminalWithdrawBattery = false
+                                creep.transfer(baseLink, RESOURCE_ENERGY)
                             } else {
 
-                                creep.withdraw(terminal, RESOURCE_BATTERY)
+                                creep.withdraw(storage, RESOURCE_ENERGY)
                             }
                         } else {
 
-                            if (transferControllerLink) {
+                            if (storageToTerminal) {
 
-                                creep.say("TCL")
+                                creep.say("STT")
 
                                 if (creep.memory.isFull == true) {
 
-                                    creep.transfer(baseLink, RESOURCE_ENERGY)
+                                    creep.transfer(terminal, RESOURCE_ENERGY)
+                                    creep.memory.storageToTerminal = false
+
                                 } else {
 
                                     creep.withdraw(storage, RESOURCE_ENERGY)
                                 }
                             } else {
 
-                                if (storageToTerminal) {
+                                if (terminalToStorage) {
 
-                                    creep.say("STT")
+                                    creep.say("TTS")
 
                                     if (creep.memory.isFull == true) {
 
-                                        creep.transfer(terminal, RESOURCE_ENERGY)
-                                        creep.memory.storageToTerminal = false
+                                        creep.transfer(storage, RESOURCE_ENERGY)
+                                        creep.memory.terminalToStorage = false
 
                                     } else {
 
-                                        creep.withdraw(storage, RESOURCE_ENERGY)
-                                    }
-                                } else {
-
-                                    if (terminalToStorage) {
-
-                                        creep.say("TTS")
-
-                                        if (creep.memory.isFull == true) {
-
-                                            creep.transfer(storage, RESOURCE_ENERGY)
-                                            creep.memory.terminalToStorage = false
-
-                                        } else {
-
-                                            creep.withdraw(terminal, RESOURCE_ENERGY)
-                                        }
+                                        creep.withdraw(terminal, RESOURCE_ENERGY)
                                     }
                                 }
                             }
