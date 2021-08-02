@@ -570,7 +570,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
             if (route[0]) {
 
-                opts.goal = { pos: new RoomPosition(25, 25, route[0].room), range: 25 }
+                opts.goal = { pos: new RoomPosition(25, 25, route[0].room), range: 24 }
             }
         }
     }
