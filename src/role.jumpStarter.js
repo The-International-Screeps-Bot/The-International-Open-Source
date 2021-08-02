@@ -25,8 +25,9 @@ module.exports = {
                         plainCost: false,
                         swampCost: false,
                         defaultCostMatrix: creep.room.memory.defaultCostMatrix,
-                        avoidStages: ["enemyRoom", "keeperRoom"],
-                        flee: false
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
                     })
                 }
             }
@@ -53,7 +54,7 @@ module.exports = {
 
                     creep.advancedTransfer(essentialStructure)
 
-                } else {
+                } else if (creep.room.storage) {
 
                     creep.advancedTransfer(creep.room.storage)
                 }

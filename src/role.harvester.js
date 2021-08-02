@@ -32,12 +32,16 @@ module.exports = {
 
                 } else {
 
-                    let goal = _.map([sourceContainer1], function(target) {
-                        return { pos: target.pos, range: 0 }
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: sourceContainer1.pos, range: 0 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
                     })
-
-                    creep.intraRoomPathing(creep.pos, goal)
-
                 }
             } else if (source1 != null) {
 
@@ -53,12 +57,16 @@ module.exports = {
 
                 } else {
 
-                    let goal = _.map([source1], function(target) {
-                        return { pos: target.pos, range: 1 }
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: source1.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
                     })
-
-                    creep.intraRoomPathing(creep.pos, goal)
-
                 }
             }
         } else if (creep.memory.task == "source2") {
@@ -89,12 +97,16 @@ module.exports = {
 
                 } else {
 
-                    let goal = _.map([sourceContainer2], function(target) {
-                        return { pos: target.pos, range: 0 }
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: sourceContainer2.pos, range: 0 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
                     })
-
-                    creep.intraRoomPathing(creep.pos, goal)
-
                 }
             } else if (source2 != null) {
 
@@ -109,12 +121,16 @@ module.exports = {
 
                 } else {
 
-                    let goal = _.map([source2], function(target) {
-                        return { pos: target.pos, range: 1 }
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: source2.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
                     })
-
-                    creep.intraRoomPathing(creep.pos, goal)
-
                 }
             }
         } else {

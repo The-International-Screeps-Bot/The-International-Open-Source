@@ -73,19 +73,28 @@ module.exports = {
 
                             if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
 
-                                let goal = _.map([essentialStructureAlt], function(target) {
-                                    return { pos: target.pos, range: 1 }
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: essentialStructureAlt.pos, range: 1 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                    avoidStages: [],
+                                    flee: false,
+                                    cacheAmount: 10,
                                 })
-
-                                creep.intraRoomPathing(creep.pos, goal)
-
                             } else if (storage) {
 
-                                let goal = _.map([storage], function(target) {
-                                    return { pos: target.pos, range: 1 }
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: storage.pos, range: 1 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                    avoidStages: [],
+                                    flee: false,
+                                    cacheAmount: 10,
                                 })
-
-                                creep.intraRoomPathing(creep.pos, goal)
                             }
                         }
                     } else {
@@ -126,29 +135,42 @@ module.exports = {
 
                     if (lowTower) {
 
-                        let goal = _.map([lowTower], function(target) {
-                            return { pos: target.pos, range: 1 }
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: lowTower.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: creep.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 10,
                         })
-
-                        creep.intraRoomPathing(creep.pos, goal)
-
                     } else {
                         if (essentialStructure) {
 
-                            let goal = _.map([essentialStructure], function(target) {
-                                return { pos: target.pos, range: 1 }
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: essentialStructure.pos, range: 1 },
+                                plainCost: false,
+                                swampCost: false,
+                                defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                avoidStages: [],
+                                flee: false,
+                                cacheAmount: 10,
                             })
-
-                            creep.intraRoomPathing(creep.pos, goal)
-
                         } else {
                             if (storage) {
 
-                                let goal = _.map([storage], function(target) {
-                                    return { pos: target.pos, range: 1 }
+                                creep.storage({
+                                    origin: creep.pos,
+                                    goal: { pos: storage.pos, range: 1 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                    avoidStages: [],
+                                    flee: false,
+                                    cacheAmount: 10,
                                 })
-
-                                creep.intraRoomPathing(creep.pos, goal)
                             }
                         }
                     }
@@ -228,27 +250,42 @@ module.exports = {
 
                     if (lowTower) {
 
-                        let goal = _.map([lowTower], function(target) {
-                            return { pos: target.pos, range: 1 }
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: lowTower.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: creep.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 10,
                         })
-
-                        creep.intraRoomPathing(creep.pos, goal)
                     } else {
                         if (essentialStructure) {
 
-                            let goal = _.map([essentialStructure], function(target) {
-                                return { pos: target.pos, range: 1 }
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: essentialStructure.pos, range: 1 },
+                                plainCost: false,
+                                swampCost: false,
+                                defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                avoidStages: [],
+                                flee: false,
+                                cacheAmount: 10,
                             })
-
-                            creep.intraRoomPathing(creep.pos, goal)
                         } else {
                             if (storage) {
 
-                                let goal = _.map([storage], function(target) {
-                                    return { pos: target.pos, range: 1 }
+                                creep.storage({
+                                    origin: creep.pos,
+                                    goal: { pos: storage.pos, range: 1 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                    avoidStages: [],
+                                    flee: false,
+                                    cacheAmount: 10,
                                 })
-
-                                creep.intraRoomPathing(creep.pos, goal)
                             }
                         }
                     }
@@ -278,19 +315,28 @@ module.exports = {
 
                         if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
 
-                            let goal = _.map([essentialStructureAlt], function(target) {
-                                return { pos: target.pos, range: 1 }
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: essentialStructureAlt.pos, range: 1 },
+                                plainCost: false,
+                                swampCost: false,
+                                defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                avoidStages: [],
+                                flee: false,
+                                cacheAmount: 10,
                             })
-
-                            creep.intraRoomPathing(creep.pos, goal)
-
                         } else if (storage) {
 
-                            let goal = _.map([storage], function(target) {
-                                return { pos: target.pos, range: 1 }
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: storage.pos, range: 1 },
+                                plainCost: false,
+                                swampCost: false,
+                                defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                avoidStages: [],
+                                flee: false,
+                                cacheAmount: 10,
                             })
-
-                            creep.intraRoomPathing(creep.pos, goal)
                         }
                     }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
@@ -480,19 +526,28 @@ module.exports = {
 
                     if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
 
-                        let goal = _.map([essentialStructureAlt], function(target) {
-                            return { pos: target.pos, range: 1 }
+                        creep.storage({
+                            origin: creep.pos,
+                            goal: { pos: essentialStructureAlt.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: creep.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 10,
                         })
-
-                        creep.intraRoomPathing(creep.pos, goal)
-
                     } else if (storage) {
 
-                        let goal = _.map([storage], function(target) {
-                            return { pos: target.pos, range: 1 }
+                        creep.storage({
+                            origin: storage.pos,
+                            goal: { pos: storage.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: creep.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 10,
                         })
-
-                        creep.intraRoomPathing(creep.pos, goal)
                     }
                 }
             } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
@@ -527,11 +582,16 @@ module.exports = {
 
                 if (creep.pos.getRangeTo(spawn) >= 4) {
 
-                    let goal = _.map([spawn], function(target) {
-                        return { pos: target.pos, range: 1 }
+                    creep.storage({
+                        origin: creep.pos,
+                        goal: { pos: spawn.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
                     })
-
-                    creep.intraRoomPathing(creep.pos, goal)
                 }
             }
         }

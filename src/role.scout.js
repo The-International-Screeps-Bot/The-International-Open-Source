@@ -78,11 +78,16 @@ module.exports = {
 
                     creep.say("Signing")
 
-                    goal = _.map([controller], function(controller) {
-                        return { pos: controller.pos, range: 1 }
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: controller.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 50,
                     })
-
-                    creep.intraRoomPathing(creep.pos, goal)
 
                     if (controller.my) {
 

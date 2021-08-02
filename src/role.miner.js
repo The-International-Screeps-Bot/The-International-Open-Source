@@ -10,11 +10,16 @@ module.exports = {
         if (mineralContainer && mineral) {
             if (creep.pos.getRangeTo(mineralContainer) != 0) {
 
-                let goal = _.map([mineralContainer], function(target) {
-                    return { pos: target.pos, range: 0 }
+                creep.advancedPathing({
+                    origin: creep.pos,
+                    goal: { pos: mineralContainer.pos, range: 0 },
+                    plainCost: false,
+                    swampCost: false,
+                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                    avoidStages: [],
+                    flee: false,
+                    cacheAmount: 10,
                 })
-
-                creep.intraRoomPathing(creep.pos, goal)
 
             } else {
 

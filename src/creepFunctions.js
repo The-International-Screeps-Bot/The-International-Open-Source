@@ -145,11 +145,16 @@ Creep.prototype.pickupDroppedEnergy = function(target) {
 
     } else {
 
-        let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 1 }
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: target.pos, range: 1 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: creep.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 10,
         })
-
-        creep.intraRoomPathing(creep.pos, goal)
     }
 }
 Creep.prototype.advancedWithdraw = function(target, resource, amount) {
@@ -172,13 +177,16 @@ Creep.prototype.advancedWithdraw = function(target, resource, amount) {
 
     } else {
 
-        let origin = creep.pos
-
-        let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 1 }
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: target.pos, range: 1 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: creep.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 10,
         })
-
-        creep.intraRoomPathing(origin, goal)
     }
 }
 Creep.prototype.advancedTransfer = function(target, resource) {
@@ -197,13 +205,16 @@ Creep.prototype.advancedTransfer = function(target, resource) {
 
     } else {
 
-        let origin = creep.pos
-
-        let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 1 }
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: target.pos, range: 1 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: creep.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 10,
         })
-
-        creep.intraRoomPathing(origin, goal)
     }
 }
 Creep.prototype.repairBarricades = function(target) {
@@ -216,13 +227,16 @@ Creep.prototype.repairBarricades = function(target) {
 
     if (creep.pos.getRangeTo(target) > 3) {
 
-        let origin = creep.pos
-
-        let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 3 }
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: target.pos, range: 3 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: creep.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 10,
         })
-
-        creep.intraRoomPathing(origin, goal)
 
     } else if (creep.repair(target) == 0) {
 
@@ -241,13 +255,16 @@ Creep.prototype.repairStructure = function(target) {
 
     if (creep.pos.getRangeTo(target) > 3) {
 
-        let origin = creep.pos
-
-        let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 3 }
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: target.pos, range: 3 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: creep.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 10,
         })
-
-        creep.intraRoomPathing(origin, goal)
 
     } else if (creep.repair(target) == 0) {
 
@@ -266,13 +283,16 @@ Creep.prototype.constructionBuild = function(target) {
 
     if (creep.pos.getRangeTo(target) > 3) {
 
-        let origin = creep.pos
-
-        let goal = _.map([target], function(target) {
-            return { pos: target.pos, range: 3 }
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: target.pos, range: 3 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: creep.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 10,
         })
-
-        creep.intraRoomPathing(origin, goal)
 
     } else if (creep.build(target) == 0) {
 
@@ -281,17 +301,22 @@ Creep.prototype.constructionBuild = function(target) {
         Memory.data.energySpentOnConstruction += creep.myParts("work")
     }
 }
-Creep.prototype.controllerUpgrade = function(controller) {
+Creep.prototype.controllerUpgrade = function(target) {
 
-    if (creep.pos.getRangeTo(controller) > 3) {
+    if (creep.pos.getRangeTo(target) > 3) {
 
-        let goal = _.map([controller], function(target) {
-            return { pos: target.pos, range: 1 }
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: target.pos, range: 3 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: creep.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 10,
         })
 
-        creep.intraRoomPathing(creep.pos, goal)
-
-    } else if (creep.upgradeController(controller) == 0) {
+    } else if (creep.upgradeController(target) == 0) {
 
         creep.say("🔋 " + creep.myParts("work"))
         Memory.data.controlPoints += creep.myParts("work")
@@ -340,11 +365,16 @@ Creep.prototype.avoidHostiles = function() {
 
                 creep.say("H! RUN RUN")
 
-                let goal = _.map([hostile], function(target) {
-                    return { pos: target.pos, range: 7 }
+                creep.advancedPathing({
+                    origin: creep.pos,
+                    goal: { pos: target.pos, range: 7 },
+                    plainCost: false,
+                    swampCost: false,
+                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                    avoidStages: [],
+                    flee: true,
+                    cacheAmount: 1,
                 })
-
-                creep.creepFlee(creep.pos, goal)
                 break
             }
         }
@@ -467,15 +497,25 @@ Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTo
     }
 }
 
-//creep.advancedPathing({ origin: creep.pos, goal: { pos: structure.pos, range: 1}, plainCost: false, swampCost: false, defaultCostMatrix: creep.room.memory.defaultCostMatrix, avoidStages: ["enemyRoom", "keeperRoom"], flee: false })
+/* 
+creep.advancedPathing({
+    origin: creep.pos,
+    goal: { pos: target.pos, range: 1 },
+    plainCost: 1,
+    swampCost: 1,
+    defaultCostMatrix: false,
+    avoidStages: [],
+    flee: false,
+    cacheAmount: 50,
+})
+ */
 Creep.prototype.advancedPathing = function(opts) {
 
     let creep = this
 
-    if (creep.fatigue > 0 || creep.spawning) {
+    let { creeps, powerCreeps, } = roomVariables(creep.room)
 
-        return
-    }
+    if (creep.fatigue > 0 || creep.spawning) return
 
     if (!opts.plainCost) {
 
@@ -498,7 +538,9 @@ Creep.prototype.advancedPathing = function(opts) {
         opts.cacheAmount = 10
     }
 
-    if (opts.origin.roomName != opts.goal.pos.roomName) {
+    const lastRoom = creep.memory.lastRoom
+
+    if (opts.origin.roomName != opts.goal.pos.roomName || lastRoom != creep.room.name) {
 
         const route = creep.memory.route
 
@@ -526,28 +568,14 @@ Creep.prototype.advancedPathing = function(opts) {
             }
         } else {
 
-            (function() {
-
-                for (let path of route) {
-
-                    let i = 0
-
-                    if (path.room == creep.room.name) {
-
-                        i++
-
-                        opts.goal = { pos: new RoomPosition(25, 25, route[i].room), range: 25 }
-                        return
-                    }
-                }
+            if (route[0]) {
 
                 opts.goal = { pos: new RoomPosition(25, 25, route[0].room), range: 25 }
-            })
+            }
         }
     }
 
     const path = creep.memory.path
-    const lastRoom = creep.memory.lastRoom
     const lastCache = Game.time
 
     if (!path || path.length <= 1 || !lastRoom || creep.room.name != lastRoom || !lastCache || lastCache - Game.time > opts.cacheAmount) {
@@ -574,12 +602,12 @@ Creep.prototype.advancedPathing = function(opts) {
 
                     cm = PathFinder.CostMatrix.deserialize(opts.defaultCostMatrix)
 
-                    for (let creep of room.find(FIND_CREEPS)) {
+                    for (let creep of creeps.allCreeps) {
 
                         cm.set(creep.pos.x, creep.pos.y, 255)
                     }
 
-                    for (let creep of room.find(FIND_POWER_CREEPS)) {
+                    for (let creep of powerCreeps.allCreeps) {
 
                         cm.set(creep.pos.x, creep.pos.y, 255)
                     }
@@ -614,12 +642,12 @@ Creep.prototype.advancedPathing = function(opts) {
                         cm.set(road.pos.x, road.pos.y, 1)
                     }
 
-                    for (let creep of room.find(FIND_CREEPS)) {
+                    for (let creep of creeps.allCreeps) {
 
                         cm.set(creep.pos.x, creep.pos.y, 255)
                     }
 
-                    for (let creep of room.find(FIND_POWER_CREEPS)) {
+                    for (let creep of powerCreeps.allCreeps) {
 
                         cm.set(creep.pos.x, creep.pos.y, 255)
                     }
@@ -635,7 +663,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
         let pos = newPath[0]
 
-        if (!newPath || !pos) return
+        if (!pos) return
 
         creep.move(creep.pos.getDirectionTo(creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name)))))
 
@@ -645,7 +673,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
         let pos = path[0]
 
-        if (!path || !pos) return
+        if (!pos) return
 
         if (creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))) == 0) {
 
@@ -1087,22 +1115,22 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
 
     /*     let direction = creep.pos.getDirectionTo(path[0])
         
-        creep.move(direction) */
+                    creep.move(direction) */
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 
     /*     for (let pos of path) {
 
-            let room = Game.rooms[pos.roomName]
+                        let room = Game.rooms[pos.roomName]
 
-            if (room) {
+                        if (room) {
 
-                room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { opacity: 0.2, stroke: "yellow", fill: "yellow" })
+                            room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { opacity: 0.2, stroke: "yellow", fill: "yellow" })
             } else {
-
-                break
+            
+                            break
             }
-        } */
+            } */
 }
 
 Creep.prototype.findSafeDistance = function(origin, goal, avoidStages) {
