@@ -1,5 +1,6 @@
 let allyList = require("allyList")
 let roomVariables = require("roomVariables")
+const creepOpts = require("./creepOpts")
 
 
 Creep.prototype.isEdge = function() {
@@ -492,6 +493,10 @@ Creep.prototype.advancedPathing = function(opts) {
 
         opts.flee = false
     }
+    if (!opts.cacheAmount) {
+
+        opts.cacheAmount = 10
+    }
 
     if (opts.origin.roomName != opts.goal.pos.roomName) {
 
@@ -541,90 +546,11 @@ Creep.prototype.advancedPathing = function(opts) {
         }
     }
 
-    /* let path = PathFinder.search(opts.origin, opts.goal, {
-        plainCost: opts.plainCost,
-        swampCost: opts.swampCost,
-        maxRooms: 1,
-        maxOps: 100000,
-        flee: opts.flee,
-
-        roomCallback: function(roomName) {
-
-            let room = Game.rooms[roomName]
-
-            if (!room) {
-
-                return false
-            }
-
-            let cm
-
-            if (opts.defaultCostMatrix) {
-
-                cm = PathFinder.CostMatrix.deserialize(opts.defaultCostMatrix)
-
-                for (let creep of room.find(FIND_CREEPS)) {
-
-                    cm.set(creep.pos.x, creep.pos.y, 255)
-                }
-
-                for (let creep of room.find(FIND_POWER_CREEPS)) {
-
-                    cm.set(creep.pos.x, creep.pos.y, 255)
-                }
-            } else {
-
-                cm = new PathFinder.CostMatrix
-
-                let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                    filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
-                })
-
-                for (let site of constructionSites) {
-
-                    cm.set(site.pos.x, site.pos.y, 255)
-                }
-
-                let structures = creep.room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
-                })
-
-                for (let structure of structures) {
-
-                    cm.set(structure.pos.x, structure.pos.y, 255)
-                }
-
-                let roads = creep.room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_ROAD
-                })
-
-                for (let road of roads) {
-
-                    cm.set(road.pos.x, road.pos.y, 1)
-                }
-
-                for (let creep of room.find(FIND_CREEPS)) {
-
-                    cm.set(creep.pos.x, creep.pos.y, 255)
-                }
-
-                for (let creep of room.find(FIND_POWER_CREEPS)) {
-
-                    cm.set(creep.pos.x, creep.pos.y, 255)
-                }
-            }
-
-            return cm
-        }
-    }).path
-
-    creep.memory.path = path
-
-    creep.moveByPath(path) */
-
     const path = creep.memory.path
+    const lastRoom = creep.memory.lastRoom
+    const lastCache = Game.time
 
-    if (!path) {
+    if (!path || path.length <= 1 || !lastRoom || creep.room.name != lastRoom || !lastCache || lastCache - Game.time > opts.cacheAmount) {
 
         let newPath = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost,
@@ -704,10 +630,27 @@ Creep.prototype.advancedPathing = function(opts) {
         }).path
 
         creep.memory.path = newPath
+        creep.memory.lastRoom = creep.room.name
+        creep.memory.lastCache = Game.time
+
+        let pos = newPath[0]
+
+        if (!newPath || !pos) return
+
+        creep.move(creep.pos.getDirectionTo(creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name)))))
+
+        creep.memory.path = creep.memory.path.slice(1, newPath.length + 1)
 
     } else {
 
-        creep.moveByPath(path)
+        let pos = path[0]
+
+        if (!path || !pos) return
+
+        if (creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))) == 0) {
+
+            creep.memory.path = creep.memory.path.slice(1, path.length + 1)
+        }
     }
 
     creep.room.visual.poly(path, { stroke: '#F4E637', strokeWidth: .15, opacity: .2, lineStyle: 'normal' })

@@ -229,7 +229,8 @@ module.exports = {
                             swampCost: 1,
                             defaultCostMatrix: creep.room.memory.defaultCostMatrix,
                             avoidStages: [],
-                            flee: false
+                            flee: false,
+                            cacheAmount: 50,
                         })
                     }
                 }
@@ -255,7 +256,8 @@ module.exports = {
                     swampCost: 1,
                     defaultCostMatrix: false,
                     avoidStages: [],
-                    flee: false
+                    flee: false,
+                    cacheAmount: 50,
                 })
             }
         }
