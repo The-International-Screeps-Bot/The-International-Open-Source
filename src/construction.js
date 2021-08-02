@@ -81,7 +81,7 @@ function construction(room) {
         }
     }
 
-    doDistanceTransform()
+    /* doDistanceTransform() */
 
     function doDistanceTransform() {
 

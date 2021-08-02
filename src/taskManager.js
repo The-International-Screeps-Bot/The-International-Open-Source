@@ -98,7 +98,7 @@ function taskManger(room, myCreeps) {
 
         let controllerLink = Game.getObjectById(room.memory.controllerLink)
 
-        if (storage && findCreepWithoutTask(haulers) && storage.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity() && (lowTowers[0] || essentialStructures[0])) {
+        if (storage && findCreepWithoutTask(haulers) && storage.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity() && (lowTowers.length > 0 || essentialStructures.length > 0)) {
 
             if (!findCreepsOfTask(haulers, "deliverFromStorage", 2)) {
 

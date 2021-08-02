@@ -7,6 +7,8 @@ let antifa = require("antifa")
 let constants = require("constants")
 let visuals = require("visuals")
 let construction = require("construction")
+let roomPlanner = require("roomPlanner")
+
 let defenseManager = require("defenseManager")
 let taskManager = require("taskManager")
 
@@ -88,6 +90,11 @@ function roomManager() {
             links(room, structures.labs, specialStructures.labs.primaryLabs, specialStructures.labs.secondaryLabs, specialStructures.labs.tertiaryLabs)
 
             labs(room, structures.labs)
+
+            if (Game.time % 10 == 0) {
+
+                roomPlanner(room)
+            }
 
             visuals(room, structures.spawns, structures.towers, structures.links, structures.labs, structures.containers)
         }

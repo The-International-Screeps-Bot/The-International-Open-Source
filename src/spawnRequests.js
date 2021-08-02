@@ -256,10 +256,15 @@ function spawnRequests(room) {
 
             minCreeps["barricadeUpgrader"] = 1
 
-        } else if (room.storage &&
-            room.storage.store[RESOURCE_ENERGY] >= 30000) {
+        } else {
 
-            minCreeps["barricadeUpgrader"] = 1
+            if (room.storage.store[RESOURCE_ENERGY] >= 30000) {
+
+                minCreeps["barricadeUpgrader"] = 1
+            } else if (room.storage.store[RESOURCE_ENERGY] >= 200000) {
+
+                minCreeps["barricadeUpgrader"] = 3
+            }
         }
     }
 

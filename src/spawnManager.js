@@ -32,7 +32,7 @@ function spawnManager(room, spawns) {
 
     for (let role in requiredCreeps) {
 
-        console.log("AMOUNT: " + requiredCreeps[role] + ", ROLE: " + role)
+        /* console.log("AMOUNT: " + requiredCreeps[role] + ", ROLE: " + role) */
 
         if (requiredCreeps[role] <= 0) continue
 

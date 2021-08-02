@@ -500,31 +500,6 @@ Creep.prototype.advancedPathing = function(opts) {
 
     if (opts.origin.roomName != opts.goal.pos.roomName) {
 
-        newRoute = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
-            routeCallback(roomName) {
-
-                if (roomName == opts.goal.pos.roomName) {
-
-                    return 1
-
-                }
-                if (Memory.rooms[roomName] && !opts.avoidStages.includes(Memory.rooms[roomName].stage)) {
-
-                    return 1
-                }
-
-                return Infinity
-            }
-        })
-
-        if (newRoute.length > 0) {
-
-            opts.goal = { pos: new RoomPosition(25, 25, newRoute[0].room), range: 24 }
-        }
-    }
-
-    if (opts.origin.roomName != opts.goal.pos.roomName) {
-
         const route = creep.memory.route
 
         if (!route) {
@@ -1139,7 +1114,7 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
 
         return
     }
-    if (route.length == 0) {
+    if (route.length == 0 || !route[0]) {
 
         return
     }
