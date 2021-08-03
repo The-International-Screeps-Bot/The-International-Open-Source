@@ -1,6 +1,5 @@
 let allyList = require("allyList")
 let roomVariables = require("roomVariables")
-const creepOpts = require("./creepOpts")
 
 
 Creep.prototype.isEdge = function() {
@@ -170,9 +169,9 @@ Creep.prototype.advancedWithdraw = function(target, resource, amount) {
         amount = creep.store.getFreeCapacity()
     }
 
-    if (creep.pos.isNearTo(target)) {
+    if (creep.pos.getRangeTo(target) <= 1) {
 
-        creep.withdraw(target, resource, [amount])
+        creep.withdraw(target, resource, amount)
         return 0
 
     } else {
@@ -189,7 +188,7 @@ Creep.prototype.advancedWithdraw = function(target, resource, amount) {
         })
     }
 }
-Creep.prototype.advancedTransfer = function(target, resource) {
+Creep.prototype.advancedTransfer = function(target, resource, amount) {
 
     if (!target) return
 
@@ -197,10 +196,14 @@ Creep.prototype.advancedTransfer = function(target, resource) {
 
         resource = RESOURCE_ENERGY
     }
+    if (!amount || amount > creep.store.getFreeCapacity()) {
 
-    if (creep.pos.isNearTo(target)) {
+        amount = creep.store.getFreeCapacity()
+    }
 
-        creep.transfer(target, resource)
+    if (creep.pos.getRangeTo(target) <= 1) {
+
+        creep.transfer(target, resource, amount)
         return 0
 
     } else {

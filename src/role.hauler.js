@@ -129,9 +129,9 @@ module.exports = {
 
             creep.isFull()
 
-            if (creep.memory.isFull == false) {
+            if (!creep.memory.isFull) {
 
-                if (creep.advancedWithdraw(sourceContainer1) == 0 && creep.store.getFreeCapacity() == 0) {
+                if (creep.advancedWithdraw(sourceContainer1) == 0) {
 
                     if (lowTower) {
 
@@ -244,9 +244,9 @@ module.exports = {
 
             creep.isFull()
 
-            if (creep.memory.isFull == false) {
+            if (!creep.memory.isFull) {
 
-                if (creep.advancedWithdraw(sourceContainer2) == 0 && creep.store.getFreeCapacity() == 0) {
+                if (creep.advancedWithdraw(sourceContainer2) == 0) {
 
                     if (lowTower) {
 

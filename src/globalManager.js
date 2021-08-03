@@ -57,11 +57,8 @@ function globalManager() {
     Memory.global.communeEstablisher = communeEstablisher
 
     function findCommuneEstablisher() {
-        if (!commands.newCommune) {
 
-            Memory.global.newCommune = undefined
-            return
-        }
+        if (!commands.newCommune) return
 
         Memory.global.newCommune = commands.newCommune
 
@@ -91,11 +88,7 @@ function globalManager() {
 
     function findAttackingRooms() {
 
-        if (!commands.attackTarget) {
-
-            Memory.global.attackTarget = undefined
-            return
-        }
+        if (!commands.attackTarget) return
 
         Memory.global.attackTarget = commands.attackTarget
 
@@ -122,7 +115,7 @@ function globalManager() {
         }
     }
 
-    //mapVisuals()
+    mapVisuals()
 }
 
 module.exports = globalManager

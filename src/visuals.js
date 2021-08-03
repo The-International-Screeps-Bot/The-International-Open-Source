@@ -298,10 +298,10 @@ function visuals(room, structures, specialStructures, constructionSites) {
 
     if (controller.progressTotal) {
 
-        room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 2, { align: 'center', opacity: "0.8" });
+        room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 1, { align: 'center', opacity: "0.8" });
     }
 
-    room.visual.text(controller.level, controller.pos.x, controller.pos.y - 1, { align: 'center', opacity: "0.8" });
+    room.visual.text(controller.level, controller.pos.x, controller.pos.y + 0.25, { align: 'center', opacity: "0.8" });
 
     if (storage) {
 

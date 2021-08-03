@@ -14,6 +14,9 @@ function mapVisuals() {
                     Game.map.visual.circle(new RoomPosition(8, 24, room), { radius: 8, fill: '#FFD180', opacity: 0.5 })
                     Game.map.visual.text((Memory.rooms[room].totalEnergy / 1000).toFixed(0) + "k", new RoomPosition(8, 24, room), { color: '#ffffff', fontSize: 8 })
 
+                } else if (Memory.rooms[room].stage == "claim") {
+
+                    Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#ffffff', opacity: 0.15 })
                 } else if (Memory.rooms[room].stage == "enemyRoom") {
 
                     Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#FF0000', opacity: 0.25 })

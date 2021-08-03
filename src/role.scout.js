@@ -1,4 +1,4 @@
-let construction = require("construction")
+let findAnchor = require("construction")
 let allyList = require("allyList")
 
 module.exports = {
@@ -187,34 +187,48 @@ module.exports = {
                         creep.room.memory.stage = "neutralRoom"
                     }
 
-                    let newCommune = false
+                    let newCommune
 
                     if (creep.room.find(FIND_SOURCES).length == 2 && Game.gcl < Memory.global.communes.length && room.memory.claim != "notViable" && !controller.owner && !controller.reservation) {
 
-                        let nearbyCommune = false
+                        let nearbyCommune = findNearbyCommunes()
 
-                        for (let commune of Memory.global.communes) {
+                        function findNearbyCommunes() {
+                            for (let commune of Memory.global.communes) {
 
-                            let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, commune)
+                                let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, commune)
 
-                            if (targetRoomDistance <= 1) {
+                                if (targetRoomDistance <= 1) {
 
-                                nearbyCommune = true
+                                    return true
+                                }
                             }
+
+                            return false
                         }
 
-                        if (nearbyCommune == false) {
+                        if (!nearbyCommune) {
 
-                            let goal = _.map([controller], function(controller) {
-                                return { pos: controller.pos, range: 1 }
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: controller.pos, range: 1 },
+                                plainCost: 1,
+                                swampCost: 1,
+                                defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                avoidStages: [],
+                                flee: false,
+                                cacheAmount: 50,
                             })
 
-                            creep.intraRoomPathing(creep.pos, goal)
-
                             //run cost matrix
-                            if (anchorPoints[0]) {
+                            if (findAnchor(creep.room)) {
 
                                 newCommune = true
+
+                                creep.memory.claim = true
+
+                                Memory.global.commands.newCommune = creep.room.name
+
                             } else {
 
                                 room.memory.claim = "notViable"
