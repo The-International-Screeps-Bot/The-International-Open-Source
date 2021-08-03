@@ -96,6 +96,8 @@ function construction(room) {
 
     let roomConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES)
 
+    let roomPathDelay = 0
+
     if (roomConstructionSites.length < 5) {
 
         if (Game.time % 100 == 0) source1Path()
@@ -109,7 +111,7 @@ function construction(room) {
             if (Game.time % 103 == 0) mineralPath()
         }
 
-        if (room.controller.level >= 5 && room.memory.remoteRooms.length > 0) {
+        if (room.controller.level >= 3 && room.memory.remoteRooms.length > 0) {
 
             for (let roomMemory of room.memory.remoteRooms) {
 
@@ -117,7 +119,7 @@ function construction(room) {
 
                 if (remoteRoom) {
 
-                    if (Game.time % 104 == 0) remotePath(remoteRoom)
+                    remotePath(remoteRoom)
                 }
             }
         }
@@ -502,6 +504,10 @@ function construction(room) {
         sources = remoteRoom.find(FIND_SOURCES)
 
         for (let source of sources) {
+
+            roomPathDelay++
+
+            if (Game.time % (roomPathDelay + 103) != 0) return
 
             let origin = room.find(FIND_MY_SPAWNS)[0]
 

@@ -589,7 +589,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
     if (!path || path.length <= 1 || !lastRoom || creep.room.name != lastRoom || !lastCache || lastCache - Game.time > opts.cacheAmount) {
 
-        creep.room.visual.text("New Path", creep.pos.x, creep.pos.y + 0.5, { color: '#F4E637' })
+        creep.room.visual.text("New Path", creep.pos.x, creep.pos.y + 0.5, { color: Memory.global.colors.neutralYellow })
 
         let newPath = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost,
@@ -692,7 +692,7 @@ Creep.prototype.advancedPathing = function(opts) {
         }
     }
 
-    creep.room.visual.poly(path, { stroke: '#F4E637', strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
+    creep.room.visual.poly(path, { stroke: Memory.global.colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
 
 }
 Creep.prototype.roadPathing = function(origin, goal) {
