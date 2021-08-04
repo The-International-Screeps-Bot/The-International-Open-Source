@@ -6,7 +6,7 @@ function taskManger(room, myCreeps) {
 
         for (let creep of collection) {
 
-            if (creep.memory.task && creep.memory.task == task) {
+            if (creep.memory.task && creep.memory.task == task && !creep.memory.dying) {
 
                 creepsWithTask.push(creep)
             }

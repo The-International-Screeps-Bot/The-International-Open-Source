@@ -189,7 +189,23 @@ module.exports = {
 
                     let newCommune
 
-                    if (creep.room.find(FIND_SOURCES).length == 2 && Game.gcl < Memory.global.communes.length && room.memory.claim != "notViable" && !controller.owner && !controller.reservation) {
+                    if (creep.room.find(FIND_SOURCES).length == 2 && Memory.global.communes.length < Game.gcl.level && creep.room.memory.claim != "notViable" && controller && !controller.owner && (!controller.reservation || (controller.reservation && controller.reservation.username == "Invader"))) {
+
+                        let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
+
+                        if (creepIsEdge) {
+
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: controller.pos, range: 1 },
+                                plainCost: 1,
+                                swampCost: 1,
+                                defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                avoidStages: [],
+                                flee: false,
+                                cacheAmount: 50,
+                            })
+                        }
 
                         let nearbyCommune = findNearbyCommunes()
 
@@ -220,8 +236,9 @@ module.exports = {
                                 cacheAmount: 50,
                             })
 
-                            //run cost matrix
                             if (findAnchor(creep.room)) {
+
+                                creep.say("NC")
 
                                 newCommune = true
 
@@ -231,11 +248,11 @@ module.exports = {
 
                             } else {
 
-                                room.memory.claim = "notViable"
+                                creep.room.memory.claim = "notViable"
                             }
                         } else {
 
-                            room.memory.claim = "notViable"
+                            creep.room.memory.claim = "notViable"
                         }
                     }
 

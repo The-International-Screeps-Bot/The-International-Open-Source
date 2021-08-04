@@ -107,12 +107,12 @@ function importantStructures(room) {
             continue
         }
 
-        if (link.pos.getRangeTo(sources[0]) <= 2) {
+        if (!sourceLink1 && link != sourceLink2 && link.pos.getRangeTo(sources[0]) <= 2) {
 
             sourceLink1 = link
             continue
         }
-        if (link.pos.getRangeTo(sources[1]) <= 2) {
+        if (!sourceLink2 && link != sourceLink1 && link.pos.getRangeTo(sources[1]) <= 2) {
 
             sourceLink2 = link
             continue

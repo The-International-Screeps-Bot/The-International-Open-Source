@@ -303,7 +303,7 @@ function spawnRequests(room, spawns, specialStructures) {
         minCreeps["miner"] = 1
     }
 
-    minCreeps["scout"] = 1
+    minCreeps["scout"] = 5
 
 
     if (stage >= 4) {

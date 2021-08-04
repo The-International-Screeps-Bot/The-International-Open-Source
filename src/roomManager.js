@@ -69,11 +69,15 @@ function roomManager() {
 
         cpuUsed = Game.cpu.getUsed()
 
-        creepManager(room, creeps.myCreeps)
+        let creepManagerConsoleMessage = creepManager(room, creeps.myCreeps)
 
         totalCpuUsed += Game.cpu.getUsed()
         cpuUsed = Game.cpu.getUsed() - cpuUsed
         consoleMessage += `creepManager: ` + cpuUsed.toFixed(2) + `
+        `
+
+        consoleMessage += `
+        ` + creepManagerConsoleMessage.consoleMessage + `
         `
 
         //

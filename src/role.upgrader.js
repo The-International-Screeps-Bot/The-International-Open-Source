@@ -9,9 +9,9 @@ module.exports = {
 
         if (controllerContainer != null || (controllerLink != null && creep.room.memory.stage >= 6)) {
 
-            creep.memory.isFull = "constant"
+            creep.memory.upgrading = "constant"
         }
-        if (creep.memory.isFull || creep.memory.isFull == "constant") {
+        if (creep.memory.isFull || creep.memory.upgrading == "constant") {
 
             creep.say("🔋")
 
@@ -35,27 +35,6 @@ module.exports = {
 
                 creep.creepFlee(creep.pos, goal)
             }
-
-            /* if (controllerLink != null && (controllerContainer == null || controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity())) {
-                if (controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
-
-                    creep.advancedWithdraw(controllerLink, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
-
-                }
-            } else if (controllerContainer && controllerContainer.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
-
-                creep.advancedWithdraw(controllerContainer, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
-
-            } else {
-
-                creep.say("NE")
-
-                let goal = _.map([target], function(target) {
-                    return { pos: target.pos, range: 2 }
-                })
-
-                creep.creepFlee(creep.pos, goal)
-            } */
         } else {
 
             creep.searchSourceContainers()

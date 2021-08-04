@@ -112,11 +112,12 @@ Creep.prototype.isFull = function() {
     if (creep.store.getUsedCapacity() == 0) {
 
         creep.memory.isFull = false
+        return false
 
     } else if (creep.store.getUsedCapacity() == creep.store.getCapacity()) {
 
         creep.memory.isFull = true
-
+        return true
     }
 }
 Creep.prototype.hasResource = function() {
@@ -512,7 +513,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
     let creep = this
 
-    let { creeps, powerCreeps, } = roomVariables(creep.room)
+    let { creeps, powerCreeps, structures, } = roomVariables(creep.room)
 
     if (creep.fatigue > 0 || creep.spawning) return
 

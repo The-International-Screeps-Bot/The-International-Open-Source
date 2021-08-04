@@ -34,6 +34,9 @@ function creepManager(room, myCreeps) {
 
     let consoleMessage = ``
 
+    consoleMessage += `
+    Creeps`
+
     for (let creep of myCreeps) {
 
         cpuUsed = Game.cpu.getUsed()
@@ -60,11 +63,14 @@ function creepManager(room, myCreeps) {
             cpuUsed = Game.cpu.getUsed() - cpuUsed
             totalCpuUsed += cpuUsed
 
-            console.log(creep.memory.role + ": " + (cpuUsed).toFixed(2))
+            consoleMessage += `
+    ` + creep.memory.role + ": " + (cpuUsed).toFixed(2) + ``
         }
     }
 
     Memory.data.cpuPerCreep = totalCpuUsed / myCreeps.length
+    consoleMessage += `
+    `
 
     return {
         consoleMessage

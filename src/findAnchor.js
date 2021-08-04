@@ -2,12 +2,12 @@ function findAnchor(room) {
 
     if (room.memory.anchorPoint) return true
 
-    if (room.memory.anchorPoint == false) return false
+    if (room.memory.anchorPoint == "noAnchor") return false
 
     let cm = new PathFinder.CostMatrix()
 
-    var dt = distanceTransform(openSpaces())
-    cm._bits = dt
+    cm._bits = distanceTransform(openSpaces())
+
     let anchorPointResult = displayCostMatrix(cm)
 
     /*
@@ -96,42 +96,35 @@ function findAnchor(room) {
 
         let anchorPoints = []
 
-        findAnchorPoints()
+        // For open spaces
 
-        function findAnchorPoints() {
+        for (var x = 0; x < 50; ++x) {
+            for (var y = 0; y < 50; ++y) {
+                var value = array[x * 50 + y];
+                if (value > 0) {
 
-            // For open spaces
+                    vis.circle(x, y, { radius: array[x * 50 + y] / 10, fill: "green" })
+                    vis.text((array[x * 50 + y]).toFixed(0), x, y, { font: 0.3 })
 
-            for (var x = 0; x < 50; ++x) {
-                for (var y = 0; y < 50; ++y) {
-                    var value = array[x * 50 + y];
-                    if (value > 0) {
+                }
+                if (value >= 6) {
 
-                        vis.circle(x, y, { radius: array[x * 50 + y] / 10, fill: "green" })
-                        vis.text((array[x * 50 + y]).toFixed(0), x, y, { font: 0.3 })
+                    let exits = room.find(FIND_EXIT)
 
-                    }
-                    if (value >= 6) {
+                    for (let exit of exits) {
+                        if (exit.getRangeTo(x, y) <= 11) {
 
-                        let exits = room.find(FIND_EXIT)
-
-                        for (let exit of exits) {
-                            if (exit.getRangeTo(x, y) < 11) {
-
-                                return false
-                            }
+                            continue
                         }
-
-                        vis.circle(x, y, { radius: array[x * 50 + y] / 10, fill: "green" })
-                        vis.text((array[x * 50 + y]).toFixed(0), x, y, { font: 0.3 })
-
-                        anchorPoints.push(new RoomPosition(x, y, room.name))
                     }
+
+                    anchorPoints.push(new RoomPosition(x, y, room.name))
                 }
             }
         }
 
-        if (!anchorPoints || anchorPoints.length == 0) return false
+
+        if (anchorPoints.length == 0) return false
 
         let startPoint = room.controller.pos
 
@@ -142,10 +135,8 @@ function findAnchor(room) {
         return anchorPoint
     }
 
-    if (anchorPointResult == false) {
+    if (anchorPointResult == false) room.memory.anchorPoint = "noAnchor"
 
-        room.memory.anchorPoint = false
-    }
 
     return true
 }

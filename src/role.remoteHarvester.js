@@ -40,26 +40,22 @@ module.exports = {
             let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
             let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
 
-            if (!sourceContainer1) {
+            if (!sourceContainer1 || !sourceContainer2) {
 
-                let container = creep.room.find(FIND_STRUCTURES, {
+                let containers = creep.room.find(FIND_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_CONTAINER
-                })[0]
+                })
 
-                if (container) {
+                for (let container of containers) {
 
-                    creep.room.memory.sourceContainer1 = container.id
-                }
-            }
-            if (!sourceContainer2) {
+                    if (!sourceContainer1 == null && source1 && container.pos.getRangeTo(source1) == 1) {
 
-                let container = creep.room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_CONTAINER
-                })[1]
+                        creep.room.memory.sourceContainer1 = container.id
+                    } else
+                    if (!sourceContainer2 == null && source2 && container.pos.getRangeTo(source2) == 1) {
 
-                if (container) {
-
-                    creep.room.memory.sourceContainer2 = container.id
+                        creep.room.memory.sourceContainer2 = container.id
+                    }
                 }
             }
 
@@ -72,7 +68,7 @@ module.exports = {
 
                     creep.say("⛏️ 1")
 
-                    if (creep.pos.inRangeTo(sourceContainer1, 0)) {
+                    if (creep.pos.getRangeTo(sourceContainer1) == 0) {
 
                         if (creep.harvest(source1) == 0) {
 
@@ -98,7 +94,6 @@ module.exports = {
                     creep.say("⛏️ 3")
 
                     if (creep.pos.inRangeTo(source1, 1)) {
-
 
                         if (creep.harvest(source1) == 0) {
 
@@ -207,21 +202,6 @@ module.exports = {
                 creep.room.memory.builderNeed = true
             }
 
-            let sources = creep.room.find(FIND_SOURCES)
-
-            if (sources.length == 2) {
-
-                if (Game.rooms[creep.memory.roomFrom].memory.remoteRooms) {
-
-                    for (let object of Game.rooms[creep.memory.roomFrom].memory.remoteRooms) {
-
-                        if (object.name == creep.room.name) {
-
-                            object.sources = 2
-                        }
-                    }
-                }
-            }
         } else {
 
             creep.say(remoteRoom)

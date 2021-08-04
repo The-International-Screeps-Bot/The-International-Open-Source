@@ -259,7 +259,7 @@ function visuals(room, structures, specialStructures, constructionSites) {
     let sourceLink1 = specialStructures.links.sourceLink1
     let sourceLink2 = specialStructures.links.sourceLink2
 
-    if (sourceLink1 != null) {
+    if (sourceLink1) {
 
         room.visual.circle(sourceLink1.pos, {
             fill: 'transparent',
@@ -267,8 +267,10 @@ function visuals(room, structures, specialStructures, constructionSites) {
             stroke: '#2DF0C9',
             strokeWidth: 0.125
         })
+
+        room.visual.text(1, sourceLink1.pos.x, sourceLink1.pos.y - 0.25, { align: 'center', opacity: "0.8" })
     }
-    if (sourceLink2 != null) {
+    if (sourceLink2) {
 
         room.visual.circle(sourceLink2.pos, {
             fill: 'transparent',
@@ -276,8 +278,10 @@ function visuals(room, structures, specialStructures, constructionSites) {
             stroke: '#2DF0C9',
             strokeWidth: 0.125
         })
+
+        room.visual.text(2, sourceLink1.pos.x, sourceLink1.pos.y - 0.25, { align: 'center', opacity: "0.8" })
     }
-    if (controllerLink != null) {
+    if (controllerLink) {
 
         room.visual.circle(controllerLink.pos, {
             fill: 'transparent',
@@ -286,7 +290,7 @@ function visuals(room, structures, specialStructures, constructionSites) {
             strokeWidth: 0.125
         })
     }
-    if (baseLink != null) {
+    if (baseLink) {
 
         room.visual.circle(baseLink.pos, {
             fill: 'transparent',
@@ -357,17 +361,17 @@ function visuals(room, structures, specialStructures, constructionSites) {
     }
     for (let source of structures.sources) {
 
-        if (source.ticksToRegeneration != undefined) {
+        if (source.ticksToRegeneration) {
 
-            room.visual.text(source.ticksToRegeneration, source.pos.x, source.pos.y - 1, { align: 'center', opacity: "0.8" });
+            room.visual.text(source.ticksToRegeneration, source.pos.x, source.pos.y - 1, { color: "#FFD180", align: 'center', opacity: "0.8" });
 
         } else {
 
-            room.visual.text("0", source.pos.x, source.pos.y - 1, { align: 'center', opacity: "0.8" });
+            room.visual.text(0, source.pos.x, source.pos.y - 1, { color: "#FFD180", align: 'center', opacity: "0.8" });
 
         }
 
-        room.visual.text(source.energy, source.pos.x, source.pos.y - 2, { align: 'center', opacity: "0.8" });
+        room.visual.text(source.energy, source.pos.x, source.pos.y - 2, { color: "#FFD180", align: 'center', opacity: "0.8" });
 
     }
 }

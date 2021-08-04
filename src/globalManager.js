@@ -4,10 +4,10 @@ function globalManager() {
 
     Memory.global.colors = {
         communeBlue: '#2b92f1',
-        enemyRed: '#ff3300',
-        invaderOrange: "#ffa31a",
         allyGreen: "#00e600",
         neutralYellow: "#F4E637",
+        invaderOrange: "#ffa31a",
+        enemyRed: '#ff3300',
     }
 
     if (Game.time % 10 == 0) {

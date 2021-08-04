@@ -142,40 +142,7 @@ module.exports = {
                 }
             } else {
 
-                if (lowTower) {
-
-                    if (creep.advancedTransfer(lowTower) == 0) {
-
-                        creep.memory.task = undefined
-                    }
-                } else if (essentialStructure) {
-
-                    creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
-
-                    essentialStructuresTranfser(essentialStructure)
-
-                } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
-
-                    if (creep.advancedTransfer(storage) == 0) {
-
-                        creep.memory.task = undefined
-                    }
-                } else if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
-
-                    if (creep.advancedTransfer(controllerContainer) == 0) {
-
-                        creep.memory.task = undefined
-                    }
-                } else if (storage) {
-
-                    if (creep.advancedTransfer(storage) == 0) {
-
-                        creep.memory.task = undefined
-                    }
-                } else {
-
-                    task = "noDeliveryPossible"
-                }
+                creep.memory.task = "deliverToBest"
             }
         } else if (task == "sourceContainer2Full" && sourceContainer2 != null) {
 
@@ -231,40 +198,7 @@ module.exports = {
                 }
             } else {
 
-                if (lowTower) {
-
-                    if (creep.advancedTransfer(lowTower) == 0) {
-
-                        creep.memory.task = undefined
-                    }
-                } else if (essentialStructure) {
-
-                    creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
-
-                    essentialStructuresTranfser(essentialStructure)
-
-                } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
-
-                    if (creep.advancedTransfer(storage) == 0) {
-
-                        creep.memory.task = undefined
-                    }
-                } else if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
-
-                    if (creep.advancedTransfer(controllerContainer) == 0) {
-
-                        creep.memory.task = undefined
-                    }
-                } else if (storage) {
-
-                    if (creep.advancedTransfer(storage) == 0) {
-
-                        creep.memory.task = undefined
-                    }
-                } else {
-
-                    task = "noDeliveryPossible"
-                }
+                creep.memory.task = "deliverToBest"
             }
         } else if (task == "tombstone") {
 

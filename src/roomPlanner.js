@@ -37,7 +37,7 @@ function roomPlanner(room) {
 
     placeBase(base)
 
-    if (room.memory.stage) {
+    if (room.memory.stage >= 4) {
 
         placeRamparts(ramparts)
     }
@@ -129,7 +129,7 @@ function roomPlanner(room) {
 
                 if (room.getTerrain().get(pos.x, pos.y) != TERRAIN_MASK_WALL) {
 
-                    if (room.memory.stage >= 3) {
+                    if (room.memory.stage >= 4) {
                         if (room.storage) {
                             if (room.storage.store[RESOURCE_ENERGY] >= 45000) {
 
