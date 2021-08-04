@@ -2,16 +2,16 @@ function taskManger(room, myCreeps) {
 
     function findCreepsOfTask(collection, task, requiredAmount) {
 
-        let creepsWithTask = []
+        let creepsWithTask = 0
 
         for (let creep of collection) {
 
-            if (creep.memory.task && creep.memory.task == task && !creep.memory.dying) {
+            if (creep.memory.task && creep.memory.task == task) {
 
-                creepsWithTask.push(creep)
+                creepsWithTask++
             }
         }
-        if (creepsWithTask.length < requiredAmount) {
+        if (creepsWithTask < requiredAmount) {
 
             return false
         }

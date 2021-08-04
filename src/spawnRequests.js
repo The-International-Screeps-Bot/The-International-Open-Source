@@ -76,46 +76,39 @@ function spawnRequests(room, spawns, specialStructures) {
         filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < s.hitsMax * 0.9
     })
 
-    let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
-    let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
-    let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
-
-    let baseLink = Game.getObjectById(room.memory.baseLink)
-    let controllerLink = Game.getObjectById(room.memory.controllerLink)
-    let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
-    let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
+    let spawnCapacity = room.energyCapacityAvailable
 
     let stage = room.memory.stage
 
-    if (room.energyCapacityAvailable >= 9100) {
+    if (spawnCapacity >= 9100) {
 
         room.memory.stage = 8
 
-    } else if (room.energyCapacityAvailable >= 4700) {
+    } else if (spawnCapacity >= 4700) {
 
         room.memory.stage = 7
 
-    } else if (room.energyCapacityAvailable >= 2300) {
+    } else if (spawnCapacity >= 2300) {
 
         room.memory.stage = 6
 
-    } else if (room.energyCapacityAvailable >= 1800) {
+    } else if (spawnCapacity >= 1800) {
 
         room.memory.stage = 5
 
-    } else if (room.energyCapacityAvailable >= 1300) {
+    } else if (spawnCapacity >= 1300) {
 
         room.memory.stage = 4
 
-    } else if (room.energyCapacityAvailable >= 800) {
+    } else if (spawnCapacity >= 800) {
 
         room.memory.stage = 3
 
-    } else if (room.energyCapacityAvailable >= 550) {
+    } else if (spawnCapacity >= 550) {
 
         room.memory.stage = 2
 
-    } else if (room.energyCapacityAvailable >= 300) {
+    } else if (spawnCapacity >= 300) {
 
         room.memory.stage = 1
 
@@ -130,54 +123,51 @@ function spawnRequests(room, spawns, specialStructures) {
         minCreeps[role] = 0
     }
 
+    if (spawnCapacity >= 550) {
+
+        minCreeps["harvester"] = 2
+
+    } else if (spawnCapacity >= 350) {
+
+        minCreeps["harvester"] = 4
+
+    } else {
+
+        minCreeps["harvester"] = 6
+    }
+
     switch (stage) {
         case 1:
-
-            minCreeps["harvester"] = 6
 
             minCreeps["hauler"] = 4
             break
         case 2:
 
-            minCreeps["harvester"] = 2
-
-            minCreeps["hauler"] = 5
+            minCreeps["hauler"] = 4
             break
         case 3:
-
-            minCreeps["harvester"] = 2
 
             minCreeps["hauler"] = 4
             break
         case 4:
 
-            minCreeps["harvester"] = 2
-
             minCreeps["hauler"] = 3
             break
         case 5:
-
-            minCreeps["harvester"] = 2
 
             minCreeps["hauler"] = 3
             break
         case 6:
 
-            minCreeps["harvester"] = 2
-
             minCreeps["hauler"] = 3
             break
         case 7:
-
-            minCreeps["harvester"] = 2
 
             minCreeps["hauler"] = 2
 
             /* minCreeps["scientist"] = 1 */
             break
         case 8:
-
-            minCreeps["harvester"] = 2
 
             minCreeps["hauler"] = 2
 
@@ -387,7 +377,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
     const roomFix = room.memory.roomFix
 
-    if (roomFix == null) {
+    if (!roomFix) {
 
         room.memory.roomFix = false
     }
@@ -396,9 +386,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
         room.memory.roomFix = true
 
-        console.log(room.name + ": roomFix true")
-
-    } else if (creepsOfRole["harvester"] > 1 && creepsOfRole["hauler"] > 1) {
+    } else if (creepsOfRole[["harvester", room.name]] > 1 && creepsOfRole[["hauler", room.name]] > 1) {
 
         room.memory.roomFix = false
     }

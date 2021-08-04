@@ -1,34 +1,53 @@
+let roomVariables = require("roomVariables")
+
 module.exports = {
     run: function(creep) {
 
-        let baseLink = Game.getObjectById(creep.room.memory.baseLink)
+        let { specialStructures } = roomVariables(creep.room)
 
-        if (creep.memory.task == "source1") {
+        let source1 = specialStructures.sources.source1
+        let source2 = specialStructures.sources.source2
 
-            if (baseLink != null && creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.myParts("work") * 2) {
+        let sourceContainer1 = specialStructures.sources.sourceContainer1
+        let sourceContainer2 = specialStructures.sources.sourceContainer2
 
-                let sourceLink1 = Game.getObjectById(creep.room.memory.sourceLink1)
+        let sourceLink1 = specialStructures.sources.sourceLink1
+        let sourceLink2 = specialStructures.sources.sourceLink2
 
-                if (sourceLink1 != null && sourceLink1.store[RESOURCE_ENERGY] < 800) {
-                    console.log(creep.transfer(sourceLink1, RESOURCE_ENERGY))
+        const task = creep.memory.task
 
-                    creep.transfer(sourceLink1, RESOURCE_ENERGY)
-                }
-            }
+        if (task == "source1" && source1) {
 
-            let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
-            let source1 = Game.getObjectById(creep.room.memory.source1)
+            creep.say("S1")
 
-            if (sourceContainer1 != null && source1 != null) {
+            if (sourceLink1) {
 
-                creep.say("⛏️ 1")
+                if (creep.pos.getRangeTo(sourceLink1) == 1) {
 
-                if (creep.pos.inRangeTo(sourceContainer1, 0)) {
+                    creep.advancedHarvest(source1)
 
-                    if (creep.harvest(source1) == 0) {
+                    if (creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.myParts("work") * 2) {
 
-                        creep.findEnergyHarvested(source1)
+                        creep.transfer(sourceLink1, RESOURCE_ENERGY)
                     }
+                } else {
+
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: sourceLink1.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
+                    })
+                }
+            } else if (sourceContainer1) {
+
+                if (creep.pos.getRangeTo(sourceContainer1) == 0) {
+
+                    creep.advancedHarvest(source1)
 
                 } else {
 
@@ -43,17 +62,11 @@ module.exports = {
                         cacheAmount: 10,
                     })
                 }
-            } else if (source1 != null) {
+            } else {
 
-                creep.say("⛏️ 3")
+                if (creep.pos.getRangeTo(source1) == 1) {
 
-                if (creep.pos.inRangeTo(source1, 1)) {
-
-
-                    if (creep.harvest(source1) == 0) {
-
-                        creep.findEnergyHarvested(source1)
-                    }
+                    creep.advancedHarvest(source1)
 
                 } else {
 
@@ -69,31 +82,38 @@ module.exports = {
                     })
                 }
             }
-        } else if (creep.memory.task == "source2") {
+        } else if (task == "source2" && source2) {
 
-            if (baseLink != null && creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.myParts("work") * 2) {
+            creep.say("S2")
 
-                let sourceLink2 = Game.getObjectById(creep.room.memory.sourceLink2)
+            if (sourceLink2) {
 
-                if (sourceLink2 != null && sourceLink2.store[RESOURCE_ENERGY] < 800) {
+                if (creep.pos.getRangeTo(sourceLink2) == 1) {
 
-                    creep.transfer(sourceLink2, RESOURCE_ENERGY)
-                }
-            }
+                    creep.advancedHarvest(source2)
 
-            let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
-            let source2 = Game.getObjectById(creep.room.memory.source2)
+                    if (creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.myParts("work") * 2) {
 
-            if (sourceContainer2 != null && source2 != null) {
-
-                creep.say("⛏️ 2")
-
-                if (creep.pos.inRangeTo(sourceContainer2, 0)) {
-
-                    if (creep.harvest(source2) == 0) {
-
-                        creep.findEnergyHarvested(source2)
+                        creep.transfer(sourceLink2, RESOURCE_ENERGY)
                     }
+                } else {
+
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: sourceLink2.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
+                    })
+                }
+            } else if (sourceContainer2) {
+
+                if (creep.pos.getRangeTo(sourceContainer2) == 0) {
+
+                    creep.advancedHarvest(source2)
 
                 } else {
 
@@ -108,16 +128,11 @@ module.exports = {
                         cacheAmount: 10,
                     })
                 }
-            } else if (source2 != null) {
+            } else {
 
-                creep.say("⛏️ 4")
+                if (creep.pos.getRangeTo(source2) == 1) {
 
-                if (creep.pos.inRangeTo(source2, 1)) {
-
-                    if (creep.harvest(source2) == 0) {
-
-                        creep.findEnergyHarvested(source2)
-                    }
+                    creep.advancedHarvest(source2)
 
                 } else {
 

@@ -1,6 +1,4 @@
-const creepOpts = require("./creepOpts")
-
-function importantStructures(room) {
+function roomVariables(room) {
 
     let allCreeps = room.find(FIND_CREEPS)
 
@@ -30,6 +28,7 @@ function importantStructures(room) {
     let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
 
     let constructionSites = {
+        allSites: allSites,
         mySites: mySites,
     }
 
@@ -89,6 +88,45 @@ function importantStructures(room) {
         sources: sources,
     }
 
+    let source1 = sources[0]
+    let source2 = sources[1]
+
+    let baseContainer
+    let controllerContainer
+    let mineralContainer
+    let sourceContainer1
+    let sourceContainer2
+
+    for (let container of containers) {
+
+        if (storage && container.pos.getRangeTo(storage) <= 2) {
+
+            baseContainer = container
+            continue
+        }
+        if (container.pos.getRangeTo(controller) <= 2) {
+
+            controllerContainer = container
+            continue
+        }
+        if (mineral && container.pos.getRangeTo(mineral) <= 1) {
+
+            mineralContainer = container
+            continue
+        }
+
+        if (!sourceContainer1 && container != sourceContainer2 && container.pos.getRangeTo(source1) <= 1) {
+
+            sourceContainer1 = container
+            continue
+        }
+        if (!sourceContainer2 && container != sourceContainer1 && container.pos.getRangeTo(source2) <= 1) {
+
+            sourceContainer2 = container
+            continue
+        }
+    }
+
     let baseLink
     let controllerLink
     let sourceLink1
@@ -107,23 +145,17 @@ function importantStructures(room) {
             continue
         }
 
-        if (!sourceLink1 && link != sourceLink2 && link.pos.getRangeTo(sources[0]) <= 2) {
+        if (!sourceLink1 && link != sourceLink2 && link.pos.getRangeTo(source1) <= 2) {
 
             sourceLink1 = link
             continue
         }
-        if (!sourceLink2 && link != sourceLink1 && link.pos.getRangeTo(sources[1]) <= 2) {
+        if (!sourceLink2 && link != sourceLink1 && link.pos.getRangeTo(source2) <= 2) {
 
             sourceLink2 = link
             continue
         }
     }
-
-    let controllerContainer
-
-    let sourceContainer1
-
-    let sourceContainer2
 
     let primaryLabs = []
     let secondaryLabs = []
@@ -163,15 +195,16 @@ function importantStructures(room) {
     }
 
     let specialStructures = {
-        baseLink: baseLink,
-        controllerContainer: controllerContainer,
-        controllerLink: controllerLink,
-        sourceContainer1: sourceContainer1,
-        sourceLink1: sourceLink1,
-        sourceContainer2: sourceContainer2,
-        sourceLink2: sourceLink2,
-        container: {
-
+        sources: {
+            source1: source1,
+            source2: source2,
+        },
+        containers: {
+            baseContainer: baseContainer,
+            controllerContainer: controllerContainer,
+            mineralContainer: mineralContainer,
+            sourceContainer1: sourceContainer1,
+            sourceContainer2: sourceContainer2,
         },
         links: {
             baseLink: baseLink,
@@ -198,4 +231,4 @@ function importantStructures(room) {
     }
 }
 
-module.exports = importantStructures
+module.exports = roomVariables

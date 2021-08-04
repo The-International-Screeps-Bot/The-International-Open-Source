@@ -2,6 +2,29 @@ require("creepFunctions")
 
 function creepManager(room, myCreeps) {
 
+    // Import managers
+
+    let managers = {}
+
+    managers["builder"] = { import: require("builderManager"), creeps: [] }
+
+
+    // Get creeps for each manager
+
+    for (let creep of myCreeps) {
+
+        if (managers[creep.memory.role]) managers[creep.memory.role].creeps.push(creep)
+    }
+
+    // Run each manager
+
+    for (let object in managers) {
+
+        let manager = managers[object]
+
+        if (manager.creeps.length > 0) manager.import(room, manager.creeps)
+    }
+
     let roles = {}
 
     // Import creep roles
@@ -10,7 +33,7 @@ function creepManager(room, myCreeps) {
     roles["harvester"] = require('role.harvester')
     roles["hauler"] = require("role.hauler")
     roles["upgrader"] = require('role.upgrader')
-    roles["builder"] = require('role.builder')
+        //roles["builder"] = require('role.builder')
     roles["repairer"] = require('role.repairer')
     roles["upgradeHauler"] = require("role.upgradeHauler")
     roles["barricadeUpgrader"] = require('role.barricadeUpgrader')
@@ -49,16 +72,7 @@ function creepManager(room, myCreeps) {
                 creep.memory.dying = true
             }
 
-            roles[creep.memory.role].run(creep)
-
-            /* try {
-
-                roles[creep.memory.role].run(creep)
-
-            } catch (err) {
-
-                creep.say("❌")
-            } */
+            if (roles[creep.memory.role]) roles[creep.memory.role].run(creep)
 
             cpuUsed = Game.cpu.getUsed() - cpuUsed
             totalCpuUsed += cpuUsed

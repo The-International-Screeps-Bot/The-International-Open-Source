@@ -30,14 +30,12 @@ function constants(room) {
 
         let sources = room.find(FIND_SOURCES)
 
-        let source1 = Game.getObjectById(room.memory.source1)
-        let source2 = Game.getObjectById(room.memory.source2)
-
-        if (source1 == null && sources[0]) {
+        if (sources[0]) {
 
             room.memory.source1 = sources[0].id
 
-        } else if (source2 == null && sources[1]) {
+        }
+        if (sources[1]) {
 
             room.memory.source2 = sources[1].id
 
@@ -56,24 +54,19 @@ function constants(room) {
             let source2 = Game.getObjectById(room.memory.source2)
             let mineral = room.find(FIND_MINERALS)[0]
 
-            let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
-            let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
-            let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
-            let mineralContainer = Game.getObjectById(room.memory.mineralContainer)
-
-            if (controllerContainer == null && container.pos.inRangeTo(room.controller, 2)) {
+            if (container.pos.inRangeTo(room.controller, 2)) {
 
                 room.memory.controllerContainer = container.id
 
-            } else if (sourceContainer1 == null && source1 && container.pos.inRangeTo(source1, 1)) {
+            } else if (source1 && container.pos.inRangeTo(source1, 1)) {
 
                 room.memory.sourceContainer1 = container.id
 
-            } else if (sourceContainer2 == null && source2 && container.pos.inRangeTo(source2, 1)) {
+            } else if (source2 && container.pos.inRangeTo(source2, 1)) {
 
                 room.memory.sourceContainer2 = container.id
 
-            } else if (mineralContainer == null && mineral && container.pos.inRangeTo(mineral, 1)) {
+            } else if (mineral && container.pos.inRangeTo(mineral, 1)) {
 
                 room.memory.mineralContainer = container.id
             }

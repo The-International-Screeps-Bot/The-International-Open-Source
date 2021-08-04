@@ -364,7 +364,7 @@ module.exports = {
 
                     creep.memory.task = undefined
                 }
-            } else if (storage) {
+            } else if (storage && storage.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
 
                 if (creep.advancedTransfer(storage) == 0) {
 

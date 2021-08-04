@@ -87,6 +87,17 @@ Creep.prototype.myParts = function(partType) {
     }
     return partsAmount
 }
+Creep.prototype.advancedHarvest = function(target) {
+
+    creep = this
+
+    if (creep.harvest(target) != 0) return false
+
+    let energyHarvested = (target.energy - target.energy) + (creep.myParts("work") * 2)
+
+    creep.say("⛏️ " + energyHarvested)
+    Memory.data.energyHarvested += energyHarvested
+}
 Creep.prototype.findEnergyHarvested = function(source) {
 
     creep = this
@@ -112,12 +123,10 @@ Creep.prototype.isFull = function() {
     if (creep.store.getUsedCapacity() == 0) {
 
         creep.memory.isFull = false
-        return false
 
     } else if (creep.store.getUsedCapacity() == creep.store.getCapacity()) {
 
         creep.memory.isFull = true
-        return true
     }
 }
 Creep.prototype.hasResource = function() {
@@ -275,11 +284,7 @@ Creep.prototype.repairStructure = function(target) {
 }
 Creep.prototype.constructionBuild = function(target) {
 
-    if (!target) return
-
     creep = this
-
-    creep.room.visual.text("🚧", target.pos.x, target.pos.y + 0.25, { align: 'center' })
 
     if (creep.pos.getRangeTo(target) > 3) {
 

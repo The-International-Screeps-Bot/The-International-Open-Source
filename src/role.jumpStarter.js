@@ -1,3 +1,5 @@
+let roleBuilder = require("role.builder")
+
 module.exports = {
     run: function(creep) {
 
@@ -5,30 +7,41 @@ module.exports = {
 
         if (!creep.memory.isFull) {
 
-            let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
+            let droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity()
+            })
 
-            if (closestSource) {
+            if (droppedEnergy && creep.pos.getRangeTo(droppedEnergy) <= 2) {
 
-                creep.say("⛏️")
+                creep.pickupDroppedEnergy(droppedEnergy)
 
-                if (creep.pos.getRangeTo(closestSource) <= 1) {
+            } else {
 
-                    if (creep.harvest(closestSource) == 0) {
+                let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
 
-                        creep.findEnergyHarvested(closestSource)
+                if (closestSource) {
+
+                    creep.say("⛏️")
+
+                    if (creep.pos.getRangeTo(closestSource) <= 1) {
+
+                        if (creep.harvest(closestSource) == 0) {
+
+                            creep.findEnergyHarvested(closestSource)
+                        }
+                    } else {
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: closestSource.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 10,
+                        })
                     }
-                } else {
-
-                    creep.advancedPathing({
-                        origin: creep.pos,
-                        goal: { pos: closestSource.pos, range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 10,
-                    })
                 }
             }
         } else {
@@ -57,6 +70,10 @@ module.exports = {
                 } else if (creep.room.storage) {
 
                     creep.advancedTransfer(creep.room.storage)
+
+                } else {
+
+                    roleBuilder.run(creep)
                 }
             }
         }

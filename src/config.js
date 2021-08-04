@@ -43,6 +43,8 @@ function config() {
 
     // Global
 
+    if (!Memory.global) Memory.global = {}
+
     Memory.global.communes = []
 
     Memory.global.totalEnergy = 0
