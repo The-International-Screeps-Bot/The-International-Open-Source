@@ -254,10 +254,10 @@ function visuals(room, structures, specialStructures, constructionSites) {
         room.visual.text(link.store[RESOURCE_ENERGY], link.pos.x, link.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
     }
 
-    let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
-    let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
-    let controllerLink = Game.getObjectById(room.memory.controllerLink)
-    let baseLink = Game.getObjectById(room.memory.baseLink)
+    let controllerLink = specialStructures.links.controllerLink
+    let baseLink = specialStructures.links.baseLink
+    let sourceLink1 = specialStructures.links.sourceLink1
+    let sourceLink2 = specialStructures.links.sourceLink2
 
     if (sourceLink1 != null) {
 

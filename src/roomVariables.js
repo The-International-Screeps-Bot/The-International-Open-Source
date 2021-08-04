@@ -1,3 +1,5 @@
+const creepOpts = require("./creepOpts")
+
 function importantStructures(room) {
 
     let allCreeps = room.find(FIND_CREEPS)
@@ -88,15 +90,40 @@ function importantStructures(room) {
     }
 
     let baseLink
+    let controllerLink
+    let sourceLink1
+    let sourceLink2
+
+    for (let link of links) {
+
+        if (storage && link.pos.getRangeTo(storage) <= 2) {
+
+            baseLink = link
+            continue
+        }
+        if (link.pos.getRangeTo(controller) <= 2) {
+
+            controllerLink = link
+            continue
+        }
+
+        if (link.pos.getRangeTo(sources[0]) <= 2) {
+
+            sourceLink1 = link
+            continue
+        }
+        if (link.pos.getRangeTo(sources[1]) <= 2) {
+
+            sourceLink2 = link
+            continue
+        }
+    }
 
     let controllerContainer
-    let controllerLink
 
     let sourceContainer1
-    let sourceLink1
 
     let sourceContainer2
-    let sourceLink2
 
     let primaryLabs = []
     let secondaryLabs = []
@@ -147,7 +174,10 @@ function importantStructures(room) {
 
         },
         links: {
-
+            baseLink: baseLink,
+            controllerLink: controllerLink,
+            sourceLink1: sourceLink1,
+            sourceLink2: sourceLink2,
         },
         labs: {
             primaryLabs: primaryLabs,

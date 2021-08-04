@@ -111,7 +111,7 @@ function construction(room) {
             if (Game.time % 103 == 0) mineralPath()
         }
 
-        if (room.controller.level >= 3 && room.memory.remoteRooms.length > 0) {
+        if (room.controller.level >= 3 && room.memory.remoteRooms && room.memory.remoteRooms.length > 0) {
 
             for (let roomMemory of room.memory.remoteRooms) {
 
@@ -535,6 +535,7 @@ function construction(room) {
 
                     }
 
+                    allowedRooms[roomName] = false
                     return Infinity
                 }
             })

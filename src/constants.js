@@ -2,16 +2,14 @@ function constants(room) {
 
     sources()
     containers()
-    links()
-    towers()
-    spawns()
-    rooms()
     costMatrixes()
     roomGlobal()
     terminals()
     myResources()
     hasBoosts()
     nuke()
+
+    if (!room.memory.remoteRooms) room.memory.remoteRooms = []
 
     function nuke() {
 
@@ -79,83 +77,6 @@ function constants(room) {
 
                 room.memory.mineralContainer = container.id
             }
-        }
-    }
-
-    function links() {
-
-        let links = room.find(FIND_MY_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_LINK
-        })
-
-        for (let link of links) {
-
-            let source1 = Game.getObjectById(room.memory.source1)
-            let source2 = Game.getObjectById(room.memory.source2)
-
-            let controllerLink = Game.getObjectById(room.memory.controllerLink)
-            let baseLink = Game.getObjectById(room.memory.baseLink)
-            let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
-            let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
-
-            if (link.pos.inRangeTo(room.controller, 2)) {
-
-                room.memory.controllerLink = link.id
-
-            } else if (source2 && room.storage && link.pos.inRangeTo(room.storage, 2)) {
-
-                room.memory.baseLink = link.id
-
-            } else if (source1 && link.pos.inRangeTo(source1, 2)) {
-
-                room.memory.sourceLink1 = link.id
-
-            } else if (source2 && link.pos.inRangeTo(source2, 2)) {
-
-                room.memory.sourceLink2 = link.id
-            }
-        }
-    }
-
-    function towers() {
-
-        let towers = room.find(FIND_MY_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_TOWER
-        })
-
-        towersSorted = []
-
-        for (let tower of towers) {
-
-            towersSorted.push(tower.id)
-
-        }
-
-        room.memory.towers = towersSorted
-
-    }
-
-    function spawns() {
-
-        let spawns = room.find(FIND_MY_SPAWNS)
-
-        sortedSpawns = []
-
-        for (let spawn of spawns) {
-
-            sortedSpawns.push(spawn.id)
-
-        }
-
-        room.memory.spawns = sortedSpawns
-
-    }
-
-    function rooms() {
-
-        if (!room.memory.remoteRooms) {
-
-            room.memory.remoteRooms = []
         }
     }
 

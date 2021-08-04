@@ -174,7 +174,7 @@ module.exports = {
                             return true
                         }
 
-                        if (checkDuplicate() && Math.floor(Memory.rooms[creep.memory.roomFrom].spawns.length * 2) > Memory.rooms[creep.memory.roomFrom].remoteRooms.length) {
+                        if (checkDuplicate() && Math.floor(Game.rooms[creep.memory.roomFrom].find(FIND_MY_SPAWNS).length * 2) > Memory.rooms[creep.memory.roomFrom].remoteRooms.length) {
 
                             let sources = creep.room.find(FIND_SOURCES).length
 

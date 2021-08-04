@@ -1,7 +1,7 @@
 let allyList = require("allyList")
 let creepData = require("creepData")
 
-function spawnRequests(room) {
+function spawnRequests(room, spawns, specialStructures) {
 
     let {
         rolesList,
@@ -20,16 +20,18 @@ function spawnRequests(room) {
 
     for (let role of remoteRoles) {
 
-        for (let remoteRoom of room.memory.remoteRooms) {
+        if (room.memory.remoteRooms) {
+            for (let remoteRoom of room.memory.remoteRooms) {
 
-            if (!creepsOfRemoteRole[[role, remoteRoom.name]]) {
+                if (!creepsOfRemoteRole[[role, remoteRoom.name]]) {
 
-                creepsOfRemoteRole[[role, remoteRoom.name]] = 0
+                    creepsOfRemoteRole[[role, remoteRoom.name]] = 0
+                }
             }
         }
     }
 
-    room.memory.remoteRooms = room.memory.remoteRooms.slice(0, Math.floor(room.memory.spawns.length * 2))
+    room.memory.remoteRooms = room.memory.remoteRooms.slice(0, Math.floor(spawns.length * 2))
 
     if (room.memory.stage && room.memory.stage < 3) {
 
@@ -267,7 +269,7 @@ function spawnRequests(room) {
         }
     }
 
-    if (baseLink != null) {
+    if (specialStructures.links.baseLink) {
 
         minCreeps["stationaryHauler"] = 1
     }

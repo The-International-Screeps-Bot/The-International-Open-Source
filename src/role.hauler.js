@@ -60,43 +60,8 @@ module.exports = {
 
                         creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 
-                        if (creep.advancedTransfer(essentialStructure) == 0) {
+                        essentialStructuresTranfser(essentialStructure)
 
-                            essentialStructuresAlt = creep.room.find(FIND_MY_STRUCTURES, {
-                                filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
-                                        s.structureType == STRUCTURE_SPAWN ||
-                                        s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
-                                    s.energy < s.energyCapacity && s.id != essentialStructure.id
-                            })
-
-                            let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
-
-                            if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
-
-                                creep.advancedPathing({
-                                    origin: creep.pos,
-                                    goal: { pos: essentialStructureAlt.pos, range: 1 },
-                                    plainCost: false,
-                                    swampCost: false,
-                                    defaultCostMatrix: creep.memory.defaultCostMatrix,
-                                    avoidStages: [],
-                                    flee: false,
-                                    cacheAmount: 10,
-                                })
-                            } else if (storage) {
-
-                                creep.advancedPathing({
-                                    origin: creep.pos,
-                                    goal: { pos: storage.pos, range: 1 },
-                                    plainCost: false,
-                                    swampCost: false,
-                                    defaultCostMatrix: creep.memory.defaultCostMatrix,
-                                    avoidStages: [],
-                                    flee: false,
-                                    cacheAmount: 10,
-                                })
-                            }
-                        }
                     } else {
 
                         if (creep.advancedTransfer(storage) == 0) {
@@ -187,34 +152,8 @@ module.exports = {
 
                     creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 
-                    if (creep.advancedTransfer(essentialStructure) == 0) {
+                    essentialStructuresTranfser(essentialStructure)
 
-                        essentialStructuresAlt = creep.room.find(FIND_MY_STRUCTURES, {
-                            filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
-                                    s.structureType == STRUCTURE_SPAWN ||
-                                    s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
-                                s.energy < s.energyCapacity && s.id != essentialStructure.id
-                        })
-
-                        let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
-
-                        if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
-
-                            let goal = _.map([essentialStructureAlt], function(target) {
-                                return { pos: target.pos, range: 1 }
-                            })
-
-                            creep.intraRoomPathing(creep.pos, goal)
-
-                        } else if (storage) {
-
-                            let goal = _.map([storage], function(target) {
-                                return { pos: target.pos, range: 1 }
-                            })
-
-                            creep.intraRoomPathing(creep.pos, goal)
-                        }
-                    }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
 
                     if (creep.advancedTransfer(storage) == 0) {
@@ -302,43 +241,8 @@ module.exports = {
 
                     creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 
-                    if (creep.advancedTransfer(essentialStructure) == 0) {
+                    essentialStructuresTranfser(essentialStructure)
 
-                        essentialStructuresAlt = creep.room.find(FIND_MY_STRUCTURES, {
-                            filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
-                                    s.structureType == STRUCTURE_SPAWN ||
-                                    s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
-                                s.energy < s.energyCapacity && s.id != essentialStructure.id
-                        })
-
-                        let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
-
-                        if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
-
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: essentialStructureAlt.pos, range: 1 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: creep.memory.defaultCostMatrix,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 10,
-                            })
-                        } else if (storage) {
-
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: storage.pos, range: 1 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: creep.memory.defaultCostMatrix,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 10,
-                            })
-                        }
-                    }
                 } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
 
                     if (creep.advancedTransfer(storage) == 0) {
@@ -513,43 +417,7 @@ module.exports = {
 
                 creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 
-                if (creep.advancedTransfer(essentialStructure) == 0) {
-
-                    essentialStructuresAlt = creep.room.find(FIND_MY_STRUCTURES, {
-                        filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
-                                s.structureType == STRUCTURE_SPAWN ||
-                                s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
-                            s.energy < s.energyCapacity && s.id != essentialStructure.id
-                    })
-
-                    let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
-
-                    if (essentialStructuresAlt.length >= 1 && creep.store.getUsedCapacity() >= essentialStructureAlt.store.getFreeCapacity()) {
-
-                        creep.advancedPathing({
-                            origin: creep.pos,
-                            goal: { pos: essentialStructureAlt.pos, range: 1 },
-                            plainCost: false,
-                            swampCost: false,
-                            defaultCostMatrix: creep.memory.defaultCostMatrix,
-                            avoidStages: [],
-                            flee: false,
-                            cacheAmount: 10,
-                        })
-                    } else if (storage) {
-
-                        creep.advancedPathing({
-                            origin: storage.pos,
-                            goal: { pos: storage.pos, range: 1 },
-                            plainCost: false,
-                            swampCost: false,
-                            defaultCostMatrix: creep.memory.defaultCostMatrix,
-                            avoidStages: [],
-                            flee: false,
-                            cacheAmount: 10,
-                        })
-                    }
-                }
+                essentialStructuresTranfser(essentialStructure)
             } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
 
                 if (creep.advancedTransfer(storage) == 0) {
@@ -585,6 +453,50 @@ module.exports = {
                     creep.advancedPathing({
                         origin: creep.pos,
                         goal: { pos: spawn.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
+                    })
+                }
+            }
+        }
+
+        function essentialStructuresTranfser(essentialStructure) {
+
+            if (creep.advancedTransfer(essentialStructure) == 0) {
+
+                essentialStructuresAlt = creep.room.find(FIND_MY_STRUCTURES, {
+                    filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
+                            s.structureType == STRUCTURE_SPAWN ||
+                            s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
+                        s.energy < s.energyCapacity && s.id != essentialStructure.id
+                })
+
+                let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
+
+                if (essentialStructuresAlt.length >= 1 && creep.store[RESOURCE_ENERGY] > essentialStructureAlt.store.getFreeCapacity()) {
+
+                    if (creep.pos.getRangeTo(essentialStructureAlt) > 1) {
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: essentialStructureAlt.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: creep.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 10,
+                        })
+                    }
+                } else if (storage) {
+
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: storage.pos, range: 1 },
                         plainCost: false,
                         swampCost: false,
                         defaultCostMatrix: creep.memory.defaultCostMatrix,

@@ -148,7 +148,7 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            spawnManager(room, structures.spawns)
+            spawnManager(room, structures.spawns, specialStructures)
 
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed

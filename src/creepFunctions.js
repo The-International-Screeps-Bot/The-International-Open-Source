@@ -188,7 +188,7 @@ Creep.prototype.advancedWithdraw = function(target, resource, amount) {
         })
     }
 }
-Creep.prototype.advancedTransfer = function(target, resource, amount) {
+Creep.prototype.advancedTransfer = function(target, resource) {
 
     if (!target) return
 
@@ -196,14 +196,10 @@ Creep.prototype.advancedTransfer = function(target, resource, amount) {
 
         resource = RESOURCE_ENERGY
     }
-    if (!amount || amount > creep.store.getFreeCapacity()) {
-
-        amount = creep.store.getFreeCapacity()
-    }
 
     if (creep.pos.getRangeTo(target) <= 1) {
 
-        creep.transfer(target, resource, amount)
+        creep.transfer(target, resource)
         return 0
 
     } else {
