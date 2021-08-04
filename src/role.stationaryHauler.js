@@ -1,9 +1,11 @@
+let roomVariables = require("roomVariables")
+
 module.exports = {
     run: function(creep) {
 
-        //Not on a if full / not full basis, but instead commands. If baseLink is full, run baseLink function. If power spawn is empty and we have energy and power in storage or terminal, fill it. Etc.
+        let { specialStructures } = roomVariables(creep.room)
 
-        let baseLink = Game.getObjectById(creep.room.memory.baseLink)
+        let baseLink = specialStructures.links.baseLink
 
         let terminal = creep.room.terminal
 
@@ -12,54 +14,6 @@ module.exports = {
         let factory = creep.room.find(FIND_MY_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_FACTORY
         })[0]
-
-        /*
-
-        let unfilteredRequiredStructures = [baseLink, terminal, storage, factory]
-        let requiredStructures = []
-
-        for (let structure of unfilteredRequiredStructures) {
-
-            if (structure && structure != null) {
-
-                requiredStructures.push(structure)
-            }
-        }
-
-        const stationaryPos = creep.memory.stationaryPos
-
-        if (stationaryPos == null && requiredStructures[0]) {
-
-            for (let x = 5; x <= 45; x++) {
-                for (let y = 5; y <= 45; y++) {
-
-                    let position = new RoomPosition(x, y, creep.room.name)
-
-                    for (let i = 0; i < requiredStructures.length; i++) {
-
-                        let structure = requiredStructures[i]
-
-                        if (!position.inRangeTo(structure, 1)) {
-
-                            break
-                        }
-                        if (i + 1 == requiredStructures.length) {
-
-                            creep.memory.stationaryPos = position
-                        }
-                    }
-                }
-            }
-        } else {
-
-            if (creep.pos.x != stationaryPos.x || creep.pos.y != stationaryPos.y) {
-
-                let goal = _.map([stationaryPos], function(target) {
-                    return { pos: target, range: 0 }
-                })
-
-                creep.intraRoomPathing(creep.pos, goal)
-            } */
 
         const anchorPoint = creep.room.memory.anchorPoint
 
@@ -83,7 +37,7 @@ module.exports = {
 
             creep.hasResource()
 
-            if (baseLink != null && baseLink.store[RESOURCE_ENERGY] >= 700 && ((storage && storage.store[RESOURCE_ENERGY] <= 400000) || (terminal && terminal.store[RESOURCE_ENERGY] <= 100000)) && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
+            if (baseLink && baseLink.store[RESOURCE_ENERGY] >= 700 && ((storage && storage.store[RESOURCE_ENERGY] <= 400000) || (terminal && terminal.store[RESOURCE_ENERGY] <= 100000)) && (terminal.store.getUsedCapacity() <= terminal.store.getCapacity() - 800 || storage.store.getUsedCapacity() <= storage.store.getCapacity() - 800)) {
 
                 creep.memory.withdrawBaseLink = true
             }
