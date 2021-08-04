@@ -65,7 +65,7 @@ module.exports = {
 
         if (!anchorPoint) return
 
-        if (creep.pos.x != anchorPoint.x && creep.pos.y != anchorPoint.y) {
+        if (creep.pos.x != anchorPoint.x || creep.pos.y != anchorPoint.y) {
 
             creep.say("M A")
 
