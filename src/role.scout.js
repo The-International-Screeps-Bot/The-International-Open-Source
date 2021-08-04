@@ -227,7 +227,7 @@ module.exports = {
 
                                 creep.memory.claim = true
 
-                                Memory.global.commands.newCommune = creep.room.name
+                                Memory.global.newCommune = creep.room.name
 
                             } else {
 
