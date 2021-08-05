@@ -83,7 +83,7 @@ function towers(room, towers, creeps) {
 
                                 tower.repair(lowRampart)
 
-                                room.visual.text("🔧 ", tower.pos.x + 1, tower.pos.y, { align: 'left' })
+                                room.visual.text("🧱 ", tower.pos.x + 1, tower.pos.y, { align: 'left' })
 
                                 Memory.data.energySpentOnBarricades += 10
                             }

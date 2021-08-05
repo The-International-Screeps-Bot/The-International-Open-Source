@@ -192,9 +192,9 @@ function creepOpts(room, spawns, specialStructures) {
             },
             {
                 stage: 2,
-                defaultParts: [CARRY],
-                defaultCost: 50,
-                extraParts: [WORK, WORK, MOVE],
+                defaultParts: [],
+                defaultCost: 0,
+                extraParts: [WORK, MOVE, CARRY, MOVE],
                 extraCost: 250,
                 sliceAmount: 25
             },

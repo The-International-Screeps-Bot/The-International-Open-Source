@@ -52,7 +52,7 @@ function roomPlanner(room) {
 
                 if (room.getTerrain().get(pos.x, pos.y) != TERRAIN_MASK_WALL) {
 
-                    if (structureType == "road" && room.controller.level <= 4) {
+                    if (structureType == "road" && room.controller.level <= 3) {
 
 
                     } else if (structureType == "link" && room.controller.level <= 6) {

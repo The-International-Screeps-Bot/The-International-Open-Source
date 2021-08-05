@@ -222,7 +222,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
             minCreeps["upgrader"] = 6
 
-        } else if (stage < 3) {
+        } else if (stage <= 3) {
 
             minCreeps["upgrader"] = 4
 

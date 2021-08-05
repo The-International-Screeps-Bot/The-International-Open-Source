@@ -382,7 +382,7 @@ module.exports = {
 
                 let spawn = creep.room.find(FIND_MY_SPAWNS)[0]
 
-                if (creep.pos.getRangeTo(spawn) >= 2) {
+                if (creep.pos.getRangeTo(spawn) > 3) {
 
                     creep.advancedPathing({
                         origin: creep.pos,
@@ -394,6 +394,9 @@ module.exports = {
                         flee: false,
                         cacheAmount: 10,
                     })
+                } else {
+
+                    creep.memory.path = []
                 }
             }
         }

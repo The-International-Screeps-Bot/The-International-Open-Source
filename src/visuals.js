@@ -279,7 +279,7 @@ function visuals(room, structures, specialStructures, constructionSites) {
             strokeWidth: 0.125
         })
 
-        room.visual.text(2, sourceLink1.pos.x, sourceLink1.pos.y - 0.25, { align: 'center', opacity: "0.8" })
+        room.visual.text(2, sourceLink2.pos.x, sourceLink2.pos.y - 0.25, { align: 'center', opacity: "0.8" })
     }
     if (controllerLink) {
 

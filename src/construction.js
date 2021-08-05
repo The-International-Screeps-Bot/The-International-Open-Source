@@ -83,7 +83,7 @@ function construction(room) {
         }
     }
 
-    let { specialStructures } = roomVariables(creep.room)
+    let { specialStructures } = roomVariables(room)
 
     let source1 = specialStructures.sources.source1
     let source2 = specialStructures.sources.source2
@@ -94,6 +94,7 @@ function construction(room) {
     let controllerContainer = specialStructures.containers.controllerContainer
 
     let baseLink = specialStructures.links.baseLink
+    let controllerLink = specialStructures.links.controllerLink
     let sourceLink1 = specialStructures.links.sourceLink1
     let sourceLink2 = specialStructures.links.sourceLink2
 

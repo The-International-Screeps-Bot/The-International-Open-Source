@@ -93,7 +93,7 @@ function roomVariables(room) {
 
     if (room.memory.stage > 0 || room.memory.stage == "remoteRoom") {
 
-        if (!source1) room.memory.source1 = sources[0].id
+        if (!source1 && sources[0]) room.memory.source1 = sources[0].id
         if (!source2 && sources[1]) room.memory.source2 = sources[1].id
     }
 
@@ -151,12 +151,12 @@ function roomVariables(room) {
             continue
         }
 
-        if (!sourceLink1 && link != sourceLink2 && link.pos.getRangeTo(source1) <= 2) {
+        if (!sourceLink1 && link != sourceLink2 && sourceContainer1 && link.pos.getRangeTo(sourceContainer1) <= 1) {
 
             sourceLink1 = link
             continue
         }
-        if (!sourceLink2 && link != sourceLink1 && link.pos.getRangeTo(source2) <= 2) {
+        if (!sourceLink2 && link != sourceLink1 && sourceContainer2 && link.pos.getRangeTo(sourceContainer2) <= 1) {
 
             sourceLink2 = link
             continue

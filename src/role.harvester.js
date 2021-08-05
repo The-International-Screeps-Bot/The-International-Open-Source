@@ -20,9 +20,9 @@ module.exports = {
 
             creep.say("S1")
 
-            if (sourceLink1) {
+            if (sourceLink1 && sourceContainer1) {
 
-                if (creep.pos.getRangeTo(sourceLink1) == 1) {
+                if (creep.pos.getRangeTo(sourceContainer1) == 0) {
 
                     creep.advancedHarvest(source1)
 
@@ -34,7 +34,7 @@ module.exports = {
 
                     creep.advancedPathing({
                         origin: creep.pos,
-                        goal: { pos: sourceLink1.pos, range: 1 },
+                        goal: { pos: sourceContainer1.pos, range: 0 },
                         plainCost: false,
                         swampCost: false,
                         defaultCostMatrix: creep.room.memory.defaultCostMatrix,
@@ -86,9 +86,9 @@ module.exports = {
 
             creep.say("S2")
 
-            if (sourceLink2) {
+            if (sourceLink2 && sourceContainer2) {
 
-                if (creep.pos.getRangeTo(sourceLink2) == 1) {
+                if (creep.pos.getRangeTo(sourceContainer2) == 0) {
 
                     creep.advancedHarvest(source2)
 
@@ -100,7 +100,7 @@ module.exports = {
 
                     creep.advancedPathing({
                         origin: creep.pos,
-                        goal: { pos: sourceLink2.pos, range: 1 },
+                        goal: { pos: sourceContainer2.pos, range: 0 },
                         plainCost: false,
                         swampCost: false,
                         defaultCostMatrix: creep.room.memory.defaultCostMatrix,

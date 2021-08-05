@@ -207,7 +207,7 @@ module.exports = {
                             })
                         }
 
-                        let nearbyCommune = findNearbyCommunes()
+                        findNearbyCommunes()
 
                         function findNearbyCommunes() {
                             for (let commune of Memory.global.communes) {
@@ -223,7 +223,7 @@ module.exports = {
                             return false
                         }
 
-                        if (!nearbyCommune) {
+                        if (!findNearbyCommunes()) {
 
                             creep.advancedPathing({
                                 origin: creep.pos,

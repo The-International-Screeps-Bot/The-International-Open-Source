@@ -90,8 +90,6 @@ function findAnchor(room) {
 
     function displayCostMatrix(cm) {
 
-        var vis = Game.rooms[room.name].visual;
-
         const array = cm._bits;
 
         let anchorPoints = []
@@ -103,8 +101,8 @@ function findAnchor(room) {
                 var value = array[x * 50 + y];
                 if (value > 0) {
 
-                    vis.circle(x, y, { radius: array[x * 50 + y] / 10, fill: "green" })
-                    vis.text((array[x * 50 + y]).toFixed(0), x, y, { font: 0.3 })
+                    room.visual.circle(x, y, { radius: array[x * 50 + y] / 10, fill: "green" })
+                    room.visual.text((array[x * 50 + y]).toFixed(0), x, y, { font: 0.3 })
 
                 }
                 if (value >= 6) {
@@ -135,10 +133,9 @@ function findAnchor(room) {
         return anchorPoint
     }
 
-    if (anchorPointResult == false) room.memory.anchorPoint = "noAnchor"
+    if (anchorPointResult.anchorPoint) return true
 
-
-    return true
+    return false
 }
 
 module.exports = findAnchor
