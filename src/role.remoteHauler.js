@@ -71,23 +71,31 @@ module.exports = {
                                 }
                             }
                         } else {
+                            let controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
 
-                            let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
+                            if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
 
-                            creep.say("S")
+                                creep.advancedTransfer(controllerContainer)
 
-                            if (spawn && creep.pos.getRangeTo(spawn) > 5) {
+                            } else {
 
-                                creep.advancedPathing({
-                                    origin: creep.pos,
-                                    goal: { pos: spawn.pos, range: 5 },
-                                    plainCost: false,
-                                    swampCost: false,
-                                    defaultCostMatrix: creep.memory.defaultCostMatrix,
-                                    avoidStages: [],
-                                    flee: false,
-                                    cacheAmount: 10,
-                                })
+                                let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
+
+                                creep.say("S")
+
+                                if (spawn && creep.pos.getRangeTo(spawn) > 5) {
+
+                                    creep.advancedPathing({
+                                        origin: creep.pos,
+                                        goal: { pos: spawn.pos, range: 5 },
+                                        plainCost: false,
+                                        swampCost: false,
+                                        defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                        avoidStages: [],
+                                        flee: false,
+                                        cacheAmount: 10,
+                                    })
+                                }
                             }
                         }
                     }

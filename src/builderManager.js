@@ -9,7 +9,7 @@ function builderManager(room, builders) {
 
     let { constructionSites, creeps } = roomVariables(room)
 
-    let targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(constructionSites.mySites)
+    const targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(constructionSites.mySites)
 
     if (!targetSite) {
 
@@ -37,6 +37,8 @@ function builderManager(room, builders) {
         }
 
         if (isFull) {
+
+            creep.say("🚧")
 
             creep.constructionBuild(targetSite)
 

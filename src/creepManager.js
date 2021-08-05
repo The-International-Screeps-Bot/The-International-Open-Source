@@ -67,7 +67,7 @@ function creepManager(room, myCreeps) {
         //creep.suicide()
 
         if (creep && creep.memory.role) {
-            if (creep.ticksToLive <= creep.body.length * 3 + 10) {
+            if (creep.ticksToLive <= creep.body.length * 3) {
 
                 creep.memory.dying = true
             }

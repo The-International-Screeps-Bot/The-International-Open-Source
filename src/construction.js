@@ -111,7 +111,7 @@ function construction(room) {
             if (Game.time % 103 == 0) mineralPath()
         }
 
-        if (room.controller.level >= 3 && room.memory.remoteRooms && room.memory.remoteRooms.length > 0) {
+        if (room.memory.stage >= 4 && room.memory.remoteRooms && room.memory.remoteRooms.length > 0) {
 
             for (let roomMemory of room.memory.remoteRooms) {
 
@@ -215,7 +215,7 @@ function construction(room) {
 
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
-                if (room.memory.stage >= 1 && sourceContainer1 == null && normalValue && i + 1 == path.length) {
+                if (room.memory.stage > 1 && sourceContainer1 == null && normalValue && i + 1 == path.length) {
 
                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                 }
@@ -306,7 +306,7 @@ function construction(room) {
 
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
-                if (room.memory.stage >= 1 && sourceContainer2 == null && normalValue && i + 1 == path.length) {
+                if (room.memory.stage > 1 && sourceContainer2 == null && normalValue && i + 1 == path.length) {
 
                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                 }
@@ -398,7 +398,7 @@ function construction(room) {
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
 
-                if (room.memory.stage >= 1 && controllerContainer == null && controllerLink == null && normalValue && i + 1 == path.length) {
+                if (room.memory.stage > 1 && controllerContainer == null && controllerLink == null && normalValue && i + 1 == path.length) {
 
                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                 }
