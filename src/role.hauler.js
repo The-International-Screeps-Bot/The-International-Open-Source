@@ -374,7 +374,7 @@ module.exports = {
 
                 task = "noDeliveryPossible"
             }
-        } else if ((!task || task == "noDeliveryPossible") && storage) {
+        } else if (!task || task == "noDeliveryPossible") {
 
             creep.say("NDP")
 
@@ -382,7 +382,7 @@ module.exports = {
 
                 let spawn = creep.room.find(FIND_MY_SPAWNS)[0]
 
-                if (creep.pos.getRangeTo(spawn) >= 4) {
+                if (creep.pos.getRangeTo(spawn) >= 2) {
 
                     creep.advancedPathing({
                         origin: creep.pos,

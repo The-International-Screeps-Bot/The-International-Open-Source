@@ -91,7 +91,7 @@ function roomVariables(room) {
     const source1 = Game.getObjectById(room.memory.source1)
     const source2 = Game.getObjectById(room.memory.source2)
 
-    if (room.memory.stage >= 1 || room.memory.stage == "remoteRoom") {
+    if (room.memory.stage > 0 || room.memory.stage == "remoteRoom") {
 
         if (!source1) room.memory.source1 = sources[0].id
         if (!source2 && sources[1]) room.memory.source2 = sources[1].id

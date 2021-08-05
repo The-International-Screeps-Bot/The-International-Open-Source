@@ -1,3 +1,5 @@
+let roomVariables = require("roomVariables")
+
 function construction(room) {
 
     destroySites("")
@@ -81,18 +83,19 @@ function construction(room) {
         }
     }
 
-    let baseLink = Game.getObjectById(room.memory.baseLink)
-    let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
-    let controllerLink = Game.getObjectById(room.memory.controllerLink)
-    let mineralContainer = Game.getObjectById(room.memory.mineralContainer)
+    let { specialStructures } = roomVariables(creep.room)
 
-    let source1 = Game.getObjectById(room.memory.source1)
-    let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
-    let sourceLink1 = Game.getObjectById(room.memory.sourceLink1)
+    let source1 = specialStructures.sources.source1
+    let source2 = specialStructures.sources.source2
 
-    let source2 = Game.getObjectById(room.memory.source2)
-    let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
-    let sourceLink2 = Game.getObjectById(room.memory.sourceLink2)
+    let sourceContainer1 = specialStructures.containers.sourceContainer1
+    let sourceContainer2 = specialStructures.containers.sourceContainer2
+    let mineralContainer = specialStructures.containers.mineralContainer
+    let controllerContainer = specialStructures.containers.controllerContainer
+
+    let baseLink = specialStructures.links.baseLink
+    let sourceLink1 = specialStructures.links.sourceLink1
+    let sourceLink2 = specialStructures.links.sourceLink2
 
     let roomConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES)
 
@@ -211,11 +214,11 @@ function construction(room) {
                 let value = path[i - 1]
                 let normalValue = path[i]
 
-                if (value && room.controller.level >= 5) {
+                if (value && room.memory.stage >= 3) {
 
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
-                if (room.memory.stage > 1 && sourceContainer1 == null && normalValue && i + 1 == path.length) {
+                if (room.memory.stage > 1 && !sourceContainer1 && normalValue && i + 1 == path.length) {
 
                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                 }
@@ -302,11 +305,11 @@ function construction(room) {
                 let value = path[i - 1]
                 let normalValue = path[i]
 
-                if (value && room.controller.level >= 5) {
+                if (value && room.memory.stage >= 3) {
 
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
-                if (room.memory.stage > 1 && sourceContainer2 == null && normalValue && i + 1 == path.length) {
+                if (room.memory.stage > 1 && !sourceContainer2 && normalValue && i + 1 == path.length) {
 
                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                 }
@@ -393,12 +396,12 @@ function construction(room) {
                 let value = path[i - 1]
                 let normalValue = path[i]
 
-                if (value && room.controller.level >= 5) {
+                if (value && room.memory.stage >= 3) {
 
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
 
-                if (room.memory.stage > 1 && controllerContainer == null && controllerLink == null && normalValue && i + 1 == path.length) {
+                if (room.memory.stage > 1 && !controllerContainer && !controllerLink && normalValue && i + 1 == path.length) {
 
                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                 }
@@ -491,7 +494,7 @@ function construction(room) {
 
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
-                if (mineralContainer == null && normalValue && i + 1 == path.length) {
+                if (!mineralContainer && normalValue && i + 1 == path.length) {
 
                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                 }

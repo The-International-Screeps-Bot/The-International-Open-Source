@@ -5,8 +5,8 @@ module.exports = {
 
         let { specialStructures } = roomVariables(creep.room)
 
-        let source1 = Game.getObjectById(creep.room.memory.source1)
-        let source2 = Game.getObjectById(creep.room.memory.source2)
+        let source1 = specialStructures.sources.source1
+        let source2 = specialStructures.sources.source2
 
         let sourceContainer1 = specialStructures.containers.sourceContainer1
         let sourceContainer2 = specialStructures.containers.sourceContainer2
