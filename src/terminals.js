@@ -2,6 +2,8 @@ function terminals(room, terminal) {
 
     if (!terminal) return
 
+    if (Game.shard.name == "CarsonComputer") return
+
     // Find the avg price of a resource
     function avgPrice(resource) {
 

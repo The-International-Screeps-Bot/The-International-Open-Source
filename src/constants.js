@@ -133,6 +133,10 @@ function constants(room) {
             cm.set(structure.pos.x, structure.pos.y, 255)
         }
 
+        /*         const anchorPoint = room.memory.anchorPoint
+
+                if (anchorPoint) cm.set(anchorPoint.x, anchorPoint.y, 255) */
+
         let enableVisuals = false
 
         if (enableVisuals) {

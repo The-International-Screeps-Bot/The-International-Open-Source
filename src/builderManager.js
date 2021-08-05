@@ -9,7 +9,9 @@ function builderManager(room, builders) {
 
     let { constructionSites, creeps } = roomVariables(room)
 
-    const targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(constructionSites.mySites)
+    const targetSite = Game.getObjectById(room.memory.targetSite)
+
+    if (!targetSite) room.memory.targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(constructionSites.mySites).id
 
     if (!targetSite) {
 

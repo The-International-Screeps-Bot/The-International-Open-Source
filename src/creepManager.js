@@ -33,7 +33,6 @@ function creepManager(room, myCreeps) {
     roles["harvester"] = require('role.harvester')
     roles["hauler"] = require("role.hauler")
     roles["upgrader"] = require('role.upgrader')
-        //roles["builder"] = require('role.builder')
     roles["repairer"] = require('role.repairer')
     roles["upgradeHauler"] = require("role.upgradeHauler")
     roles["barricadeUpgrader"] = require('role.barricadeUpgrader')

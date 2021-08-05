@@ -3,9 +3,11 @@ var roleUpgrader = require('role.upgrader');
 module.exports = {
     run: function(creep) {
 
-        let constructionSite = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES)
+        const targetSite = Game.getObjectById(room.memory.targetSite)
 
-        if (!constructionSite) {
+        if (!targetSite) return
+
+        if (!targetSite) {
 
             roleUpgrader.run(creep);
 
@@ -17,7 +19,7 @@ module.exports = {
 
                 creep.say("🚧")
 
-                creep.constructionBuild(constructionSite)
+                creep.constructionBuild(targetSite)
             } else {
 
                 let terminal = creep.room.terminal

@@ -1,13 +1,17 @@
+let roomVariables = require("roomVariables")
+
 module.exports = {
     run: function(creep) {
 
-        var controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
+        let { specialStructures } = roomVariables(creep.room)
 
-        var controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
+        var controllerLink = specialStructures.links.controllerLink
+
+        var controllerContainer = specialStructures.containers.controllerContainer
 
         creep.isFull()
 
-        if (controllerContainer != null || (controllerLink != null && creep.room.memory.stage >= 6)) {
+        if (controllerContainer || (controllerLink && creep.room.memory.stage >= 6)) {
 
             creep.memory.upgrading = "constant"
         }
@@ -17,12 +21,12 @@ module.exports = {
 
             creep.controllerUpgrade(creep.room.controller)
 
-            if (controllerLink != null && controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
+            if (controllerLink && controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
                 if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
 
                     creep.advancedWithdraw(controllerLink, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
                 }
-            } else if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
+            } else if (controllerContainer && controllerContainer.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
                 if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
 
                     creep.advancedWithdraw(controllerContainer, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
@@ -39,7 +43,7 @@ module.exports = {
 
             creep.searchSourceContainers()
 
-            if (creep.container != null && creep.container) {
+            if (creep.container && creep.container) {
 
                 creep.say("SC")
 
