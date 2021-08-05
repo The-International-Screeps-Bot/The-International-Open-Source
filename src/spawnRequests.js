@@ -194,9 +194,8 @@ function spawnRequests(room, spawns, specialStructures) {
 
             if (stage <= 1) {
 
-                minCreeps["builder"] = 4
-            }
-            if (stage <= 2) {
+                minCreeps["builder"] = 6
+            } else if (stage <= 2) {
 
                 minCreeps["builder"] = 3
             } else {

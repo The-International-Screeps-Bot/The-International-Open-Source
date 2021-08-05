@@ -9,19 +9,16 @@ function builderManager(room, builders) {
 
     let { constructionSites, creeps } = roomVariables(room)
 
-    const targetSite = Game.getObjectById(room.memory.targetSite)
+    const targetSite = room.getObjectWithId(room.memory.targetSite)
 
-    if (!targetSite) room.memory.targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(constructionSites.mySites).id
+    if (!targetSite && constructionSites.mySites.length > 0) room.memory.targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(constructionSites.mySites).id
 
     if (!targetSite) {
 
         for (let creep of builders) {
 
-            if (!targetSite) {
-
-                roleUpgrader.run(creep)
-                return
-            }
+            roleUpgrader.run(creep)
+            return
         }
     }
 
@@ -31,12 +28,6 @@ function builderManager(room, builders) {
 
         creep.isFull()
         const isFull = creep.memory.isFull
-
-        if (!targetSite) {
-
-            roleUpgrader.run(creep)
-            return
-        }
 
         if (isFull) {
 
