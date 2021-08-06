@@ -189,7 +189,7 @@ module.exports = {
 
                     let newCommune
 
-                    if (creep.room.find(FIND_SOURCES).length == 2 && Memory.global.communes.length < Game.gcl.level && creep.room.memory.claim != true && creep.room.memory.claim != "notViable" && controller && !controller.owner && (!controller.reservation || (controller.reservation && controller.reservation.username == "Invader"))) {
+                    if (creep.room.find(FIND_SOURCES).length == 2 && Memory.global.communes.length < Game.gcl.level && creep.room.memory.claim != true && creep.room.memory.claim != "notViable" && controller && !controller.owner && (!controller.reservation || (controller.reservation && controller.reservation.username == "Invader")) && creep.findSafeDistance(creep.pos, goal, ["enemyRoom", "keeperRoom"]) <= 12) {
 
                         let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
 

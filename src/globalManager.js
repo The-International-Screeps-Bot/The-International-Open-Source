@@ -82,7 +82,7 @@ function globalManager() {
     } */
 
     //
-    if (Game.gcl.level == communes.length) Memory.global.newCommunes = []
+    if (Game.gcl.level == Memory.global.communes.length) Memory.global.newCommunes = []
 
     if (!Memory.global.newCommunes) Memory.global.newCommunes = []
 
