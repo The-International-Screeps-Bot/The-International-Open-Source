@@ -108,15 +108,17 @@ function findAnchor(room) {
                 if (value >= 6) {
 
                     let exits = room.find(FIND_EXIT)
+                    let exitValue
 
                     for (let exit of exits) {
                         if (exit.getRangeTo(x, y) <= 11) {
 
-                            continue
+                            exitvalue = true
+                            break
                         }
                     }
 
-                    anchorPoints.push(new RoomPosition(x, y, room.name))
+                    if (!exitValue) anchorPoints.push(new RoomPosition(x, y, room.name))
                 }
             }
         }
