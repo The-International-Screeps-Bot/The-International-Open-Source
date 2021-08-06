@@ -1,15 +1,12 @@
-var roleBuilder = require('role.builder');
-var roleUpgrader = require('role.upgrader');
+var roleBuilder = require('role.builder')
+var roleUpgrader = require('role.upgrader')
 
 module.exports = {
     run: function(creep) {
 
         const newCommune = Memory.global.newCommune
 
-        if (!newCommune) {
-
-            roleBuilder.run(creep)
-        }
+        if (!newCommune) roleBuilder.run(creep)
 
         let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
 
@@ -20,14 +17,18 @@ module.exports = {
 
         } else if (creep.room.name != newCommune) {
 
-            let goal = _.map([new RoomPosition(25, 25, newCommune)], function(pos) {
-                return { pos: pos, range: 24 }
-            })
-
             creep.say("BC " + newCommune)
 
-            creep.onlySafeRoomPathing(creep, goal, ["enemyRoom", "keeperRoom"])
-
+            creep.advancedPathing({
+                origin: creep.pos,
+                goal: { pos: new RoomPosition(25, 25, newCommune), range: 1 },
+                plainCost: 3,
+                swampCost: 8,
+                defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                avoidStages: ["enemyRoom", "keeperRoom"],
+                flee: false,
+                cacheAmount: 10,
+            })
         } else {
 
             creep.isFull()
@@ -97,17 +98,19 @@ module.exports = {
 
                                     if (creep.pos.getRangeTo(closestSource) <= 1) {
 
-                                        if (creep.harvest(closestSource) == 0) {
-
-                                            creep.findEnergyHarvested(closestSource)
-                                        }
+                                        creep.advancedHarvest(closestSource)
                                     } else {
 
-                                        let goal = _.map([closestSource], function(target) {
-                                            return { pos: target.pos, range: 1 }
+                                        creep.advancedPathing({
+                                            origin: creep.pos,
+                                            goal: { pos: closestSource.pos, range: 1 },
+                                            plainCost: 3,
+                                            swampCost: 8,
+                                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                            avoidStages: [],
+                                            flee: false,
+                                            cacheAmount: 10,
                                         })
-
-                                        creep.intraRoomPathing(creep.pos, goal)
                                     }
                                 } else {
 
@@ -124,11 +127,16 @@ module.exports = {
                                                 creep.dismantle(rampart)
                                             } else {
 
-                                                let goal = _.map([rampart], function(target) {
-                                                    return { pos: target.pos, range: 1 }
+                                                creep.advancedPathing({
+                                                    origin: creep.pos,
+                                                    goal: { pos: rampart.pos, range: 1 },
+                                                    plainCost: 3,
+                                                    swampCost: 8,
+                                                    defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                                    avoidStages: [],
+                                                    flee: false,
+                                                    cacheAmount: 10,
                                                 })
-
-                                                creep.intraRoomPathing(creep.pos, goal)
                                             }
                                         }
                                     }

@@ -94,7 +94,7 @@ function findAnchor(room) {
 
         let anchorPoints = []
 
-        // For open spaces
+        // Find and push open spaces
 
         for (var x = 0; x < 50; ++x) {
             for (var y = 0; y < 50; ++y) {
@@ -133,8 +133,9 @@ function findAnchor(room) {
         return anchorPoint
     }
 
-    if (anchorPointResult.anchorPoint) return true
+    if (anchorPointResult) return true
 
+    room.memory.anchorPoint == "noAnchor"
     return false
 }
 

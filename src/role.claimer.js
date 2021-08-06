@@ -1,9 +1,9 @@
 module.exports = {
     run: function(creep) {
 
-        const target = creep.memory.target = Memory.global.newCommune
+        const newCommune = Memory.global.newCommune
 
-        if (creep.room.name == target) {
+        if (creep.room.name == newCommune) {
 
             creep.say("C")
 
@@ -33,11 +33,11 @@ module.exports = {
 
         } else {
 
-            creep.say("NC " + target)
+            creep.say("NC " + newCommune)
 
             creep.advancedPathing({
                 origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, target), range: 1 },
+                goal: { pos: new RoomPosition(25, 25, newCommune), range: 1 },
                 plainCost: false,
                 swampCost: false,
                 defaultCostMatrix: creep.room.memory.defaultCostMatrix,

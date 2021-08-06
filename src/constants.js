@@ -9,6 +9,13 @@ function constants(room) {
     hasBoosts()
     nuke()
 
+    if (room.memory.stage >= 2 && Memory.global.newCommunes.includes(room.name)) {
+
+        let sliceIndex = Memory.global.newCommunes.indexOf(room.name)
+
+        Memory.global.newCommunesslice(sliceIndex, sliceIndex + 1)
+    }
+
     if (!room.memory.remoteRooms) room.memory.remoteRooms = []
 
     function nuke() {

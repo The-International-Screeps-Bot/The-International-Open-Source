@@ -16,7 +16,7 @@ function mapVisuals() {
 
                 } else if (Memory.rooms[room].claim == true) {
 
-                    Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#ffffff', opacity: 0.15 })
+                    Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#ffffff', opacity: 0.25 })
 
                 } else if (Memory.rooms[room].claim == "notViable") {
 

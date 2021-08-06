@@ -85,8 +85,8 @@ function construction(room) {
 
     let { specialStructures } = roomVariables(room)
 
-    let source1 = specialStructures.sources.source1
-    let source2 = specialStructures.sources.source2
+    let source1 = room.getObjectWithId(room.memory.source1)
+    let source2 = room.getObjectWithId(room.memory.source2)
 
     let sourceContainer1 = specialStructures.containers.sourceContainer1
     let sourceContainer2 = specialStructures.containers.sourceContainer2
@@ -139,6 +139,8 @@ function construction(room) {
     function source1Path() {
 
         let origin = room.find(FIND_MY_SPAWNS)[0]
+
+        if (!source1) return
 
         let goal = { pos: source1.pos, range: 1 }
 
@@ -230,6 +232,8 @@ function construction(room) {
     function source2Path() {
 
         let origin = room.find(FIND_MY_SPAWNS)[0]
+
+        if (!source2) return
 
         let goal = { pos: source2.pos, range: 1 }
 

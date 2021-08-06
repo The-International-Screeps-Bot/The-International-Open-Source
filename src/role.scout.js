@@ -1,4 +1,4 @@
-let findAnchor = require("construction")
+let findAnchor = require("findAnchor")
 let allyList = require("allyList")
 
 module.exports = {
@@ -51,7 +51,6 @@ module.exports = {
                 }
 
                 lowestScoutTick = _.min(targetRoomsArrayScoutTick, function(tick) { return tick })
-                    //console.log(lowestScoutTick)
 
                 for (let room in Memory.rooms) {
 
@@ -93,6 +92,7 @@ module.exports = {
 
                         creep.signController(controller, "A commune of The Internationale. Bourgeoisie not welcome here.")
                     } else {
+
                         //output an integer from 1-6
                         let signType = Math.floor(Math.random(7) * 10)
 
@@ -189,7 +189,7 @@ module.exports = {
 
                     let newCommune
 
-                    if (creep.room.find(FIND_SOURCES).length == 2 && Memory.global.communes.length < Game.gcl.level && creep.room.memory.claim != "notViable" && controller && !controller.owner && (!controller.reservation || (controller.reservation && controller.reservation.username == "Invader"))) {
+                    if (creep.room.find(FIND_SOURCES).length == 2 && Memory.global.communes.length < Game.gcl.level && creep.room.memory.claim != true && creep.room.memory.claim != "notViable" && controller && !controller.owner && (!controller.reservation || (controller.reservation && controller.reservation.username == "Invader"))) {
 
                         let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
 
@@ -207,23 +207,24 @@ module.exports = {
                             })
                         }
 
-                        findNearbyCommunes()
+                        let nearbyCommunes
 
-                        function findNearbyCommunes() {
-                            for (let commune of Memory.global.communes) {
+                        for (let commune of Memory.global.communes) {
 
-                                let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, commune)
+                            let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, commune)
 
-                                if (targetRoomDistance <= 1) {
+                            if (targetRoomDistance <= 1) {
 
-                                    return true
-                                }
+                                nearbyCommunes = true
+                                break
                             }
-
-                            return false
                         }
 
-                        if (!findNearbyCommunes()) {
+                        creep.say("N")
+
+                        if (!nearbyCommunes) {
+
+                            creep.say("NNC")
 
                             creep.advancedPathing({
                                 origin: creep.pos,
@@ -238,13 +239,13 @@ module.exports = {
 
                             if (findAnchor(creep.room)) {
 
-                                creep.say("NC")
+                                creep.say("FA")
 
                                 newCommune = true
 
-                                creep.memory.claim = true
+                                creep.room.memory.claim = true
 
-                                Memory.global.newCommune = creep.room.name
+                                if (!Memory.global.newCommunes.includes(creep.room.name)) Memory.global.newCommunes.push(creep.room.name)
 
                             } else {
 

@@ -13,7 +13,7 @@ function builderManager(room, builders) {
 
     if (!targetSite && constructionSites.mySites.length > 0) room.memory.targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(constructionSites.mySites).id
 
-    if (!targetSite) {
+    if (constructionSites.mySites.length == 0) {
 
         for (let creep of builders) {
 
@@ -21,6 +21,8 @@ function builderManager(room, builders) {
             return
         }
     }
+
+    if (!targetSite) return
 
     room.visual.text("🚧", targetSite.pos.x, targetSite.pos.y + 0.25, { align: 'center' })
 

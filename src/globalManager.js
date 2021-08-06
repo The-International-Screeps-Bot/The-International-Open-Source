@@ -42,18 +42,16 @@ function globalManager() {
     if (Game.shard.name == "shard2") {
 
         var commands = {
-            //newCommune: "E28N8",
             //attackTarget: "E28N8",
         }
     } else {
 
         var commands = {
-            //newCommune: "E28N8",
             //attackTarget: "E27N17",
         }
     }
 
-    let communeEstablisher = findCommuneEstablisher()
+    /* let communeEstablisher = findCommuneEstablisher()
     Memory.global.communeEstablisher = communeEstablisher
 
     function findCommuneEstablisher() {
@@ -77,6 +75,40 @@ function globalManager() {
                         console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
 
                         return room
+                    }
+                }
+            }
+        }
+    } */
+
+    //
+
+    if (!Memory.global.newCommunes) Memory.global.newCommunes = []
+
+    if (Memory.global.newCommunes.length > 0) {
+
+        let newCommune = Memory.global.newCommunes[0]
+        Memory.global.newCommune = newCommune
+        Memory.global.communeEstablisher = findCommuneEstablisher(newCommune)
+
+        function findCommuneEstablisher(newCommune) {
+
+            for (let maxDistance = 1; maxDistance <= 12; maxDistance++) {
+
+                for (let roomName in Game.rooms) {
+
+                    room = Game.rooms[roomName]
+
+                    if (room.controller && room.controller.my && room.memory.stage >= 3) {
+
+                        let distance = Game.map.getRoomLinearDistance(newCommune, room.name)
+
+                        if (distance < maxDistance) {
+
+                            console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
+
+                            return room.name
+                        }
                     }
                 }
             }
