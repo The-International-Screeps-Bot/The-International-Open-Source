@@ -406,7 +406,7 @@ function construction(room) {
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
 
-                if (room.memory.stage > 1 && !controllerContainer && !controllerLink && normalValue && i + 1 == path.length) {
+                if (room.memory.stage >= 2 && !controllerContainer && !controllerLink && normalValue && i + 1 == path.length) {
 
                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                 }
