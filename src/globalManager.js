@@ -87,7 +87,13 @@ function globalManager() {
 
     if (Memory.global.newCommunes.length > 0) {
 
-        let newCommune = Memory.global.newCommunes[0]
+        const newCommune = Memory.global.newCommunes[0]
+
+        if (Memory.rooms[newCommune].stage >= 2) {
+
+            Memory.global.newCommunes = Memory.global.newCommunes.slice(1, Memory.global.newCommunes.length)
+        }
+
         Memory.global.newCommune = newCommune
         Memory.global.communeEstablisher = findCommuneEstablisher(newCommune)
 
@@ -113,6 +119,10 @@ function globalManager() {
                 }
             }
         }
+    } else {
+
+        Memory.global.newCommune = undefined
+        Memory.global.communeEstablisher = undefined
     }
 
     let attackingRoom = findAttackingRooms()
