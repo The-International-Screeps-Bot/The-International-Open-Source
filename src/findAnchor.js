@@ -94,6 +94,8 @@ function findAnchor(room) {
 
         let anchorPoints = []
 
+        let exits = room.find(FIND_EXIT)
+
         // Find and push open spaces
 
         for (var x = 0; x < 50; ++x) {
@@ -107,18 +109,22 @@ function findAnchor(room) {
                 }
                 if (value >= 6) {
 
-                    let exits = room.find(FIND_EXIT)
-                    let exitValue
+                    let isExit = (x <= 0 || x >= 49 || y <= 0 || y >= 49)
+                    if (isExit) continue
+
+                    let nearExit
 
                     for (let exit of exits) {
                         if (exit.getRangeTo(x, y) <= 11) {
 
-                            exitvalue = true
+                            nearExit = true
                             break
                         }
                     }
 
-                    if (!exitValue) anchorPoints.push(new RoomPosition(x, y, room.name))
+                    if (nearExit) continue
+
+                    anchorPoints.push(new RoomPosition(x, y, room.name))
                 }
             }
         }

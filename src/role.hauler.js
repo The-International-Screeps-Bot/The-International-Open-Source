@@ -39,6 +39,8 @@ module.exports = {
 
         if (task == "deliverFromStorage" && storage) {
 
+            if (storage.store[RESOURCE_ENERGY] < creep.store.getCapacity()) creep.memory.task = undefined
+
             creep.say("DFS")
 
             creep.isFull()
