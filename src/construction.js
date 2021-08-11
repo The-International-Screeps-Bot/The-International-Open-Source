@@ -138,7 +138,7 @@ function construction(room) {
 
     function source1Path() {
 
-        let origin = room.find(FIND_MY_SPAWNS)[0]
+        let origin = room.memory.anchorPoint
 
         if (!source1) return
 
@@ -231,7 +231,7 @@ function construction(room) {
 
     function source2Path() {
 
-        let origin = room.find(FIND_MY_SPAWNS)[0]
+        let origin = room.memory.anchorPoint
 
         if (!source2) return
 
@@ -324,7 +324,7 @@ function construction(room) {
 
     function controllerPath() {
 
-        let origin = room.find(FIND_MY_SPAWNS)[0]
+        let origin = room.memory.anchorPoint
 
         let goal = { pos: room.controller.pos, range: 2 }
 
@@ -416,7 +416,7 @@ function construction(room) {
 
     function mineralPath() {
 
-        let origin = room.find(FIND_MY_SPAWNS)[0]
+        let origin = room.memory.anchorPoint
 
         let mineral = room.find(FIND_MINERALS)[0]
 
@@ -517,7 +517,7 @@ function construction(room) {
 
             if (Game.time % (roomPathDelay + 103) != 0) return
 
-            let origin = room.find(FIND_MY_SPAWNS)[0]
+            let origin = room.memory.anchorPoint
 
             let goal = { pos: source.pos, range: 1 }
 
