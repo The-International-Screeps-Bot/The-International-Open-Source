@@ -176,7 +176,7 @@ Creep.prototype.advancedWithdraw = function(target, resource, amount) {
     }
     if (!amount || amount > creep.store.getFreeCapacity()) {
 
-        amount = creep.store.getFreeCapacity()
+        amount = Math.min(creep.store.getFreeCapacity(), target.store[resource])
     }
 
     if (creep.pos.getRangeTo(target) <= 1) {
