@@ -20,9 +20,9 @@ module.exports = {
                 creep.advancedPathing({
                     origin: creep.pos,
                     goal: { pos: controller.pos, range: 1 },
-                    plainCost: false,
-                    swampCost: false,
-                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                    plainCost: 1,
+                    swampCost: 1,
+                    defaultCostMatrix: false,
                     avoidStages: [],
                     flee: false,
                     cacheAmount: 10,
@@ -38,10 +38,10 @@ module.exports = {
             creep.advancedPathing({
                 origin: creep.pos,
                 goal: { pos: new RoomPosition(25, 25, newCommune), range: 1 },
-                plainCost: false,
-                swampCost: false,
-                defaultCostMatrix: creep.room.memory.defaultCostMatrix,
-                avoidStages: ["enemyRoom", "keeperRoom"],
+                plainCost: 1,
+                swampCost: 1,
+                defaultCostMatrix: false,
+                avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
                 flee: false,
                 cacheAmount: 10,
             })

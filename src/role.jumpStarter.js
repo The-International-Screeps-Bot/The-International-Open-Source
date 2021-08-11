@@ -5,7 +5,48 @@ module.exports = {
 
         creep.isFull()
 
-        if (!creep.memory.isFull) {
+        if (creep.memory.isFull) {
+
+            creep.say("🚬")
+
+            let lowTower = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                filter: (s) => (s.structureType == STRUCTURE_TOWER) && s.energy < 500
+            })
+
+            if (lowTower) {
+
+                creep.say("LT")
+
+                creep.advancedTransfer(lowTower)
+
+            } else {
+
+                let essentialStructure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                    filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
+                            s.structureType == STRUCTURE_SPAWN ||
+                            s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
+                        s.energy < s.energyCapacity
+                })
+
+                if (essentialStructure) {
+
+                    creep.say("ES")
+
+                    creep.advancedTransfer(essentialStructure)
+
+                } else if (creep.room.storage) {
+
+                    creep.say("S")
+
+                    creep.advancedTransfer(creep.room.storage)
+
+                } else {
+
+                    roleBuilder.run(creep)
+                }
+            }
+
+        } else {
 
             let droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
                 filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity()
@@ -42,38 +83,6 @@ module.exports = {
                             cacheAmount: 10,
                         })
                     }
-                }
-            }
-        } else {
-
-            let lowTower = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                filter: (s) => (s.structureType == STRUCTURE_TOWER) && s.energy < 500
-            })
-
-            if (lowTower) {
-
-                creep.advancedTransfer(lowTower)
-
-            } else {
-
-                let essentialStructure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                    filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
-                            s.structureType == STRUCTURE_SPAWN ||
-                            s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
-                        s.energy < s.energyCapacity
-                })
-
-                if (essentialStructure) {
-
-                    creep.advancedTransfer(essentialStructure)
-
-                } else if (creep.room.storage) {
-
-                    creep.advancedTransfer(creep.room.storage)
-
-                } else {
-
-                    roleBuilder.run(creep)
                 }
             }
         }

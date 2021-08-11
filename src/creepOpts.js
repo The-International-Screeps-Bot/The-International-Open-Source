@@ -400,11 +400,11 @@ function creepOpts(room, spawns, specialStructures) {
     roleOpts["claimer"] = roleValues(
         [{
             stage: 1,
-            defaultParts: [CLAIM, MOVE, MOVE],
-            defaultCost: 700,
-            extraParts: [],
-            extraCost: 0,
-            sliceAmount: 3
+            defaultParts: [CLAIM],
+            defaultCost: 600,
+            extraParts: [MOVE],
+            extraCost: 50,
+            sliceAmount: 6
         }],
         "claimer", {})
 

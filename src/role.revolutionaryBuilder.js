@@ -17,7 +17,7 @@ module.exports = {
 
         } else if (creep.room.name != newCommune) {
 
-            creep.say("BC " + newCommune)
+            creep.say("NC " + newCommune)
 
             creep.advancedPathing({
                 origin: creep.pos,
@@ -25,7 +25,7 @@ module.exports = {
                 plainCost: 3,
                 swampCost: 8,
                 defaultCostMatrix: creep.room.memory.defaultCostMatrix,
-                avoidStages: ["enemyRoom", "keeperRoom"],
+                avoidStages: ["enemyRoom", "keeperRoom", "allyRoom"],
                 flee: false,
                 cacheAmount: 10,
             })
