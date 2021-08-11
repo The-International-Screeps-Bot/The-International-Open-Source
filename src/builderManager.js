@@ -9,9 +9,22 @@ function builderManager(room, builders) {
 
     let { constructionSites, creeps } = roomVariables(room)
 
-    const targetSite = room.getObjectWithId(room.memory.targetSite)
+    let targetSite = room.getObjectWithId(room.memory.targetSite)
 
-    if (!targetSite && constructionSites.mySites.length > 0) room.memory.targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(constructionSites.mySites).id
+    if (!targetSite && constructionSites.mySites.length > 0) {
+
+        if (builders.length == 1) {
+
+
+            targetSite = builders[0].pos.findClosestByRange(constructionSites.mySites)
+            room.memory.targetSite = targetSite.id
+
+        } else {
+
+            targetSite = room.memory.targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(constructionSites.mySites)
+            room.memory.targetSite = targetSite.id
+        }
+    }
 
     if (constructionSites.mySites.length == 0) {
 

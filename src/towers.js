@@ -2,6 +2,8 @@ let allyList = require("allyList")
 
 function towers(room, towers, creeps) {
 
+    if (towers.length == 0) return
+
     let injuredCreep = room.find(FIND_CREEPS, {
         filter: (c) => {
             return ((allyList.indexOf(c.owner.username.toLowerCase()) >= 0 || c.my) && c.hits < c.hitsMax * 0.75)
