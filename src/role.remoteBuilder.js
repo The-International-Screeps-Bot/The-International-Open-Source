@@ -117,42 +117,19 @@ module.exports = {
 
                 creep.say("🚬")
 
-                let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_RAMPART
-                })
+                const anchorPoint = creep.room.memory.anchorPoint
 
-                if (ramparts.length > 0) {
+                if (anchorPoint) {
 
-                    let cm = PathFinder.CostMatrix.deserialize(false)
+                    if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) != 6) {
 
-                    let outerRamparts = []
+                        creep.say("AIR" + creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y))
 
-                    for (let rampart of ramparts) {
-
-                        let creeps = creep.room.find(FIND_CREEPS)
-
-                        for (let creep of creeps) {
-
-                            cm.set(creep.pos.x, creep.pos.y, 255)
-                        }
-
-                        cm.set(creep.pos.x, creep.pos.y, 1)
-
-                        if (cm && cm.get(rampart.pos.x, rampart.pos.y) < 255) {
-
-                            outerRamparts.push(rampart)
-                        }
-                    }
-
-                    if (outerRamparts.length > 0) {
-
-                        let outerRampart = creep.pos.findClosestByRange(outerRamparts)
-
-                        if (outerRampart) {
+                        if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
 
                             creep.advancedPathing({
                                 origin: creep.pos,
-                                goal: { pos: outerRampart.pos, range: 0 },
+                                goal: { pos: anchorPoint, range: 6 },
                                 plainCost: false,
                                 swampCost: false,
                                 defaultCostMatrix: false,
@@ -160,43 +137,18 @@ module.exports = {
                                 flee: false,
                                 cacheAmount: 10,
                             })
-                        }
-                    }
-                } else {
+                        } else {
 
-                    const anchorPoint = creep.room.memory.anchorPoint
-
-                    if (anchorPoint) {
-
-                        if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) != 6) {
-
-                            creep.say("AIR" + creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y))
-
-                            if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
-
-                                creep.advancedPathing({
-                                    origin: creep.pos,
-                                    goal: { pos: anchorPoint, range: 6 },
-                                    plainCost: false,
-                                    swampCost: false,
-                                    defaultCostMatrix: false,
-                                    avoidStages: [],
-                                    flee: false,
-                                    cacheAmount: 10,
-                                })
-                            } else {
-
-                                creep.advancedPathing({
-                                    origin: creep.pos,
-                                    goal: { pos: anchorPoint, range: 6 },
-                                    plainCost: false,
-                                    swampCost: false,
-                                    defaultCostMatrix: false,
-                                    avoidStages: [],
-                                    flee: true,
-                                    cacheAmount: 10,
-                                })
-                            }
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: anchorPoint, range: 6 },
+                                plainCost: false,
+                                swampCost: false,
+                                defaultCostMatrix: false,
+                                avoidStages: [],
+                                flee: true,
+                                cacheAmount: 10,
+                            })
                         }
                     }
                 }
