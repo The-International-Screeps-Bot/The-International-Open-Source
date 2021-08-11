@@ -12,7 +12,7 @@ module.exports = {
                 s.energy < s.energyCapacity
         })
 
-        let ruinWithResources = room.find(FIND_RUINS, {
+        let ruinWithResources = creep.pos.findClosestByRange(FIND_RUINS, {
             filter: ruin => ruin.store.getUsedCapacity() >= creep.store.getCapacity()
         })
 

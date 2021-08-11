@@ -599,7 +599,7 @@ function construction(room) {
                             cm.set(road.pos.x, road.pos.y, 1)
                         }
 
-                        if (room.name == origin.room.name) {
+                        if (room.name == origin.roomName) {
 
                             let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                                 filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
