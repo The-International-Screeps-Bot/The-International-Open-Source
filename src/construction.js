@@ -146,7 +146,7 @@ function construction(room) {
 
         if (origin && goal) {
 
-            var path = PathFinder.search(origin.pos, goal, {
+            var path = PathFinder.search(origin, goal, {
                 plainCost: 4,
                 swampCost: 24,
                 maxRooms: 1,
@@ -239,7 +239,7 @@ function construction(room) {
 
         if (origin && goal) {
 
-            var path = PathFinder.search(origin.pos, goal, {
+            var path = PathFinder.search(origin, goal, {
                 plainCost: 4,
                 swampCost: 24,
                 maxRooms: 1,
@@ -330,7 +330,7 @@ function construction(room) {
 
         if (origin && goal) {
 
-            var path = PathFinder.search(origin.pos, goal, {
+            var path = PathFinder.search(origin, goal, {
                 plainCost: 4,
                 swampCost: 24,
                 maxRooms: 1,
@@ -424,7 +424,7 @@ function construction(room) {
 
         if (origin && goal) {
 
-            var path = PathFinder.search(origin.pos, goal, {
+            var path = PathFinder.search(origin, goal, {
                 plainCost: 4,
                 swampCost: 24,
                 maxRooms: 1,
@@ -555,7 +555,7 @@ function construction(room) {
 
             if (origin && goal) {
 
-                var path = PathFinder.search(origin.pos, goal, {
+                var path = PathFinder.search(origin, goal, {
                     plainCost: 4,
                     swampCost: 24,
                     maxOps: 10000,
