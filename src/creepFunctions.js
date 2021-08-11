@@ -545,7 +545,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
     if (opts.origin.roomName != opts.goal.pos.roomName) {
 
-        const route = creep.memory.route
+        let route = creep.memory.route
 
         if (!route || route.length == 0) {
 
@@ -571,12 +571,16 @@ Creep.prototype.advancedPathing = function(opts) {
             if (newRoute.length > 0) {
 
                 creep.memory.route = newRoute
+                route = newRoute
+
+                opts.goal = { pos: new RoomPosition(25, 25, route[0].room), range: 1 }
             }
         } else {
 
             if (route[0].room == creep.room.name) {
 
                 creep.memory.route = route.slice(1, route.length + 1)
+                route = route.slice(1, route.length + 1)
             }
 
             if (route[0]) {
