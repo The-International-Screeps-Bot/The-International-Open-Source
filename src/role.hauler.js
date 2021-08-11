@@ -12,6 +12,10 @@ module.exports = {
                 s.energy < s.energyCapacity
         })
 
+        let ruinWithResources = room.find(FIND_RUINS, {
+            filter: ruin => ruin.store.getUsedCapacity() >= creep.store.getCapacity()
+        })
+
         let storage = creep.room.storage
         let terminal = creep.room.terminal
 
@@ -375,6 +379,32 @@ module.exports = {
             } else {
 
                 task = "noDeliveryPossible"
+            }
+        } else if (task == "collectFromRuins" && ruinWithResources) {
+
+            creep.isFull()
+
+            if (creep.memory.isFull) {
+
+                if (terminal && terminal.store.getFreeCapacity() >= 10000) {
+
+                    for (let resourceType in ruinWithResources) {
+
+                        creep.advancedTransfer(terminal, resourceType)
+                    }
+                } else if (storage && storage.store.getFreeCapacity() >= 50000) {
+
+                    for (let resourceType in ruinWithResources) {
+
+                        creep.advancedTransfer(storage, resourceType)
+                    }
+                }
+            } else {
+
+                for (let resourceType in ruinWithResources) {
+
+                    creep.advancedWithdraw(ruinWithResources, resourceType)
+                }
             }
         } else if (!task || task == "noDeliveryPossible") {
 
