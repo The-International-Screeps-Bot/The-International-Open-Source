@@ -1,6 +1,4 @@
-let roomVariables = require("roomVariables")
-
-function construction(room) {
+function construction(room, specialStructures) {
 
     destroySites("")
 
@@ -82,8 +80,6 @@ function construction(room) {
             structure.destroy()
         }
     }
-
-    let { specialStructures } = roomVariables(room)
 
     let source1 = room.getObjectWithId(room.memory.source1)
     let source2 = room.getObjectWithId(room.memory.source2)

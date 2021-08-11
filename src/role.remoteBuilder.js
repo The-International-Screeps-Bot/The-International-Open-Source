@@ -164,25 +164,45 @@ module.exports = {
                     }
                 } else {
 
-                    let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
+                    const anchorPoint = creep.room.memory.anchorPoint
 
-                    if (spawn && creep.pos.getRangeTo(spawn) > 5) {
+                    if (anchorPoint) {
 
-                        creep.advancedPathing({
-                            origin: creep.pos,
-                            goal: { pos: spawn.pos, range: 5 },
-                            plainCost: false,
-                            swampCost: false,
-                            defaultCostMatrix: creep.memory.defaultCostMatrix,
-                            avoidStages: [],
-                            flee: false,
-                            cacheAmount: 10,
-                        })
+                        if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) != 6) {
+
+                            creep.say("AIR" + creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y))
+
+                            if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
+
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: anchorPoint, range: 6 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: false,
+                                    avoidStages: [],
+                                    flee: false,
+                                    cacheAmount: 10,
+                                })
+                            } else {
+
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: anchorPoint, range: 6 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: false,
+                                    avoidStages: [],
+                                    flee: true,
+                                    cacheAmount: 10,
+                                })
+                            }
+                        }
                     }
                 }
             } else {
 
-                creep.say("🚬")
+                creep.say(roomFrom)
 
                 creep.advancedPathing({
                     origin: creep.pos,
