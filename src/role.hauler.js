@@ -13,7 +13,7 @@ module.exports = {
         })
 
         let ruinWithResources = creep.pos.findClosestByRange(FIND_RUINS, {
-            filter: ruin => ruin.store.getUsedCapacity() >= creep.store.getCapacity()
+            filter: ruin => ruin.store.getUsedCapacity() >= creep.store.getFreeCapacity()
         })
 
         let storage = creep.room.storage
@@ -380,7 +380,9 @@ module.exports = {
 
                 task = "noDeliveryPossible"
             }
-        } else if (task == "collectFromRuins" && ruinWithResources) {
+        } else if (task == "collectFromRuin") {
+
+            creep.say("CFR")
 
             creep.isFull()
 
@@ -388,23 +390,26 @@ module.exports = {
 
                 if (terminal && terminal.store.getFreeCapacity() >= 10000) {
 
-                    for (let resourceType in ruinWithResources) {
+                    for (let resourceType in creep.store) {
 
                         creep.advancedTransfer(terminal, resourceType)
                     }
                 } else if (storage && storage.store.getFreeCapacity() >= 50000) {
 
-                    for (let resourceType in ruinWithResources) {
+                    for (let resourceType in creep.store) {
 
                         creep.advancedTransfer(storage, resourceType)
                     }
                 }
-            } else {
+            } else if (ruinWithResources) {
 
-                for (let resourceType in ruinWithResources) {
+                for (let resourceType in ruinWithResources.store) {
 
                     creep.advancedWithdraw(ruinWithResources, resourceType)
                 }
+            } else {
+
+                creep.memory.task = undefined
             }
         } else if (!task || task == "noDeliveryPossible") {
 
