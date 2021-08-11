@@ -702,7 +702,6 @@ Creep.prototype.advancedPathing = function(opts) {
     }
 
     creep.room.visual.poly(path, { stroke: Memory.global.colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
-
 }
 Creep.prototype.roadPathing = function(origin, goal) {
 

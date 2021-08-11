@@ -31,9 +31,9 @@ module.exports = {
 
                 creep.rampartPathing(creep.pos, goal)
 
-                if (closestHostile.pos.isNearTo(creep)) {
+                if (creep.pos.getRangeTo(closestHostile) == 1) {
 
-                    creep.rangedMassAttack(closestHostile)
+                    creep.rangedMassAttack()
                 } else {
 
                     creep.rangedAttack(closestHostile)

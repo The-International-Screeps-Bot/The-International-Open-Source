@@ -206,7 +206,7 @@ function construction(room, specialStructures) {
                 }
             }).path
 
-            new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+            room.visual.poly(path, { stroke: Memory.global.colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
 
             for (let i = 0; i < path.length; i++) {
 
@@ -299,7 +299,7 @@ function construction(room, specialStructures) {
                 }
             }).path
 
-            new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+            room.visual.poly(path, { stroke: Memory.global.colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
 
             for (let i = 0; i < path.length; i++) {
 
@@ -390,7 +390,7 @@ function construction(room, specialStructures) {
                 }
             }).path
 
-            new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+            room.visual.poly(path, { stroke: Memory.global.colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
 
             for (let i = 0; i < path.length; i++) {
 
@@ -484,7 +484,7 @@ function construction(room, specialStructures) {
                 }
             }).path
 
-            new RoomVisual(room.name).poly(path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
+            room.visual.poly(path, { stroke: Memory.global.colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
 
             for (let i = 0; i < path.length; i++) {
 

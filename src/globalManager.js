@@ -100,21 +100,23 @@ function globalManager() {
 
         function findCommuneEstablisher(newCommune) {
 
-            for (let maxDistance = 1; maxDistance <= 12; maxDistance++) {
+            for (let stage = 8; stage != 0; stage--) {
+                for (let maxDistance = 1; maxDistance < 10; maxDistance++) {
 
-                for (let roomName in Game.rooms) {
+                    for (let roomName in Game.rooms) {
 
-                    room = Game.rooms[roomName]
+                        room = Game.rooms[roomName]
 
-                    if (room.controller && room.controller.my && room.memory.stage >= 3) {
+                        if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.memory.stage >= 3) {
 
-                        let distance = Game.map.getRoomLinearDistance(newCommune, room.name)
+                            let distance = Game.map.getRoomLinearDistance(newCommune, room.name)
 
-                        if (distance < maxDistance) {
+                            if (distance < maxDistance) {
 
-                            console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
+                                console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
 
-                            return room.name
+                                return room.name
+                            }
                         }
                     }
                 }
