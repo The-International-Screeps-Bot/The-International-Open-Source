@@ -35,19 +35,28 @@ module.exports = {
 
             if (creep.memory.isFull) {
 
-                let constructionSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
+                const controller = creep.room.controller
 
-                if (constructionSites.length > 0) {
+                if (controller.ticksToDowngrade <= 5000) {
 
-                    let constructionSite = creep.pos.findClosestByRange(constructionSites)
-
-                    creep.say("🚧")
-
-                    creep.constructionBuild(constructionSite)
+                    roleUpgrader.run(creep)
 
                 } else {
 
-                    roleUpgrader.run(creep)
+                    let constructionSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
+
+                    if (constructionSites.length > 0) {
+
+                        let constructionSite = creep.pos.findClosestByRange(constructionSites)
+
+                        creep.say("🚧")
+
+                        creep.constructionBuild(constructionSite)
+
+                    } else {
+
+                        roleUpgrader.run(creep)
+                    }
                 }
             } else {
 
@@ -114,27 +123,38 @@ module.exports = {
                                     }
                                 } else {
 
-                                    if (!creep.room.controller.my) {
+                                    creep.say("🚬")
 
-                                        let rampart = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                                            filter: s => s.structureType == STRUCTURE_RAMPART
-                                        })
+                                    const anchorPoint = creep.room.memory.anchorPoint
 
-                                        if (rampart) {
+                                    if (anchorPoint) {
 
-                                            if (creep.pos.getRangeTo(rampart) <= 1) {
+                                        if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) != 6) {
 
-                                                creep.dismantle(rampart)
+                                            creep.say("AIR" + creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y))
+
+                                            if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
+
+                                                creep.advancedPathing({
+                                                    origin: creep.pos,
+                                                    goal: { pos: anchorPoint, range: 6 },
+                                                    plainCost: false,
+                                                    swampCost: false,
+                                                    defaultCostMatrix: false,
+                                                    avoidStages: [],
+                                                    flee: false,
+                                                    cacheAmount: 10,
+                                                })
                                             } else {
 
                                                 creep.advancedPathing({
                                                     origin: creep.pos,
-                                                    goal: { pos: rampart.pos, range: 1 },
-                                                    plainCost: 3,
-                                                    swampCost: 8,
-                                                    defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                                    goal: { pos: anchorPoint, range: 6 },
+                                                    plainCost: false,
+                                                    swampCost: false,
+                                                    defaultCostMatrix: false,
                                                     avoidStages: [],
-                                                    flee: false,
+                                                    flee: true,
                                                     cacheAmount: 10,
                                                 })
                                             }
