@@ -21,23 +21,26 @@ module.exports = {
 
             creep.controllerUpgrade(creep.room.controller)
 
-            if (controllerLink && controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
-                if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
+            if (controllerLink || controllerContainer) {
 
-                    creep.advancedWithdraw(controllerLink, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
+                if (controllerLink && controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
+                    if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
+
+                        creep.advancedWithdraw(controllerLink, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
+                    }
+                } else if (controllerContainer && controllerContainer.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
+                    if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
+
+                        creep.advancedWithdraw(controllerContainer, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
+                    }
+                } else {
+
+                    creep.say("NE")
+
+                    let goal = { pos: creep.room.controller.pos, range: 2 }
+
+                    creep.creepFlee(creep.pos, goal)
                 }
-            } else if (controllerContainer && controllerContainer.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
-                if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
-
-                    creep.advancedWithdraw(controllerContainer, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
-                }
-            } else {
-
-                creep.say("NE")
-
-                let goal = { pos: creep.room.controller.pos, range: 2 }
-
-                creep.creepFlee(creep.pos, goal)
             }
         } else {
 
