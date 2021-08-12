@@ -305,7 +305,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
     if (stage >= 4) {
 
-        minCreeps["remoteBuilder"] = 1 /* + Math.floor(room.memory.remoteRooms.length / 3) */
+        minCreeps["remoteBuilder"] = 1 + Math.floor(room.memory.remoteRooms.length / 3)
     }
 
     if (stage >= 3) {
