@@ -1,11 +1,7 @@
 module.exports = {
     run: function(creep) {
 
-        var target = creep.memory.target
-
-        let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
-
-        if (creepIsEdge) {
+        if (creep.isEdge()) {
 
             const direction = creep.pos.getDirectionTo(25, 25)
             creep.move(direction);

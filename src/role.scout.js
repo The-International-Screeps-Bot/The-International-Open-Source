@@ -191,9 +191,7 @@ module.exports = {
 
                     if (creep.room.find(FIND_SOURCES).length == 2 && Memory.global.communes.length < Game.gcl.level && creep.room.memory.claim != true && creep.room.memory.claim != "notViable" && controller && !controller.owner && !controller.reservation && creep.findSafeDistance(creep.pos, goal, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10) {
 
-                        let creepIsEdge = (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49)
-
-                        if (creepIsEdge) {
+                        if (creep.isEdge()) {
 
                             creep.advancedPathing({
                                 origin: creep.pos,
