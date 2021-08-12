@@ -4,6 +4,7 @@ let allyList = [
     "barryoseven",
     "nevercast",
     "slowmotionghost",
+    "sbense",
 ]
 
 module.exports = allyList
