@@ -182,7 +182,7 @@ function spawnRequests(room, spawns, specialStructures) {
             return
         }
 
-        if (Memory.global.attackingRoom == room) {
+        if (Memory.global.attackingRoom == room.name) {
 
             minCreeps["antifaAssaulter"] = 4
             minCreeps["antifaSupporter"] = minCreeps["antifaAssaulter"]
@@ -305,7 +305,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
     if (stage >= 4) {
 
-        minCreeps["remoteBuilder"] = 1 + Math.round(room.memory.remoteRooms.length / 3)
+        minCreeps["remoteBuilder"] = 1 + Math.floor(room.memory.remoteRooms.length / 3)
     }
 
     if (stage >= 3) {

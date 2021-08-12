@@ -58,7 +58,7 @@ function creepOpts(room, spawns, specialStructures) {
 
                 if (object.defaultParts.length > 0) body.push(object.defaultParts)
 
-                var bodyAmount = Math.round((energyType - object.defaultCost) / object.extraCost)
+                var bodyAmount = Math.floor((energyType - object.defaultCost) / object.extraCost)
 
                 bodyTier = Math.min(bodyAmount, sliceAmount)
 
@@ -500,7 +500,7 @@ function creepOpts(room, spawns, specialStructures) {
                 defaultCost: 0,
                 extraParts: [HEAL, MOVE],
                 extraCost: 300,
-                sliceAmount: 50
+                sliceAmount: 10
             }],
             "antifaSupporter", {})
     } else if (squadType == "attack") {
