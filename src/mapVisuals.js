@@ -61,7 +61,7 @@ function mapVisuals() {
     }
     if (Memory.global.attackingRoom && Memory.global.attackTarget) {
 
-        Game.map.visual.line(new RoomPosition(25, 25, Memory.global.attackingRoom.name), new RoomPosition(25, 25, Memory.global.attackTarget), { width: 2.5, color: '#FE411E', lineStyle: "dashed", opacity: 0.8 })
+        Game.map.visual.line(new RoomPosition(25, 25, Memory.global.attackingRoom), new RoomPosition(25, 25, Memory.global.attackTarget), { width: 2.5, color: '#FE411E', lineStyle: "dashed", opacity: 0.8 })
 
 
         if (Memory.global.attackTarget) {
@@ -72,7 +72,7 @@ function mapVisuals() {
 
         if (Memory.global.communeEstablisher && Memory.global.newCommune) {
 
-            Game.map.visual.line(new RoomPosition(25, 25, Memory.global.communeEstablisher.name), new RoomPosition(25, 25, Memory.global.newCommune), { width: 2.5, color: '#00e600', lineStyle: "dashed", opacity: 0.8 })
+            Game.map.visual.line(new RoomPosition(25, 25, Memory.global.communeEstablisher), new RoomPosition(25, 25, Memory.global.newCommune), { width: 2.5, color: '#00e600', lineStyle: "dashed", opacity: 0.8 })
         }
 
         if (Memory.global.newCommune) {

@@ -1,3 +1,5 @@
+let allyList = require("allyList")
+
 var roleBuilder = require('role.builder')
 var roleUpgrader = require('role.upgrader')
 
@@ -28,6 +30,17 @@ module.exports = {
                 cacheAmount: 10,
             })
         } else {
+
+            let hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+                filter: (c) => {
+                    return (!allyList.includes(c.owner.username.toLowerCase()) && c.structureType == STRUCTURE_INVADER_CORE)
+                }
+            })
+
+            if ((hostileStructure || creep.room.controller.reservation || (creep.room.controller.owner && !creep.room.controller.my)) && Memory.global.newCommunes.includes(creep.room.name)) {
+
+                Memory.global.newCommunes = Memory.global.newCommunes.slice(1, Memory.global.newCommunes.length)
+            }
 
             creep.isFull()
 
@@ -168,4 +181,4 @@ module.exports = {
             creep.avoidHostiles()
         }
     }
-};
+}

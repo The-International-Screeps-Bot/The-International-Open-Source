@@ -44,38 +44,34 @@ function creepOpts(room, spawns, specialStructures) {
 
             sliceAmount = object.sliceAmount
 
-            if (roomFix && stage >= object.stage) {
+            if (stage < object.stage) continue
+
+            if (roomFix) {
 
                 getParts(freeEnergy)
-                break
 
-            } else if (!roomFix && stage >= object.stage) {
+            } else getParts(capacityEnergy)
 
-                getParts(capacityEnergy)
-                break
-            }
+            break
 
             function getParts(energyType) {
 
-                cost += object.defaultCost + object.extraCost
+                if (object.defaultParts.length > 0) body.push(object.defaultParts)
 
-                if (object.defaultParts[0]) {
-
-                    body.push(object.defaultParts)
-                    bodyTier++
-                }
-
-                var bodyAmount = Math.floor((energyType - object.defaultCost) / object.extraCost)
+                var bodyAmount = Math.round((energyType - object.defaultCost) / object.extraCost)
 
                 bodyTier = Math.min(bodyAmount, sliceAmount)
 
-                if (bodyAmount != Infinity) {
+                if (bodyAmount == Infinity) return
 
-                    for (let i = 0; i < bodyAmount && i < sliceAmount; i++) {
+                for (let i = 0; i < bodyAmount && (body.length + object.extraParts.length) <= sliceAmount; i++) {
 
-                        body.push(object.extraParts)
-                    }
+                    body.push(object.extraParts)
+
+                    cost += object.extraCost
                 }
+
+                cost += object.defaultCost
             }
         }
 
@@ -83,7 +79,7 @@ function creepOpts(room, spawns, specialStructures) {
 
         let memory = { role: role, roomFrom: room.name }
 
-        for (let property of Object.keys(memoryAdditions)) {
+        for (let property in memoryAdditions) {
 
             memory[property] = memoryAdditions[property]
         }
@@ -558,4 +554,5 @@ function creepOpts(room, spawns, specialStructures) {
     }
 }
 
+module.exports = creepOpts
 module.exports = creepOpts

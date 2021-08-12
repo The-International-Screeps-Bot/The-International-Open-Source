@@ -47,39 +47,9 @@ function globalManager() {
     } else {
 
         var commands = {
-            //attackTarget: "E27N17",
+            attackTarget: "W5N3",
         }
     }
-
-    /* let communeEstablisher = findCommuneEstablisher()
-    Memory.global.communeEstablisher = communeEstablisher
-
-    function findCommuneEstablisher() {
-
-        if (!commands.newCommune) return
-
-        Memory.global.newCommune = commands.newCommune
-
-        for (let maxDistance = 1; maxDistance <= 12; maxDistance++) {
-
-            for (let room of Object.keys(Game.rooms)) {
-
-                room = Game.rooms[room]
-
-                if (room.controller && room.controller.my && room.memory.stage >= 3) {
-
-                    let distance = Game.map.getRoomLinearDistance(commands.newCommune, room.name)
-
-                    if (distance < maxDistance) {
-
-                        console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
-
-                        return room
-                    }
-                }
-            }
-        }
-    } */
 
     //
     if (Game.gcl.level == Memory.global.communes.length) Memory.global.newCommunes = []
