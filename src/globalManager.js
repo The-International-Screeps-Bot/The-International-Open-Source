@@ -152,7 +152,7 @@ function globalManager() {
 
                             console.log("AT, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
 
-                            return room
+                            return room.name
                         }
                     }
                 }

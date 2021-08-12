@@ -177,82 +177,80 @@ function roomPlanner(room) {
         if (!collection) return
 
         for (let structureType in collection) {
+
+            if (structureType == "road" && room.controller.level <= 3) continue
+
+            if (structureType == "link" && room.controller.level <= 6) continue
+
             for (let pos of collection[structureType].pos) {
 
                 pos.x += anchorPoint.x - 6
                 pos.y += anchorPoint.y - 6
 
-                if (room.getTerrain().get(pos.x, pos.y) != TERRAIN_MASK_WALL) {
+                if (room.getTerrain().get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
 
-                    if (structureType == "road" && room.controller.level <= 3) {
+                room.createConstructionSite(pos.x, pos.y, structureType)
 
+                if (structureType == "road") {
 
-                    } else if (structureType == "link" && room.controller.level <= 6) {
+                    room.visual.circle(pos.x, pos.y, {
+                        fill: '#FCFEFF',
+                        radius: 0.2,
+                        strokeWidth: 0.125
+                    })
+                } else if (structureType == "extension") {
 
+                    room.visual.circle(pos.x, pos.y, {
+                        fill: '#F4E637',
+                        radius: 0.2,
+                        strokeWidth: 0.125
+                    })
+                } else if (structureType == "tower") {
 
-                    } else {
+                    room.visual.circle(pos.x, pos.y, {
+                        fill: '#FE411E',
+                        radius: 0.2,
+                        strokeWidth: 0.125
+                    })
+                } else if (structureType == "container") {
 
-                        room.createConstructionSite(pos.x, pos.y, structureType)
-                    }
+                    room.visual.circle(pos.x, pos.y, {
+                        fill: 'transparent',
+                        radius: 0.4,
+                        stroke: '#747575',
+                        strokeWidth: 0.125
+                    })
+                } else if (structureType == "spawn") {
 
+                    room.visual.circle(pos.x, pos.y, {
+                        fill: '#FE8F00',
+                        radius: 0.2,
+                        strokeWidth: 0.125
+                    })
+                } else if (structureType == "lab") {
 
-                    if (structureType == "road") {
+                    room.visual.circle(pos.x, pos.y, {
+                        fill: '#B6B7B8',
+                        radius: 0.2,
+                        strokeWidth: 0.125
+                    })
+                } else {
 
-                        room.visual.circle(pos.x, pos.y, {
-                            fill: '#FCFEFF',
-                            radius: 0.2,
-                            strokeWidth: 0.125
-                        })
-                    } else if (structureType == "extension") {
-
-                        room.visual.circle(pos.x, pos.y, {
-                            fill: '#F4E637',
-                            radius: 0.2,
-                            strokeWidth: 0.125
-                        })
-                    } else if (structureType == "tower") {
-
-                        room.visual.circle(pos.x, pos.y, {
-                            fill: '#FE411E',
-                            radius: 0.2,
-                            strokeWidth: 0.125
-                        })
-                    } else if (structureType == "container") {
-
-                        room.visual.circle(pos.x, pos.y, {
-                            fill: 'transparent',
-                            radius: 0.4,
-                            stroke: '#747575',
-                            strokeWidth: 0.125
-                        })
-                    } else if (structureType == "spawn") {
-
-                        room.visual.circle(pos.x, pos.y, {
-                            fill: '#FE8F00',
-                            radius: 0.2,
-                            strokeWidth: 0.125
-                        })
-                    } else if (structureType == "lab") {
-
-                        room.visual.circle(pos.x, pos.y, {
-                            fill: '#B6B7B8',
-                            radius: 0.2,
-                            strokeWidth: 0.125
-                        })
-                    } else {
-
-                        room.visual.circle(pos.x, pos.y, {
-                            fill: '#B03CBD',
-                            radius: 0.2,
-                            strokeWidth: 0.125
-                        })
-                    }
+                    room.visual.circle(pos.x, pos.y, {
+                        fill: '#B03CBD',
+                        radius: 0.2,
+                        strokeWidth: 0.125
+                    })
                 }
             }
         }
     }
 
     function placeRamparts(ramparts) {
+
+        if (room.memory.stage && room.memory.stage < 4) return
+
+        if (!room.storage && room.storage.store[RESOURCE_ENERGY] < 45000) return
 
         let collection
 
@@ -272,26 +270,15 @@ function roomPlanner(room) {
                 pos.x += anchorPoint.x - 6
                 pos.y += anchorPoint.y - 6
 
-                if (room.getTerrain().get(pos.x, pos.y) != TERRAIN_MASK_WALL) {
+                if (room.getTerrain().get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
 
-                    if (room.memory.stage >= 4) {
-                        if (room.storage) {
-                            if (room.storage.store[RESOURCE_ENERGY] >= 45000) {
+                room.createConstructionSite(pos.x, pos.y, structureType)
 
-                                room.createConstructionSite(pos.x, pos.y, structureType)
-                            }
-                        } else {
-
-                            room.createConstructionSite(pos.x, pos.y, structureType)
-                        }
-                    }
-
-                    room.visual.circle(pos.x, pos.y, {
-                        fill: '#4def52',
-                        radius: 0.2,
-                        strokeWidth: 0.125
-                    })
-                }
+                room.visual.circle(pos.x, pos.y, {
+                    fill: '#4def52',
+                    radius: 0.2,
+                    strokeWidth: 0.125
+                })
             }
         }
     }
