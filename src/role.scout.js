@@ -213,12 +213,12 @@ module.exports = {
 
                         let nearGhost = false
 
-                        let exits = Game.map.describeExits(roomName)
+                        let exits = Game.map.describeExits(creep.room.name)
                         let exitRoomNames = []
 
                         for (let property in exits) {
 
-                            exits.push(exits[property])
+                            exitRoomNames.push(exits[property])
                         }
 
                         for (let roomName of exitRoomNames) {

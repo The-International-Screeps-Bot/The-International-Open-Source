@@ -13,7 +13,7 @@ Room.prototype.findExitRooms = function(roomName) {
 
     for (let property in exits) {
 
-        exits.push(exits[property])
+        exitRoomNames.push(exits[property])
     }
 
     return exitRoomNames
