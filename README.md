@@ -41,11 +41,11 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [x] Automated scouting
 - [x] Basic factory operations
 - [ ] Commodity factory opperations
-- [ ] Automated intel on enemies
+- [x] Automated intel on enemies
 - [ ] Automated attacking
 - [ ] Different, functional room blueprints depending on room size and shape
-- [ ] Automated recording of viable rooms to claim
-- [ ] Automated claiming of rooms
+- [x] Automated recording of viable rooms to claim
+- [x] Automated claiming of rooms
 - [x] Automated recording of viable remote harvesting rooms
 - [x] Add room and map visuals to display important information
 - [ ] Power creep offensive capabilities
@@ -72,5 +72,4 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [ ] Squads morph size shape and amount depending on situation
 - [x] Squads flee when overwhelmed or avoiding range of enemy
 - [x] Haulers to manage mineral containers
-- [ ] Create a traffic manager
-- [ ] Creep recycling at early stages to transport energy
+- [ ] Traffic manager to improve pathing
