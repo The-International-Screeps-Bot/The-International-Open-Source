@@ -508,7 +508,7 @@ function antifa(room, creeps) {
                             } else {
 
                                 let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
-                                    filter: s => s.structureType != STRUCTURE_CONTROLLER
+                                    filter: s => (!allyList.includes(toLowerCase(s.owner.username)) && s.structureType != STRUCTURE_CONTROLLER)
                                 })
 
                                 if (closestHostileStructure) {

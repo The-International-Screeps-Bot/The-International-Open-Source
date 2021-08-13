@@ -93,7 +93,48 @@ function creepOpts(room, spawns, specialStructures) {
         }
     }
 
+    class BodyPart {
+        constructor(partType, cost) {
+
+            this.type = partType
+            this.cost = cost
+        }
+    }
+
+    // Economy
+
+    let workPart = new BodyPart(WORK, 100)
+    let carryPart = new BodyPart(CARRY, 50)
+
+    // Combat
+
+    let attackPart = new BodyPart(ATTACK, 80)
+    let rangedAttackPart = new BodyPart(RANGED_ATTACK, 150)
+    let healPart = new BodyPart(HEAL, 250)
+    let toughPart = new BodyPart(TOUGH, 10)
+
+    // Other
+
+    let movePart = new BodyPart(MOVE, 50)
+    let claimPart = new BodyPart(CLAIM, 600)
+
+    // Define spawn opts for role
+
     let roleOpts = {}
+
+    /*     roleOpts["jumpStarter"] = roleValues({
+            role: "jumpStarter",
+            parts: {
+                1: {
+                    defaultParts: [],
+                    extraParts: [workPart, movePart, carryPart, movePart],
+                    maxParts: 20
+                },
+            },
+            memoryAdditions: {}
+        }) */
+
+    //
 
     roleOpts["jumpStarter"] = roleValues(
         [{
