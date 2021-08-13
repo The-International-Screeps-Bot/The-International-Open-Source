@@ -1,5 +1,6 @@
 let findAnchor = require("findAnchor")
 let allyList = require("allyList")
+require("roomFunctions")
 
 module.exports = {
     run: function(creep) {
@@ -96,6 +97,10 @@ module.exports = {
                         //output an integer from 1-6
                         let signType = Math.floor(Math.random(7) * 10)
 
+                        let messages = [
+                            "The top 1% have more money than the poorest 4.5 billion",
+                        ]
+
                         if (signType == 1) {
 
                             creep.signController(controller, "The top 1% have more money than the poorest 4.5 billion")
@@ -124,30 +129,31 @@ module.exports = {
 
                             creep.room.memory.stage = "allyRoom"
                             creep.room.memory.owner = controller.owner.username
-                            creep.room.memory.power = controller.level
+                            creep.room.memory.level = controller.level
 
                         } else {
 
                             creep.room.memory.stage = "enemyRoom"
                             creep.room.memory.owner = controller.owner.username
-                            creep.room.memory.power = controller.level
+                            creep.room.memory.level = controller.level
                             creep.room.memory.threat = 0
+
+                            /* creep.room.memory.maxRampart = */
+                            /* creep.room.memory.towerAmount =  */
+                            /* creep.room.memory.spawnAmount =  */
+                            /* creep.room.memory.labAmount =  */
+                            /* creep.room.memory.storedEnergy =  */
+                            /* creep.room.memory.boosts = {attack, rangedAttack, work} */
                         }
                     }
 
-                    if (controller.reservation && controller.reservation.username != "MarvinTMB") {
-
-                        creep.say("1")
+                    if (controller.reservation && controller.reservation.username != "MarvinTMB" && controller.reservation.username != "Invader") {
 
                         if (allyList.indexOf((controller.reservation.username).toLowerCase()) >= 0) {
-
-                            creep.say("2")
 
                             creep.room.memory.stage = "allyReservation"
 
                         } else {
-
-                            creep.say("3")
 
                             creep.room.memory.stage = "enemyReservation"
                         }
@@ -205,6 +211,21 @@ module.exports = {
                             })
                         }
 
+                        let nearGhost = false
+
+                        let exits = Game.map.describeExits(roomName)
+                        let exitRoomNames = []
+
+                        for (let property in exits) {
+
+                            exits.push(exits[property])
+                        }
+
+                        for (let roomName of exitRoomNames) {
+
+                            if (Memory.rooms[roomName].owner && Memory.rooms[roomName].owner == "slowmotionghost") nearGhost = true
+                        }
+
                         let nearbyCommunes
 
                         for (let commune of Memory.global.communes) {
@@ -220,7 +241,7 @@ module.exports = {
 
                         creep.say("N")
 
-                        if (!nearbyCommunes) {
+                        if (!nearbyCommunes && !nearGhost) {
 
                             creep.say("NNC")
 

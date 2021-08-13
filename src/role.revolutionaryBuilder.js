@@ -8,7 +8,11 @@ module.exports = {
 
         const newCommune = Memory.global.newCommune
 
-        if (!newCommune) roleBuilder.run(creep)
+        if (!newCommune) {
+
+            roleBuilder.run(creep)
+            return
+        }
 
         if (creep.isEdge()) {
 
