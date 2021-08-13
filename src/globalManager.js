@@ -42,12 +42,12 @@ function globalManager() {
     if (Game.shard.name == "shard2") {
 
         var commands = {
-            //attackTarget: "E28N8",
+            /* attackTarget: "E28N8", */
         }
     } else {
 
         var commands = {
-            attackTarget: "W5N3",
+            /* attackTarget: "W5N3", */
         }
     }
 
