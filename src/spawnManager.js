@@ -1,4 +1,4 @@
-let creepOpts = require("creepOpts")
+let spawnVariables = require("spawnVariables")
 let spawnRequests = require("spawnRequests")
 
 function spawnManager(room, spawns, specialStructures) {
@@ -22,7 +22,7 @@ function spawnManager(room, spawns, specialStructures) {
 
     // Return values needed for spawning
 
-    let { roleOpts } = creepOpts(room, spawns, specialStructures)
+    let { roleOpts } = spawnVariables(room, spawns, specialStructures)
 
     let { requiredCreeps } = spawnRequests(room, spawns, specialStructures)
 
@@ -59,4 +59,5 @@ function spawnManager(room, spawns, specialStructures) {
     }
 }
 
+module.exports = spawnManager
 module.exports = spawnManager
