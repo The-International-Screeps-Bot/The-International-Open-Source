@@ -3,6 +3,8 @@ module.exports = {
 
         const newCommune = Memory.global.newCommune
 
+        if (!newCommune) return
+
         if (creep.room.name == newCommune) {
 
             creep.say("C")
