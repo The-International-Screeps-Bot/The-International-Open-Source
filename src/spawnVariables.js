@@ -259,7 +259,7 @@ function roleOpts(room, spawns, specialStructures) {
             }
         },
         memoryAdditions: {
-            remoteRoom: findRemoteRoom("remoteHarvester1")
+            remoteRoom: findRemoteRoom("remoteHarvester2")
         }
     })
 
@@ -278,7 +278,7 @@ function roleOpts(room, spawns, specialStructures) {
             }
         },
         memoryAdditions: {
-            remoteRoom: findRemoteRoom("remoteHarvester1")
+            remoteRoom: findRemoteRoom("remoteHauler")
         }
     })
 
@@ -292,7 +292,7 @@ function roleOpts(room, spawns, specialStructures) {
             }
         },
         memoryAdditions: {
-            remoteRoom: findRemoteRoom("remoteHarvester1")
+            remoteRoom: findRemoteRoom("reserver")
         }
     })
 
