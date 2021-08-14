@@ -1,4 +1,5 @@
 let mapVisuals = require("mapVisuals")
+require("roomFunctions")
 
 function globalManager() {
 
@@ -47,7 +48,7 @@ function globalManager() {
     } else {
 
         var commands = {
-            /* attackTarget: "W5N3", */
+            /* attackTarget: "W6N3", */
         }
     }
 
@@ -71,15 +72,15 @@ function globalManager() {
         function findCommuneEstablisher(newCommune) {
 
             for (let stage = 8; stage != 0; stage--) {
-                for (let maxDistance = 1; maxDistance < 10; maxDistance++) {
+                for (let maxDistance = 1; maxDistance < 11; maxDistance++) {
 
                     for (let roomName in Game.rooms) {
 
                         room = Game.rooms[roomName]
 
-                        if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.memory.stage >= 3) {
+                        if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.memory.stage >= 3 && room.memory.anchorPoint) {
 
-                            let distance = Game.map.getRoomLinearDistance(newCommune, room.name)
+                            let distance = room.findSafeDistance(room.memory.anchorPoint, { pos: new RoomPosition(25, 25, newCommune), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
 
                             if (distance < maxDistance) {
 

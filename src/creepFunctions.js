@@ -1164,7 +1164,7 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
 
 Creep.prototype.findSafeDistance = function(origin, goal, avoidStages) {
 
-    let creep = TERMINAL_HITS
+    let creep = this
 
     let route = Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
         routeCallback(roomName) {

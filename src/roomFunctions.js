@@ -28,3 +28,23 @@ Room.prototype.storedEnergy = function(room) {
 
     return storedEnergy
 }
+Room.prototype.findSafeDistance = function(origin, goal, avoidStages) {
+
+    let route = Game.map.findRoute(origin.roomName, goal.pos.roomName, {
+        routeCallback(roomName) {
+
+            if (roomName == goal.pos.roomName) {
+
+                return 1
+            }
+            if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName].stage)) {
+
+                return 1
+            }
+
+            return Infinity
+        }
+    })
+
+    return route.length
+}
