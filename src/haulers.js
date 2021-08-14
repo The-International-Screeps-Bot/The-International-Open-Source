@@ -1,5 +1,7 @@
 function haulers(room, haulers) {
 
+    return
+
     const stage = room.memory.stage
     const storage = room.storage
     const terminal = room.terminal

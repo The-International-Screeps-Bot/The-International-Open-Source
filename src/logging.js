@@ -123,7 +123,7 @@ function logging() {
                 <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Alles: ` + allyList + `</th>
             </tr>
             <tr style="background: #333">
-                <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Creeps: ` + Object.keys(Memory.creeps).length + " (" + Math.floor(Object.keys(Memory.creeps).length / myRoomsNumber()) + " / room)" + `</th>
+                <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Creeps: ` + Object.keys(Memory.creeps).length + " (" + Math.floor(Object.keys(Memory.creeps).length / myRoomsNumber()) + " per room)" + `</th>
                 <th style="text-align: center; padding: 5px 0;">Total Boosts: ` + "x" + `</th>
                 <th style="text-align: center; padding: 5px 0;">Last Attack: ` + "x ticks ago, room y" + `</th>
                 <th style="text-align: center; padding: 5px 0;">Market Offers: ` + Object.keys(Game.market.orders).length + `</th>

@@ -2,7 +2,7 @@ module.exports = {
     run: function(creep) {
 
         let lowTower = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-            filter: (s) => (s.structureType == STRUCTURE_TOWER) && s.energy < 500
+            filter: s => s.structureType == STRUCTURE_TOWER && s.store.getUsedCapacity(RESOURCE_ENERGY) < 500
         })
 
         let essentialStructure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
@@ -49,7 +49,7 @@ module.exports = {
 
             creep.isFull()
 
-            if (creep.memory.isFull == false) {
+            if (!creep.memory.isFull) {
 
                 creep.advancedWithdraw(storage)
             } else {

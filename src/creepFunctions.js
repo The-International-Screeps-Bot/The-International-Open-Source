@@ -200,6 +200,8 @@ Creep.prototype.advancedWithdraw = function(target, resource, amount) {
 }
 Creep.prototype.advancedTransfer = function(target, resource) {
 
+    let creep = this
+
     if (!target) return
 
     if (!resource) {

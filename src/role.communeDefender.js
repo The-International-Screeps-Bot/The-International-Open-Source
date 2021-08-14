@@ -97,40 +97,102 @@ module.exports = {
         } else {
             if (creep.room.name == roomFrom) {
 
-                creep.say("🚬")
+                let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                    filter: (c) => {
+                        return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+                    }
+                })
 
-                const anchorPoint = creep.room.memory.anchorPoint
+                creep.say("No Enemy")
 
-                if (anchorPoint) {
+                if (closestHostile) {
 
-                    if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) != 6) {
+                    creep.say("Enemy")
 
-                        creep.say("AIR" + creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y))
+                    let rampart = closestHostile.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_RAMPART
+                    })
 
-                        if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
+                    if (rampart) {
 
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: anchorPoint, range: 6 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: false,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 10,
-                            })
+                        creep.say("Rampart")
+
+                        if (creep.pos.getRangeTo(closestHostile) == 1) {
+
+                            creep.attack(closestHostile)
+
                         } else {
 
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: anchorPoint, range: 6 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: false,
-                                avoidStages: [],
-                                flee: true,
-                                cacheAmount: 10,
+                            let goal = _.map([rampart], function(target) {
+                                return { pos: target.pos, range: 0 }
                             })
+
+                            creep.rampartPathing(creep.pos, goal)
+                        }
+                    } else {
+
+                        creep.say("NE")
+
+                        if (!(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
+
+                            creep.say("H")
+
+                            if (creep.pos.getRangeTo(closestHostile) == 1) {
+
+                                creep.attack(closestHostile)
+
+                            } else {
+
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: closestHostile, range: 6 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: false,
+                                    avoidStages: [],
+                                    flee: false,
+                                    cacheAmount: 10,
+                                })
+                            }
+                        }
+                    }
+                } else {
+
+                    creep.say("🚬")
+
+                    const anchorPoint = creep.room.memory.anchorPoint
+
+                    if (anchorPoint) {
+
+                        if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) != 6) {
+
+                            creep.say("AIR" + creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y))
+
+                            if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
+
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: anchorPoint, range: 6 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: false,
+                                    avoidStages: [],
+                                    flee: false,
+                                    cacheAmount: 10,
+                                })
+                            } else {
+
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: anchorPoint, range: 6 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: false,
+                                    avoidStages: [],
+                                    flee: true,
+                                    cacheAmount: 10,
+                                })
+                            }
                         }
                     }
                 }
