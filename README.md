@@ -15,7 +15,7 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 
 ![Information Panel](images/infopanel.png)
 
-![Grafana](images/grafana.png)
+![Visuals](images/visuals.png)
 
 ## Progress
 
