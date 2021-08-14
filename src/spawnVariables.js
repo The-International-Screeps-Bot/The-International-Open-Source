@@ -79,7 +79,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["hauler"] = roleValues({
         role: "hauler",
         parts: {
-            5600: {
+            5300: {
                 defaultParts: [],
                 extraParts: [carryPart, carryPart, movePart],
                 maxParts: 48
@@ -128,7 +128,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["upgrader"] = roleValues({
         role: "upgrader",
         parts: {
-            12900: {
+            10300: {
                 defaultParts: [carryPart, carryPart],
                 extraParts: [workPart, workPart, movePart],
                 maxParts: 5
@@ -172,7 +172,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["builder"] = roleValues({
         role: "builder",
         parts: {
-            12900: {
+            10300: {
                 defaultParts: [],
                 extraParts: [workPart, carryPart, movePart],
                 maxParts: 36
@@ -194,7 +194,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["barricadeUpgrader"] = roleValues({
         role: "barricadeUpgrader",
         parts: {
-            12900: {
+            10300: {
                 defaultParts: [],
                 extraParts: [workPart, workPart, movePart, workPart, carryPart, movePart],
                 maxParts: 30

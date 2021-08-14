@@ -80,11 +80,11 @@ function spawnRequests(room, spawns, specialStructures) {
 
     let stage = room.memory.stage
 
-    if (spawnCapacity >= 12900) {
+    if (spawnCapacity >= 10300) {
 
         room.memory.stage = 8
 
-    } else if (spawnCapacity >= 5600) {
+    } else if (spawnCapacity >= 5300) {
 
         room.memory.stage = 7
 
