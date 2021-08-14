@@ -24,12 +24,12 @@ module.exports = {
             if (controllerLink || controllerContainer) {
 
                 if (controllerLink && controllerLink.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
-                    if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
+                    if (creep.store.getUsedCapacity() <= creep.findParts("work")) {
 
                         creep.advancedWithdraw(controllerLink, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
                     }
                 } else if (controllerContainer && controllerContainer.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
-                    if (creep.store.getUsedCapacity() <= creep.myParts("work")) {
+                    if (creep.store.getUsedCapacity() <= creep.findParts("work")) {
 
                         creep.advancedWithdraw(controllerContainer, RESOURCE_ENERGY, (creep.store.getCapacity() - creep.store.getUsedCapacity()))
                     }

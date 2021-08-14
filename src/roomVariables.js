@@ -1,3 +1,5 @@
+let allyList = require("allyList")
+
 function roomVariables(room) {
 
     let allCreeps = room.find(FIND_CREEPS)
@@ -23,6 +25,13 @@ function roomVariables(room) {
         hostileCreeps: "",
     }
 
+    function findBuildingConstantOfType(constant, type) {
+
+        return room.find(constant, {
+            filter: building => building.structureType == type
+        })
+    }
+
     let allSites = room.find(FIND_CONSTRUCTION_SITES)
 
     let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
@@ -36,29 +45,17 @@ function roomVariables(room) {
 
     let spawns = room.find(FIND_MY_SPAWNS)
 
-    let links = room.find(FIND_MY_STRUCTURES, {
-        filter: s => s.structureType == STRUCTURE_LINK
-    })
+    let links = findBuildingConstantOfType(FIND_MY_STRUCTURES, STRUCTURE_LINK)
 
-    let labs = room.find(FIND_MY_STRUCTURES, {
-        filter: s => s.structureType == STRUCTURE_LAB
-    })
+    let labs = findBuildingConstantOfType(FIND_MY_STRUCTURES, STRUCTURE_LAB)
 
-    let towers = room.find(FIND_MY_STRUCTURES, {
-        filter: s => s.structureType == STRUCTURE_TOWER
-    })
+    let towers = findBuildingConstantOfType(FIND_MY_STRUCTURES, STRUCTURE_TOWER)
 
-    let containers = room.find(FIND_STRUCTURES, {
-        filter: s => s.structureType == STRUCTURE_CONTAINER
-    })
+    let containers = findBuildingConstantOfType(FIND_STRUCTURES, STRUCTURE_CONTAINER)
 
-    let factory = room.find(FIND_MY_STRUCTURES, {
-        filter: s => s.structureType == STRUCTURE_FACTORY
-    })[0]
+    let factory = findBuildingConstantOfType(FIND_MY_STRUCTURES, STRUCTURE_FACTORY)[0]
 
-    let powerSpawn = room.find(FIND_MY_STRUCTURES, {
-        filter: s => s.structureType == STRUCTURE_POWER_SPAWN
-    })[0]
+    let powerSpawn = findBuildingConstantOfType(FIND_MY_STRUCTURES, STRUCTURE_POWER_SPAWN)[0]
 
     let storage = room.storage
 

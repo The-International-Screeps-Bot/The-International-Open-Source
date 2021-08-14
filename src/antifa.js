@@ -230,7 +230,7 @@ function antifa(room, creeps) {
                                 creep.rangedAttack(closestAttacker)
                             }
                         }
-                        if (closestAttacker && (closestAttacker.body.some(i => i.type === ATTACK) || closestAttacker.getActiveBodyparts(RANGED_ATTACK) <= creep.myParts("rangedAttack")) && creep.pos.getRangeTo(closestAttacker) <= 2) {
+                        if (closestAttacker && (closestAttacker.body.some(i => i.type === ATTACK) || closestAttacker.getActiveBodyparts(RANGED_ATTACK) <= creep.findParts("rangedAttack")) && creep.pos.getRangeTo(closestAttacker) <= 2) {
 
                             let goal = _.map([closestAttacker], function(target) {
                                 return { pos: target.pos, range: 6 }

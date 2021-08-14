@@ -1,4 +1,5 @@
 let { structures } = require("roomVariables")
+require("creepFunctions")
 
 Room.prototype.getObjectWithId = function(id) {
 
@@ -69,4 +70,17 @@ Room.prototype.findTowerDamage = function(towers, pos) {
     creep.room.visual.text(totalDamage, pos.x, pos.y + 0.25, { align: 'center', color: Memory.global.colors.communeBlue, font: "0.7" })
 
     return totalDamage
+}
+Room.prototype.findHealPower = function(pos, range, creeps) {
+
+    let healPower = 0
+
+    for (let creep of creeps) {
+
+        if (creep.pos.getRangeTo(pos) <= range) healPower += creep.findParts("heal") * HEAL_POWER
+    }
+
+    creep.room.visual.text(healPower, pos.x, pos.y + 0.25, { align: 'center', color: Memory.global.colors.allyGreen, font: "0.7" })
+
+    return healPower
 }

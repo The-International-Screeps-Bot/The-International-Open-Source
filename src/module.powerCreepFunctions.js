@@ -20,7 +20,7 @@ PowerCreep.prototype.barricadesFindAndRepair = function() {
 
             let barricade = Game.getObjectById(creep.memory.target)
 
-            if (barricade.hits < barricade.hitsMax && barricade.hits < (creep.memory.quota + creep.myParts("work") * 1000)) {
+            if (barricade.hits < barricade.hitsMax && barricade.hits < (creep.memory.quota + creep.findParts("work") * 1000)) {
 
                 creep.repairBarricades(barricade)
             } else {
@@ -33,7 +33,7 @@ PowerCreep.prototype.barricadesFindAndRepair = function() {
                 filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
             })
 
-            for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
+            for (let quota = creep.findParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.findParts("work") * 1000) {
 
                 let barricade = creep.room.find(FIND_STRUCTURES, {
                     filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
@@ -63,9 +63,9 @@ PowerCreep.prototype.barricadesFindAndRepair = function() {
             filter: s => s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL
         })
 
-        for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
+        for (let quota = creep.findParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.findParts("work") * 1000) {
 
-            quota += creep.myParts("work") * 500
+            quota += creep.findParts("work") * 500
 
             let barricade = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
@@ -105,7 +105,7 @@ PowerCreep.prototype.findEnergyHarvested = function(source) {
 
     creep = this
 
-    let energyHarvested = source.energy - source.energy + creep.myParts("work")
+    let energyHarvested = source.energy - source.energy + creep.findParts("work")
 
     creep.say("⛏️ " + energyHarvested)
     Memory.data.energyHarvested += energyHarvested
@@ -264,8 +264,8 @@ PowerCreep.prototype.controllerUpgrade = function(target) {
         creep.intraRoomPathing(origin, goal)
     } else if (creep.upgradeController(target) == 0) {
 
-        creep.say("🔋 " + creep.myParts("work"))
-        Memory.data.controlPoints += creep.myParts("work")
+        creep.say("🔋 " + creep.findParts("work"))
+        Memory.data.controlPoints += creep.findParts("work")
     }
 
 }

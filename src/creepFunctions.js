@@ -31,7 +31,7 @@ Creep.prototype.barricadesFindAndRepair = function() {
 
         let barricade = Game.getObjectById(creep.memory.target)
 
-        if (barricade && barricade.hits < barricade.hitsMax && barricade.hits < (creep.memory.quota + creep.myParts("work") * 1000)) {
+        if (barricade && barricade.hits < barricade.hitsMax && barricade.hits < (creep.memory.quota + creep.findParts("work") * 1000)) {
 
             creep.repairBarricades(barricade)
         } else {
@@ -46,7 +46,7 @@ Creep.prototype.barricadesFindAndRepair = function() {
 
         if (barricades.length == 0) return
 
-        for (let quota = creep.myParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.myParts("work") * 1000) {
+        for (let quota = creep.findParts("work") * 1000; quota < barricades[0].hitsMax; quota += creep.findParts("work") * 1000) {
 
             let barricade = creep.room.find(FIND_STRUCTURES, {
                 filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < quota
@@ -71,8 +71,7 @@ Creep.prototype.barricadesFindAndRepair = function() {
         }
     }
 }
-
-Creep.prototype.myParts = function(partType) {
+Creep.prototype.findParts = function(partType) {
 
     creep = this
 
@@ -80,12 +79,21 @@ Creep.prototype.myParts = function(partType) {
 
     for (let part of creep.body) {
 
-        if (part.type == partType) {
-
-            partsAmount++
-        }
+        if (part.type == partType) partsAmount += 1
     }
+
     return partsAmount
+}
+Creep.prototype.hasPartsOfTypes = function(partTypes) {
+
+    let creep = this
+
+    for (let partType of partTypes) {
+
+        if (creep.body.some(part => part.type == partType)) return true
+    }
+
+    return false
 }
 Creep.prototype.advancedHarvest = function(target) {
 
@@ -93,7 +101,7 @@ Creep.prototype.advancedHarvest = function(target) {
 
     if (creep.harvest(target) != 0) return false
 
-    let energyHarvested = (target.energy - target.energy) + (creep.myParts("work") * 2)
+    let energyHarvested = (target.energy - target.energy) + (creep.findParts("work") * 2)
 
     creep.say("⛏️ " + energyHarvested)
     Memory.data.energyHarvested += energyHarvested
@@ -102,7 +110,7 @@ Creep.prototype.findEnergyHarvested = function(source) {
 
     creep = this
 
-    let energyHarvested = (source.energy - source.energy) + (creep.myParts("work") * 2)
+    let energyHarvested = (source.energy - source.energy) + (creep.findParts("work") * 2)
 
     creep.say("⛏️ " + energyHarvested)
     Memory.data.energyHarvested += energyHarvested
@@ -111,7 +119,7 @@ Creep.prototype.findMineralsHarvested = function(mineral) {
 
     creep = this
 
-    let mineralsHarvested = mineral.mineralAmount - mineral.mineralAmount + creep.myParts("work")
+    let mineralsHarvested = mineral.mineralAmount - mineral.mineralAmount + creep.findParts("work")
 
     creep.say("⛏️ " + mineralsHarvested)
     Memory.data.mineralsHarvested += mineralsHarvested
@@ -251,9 +259,9 @@ Creep.prototype.repairBarricades = function(target) {
 
     } else if (creep.repair(target) == 0) {
 
-        creep.say("🧱 " + creep.myParts("work"))
+        creep.say("🧱 " + creep.findParts("work"))
 
-        Memory.data.energySpentOnBarricades += creep.myParts("work")
+        Memory.data.energySpentOnBarricades += creep.findParts("work")
     }
 }
 Creep.prototype.repairStructure = function(target) {
@@ -279,9 +287,9 @@ Creep.prototype.repairStructure = function(target) {
 
     } else if (creep.repair(target) == 0) {
 
-        creep.say("🔧 " + creep.myParts("work"))
+        creep.say("🔧 " + creep.findParts("work"))
 
-        Memory.data.energySpentOnRepairs += creep.myParts("work")
+        Memory.data.energySpentOnRepairs += creep.findParts("work")
     }
 }
 Creep.prototype.constructionBuild = function(target) {
@@ -303,9 +311,9 @@ Creep.prototype.constructionBuild = function(target) {
 
     } else if (creep.build(target) == 0) {
 
-        creep.say("🚧 " + creep.myParts("work"))
+        creep.say("🚧 " + creep.findParts("work"))
 
-        Memory.data.energySpentOnConstruction += creep.myParts("work")
+        Memory.data.energySpentOnConstruction += creep.findParts("work")
     }
 }
 Creep.prototype.controllerUpgrade = function(target) {
@@ -325,8 +333,8 @@ Creep.prototype.controllerUpgrade = function(target) {
 
     } else if (creep.upgradeController(target) == 0) {
 
-        creep.say("🔋 " + creep.myParts("work"))
-        Memory.data.controlPoints += creep.myParts("work")
+        creep.say("🔋 " + creep.findParts("work"))
+        Memory.data.controlPoints += creep.findParts("work")
     }
 }
 Creep.prototype.searchSourceContainers = function() {
@@ -390,6 +398,7 @@ Creep.prototype.avoidHostiles = function() {
                     flee: true,
                     cacheAmount: 1,
                 })
+
                 break
             }
         }

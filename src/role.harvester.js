@@ -26,7 +26,7 @@ module.exports = {
 
                     creep.advancedHarvest(source1)
 
-                    if (creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.myParts("work") * 2) {
+                    if (creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.findParts("work") * 2) {
 
                         creep.transfer(sourceLink1, RESOURCE_ENERGY)
                     }
@@ -92,7 +92,7 @@ module.exports = {
 
                     creep.advancedHarvest(source2)
 
-                    if (creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.myParts("work") * 2) {
+                    if (creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.findParts("work") * 2) {
 
                         creep.transfer(sourceLink2, RESOURCE_ENERGY)
                     }

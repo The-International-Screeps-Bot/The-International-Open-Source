@@ -1,4 +1,4 @@
-function roomPlanner(room) {
+function roomPlanner(room, structures, constructionSites) {
 
     const anchorPoint = room.memory.anchorPoint
 
@@ -189,8 +189,6 @@ function roomPlanner(room) {
 
                 if (room.getTerrain().get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
 
-                room.createConstructionSite(pos.x, pos.y, structureType)
-
                 if (structureType == "road") {
 
                     room.visual.circle(pos.x, pos.y, {
@@ -242,6 +240,10 @@ function roomPlanner(room) {
                         strokeWidth: 0.125
                     })
                 }
+
+                if (findBuildingsOnPos(FIND_STRUCTURES, structureType, pos) || findBuildingsOnPos(FIND_MY_CONSTRUCTION_SITES, structureType, pos)) continue
+
+                room.createConstructionSite(pos.x, pos.y, structureType)
             }
         }
     }
@@ -272,15 +274,28 @@ function roomPlanner(room) {
 
                 if (room.getTerrain().get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
 
-                room.createConstructionSite(pos.x, pos.y, structureType)
-
                 room.visual.circle(pos.x, pos.y, {
                     fill: '#4def52',
                     radius: 0.2,
                     strokeWidth: 0.125
                 })
+
+                if (findBuildingsOnPos(FIND_STRUCTURES, structureType, pos) || findBuildingsOnPos(FIND_MY_CONSTRUCTION_SITES, structureType, pos)) continue
+
+                room.createConstructionSite(pos.x, pos.y, structureType)
             }
         }
+    }
+
+    function findBuildingsOnPos(constant, type, pos) {
+
+        let building = room.find(constant, {
+            filter: building => { return building.structureType == type && building.pos == pos }
+        })
+
+        if (building) return true
+
+        return false
     }
 }
 
