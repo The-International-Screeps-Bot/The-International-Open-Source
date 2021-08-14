@@ -22,12 +22,10 @@ function mapVisuals() {
 
                     Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#FF0000', opacity: 0.25 })
 
-                    if (Memory.rooms[room].power) {
-
+                    if (Memory.rooms[room].level) {
 
                         Game.map.visual.circle(new RoomPosition(8, 8, room), { radius: 8, fill: '#FF0000', opacity: 0.5 })
-                        Game.map.visual.text(Memory.rooms[room].power, new RoomPosition(8, 8, room), { color: '#ffffff', fontSize: 8 })
-
+                        Game.map.visual.text(Memory.rooms[room].level, new RoomPosition(8, 8, room), { color: '#ffffff', fontSize: 8 })
                     }
                 } else if (Memory.rooms[room].stage == "enemyReservation") {
 
@@ -45,9 +43,11 @@ function mapVisuals() {
 
                     Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#1171bb', opacity: 0.25 })
 
-                    Game.map.visual.circle(new RoomPosition(8, 8, room), { radius: 8, fill: '#1171bb', opacity: 0.5 })
-                    Game.map.visual.text(Memory.rooms[room].power, new RoomPosition(8, 8, room), { color: '#ffffff', fontSize: 8 })
+                    if (Memory.rooms[room].level) {
 
+                        Game.map.visual.circle(new RoomPosition(8, 8, room), { radius: 8, fill: '#1171bb', opacity: 0.5 })
+                        Game.map.visual.text(Memory.rooms[room].level, new RoomPosition(8, 8, room), { color: '#ffffff', fontSize: 8 })
+                    }
                 } else if (Memory.rooms[room].stage == "allyReservation") {
 
                     Game.map.visual.rect(new RoomPosition(0, 0, room), 50, 50, { fill: '#1171bb', opacity: 0.15 })
