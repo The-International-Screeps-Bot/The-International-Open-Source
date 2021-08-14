@@ -67,7 +67,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["jumpStarter"] = roleValues({
         role: "jumpStarter",
         parts: {
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [workPart, movePart, carryPart, movePart],
                 maxParts: 20
@@ -79,17 +79,17 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["hauler"] = roleValues({
         role: "hauler",
         parts: {
-            7: {
+            5600: {
                 defaultParts: [],
                 extraParts: [carryPart, carryPart, movePart],
                 maxParts: 48
             },
-            5: {
+            1800: {
                 defaultParts: [],
                 extraParts: [carryPart, carryPart, movePart],
                 maxParts: 36
             },
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [carryPart, movePart],
                 maxParts: 50
@@ -101,22 +101,22 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["harvester"] = roleValues({
         role: "harvester",
         parts: {
-            6: {
+            2300: {
                 defaultParts: [carryPart],
                 extraParts: [workPart, workPart, movePart],
                 maxParts: 13
             },
-            5: {
+            1800: {
                 defaultParts: [],
                 extraParts: [workPart, workPart, movePart],
                 maxParts: 12
             },
-            3: {
+            800: {
                 defaultParts: [],
                 extraParts: [workPart, workPart, movePart],
                 maxParts: 12
             },
-            1: {
+            300: {
                 defaultParts: [movePart],
                 extraParts: [workPart],
                 maxParts: 9
@@ -128,22 +128,22 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["upgrader"] = roleValues({
         role: "upgrader",
         parts: {
-            8: {
+            12900: {
                 defaultParts: [carryPart, carryPart],
                 extraParts: [workPart, workPart, movePart],
                 maxParts: 5
             },
-            3: {
+            800: {
                 defaultParts: [carryPart],
                 extraParts: [workPart, workPart, movePart],
                 maxParts: 25
             },
-            2: {
+            550: {
                 defaultParts: [],
                 extraParts: [workPart, movePart, carryPart, movePart],
                 maxParts: 25
             },
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [workPart, movePart, carryPart, movePart],
                 maxParts: 25
@@ -155,12 +155,12 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["repairer"] = roleValues({
         role: "repairer",
         parts: {
-            5: {
+            1800: {
                 defaultParts: [],
                 extraParts: [workPart, carryPart, movePart],
                 maxParts: 18
             },
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [workPart, movePart, carryPart, movePart],
                 maxParts: 24
@@ -172,17 +172,17 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["builder"] = roleValues({
         role: "builder",
         parts: {
-            8: {
+            12900: {
                 defaultParts: [],
                 extraParts: [workPart, carryPart, movePart],
                 maxParts: 36
             },
-            5: {
+            1800: {
                 defaultParts: [],
                 extraParts: [workPart, carryPart, movePart],
                 maxParts: 24
             },
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [workPart, movePart, carryPart, movePart],
                 maxParts: 24
@@ -194,17 +194,17 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["barricadeUpgrader"] = roleValues({
         role: "barricadeUpgrader",
         parts: {
-            8: {
+            12900: {
                 defaultParts: [],
                 extraParts: [workPart, workPart, movePart, workPart, carryPart, movePart],
                 maxParts: 30
             },
-            5: {
+            1800: {
                 defaultParts: [],
                 extraParts: [workPart, workPart, movePart, workPart, carryPart, movePart],
                 maxParts: 18
             },
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [workPart, movePart, carryPart, movePart],
                 maxParts: 24
@@ -216,7 +216,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["remoteBuilder"] = roleValues({
         role: "remoteBuilder",
         parts: {
-            5: {
+            1800: {
                 defaultParts: [],
                 extraParts: [workPart, movePart, carryPart, movePart],
                 maxParts: 24
@@ -228,12 +228,12 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["remoteHarvester1"] = roleValues({
         role: "remoteHarvester1",
         parts: {
-            5: {
+            1800: {
                 defaultParts: [],
                 extraParts: [workPart, workPart, movePart],
                 maxParts: 12
             },
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [workPart, movePart],
                 maxParts: 16
@@ -247,12 +247,12 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["remoteHarvester2"] = roleValues({
         role: "remoteHarvester2",
         parts: {
-            5: {
+            1800: {
                 defaultParts: [],
                 extraParts: [workPart, workPart, movePart],
                 maxParts: 12
             },
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [workPart, movePart],
                 maxParts: 16
@@ -266,12 +266,12 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["remoteHauler"] = roleValues({
         role: "remoteHauler",
         parts: {
-            5: {
+            1800: {
                 defaultParts: [],
                 extraParts: [carryPart, carryPart, movePart],
                 maxParts: 48
             },
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [carryPart, movePart],
                 maxParts: 50
@@ -285,7 +285,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["reserver"] = roleValues({
         role: "reserver",
         parts: {
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [claimPart, movePart, movePart],
                 maxParts: 6
@@ -299,12 +299,12 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["communeDefender"] = roleValues({
         role: "communeDefender",
         parts: {
-            6: {
+            2300: {
                 defaultParts: [],
                 extraParts: [attackPart, movePart, attackPart, movePart, attackPart, movePart, attackPart, movePart, attackPart, movePart, healPart, movePart],
                 maxParts: 24
             },
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [attackPart, movePart],
                 maxParts: 20
@@ -316,7 +316,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["revolutionaryBuilder"] = roleValues({
         role: "revolutionaryBuilder",
         parts: {
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [workPart, movePart, carryPart, movePart],
                 maxParts: 24
@@ -328,7 +328,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["claimer"] = roleValues({
         role: "claimer",
         parts: {
-            1: {
+            300: {
                 defaultParts: [claimPart],
                 extraParts: [movePart],
                 maxParts: 6
@@ -340,7 +340,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["rangedDefender"] = roleValues({
         role: "rangedDefender",
         parts: {
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [rangedAttackPart, movePart],
                 maxParts: 50
@@ -352,7 +352,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["scientist"] = roleValues({
         role: "scientist",
         parts: {
-            1: {
+            300: {
                 defaultParts: [carryPart, carryPart, movePart, carryPart, carryPart, movePart, carryPart, movePart],
                 extraParts: [],
                 maxParts: 8
@@ -364,7 +364,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["stationaryHauler"] = roleValues({
         role: "stationaryHauler",
         parts: {
-            1: {
+            300: {
                 defaultParts: [movePart],
                 extraParts: [carryPart],
                 maxParts: 17
@@ -376,7 +376,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["upgradeHauler"] = roleValues({
         role: "upgradeHauler",
         parts: {
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [carryPart, carryPart, movePart],
                 maxParts: 36
@@ -388,7 +388,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["miner"] = roleValues({
         role: "miner",
         parts: {
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [workPart, workPart, workPart, workPart, movePart],
                 maxParts: 50
@@ -400,7 +400,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["robber"] = roleValues({
         role: "robber",
         parts: {
-            1: {
+            300: {
                 defaultParts: [],
                 extraParts: [carryPart, movePart],
                 maxParts: 24
@@ -412,7 +412,7 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["scout"] = roleValues({
         role: "scout",
         parts: {
-            1: {
+            300: {
                 defaultParts: [movePart],
                 extraParts: [],
                 maxParts: 1
@@ -426,7 +426,7 @@ function roleOpts(room, spawns, specialStructures) {
         roleOpts["antifaAssaulter"] = roleValues({
             role: "antifaAssaulter",
             parts: {
-                1: {
+                300: {
                     defaultParts: [],
                     extraParts: [rangedAttackPart, movePart],
                     maxParts: 20
@@ -437,7 +437,7 @@ function roleOpts(room, spawns, specialStructures) {
         roleOpts["antifaSupporter"] = roleValues({
             role: "antifaSupporter",
             parts: {
-                1: {
+                300: {
                     defaultParts: [],
                     extraParts: [healPart, movePart],
                     maxParts: 20
@@ -450,7 +450,7 @@ function roleOpts(room, spawns, specialStructures) {
         roleOpts["antifaAssaulter"] = roleValues({
             role: "antifaAssaulter",
             parts: {
-                1: {
+                300: {
                     defaultParts: [],
                     extraParts: [attackPart, movePart],
                     maxParts: 20
@@ -461,7 +461,7 @@ function roleOpts(room, spawns, specialStructures) {
         roleOpts["antifaSupporter"] = roleValues({
             role: "antifaSupporter",
             parts: {
-                1: {
+                300: {
                     defaultParts: [],
                     extraParts: [healPart, movePart],
                     maxParts: 20
@@ -474,7 +474,7 @@ function roleOpts(room, spawns, specialStructures) {
         roleOpts["antifaAssaulter"] = roleValues({
             role: "antifaAssaulter",
             parts: {
-                1: {
+                300: {
                     defaultParts: [],
                     extraParts: [workPart, movePart],
                     maxParts: 20
@@ -485,7 +485,7 @@ function roleOpts(room, spawns, specialStructures) {
         roleOpts["antifaSupporter"] = roleValues({
             role: "antifaSupporter",
             parts: {
-                1: {
+                300: {
                     defaultParts: [],
                     extraParts: [healPart, movePart],
                     maxParts: 20
@@ -505,11 +505,9 @@ function roleOpts(room, spawns, specialStructures) {
 
         let parts
 
-        if (!stage) return false
-
         for (let property in opts.parts) {
 
-            if (stage >= property) {
+            if (energyCapacity >= property) {
 
                 parts = opts.parts[property]
             }

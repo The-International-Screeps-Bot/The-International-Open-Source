@@ -248,9 +248,9 @@ function roomPlanner(room) {
 
     function placeRamparts(ramparts) {
 
-        if (room.memory.stage && room.memory.stage < 4) return
+        if (!room.memory.stage || room.memory.stage < 4) return
 
-        if (!room.storage && room.storage.store[RESOURCE_ENERGY] < 45000) return
+        if (!room.storage || room.storage.store[RESOURCE_ENERGY] < 45000) return
 
         let collection
 
