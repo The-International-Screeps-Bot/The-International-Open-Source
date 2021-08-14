@@ -1,8 +1,11 @@
 let allyList = require("allyList")
+require("roomFunctions")
 
 function towers(room, towers, creeps) {
 
     if (towers.length == 0) return
+
+    room.findTowerDamage(towers, new RoomPosition(24, 36, room.name))
 
     let injuredCreep = room.find(FIND_CREEPS, {
         filter: (c) => {
