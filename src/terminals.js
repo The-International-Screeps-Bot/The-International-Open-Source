@@ -103,7 +103,7 @@ function terminals(room, terminal) {
 
     if (Game.resources.pixel > 10) {
 
-        //Game.market.createOrder({ type: ORDER_SELL, resourceType: PIXEL, price: avgPrice(PIXEL) * 0.9, totalAmount: 10, roomName: "E25N2" })
+        Game.market.createOrder({ type: ORDER_SELL, resourceType: PIXEL, price: avgPrice(PIXEL) * 0.9, totalAmount: 10, roomName: room.name })
     }
 
     if (Memory.global.globalStage <= 2 && Game.market.credits >= 100000 && terminal.store[RESOURCE_ENERGY] <= 100000 && room.controller.level <= 7) {
