@@ -126,7 +126,7 @@ function towersAttack(towers, target, visualText) {
 
         tower.attack(target)
 
-        room.visual.text(visualText, tower.pos.x + 1, tower.pos.y, { align: 'left' })
+        tower.room.visual.text(visualText, tower.pos.x + 1, tower.pos.y, { align: 'left' })
     }
 }
 
@@ -136,7 +136,7 @@ function towersHeal(towers, target, visualText) {
 
         tower.heal(target)
 
-        room.visual.text(visualText, tower.pos.x + 1, tower.pos.y, { align: 'left' })
+        tower.room.visual.text(visualText, tower.pos.x + 1, tower.pos.y, { align: 'left' })
     }
 }
 
@@ -146,7 +146,7 @@ function towersRepair(towers, target, visualText) {
 
         tower.repair(target)
 
-        room.visual.text(visualText, tower.pos.x + 1, tower.pos.y, { align: 'left' })
+        tower.room.visual.text(visualText, tower.pos.x + 1, tower.pos.y, { align: 'left' })
         Memory.data.energySpentOnRepairs += 10
     }
 }
