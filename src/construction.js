@@ -213,7 +213,7 @@ function construction(room, specialStructures) {
                 let value = path[i - 1]
                 let normalValue = path[i]
 
-                if (value && room.memory.stage >= 3) {
+                if (value && room.memory.stage >= 4) {
 
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
@@ -306,7 +306,7 @@ function construction(room, specialStructures) {
                 let value = path[i - 1]
                 let normalValue = path[i]
 
-                if (value && room.memory.stage >= 3) {
+                if (value && room.memory.stage >= 4) {
 
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
@@ -397,7 +397,7 @@ function construction(room, specialStructures) {
                 let value = path[i - 1]
                 let normalValue = path[i]
 
-                if (value && room.memory.stage >= 3) {
+                if (value && room.memory.stage >= 4) {
 
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
