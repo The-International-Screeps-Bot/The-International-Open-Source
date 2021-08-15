@@ -12,13 +12,6 @@ let logging = require("logging")
 
 module.exports.loop = function() {
 
-    if (Game.shard.name == "shard2") {
-
-        if (Game.cpu.bucket == 10000) {
-            Game.cpu.generatePixel();
-        }
-    }
-
     //
 
     let cpuUsed = Game.cpu.getUsed().toFixed(2)

@@ -290,10 +290,10 @@ function roomPlanner(room, structures, constructionSites) {
     function findBuildingsOnPos(constant, type, pos) {
 
         let building = room.find(constant, {
-            filter: building => { return building.structureType == type && building.pos == pos }
+            filter: building => building.structureType == type && building.pos == pos
         })
 
-        if (building) return true
+        if (building.length > 0) return true
 
         return false
     }

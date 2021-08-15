@@ -3,6 +3,8 @@ require("roomFunctions")
 
 function globalManager() {
 
+    // Global data configuration
+
     Memory.global.colors = {
         communeBlue: '#2b92f1',
         allyGreen: "#00e600",
@@ -38,7 +40,14 @@ function globalManager() {
         Memory.global.globalStage = 0
     }
 
-    //
+    // Commands
+
+    if (Game.shard.name == "shard2") {
+
+        if (Game.cpu.bucket == 10000) {
+            Game.cpu.generatePixel();
+        }
+    }
 
     if (Game.shard.name == "shard2") {
 
@@ -52,7 +61,8 @@ function globalManager() {
         }
     }
 
-    //
+    // New commune logic
+
     if (Game.gcl.level == Memory.global.communes.length) Memory.global.newCommunes = []
 
     if (!Memory.global.newCommunes) Memory.global.newCommunes = []
@@ -98,6 +108,8 @@ function globalManager() {
         Memory.global.newCommune = undefined
         Memory.global.communeEstablisher = undefined
     }
+
+    // Attack room logic
 
     let attackingRoom = findAttackingRooms()
     Memory.global.attackingRoom = attackingRoom
