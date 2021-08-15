@@ -1,22 +1,21 @@
 let allyList = require("allyList")
 require("roomFunctions")
+require("creepFunctions")
 
 Room.prototype.attackHostiles = function(towers) {
+
+    let room = this
 
     let target
 
     let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-        filter: hostileCreep => {
-            return !allyList.includes(hostileCreep.owner.username.toLowerCase()) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, HEAL, WORK, CARRY, CLAIM])
-        }
+        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username.toLowerCase()) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, HEAL, WORK, CARRY, CLAIM])
     })
 
     if (hostiles.length == 0) return false
 
     let enemyHealers = room.find(FIND_HOSTILE_CREEPS, {
-        filter: hostileCreep => {
-            return !allyList.includes(hostileCreep.owner.username.toLowerCase()) && hostileCreep.hasPartsOfTypes([HEAL])
-        }
+        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username.toLowerCase()) && hostileCreep.hasPartsOfTypes([HEAL])
     })
 
     if (enemyHealers.length > 0) {
@@ -38,7 +37,7 @@ Room.prototype.attackHostiles = function(towers) {
 
         const anchorPoint = room.memory.anchorPoint
 
-        if (!anchorPoint) return
+        if (!anchorPoint) return false
 
         target = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(hostiles)
     }
@@ -52,13 +51,13 @@ Room.prototype.attackHostiles = function(towers) {
 
 Room.prototype.healCreeps = function(towers) {
 
+    let room = this
+
     if (towers[0].store[RESOURCE_ENERGY] <= (towers[0].store.getCapacity() * 0.4)) return false
 
     let injuredCreep = room.find(FIND_CREEPS, {
-        filter: injuredCreep => {
-            return (allyList.includes(injuredCreep.owner.username.toLowerCase()) || injuredCreep.my) &&
-                injuredCreep.hits < injuredCreep.hitsMax - 50
-        }
+        filter: injuredCreep => (allyList.includes(injuredCreep.owner.username.toLowerCase()) || injuredCreep.my) &&
+            injuredCreep.hits < injuredCreep.hitsMax - 50
     })[0]
 
     if (!injuredCreep) return false
@@ -70,13 +69,14 @@ Room.prototype.healCreeps = function(towers) {
 
 Room.prototype.healPowerCreeps = function(towers) {
 
+    let room = this
+
     if (towers[0].store[RESOURCE_ENERGY] <= (towers[0].store.getCapacity() * 0.4)) return false
 
     let injuredPowerCreep = room.find(FIND_POWER_CREEPS, {
-        filter: injuredPowerCreep => {
-            return (allyList.includes(injuredPowerCreep.owner.username.toLowerCase()) || injuredPowerCreep.my) &&
-                injuredPowerCreep.hits < injuredPowerCreep.hitsMax - 50
-        }
+        filter: injuredPowerCreep => (allyList.includes(injuredPowerCreep.owner.username.toLowerCase()) || injuredPowerCreep.my) &&
+            injuredPowerCreep.hits < injuredPowerCreep.hitsMax - 50
+
     })[0]
 
     if (!injuredPowerCreep) return false
@@ -88,10 +88,12 @@ Room.prototype.healPowerCreeps = function(towers) {
 
 Room.prototype.repairEcoStructures = function(towers) {
 
-    if (towers[0].store[RESOURCE_ENERGY] < (towers[0].store.getCapacity() * 0.7)) return false
+    let room = this
+
+    if (towers[0].store[RESOURCE_ENERGY] <= (towers[0].store.getCapacity() * 0.7)) return false
 
     let lowEcoStructure = room.find(FIND_STRUCTURES, {
-        filter: (s) => (s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_CONTAINER) & s.hits < s.hitsMax * 0.1
+        filter: s => (s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_CONTAINER) & s.hits < s.hitsMax * 0.1
     })[0]
 
     if (!lowEcoStructure) return false
@@ -103,7 +105,9 @@ Room.prototype.repairEcoStructures = function(towers) {
 
 Room.prototype.repairRamparts = function(towers) {
 
-    if (towers[0].store[RESOURCE_ENERGY] < (towers[0].store.getCapacity() * 0.6)) return false
+    let room = this
+
+    if (towers[0].store[RESOURCE_ENERGY] <= (towers[0].store.getCapacity() * 0.6)) return false
 
     let lowRampart = room.find(FIND_MY_STRUCTURES, {
         filter: s => s.structureType == STRUCTURE_RAMPART && s.hits <= 1000

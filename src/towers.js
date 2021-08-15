@@ -1,5 +1,3 @@
-require("roomFunctions")
-require("creepFunctions")
 require("towerFunctions")
 
 function towers(room, towers) {

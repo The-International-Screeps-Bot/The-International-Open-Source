@@ -42,6 +42,8 @@ function spawnManager(room, spawns, specialStructures) {
 
         let roleValues = roleOpts[role]
 
+        if (!roleValues) continue
+
         let testSpawn = spawn.spawnCreep(roleValues.body, roleValues.role, { dryRun: true })
 
         if (testSpawn == 0) {
