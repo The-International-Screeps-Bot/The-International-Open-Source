@@ -9,6 +9,8 @@ module.exports = {
         let min
         let targetRoom
 
+        // If no target room find one
+
         if (!targetRoom) {
             for (let i = 0; i <= 7; i++) {
 
@@ -63,6 +65,8 @@ module.exports = {
             }
         }
 
+        // If target room scout it
+
         if (targetRoom) {
 
             creep.say(targetRoom)
@@ -72,6 +76,8 @@ module.exports = {
             let controller = creep.room.controller
 
             if (controller) {
+
+                // If not signed or not signed by me and not reserved or owned by me sign controller
 
                 if ((!controller.sign || controller.sign.username != "MarvinTMB") && !controller.reservation && (!controller.owner || controller.owner.username == "MarvinTMB")) {
 
@@ -106,8 +112,13 @@ module.exports = {
 
                         creep.signController(controller, messages[signType])
                     }
-
                 } else {
+
+                    // If not my room but was my room reset memory
+
+                    if (!controller.my && creep.room.memory.stage >= 0) creep.room.memory = {}
+
+                    // If not my room but owner check if ally or enemy
 
                     if (!controller.my && controller.owner) {
                         if (allyList.indexOf(controller.owner.username.toLowerCase()) >= 0) {
@@ -132,6 +143,8 @@ module.exports = {
                         }
                     }
 
+                    // If reserved and not reserved by me or invaders find if enemy or ally has reserved it
+
                     if (controller.reservation && controller.reservation.username != "MarvinTMB" && controller.reservation.username != "Invader") {
 
                         if (allyList.indexOf((controller.reservation.username).toLowerCase()) >= 0) {
@@ -143,6 +156,8 @@ module.exports = {
                             creep.room.memory.stage = "enemyReservation"
                         }
                     }
+
+                    // See if room can be a remote room
 
                     let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memory.roomFrom)
 
@@ -173,6 +188,8 @@ module.exports = {
 
                         creep.room.memory.stage = "neutralRoom"
                     }
+
+                    // See if room can be a new commune
 
                     let newCommune
 
@@ -240,6 +257,8 @@ module.exports = {
                         }
                     }
 
+                    // If not able to be a new commune continue to next room
+
                     if (!newCommune) {
 
                         creep.advancedPathing({
@@ -256,6 +275,8 @@ module.exports = {
                 }
             } else {
 
+                // Check if keeper room
+
                 let keeperLair = creep.room.find(FIND_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_KEEPER_LAIR
                 })
@@ -268,6 +289,8 @@ module.exports = {
 
                     creep.room.memory.stage = "emptyRoom"
                 }
+
+                // Go to next room
 
                 creep.advancedPathing({
                     origin: creep.pos,
