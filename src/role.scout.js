@@ -192,37 +192,20 @@ module.exports = {
                             })
                         }
 
-                        let nearGhost = false
+                        let nearRoom = false
 
                         let exits = Game.map.describeExits(creep.room.name)
-                        let exitRoomNames = []
 
                         for (let property in exits) {
 
-                            exitRoomNames.push(exits[property])
-                        }
+                            let roomName = exits[property]
 
-                        for (let roomName of exitRoomNames) {
-
-                            if (Memory.rooms[roomName].owner && Memory.rooms[roomName].owner == "slowmotionghost") nearGhost = true
-                        }
-
-                        let nearbyCommunes
-
-                        for (let commune of Memory.global.communes) {
-
-                            let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, commune)
-
-                            if (targetRoomDistance <= 1) {
-
-                                nearbyCommunes = true
-                                break
-                            }
+                            if (Memory.rooms[roomName].owner && (Memory.rooms[roomName].owner == "slowmotionghost" || Memory.rooms[room].stage >= 0 || Memory.rooms[room].claim == true)) nearRoom = true
                         }
 
                         creep.say("N")
 
-                        if (!nearbyCommunes && !nearGhost) {
+                        if (!nearRoom) {
 
                             creep.say("NNC")
 
