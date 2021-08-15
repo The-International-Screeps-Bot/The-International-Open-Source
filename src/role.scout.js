@@ -1,6 +1,5 @@
 let findAnchor = require("findAnchor")
 let allyList = require("allyList")
-require("roomFunctions")
 
 module.exports = {
     run: function(creep) {
@@ -147,11 +146,7 @@ module.exports = {
 
                     let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memory.roomFrom)
 
-                    let goal = _.map([new RoomPosition(25, 25, creep.memory.roomFrom)], function(pos) {
-                        return { pos: pos, range: 1 }
-                    })
-
-                    if (targetRoomDistance == 1 && !controller.owner && (!controller.reservation || controller.reservation.username == "Invader") && creep.findSafeDistance(creep.pos, goal, ["enemyRoom", "keeperRoom", "enemyReservation"]) <= 2) {
+                    if (targetRoomDistance == 1 && !controller.owner && (!controller.reservation || controller.reservation.username == "Invader") && room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"]) <= 2) {
 
                         function checkDuplicate() {
 
@@ -181,7 +176,7 @@ module.exports = {
 
                     let newCommune
 
-                    if (creep.room.find(FIND_SOURCES).length == 2 && Memory.global.communes.length < Game.gcl.level && creep.room.memory.claim != true && creep.room.memory.claim != "notViable" && controller && !controller.owner && !controller.reservation && creep.findSafeDistance(creep.pos, goal, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10) {
+                    if (creep.room.find(FIND_SOURCES).length == 2 && Memory.global.communes.length < Game.gcl.level && creep.room.memory.claim != true && creep.room.memory.claim != "notViable" && controller && !controller.owner && !controller.reservation && room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10) {
 
                         if (creep.isEdge()) {
 

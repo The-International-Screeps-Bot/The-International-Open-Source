@@ -1,4 +1,7 @@
 let config = require("config")
+
+require("commands")
+
 let globalManager = require("globalManager")
 
 let roomManager = require("roomManager")
