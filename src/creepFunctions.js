@@ -587,19 +587,14 @@ Creep.prototype.advancedPathing = function(opts) {
                 }
             })
 
-            if (newRoute.length > 0) {
-
-                creep.memory.route = newRoute
-                route = newRoute
-
-                opts.goal = { pos: new RoomPosition(25, 25, route[0].room), range: 1 }
-            }
-        } else {
-
+            route = newRoute
+            creep.memory.route = route
+        }
+        if (route && route.length >= 0) {
             if (route[0].room == creep.room.name) {
 
-                creep.memory.route = route.slice(1, route.length + 1)
                 route = route.slice(1, route.length + 1)
+                creep.memory.route = route
             }
 
             if (route[0]) {
@@ -611,7 +606,7 @@ Creep.prototype.advancedPathing = function(opts) {
         creep.memory.lastRoom = creep.room.name
     }
 
-    const path = creep.memory.path
+    let path = creep.memory.path
     const lastCache = Game.time
     const lastRoom = creep.memory.lastRoom
 
@@ -696,31 +691,27 @@ Creep.prototype.advancedPathing = function(opts) {
             }
         }).path
 
-        creep.memory.path = newPath
+        path = newPath
+        creep.memory.path = path
+
         creep.memory.lastRoom = creep.room.name
         creep.memory.lastCache = Game.time
+    }
 
-        let pos = newPath[0]
-
-        if (!pos) return
-
-        if (creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))) == 0) {
-
-            creep.memory.path = creep.memory.path.slice(1, newPath.length + 1)
-        }
-    } else {
+    if (path && path.length > 0) {
 
         let pos = path[0]
 
         if (!pos) return
 
+        creep.room.visual.poly(path, { stroke: Memory.global.colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
+
         if (creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))) == 0) {
 
-            creep.memory.path = creep.memory.path.slice(1, path.length + 1)
+            path = creep.memory.path.slice(1, path.length + 1)
+            creep.memory.path = path
         }
     }
-
-    creep.room.visual.poly(path, { stroke: Memory.global.colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
 }
 Creep.prototype.roadPathing = function(origin, goal) {
 
@@ -1151,49 +1142,7 @@ Creep.prototype.onlySafeRoomPathing = function(origin, goal, avoidStages) {
 
     creep.moveByPath(path)
 
-    /*     let direction = creep.pos.getDirectionTo(path[0])
-        
-                    creep.move(direction) */
-
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
-
-    /*     for (let pos of path) {
-
-                        let room = Game.rooms[pos.roomName]
-
-                        if (room) {
-
-                            room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { opacity: 0.2, stroke: "yellow", fill: "yellow" })
-            } else {
-            
-                            break
-            }
-            } */
-}
-
-Creep.prototype.findSafeDistance = function(origin, goal, avoidStages) {
-
-    let creep = this
-
-    let route = Game.map.findRoute(origin.roomName, goal[0].pos.roomName, {
-        routeCallback(roomName) {
-
-            if (roomName == goal[0].pos.roomName) {
-
-                return 1
-
-            }
-            if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName].stage)) {
-
-                return 1
-
-            }
-
-            return Infinity
-        }
-    })
-
-    return route.length
 }
 Creep.prototype.rampartPathing = function(origin, goal) {
 
