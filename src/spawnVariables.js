@@ -601,9 +601,9 @@ function roleOpts(room, spawns, specialStructures) {
 
         // Add extra parts
 
-        let i = 0
+        let i = 1
 
-        while (i < extraIterations && (body.length + parts.extraParts.length) <= maxParts) {
+        while (i < extraIterations && body.length + parts.extraParts.length < maxParts) {
 
             body.push(getTypesOfParts(parts.extraParts))
 

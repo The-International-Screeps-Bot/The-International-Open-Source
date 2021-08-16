@@ -527,7 +527,6 @@ creep.advancedPathing({
     goal: { pos: target.pos, range: 1 },
     plainCost: 1,
     swampCost: 1,
-    defaultCostMatrix: false,
     avoidStages: [],
     flee: false,
     cacheAmount: 50,
@@ -537,7 +536,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
     let creep = this
 
-    let { creeps, powerCreeps, structures, } = roomVariables(creep.room)
+    let { creeps, powerCreeps, } = roomVariables(creep.room)
 
     if (creep.fatigue > 0 || creep.spawning) return
 
@@ -632,59 +631,43 @@ Creep.prototype.advancedPathing = function(opts) {
 
                 let cm
 
-                if (opts.defaultCostMatrix) {
+                cm = new PathFinder.CostMatrix
 
-                    cm = PathFinder.CostMatrix.deserialize(opts.defaultCostMatrix)
+                let roads = creep.room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_ROAD
+                })
 
-                    for (let creep of creeps.allCreeps) {
+                for (let road of roads) {
 
-                        cm.set(creep.pos.x, creep.pos.y, 255)
-                    }
+                    cm.set(road.pos.x, road.pos.y, 1)
+                }
 
-                    for (let creep of powerCreeps.allCreeps) {
+                let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+                    filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
+                })
 
-                        cm.set(creep.pos.x, creep.pos.y, 255)
-                    }
-                } else {
+                for (let site of constructionSites) {
 
-                    cm = new PathFinder.CostMatrix
+                    cm.set(site.pos.x, site.pos.y, 255)
+                }
 
-                    let roads = creep.room.find(FIND_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_ROAD
-                    })
+                let structures = creep.room.find(FIND_STRUCTURES, {
+                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                })
 
-                    for (let road of roads) {
+                for (let structure of structures) {
 
-                        cm.set(road.pos.x, road.pos.y, 1)
-                    }
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
 
-                    let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                        filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
-                    })
+                for (let creep of creeps.allCreeps) {
 
-                    for (let site of constructionSites) {
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                }
 
-                        cm.set(site.pos.x, site.pos.y, 255)
-                    }
+                for (let creep of powerCreeps.allCreeps) {
 
-                    let structures = creep.room.find(FIND_STRUCTURES, {
-                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
-                    })
-
-                    for (let structure of structures) {
-
-                        cm.set(structure.pos.x, structure.pos.y, 255)
-                    }
-
-                    for (let creep of creeps.allCreeps) {
-
-                        cm.set(creep.pos.x, creep.pos.y, 255)
-                    }
-
-                    for (let creep of powerCreeps.allCreeps) {
-
-                        cm.set(creep.pos.x, creep.pos.y, 255)
-                    }
+                    cm.set(creep.pos.x, creep.pos.y, 255)
                 }
 
                 return cm

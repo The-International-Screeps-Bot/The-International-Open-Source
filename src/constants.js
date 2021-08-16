@@ -2,7 +2,7 @@ function constants(room) {
 
     sources()
     containers()
-    costMatrixes()
+        /* costMatrixes() */
     roomGlobal()
     terminals()
     myResources()
@@ -106,15 +106,6 @@ function constants(room) {
 
         let cm = new PathFinder.CostMatrix
 
-        let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-            filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
-        })
-
-        for (let site of constructionSites) {
-
-            cm.set(site.pos.x, site.pos.y, 255)
-        }
-
         let roads = room.find(FIND_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_ROAD
         })
@@ -122,6 +113,15 @@ function constants(room) {
         for (let road of roads) {
 
             cm.set(road.pos.x, road.pos.y, 1)
+        }
+
+        let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+            filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
+        })
+
+        for (let site of constructionSites) {
+
+            cm.set(site.pos.x, site.pos.y, 255)
         }
 
         let structures = room.find(FIND_STRUCTURES, {
