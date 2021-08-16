@@ -1,5 +1,6 @@
 let mapVisuals = require("mapVisuals")
 require("roomFunctions")
+let globalFunctions = require("globalFunctions")
 
 function globalManager() {
 
@@ -46,6 +47,11 @@ function globalManager() {
 
         if (Game.cpu.bucket == 10000) {
             Game.cpu.generatePixel();
+        }
+
+        if (Game.resources.pixel > 10) {
+
+            Game.market.createOrder({ type: ORDER_SELL, resourceType: PIXEL, price: globalFunctions.avgPrice(PIXEL) * 0.9, totalAmount: 10 })
         }
     }
 
