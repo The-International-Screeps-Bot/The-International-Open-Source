@@ -61,11 +61,11 @@ function spawnManager(room, spawns, specialStructures) {
             switch (testSpawn) {
                 case ERR_BUSY:
 
-                    console.log("Failed to spawn: " + roleValues.role + ", " + room.name + ", " + "all spawns are busy " + roleValues.body)
+                    console.log("Failed to spawn: " + roleValues.role + ", " + room.name + ", " + "all spawns are busy, " + roleValues.body)
                     break
                 case ERR_NOT_ENOUGH_ENERGY:
 
-                    console.log("Failed to spawn: " + roleValues.role + ", " + room.name + ", " + "not enough energy " + roleValues.body)
+                    console.log("Failed to spawn: " + roleValues.role + ", " + room.name + ", " + "not enough energy, " + room.energyAvailable + " / " + roleValues.cost + ", " + roleValues.body)
                     break
                 default:
 
@@ -77,5 +77,4 @@ function spawnManager(room, spawns, specialStructures) {
     }
 }
 
-module.exports = spawnManager
 module.exports = spawnManager

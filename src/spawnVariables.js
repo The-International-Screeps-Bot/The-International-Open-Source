@@ -36,9 +36,11 @@ function roleOpts(room, spawns, specialStructures) {
     let spawnStructuresWithRanges = {}
     let startPos = new RoomPosition(anchorPoint.y - 3, anchorPoint.x, anchorPoint.roomName)
 
-    let spawnStructures = room.find(FIND_MY_STRUCTURES, {
-        filter: s => s.structureType == STRUCTURE_EXTENSION || s.structuretype == STRUCTURE_SPAWN
+    let extensions = room.find(FIND_MY_STRUCTURES, {
+        filter: s => s.structureType == STRUCTURE_EXTENSION
     })
+
+    let spawnStructures = extensions.concat(spawns)
 
     // Add each spawnStructures with their range to the object
 
@@ -597,11 +599,13 @@ function roleOpts(room, spawns, specialStructures) {
 
         // Find iteration amount
 
-        let extraIterations = Math.floor((energyAmount - getCostOfParts(parts.defaultParts)) / getCostOfParts(parts.extraParts))
+        let extraIterations = Math.min(Math.floor((energyAmount - getCostOfParts(parts.defaultParts)) / getCostOfParts(parts.extraParts)), maxParts - body.length)
+
+        console.log(extraIterations)
 
         // Add extra parts
 
-        let i = 1
+        let i = 0
 
         while (i < extraIterations && body.length + parts.extraParts.length < maxParts) {
 
