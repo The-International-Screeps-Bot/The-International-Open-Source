@@ -585,6 +585,8 @@ function roleOpts(room, spawns, specialStructures) {
             return partTypes
         }
 
+        // Add default parts if exists
+
         if (parts.defaultParts.length > 0) {
 
             body.push(getTypesOfParts(parts.defaultParts))
@@ -593,14 +595,22 @@ function roleOpts(room, spawns, specialStructures) {
             tier += 1
         }
 
+        // Find iteration amount
+
         let extraIterations = Math.floor((energyAmount - getCostOfParts(parts.defaultParts)) / getCostOfParts(parts.extraParts))
 
-        for (let i = 0; i < extraIterations && (body.length + parts.extraParts.length) <= maxParts; i++) {
+        // Add extra parts
+
+        let i = 0
+
+        while (i < extraIterations && (body.length + parts.extraParts.length) <= maxParts) {
 
             body.push(getTypesOfParts(parts.extraParts))
 
             cost += getCostOfParts(parts.extraParts)
             tier += 1
+
+            i++
         }
 
         body = _.flattenDeep(body).slice(0, maxParts)
