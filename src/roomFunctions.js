@@ -1,12 +1,6 @@
 let { structures } = require("roomVariables")
 require("creepFunctions")
 
-Room.prototype.getObjectWithId = function(id) {
-
-    if (Game.getObjectById(id) == null) return false
-
-    return Game.getObjectById(id)
-}
 Room.prototype.findExitRooms = function(roomName) {
 
     let exits = Game.map.describeExits(roomName)

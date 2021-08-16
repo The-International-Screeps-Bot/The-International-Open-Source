@@ -27,13 +27,43 @@ function roleOpts(room, spawns, specialStructures) {
 
     let squadType = squadTypes.rangedAttack
 
+    // Get array of spawningStructures
+
+    let energyStructures = []
+
+    const anchorPoint = room.memory.anchorPoint
+
+    let spawnStructuresWithRanges = {}
+    let startPos = new RoomPosition(anchorPoint.y - 3, anchorPoint.x, anchorPoint.roomName)
+
+    let spawnStructures = room.find(FIND_MY_STRUCTURES, {
+        filter: s => s.structureType == STRUCTURE_EXTENSION || s.structuretype == STRUCTURE_SPAWN
+    })
+
+    // Add each spawnStructures with their range to the object
+
+    for (let spawnStructure of spawnStructures) {
+
+        spawnStructuresWithRanges[spawnStructure.id] = startPos.getRangeTo(spawnStructure)
+    }
+
+    for (let minRange = 0; minRange < 50; minRange++) {
+
+        for (let spawnStructure in spawnStructuresWithRanges) {
+
+            if (spawnStructuresWithRanges[spawnStructure] <= minRange) continue
+
+            energyStructures.push(getObjectWithId(spawnStructure))
+            delete spawnStructuresWithRanges[spawnStructure]
+        }
+    }
+
     // Asign variables needed for creating roleValues
 
     let energyAvailable = room.energyAvailable
     let energyCapacity = room.energyCapacityAvailable
 
     const roomFix = room.memory.roomFix
-    const stage = room.memory.stage
 
     class BodyPart {
         constructor(partType, cost) {
@@ -60,7 +90,7 @@ function roleOpts(room, spawns, specialStructures) {
     let movePart = new BodyPart(MOVE, 50)
     let claimPart = new BodyPart(CLAIM, 600)
 
-    // Define spawn opts for role
+    // Define spawn opts for roles
 
     let roleOpts = {}
 
@@ -588,13 +618,13 @@ function roleOpts(room, spawns, specialStructures) {
             role: role,
             body: body,
             tier: tier,
-            memory: { memory },
+            opts: { memory: memory, energyStructures: energyStructures },
             cost: cost
         }
     }
 
     return {
-        roleOpts: roleOpts
+        roleOpts: roleOpts,
     }
 }
 

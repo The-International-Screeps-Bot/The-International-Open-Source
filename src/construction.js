@@ -1,7 +1,7 @@
 function construction(room, specialStructures) {
 
-    let source1 = room.getObjectWithId(room.memory.source1)
-    let source2 = room.getObjectWithId(room.memory.source2)
+    let source1 = getObjectWithId(room.memory.source1)
+    let source2 = getObjectWithId(room.memory.source2)
 
     let sourceContainer1 = specialStructures.containers.sourceContainer1
     let sourceContainer2 = specialStructures.containers.sourceContainer2

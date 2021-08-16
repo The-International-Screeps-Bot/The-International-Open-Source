@@ -9,7 +9,7 @@ function builderManager(room, builders) {
 
     let { constructionSites, creeps } = roomVariables(room)
 
-    let targetSite = room.getObjectWithId(room.memory.targetSite)
+    let targetSite = getObjectWithId(room.memory.targetSite)
 
     if (!targetSite && constructionSites.mySites.length > 0) {
 

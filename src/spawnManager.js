@@ -44,17 +44,33 @@ function spawnManager(room, spawns, specialStructures) {
 
         if (!roleValues) continue
 
-        let testSpawn = spawn.spawnCreep(roleValues.body, roleValues.role, { dryRun: true })
+        roleValues.opts["dryRun"] = true
+
+        let testSpawn = spawn.spawnCreep(roleValues.body, (roomFixMessage + roleValues.role + ", T" + roleValues.tier + ", " + Game.time), roleValues.opts)
 
         if (testSpawn == 0) {
 
-            spawn.spawnCreep(roleValues.body, (roomFixMessage + roleValues.role + ", T" + roleValues.tier + ", " + Game.time), roleValues.memory)
+            roleValues.opts["dryRun"] = false
+
+            spawn.spawnCreep(roleValues.body, (roomFixMessage + roleValues.role + ", T" + roleValues.tier + ", " + Game.time), roleValues.opts)
 
             Memory.data.energySpentOnCreeps += roleValues.cost
 
-        } else if (testSpawn != ERR_BUSY) {
+        } else {
 
-            console.log("Failed to spawn: " + testSpawn + ", " + roleValues.role + ", " + roleValues.body.length + ", " + roleValues.tier + " " + JSON.stringify(roleValues.memory))
+            switch (testSpawn) {
+                case ERR_BUSY:
+
+                    console.log("Failed to spawn: " + roleValues.role + ", " + room.name + ", " + "all spawns are busy")
+                    break
+                case ERR_NOT_ENOUGH_ENERGY:
+
+                    console.log("Failed to spawn: " + roleValues.role + ", " + room.name + ", " + "not enough energy")
+                    break
+                default:
+
+                    console.log("Failed to spawn: " + room.name + ", " + testSpawn + ", " + roleValues.role + ", " + roleValues.body.length + ", " + roleValues.tier + " " + JSON.stringify(roleValues.opts))
+            }
         }
 
         i++

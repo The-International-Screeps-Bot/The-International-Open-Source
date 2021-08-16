@@ -85,8 +85,8 @@ function roomVariables(room) {
         sources: sources,
     }
 
-    const source1 = room.getObjectWithId(room.memory.source1)
-    const source2 = room.getObjectWithId(room.memory.source2)
+    const source1 = getObjectWithId(room.memory.source1)
+    const source2 = getObjectWithId(room.memory.source2)
 
     if (room.memory.stage > 0 || room.memory.stage == "remoteRoom") {
 

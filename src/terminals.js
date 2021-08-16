@@ -1,5 +1,3 @@
-let globalFunctions = require("globalFunctions")
-
 function terminals(room, terminal) {
 
     if (!terminal) return
@@ -43,11 +41,11 @@ function terminals(room, terminal) {
             let buyOrder
 
             // First try to find a buy offer
-            if (globalFunctions.findOrders(ORDER_BUY, resource).length > 0) {
+            if (findOrders(ORDER_BUY, resource).length > 0) {
 
-                for (let order of globalFunctions.findOrders(ORDER_BUY, resource)) {
+                for (let order of findOrders(ORDER_BUY, resource)) {
 
-                    if (order && order.price >= globalFunctions.avgPrice(resource) * 0.9) {
+                    if (order && order.price >= avgPrice(resource) * 0.9) {
 
                         let buyAmount = 10000
 
@@ -68,7 +66,7 @@ function terminals(room, terminal) {
             if (!buyOrder && Object.keys(Game.market.orders).length < 300) {
 
                 //console.log("Terminal " + room.name + " wants to make a sell order for: " + resource)
-                Game.market.createOrder({ type: ORDER_SELL, resourceType: resource, price: globalFunctions.avgPrice(resource) * 0.9, totalAmount: 10000, roomName: room.name });
+                Game.market.createOrder({ type: ORDER_SELL, resourceType: resource, price: avgPrice(resource) * 0.9, totalAmount: 10000, roomName: room.name });
             }
         }
     }
@@ -85,7 +83,7 @@ function terminals(room, terminal) {
 
             let batteryQuota = 10000 // 10k
 
-            let batterySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_BATTERY && order.price <= globalFunctions.avgPrice(RESOURCE_BATTERY) * 1.2 && order.amount >= (batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])))
+            let batterySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_BATTERY && order.price <= avgPrice(RESOURCE_BATTERY) * 1.2 && order.amount >= (batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])))
 
             if (terminal.store[RESOURCE_BATTERY] < batteryQuota && batterySellOffers[0]) {
 
@@ -105,7 +103,7 @@ function terminals(room, terminal) {
 
             let energyQuota = 50000 // 50k
 
-            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= globalFunctions.avgPrice(RESOURCE_ENERGY) * 1.2 && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
+            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= avgPrice(RESOURCE_ENERGY) * 1.2 && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
 
             if (energySellOffers[0]) {
 
@@ -126,7 +124,7 @@ function terminals(room, terminal) {
 
             let energyQuota = 100000 // 100k
 
-            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= globalFunctions.avgPrice(RESOURCE_ENERGY) * 1.2 && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
+            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= avgPrice(RESOURCE_ENERGY) * 1.2 && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
 
             if (energySellOffers[0]) {
 
@@ -189,7 +187,7 @@ function terminals(room, terminal) {
 
                     //console.log(filteredResource + ", " + terminal.room.name)
 
-                    let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == filteredResource && order.price < globalFunctions.avgPrice(filteredResource) * 1.2 && order.amount >= (6000 - terminal.store.getUsedCapacity([filteredResource])))
+                    let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == filteredResource && order.price < avgPrice(filteredResource) * 1.2 && order.amount >= (6000 - terminal.store.getUsedCapacity([filteredResource])))
 
                     if (buyOrders[0]) {
 
@@ -204,11 +202,11 @@ function terminals(room, terminal) {
 
     if (room.controller.level == 8) {
 
-        if (terminal.store[RESOURCE_POWER] < 5000 && globalFunctions.findOrders(ORDER_SELL, RESOURCE_POWER).length > 0) {
+        if (terminal.store[RESOURCE_POWER] < 5000 && findOrders(ORDER_SELL, RESOURCE_POWER).length > 0) {
 
-            for (let order of globalFunctions.findOrders(ORDER_SELL, RESOURCE_POWER)) {
+            for (let order of findOrders(ORDER_SELL, RESOURCE_POWER)) {
 
-                if (order && order.price >= globalFunctions.avgPrice(RESOURCE_POWER) * 0.9) {
+                if (order && order.price >= avgPrice(RESOURCE_POWER) * 0.9) {
 
                     let buyAmount = 6000
 
