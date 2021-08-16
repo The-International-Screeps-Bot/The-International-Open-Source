@@ -1,4 +1,4 @@
-function haulers(room, haulers) {
+function haulerManager(room, haulers) {
 
     return
 

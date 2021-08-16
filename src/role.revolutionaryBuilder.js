@@ -86,14 +86,12 @@ module.exports = {
 
                     let storage = creep.room.storage
 
-                    if (storage) {
+                    if (storage && storage.store[RESOURCE_ENERGY] >= 10000) {
 
                         creep.say("S 10k")
 
-                        if (storage.store[RESOURCE_ENERGY] >= 10000) {
+                        creep.advancedWithdraw(storage)
 
-                            creep.advancedWithdraw(storage)
-                        }
                     } else {
 
                         creep.searchSourceContainers()
