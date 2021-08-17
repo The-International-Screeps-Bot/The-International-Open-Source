@@ -34,7 +34,7 @@ module.exports = {
 
                 if (!Memory.rooms[roomName].scoutTick) {
 
-                    targetRoom = room
+                    targetRoom = roomName
                     break
                 } else if (i + 1 == targetRoomsArray.length) {
 
@@ -58,7 +58,7 @@ module.exports = {
 
                     if (Memory.rooms[roomName].scoutTick == lowestScoutTick) {
 
-                        targetRoom = room
+                        targetRoom = roomName
                         break
                     }
                 }
