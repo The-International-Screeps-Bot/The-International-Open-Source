@@ -18,9 +18,9 @@ module.exports = {
 
                 if (room) {
 
-                    if (!Memory.rooms[room]) {
+                    if (!Memory.rooms[roomName]) {
 
-                        Memory.rooms[room] = {}
+                        Memory.rooms[roomName] = {}
                     }
 
                     targetRoomsArray.push(room)
@@ -32,7 +32,7 @@ module.exports = {
 
                 let room = targetRoomsArray[i]
 
-                if (!Memory.rooms[room].scoutTick) {
+                if (!Memory.rooms[roomName].scoutTick) {
 
                     targetRoom = room
                     break
@@ -49,14 +49,14 @@ module.exports = {
 
                 for (let room of targetRoomsArray) {
 
-                    targetRoomsArrayScoutTick.push(Memory.rooms[room].scoutTick)
+                    targetRoomsArrayScoutTick.push(Memory.rooms[roomName].scoutTick)
                 }
 
                 lowestScoutTick = _.min(targetRoomsArrayScoutTick, function(tick) { return tick })
 
                 for (let room in Memory.rooms) {
 
-                    if (Memory.rooms[room].scoutTick == lowestScoutTick) {
+                    if (Memory.rooms[roomName].scoutTick == lowestScoutTick) {
 
                         targetRoom = room
                         break
@@ -217,7 +217,7 @@ module.exports = {
 
                             let roomName = exits[property]
 
-                            if (Memory.rooms[roomName].owner && (Memory.rooms[roomName].owner == "slowmotionghost" || Memory.rooms[room].stage >= 0 || Memory.rooms[room].claim == true)) nearRoom = true
+                            if (Memory.rooms[roomName].owner && (Memory.rooms[roomName].owner == "slowmotionghost" || Memory.rooms[roomName].stage >= 0 || Memory.rooms[roomName].claim == true)) nearRoom = true
                         }
 
                         creep.say("N")

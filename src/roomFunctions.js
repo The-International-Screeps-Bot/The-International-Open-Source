@@ -22,6 +22,24 @@ Room.prototype.get = function(roomObject) {
         })
     }
 
+    function findSources(sources, desiredObject) {
+
+        if (Game.getObjectWithId(room.memory[desiredObject])) return Game.getObjectWithId(room.memory[desiredObject])
+
+        let cache = {}
+
+        if (sources[0]) cache.source1 = sources[0]
+
+        if (sources[1]) cache.source2 = sources[1]
+
+        for (let object in cache) {
+
+            room.memory[object] = cache[object.id]
+        }
+
+        return cache[desiredObject]
+    }
+
     function findContainers(containers, desiredObject) {
 
         if (Game.getObjectWithId(room.memory[desiredObject])) return Game.getObjectWithId(room.memory[desiredObject])
@@ -32,53 +50,105 @@ Room.prototype.get = function(roomObject) {
 
             if (room.get(anchorPoint) && container.pos.getRangeTo(room.get(anchorPoint)) == 0) {
 
-                cache[baseContainer] = container
+                cache.baseContainer = container
                 continue
             }
             if (room.get(controller) && container.pos.getRangeTo(room.get(controller)) <= 2) {
 
-                cache[controllerContainer] = container
+                cache.controllerContainer = container
                 continue
             }
             if (room.get(mineral) && container.pos.getRangeTo(room.get(mineral)) == 1) {
 
-                cache[mineralContainer] = container
+                cache.mineralContainer = container
                 continue
             }
 
             if (container != cache.sourceContainer2 && container.pos.getRangeTo(room.get(source1)) == 1) {
 
-                cache[sourceContainer1] = container
+                cache.sourceContainer1 = container
                 continue
             }
             if (container != cache.sourceContainer1 && container.pos.getRangeTo(room.get(source2)) == 1) {
 
-                cache[sourceContainer2] = container
+                cache.sourceContainer2 = container
                 continue
             }
         }
 
         for (let object in cache) {
 
-            room.memory[object] = cache[object].id
+            room.memory[object] = cache[object.id]
         }
 
         return cache[desiredObject]
     }
 
-    function findSources(sources, desiredObject) {
+    function findLinks(links, desiredObject) {
 
         if (Game.getObjectWithId(room.memory[desiredObject])) return Game.getObjectWithId(room.memory[desiredObject])
 
         let cache = {}
 
-        if (sources[0]) cache[source1] = sources[0]
+        for (let link of links) {
 
-        if (sources[1]) cache[source2] = sources[1]
+            if (room.get(storage) && link.pos.getRangeTo(room.get(storage)) == 1) {
+
+                cache.baseLink = link
+                continue
+            }
+            if (link.pos.getRangeTo(room.get(controller)) <= 2) {
+
+                cache.controllerLink = link
+                continue
+            }
+
+            if (link != cache.sourceLink2 && room.get(sourceContainer1) && link.pos.getRangeTo(room.get(sourceContainer1)) == 1) {
+
+                cache.sourceLink1 = link
+                continue
+            }
+            if (link != cache.sourceLink1 && room.get(sourceContainer2) && link.pos.getRangeTo(room.get(sourceContainer2)) == 1) {
+
+                cache.sourceLink2 = link
+                continue
+            }
+        }
 
         for (let object in cache) {
 
-            room.memory[object] = cache[object].id
+            room.memory[object] = cache[object.id]
+        }
+
+        return cache[desiredObject]
+    }
+
+    function findLabs(labs, desiredObject) {
+
+        if (Game.getObjectWithId(room.memory[desiredObject])) return Game.getObjectWithId(room.memory[desiredObject])
+
+        let cache = {}
+
+        cache.primaryLabs = []
+        cache.secondaryLabs = []
+        cache.tertiaryLabs = []
+
+        for (let lab of labs) {
+
+            var nearbyLab = lab.pos.findInRange(labs, 2)
+
+            if (nearbyLab.length == labs.length && primaryLabs.length < 2) {
+
+                cache.primaryLabs.push(lab)
+                continue
+            }
+
+            cache.secondaryLabs.push(lab)
+        }
+
+        for (let object in cache) {
+
+            room.memory[object] = cache[object.id]
         }
 
         return cache[desiredObject]
@@ -88,6 +158,9 @@ Room.prototype.get = function(roomObject) {
 
         // Structures
         allStructures: room.find(FIND_STRUCTURES),
+        enemyStructures: room.find(FIND_HOSTILE_STRUCTURES, {
+            filter: structure => !allyList.indexOf(structure.owner.username)
+        }),
 
         spawns: room.find(FIND_MY_SPAWNS),
         extensions: findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_EXTENSION),
@@ -102,28 +175,31 @@ Room.prototype.get = function(roomObject) {
         storage: room.storage,
         terminal: room.terminal,
 
+        extractor: findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_EXTRACTOR)[0],
         factory: findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_FACTORY)[0],
         powerSpawn: findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_POWER_SPAWN)[0],
 
         baseContainer: findContainers(roomObjects[containers], "baseContainer"),
-        controllerContainer: controllerContainer,
-        mineralContainer: mineralContainer,
-        sourceContainer1: sourceContainer1,
-        sourceContainer2: sourceContainer2,
-        baseLink: baseLink,
-        controllerLink: controllerLink,
-        sourceLink1: sourceLink1,
-        sourceLink2: sourceLink2,
-        primaryLabs: primaryLabs,
-        secondaryLabs: secondaryLabs,
-        tertiaryLabs: "tertiaryLabs",
+        controllerContainer: findContainers(roomObjects[containers], "controllerContainer"),
+        mineralContainer: findContainers(roomObjects[containers], "mineralContainer"),
+        sourceContainer1: findContainers(roomObjects[containers], "sourceContainer1"),
+        sourceContainer2: findContainers(roomObjects[containers], "sourceContainer2"),
+
+        baseLink: findLinks(roomObjects[links], "baseLink"),
+        controllerLink: findLinks(roomObjects[links], "controllerLink"),
+        sourceLink1: findLinks(roomObjects[links], "sourceLink1"),
+        sourceLink2: findLinks(roomObjects[links], "sourceLink2"),
+
+        primaryLabs: findLabs(roomObjects[labs], "primaryLabs"),
+        secondaryLabs: findLabs(roomObjects[labs], "secondaryLabs"),
+        tertiaryLabs: findLabs(roomObjects[labs], "tertiaryLabs"),
 
         // Resources
         mineral: room.find(FIND_MINERALS)[0],
 
         sources: room.find(FIND_SOURCES),
-        source1: source1,
-        source2: source2,
+        source1: findSources(sources, source1),
+        source2: findSources(sources, source2),
 
         // Construction sites
         allSites: room.find(FIND_CONSTRUCTION_SITES),
