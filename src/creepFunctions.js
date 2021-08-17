@@ -1,4 +1,3 @@
-let allyList = require("allyList")
 let roomVariables = require("roomVariables")
 
 
@@ -377,7 +376,7 @@ Creep.prototype.avoidHostiles = function() {
 
     let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
         filter: (c) => {
-            return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (c.getActiveBodyparts(ATTACK) > 0 || c.getActiveBodyparts(RANGED_ATTACK) > 0))
+            return (allyList.indexOf(c.owner.username) === -1 && (c.getActiveBodyparts(ATTACK) > 0 || c.getActiveBodyparts(RANGED_ATTACK) > 0))
         }
     })
 
@@ -611,7 +610,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
     if (!path || path.length <= 1 || !lastRoom || creep.room.name != lastRoom || !lastCache || lastCache - Game.time > opts.cacheAmount) {
 
-        creep.room.visual.text("New Path", creep.pos.x, creep.pos.y + 0.5, { color: Memory.global.colors.neutralYellow })
+        creep.room.visual.text("New Path", creep.pos.x, creep.pos.y + 0.5, { color: colors.neutralYellow })
 
         let newPath = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost,
@@ -687,7 +686,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
         if (!pos) return
 
-        creep.room.visual.poly(path, { stroke: Memory.global.colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
+        creep.room.visual.poly(path, { stroke: colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
 
         if (creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))) == 0) {
 

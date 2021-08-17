@@ -1,18 +1,11 @@
 let mapVisuals = require("mapVisuals")
 require("roomFunctions")
 require("globalFunctions")
+require("globalVariables")
 
 function globalManager() {
 
     // Global data configuration
-
-    Memory.global.colors = {
-        communeBlue: '#2b92f1',
-        allyGreen: "#00e600",
-        neutralYellow: "#F4E637",
-        invaderOrange: "#ffa31a",
-        enemyRed: '#ff3300',
-    }
 
     if (Game.time % 10 == 0) {
         for (let name in Memory.creeps) {

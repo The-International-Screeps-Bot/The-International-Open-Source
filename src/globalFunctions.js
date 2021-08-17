@@ -1,3 +1,9 @@
+global.cacheValue = function(value) {
+
+    if (!cachedValues[value]) cachedValues[value] = value
+
+    return value
+}
 global.avgPrice = function(resource) {
 
     let resourceHistory = Game.market.getHistory(resource)
@@ -29,7 +35,7 @@ global.findOrders = function(orderType, resourceType) {
 
 global.getObjectWithId = function(id) {
 
-    if (Game.getObjectById(id) == null) return false
+    if (!id || Game.getObjectById(id) == null) return false
 
     return Game.getObjectById(id)
 }

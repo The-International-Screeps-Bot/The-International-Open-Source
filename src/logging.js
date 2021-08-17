@@ -1,5 +1,3 @@
-let allyList = require("allyList")
-
 function logging() {
 
     function lastDefence() {

@@ -18,7 +18,7 @@ module.exports = {
                         creep.say("R")
                     }
 
-                    if (controller.reservation && controller.reservation.username != "MarvinTMB") {
+                    if (controller.reservation && controller.reservation.username != me) {
 
                         creep.say("A")
 

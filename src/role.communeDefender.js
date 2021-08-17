@@ -1,5 +1,3 @@
-let allyList = require("allyList")
-
 module.exports = {
     run: function(creep) {
 
@@ -27,7 +25,7 @@ module.exports = {
 
                 let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
-                        return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+                        return (allyList.indexOf(c.owner.username) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
                     }
                 })
 
@@ -51,7 +49,7 @@ module.exports = {
 
                     let hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
                         filter: (c) => {
-                            return (allyList.indexOf(c.owner.username.toLowerCase()) === -1)
+                            return (allyList.indexOf(c.owner.username) === -1)
                         }
                     })
 
@@ -99,7 +97,7 @@ module.exports = {
 
                 let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
-                        return (allyList.indexOf(c.owner.username.toLowerCase()) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+                        return (allyList.indexOf(c.owner.username) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
                     }
                 })
 

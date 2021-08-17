@@ -1,5 +1,3 @@
-let allyList = require("allyList")
-
 var roleBuilder = require('role.builder')
 var roleUpgrader = require('role.upgrader')
 
@@ -37,7 +35,7 @@ module.exports = {
 
             let hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
                 filter: (c) => {
-                    return (!allyList.includes(c.owner.username.toLowerCase()) && c.structureType == STRUCTURE_INVADER_CORE)
+                    return (!allyList.includes(c.owner.username) && c.structureType == STRUCTURE_INVADER_CORE)
                 }
             })
 

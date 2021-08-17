@@ -1,4 +1,4 @@
-var AttackWhitelist = ["cplive", "marvintmb"];
+var AttackWhitelist = ["cplive", me];
 module.exports = {
     run: function(creep) {
 

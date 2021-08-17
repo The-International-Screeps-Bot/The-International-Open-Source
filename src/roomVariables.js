@@ -1,5 +1,3 @@
-let allyList = require("allyList")
-
 function roomVariables(room) {
 
     let allCreeps = room.find(FIND_CREEPS)

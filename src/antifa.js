@@ -1,5 +1,3 @@
-let allyList = require("allyList")
-
 function antifa(room, creeps) {
 
     let squadType
@@ -148,7 +146,7 @@ function antifa(room, creeps) {
 
                     let closestInjured = creep.pos.findClosestByRange(FIND_CREEPS, {
                         filter: (creep) => {
-                            return (creep.my || allyList.includes(creep.owner.username.toLowerCase()))
+                            return (creep.my || allyList.includes(creep.owner.username))
                         }
                     })
 
@@ -173,13 +171,13 @@ function antifa(room, creeps) {
 
                 let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
-                        return (!allyList.includes(c.owner.username.toLowerCase()))
+                        return (!allyList.includes(c.owner.username))
                     }
                 })
 
                 let closestAttacker = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
-                        return (!allyList.includes(c.owner.username.toLowerCase()) && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK)))
+                        return (!allyList.includes(c.owner.username) && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK)))
                     }
                 })
 

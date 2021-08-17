@@ -1,5 +1,3 @@
-let allyList = require("allyList")
-
 PowerCreep.prototype.findRemoteRoom = function() {
 
     if (!creep.memory.remoteRoom) {

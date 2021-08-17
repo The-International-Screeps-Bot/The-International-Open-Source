@@ -601,8 +601,6 @@ function roleOpts(room, spawns, specialStructures) {
 
         let extraIterations = Math.min(Math.floor((energyAmount - getCostOfParts(parts.defaultParts)) / getCostOfParts(parts.extraParts)), maxParts - body.length)
 
-        console.log(extraIterations)
-
         // Add extra parts
 
         let i = 0

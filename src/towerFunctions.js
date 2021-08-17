@@ -1,4 +1,3 @@
-let allyList = require("allyList")
 require("roomFunctions")
 require("creepFunctions")
 
@@ -9,13 +8,13 @@ Room.prototype.attackHostiles = function(towers) {
     let target
 
     let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username.toLowerCase()) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, HEAL, WORK, CARRY, CLAIM])
+        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, HEAL, WORK, CARRY, CLAIM])
     })
 
     if (hostiles.length == 0) return false
 
     let enemyHealers = room.find(FIND_HOSTILE_CREEPS, {
-        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username.toLowerCase()) && hostileCreep.hasPartsOfTypes([HEAL])
+        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([HEAL])
     })
 
     if (enemyHealers.length > 0) {
@@ -56,7 +55,7 @@ Room.prototype.healCreeps = function(towers) {
     if (towers[0].store[RESOURCE_ENERGY] <= (towers[0].store.getCapacity() * 0.4)) return false
 
     let injuredCreep = room.find(FIND_CREEPS, {
-        filter: injuredCreep => (allyList.includes(injuredCreep.owner.username.toLowerCase()) || injuredCreep.my) &&
+        filter: injuredCreep => (allyList.includes(injuredCreep.owner.username) || injuredCreep.my) &&
             injuredCreep.hits < injuredCreep.hitsMax - 50
     })[0]
 
@@ -74,7 +73,7 @@ Room.prototype.healPowerCreeps = function(towers) {
     if (towers[0].store[RESOURCE_ENERGY] <= (towers[0].store.getCapacity() * 0.4)) return false
 
     let injuredPowerCreep = room.find(FIND_POWER_CREEPS, {
-        filter: injuredPowerCreep => (allyList.includes(injuredPowerCreep.owner.username.toLowerCase()) || injuredPowerCreep.my) &&
+        filter: injuredPowerCreep => (allyList.includes(injuredPowerCreep.owner.username) || injuredPowerCreep.my) &&
             injuredPowerCreep.hits < injuredPowerCreep.hitsMax - 50
 
     })[0]

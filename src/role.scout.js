@@ -1,5 +1,5 @@
 let findAnchor = require("findAnchor")
-let allyList = require("allyList")
+
 
 module.exports = {
     run: function(creep) {
@@ -79,7 +79,7 @@ module.exports = {
 
                 // If not signed or not signed by me and not reserved or owned by me sign controller
 
-                if ((!controller.sign || controller.sign.username != "MarvinTMB") && !controller.reservation && (!controller.owner || controller.owner.username == "MarvinTMB")) {
+                if ((!controller.sign || controller.sign.username != me) && !controller.reservation && (!controller.owner || controller.owner.username == me)) {
 
                     creep.say("Signing")
 
@@ -121,7 +121,7 @@ module.exports = {
                     // If not my room but owner check if ally or enemy
 
                     if (!controller.my && controller.owner) {
-                        if (allyList.indexOf(controller.owner.username.toLowerCase()) >= 0) {
+                        if (allyList.indexOf(controller.owner.username) >= 0) {
 
                             creep.room.memory.stage = "allyRoom"
                             creep.room.memory.owner = controller.owner.username
@@ -145,9 +145,9 @@ module.exports = {
 
                     // If reserved and not reserved by me or invaders find if enemy or ally has reserved it
 
-                    if (controller.reservation && controller.reservation.username != "MarvinTMB" && controller.reservation.username != "Invader") {
+                    if (controller.reservation && controller.reservation.username != me && controller.reservation.username != "Invader") {
 
-                        if (allyList.indexOf((controller.reservation.username).toLowerCase()) >= 0) {
+                        if (allyList.indexOf((controller.reservation.username)) >= 0) {
 
                             creep.room.memory.stage = "allyReservation"
 
