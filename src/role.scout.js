@@ -14,23 +14,23 @@ module.exports = {
         if (!targetRoom) {
             for (let i = 0; i <= 7; i++) {
 
-                let room = targetRooms[i]
+                let roomName = targetRooms[i]
 
-                if (room) {
+                if (roomName) {
 
                     if (!Memory.rooms[roomName]) {
 
                         Memory.rooms[roomName] = {}
                     }
 
-                    targetRoomsArray.push(room)
+                    targetRoomsArray.push(roomName)
                 }
             }
 
             for (let i = 0; i < targetRoomsArray.length; i++) {
                 creep.say("tRA")
 
-                let room = targetRoomsArray[i]
+                let roomName = targetRoomsArray[i]
 
                 if (!Memory.rooms[roomName].scoutTick) {
 
@@ -47,14 +47,14 @@ module.exports = {
 
                 let targetRoomsArrayScoutTick = []
 
-                for (let room of targetRoomsArray) {
+                for (let roomName of targetRoomsArray) {
 
                     targetRoomsArrayScoutTick.push(Memory.rooms[roomName].scoutTick)
                 }
 
                 lowestScoutTick = _.min(targetRoomsArrayScoutTick, function(tick) { return tick })
 
-                for (let room in Memory.rooms) {
+                for (let roomName in Memory.rooms) {
 
                     if (Memory.rooms[roomName].scoutTick == lowestScoutTick) {
 
