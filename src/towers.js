@@ -4,8 +4,6 @@ function towers(room) {
 
     let towers = room.get("towers")
 
-    console.log("Towers: " + JSON.stringify(towers))
-
     if (towers.length == 0) return
 
     if (room.attackHostiles(towers)) return
