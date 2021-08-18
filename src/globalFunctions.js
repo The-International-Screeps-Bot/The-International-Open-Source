@@ -1,16 +1,20 @@
 global.avgPrice = function(resource) {
 
-    let avg = 0
-    let total = 0
+    let resourceHistory = Game.market.getHistory(resource)
+    let avgPrices = []
+    let totalPrice = 0
 
-    let history = Game.market.getHistory(resource)
+    for (let object of resourceHistory) {
 
-    for (let trade of history) {
+        avgPrices.push(object.avgPrice)
+    }
+    for (let price of avgPrices) {
 
-        total += trade.avgPrice
+        totalPrice += price
     }
 
-    avg = total / history.length
+    let avg = totalPrice / avgPrices.length
+    console.log(avg)
 
     return avg
 }
@@ -22,9 +26,10 @@ global.findOrders = function(orderType, resourceType) {
     return orders
 }
 
+
 global.findObjectWithId = function(id) {
 
-    if (!id || Game.getObjectById(id) == false) return false
+    if (!id || Game.getObjectById(id) == null) return false
 
     return Game.getObjectById(id)
 }

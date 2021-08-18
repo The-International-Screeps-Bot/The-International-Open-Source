@@ -49,14 +49,14 @@ function config() {
 
     Memory.global.totalEnergy = 0
 
-    if (Memory.global == false || !Memory.global) {
+    if (Memory.global == null || !Memory.global) {
 
         Memory.global = {}
     }
 
     Memory.global.establishedRooms = []
 
-    if (Memory.global.hasBoosts == false || !Memory.global.hasBoosts) {
+    if (Memory.global.hasBoosts == null || !Memory.global.hasBoosts) {
 
         Memory.global.hasBoosts = 0
     }

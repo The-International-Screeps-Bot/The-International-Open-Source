@@ -77,7 +77,7 @@ function builderManager(room, builders) {
 
                     creep.searchSourceContainers()
 
-                    if (creep.container == true && creep.container) {
+                    if (creep.container != null && creep.container) {
 
                         creep.say("SC")
 

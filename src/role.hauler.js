@@ -19,13 +19,13 @@ module.exports = {
         let storage = creep.room.storage
         let terminal = creep.room.terminal
 
-        let sourceContainer1 = findObjectWithId(creep.room.memory.sourceContainer1)
-        let sourceContainer2 = findObjectWithId(creep.room.memory.sourceContainer2)
-        let controllerContainer = findObjectWithId(creep.room.memory.controllerContainer)
+        let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
+        let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
+        let controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
 
-        let mineralContainer = findObjectWithId(creep.room.memory.mineralContainer)
+        let mineralContainer = Game.getObjectById(creep.room.memory.mineralContainer)
 
-        let controllerLink = findObjectWithId(creep.room.memory.controllerLink)
+        let controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
 
         let droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
             filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
@@ -84,7 +84,7 @@ module.exports = {
                     }
                 }
             }
-        } else if (task == "deliverToControllerContainer" && controllerContainer == true && (storage || terminal)) {
+        } else if (task == "deliverToControllerContainer" && controllerContainer != null && (storage || terminal)) {
 
             creep.say("DTCC")
 
@@ -107,7 +107,7 @@ module.exports = {
                     creep.memory.task = undefined
                 }
             }
-        } else if (task == "sourceContainer1Full" && sourceContainer1 == true) {
+        } else if (task == "sourceContainer1Full" && sourceContainer1 != null) {
 
             creep.say("SC1F")
 
@@ -163,7 +163,7 @@ module.exports = {
 
                 creep.memory.task = "deliverToBest"
             }
-        } else if (task == "sourceContainer2Full" && sourceContainer2 == true) {
+        } else if (task == "sourceContainer2Full" && sourceContainer2 != null) {
 
             creep.say("SC2F")
 
@@ -255,7 +255,7 @@ module.exports = {
 
                 creep.memory.task = "deliverToBest"
             }
-        } else if (task == "mineralContainerFull" && mineralContainer == true) {
+        } else if (task == "mineralContainerFull" && mineralContainer != null) {
 
             creep.say("MCF")
 
@@ -377,7 +377,7 @@ module.exports = {
 
                     creep.memory.task = undefined
                 }
-            } else if (controllerContainer == true && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
+            } else if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
 
                 if (creep.advancedTransfer(controllerContainer) == 0) {
 

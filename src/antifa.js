@@ -37,7 +37,7 @@ function antifa(room, creeps) {
                 creep.memory.assaulter = undefined
                 creep.memory.inSquad = false
             }
-            if (assaulter == true) {
+            if (assaulter != null) {
 
                 if (inSquad) {
 
@@ -345,7 +345,7 @@ function antifa(room, creeps) {
                 creep.memory.supporter = undefined
                 creep.memory.inSquad = false
             }
-            if (supporter == true) {
+            if (supporter != null) {
 
                 if (!creep.memory.squadType) {
 

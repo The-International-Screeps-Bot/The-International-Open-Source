@@ -11,7 +11,7 @@ function links(room, specialLinks) {
 
         for (let link of collection) {
 
-            if (link && link == true && link.store[RESOURCE_ENERGY] >= 790) {
+            if (link && link != null && link.store[RESOURCE_ENERGY] >= 790) {
 
                 return link
             }
@@ -22,7 +22,7 @@ function links(room, specialLinks) {
 
     if (findFullLink()) {
 
-        if (controllerLink == true) {
+        if (controllerLink != null) {
 
             if (controllerLink.store[RESOURCE_ENERGY] < 400 && room.controller.ticksToDowngrade <= 15000) {
 
@@ -35,11 +35,11 @@ function links(room, specialLinks) {
 
                 findFullLink().transferEnergy(controllerLink)
 
-            } else if (baseLink == true && baseLink.store[RESOURCE_ENERGY] < 700) {
+            } else if (baseLink != null && baseLink.store[RESOURCE_ENERGY] < 700) {
 
                 findFullLink().transferEnergy(baseLink)
             }
-        } else if (baseLink == true && baseLink.store[RESOURCE_ENERGY] < 700) {
+        } else if (baseLink != null && baseLink.store[RESOURCE_ENERGY] < 700) {
 
             findFullLink().transferEnergy(baseLink)
         }

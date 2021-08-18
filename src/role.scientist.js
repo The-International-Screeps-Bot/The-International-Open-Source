@@ -233,13 +233,13 @@ module.exports = {
 
         for (let labs of rawPrimaryLabs) {
 
-            let lab = findObjectWithId(labs)
+            let lab = Game.getObjectById(labs)
             primaryLab.push(lab)
 
         }
         for (let labs of rawSecondaryLabs) {
 
-            let lab = findObjectWithId(labs)
+            let lab = Game.getObjectById(labs)
             secondaryLab.push(lab)
 
         }

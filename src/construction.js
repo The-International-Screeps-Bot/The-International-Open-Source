@@ -608,17 +608,17 @@ function construction(room, specialStructures) {
 
     function removeUneeded() {
 
-        if (baseLink == true && controllerLink == true && controllerContainer == true) {
+        if (baseLink != null && controllerLink != null && controllerContainer != null) {
 
             controllerContainer.destroy()
         }
 
-        if (sourceContainer1 == true && sourceLink1 == true) {
+        if (sourceContainer1 != null && sourceLink1 != null) {
 
             //sourceContainer1.destroy()
         }
 
-        if (sourceContainer2 == true && sourceLink2 == true) {
+        if (sourceContainer2 != null && sourceLink2 != null) {
 
             //sourceContainer2.destroy()
         }

@@ -59,7 +59,7 @@ function spawnRequests(room, spawns, specialStructures) {
         filter: s => s.mineralAmount > 0
     })
 
-    let mineralContainer = findObjectWithId(room.memory.mineralContainer)
+    let mineralContainer = Game.getObjectById(room.memory.mineralContainer)
 
     let roomExtractor = room.find(FIND_MY_STRUCTURES, {
         filter: s => s.structureType == STRUCTURE_EXTRACTOR
@@ -294,7 +294,7 @@ function spawnRequests(room, spawns, specialStructures) {
         minCreeps["revolutionaryBuilder"] = 4
     }
 
-    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 35000 && mineralContainer == true && roomExtractor.length > 0 && roomMineral.length > 0) {
+    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 35000 && mineralContainer != null && roomExtractor.length > 0 && roomMineral.length > 0) {
 
         minCreeps["miner"] = 1
     }

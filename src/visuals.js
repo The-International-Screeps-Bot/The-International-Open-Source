@@ -217,11 +217,11 @@ function visuals(room, structures, specialStructures, constructionSites) {
         room.visual.text(container.store.getUsedCapacity(), container.pos.x, container.pos.y, { font: 0.5, backgroundColor: "#b4b4b4", backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
     }
 
-    let sourceContainer1 = findObjectWithId(room.memory.sourceContainer1)
-    let sourceContainer2 = findObjectWithId(room.memory.sourceContainer2)
-    let controllerContainer = findObjectWithId(room.memory.controllerContainer)
+    let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
+    let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
+    let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
 
-    if (sourceContainer1 == true) {
+    if (sourceContainer1 != null) {
 
         room.visual.circle(sourceContainer1.pos, {
             fill: 'transparent',
@@ -230,7 +230,7 @@ function visuals(room, structures, specialStructures, constructionSites) {
             strokeWidth: 0.125
         })
     }
-    if (sourceContainer2 == true) {
+    if (sourceContainer2 != null) {
 
         room.visual.circle(sourceContainer2.pos, {
             fill: 'transparent',
@@ -239,7 +239,7 @@ function visuals(room, structures, specialStructures, constructionSites) {
             strokeWidth: 0.125
         })
     }
-    if (controllerContainer == true) {
+    if (controllerContainer != null) {
 
         room.visual.circle(controllerContainer.pos, {
             fill: 'transparent',

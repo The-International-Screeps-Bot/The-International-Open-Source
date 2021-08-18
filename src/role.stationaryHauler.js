@@ -58,7 +58,7 @@ module.exports = {
                 creep.memory.terminalToStorage = true
             }
 
-            //if (storage && storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink == true && controllerLink.store[RESOURCE_ENERGY] <= 400) {
+            //if (storage && storage.store[RESOURCE_ENERGY] >= 200000 && controllerLink != null && controllerLink.store[RESOURCE_ENERGY] <= 400) {
 
             //creep.memory.transferControllerLink = true
             //}

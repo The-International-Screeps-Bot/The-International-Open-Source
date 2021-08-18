@@ -4,7 +4,7 @@ function logging() {
 
         let lastDefence
 
-        if (Memory.global.lastDefence == false) {
+        if (Memory.global.lastDefence == null) {
 
             Memory.global.lastDefence = { time: false, room: false }
         }

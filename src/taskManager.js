@@ -91,12 +91,12 @@ function taskManger(room, myCreeps) {
         let storage = room.storage
         let terminal = room.terminal
 
-        let sourceContainer1 = findObjectWithId(room.memory.sourceContainer1)
-        let sourceContainer2 = findObjectWithId(room.memory.sourceContainer2)
-        let controllerContainer = findObjectWithId(room.memory.controllerContainer)
-        let mineralContainer = findObjectWithId(room.memory.mineralContainer)
+        let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
+        let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
+        let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
+        let mineralContainer = Game.getObjectById(room.memory.mineralContainer)
 
-        let controllerLink = findObjectWithId(room.memory.controllerLink)
+        let controllerLink = Game.getObjectById(room.memory.controllerLink)
 
         if (findCreepWithoutTask(haulers) && (storage && storage.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity() * 2 || terminal && terminal.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity() * 2) && (lowTowers.length > 0 || essentialStructures.length > 0)) {
 
@@ -106,7 +106,7 @@ function taskManger(room, myCreeps) {
             }
         }
 
-        if (findCreepWithoutTask(haulers) && controllerLink == false && controllerContainer == true && (storage && storage.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers) || terminal && terminal.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers)) && controllerContainer.store[RESOURCE_ENERGY] <= findCreepWithoutTask(haulers).store.getCapacity()) {
+        if (findCreepWithoutTask(haulers) && controllerLink == null && controllerContainer != null && (storage && storage.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers) || terminal && terminal.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers)) && controllerContainer.store[RESOURCE_ENERGY] <= findCreepWithoutTask(haulers).store.getCapacity()) {
 
             if (!findCreepsOfTask(haulers, "deliverToControllerContainer", 1)) {
 
@@ -114,14 +114,14 @@ function taskManger(room, myCreeps) {
             }
         }
 
-        if (findCreepWithoutTask(haulers) && sourceContainer1 == true && sourceContainer1.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity()) {
+        if (findCreepWithoutTask(haulers) && sourceContainer1 != null && sourceContainer1.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity()) {
 
             if (!findCreepsOfTask(haulers, "sourceContainer1Full", 1)) {
 
                 findCreepWithoutTask(haulers).memory.task = "sourceContainer1Full"
             }
         }
-        if (findCreepWithoutTask(haulers) && sourceContainer2 == true && sourceContainer2.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity()) {
+        if (findCreepWithoutTask(haulers) && sourceContainer2 != null && sourceContainer2.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity()) {
 
             if (!findCreepsOfTask(haulers, "sourceContainer2Full", 1)) {
 
@@ -159,7 +159,7 @@ function taskManger(room, myCreeps) {
             }
         }
 
-        if (findCreepWithoutTask(haulers) && mineralContainer == true && mineralContainer.store.getUsedCapacity() >= findCreepWithoutTask(haulers).store.getCapacity()) {
+        if (findCreepWithoutTask(haulers) && mineralContainer != null && mineralContainer.store.getUsedCapacity() >= findCreepWithoutTask(haulers).store.getCapacity()) {
 
             if (!findCreepsOfTask(haulers, "mineralContainerFull", 1)) {
 

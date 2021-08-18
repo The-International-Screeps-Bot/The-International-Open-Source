@@ -50,8 +50,8 @@ function constants(room) {
 
         for (let container of containers) {
 
-            let source1 = findObjectWithId(room.memory.source1)
-            let source2 = findObjectWithId(room.memory.source2)
+            let source1 = Game.getObjectById(room.memory.source1)
+            let source2 = Game.getObjectById(room.memory.source2)
             let mineral = room.find(FIND_MINERALS)[0]
 
             if (container.pos.inRangeTo(room.controller, 2)) {
