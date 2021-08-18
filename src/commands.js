@@ -71,3 +71,8 @@ global.resetRoom = function(roomName) {
 
     return "reset " + roomName
 }
+
+global.consoleMessages = function(state) {
+
+    Memory.global.consoleMessages = state
+}

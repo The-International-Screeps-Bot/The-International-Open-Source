@@ -1,4 +1,6 @@
-Room.prototype.get = function(roomVar) {
+Room.prototype.get = function(roomVar, cache) {
+
+    if (!cache) cache = true
 
     let room = this
 
@@ -249,7 +251,6 @@ Room.prototype.get = function(roomVar) {
     }
 
     if (roomVar in roomVars) return roomVars[roomVar]
-
 
     console.log("Not a proper room object")
 }

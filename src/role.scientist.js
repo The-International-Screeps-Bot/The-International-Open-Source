@@ -1,210 +1,59 @@
 module.exports = {
     run: function(creep) {
 
-        let labs = creep.room.find(FIND_MY_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_LAB
-        })
+        let labs = room.get("labs")
 
-        if (labs.length > 0) {
+        if (labs.length == 0) return
 
-            let rawPrimaryLabs = creep.room.memory.primaryLabs
-            let rawSecondaryLabs = creep.room.memory.secondaryLabs
-            let rawTertiaryLabs = creep.room.memory.secondaryLabs
+        let primaryLabs = room.get("primaryLabs")
+        let secondaryLabs = room.get("secondaryLabs")
+        let tertiaryLabs = room.get("tertiaryLabs")
 
-            let primaryLab = []
-            let secondaryLab = []
-            let tertiaryLabs = []
+        let storage = creep.room.storage
+        let terminal = creep.room.terminal
 
-            for (let lab of labs) {
-
-                if (rawPrimaryLabs.indexOf(lab) > 0) {
+        if (!creep.memory.reaction) {
 
 
-                } else if (rawSecondaryLabs.indexOf(lab) > 0) {
 
+            for (let baseResource of Object.keys(resources)) {
 
-                } else if (rawTertiaryLabs.indexOf(lab) > 0) {
+                for (let reactionResource of Object.keys(resources[baseResource])) {
 
+                    let resource = resources[baseResource][reactionResource]
 
-                }
-            }
+                    if ((storage && storage.store[baseResource] >= 6000 && storage.store[reactionResource] >= 6000 && storage.store[resource] <= 4000) ||
+                        (terminal && terminal.store[baseResource] >= 6000 && terminal.store[reactionResource] >= 6000 && terminal.store[resource] <= 4000)) {
 
-            let storage = creep.room.storage
-            let terminal = creep.room.terminal
-
-            if (!creep.memory.reaction) {
-
-                let resources = {
-                    H: {
-                        O: "OH",
-                        L: "LH",
-                        K: "KH",
-                        U: "UH",
-                        Z: "ZH",
-                        G: "GH"
-                    },
-                    O: {
-                        H: "OH",
-                        L: "LO",
-                        K: "KO",
-                        U: "UO",
-                        Z: "ZO",
-                        G: "GO"
-                    },
-                    Z: {
-                        K: "ZK",
-                        H: "ZH",
-                        O: "ZO"
-                    },
-                    L: {
-                        U: "UL",
-                        H: "LH",
-                        O: "LO"
-                    },
-                    K: {
-                        Z: "ZK",
-                        H: "KH",
-                        O: "KO"
-                    },
-                    G: {
-                        H: "GH",
-                        O: "GO"
-                    },
-                    U: {
-                        L: "UL",
-                        H: "UH",
-                        O: "UO"
-                    },
-                    OH: {
-                        UH: "UH2O",
-                        UO: "UHO2",
-                        ZH: "ZH2O",
-                        ZO: "ZHO2",
-                        KH: "KH2O",
-                        KO: "KHO2",
-                        LH: "LH2O",
-                        LO: "LHO2",
-                        GH: "GH2O",
-                        GO: "GHO2"
-                    },
-                    X: {
-                        UH2O: "XUH2O",
-                        UHO2: "XUHO2",
-                        LH2O: "XLH2O",
-                        LHO2: "XLHO2",
-                        KH2O: "XKH2O",
-                        KHO2: "XKHO2",
-                        ZH2O: "XZH2O",
-                        ZHO2: "XZHO2",
-                        GH2O: "XGH2O",
-                        GHO2: "XGHO2"
-                    },
-                    ZK: {
-                        UL: "G"
-                    },
-                    UL: {
-                        ZK: "G"
-                    },
-                    LH: {
-                        OH: "LH2O"
-                    },
-                    ZH: {
-                        OH: "ZH2O"
-                    },
-                    GH: {
-                        OH: "GH2O"
-                    },
-                    KH: {
-                        OH: "KH2O"
-                    },
-                    UH: {
-                        OH: "UH2O"
-                    },
-                    LO: {
-                        OH: "LHO2"
-                    },
-                    ZO: {
-                        OH: "ZHO2"
-                    },
-                    KO: {
-                        OH: "KHO2"
-                    },
-                    UO: {
-                        OH: "UHO2"
-                    },
-                    GO: {
-                        OH: "GHO2"
-                    },
-                    LH2O: {
-                        X: "XLH2O"
-                    },
-                    KH2O: {
-                        X: "XKH2O"
-                    },
-                    ZH2O: {
-                        X: "XZH2O"
-                    },
-                    UH2O: {
-                        X: "XUH2O"
-                    },
-                    GH2O: {
-                        X: "XGH2O"
-                    },
-                    LHO2: {
-                        X: "XLHO2"
-                    },
-                    UHO2: {
-                        X: "XUHO2"
-                    },
-                    KHO2: {
-                        X: "XKHO2"
-                    },
-                    ZHO2: {
-                        X: "XZHO2"
-                    },
-                    GHO2: {
-                        X: "XGHO2"
+                        creep.memory.reaction = reactionResource
+                        creep.memory.primaryResource = resource
+                        creep.memory.secondaryResource = baseResource
                     }
                 }
-
-                for (let baseResource of Object.keys(resources)) {
-
-                    for (let reactionResource of Object.keys(resources[baseResource])) {
-
-                        let resource = resources[baseResource][reactionResource]
-
-                        if ((storage && storage.store[baseResource] >= 6000 && storage.store[reactionResource] >= 6000 && storage.store[resource] <= 4000) ||
-                            (terminal && terminal.store[baseResource] >= 6000 && terminal.store[reactionResource] >= 6000 && terminal.store[resource] <= 4000)) {
-
-                            creep.memory.reaction = reactionResource
-                            creep.memory.primaryResource = resource
-                            creep.memory.secondaryResource = baseResource
-                        }
-                    }
-                }
-            } else {
-
-                let task = creep.memory.task
-
-                if (primaryLabs.length == 2) {
-
-
-                }
-                if (secondaryLabs.length > 0) {
-
-
-                }
-                if (tertiaryLabs.length > 0) {
-
-
-                }
-
-
-                creep.say(creep.memory.reaction)
             }
+        } else {
+
+            let task = creep.memory.task
+
+            if (primaryLabs.length == 2) {
+
+
+            }
+            if (secondaryLabs.length > 0) {
+
+
+            }
+            if (tertiaryLabs.length > 0) {
+
+
+            }
+
+
+            creep.say(creep.memory.reaction)
         }
     }
 }
+
 
 /*
 module.exports = {

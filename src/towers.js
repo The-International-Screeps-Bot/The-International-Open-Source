@@ -2,6 +2,8 @@ require("towerFunctions")
 
 function towers(room) {
 
+    console.log(room.get("controllerContainer"))
+
     let towers = room.get("towers")
 
     if (towers.length == 0) return
