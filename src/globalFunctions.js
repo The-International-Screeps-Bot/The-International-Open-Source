@@ -1,9 +1,3 @@
-global.cacheValue = function(value) {
-
-    if (!cachedValues[value]) cachedValues[value] = value
-
-    return value
-}
 global.avgPrice = function(resource) {
 
     let resourceHistory = Game.market.getHistory(resource)

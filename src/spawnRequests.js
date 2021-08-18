@@ -377,7 +377,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
         if (requiredCreeps[role] > 0) {
 
-            console.log(role + ", " + requiredCreeps[role] + ", " + room.name)
+            /* console.log(role + ", " + requiredCreeps[role] + ", " + room.name) */
         }
     }
 

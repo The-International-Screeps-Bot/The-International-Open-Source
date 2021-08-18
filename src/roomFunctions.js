@@ -7,7 +7,11 @@ Room.prototype.get = function(roomObject) {
 
     // If value is cached in global return it
 
-    if (cachedValues[roomObject]) return cachedValues[roomObject]
+    if (cachedValues[room.name] && cachedValues[room.name].roomObjects && cachedValues[room.name].roomObjects[roomObject]) {
+
+        console.log("got from cache " + JSON.stringify(cachedValues[room.name].roomObjects[roomObject]))
+        return cachedValues[room.name].roomObjects[roomObject]
+    }
 
     // If value isn't in global recreate values
 
@@ -15,6 +19,7 @@ Room.prototype.get = function(roomObject) {
 
     // Structures
     roomObjects.allStructures = room.find(FIND_STRUCTURES)
+    roomObjects.allyStructures = "Coming soon near you"
     roomObjects.enemyStructures = room.find(FIND_HOSTILE_STRUCTURES, {
         filter: structure => !allyList.indexOf(structure.owner.username)
     })
@@ -229,11 +234,17 @@ Room.prototype.get = function(roomObject) {
         return cache[desiredObject]
     }
 
-    // Assign new values to global
+    // Assign new values to cachedValues
 
-    cacheValue(Object.values(roomObjects))
+    cachedValues[room.name] = { roomObjects: {} }
 
-    if (roomObjects[roomObject]) return roomObjects[roomObject]
+    for (let property in roomObjects) {
+
+        cachedValues[room.name].roomObjects[property] = roomObjects[property]
+    }
+
+    if (roomObject in roomObjects) return roomObjects[roomObject]
+
 
     console.log("Not a proper room object")
 }
