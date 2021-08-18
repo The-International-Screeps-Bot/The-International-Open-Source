@@ -51,11 +51,11 @@ module.exports = {
 
             if (!creep.memory.isFull) {
 
-                if (storage.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
+                if (storage && storage.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
 
                     creep.advancedWithdraw(storage)
 
-                } else if (terminal.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
+                } else if (terminal && terminal.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
 
                     creep.advancedWithdraw(terminal)
                 }
@@ -92,11 +92,11 @@ module.exports = {
 
             if (creep.memory.isFull == false) {
 
-                if (storage.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
+                if (storage && storage.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
 
                     creep.advancedWithdraw(storage)
 
-                } else if (terminal.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
+                } else if (terminal && terminal.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
 
                     creep.advancedWithdraw(terminal)
                 }

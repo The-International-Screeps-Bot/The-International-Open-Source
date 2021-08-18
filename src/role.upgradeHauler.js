@@ -7,23 +7,29 @@ module.exports = {
 
         if (creep.memory.isFull) {
 
-            let controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
+            let controllerLink = findObjectWithId(creep.room.memory.controllerLink)
 
-            if (controllerLink != null) {
+            if (controllerLink) {
 
                 creep.say("CL")
 
-                creep.advancedTransfer(controllerLink, RESOURCE_ENERGY)
+                creep.advancedTransfer(controllerLink)
+
+            } else if (room.get("controllerContainer")) {
+
+                creep.say("CC")
+
+                creep.advancedTransfer(room.get("controllerContainer"))
             }
         } else {
 
             let terminal = creep.room.terminal
 
-            if (terminal && terminal.store[RESOURCE_ENERGY] >= 80000) {
+            if (terminal && terminal.store[RESOURCE_ENERGY] >= 70000) {
 
                 creep.say("T")
 
-                creep.advancedWithdraw(terminal, RESOURCE_ENERGY)
+                creep.advancedWithdraw(terminal)
             }
         }
 
