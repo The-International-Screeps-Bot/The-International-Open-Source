@@ -44,7 +44,7 @@ function globalManager() {
 
         if (Game.resources.pixel > 10) {
 
-            Game.market.createOrder({ type: ORDER_SELL, resourceType: PIXEL, price: avgPrice(PIXEL) * 0.9, totalAmount: 10 })
+            Game.market.createOrder({ type: ORDER_SELL, resourceType: PIXEL, price: avgPrice(PIXEL) * 0.6, totalAmount: 10 })
         }
     }
 

@@ -164,7 +164,7 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            towers(room, structures.towers)
+            towers(room)
 
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed

@@ -1,6 +1,8 @@
 require("towerFunctions")
 
-function towers(room, towers) {
+function towers(room) {
+
+    let towers = room.get("towers")
 
     if (towers.length == 0) return
 
