@@ -15,11 +15,11 @@ module.exports = {
 
                 creep.advancedTransfer(controllerLink)
 
-            } else if (room.get("controllerContainer")) {
+            } else if (creep.room.get("controllerContainer")) {
 
                 creep.say("CC")
 
-                creep.advancedTransfer(room.get("controllerContainer"))
+                creep.advancedTransfer(creep.room.get("controllerContainer"))
             }
         } else {
 
