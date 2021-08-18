@@ -41,9 +41,9 @@ module.exports = {
 
         let task = creep.memory.task
 
-        if (task == "deliverFromStorage" && storage) {
+        if (task == "deliverFromStorage" && (storage || terminal)) {
 
-            if (storage.store[RESOURCE_ENERGY] < creep.store.getCapacity()) creep.memory.task = undefined
+            if ((storage && storage.store[RESOURCE_ENERGY] < creep.store.getCapacity()) && (terminal && terminal.store[RESOURCE_ENERGY] < creep.store.getCapacity())) creep.memory.task = undefined
 
             creep.say("DFS")
 
@@ -51,7 +51,14 @@ module.exports = {
 
             if (!creep.memory.isFull) {
 
-                creep.advancedWithdraw(storage)
+                if (storage.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
+
+                    creep.advancedWithdraw(storage)
+
+                } else if (terminal.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
+
+                    creep.advancedWithdraw(terminal)
+                }
             } else {
 
                 if (lowTower) {
@@ -77,7 +84,7 @@ module.exports = {
                     }
                 }
             }
-        } else if (task == "deliverToControllerContainer" && controllerContainer != null && storage) {
+        } else if (task == "deliverToControllerContainer" && controllerContainer != null && (storage || terminal)) {
 
             creep.say("DTCC")
 
@@ -85,8 +92,14 @@ module.exports = {
 
             if (creep.memory.isFull == false) {
 
-                creep.advancedWithdraw(storage)
+                if (storage.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
 
+                    creep.advancedWithdraw(storage)
+
+                } else if (terminal.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()) {
+
+                    creep.advancedWithdraw(terminal)
+                }
             } else {
 
                 if (creep.advancedTransfer(controllerContainer) == 0) {

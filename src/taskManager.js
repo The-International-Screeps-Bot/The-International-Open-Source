@@ -98,7 +98,7 @@ function taskManger(room, myCreeps) {
 
         let controllerLink = Game.getObjectById(room.memory.controllerLink)
 
-        if (findCreepWithoutTask(haulers) && storage && storage.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity() * 2 && (lowTowers.length > 0 || essentialStructures.length > 0)) {
+        if (findCreepWithoutTask(haulers) && (storage && storage.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity() * 2 || terminal && terminal.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity() * 2) && (lowTowers.length > 0 || essentialStructures.length > 0)) {
 
             if (!findCreepsOfTask(haulers, "deliverFromStorage", 2)) {
 
@@ -106,7 +106,7 @@ function taskManger(room, myCreeps) {
             }
         }
 
-        if (findCreepWithoutTask(haulers) && controllerLink == null && controllerContainer != null && storage && storage.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers) && controllerContainer.store[RESOURCE_ENERGY] <= findCreepWithoutTask(haulers).store.getCapacity()) {
+        if (findCreepWithoutTask(haulers) && controllerLink == null && controllerContainer != null && (storage && storage.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers) || terminal && terminal.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers)) && controllerContainer.store[RESOURCE_ENERGY] <= findCreepWithoutTask(haulers).store.getCapacity()) {
 
             if (!findCreepsOfTask(haulers, "deliverToControllerContainer", 1)) {
 
