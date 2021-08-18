@@ -55,7 +55,7 @@ function roleOpts(room, spawns, specialStructures) {
 
             if (spawnStructuresWithRanges[spawnStructure] <= minRange) continue
 
-            energyStructures.push(getObjectWithId(spawnStructure))
+            energyStructures.push(findObjectWithId(spawnStructure))
             delete spawnStructuresWithRanges[spawnStructure]
         }
     }
@@ -93,6 +93,17 @@ function roleOpts(room, spawns, specialStructures) {
     let claimPart = new BodyPart(CLAIM, 600)
 
     // Define spawn opts for roles
+
+    /* 
+    300 = rcl 1
+    500 = rcl 2
+    800 = rcl 3
+    1300 = rcl 4
+    1800 = rcl 5
+    2300 = rcl 6
+    5300 = rcl 7
+    10300 = rcl 8
+     */
 
     let roleOpts = {}
 
@@ -348,6 +359,11 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["revolutionaryBuilder"] = roleValues({
         role: "revolutionaryBuilder",
         parts: {
+            10300: {
+                defaultParts: [],
+                extraParts: [workPart, movePart, carryPart, movePart],
+                maxParts: 32
+            },
             300: {
                 defaultParts: [],
                 extraParts: [workPart, movePart, carryPart, movePart],

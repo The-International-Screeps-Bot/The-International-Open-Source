@@ -63,7 +63,7 @@ function terminals(room, terminal) {
             }
 
             // If no buy orders make a sell order
-            if (!buyOrder && Object.keys(Game.market.orders).length < 300) {
+            if (!buyOrder && Object.keys(Game.market.orders).length < 300 && Game.market.credits >= 50000) {
 
                 //console.log("Terminal " + room.name + " wants to make a sell order for: " + resource)
                 Game.market.createOrder({ type: ORDER_SELL, resourceType: resource, price: avgPrice(resource) * 0.9, totalAmount: 10000, roomName: room.name });

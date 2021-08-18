@@ -3,7 +3,7 @@ var roleUpgrader = require('role.upgrader');
 module.exports = {
     run: function(creep) {
 
-        const targetSite = getObjectWithId(creep.room.memory.targetSite)
+        const targetSite = findObjectWithId(creep.room.memory.targetSite)
 
         if (!targetSite) return
 

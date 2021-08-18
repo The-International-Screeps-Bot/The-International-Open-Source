@@ -33,7 +33,7 @@ global.findOrders = function(orderType, resourceType) {
 }
 
 
-global.getObjectWithId = function(id) {
+global.findObjectWithId = function(id) {
 
     if (!id || Game.getObjectById(id) == null) return false
 
