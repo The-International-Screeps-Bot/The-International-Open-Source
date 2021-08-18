@@ -1,5 +1,3 @@
-let { structures } = require("roomVariables")
-
 Room.prototype.get = function(roomVar) {
 
     let room = this
@@ -104,9 +102,9 @@ Room.prototype.get = function(roomVar) {
 
         let cache = {}
 
-        if (sources[0]) cache.source1 = sources[0]
+        if (sources[0]) cache.source1 = roomObjects.sources[0]
 
-        if (sources[1]) cache.source2 = sources[1]
+        if (sources[1]) cache.source2 = roomObjects.sources[1]
 
         for (let object in cache) {
 
@@ -267,16 +265,6 @@ Room.prototype.findExitRooms = function(roomName) {
     }
 
     return exitRoomNames
-}
-Room.prototype.storedEnergy = function() {
-
-    let storedEnergy = 0
-
-    if (structures.storage) storedEnergy += structures.storage.store[RESOURCE_ENERGY]
-
-    if (structures.terminal) storedEnergy += structures.terminal.store[RESOURCE_ENERGY]
-
-    return storedEnergy
 }
 Room.prototype.findSafeDistance = function(origin, goal, avoidStages) {
 
