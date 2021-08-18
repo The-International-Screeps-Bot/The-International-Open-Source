@@ -5,16 +5,22 @@ module.exports = {
 
         if (labs.length == 0) return
 
+        // Define variables needed
+
         let primaryLabs = room.get("primaryLabs")
         let secondaryLabs = room.get("secondaryLabs")
         let tertiaryLabs = room.get("tertiaryLabs")
 
-        let storage = creep.room.storage
-        let terminal = creep.room.terminal
+        let storage = room.get("storage")
+        let terminal = room.get("terminal")
 
-        if (!creep.memory.reaction) {
+        //
 
+        creep.say(REACTIONS)
 
+        const task = creep.memory.task
+
+        /* if (!creep.memory.reaction) {
 
             for (let baseResource of Object.keys(resources)) {
 
@@ -35,6 +41,11 @@ module.exports = {
 
             let task = creep.memory.task
 
+
+            if (tertiaryLabs.length > 0) {
+
+
+            }
             if (primaryLabs.length == 2) {
 
 
@@ -43,14 +54,10 @@ module.exports = {
 
 
             }
-            if (tertiaryLabs.length > 0) {
-
-
-            }
 
 
             creep.say(creep.memory.reaction)
-        }
+        } */
     }
 }
 

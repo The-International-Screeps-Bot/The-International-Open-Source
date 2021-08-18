@@ -6,8 +6,6 @@ let globalManager = require("globalManager")
 
 let roomManager = require("roomManager")
 
-let powerCreeps = require("module.powerCreeps")
-
 let informationManager = require("informationManager")
 
 let data = require("data")
@@ -52,16 +50,6 @@ module.exports.loop = function() {
     cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
 
     console.log("roomManager: " + cpuUsed)
-
-    //
-
-    cpuUsed = Game.cpu.getUsed()
-
-    powerCreeps.run()
-
-    cpuUsed = (Game.cpu.getUsed() - cpuUsed).toFixed(2)
-
-    console.log("powerCreeps: " + cpuUsed)
 
     //
 

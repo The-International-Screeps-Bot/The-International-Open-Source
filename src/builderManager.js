@@ -7,7 +7,7 @@ function builderManager(room, builders) {
 
     if (!anchorPoint) return
 
-    let { constructionSites, creeps } = roomVariables(room)
+    let constructionSites = room.get("constructionSites")
 
     let targetSite = findObjectWithId(room.memory.targetSite)
 

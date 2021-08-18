@@ -4,7 +4,7 @@ require("roomFunctions")
 require("creepFunctions")
 
 let creepManager = require("creepManager")
-let powerCreeps = require("powerCreeps")
+let powerCreepManager = require("powerCreepManager")
 let antifa = require("antifa")
 
 let constants = require("constants")
@@ -56,11 +56,9 @@ function roomManager() {
 
         let {
             creeps,
-            powerCreeps,
             structures,
             constructionSites,
             specialStructures,
-            costMatrixes,
         } = roomVariables(room)
 
         totalCpuUsed += Game.cpu.getUsed()
@@ -82,6 +80,21 @@ function roomManager() {
         consoleMessage += `
         ` + creepManagerConsoleMessage.consoleMessage + `
         `
+            //
+
+        cpuUsed = Game.cpu.getUsed()
+
+        /* let creepManagerConsoleMessage =  */
+        powerCreepManager(room)
+
+        totalCpuUsed += Game.cpu.getUsed()
+        cpuUsed = Game.cpu.getUsed() - cpuUsed
+        consoleMessage += `powerCreepManager: ` + cpuUsed.toFixed(2) + `
+                `
+
+        /* consoleMessage += `
+                 ` + creepManagerConsoleMessage.consoleMessage + `
+                 ` */
 
         //
 
@@ -179,7 +192,7 @@ function roomManager() {
 
             if (Game.time % 10 == 0) {
 
-                terminals(room, structures.terminal)
+                terminals(room)
             }
 
             totalCpuUsed += Game.cpu.getUsed()

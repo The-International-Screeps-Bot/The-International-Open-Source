@@ -1,4 +1,6 @@
-function terminals(room, terminal) {
+function terminals(room) {
+
+    let terminal = room.get("terminal")
 
     if (!terminal) return
 

@@ -72,7 +72,7 @@ Room.prototype.get = function(roomVar, cache) {
 
     // Power creeps
     roomVars.allPowerCreeps = room.find(FIND_POWER_CREEPS)
-    roomVars.myPowerCreeps = findObjectWithOwner(FIND_CREEPS, [me])
+    roomVars.myPowerCreeps = findObjectWithOwner(FIND_POWER_CREEPS, [me])
     roomVars.allyPowerCreeps = findObjectWithOwner(FIND_HOSTILE_POWER_CREEPS, allyList)
     roomVars.hostilePowerCreeps = room.find(FIND_HOSTILE_POWER_CREEPS, {
         filter: creep => !allyList.includes(creep.owner.username)
@@ -104,9 +104,9 @@ Room.prototype.get = function(roomVar, cache) {
 
         let cache = {}
 
-        if (sources[0]) cache.source1 = roomObjects.sources[0]
+        if (sources[0]) cache.source1 = roomVars.sources[0]
 
-        if (sources[1]) cache.source2 = roomObjects.sources[1]
+        if (sources[1]) cache.source2 = roomVars.sources[1]
 
         for (let object in cache) {
 

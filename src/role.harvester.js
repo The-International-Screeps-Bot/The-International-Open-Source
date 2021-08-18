@@ -3,18 +3,20 @@ let roomVariables = require("roomVariables")
 module.exports = {
     run: function(creep) {
 
-        let { specialStructures } = roomVariables(creep.room)
+        // Define variables for harvesters
 
-        let source1 = specialStructures.sources.source1
-        let source2 = specialStructures.sources.source2
+        let source1 = creep.room.get("source1")
+        let source2 = creep.room.get("source2")
 
-        let sourceContainer1 = specialStructures.containers.sourceContainer1
-        let sourceContainer2 = specialStructures.containers.sourceContainer2
+        let sourceContainer1 = creep.room.get("sourceContainer1")
+        let sourceContainer2 = creep.room.get("sourceContainer2")
 
-        let sourceLink1 = specialStructures.links.sourceLink1
-        let sourceLink2 = specialStructures.links.sourceLink2
+        let sourceLink1 = creep.room.get("sourceLink1")
+        let sourceLink2 = creep.room.get("sourceLink2")
 
         const task = creep.memory.task
+
+        // Harvest source depending on task
 
         if (task == "source1" && source1) {
 
