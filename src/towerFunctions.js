@@ -1,6 +1,3 @@
-require("roomFunctions")
-require("creepFunctions")
-
 Room.prototype.attackHostiles = function(towers) {
 
     let room = this

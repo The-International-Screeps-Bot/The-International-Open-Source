@@ -1,5 +1,4 @@
 let { structures } = require("roomVariables")
-require("creepFunctions")
 
 Room.prototype.get = function(roomVar) {
 

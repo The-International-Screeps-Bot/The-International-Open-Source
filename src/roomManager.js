@@ -1,5 +1,7 @@
 let roomVariables = require("roomVariables")
+
 require("roomFunctions")
+require("creepFunctions")
 
 let creepManager = require("creepManager")
 let powerCreeps = require("powerCreeps")

@@ -1,5 +1,3 @@
-require("creepFunctions")
-
 function creepManager(room, myCreeps) {
 
     // Import managers
