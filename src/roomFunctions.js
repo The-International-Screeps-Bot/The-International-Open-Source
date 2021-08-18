@@ -104,9 +104,9 @@ Room.prototype.get = function(roomVar, cache) {
 
         let cache = {}
 
-        if (sources[0]) cache.source1 = roomVars.sources[0]
+        if (roomVars.sources[0]) cache.source1 = roomVars.sources[0]
 
-        if (sources[1]) cache.source2 = roomVars.sources[1]
+        if (roomVars.sources[1]) cache.source2 = roomVars.sources[1]
 
         for (let object in cache) {
 

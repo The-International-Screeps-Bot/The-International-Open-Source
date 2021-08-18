@@ -92,15 +92,21 @@ function logging() {
         return Memory.global.establishedRooms.length
     }
 
+    let trPadding = "padding: 6px 0;"
+    let trBorderRadius = ""
+    let trTextAlign = "color: white; font-size: 15px; text-align: center; padding: 6px 0px;"
+
+    let trDefaultStyle = ""
+
     console.log('--------------------------------------------------------')
     console.log(`
         <table style="background: rgba(255, 255, 255, 0.1); padding: 6px; border-radius: 4px; width: 90vw; border-collapse: initial; box-shadow: rgba(0, 0, 0, 0.18) 0 12px 30px 0; overflow: hidden; font-family: 'Roboto', sans-serif; margin-left: 10px;">
             
             <tr style="background: rgba(44, 97, 242, 1);">
                 <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">CPU</th>
-                <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px;"></th>
-                <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px;"></th>
-                <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px;"></th>
+                <th style="` + trTextAlign + `"></th>
+                <th style="` + trTextAlign + `"></th>
+                <th style="` + trTextAlign + `"></th>
                 <th style="color: white; font-size: 15px; text-align: center; padding: 6px 0px; border-top-right-radius: 4px; border-bottom-right-radius: 4px;"></th>
             </tr>
             <tr>
