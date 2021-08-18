@@ -248,8 +248,9 @@ Room.prototype.get = function(roomVar) {
         cachedValues[room.name].roomVars[property] = roomVars[property]
     }
 
-    if (roomVar in roomVars) return roomVars[roomVar]
+    // Return requested room variable if exists
 
+    if (roomVar in roomVars) return roomVars[roomVar]
 
     console.log("Not a proper room object")
 }

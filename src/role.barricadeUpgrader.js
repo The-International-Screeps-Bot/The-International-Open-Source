@@ -30,7 +30,7 @@ module.exports = {
 
                 creep.searchSourceContainers()
 
-                if (creep.container != null && creep.container) {
+                if (creep.container == true && creep.container) {
 
                     creep.say("SC")
 

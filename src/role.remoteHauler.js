@@ -71,9 +71,9 @@ module.exports = {
                                 }
                             }
                         } else {
-                            let controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
+                            let controllerContainer = findObjectWithId(creep.room.memory.controllerContainer)
 
-                            if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
+                            if (controllerContainer == true && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
 
                                 creep.advancedTransfer(controllerContainer)
 

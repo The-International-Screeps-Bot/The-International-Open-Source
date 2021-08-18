@@ -3,7 +3,7 @@ module.exports = {
 
         let mineral = creep.room.find(FIND_MINERALS)[0]
 
-        let mineralContainer = Game.getObjectById(creep.room.memory.mineralContainer)
+        let mineralContainer = findObjectWithId(creep.room.memory.mineralContainer)
 
         creep.say("⛏️");
 

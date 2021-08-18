@@ -16,7 +16,7 @@ PowerCreep.prototype.barricadesFindAndRepair = function() {
 
         if (creep.memory.target) {
 
-            let barricade = Game.getObjectById(creep.memory.target)
+            let barricade = findObjectWithId(creep.memory.target)
 
             if (barricade.hits < barricade.hitsMax && barricade.hits < (creep.memory.quota + creep.findParts("work") * 1000)) {
 
@@ -271,15 +271,15 @@ PowerCreep.prototype.searchSourceContainers = function() {
 
     creep = this
 
-    let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
-    let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
+    let sourceContainer1 = findObjectWithId(creep.room.memory.sourceContainer1)
+    let sourceContainer2 = findObjectWithId(creep.room.memory.sourceContainer2)
 
     let containerTarget = [sourceContainer1, sourceContainer2]
 
     for (var i = 0; i < containerTarget.length; i++) {
 
         let container = containerTarget[i]
-        if (container != null) {
+        if (container == true) {
             if (container.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
 
                 creep.container = container

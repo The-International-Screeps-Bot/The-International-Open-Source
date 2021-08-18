@@ -14,8 +14,8 @@ module.exports = {
                 creep.room.memory.stage = "enemyReservation"
             }
 
-            let source1 = Game.getObjectById(creep.room.memory.source1)
-            let source2 = Game.getObjectById(creep.room.memory.source2)
+            let source1 = findObjectWithId(creep.room.memory.source1)
+            let source2 = findObjectWithId(creep.room.memory.source2)
 
             if (!source1) {
 
@@ -35,8 +35,8 @@ module.exports = {
                 }
             }
 
-            let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
-            let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
+            let sourceContainer1 = findObjectWithId(creep.room.memory.sourceContainer1)
+            let sourceContainer2 = findObjectWithId(creep.room.memory.sourceContainer2)
 
             if (!sourceContainer1 || !sourceContainer2) {
 
@@ -46,11 +46,11 @@ module.exports = {
 
                 for (let container of containers) {
 
-                    if (!sourceContainer1 == null && source1 && container.pos.getRangeTo(source1) == 1) {
+                    if (!sourceContainer1 == false && source1 && container.pos.getRangeTo(source1) == 1) {
 
                         creep.room.memory.sourceContainer1 = container.id
                     } else
-                    if (!sourceContainer2 == null && source2 && container.pos.getRangeTo(source2) == 1) {
+                    if (!sourceContainer2 == false && source2 && container.pos.getRangeTo(source2) == 1) {
 
                         creep.room.memory.sourceContainer2 = container.id
                     }
@@ -59,10 +59,10 @@ module.exports = {
 
             if (creep.memory.role == "remoteHarvester1") {
 
-                let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
-                let source1 = Game.getObjectById(creep.room.memory.source1)
+                let sourceContainer1 = findObjectWithId(creep.room.memory.sourceContainer1)
+                let source1 = findObjectWithId(creep.room.memory.source1)
 
-                if (sourceContainer1 != null && source1 != null) {
+                if (sourceContainer1 == true && source1 == true) {
 
                     creep.say("⛏️ 1")
 
@@ -87,7 +87,7 @@ module.exports = {
                         })
 
                     }
-                } else if (source1 != null) {
+                } else if (source1 == true) {
 
                     creep.say("⛏️ 3")
 
@@ -114,10 +114,10 @@ module.exports = {
                 }
             } else if (creep.memory.role == "remoteHarvester2") {
 
-                let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
-                let source2 = Game.getObjectById(creep.room.memory.source2)
+                let sourceContainer2 = findObjectWithId(creep.room.memory.sourceContainer2)
+                let source2 = findObjectWithId(creep.room.memory.source2)
 
-                if (sourceContainer2 != null && source2 != null) {
+                if (sourceContainer2 == true && source2 == true) {
 
                     creep.say("⛏️ 2")
 
@@ -141,7 +141,7 @@ module.exports = {
                             cacheAmount: 10,
                         })
                     }
-                } else if (source2 != null) {
+                } else if (source2 == true) {
 
                     creep.say("⛏️ 4")
 

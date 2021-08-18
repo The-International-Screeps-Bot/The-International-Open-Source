@@ -2,9 +2,9 @@ require("towerFunctions")
 
 function towers(room) {
 
-    let towers = room.get("towers")
+    console.log(room.get("storedEnergy"))
 
-    console.log("Towers: " + JSON.stringify(towers))
+    let towers = room.get("towers")
 
     if (towers.length == 0) return
 
