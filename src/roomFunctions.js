@@ -1,97 +1,94 @@
 let { structures } = require("roomVariables")
 require("creepFunctions")
 
-Room.prototype.get = function(roomObject) {
+Room.prototype.get = function(roomVar) {
 
     let room = this
 
-    // If value is cached in global return it
+    // If value is cached in cachedValues return it
 
-    if (cachedValues[room.name] && cachedValues[room.name].roomObjects && cachedValues[room.name].roomObjects[roomObject]) {
+    if (cachedValues[room.name] && cachedValues[room.name].roomVars && cachedValues[room.name].roomVars[roomVar]) return cachedValues[room.name].roomVars[roomVar]
 
-        console.log("got from cache " + JSON.stringify(cachedValues[room.name].roomObjects[roomObject]))
-        return cachedValues[room.name].roomObjects[roomObject]
-    }
+    // If value isn't cached recreate roomVars
 
-    // If value isn't in global recreate values
-
-    let roomObjects = {}
+    let roomVars = {}
 
     // Structures
-    roomObjects.allStructures = room.find(FIND_STRUCTURES)
-    roomObjects.allyStructures = "Coming soon near you"
-    roomObjects.enemyStructures = room.find(FIND_HOSTILE_STRUCTURES, {
+    roomVars.allStructures = room.find(FIND_STRUCTURES)
+    roomVars.allyStructures = findObjectWithOwner(FIND_HOSTILE_STRUCTURES, allyList)
+    roomVars.enemyStructures = room.find(FIND_HOSTILE_STRUCTURES, {
         filter: structure => !allyList.indexOf(structure.owner.username)
     })
 
-    roomObjects.spawns = room.find(FIND_MY_SPAWNS)
-    roomObjects.extensions = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_EXTENSION)
-    roomObjects.towers = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_TOWER)
-    roomObjects.links = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_LINK)
-    roomObjects.labs = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_LAB)
+    roomVars.spawns = room.find(FIND_MY_SPAWNS)
+    roomVars.extensions = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_EXTENSION)
+    roomVars.towers = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_TOWER)
+    roomVars.links = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_LINK)
+    roomVars.labs = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_LAB)
 
-    roomObjects.containers = findConstructionOfType(FIND_STRUCTURES, STRUCTURE_CONTAINER)
-    roomObjects.roads = findConstructionOfType(FIND_STRUCTURES, STRUCTURE_ROAD)
+    roomVars.containers = findConstructionOfType(FIND_STRUCTURES, STRUCTURE_CONTAINER)
+    roomVars.roads = findConstructionOfType(FIND_STRUCTURES, STRUCTURE_ROAD)
 
-    roomObjects.controller = room.controller
-    roomObjects.storage = room.storage
-    roomObjects.terminal = room.terminal
+    roomVars.controller = room.controller
+    roomVars.storage = room.storage
+    roomVars.terminal = room.terminal
 
-    roomObjects.extractor = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_EXTRACTOR)[0]
-    roomObjects.factory = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_FACTORY)[0]
-    roomObjects.powerSpawn = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_POWER_SPAWN)[0]
+    roomVars.extractor = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_EXTRACTOR)[0]
+    roomVars.factory = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_FACTORY)[0]
+    roomVars.powerSpawn = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_POWER_SPAWN)[0]
 
-    roomObjects.baseContainer = findContainers("baseContainer")
-    roomObjects.controllerContainer = findContainers("controllerContainer")
-    roomObjects.mineralContainer = findContainers("mineralContainer")
-    roomObjects.sourceContainer1 = findContainers("sourceContainer1")
-    roomObjects.sourceContainer2 = findContainers("sourceContainer2")
+    roomVars.baseContainer = findContainers("baseContainer")
+    roomVars.controllerContainer = findContainers("controllerContainer")
+    roomVars.mineralContainer = findContainers("mineralContainer")
+    roomVars.sourceContainer1 = findContainers("sourceContainer1")
+    roomVars.sourceContainer2 = findContainers("sourceContainer2")
 
-    roomObjects.baseLink = findLinks("baseLink")
-    roomObjects.controllerLink = findLinks("controllerLink")
-    roomObjects.sourceLink1 = findLinks("sourceLink1")
-    roomObjects.sourceLink2 = findLinks("sourceLink2")
+    roomVars.baseLink = findLinks("baseLink")
+    roomVars.controllerLink = findLinks("controllerLink")
+    roomVars.sourceLink1 = findLinks("sourceLink1")
+    roomVars.sourceLink2 = findLinks("sourceLink2")
 
-    roomObjects.primaryLabs = findLabs("primaryLabs")
-    roomObjects.secondaryLabs = findLabs("secondaryLabs")
-    roomObjects.tertiaryLabs = findLabs("tertiaryLabs")
+    roomVars.primaryLabs = findLabs("primaryLabs")
+    roomVars.secondaryLabs = findLabs("secondaryLabs")
+    roomVars.tertiaryLabs = findLabs("tertiaryLabs")
 
     // Resources
-    roomObjects.mineral = room.find(FIND_MINERALS)[0]
+    roomVars.mineral = room.find(FIND_MINERALS)[0]
 
-    roomObjects.sources = room.find(FIND_SOURCES)
-    roomObjects.source1 = findSources("source1")
-    roomObjects.source2 = findSources("source2")
+    roomVars.sources = room.find(FIND_SOURCES)
+    roomVars.source1 = findSources("source1")
+    roomVars.source2 = findSources("source2")
 
     // Construction sites
-    roomObjects.allSites = room.find(FIND_CONSTRUCTION_SITES)
-    roomObjects.mySites = findObjectWithOwner(FIND_CONSTRUCTION_SITES[me])
+    roomVars.allSites = room.find(FIND_CONSTRUCTION_SITES)
+    roomVars.mySites = findObjectWithOwner(FIND_CONSTRUCTION_SITES[me])
 
     // Creeps
-    roomObjects.allCreeps = room.find(FIND_CREEPS)
-    roomObjects.myCreeps = findObjectWithOwner(FIND_CREEPS[me])
-    roomObjects.allyCreeps = findObjectWithOwner(FIND_HOSTILE_CREEPS, allyList)
-    roomObjects.hostileCreeps = room.find(FIND_HOSTILE_CREEPS, {
+    roomVars.allCreeps = room.find(FIND_CREEPS)
+    roomVars.myCreeps = findObjectWithOwner(FIND_CREEPS, [me])
+    roomVars.allyCreeps = findObjectWithOwner(FIND_HOSTILE_CREEPS, allyList)
+    roomVars.hostileCreeps = room.find(FIND_HOSTILE_CREEPS, {
         filter: creep => !allyList.includes(creep.owner.username)
     })
 
     // Power creeps
-    roomObjects.allPowerCreeps = room.find(FIND_POWER_CREEPS)
-    roomObjects.myPowerCreeps = findObjectWithOwner(FIND_CREEPS[me])
-    roomObjects.allyPowerCreeps = findObjectWithOwner(FIND_HOSTILE_POWER_CREEPS, allyList)
-    roomObjects.hostilePowerCreeps = room.find(FIND_HOSTILE_POWER_CREEPS, {
+    roomVars.allPowerCreeps = room.find(FIND_POWER_CREEPS)
+    roomVars.myPowerCreeps = findObjectWithOwner(FIND_CREEPS, [me])
+    roomVars.allyPowerCreeps = findObjectWithOwner(FIND_HOSTILE_POWER_CREEPS, allyList)
+    roomVars.hostilePowerCreeps = room.find(FIND_HOSTILE_POWER_CREEPS, {
         filter: creep => !allyList.includes(creep.owner.username)
     })
 
     // Other
-    roomObjects.anchorPoint = room.memory.anchorPoint
+    roomVars.anchorPoint = room.memory.anchorPoint
+    roomVars.storedEnergy = storedEnergy()
 
     //
 
     function findObjectWithOwner(constant, usernames) {
 
         return room.find(constant, {
-            filter: object => usernames.indexOf(object.owner.username)
+            filter: object => object.owner && usernames.indexOf(object.owner.username)
         })
     }
 
@@ -126,30 +123,30 @@ Room.prototype.get = function(roomObject) {
 
         let cache = {}
 
-        for (let container of roomObjects.containers) {
+        for (let container of roomVars.containers) {
 
-            if (roomObjects.anchorPoint && roomObjects.anchorPoint.getRangeTo(container) == 0) {
+            if (roomVars.anchorPoint && roomVars.anchorPoint.getRangeTo(container) == 0) {
 
                 cache.baseContainer = container
                 continue
             }
-            if (roomObjects.controller && container.pos.getRangeTo(roomObjects.controller) <= 2) {
+            if (roomVars.controller && container.pos.getRangeTo(roomVars.controller) <= 2) {
 
                 cache.controllerContainer = container
                 continue
             }
-            if (roomObjects.mineral && container.pos.getRangeTo(roomObjects.mineral) == 1) {
+            if (roomVars.mineral && container.pos.getRangeTo(roomVars.mineral) == 1) {
 
                 cache.mineralContainer = container
                 continue
             }
 
-            if (container != cache.sourceContainer2 && container.pos.getRangeTo(roomObjects.source1) == 1) {
+            if (container != cache.sourceContainer2 && container.pos.getRangeTo(roomVars.source1) == 1) {
 
                 cache.sourceContainer1 = container
                 continue
             }
-            if (container != cache.sourceContainer1 && container.pos.getRangeTo(roomObjects.source2) == 1) {
+            if (container != cache.sourceContainer1 && container.pos.getRangeTo(roomVars.source2) == 1) {
 
                 cache.sourceContainer2 = container
                 continue
@@ -170,25 +167,25 @@ Room.prototype.get = function(roomObject) {
 
         let cache = {}
 
-        for (let link of roomObjects.links) {
+        for (let link of roomVars.links) {
 
-            if (roomObjects.storage && link.pos.getRangeTo(roomObjects.storage) == 1) {
+            if (roomVars.storage && link.pos.getRangeTo(roomVars.storage) == 1) {
 
                 cache.baseLink = link
                 continue
             }
-            if (link.pos.getRangeTo(roomObjects.controller) <= 2) {
+            if (link.pos.getRangeTo(roomVars.controller) <= 2) {
 
                 cache.controllerLink = link
                 continue
             }
 
-            if (link != cache.sourceLink2 && roomObjects.sourceContainer1 && link.pos.getRangeTo(roomObjects.sourceContainer1) == 1) {
+            if (link != cache.sourceLink2 && roomVars.sourceContainer1 && link.pos.getRangeTo(roomVars.sourceContainer1) == 1) {
 
                 cache.sourceLink1 = link
                 continue
             }
-            if (link != cache.sourceLink1 && roomObjects.sourceContainer2 && link.pos.getRangeTo(roomObjects.sourceContainer2) == 1) {
+            if (link != cache.sourceLink1 && roomVars.sourceContainer2 && link.pos.getRangeTo(roomVars.sourceContainer2) == 1) {
 
                 cache.sourceLink2 = link
                 continue
@@ -213,11 +210,11 @@ Room.prototype.get = function(roomObject) {
         cache.secondaryLabs = []
         cache.tertiaryLabs = []
 
-        for (let lab of roomObjects.labs) {
+        for (let lab of roomVars.labs) {
 
-            var nearbyLab = lab.pos.findInRange(roomObjects.labs, 2)
+            var nearbyLab = lab.pos.findInRange(roomVars.labs, 2)
 
-            if (nearbyLab.length == roomObjects.labs.length && cache.primaryLabs.length < 2) {
+            if (nearbyLab.length == roomVars.labs.length && cache.primaryLabs.length < 2) {
 
                 cache.primaryLabs.push(lab)
                 continue
@@ -234,16 +231,27 @@ Room.prototype.get = function(roomObject) {
         return cache[desiredObject]
     }
 
-    // Assign new values to cachedValues
+    function storedEnergy() {
 
-    cachedValues[room.name] = { roomObjects: {} }
+        let storedEnergy = 0
 
-    for (let property in roomObjects) {
+        if (roomVars.storage) storedEnergy += roomVars.storage.store[RESOURCE_ENERGY]
 
-        cachedValues[room.name].roomObjects[property] = roomObjects[property]
+        if (roomVars.terminal) storedEnergy += roomVars.terminal.store[RESOURCE_ENERGY]
+
+        return storedEnergy
     }
 
-    if (roomObject in roomObjects) return roomObjects[roomObject]
+    // Assign new values to cachedValues
+
+    cachedValues[room.name] = { roomVars: {} }
+
+    for (let property in roomVars) {
+
+        cachedValues[room.name].roomVars[property] = roomVars[property]
+    }
+
+    if (roomVar in roomVars) return roomVars[roomVar]
 
 
     console.log("Not a proper room object")
