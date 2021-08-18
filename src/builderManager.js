@@ -7,26 +7,26 @@ function builderManager(room, builders) {
 
     if (!anchorPoint) return
 
-    let constructionSites = room.get("constructionSites")
+    let mySites = room.get("mySites")
 
     let targetSite = findObjectWithId(room.memory.targetSite)
 
-    if (!targetSite && constructionSites.mySites.length > 0) {
+    if (!targetSite && mySites.length > 0) {
 
         if (builders.length == 1) {
 
 
-            targetSite = builders[0].pos.findClosestByRange(constructionSites.mySites)
+            targetSite = builders[0].pos.findClosestByRange(mySites)
             room.memory.targetSite = targetSite.id
 
         } else {
 
-            targetSite = room.memory.targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(constructionSites.mySites)
+            targetSite = room.memory.targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(mySites)
             room.memory.targetSite = targetSite.id
         }
     }
 
-    if (constructionSites.mySites.length == 0) {
+    if (mySites.length == 0) {
 
         for (let creep of builders) {
 

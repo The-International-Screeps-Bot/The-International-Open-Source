@@ -225,12 +225,6 @@ function constants(room) {
                 Memory.global.needsEnergy.splice(index, 1);
             }
         }
-
-        let totalEnergy = storageEnergy + terminalEnergy
-
-        room.memory.totalEnergy = totalEnergy
-        Memory.global.totalEnergy += totalEnergy
-        Memory.data.totalEnergy += totalEnergy
     }
 
     function hasBoosts() {
