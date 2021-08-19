@@ -10,19 +10,6 @@ Creep.prototype.isEdge = function() {
 
     return false
 }
-Creep.prototype.findRemoteRoom = function() {
-
-    if (!creep.memory.remoteRoom) {
-
-        for (let remoteRoom of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
-
-            if (remoteRoom.creepsOfRole[creep.memory.role] < remoteRoom.minCreeps[creep.memory.role]) {
-
-                creep.memory.remoteRoom = remoteRoom
-            }
-        }
-    }
-}
 
 Creep.prototype.findRampartToRepair = function(ramparts) {
 
@@ -54,6 +41,79 @@ Creep.prototype.findRampartToRepair = function(ramparts) {
 
     if (creep.target) return true
 }
+
+Creep.prototype.repairRamparts = function(target) {
+
+    if (!target) return
+
+    creep = this
+
+    creep.room.visual.text("🧱", target.pos.x, target.pos.y + 0.25, { align: 'center' })
+
+    if (creep.repair(target) == 0) {
+
+        creep.say("🧱 " + creep.findParts("work"))
+
+        Memory.data.energySpentOnBarricades += creep.findParts("work")
+
+        if (creep.store.getUsedCapacity() == 0) {
+
+            if (creep.room.get("anchorPoint")) {
+
+                creep.advancedPathing({
+                    origin: creep.pos,
+                    goal: { pos: creep.room.get("anchorPoint"), range: 1 },
+                    plainCost: false,
+                    swampCost: false,
+                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                    avoidStages: [],
+                    flee: false,
+                    cacheAmount: 10,
+                })
+            }
+            return
+        }
+
+        if (target.hits > creep.memory.quota + creep.findParts("work") * 900) {
+
+            if (creep.findRampartToRepair(removePropertyFromArray(creep.room.get("myRamparts"), target))) {
+
+                if (creep.pos.getRangeTo(creep.target) > 3) {
+
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: target.pos, range: 3 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
+                    })
+                }
+            }
+        }
+
+        return
+    }
+
+    if (creep.pos.getRangeTo(target) > 3) {
+
+        creep.say("MR")
+
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: target.pos, range: 3 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: creep.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 10,
+        })
+    }
+}
+
 Creep.prototype.findParts = function(partType) {
 
     creep = this
@@ -210,75 +270,6 @@ Creep.prototype.advancedTransfer = function(target, resource) {
         creep.advancedPathing({
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
-            plainCost: false,
-            swampCost: false,
-            defaultCostMatrix: creep.memory.defaultCostMatrix,
-            avoidStages: [],
-            flee: false,
-            cacheAmount: 10,
-        })
-    }
-}
-Creep.prototype.repairRamparts = function(target) {
-
-    if (!target) return
-
-    creep = this
-
-    creep.room.visual.text("🧱", target.pos.x, target.pos.y + 0.25, { align: 'center' })
-
-    if (creep.repair(target) == 0) {
-
-        creep.say("🧱 " + creep.findParts("work"))
-
-        Memory.data.energySpentOnBarricades += creep.findParts("work")
-
-        if (creep.store.getFreeCapacity() == 0) {
-
-            if (creep.room.get("anchorPoint")) {
-
-                creep.advancedPathing({
-                    origin: creep.pos,
-                    goal: { pos: creep.room.get("anchorPoint"), range: 1 },
-                    plainCost: false,
-                    swampCost: false,
-                    defaultCostMatrix: creep.memory.defaultCostMatrix,
-                    avoidStages: [],
-                    flee: false,
-                    cacheAmount: 10,
-                })
-            }
-            return
-        }
-
-        if (target.hits <= creep.findParts("work") * 100) {
-
-            if (findRampartToRepair(removePropertyFromArray(creep.room.get("ramparts"), target))) {
-
-                if (creep.pos.getRangeTo(creep.target) > 3) {
-
-                    creep.advancedPathing({
-                        origin: creep.pos,
-                        goal: { pos: target.pos, range: 3 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: creep.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 10,
-                    })
-                }
-            }
-        }
-
-        return
-    }
-
-    if (creep.pos.getRangeTo(target) > 3) {
-
-        creep.advancedPathing({
-            origin: creep.pos,
-            goal: { pos: target.pos, range: 3 },
             plainCost: false,
             swampCost: false,
             defaultCostMatrix: creep.memory.defaultCostMatrix,

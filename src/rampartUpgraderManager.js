@@ -23,6 +23,8 @@ function rampartUpgraderManager(room, creepsWithRole) {
 
             if (terminal && terminal.store[RESOURCE_ENERGY] >= 80000) {
 
+                creep.say("T")
+
                 creep.advancedWithdraw(terminal)
 
             } else {
@@ -33,10 +35,8 @@ function rampartUpgraderManager(room, creepsWithRole) {
 
                     creep.say("S")
 
-                    if (storage.store[RESOURCE_ENERGY] >= 30000) {
+                    creep.advancedWithdraw(storage)
 
-                        creep.advancedWithdraw(storage)
-                    }
                 } else {
 
                     let container = creep.searchSourceContainers()
