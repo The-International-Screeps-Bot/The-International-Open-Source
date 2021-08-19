@@ -254,15 +254,15 @@ function spawnRequests(room, spawns, specialStructures) {
     if (barricadesToUpgrade.length > 0) {
         if (!room.storage) {
 
-            minCreeps["barricadeUpgrader"] = 1
+            minCreeps["rampartUpgrader"] = 1
 
         } else {
             if (room.storage.store[RESOURCE_ENERGY] >= 200000) {
 
-                minCreeps["barricadeUpgrader"] = 3
+                minCreeps["rampartUpgrader"] = 3
             } else if (room.storage.store[RESOURCE_ENERGY] >= 30000) {
 
-                minCreeps["barricadeUpgrader"] = 1
+                minCreeps["rampartUpgrader"] = 1
             }
         }
     }

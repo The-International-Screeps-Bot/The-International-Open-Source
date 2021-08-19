@@ -44,13 +44,13 @@ module.exports = {
             }
         } else {
 
-            creep.searchSourceContainers()
+            let container = creep.searchSourceContainers()
 
-            if (creep.container && creep.container) {
+            if (container && container) {
 
                 creep.say("SC")
 
-                let target = creep.container
+                let target = container
 
                 creep.advancedWithdraw(target)
             } else {

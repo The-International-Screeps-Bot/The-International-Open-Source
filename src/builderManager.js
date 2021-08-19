@@ -1,7 +1,6 @@
-let roomVariables = require("roomVariables")
 var roleUpgrader = require('role.upgrader')
 
-function builderManager(room, builders) {
+function builderManager(room, creepsWithRole) {
 
     const anchorPoint = room.memory.anchorPoint
 
@@ -13,10 +12,10 @@ function builderManager(room, builders) {
 
     if (!targetSite && mySites.length > 0) {
 
-        if (builders.length == 1) {
+        if (creepsWithRole.length == 1) {
 
 
-            targetSite = builders[0].pos.findClosestByRange(mySites)
+            targetSite = creepsWithRole[0].pos.findClosestByRange(mySites)
             room.memory.targetSite = targetSite.id
 
         } else {
@@ -28,7 +27,7 @@ function builderManager(room, builders) {
 
     if (mySites.length == 0) {
 
-        for (let creep of builders) {
+        for (let creep of creepsWithRole) {
 
             roleUpgrader.run(creep)
             return
@@ -39,7 +38,7 @@ function builderManager(room, builders) {
 
     room.visual.text("🚧", targetSite.pos.x, targetSite.pos.y + 0.25, { align: 'center' })
 
-    for (let creep of builders) {
+    for (let creep of creepsWithRole) {
 
         creep.isFull()
         const isFull = creep.memory.isFull
@@ -75,13 +74,13 @@ function builderManager(room, builders) {
                     }
                 } else {
 
-                    creep.searchSourceContainers()
+                    let container = creep.searchSourceContainers()
 
-                    if (creep.container != null && creep.container) {
+                    if (container != null && container) {
 
                         creep.say("SC")
 
-                        creep.advancedWithdraw(creep.container)
+                        creep.advancedWithdraw(container)
                     } else {
 
                         let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {

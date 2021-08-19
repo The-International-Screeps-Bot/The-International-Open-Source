@@ -5,12 +5,14 @@ function creepManager(room, myCreeps) {
     let managers = {}
 
     managers["builder"] = { import: require("builderManager"), creeps: [] }
+    managers["rampartUpgrader"] = { import: require("rampartUpgraderManager"), creeps: [] }
 
 
     // Get creeps for each manager
 
     for (let creep of myCreeps) {
 
+        if (managers[creep.memory.role]) managers[creep.memory.role].creeps.push(creep)
         if (managers[creep.memory.role]) managers[creep.memory.role].creeps.push(creep)
     }
 
@@ -33,7 +35,6 @@ function creepManager(room, myCreeps) {
     roles["upgrader"] = require('role.upgrader')
     roles["repairer"] = require('role.repairer')
     roles["upgradeHauler"] = require("role.upgradeHauler")
-    roles["barricadeUpgrader"] = require('role.barricadeUpgrader')
     roles["claimer"] = require('role.claimer')
     roles["revolutionaryBuilder"] = require('role.revolutionaryBuilder')
     roles["rangedDefender"] = require('role.rangedDefender')

@@ -234,8 +234,8 @@ function roleOpts(room, spawns, specialStructures) {
         memoryAdditions: {}
     })
 
-    roleOpts["barricadeUpgrader"] = roleValues({
-        role: "barricadeUpgrader",
+    roleOpts["rampartUpgrader"] = roleValues({
+        role: "rampartUpgrader",
         parts: {
             10300: {
                 defaultParts: [],

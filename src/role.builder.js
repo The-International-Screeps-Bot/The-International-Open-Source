@@ -45,13 +45,13 @@ module.exports = {
                         }
                     } else {
 
-                        creep.searchSourceContainers()
+                        let container = creep.searchSourceContainers()
 
-                        if (creep.container != null && creep.container) {
+                        if (container != null && container) {
 
                             creep.say("SC")
 
-                            creep.advancedWithdraw(creep.container)
+                            creep.advancedWithdraw(container)
                         } else {
 
                             let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {

@@ -282,7 +282,7 @@ PowerCreep.prototype.searchSourceContainers = function() {
         if (container != null) {
             if (container.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
 
-                creep.container = container
+                container = container
                 break
             }
         } else {

@@ -25,6 +25,9 @@ Room.prototype.get = function(roomVar, cache) {
     roomVars.links = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_LINK)
     roomVars.labs = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_LAB)
 
+    roomVars.myRamparts = findConstructionOfType(FIND_MY_STRUCTURES, STRUCTURE_RAMPART)
+    roomVars.enemyRamparts = findConstructionOfType(FIND_HOSTILE_STRUCTURES, STRUCTURE_RAMPART)
+
     roomVars.containers = findConstructionOfType(FIND_STRUCTURES, STRUCTURE_CONTAINER)
     roomVars.roads = findConstructionOfType(FIND_STRUCTURES, STRUCTURE_ROAD)
 
