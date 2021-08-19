@@ -5,7 +5,7 @@ require("creepFunctions")
 
 let creepManager = require("creepManager")
 let powerCreepManager = require("powerCreepManager")
-let antifa = require("antifa")
+    /* let antifa = require("antifa") */
 
 let constants = require("constants")
 let construction = require("construction")
@@ -78,7 +78,7 @@ function roomManager() {
         `
 
         consoleMessage += `
-        ` + creepManagerConsoleMessage.consoleMessage + `
+        ` + creepManagerConsoleMessage + `
         `
             //
 
@@ -109,18 +109,18 @@ function roomManager() {
 
         //
 
-        cpuUsed = Game.cpu.getUsed()
+        /*         cpuUsed = Game.cpu.getUsed()
 
-        antifa(room, creeps)
+                antifa(room, creeps)
 
-        totalCpuUsed += Game.cpu.getUsed()
-        cpuUsed = Game.cpu.getUsed() - cpuUsed
-        consoleMessage += `antifa: ` + cpuUsed.toFixed(2) + `
-        `
+                totalCpuUsed += Game.cpu.getUsed()
+                cpuUsed = Game.cpu.getUsed() - cpuUsed
+                consoleMessage += `antifa: ` + cpuUsed.toFixed(2) + `
+                ` */
 
         //
 
-        //trafficManager(room, creeps.myCreeps)
+        /* trafficManager(room, creeps.myCreeps) */
 
         // Commune only scripts
 

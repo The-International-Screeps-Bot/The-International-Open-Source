@@ -1,4 +1,4 @@
-function communeManager(room, ) {
+function communeManager(room) {
 
 
 }

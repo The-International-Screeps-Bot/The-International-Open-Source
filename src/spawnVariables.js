@@ -475,10 +475,12 @@ function roleOpts(room, spawns, specialStructures) {
                 300: {
                     defaultParts: [],
                     extraParts: [rangedAttackPart, movePart],
-                    maxParts: 20
+                    maxParts: 2
                 },
             },
-            memoryAdditions: {}
+            memoryAdditions: {
+                squad: { type: "rangedAttack", size: "quad", amount: 0, requiredAmount: 4, part: false, }
+            }
         })
         roleOpts["antifaSupporter"] = roleValues({
             role: "antifaSupporter",
@@ -486,10 +488,12 @@ function roleOpts(room, spawns, specialStructures) {
                 300: {
                     defaultParts: [],
                     extraParts: [healPart, movePart],
-                    maxParts: 20
+                    maxParts: 2
                 },
             },
-            memoryAdditions: {}
+            memoryAdditions: {
+                squad: { type: "rangedAttack", size: "quad", amount: 0, requiredAmount: 4, part: false, }
+            }
         })
     } else if (squadType == "attack") {
 
@@ -619,7 +623,7 @@ function roleOpts(room, spawns, specialStructures) {
 
         let i = 0
 
-        while (i < extraIterations && body.length + parts.extraParts.length < maxParts) {
+        while (i < extraIterations && body.length + parts.extraParts.length <= maxParts) {
 
             body.push(getTypesOfParts(parts.extraParts))
 

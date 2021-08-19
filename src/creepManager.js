@@ -1,12 +1,15 @@
 function creepManager(room, myCreeps) {
 
-    // Import managers
+    if (myCreeps.length == 0) return
 
     let managers = {}
 
+    // Import managers
+
     managers["builder"] = { import: require("builderManager"), creeps: [] }
     managers["rampartUpgrader"] = { import: require("rampartUpgraderManager"), creeps: [] }
-
+    managers["antifaAssaulter"] = { import: require("antifaAssaulterManager"), creeps: [] }
+    managers["antifaSupporter"] = { import: require("antifaSupporterManager"), creeps: [] }
 
     // Get creeps for each manager
 
@@ -83,9 +86,7 @@ function creepManager(room, myCreeps) {
     consoleMessage += `
     `
 
-    return {
-        consoleMessage
-    }
+    return consoleMessage
 }
 
 module.exports = creepManager
