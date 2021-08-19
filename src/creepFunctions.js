@@ -375,9 +375,7 @@ Creep.prototype.avoidHostiles = function() {
     let creep = this
 
     let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
-        filter: (c) => {
-            return (allyList.indexOf(c.owner.username) === -1 && (c.getActiveBodyparts(ATTACK) > 0 || c.getActiveBodyparts(RANGED_ATTACK) > 0))
-        }
+        filter: creep => allyList.indexOf(creep.owner.username) && (creep.getActiveBodyparts(ATTACK) > 0 || creep.getActiveBodyparts(RANGED_ATTACK) > 0)
     })
 
     if (hostiles.length > 0) {
@@ -527,6 +525,7 @@ creep.advancedPathing({
     plainCost: 1,
     swampCost: 1,
     avoidStages: [],
+    defaultCostMatrix: 1,
     flee: false,
     cacheAmount: 50,
 })
@@ -535,7 +534,7 @@ Creep.prototype.advancedPathing = function(opts) {
 
     let creep = this
 
-    let { creeps, powerCreeps, } = roomVariables(creep.room)
+    let { creeps, powerCreeps } = roomVariables(creep.room)
 
     if (creep.fatigue > 0 || creep.spawning) return
 
@@ -623,29 +622,18 @@ Creep.prototype.advancedPathing = function(opts) {
 
                 let room = Game.rooms[roomName]
 
-                if (!room) {
-
-                    return false
-                }
+                if (!room) return false
 
                 let cm
 
                 cm = new PathFinder.CostMatrix
 
-                let roads = creep.room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_ROAD
-                })
-
-                for (let road of roads) {
+                for (let road of room.get("roads")) {
 
                     cm.set(road.pos.x, road.pos.y, 1)
                 }
 
-                let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                    filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
-                })
-
-                for (let site of constructionSites) {
+                for (let site of room.get("mySites")) {
 
                     cm.set(site.pos.x, site.pos.y, 255)
                 }

@@ -60,6 +60,8 @@ global.resetRoom = function(roomName) {
 
     if (!roomName || !Game.rooms[roomName]) return "room is undefined"
 
+    let room = Game.rooms[roomName]
+
     let structures = room.find(FIND_STRUCTURES, {
         filter: s => s.structureType != STRUCTURE_SPAWN
     })

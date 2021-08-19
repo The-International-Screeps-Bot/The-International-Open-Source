@@ -2,6 +2,8 @@ let creepData = require("creepData")
 
 function spawnRequests(room, spawns, specialStructures) {
 
+    // Import variables we need
+
     let {
         rolesList,
         remoteRoles,
@@ -113,7 +115,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
     }
 
-    /*Minimum creeps definitions*/
+    // Define min creeps for each role
 
     let minCreeps = {}
 
