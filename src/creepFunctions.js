@@ -15,7 +15,7 @@ Creep.prototype.findRampartToRepair = function(ramparts) {
 
     let creep = this
 
-    if (creep.memory.target && findObjectWithId(creep.memory.target) && findObjectWithId(creep.memory.target).hits < creep.memory.quota + creep.findParts("work") * 1000) {
+    if (findObjectWithId(creep.memory.target) && findObjectWithId(creep.memory.target).hits < creep.memory.quota + creep.findParts("work") * 1000) {
 
         creep.target = findObjectWithId(creep.memory.target)
 
@@ -23,13 +23,11 @@ Creep.prototype.findRampartToRepair = function(ramparts) {
 
         for (let quota = creep.memory.quota || creep.findParts("work") * 1000; quota < ramparts[0].hitsMax; quota += creep.findParts("work") * 1000) {
 
-            let ramparts = creep.room.find(FIND_STRUCTURES, {
-                filter: s => s.structureType == STRUCTURE_RAMPART && s.hits < quota
-            })
+            let rampartsUnderQuota = ramparts.filter(r => r.hits < quota)
 
-            if (ramparts.length == 0) continue
+            if (rampartsUnderQuota.length == 0) continue
 
-            let rampart = creep.pos.findClosestByRange(ramparts)
+            let rampart = creep.pos.findClosestByRange(rampartsUnderQuota)
 
             creep.target = rampart
             creep.memory.target = creep.target.id
@@ -391,7 +389,8 @@ Creep.prototype.avoidHostiles = function() {
     })
 
     if (hostiles.length > 0) {
-        for (let hostile of hostiles) {
+
+        /* for (let hostile of hostiles) {
 
             if (creep.pos.getRangeTo(hostile) <= 6) {
 
@@ -410,7 +409,22 @@ Creep.prototype.avoidHostiles = function() {
 
                 break
             }
-        }
+        } */
+
+        let hostile = creep.pos.findClosestByRange(hostiles)
+
+        creep.say("H! R")
+
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: hostile.pos, range: 7 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: creep.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: true,
+            cacheAmount: 1,
+        })
     }
 }
 Creep.prototype.findDamagePossible = function(creep, healers, towers) {

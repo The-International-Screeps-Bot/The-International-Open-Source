@@ -125,8 +125,8 @@ global.attackTarget = function(attackTarget) {
 
                         console.log("AT, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
 
-                        Memory.global.attackingRoom = attackTarget
-                        Memory.global.attackTarget = room.name
+                        Memory.global.attackingRoom = room.name
+                        Memory.global.attackTarget = attackTarget
                         return room.name
                     }
                 }

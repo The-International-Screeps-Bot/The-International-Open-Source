@@ -39,6 +39,8 @@ module.exports = {
             filter: s => s.structureType == STRUCTURE_POWER_SPAWN
         })[0]
 
+        creep.isFull()
+
         let task = creep.memory.task
 
         if (task == "deliverFromStorage" && (storage || terminal)) {
@@ -46,8 +48,6 @@ module.exports = {
             if ((storage && storage.store[RESOURCE_ENERGY] < creep.store.getCapacity()) && (terminal && terminal.store[RESOURCE_ENERGY] < creep.store.getCapacity())) creep.memory.task = undefined
 
             creep.say("DFS")
-
-            creep.isFull()
 
             if (!creep.memory.isFull) {
 
@@ -88,7 +88,7 @@ module.exports = {
 
             creep.say("DTCC")
 
-            creep.isFull()
+
 
             if (creep.memory.isFull == false) {
 
@@ -111,7 +111,7 @@ module.exports = {
 
             creep.say("SC1F")
 
-            creep.isFull()
+
 
             if (!creep.memory.isFull) {
 
@@ -167,7 +167,7 @@ module.exports = {
 
             creep.say("SC2F")
 
-            creep.isFull()
+
 
             if (!creep.memory.isFull) {
 
@@ -227,12 +227,10 @@ module.exports = {
 
                 creep.memory.task = undefined
             }
-            if (creep.isFull()) {
+            if (creep.memory.isFull) {
 
                 creep.memory.task = "deliverToBest"
             }
-
-            creep.isFull()
 
             if (creep.advancedWithdraw(tombstone, RESOURCE_ENERGY) == 0) {
 
@@ -246,7 +244,7 @@ module.exports = {
 
                 creep.memory.task = undefined
             }
-            if (creep.isFull()) {
+            if (creep.memory.isFull) {
 
                 creep.memory.task = "deliverToBest"
             }
@@ -261,7 +259,7 @@ module.exports = {
 
             let mineralType = creep.room.find(FIND_MINERALS)[0].mineralType
 
-            creep.isFull()
+
 
             if (creep.memory.isFull == false) {
 
@@ -280,9 +278,6 @@ module.exports = {
 
                         creep.memory.task = undefined
                     }
-                } else {
-
-                    task = "noDeliveryPossible"
                 }
             }
         } else if (task == "fillPowerSpawnEnergy" && powerSpawn) {
@@ -353,7 +348,7 @@ module.exports = {
 
             creep.say("DTB")
 
-            creep.isFull()
+
 
             if (!creep.memory.isFull) creep.memory.task = undefined
 
@@ -387,15 +382,12 @@ module.exports = {
 
                     creep.memory.task = undefined
                 }
-            } else {
-
-                task = "noDeliveryPossible"
             }
         } else if (task == "collectFromRuin") {
 
             creep.say("CFR")
 
-            creep.isFull()
+
 
             if (creep.memory.isFull) {
 
@@ -421,31 +413,6 @@ module.exports = {
             } else {
 
                 creep.memory.task = undefined
-            }
-        } else if (!task || task == "noDeliveryPossible") {
-
-            creep.say("NDP")
-
-            if (creep.memory.isFull) {
-
-                let spawn = creep.room.find(FIND_MY_SPAWNS)[0]
-
-                if (creep.pos.getRangeTo(spawn) > 3) {
-
-                    creep.advancedPathing({
-                        origin: creep.pos,
-                        goal: { pos: spawn.pos, range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: creep.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 10,
-                    })
-                } else {
-
-                    creep.memory.path = []
-                }
             }
         }
 

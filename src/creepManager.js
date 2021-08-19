@@ -13,7 +13,6 @@ function creepManager(room, myCreeps) {
     for (let creep of myCreeps) {
 
         if (managers[creep.memory.role]) managers[creep.memory.role].creeps.push(creep)
-        if (managers[creep.memory.role]) managers[creep.memory.role].creeps.push(creep)
     }
 
     // Run each manager

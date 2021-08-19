@@ -143,7 +143,7 @@ module.exports = {
 
                                 creep.advancedPathing({
                                     origin: creep.pos,
-                                    goal: { pos: closestHostile, range: 6 },
+                                    goal: { pos: closestHostile.pos, range: 6 },
                                     plainCost: false,
                                     swampCost: false,
                                     defaultCostMatrix: false,
