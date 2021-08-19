@@ -64,7 +64,7 @@ module.exports = {
 
                         creep.say("🚧")
 
-                        creep.constructionBuild(constructionSite)
+                        creep.buildSite(constructionSite)
 
                     } else {
 

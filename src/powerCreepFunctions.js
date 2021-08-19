@@ -234,7 +234,7 @@ PowerCreep.prototype.repairStructure = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-PowerCreep.prototype.constructionBuild = function(target) {
+PowerCreep.prototype.buildSite = function(target) {
 
     creep = this
 

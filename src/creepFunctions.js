@@ -307,7 +307,7 @@ Creep.prototype.repairStructure = function(target) {
         Memory.data.energySpentOnRepairs += creep.findParts("work")
     }
 }
-Creep.prototype.constructionBuild = function(target) {
+Creep.prototype.buildSite = function(target) {
 
     creep = this
 
@@ -645,7 +645,11 @@ Creep.prototype.advancedPathing = function(opts) {
                     cm.set(road.pos.x, road.pos.y, 1)
                 }
 
-                for (let site of room.get("mySites")) {
+                let sites = creep.room.find(FIND_MY_CONSTRUCTION_SITES, {
+                    filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                })
+
+                for (let site of sites) {
 
                     cm.set(site.pos.x, site.pos.y, 255)
                 }

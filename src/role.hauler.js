@@ -73,7 +73,7 @@ module.exports = {
 
                         creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 
-                        essentialStructuresTranfser(essentialStructure)
+                        essentialStructuresTransfer(essentialStructure)
 
                     } else {
 
@@ -355,10 +355,7 @@ module.exports = {
 
             creep.isFull()
 
-            if (!creep.memory.isFull) {
-
-                creep.memory.task = undefined
-            }
+            if (!creep.memory.isFull) creep.memory.task = undefined
 
             if (lowTower) {
 
@@ -370,7 +367,8 @@ module.exports = {
 
                 creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 
-                essentialStructuresTranfser(essentialStructure)
+                essentialStructuresTransfer(essentialStructure)
+
             } else if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
 
                 if (creep.advancedTransfer(storage) == 0) {
@@ -451,7 +449,7 @@ module.exports = {
             }
         }
 
-        function essentialStructuresTranfser(essentialStructure) {
+        function essentialStructuresTransfer(essentialStructure) {
 
             if (creep.advancedTransfer(essentialStructure) == 0) {
 

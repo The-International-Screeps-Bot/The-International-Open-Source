@@ -19,7 +19,7 @@ module.exports = {
 
                 creep.say("🚧")
 
-                creep.constructionBuild(targetSite)
+                creep.buildSite(targetSite)
             } else {
 
                 let terminal = creep.room.terminal

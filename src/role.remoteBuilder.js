@@ -44,7 +44,7 @@ module.exports = {
 
                             creep.say("🚧")
 
-                            creep.constructionBuild(constructionSite)
+                            creep.buildSite(constructionSite)
 
                         } else if (creep.room.memory.builderNeed == true && !constructionSite && !lowLogisticStructure) {
 

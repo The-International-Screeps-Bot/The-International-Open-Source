@@ -36,11 +36,9 @@ function roleOpts(room, spawns, specialStructures) {
     let spawnStructuresWithRanges = {}
     let startPos = new RoomPosition(anchorPoint.y - 3, anchorPoint.x, anchorPoint.roomName)
 
-    let extensions = room.find(FIND_MY_STRUCTURES, {
-        filter: s => s.structureType == STRUCTURE_EXTENSION
+    let spawnStructures = room.find(FIND_MY_STRUCTURES, {
+        filter: s => s.structureType == STRUCTURE_EXTENSION || STRUCTURE_SPAWN
     })
-
-    let spawnStructures = extensions.concat(spawns)
 
     // Add each spawnStructures with their range to the object
 
