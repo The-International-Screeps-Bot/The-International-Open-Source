@@ -66,7 +66,7 @@ Creep.prototype.findDuo = function(assaulters) {
             assaulter.memory.secondSupporter = creep.memory.supporter
 
             creep.memory.secondAssaulter = assaulter.name
-            creep.memory.secondSupporter = assaulters.memory.supporter
+            creep.memory.secondSupporter = assaulter.memory.supporter
 
             return true
         }
