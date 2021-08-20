@@ -298,12 +298,18 @@ function visuals(room) {
     let controller = room.get("controller")
 
     if (controller) {
-        if (controller.progressTotal) {
+        if (controller.my) {
 
-            room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 1, { align: 'center', opacity: "0.8" });
+            room.visual.text(controller.level, controller.pos.x, controller.pos.y + 0.25, { align: 'center', opacity: "0.8" });
+
+            if (controller.progressTotal) {
+
+                room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 1, { align: 'center', opacity: "0.8" });
+            }
+        } else if (controller.reservation) {
+
+            room.visual.text(controller.reservation.ticksToEnd, controller.pos.x, controller.pos.y + 0.25, { align: 'center', opacity: "0.8" });
         }
-
-        room.visual.text(controller.level, controller.pos.x, controller.pos.y + 0.25, { align: 'center', opacity: "0.8" });
     }
 
     let storage = room.get("storage")
