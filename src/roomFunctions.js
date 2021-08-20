@@ -19,6 +19,10 @@ Room.prototype.get = function(roomVar, cache) {
     roomVars.source1 = findSources("source1")
     roomVars.source2 = findSources("source2")
 
+    roomVars.droppedEnergy = room.find(FIND_DROPPED_RESOURCES, {
+        filter: resource => resource.resourceType == RESOURCE_ENERGY
+    })
+
     // Structures
     roomVars.allStructures = room.find(FIND_STRUCTURES)
     roomVars.allyStructures = findObjectWithOwner(FIND_HOSTILE_STRUCTURES, allyList)
@@ -63,7 +67,7 @@ Room.prototype.get = function(roomVar, cache) {
 
     // Construction sites
     roomVars.allSites = room.find(FIND_CONSTRUCTION_SITES)
-    roomVars.mySites = findObjectWithOwner(FIND_CONSTRUCTION_SITES, [me])
+    roomVars.mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
 
     // Creeps
     roomVars.allCreeps = room.find(FIND_CREEPS)

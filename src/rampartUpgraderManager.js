@@ -31,12 +31,14 @@ function rampartUpgraderManager(room, creepsWithRole) {
 
                 let storage = room.get("storage")
 
-                if (storage && storage.store[RESOURCE_ENERGY] >= 30000) {
+                if (storage) {
+                    if (storage.store[RESOURCE_ENERGY] >= 30000) {
 
-                    creep.say("S")
+                        creep.say("S")
 
-                    creep.advancedWithdraw(storage)
+                        creep.advancedWithdraw(storage)
 
+                    }
                 } else {
 
                     let container = creep.searchSourceContainers()
@@ -49,15 +51,13 @@ function rampartUpgraderManager(room, creepsWithRole) {
 
                     } else {
 
-                        let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-                            filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
-                        });
+                        let droppedEnergy = findDroppedEnergyOfAmount(creep.store.getFreeCapacity())
 
-                        if (droppedResources) {
+                        if (droppedEnergy) {
 
                             creep.say("💡")
 
-                            creep.pickupDroppedEnergy(droppedResources)
+                            creep.pickupDroppedEnergy(droppedEnergy)
                         }
                     }
                 }

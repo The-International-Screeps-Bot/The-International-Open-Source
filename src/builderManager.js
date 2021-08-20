@@ -51,7 +51,7 @@ function builderManager(room, creepsWithRole) {
 
         } else {
 
-            let terminal = creep.room.terminal
+            let terminal = creep.get("terminal")
 
             if (terminal && terminal.store[RESOURCE_ENERGY] >= 30000) {
 
@@ -60,38 +60,35 @@ function builderManager(room, creepsWithRole) {
                 creep.advancedWithdraw(terminal)
             } else {
 
-                let storage = creep.room.storage
+                let storage = creep.get("storage")
 
                 if (storage) {
 
                     creep.say("S")
 
-                    let target = storage
+                    if (storage.store[RESOURCE_ENERGY] >= 35000) {
 
-                    if (target.store[RESOURCE_ENERGY] >= 35000) {
-
-                        creep.advancedWithdraw(target)
+                        creep.advancedWithdraw(storage)
                     }
                 } else {
 
                     let container = creep.searchSourceContainers()
 
-                    if (container != null && container) {
+                    if (container) {
 
                         creep.say("SC")
 
                         creep.advancedWithdraw(container)
+
                     } else {
 
-                        let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-                            filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
-                        });
+                        let droppedEnergy = findDroppedEnergyOfAmount(creep.store.getFreeCapacity())
 
-                        if (droppedResources) {
+                        if (droppedEnergy) {
 
                             creep.say("💡")
 
-                            creep.pickupDroppedEnergy(droppedResources)
+                            creep.pickupDroppedEnergy(droppedEnergy)
                         }
                     }
                 }

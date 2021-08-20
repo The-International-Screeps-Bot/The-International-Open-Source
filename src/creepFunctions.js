@@ -351,24 +351,32 @@ Creep.prototype.searchSourceContainers = function() {
 
     creep = this
 
-    let containerTargets = [room.get("sourceContainer1"), room.get("sourceContainer2")]
+    let sourceContainers = [room.get("sourceContainer1"), room.get("sourceContainer2")]
 
-    for (var i = 0; i < containerTargets.length; i++) {
+    viableContainers = sourceContainers.filter(container => {
+        return container != null && container.store.getUsedCapacity(RESOURCE_ENERGY) >= creep.store.getFreeCapacity()
+    })
 
-        let container = containerTargets[i]
-        if (container != null) {
-            if (container.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) {
+    if (viableContainers.length == 0) return false
 
-                return container
-            }
-        } else {
-
-            i = 0
-
-            break
-        }
-    }
+    return creep.pos.findClosestByRange(viableContainers)
 }
+
+Creep.prototype.findDroppedEnergyOfAmount = function(amount) {
+
+    creep = this
+
+    let droppedEnergy = creep.room.get("droppedEnergy")
+
+    if (droppedEnergy.length == 0) return false
+
+    droppedEnergyOfAmount = droppedEnergy.filter(resource => resource.amount[RESOURCE_ENERGY] >= amount)
+
+    if (droppedEnergyOfAmount.length == 0) return false
+
+    return creep.pos.findClosestByRange(droppedEnergyOfAmount)
+}
+
 Creep.prototype.isEdge = function() {
 
     let creep = this
