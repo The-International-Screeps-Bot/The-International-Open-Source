@@ -23,8 +23,6 @@ function antifaAssaulterManager(room, assaulters) {
 
         creep.findAmount(members)
 
-        console.log(creep.name + ", " + JSON.stringify(members))
-
         if (room.name == attackTarget) {
 
             // Creep is in room to attack

@@ -1,13 +1,9 @@
 function constants(room) {
 
-    sources()
-    containers()
-        /* costMatrixes() */
+    /* costMatrixes() */
     roomGlobal()
-    terminals()
     myResources()
-    hasBoosts()
-    nuke()
+        /* nuke() */
 
     if (!room.memory.remoteRooms) room.memory.remoteRooms = []
 
@@ -22,53 +18,6 @@ function constants(room) {
             if (nuker.store[RESOURCE_ENERGY] == nuker.store.getCapacity(RESOURCE_ENERGY) && nuker.store[RESOURCE_GHODIUM] == nuker.store.getCapacity(RESOURCE_GHODIUM)) {
 
                 nuker.launchNuke(new RoomPosition(18, 24, 'E32N8'));
-            }
-        }
-    }
-
-    function sources() {
-
-        let sources = room.find(FIND_SOURCES)
-
-        if (sources[0]) {
-
-            room.memory.source1 = sources[0].id
-
-        }
-        if (sources[1]) {
-
-            room.memory.source2 = sources[1].id
-
-        }
-    }
-
-    function containers() {
-
-        let containers = room.find(FIND_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_CONTAINER
-        })
-
-        for (let container of containers) {
-
-            let source1 = Game.getObjectById(room.memory.source1)
-            let source2 = Game.getObjectById(room.memory.source2)
-            let mineral = room.find(FIND_MINERALS)[0]
-
-            if (container.pos.inRangeTo(room.controller, 2)) {
-
-                room.memory.controllerContainer = container.id
-
-            } else if (source1 && container.pos.inRangeTo(source1, 1)) {
-
-                room.memory.sourceContainer1 = container.id
-
-            } else if (source2 && container.pos.inRangeTo(source2, 1)) {
-
-                room.memory.sourceContainer2 = container.id
-
-            } else if (mineral && container.pos.inRangeTo(mineral, 1)) {
-
-                room.memory.mineralContainer = container.id
             }
         }
     }
@@ -179,11 +128,6 @@ function constants(room) {
         room.memory.defaultCostMatrix = cm.serialize()
     }
 
-    function terminals() {
-
-
-    }
-
     function roomGlobal() {
 
         if (room.memory.stage == 8 && Memory.global.establishedRooms.indexOf(room.name) == -1) {
@@ -225,42 +169,6 @@ function constants(room) {
                 Memory.global.needsEnergy.splice(index, 1);
             }
         }
-    }
-
-    function hasBoosts() {
-
-        /*         var hasBoosts = false
-                let t3Boosts = ["XUH2O", "XUHO2", "XKH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2"]
-                let importantBoosts = ["XUH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2"]
-                let attackBoosts = ["XUH2O", "XKHO2", "XLHO2", "XZH2O", "XGHO2", "XZHO2"]
-                let defendBoosts = ["XUH2O", "XKHO2", "XLH2O", "XZHO2"]
-                let economyBoosts = ["XGH2O"]
-
-                if (room.storage && room.terminal) {
-
-                    let i = 0
-
-                    while (i < importantBoosts.length) {
-
-                        if (room.storage.store[importantBoosts[i]] || room.terminal.store[importantBoosts[i]]) {
-
-                            i++
-                        }
-                        if (i == importantBoosts.length) {
-
-                            hasBoots = true
-
-                            break
-                        } else {
-
-                            break
-                        }
-                    }
-                }
-                if (hasBoosts == true) {
-
-                    room.memory.hasBoosts = true
-                } */
     }
 }
 

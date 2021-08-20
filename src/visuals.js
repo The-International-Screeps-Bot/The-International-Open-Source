@@ -1,16 +1,12 @@
-function visuals(room, structures, specialStructures, constructionSites) {
+function visuals(room) {
 
-    var controller = structures.controller
+    if (!Memory.global.roomVisuals) return
 
-    var storage = structures.storage
+    let primaryLabs = room.get("primaryLabs")
+    let secondaryLabs = room.get("secondaryLabs")
+    let tertiaryLabs = room.get("tertiaryLabs")
 
-    var terminal = structures.terminal
-
-    let primaryLabs = specialStructures.labs.primaryLabs
-    let secondaryLabs = specialStructures.labs.secondaryLabs
-    let tertiaryLabs = specialStructures.labs.secondaryLabs
-
-    for (let lab of structures.labs) {
+    for (let lab of room.get("labs")) {
 
         if (primaryLabs && primaryLabs.includes(lab)) {
 
@@ -37,7 +33,7 @@ function visuals(room, structures, specialStructures, constructionSites) {
                 strokeWidth: 0.125
             })
         }
-        //Minerals
+
         if (lab.store[RESOURCE_HYDROGEN]) {
 
             room.visual.text("H", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" });
@@ -65,7 +61,6 @@ function visuals(room, structures, specialStructures, constructionSites) {
         } else if (lab.store[RESOURCE_CATALYST]) {
 
             room.visual.text("X", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" });
-
         }
         //Base
         else if (lab.store[RESOURCE_HYDROXIDE]) {
@@ -212,16 +207,16 @@ function visuals(room, structures, specialStructures, constructionSites) {
 
         }
     }
-    for (let container of structures.containers) {
+    for (let container of room.get("containers")) {
 
         room.visual.text(container.store.getUsedCapacity(), container.pos.x, container.pos.y, { font: 0.5, backgroundColor: "#b4b4b4", backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
     }
 
-    let sourceContainer1 = Game.getObjectById(room.memory.sourceContainer1)
-    let sourceContainer2 = Game.getObjectById(room.memory.sourceContainer2)
-    let controllerContainer = Game.getObjectById(room.memory.controllerContainer)
+    let sourceContainer1 = room.get("sourceContainer1")
+    let sourceContainer2 = room.get("sourceContainer2")
+    let controllerContainer = room.get("controllerContainer")
 
-    if (sourceContainer1 != null) {
+    if (sourceContainer1) {
 
         room.visual.circle(sourceContainer1.pos, {
             fill: 'transparent',
@@ -230,7 +225,7 @@ function visuals(room, structures, specialStructures, constructionSites) {
             strokeWidth: 0.125
         })
     }
-    if (sourceContainer2 != null) {
+    if (sourceContainer2) {
 
         room.visual.circle(sourceContainer2.pos, {
             fill: 'transparent',
@@ -239,7 +234,7 @@ function visuals(room, structures, specialStructures, constructionSites) {
             strokeWidth: 0.125
         })
     }
-    if (controllerContainer != null) {
+    if (controllerContainer) {
 
         room.visual.circle(controllerContainer.pos, {
             fill: 'transparent',
@@ -249,15 +244,15 @@ function visuals(room, structures, specialStructures, constructionSites) {
         })
     }
 
-    for (let link of structures.links) {
+    for (let link of room.get("links")) {
 
         room.visual.text(link.store[RESOURCE_ENERGY], link.pos.x, link.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
     }
 
-    let controllerLink = specialStructures.links.controllerLink
-    let baseLink = specialStructures.links.baseLink
-    let sourceLink1 = specialStructures.links.sourceLink1
-    let sourceLink2 = specialStructures.links.sourceLink2
+    let controllerLink = room.get("controllerLink")
+    let baseLink = room.get("baseLink")
+    let sourceLink1 = room.get("sourceLink1")
+    let sourceLink2 = room.get("sourceLink2")
 
     if (sourceLink1) {
 
@@ -300,79 +295,79 @@ function visuals(room, structures, specialStructures, constructionSites) {
         })
     }
 
-    if (controller.progressTotal) {
+    let controller = room.get("controller")
 
-        room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 1, { align: 'center', opacity: "0.8" });
+    if (controller) {
+        if (controller.progressTotal) {
+
+            room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 1, { align: 'center', opacity: "0.8" });
+        }
+
+        room.visual.text(controller.level, controller.pos.x, controller.pos.y + 0.25, { align: 'center', opacity: "0.8" });
     }
 
-    room.visual.text(controller.level, controller.pos.x, controller.pos.y + 0.25, { align: 'center', opacity: "0.8" });
+    let storage = room.get("storage")
 
     if (storage) {
 
         room.visual.text((storage.store[RESOURCE_ENERGY] / 1000).toFixed(0) + "k", storage.pos.x, storage.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center', opacity: "0.8" });
     }
+
+    let terminal = room.get("terminal")
+
     if (terminal) {
 
         room.visual.text((terminal.store[RESOURCE_ENERGY] / 1000).toFixed(0) + "k", terminal.pos.x, terminal.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center', opacity: "0.8" });
 
     }
 
-    let mineral = structures.mineral
+    let mineral = room.get("mineral")
 
-    mineral.room.visual.text((mineral.mineralAmount / 1000).toFixed(0) + "k" + ", " + (mineral.ticksToRegeneration / 1000).toFixed(0) + "k", mineral.pos.x, mineral.pos.y - 1, { align: 'center', opacity: "0.8" });
+    if (mineral) {
 
-    if (mineral.density == 1) {
+        room.visual.text((mineral.mineralAmount / 1000).toFixed(0) + "k" + ", " + (mineral.ticksToRegeneration / 1000).toFixed(0) + "k", mineral.pos.x, mineral.pos.y - 1, { align: 'center', opacity: "0.8" });
 
-        mineral.room.visual.text("Low", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
+        if (mineral.density == 1) {
 
-    } else if (mineral.density == 2) {
+            room.visual.text("Low", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
 
-        mineral.room.visual.text("Moderate", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
+        } else if (mineral.density == 2) {
 
-    } else if (mineral.density == 3) {
+            room.visual.text("Moderate", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
 
-        mineral.room.visual.text("High", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
+        } else if (mineral.density == 3) {
 
-    } else if (mineral.density == 4) {
+            room.visual.text("High", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
 
-        mineral.room.visual.text("Ultra", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
+        } else if (mineral.density == 4) {
 
+            room.visual.text("Ultra", mineral.pos.x, mineral.pos.y - 2, { align: 'center', opacity: "0.8" });
+        }
     }
 
-    for (let constructionSite of constructionSites.mySites) {
+    for (let site of room.get("mySites")) {
 
-        room.visual.text("%" + (constructionSite.progress / constructionSite.progressTotal * 100).toFixed(0), constructionSite.pos.x, constructionSite.pos.y - 0.25, { font: 0.5, align: 'center', opacity: "0.8" });
+        room.visual.text("%" + (site.progress / site.progressTotal * 100).toFixed(0), site.pos.x, site.pos.y - 0.25, { font: 0.5, align: 'center', opacity: "0.8" });
 
     }
-    for (let tower of structures.towers) {
+    for (let tower of room.get("towers")) {
 
         room.visual.text(tower.store[RESOURCE_ENERGY], tower.pos.x, tower.pos.y, { font: 0.5, backgroundColor: "#FFD180", backgroundPadding: "0.1", align: 'center', opacity: "0.8" });
-
     }
-    for (let spawn of structures.spawns) {
+    for (let spawn of room.get("spawns")) {
 
         if (spawn.spawning) {
 
             room.visual.text(spawn.spawning.remainingTime, spawn.pos.x, spawn.pos.y - 1, { align: 'center', opacity: "0.8" })
 
             room.visual.text(Game.creeps[spawn.spawning.name].memory.role, spawn.pos.x, spawn.pos.y, { align: 'center' })
-
         }
     }
-    for (let source of structures.sources) {
+    for (let source of room.get("sources")) {
 
-        if (source.ticksToRegeneration) {
-
-            room.visual.text(source.ticksToRegeneration, source.pos.x, source.pos.y - 1, { color: "#FFD180", align: 'center', opacity: "0.8" });
-
-        } else {
-
-            room.visual.text(0, source.pos.x, source.pos.y - 1, { color: "#FFD180", align: 'center', opacity: "0.8" });
-
-        }
+        room.visual.text(source.ticksToRegeneration || 0, source.pos.x, source.pos.y - 1, { color: "#FFD180", align: 'center', opacity: "0.8" })
 
         room.visual.text(source.energy, source.pos.x, source.pos.y - 2, { color: "#FFD180", align: 'center', opacity: "0.8" });
-
     }
 }
 

@@ -77,6 +77,19 @@ global.resetRoom = function(roomName) {
 global.consoleMessages = function(state) {
 
     Memory.global.consoleMessages = state
+    return "console messages " + state
+}
+
+global.mapVisuals = function(state) {
+
+    Memory.global.mapVisuals = state
+    return "map visuals " + state
+}
+
+global.roomVisuals = function(state) {
+
+    Memory.global.roomVisuals = state
+    return "room visuals " + state
 }
 
 global.newCommune = function(newCommune) {
@@ -137,7 +150,7 @@ global.attackTarget = function(attackTarget) {
     return "no commune able to attack " + attackTarget
 }
 
-global.nukeTarget = function(position) {
+global.nukeTarget = function(x, y, roomName) {
 
 
 }

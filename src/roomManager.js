@@ -18,6 +18,7 @@ let taskManager = require("taskManager")
 
 let spawnManager = require("spawnManager")
 
+let nukerManager = require("nukerManager")
 let towers = require("towers")
 let links = require("links")
 let labs = require("labs")
@@ -121,6 +122,17 @@ function roomManager() {
         //
 
         /* trafficManager(room, creeps.myCreeps) */
+
+        //
+
+        cpuUsed = Game.cpu.getUsed()
+
+        visuals(room, structures, specialStructures, constructionSites)
+
+        totalCpuUsed += Game.cpu.getUsed()
+        cpuUsed = Game.cpu.getUsed() - cpuUsed
+        consoleMessage += `visuals: ` + cpuUsed.toFixed(2) + `
+                    `
 
         // Commune only scripts
 
@@ -267,17 +279,6 @@ function roomManager() {
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed
             consoleMessage += `roomPlanner: ` + cpuUsed.toFixed(2) + `
-            `
-
-            //
-
-            cpuUsed = Game.cpu.getUsed()
-
-            visuals(room, structures, specialStructures, constructionSites)
-
-            totalCpuUsed += Game.cpu.getUsed()
-            cpuUsed = Game.cpu.getUsed() - cpuUsed
-            consoleMessage += `visuals: ` + cpuUsed.toFixed(2) + `
             `
         }
 

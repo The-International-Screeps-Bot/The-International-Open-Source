@@ -1,5 +1,7 @@
 function config() {
 
+    // Eventually move this to tickConfig
+
     if (!Memory.data) {
 
         Memory.data = {}
@@ -45,23 +47,30 @@ function config() {
 
     if (!Memory.global) Memory.global = {}
 
+    let globalValues = {
+        resourceRequests: {},
+    }
+
+    for (let value in globalValues) {
+
+        if (!Memory.global[value]) Memory.global[value] = globalValues[value]
+    }
+
     Memory.global.communes = []
 
     Memory.global.totalEnergy = 0
 
-    if (Memory.global == null || !Memory.global) {
-
-        Memory.global = {}
-    }
-
     Memory.global.establishedRooms = []
 
-    if (Memory.global.hasBoosts == null || !Memory.global.hasBoosts) {
+    if (!Memory.global.hasBoosts) Memory.global.hasBoosts = 0
 
-        Memory.global.hasBoosts = 0
-    }
+    if (!Memory.global.needsEnergy) Memory.global.needsEnergy = []
 
-    Memory.global.needsEnergy = []
+    // Command based defaults
+
+    if (Memory.global.consoleMessages == undefined) Memory.global.consoleMessages = true
+    if (Memory.global.mapVisuals == undefined) Memory.global.mapVisuals = true
+    if (Memory.global.roomVisuals == undefined) Memory.global.roomVisuals = true
 }
 
 module.exports = config
