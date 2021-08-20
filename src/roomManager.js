@@ -51,7 +51,14 @@ function roomManager() {
 
         //
 
-        if (!Memory.rooms[creep.memory.roomFrom].deposits) Memory.rooms[creep.memory.roomFrom].deposits = {}
+        if (!room.memory.deposits) room.memory.deposits = {}
+
+        for (let depositID in room.memory.deposits) {
+
+            let deposit = room.memory.deposits[depositID]
+
+            if (Game.time > deposit.decayBy) delete deposit
+        }
 
         // Run room scripts
 

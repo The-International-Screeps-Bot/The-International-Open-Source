@@ -334,7 +334,7 @@ module.exports = {
 
                             if (Memory.rooms[creep.memory.roomFrom].deposits[deposit.id]) break
 
-                            Memory.rooms[creep.memory.roomFrom].deposits[deposit.id] = { roomName: creep.room.name }
+                            Memory.rooms[creep.memory.roomFrom].deposits[deposit.id] = { roomName: creep.room.name, decayBy: Game.time + deposit.ticksToDecay }
                         }
                     }
                 }

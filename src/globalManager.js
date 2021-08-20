@@ -8,12 +8,11 @@ function globalManager() {
     // Remove dead creeps from memory
 
     if (Game.time % 10 == 0) {
-        for (let name in Memory.creeps) {
+        for (let creepName in Memory.creeps) {
 
-            if (Game.creeps[name] == undefined) {
+            let creep = Game.creeps[creepName]
 
-                delete Memory.creeps[name];
-            }
+            if (!creep) delete creep
         }
     }
 
