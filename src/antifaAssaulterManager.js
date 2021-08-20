@@ -16,10 +16,12 @@ function antifaAssaulterManager(room, assaulters) {
         const part = creep.memory.part
 
         const supporter = Game.creeps[creep.memory.supporter]
-        const secondLeader = Game.creeps[creep.memory.secondLeader]
+        const secondLeader = Game.creeps[creep.memory.secondAssaulter]
         const secondSupporter = Game.creeps[creep.memory.secondSupporter]
 
         const members = [creep, supporter, secondLeader, secondSupporter]
+
+        console.log(JSON.stringify(members))
 
         creep.findAmount(members)
 
@@ -73,14 +75,9 @@ function antifaAssaulterManager(room, assaulters) {
                         }
                     } else {
 
-                        if (size == "quad" && supporter) {
+                        if (size == "quad" && supporter && creep.pos.getRangeTo(supporter) == 1) {
 
-                            if (amount == 2) creep.findDuo(assaulters)
-
-                            if (creep.pos.getRangeTo(supporter) == 1 && amount == 4) {
-
-                                creep.say(amount)
-                            }
+                            creep.findDuo(assaulters)
                         }
                     }
                 }

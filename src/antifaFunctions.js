@@ -19,7 +19,9 @@ Creep.prototype.isSquadFull = function() {
 
 Creep.prototype.findAmount = function(members) {
 
-    let definedMembers = members.filter(member => member != null)
+    let definedMembers = members.filter(member => {
+        if (member != null) return member
+    })
 
     creep.memory.amount = definedMembers.length
 }
@@ -60,15 +62,14 @@ Creep.prototype.findDuo = function(assaulters) {
 
     for (let assaulter of assaulters) {
 
-        if (Game.creeps[assaulter.memory.supporter] && assaulter.memory.amount == 2) {
+        if (creep == assaulter || !Game.creeps[assaulter.memory.supporter] || assaulter.memory.amount != 2) continue
 
-            assaulter.memory.secondAssaulter = creep.name
-            assaulter.memory.secondSupporter = creep.memory.supporter
+        assaulter.memory.secondAssaulter = creep.name
+        assaulter.memory.secondSupporter = creep.memory.supporter
 
-            creep.memory.secondAssaulter = assaulter.name
-            creep.memory.secondSupporter = assaulter.memory.supporter
+        creep.memory.secondAssaulter = assaulter.name
+        creep.memory.secondSupporter = assaulter.memory.supporter
 
-            return true
-        }
+        return true
     }
 }
