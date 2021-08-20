@@ -320,23 +320,26 @@ module.exports = {
 
                 // Check for deposits
 
-                let deposits = creep.room.find(FIND_DEPOSITS, {
-                    filter: deposit => deposit.ticksToDecay > 1000
-                })
+                if (Memory.rooms[creep.memory.roomFrom].deposits) {
 
-                if (deposits.length > 0) {
+                    let deposits = creep.room.find(FIND_DEPOSITS, {
+                        filter: deposit => deposit.ticksToDecay > 1000
+                    })
 
-                    let safeDistance = creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 6
+                    if (deposits.length > 0) {
 
-                    if (safeDistance) {
+                        let safeDistance = creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 6
 
-                        for (let deposit of deposits) {
+                        if (safeDistance) {
 
-                            // Break loop if memory already contians deposit
+                            for (let deposit of deposits) {
 
-                            if (Memory.rooms[creep.memory.roomFrom].deposits[deposit.id]) break
+                                // Break loop if memory already contians deposit
 
-                            Memory.rooms[creep.memory.roomFrom].deposits[deposit.id] = { roomName: creep.room.name, decayBy: Game.time + deposit.ticksToDecay }
+                                if (Memory.rooms[creep.memory.roomFrom].deposits[deposit.id]) continue
+
+                                Memory.rooms[creep.memory.roomFrom].deposits[deposit.id] = { roomName: creep.room.name, decayBy: Game.time + deposit.ticksToDecay }
+                            }
                         }
                     }
                 }

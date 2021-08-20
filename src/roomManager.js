@@ -144,9 +144,9 @@ function roomManager() {
 
             if (!room.memory.deposits) room.memory.deposits = {}
 
-            for (let depositID in room.memory.deposits) {
+            for (let depositId in room.memory.deposits) {
 
-                let deposit = room.memory.deposits[depositID]
+                let deposit = room.memory.deposits[depositId]
 
                 if (Game.time > deposit.decayBy) delete deposit
             }
