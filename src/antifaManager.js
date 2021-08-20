@@ -6,7 +6,7 @@ function antifaManager(room, assaulters, supporters) {
 
     // Make sure there is something to attack
 
-    if (!Memory.global.attackTarget) return "No attack target"
+    if (!Memory.global.attackTarget || (assaulters.length == 0 && supporters.length == 0)) return "No attack target"
 
     // Run each antifa unit
 
