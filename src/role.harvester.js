@@ -3,49 +3,28 @@ let roomVariables = require("roomVariables")
 module.exports = {
     run: function(creep) {
 
-        // Define variables for harvesters
-
-        let source1 = creep.room.get("source1")
-        let source2 = creep.room.get("source2")
-
-        let sourceContainer1 = creep.room.get("sourceContainer1")
-        let sourceContainer2 = creep.room.get("sourceContainer2")
-
-        let sourceLink1 = creep.room.get("sourceLink1")
-        let sourceLink2 = creep.room.get("sourceLink2")
+        creep.say("🚬")
 
         const task = creep.memory.task
+        if (!task) return
 
         // Harvest source depending on task
 
-        if (task == "source1" && source1) {
+        if (task == "source1") {
 
             creep.say("S1")
 
-            if (sourceLink1 && sourceContainer1) {
+            let source1 = creep.room.get("source1")
 
-                if (creep.pos.getRangeTo(sourceContainer1) == 0) {
+            let sourceLink1 = creep.room.get("sourceLink1")
+            let sourceContainer1 = creep.room.get("sourceContainer1")
 
-                    creep.advancedHarvest(source1)
+            if (sourceLink1 && creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.findParts("work") * 2) {
 
-                    if (creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.findParts("work") * 2) {
+                creep.transfer(sourceLink1, RESOURCE_ENERGY)
+            }
 
-                        creep.transfer(sourceLink1, RESOURCE_ENERGY)
-                    }
-                } else {
-
-                    creep.advancedPathing({
-                        origin: creep.pos,
-                        goal: { pos: sourceContainer1.pos, range: 0 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 10,
-                    })
-                }
-            } else if (sourceContainer1) {
+            if (sourceContainer1) {
 
                 if (creep.pos.getRangeTo(sourceContainer1) == 0) {
 
@@ -61,16 +40,12 @@ module.exports = {
                         defaultCostMatrix: creep.room.memory.defaultCostMatrix,
                         avoidStages: [],
                         flee: false,
-                        cacheAmount: 10,
+                        cacheAmount: 20,
                     })
                 }
             } else {
 
-                if (creep.pos.getRangeTo(source1) == 1) {
-
-                    creep.advancedHarvest(source1)
-
-                } else {
+                if (creep.advancedHarvest(source1) == ERR_NOT_IN_RANGE) {
 
                     creep.advancedPathing({
                         origin: creep.pos,
@@ -80,38 +55,25 @@ module.exports = {
                         defaultCostMatrix: creep.room.memory.defaultCostMatrix,
                         avoidStages: [],
                         flee: false,
-                        cacheAmount: 10,
+                        cacheAmount: 20,
                     })
                 }
             }
-        } else if (task == "source2" && source2) {
+        } else if (task == "source2") {
 
             creep.say("S2")
 
-            if (sourceLink2 && sourceContainer2) {
+            let source2 = creep.room.get("source2")
 
-                if (creep.pos.getRangeTo(sourceContainer2) == 0) {
+            let sourceLink2 = creep.room.get("sourceLink2")
+            let sourceContainer2 = creep.room.get("sourceContainer2")
 
-                    creep.advancedHarvest(source2)
+            if (sourceLink2 && creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.findParts("work") * 2) {
 
-                    if (creep.store.getUsedCapacity() >= creep.store.getCapacity() - creep.findParts("work") * 2) {
+                creep.transfer(sourceLink2, RESOURCE_ENERGY)
+            }
 
-                        creep.transfer(sourceLink2, RESOURCE_ENERGY)
-                    }
-                } else {
-
-                    creep.advancedPathing({
-                        origin: creep.pos,
-                        goal: { pos: sourceContainer2.pos, range: 0 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 10,
-                    })
-                }
-            } else if (sourceContainer2) {
+            if (sourceContainer2) {
 
                 if (creep.pos.getRangeTo(sourceContainer2) == 0) {
 
@@ -127,16 +89,12 @@ module.exports = {
                         defaultCostMatrix: creep.room.memory.defaultCostMatrix,
                         avoidStages: [],
                         flee: false,
-                        cacheAmount: 10,
+                        cacheAmount: 20,
                     })
                 }
             } else {
 
-                if (creep.pos.getRangeTo(source2) == 1) {
-
-                    creep.advancedHarvest(source2)
-
-                } else {
+                if (creep.advancedHarvest(source2) == ERR_NOT_IN_RANGE) {
 
                     creep.advancedPathing({
                         origin: creep.pos,
@@ -146,13 +104,10 @@ module.exports = {
                         defaultCostMatrix: creep.room.memory.defaultCostMatrix,
                         avoidStages: [],
                         flee: false,
-                        cacheAmount: 10,
+                        cacheAmount: 20,
                     })
                 }
             }
-        } else {
-
-            creep.say("🚬")
         }
 
         creep.avoidHostiles()

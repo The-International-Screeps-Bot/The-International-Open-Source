@@ -114,146 +114,174 @@ module.exports = {
                     }
                 } else {
 
-                    // If not my room but was my room reset memory
+                    if (controller.my) {
 
-                    if (!controller.my && creep.room.memory.stage >= 0) creep.room.memory = {}
 
-                    // If not my room but owner check if ally or enemy
+                    } else {
 
-                    if (!controller.my && controller.owner) {
-                        if (allyList.indexOf(controller.owner.username) >= 0) {
+                        // If not my room but was my room reset memory
 
-                            creep.room.memory.stage = "allyRoom"
-                            creep.room.memory.owner = controller.owner.username
-                            creep.room.memory.level = controller.level
+                        if (creep.room.memory.stage >= 0) creep.room.memory = {}
 
-                        } else {
+                        if (controller.reservation) {
 
-                            creep.room.memory.stage = "enemyRoom"
-                            creep.room.memory.owner = controller.owner.username
-                            creep.room.memory.level = controller.level
-                            creep.room.memory.threat = 0
+                            if (controller.reservation.username == me) {
 
-                            /* creep.room.memory.maxRampart = */
-                            /* creep.room.memory.towerAmount =  */
-                            /* creep.room.memory.spawnAmount =  */
-                            /* creep.room.memory.labAmount =  */
-                            /* creep.room.memory.storedEnergy =  */
-                            /* creep.room.memory.boosts = {attack, rangedAttack, work} */
-                        }
-                    }
 
-                    // If reserved and not reserved by me or invaders find if enemy or ally has reserved it
+                            } else {
 
-                    if (controller.reservation && controller.reservation.username != me && controller.reservation.username != "Invader") {
+                                if (controller.reservation.username != "Invader") {
 
-                        if (allyList.indexOf((controller.reservation.username)) >= 0) {
+                                    // If reserved and not reserved by me or invaders find if enemy or ally has reserved it
 
-                            creep.room.memory.stage = "allyReservation"
+                                    if (allyList.includes(controller.reservation.username)) {
 
-                        } else {
+                                        creep.room.memory.stage = "allyReservation"
 
-                            creep.room.memory.stage = "enemyReservation"
-                        }
-                    }
+                                    } else {
 
-                    // See if room can be a remote room
-
-                    let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memory.roomFrom)
-
-                    if (targetRoomDistance == 1 && !controller.owner && (!controller.reservation || controller.reservation.username == "Invader") && creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"]) <= 2) {
-
-                        function checkDuplicate() {
-
-                            for (let object of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
-
-                                if (object.name == creep.room.name) {
-
-                                    return false
+                                        creep.room.memory.stage = "enemyReservation"
+                                    }
                                 }
                             }
+                        } else {
 
-                            return true
+                            if (controller.owner) {
+
+                                if (allyList.indexOf(controller.owner.username) >= 0) {
+
+                                    creep.room.memory.stage = "allyRoom"
+                                    creep.room.memory.owner = controller.owner.username
+                                    creep.room.memory.level = controller.level
+
+                                } else {
+
+                                    creep.room.memory.stage = "enemyRoom"
+                                    creep.room.memory.owner = controller.owner.username
+                                    creep.room.memory.level = controller.level
+                                    creep.room.memory.threat = 0
+
+                                    /* creep.room.memory.maxRampart = */
+                                    /* creep.room.memory.towerAmount =  */
+                                    /* creep.room.memory.spawnAmount =  */
+                                    /* creep.room.memory.labAmount =  */
+                                    /* creep.room.memory.storedEnergy =  */
+                                    /* creep.room.memory.boosts = {attack, rangedAttack, work} */
+                                }
+                            }
                         }
 
-                        if (checkDuplicate() && Math.floor(Game.rooms[creep.memory.roomFrom].find(FIND_MY_SPAWNS).length * 2) > Memory.rooms[creep.memory.roomFrom].remoteRooms.length) {
+                        // Find if viable remoteRoom
 
-                            let sources = creep.room.find(FIND_SOURCES).length
+                        if (!controller.reservation || controller.reservation.username == "Invader") {
 
-                            Memory.rooms[creep.memory.roomFrom].remoteRooms.push({ name: creep.room.name, sources: sources, roads: false, builderNeed: false, enemy: false, distance: null })
+                            let targetRoomDistance = Game.map.getRoomLinearDistance(creep.room.name, creep.memory.roomFrom) == 1
 
-                            creep.room.memory.stage = "remoteRoom"
+                            if (targetRoomDistance == 1) {
+
+                                let safeDistance = creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"]) <= 2
+
+                                if (safeDistance) {
+
+                                    function checkDuplicate() {
+
+                                        for (let object of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
+
+                                            if (object.name == creep.room.name) {
+
+                                                return false
+                                            }
+                                        }
+
+                                        return true
+                                    }
+
+                                    if (checkDuplicate()) {
+
+                                        let canHaveMoreRemotes = Math.floor(Game.rooms[creep.memory.roomFrom].get("spawns").length * 2) > Memory.rooms[creep.memory.roomFrom].remoteRooms.length
+
+                                        if (canHaveMoreRemotes) {
+
+                                            let sources = creep.room.get("sources").length
+
+                                            Memory.rooms[creep.memory.roomFrom].remoteRooms.push({ name: creep.room.name, sources: sources, roads: false, builderNeed: false, enemy: false, distance: null })
+
+                                            creep.room.memory.stage = "remoteRoom"
+                                        }
+                                    }
+                                }
+                            } else if (creep.room.memory.stage != "remoteRoom") {
+
+                                creep.room.memory.stage = "neutralRoom"
+                            }
                         }
-                    } else if (!controller.owner && (!controller.reservation || controller.reservation.username == "Invader") && creep.room.memory.stage != "remoteRoom") {
 
-                        creep.room.memory.stage = "neutralRoom"
-                    }
+                        // See if room can be a new commune
 
-                    // See if room can be a new commune
+                        var newCommune
 
-                    let newCommune
+                        if (creep.room.get("sources").length == 2 && Memory.global.communes.length < Game.gcl.level && creep.room.memory.claim != true && creep.room.memory.claim != "notViable" && controller && !controller.owner && !controller.reservation && creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10) {
 
-                    if (creep.room.find(FIND_SOURCES).length == 2 && Memory.global.communes.length < Game.gcl.level && creep.room.memory.claim != true && creep.room.memory.claim != "notViable" && controller && !controller.owner && !controller.reservation && creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10) {
+                            if (creep.isEdge()) {
 
-                        if (creep.isEdge()) {
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: controller.pos, range: 1 },
+                                    plainCost: 1,
+                                    swampCost: 1,
+                                    defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                    avoidStages: [],
+                                    flee: false,
+                                    cacheAmount: 50,
+                                })
+                            }
 
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: controller.pos, range: 1 },
-                                plainCost: 1,
-                                swampCost: 1,
-                                defaultCostMatrix: creep.room.memory.defaultCostMatrix,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 50,
-                            })
-                        }
+                            let nearRoom = false
 
-                        let nearRoom = false
+                            let exits = Game.map.describeExits(creep.room.name)
 
-                        let exits = Game.map.describeExits(creep.room.name)
+                            for (let property in exits) {
 
-                        for (let property in exits) {
+                                let roomName = exits[property]
 
-                            let roomName = exits[property]
+                                if (Memory.rooms[roomName].owner && (Memory.rooms[roomName].owner == "slowmotionghost" || Memory.rooms[roomName].stage >= 0 || Memory.rooms[roomName].claim == true)) nearRoom = true
+                            }
 
-                            if (Memory.rooms[roomName].owner && (Memory.rooms[roomName].owner == "slowmotionghost" || Memory.rooms[roomName].stage >= 0 || Memory.rooms[roomName].claim == true)) nearRoom = true
-                        }
+                            creep.say("N")
 
-                        creep.say("N")
+                            if (!nearRoom) {
 
-                        if (!nearRoom) {
+                                creep.say("NNC")
 
-                            creep.say("NNC")
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: controller.pos, range: 1 },
+                                    plainCost: 1,
+                                    swampCost: 1,
+                                    defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                    avoidStages: [],
+                                    flee: false,
+                                    cacheAmount: 50,
+                                })
 
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: controller.pos, range: 1 },
-                                plainCost: 1,
-                                swampCost: 1,
-                                defaultCostMatrix: creep.room.memory.defaultCostMatrix,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 50,
-                            })
+                                if (findAnchor(creep.room)) {
 
-                            if (findAnchor(creep.room)) {
+                                    creep.say("FA")
 
-                                creep.say("FA")
+                                    newCommune = true
 
-                                newCommune = true
+                                    creep.room.memory.claim = true
 
-                                creep.room.memory.claim = true
+                                    if (!Memory.global.newCommunes.includes(creep.room.name)) Memory.global.newCommunes.push(creep.room.name)
 
-                                if (!Memory.global.newCommunes.includes(creep.room.name)) Memory.global.newCommunes.push(creep.room.name)
+                                } else {
 
+                                    creep.room.memory.claim = "notViable"
+                                }
                             } else {
 
                                 creep.room.memory.claim = "notViable"
                             }
-                        } else {
-
-                            creep.room.memory.claim = "notViable"
                         }
                     }
 
@@ -288,6 +316,27 @@ module.exports = {
                 } else {
 
                     creep.room.memory.stage = "emptyRoom"
+                }
+
+                // Check for deposits
+
+                let deposits = creep.room.find(FIND_DEPOSITS, {
+                    filter: deposit => deposit.ticksToDecay > 1000
+                })
+
+                if (deposits.length > 0) {
+
+                    let safeDistance = creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10
+
+                    if (safeDistance) {
+
+                        for (let deposit of deposits) {
+
+                            if (Memory.rooms[creep.memory.roomFrom].deposits[deposit.id]) break
+
+                            Memory.rooms[creep.memory.roomFrom].deposits[deposit.id] = { roomName: creep.room.name }
+                        }
+                    }
                 }
 
                 // Go to next room

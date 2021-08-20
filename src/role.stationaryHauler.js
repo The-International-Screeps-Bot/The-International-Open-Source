@@ -26,8 +26,8 @@ module.exports = {
             creep.advancedPathing({
                 origin: creep.pos,
                 goal: { pos: anchorPoint, range: 0 },
-                plainCost: false,
-                swampCost: false,
+                plainCost: 1,
+                swampCost: 1,
                 defaultCostMatrix: creep.memory.defaultCostMatrix,
                 avoidStages: [],
                 flee: false,

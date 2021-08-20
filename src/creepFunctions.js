@@ -137,7 +137,7 @@ Creep.prototype.advancedHarvest = function(target) {
 
     creep = this
 
-    if (creep.harvest(target) != 0) return false
+    if (creep.harvest(target) != 0) return creep.harvest(target)
 
     let energyHarvested = (target.energy - target.energy) + (creep.findParts("work") * 2)
 
@@ -636,16 +636,14 @@ Creep.prototype.advancedPathing = function(opts) {
 
                 if (!room) return false
 
-                let cm
-
-                cm = new PathFinder.CostMatrix
+                let cm = new PathFinder.CostMatrix
 
                 for (let road of room.get("roads")) {
 
                     cm.set(road.pos.x, road.pos.y, 1)
                 }
 
-                let sites = creep.room.find(FIND_MY_CONSTRUCTION_SITES, {
+                let sites = creep.room.find(FIND_CONSTRUCTION_SITES, {
                     filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                 })
 

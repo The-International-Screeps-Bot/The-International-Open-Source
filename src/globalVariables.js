@@ -11,9 +11,9 @@ global.allyList = [
 global.cachedValues = {}
 
 global.colors = {
-    communeBlue: '#2b92f1',
-    allyGreen: "#00e600",
-    neutralYellow: "#F4E637",
+    communeGreen: '#00e600',
+    allyBlue: "#2b92f1",
+    neutralYellow: "#FFD180",
     invaderOrange: "#ffa31a",
     enemyRed: '#ff3300',
 }

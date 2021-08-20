@@ -6,7 +6,11 @@ Room.prototype.get = function(roomVar, cache) {
 
     // If value is cached in cachedValues return it
 
-    if (cachedValues[room.name] && cachedValues[room.name].roomVars && cachedValues[room.name].roomVars[roomVar]) return cachedValues[room.name].roomVars[roomVar]
+    if (cachedValues[room.name] && cachedValues[room.name].roomVars && cachedValues[room.name].roomVars[roomVar]) {
+
+        if (roomVar == "terrainCM") console.log("Got from cachedValues: " + JSON.stringify(cachedValues[room.name].roomVars[roomVar]))
+        return cachedValues[room.name].roomVars[roomVar]
+    }
 
     // If value isn't cached recreate roomVars
 
@@ -85,9 +89,14 @@ Room.prototype.get = function(roomVar, cache) {
         filter: creep => !allyList.includes(creep.owner.username)
     })
 
+    // CostMatrixes
+
     // Other
     roomVars.anchorPoint = room.memory.anchorPoint
     roomVars.storedEnergy = storedEnergy()
+
+    roomVars.source1HarvestPositions = findHarvestPositions("source1")
+    roomVars.source2HarvestPositions = findHarvestPositions("source2")
 
     //
 
@@ -237,6 +246,51 @@ Room.prototype.get = function(roomVar, cache) {
         return cache[desiredObject]
     }
 
+    function findHarvestPositions(source, desiredObject) {
+
+        if (room.memory[desiredObject]) return room.memory[desiredObject]
+
+        let cache = {}
+
+        source = roomVars[source]
+
+        if (!source) return false
+
+        let harvestPositions = {
+            [source]: {
+                closest: undefined,
+                positions: []
+            }
+        }
+
+        let top = source.pos.y - 1
+        let left = source.pos.x - 1
+        let bottom = source.pos.y + 1
+        let right = source.pos.x + 1
+
+        let area = room.lookAtArea(top, left, bottom, right, true)
+
+        for (let square of area) {
+
+            let pos = { x: square.x, y: square.y }
+            let type = square.type
+
+            if (type.terrain && type.terrain == "wall") continue
+
+            harvestPositions[source].positions.push(pos)
+        }
+
+        if (!roomVars.anchorPoint) return false
+        harvestPositions[source].closest = new RoomPosition(roomVars.anchorPoint.x, roomVars.anchorPoint.y, roomVars.anchorPoint.roomName).findClosestByPath(harvestPositions)
+
+        for (let object in cache) {
+
+            room.memory[object] = cache[object]
+        }
+
+        return cache[desiredObject]
+    }
+
     function storedEnergy() {
 
         let storedEnergy = 0
@@ -312,7 +366,7 @@ Room.prototype.findTowerDamage = function(towers, pos) {
         totalDamage += Math.floor(TOWER_POWER_ATTACK * (1 - TOWER_FALLOFF * factor));
     }
 
-    creep.room.visual.text(totalDamage, pos.x, pos.y + 0.25, { align: 'center', color: colors.communeBlue, font: "0.7" })
+    creep.room.visual.text(totalDamage, pos.x, pos.y + 0.25, { align: 'center', color: colors.communeGreen, font: "0.7" })
 
     return totalDamage
 }
@@ -325,7 +379,7 @@ Room.prototype.findHealPower = function(pos, range, creeps) {
         if (creep.pos.getRangeTo(pos) <= range) healPower += creep.findParts("heal") * HEAL_POWER
     }
 
-    creep.room.visual.text(healPower, pos.x, pos.y + 0.25, { align: 'center', color: colors.allyGreen, font: "0.7" })
+    creep.room.visual.text(healPower, pos.x, pos.y + 0.25, { align: 'center', color: colors.allyBlue, font: "0.7" })
 
     return healPower
 }
