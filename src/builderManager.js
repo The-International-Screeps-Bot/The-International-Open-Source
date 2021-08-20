@@ -82,7 +82,7 @@ function builderManager(room, creepsWithRole) {
 
                     } else {
 
-                        let droppedEnergy = findDroppedEnergyOfAmount(creep.store.getFreeCapacity())
+                        let droppedEnergy = creep.findDroppedEnergyOfAmount(creep.store.getFreeCapacity())
 
                         if (droppedEnergy) {
 
