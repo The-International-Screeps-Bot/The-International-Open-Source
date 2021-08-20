@@ -49,6 +49,10 @@ function roomManager() {
         --------------------------------------------------------
         `
 
+        //
+
+        if (!Memory.rooms[creep.memory.roomFrom].deposits) Memory.rooms[creep.memory.roomFrom].deposits = {}
+
         // Run room scripts
 
         //
