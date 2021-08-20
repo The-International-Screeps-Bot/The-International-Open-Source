@@ -49,17 +49,6 @@ function roomManager() {
         --------------------------------------------------------
         `
 
-        //
-
-        if (!room.memory.deposits) room.memory.deposits = {}
-
-        for (let depositID in room.memory.deposits) {
-
-            let deposit = room.memory.deposits[depositID]
-
-            if (Game.time > deposit.decayBy) delete deposit
-        }
-
         // Run room scripts
 
         //
@@ -150,6 +139,17 @@ function roomManager() {
         if (room.controller && room.controller.my) {
 
             Memory.global.communes.push(room.name)
+
+            //
+
+            if (!room.memory.deposits) room.memory.deposits = {}
+
+            for (let depositID in room.memory.deposits) {
+
+                let deposit = room.memory.deposits[depositID]
+
+                if (Game.time > deposit.decayBy) delete deposit
+            }
 
             //
 

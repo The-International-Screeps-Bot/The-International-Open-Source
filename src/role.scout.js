@@ -326,11 +326,13 @@ module.exports = {
 
                 if (deposits.length > 0) {
 
-                    let safeDistance = creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10
+                    let safeDistance = creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 6
 
                     if (safeDistance) {
 
                         for (let deposit of deposits) {
+
+                            // Break loop if memory already contians deposit
 
                             if (Memory.rooms[creep.memory.roomFrom].deposits[deposit.id]) break
 
