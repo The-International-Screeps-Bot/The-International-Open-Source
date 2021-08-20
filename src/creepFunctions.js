@@ -370,7 +370,7 @@ Creep.prototype.findDroppedEnergyOfAmount = function(amount) {
 
     if (droppedEnergy.length == 0) return false
 
-    droppedEnergyOfAmount = droppedEnergy.filter(resource => resource.amount[RESOURCE_ENERGY] >= amount)
+    droppedEnergyOfAmount = droppedEnergy.filter(resource => resource.amount >= amount)
 
     if (droppedEnergyOfAmount.length == 0) return false
 
@@ -397,13 +397,13 @@ Creep.prototype.avoidHostiles = function() {
 
     let hostile = creep.pos.findClosestByRange(hostiles)
 
-    if (creep.pos.getRangeTo(hostile) <= 6) {
+    if (creep.pos.getRangeTo(hostile) <= 4) {
 
         creep.say("H! R")
 
         creep.advancedPathing({
             origin: creep.pos,
-            goal: { pos: hostile.pos, range: 6 },
+            goal: { pos: hostile.pos, range: 4 },
             plainCost: false,
             swampCost: false,
             defaultCostMatrix: creep.memory.defaultCostMatrix,
@@ -1135,8 +1135,8 @@ Creep.prototype.rampartPathing = function(origin, goal) {
     creep = this
 
     var path = PathFinder.search(origin, goal, {
-        plainCost: 20,
-        swampCost: 60,
+        plainCost: 255,
+        swampCost: 255,
         maxRooms: 1,
 
         roomCallback: function(roomName) {
@@ -1149,13 +1149,13 @@ Creep.prototype.rampartPathing = function(origin, goal) {
 
             cm = new PathFinder.CostMatrix
 
-            let constructionSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES, {
-                filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
+            let roads = creep.room.find(FIND_STRUCTURES, {
+                filter: s => s.structureType == STRUCTURE_ROAD
             })
 
-            for (let site of constructionSites) {
+            for (let road of roads) {
 
-                cm.set(site.pos.x, site.pos.y, 255)
+                cm.set(road.pos.x, road.pos.y, 50)
             }
 
             let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
@@ -1167,13 +1167,13 @@ Creep.prototype.rampartPathing = function(origin, goal) {
                 cm.set(rampart.pos.x, rampart.pos.y, 1)
             }
 
-            let roads = creep.room.find(FIND_STRUCTURES, {
-                filter: s => s.structureType == STRUCTURE_ROAD
+            let constructionSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES, {
+                filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
             })
 
-            for (let road of roads) {
+            for (let site of constructionSites) {
 
-                cm.set(road.pos.x, road.pos.y, 10)
+                cm.set(site.pos.x, site.pos.y, 255)
             }
 
             let structures = creep.room.find(FIND_STRUCTURES, {

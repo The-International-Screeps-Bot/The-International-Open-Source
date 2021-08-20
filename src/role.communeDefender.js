@@ -95,61 +95,75 @@ module.exports = {
         } else {
             if (creep.room.name == roomFrom) {
 
-                let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                    filter: (c) => {
-                        return (allyList.indexOf(c.owner.username) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
-                    }
+                let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
+                    filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
                 })
 
-                creep.say("No Enemy")
+                if (hostiles.length > 0) {
 
-                if (closestHostile) {
+                    creep.say("H")
 
-                    creep.say("Enemy")
+                    let hostile = creep.pos.findClosestByRange(hostiles)
 
-                    let rampart = closestHostile.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                    let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
                         filter: s => s.structureType == STRUCTURE_RAMPART
                     })
 
-                    if (rampart) {
+                    if (ramparts.length > 0) {
 
-                        creep.say("Rampart")
+                        let openRamparts = []
 
-                        if (creep.pos.getRangeTo(closestHostile) == 1) {
+                        let cm = new PathFinder.CostMatrix
 
-                            creep.attack(closestHostile)
+                        for (let rampart of ramparts) {
 
-                        } else {
+                            let creeps = creep.room.find(FIND_MY_CREEPS)
+
+                            for (let creep of creeps) {
+
+                                cm.set(creep.pos.x, creep.pos.y, 255)
+                            }
+
+                            cm.set(creep.pos.x, creep.pos.y, 1)
+
+                            if (cm.get(rampart.pos.x, rampart.pos.y) < 255) openRamparts.push(rampart)
+                        }
+
+                        if (openRamparts.length > 0) {
+
+                            creep.say("OR")
+
+                            let rampart = hostile.pos.findClosestByRange(openRamparts)
 
                             let goal = _.map([rampart], function(target) {
                                 return { pos: target.pos, range: 0 }
                             })
 
                             creep.rampartPathing(creep.pos, goal)
+
+                            creep.attack(hostile)
                         }
                     } else {
 
                         creep.say("NE")
 
-                        if (!(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
+                        if (!hostile.isEdge()) {
 
                             creep.say("H")
 
-                            if (creep.pos.getRangeTo(closestHostile) == 1) {
+                            creep.attack(hostile)
 
-                                creep.attack(closestHostile)
-
-                            } else {
+                            if (creep.pos.getRangeTo(hostile) > 1) {
 
                                 creep.advancedPathing({
                                     origin: creep.pos,
-                                    goal: { pos: closestHostile.pos, range: 6 },
+                                    goal: { pos: hostile.pos, range: 1 },
                                     plainCost: false,
                                     swampCost: false,
                                     defaultCostMatrix: false,
                                     avoidStages: [],
                                     flee: false,
-                                    cacheAmount: 10,
+                                    cacheAmount: 1,
                                 })
                             }
                         }

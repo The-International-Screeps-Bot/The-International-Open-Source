@@ -53,6 +53,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
     if (hostiles.length > 0) {
 
+        Memory.global.lastDefence.attacker = hostiles[0].owner.username
         Memory.global.lastDefence.time = Game.time
         Memory.global.lastDefence.room = room.name
     }
@@ -263,6 +264,11 @@ function spawnRequests(room, spawns, specialStructures) {
             } else if (room.storage.store[RESOURCE_ENERGY] >= 30000) {
 
                 minCreeps["rampartUpgrader"] = 1
+            }
+
+            if (hostiles.length > 0 && ((storage && storage.store[RESOURCE_ENERGY] >= 60000) || (terminal && terminal.store[RESOURCE_ENERGY] >= 80000))) {
+
+                minCreeps["rampartUpgrader"] += 1
             }
         }
     }
