@@ -498,8 +498,6 @@ function roleOpts(room, spawns, specialStructures) {
             memoryAdditions: {
                 type: "rangedAttack",
                 size: "quad",
-                amount: 0,
-                requiredAmount: 4,
                 part: false,
             }
         })

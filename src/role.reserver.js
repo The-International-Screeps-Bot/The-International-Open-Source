@@ -70,6 +70,8 @@ module.exports = {
             }
         } else {
 
+            creep.say(remoteRoom)
+
             creep.advancedPathing({
                 origin: creep.pos,
                 goal: { pos: new RoomPosition(25, 25, remoteRoom), range: 1 },

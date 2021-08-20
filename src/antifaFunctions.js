@@ -1,3 +1,5 @@
+const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require("constants")
+
 Creep.prototype.squadFatigued = function(squad) {
 
     creep = this
@@ -19,9 +21,9 @@ Creep.prototype.isSquadFull = function() {
 
 Creep.prototype.findAmount = function(members) {
 
-    let definedMembers = members.filter(member => {
-        if (member != null) return member
-    })
+    creep = this
+
+    let definedMembers = members.filter(member => member != null && member.name)
 
     creep.memory.amount = definedMembers.length
 }
@@ -64,12 +66,50 @@ Creep.prototype.findDuo = function(assaulters) {
 
         if (creep == assaulter || !Game.creeps[assaulter.memory.supporter] || assaulter.memory.amount != 2) continue
 
-        assaulter.memory.secondAssaulter = creep.name
-        assaulter.memory.secondSupporter = creep.memory.supporter
+        // Asign values to memory
 
         creep.memory.secondAssaulter = assaulter.name
         creep.memory.secondSupporter = assaulter.memory.supporter
 
+        assaulter.memory.secondAssaulter = creep.name
+        assaulter.memory.secondSupporter = creep.memory.supporter
+
+        // Assign parts
+
+        creep.memory.part = "front"
+        Game.creeps[creep.memory.supporter].memory.part = "middle1"
+
+        assaulter.memory.part = "middle2"
+        Game.creeps[assaulter.memory.supporter].memory.part = "back"
+
         return true
     }
+}
+
+// Squad functions
+
+Creep.prototype.squadCanMove = function(members) {
+
+    for (let creep of members) {
+
+        if (creep.fatigue > 0) return false
+    }
+
+    return true
+}
+
+Creep.prototype.squadInRange = function(members) {
+
+    let lastCreep = members[0]
+
+    for (let i = 0; i < members.length; i++) {
+
+        let creep = members[i]
+
+        if (creep.pos.getRangeTo(lastCreep) > 1) return false
+
+        lastCreep = creep
+    }
+
+    return true
 }

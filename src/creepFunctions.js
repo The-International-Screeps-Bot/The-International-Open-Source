@@ -3,10 +3,7 @@ let roomVariables = require("roomVariables")
 
 Creep.prototype.isEdge = function() {
 
-    if (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49) {
-
-        return true
-    }
+    if (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49) return true
 
     return false
 }
@@ -630,10 +627,10 @@ Creep.prototype.advancedPathing = function(opts) {
     }
 
     let path = creep.memory.path
-    const lastCache = Game.time
+    const lastCache = creep.memory.lastCache
     const lastRoom = creep.memory.lastRoom
 
-    if (!path || path.length <= 1 || !lastRoom || creep.room.name != lastRoom || !lastCache || lastCache - Game.time > opts.cacheAmount) {
+    if (!path || path.length <= 1 || !lastRoom || creep.room.name != lastRoom || !lastCache || Game.time - lastCache >= opts.cacheAmount) {
 
         creep.room.visual.text("New Path", creep.pos.x, creep.pos.y + 0.5, { color: colors.neutralYellow })
 
