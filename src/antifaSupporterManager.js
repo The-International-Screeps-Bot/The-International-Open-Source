@@ -1,21 +1,14 @@
-require("antifaFunctions")
-
-function antifaSupporterManager(room, creepsWithRole) {
-
-    // Make sure there is something to attack
+function antifaSupporterManager(room, assaulters, supporters) {
 
     const attackTarget = Memory.global.attackTarget
 
-    if (!attackTarget) return "No attack target"
-
-    for (let creep of creepsWithRole) {
+    for (let creep of supporters) {
 
         // Define useful variables
 
         const roomFrom = creep.memory.roomFrom
-        const attackTarget = Memory.global.attackTarget
 
-        const squad = creep.memory.squad
+        const assaulter = Game.creeps[creep.memory.assaulter]
 
         if (room.name == attackTarget) {
 
@@ -26,46 +19,25 @@ function antifaSupporterManager(room, creepsWithRole) {
 
             // Creep is at home
 
-            if (creep.isSquadFull(squad)) {
+            if (assaulter) {
 
+                creep.say("HA")
 
+                creep.advancedPathing({
+                    origin: creep.pos,
+                    goal: { pos: assaulter.pos, range: 1 },
+                    plainCost: false,
+                    swampCost: false,
+                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                    avoidStages: [],
+                    flee: false,
+                    cacheAmount: 10,
+                })
             } else {
 
-                const anchorPoint = creep.room.memory.anchorPoint
+                creep.say("FA")
 
-                if (anchorPoint) {
-
-                    if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) != 6) {
-
-                        creep.say("AIR" + creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y))
-
-                        if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
-
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: anchorPoint, range: 6 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: false,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 10,
-                            })
-                        } else {
-
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: anchorPoint, range: 6 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: false,
-                                avoidStages: [],
-                                flee: true,
-                                cacheAmount: 10,
-                            })
-                        }
-                    }
-                }
+                creep.findAssaulter(assaulters)
             }
         } else {
 

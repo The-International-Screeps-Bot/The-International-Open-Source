@@ -8,14 +8,17 @@ function creepManager(room, myCreeps) {
 
     managers["builder"] = { import: require("builderManager"), creeps: [] }
     managers["rampartUpgrader"] = { import: require("rampartUpgraderManager"), creeps: [] }
-    managers["antifaAssaulter"] = { import: require("antifaAssaulterManager"), creeps: [] }
-    managers["antifaSupporter"] = { import: require("antifaSupporterManager"), creeps: [] }
+
+    managers["antifaManager"] = { import: require("antifaManager"), assaulters: [], supporters: [] }
 
     // Get creeps for each manager
 
     for (let creep of myCreeps) {
 
         if (managers[creep.memory.role]) managers[creep.memory.role].creeps.push(creep)
+
+        if (creep.memory.role == "antifaAssaulter") managers.antifaManager.assaulters.push(creep)
+        if (creep.memory.role == "antifaSupporter") managers.antifaManager.supporters.push(creep)
     }
 
     // Run each manager
@@ -24,8 +27,11 @@ function creepManager(room, myCreeps) {
 
         let manager = managers[object]
 
-        if (manager.creeps.length > 0) manager.import(room, manager.creeps)
+        if (manager.creeps && manager.creeps.length > 0) manager.import(room, manager.creeps)
     }
+
+    let antifaManager = managers.antifaManager
+    antifaManager.import(room, antifaManager.assaulters, antifaManager.supporters)
 
     let roles = {}
 

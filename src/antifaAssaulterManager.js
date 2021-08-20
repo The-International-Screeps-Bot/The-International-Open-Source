@@ -1,22 +1,27 @@
-require("antifaFunctions")
+const findAnchor = require("./findAnchor")
 
-function antifaAssaulterManager(room, creepsWithRole) {
+function antifaAssaulterManager(room, assaulters) {
 
-    // Make sure there is something to attack
-
-    const attackTarget = Memory.global.attackTarget
-
-    if (!attackTarget) return "No attack target"
-
-    for (let creep of creepsWithRole) {
+    for (let creep of assaulters) {
 
         // Define useful variables
 
         const roomFrom = creep.memory.roomFrom
         const attackTarget = Memory.global.attackTarget
 
-        const squad = creep.memory.squad
+        const type = creep.memory.type
+        const size = creep.memory.size
+        const amount = creep.memory.amount
+        const requiredAmount = creep.memory.amount
+        const part = creep.memory.part
 
+        const supporter = Game.creeps[creep.memory.supporter]
+        const secondLeader = Game.creeps[creep.memory.secondLeader]
+        const secondSupporter = Game.creeps[creep.memory.secondSupporter]
+
+        const members = [creep, supporter, secondLeader, secondSupporter]
+
+        creep.findAmount(members)
 
         if (room.name == attackTarget) {
 
@@ -27,8 +32,9 @@ function antifaAssaulterManager(room, creepsWithRole) {
 
             // Creep is at home
 
-            if (creep.isSquadFull(squad)) {
+            if (creep.isSquadFull()) {
 
+                creep.say("Full")
 
             } else {
 
@@ -64,6 +70,17 @@ function antifaAssaulterManager(room, creepsWithRole) {
                                 flee: true,
                                 cacheAmount: 10,
                             })
+                        }
+                    } else {
+
+                        if (size == "quad" && supporter) {
+
+                            if (amount == 2) creep.findDuo(assaulters)
+
+                            if (creep.pos.getRangeTo(supporter) == 1 && amount == 4) {
+
+                                creep.say(amount)
+                            }
                         }
                     }
                 }

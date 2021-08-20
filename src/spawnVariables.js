@@ -479,7 +479,11 @@ function roleOpts(room, spawns, specialStructures) {
                 },
             },
             memoryAdditions: {
-                squad: { type: "rangedAttack", size: "quad", amount: 0, requiredAmount: 4, part: false, }
+                type: "rangedAttack",
+                size: "quad",
+                amount: 0,
+                requiredAmount: 4,
+                part: false,
             }
         })
         roleOpts["antifaSupporter"] = roleValues({
@@ -492,7 +496,11 @@ function roleOpts(room, spawns, specialStructures) {
                 },
             },
             memoryAdditions: {
-                squad: { type: "rangedAttack", size: "quad", amount: 0, requiredAmount: 4, part: false, }
+                type: "rangedAttack",
+                size: "quad",
+                amount: 0,
+                requiredAmount: 4,
+                part: false,
             }
         })
     } else if (squadType == "attack") {
