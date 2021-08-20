@@ -51,7 +51,7 @@ function builderManager(room, creepsWithRole) {
 
         } else {
 
-            let terminal = creep.get("terminal")
+            let terminal = creep.room.get("terminal")
 
             if (terminal && terminal.store[RESOURCE_ENERGY] >= 30000) {
 
@@ -60,7 +60,7 @@ function builderManager(room, creepsWithRole) {
                 creep.advancedWithdraw(terminal)
             } else {
 
-                let storage = creep.get("storage")
+                let storage = creep.room.get("storage")
 
                 if (storage) {
 
