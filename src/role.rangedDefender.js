@@ -4,9 +4,7 @@ module.exports = {
         creep.say("Broke")
 
         let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-            filter: (c) => {
-                return (allyList.indexOf(c.owner.username) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
-            }
+            filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
         })
 
         creep.say("No Enemy")

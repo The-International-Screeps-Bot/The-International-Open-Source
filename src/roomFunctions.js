@@ -27,7 +27,7 @@ Room.prototype.get = function(roomVar, cache) {
     roomVars.allStructures = room.find(FIND_STRUCTURES)
     roomVars.allyStructures = findObjectWithOwner(FIND_HOSTILE_STRUCTURES, allyList)
     roomVars.enemyStructures = room.find(FIND_HOSTILE_STRUCTURES, {
-        filter: structure => !allyList.indexOf(structure.owner.username)
+        filter: structure => !allyList.includes(structure.owner.username)
     })
 
     roomVars.spawns = room.find(FIND_MY_SPAWNS)
@@ -94,7 +94,7 @@ Room.prototype.get = function(roomVar, cache) {
     function findObjectWithOwner(constant, usernames) {
 
         return room.find(constant, {
-            filter: object => object.owner && usernames.indexOf(object.owner.username)
+            filter: object => object.owner && usernames.includes(object.owner.username)
         })
     }
 

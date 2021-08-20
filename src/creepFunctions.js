@@ -390,39 +390,20 @@ Creep.prototype.avoidHostiles = function() {
     let creep = this
 
     let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
-        filter: creep => allyList.indexOf(creep.owner.username) && (creep.getActiveBodyparts(ATTACK) > 0 || creep.getActiveBodyparts(RANGED_ATTACK) > 0)
+        filter: creep => !allyList.includes(creep.owner.username) && (creep.getActiveBodyparts(ATTACK) > 0 || creep.getActiveBodyparts(RANGED_ATTACK) > 0)
     })
 
-    if (hostiles.length > 0) {
+    if (hostiles.length == 0) return false
 
-        /* for (let hostile of hostiles) {
+    let hostile = creep.pos.findClosestByRange(hostiles)
 
-            if (creep.pos.getRangeTo(hostile) <= 6) {
-
-                creep.say("H! R")
-
-                creep.advancedPathing({
-                    origin: creep.pos,
-                    goal: { pos: hostile.pos, range: 7 },
-                    plainCost: false,
-                    swampCost: false,
-                    defaultCostMatrix: creep.memory.defaultCostMatrix,
-                    avoidStages: [],
-                    flee: true,
-                    cacheAmount: 1,
-                })
-
-                break
-            }
-        } */
-
-        let hostile = creep.pos.findClosestByRange(hostiles)
+    if (creep.pos.getRangeTo(hostile) <= 6) {
 
         creep.say("H! R")
 
         creep.advancedPathing({
             origin: creep.pos,
-            goal: { pos: hostile.pos, range: 7 },
+            goal: { pos: hostile.pos, range: 6 },
             plainCost: false,
             swampCost: false,
             defaultCostMatrix: creep.memory.defaultCostMatrix,

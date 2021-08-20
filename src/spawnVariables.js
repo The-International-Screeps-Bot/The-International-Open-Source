@@ -386,9 +386,31 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["rangedDefender"] = roleValues({
         role: "rangedDefender",
         parts: {
+            1800: {
+                defaultParts: [],
+                extraParts: [rangedAttackPart, rangedAttackPart, movePart],
+                maxParts: 50
+            },
             300: {
                 defaultParts: [],
                 extraParts: [rangedAttackPart, movePart],
+                maxParts: 50
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["meleeDefender"] = roleValues({
+        role: "meleeDefender",
+        parts: {
+            1800: {
+                defaultParts: [],
+                extraParts: [attackPart, attackPart, movePart],
+                maxParts: 50
+            },
+            300: {
+                defaultParts: [],
+                extraParts: [attackPart, movePart],
                 maxParts: 50
             }
         },

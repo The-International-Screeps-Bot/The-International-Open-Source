@@ -460,6 +460,6 @@ module.exports = {
             }
         }
 
-        creep.avoidHostiles()
+        if (creep.room.controller.level < 4) creep.avoidHostiles()
     }
 };

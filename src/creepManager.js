@@ -8,6 +8,7 @@ function creepManager(room, myCreeps) {
 
     managers["builder"] = { import: require("builderManager"), creeps: [] }
     managers["rampartUpgrader"] = { import: require("rampartUpgraderManager"), creeps: [] }
+    managers["meleeDefender"] = { import: require("meleeDefenderManager"), creeps: [] }
 
     managers["antifaManager"] = { import: require("antifaManager"), assaulters: [], supporters: [] }
 

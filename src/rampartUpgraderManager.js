@@ -63,8 +63,6 @@ function rampartUpgraderManager(room, creepsWithRole) {
                 }
             }
         }
-
-        creep.avoidHostiles()
     }
 }
 

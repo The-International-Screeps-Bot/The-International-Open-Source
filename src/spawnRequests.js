@@ -274,7 +274,9 @@ function spawnRequests(room, spawns, specialStructures) {
 
     if (hostiles.length > 0) {
 
-        minCreeps["rangedDefender"] = 2
+        minCreeps["rangedDefender"] = 0
+
+        minCreeps["meleeDefender"] = 2
     }
 
     if (Game.flags.R && stage >= 4) {
