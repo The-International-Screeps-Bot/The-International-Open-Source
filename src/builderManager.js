@@ -2,15 +2,24 @@ var roleUpgrader = require('role.upgrader')
 
 function builderManager(room, creepsWithRole) {
 
-    const anchorPoint = room.memory.anchorPoint
+    const anchorPoint = room.get("anchorPoint")
 
     if (!anchorPoint) return
 
     let mySites = room.get("mySites")
 
+    if (mySites.length == 0) {
+
+        for (let creep of creepsWithRole) {
+
+            roleUpgrader.run(creep)
+            return
+        }
+    }
+
     let targetSite = findObjectWithId(room.memory.targetSite)
 
-    if (!targetSite && mySites.length > 0) {
+    if (!targetSite) {
 
         if (creepsWithRole.length == 1) {
 
@@ -22,15 +31,6 @@ function builderManager(room, creepsWithRole) {
 
             targetSite = room.memory.targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(mySites)
             room.memory.targetSite = targetSite.id
-        }
-    }
-
-    if (mySites.length == 0) {
-
-        for (let creep of creepsWithRole) {
-
-            roleUpgrader.run(creep)
-            return
         }
     }
 

@@ -159,7 +159,7 @@ module.exports = {
                                 flee: false,
                                 cacheAmount: 10,
                             })
-                        } else {
+                        } else if (creep.pos.getRangeTo(closestSource) < 3) {
 
                             creep.advancedPathing({
                                 origin: creep.pos,
@@ -168,7 +168,7 @@ module.exports = {
                                 swampCost: false,
                                 defaultCostMatrix: creep.memory.defaultCostMatrix,
                                 avoidStages: [],
-                                flee: false,
+                                flee: true,
                                 cacheAmount: 10,
                             })
                         }

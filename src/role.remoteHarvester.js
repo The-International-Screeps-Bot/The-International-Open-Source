@@ -14,55 +14,12 @@ module.exports = {
                 creep.room.memory.stage = "enemyReservation"
             }
 
-            let source1 = Game.getObjectById(creep.room.memory.source1)
-            let source2 = Game.getObjectById(creep.room.memory.source2)
-
-            if (!source1) {
-
-                let sources = creep.room.find(FIND_SOURCES)[0]
-
-                creep.room.memory.source1 = sources.id
-
-            }
-
-            if (!source2) {
-
-                let sources = creep.room.find(FIND_SOURCES)[1]
-
-                if (sources) {
-
-                    creep.room.memory.source2 = sources.id
-                }
-            }
-
-            let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
-            let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
-
-            if (!sourceContainer1 || !sourceContainer2) {
-
-                let containers = creep.room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_CONTAINER
-                })
-
-                for (let container of containers) {
-
-                    if (!sourceContainer1 == null && source1 && container.pos.getRangeTo(source1) == 1) {
-
-                        creep.room.memory.sourceContainer1 = container.id
-                    } else
-                    if (!sourceContainer2 == null && source2 && container.pos.getRangeTo(source2) == 1) {
-
-                        creep.room.memory.sourceContainer2 = container.id
-                    }
-                }
-            }
-
             if (creep.memory.role == "remoteHarvester1") {
 
-                let sourceContainer1 = Game.getObjectById(creep.room.memory.sourceContainer1)
-                let source1 = Game.getObjectById(creep.room.memory.source1)
+                let source1 = creep.room.get("source1")
+                let sourceContainer1 = creep.room.get("sourceContainer1")
 
-                if (sourceContainer1 != null && source1 != null) {
+                if (sourceContainer1 && source1) {
 
                     creep.say("⛏️ 1")
 
@@ -72,7 +29,6 @@ module.exports = {
 
                             creep.findEnergyHarvested(source1)
                         }
-
                     } else {
 
                         creep.advancedPathing({
@@ -87,7 +43,7 @@ module.exports = {
                         })
 
                     }
-                } else if (source1 != null) {
+                } else if (source1) {
 
                     creep.say("⛏️ 3")
 
@@ -97,7 +53,6 @@ module.exports = {
 
                             creep.findEnergyHarvested(source1)
                         }
-
                     } else {
 
                         creep.advancedPathing({
@@ -114,10 +69,10 @@ module.exports = {
                 }
             } else if (creep.memory.role == "remoteHarvester2") {
 
-                let sourceContainer2 = Game.getObjectById(creep.room.memory.sourceContainer2)
-                let source2 = Game.getObjectById(creep.room.memory.source2)
+                let source2 = creep.room.get("source2")
+                let sourceContainer2 = creep.room.get("sourceContainer2")
 
-                if (sourceContainer2 != null && source2 != null) {
+                if (sourceContainer2 && source2) {
 
                     creep.say("⛏️ 2")
 
@@ -127,7 +82,6 @@ module.exports = {
 
                             creep.findEnergyHarvested(source2)
                         }
-
                     } else {
 
                         creep.advancedPathing({
@@ -141,7 +95,7 @@ module.exports = {
                             cacheAmount: 10,
                         })
                     }
-                } else if (source2 != null) {
+                } else if (source2) {
 
                     creep.say("⛏️ 4")
 

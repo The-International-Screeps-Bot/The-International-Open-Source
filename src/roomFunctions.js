@@ -12,6 +12,13 @@ Room.prototype.get = function(roomVar, cache) {
 
     let roomVars = {}
 
+    // Resources
+    roomVars.mineral = room.find(FIND_MINERALS)[0]
+
+    roomVars.sources = room.find(FIND_SOURCES)
+    roomVars.source1 = findSources("source1")
+    roomVars.source2 = findSources("source2")
+
     // Structures
     roomVars.allStructures = room.find(FIND_STRUCTURES)
     roomVars.allyStructures = findObjectWithOwner(FIND_HOSTILE_STRUCTURES, allyList)
@@ -54,16 +61,9 @@ Room.prototype.get = function(roomVar, cache) {
     roomVars.secondaryLabs = findLabs("secondaryLabs")
     roomVars.tertiaryLabs = findLabs("tertiaryLabs")
 
-    // Resources
-    roomVars.mineral = room.find(FIND_MINERALS)[0]
-
-    roomVars.sources = room.find(FIND_SOURCES)
-    roomVars.source1 = findSources("source1")
-    roomVars.source2 = findSources("source2")
-
     // Construction sites
     roomVars.allSites = room.find(FIND_CONSTRUCTION_SITES)
-    roomVars.mySites = findObjectWithOwner(FIND_CONSTRUCTION_SITES[me])
+    roomVars.mySites = findObjectWithOwner(FIND_CONSTRUCTION_SITES, [me])
 
     // Creeps
     roomVars.allCreeps = room.find(FIND_CREEPS)
@@ -157,7 +157,7 @@ Room.prototype.get = function(roomVar, cache) {
 
         for (let object in cache) {
 
-            room.memory[object] = cache[object.id]
+            room.memory[object] = cache[object].id
         }
 
         return cache[desiredObject]
@@ -196,7 +196,7 @@ Room.prototype.get = function(roomVar, cache) {
 
         for (let object in cache) {
 
-            room.memory[object] = cache[object.id]
+            room.memory[object] = cache[object].id
         }
 
         return cache[desiredObject]
@@ -227,7 +227,7 @@ Room.prototype.get = function(roomVar, cache) {
 
         for (let object in cache) {
 
-            room.memory[object] = cache[object.id]
+            room.memory[object] = cache[object].id
         }
 
         return cache[desiredObject]
