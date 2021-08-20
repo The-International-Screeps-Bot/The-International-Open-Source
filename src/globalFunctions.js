@@ -1,5 +1,3 @@
-const { property } = require("lodash")
-
 global.avgPrice = function(resource) {
 
     let resourceHistory = Game.market.getHistory(resource)
