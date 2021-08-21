@@ -348,13 +348,13 @@ Room.prototype.findSafeDistance = function(origin, goal, avoidStages) {
 
     return route.length
 }
-Room.prototype.findTowerDamage = function(towers, pos) {
+Room.prototype.findTowerDamage = function(towers, hostile) {
 
     let totalDamage = 0
 
     for (let tower of towers) {
 
-        let range = tower.pos.getRangeTo(pos)
+        let range = tower.pos.getRangeTo(hostile.pos)
 
         if (range <= TOWER_OPTIMAL_RANGE) {
 
@@ -366,7 +366,16 @@ Room.prototype.findTowerDamage = function(towers, pos) {
         totalDamage += Math.floor(TOWER_POWER_ATTACK * (1 - TOWER_FALLOFF * factor));
     }
 
-    creep.room.visual.text(totalDamage, pos.x, pos.y + 0.25, { align: 'center', color: colors.communeGreen, font: "0.7" })
+    for (let part of creep.body) {
+
+        if (part.type == TOUGH && part.boost == "XGHO2") {
+
+            totalDamage = totalDamage * 0.3
+            break
+        }
+    }
+
+    creep.room.visual.text(totalDamage, hostile.pos.x, hostile.pos.y + 0.25, { align: 'center', color: colors.communeGreen, font: "0.7" })
 
     return totalDamage
 }

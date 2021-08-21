@@ -98,6 +98,14 @@ function taskManger(room, myCreeps) {
 
         let controllerLink = Game.getObjectById(room.memory.controllerLink)
 
+        if (findCreepWithoutTask(haulers) && findCreepWithoutTask(haulers).memory.isFull) {
+
+            if (!findCreepsOfTask(haulers, "deliverToBest", haulers.length)) {
+
+                findCreepWithoutTask(haulers).memory.task = "deliverToBest"
+            }
+        }
+
         if (findCreepWithoutTask(haulers) && ((storage && storage.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity() * 2) || (terminal && terminal.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity() * 2)) && (lowTowers.length > 0 || essentialStructures.length > 0)) {
 
             if (!findCreepsOfTask(haulers, "deliverFromStorage", 2)) {
@@ -106,19 +114,7 @@ function taskManger(room, myCreeps) {
             }
         }
 
-        let immovableHarvesters = creep.room.find(FIND_MY_CREEPS, {
-            filter: creep => creep.memory.role == "harvester" && creep.findParts("move") == 0 && creep.memory.task && !creep.memory.hauler && creep.pos.getRangeTo(creep.room.get(creep.memory.task)) > 1
-        })
-
-        if (findCreepWithoutTask(haulers) && immovableHarvesters.length > 0) {
-
-            if (!findCreepsOfTask(haulers, "harvesterToSource", immovableHarvesters.length)) {
-
-                findCreepWithoutTask(haulers).memory.task = "harvesterToSource"
-            }
-        }
-
-        if (findCreepWithoutTask(haulers) && controllerLink == null && controllerContainer != null && ((storage && storage.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers)) || (terminal && terminal.store[RESOURCE_ENERGY] >= 30000) || room.get("controller").ticksToDowngrade <= 15000) && controllerContainer.store.getFreeCapacity() >= findCreepWithoutTask(haulers).store.getCapacity()) {
+        if (findCreepWithoutTask(haulers) && controllerLink == null && controllerContainer != null && ((storage && storage.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers)) || (terminal && terminal.store[RESOURCE_ENERGY] >= 30000) || (room.get("controller").ticksToDowngrade <= 15000 && !findCreepWithoutTask(haulers).memory.isFull)) && controllerContainer.store.getFreeCapacity() >= findCreepWithoutTask(haulers).store.getCapacity()) {
 
             if (!findCreepsOfTask(haulers, "deliverToControllerContainer", 1)) {
 
@@ -126,14 +122,14 @@ function taskManger(room, myCreeps) {
             }
         }
 
-        if (findCreepWithoutTask(haulers) && sourceContainer1 != null && sourceContainer1.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity()) {
+        if (findCreepWithoutTask(haulers) && sourceContainer1 != null && sourceContainer1.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getFreeCapacity() && !findCreepWithoutTask(haulers).memory.isFull) {
 
             if (!findCreepsOfTask(haulers, "sourceContainer1Full", 1)) {
 
                 findCreepWithoutTask(haulers).memory.task = "sourceContainer1Full"
             }
         }
-        if (findCreepWithoutTask(haulers) && sourceContainer2 != null && sourceContainer2.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity()) {
+        if (findCreepWithoutTask(haulers) && sourceContainer2 != null && sourceContainer2.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getFreeCapacity() && !findCreepWithoutTask(haulers).memory.isFull) {
 
             if (!findCreepsOfTask(haulers, "sourceContainer2Full", 1)) {
 
@@ -141,7 +137,7 @@ function taskManger(room, myCreeps) {
             }
         }
 
-        if (findCreepWithoutTask(haulers)) {
+        if (findCreepWithoutTask(haulers) && !findCreepWithoutTask(haulers).memory.isFull) {
 
             let droppedEnergy = room.find(FIND_DROPPED_RESOURCES, {
                 filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= findCreepWithoutTask(haulers).store.getCapacity() * 0.5
@@ -156,7 +152,7 @@ function taskManger(room, myCreeps) {
             }
         }
 
-        if (findCreepWithoutTask(haulers)) {
+        if (findCreepWithoutTask(haulers) && !findCreepWithoutTask(haulers).memory.isFull) {
 
             let tombstones = room.find(FIND_TOMBSTONES, {
                 filter: (s) => s.store[RESOURCE_ENERGY] >= findCreepWithoutTask(haulers).store.getCapacity() * 0.5

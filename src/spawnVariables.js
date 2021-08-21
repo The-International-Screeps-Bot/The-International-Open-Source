@@ -1,6 +1,14 @@
+let creepData = require("creepData")
 let spawnRequests = require("spawnRequests")
 
 function roleOpts(room, spawns, specialStructures) {
+
+    let {
+        rolesList,
+        remoteRoles,
+        creepsOfRole,
+        creepsOfRemoteRole
+    } = creepData()
 
     let { requiredRemoteCreeps } = spawnRequests(room, spawns, specialStructures)
 
@@ -115,22 +123,27 @@ function roleOpts(room, spawns, specialStructures) {
 
     let roleOpts = {}
 
+    function JumpStarterBody() {
+
+        if (creepsOfRole[["hauler", room.name]] == 0) {
+
+            this.defaultParts = []
+            this.extraParts = [carryPart, movePart]
+            this.maxParts = 2
+
+        } else {
+
+            this.defaultParts = []
+            this.extraParts = [workPart, movePart, carryPart, movePart]
+            this.maxParts = 20
+        }
+    }
+
+    console.log(new JumpStarterBody())
+
     roleOpts["jumpStarter"] = roleValues({
         role: "jumpStarter",
-        parts: {
-            550: {
-                defaultParts: [],
-                extraParts: [workPart, movePart, carryPart, movePart],
-                maxParts: 20
-            },
-        },
-        parts: {
-            300: {
-                defaultParts: [],
-                extraParts: [workPart, movePart, carryPart, movePart, movePart],
-                maxParts: 20
-            },
-        },
+        parts: { 300: new JumpStarterBody() },
         memoryAdditions: {}
     })
 
@@ -185,9 +198,9 @@ function roleOpts(room, spawns, specialStructures) {
                 maxParts: 9
             },
             300: {
-                defaultParts: [movePart],
+                defaultParts: [],
                 extraParts: [workPart],
-                maxParts: 9
+                maxParts: 8
             }
         },
         memoryAdditions: {}

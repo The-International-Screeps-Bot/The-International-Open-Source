@@ -1,12 +1,12 @@
-function harvesterHaulerManager(room, creepsWithRole) {
+function jumpStarterManager(room, creepsWithRole) {
 
     if (creepsWithRole.length == 0) return
 
-    let immovableHarvesters = room.find(FIND_MY_CREEPS, {
-        filter: harvester => harvester.memory.role == "harvester" && harvester.findParts("move") == 0 && harvester.memory.task && (!harvester.memory.hauler || harvester.memory.hauler == creep.name) && harvester.pos.getRangeTo(room.get(harvester.memory.task)) > 1
-    })
-
     for (let creep of creepsWithRole) {
+
+        let immovableHarvesters = room.find(FIND_MY_CREEPS, {
+            filter: harvester => harvester.memory.role == "harvester" && harvester.findParts("move") == 0 && (!harvester.memory.hauler || harvester.memory.hauler == creep.name) && harvester.memory.task && harvester.pos.getRangeTo(room.get(harvester.memory.task)) > 1
+        })
 
         if (immovableHarvesters.length > 0) {
 
@@ -58,15 +58,14 @@ function harvesterHaulerManager(room, creepsWithRole) {
         } else {
 
             creep.isFull()
-            const isFull = creep.memory.isFull
 
-            if (isFull) {
+            if (creep.memory.isFull) {
 
                 let lowTowers = room.find(FIND_MY_STRUCTURES, {
                     filter: s => s.structureType == STRUCTURE_TOWER && s.store.getUsedCapacity() < 500
                 })
 
-                if (lowTowers) {
+                if (lowTowers.length > 0) {
 
                     let lowTower = creep.pos.findClosestByRange(lowTowers)
 
@@ -77,11 +76,13 @@ function harvesterHaulerManager(room, creepsWithRole) {
                     let essentialStructures = room.find(FIND_MY_STRUCTURES, {
                         filter: s => (s.structureType == STRUCTURE_EXTENSION ||
                                 s.structureType == STRUCTURE_SPAWN ||
-                                s.structureType == STRUCTURE_TOWER && s.store.getUsedCapacity() < 710) &&
-                            s.store.getUsedCapacity() < s.store.getCapacity()
+                                (s.structureType == STRUCTURE_TOWER && s.store.getUsedCapacity() < 710)) &&
+                            s.store.getCapacity() > s.store.getUsedCapacity()
                     })
 
-                    if (essentialStructures) {
+                    console.log(essentialStructures)
+
+                    if (essentialStructures.length > 0) {
 
                         let essentialStructure = creep.pos.findClosestByRange(essentialStructures)
 
@@ -161,7 +162,68 @@ function harvesterHaulerManager(room, creepsWithRole) {
                 }
             } else {
 
+                let droppedEnergy = creep.findDroppedEnergyOfAmount(creep.store.getFreeCapacity())
 
+                if (droppedEnergy) {
+
+                    creep.say("💡")
+
+                    creep.pickupDroppedEnergy(droppedEnergy)
+
+                } else {
+
+                    if (creep.findParts("work") > 0) {
+
+                        let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
+
+                        if (closestSource && creep.advancedHarvest(closestSource) == ERR_NOT_IN_RANGE) {
+
+                            creep.say("⛏️")
+
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: closestSource.pos, range: 1 },
+                                plainCost: false,
+                                swampCost: false,
+                                defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                avoidStages: [],
+                                flee: false,
+                                cacheAmount: 10,
+                            })
+                        }
+                    } else {
+
+                        let closestSource = creep.pos.findClosestByRange(FIND_SOURCES)
+
+                        creep.say("🔦")
+
+                        if (creep.pos.getRangeTo(closestSource) > 3) {
+
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: closestSource.pos, range: 1 },
+                                plainCost: false,
+                                swampCost: false,
+                                defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                avoidStages: [],
+                                flee: false,
+                                cacheAmount: 10,
+                            })
+                        } else if (creep.pos.getRangeTo(closestSource) < 3) {
+
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: closestSource.pos, range: 3 },
+                                plainCost: false,
+                                swampCost: false,
+                                defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                avoidStages: [],
+                                flee: true,
+                                cacheAmount: 10,
+                            })
+                        }
+                    }
+                }
             }
         }
 
@@ -169,4 +231,4 @@ function harvesterHaulerManager(room, creepsWithRole) {
     }
 }
 
-module.exports = harvesterHaulerManager
+module.exports = jumpStarterManager

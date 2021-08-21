@@ -43,7 +43,7 @@ function builderManager(room, creepsWithRole) {
 
     let targetSite = findObjectWithId(room.memory.targetSite)
 
-    if (!targetSite) {
+    if (!targetSite || !mySites.includes(targetSite)) {
 
         if (creepsWithRole.length == 1) {
 

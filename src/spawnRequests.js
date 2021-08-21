@@ -132,7 +132,7 @@ function spawnRequests(room, spawns, specialStructures) {
             break
         case 2:
 
-            minCreeps["hauler"] = 4
+            minCreeps["hauler"] = 6
             break
         case 3:
 
@@ -181,18 +181,14 @@ function spawnRequests(room, spawns, specialStructures) {
 
         minCreeps["harvester"] = 2
 
-    } else if (spawnCapacity >= 350) {
-
-        minCreeps["harvester"] = 4
-
     } else {
 
         if (creepsOfRole[["hauler", room.name]] >= minCreeps["hauler"]) {
 
-            minCreeps["harvester"] = 6
+            minCreeps["harvester"] = 4
         } else {
 
-            minCreeps["harvester"] = 3
+            minCreeps["harvester"] = 2
         }
     }
 
@@ -394,20 +390,26 @@ function spawnRequests(room, spawns, specialStructures) {
         }
     })()
 
-    if (room.memory.roomFix) {
-        if (room.storage) {
-            if (room.storage.store[RESOURCE_ENERGY] < 1000) {
+    if (spawnCapacity >= 550) {
+        if (room.memory.roomfix) {
+
+            if (room.storage) {
+                if (room.storage.store[RESOURCE_ENERGY] < 1000) {
+
+                    minCreeps["jumpStarter"] = 2
+                }
+            } else if (spawnCapacity == 300) {
+
+                minCreeps["jumpStarter"] = 1
+
+            } else {
 
                 minCreeps["jumpStarter"] = 2
             }
-        } else if (spawnCapacity == 300) {
-
-            minCreeps["jumpStarter"] = 3
-
-        } else {
-
-            minCreeps["jumpStarter"] = 2
         }
+    } else {
+
+        minCreeps["jumpStarter"] = 1
     }
 
     if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 175000 && room.controller.level <= 7) {

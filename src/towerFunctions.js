@@ -16,13 +16,15 @@ Room.prototype.attackHostiles = function(towers) {
 
     if (enemyHealers.length > 0) {
 
+        // If there are healers find target that we can deal the most damage to accounting for possible healing
+
         function findBestTarget() {
 
             for (let minDamage = towers.length * TOWER_POWER_ATTACK; minDamage > 100; minDamage -= 100) {
 
                 for (let hostile of hostiles) {
 
-                    if (room.findTowerDamage(towers, hostile.pos) - room.findHealPower(hostile.pos, 1, enemyHealers) >= minDamage) return hostile
+                    if (room.findTowerDamage(towers, hostile) - room.findHealPower(hostile.pos, 1, enemyHealers) >= minDamage) return hostile
                 }
             }
         }
@@ -31,11 +33,11 @@ Room.prototype.attackHostiles = function(towers) {
 
     } else {
 
-        const anchorPoint = room.memory.anchorPoint
+        // Filter hostiles and find target towers can do the most damage to
 
-        if (!anchorPoint) return false
-
-        target = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(hostiles)
+        target = hostiles.reduce(function(highestDamage, hostile) {
+            return hostile.num > highestDamage.num ? hostile : highestDamage
+        })
     }
 
     if (!target) return false
