@@ -25,8 +25,6 @@ module.exports = {
 
         let mineralContainer = Game.getObjectById(creep.room.memory.mineralContainer)
 
-        let controllerLink = Game.getObjectById(creep.room.memory.controllerLink)
-
         let droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
             filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
         })
@@ -223,8 +221,6 @@ module.exports = {
         } else if (task == "sourceContainer2Full" && sourceContainer2 != null) {
 
             creep.say("SC2F")
-
-
 
             if (!creep.memory.isFull) {
 

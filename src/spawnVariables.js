@@ -350,9 +350,14 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["reserver"] = roleValues({
         role: "reserver",
         parts: {
-            300: {
+            1800: {
                 defaultParts: [],
                 extraParts: [claimPart, movePart, movePart],
+                maxParts: 6
+            },
+            300: {
+                defaultParts: [],
+                extraParts: [claimPart, movePart],
                 maxParts: 6
             }
         },

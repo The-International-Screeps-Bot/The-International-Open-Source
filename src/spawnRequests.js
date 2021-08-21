@@ -355,29 +355,41 @@ function spawnRequests(room, spawns, specialStructures) {
 
         for (let remoteRoom of room.memory.remoteRooms) {
 
-            if (stage <= 2) {
+            if (spawnCapacity >= 1800) {
 
-                minCreeps["remoteHarvester1"] += 2
-
-                if (remoteRoom.sources == 2) {
-
-                    minCreeps["remoteHarvester2"] += 2
-                }
-
-                minCreeps["remoteHauler"] += remoteRoom.sources * 2
-            }
-            if (stage >= 3) {
-
-                minCreeps["reserver"] += 1
+                minCreeps["reserver"] = 1
 
                 minCreeps["remoteHarvester1"] += 1
 
-                if (remoteRoom.sources == 2) {
-
-                    minCreeps["remoteHarvester2"] += 1
-                }
+                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] = 1
 
                 minCreeps["remoteHauler"] += Math.floor(remoteRoom.sources * 1.5)
+
+            } else if (spawnCapacity >= 800) {
+
+                minCreeps["reserver"] = 1
+
+                minCreeps["remoteHarvester1"] += 2
+
+                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] = 2
+
+                minCreeps["remoteHauler"] += remoteRoom.sources * 2
+
+            } else if (spawnCapacity >= 550) {
+
+                minCreeps["remoteHarvester1"] += 1
+
+                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] = 1
+
+                minCreeps["remoteHauler"] += remoteRoom.sources * 2
+
+            } else if (spawnCapacity >= 300) {
+
+                minCreeps["remoteHarvester1"] += 2
+
+                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] = 2
+
+                minCreeps["remoteHauler"] += remoteRoom.sources * 2
             }
         }
     })()
@@ -444,29 +456,45 @@ function spawnRequests(room, spawns, specialStructures) {
 
     for (let remoteRoom of room.memory.remoteRooms) {
 
-        if (stage <= 2) {
-
-            minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 2
-
-            if (remoteRoom.sources == 2) {
-
-                minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 2
-            }
-
-            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
-        }
-        if (stage >= 3) {
+        if (spawnCapacity >= 1800) {
 
             minRemoteCreeps[["reserver", remoteRoom.name]] = 1
 
             minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 1
 
-            if (remoteRoom.sources == 2) {
+            if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 1
 
-                minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 1
-            }
 
             minRemoteCreeps[["remoteHauler", remoteRoom.name]] = Math.floor(remoteRoom.sources * 1.5)
+
+        } else if (spawnCapacity >= 800) {
+
+            minRemoteCreeps[["reserver", remoteRoom.name]] = 1
+
+            minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 1
+
+            if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 1
+
+
+            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
+
+        } else if (spawnCapacity >= 550) {
+
+            minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 2
+
+            if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 2
+
+
+            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
+
+        } else if (spawnCapacity >= 300) {
+
+            minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 2
+
+            if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 2
+
+
+            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
         }
     }
 

@@ -67,9 +67,9 @@ function config() {
 
     // Command based defaults
 
-    if (Memory.global.consoleMessages == undefined) Memory.global.consoleMessages = true
-    if (Memory.global.mapVisuals == undefined) Memory.global.mapVisuals = true
-    if (Memory.global.roomVisuals == undefined) Memory.global.roomVisuals = true
+    if (Memory.global.consoleMessages == undefined) Memory.global.consoleMessages = false
+    if (Memory.global.mapVisuals == undefined) Memory.global.mapVisuals = false
+    if (Memory.global.roomVisuals == undefined) Memory.global.roomVisuals = false
 }
 
 module.exports = config
