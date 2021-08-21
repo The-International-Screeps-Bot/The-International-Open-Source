@@ -3,85 +3,137 @@ let roleBuilder = require("role.builder")
 module.exports = {
     run: function(creep) {
 
-        creep.isFull()
+        let immovableHarvesters = creep.room.find(FIND_MY_CREEPS, {
+            filter: creep => creep.memory.role == "harvester" && creep.findParts("move") == 0 && creep.memory.task && creep.pos.getRangeTo(creep.room.get(creep.memory.task)) > 1
+        })
 
-        if (creep.memory.isFull) {
+        if (immovableHarvesters.length > 0) {
 
-            creep.say("🚬")
+            creep.say("P")
 
-            let lowTower = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                filter: (s) => (s.structureType == STRUCTURE_TOWER) && s.energy < 500
-            })
+            let harvester = creep.pos.findClosestByRange(immovableHarvesters)
+            let source = creep.room.get(harvester.memory.task)
 
-            if (lowTower) {
+            if (creep.pos.getRangeTo(source) == 1) {
 
-                creep.say("LT")
+                creep.move(creep.pos.getDirectionTo(harvester))
 
-                creep.advancedTransfer(lowTower)
+                creep.pull(harvester)
+
+                harvester.move(creep)
 
             } else {
 
-                let essentialStructure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                    filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
-                            s.structureType == STRUCTURE_SPAWN ||
-                            s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
-                        s.energy < s.energyCapacity
+                if (creep.pull(harvester) == ERR_NOT_IN_RANGE) {
+
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: harvester.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 1,
+                    })
+                } else {
+
+                    harvester.move(creep)
+
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: source.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 1,
+                    })
+                }
+            }
+        } else {
+
+            creep.isFull()
+
+            if (creep.memory.isFull) {
+
+                creep.say("🚬")
+
+                let lowTower = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                    filter: (s) => (s.structureType == STRUCTURE_TOWER) && s.energy < 500
                 })
 
-                if (essentialStructure) {
+                if (lowTower) {
 
-                    creep.say("ES")
+                    creep.say("LT")
 
-                    creep.advancedTransfer(essentialStructure)
-
-                } else if (creep.room.storage) {
-
-                    creep.say("S")
-
-                    creep.advancedTransfer(creep.room.storage)
+                    creep.advancedTransfer(lowTower)
 
                 } else {
 
-                    roleBuilder.run(creep)
+                    let essentialStructure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                        filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
+                                s.structureType == STRUCTURE_SPAWN ||
+                                s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
+                            s.energy < s.energyCapacity
+                    })
+
+                    if (essentialStructure) {
+
+                        creep.say("ES")
+
+                        creep.advancedTransfer(essentialStructure)
+
+                    } else if (creep.room.storage) {
+
+                        creep.say("S")
+
+                        creep.advancedTransfer(creep.room.storage)
+
+                    } else {
+
+                        roleBuilder.run(creep)
+                    }
                 }
-            }
-
-        } else {
-
-            let droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-                filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity()
-            })
-
-            if (droppedEnergy && creep.pos.getRangeTo(droppedEnergy) <= 2) {
-
-                creep.pickupDroppedEnergy(droppedEnergy)
 
             } else {
 
-                let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
+                let droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                    filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity()
+                })
 
-                if (closestSource) {
+                if (droppedEnergy && creep.pos.getRangeTo(droppedEnergy) <= 2) {
 
-                    creep.say("⛏️")
+                    creep.pickupDroppedEnergy(droppedEnergy)
 
-                    if (creep.pos.getRangeTo(closestSource) <= 1) {
+                } else {
 
-                        if (creep.harvest(closestSource) == 0) {
+                    let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
 
-                            creep.findEnergyHarvested(closestSource)
+                    if (closestSource) {
+
+                        creep.say("⛏️")
+
+                        if (creep.pos.getRangeTo(closestSource) <= 1) {
+
+                            if (creep.harvest(closestSource) == 0) {
+
+                                creep.findEnergyHarvested(closestSource)
+                            }
+                        } else {
+
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: closestSource.pos, range: 1 },
+                                plainCost: false,
+                                swampCost: false,
+                                defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                avoidStages: [],
+                                flee: false,
+                                cacheAmount: 10,
+                            })
                         }
-                    } else {
-
-                        creep.advancedPathing({
-                            origin: creep.pos,
-                            goal: { pos: closestSource.pos, range: 1 },
-                            plainCost: false,
-                            swampCost: false,
-                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
-                            avoidStages: [],
-                            flee: false,
-                            cacheAmount: 10,
-                        })
                     }
                 }
             }

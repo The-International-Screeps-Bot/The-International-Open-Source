@@ -32,7 +32,7 @@ function spawnRequests(room, spawns, specialStructures) {
         }
     }
 
-    room.memory.remoteRooms = room.memory.remoteRooms.slice(0, Math.floor(spawns.length * 2))
+    if (room.memory.remoteRooms) room.memory.remoteRooms = room.memory.remoteRooms.slice(0, Math.floor(spawns.length * 2))
 
     if (room.memory.stage && room.memory.stage < 3) {
 
@@ -125,19 +125,6 @@ function spawnRequests(room, spawns, specialStructures) {
         minCreeps[role] = 0
     }
 
-    if (spawnCapacity >= 550) {
-
-        minCreeps["harvester"] = 2
-
-    } else if (spawnCapacity >= 350) {
-
-        minCreeps["harvester"] = 4
-
-    } else {
-
-        minCreeps["harvester"] = 6
-    }
-
     switch (stage) {
         case 1:
 
@@ -177,6 +164,38 @@ function spawnRequests(room, spawns, specialStructures) {
             break
     }
 
+    if (stage >= 7) {
+
+        minCreeps["hauler"] = 2
+
+    } else if (stage >= 4) {
+
+
+        minCreeps["hauler"] = 3
+    } else {
+
+        minCreeps["hauler"] = 4
+    }
+
+    if (spawnCapacity >= 550) {
+
+        minCreeps["harvester"] = 2
+
+    } else if (spawnCapacity >= 350) {
+
+        minCreeps["harvester"] = 4
+
+    } else {
+
+        if (creepsOfRole[["hauler", room.name]] >= minCreeps["hauler"]) {
+
+            minCreeps["harvester"] = 6
+        } else {
+
+            minCreeps["harvester"] = 3
+        }
+    }
+
     (function() {
 
         if (room.storage && room.storage.store[RESOURCE_ENERGY] <= 20000) {
@@ -194,15 +213,21 @@ function spawnRequests(room, spawns, specialStructures) {
     if (roomConstructionSite.length > 0) {
         if (!room.storage) {
 
-            if (stage <= 1) {
-
-                minCreeps["builder"] = 6
-            } else if (stage <= 2) {
+            if (spawnCapacity >= 1300) {
 
                 minCreeps["builder"] = 3
-            } else {
 
-                minCreeps["builder"] = 2
+            } else if (spawnCapacity >= 800) {
+
+                minCreeps["builder"] = 3
+
+            } else if (spawnCapacity >= 600) {
+
+                minCreeps["builder"] = 4
+
+            } else if (spawnCapacity >= 300) {
+
+                minCreeps["builder"] = 7
             }
         } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 40000) {
 
@@ -223,21 +248,21 @@ function spawnRequests(room, spawns, specialStructures) {
 
     if (!room.storage) {
 
-        if (stage == 1) {
+        if (spawnCapacity >= 1300) {
 
-            minCreeps["upgrader"] = 6
+            minCreeps["upgrader"] = 2
 
-        } else if (stage == 2) {
+        } else if (spawnCapacity >= 800) {
 
             minCreeps["upgrader"] = 4
 
-        } else if (stage == 3) {
+        } else if (spawnCapacity >= 550) {
 
-            minCreeps["upgrader"] = 3
+            minCreeps["upgrader"] = 4
 
-        } else {
+        } else if (spawnCapacity >= 300) {
 
-            minCreeps["upgrader"] = 3
+            minCreeps["upgrader"] = 6
         }
     } else if (room.storage &&
         room.storage.store[RESOURCE_ENERGY] >= 50000) {
@@ -363,6 +388,10 @@ function spawnRequests(room, spawns, specialStructures) {
 
                 minCreeps["jumpStarter"] = 2
             }
+        } else if (spawnCapacity == 300) {
+
+            minCreeps["jumpStarter"] = 3
+
         } else {
 
             minCreeps["jumpStarter"] = 2

@@ -106,6 +106,18 @@ function taskManger(room, myCreeps) {
             }
         }
 
+        let immovableHarvesters = creep.room.find(FIND_MY_CREEPS, {
+            filter: creep => creep.memory.role == "harvester" && creep.findParts("move") == 0 && creep.memory.task && !creep.memory.hauler && creep.pos.getRangeTo(creep.room.get(creep.memory.task)) > 1
+        })
+
+        if (findCreepWithoutTask(haulers) && immovableHarvesters.length > 0) {
+
+            if (!findCreepsOfTask(haulers, "harvesterToSource", immovableHarvesters.length)) {
+
+                findCreepWithoutTask(haulers).memory.task = "harvesterToSource"
+            }
+        }
+
         if (findCreepWithoutTask(haulers) && controllerLink == null && controllerContainer != null && ((storage && storage.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers)) || (terminal && terminal.store[RESOURCE_ENERGY] >= 30000) || room.get("controller").ticksToDowngrade <= 15000) && controllerContainer.store[RESOURCE_ENERGY] <= findCreepWithoutTask(haulers).store.getCapacity()) {
 
             if (!findCreepsOfTask(haulers, "deliverToControllerContainer", 1)) {

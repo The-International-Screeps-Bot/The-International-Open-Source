@@ -138,7 +138,9 @@ function roomManager() {
 
         if (room.controller && room.controller.my) {
 
-            Memory.global.communes.push(room.name)
+            if (!Memory.global.communes.includes(room.name)) Memory.global.communes.push(room.name)
+
+            // PLEASE MOVE THIS TO A DEDICATED FILE
 
             //
 
@@ -150,6 +152,24 @@ function roomManager() {
 
                 if (Game.time > deposit.decayBy) delete deposit
             }
+
+            //
+
+            let hostiles = room.find(FIND_HOSTILE_CREEPS, {
+                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+            })
+
+            if (hostiles.length > 0) {
+
+                for (let spawn of room.get("spawns")) {
+
+                    if (spawn.hits < spawn.hitsMax) room.controller.activateSafeMode()
+                }
+            }
+
+            //
+
+            room.memory.storedEnergy = room.get("storedEnergy")
 
             //
 

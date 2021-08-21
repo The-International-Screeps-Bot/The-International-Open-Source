@@ -66,7 +66,9 @@ function visuals(room) {
         }
     }
 
-    for (let site of room.get("mySites")) {
+    let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
+
+    for (let site of mySites) {
 
         room.visual.text("%" + (site.progress / site.progressTotal * 100).toFixed(0), site.pos.x, site.pos.y - 0.25, { font: 0.5, align: 'center', opacity: "0.8" })
     }

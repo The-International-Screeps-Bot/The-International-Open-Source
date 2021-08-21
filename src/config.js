@@ -49,14 +49,13 @@ function config() {
 
     let globalValues = {
         resourceRequests: {},
+        communes: [],
     }
 
     for (let value in globalValues) {
 
         if (!Memory.global[value]) Memory.global[value] = globalValues[value]
     }
-
-    Memory.global.communes = []
 
     Memory.global.totalEnergy = 0
 

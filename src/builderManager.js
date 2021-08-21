@@ -6,7 +6,31 @@ function builderManager(room, creepsWithRole) {
 
     if (!anchorPoint) return
 
-    let mySites = room.get("mySites")
+    function findBuildableSites(mySites) {
+
+        let myCreeps = room.find(FIND_MY_CREEPS)
+        let myCreepPositions = []
+
+        for (let creep of myCreeps) {
+
+            myCreepPositions.push(creep.pos)
+        }
+
+        let buildableSites = []
+
+        for (let site of mySites) {
+
+            if (site.structureType == STRUCTURE_CONTAINER || site.structureType == STRUCTURE_ROAD || site.structureType == STRUCTURE_RAMPART) buildableSites.push(site)
+
+            if (myCreepPositions.includes(site.pos)) continue
+
+            buildableSites.push(site)
+        }
+
+        return buildableSites
+    }
+
+    let mySites = findBuildableSites(room.find(FIND_MY_CONSTRUCTION_SITES))
 
     if (mySites.length == 0) {
 

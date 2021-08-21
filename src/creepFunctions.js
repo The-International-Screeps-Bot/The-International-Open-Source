@@ -351,11 +351,9 @@ Creep.prototype.searchSourceContainers = function() {
 
     creep = this
 
-    let sourceContainers = [room.get("sourceContainer1"), room.get("sourceContainer2")]
+    let sourceContainers = [creep.room.get("sourceContainer1"), creep.room.get("sourceContainer2")]
 
-    viableContainers = sourceContainers.filter(container => {
-        return container != null && container.store.getUsedCapacity(RESOURCE_ENERGY) >= creep.store.getFreeCapacity()
-    })
+    viableContainers = sourceContainers.filter(container => container && container.store.getUsedCapacity(RESOURCE_ENERGY) >= creep.store.getFreeCapacity())
 
     if (viableContainers.length == 0) return false
 

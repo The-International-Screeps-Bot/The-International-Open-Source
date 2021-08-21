@@ -84,6 +84,63 @@ module.exports = {
                     }
                 }
             }
+        } else if (task == "harvesterToSource") {
+
+            creep.say("HTS")
+
+            let immovableHarvesters = creep.room.find(FIND_MY_CREEPS, {
+                filter: harvester => harvester.memory.role == "harvester" && creep.findParts("move") == 0 && harvester.memory.task && (!harvester.memory.hauler || harvester.memory.hauler == creep.name) && harvester.pos.getRangeTo(creep.room.get(harvester.memory.task)) > 1
+            })
+
+            if (immovableHarvesters.length > 0) {
+
+                creep.say("Y")
+
+                let harvester = creep.pos.findClosestByRange(immovableHarvesters)
+
+                harvester.memory.hauler = creep.name
+
+                let source = creep.room.get(harvester.memory.task)
+
+                if (creep.pos.getRangeTo(source) == 1) {
+
+                    creep.move(creep.pos.getDirectionTo(harvester))
+
+                    creep.pull(harvester)
+
+                    harvester.move(creep)
+
+                } else {
+
+                    if (creep.pull(harvester) == ERR_NOT_IN_RANGE) {
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: harvester.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 1,
+                        })
+                    } else {
+
+                        harvester.move(creep)
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: source.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 1,
+                        })
+                    }
+                }
+            }
         } else if (task == "deliverToControllerContainer" && controllerContainer != null && (storage || terminal)) {
 
             creep.say("DTCC")
@@ -348,8 +405,6 @@ module.exports = {
 
             creep.say("DTB")
 
-
-
             if (!creep.memory.isFull) creep.memory.task = undefined
 
             if (lowTower) {
@@ -370,7 +425,7 @@ module.exports = {
 
                     creep.memory.task = undefined
                 }
-            } else if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
+            } else if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= creep.store.getUsedCapacity()) {
 
                 if (creep.advancedTransfer(controllerContainer) == 0) {
 
@@ -382,6 +437,9 @@ module.exports = {
 
                     creep.memory.task = undefined
                 }
+            } else {
+
+                creep.memory.task = undefined
             }
         } else if (task == "collectFromRuin") {
 

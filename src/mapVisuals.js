@@ -13,7 +13,7 @@ function mapVisuals() {
                 Game.map.visual.text(Memory.rooms[room].stage, new RoomPosition(8, 8, room), { color: '#ffffff', fontSize: 8 })
 
                 Game.map.visual.circle(new RoomPosition(8, 24, room), { radius: 8, fill: '#FFD180', opacity: 0.5 })
-                Game.map.visual.text((Memory.rooms[room].totalEnergy / 1000).toFixed(0) + "k", new RoomPosition(8, 24, room), { color: '#ffffff', fontSize: 8 })
+                Game.map.visual.text((Memory.rooms[room].storedEnergy / 1000).toFixed(0) + "k", new RoomPosition(8, 24, room), { color: '#ffffff', fontSize: 8 })
 
             } else if (Memory.rooms[room].claim == true) {
 

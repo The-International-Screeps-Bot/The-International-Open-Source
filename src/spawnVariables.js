@@ -27,34 +27,41 @@ function roleOpts(room, spawns, specialStructures) {
 
     let squadType = squadTypes.rangedAttack
 
-    // Get array of spawningStructures
+    // Find spawning structures
 
     let energyStructures = []
+    findSpawningStructures()
 
-    const anchorPoint = room.memory.anchorPoint
+    function findSpawningStructures() {
 
-    let spawnStructuresWithRanges = {}
-    let startPos = new RoomPosition(anchorPoint.y - 3, anchorPoint.x, anchorPoint.roomName)
+        const anchorPoint = room.memory.anchorPoint
+        if (!anchorPoint) return
 
-    let spawnStructures = room.find(FIND_MY_STRUCTURES, {
-        filter: s => s.structureType == STRUCTURE_EXTENSION || STRUCTURE_SPAWN
-    })
+        let spawnStructuresWithRanges = {}
+        let startPos = new RoomPosition(anchorPoint.y - 3, anchorPoint.x, anchorPoint.roomName)
 
-    // Add each spawnStructures with their range to the object
+        // Get array of spawningStructures
 
-    for (let spawnStructure of spawnStructures) {
+        let spawnStructures = room.find(FIND_MY_STRUCTURES, {
+            filter: s => s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN
+        })
 
-        spawnStructuresWithRanges[spawnStructure.id] = startPos.getRangeTo(spawnStructure)
-    }
+        // Add each spawnStructures with their range to the object
 
-    for (let minRange = 0; minRange < 50; minRange++) {
+        for (let spawnStructure of spawnStructures) {
 
-        for (let spawnStructure in spawnStructuresWithRanges) {
+            spawnStructuresWithRanges[spawnStructure.id] = startPos.getRangeTo(spawnStructure)
+        }
 
-            if (spawnStructuresWithRanges[spawnStructure] <= minRange) continue
+        for (let minRange = 0; minRange < 50; minRange++) {
 
-            energyStructures.push(findObjectWithId(spawnStructure))
-            delete spawnStructuresWithRanges[spawnStructure]
+            for (let spawnStructure in spawnStructuresWithRanges) {
+
+                if (spawnStructuresWithRanges[spawnStructure] <= minRange) continue
+
+                energyStructures.push(findObjectWithId(spawnStructure))
+                delete spawnStructuresWithRanges[spawnStructure]
+            }
         }
     }
 
@@ -108,9 +115,16 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["jumpStarter"] = roleValues({
         role: "jumpStarter",
         parts: {
-            300: {
+            550: {
                 defaultParts: [],
                 extraParts: [workPart, movePart, carryPart, movePart],
+                maxParts: 20
+            },
+        },
+        parts: {
+            300: {
+                defaultParts: [],
+                extraParts: [workPart, movePart, carryPart, movePart, movePart],
                 maxParts: 20
             },
         },
@@ -142,6 +156,11 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["harvester"] = roleValues({
         role: "harvester",
         parts: {
+            10300: {
+                defaultParts: [carryPart, carryPart],
+                extraParts: [workPart, workPart, movePart],
+                maxParts: 17
+            },
             2300: {
                 defaultParts: [carryPart],
                 extraParts: [workPart, workPart, movePart],
@@ -156,6 +175,11 @@ function roleOpts(room, spawns, specialStructures) {
                 defaultParts: [],
                 extraParts: [workPart, workPart, movePart],
                 maxParts: 12
+            },
+            550: {
+                defaultParts: [movePart],
+                extraParts: [workPart],
+                maxParts: 9
             },
             300: {
                 defaultParts: [movePart],
@@ -172,7 +196,7 @@ function roleOpts(room, spawns, specialStructures) {
             10300: {
                 defaultParts: [carryPart, carryPart],
                 extraParts: [workPart, workPart, movePart],
-                maxParts: 5
+                maxParts: 13
             },
             800: {
                 defaultParts: [carryPart],
@@ -180,8 +204,8 @@ function roleOpts(room, spawns, specialStructures) {
                 maxParts: 25
             },
             550: {
-                defaultParts: [],
-                extraParts: [workPart, movePart, carryPart, movePart],
+                defaultParts: [carryPart],
+                extraParts: [workPart, workPart, movePart],
                 maxParts: 25
             },
             300: {

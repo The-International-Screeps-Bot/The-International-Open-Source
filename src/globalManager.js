@@ -12,7 +12,7 @@ function globalManager() {
 
             let creep = Game.creeps[creepName]
 
-            if (!creep) delete creep
+            if (!creep) delete Memory.creeps[creepName]
         }
     }
 
@@ -60,11 +60,7 @@ function globalManager() {
 
     // New commune logic
 
-    if (Game.gcl.level == Memory.global.communes.length) Memory.global.newCommunes = []
-
-    if (!Memory.global.newCommunes) Memory.global.newCommunes = []
-
-    if (Memory.global.newCommunes.length > 0) {
+    if (Game.gcl.level > Memory.global.communes.length && Memory.global.newCommunes.length > 0) {
 
         const newCommune = Memory.global.newCommunes[0]
 
