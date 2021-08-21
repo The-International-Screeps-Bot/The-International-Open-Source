@@ -73,3 +73,8 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 - [x] Squads flee when overwhelmed or avoiding range of enemy
 - [x] Haulers to manage mineral containers
 - [ ] Traffic manager to improve pathing
+- [ ] Stationary builders harvesters and upgraders at low rcl
+- [x] Commodity scouting and recording
+- [ ] Power bank scouting and recording
+- [ ] Hauler re-write based purely on commands
+- [x] Squad different possible sizes (duo, quad, etc.)
