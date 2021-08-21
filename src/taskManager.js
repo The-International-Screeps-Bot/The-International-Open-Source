@@ -118,7 +118,7 @@ function taskManger(room, myCreeps) {
             }
         }
 
-        if (findCreepWithoutTask(haulers) && controllerLink == null && controllerContainer != null && ((storage && storage.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers)) || (terminal && terminal.store[RESOURCE_ENERGY] >= 30000) || room.get("controller").ticksToDowngrade <= 15000) && controllerContainer.store.getFreeCapacity() >= findCreepWithoutTask(haulers).store.getUsedCapacity()) {
+        if (findCreepWithoutTask(haulers) && controllerLink == null && controllerContainer != null && ((storage && storage.store[RESOURCE_ENERGY] >= 30000 && findCreepWithoutTask(haulers)) || (terminal && terminal.store[RESOURCE_ENERGY] >= 30000) || room.get("controller").ticksToDowngrade <= 15000) && controllerContainer.store.getFreeCapacity() >= findCreepWithoutTask(haulers).store.getCapacity()) {
 
             if (!findCreepsOfTask(haulers, "deliverToControllerContainer", 1)) {
 
