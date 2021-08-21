@@ -29,16 +29,12 @@ function roleOpts(room, spawns, specialStructures) {
 
     // Find spawning structures
 
-    let energyStructures = []
-    findSpawningStructures()
+    let energyStructures = findSpawningStructures()
 
     function findSpawningStructures() {
 
         const anchorPoint = room.memory.anchorPoint
         if (!anchorPoint) return
-
-        let spawnStructuresWithRanges = {}
-        let startPos = new RoomPosition(anchorPoint.y - 3, anchorPoint.x, anchorPoint.roomName)
 
         // Get array of spawningStructures
 
@@ -48,21 +44,28 @@ function roleOpts(room, spawns, specialStructures) {
 
         // Add each spawnStructures with their range to the object
 
+        let spawnStructuresWithRanges = {}
+        let startPos = new RoomPosition(anchorPoint.x, anchorPoint.y + 3, anchorPoint.roomName)
+
         for (let spawnStructure of spawnStructures) {
 
             spawnStructuresWithRanges[spawnStructure.id] = startPos.getRangeTo(spawnStructure)
         }
 
-        for (let minRange = 0; minRange < 50; minRange++) {
+        let energyStructures = []
 
-            for (let spawnStructure in spawnStructuresWithRanges) {
+        for (let minRange = 0; minRange < 25; minRange++) {
 
-                if (spawnStructuresWithRanges[spawnStructure] <= minRange) continue
+            for (let structureId in spawnStructuresWithRanges) {
 
-                energyStructures.push(findObjectWithId(spawnStructure))
-                delete spawnStructuresWithRanges[spawnStructure]
+                if (spawnStructuresWithRanges[structureId] > minRange) continue
+
+                energyStructures.push(findObjectWithId(structureId))
+                delete spawnStructuresWithRanges[structureId]
             }
         }
+
+        return energyStructures
     }
 
     // Asign variables needed for creating roleValues
