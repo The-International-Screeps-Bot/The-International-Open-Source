@@ -116,7 +116,10 @@ module.exports = {
 
                     if (controller.owner) {
 
-                        if (allyList.indexOf(controller.owner.username) >= 0) {
+                        if (controller.my) {
+
+
+                        } else if (allyList.indexOf(controller.owner.username) >= 0) {
 
                             creep.room.memory.stage = "allyRoom"
                             creep.room.memory.owner = controller.owner.username
