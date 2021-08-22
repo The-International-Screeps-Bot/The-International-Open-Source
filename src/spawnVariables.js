@@ -217,7 +217,7 @@ function roleOpts(room, spawns, specialStructures) {
             800: {
                 defaultParts: [carryPart],
                 extraParts: [workPart, workPart, movePart],
-                maxParts: 25
+                maxParts: 28
             },
             550: {
                 defaultParts: [carryPart],
