@@ -1,5 +1,3 @@
-let roomVariables = require("roomVariables")
-
 module.exports = {
     run: function(creep) {
 
@@ -7,6 +5,10 @@ module.exports = {
 
         const task = creep.memory.task
         if (!task) return
+
+        // If creep can have move parts and isn't suicide
+
+        if (creep.room.memory.stage >= 2 && creep.findParts("move") == 0) creep.suicide()
 
         // Harvest source depending on task
 

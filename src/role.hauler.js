@@ -383,8 +383,6 @@ module.exports = {
 
             creep.say("CFR")
 
-
-
             if (creep.memory.isFull) {
 
                 if (terminal && terminal.store.getFreeCapacity() >= 10000) {
@@ -409,6 +407,28 @@ module.exports = {
             } else {
 
                 creep.memory.task = undefined
+            }
+        } else {
+
+            let anchorPoint = room.get("anchorPoint")
+
+            if (anchorPoint) {
+
+                creep.say("AIR")
+
+                if (creep.pos.getRangeTo(anchorPoint) > 3) {
+
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: anchorPoint, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
+                    })
+                }
             }
         }
 

@@ -4,152 +4,86 @@ function jumpStarterManager(room, creepsWithRole) {
 
     for (let creep of creepsWithRole) {
 
-        let immovableHarvesters = room.find(FIND_MY_CREEPS, {
-            filter: harvester => harvester.memory.role == "harvester" && harvester.findParts("move") == 0 && (!harvester.memory.hauler || harvester.memory.hauler == creep.name) && harvester.memory.task && harvester.pos.getRangeTo(room.get(harvester.memory.task)) > 1
-        })
+        creep.isFull()
 
-        if (immovableHarvesters.length > 0) {
+        if (creep.memory.isFull) {
 
-            creep.say("P")
+            let lowTowers = room.find(FIND_MY_STRUCTURES, {
+                filter: s => s.structureType == STRUCTURE_TOWER && s.store.getUsedCapacity() < 500
+            })
 
-            let harvester = creep.pos.findClosestByRange(immovableHarvesters)
-            harvester.memory.hauler = creep.name
+            if (lowTowers.length > 0) {
 
-            let source = room.get(harvester.memory.task)
+                let lowTower = creep.pos.findClosestByRange(lowTowers)
 
-            if (creep.pos.getRangeTo(source) == 1) {
-
-                creep.move(creep.pos.getDirectionTo(harvester))
-
-                creep.pull(harvester)
-
-                harvester.move(creep)
+                creep.advancedTransfer(lowTower)
 
             } else {
 
-                if (creep.pull(harvester) == ERR_NOT_IN_RANGE) {
-
-                    creep.advancedPathing({
-                        origin: creep.pos,
-                        goal: { pos: harvester.pos, range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: room.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 1,
-                    })
-                } else {
-
-                    harvester.move(creep)
-
-                    creep.advancedPathing({
-                        origin: creep.pos,
-                        goal: { pos: source.pos, range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: room.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 1,
-                    })
-                }
-            }
-        } else {
-
-            creep.isFull()
-
-            if (creep.memory.isFull) {
-
-                let lowTowers = room.find(FIND_MY_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_TOWER && s.store.getUsedCapacity() < 500
+                let essentialStructures = room.find(FIND_MY_STRUCTURES, {
+                    filter: s => (s.structureType == STRUCTURE_EXTENSION ||
+                            s.structureType == STRUCTURE_SPAWN ||
+                            s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
+                        s.energy < s.energyCapacity
                 })
 
-                if (lowTowers.length > 0) {
+                if (essentialStructures.length > 0) {
 
-                    let lowTower = creep.pos.findClosestByRange(lowTowers)
+                    let essentialStructure = creep.pos.findClosestByRange(essentialStructures)
 
-                    creep.advancedTransfer(lowTower)
+                    essentialStructuresTransfer(essentialStructure)
 
                 } else {
 
-                    let essentialStructures = room.find(FIND_MY_STRUCTURES, {
-                        filter: s => (s.structureType == STRUCTURE_EXTENSION ||
-                                s.structureType == STRUCTURE_SPAWN ||
-                                (s.structureType == STRUCTURE_TOWER && s.store.getUsedCapacity() < 710)) &&
-                            s.store.getCapacity() > s.store.getUsedCapacity()
-                    })
+                    let storage = room.get("storage")
 
-                    console.log(essentialStructures)
+                    if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
 
-                    if (essentialStructures.length > 0) {
-
-                        let essentialStructure = creep.pos.findClosestByRange(essentialStructures)
-
-                        essentialStructuresTransfer(essentialStructure)
+                        creep.advancedTransfer(storage)
 
                     } else {
 
-                        let storage = room.get("storage")
+                        let controllerContainer = room.get("controllerContianer")
 
-                        if (storage && storage.store[RESOURCE_ENERGY] <= 30000) {
+                        if (controllerContainer && controllerContainer.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
 
-                            creep.advancedTransfer(storage)
+                            creep.advancedTransfer(controllerContainer)
 
                         } else {
 
-                            let controllerContainer = room.get("controllerContianer")
+                            if (storage && storage.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
 
-                            if (controllerContainer && controllerContainer.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
-
-                                creep.advancedTransfer(controllerContainer)
-
-                            } else {
-
-                                if (storage && storage.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
-
-                                    creep.advancedTransfer(storage)
-                                }
+                                creep.advancedTransfer(storage)
                             }
                         }
                     }
                 }
+            }
 
-                function essentialStructuresTransfer(essentialStructure) {
+            function essentialStructuresTransfer(essentialStructure) {
 
-                    room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
+                let storage = room.get("storage")
 
-                    if (creep.advancedTransfer(essentialStructure) == 0) {
+                room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 
-                        essentialStructuresAlt = room.find(FIND_MY_STRUCTURES, {
-                            filter: s => (s.structureType == STRUCTURE_EXTENSION ||
-                                    s.structureType == STRUCTURE_SPAWN ||
-                                    s.structureType == STRUCTURE_TOWER && s.store.getUsedCapacity() < 710) &&
-                                s.store.getUsedCapacity() < s.store.getCapacity() && s.id != essentialStructure.id
-                        })
+                if (creep.advancedTransfer(essentialStructure) == 0) {
 
-                        let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
+                    essentialStructuresAlt = room.find(FIND_MY_STRUCTURES, {
+                        filter: s => (s.structureType == STRUCTURE_EXTENSION ||
+                                s.structureType == STRUCTURE_SPAWN ||
+                                s.structureType == STRUCTURE_TOWER && s.store.getUsedCapacity() < 710) &&
+                            s.store.getUsedCapacity() < s.store.getCapacity() && s.id != essentialStructure.id
+                    })
 
-                        if (essentialStructuresAlt.length > 0 && creep.store[RESOURCE_ENERGY] > essentialStructureAlt.store.getFreeCapacity()) {
+                    let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
 
-                            if (creep.pos.getRangeTo(essentialStructureAlt) > 1) {
+                    if (essentialStructuresAlt.length > 0 && creep.store[RESOURCE_ENERGY] > essentialStructureAlt.store.getFreeCapacity()) {
 
-                                creep.advancedPathing({
-                                    origin: creep.pos,
-                                    goal: { pos: essentialStructureAlt.pos, range: 1 },
-                                    plainCost: false,
-                                    swampCost: false,
-                                    defaultCostMatrix: creep.memory.defaultCostMatrix,
-                                    avoidStages: [],
-                                    flee: false,
-                                    cacheAmount: 10,
-                                })
-                            }
-                        } else if (storage && storage.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
+                        if (creep.pos.getRangeTo(essentialStructureAlt) > 1) {
 
                             creep.advancedPathing({
                                 origin: creep.pos,
-                                goal: { pos: storage.pos, range: 1 },
+                                goal: { pos: essentialStructureAlt.pos, range: 1 },
                                 plainCost: false,
                                 swampCost: false,
                                 defaultCostMatrix: creep.memory.defaultCostMatrix,
@@ -158,6 +92,72 @@ function jumpStarterManager(room, creepsWithRole) {
                                 cacheAmount: 10,
                             })
                         }
+                    } else if (storage && storage.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: storage.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: creep.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 10,
+                        })
+                    }
+                }
+            }
+        } else {
+
+            let immovableHarvesters = room.find(FIND_MY_CREEPS, {
+                filter: harvester => harvester.memory.role == "harvester" && harvester.findParts("move") == 0 && (!harvester.memory.hauler || harvester.memory.hauler == creep.name) && harvester.memory.task && harvester.pos.getRangeTo(room.get(harvester.memory.task)) > 1
+            })
+
+            if (immovableHarvesters.length > 0) {
+
+                creep.say("P")
+
+                let harvester = creep.pos.findClosestByRange(immovableHarvesters)
+                harvester.memory.hauler = creep.name
+
+                let source = room.get(harvester.memory.task)
+
+                if (creep.pos.getRangeTo(source) == 1) {
+
+                    creep.move(creep.pos.getDirectionTo(harvester))
+
+                    creep.pull(harvester)
+
+                    harvester.move(creep)
+
+                } else {
+
+                    if (creep.pull(harvester) == ERR_NOT_IN_RANGE) {
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: harvester.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: room.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 1,
+                        })
+                    } else {
+
+                        harvester.move(creep)
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: source.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: room.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 1,
+                        })
                     }
                 }
             } else {

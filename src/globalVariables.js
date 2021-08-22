@@ -2,7 +2,7 @@ global.me = "MarvinTMB"
 
 global.allyList = [
     "Q13214",
-    "orlet",
+    "Orlet",
     "BarryOSeven",
     "slowmotionghost",
     "SBense",

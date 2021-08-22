@@ -136,7 +136,7 @@ function construction(room, specialStructures) {
 
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
-                if (room.memory.stage > 1 && !sourceContainer1 && normalValue && i + 1 == path.length) {
+                if (room.memory.stage > 1 && (controllerContainer || controllerLink) && !sourceContainer1 && normalValue && i + 1 == path.length) {
 
                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                 }
@@ -229,7 +229,7 @@ function construction(room, specialStructures) {
 
                     room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
                 }
-                if (room.memory.stage > 1 && !sourceContainer2 && normalValue && i + 1 == path.length) {
+                if (room.memory.stage > 1 && (controllerContainer || controllerLink) && !sourceContainer2 && normalValue && i + 1 == path.length) {
 
                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                 }

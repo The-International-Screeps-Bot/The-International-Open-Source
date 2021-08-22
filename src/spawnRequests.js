@@ -317,12 +317,24 @@ function spawnRequests(room, spawns, specialStructures) {
 
     if (Memory.global.communeEstablisher == room.name) {
 
-        minCreeps["claimer"] = 1
+        if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 20000) {
+
+            minCreeps["claimer"] = 1
+        } else {
+
+            minCreeps["claimer"] = 1
+        }
     }
 
     if (Memory.global.communeEstablisher == room.name) {
 
-        minCreeps["revolutionaryBuilder"] = 4
+        if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 20000) {
+
+            minCreeps["revolutionaryBuilder"] = 4
+        } else {
+
+            minCreeps["revolutionaryBuilder"] = 4
+        }
     }
 
     if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 35000 && mineralContainer != null && roomExtractor.length > 0 && roomMineral.length > 0) {
@@ -353,21 +365,21 @@ function spawnRequests(room, spawns, specialStructures) {
 
             if (spawnCapacity >= 1800) {
 
-                minCreeps["reserver"] = 1
+                minCreeps["reserver"] += 1
 
                 minCreeps["remoteHarvester1"] += 1
 
-                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] = 1
+                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 1
 
                 minCreeps["remoteHauler"] += Math.floor(remoteRoom.sources * 1.5)
 
             } else if (spawnCapacity >= 800) {
 
-                minCreeps["reserver"] = 1
+                minCreeps["reserver"] += 1
 
                 minCreeps["remoteHarvester1"] += 2
 
-                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] = 2
+                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 2
 
                 minCreeps["remoteHauler"] += remoteRoom.sources * 2
 
@@ -375,7 +387,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
                 minCreeps["remoteHarvester1"] += 1
 
-                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] = 1
+                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 1
 
                 minCreeps["remoteHauler"] += remoteRoom.sources * 2
 
@@ -383,7 +395,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
                 minCreeps["remoteHarvester1"] += 2
 
-                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] = 2
+                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 2
 
                 minCreeps["remoteHauler"] += remoteRoom.sources * 2
             }

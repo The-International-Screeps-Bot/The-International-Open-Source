@@ -133,6 +133,20 @@ Creep.prototype.hasPartsOfTypes = function(partTypes) {
 
     return false
 }
+Creep.prototype.hasBoost = function(partType, boostType) {
+
+    let creep = this
+
+    for (let part of creep.body) {
+
+        if (part.type == partType && part.boost == boostType) {
+
+            return true
+        }
+    }
+
+    return false
+}
 Creep.prototype.advancedHarvest = function(target) {
 
     creep = this

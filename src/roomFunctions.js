@@ -281,6 +281,7 @@ Room.prototype.get = function(roomVar, cache) {
         }
 
         if (!roomVars.anchorPoint) return false
+
         harvestPositions[source].closest = new RoomPosition(roomVars.anchorPoint.x, roomVars.anchorPoint.y, roomVars.anchorPoint.roomName).findClosestByPath(harvestPositions)
 
         for (let object in cache) {
@@ -350,6 +351,8 @@ Room.prototype.findSafeDistance = function(origin, goal, avoidStages) {
 }
 Room.prototype.findTowerDamage = function(towers, hostile) {
 
+    room = this
+
     let totalDamage = 0
 
     for (let tower of towers) {
@@ -366,29 +369,33 @@ Room.prototype.findTowerDamage = function(towers, hostile) {
         totalDamage += Math.floor(TOWER_POWER_ATTACK * (1 - TOWER_FALLOFF * factor));
     }
 
-    for (let part of creep.body) {
+    if (hostile.hasBoost(TOUGH, "GO")) totalDamage -= totalDamage * 0.3
+    if (hostile.hasBoost(TOUGH, "GHO2")) totalDamage -= totalDamage * 0.5
+    if (hostile.hasBoost(TOUGH, "XGHO2")) totalDamage -= totalDamage * 0.7
 
-        if (part.type == TOUGH && part.boost == "XGHO2") {
-
-            totalDamage = totalDamage * 0.3
-            break
-        }
-    }
-
-    creep.room.visual.text(totalDamage, hostile.pos.x, hostile.pos.y + 0.25, { align: 'center', color: colors.communeGreen, font: "0.7" })
+    room.visual.text(totalDamage, hostile.pos.x, hostile.pos.y + 0.25, { align: 'center', color: colors.communeGreen, font: "0.7" })
 
     return totalDamage
 }
-Room.prototype.findHealPower = function(pos, range, creeps) {
+Room.prototype.findHealPower = function(pos, creeps) {
+
+    room = this
 
     let healPower = 0
 
     for (let creep of creeps) {
 
-        if (creep.pos.getRangeTo(pos) <= range) healPower += creep.findParts("heal") * HEAL_POWER
+        if (creep.pos.getRangeTo(pos) == 1) {
+
+            healPower += creep.findParts("heal") * HEAL_POWER
+
+            if (creep.hasBoost(HEAL, "LO")) healPower += healPower * 1
+            if (creep.hasBoost(HEAL, "LHO2")) healPower += healPower * 2
+            if (creep.hasBoost(HEAL, "XLHO2")) healPower += healPower * 3
+        }
     }
 
-    creep.room.visual.text(healPower, pos.x, pos.y + 0.25, { align: 'center', color: colors.allyBlue, font: "0.7" })
+    room.visual.text(healPower, pos.x, pos.y + 0.25, { align: 'center', color: colors.allyBlue, font: "0.7" })
 
     return healPower
 }
