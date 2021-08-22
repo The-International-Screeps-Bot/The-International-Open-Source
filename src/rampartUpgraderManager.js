@@ -17,7 +17,7 @@ function rampartUpgraderManager(room, creepsWithRole) {
 
         if (isFull) {
 
-            creep.say((creep.memory.quota).toFixed(0) / 1000 + "k")
+            creep.memory.quota ? creep.say((creep.memory.quota).toFixed(0) / 1000 + "k") : creep.say("NQ")
 
             if (creep.findRampartToRepair(ramparts)) creep.repairRamparts(creep.target)
 
