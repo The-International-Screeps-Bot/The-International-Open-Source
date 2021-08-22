@@ -267,7 +267,7 @@ function roleOpts(room, spawns, specialStructures) {
 
             // For every 10,000 energy in storage add 3 parts
 
-            let bodySize = Math.floor(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000) * 3 + 1
+            let bodySize = Math.floor(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000) * 3
 
             this.defaultParts = []
             this.extraParts = [workPart, carryPart, movePart]
@@ -284,43 +284,35 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["builder"] = roleValues({
         role: "builder",
         parts: {
-            10300: {
-                defaultParts: [],
-                extraParts: [workPart, carryPart, movePart],
-                maxParts: 36
-            },
-            1800: {
-                defaultParts: [],
-                extraParts: [workPart, carryPart, movePart],
-                maxParts: 24
-            },
-            300: {
-                defaultParts: [],
-                extraParts: [workPart, movePart, carryPart, movePart],
-                maxParts: 24
-            }
+            300: new BuilderBody()
         },
         memoryAdditions: {}
     })
 
+    function RampartUpgraderBody() {
+
+        if (storage) {
+
+            // For every 10,000 energy in storage add 3 parts
+
+            let bodySize = Math.floor(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000) * 6
+
+            this.defaultParts = []
+            this.extraParts = [workPart, workPart, movePart, workPart, carryPart, movePart]
+            this.maxParts = Math.min(bodySize, 30)
+
+        } else {
+
+            this.defaultParts = []
+            this.extraParts = [workPart, movePart, carryPart, movePart]
+            this.maxParts = 18
+        }
+    }
+
     roleOpts["rampartUpgrader"] = roleValues({
         role: "rampartUpgrader",
         parts: {
-            10300: {
-                defaultParts: [],
-                extraParts: [workPart, workPart, movePart, workPart, carryPart, movePart],
-                maxParts: 30
-            },
-            1800: {
-                defaultParts: [],
-                extraParts: [workPart, workPart, movePart, workPart, carryPart, movePart],
-                maxParts: 18
-            },
-            300: {
-                defaultParts: [],
-                extraParts: [workPart, movePart, carryPart, movePart],
-                maxParts: 24
-            }
+            300: new RampartUpgraderBody()
         },
         memoryAdditions: {}
     })
@@ -416,16 +408,11 @@ function roleOpts(room, spawns, specialStructures) {
     roleOpts["communeDefender"] = roleValues({
         role: "communeDefender",
         parts: {
-            2300: {
-                defaultParts: [],
-                extraParts: [attackPart, movePart, attackPart, movePart, attackPart, movePart, attackPart, movePart, rangedAttackPart, movePart, rangedAttackPart, movePart],
-                maxParts: 22
-            },
             300: {
                 defaultParts: [],
-                extraParts: [attackPart, movePart],
+                extraParts: [attackPart, movePart, attackPart, movePart, attackPart, movePart, rangedAttackPart, movePart, rangedAttackPart, movePart],
                 maxParts: 20
-            }
+            },
         },
         memoryAdditions: {}
     })

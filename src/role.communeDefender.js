@@ -27,7 +27,7 @@ module.exports = {
                     filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
                 })
 
-                if (!hostile.isEdge()) {
+                if (hostile && !hostile.isEdge()) {
 
                     creep.say("H")
 
