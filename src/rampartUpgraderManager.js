@@ -4,7 +4,9 @@ function rampartUpgraderManager(room, creepsWithRole) {
 
     if (!anchorPoint) return
 
-    let ramparts = room.get("myRamparts")
+    let ramparts = room.find(FIND_MY_STRUCTURES, {
+        filter: s => s.structureType == STRUCTURE_RAMPART
+    })
 
     if (ramparts.length == 0) return
 
@@ -15,7 +17,7 @@ function rampartUpgraderManager(room, creepsWithRole) {
 
         if (isFull) {
 
-            if (creep.memory.quota) creep.say(creep.memory.quota.toFixed(0) / 1000 + "k")
+            creep.say((creep.memory.quota || "NQ").toFixed(0) / 1000 + "k")
 
             if (creep.findRampartToRepair(ramparts)) creep.repairRamparts(creep.target)
 

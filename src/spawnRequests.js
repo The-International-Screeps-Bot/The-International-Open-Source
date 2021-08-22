@@ -116,6 +116,10 @@ function spawnRequests(room, spawns, specialStructures) {
 
     }
 
+    let storage = room.get("storage")
+
+    let terminal = room.get("terminal")
+
     // Define min creeps for each role
 
     let minCreeps = {}
@@ -194,7 +198,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
     (function() {
 
-        if (room.storage && room.storage.store[RESOURCE_ENERGY] <= 20000) {
+        if (storage && storage.store[RESOURCE_ENERGY] <= 20000) {
 
             return
         }
@@ -207,7 +211,7 @@ function spawnRequests(room, spawns, specialStructures) {
     })()
 
     if (roomConstructionSite.length > 0) {
-        if (!room.storage) {
+        if (!storage) {
 
             if (spawnCapacity >= 1300) {
 
@@ -225,7 +229,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
                 minCreeps["builder"] = 7
             }
-        } else if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 40000) {
+        } else if (storage && storage.store[RESOURCE_ENERGY] >= 40000) {
 
             if (stage <= 5) {
 
@@ -242,7 +246,7 @@ function spawnRequests(room, spawns, specialStructures) {
         minCreeps["upgrader"] = 1
     }
 
-    if (!room.storage) {
+    if (!storage) {
 
         if (spawnCapacity >= 1300) {
 
@@ -260,8 +264,8 @@ function spawnRequests(room, spawns, specialStructures) {
 
             minCreeps["upgrader"] = 6
         }
-    } else if (room.storage &&
-        room.storage.store[RESOURCE_ENERGY] >= 50000) {
+    } else if (storage &&
+        storage.store[RESOURCE_ENERGY] >= 50000) {
 
         if (stage <= 5) {
 
@@ -274,15 +278,15 @@ function spawnRequests(room, spawns, specialStructures) {
     }
 
     if (barricadesToUpgrade.length > 0) {
-        if (!room.storage) {
+        if (!storage) {
 
             minCreeps["rampartUpgrader"] = 1
 
         } else {
-            if (room.storage.store[RESOURCE_ENERGY] >= 200000) {
+            if (storage.store[RESOURCE_ENERGY] >= 200000) {
 
                 minCreeps["rampartUpgrader"] = 3
-            } else if (room.storage.store[RESOURCE_ENERGY] >= 30000) {
+            } else if (storage.store[RESOURCE_ENERGY] >= 30000) {
 
                 minCreeps["rampartUpgrader"] = 1
             }
@@ -317,7 +321,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
     if (Memory.global.communeEstablisher == room.name) {
 
-        if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 20000) {
+        if (storage && storage.store[RESOURCE_ENERGY] >= 20000) {
 
             minCreeps["claimer"] = 1
         } else {
@@ -328,7 +332,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
     if (Memory.global.communeEstablisher == room.name) {
 
-        if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 20000) {
+        if (storage && storage.store[RESOURCE_ENERGY] >= 20000) {
 
             minCreeps["revolutionaryBuilder"] = 4
         } else {
@@ -337,7 +341,7 @@ function spawnRequests(room, spawns, specialStructures) {
         }
     }
 
-    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 35000 && mineralContainer != null && roomExtractor.length > 0 && roomMineral.length > 0) {
+    if (storage && storage.store[RESOURCE_ENERGY] >= 35000 && mineralContainer != null && roomExtractor.length > 0 && roomMineral.length > 0) {
 
         minCreeps["miner"] = 1
     }
@@ -356,7 +360,7 @@ function spawnRequests(room, spawns, specialStructures) {
     }
     (function() {
 
-        if (room.storage && room.storage.store[RESOURCE_ENERGY] <= 15000) {
+        if (storage && storage.store[RESOURCE_ENERGY] <= 15000) {
 
             return
         }
@@ -405,8 +409,8 @@ function spawnRequests(room, spawns, specialStructures) {
     if (spawnCapacity >= 550) {
         if (room.memory.roomfix) {
 
-            if (room.storage) {
-                if (room.storage.store[RESOURCE_ENERGY] < 1000) {
+            if (storage) {
+                if (storage.store[RESOURCE_ENERGY] < 1000) {
 
                     minCreeps["jumpStarter"] = 2
                 }
@@ -424,11 +428,11 @@ function spawnRequests(room, spawns, specialStructures) {
         minCreeps["jumpStarter"] = 1
     }
 
-    if (room.storage && room.storage.store[RESOURCE_ENERGY] >= 175000 && room.controller.level <= 7) {
+    if (storage && storage.store[RESOURCE_ENERGY] >= 175000 && room.controller.level <= 7) {
 
         minCreeps["upgrader"] += 1
     }
-    if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 80000 && room.controller.level <= 7) {
+    if (terminal && terminal.store[RESOURCE_ENERGY] >= 80000 && room.controller.level <= 7) {
 
         minCreeps["upgradeHauler"] = 1
         minCreeps["upgrader"] += 2
