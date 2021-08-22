@@ -52,7 +52,7 @@ function globalManager() {
             Game.cpu.generatePixel();
         }
 
-        if (Game.resources.pixel > 10) {
+        if (Game.resources.pixel > 10 && Object.values(Game.market.orders).length < 100) {
 
             Game.market.createOrder({ type: ORDER_SELL, resourceType: PIXEL, price: avgPrice(PIXEL) * 0.7, totalAmount: 10 })
         }

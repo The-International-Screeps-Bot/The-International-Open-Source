@@ -78,39 +78,39 @@ function spawnRequests(room, spawns, specialStructures) {
         filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < s.hitsMax * 0.9
     })
 
-    let spawnCapacity = room.energyCapacityAvailable
+    let energyCapacity = room.energyCapacityAvailable
 
     let stage = room.memory.stage
 
-    if (spawnCapacity >= 10300) {
+    if (energyCapacity >= 10300) {
 
         room.memory.stage = 8
 
-    } else if (spawnCapacity >= 5300) {
+    } else if (energyCapacity >= 5300) {
 
         room.memory.stage = 7
 
-    } else if (spawnCapacity >= 2300) {
+    } else if (energyCapacity >= 2300) {
 
         room.memory.stage = 6
 
-    } else if (spawnCapacity >= 1800) {
+    } else if (energyCapacity >= 1800) {
 
         room.memory.stage = 5
 
-    } else if (spawnCapacity >= 1300) {
+    } else if (energyCapacity >= 1300) {
 
         room.memory.stage = 4
 
-    } else if (spawnCapacity >= 800) {
+    } else if (energyCapacity >= 800) {
 
         room.memory.stage = 3
 
-    } else if (spawnCapacity >= 550) {
+    } else if (energyCapacity >= 550) {
 
         room.memory.stage = 2
 
-    } else if (spawnCapacity >= 300) {
+    } else if (energyCapacity >= 300) {
 
         room.memory.stage = 1
 
@@ -181,7 +181,7 @@ function spawnRequests(room, spawns, specialStructures) {
         minCreeps["hauler"] = 4
     }
 
-    if (spawnCapacity >= 550) {
+    if (energyCapacity >= 550) {
 
         minCreeps["harvester"] = 2
 
@@ -213,19 +213,19 @@ function spawnRequests(room, spawns, specialStructures) {
     if (roomConstructionSite.length > 0) {
         if (!storage) {
 
-            if (spawnCapacity >= 1300) {
+            if (energyCapacity >= 1300) {
 
                 minCreeps["builder"] = 3
 
-            } else if (spawnCapacity >= 800) {
+            } else if (energyCapacity >= 800) {
 
                 minCreeps["builder"] = 3
 
-            } else if (spawnCapacity >= 600) {
+            } else if (energyCapacity >= 600) {
 
                 minCreeps["builder"] = 4
 
-            } else if (spawnCapacity >= 300) {
+            } else if (energyCapacity >= 300) {
 
                 minCreeps["builder"] = 7
             }
@@ -248,24 +248,23 @@ function spawnRequests(room, spawns, specialStructures) {
 
     if (!storage) {
 
-        if (spawnCapacity >= 1300) {
+        if (energyCapacity >= 1300) {
 
             minCreeps["upgrader"] = 2
 
-        } else if (spawnCapacity >= 800) {
+        } else if (energyCapacity >= 800) {
 
             minCreeps["upgrader"] = 4
 
-        } else if (spawnCapacity >= 550) {
+        } else if (energyCapacity >= 550) {
 
             minCreeps["upgrader"] = 4
 
-        } else if (spawnCapacity >= 300) {
+        } else if (energyCapacity >= 300) {
 
             minCreeps["upgrader"] = 6
         }
-    } else if (storage &&
-        storage.store[RESOURCE_ENERGY] >= 50000) {
+    } else if (storage) {
 
         if (stage <= 5) {
 
@@ -367,7 +366,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
         for (let remoteRoom of room.memory.remoteRooms) {
 
-            if (spawnCapacity >= 1800) {
+            if (energyCapacity >= 1800) {
 
                 minCreeps["reserver"] += 1
 
@@ -377,7 +376,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
                 minCreeps["remoteHauler"] += Math.floor(remoteRoom.sources * 1.5)
 
-            } else if (spawnCapacity >= 800) {
+            } else if (energyCapacity >= 800) {
 
                 minCreeps["reserver"] += 1
 
@@ -387,7 +386,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
                 minCreeps["remoteHauler"] += remoteRoom.sources * 2
 
-            } else if (spawnCapacity >= 550) {
+            } else if (energyCapacity >= 550) {
 
                 minCreeps["remoteHarvester1"] += 1
 
@@ -395,7 +394,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
                 minCreeps["remoteHauler"] += remoteRoom.sources * 2
 
-            } else if (spawnCapacity >= 300) {
+            } else if (energyCapacity >= 300) {
 
                 minCreeps["remoteHarvester1"] += 2
 
@@ -406,7 +405,7 @@ function spawnRequests(room, spawns, specialStructures) {
         }
     })()
 
-    if (spawnCapacity >= 550) {
+    if (energyCapacity >= 550) {
         if (room.memory.roomfix) {
 
             if (storage) {
@@ -414,7 +413,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
                     minCreeps["jumpStarter"] = 2
                 }
-            } else if (spawnCapacity == 300) {
+            } else if (energyCapacity == 300) {
 
                 minCreeps["jumpStarter"] = 1
 
@@ -474,7 +473,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
     for (let remoteRoom of room.memory.remoteRooms) {
 
-        if (spawnCapacity >= 1800) {
+        if (energyCapacity >= 1800) {
 
             minRemoteCreeps[["reserver", remoteRoom.name]] = 1
 
@@ -485,7 +484,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
             minRemoteCreeps[["remoteHauler", remoteRoom.name]] = Math.floor(remoteRoom.sources * 1.5)
 
-        } else if (spawnCapacity >= 800) {
+        } else if (energyCapacity >= 800) {
 
             minRemoteCreeps[["reserver", remoteRoom.name]] = 1
 
@@ -496,7 +495,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
             minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
 
-        } else if (spawnCapacity >= 550) {
+        } else if (energyCapacity >= 550) {
 
             minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 2
 
@@ -505,7 +504,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
             minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
 
-        } else if (spawnCapacity >= 300) {
+        } else if (energyCapacity >= 300) {
 
             minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 2
 

@@ -82,12 +82,15 @@ function roleOpts(room, spawns, specialStructures) {
 
     const roomFix = room.memory.roomFix
 
-    class BodyPart {
-        constructor(partType, cost) {
+    let storage = room.get("storage")
+    let terminal = room.get("terminal")
 
-            this.type = partType
-            this.cost = cost
-        }
+    let controllerContainer = room.get("controllerContianer")
+
+    function BodyPart(partType, partCost) {
+
+        this.type = partType
+        this.cost = partCost
     }
 
     // Economy
@@ -205,29 +208,38 @@ function roleOpts(room, spawns, specialStructures) {
         memoryAdditions: {}
     })
 
+    function UpgraderBody() {
+
+        if (storage) {
+
+            // For every 10,000 energy in storage add 3 parts
+
+            let bodySize = Math.floor(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000) * 3 + 1
+
+            this.defaultParts = [carryPart]
+            this.extraParts = [workPart, workPart, movePart]
+            this.maxParts = Math.min(bodySize, 31)
+
+        } else {
+
+            if (controllerContainer) {
+
+                this.defaultParts = [carryPart]
+                this.extraParts = [workPart, workPart, movePart]
+                this.maxParts = 28
+            } else {
+
+                this.defaultParts = []
+                this.extraParts = [workPart, movePart, carryPart, movePart]
+                this.maxParts = 28
+            }
+        }
+    }
+
     roleOpts["upgrader"] = roleValues({
         role: "upgrader",
         parts: {
-            10300: {
-                defaultParts: [carryPart, carryPart],
-                extraParts: [workPart, workPart, movePart],
-                maxParts: 13
-            },
-            800: {
-                defaultParts: [carryPart],
-                extraParts: [workPart, workPart, movePart],
-                maxParts: 28
-            },
-            550: {
-                defaultParts: [carryPart],
-                extraParts: [workPart, workPart, movePart],
-                maxParts: 25
-            },
-            300: {
-                defaultParts: [],
-                extraParts: [workPart, movePart, carryPart, movePart],
-                maxParts: 25
-            }
+            300: new UpgraderBody()
         },
         memoryAdditions: {}
     })
@@ -386,8 +398,8 @@ function roleOpts(room, spawns, specialStructures) {
         parts: {
             2300: {
                 defaultParts: [],
-                extraParts: [attackPart, movePart, attackPart, movePart, attackPart, movePart, attackPart, movePart, attackPart, movePart, healPart, movePart],
-                maxParts: 24
+                extraParts: [attackPart, movePart, attackPart, movePart, attackPart, movePart, attackPart, movePart, rangedAttackPart, movePart, rangedAttackPart, movePart],
+                maxParts: 22
             },
             300: {
                 defaultParts: [],

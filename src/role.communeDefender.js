@@ -23,28 +23,34 @@ module.exports = {
         if (remoteRoom) {
             if (creep.room.name == remoteRoom) {
 
-                let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                    filter: (c) => {
-                        return (allyList.indexOf(c.owner.username) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
-                    }
+                let hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                    filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
                 })
 
-                if (closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
+                if (!hostile.isEdge()) {
 
                     creep.say("H")
 
-                    creep.attack(closestHostile)
+                    if (creep.pos.getRangeTo(hostile) == 1) {
 
-                    creep.advancedPathing({
-                        origin: creep.pos,
-                        goal: { pos: closestHostile.pos, range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: false,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 10,
-                    })
+                        creep.attack(hostile)
+                        creep.rangedMassAttack()
+
+                    } else {
+
+                        creep.rangedAttack(hostile)
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: hostile.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: false,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 2,
+                        })
+                    }
                 } else {
 
                     let hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
@@ -55,20 +61,28 @@ module.exports = {
 
                     if (hostileStructure) {
 
-                        creep.say("H")
+                        creep.say("HS")
 
-                        creep.attack(hostileStructure)
+                        if (creep.pos.getRangeTo(hostile) == 1) {
 
-                        creep.advancedPathing({
-                            origin: creep.pos,
-                            goal: { pos: hostileStructure.pos, range: 1 },
-                            plainCost: false,
-                            swampCost: false,
-                            defaultCostMatrix: false,
-                            avoidStages: [],
-                            flee: false,
-                            cacheAmount: 10,
-                        })
+                            creep.attack(hostile)
+                            creep.rangedMassAttack()
+
+                        } else {
+
+                            creep.rangedAttack(hostile)
+
+                            creep.advancedPathing({
+                                origin: creep.pos,
+                                goal: { pos: hostileStructure.pos, range: 1 },
+                                plainCost: false,
+                                swampCost: false,
+                                defaultCostMatrix: false,
+                                avoidStages: [],
+                                flee: false,
+                                cacheAmount: 2,
+                            })
+                        }
                     } else {
 
                         if (creep.hits < creep.hitsMax) {
@@ -133,27 +147,40 @@ module.exports = {
 
                             creep.say("OR")
 
-                            let rampart = hostile.pos.findClosestByRange(openRamparts)
+                            if (creep.pos.getRangeTo(hostile) == 1) {
 
-                            let goal = _.map([rampart], function(target) {
-                                return { pos: target.pos, range: 0 }
-                            })
+                                creep.attack(hostile)
+                                creep.rangedMassAttack()
 
-                            creep.rampartPathing(creep.pos, goal)
+                            } else {
 
-                            creep.attack(hostile)
+                                creep.rangedAttack(hostile)
+
+                                let rampart = hostile.pos.findClosestByRange(openRamparts)
+
+                                creep.rampartPathing(creep.pos, goal)
+
+                                let goal = _.map([rampart], function(target) {
+                                    return { pos: target.pos, range: 0 }
+                                })
+                            }
                         }
                     } else {
 
-                        creep.say("NE")
+                        creep.say("NH")
 
                         if (!hostile.isEdge()) {
 
                             creep.say("H")
 
-                            creep.attack(hostile)
+                            if (creep.pos.getRangeTo(hostile) == 1) {
 
-                            if (creep.pos.getRangeTo(hostile) > 1) {
+                                creep.attack(hostile)
+                                creep.rangedMassAttack()
+
+                            } else {
+
+                                creep.rangedAttack(hostile)
 
                                 creep.advancedPathing({
                                     origin: creep.pos,
@@ -163,7 +190,7 @@ module.exports = {
                                     defaultCostMatrix: false,
                                     avoidStages: [],
                                     flee: false,
-                                    cacheAmount: 1,
+                                    cacheAmount: 2,
                                 })
                             }
                         }

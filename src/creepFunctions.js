@@ -417,13 +417,13 @@ Creep.prototype.avoidHostiles = function() {
 
     let hostile = creep.pos.findClosestByRange(hostiles)
 
-    if (creep.pos.getRangeTo(hostile) <= 4) {
+    if (creep.pos.getRangeTo(hostile) <= 5) {
 
         creep.say("H! R")
 
         creep.advancedPathing({
             origin: creep.pos,
-            goal: { pos: hostile.pos, range: 4 },
+            goal: { pos: hostile.pos, range: 5 },
             plainCost: false,
             swampCost: false,
             defaultCostMatrix: creep.memory.defaultCostMatrix,
