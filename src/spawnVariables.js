@@ -127,17 +127,17 @@ function roleOpts(room, spawns, specialStructures) {
 
     function JumpStarterBody() {
 
-        if (creepsOfRole[["hauler", room.name]] == 0) {
-
-            this.defaultParts = []
-            this.extraParts = [carryPart, movePart]
-            this.maxParts = 2
-
-        } else {
+        if (energyCapacity >= 550) {
 
             this.defaultParts = []
             this.extraParts = [workPart, movePart, carryPart, movePart]
             this.maxParts = 20
+
+        } else {
+
+            this.defaultParts = []
+            this.extraParts = [carryPart, movePart]
+            this.maxParts = 2
         }
     }
 
@@ -295,7 +295,7 @@ function roleOpts(room, spawns, specialStructures) {
 
             // For every x stored energy add y parts
 
-            let bodySize = Math.min(Math.floor(room.get("storedEnergy") / 15000) * 6, 6)
+            let bodySize = Math.min(Math.floor(room.get("storedEnergy") / 25000) * 6, 6)
 
             this.defaultParts = []
             this.extraParts = [workPart, workPart, movePart, workPart, carryPart, movePart]
