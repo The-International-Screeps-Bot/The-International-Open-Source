@@ -212,9 +212,9 @@ function roleOpts(room, spawns, specialStructures) {
 
         if (storage) {
 
-            // For every 10,000 energy in storage add 3 parts
+            // For every x stored energy add y parts
 
-            let bodySize = Math.floor(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000) * 3 + 1
+            let bodySize = Math.min(Math.floor(room.get("storedEnergy") / 15000) * 3 + 1, 4)
 
             this.defaultParts = [carryPart]
             this.extraParts = [workPart, workPart, movePart]
@@ -265,9 +265,9 @@ function roleOpts(room, spawns, specialStructures) {
 
         if (storage) {
 
-            // For every 10,000 energy in storage add 3 parts
+            // For every x stored energy add y parts
 
-            let bodySize = Math.floor(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000) * 3
+            let bodySize = Math.min(Math.floor(room.get("storedEnergy") / 15000) * 3, 3)
 
             this.defaultParts = []
             this.extraParts = [workPart, carryPart, movePart]
@@ -293,9 +293,9 @@ function roleOpts(room, spawns, specialStructures) {
 
         if (storage) {
 
-            // For every 10,000 energy in storage add 3 parts
+            // For every x stored energy add y parts
 
-            let bodySize = Math.floor(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000) * 6
+            let bodySize = Math.min(Math.floor(room.get("storedEnergy") / 15000) * 6, 6)
 
             this.defaultParts = []
             this.extraParts = [workPart, workPart, movePart, workPart, carryPart, movePart]
