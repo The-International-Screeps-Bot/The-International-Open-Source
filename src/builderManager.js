@@ -8,12 +8,13 @@ function builderManager(room, creepsWithRole) {
 
     function findBuildableSites(mySites) {
 
+        let cm = new PathFinder.CostMatrix
+
         let myCreeps = room.find(FIND_MY_CREEPS)
-        let myCreepPositions = []
 
         for (let creep of myCreeps) {
 
-            myCreepPositions.push(creep.pos)
+            cm.set(creep.pos.x, creep.pos.y, 255)
         }
 
         let buildableSites = []
@@ -22,7 +23,7 @@ function builderManager(room, creepsWithRole) {
 
             if (site.structureType == STRUCTURE_CONTAINER || site.structureType == STRUCTURE_ROAD || site.structureType == STRUCTURE_RAMPART) buildableSites.push(site)
 
-            if (myCreepPositions.includes(site.pos)) continue
+            if (cm.get(site.pos.x, site.pos.y) == 255) continue
 
             buildableSites.push(site)
         }
