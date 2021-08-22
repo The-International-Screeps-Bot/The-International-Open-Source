@@ -2,6 +2,8 @@ let roomVariables = require("roomVariables")
 
 Creep.prototype.signWithMessage = function() {
 
+    creep = this
+
     let signType = Math.floor(Math.random(signMessages.length - 1) * 10)
 
     creep.signController(creep.room.get("controller"), signMessages[signType])
@@ -417,7 +419,7 @@ Creep.prototype.avoidHostiles = function() {
 
     let hostile = creep.pos.findClosestByRange(hostiles)
 
-    if (creep.pos.getRangeTo(hostile) <= 5) {
+    if (creep.pos.getRangeTo(hostile) <= 4) {
 
         creep.say("H! R")
 

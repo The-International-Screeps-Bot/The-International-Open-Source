@@ -261,6 +261,26 @@ function roleOpts(room, spawns, specialStructures) {
         memoryAdditions: {}
     })
 
+    function BuilderBody() {
+
+        if (storage) {
+
+            // For every 10,000 energy in storage add 3 parts
+
+            let bodySize = Math.floor(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000) * 3 + 1
+
+            this.defaultParts = []
+            this.extraParts = [workPart, carryPart, movePart]
+            this.maxParts = Math.min(bodySize, 24)
+
+        } else {
+
+            this.defaultParts = []
+            this.extraParts = [workPart, movePart, carryPart, movePart]
+            this.maxParts = 24
+        }
+    }
+
     roleOpts["builder"] = roleValues({
         role: "builder",
         parts: {
