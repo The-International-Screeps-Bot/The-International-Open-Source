@@ -381,9 +381,9 @@ function spawnRequests(room, spawns, specialStructures) {
 
                 minCreeps["reserver"] += 1
 
-                minCreeps["remoteHarvester1"] += 2
+                minCreeps["remoteHarvester1"] += 1
 
-                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 2
+                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 1
 
                 minCreeps["remoteHauler"] += remoteRoom.sources * 2
 
