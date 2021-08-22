@@ -99,18 +99,7 @@ module.exports = {
                         creep.signController(controller, "A commune of The Internationale. Bourgeoisie not welcome here.")
                     } else {
 
-                        let messages = [
-                            "The top 1% have more money than the poorest 4.5 billion",
-                            "McDonalds workers in the US make $10/hour. In Denmark, as a result of unions, they make $22/hour",
-                            "We have democracy in our policial system, why do we not have it in our companies?",
-                            "Workers of the world, unite!",
-                            "Real democracy requires democracy in the workplace - Richard Wolff",
-                            "Adults spend a combined 13 years of their life under a dictatorship: the workplace",
-                        ]
-
-                        let signType = Math.floor(Math.random(messages.length) * 10) - 1
-
-                        creep.signController(controller, messages[signType])
+                        creep.signWithMessage()
                     }
                 } else {
 

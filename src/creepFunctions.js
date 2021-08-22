@@ -1,5 +1,11 @@
 let roomVariables = require("roomVariables")
 
+Creep.prototype.signWithMessage = function() {
+
+    let signType = Math.floor(Math.random(signMessages.length - 1) * 10)
+
+    creep.signController(controller, signMessages[signType])
+}
 
 Creep.prototype.isEdge = function() {
 
