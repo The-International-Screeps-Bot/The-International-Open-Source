@@ -41,7 +41,7 @@ function roleOpts(room, spawns, specialStructures) {
 
     function findSpawningStructures() {
 
-        const anchorPoint = room.memory.anchorPoint
+        const anchorPoint = room.get("anchorPoint")
         if (!anchorPoint) return
 
         // Get array of spawningStructures
@@ -53,11 +53,10 @@ function roleOpts(room, spawns, specialStructures) {
         // Add each spawnStructures with their range to the object
 
         let spawnStructuresWithRanges = {}
-        let startPos = new RoomPosition(anchorPoint.x, anchorPoint.y + 3, anchorPoint.roomName)
 
         for (let spawnStructure of spawnStructures) {
 
-            spawnStructuresWithRanges[spawnStructure.id] = startPos.getRangeTo(spawnStructure)
+            spawnStructuresWithRanges[spawnStructure.id] = anchorPoint.getRangeTo(spawnStructure)
         }
 
         let energyStructures = []

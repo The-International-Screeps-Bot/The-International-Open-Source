@@ -42,24 +42,45 @@ module.exports = {
 
                         if (essentialStructure) {
 
-                            creep.room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
+                            essentialStructuresTransfer(essentialStructure)
 
-                            if (creep.advancedTransfer(essentialStructure) == 0) {
+                            function essentialStructuresTransfer(essentialStructure) {
 
-                                let structureToMoveTo = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                                    filter: (s) => (s.structureType == STRUCTURE_EXTENSION ||
-                                            s.structureType == STRUCTURE_SPAWN ||
-                                            s.structureType == STRUCTURE_TOWER && s.energy < 710) &&
-                                        s.energy < s.energyCapacity && s.id != essentialStructure.id
-                                })
+                                let storage = creep.room.get("storage")
 
-                                if (structureToMoveTo) {
+                                room.visual.text("☀️", essentialStructure.pos.x, essentialStructure.pos.y + 0.25, { align: 'center' })
 
-                                    if (structureToMoveTo.pos.getRangeTo(creep) > 1) {
+                                if (creep.advancedTransfer(essentialStructure) == 0) {
+
+                                    essentialStructuresAlt = room.find(FIND_MY_STRUCTURES, {
+                                        filter: s => (s.structureType == STRUCTURE_EXTENSION ||
+                                                s.structureType == STRUCTURE_SPAWN ||
+                                                s.structureType == STRUCTURE_TOWER && s.store.getUsedCapacity() < 710) &&
+                                            s.store.getUsedCapacity() < s.store.getCapacity() && s.id != essentialStructure.id
+                                    })
+
+                                    let essentialStructureAlt = creep.pos.findClosestByRange(essentialStructuresAlt)
+
+                                    if (essentialStructuresAlt.length > 0 && creep.store[RESOURCE_ENERGY] > essentialStructureAlt.store.getFreeCapacity()) {
+
+                                        if (creep.pos.getRangeTo(essentialStructureAlt) > 1) {
+
+                                            creep.advancedPathing({
+                                                origin: creep.pos,
+                                                goal: { pos: essentialStructureAlt.pos, range: 1 },
+                                                plainCost: false,
+                                                swampCost: false,
+                                                defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                                avoidStages: [],
+                                                flee: false,
+                                                cacheAmount: 10,
+                                            })
+                                        }
+                                    } else if (storage && storage.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
 
                                         creep.advancedPathing({
                                             origin: creep.pos,
-                                            goal: { pos: structureToMoveTo.pos, range: 1 },
+                                            goal: { pos: storage.pos, range: 1 },
                                             plainCost: false,
                                             swampCost: false,
                                             defaultCostMatrix: creep.memory.defaultCostMatrix,
@@ -71,9 +92,12 @@ module.exports = {
                                 }
                             }
                         } else {
-                            let controllerContainer = Game.getObjectById(creep.room.memory.controllerContainer)
 
-                            if (controllerContainer != null && controllerContainer.store[RESOURCE_ENERGY] <= 1000) {
+                            let controllerContainer = creep.room.get("controllerContainer")
+
+                            if (controllerContainer && controllerContainer.store[RESOURCE_ENERGY] <= creep.store.getUsedCapacity()) {
+
+                                creep.say("CC")
 
                                 creep.advancedTransfer(controllerContainer)
 

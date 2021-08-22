@@ -53,11 +53,13 @@ Creep.prototype.repairRamparts = function(target) {
 
         if (creep.store.getUsedCapacity() == 0) {
 
-            if (creep.room.get("anchorPoint")) {
+            let anchorPoint = creep.room.get("anchorPoint")
+
+            if (anchorPoint) {
 
                 creep.advancedPathing({
                     origin: creep.pos,
-                    goal: { pos: creep.room.get("anchorPoint"), range: 1 },
+                    goal: { pos: anchorPoint, range: 1 },
                     plainCost: false,
                     swampCost: false,
                     defaultCostMatrix: creep.memory.defaultCostMatrix,

@@ -92,7 +92,7 @@ Room.prototype.get = function(roomVar, cache) {
     // CostMatrixes
 
     // Other
-    roomVars.anchorPoint = room.memory.anchorPoint
+    roomVars.anchorPoint = room.memory.anchorPoint ? new RoomPosition(room.memory.anchorPoint.x, room.memory.anchorPoint.y, room.memory.anchorPoint.roomName) : false
     roomVars.storedEnergy = storedEnergy()
 
     roomVars.source1HarvestPositions = findHarvestPositions("source1")

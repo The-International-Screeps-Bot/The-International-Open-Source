@@ -37,11 +37,30 @@ module.exports = {
             filter: s => s.structureType == STRUCTURE_POWER_SPAWN
         })[0]
 
+        const anchorPoint = creep.room.get("anchorPoint")
+
         creep.isFull()
 
         let task = creep.memory.task
 
-        if (task == "deliverFromStorage" && (storage || terminal)) {
+        if (!task && anchorPoint) {
+
+            creep.say("AP")
+
+            if (creep.pos.getRangeTo(anchorPoint) > 1) {
+
+                creep.advancedPathing({
+                    origin: creep.pos,
+                    goal: { pos: anchorPoint, range: 1 },
+                    plainCost: false,
+                    swampCost: false,
+                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                    avoidStages: [],
+                    flee: false,
+                    cacheAmount: 10,
+                })
+            }
+        } else if (task == "deliverFromStorage" && (storage || terminal)) {
 
             if ((storage && storage.store[RESOURCE_ENERGY] < creep.store.getCapacity()) && (terminal && terminal.store[RESOURCE_ENERGY] < creep.store.getCapacity())) creep.memory.task = undefined
 
@@ -254,8 +273,6 @@ module.exports = {
 
             let mineralType = creep.room.find(FIND_MINERALS)[0].mineralType
 
-
-
             if (creep.memory.isFull == false) {
 
                 creep.advancedWithdraw(mineralContainer, mineralType)
@@ -321,7 +338,7 @@ module.exports = {
                     creep.memory.task = undefined
                 }
             }
-        } else if ((!task || task == "deliverToStorage") && storage) {
+        } else if (task == "deliverToStorage" && storage) {
 
             creep.say("DTS")
 
@@ -408,29 +425,8 @@ module.exports = {
 
                 creep.memory.task = undefined
             }
-        } else {
-
-            let anchorPoint = room.get("anchorPoint")
-
-            if (anchorPoint) {
-
-                creep.say("AIR")
-
-                if (creep.pos.getRangeTo(anchorPoint) > 3) {
-
-                    creep.advancedPathing({
-                        origin: creep.pos,
-                        goal: { pos: anchorPoint, range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: creep.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 10,
-                    })
-                }
-            }
         }
+
 
         function essentialStructuresTransfer(essentialStructure) {
 

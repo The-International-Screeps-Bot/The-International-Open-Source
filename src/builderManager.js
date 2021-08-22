@@ -54,7 +54,7 @@ function builderManager(room, creepsWithRole) {
 
         } else {
 
-            targetSite = room.memory.targetSite = new RoomPosition(anchorPoint.x, anchorPoint.y, anchorPoint.roomName).findClosestByRange(mySites)
+            targetSite = room.memory.targetSite = anchorPoint.findClosestByRange(mySites)
             room.memory.targetSite = targetSite.id
         }
     }
