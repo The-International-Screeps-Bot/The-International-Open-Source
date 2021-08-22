@@ -196,7 +196,7 @@ module.exports = {
 
                             var newCommune
 
-                            if (creep.room.get("sources").length == 2 && creep.room.memory.claim != true && creep.room.memory.claim != "notViable" && creep.room.memory.stage >= "remoteRoom" && creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10) {
+                            if (Game.gcl.level > Memory.global.communes.length && creep.room.get("sources").length == 2 && creep.room.memory.claim != true && creep.room.memory.claim != "notViable" && creep.room.memory.stage != "remoteRoom" && creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10) {
 
                                 if (creep.isEdge()) {
 

@@ -60,7 +60,7 @@ function globalManager() {
 
     // New commune logic
 
-    if (Game.gcl.level > Memory.global.communes.length && Memory.global.newCommunes.length > 0) {
+    if (Memory.global.newCommunes && Memory.global.newCommunes.length > 0) {
 
         const newCommune = Memory.global.newCommunes[0]
 
@@ -81,7 +81,7 @@ function globalManager() {
 
                         room = Game.rooms[roomName]
 
-                        if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.memory.stage >= 3 && room.memory.anchorPoint) {
+                        if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.memory.stage >= 4 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000 && room.memory.anchorPoint) {
 
                             let distance = room.findSafeDistance(room.memory.anchorPoint, { pos: new RoomPosition(25, 25, newCommune), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
 
