@@ -54,23 +54,21 @@ module.exports = {
                 } else {
 
                     let hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
-                        filter: (c) => {
-                            return (allyList.indexOf(c.owner.username) === -1)
-                        }
+                        filter: hostileStructure => !allyList.includes(hostileStructure.owner.username)
                     })
 
                     if (hostileStructure) {
 
                         creep.say("HS")
 
-                        if (creep.pos.getRangeTo(hostile) == 1) {
+                        if (creep.pos.getRangeTo(hostileStructure) == 1) {
 
-                            creep.attack(hostile)
+                            creep.attack(hostileStructure)
                             creep.rangedMassAttack()
 
                         } else {
 
-                            creep.rangedAttack(hostile)
+                            creep.rangedAttack(hostileStructure)
 
                             creep.advancedPathing({
                                 origin: creep.pos,
