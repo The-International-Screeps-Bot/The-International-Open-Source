@@ -49,6 +49,25 @@ Creep.prototype.withdrawStoredResource = function(minAmount, withdrawAmount, res
     return -100
 }
 
+Creep.moveToNextTarget = function(state, target, range) {
+
+    if (!state) return false
+
+    if (creep.pos.getRangeTo != range) {
+
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: target, range: 1 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: creep.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 10,
+        })
+    }
+}
+
 Creep.prototype.findRampartToRepair = function(ramparts) {
 
     let creep = this
