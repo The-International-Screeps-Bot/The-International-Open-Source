@@ -23,46 +23,31 @@ function rampartUpgraderManager(room, creepsWithRole) {
 
         } else {
 
+            let storage = room.get("storage")
             let terminal = room.get("terminal")
 
-            if (terminal && terminal.store[RESOURCE_ENERGY] >= 80000) {
+            if (storage || terminal) {
 
-                creep.say("T")
-
-                creep.advancedWithdraw(terminal)
-
+                console.log(creep.withdrawStoredResource(10000))
             } else {
 
-                let storage = room.get("storage")
+                let container = creep.searchSourceContainers()
 
-                if (storage) {
-                    if (storage.store[RESOURCE_ENERGY] >= 30000) {
+                if (container) {
 
-                        creep.say("S")
+                    creep.say("SC")
 
-                        creep.advancedWithdraw(storage)
+                    creep.advancedWithdraw(container)
 
-                    }
                 } else {
 
-                    let container = creep.searchSourceContainers()
+                    let droppedEnergy = creep.findDroppedEnergyOfAmount(creep.store.getFreeCapacity())
 
-                    if (container) {
+                    if (droppedEnergy) {
 
-                        creep.say("SC")
+                        creep.say("💡")
 
-                        creep.advancedWithdraw(container)
-
-                    } else {
-
-                        let droppedEnergy = creep.findDroppedEnergyOfAmount(creep.store.getFreeCapacity())
-
-                        if (droppedEnergy) {
-
-                            creep.say("💡")
-
-                            creep.pickupDroppedEnergy(droppedEnergy)
-                        }
+                        creep.pickupDroppedEnergy(droppedEnergy)
                     }
                 }
             }

@@ -16,6 +16,39 @@ Creep.prototype.isEdge = function() {
     return false
 }
 
+Creep.prototype.withdrawStoredResource = function(minAmount, withdrawAmount, resource) {
+
+    creep = this
+
+    let storedEnergy = creep.room.get("storedEnergy")
+    let storage = creep.room.get("storage")
+    let terminal = creep.room.get("terminal")
+
+    if (storedEnergy < minAmount || (!storage && !terminal)) return false
+
+    if (!resource) resource = RESOURCE_ENERGY
+
+    function targetWithdrawAmount(target) {
+
+        if (withdrawAmount) return
+
+        return Math.min(creep.store.getFreeCapacity(), storage.store.getUsedCapacity(resource))
+    }
+
+    if (storage && storage.store.getUsedCapacity(resource) >= targetWithdrawAmount(storage)) {
+
+        creep.say("S")
+        return creep.advancedWithdraw(storage, resource, targetWithdrawAmount(storage))
+
+    } else if (terminal && terminal.store.getUsedCapacity(resource) >= targetWithdrawAmount(terminal)) {
+
+        creep.say("T")
+        return creep.advancedWithdraw(terminal, resource, targetWithdrawAmount(terminal))
+    }
+
+    return -100
+}
+
 Creep.prototype.findRampartToRepair = function(ramparts) {
 
     let creep = this
@@ -251,8 +284,7 @@ Creep.prototype.advancedWithdraw = function(target, resource, amount) {
 
     if (creep.pos.getRangeTo(target) <= 1) {
 
-        creep.withdraw(target, resource, amount)
-        return 0
+        return creep.withdraw(target, resource, amount)
 
     } else {
 
@@ -281,8 +313,7 @@ Creep.prototype.advancedTransfer = function(target, resource) {
 
     if (creep.pos.getRangeTo(target) <= 1) {
 
-        creep.transfer(target, resource)
-        return 0
+        return creep.transfer(target, resource)
 
     } else {
 
