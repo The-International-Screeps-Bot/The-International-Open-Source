@@ -375,7 +375,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
                 if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 1
 
-                minCreeps["remoteHauler"] += Math.floor(remoteRoom.sources * 1.5)
+                minCreeps["remoteHauler"] += 2
 
             } else if (energyCapacity >= 800) {
 
@@ -482,7 +482,7 @@ function spawnRequests(room, spawns, specialStructures) {
 
             if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 1
 
-            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = Math.floor(remoteRoom.sources * 1.5)
+            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = 2
 
         } else if (energyCapacity >= 800) {
 
