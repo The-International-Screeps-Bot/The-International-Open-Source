@@ -45,7 +45,7 @@ Creep.prototype.findRampartToRepair = function(ramparts) {
     if (creep.target) return true
 }
 
-Creep.prototype.repairRamparts = function(target) {
+Creep.prototype.repairRamparts = function(target, ramparts) {
 
     if (!target) return
 
@@ -81,7 +81,7 @@ Creep.prototype.repairRamparts = function(target) {
 
         if (target.hits > creep.memory.quota + creep.findParts("work") * 900) {
 
-            if (creep.findRampartToRepair(removePropertyFromArray(creep.room.get("myRamparts"), target))) {
+            if (creep.findRampartToRepair(removePropertyFromArray(ramparts, target))) {
 
                 if (creep.pos.getRangeTo(creep.target) > 3) {
 

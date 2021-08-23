@@ -141,8 +141,6 @@ function roleOpts(room, spawns, specialStructures) {
         }
     }
 
-    console.log(new JumpStarterBody())
-
     roleOpts["jumpStarter"] = roleValues({
         role: "jumpStarter",
         parts: { 300: new JumpStarterBody() },
