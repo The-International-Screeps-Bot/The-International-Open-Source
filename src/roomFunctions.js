@@ -93,7 +93,7 @@ Room.prototype.get = function(roomVar, cache) {
 
     // Other
     roomVars.anchorPoint = room.memory.anchorPoint ? new RoomPosition(room.memory.anchorPoint.x, room.memory.anchorPoint.y, room.memory.anchorPoint.roomName) : false
-    roomVars.storedEnergy = storedEnergy()
+    roomVars.storedEnergy = findStoredEnergy()
 
     roomVars.source1HarvestPositions = findHarvestPositions("source1")
     roomVars.source2HarvestPositions = findHarvestPositions("source2")
@@ -292,13 +292,13 @@ Room.prototype.get = function(roomVar, cache) {
         return cache[desiredObject]
     }
 
-    function storedEnergy() {
+    function findStoredEnergy() {
 
         let storedEnergy = 0
 
-        if (roomVars.storage) storedEnergy += roomVars.storage.store[RESOURCE_ENERGY]
+        if (roomVars.storage) storedEnergy += roomVars.storage.store.getUsedCapacity(RESOURCE_ENERGY)
 
-        if (roomVars.terminal) storedEnergy += roomVars.terminal.store[RESOURCE_ENERGY]
+        if (roomVars.terminal) storedEnergy += roomVars.terminal.store.getUsedCapacity(RESOURCE_ENERGY)
 
         return storedEnergy
     }
@@ -373,11 +373,11 @@ Room.prototype.findTowerDamage = function(towers, hostile) {
     if (hostile.hasBoost(TOUGH, "GHO2")) totalDamage -= totalDamage * 0.5
     if (hostile.hasBoost(TOUGH, "XGHO2")) totalDamage -= totalDamage * 0.7
 
-    room.visual.text(totalDamage, hostile.pos.x, hostile.pos.y + 0.25, { align: 'center', color: colors.communeGreen, font: "0.7" })
+    room.visual.text(totalDamage, hostile.pos.x, hostile.pos.y + 0.25, { align: 'center', color: colors.allyBlue, font: "0.7" })
 
     return totalDamage
 }
-Room.prototype.findHealPower = function(pos, creeps) {
+Room.prototype.findHealPower = function(hostile, creeps) {
 
     room = this
 
@@ -385,7 +385,7 @@ Room.prototype.findHealPower = function(pos, creeps) {
 
     for (let creep of creeps) {
 
-        if (creep.pos.getRangeTo(pos) == 1) {
+        if (creep.pos.getRangeTo(hostile.pos) <= 1) {
 
             healPower += creep.findParts("heal") * HEAL_POWER
 
@@ -395,7 +395,7 @@ Room.prototype.findHealPower = function(pos, creeps) {
         }
     }
 
-    room.visual.text(healPower, pos.x, pos.y + 0.25, { align: 'center', color: colors.allyBlue, font: "0.7" })
+    room.visual.text(healPower, hostile.pos.x, hostile.pos.y + 0.75, { align: 'center', color: colors.communeGreen, font: "0.7" })
 
     return healPower
 }

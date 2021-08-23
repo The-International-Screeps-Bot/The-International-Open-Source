@@ -1,6 +1,6 @@
 Room.prototype.attackHostiles = function(towers) {
 
-    let room = this
+    room = this
 
     let target
 
@@ -24,7 +24,7 @@ Room.prototype.attackHostiles = function(towers) {
 
                 for (let hostile of hostiles) {
 
-                    if (room.findTowerDamage(towers, hostile) - room.findHealPower(hostile.pos, enemyHealers) >= minDamage) return hostile
+                    if (room.findTowerDamage(towers, hostile) - room.findHealPower(hostile, enemyHealers) >= minDamage) return hostile
                 }
             }
         }

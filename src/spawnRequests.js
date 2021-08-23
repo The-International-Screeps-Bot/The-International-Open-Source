@@ -285,14 +285,15 @@ function spawnRequests(room, spawns, specialStructures) {
             if (storage.store[RESOURCE_ENERGY] >= 200000) {
 
                 minCreeps["rampartUpgrader"] = 3
+
             } else if (storage.store[RESOURCE_ENERGY] >= 30000) {
 
                 minCreeps["rampartUpgrader"] = 1
             }
 
-            if (hostiles.length > 0 && ((storage && storage.store[RESOURCE_ENERGY] >= 60000) || (terminal && terminal.store[RESOURCE_ENERGY] >= 80000))) {
+            if (hostiles.length > 0 && ((storage && storage.store[RESOURCE_ENERGY] >= 30000) || (terminal && terminal.store[RESOURCE_ENERGY] >= 30000)) && creepsOfRole[["meleeDefender", room.name]] > 0) {
 
-                minCreeps["rampartUpgrader"] += 1
+                minCreeps["rampartUpgrader"] += 2
             }
         }
     }
@@ -480,7 +481,6 @@ function spawnRequests(room, spawns, specialStructures) {
             minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 1
 
             if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 1
-
 
             minRemoteCreeps[["remoteHauler", remoteRoom.name]] = Math.floor(remoteRoom.sources * 1.5)
 

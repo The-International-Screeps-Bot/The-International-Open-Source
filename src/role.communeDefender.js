@@ -147,6 +147,14 @@ module.exports = {
 
                             creep.say("OR")
 
+                            let rampart = hostile.pos.findClosestByRange(openRamparts)
+
+                            let goal = _.map([rampart], function(target) {
+                                return { pos: target.pos, range: 0 }
+                            })
+
+                            creep.rampartPathing(creep.pos, goal)
+
                             if (creep.pos.getRangeTo(hostile) == 1) {
 
                                 creep.attack(hostile)
@@ -155,14 +163,6 @@ module.exports = {
                             } else {
 
                                 creep.rangedAttack(hostile)
-
-                                let rampart = hostile.pos.findClosestByRange(openRamparts)
-
-                                creep.rampartPathing(creep.pos, goal)
-
-                                let goal = _.map([rampart], function(target) {
-                                    return { pos: target.pos, range: 0 }
-                                })
                             }
                         }
                     } else {
