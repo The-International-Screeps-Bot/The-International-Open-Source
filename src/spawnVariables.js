@@ -77,6 +77,23 @@ function roleOpts(room, spawns, specialStructures) {
 
     // Asign variables needed for creating roleValues
 
+    if (room.memory.stage && room.memory.stage < 3) {
+
+        var hostiles = room.find(FIND_HOSTILE_CREEPS, {
+            filter: (c) => {
+                return (allyList.indexOf(c.owner.username) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+            }
+        })
+
+    } else {
+
+        var hostiles = room.find(FIND_HOSTILE_CREEPS, {
+            filter: (c) => {
+                return (allyList.indexOf(c.owner.username) === -1 && c.owner.username != "Invader" && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+            }
+        })
+    }
+
     let energyAvailable = room.energyAvailable
     let energyCapacity = room.energyCapacityAvailable
 
@@ -217,7 +234,9 @@ function roleOpts(room, spawns, specialStructures) {
 
             // For every x stored energy add y parts
 
-            let bodySize = Math.max(Math.floor(room.get("storedEnergy") / 15000) * 3 + 1, 4)
+            let storedEnergyReducer = 15000
+
+            let bodySize = Math.max(Math.floor(room.get("storedEnergy") / storedEnergyReducer) * 3 + 1, 4)
 
             this.defaultParts = [carryPart]
             this.extraParts = [workPart, workPart, movePart]
@@ -270,7 +289,9 @@ function roleOpts(room, spawns, specialStructures) {
 
             // For every x stored energy add y parts
 
-            let bodySize = Math.max(Math.floor(room.get("storedEnergy") / 15000) * 3, 3)
+            let storedEnergyReducer = 15000
+
+            let bodySize = Math.max(Math.floor(room.get("storedEnergy") / storedEnergyReducer) * 3, 3)
 
             this.defaultParts = []
             this.extraParts = [workPart, carryPart, movePart]
@@ -298,7 +319,14 @@ function roleOpts(room, spawns, specialStructures) {
 
             // For every x stored energy add y parts
 
-            let bodySize = Math.max(Math.floor(room.get("storedEnergy") / 25000) * 6, 6)
+            let storedEnergyReducer = 25000
+
+            if (hostiles.length > 0 && room.get("storedEnergy") > 10000 && creepsOfRole[["meleeDefender", room.name]] > 0) {
+
+                storedEnergyReducer = 10000
+            }
+
+            let bodySize = Math.max(Math.floor(room.get("storedEnergy") / storedEnergyReducer) * 6, 6)
 
             this.defaultParts = []
             this.extraParts = [workPart, workPart, movePart, workPart, carryPart, movePart]

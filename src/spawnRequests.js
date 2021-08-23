@@ -295,7 +295,7 @@ function spawnRequests(room, spawns, specialStructures) {
                 minCreeps["rampartUpgrader"] = 1
             }
 
-            if (hostiles.length > 0 && ((storage && storage.store[RESOURCE_ENERGY] >= 30000) || (terminal && terminal.store[RESOURCE_ENERGY] >= 30000)) && creepsOfRole[["meleeDefender", room.name]] > 0) {
+            if (hostiles.length > 0 && room.get("storedEnergy") > 10000 && creepsOfRole[["meleeDefender", room.name]] > 0) {
 
                 minCreeps["rampartUpgrader"] += 2
             }
