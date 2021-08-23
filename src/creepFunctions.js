@@ -614,6 +614,13 @@ Creep.prototype.advancedPathing = function(opts) {
                     cm.set(road.pos.x, road.pos.y, 1)
                 }
 
+                // Set sorrounding area of hostileCreeps to unwalkable if position does not have a rampart
+
+                for (let hostile of room.get("hostileCreeps")) {
+
+                    cm.set(hostile.pos.x, hostile.pos.y, 255)
+                }
+
                 let sites = room.find(FIND_CONSTRUCTION_SITES, {
                     filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                 })

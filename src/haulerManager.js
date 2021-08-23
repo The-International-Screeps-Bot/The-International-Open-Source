@@ -13,6 +13,8 @@ function haulerManager(room, creepsWithRole) {
     for (let creep of creepsWithRole) {
 
         const task = creep.memory.task
+
+
     }
 }
 

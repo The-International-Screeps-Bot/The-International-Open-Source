@@ -408,8 +408,8 @@ function roleOpts(room, spawns, specialStructures) {
         parts: {
             300: {
                 defaultParts: [],
-                extraParts: [attackPart, movePart, attackPart, movePart, attackPart, movePart, rangedAttackPart, movePart, rangedAttackPart, movePart],
-                maxParts: 20
+                extraParts: [attackPart, movePart, attackPart, movePart, rangedAttackPart, movePart],
+                maxParts: 24
             },
         },
         memoryAdditions: {}

@@ -246,50 +246,51 @@ Room.prototype.get = function(roomVar, cache) {
         return cache[desiredObject]
     }
 
-    function findHarvestPositions(source, desiredObject) {
+    function findHarvestPositions(desiredObject) {
 
-        if (room.memory[desiredObject]) return room.memory[desiredObject]
+        if (room.memory.harvestPositions && room.memory.harvestPositions[desiredObject]) return room.memory.harvestPositions[desiredObject]
 
         let cache = {}
 
-        source = roomVars[source]
+        cache.harvestPositions = {}
 
-        if (!source) return false
+        let sources = { source1: roomVars.source1, source2: roomVars.source2 }
 
-        let harvestPositions = {
-            [source]: {
-                closest: undefined,
-                positions: []
+        for (let sourceName in sources) {
+
+            cache.harvestPositions[sourceName] = { closest: undefined, positions: [] }
+
+            let source = sources[sourceName]
+
+            let top = source.pos.y - 1
+            let left = source.pos.x - 1
+            let bottom = source.pos.y + 1
+            let right = source.pos.x + 1
+
+            let area = room.lookAtArea(top, left, bottom, right, true)
+
+            for (let square of area) {
+
+                let pos = new RoomPosition(square.x, square.y, room.name)
+                let type = square.type
+                let terrain = square.terrain
+
+                if (type != "terrain" || terrain == "wall") continue
+
+                cache.harvestPositions[sourceName].positions.push(pos)
             }
+
+            if (!roomVars.anchorPoint) return false
+
+            cache.harvestPositions[sourceName].closest = roomVars.anchorPoint.findClosestByPath(cache.harvestPositions[sourceName].positions)
         }
-
-        let top = source.pos.y - 1
-        let left = source.pos.x - 1
-        let bottom = source.pos.y + 1
-        let right = source.pos.x + 1
-
-        let area = room.lookAtArea(top, left, bottom, right, true)
-
-        for (let square of area) {
-
-            let pos = { x: square.x, y: square.y }
-            let type = square.type
-
-            if (type.terrain && type.terrain == "wall") continue
-
-            harvestPositions[source].positions.push(pos)
-        }
-
-        if (!roomVars.anchorPoint) return false
-
-        harvestPositions[source].closest = new RoomPosition(roomVars.anchorPoint.x, roomVars.anchorPoint.y, roomVars.anchorPoint.roomName).findClosestByPath(harvestPositions)
 
         for (let object in cache) {
 
             room.memory[object] = cache[object]
         }
 
-        return cache[desiredObject]
+        return cache.harvestPositions[desiredObject]
     }
 
     function findStoredEnergy() {

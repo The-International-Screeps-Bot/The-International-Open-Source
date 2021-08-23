@@ -144,6 +144,12 @@ function roomManager() {
 
             //
 
+            console.log(JSON.stringify(room.get("source1HarvestPositions")))
+
+            room.visual.text("hi", room.get("source1HarvestPositions").closest, {})
+
+            //
+
             if (!room.memory.deposits) room.memory.deposits = {}
 
             for (let depositId in room.memory.deposits) {
