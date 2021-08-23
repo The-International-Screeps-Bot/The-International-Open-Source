@@ -261,6 +261,7 @@ Room.prototype.get = function(roomVar, cache) {
             cache.harvestPositions[sourceName] = { closest: undefined, positions: [] }
 
             let source = sources[sourceName]
+            if (!source) continue
 
             let top = source.pos.y - 1
             let left = source.pos.x - 1

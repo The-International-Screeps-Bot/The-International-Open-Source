@@ -169,6 +169,11 @@ function roleOpts(room, spawns, specialStructures) {
         memoryAdditions: {}
     })
 
+    function HarvesterBody() {
+
+
+    }
+
     roleOpts["harvester"] = roleValues({
         role: "harvester",
         parts: {

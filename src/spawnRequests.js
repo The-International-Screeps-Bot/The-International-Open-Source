@@ -116,9 +116,12 @@ function spawnRequests(room, spawns, specialStructures) {
 
     }
 
+    let controller = room.get("controller")
     let storage = room.get("storage")
-
     let terminal = room.get("terminal")
+
+    let source1HarvestPositionsAmount = room.get("source1HarvestPositions").positions.length
+    let source2HarvestPositionsAmount = room.get("source2HarvestPositions").positions.length
 
     // Define min creeps for each role
 
@@ -189,7 +192,8 @@ function spawnRequests(room, spawns, specialStructures) {
 
         if (creepsOfRole[["hauler", room.name]] >= minCreeps["hauler"]) {
 
-            minCreeps["harvester"] = 4
+            minCreeps["harvester"] = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2)
+
         } else {
 
             minCreeps["harvester"] = 2
