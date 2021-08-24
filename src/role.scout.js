@@ -220,7 +220,7 @@ module.exports = {
 
                                     let roomName = exits[property]
 
-                                    if (Memory.rooms[roomName].owner && (Memory.rooms[roomName].owner == "slowmotionghost" || Memory.rooms[roomName].stage >= 0 || Memory.rooms[roomName].claimable == true)) nearRoom = true
+                                    if ((Memory.rooms[roomName].owner && Memory.rooms[roomName].owner == "slowmotionghost") || Memory.rooms[roomName].stage >= 0 || Memory.rooms[roomName].claimable == true) nearRoom = true
                                 }
 
                                 creep.say("N")

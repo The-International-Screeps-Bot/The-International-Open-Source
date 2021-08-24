@@ -302,6 +302,16 @@ function roomPlanner(room) {
         return false
     }
 
+    // Non bunker construction
+
+    let sourceContainer1 = room.get("sourceContainer1")
+    let sourceContainer2 = room.get("sourceContainer2")
+    let controllerContainer = room.get("controllerContainer")
+
+    let sourceLink1 = room.get("sourceLink1")
+    let sourceLink2 = room.get("sourceLink2")
+    let controllerLink = room.get("controllerLink")
+
     if (room.memory.stage >= 2) placeSourceContainers()
 
     function placeSourceContainers() {
@@ -311,11 +321,18 @@ function roomPlanner(room) {
             room.get("source2HarvestPositions")
         ]
 
+        let sourceContainers = [sourceContainer1, sourceContainer2]
+
+        let i = 0
+
         for (let harvestPositionsObject of harvestPositions) {
 
-            let closestHarvestPos = harvestPositionsObject.closest
+            i++
 
-            if (!closestHarvestPos) continue
+            let closestHarvestPos = harvestPositionsObject.closest
+            let sourceContainer = sourceContainers[i]
+
+            if (!closestHarvestPos || sourceContainer) continue
 
             if (placedSites < 10 && room.createConstructionSite(closestHarvestPos.x, closestHarvestPos.y, STRUCTURE_CONTAINER) == 0) placedSites++
         }
@@ -405,12 +422,40 @@ function roomPlanner(room) {
 
     function placeSourceLinks() {
 
-        let sources = [room.get("source1"), room.get("source2")]
+        let harvestPositions = [
+            room.get("source1HarvestPositions"),
+            room.get("source2HarvestPositions")
+        ]
 
-        for (let source of sources) {
+        let sourceLinks = [sourceLink1, sourceLink2]
 
+        let i = 0
 
+        for (let harvestPositionsObject of harvestPositions) {
+
+            i++
+
+            let closestHarvestPos = harvestPositionsObject.closest
+            let sourceLink = sourceLinks[i]
+
+            if (!closestHarvestPos || sourceLink) continue
+
+            /* if (placedSites < 10 && room.createConstructionSite(closestHarvestPos.x, closestHarvestPos.y, STRUCTURE_LINK) == 0) placedSites++ */
         }
+    }
+
+
+
+    function placeControllerLink() {
+
+
+    }
+
+    function removeUneeded() {
+
+        if (controllerContainer && controllerLink) controllerContianer.destroy()
+
+
     }
 }
 

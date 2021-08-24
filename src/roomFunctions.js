@@ -98,7 +98,9 @@ Room.prototype.get = function(roomVar, cache) {
     roomVars.source1HarvestPositions = findHarvestPositions("source1")
     roomVars.source2HarvestPositions = findHarvestPositions("source2")
 
-    //
+    roomVars.source1LinkPosition = findLinkPositions("source1")
+    roomVars.source2LinkPosition = findLinkPositions("source2")
+        //
 
     function findObjectWithOwner(constant, usernames) {
 
@@ -247,6 +249,61 @@ Room.prototype.get = function(roomVar, cache) {
     }
 
     function findHarvestPositions(desiredObject) {
+
+        if (room.memory.harvestPositions && room.memory.harvestPositions[desiredObject]) return room.memory.harvestPositions[desiredObject]
+
+        if (!roomVars.anchorPoint) return
+        if (!roomVars.source1 || !roomVars.source2) return
+
+        let cache = {}
+
+        cache.harvestPositions = {}
+
+        let sources = { source1: roomVars.source1, source2: roomVars.source2 }
+
+        for (let sourceName in sources) {
+
+            cache.harvestPositions[sourceName] = { closest: undefined, positions: [] }
+
+            let source = sources[sourceName]
+            if (!source) continue
+
+            let top = source.pos.y - 1
+            let left = source.pos.x - 1
+            let bottom = source.pos.y + 1
+            let right = source.pos.x + 1
+
+            let area = room.lookAtArea(top, left, bottom, right, true)
+
+            for (let square of area) {
+
+                let pos = new RoomPosition(square.x, square.y, room.name)
+                let type = square.type
+                let terrain = square.terrain
+
+                if (type != "terrain" || terrain == "wall") continue
+
+                cache.harvestPositions[sourceName].positions.push(pos)
+            }
+
+            cache.harvestPositions[sourceName].closest = roomVars.anchorPoint.findClosestByPath(cache.harvestPositions[sourceName].positions)
+        }
+
+        console.log("hi")
+
+        for (let object in cache) {
+
+            room.memory[object] = cache[object]
+        }
+
+        if (cache.harvestPositions[desiredObject]) return cache.harvestPositions[desiredObject]
+
+        return []
+    }
+
+    function findLinkPositions(desiredObject) {
+
+        return
 
         if (room.memory.harvestPositions && room.memory.harvestPositions[desiredObject]) return room.memory.harvestPositions[desiredObject]
 
