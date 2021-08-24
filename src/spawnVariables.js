@@ -188,42 +188,42 @@ function roleOpts(room, spawns, specialStructures) {
 
     function HarvesterBody() {
 
+        if (energyCapacity >= 10300) {
 
+            this.defaultParts = [carryPart, carryPart]
+            this.extraParts = []
+            this.maxParts = 8
+
+        } else if (energyCapacity >= 2300) {
+
+            this.defaultParts = [carryPart]
+            this.extraParts = []
+            this.maxParts = 8
+
+        } else if (energyCapacity >= 1800) {
+
+            this.defaultParts = []
+            this.extraParts = [workPart, workPart, movePart]
+            this.maxParts = 8
+
+        } else if (energyCapacity >= 550) {
+
+            this.defaultParts = [movePart]
+            this.extraParts = [workPart]
+            this.maxParts = 8
+
+        } else if (energyCapacity >= 300) {
+
+            this.defaultParts = []
+            this.extraParts = [workPart]
+            this.maxParts = 8
+        }
     }
 
     roleOpts["harvester"] = roleValues({
         role: "harvester",
         parts: {
-            10300: {
-                defaultParts: [carryPart, carryPart],
-                extraParts: [workPart, workPart, movePart],
-                maxParts: 17
-            },
-            2300: {
-                defaultParts: [carryPart],
-                extraParts: [workPart, workPart, movePart],
-                maxParts: 13
-            },
-            1800: {
-                defaultParts: [],
-                extraParts: [workPart, workPart, movePart],
-                maxParts: 12
-            },
-            800: {
-                defaultParts: [],
-                extraParts: [workPart, workPart, movePart],
-                maxParts: 12
-            },
-            550: {
-                defaultParts: [movePart],
-                extraParts: [workPart],
-                maxParts: 9
-            },
-            300: {
-                defaultParts: [],
-                extraParts: [workPart],
-                maxParts: 8
-            }
+            300: new HarvesterBody()
         },
         memoryAdditions: {}
     })
