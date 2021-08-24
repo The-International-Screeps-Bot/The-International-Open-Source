@@ -14,16 +14,6 @@ Market:
     Game.market.createOrder({type: ORDER_SELL, resourceType: PIXEL, price: 1000, totalAmount: 750, roomName: "E25N2"})
     
     //-----------------------------------------------------------------------------------------------
-
-Claim Room:
-
-    Game.spawns.Spawn1.memory.claimRoom = "W17N52"
-
-    Create New Spawner Memory:
-
-    Game.spawns.Spawn2.memory.minimumNumberOfMiners = 1
-    
-    //-----------------------------------------------------------------------------------------------
     
 Flags:
 

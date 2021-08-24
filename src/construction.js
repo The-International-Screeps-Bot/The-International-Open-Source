@@ -19,9 +19,9 @@ function construction(room, specialStructures) {
 
     if (roomConstructionSites.length < 5) {
 
-        if (Game.time % 100 == 0) source1Path()
+        /*         if (Game.time % 100 == 0) source1Path()
 
-        if (Game.time % 101 == 0) source2Path()
+                if (Game.time % 101 == 0) source2Path() */
 
         if (Game.time % 102 == 0) controllerPath()
 

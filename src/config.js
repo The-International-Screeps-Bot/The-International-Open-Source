@@ -1,3 +1,5 @@
+const { isUndefined } = require("lodash")
+
 function config() {
 
     // Eventually move this to tickConfig
@@ -50,6 +52,8 @@ function config() {
     let globalValues = {
         resourceRequests: {},
         communes: [],
+        claimableRooms: [],
+        newCommune: undefined,
     }
 
     for (let value in globalValues) {

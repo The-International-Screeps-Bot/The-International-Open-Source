@@ -196,7 +196,7 @@ module.exports = {
 
                             var newCommune
 
-                            if (Game.gcl.level > Memory.global.communes.length && creep.room.get("sources").length == 2 && creep.room.memory.claim != true && creep.room.memory.claim != "notViable" && creep.room.memory.stage != "remoteRoom" && creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10) {
+                            if (creep.room.get("sources").length == 2 && creep.room.memory.claimable != true && creep.room.memory.claimable != "notViable" && creep.room.memory.stage != "remoteRoom" && creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10) {
 
                                 if (creep.isEdge()) {
 
@@ -220,7 +220,7 @@ module.exports = {
 
                                     let roomName = exits[property]
 
-                                    if (Memory.rooms[roomName].owner && (Memory.rooms[roomName].owner == "slowmotionghost" || Memory.rooms[roomName].stage >= 0 || Memory.rooms[roomName].claim == true)) nearRoom = true
+                                    if (Memory.rooms[roomName].owner && (Memory.rooms[roomName].owner == "slowmotionghost" || Memory.rooms[roomName].stage >= 0 || Memory.rooms[roomName].claimable == true)) nearRoom = true
                                 }
 
                                 creep.say("N")
@@ -246,17 +246,17 @@ module.exports = {
 
                                         newCommune = true
 
-                                        creep.room.memory.claim = true
+                                        creep.room.memory.claimable = true
 
-                                        if (!Memory.global.newCommunes.includes(creep.room.name)) Memory.global.newCommunes.push(creep.room.name)
+                                        if (!Memory.global.claimableRooms.includes(creep.room.name)) Memory.global.claimableRooms.push(creep.room.name)
 
                                     } else {
 
-                                        creep.room.memory.claim = "notViable"
+                                        creep.room.memory.claimable = "notViable"
                                     }
                                 } else {
 
-                                    creep.room.memory.claim = "notViable"
+                                    creep.room.memory.claimable = "notViable"
                                 }
                             }
                         }

@@ -1,25 +1,19 @@
-let roomVariables = require("roomVariables")
-
 module.exports = {
     run: function(creep) {
 
-        let { specialStructures } = roomVariables(creep.room)
-
-        let baseLink = specialStructures.links.baseLink
+        let baseLink = creep.room.get("baseLink")
 
         let terminal = creep.room.terminal
 
         let storage = creep.room.storage
 
-        let factory = creep.room.find(FIND_MY_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_FACTORY
-        })[0]
+        let factory = creep.room.get("factory")
 
-        const anchorPoint = creep.room.memory.anchorPoint
+        const anchorPoint = creep.room.get("anchorPoint")
 
-        if (creep.pos.x != anchorPoint.x || creep.pos.y != anchorPoint.y) {
+        if (creep.pos.getRangeTo(anchorPoint) > 0) {
 
-            creep.say("M A")
+            creep.say("NIP")
 
             creep.advancedPathing({
                 origin: creep.pos,
@@ -47,11 +41,11 @@ module.exports = {
 
                 creep.memory.terminalWithdrawBattery = true
             }
-            if (storage && storage.store[RESOURCE_ENERGY] >= 120000 && terminal && terminal.store[RESOURCE_ENERGY] < 120000 && terminal.store.getFreeCapacity() >= creep.store.getCapacity()) {
+            if (storage && storage.store[RESOURCE_ENERGY] >= 80000 && terminal && terminal.store[RESOURCE_ENERGY] < 60000 && terminal.store.getFreeCapacity() >= creep.store.getCapacity()) {
 
                 creep.memory.storageToTerminal = true
             }
-            if (storage && storage.store[RESOURCE_ENERGY] < 10000 && terminal && terminal.store[RESOURCE_ENERGY] > storage.store[RESOURCE_ENERGY]) {
+            if (storage && storage.store[RESOURCE_ENERGY] <= 30000 && terminal && terminal.store[RESOURCE_ENERGY] > storage.store[RESOURCE_ENERGY]) {
 
                 creep.memory.terminalToStorage = true
             }

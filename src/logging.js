@@ -135,7 +135,7 @@ function logging() {
             </tr>
             <tr>
                 ` + cpuMessage() + `
-                <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
+                <th style="text-align: center; padding: 5px 0;">New Commune: ` + Memory.global.newCommmune + `</th>
                 <th style="text-align: center; padding: 5px 0;">cSites: ` + Object.keys(Game.constructionSites).length + `</th>
                 <th style="text-align: center; padding: 5px 0;">Time: ` + "x" + `</th>
                 <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Military Need: ` + "true / false" + `</th>

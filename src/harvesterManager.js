@@ -96,7 +96,7 @@ function harvesterManager(room, creepsWithRole) {
 
             // If no source container just move to source target
 
-            if (creep.advancedHarvest(source) == ERR_NOT_IN_RANGE) {
+            if (creep.advancedHarvest(source) != 0) {
 
                 creep.advancedPathing({
                     origin: creep.pos,

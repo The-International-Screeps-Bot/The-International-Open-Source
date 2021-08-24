@@ -370,10 +370,7 @@ function spawnRequests(room, spawns) {
     }
     (function() {
 
-        if (storage && storage.store[RESOURCE_ENERGY] <= 15000) {
-
-            return
-        }
+        if (room.get("storedEnergy") < 15000) return
 
         for (let remoteRoom of room.memory.remoteRooms) {
 
@@ -478,8 +475,6 @@ function spawnRequests(room, spawns) {
 
     // Remote room creep requirements
 
-    let requiredRemoteCreeps = []
-
     let minRemoteCreeps = {}
 
     for (let remoteRoom of room.memory.remoteRooms) {
@@ -521,6 +516,8 @@ function spawnRequests(room, spawns) {
             minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
         }
     }
+
+    let requiredRemoteCreeps = {}
 
     for (let role of remoteRoles) {
 
@@ -684,11 +681,22 @@ function spawnRequests(room, spawns) {
     function HarvesterBody() {
 
         if (energyCapacity >= 10300) {
+            if (storage) {
 
-            this.defaultParts = [carryPart, carryPart]
-            this.extraParts = [workPart, workPart, movePart]
-            this.maxParts = 14
+                let storedEnergyReducer = 20000
 
+                let bodySize = Math.max(Math.floor(room.get("storedEnergy") / storedEnergyReducer) * 3 + 2, 14)
+
+                this.defaultParts = [carryPart, carryPart]
+                this.extraParts = [workPart, workPart, movePart]
+                this.maxParts = Math.min(bodySize, 20)
+
+            } else {
+
+                this.defaultParts = [carryPart, carryPart]
+                this.extraParts = [workPart, workPart, movePart]
+                this.maxParts = 14
+            }
         } else if (energyCapacity >= 2300) {
 
             this.defaultParts = [carryPart]
@@ -727,6 +735,9 @@ function spawnRequests(room, spawns) {
 
         if (storage) {
 
+            let maxParts = 31
+            if (energyCapacity == 10300) maxParts = 12
+
             // For every x stored energy add y parts
 
             let storedEnergyReducer = 15000
@@ -735,7 +746,7 @@ function spawnRequests(room, spawns) {
 
             this.defaultParts = [carryPart]
             this.extraParts = [workPart, workPart, movePart]
-            this.maxParts = Math.min(bodySize, 31)
+            this.maxParts = Math.min(bodySize, maxParts)
 
         } else {
 

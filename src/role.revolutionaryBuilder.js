@@ -37,9 +37,11 @@ module.exports = {
                 filter: s => !allyList.includes(s.owner.username) && s.structureType == STRUCTURE_INVADER_CORE
             })
 
-            if ((hostileStructure || creep.room.controller.reservation || (creep.room.controller.owner && !creep.room.controller.my)) && Memory.global.newCommunes.includes(creep.room.name)) {
+            if ((hostileStructure || creep.room.controller.reservation || (creep.room.controller.owner && !creep.room.controller.my)) && room.name == Memory.global.newCommune) {
 
-                Memory.global.newCommunes = Memory.global.newCommunes.slice(1, Memory.global.newCommunes.length)
+                room.memory.claimable = false
+                Memory.global.newCommune = false
+                Memory.global.calimableRooms = removePropertyFromArray(Memory.global.claimableRooms, room.name)
             }
 
             creep.isFull()

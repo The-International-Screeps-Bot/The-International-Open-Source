@@ -219,6 +219,8 @@ Creep.prototype.advancedHarvest = function(target) {
 
     creep.say("⛏️ " + energyHarvested)
     Memory.data.energyHarvested += energyHarvested
+
+    return 0
 }
 Creep.prototype.findEnergyHarvested = function(source) {
 

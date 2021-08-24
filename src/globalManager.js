@@ -58,21 +58,13 @@ function globalManager() {
         }
     }
 
+    const anchorPoint = room.get("anchorPoint")
+
     // New commune logic
 
-    if (Memory.global.newCommunes && Memory.global.newCommunes.length > 0) {
+    if (Game.gcl.level > Memory.global.communes.length && Memory.global.claimableRooms.length > 0) {
 
-        const newCommune = Memory.global.newCommunes[0]
-
-        if (Memory.rooms[newCommune].stage >= 2) {
-
-            Memory.global.newCommunes = Memory.global.newCommunes.slice(1, Memory.global.newCommunes.length)
-        }
-
-        Memory.global.newCommune = newCommune
-        Memory.global.communeEstablisher = findCommuneEstablisher(newCommune)
-
-        function findCommuneEstablisher(newCommune) {
+        function findCommuneEstablisher(potentialNewCommune) {
 
             for (let stage = 8; stage != 0; stage--) {
                 for (let maxDistance = 1; maxDistance < 11; maxDistance++) {
@@ -81,9 +73,9 @@ function globalManager() {
 
                         room = Game.rooms[roomName]
 
-                        if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.memory.stage >= 4 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000 && room.memory.anchorPoint) {
+                        if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.memory.stage >= 4 && room.storage && room.storage.store[RESOURCE_ENERGY] >= 30000 && anchorPoint) {
 
-                            let distance = room.findSafeDistance(room.memory.anchorPoint, { pos: new RoomPosition(25, 25, newCommune), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
+                            let distance = room.findSafeDistance(anchorPoint, { pos: new RoomPosition(25, 25, potentialNewCommune), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
 
                             if (distance < maxDistance) {
 
@@ -95,11 +87,18 @@ function globalManager() {
                     }
                 }
             }
-        }
-    } else {
 
-        Memory.global.newCommune = undefined
-        Memory.global.communeEstablisher = undefined
+            return false
+        }
+
+        for (let potentialNewCommune of Memory.global.claimableRooms) {
+
+            if (!findCommuneEstablisher(potentialNewCommune)) continue
+
+            Memory.global.newCommune = potentialNewCommune
+            Memory.global.communeEstablisher = findCommuneEstablisher(potentialNewCommune)
+            break
+        }
     }
 
     // Attack room logic
