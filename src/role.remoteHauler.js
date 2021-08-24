@@ -103,22 +103,26 @@ module.exports = {
 
                             } else {
 
-                                let spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS)
+                                let controller = creep.room.controller
 
-                                creep.say("S")
+                                creep.say("C")
 
-                                if (spawn && creep.pos.getRangeTo(spawn) > 5) {
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: controller.pos, range: 5 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                    avoidStages: [],
+                                    flee: false,
+                                    cacheAmount: 10,
+                                })
 
-                                    creep.advancedPathing({
-                                        origin: creep.pos,
-                                        goal: { pos: spawn.pos, range: 5 },
-                                        plainCost: false,
-                                        swampCost: false,
-                                        defaultCostMatrix: creep.memory.defaultCostMatrix,
-                                        avoidStages: [],
-                                        flee: false,
-                                        cacheAmount: 10,
-                                    })
+                                let controllerContainer = creep.room.get("controllerContainer")
+
+                                if (!controllerContainer) {
+
+                                    creep.drop(RESOURCE_ENERGY)
                                 }
                             }
                         }

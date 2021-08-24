@@ -54,6 +54,10 @@ function jumpStarterManager(room, creepsWithRole) {
                             if (storage && storage.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
 
                                 creep.advancedTransfer(storage)
+
+                            } else if (creep.findParts("work") == 0) {
+
+                                creep.drop(RESOURCE_ENERGY)
                             }
                         }
                     }

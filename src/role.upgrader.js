@@ -55,15 +55,13 @@ module.exports = {
                 creep.advancedWithdraw(target)
             } else {
 
-                let droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-                    filter: (s) => s.resourceType == RESOURCE_ENERGY && s.energy >= creep.store.getCapacity() * 0.5
-                });
+                let droppedEnergy = creep.findDroppedEnergyOfAmount(creep.store.getFreeCapacity())
 
-                if (droppedResources) {
+                if (droppedEnergy) {
 
                     creep.say("💡")
 
-                    creep.pickupDroppedEnergy(droppedResources)
+                    creep.pickupDroppedEnergy(droppedEnergy)
                 }
             }
         }

@@ -49,10 +49,6 @@ function harvesterManager(room, creepsWithRole) {
 
         creep.say(task)
 
-        // If creep can have move parts and isn't suicide
-
-        if (room.memory.stage >= 2 && creep.findParts("move") == 0) creep.suicide()
-
         // Assign targets depending on task
 
         if (task == "source1") {
