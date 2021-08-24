@@ -385,7 +385,7 @@ function spawnRequests(room, spawns) {
 
                 if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 1
 
-                minCreeps["remoteHauler"] += 2
+                minCreeps["remoteHauler"] += remoteRoom.sources
 
             } else if (energyCapacity >= 800) {
 
@@ -492,7 +492,7 @@ function spawnRequests(room, spawns) {
 
             if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 1
 
-            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = 2
+            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources
 
         } else if (energyCapacity >= 800) {
 
@@ -502,7 +502,6 @@ function spawnRequests(room, spawns) {
 
             if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 1
 
-
             minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
 
         } else if (energyCapacity >= 550) {
@@ -511,7 +510,6 @@ function spawnRequests(room, spawns) {
 
             if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 2
 
-
             minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
 
         } else if (energyCapacity >= 300) {
@@ -519,7 +517,6 @@ function spawnRequests(room, spawns) {
             minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 2
 
             if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 2
-
 
             minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
         }
@@ -533,7 +530,7 @@ function spawnRequests(room, spawns) {
 
                 requiredRemoteCreeps[[role, remoteRoom.name]] = minRemoteCreeps[[role, remoteRoom.name]] - creepsOfRemoteRole[[role, remoteRoom.name]]
 
-                //console.log(role + ", " + requiredRemoteCreeps[[role, remoteRoom.name]] + ", " + remoteRoom.name)
+                console.log(role + ", " + requiredRemoteCreeps[[role, remoteRoom.name]] + ", " + remoteRoom.name)
             }
         }
     }
