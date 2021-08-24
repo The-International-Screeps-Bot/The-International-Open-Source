@@ -689,20 +689,20 @@ function spawnRequests(room, spawns) {
         if (energyCapacity >= 10300) {
 
             this.defaultParts = [carryPart, carryPart]
-            this.extraParts = []
-            this.maxParts = 8
+            this.extraParts = [workPart, workPart, movePart]
+            this.maxParts = 14
 
         } else if (energyCapacity >= 2300) {
 
             this.defaultParts = [carryPart]
-            this.extraParts = []
-            this.maxParts = 8
+            this.extraParts = [workPart, workPart, movePart]
+            this.maxParts = 13
 
         } else if (energyCapacity >= 1800) {
 
             this.defaultParts = []
             this.extraParts = [workPart, workPart, movePart]
-            this.maxParts = 8
+            this.maxParts = 12
 
         } else if (energyCapacity >= 550) {
 

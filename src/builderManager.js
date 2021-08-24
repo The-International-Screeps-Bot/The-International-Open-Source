@@ -46,7 +46,6 @@ function builderManager(room, creepsWithRole) {
 
         if (creepsWithRole.length == 1) {
 
-
             targetSite = creepsWithRole[0].pos.findClosestByRange(mySites)
             room.memory.targetSite = targetSite.id
 
