@@ -1,6 +1,6 @@
 let creepData = require("creepData")
 
-function spawnRequests(room, spawns, specialStructures) {
+function spawnRequests(room, spawns) {
 
     // Import variables we need
 
@@ -78,6 +78,7 @@ function spawnRequests(room, spawns, specialStructures) {
         filter: s => (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL) && s.hits < s.hitsMax * 0.9
     })
 
+    let energyAvailable = room.energyAvailable
     let energyCapacity = room.energyCapacityAvailable
 
     let stage = room.memory.stage
@@ -122,6 +123,11 @@ function spawnRequests(room, spawns, specialStructures) {
 
     let source1HarvestPositionsAmount = room.get("source1HarvestPositions").positions.length
     let source2HarvestPositionsAmount = room.get("source2HarvestPositions").positions.length
+
+    let baseLink = room.get("baseLink")
+
+
+    let controllerContainer = room.get("controllerContainer")
 
     // Define min creeps for each role
 
@@ -302,7 +308,7 @@ function spawnRequests(room, spawns, specialStructures) {
         }
     }
 
-    if (specialStructures.links.baseLink) {
+    if (baseLink) {
 
         minCreeps["stationaryHauler"] = 1
     }
@@ -532,9 +538,744 @@ function spawnRequests(room, spawns, specialStructures) {
         }
     }
 
+    function findRemoteRoom(role) {
+
+        for (let remoteRoom of room.memory.remoteRooms) {
+
+            if (requiredRemoteCreeps[[role, remoteRoom.name]] > 0) {
+
+                return remoteRoom.name
+            }
+        }
+
+        return false
+    }
+
+    let boostedSquads = false
+
+    let squadTypes = {
+        rangedAttack: "rangedAttack",
+        attack: "attack",
+        dismantle: "dismantle",
+    }
+
+    let squadType = squadTypes.rangedAttack
+
+    // Find spawning structures
+
+    let energyStructures = findSpawningStructures()
+
+    function findSpawningStructures() {
+
+        const anchorPoint = room.get("anchorPoint")
+
+        // Get array of spawningStructures
+
+        let spawnStructures = room.find(FIND_MY_STRUCTURES, {
+            filter: s => s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN
+        })
+
+        // Add each spawnStructures with their range to the object
+
+        let spawnStructuresWithRanges = {}
+
+        for (let spawnStructure of spawnStructures) {
+
+            spawnStructuresWithRanges[spawnStructure.id] = anchorPoint.getRangeTo(spawnStructure)
+        }
+
+        let energyStructures = []
+
+        for (let minRange = 0; minRange < 25; minRange++) {
+
+            for (let structureId in spawnStructuresWithRanges) {
+
+                if (spawnStructuresWithRanges[structureId] > minRange) continue
+
+                energyStructures.push(findObjectWithId(structureId))
+                delete spawnStructuresWithRanges[structureId]
+            }
+        }
+
+        return energyStructures
+    }
+
+    // Body parts
+
+    function BodyPart(partType, partCost) {
+
+        this.type = partType
+        this.cost = partCost
+    }
+
+    // Economy
+
+    let workPart = new BodyPart(WORK, 100)
+    let carryPart = new BodyPart(CARRY, 50)
+
+    // Combat
+
+    let attackPart = new BodyPart(ATTACK, 80)
+    let rangedAttackPart = new BodyPart(RANGED_ATTACK, 150)
+    let healPart = new BodyPart(HEAL, 250)
+    let toughPart = new BodyPart(TOUGH, 10)
+
+    // Other
+
+    let movePart = new BodyPart(MOVE, 50)
+    let claimPart = new BodyPart(CLAIM, 600)
+
+    // Define spawn opts for roles
+
+    /* 
+    300 = rcl 1
+    500 = rcl 2
+    800 = rcl 3
+    1300 = rcl 4
+    1800 = rcl 5
+    2300 = rcl 6
+    5300 = rcl 7
+    10300 = rcl 8
+     */
+
+    let roleOpts = {}
+
+    function JumpStarterBody() {
+
+        if (energyCapacity >= 550) {
+
+            this.defaultParts = []
+            this.extraParts = [workPart, movePart, carryPart, movePart]
+            this.maxParts = 20
+
+        } else {
+
+            this.defaultParts = []
+            this.extraParts = [carryPart, movePart]
+            this.maxParts = 2
+        }
+    }
+
+    roleOpts["jumpStarter"] = roleValues({
+        role: "jumpStarter",
+        parts: { 300: new JumpStarterBody() },
+        memoryAdditions: {}
+    })
+
+    roleOpts["hauler"] = roleValues({
+        role: "hauler",
+        parts: {
+            5300: {
+                defaultParts: [],
+                extraParts: [carryPart, carryPart, movePart],
+                maxParts: 48
+            },
+            1800: {
+                defaultParts: [],
+                extraParts: [carryPart, carryPart, movePart],
+                maxParts: 36
+            },
+            300: {
+                defaultParts: [],
+                extraParts: [carryPart, movePart],
+                maxParts: 50
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    function HarvesterBody() {
+
+        if (energyCapacity >= 10300) {
+
+            this.defaultParts = [carryPart, carryPart]
+            this.extraParts = []
+            this.maxParts = 8
+
+        } else if (energyCapacity >= 2300) {
+
+            this.defaultParts = [carryPart]
+            this.extraParts = []
+            this.maxParts = 8
+
+        } else if (energyCapacity >= 1800) {
+
+            this.defaultParts = []
+            this.extraParts = [workPart, workPart, movePart]
+            this.maxParts = 8
+
+        } else if (energyCapacity >= 550) {
+
+            this.defaultParts = [movePart]
+            this.extraParts = [workPart]
+            this.maxParts = 8
+
+        } else if (energyCapacity >= 300) {
+
+            this.defaultParts = []
+            this.extraParts = [workPart]
+            this.maxParts = 8
+        }
+    }
+
+    roleOpts["harvester"] = roleValues({
+        role: "harvester",
+        parts: {
+            300: new HarvesterBody()
+        },
+        memoryAdditions: {}
+    })
+
+    function UpgraderBody() {
+
+        if (storage) {
+
+            // For every x stored energy add y parts
+
+            let storedEnergyReducer = 15000
+
+            let bodySize = Math.max(Math.floor(room.get("storedEnergy") / storedEnergyReducer) * 3 + 1, 4)
+
+            this.defaultParts = [carryPart]
+            this.extraParts = [workPart, workPart, movePart]
+            this.maxParts = Math.min(bodySize, 31)
+
+        } else {
+
+            if (controllerContainer) {
+
+                this.defaultParts = [carryPart]
+                this.extraParts = [workPart, workPart, movePart]
+                this.maxParts = 28
+            } else {
+
+                this.defaultParts = []
+                this.extraParts = [workPart, movePart, carryPart, movePart]
+                this.maxParts = 28
+            }
+        }
+    }
+
+    roleOpts["upgrader"] = roleValues({
+        role: "upgrader",
+        parts: {
+            300: new UpgraderBody()
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["repairer"] = roleValues({
+        role: "repairer",
+        parts: {
+            1800: {
+                defaultParts: [],
+                extraParts: [workPart, carryPart, movePart],
+                maxParts: 18
+            },
+            300: {
+                defaultParts: [],
+                extraParts: [workPart, movePart, carryPart, movePart],
+                maxParts: 24
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    function BuilderBody() {
+
+        if (storage) {
+
+            // For every x stored energy add y parts
+
+            let storedEnergyReducer = 15000
+
+            let bodySize = Math.max(Math.floor(room.get("storedEnergy") / storedEnergyReducer) * 3, 3)
+
+            this.defaultParts = []
+            this.extraParts = [workPart, carryPart, movePart]
+            this.maxParts = Math.min(bodySize, 24)
+
+        } else {
+
+            this.defaultParts = []
+            this.extraParts = [workPart, movePart, carryPart, movePart]
+            this.maxParts = 24
+        }
+    }
+
+    roleOpts["builder"] = roleValues({
+        role: "builder",
+        parts: {
+            300: new BuilderBody()
+        },
+        memoryAdditions: {}
+    })
+
+    function RampartUpgraderBody() {
+
+        if (storage) {
+
+            // For every x stored energy add y parts
+
+            let storedEnergyReducer = 25000
+
+            if (hostiles.length > 0 && room.get("storedEnergy") > 10000 && creepsOfRole[["meleeDefender", room.name]] > 0) {
+
+                storedEnergyReducer = 10000
+            }
+
+            let bodySize = Math.max(Math.floor(room.get("storedEnergy") / storedEnergyReducer) * 6, 6)
+
+            this.defaultParts = []
+            this.extraParts = [workPart, workPart, movePart, workPart, carryPart, movePart]
+            this.maxParts = Math.min(bodySize, 30)
+
+        } else {
+
+            this.defaultParts = []
+            this.extraParts = [workPart, movePart, carryPart, movePart]
+            this.maxParts = 18
+        }
+    }
+
+    roleOpts["rampartUpgrader"] = roleValues({
+        role: "rampartUpgrader",
+        parts: {
+            300: new RampartUpgraderBody()
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["remoteBuilder"] = roleValues({
+        role: "remoteBuilder",
+        parts: {
+            1800: {
+                defaultParts: [],
+                extraParts: [workPart, movePart, carryPart, movePart],
+                maxParts: 24
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["remoteHarvester1"] = roleValues({
+        role: "remoteHarvester1",
+        parts: {
+            1800: {
+                defaultParts: [],
+                extraParts: [workPart, workPart, movePart],
+                maxParts: 12
+            },
+            300: {
+                defaultParts: [],
+                extraParts: [workPart, movePart],
+                maxParts: 16
+            }
+        },
+        memoryAdditions: {
+            remoteRoom: findRemoteRoom("remoteHarvester1")
+        }
+    })
+
+    roleOpts["remoteHarvester2"] = roleValues({
+        role: "remoteHarvester2",
+        parts: {
+            1800: {
+                defaultParts: [],
+                extraParts: [workPart, workPart, movePart],
+                maxParts: 12
+            },
+            300: {
+                defaultParts: [],
+                extraParts: [workPart, movePart],
+                maxParts: 16
+            }
+        },
+        memoryAdditions: {
+            remoteRoom: findRemoteRoom("remoteHarvester2")
+        }
+    })
+
+    roleOpts["remoteHauler"] = roleValues({
+        role: "remoteHauler",
+        parts: {
+            1800: {
+                defaultParts: [],
+                extraParts: [carryPart, carryPart, movePart],
+                maxParts: 48
+            },
+            300: {
+                defaultParts: [],
+                extraParts: [carryPart, movePart],
+                maxParts: 50
+            }
+        },
+        memoryAdditions: {
+            remoteRoom: findRemoteRoom("remoteHauler")
+        }
+    })
+
+    roleOpts["reserver"] = roleValues({
+        role: "reserver",
+        parts: {
+            1800: {
+                defaultParts: [],
+                extraParts: [claimPart, movePart, movePart],
+                maxParts: 6
+            },
+            300: {
+                defaultParts: [],
+                extraParts: [claimPart, movePart],
+                maxParts: 6
+            }
+        },
+        memoryAdditions: {
+            remoteRoom: findRemoteRoom("reserver")
+        }
+    })
+
+    roleOpts["communeDefender"] = roleValues({
+        role: "communeDefender",
+        parts: {
+            300: {
+                defaultParts: [],
+                extraParts: [attackPart, movePart, attackPart, movePart, rangedAttackPart, movePart],
+                maxParts: 24
+            },
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["revolutionaryBuilder"] = roleValues({
+        role: "revolutionaryBuilder",
+        parts: {
+            10300: {
+                defaultParts: [],
+                extraParts: [workPart, movePart, carryPart, movePart],
+                maxParts: 32
+            },
+            300: {
+                defaultParts: [],
+                extraParts: [workPart, movePart, carryPart, movePart],
+                maxParts: 24
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["claimer"] = roleValues({
+        role: "claimer",
+        parts: {
+            300: {
+                defaultParts: [claimPart],
+                extraParts: [movePart],
+                maxParts: 6
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["rangedDefender"] = roleValues({
+        role: "rangedDefender",
+        parts: {
+            1800: {
+                defaultParts: [],
+                extraParts: [rangedAttackPart, rangedAttackPart, movePart],
+                maxParts: 50
+            },
+            300: {
+                defaultParts: [],
+                extraParts: [rangedAttackPart, movePart],
+                maxParts: 50
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["meleeDefender"] = roleValues({
+        role: "meleeDefender",
+        parts: {
+            1800: {
+                defaultParts: [],
+                extraParts: [attackPart, attackPart, movePart],
+                maxParts: 50
+            },
+            300: {
+                defaultParts: [],
+                extraParts: [attackPart, movePart],
+                maxParts: 50
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["scientist"] = roleValues({
+        role: "scientist",
+        parts: {
+            300: {
+                defaultParts: [carryPart, carryPart, movePart, carryPart, carryPart, movePart, carryPart, movePart],
+                extraParts: [],
+                maxParts: 8
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["stationaryHauler"] = roleValues({
+        role: "stationaryHauler",
+        parts: {
+            300: {
+                defaultParts: [movePart],
+                extraParts: [carryPart],
+                maxParts: 17
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["upgradeHauler"] = roleValues({
+        role: "upgradeHauler",
+        parts: {
+            300: {
+                defaultParts: [],
+                extraParts: [carryPart, carryPart, movePart],
+                maxParts: 36
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["miner"] = roleValues({
+        role: "miner",
+        parts: {
+            300: {
+                defaultParts: [],
+                extraParts: [workPart, workPart, workPart, workPart, movePart],
+                maxParts: 50
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["robber"] = roleValues({
+        role: "robber",
+        parts: {
+            300: {
+                defaultParts: [],
+                extraParts: [carryPart, movePart],
+                maxParts: 24
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    roleOpts["scout"] = roleValues({
+        role: "scout",
+        parts: {
+            300: {
+                defaultParts: [movePart],
+                extraParts: [],
+                maxParts: 1
+            }
+        },
+        memoryAdditions: {}
+    })
+
+    if (squadType == "rangedAttack") {
+
+        roleOpts["antifaAssaulter"] = roleValues({
+            role: "antifaAssaulter",
+            parts: {
+                300: {
+                    defaultParts: [],
+                    extraParts: [rangedAttackPart, movePart],
+                    maxParts: 2
+                },
+            },
+            memoryAdditions: {
+                type: "rangedAttack",
+                size: "quad",
+                amount: 0,
+                requiredAmount: 4,
+                part: false,
+            }
+        })
+        roleOpts["antifaSupporter"] = roleValues({
+            role: "antifaSupporter",
+            parts: {
+                300: {
+                    defaultParts: [],
+                    extraParts: [healPart, movePart],
+                    maxParts: 2
+                },
+            },
+            memoryAdditions: {
+                type: "rangedAttack",
+                size: "quad",
+                part: false,
+            }
+        })
+    } else if (squadType == "attack") {
+
+        roleOpts["antifaAssaulter"] = roleValues({
+            role: "antifaAssaulter",
+            parts: {
+                300: {
+                    defaultParts: [],
+                    extraParts: [attackPart, movePart],
+                    maxParts: 20
+                },
+            },
+            memoryAdditions: {}
+        })
+        roleOpts["antifaSupporter"] = roleValues({
+            role: "antifaSupporter",
+            parts: {
+                300: {
+                    defaultParts: [],
+                    extraParts: [healPart, movePart],
+                    maxParts: 20
+                },
+            },
+            memoryAdditions: {}
+        })
+    } else if (squadType == "dismantle") {
+
+        roleOpts["antifaAssaulter"] = roleValues({
+            role: "antifaAssaulter",
+            parts: {
+                300: {
+                    defaultParts: [],
+                    extraParts: [workPart, movePart],
+                    maxParts: 20
+                },
+            },
+            memoryAdditions: {}
+        })
+        roleOpts["antifaSupporter"] = roleValues({
+            role: "antifaSupporter",
+            parts: {
+                300: {
+                    defaultParts: [],
+                    extraParts: [healPart, movePart],
+                    maxParts: 20
+                },
+            },
+            memoryAdditions: {}
+        })
+    }
+
+    // Convert given values into spawnable object
+
+    function roleValues(opts) {
+
+        // Define values given
+
+        let role = opts.role
+
+        let parts
+
+        for (let property in opts.parts) {
+
+            if (energyCapacity >= property) {
+
+                parts = opts.parts[property]
+            }
+        }
+
+        if (!parts) return false
+
+        let maxParts = parts.maxParts
+
+        let memoryAdditions = opts.memoryAdditions
+
+        // Create values for spawning object
+
+        let body = []
+        let tier = 0
+        let cost = 0
+
+        let energyAmount = energyCapacity
+
+        if (roomFix) energyAmount = energyAvailable
+
+        // Create role body
+
+        function getCostOfParts(array) {
+
+            let totalCost = 0
+
+            for (let object of array) {
+
+                totalCost += object.cost
+            }
+
+            return totalCost
+        }
+
+        function getTypesOfParts(array) {
+
+            let partTypes = []
+
+            for (let object of array) {
+
+                partTypes.push(object.type)
+            }
+
+            return partTypes
+        }
+
+        // Add default parts if exists
+
+        if (parts.defaultParts.length > 0) {
+
+            body.push(getTypesOfParts(parts.defaultParts))
+
+            cost += getCostOfParts(parts.defaultParts)
+            tier += 1
+        }
+
+        // Find iteration amount
+
+        let extraIterations = Math.min(Math.floor((energyAmount - getCostOfParts(parts.defaultParts)) / getCostOfParts(parts.extraParts)), maxParts - body.length)
+
+        // Add extra parts
+
+        let i = 0
+
+        while (i < extraIterations && body.length + parts.extraParts.length <= maxParts) {
+
+            body.push(getTypesOfParts(parts.extraParts))
+
+            cost += getCostOfParts(parts.extraParts)
+            tier += 1
+
+            i++
+        }
+
+        body = _.flattenDeep(body).slice(0, maxParts)
+
+        // Create memory object and add additions
+
+        let memory = { role: role, roomFrom: room.name }
+
+        for (let property in memoryAdditions) {
+
+            memory[property] = memoryAdditions[property]
+        }
+
+        return {
+            role: role,
+            body: body,
+            tier: tier,
+            opts: { memory: memory, energyStructures: energyStructures },
+            cost: cost
+        }
+    }
+
     return {
         requiredCreeps: requiredCreeps,
-        requiredRemoteCreeps: requiredRemoteCreeps,
+        roleOpts: roleOpts,
     }
 }
 
