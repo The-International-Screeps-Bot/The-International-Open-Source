@@ -1,8 +1,6 @@
 function roomPlanner(room, structures, constructionSites) {
 
-    const anchorPoint = room.memory.anchorPoint
-
-    if (!anchorPoint) return
+    const anchorPoint = room.get("anchorPoint")
 
     room.visual.rect(anchorPoint.x - 5.5, anchorPoint.y - 5.5, 11, 11, { fill: "transparent", stroke: "#45C476" })
 

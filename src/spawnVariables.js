@@ -42,7 +42,6 @@ function roleOpts(room, spawns, specialStructures) {
     function findSpawningStructures() {
 
         const anchorPoint = room.get("anchorPoint")
-        if (!anchorPoint) return
 
         // Get array of spawningStructures
 

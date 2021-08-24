@@ -250,6 +250,9 @@ Room.prototype.get = function(roomVar, cache) {
 
         if (room.memory.harvestPositions && room.memory.harvestPositions[desiredObject]) return room.memory.harvestPositions[desiredObject]
 
+        if (!roomVars.anchorPoint) return
+        if (!roomVars.source1 || !roomVars.source2) return
+
         let cache = {}
 
         cache.harvestPositions = {}
@@ -281,17 +284,19 @@ Room.prototype.get = function(roomVar, cache) {
                 cache.harvestPositions[sourceName].positions.push(pos)
             }
 
-            if (!roomVars.anchorPoint) return false
-
             cache.harvestPositions[sourceName].closest = roomVars.anchorPoint.findClosestByPath(cache.harvestPositions[sourceName].positions)
         }
+
+        console.log("hi")
 
         for (let object in cache) {
 
             room.memory[object] = cache[object]
         }
 
-        return cache.harvestPositions[desiredObject]
+        if (cache.harvestPositions[desiredObject]) return cache.harvestPositions[desiredObject]
+
+        return []
     }
 
     function findStoredEnergy() {

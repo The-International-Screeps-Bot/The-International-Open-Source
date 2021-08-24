@@ -1,9 +1,5 @@
 function rampartUpgraderManager(room, creepsWithRole) {
 
-    const anchorPoint = room.memory.anchorPoint
-
-    if (!anchorPoint) return
-
     let ramparts = room.find(FIND_MY_STRUCTURES, {
         filter: s => s.structureType == STRUCTURE_RAMPART
     })

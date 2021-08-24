@@ -17,8 +17,6 @@ module.exports = {
 
         const anchorPoint = creep.room.memory.anchorPoint
 
-        if (!anchorPoint) return
-
         if (creep.pos.x != anchorPoint.x || creep.pos.y != anchorPoint.y) {
 
             creep.say("M A")

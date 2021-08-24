@@ -4,8 +4,6 @@ function builderManager(room, creepsWithRole) {
 
     const anchorPoint = room.get("anchorPoint")
 
-    if (!anchorPoint) return
-
     function findBuildableSites(mySites) {
 
         let cm = new PathFinder.CostMatrix

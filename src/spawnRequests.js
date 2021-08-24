@@ -190,13 +190,13 @@ function spawnRequests(room, spawns, specialStructures) {
 
     } else {
 
-        if (creepsOfRole[["hauler", room.name]] >= minCreeps["hauler"]) {
+        if (creepsOfRole[["hauler", room.name]] > 0) {
 
             minCreeps["harvester"] = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2)
 
         } else {
 
-            minCreeps["harvester"] = 2
+            minCreeps["harvester"] = 1
         }
     }
 

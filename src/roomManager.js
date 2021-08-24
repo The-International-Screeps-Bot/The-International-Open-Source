@@ -53,6 +53,10 @@ function roomManager() {
 
         //
 
+        if (room.controller && room.controller.my) findAnchor(room)
+
+        //
+
         cpuUsed = Game.cpu.getUsed()
 
         let {

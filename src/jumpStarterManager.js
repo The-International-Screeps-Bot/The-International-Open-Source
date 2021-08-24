@@ -172,13 +172,13 @@ function jumpStarterManager(room, creepsWithRole) {
 
                 } else {
 
-                    if (creep.findParts("work") > 0) {
+                    let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
 
-                        let closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
+                    if (creep.findParts("work") > 0 && closestSource) {
 
-                        if (closestSource && creep.advancedHarvest(closestSource) == ERR_NOT_IN_RANGE) {
+                        creep.say("⛏️")
 
-                            creep.say("⛏️")
+                        if (creep.advancedHarvest(closestSource) == ERR_NOT_IN_RANGE) {
 
                             creep.advancedPathing({
                                 origin: creep.pos,
