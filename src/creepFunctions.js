@@ -4,7 +4,7 @@ Creep.prototype.signWithMessage = function() {
 
     creep = this
 
-    let signType = Math.floor(Math.random() * signMessages.length - 1)
+    let signType = Math.floor(Math.random() * (signMessages.length - 1))
 
     creep.signController(creep.room.get("controller"), signMessages[signType])
 }
