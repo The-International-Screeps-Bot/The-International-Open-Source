@@ -316,11 +316,9 @@ Room.prototype.get = function(roomVar, cache) {
 
         let harvestPositions = { source1: roomVars.source1HarvestPositions, source2: roomVars.source2HarvestPositions }
 
-        for (let sourceName in harvestPositions) {
+        for (let sourceName in linkPositions) {
 
-            cache.harvestPositions[sourceName] = { closest: undefined, positions: [] }
-
-            let closestHarvestPos = harvestPositions[sourceName].closest
+            let closestHarvestPos = linkPositions[sourceName].closest
             if (!closestHarvestPos) continue
 
             let top = closestHarvestPos.pos.y - 1
@@ -338,10 +336,10 @@ Room.prototype.get = function(roomVar, cache) {
 
                 if ((type != "terrain" || terrain == "wall") && (type != "structure")) continue
 
-                cache.harvestPositions[sourceName].positions.push(pos)
+                cache.linkPositions[sourceName].positions.push(pos)
             }
 
-            cache.harvestPositions[sourceName].closest = roomVars.anchorPoint.findClosestByPath(cache.harvestPositions[sourceName].positions)
+            cache.linkPositions[sourceName] = roomVars.anchorPoint.findClosestByPath(cache.linkPositions[sourceName].positions)
         }
 
         console.log("hi")
@@ -351,7 +349,7 @@ Room.prototype.get = function(roomVar, cache) {
             room.memory[object] = cache[object]
         }
 
-        if (cache.harvestPositions[desiredObject]) return cache.harvestPositions[desiredObject]
+        if (cache.linkPositions[desiredObject]) return cache.linkPositions[desiredObject]
 
         return []
     }
