@@ -575,7 +575,7 @@ function spawnRequests(room, spawns) {
 
         for (let spawnStructure of spawnStructures) {
 
-            spawnStructuresWithRanges[spawnStructure.id] = anchorPoint.getRangeTo(spawnStructure)
+            spawnStructuresWithRanges[spawnStructure.id] = spawnStructure.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5)
         }
 
         let energyStructures = []

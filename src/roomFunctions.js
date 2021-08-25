@@ -305,28 +305,28 @@ Room.prototype.get = function(roomVar, cache) {
 
         return
 
-        if (room.memory.harvestPositions && room.memory.harvestPositions[desiredObject]) return room.memory.harvestPositions[desiredObject]
+        if (room.memory.linkPositions && room.memory.linkPositions[desiredObject]) return room.memory.linkPositions[desiredObject]
 
         if (!roomVars.anchorPoint) return
-        if (!roomVars.source1 || !roomVars.source2) return
+        if (!roomVars.source1HarvestPositions || !roomVars.source2HarvestPositions) return
 
         let cache = {}
 
-        cache.harvestPositions = {}
+        cache.linkPositions = {}
 
-        let sources = { source1: roomVars.source1, source2: roomVars.source2 }
+        let harvestPositions = { source1: roomVars.source1HarvestPositions, source2: roomVars.source2HarvestPositions }
 
-        for (let sourceName in sources) {
+        for (let sourceName in harvestPositions) {
 
             cache.harvestPositions[sourceName] = { closest: undefined, positions: [] }
 
-            let source = sources[sourceName]
-            if (!source) continue
+            let closestHarvestPos = harvestPositions[sourceName].closest
+            if (!closestHarvestPos) continue
 
-            let top = source.pos.y - 1
-            let left = source.pos.x - 1
-            let bottom = source.pos.y + 1
-            let right = source.pos.x + 1
+            let top = closestHarvestPos.pos.y - 1
+            let left = closestHarvestPos.pos.x - 1
+            let bottom = closestHarvestPos.pos.y + 1
+            let right = closestHarvestPos.pos.x + 1
 
             let area = room.lookAtArea(top, left, bottom, right, true)
 
@@ -336,7 +336,7 @@ Room.prototype.get = function(roomVar, cache) {
                 let type = square.type
                 let terrain = square.terrain
 
-                if (type != "terrain" || terrain == "wall") continue
+                if ((type != "terrain" || terrain == "wall") && (type != "structure")) continue
 
                 cache.harvestPositions[sourceName].positions.push(pos)
             }

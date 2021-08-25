@@ -168,9 +168,13 @@ function roomPlanner(room) {
 
         for (let structureType in collection) {
 
-            if (structureType == "road" && room.controller.level <= 3) continue
+            if (structureType == STRUCTURE_ROAD && room.memory.stage < 5) continue
 
-            if (structureType == "link" && room.controller.level <= 6) continue
+            if (structureType == STRUCTURE_LINK && room.memory.stage < 6) continue
+
+            if (structureType == STRUCTURE_LAB) continue
+            if (structureType == STRUCTURE_NUKER) continue
+            if (structureType == STRUCTURE_OBSERVER) continue
 
             for (let pos of collection[structureType].pos) {
 
