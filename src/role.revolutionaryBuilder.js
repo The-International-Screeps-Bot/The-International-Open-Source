@@ -41,7 +41,8 @@ module.exports = {
 
                 room.memory.claimable = false
                 Memory.global.newCommune = false
-                Memory.global.claimableRooms = removePropertyFromArray(Memory.global.claimableRooms, room.name)
+                Memory.global.communeEstablisher = false
+                Memory.global.claimableRooms = removePropertyFromArray(Memory.global.claimableRooms, creep.room.name)
             }
 
             creep.isFull()

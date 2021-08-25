@@ -19,10 +19,6 @@ function construction(room, specialStructures) {
 
     if (roomConstructionSites.length < 5) {
 
-        /*         if (Game.time % 100 == 0) source1Path()
-
-                if (Game.time % 101 == 0) source2Path() */
-
         if (Game.time % 102 == 0) controllerPath()
 
         if (room.memory.stage >= 6) {
@@ -50,192 +46,6 @@ function construction(room, specialStructures) {
     }
 
     if (Game.time % 100 == 0) removeUneeded()
-
-    function source1Path() {
-
-        let origin = room.memory.anchorPoint
-
-        if (!source1) return
-
-        let goal = { pos: source1.pos, range: 1 }
-
-        if (origin && goal) {
-
-            var path = PathFinder.search(origin, goal, {
-                plainCost: 4,
-                swampCost: 24,
-                maxRooms: 1,
-
-                roomCallback: function(roomName) {
-
-                    let room = Game.rooms[roomName]
-
-                    if (!room) return
-
-                    let cm
-
-                    cm = new PathFinder.CostMatrix
-
-                    let ramparts = room.find(FIND_MY_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_RAMPART
-                    })
-
-                    for (let rampart of ramparts) {
-
-                        cm.set(rampart.pos.x, rampart.pos.y, 4)
-                    }
-
-                    let roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                        filter: s => s.structureType == STRUCTURE_ROAD
-                    })
-
-                    for (let roadSite of roadConstructionSites) {
-
-                        cm.set(roadSite.pos.x, roadSite.pos.y, 1)
-                    }
-
-                    let roads = room.find(FIND_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_ROAD
-                    })
-
-                    for (let road of roads) {
-
-                        cm.set(road.pos.x, road.pos.y, 1)
-                    }
-
-                    let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                        filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
-                    })
-
-                    for (let site of constructionSites) {
-
-                        cm.set(site.pos.x, site.pos.y, 255)
-                    }
-
-                    let structures = room.find(FIND_STRUCTURES, {
-                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
-                    })
-
-                    for (let structure of structures) {
-
-                        cm.set(structure.pos.x, structure.pos.y, 255)
-                    }
-
-                    return cm
-                }
-            }).path
-
-            room.visual.poly(path, { stroke: colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
-
-            for (let i = 0; i < path.length; i++) {
-
-                let value = path[i - 1]
-                let normalValue = path[i]
-
-                if (value && room.memory.stage >= 4) {
-
-                    room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
-                }
-                if (room.memory.stage > 1 && (controllerContainer || controllerLink) && !sourceContainer1 && normalValue && i + 1 == path.length) {
-
-                    room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
-                }
-            }
-        }
-    }
-
-    function source2Path() {
-
-        let origin = room.memory.anchorPoint
-
-        if (!source2) return
-
-        let goal = { pos: source2.pos, range: 1 }
-
-        if (origin && goal) {
-
-            var path = PathFinder.search(origin, goal, {
-                plainCost: 4,
-                swampCost: 24,
-                maxRooms: 1,
-
-                roomCallback: function(roomName) {
-
-                    let room = Game.rooms[roomName]
-
-                    if (!room) return
-
-                    let cm
-
-                    cm = new PathFinder.CostMatrix
-
-                    let ramparts = room.find(FIND_MY_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_RAMPART
-                    })
-
-                    for (let rampart of ramparts) {
-
-                        cm.set(rampart.pos.x, rampart.pos.y, 4)
-                    }
-
-                    let roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                        filter: s => s.structureType == STRUCTURE_ROAD
-                    })
-
-                    for (let roadSite of roadConstructionSites) {
-
-                        cm.set(roadSite.pos.x, roadSite.pos.y, 1)
-                    }
-
-                    let roads = room.find(FIND_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_ROAD
-                    })
-
-                    for (let road of roads) {
-
-                        cm.set(road.pos.x, road.pos.y, 1)
-                    }
-
-                    let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                        filter: s => s.structureType != STRUCTURE_CONTAINER && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
-                    })
-
-                    for (let site of constructionSites) {
-
-                        cm.set(site.pos.x, site.pos.y, 255)
-                    }
-
-                    let structures = room.find(FIND_STRUCTURES, {
-                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
-                    })
-
-                    for (let structure of structures) {
-
-                        cm.set(structure.pos.x, structure.pos.y, 255)
-                    }
-
-                    return cm
-                }
-            }).path
-
-            room.visual.poly(path, { stroke: colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
-
-            for (let i = 0; i < path.length; i++) {
-
-                let value = path[i - 1]
-                let normalValue = path[i]
-
-                if (value && room.memory.stage >= 4) {
-
-                    room.createConstructionSite(value.x, value.y, STRUCTURE_ROAD)
-                }
-                if (room.memory.stage > 1 && (controllerContainer || controllerLink) && !sourceContainer2 && normalValue && i + 1 == path.length) {
-
-                    room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
-                }
-            }
-        }
-    }
 
     function controllerPath() {
 
@@ -430,7 +240,7 @@ function construction(room, specialStructures) {
 
             roomPathDelay++
 
-            if (Game.time % (roomPathDelay + 103) != 0) return
+            /* if (Game.time % (roomPathDelay + 103) != 0) return */
 
             let origin = room.memory.anchorPoint
 
@@ -450,12 +260,10 @@ function construction(room, specialStructures) {
                         allowedRooms[roomName] = true
                         return 1
 
-                    }
-                    if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName].stage)) {
+                    } else if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName].stage)) {
 
                         allowedRooms[roomName] = true
                         return 1
-
                     }
 
                     allowedRooms[roomName] = false
@@ -473,7 +281,7 @@ function construction(room, specialStructures) {
                 var path = PathFinder.search(origin, goal, {
                     plainCost: 4,
                     swampCost: 24,
-                    maxOps: 10000,
+                    maxOps: 100000,
 
                     roomCallback: function(roomName) {
 
@@ -486,15 +294,6 @@ function construction(room, specialStructures) {
                         let cm
 
                         cm = new PathFinder.CostMatrix
-
-                        let ramparts = room.find(FIND_MY_STRUCTURES, {
-                            filter: s => s.structureType == STRUCTURE_RAMPART
-                        })
-
-                        for (let rampart of ramparts) {
-
-                            cm.set(rampart.pos.x, rampart.pos.y, 4)
-                        }
 
                         let roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                             filter: s => s.structureType == STRUCTURE_ROAD
@@ -514,51 +313,31 @@ function construction(room, specialStructures) {
                             cm.set(road.pos.x, road.pos.y, 1)
                         }
 
-                        if (room.name == origin.roomName) {
+                        let constructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                            filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                        })
 
-                            let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                                filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
-                            })
+                        for (let site of constructionSites) {
 
-                            for (let site of constructionSites) {
+                            cm.set(site.pos.x, site.pos.y, 255)
+                        }
 
-                                cm.set(site.pos.x, site.pos.y, 255)
-                            }
+                        let structures = room.find(FIND_STRUCTURES, {
+                            filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                        })
 
-                            let structures = room.find(FIND_STRUCTURES, {
-                                filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD
-                            })
+                        for (let structure of structures) {
 
-                            for (let structure of structures) {
-
-                                cm.set(structure.pos.x, structure.pos.y, 255)
-                            }
-                        } else {
-
-                            let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                                filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
-                            })
-
-                            for (let site of constructionSites) {
-
-                                cm.set(site.pos.x, site.pos.y, 255)
-                            }
-
-                            let structures = room.find(FIND_STRUCTURES, {
-                                filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
-                            })
-
-                            for (let structure of structures) {
-
-                                cm.set(structure.pos.x, structure.pos.y, 255)
-                            }
+                            cm.set(structure.pos.x, structure.pos.y, 255)
                         }
 
                         return cm
                     }
                 }).path
 
-                let containerConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+                console.log(JSON.stringify(path))
+
+                let containerConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
                     filter: s => s.structureType == STRUCTURE_CONTAINER
                 })
 

@@ -15,13 +15,13 @@ function mapVisuals() {
                 Game.map.visual.circle(new RoomPosition(8, 24, roomName), { radius: 8, fill: '#FFD180', opacity: 0.5 })
                 Game.map.visual.text((Memory.rooms[roomName].storedEnergy / 1000).toFixed(0) + "k", new RoomPosition(8, 24, roomName), { color: '#ffffff', fontSize: 8 })
 
-            } else if (Memory.rooms[roomName].claimable) {
+            } else if (Memory.rooms[roomName].claimable == true) {
 
                 Game.map.visual.rect(new RoomPosition(0, 0, roomName), 50, 50, { fill: '#ffffff', opacity: 0.25 })
 
             } else if (Memory.rooms[roomName].claimable == "notViable") {
 
-                Game.map.visual.rect(new RoomPosition(0, 0, roomName), 50, 50, { fill: '#ffffff', opacity: 0.25 })
+                Game.map.visual.rect(new RoomPosition(0, 0, roomName), 50, 50, { fill: '#ff66ff', opacity: 0.25 })
 
             } else if (Memory.rooms[roomName].stage == "enemyRoom") {
 

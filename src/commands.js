@@ -154,3 +154,16 @@ global.nukeTarget = function(x, y, roomName) {
 
 
 }
+
+global.killAllCreeps = function() {
+
+    for (let creepName in Game.creeps) {
+
+        let creep = Game.creeps[creepName]
+
+        creep.suicide()
+
+    }
+
+    return "killed all creeps"
+}

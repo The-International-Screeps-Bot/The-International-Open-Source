@@ -736,7 +736,7 @@ function spawnRequests(room, spawns) {
         if (storage) {
 
             let maxParts = 31
-            if (energyCapacity == 10300) maxParts = 12
+            if (energyCapacity == 10300) maxParts = 18
 
             // For every x stored energy add y parts
 

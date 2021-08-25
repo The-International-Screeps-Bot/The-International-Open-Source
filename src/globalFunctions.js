@@ -25,10 +25,7 @@ global.removePropertyFromArray = function(array, property) {
 
     while (i < array.length) {
 
-        if (array[i] == property) {
-
-            return array.splice(i)
-        }
+        if (array[i] == property) return array.slice(i + 1)
 
         i++
     }

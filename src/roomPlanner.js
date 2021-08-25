@@ -455,6 +455,11 @@ function roomPlanner(room) {
 
     }
 
+    function placeRemotePaths() {
+
+
+    }
+
     function removeUneeded() {
 
         if (controllerContainer && controllerLink) controllerContianer.destroy()

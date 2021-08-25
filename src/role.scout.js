@@ -196,7 +196,7 @@ module.exports = {
 
                             var newCommune
 
-                            if (creep.room.get("sources").length == 2 && creep.room.memory.claimable != true && creep.room.memory.claimable != "notViable" && creep.room.memory.stage != "remoteRoom" && creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 10) {
+                            if (creep.room.get("sources").length == 2 && creep.room.memory.claimable != true && creep.room.memory.claimable != "notViable" && creep.room.memory.stage != "remoteRoom") {
 
                                 if (creep.isEdge()) {
 
@@ -211,6 +211,8 @@ module.exports = {
                                         cacheAmount: 50,
                                     })
                                 }
+
+                                // Make sure room doesn't share an exit with slowmotionghost, a commune, or a possible commune
 
                                 let nearRoom = false
 

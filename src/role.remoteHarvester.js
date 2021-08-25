@@ -7,8 +7,6 @@ module.exports = {
 
         if (creep.room.name == remoteRoom) {
 
-            creep.room.memory.stage = "remoteRoom"
-
             if (creep.room.controller.reservation && creep.room.controller.reservation.username != "Invader" && creep.room.controller.reservation.username != me) {
 
                 creep.room.memory.stage = "enemyReservation"
