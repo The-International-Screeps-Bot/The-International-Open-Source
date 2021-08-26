@@ -146,7 +146,7 @@ function jumpStarterManager(room, creepsWithRole) {
                             defaultCostMatrix: room.memory.defaultCostMatrix,
                             avoidStages: [],
                             flee: false,
-                            cacheAmount: 1,
+                            cacheAmount: 10,
                         })
                     } else {
 
@@ -160,7 +160,7 @@ function jumpStarterManager(room, creepsWithRole) {
                             defaultCostMatrix: room.memory.defaultCostMatrix,
                             avoidStages: [],
                             flee: false,
-                            cacheAmount: 1,
+                            cacheAmount: 2,
                         })
                     }
                 }

@@ -62,7 +62,7 @@ function globalManager() {
 
     // New commune logic
 
-    if (!Memory.global.newCommune && !Memory.global.communeEstablisher && Game.gcl.level > Memory.global.communes.length && Memory.global.claimableRooms.length > 0) {
+    if ((!Memory.global.newCommune || !Memory.global.communeEstablisher) && Game.gcl.level > Memory.global.communes.length && Memory.global.claimableRooms.length > 0) {
 
         function findCommuneEstablisher(potentialNewCommune) {
 

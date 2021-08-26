@@ -37,9 +37,21 @@ module.exports = {
 
                     creep.say("NE")
 
-                    let goal = { pos: creep.room.controller.pos, range: 2 }
+                    let fleeTarget = controllerContainer.pos || controllerLink.pos
 
-                    creep.creepFlee(creep.pos, goal)
+                    if (creep.pos.getRangeTo(fleeTarget) < 2) {
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: fleeTarget, range: 2 },
+                            plainCost: 1,
+                            swampCost: 5,
+                            defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                            avoidStages: [],
+                            flee: true,
+                            cacheAmount: 10,
+                        })
+                    }
                 }
             }
         } else {

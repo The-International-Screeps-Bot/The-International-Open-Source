@@ -35,9 +35,11 @@ module.exports = {
 
             let controller = creep.room.get("controller")
 
-            if ((controller.owner && controller.owner.username != me) || controller.reservation || room.memory.stage >= 3) {
+            if ((controller.owner && !controller.my) || controller.reservation || creep.room.memory.stage >= 3) {
 
-                room.memory.claimable = false
+                console.log("AQ")
+
+                creep.room.memory.claimable = false
                 Memory.global.newCommune = false
                 Memory.global.communeEstablisher = false
                 Memory.global.claimableRooms = removePropertyFromArray(Memory.global.claimableRooms, creep.room.name)
