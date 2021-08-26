@@ -150,7 +150,7 @@ function roomPlanner(room) {
         }
     }
 
-    placeBase(bases)
+    if (Game.time % 100 == 0) placeBase(bases)
 
     function placeBase(bases) {
 
@@ -253,7 +253,7 @@ function roomPlanner(room) {
 
     if (room.storage && room.memory.stage >= 4) {
 
-        placeRamparts(ramparts)
+        if (Game.time % 100 == 0) placeRamparts(ramparts)
     }
 
     function placeRamparts(ramparts) {
@@ -316,7 +316,10 @@ function roomPlanner(room) {
     let sourceLink2 = room.get("sourceLink2")
     let controllerLink = room.get("controllerLink")
 
-    if (room.memory.stage >= 2) placeSourceContainers()
+    if (room.memory.stage >= 2) {
+
+        if (Game.time % 100 == 0) placeSourceContainers()
+    }
 
     function placeSourceContainers() {
 
@@ -353,7 +356,13 @@ function roomPlanner(room) {
 
         let origin = room.get("anchorPoint")
 
+        let roomPathDelay = 0
+
         for (let harvestPositionsObject of harvestPositions) {
+
+            roomPathDelay++
+
+            if (Game.time % (roomPathDelay + 101) != 0) return
 
             let goal = { pos: harvestPositionsObject.closest, range: 1 }
 
@@ -570,7 +579,6 @@ function roomPlanner(room) {
             for (let pos of path) {
 
                 let room = Game.rooms[pos.roomName]
-
                 room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476" })
 
                 room.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD)

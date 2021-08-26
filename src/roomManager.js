@@ -306,10 +306,7 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            if (Game.time % 100 == 0) {
-
-                roomPlanner(room, structures, constructionSites)
-            }
+            roomPlanner(room)
 
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed
