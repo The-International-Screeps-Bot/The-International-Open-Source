@@ -1,5 +1,3 @@
-const { isUndefined } = require("lodash")
-
 function config() {
 
     // Eventually move this to tickConfig
@@ -44,6 +42,8 @@ function config() {
     Memory.data.cpuPerCreep = 0
 
     Memory.data.roomManager = {}
+
+    Memory.data.marketAverages = {}
 
     // Global
 

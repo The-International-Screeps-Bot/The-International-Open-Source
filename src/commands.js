@@ -45,15 +45,15 @@ global.removeAllSites = function() {
 global.destroyAllStructures = function(type) {
 
     let structures = room.find(FIND_STRUCTURES, {
-        filter: s => !type || (type && s.structureType == type)
+        filter: s => {
+            if (type && s.structureType == type) return s
+            if (!type) return s
+        }
     })
 
-    for (let structure of structures) {
+    for (let structure of structures) structure.destroy()
 
-        structure.destroy()
-    }
-
-    return "destroyed all structures"
+    return "destroyed all structures " + type
 }
 
 global.resetRoom = function(roomName) {
@@ -66,10 +66,8 @@ global.resetRoom = function(roomName) {
         filter: s => s.structureType != STRUCTURE_SPAWN
     })
 
-    for (let structure of structures) {
+    for (let structure of structures) structure.destroy()
 
-        structure.destroy()
-    }
 
     return "reset " + roomName
 }

@@ -1,6 +1,7 @@
 global.avgPrice = function(resource) {
 
     let resourceHistory = Game.market.getHistory(resource)
+    if (Object.keys(resourceHistory).length == 0) return 0
 
     return resourceHistory[0].avgPrice
 }
@@ -30,5 +31,5 @@ global.removePropertyFromArray = function(array, property) {
         i++
     }
 
-    return false
+    return array
 }

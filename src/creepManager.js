@@ -91,7 +91,7 @@ function creepManager(room, myCreeps) {
         }
     }
 
-    Memory.data.cpuPerCreep = totalCpuUsed / myCreeps.length
+    Memory.data.cpuPerCreep = (totalCpuUsed / myCreeps.length).toFixed(2)
     consoleMessage += `
     `
 

@@ -34,7 +34,7 @@ function construction(room, specialStructures) {
 
                 if (remoteRoom) {
 
-                    remotePath(remoteRoom)
+                    /* remotePath(remoteRoom) */
                 }
             }
         }
@@ -240,7 +240,7 @@ function construction(room, specialStructures) {
 
             roomPathDelay++
 
-            /* if (Game.time % (roomPathDelay + 103) != 0) return */
+            if (Game.time % (roomPathDelay + 103) != 0) return
 
             let origin = room.memory.anchorPoint
 
@@ -335,7 +335,7 @@ function construction(room, specialStructures) {
                     }
                 }).path
 
-                console.log(JSON.stringify(path))
+                /* console.log(JSON.stringify(path)) */
 
                 let containerConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
                     filter: s => s.structureType == STRUCTURE_CONTAINER

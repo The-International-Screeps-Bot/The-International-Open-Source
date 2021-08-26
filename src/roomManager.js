@@ -318,7 +318,9 @@ function roomManager() {
         }
 
         Memory.data.roomManager[room.name] = {}
-        Memory.data.roomManager[room.name].cpuUsage = Game.cpu.getUsed() - roomCpuUsed
+        Memory.data.roomManager[room.name].cpuUsage = (Game.cpu.getUsed() - roomCpuUsed).toFixed(2)
+        Memory.data.roomManager[room.name].storedEnergy = room.get("storedEnergy")
+        Memory.data.roomManager[room.name].myCreeps = creeps.myCreeps.length
     }
 
     return {

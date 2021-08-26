@@ -105,6 +105,10 @@ function globalManager() {
 
 
     mapVisuals()
+
+    // Record data
+
+    Memory.data.marketAverages.energy = avgPrice(RESOURCE_ENERGY)
 }
 
 module.exports = globalManager

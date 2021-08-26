@@ -33,11 +33,9 @@ module.exports = {
             })
         } else {
 
-            let hostileStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
-                filter: s => !allyList.includes(s.owner.username) && s.structureType == STRUCTURE_INVADER_CORE
-            })
+            let controller = creep.room.get("controller")
 
-            if ((hostileStructure || creep.room.controller.reservation || (creep.room.controller.owner && !creep.room.controller.my) || room.memory.stage >= 3) && creep.room.name == Memory.global.newCommune) {
+            if ((controller.owner && controller.owner.username != me) || controller.reservation || room.memory.stage >= 3) {
 
                 room.memory.claimable = false
                 Memory.global.newCommune = false
