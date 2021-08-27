@@ -201,10 +201,11 @@ Creep.prototype.hasBoost = function(partType, boostType) {
 
     for (let part of creep.body) {
 
-        if (part.type == partType && part.boost == boostType) {
+        if (part.hits == 0) continue
+        if (part.type != partType) continue
+        if (part.boost != boostType) continue
 
-            return true
-        }
+        return true
     }
 
     return false

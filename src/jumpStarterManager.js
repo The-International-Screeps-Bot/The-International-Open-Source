@@ -199,32 +199,37 @@ function jumpStarterManager(room, creepsWithRole) {
 
                         let closestSource = creep.pos.findClosestByRange(FIND_SOURCES)
 
-                        creep.say("🔦")
+                        let myCreeps = room.find(FIND_MY_CREEPS)
 
-                        if (creep.pos.getRangeTo(closestSource) > 3) {
+                        if (myCreeps.length > 1) {
 
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: closestSource.pos, range: 1 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: creep.memory.defaultCostMatrix,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 10,
-                            })
-                        } else if (creep.pos.getRangeTo(closestSource) < 3) {
+                            creep.say("🔦")
 
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: closestSource.pos, range: 3 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: creep.memory.defaultCostMatrix,
-                                avoidStages: [],
-                                flee: true,
-                                cacheAmount: 10,
-                            })
+                            if (creep.pos.getRangeTo(closestSource) > 3) {
+
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: closestSource.pos, range: 1 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                    avoidStages: [],
+                                    flee: false,
+                                    cacheAmount: 10,
+                                })
+                            } else if (creep.pos.getRangeTo(closestSource) < 3) {
+
+                                creep.advancedPathing({
+                                    origin: creep.pos,
+                                    goal: { pos: closestSource.pos, range: 3 },
+                                    plainCost: false,
+                                    swampCost: false,
+                                    defaultCostMatrix: creep.memory.defaultCostMatrix,
+                                    avoidStages: [],
+                                    flee: true,
+                                    cacheAmount: 10,
+                                })
+                            }
                         }
                     }
                 }
