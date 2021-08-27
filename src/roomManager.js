@@ -158,7 +158,7 @@ function roomManager() {
             //
 
             let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && creep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
             })
 
             if (hostiles.length > 0) {
