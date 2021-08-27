@@ -4,6 +4,8 @@ let findAnchor = require("findAnchor")
 module.exports = {
     run: function(creep) {
 
+        console.log(creep.memory.roomFrom)
+
         let targetRooms = Game.map.describeExits(creep.room.name)
         let targetRoomsArray = []
         let min

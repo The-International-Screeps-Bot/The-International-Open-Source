@@ -45,7 +45,7 @@ function config() {
 
     Memory.data.marketAverages = {}
 
-    // Global
+    // Global config
 
     if (!Memory.global) Memory.global = {}
 
@@ -69,11 +69,31 @@ function config() {
 
     if (!Memory.global.needsEnergy) Memory.global.needsEnergy = []
 
-    // Command based defaults
+    // Command defaults
 
     if (Memory.global.consoleMessages == undefined) Memory.global.consoleMessages = false
     if (Memory.global.mapVisuals == undefined) Memory.global.mapVisuals = false
     if (Memory.global.roomVisuals == undefined) Memory.global.roomVisuals = false
+
+    // Room config
+
+    for (let roomName in Game.rooms) {
+
+        let room = Game.rooms[roomName]
+
+        let controller = room.get("controller")
+        if (!controller || !controller.my) continue
+
+        let roomValues = {
+            remoteRooms: [],
+            deposits: {},
+        }
+
+        for (let value in roomValues) {
+
+            if (!room.memory[value]) room.memory[value] = roomValues[value]
+        }
+    }
 }
 
 module.exports = config
