@@ -2,6 +2,10 @@ function roomPlanner(room) {
 
     if (Object.keys(Game.constructionSites).length == 100) return
 
+    let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
+
+    if (mySites.length > 10) return
+
     //
 
     let placedSites = 0
@@ -168,7 +172,7 @@ function roomPlanner(room) {
 
         for (let structureType in collection) {
 
-            if (structureType == STRUCTURE_ROAD && room.memory.stage < 5) continue
+            if (structureType == STRUCTURE_ROAD && room.memory.stage < 4) continue
 
             if (structureType == STRUCTURE_LINK && room.memory.stage < 6) continue
 
@@ -464,7 +468,7 @@ function roomPlanner(room) {
 
     }
 
-    if (room.memory.stage >= 4 && room.memory.remoteRooms && room.memory.remoteRooms.length > 0) {
+    if (room.memory.stage >= 4 && room.memory.remoteRooms.length > 0) {
 
         let roomPathDelay = 0
 
