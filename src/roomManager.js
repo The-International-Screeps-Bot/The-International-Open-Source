@@ -162,7 +162,7 @@ function roomManager() {
         if (combatHappened && room.memory.stage == "remoteRoom") {
 
             let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && creep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
             })
 
             if (hostiles.length > 0) room.memory.stage = "neutralRoom"
@@ -189,7 +189,7 @@ function roomManager() {
             //
 
             let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && creep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
             })
 
             if (combatHappened && hostiles.length > 0) room.controller.activateSafeMode()
