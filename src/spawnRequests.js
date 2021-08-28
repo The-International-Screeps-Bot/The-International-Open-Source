@@ -32,7 +32,7 @@ function spawnRequests(room, spawns) {
         }
     }
 
-    if (room.memory.remoteRooms) room.memory.remoteRooms = room.memory.remoteRooms.slice(0, Math.floor(spawns.length * 2))
+    if (room.memory.remoteRooms) room.memory.remoteRooms = room.memory.remoteRooms.slice(0, Math.floor(spawns.length * 3))
 
     if (room.memory.stage && room.memory.stage < 3) {
 
@@ -368,9 +368,9 @@ function spawnRequests(room, spawns) {
 
         minCreeps["communeDefender"] = 1
     }
-    (function() {
 
-        if (room.get("storedEnergy") < 15000) return
+
+    if (!storage || (storage && room.get("storedEnergy") > 15000)) {
 
         for (let remoteRoom of room.memory.remoteRooms) {
 
@@ -411,7 +411,7 @@ function spawnRequests(room, spawns) {
                 minCreeps["remoteHauler"] += remoteRoom.sources * 2
             }
         }
-    })()
+    }
 
     if (energyCapacity >= 550) {
         if (room.memory.roomfix) {

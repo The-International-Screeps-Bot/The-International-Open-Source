@@ -29,7 +29,7 @@ function scoutManager(room, creepsWithRole) {
                 exitRoomNames.push(roomName)
             }
 
-            targetRoom = exitRoomNames.filter(roomName => !Memory.rooms[roomName].scoutTick)[0]
+            targetRoom = exitRoomNames.filter(roomName => !Memory.rooms[roomName] || !Memory.rooms[roomName].scoutTick)[0]
 
             console.log("TargetRoom" + targetRoom)
 
@@ -157,15 +157,22 @@ function scoutManager(room, creepsWithRole) {
 
                             if (checkDuplicate()) {
 
-                                let canHaveMoreRemotes = Math.floor(Game.rooms[creep.memory.roomFrom].get("spawns").length * 2) > Memory.rooms[creep.memory.roomFrom].remoteRooms.length
+                                let canHaveMoreRemotes = Math.floor(Game.rooms[creep.memory.roomFrom].get("spawns").length * 3) > Memory.rooms[creep.memory.roomFrom].remoteRooms.length
 
                                 if (canHaveMoreRemotes) {
 
-                                    let sources = room.get("sources").length
+                                    let hostiles = room.find(FIND_HOSTILE_CREEPS, {
+                                        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+                                    })
 
-                                    Memory.rooms[creep.memory.roomFrom].remoteRooms.push({ name: room.name, sources: sources, roads: false, builderNeed: false, enemy: false, distance: null })
+                                    if (hostiles.length == 0) {
 
-                                    room.memory.stage = "remoteRoom"
+                                        let sources = room.get("sources").length
+
+                                        Memory.rooms[creep.memory.roomFrom].remoteRooms.push({ name: room.name, sources: sources, roads: false, builderNeed: false, enemy: false, distance: null })
+
+                                        room.memory.stage = "remoteRoom"
+                                    }
                                 }
                             }
                         }

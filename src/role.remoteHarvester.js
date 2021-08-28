@@ -120,19 +120,15 @@ module.exports = {
                 }
             }
 
-            let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                filter: (c) => {
-                    return (allyList.indexOf(c.owner.username) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
-                }
+            let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
+                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
             })
 
             let hostileStructure = creep.room.find(FIND_HOSTILE_STRUCTURES, {
-                filter: (c) => {
-                    return (allyList.indexOf(c.owner.username) === -1)
-                }
+                filter: s => !allyList.includes(s.owner.username)
             })
 
-            if ((closestHostile && !(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) || hostileStructure.length > 0) {
+            if (hostiles.length > 0 || hostileStructure.length > 0) {
 
                 creep.room.memory.enemy = true
 
@@ -144,13 +140,11 @@ module.exports = {
             let constructionSite = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
 
             let structure = creep.room.find(FIND_STRUCTURES, {
-                filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5
+                filter: s => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5
             })
 
-            if (constructionSite.length > 0 || structure.length > 0) {
+            if (constructionSite.length > 0 || structure.length > 0) creep.room.memory.builderNeed = true
 
-                creep.room.memory.builderNeed = true
-            }
 
         } else {
 

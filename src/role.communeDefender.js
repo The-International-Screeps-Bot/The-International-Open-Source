@@ -13,7 +13,6 @@ module.exports = {
                 if (remoteRoomDistance == 1) {
 
                     remoteRoom = unfilteredRoom.name
-
                 }
             }
         })
@@ -83,10 +82,7 @@ module.exports = {
                         }
                     } else {
 
-                        if (creep.hits < creep.hitsMax) {
-
-                            creep.heal(creep)
-                        }
+                        if (creep.hits < creep.hitsMax) creep.heal(creep)
 
                         creep.room.memory.enemy = false
                     }

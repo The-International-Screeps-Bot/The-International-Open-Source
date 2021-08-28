@@ -156,6 +156,7 @@ function roomManager() {
 
                 combatHappened = true
                 console.log("EVENT: " + event.event)
+                break
             }
         }
 
@@ -166,6 +167,13 @@ function roomManager() {
             })
 
             if (hostiles.length > 0) room.memory.stage = "neutralRoom"
+
+            let roomsWithThisRemote = Memory.global.communes.filter(roomName => Memory.rooms[roomName].remoteRooms.includes(room.name))
+
+            for (let roomName of roomsWithThisRemote) {
+
+                Memory.rooms[roomName].remoteRooms = removePropertyFromArray(Memory.rooms[roomName].remoteRooms, room.name)
+            }
         }
 
 

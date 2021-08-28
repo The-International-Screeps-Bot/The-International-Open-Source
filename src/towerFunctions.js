@@ -5,7 +5,7 @@ Room.prototype.attackHostiles = function(towers) {
     let target
 
     let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, HEAL, WORK, CARRY, CLAIM])
+        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username)
     })
 
     if (hostiles.length == 0) return false
