@@ -174,8 +174,6 @@ function roomPlanner(room) {
 
             if (structureType == STRUCTURE_ROAD && room.memory.stage < 4) continue
 
-            if (structureType == STRUCTURE_LINK && room.memory.stage < 6) continue
-
             if (structureType == STRUCTURE_LAB) continue
             if (structureType == STRUCTURE_NUKER) continue
             if (structureType == STRUCTURE_OBSERVER) continue
@@ -461,10 +459,7 @@ function roomPlanner(room) {
         }
     }
 
-
-
     function placeControllerLink() {
-
 
     }
 
@@ -608,9 +603,27 @@ function roomPlanner(room) {
 
     function removeUneeded() {
 
-        if (controllerContainer && controllerLink) controllerContianer.destroy()
+        if (baseLink && controllerLink && controllerContainer) controllerContainer.destroy()
 
 
+        if (sourceContainer1 && sourceLink1) 1 == 1 //sourceContainer1.destroy()
+
+
+        if (sourceContainer2 && sourceLink2) 1 == 1 //sourceContainer2.destroy()
+
+
+        let walls = room.find(FIND_STRUCTURES, {
+            filter: s => s.structureType == STRUCTURE_WALL
+        })
+
+        for (let structure of walls) structure.destroy()
+
+
+        let hostileStructures = room.find(FIND_HOSTILE_STRUCTURES, {
+            filter: s => s.owner && !s.my
+        })
+
+        for (let structure of hostileStructures) structure.destroy()
     }
 }
 
