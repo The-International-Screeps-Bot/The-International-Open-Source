@@ -14,8 +14,9 @@ function scoutManager(room, creepsWithRole) {
 
         function findNewTargetRoom() {
 
+            // If we have a target room and it's not our room return
+
             if (targetRoom && room.name != targetRoom) return
-            if (targetRoom) return
 
             let exits = Game.map.describeExits(room.name)
 
@@ -56,7 +57,7 @@ function scoutManager(room, creepsWithRole) {
 
             function signController() {
 
-                if (controller.sign && controller.sign.username != me) return
+                if (controller.sign && controller.sign.username == me) return
                 if (controller.reservation) return
                 if (controller.owner && !controller.my) return
 

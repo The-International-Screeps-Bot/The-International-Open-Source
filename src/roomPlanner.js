@@ -317,6 +317,7 @@ function roomPlanner(room) {
     let sourceLink1 = room.get("sourceLink1")
     let sourceLink2 = room.get("sourceLink2")
     let controllerLink = room.get("controllerLink")
+    let baseLink = room.get("baseLink")
 
     if (room.memory.stage >= 2) {
 
@@ -459,8 +460,15 @@ function roomPlanner(room) {
         }
     }
 
+    placeControllerLink()
+
     function placeControllerLink() {
 
+        if (Game.time % 100 != 0) return
+
+        if (!controllerContainer) return
+
+        if (placedSites < 10 && room.createConstructionSite(controllerContainer.x, controllerContainer.y, STRUCTURE_LINK) == 0) placedSites++
     }
 
     if (room.memory.stage >= 4 && room.memory.remoteRooms.length > 0) {
@@ -601,23 +609,23 @@ function roomPlanner(room) {
         }
     }
 
+    removeUneeded()
+
     function removeUneeded() {
+
+        if (Game.time % 100 != 0) return
 
         if (baseLink && controllerLink && controllerContainer) controllerContainer.destroy()
 
+        /* if (sourceContainer1 && sourceLink1) sourceContainer1.destroy()
 
-        if (sourceContainer1 && sourceLink1) 1 == 1 //sourceContainer1.destroy()
-
-
-        if (sourceContainer2 && sourceLink2) 1 == 1 //sourceContainer2.destroy()
-
+        if (sourceContainer2 && sourceLink2) sourceContainer2.destroy() */
 
         let walls = room.find(FIND_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_WALL
         })
 
         for (let structure of walls) structure.destroy()
-
 
         let hostileStructures = room.find(FIND_HOSTILE_STRUCTURES, {
             filter: s => s.owner && !s.my

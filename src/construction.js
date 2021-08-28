@@ -32,8 +32,6 @@ function construction(room, specialStructures) {
         }
     }
 
-    if (Game.time % 100 == 0) removeUneeded()
-
     function controllerPath() {
 
         let origin = room.memory.anchorPoint

@@ -138,6 +138,37 @@ function roomManager() {
         consoleMessage += `visuals: ` + cpuUsed.toFixed(2) + `
                     `
 
+        //
+
+        let combatHappened = false
+
+        if ((room.controller && room.controller.my) || room.memory.stage == "remoteRoom") {
+
+            let eventLog = room.getEventLog()
+            let combatEvents = eventLog.filter(eventObject => eventObject.event == EVENT_ATTACK)
+
+            for (let event of combatEvents) {
+
+                let target = Game.getObjectById(event.data.targetId)
+
+                if (!target) continue
+                if (!target.my) continue
+
+                combatHappened = true
+                console.log("EVENT: " + event.event)
+            }
+        }
+
+        if (combatHappened && room.memory.stage == "remoteRoom") {
+
+            let hostiles = room.find(FIND_HOSTILE_CREEPS, {
+                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && creep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+            })
+
+            if (hostiles.length > 0) room.memory.stage = "neutralRoom"
+        }
+
+
         // Commune only scripts
 
         if (room.controller && room.controller.my) {
@@ -161,13 +192,7 @@ function roomManager() {
                 filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && creep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
             })
 
-            if (hostiles.length > 0) {
-
-                for (let spawn of room.get("spawns")) {
-
-                    if (spawn.hits < spawn.hitsMax) room.controller.activateSafeMode()
-                }
-            }
+            if (combatHappened && hostiles.length > 0) room.controller.activateSafeMode()
 
             //
 
