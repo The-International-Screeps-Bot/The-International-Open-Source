@@ -19,9 +19,13 @@ The bot is not meant for use or forking, please do not use it as such. It is sim
 
 ## Progress
 
-### Official Progress Board
+### Progress Board
 
 https://trello.com/b/BIZ8G8je/the-internationale-screeps-bot
+
+### Flowchart
+
+https://cloud.smartdraw.com/share.aspx/?pubDocShare=253503CFB284B9C4323DA9A85219E9857F3
 
 - [x] Setup info to be displayed in Grafana
 - [x] Automated spawning
