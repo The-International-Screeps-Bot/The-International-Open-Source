@@ -90,11 +90,17 @@ function scoutManager(room, creepsWithRole) {
 
             // Check if viable remoteRoom
 
-            isRemoteRoom()
+            if (isRemoteRoom()) {
+
+                room.memory.stage = "remoteRoom"
+
+            } else if (room.memory.stage == "remoteRoom") room.memory.stage = "neutralRoom"
 
             function isRemoteRoom() {
 
                 if (room.memory.stage == "remoteRoom") return
+
+                if (controller.owner) return
 
                 if (controller.reservation && controller.reservation != "Invader") return
 
@@ -109,11 +115,17 @@ function scoutManager(room, creepsWithRole) {
                 })
                 if (hostiles.length > 0) return
 
-                let distanceFromCommune = Game.map.getRoomLinearDistance(room.name, creep.memory.roomFrom)
-                if (distanceFromCommune < 1) return
+                let safeNearCommune = false
 
-                let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"])
-                if (safeDistance > 2) return
+                for (let roomName of Memory.global.communes) {
+
+                    let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, roomName), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"])
+
+                    if (safeDistance <= 2) continue
+
+                    safeNearCommune = true
+                }
+                if (!safeNearCommune) return
 
                 let sources = room.get("sources")
                 let sourceIds = []
@@ -121,8 +133,6 @@ function scoutManager(room, creepsWithRole) {
                 for (let source of sources) sourceIds.push(source.id)
 
                 Memory.rooms[creep.memory.roomFrom].remoteRooms[room.name] = { inUse: false, sources: sourceIds, roads: false, builderNeed: false, enemy: false, distance: undefined }
-
-                room.memory.stage = "remoteRoom"
             }
 
             if (controller.owner) {

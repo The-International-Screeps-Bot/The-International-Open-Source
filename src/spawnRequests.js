@@ -742,14 +742,6 @@ function spawnRequests(room, spawns) {
             return
         }
         if (energyCapacity >= 300) {
-            if (creepsWithRole[["hauler", room.name]] == 0) {
-
-                this.defaultParts = []
-                this.extraParts = [workPart]
-                this.maxParts = 2
-
-                return
-            }
 
             this.defaultParts = []
             this.extraParts = [workPart]
@@ -1328,5 +1320,4 @@ function spawnRequests(room, spawns) {
     }
 }
 
-module.exports = spawnRequests
 module.exports = spawnRequests

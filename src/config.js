@@ -51,7 +51,6 @@ function config() {
 
     let globalValues = {
         resourceRequests: {},
-        communes: [],
         claimableRooms: [],
         newCommune: undefined,
     }
@@ -63,11 +62,8 @@ function config() {
 
     Memory.global.totalEnergy = 0
 
+    Memory.global.communes = []
     Memory.global.establishedRooms = []
-
-    if (!Memory.global.hasBoosts) Memory.global.hasBoosts = 0
-
-    if (!Memory.global.needsEnergy) Memory.global.needsEnergy = []
 
     // Command defaults
 
@@ -84,9 +80,13 @@ function config() {
         let controller = room.get("controller")
         if (!controller || !controller.my) continue
 
+        Memory.global.communes.push(roomName)
+
         let roomValues = {
             remoteRooms: {},
             deposits: {},
+            boosts: {},
+            storedEnergy: 0,
         }
 
         for (let value in roomValues) {

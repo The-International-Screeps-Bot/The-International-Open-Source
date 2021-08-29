@@ -164,8 +164,6 @@ function roomManager() {
 
         if (room.controller && room.controller.my) {
 
-            if (!Memory.global.communes.includes(room.name)) Memory.global.communes.push(room.name)
-
             // PLEASE MOVE THIS TO A DEDICATED FILE
 
             //
