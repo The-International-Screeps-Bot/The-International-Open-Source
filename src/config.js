@@ -85,7 +85,7 @@ function config() {
         if (!controller || !controller.my) continue
 
         let roomValues = {
-            remoteRooms: [],
+            remoteRooms: {},
             deposits: {},
         }
 

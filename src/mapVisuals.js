@@ -17,13 +17,16 @@ function mapVisuals() {
 
             } else if (Memory.rooms[roomName].claimable == true) {
 
-                Game.map.visual.rect(new RoomPosition(0, 0, roomName), 50, 50, { fill: '#ffffff', opacity: 0.25 })
+                Game.map.visual.circle(new RoomPosition(8, 8, roomName), { radius: 8, fill: '#ffffff', opacity: 0.5 })
+                Game.map.visual.text("C", new RoomPosition(8, 8, roomName), { color: '#00e600', fontSize: 8 })
 
-            } else if (Memory.rooms[roomName].claimable == "notViable") {
+            }
+            /* else if (Memory.rooms[roomName].claimable == "notViable") {
 
                 Game.map.visual.rect(new RoomPosition(0, 0, roomName), 50, 50, { fill: '#ff66ff', opacity: 0.25 })
 
-            } else if (Memory.rooms[roomName].stage == "enemyRoom") {
+            } */
+            if (Memory.rooms[roomName].stage == "enemyRoom") {
 
                 Game.map.visual.rect(new RoomPosition(0, 0, roomName), 50, 50, { fill: '#FF0000', opacity: 0.25 })
 

@@ -31,8 +31,6 @@ function scoutManager(room, creepsWithRole) {
 
             targetRoom = exitRoomNames.filter(roomName => !Memory.rooms[roomName] || !Memory.rooms[roomName].scoutTick)[0]
 
-            console.log("TargetRoom" + targetRoom)
-
             if (targetRoom) return
 
             lowestScoutTick = Math.min.apply(Math, exitRoomNames.map(roomName => Memory.rooms[roomName].scoutTick))
@@ -40,8 +38,15 @@ function scoutManager(room, creepsWithRole) {
             targetRoom = exitRoomNames.filter(roomName => Memory.rooms[roomName].scoutTick == lowestScoutTick)[0]
         }
 
+        // If no target room after trying to find one stop creep
+
         if (!targetRoom) continue
+
+        // cache targetRoom in memory
+
         creep.memory.targetRoom = targetRoom
+
+        room.memory.scoutTick = Game.time
 
         // If target room see if there is a controller
 
@@ -82,6 +87,43 @@ function scoutManager(room, creepsWithRole) {
             }
 
             // Find what type of room this is and gather and record data on it
+
+            // Check if viable remoteRoom
+
+            isRemoteRoom()
+
+            function isRemoteRoom() {
+
+                if (room.memory.stage == "remoteRoom") return
+
+                if (controller.reservation && controller.reservation != "Invader") return
+
+                if (Memory.rooms[creep.memory.roomFrom].remoteRooms[room.name]) return
+
+                let maxRemoteRooms = Math.floor(Game.rooms[creep.memory.roomFrom].get("spawns").length * 3)
+                let activeRemotes = Object.values(Memory.rooms[creep.memory.roomFrom].remoteRooms).length
+                if (activeRemotes >= maxRemoteRooms) return
+
+                let hostiles = room.find(FIND_HOSTILE_CREEPS, {
+                    filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
+                })
+                if (hostiles.length > 0) return
+
+                let distanceFromCommune = Game.map.getRoomLinearDistance(room.name, creep.memory.roomFrom)
+                if (distanceFromCommune < 1) return
+
+                let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"])
+                if (safeDistance > 2) return
+
+                let sources = room.get("sources")
+                let sourceIds = []
+
+                for (let source of sources) sourceIds.push(source.id)
+
+                Memory.rooms[creep.memory.roomFrom].remoteRooms[room.name] = { inUse: false, sources: sourceIds, roads: false, builderNeed: false, enemy: false, distance: undefined }
+
+                room.memory.stage = "remoteRoom"
+            }
 
             if (controller.owner) {
 
@@ -132,51 +174,7 @@ function scoutManager(room, creepsWithRole) {
                     }
                 } else {
 
-                    // Check if viable remoteRoom
-
-                    let targetRoomDistance = Game.map.getRoomLinearDistance(room.name, creep.memory.roomFrom) == 1
-
-                    if (targetRoomDistance == 1) {
-
-                        let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"]) <= 2
-
-                        if (safeDistance) {
-
-                            function checkDuplicate() {
-
-                                for (let object of Memory.rooms[creep.memory.roomFrom].remoteRooms) {
-
-                                    if (object.name == room.name) {
-
-                                        return false
-                                    }
-                                }
-
-                                return true
-                            }
-
-                            if (checkDuplicate()) {
-
-                                let canHaveMoreRemotes = Math.floor(Game.rooms[creep.memory.roomFrom].get("spawns").length * 3) > Memory.rooms[creep.memory.roomFrom].remoteRooms.length
-
-                                if (canHaveMoreRemotes) {
-
-                                    let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-                                        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
-                                    })
-
-                                    if (hostiles.length == 0) {
-
-                                        let sources = room.get("sources").length
-
-                                        Memory.rooms[creep.memory.roomFrom].remoteRooms.push({ name: room.name, sources: sources, roads: false, builderNeed: false, enemy: false, distance: null })
-
-                                        room.memory.stage = "remoteRoom"
-                                    }
-                                }
-                            }
-                        }
-                    } else if (room.memory.stage != "remoteRoom") {
+                    if (room.memory.stage != "remoteRoom") {
 
                         room.memory.stage = "neutralRoom"
                     }
@@ -208,6 +206,8 @@ function scoutManager(room, creepsWithRole) {
                         for (let property in exits) {
 
                             let roomName = exits[property]
+
+                            if (!Memory.rooms[roomName]) continue
 
                             if ((Memory.rooms[roomName].owner && Memory.rooms[roomName].owner == "slowmotionghost") || Memory.rooms[roomName].stage >= 0 || Memory.rooms[roomName].claimable == true) nearRoom = true
                         }
@@ -322,4 +322,5 @@ function scoutManager(room, creepsWithRole) {
     }
 }
 
+module.exports = scoutManager
 module.exports = scoutManager

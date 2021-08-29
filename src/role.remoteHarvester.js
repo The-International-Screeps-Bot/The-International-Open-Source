@@ -121,7 +121,7 @@ module.exports = {
             }
 
             let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
-                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
             })
 
             let hostileStructure = creep.room.find(FIND_HOSTILE_STRUCTURES, {
@@ -130,11 +130,11 @@ module.exports = {
 
             if (hostiles.length > 0 || hostileStructure.length > 0) {
 
-                creep.room.memory.enemy = true
+                Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.room.name].enemy = true
 
             } else {
 
-                creep.room.memory.enemy = false
+                Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.room.name].enemy = false
             }
 
             let constructionSite = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
@@ -143,8 +143,10 @@ module.exports = {
                 filter: s => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5
             })
 
-            if (constructionSite.length > 0 || structure.length > 0) creep.room.memory.builderNeed = true
+            if (constructionSite.length > 0 || structure.length > 0) {
 
+                Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.room.name].builderNeed = true
+            }
 
         } else {
 

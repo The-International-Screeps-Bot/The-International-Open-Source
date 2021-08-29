@@ -115,7 +115,7 @@ function findAnchor(room) {
                     let nearExit
 
                     for (let exit of exits) {
-                        if (exit.getRangeTo(x, y) <= 11) {
+                        if (exit.getRangeTo(x, y) <= 9) {
 
                             nearExit = true
                             break

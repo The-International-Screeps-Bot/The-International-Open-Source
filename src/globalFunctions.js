@@ -1,7 +1,7 @@
 global.avgPrice = function(resource) {
 
     let resourceHistory = Game.market.getHistory(resource)
-    if (Object.keys(resourceHistory).length == 0) return 0
+    if (Object.values(resourceHistory).length == 0) return 0
 
     return resourceHistory[0].avgPrice
 }

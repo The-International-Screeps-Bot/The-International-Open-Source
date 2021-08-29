@@ -5,18 +5,13 @@ module.exports = {
         const roomFrom = creep.memory.roomFrom
         let remoteRoom
 
-        _.forEach(Game.rooms, function(unfilteredRoom) {
+        for (let remoteRoomName in Memory.rooms[creep.memory.roomFrom].remoteRooms) {
 
-            if (unfilteredRoom.memory.stage == "remoteRoom" && unfilteredRoom.memory.builderNeed == true) {
+            if (!remoteRoomName.builderNeed) continue
 
-                let remoteRoomDistance = Game.map.getRoomLinearDistance(creep.memory.roomFrom, unfilteredRoom.name)
-
-                if (remoteRoomDistance == 1) {
-
-                    remoteRoom = unfilteredRoom.name
-                }
-            }
-        })
+            remoteRoom = remoteRoomName
+            break
+        }
 
         creep.memory.remoteRoom = remoteRoom
 

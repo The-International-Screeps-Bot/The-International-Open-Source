@@ -22,9 +22,9 @@ module.exports = {
 
         /* if (!creep.memory.reaction) {
 
-            for (let baseResource of Object.keys(resources)) {
+            for (let baseResource of Object.values(resources)) {
 
-                for (let reactionResource of Object.keys(resources[baseResource])) {
+                for (let reactionResource of Object.values(resources[baseResource])) {
 
                     let resource = resources[baseResource][reactionResource]
 

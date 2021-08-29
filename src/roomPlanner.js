@@ -1,6 +1,6 @@
 function roomPlanner(room) {
 
-    if (Object.keys(Game.constructionSites).length == 100) return
+    if (Object.values(Game.constructionSites).length == 100) return
 
     let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
 

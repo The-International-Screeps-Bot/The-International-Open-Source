@@ -19,7 +19,7 @@ let taskManager = require("taskManager")
 let spawnManager = require("spawnManager")
 
 let nukerManager = require("nukerManager")
-let towers = require("towers")
+let towerManager = require("towerManager")
 let links = require("links")
 let labs = require("labs")
 let terminals = require("terminals")
@@ -160,23 +160,6 @@ function roomManager() {
             }
         }
 
-        if (combatHappened && room.memory.stage == "remoteRoom") {
-
-            let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
-            })
-
-            if (hostiles.length > 0) room.memory.stage = "neutralRoom"
-
-            let roomsWithThisRemote = Memory.global.communes.filter(roomName => Memory.rooms[roomName].remoteRooms.includes(room.name))
-
-            for (let roomName of roomsWithThisRemote) {
-
-                Memory.rooms[roomName].remoteRooms = removePropertyFromArray(Memory.rooms[roomName].remoteRooms, room.name)
-            }
-        }
-
-
         // Commune only scripts
 
         if (room.controller && room.controller.my) {
@@ -257,11 +240,11 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            towers(room)
+            towerManager(room)
 
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed
-            consoleMessage += `towers: ` + cpuUsed.toFixed(2) + `
+            consoleMessage += `towerManager: ` + cpuUsed.toFixed(2) + `
             `
 
             //

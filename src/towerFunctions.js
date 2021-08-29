@@ -24,6 +24,8 @@ Room.prototype.attackHostiles = function(towers) {
 
                 for (let hostile of hostiles) {
 
+                    if (hostile.isEdge()) continue
+
                     if (room.findTowerDamage(towers, hostile) - room.findHealPower(hostile, enemyHealers) >= minDamage) return hostile
                 }
             }

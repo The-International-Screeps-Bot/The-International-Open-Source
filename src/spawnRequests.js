@@ -21,18 +21,14 @@ function spawnRequests(room, spawns) {
 
     for (let role of remoteRoles) {
 
-        if (room.memory.remoteRooms) {
-            for (let remoteRoom of room.memory.remoteRooms) {
+        for (let remoteRoomName in room.memory.remoteRooms) {
 
-                if (!creepsOfRemoteRole[[role, remoteRoom.name]]) {
+            if (!creepsOfRemoteRole[[role, remoteRoomName]]) {
 
-                    creepsOfRemoteRole[[role, remoteRoom.name]] = 0
-                }
+                creepsOfRemoteRole[[role, remoteRoomName]] = 0
             }
         }
     }
-
-    if (room.memory.remoteRooms) room.memory.remoteRooms = room.memory.remoteRooms.slice(0, Math.floor(spawns.length * 3))
 
     if (room.memory.stage && room.memory.stage < 3) {
 
@@ -258,9 +254,13 @@ function spawnRequests(room, spawns) {
 
     if (!storage) {
 
-        if (energyCapacity >= 1300) {
+        if (energyCapacity >= 1800) {
 
             minCreeps["upgrader"] = 2
+
+        } else if (energyCapacity >= 1300) {
+
+            minCreeps["upgrader"] = 3
 
         } else if (energyCapacity >= 800) {
 
@@ -358,10 +358,9 @@ function spawnRequests(room, spawns) {
 
     minCreeps["scout"] = 1
 
-
     if (stage >= 4) {
 
-        minCreeps["remoteBuilder"] = 1 + Math.floor(room.memory.remoteRooms.length / 3)
+        minCreeps["remoteBuilder"] = 1 + Math.floor(Object.values(room.memory.remoteRooms).length / 3)
     }
 
     if (stage >= 3) {
@@ -369,10 +368,11 @@ function spawnRequests(room, spawns) {
         minCreeps["communeDefender"] = 1
     }
 
+    if (!storage || (room.get("storedEnergy") > 15000)) {
 
-    if (!storage || (storage && room.get("storedEnergy") > 15000)) {
+        for (let remoteRoomName in room.memory.remoteRooms) {
 
-        for (let remoteRoom of room.memory.remoteRooms) {
+            let remoteRoom = room.memory.remoteRooms[remoteRoomName]
 
             if (energyCapacity >= 1800) {
 
@@ -380,35 +380,43 @@ function spawnRequests(room, spawns) {
 
                 minCreeps["remoteHarvester1"] += 1
 
-                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 1
+                if (remoteRoom.sources.length == 2) minCreeps["remoteHarvester2"] += 1
 
-                minCreeps["remoteHauler"] += remoteRoom.sources
+                minCreeps["remoteHauler"] += remoteRoom.sources.length
 
-            } else if (energyCapacity >= 800) {
+                continue
+            }
+            if (energyCapacity >= 800) {
 
                 minCreeps["reserver"] += 1
 
                 minCreeps["remoteHarvester1"] += 1
 
-                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 1
+                if (remoteRoom.sources.length == 2) minCreeps["remoteHarvester2"] += 1
 
-                minCreeps["remoteHauler"] += remoteRoom.sources * 2
+                minCreeps["remoteHauler"] += remoteRoom.sources.length * 2
 
-            } else if (energyCapacity >= 550) {
+                continue
+            }
+            if (energyCapacity >= 550) {
 
                 minCreeps["remoteHarvester1"] += 1
 
-                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 1
+                if (remoteRoom.sources.length == 2) minCreeps["remoteHarvester2"] += 1
 
-                minCreeps["remoteHauler"] += remoteRoom.sources * 2
+                minCreeps["remoteHauler"] += remoteRoom.sources.length * 2
 
-            } else if (energyCapacity >= 300) {
+                continue
+            }
+            if (energyCapacity >= 300) {
 
                 minCreeps["remoteHarvester1"] += 2
 
-                if (remoteRoom.sources == 2) minCreeps["remoteHarvester2"] += 2
+                if (remoteRoom.sources.length == 2) minCreeps["remoteHarvester2"] += 2
 
-                minCreeps["remoteHauler"] += remoteRoom.sources * 2
+                minCreeps["remoteHauler"] += remoteRoom.sources.length * 2
+
+                continue
             }
         }
     }
@@ -453,7 +461,7 @@ function spawnRequests(room, spawns) {
 
         if (requiredCreeps[role] > 0) {
 
-            /* console.log(role + ", " + requiredCreeps[role] + ", " + room.name) */
+            console.log(role + ", " + requiredCreeps[role] + ", " + room.name)
         }
     }
 
@@ -477,43 +485,53 @@ function spawnRequests(room, spawns) {
 
     let minRemoteCreeps = {}
 
-    for (let remoteRoom of room.memory.remoteRooms) {
+    for (let remoteRoomName in room.memory.remoteRooms) {
+
+        let remoteRoom = room.memory.remoteRooms[remoteRoomName]
 
         if (energyCapacity >= 1800) {
 
-            minRemoteCreeps[["reserver", remoteRoom.name]] = 1
+            minRemoteCreeps[["reserver", remoteRoomName]] = 1
 
-            minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 1
+            minRemoteCreeps[["remoteHarvester1", remoteRoomName]] = 1
 
-            if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 1
+            if (remoteRoom.sources.length == 2) minRemoteCreeps[["remoteHarvester2", remoteRoomName]] = 1
 
-            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources
+            minRemoteCreeps[["remoteHauler", remoteRoomName]] = remoteRoom.sources.length
 
-        } else if (energyCapacity >= 800) {
+            continue
+        }
+        if (energyCapacity >= 800) {
 
-            minRemoteCreeps[["reserver", remoteRoom.name]] = 1
+            minRemoteCreeps[["reserver", remoteRoomName]] = 1
 
-            minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 1
+            minRemoteCreeps[["remoteHarvester1", remoteRoomName]] = 1
 
-            if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 1
+            if (remoteRoom.sources.length == 2) minRemoteCreeps[["remoteHarvester2", remoteRoomName]] = 1
 
-            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
+            minRemoteCreeps[["remoteHauler", remoteRoomName]] = remoteRoom.sources.length * 2
 
-        } else if (energyCapacity >= 550) {
+            continue
+        }
+        if (energyCapacity >= 550) {
 
-            minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 2
+            minRemoteCreeps[["remoteHarvester1", remoteRoomName]] = 2
 
-            if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 2
+            if (remoteRoom.sources.length == 2) minRemoteCreeps[["remoteHarvester2", remoteRoomName]] = 2
 
-            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
+            minRemoteCreeps[["remoteHauler", remoteRoomName]] = remoteRoom.sources.length * 2
 
-        } else if (energyCapacity >= 300) {
+            continue
+        }
+        if (energyCapacity >= 300) {
 
-            minRemoteCreeps[["remoteHarvester1", remoteRoom.name]] = 2
+            minRemoteCreeps[["remoteHarvester1", remoteRoomName]] = 2
 
-            if (remoteRoom.sources == 2) minRemoteCreeps[["remoteHarvester2", remoteRoom.name]] = 2
+            if (remoteRoom.sources.length == 2) minRemoteCreeps[["remoteHarvester2", remoteRoomName]] = 2
 
-            minRemoteCreeps[["remoteHauler", remoteRoom.name]] = remoteRoom.sources * 2
+            minRemoteCreeps[["remoteHauler", remoteRoomName]] = remoteRoom.sources.length * 2
+
+            continue
         }
     }
 
@@ -521,25 +539,22 @@ function spawnRequests(room, spawns) {
 
     for (let role of remoteRoles) {
 
-        for (let remoteRoom of room.memory.remoteRooms) {
+        for (let remoteRoomName in room.memory.remoteRooms) {
 
-            if (minRemoteCreeps[[role, remoteRoom.name]] > creepsOfRemoteRole[[role, remoteRoom.name]]) {
+            if (minRemoteCreeps[[role, remoteRoomName]] > creepsOfRemoteRole[[role, remoteRoomName]]) {
 
-                requiredRemoteCreeps[[role, remoteRoom.name]] = minRemoteCreeps[[role, remoteRoom.name]] - creepsOfRemoteRole[[role, remoteRoom.name]]
+                requiredRemoteCreeps[[role, remoteRoomName]] = minRemoteCreeps[[role, remoteRoomName]] - creepsOfRemoteRole[[role, remoteRoomName]]
 
-                /* console.log(role + ", " + requiredRemoteCreeps[[role, remoteRoom.name]] + ", " + remoteRoom.name) */
+                console.log(role + ", " + requiredRemoteCreeps[[role, remoteRoomName]] + ", " + remoteRoomName)
             }
         }
     }
 
     function findRemoteRoom(role) {
 
-        for (let remoteRoom of room.memory.remoteRooms) {
+        for (let remoteRoomName in room.memory.remoteRooms) {
 
-            if (requiredRemoteCreeps[[role, remoteRoom.name]] > 0) {
-
-                return remoteRoom.name
-            }
+            if (requiredRemoteCreeps[[role, remoteRoomName]] > 0) return remoteRoomName
         }
 
         return false
@@ -642,12 +657,14 @@ function spawnRequests(room, spawns) {
             this.extraParts = [workPart, movePart, carryPart, movePart]
             this.maxParts = 20
 
-        } else {
-
-            this.defaultParts = []
-            this.extraParts = [carryPart, movePart]
-            this.maxParts = 2
+            return
         }
+
+        this.defaultParts = []
+        this.extraParts = [carryPart, movePart]
+        this.maxParts = 2
+
+        return
     }
 
     roleOpts["jumpStarter"] = roleValues({
@@ -691,35 +708,54 @@ function spawnRequests(room, spawns) {
                 this.extraParts = [workPart, workPart, movePart]
                 this.maxParts = Math.min(bodySize, 20)
 
-            } else {
-
-                this.defaultParts = [carryPart, carryPart]
-                this.extraParts = [workPart, workPart, movePart]
-                this.maxParts = 14
+                return
             }
-        } else if (energyCapacity >= 2300) {
+
+            this.defaultParts = [carryPart, carryPart]
+            this.extraParts = [workPart, workPart, movePart]
+            this.maxParts = 14
+
+            return
+        }
+        if (energyCapacity >= 2300) {
 
             this.defaultParts = [carryPart]
             this.extraParts = [workPart, workPart, movePart]
             this.maxParts = 13
 
-        } else if (energyCapacity >= 1800) {
+            return
+        }
+        if (energyCapacity >= 1800) {
 
             this.defaultParts = []
             this.extraParts = [workPart, workPart, movePart]
             this.maxParts = 12
 
-        } else if (energyCapacity >= 550) {
+            return
+        }
+        if (energyCapacity >= 550) {
 
             this.defaultParts = [movePart]
             this.extraParts = [workPart]
             this.maxParts = 8
 
-        } else if (energyCapacity >= 300) {
+            return
+        }
+        if (energyCapacity >= 300) {
+            if (creepsWithRole[["hauler", room.name]] == 0) {
+
+                this.defaultParts = []
+                this.extraParts = [workPart]
+                this.maxParts = 2
+
+                return
+            }
 
             this.defaultParts = []
             this.extraParts = [workPart]
             this.maxParts = 8
+
+            return
         }
     }
 
@@ -748,20 +784,23 @@ function spawnRequests(room, spawns) {
             this.extraParts = [workPart, workPart, movePart]
             this.maxParts = Math.min(bodySize, maxParts)
 
-        } else {
-
-            if (controllerContainer) {
-
-                this.defaultParts = [carryPart]
-                this.extraParts = [workPart, workPart, movePart]
-                this.maxParts = 28
-            } else {
-
-                this.defaultParts = []
-                this.extraParts = [workPart, movePart, carryPart, movePart]
-                this.maxParts = 28
-            }
+            return
         }
+
+        if (controllerContainer) {
+
+            this.defaultParts = [carryPart]
+            this.extraParts = [workPart, workPart, movePart]
+            this.maxParts = 28
+
+            return
+        }
+
+        this.defaultParts = []
+        this.extraParts = [workPart, movePart, carryPart, movePart]
+        this.maxParts = 28
+
+        return
     }
 
     roleOpts["upgrader"] = roleValues({
@@ -803,12 +842,14 @@ function spawnRequests(room, spawns) {
             this.extraParts = [workPart, carryPart, movePart]
             this.maxParts = Math.min(bodySize, 24)
 
-        } else {
-
-            this.defaultParts = []
-            this.extraParts = [workPart, movePart, carryPart, movePart]
-            this.maxParts = 24
+            return
         }
+
+        this.defaultParts = []
+        this.extraParts = [workPart, movePart, carryPart, movePart]
+        this.maxParts = 24
+
+        return
     }
 
     roleOpts["builder"] = roleValues({
@@ -1287,4 +1328,5 @@ function spawnRequests(room, spawns) {
     }
 }
 
+module.exports = spawnRequests
 module.exports = spawnRequests

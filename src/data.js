@@ -54,15 +54,15 @@ function data() {
 
     Memory.data.establishedRooms = Memory.global.establishedRooms
 
-    Memory.data.totalCreeps = Object.keys(Memory.creeps).length
+    Memory.data.totalCreeps = Object.values(Memory.creeps).length
 
-    Memory.data.creepsPerRoom = (Object.keys(Memory.creeps).length / Memory.global.communes.length).toFixed(2)
+    Memory.data.creepsPerRoom = (Object.values(Memory.creeps).length / Memory.global.communes.length).toFixed(2)
 
     //ECONOMY
 
     Memory.data.totalEnergy = Memory.global.totalEnergy
 
-    Memory.data.marketOrders = Object.keys(Game.market.orders).length
+    Memory.data.marketOrders = Object.values(Game.market.orders).length
 
     Memory.data.credits = (Game.market.credits).toFixed(2)
 

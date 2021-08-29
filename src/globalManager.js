@@ -67,22 +67,20 @@ function globalManager() {
         function findCommuneEstablisher(potentialNewCommune) {
 
             for (let stage = 8; stage > 3; stage--) {
-                for (let maxDistance = 1; maxDistance < 11; maxDistance++) {
+                for (let maxDistance = 0; maxDistance < 11; maxDistance++) {
+                    for (let roomName of Memory.global.communes) {
 
-                    for (let roomName in Game.rooms) {
+                        let room = Game.rooms[roomName]
 
-                        room = Game.rooms[roomName]
+                        if (!room || !room.controller || stage != room.memory.stage) continue
 
-                        if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.get("storedEnergy") >= 30000) {
+                        let distance = room.findSafeDistance(anchorPoint, { pos: new RoomPosition(25, 25, potentialNewCommune), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
 
-                            let distance = room.findSafeDistance(anchorPoint, { pos: new RoomPosition(25, 25, potentialNewCommune), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
+                        if (maxDistance != distance) continue
 
-                            if (distance > maxDistance) continue
+                        console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
 
-                            console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
-
-                            return room.name
-                        }
+                        return room.name
                     }
                 }
             }

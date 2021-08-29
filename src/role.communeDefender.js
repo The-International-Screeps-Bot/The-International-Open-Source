@@ -4,18 +4,13 @@ module.exports = {
         const roomFrom = creep.memory.roomFrom
         let remoteRoom
 
-        _.forEach(Game.rooms, function(unfilteredRoom) {
+        for (let remoteRoomName in Memory.rooms[creep.memory.roomFrom].remoteRooms) {
 
-            if (unfilteredRoom.memory.stage == "remoteRoom" && unfilteredRoom.memory.enemy == true) {
+            if (!remoteRoomName.enemy) continue
 
-                let remoteRoomDistance = Game.map.getRoomLinearDistance(creep.memory.roomFrom, unfilteredRoom.name)
-
-                if (remoteRoomDistance == 1) {
-
-                    remoteRoom = unfilteredRoom.name
-                }
-            }
-        })
+            remoteRoom = remoteRoomName
+            break
+        }
 
         creep.memory.remoteRoom = remoteRoom
 
@@ -23,7 +18,7 @@ module.exports = {
             if (creep.room.name == remoteRoom) {
 
                 let hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                    filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+                    filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
                 })
 
                 if (hostile && !hostile.isEdge()) {

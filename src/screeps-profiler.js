@@ -224,7 +224,7 @@ const Profiler = {
     },
 
     lines() {
-        const data = Object.keys(Memory.profiler.map).map(functionName => {
+        const data = Object.values(Memory.profiler.map).map(functionName => {
             const functionCalls = Memory.profiler.map[functionName];
             return {
                 name: functionName,
