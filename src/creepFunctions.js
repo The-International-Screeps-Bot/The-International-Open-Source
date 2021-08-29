@@ -606,15 +606,11 @@ Creep.prototype.advancedPathing = function(opts) {
             newRoute = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
                 routeCallback(roomName) {
 
-                    if (roomName == opts.goal.pos.roomName) {
+                    if (roomName == opts.goal.pos.roomName) return 1
 
-                        return 1
+                    if (Memory.rooms[roomName] && !opts.avoidStages.includes(Memory.rooms[roomName].stage)) return 1
 
-                    }
-                    if (Memory.rooms[roomName] && !opts.avoidStages.includes(Memory.rooms[roomName].stage)) {
-
-                        return 1
-                    }
+                    if (!Memory.rooms[roomName]) return 5
 
                     return Infinity
                 }
