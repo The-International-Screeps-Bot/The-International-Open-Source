@@ -1,21 +1,30 @@
-module.exports = {
-    run: function(creep) {
+function remoteHarvesterManager(room, creepsWithRole) {
+
+    if (creepsWithRole.length == 0) return
+
+    room.remoteRequests(creepsWithRole[0])
+
+    for (let creep of creepsWithRole) {
 
         const remoteRoom = creep.memory.remoteRoom
 
         if (!remoteRoom) return false
 
-        if (creep.room.name == remoteRoom) {
+        if (creep.avoidHostiles()) continue
 
-            if (creep.room.controller.reservation && creep.room.controller.reservation.username != "Invader" && creep.room.controller.reservation.username != me) {
+        if (room.name == remoteRoom) {
 
-                creep.room.memory.stage = "enemyReservation"
+            let controller = room.get("controller")
+
+            if (controller.reservation && controller.reservation.username != "Invader" && controller.reservation.username != me) {
+
+                Memory.rooms[creep.memory.roomFrom].remoteRooms[remoteRoom].inUse = false
             }
 
             if (creep.memory.role == "remoteHarvester1") {
 
-                let source1 = creep.room.get("source1")
-                let sourceContainer1 = creep.room.get("sourceContainer1")
+                let source1 = room.get("source1")
+                let sourceContainer1 = room.get("sourceContainer1")
 
                 if (sourceContainer1 && source1) {
 
@@ -65,10 +74,13 @@ module.exports = {
                         })
                     }
                 }
-            } else if (creep.memory.role == "remoteHarvester2") {
 
-                let source2 = creep.room.get("source2")
-                let sourceContainer2 = creep.room.get("sourceContainer2")
+                continue
+            }
+            if (creep.memory.role == "remoteHarvester2") {
+
+                let source2 = room.get("source2")
+                let sourceContainer2 = room.get("sourceContainer2")
 
                 if (sourceContainer2 && source2) {
 
@@ -118,53 +130,24 @@ module.exports = {
                         })
                     }
                 }
+
+                continue
             }
-
-            let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
-                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasActivePartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
-            })
-
-            let hostileStructure = creep.room.find(FIND_HOSTILE_STRUCTURES, {
-                filter: s => !allyList.includes(s.owner.username)
-            })
-
-            if (hostiles.length > 0 || hostileStructure.length > 0) {
-
-                Memory.rooms[creep.memory.roomFrom].remoteRooms[remoteRoom].enemy = true
-                creep.say(Memory.rooms[creep.memory.roomFrom].remoteRooms[remoteRoom].enemy)
-
-            } else {
-
-                Memory.rooms[creep.memory.roomFrom].remoteRooms[remoteRoom].enemy = false
-            }
-
-            let constructionSite = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
-
-            let structure = creep.room.find(FIND_STRUCTURES, {
-                filter: s => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5
-            })
-
-            if (constructionSite.length > 0 || structure.length > 0) {
-
-                Memory.rooms[creep.memory.roomFrom].remoteRooms[remoteRoom].builderNeed = true
-            }
-
-        } else {
-
-            creep.say(remoteRoom)
-
-            creep.advancedPathing({
-                origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, remoteRoom), range: 1 },
-                plainCost: false,
-                swampCost: false,
-                defaultCostMatrix: creep.memory.defaultCostMatrix,
-                avoidStages: ["enemyRoom", "keeperRoom", "enemyReservation"],
-                flee: false,
-                cacheAmount: 10,
-            })
         }
 
-        creep.avoidHostiles()
+        creep.say(remoteRoom)
+
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: new RoomPosition(25, 25, remoteRoom), range: 1 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: creep.memory.defaultCostMatrix,
+            avoidStages: ["enemyRoom", "keeperRoom", "enemyReservation", "allyRoom"],
+            flee: false,
+            cacheAmount: 10,
+        })
     }
 }
+
+module.exports = remoteHarvesterManager

@@ -5,9 +5,11 @@ module.exports = {
         const roomFrom = creep.memory.roomFrom
         let remoteRoom
 
-        for (let remoteRoomName in Memory.rooms[creep.memory.roomFrom].remoteRooms) {
+        for (let remoteRoomName in Memory.rooms[roomFrom].remoteRooms) {
 
-            if (!remoteRoomName.builderNeed) continue
+            let remoteRoomMemory = Memory.rooms[roomFrom].remoteRooms[remoteRoomName]
+
+            if (!remoteRoomMemory.builderNeed) continue
 
             remoteRoom = remoteRoomName
             break

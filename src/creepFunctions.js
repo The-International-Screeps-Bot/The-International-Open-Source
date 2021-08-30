@@ -49,7 +49,7 @@ Creep.prototype.withdrawStoredResource = function(minAmount, withdrawAmount, res
     return -100
 }
 
-Creep.moveToNextTarget = function(state, target, range) {
+Creep.prototype.moveToNextTarget = function(state, target, range) {
 
     if (!state) return false
 
@@ -191,6 +191,17 @@ Creep.prototype.hasPartsOfTypes = function(partTypes) {
     for (let partType of partTypes) {
 
         if (creep.body.some(part => part.type == partType)) return true
+    }
+
+    return false
+}
+Creep.prototype.hasActivePartsOfTypes = function(partTypes) {
+
+    let creep = this
+
+    for (let partType of partTypes) {
+
+        if (creep.getActiveBodyparts(partType) > 0) return true
     }
 
     return false
@@ -465,28 +476,29 @@ Creep.prototype.avoidHostiles = function() {
     let creep = this
 
     let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
-        filter: creep => !allyList.includes(creep.owner.username) && (creep.getActiveBodyparts(ATTACK) > 0 || creep.getActiveBodyparts(RANGED_ATTACK) > 0)
+        filter: hostile => !allyList.includes(hostile.owner.username) && hostile.hasActivePartsOfTypes([ATTACK, RANGED_ATTACK])
     })
 
     if (hostiles.length == 0) return false
 
     let hostile = creep.pos.findClosestByRange(hostiles)
 
-    if (creep.pos.getRangeTo(hostile) <= 4) {
+    if (creep.pos.getRangeTo(hostile) > 5) return false
 
-        creep.say("H! R")
+    creep.say("H R")
 
-        creep.advancedPathing({
-            origin: creep.pos,
-            goal: { pos: hostile.pos, range: 5 },
-            plainCost: false,
-            swampCost: false,
-            defaultCostMatrix: creep.memory.defaultCostMatrix,
-            avoidStages: [],
-            flee: true,
-            cacheAmount: 1,
-        })
-    }
+    creep.advancedPathing({
+        origin: creep.pos,
+        goal: { pos: hostile.pos, range: 6 },
+        plainCost: false,
+        swampCost: false,
+        defaultCostMatrix: creep.memory.defaultCostMatrix,
+        avoidStages: [],
+        flee: true,
+        cacheAmount: 1,
+    })
+
+    return true
 }
 Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTower, towerCount) {
 

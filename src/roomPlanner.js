@@ -471,140 +471,151 @@ function roomPlanner(room) {
         if (placedSites < 10 && room.createConstructionSite(controllerContainer.x, controllerContainer.y, STRUCTURE_LINK) == 0) placedSites++
     }
 
-    if (room.memory.stage >= 4 && room.memory.remoteRooms.length > 0) {
+    placeRemotePaths()
+
+    function placeRemotePaths() {
+
+        if (room.memory.stage < 4) return
+
+        if (Object.values(room.memory.remoteRooms).length == 0) return
 
         let roomPathDelay = 0
 
-        for (let roomMemory of room.memory.remoteRooms) {
+        for (let remoteRoomName in room.memory.remoteRooms) {
 
-            remoteRoom = Game.rooms[roomMemory.name]
+            let remoteRoom = Game.rooms[remoteRoomName]
+            if (!remoteRoom) continue
 
-            if (remoteRoom) placeRemotePaths(remoteRoom, roomPathDelay)
-        }
-    }
+            let sources = room.memory.remoteRooms[remoteRoomName].sources
 
-    function placeRemotePaths(remoteRoom, roomPathDelay) {
+            for (let sourceId of sources) {
 
-        sources = remoteRoom.find(FIND_SOURCES)
+                roomPathDelay++
 
-        for (let source of sources) {
+                if (Game.time % (roomPathDelay + 103) != 0) continue
 
-            roomPathDelay++
+                let source = findObjectWithId(sourceId)
 
-            if (Game.time % (roomPathDelay + 103) != 0) return
+                let origin = room.memory.anchorPoint
 
-            let origin = room.memory.anchorPoint
+                let goal = { pos: source.pos, range: 1 }
 
-            let goal = { pos: source.pos, range: 1 }
+                let avoidStages = ["enemyRoom", "keeperRoom", "enemyReservation"]
 
-            let avoidStages = ["enemyRoom", "keeperRoom", "enemyReservation"]
-
-            let allowedRooms = {
-                [room.name]: true
-            }
-
-            let route = Game.map.findRoute(room.name, goal.pos.roomName, {
-                routeCallback(roomName) {
-
-                    if (roomName == goal.pos.roomName) {
-
-                        allowedRooms[roomName] = true
-                        return 1
-
-                    } else if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName].stage)) {
-
-                        allowedRooms[roomName] = true
-                        return 1
-                    }
-
-                    allowedRooms[roomName] = false
-                    return Infinity
+                let allowedRooms = {
+                    [room.name]: true
                 }
-            })
 
-            if (!route || route == ERR_NO_PATH || route.length < 1) return
+                let route = Game.map.findRoute(room.name, goal.pos.roomName, {
+                    routeCallback(roomName) {
 
-            if (!origin || !goal) return
+                        if (roomName == goal.pos.roomName) {
 
-            var path = PathFinder.search(origin, goal, {
-                plainCost: 4,
-                swampCost: 24,
-                maxOps: 100000,
+                            allowedRooms[roomName] = true
+                            return 1
+                        }
 
-                roomCallback: function(roomName) {
+                        if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName].stage)) {
 
-                    let room = Game.rooms[roomName]
+                            allowedRooms[roomName] = true
+                            return 1
+                        }
 
-                    if (!room) return false
+                        if (!Memory.rooms[roomName]) {
 
-                    if (!allowedRooms[roomName]) return false
+                            allowedRooms[roomName] = false
+                            return 5
+                        }
 
-                    let cm
-
-                    cm = new PathFinder.CostMatrix
-
-                    let roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                        filter: s => s.structureType == STRUCTURE_ROAD
-                    })
-
-                    for (let roadSite of roadConstructionSites) {
-
-                        cm.set(roadSite.pos.x, roadSite.pos.y, 1)
+                        allowedRooms[roomName] = false
+                        return Infinity
                     }
-
-                    let roads = room.find(FIND_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_ROAD
-                    })
-
-                    for (let road of roads) {
-
-                        cm.set(road.pos.x, road.pos.y, 1)
-                    }
-
-                    let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
-                    })
-
-                    for (let site of constructionSites) {
-
-                        cm.set(site.pos.x, site.pos.y, 255)
-                    }
-
-                    let structures = room.find(FIND_STRUCTURES, {
-                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
-                    })
-
-                    for (let structure of structures) {
-
-                        cm.set(structure.pos.x, structure.pos.y, 255)
-                    }
-
-                    return cm
-                }
-            }).path
-
-            for (let pos of path) {
-
-                let room = Game.rooms[pos.roomName]
-                room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476" })
-
-                room.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD)
-
-                if (pos.roomName != remoteRoom.name || pos != path[path.length - 1]) continue
-
-                let containerConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
-                    filter: s => s.structureType == STRUCTURE_CONTAINER
                 })
 
-                let containers = room.find(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_CONTAINER
-                })
+                if (!route || route == ERR_NO_PATH || route.length == 0) continue
 
-                if (source.pos.findInRange(containerConstructionSites, 1) > 0 || source.pos.findInRange(containers, 1) > 0) break
+                if (!origin || !goal) continue
 
-                room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { fill: "transparent", stroke: "red" })
+                var path = PathFinder.search(origin, goal, {
+                    plainCost: 4,
+                    swampCost: 24,
+                    maxOps: 100000,
 
-                room.createConstructionSite(pos.x, pos.y, STRUCTURE_CONTAINER)
+                    roomCallback: function(roomName) {
+
+                        let room = Game.rooms[roomName]
+
+                        if (!room) return false
+
+                        if (!allowedRooms[roomName]) return false
+
+                        let cm
+
+                        cm = new PathFinder.CostMatrix
+
+                        let roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+                            filter: s => s.structureType == STRUCTURE_ROAD
+                        })
+
+                        for (let roadSite of roadConstructionSites) {
+
+                            cm.set(roadSite.pos.x, roadSite.pos.y, 1)
+                        }
+
+                        let roads = room.find(FIND_STRUCTURES, {
+                            filter: s => s.structureType == STRUCTURE_ROAD
+                        })
+
+                        for (let road of roads) {
+
+                            cm.set(road.pos.x, road.pos.y, 1)
+                        }
+
+                        let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+                            filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                        })
+
+                        for (let site of constructionSites) {
+
+                            cm.set(site.pos.x, site.pos.y, 255)
+                        }
+
+                        let structures = room.find(FIND_STRUCTURES, {
+                            filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                        })
+
+                        for (let structure of structures) {
+
+                            cm.set(structure.pos.x, structure.pos.y, 255)
+                        }
+
+                        return cm
+                    }
+                }).path
+
+                for (let pos of path) {
+
+                    let room = Game.rooms[pos.roomName]
+                    room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476" })
+
+                    room.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD)
+
+                    if (pos.roomName != remoteRoom.name || pos != path[path.length - 1]) continue
+
+                    let containerConstructionSites = room.find(FIND_CONSTRUCTION_SITES, {
+                        filter: s => s.structureType == STRUCTURE_CONTAINER
+                    })
+
+                    let containers = room.find(FIND_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_CONTAINER
+                    })
+
+                    if (source.pos.findInRange(containerConstructionSites, 1) > 0 || source.pos.findInRange(containers, 1) > 0) break
+
+                    room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { fill: "transparent", stroke: "red" })
+
+                    room.createConstructionSite(pos.x, pos.y, STRUCTURE_CONTAINER)
+                }
             }
         }
     }
@@ -635,4 +646,5 @@ function roomPlanner(room) {
     }
 }
 
+module.exports = roomPlanner
 module.exports = roomPlanner

@@ -26,12 +26,18 @@ function scoutManager(room, creepsWithRole) {
 
                 let roomName = exits[property]
 
+                if (Game.map.getRoomStatus(roomName).status != "normal") continue
+
                 exitRoomNames.push(roomName)
             }
+
+            // See if there is a room without memory or without a scoutTick
 
             targetRoom = exitRoomNames.filter(roomName => !Memory.rooms[roomName] || !Memory.rooms[roomName].scoutTick)[0]
 
             if (targetRoom) return
+
+            // Otherwise find the room with the lowest scout tick
 
             lowestScoutTick = Math.min.apply(Math, exitRoomNames.map(roomName => Memory.rooms[roomName].scoutTick))
 
@@ -45,6 +51,8 @@ function scoutManager(room, creepsWithRole) {
         // cache targetRoom in memory
 
         creep.memory.targetRoom = targetRoom
+
+        // Record tick the room was scouted
 
         room.memory.scoutTick = Game.time
 
@@ -77,11 +85,15 @@ function scoutManager(room, creepsWithRole) {
                     cacheAmount: 50,
                 })
 
+                // If my room sign with commune message
+
                 if (controller.my) {
 
                     creep.signController(controller, "A commune of The Internationale. Bourgeoisie not welcome here.")
                     return
                 }
+
+                // If neutral room sign it with a random neutral message
 
                 creep.signWithMessage()
             }
@@ -90,42 +102,52 @@ function scoutManager(room, creepsWithRole) {
 
             // Check if viable remoteRoom
 
-            if (isRemoteRoom()) {
-
-                room.memory.stage = "remoteRoom"
-
-            } else if (room.memory.stage == "remoteRoom") room.memory.stage = "neutralRoom"
+            isRemoteRoom()
 
             function isRemoteRoom() {
 
-                if (room.memory.stage == "remoteRoom") return
+                if (room.memory.stage == "remoteRoom") {
+
+                    let nearCommune
+
+                    for (let roomName of Memory.global.communes) {
+
+                        let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, roomName), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"])
+
+                        if (safeDistance > 2) continue
+
+                        nearCommune = true
+                        break
+                    }
+
+                    if (!nearCommune) room.memory.stage = undefined
+
+                    return
+                }
 
                 if (controller.owner) return
 
                 if (controller.reservation && controller.reservation != "Invader") return
 
-                if (Memory.rooms[creep.memory.roomFrom].remoteRooms[room.name]) return
+                // Make sure the commune can have more rooms
 
                 let maxRemoteRooms = Math.floor(Game.rooms[creep.memory.roomFrom].get("spawns").length * 3)
                 let activeRemotes = Object.values(Memory.rooms[creep.memory.roomFrom].remoteRooms).length
                 if (activeRemotes >= maxRemoteRooms) return
+
+                // Make sure there are no hostiles
 
                 let hostiles = room.find(FIND_HOSTILE_CREEPS, {
                     filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
                 })
                 if (hostiles.length > 0) return
 
-                let safeNearCommune = false
+                // Make sure the room is in a range of 2 from the commune
 
-                for (let roomName of Memory.global.communes) {
+                let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"])
+                if (safeDistance > 2) return
 
-                    let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, roomName), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"])
-
-                    if (safeDistance <= 2) continue
-
-                    safeNearCommune = true
-                }
-                if (!safeNearCommune) return
+                // record room in memory
 
                 let sources = room.get("sources")
                 let sourceIds = []
@@ -133,6 +155,8 @@ function scoutManager(room, creepsWithRole) {
                 for (let source of sources) sourceIds.push(source.id)
 
                 Memory.rooms[creep.memory.roomFrom].remoteRooms[room.name] = { inUse: false, sources: sourceIds, roads: false, builderNeed: false, enemy: false, distance: undefined }
+
+                room.memory.stage = "remoteRoom"
             }
 
             if (controller.owner) {
@@ -307,7 +331,7 @@ function scoutManager(room, creepsWithRole) {
 
                     for (let deposit of deposits) {
 
-                        // Break loop if memory already contians deposit
+                        // Iterate if memory already contians deposit
 
                         if (Memory.rooms[creep.memory.roomFrom].deposits[deposit.id]) continue
 

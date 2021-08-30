@@ -400,14 +400,11 @@ Room.prototype.findSafeDistance = function(origin, goal, avoidStages) {
     let route = Game.map.findRoute(origin.roomName, goal.pos.roomName, {
         routeCallback(roomName) {
 
-            if (roomName == goal.pos.roomName) {
+            if (roomName == goal.pos.roomName) return 1
 
-                return 1
-            }
-            if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName].stage)) {
+            if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName].stage)) return 1
 
-                return 1
-            }
+            if (!Memory.rooms[roomName]) return 5
 
             return Infinity
         }
@@ -464,4 +461,30 @@ Room.prototype.findHealPower = function(hostile, creeps) {
     room.visual.text(healPower, hostile.pos.x, hostile.pos.y + 0.75, { align: 'center', color: colors.communeGreen, font: "0.7" })
 
     return healPower
+}
+Room.prototype.remoteRequests = function(creep) {
+
+    let hostiles = room.find(FIND_HOSTILE_CREEPS, {
+        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasActivePartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
+    })
+
+    if (hostiles.length > 0 || room.get("enemyStructures").length > 0) {
+
+        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].enemy = true
+
+    } else {
+
+        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].enemy = false
+    }
+
+    let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
+
+    let lowEcoStructures = room.find(FIND_STRUCTURES, {
+        filter: s => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5
+    })
+
+    if (mySites.length > 0 || lowEcoStructures.length > 0) {
+
+        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].builderNeed = true
+    }
 }
