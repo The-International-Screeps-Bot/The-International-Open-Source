@@ -15,6 +15,11 @@ function mapVisuals() {
                 Game.map.visual.circle(new RoomPosition(8, 24, roomName), { radius: 8, fill: '#FFD180', opacity: 0.5 })
                 Game.map.visual.text((Memory.rooms[roomName].storedEnergy / 1000).toFixed(0) + "k", new RoomPosition(8, 24, roomName), { color: '#ffffff', fontSize: 8 })
 
+                for (let remoteRoomName in Memory.rooms[roomName].remoteRooms) {
+
+                    Game.map.visual.line(new RoomPosition(25, 25, roomName), new RoomPosition(25, 25, remoteRoomName), { width: 1.5, color: colors.neutralYellow, lineStyle: "dashed", opacity: 0.8 })
+                }
+
             } else if (Memory.rooms[roomName].claimable == true) {
 
                 Game.map.visual.circle(new RoomPosition(8, 8, roomName), { radius: 8, fill: '#ffffff', opacity: 0.5 })

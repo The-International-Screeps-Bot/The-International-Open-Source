@@ -468,6 +468,8 @@ Creep.prototype.remoteRequests = function() {
 
     let room = creep.room
 
+    if (!Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom]) return
+
     let hostiles = room.find(FIND_HOSTILE_CREEPS, {
         filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasActivePartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
     })

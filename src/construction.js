@@ -1,21 +1,11 @@
 function construction(room, specialStructures) {
 
-    let source1 = findObjectWithId(room.memory.source1)
-    let source2 = findObjectWithId(room.memory.source2)
-
-    let sourceContainer1 = specialStructures.containers.sourceContainer1
-    let sourceContainer2 = specialStructures.containers.sourceContainer2
     let mineralContainer = specialStructures.containers.mineralContainer
     let controllerContainer = specialStructures.containers.controllerContainer
 
-    let baseLink = specialStructures.links.baseLink
     let controllerLink = specialStructures.links.controllerLink
-    let sourceLink1 = specialStructures.links.sourceLink1
-    let sourceLink2 = specialStructures.links.sourceLink2
 
     let roomConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES)
-
-    let roomPathDelay = 0
 
     if (roomConstructionSites.length < 5) {
 
