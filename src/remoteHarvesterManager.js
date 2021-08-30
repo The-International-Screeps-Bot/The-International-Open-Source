@@ -2,7 +2,7 @@ function remoteHarvesterManager(room, creepsWithRole) {
 
     if (creepsWithRole.length == 0) return
 
-    room.remoteRequests(creepsWithRole[0])
+    creepsWithRole[0].remoteRequests()
 
     for (let creep of creepsWithRole) {
 

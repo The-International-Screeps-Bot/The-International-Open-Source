@@ -1,6 +1,6 @@
 let creepData = require("creepData")
 
-function spawnRequests(room, spawns) {
+function spawnRequests(room) {
 
     // Import variables we need
 
@@ -659,10 +659,18 @@ function spawnRequests(room, spawns) {
 
             return
         }
+        if (creepsOfRole[["harvester", room.name]] == 0 && creepsOfRole[["hauler", room.name]] == 0) {
 
-        this.defaultParts = []
-        this.extraParts = [carryPart, movePart]
-        this.maxParts = 2
+            this.defaultParts = [carryPart]
+            this.extraParts = [movePart]
+            this.maxParts = 2
+
+            return
+        }
+
+        this.defaultParts = [carryPart]
+        this.extraParts = [movePart]
+        this.maxParts = 6
 
         return
     }

@@ -81,6 +81,7 @@ function config() {
         if (!controller || !controller.my) continue
 
         Memory.global.communes.push(roomName)
+        if (room.memory.stage == 8) Memory.global.establishedRooms.push(roomName)
 
         let roomValues = {
             remoteRooms: {},

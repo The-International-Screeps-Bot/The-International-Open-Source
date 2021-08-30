@@ -462,29 +462,3 @@ Room.prototype.findHealPower = function(hostile, creeps) {
 
     return healPower
 }
-Room.prototype.remoteRequests = function(creep) {
-
-    let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasActivePartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
-    })
-
-    if (hostiles.length > 0 || room.get("enemyStructures").length > 0) {
-
-        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].enemy = true
-
-    } else {
-
-        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].enemy = false
-    }
-
-    let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
-
-    let lowEcoStructures = room.find(FIND_STRUCTURES, {
-        filter: s => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.5
-    })
-
-    if (mySites.length > 0 || lowEcoStructures.length > 0) {
-
-        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].builderNeed = true
-    }
-}

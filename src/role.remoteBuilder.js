@@ -26,7 +26,7 @@ module.exports = {
                 if (creep.memory.isFull) {
 
                     let lowLogisticStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits <= (s.hitsMax - creep.findParts("work") * 100)
+                        filter: s => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits <= (s.hitsMax - creep.findParts("work") * 100)
                     })
 
                     if (lowLogisticStructure) {
@@ -43,11 +43,6 @@ module.exports = {
 
                             creep.buildSite(constructionSite)
 
-                        } else if (creep.room.memory.builderNeed == true && !constructionSite && !lowLogisticStructure) {
-
-                            creep.memory.remoteRoom = false
-
-                            creep.room.memory.builderNeed = false
                         }
                     }
                 } else {

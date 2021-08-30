@@ -7,7 +7,6 @@ let creepManager = require("creepManager")
 let powerCreepManager = require("powerCreepManager")
     /* let antifa = require("antifa") */
 
-let constants = require("constants")
 let construction = require("construction")
 
 let findAnchor = require("findAnchor")
@@ -186,20 +185,6 @@ function roomManager() {
             //
 
             room.memory.storedEnergy = room.get("storedEnergy")
-
-            //
-
-            cpuUsed = Game.cpu.getUsed()
-
-            if (Game.time % 10 == 0) {
-
-                constants(room, structures)
-            }
-
-            totalCpuUsed += Game.cpu.getUsed()
-            cpuUsed = Game.cpu.getUsed() - cpuUsed
-            consoleMessage += `constants: ` + cpuUsed.toFixed(2) + `
-            `
 
             //
 
