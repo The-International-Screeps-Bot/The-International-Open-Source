@@ -465,7 +465,6 @@ Creep.prototype.findDroppedEnergyOfAmount = function(amount) {
 Creep.prototype.remoteRequests = function() {
 
     creep = this
-
     let room = creep.room
 
     if (!Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom]) return
@@ -481,6 +480,19 @@ Creep.prototype.remoteRequests = function() {
     } else {
 
         Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].enemy = false
+    }
+
+    let invaderCores = room.find(FIND_HOSTILE_STRUCTURES, {
+        filter: structure => structure.structureType == STRUCTURE_INVADER_CORE
+    })
+
+    if (invaderCores.length > 0) {
+
+        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].invaderCore = true
+
+    } else {
+
+        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].invaderCore = false
     }
 
     let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)

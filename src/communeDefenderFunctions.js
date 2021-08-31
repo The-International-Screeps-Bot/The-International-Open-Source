@@ -185,7 +185,7 @@ Creep.prototype.attackHostiles = function(enemyCreeps, enemyCreep, enemyAttacker
 Creep.prototype.findAndAttackInvaderCores = function() {
 
     let creep = this
-    let room = this
+    let room = creep.room
 
     let invaderCores = room.find(FIND_HOSTILE_STRUCTURES, {
         filter: structure => structure.structureType == STRUCTURE_INVADER_CORE

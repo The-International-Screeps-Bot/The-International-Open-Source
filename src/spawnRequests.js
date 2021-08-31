@@ -866,7 +866,7 @@ function spawnRequests(room) {
 
             // For every x stored energy add y parts
 
-            let storedEnergyReducer = 25000
+            let storedEnergyReducer = 30000
 
             if (hostiles.length > 0 && room.get("storedEnergy") > 10000 && creepsOfRole[["meleeDefender", room.name]] > 0) {
 
