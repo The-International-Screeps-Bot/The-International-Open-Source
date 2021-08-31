@@ -1,6 +1,7 @@
 require("towerFunctions")
 
 function towerManager(room) {
+    return
 
     let towers = room.get("towers")
 

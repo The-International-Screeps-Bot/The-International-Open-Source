@@ -112,7 +112,7 @@ function scoutManager(room, creepsWithRole) {
 
                     for (let roomName of Memory.global.communes) {
 
-                        let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, roomName), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"])
+                        let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, roomName), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation", "emptyRoom"])
 
                         if (safeDistance > 2) continue
 
@@ -154,7 +154,7 @@ function scoutManager(room, creepsWithRole) {
 
                 for (let source of sources) sourceIds.push(source.id)
 
-                Memory.rooms[creep.memory.roomFrom].remoteRooms[room.name] = { inUse: false, sources: sourceIds, roads: false, builderNeed: false, enemy: false, distance: undefined }
+                Memory.rooms[creep.memory.roomFrom].remoteRooms[room.name] = { inUse: false, sources: sourceIds, roads: false, builderNeed: false, enemy: false, invaderCode: false, distance: undefined }
 
                 room.memory.stage = "remoteRoom"
             }

@@ -969,7 +969,7 @@ function spawnRequests(room) {
         parts: {
             1800: {
                 defaultParts: [],
-                extraParts: [claimPart, movePart, movePart],
+                extraParts: [claimPart, movePart],
                 maxParts: 6
             },
             300: {
@@ -988,8 +988,8 @@ function spawnRequests(room) {
         parts: {
             300: {
                 defaultParts: [],
-                extraParts: [attackPart, movePart, attackPart, movePart, rangedAttackPart, movePart],
-                maxParts: 24
+                extraParts: [rangedAttackPart, movePart, rangedAttackPart, movePart, healPart, movePart],
+                maxParts: 18
             },
         },
         memoryAdditions: {}

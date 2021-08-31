@@ -65,6 +65,10 @@ function mapVisuals() {
 
                 Game.map.visual.rect(new RoomPosition(0, 0, roomName), 50, 50, { fill: '#1171bb', opacity: 0.15 })
 
+            } else if (Memory.rooms[roomName].stage == "emptyRoom") {
+
+                Game.map.visual.rect(new RoomPosition(0, 0, roomName), 50, 50, { fill: '#9900ff', opacity: 0.15 })
+
             } else {
 
                 Game.map.visual.rect(new RoomPosition(0, 0, roomName), 50, 50, { fill: '#F4E637', opacity: 0.1 })

@@ -189,7 +189,7 @@ function jumpStarterManager(room, creepsWithRole) {
                                 goal: { pos: closestSource.pos, range: 1 },
                                 plainCost: false,
                                 swampCost: false,
-                                defaultCostMatrix: creep.room.memory.defaultCostMatrix,
+                                defaultCostMatrix: room.memory.defaultCostMatrix,
                                 avoidStages: [],
                                 flee: false,
                                 cacheAmount: 10,

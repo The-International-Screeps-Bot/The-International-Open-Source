@@ -456,7 +456,7 @@ Creep.prototype.findDroppedEnergyOfAmount = function(amount) {
 
     if (droppedEnergy.length == 0) return false
 
-    droppedEnergyOfAmount = droppedEnergy.filter(resource => resource.amount >= amount)
+    droppedEnergyOfAmount = droppedEnergy.filter(resource => resource && resource.amount >= amount)
 
     if (droppedEnergyOfAmount.length == 0) return false
 
