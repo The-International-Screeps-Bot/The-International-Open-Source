@@ -75,7 +75,6 @@ Creep.prototype.healMyCreeps = function(enemyAttacker) {
 Creep.prototype.attackHostiles = function(enemyCreeps, enemyCreep, enemyAttacker) {
 
     let creep = this
-    let room = creep.room
 
     if (attackEnemyAttacker()) return true
 
@@ -83,19 +82,39 @@ Creep.prototype.attackHostiles = function(enemyCreeps, enemyCreep, enemyAttacker
 
         if (!enemyAttacker) return
 
-        if ((enemyAttacker.hasActivePartsOfTypes([ATTACK]) || enemyAttacker.getActiveBodyparts(RANGED_ATTACK) >= creep.findParts("rangedAttack")) && creep.pos.getRangeTo(enemyAttacker) <= 2) {
+        moveToEnemy()
 
-            creep.advancedPathing({
-                origin: creep.pos,
-                goal: { pos: enemyAttacker.pos, range: 4 },
-                plainCost: 1,
-                swampCost: false,
-                defaultCostMatrix: false,
-                avoidStages: [],
-                flee: true,
-                cacheAmount: 1,
-            })
-        } else {
+        function moveToEnemy() {
+
+            if ((enemyAttacker.hasActivePartsOfTypes([ATTACK]) || enemyAttacker.getActiveBodyparts(RANGED_ATTACK) >= creep.findParts("rangedAttack"))) {
+
+                if (creep.pos.getRangeTo(enemyAttacker) <= 2) {
+
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: enemyAttacker.pos, range: 3 },
+                        plainCost: 1,
+                        swampCost: false,
+                        defaultCostMatrix: false,
+                        avoidStages: [],
+                        flee: true,
+                        cacheAmount: 1,
+                    })
+                    return
+                }
+
+                creep.advancedPathing({
+                    origin: creep.pos,
+                    goal: { pos: enemyAttacker.pos, range: 3 },
+                    plainCost: 1,
+                    swampCost: false,
+                    defaultCostMatrix: false,
+                    avoidStages: [],
+                    flee: false,
+                    cacheAmount: 1,
+                })
+                return
+            }
 
             creep.advancedPathing({
                 origin: creep.pos,
@@ -141,9 +160,8 @@ Creep.prototype.attackHostiles = function(enemyCreeps, enemyCreep, enemyAttacker
             defaultCostMatrix: false,
             avoidStages: [],
             flee: false,
-            cacheAmount: 10,
+            cacheAmount: 2,
         })
-
 
         let enemyCreepsInRange = creep.pos.findInRange(enemyCreeps, 3)
 
@@ -165,6 +183,9 @@ Creep.prototype.attackHostiles = function(enemyCreeps, enemyCreep, enemyAttacker
 }
 
 Creep.prototype.findAndAttackInvaderCores = function() {
+
+    let creep = this
+    let room = this
 
     let invaderCores = room.find(FIND_HOSTILE_STRUCTURES, {
         filter: structure => structure.structureType == STRUCTURE_INVADER_CORE

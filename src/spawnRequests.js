@@ -363,7 +363,7 @@ function spawnRequests(room) {
         minCreeps["remoteBuilder"] = 1 + Math.floor(Object.values(room.memory.remoteRooms).length / 3)
     }
 
-    if (stage >= 3) {
+    if (stage >= 3 && energyCapacity >= 700) {
 
         minCreeps["communeDefender"] = 1
     }
