@@ -9,7 +9,9 @@ let powerCreepManager = require("powerCreepManager")
 
 let construction = require("construction")
 
+let findRampartPlacement = require("findRampartPlacement")
 let findAnchor = require("findAnchor")
+
 let roomPlanner = require("roomPlanner")
 
 let defenseManager = require("defenseManager")
@@ -154,7 +156,6 @@ function roomManager() {
                 if (!target.my) continue
 
                 combatHappened = true
-                console.log("EVENT: " + event.event)
                 break
             }
         }
@@ -185,6 +186,11 @@ function roomManager() {
             //
 
             room.memory.storedEnergy = room.get("storedEnergy")
+
+            //
+
+            /* if (room.name == "W8N3") */
+            /* findRampartPlacement(room) */
 
             //
 

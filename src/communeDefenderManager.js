@@ -30,7 +30,7 @@ function communeDefenderManager(room, creepsWithRole) {
 
                 if (creep.attackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
 
-                if (creep.findAndAttackInvaderCores()) continue
+                /* if (creep.findAndAttackInvaderCores()) continue */
 
                 continue
             }

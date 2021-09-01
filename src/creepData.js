@@ -2,7 +2,7 @@ function creepData() {
 
     let remoteRoles = ["remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver"]
 
-    let rolesList = ["jumpStarter", "harvester", "hauler", "stationaryHauler", "upgrader", "builder", "repairer", "rampartUpgrader", "meleeDefender", "rangedDefender", "scientist", "upgradeHauler", "claimer", "revolutionaryBuilder", "miner", "robber", "scout", "communeDefender", "remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver", "remoteBuilder", "antifaSupporter", "antifaAssaulter"]
+    let rolesList = ["jumpStarter", "harvester", "hauler", "stationaryHauler", "upgrader", "builder", "repairer", "rampartUpgrader", "scientist", "meleeDefender", "rangedDefender", "communeDefender", "upgradeHauler", "miner", "robber", "scout", "claimer", "revolutionaryBuilder", "remoteBuilder", "coreAttacker", "remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver", "antifaSupporter", "antifaAssaulter"]
 
     let creepsOfRemoteRole = {}
     let creepsOfRole = {}

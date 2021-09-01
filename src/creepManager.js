@@ -12,6 +12,7 @@ function creepManager(room, myCreeps) {
     managers["scout"] = { import: require("scoutManager"), creeps: [] }
 
     managers["communeDefender"] = { import: require("communeDefenderManager"), creeps: [] }
+    managers["coreAttacker"] = { import: require("coreAttackerManager"), creeps: [] }
 
     managers["remoteHarvester1"] = { import: require("remoteHarvesterManager"), creeps: [] }
     managers["remoteHarvester2"] = { import: require("remoteHarvesterManager"), creeps: [] }

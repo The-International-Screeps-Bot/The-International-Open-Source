@@ -1,6 +1,6 @@
 require("coreAttackerFunctions")
 
-function coreAttackerManager() {
+function coreAttackerManager(room, creepsWithRole) {
 
     if (creepsWithRole.length == 0) return
 
@@ -23,10 +23,6 @@ function coreAttackerManager() {
 
         if (remoteRoom) {
             if (room.name == remoteRoom) {
-
-                let enemyCreepsObject = creep.findHostile()
-
-                if (creep.attackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
 
                 if (creep.findAndAttackInvaderCores()) continue
 

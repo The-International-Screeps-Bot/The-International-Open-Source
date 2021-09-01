@@ -1,5 +1,11 @@
 function roomPlanner(room) {
 
+    const anchorPoint = room.get("anchorPoint")
+
+    room.visual.rect(anchorPoint.x - 5.5, anchorPoint.y - 5.5, 11, 11, { fill: "transparent", stroke: "#45C476" })
+
+    room.visual.rect(anchorPoint.x - 0.5, anchorPoint.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476", strokeWidth: "0.15" })
+
     if (Object.values(Game.constructionSites).length == 100) return
 
     let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
@@ -9,12 +15,6 @@ function roomPlanner(room) {
     //
 
     let placedSites = 0
-
-    const anchorPoint = room.get("anchorPoint")
-
-    room.visual.rect(anchorPoint.x - 5.5, anchorPoint.y - 5.5, 11, 11, { fill: "transparent", stroke: "#45C476" })
-
-    room.visual.rect(anchorPoint.x - 0.5, anchorPoint.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476", strokeWidth: "0.15" })
 
     // Bases labeled and used by RCL
 
@@ -255,7 +255,7 @@ function roomPlanner(room) {
 
     if (room.storage && room.memory.stage >= 4) {
 
-        if (Game.time % 100 == 0) placeRamparts(ramparts)
+        /* if (Game.time % 100 == 0) placeRamparts(ramparts) */
     }
 
     function placeRamparts(ramparts) {
