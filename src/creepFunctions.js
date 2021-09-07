@@ -192,8 +192,6 @@ Creep.prototype.hasPartsOfTypes = function(partTypes) {
 
         if (creep.body.some(part => part.type == partType)) return true
     }
-
-    return false
 }
 Creep.prototype.hasActivePartsOfTypes = function(partTypes) {
 
@@ -203,8 +201,6 @@ Creep.prototype.hasActivePartsOfTypes = function(partTypes) {
 
         if (creep.getActiveBodyparts(partType) > 0) return true
     }
-
-    return false
 }
 Creep.prototype.hasBoost = function(partType, boostType) {
 
@@ -218,8 +214,6 @@ Creep.prototype.hasBoost = function(partType, boostType) {
 
         return true
     }
-
-    return false
 }
 Creep.prototype.advancedHarvest = function(target) {
 
@@ -304,7 +298,10 @@ Creep.prototype.pickupDroppedEnergy = function(target) {
 }
 Creep.prototype.advancedWithdraw = function(target, resource, amount) {
 
+    creep = this
+
     if (!target) return
+    if (creep.memory.dying) return
 
     if (!resource) {
 
@@ -466,20 +463,19 @@ Creep.prototype.remoteRequests = function() {
 
     creep = this
     let room = creep.room
+    let remoteRoomMemory = Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom]
 
-    if (!Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom]) return
+    // Make sure creep is in remoteRoom
 
-    let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasActivePartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
+    if (!remoteRoomMemory) return
+
+    let enemyCreeps = room.find(FIND_HOSTILE_CREEPS, {
+        filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM, HEAL])
     })
 
-    if (hostiles.length > 0 || room.get("enemyStructures").length > 0) {
+    if (enemyCreeps.length > 0) {
 
-        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].enemy = true
-
-    } else {
-
-        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].enemy = false
+        remoteRoomMemory.enemy = true
     }
 
     let invaderCores = room.find(FIND_HOSTILE_STRUCTURES, {
@@ -488,26 +484,19 @@ Creep.prototype.remoteRequests = function() {
 
     if (invaderCores.length > 0) {
 
-        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].invaderCore = true
-
-    } else {
-
-        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].invaderCore = false
+        remoteRoomMemory.invaderCore = true
     }
 
     let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
 
     let lowEcoStructures = room.find(FIND_STRUCTURES, {
-        filter: s => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.25
+        filter: s => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax * 0.2
     })
 
     if (mySites.length > 0 || lowEcoStructures.length > 0) {
 
-        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].builderNeed = true
+        remoteRoomMemory.builderNeed = true
 
-    } else {
-
-        Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].builderNeed = false
     }
 }
 Creep.prototype.isEdge = function() {
@@ -774,13 +763,21 @@ Creep.prototype.advancedPathing = function(opts) {
 
         if (!pos) return
 
+        if (creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))) != 0) return
+
         creep.room.visual.poly(path, { stroke: colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
 
-        if (creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))) == 0) {
+        path = removePropertyFromArray(path, pos)
+        creep.memory.path = path
 
-            path = creep.memory.path.slice(1, path.length + 1)
-            creep.memory.path = path
-        }
+        /* if (creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))) != 0) return
+
+        if (creep.pos != pos) return
+
+        creep.room.visual.poly(path, { stroke: colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
+
+        path = removePropertyFromArray(path, pos)
+        creep.memory.path = path */
     }
 }
 Creep.prototype.roadPathing = function(origin, goal) {

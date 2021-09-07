@@ -53,16 +53,16 @@ Room.prototype.healCreeps = function(towers) {
 
     let room = this
 
-    if (towers[0].store[RESOURCE_ENERGY] <= (towers[0].store.getCapacity() * 0.4)) return false
+    if (towers[0].store.getCapacity(RESOURCE_ENERGY) * 0.4 >= towers[0].store.getUsedCapacity(RESOURCE_ENERGY)) return false
 
-    let injuredCreep = room.find(FIND_CREEPS, {
+    let injuredCreeps = room.find(FIND_CREEPS, {
         filter: injuredCreep => (allyList.includes(injuredCreep.owner.username) || injuredCreep.my) &&
             injuredCreep.hits < injuredCreep.hitsMax - 50
-    })[0]
+    })
 
-    if (!injuredCreep) return false
+    if (injuredCreeps.length == 0) return false
 
-    towersHeal(towers, injuredCreep, "🩺")
+    towersHeal(towers, injuredCreeps[0], "🩺")
 
     return true
 }
@@ -71,7 +71,7 @@ Room.prototype.healPowerCreeps = function(towers) {
 
     let room = this
 
-    if (towers[0].store[RESOURCE_ENERGY] <= (towers[0].store.getCapacity() * 0.4)) return false
+    if (towers[0].store.getCapacity(RESOURCE_ENERGY) * 0.4 >= towers[0].store.getUsedCapacity(RESOURCE_ENERGY)) return false
 
     let injuredPowerCreep = room.find(FIND_POWER_CREEPS, {
         filter: injuredPowerCreep => (allyList.includes(injuredPowerCreep.owner.username) || injuredPowerCreep.my) &&
@@ -90,7 +90,7 @@ Room.prototype.repairEcoStructures = function(towers) {
 
     let room = this
 
-    if (towers[0].store[RESOURCE_ENERGY] <= (towers[0].store.getCapacity() * 0.7)) return false
+    if (towers[0].store.getCapacity(RESOURCE_ENERGY) * 0.7 >= towers[0].store.getUsedCapacity(RESOURCE_ENERGY)) return false
 
     let lowEcoStructure = room.find(FIND_STRUCTURES, {
         filter: s => (s.structureType == STRUCTURE_ROAD || s.structureType == STRUCTURE_CONTAINER) & s.hits < s.hitsMax * 0.1
@@ -107,7 +107,7 @@ Room.prototype.repairRamparts = function(towers) {
 
     let room = this
 
-    if (towers[0].store[RESOURCE_ENERGY] <= (towers[0].store.getCapacity() * 0.6)) return false
+    if (towers[0].store.getCapacity(RESOURCE_ENERGY) * 0.6 >= towers[0].store.getUsedCapacity(RESOURCE_ENERGY)) return false
 
     let lowRampart = room.find(FIND_MY_STRUCTURES, {
         filter: s => s.structureType == STRUCTURE_RAMPART && s.hits <= 1000

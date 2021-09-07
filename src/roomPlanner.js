@@ -6,7 +6,7 @@ function roomPlanner(room) {
 
     room.visual.rect(anchorPoint.x - 0.5, anchorPoint.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476", strokeWidth: "0.15" })
 
-    if (Object.values(Game.constructionSites).length == 100) return
+    /* if (Object.values(Game.constructionSites).length == 100) return */
 
     let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
 
@@ -258,45 +258,6 @@ function roomPlanner(room) {
         /* if (Game.time % 100 == 0) placeRamparts(ramparts) */
     }
 
-    function placeRamparts(ramparts) {
-
-        if (!room.memory.stage || room.memory.stage < 4) return
-
-        if (!room.storage || room.storage.store[RESOURCE_ENERGY] < 35000) return
-
-        let collection
-
-        for (let property in ramparts) {
-
-            if (room.controller.level >= property) {
-
-                collection = ramparts[property]
-            }
-        }
-
-        if (!collection) return
-
-        for (let structureType in collection) {
-            for (let pos of collection[structureType].pos) {
-
-                pos.x += anchorPoint.x - 6
-                pos.y += anchorPoint.y - 6
-
-                if (room.getTerrain().get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
-
-                room.visual.circle(pos.x, pos.y, {
-                    fill: '#4def52',
-                    radius: 0.2,
-                    strokeWidth: 0.125
-                })
-
-                if (findBuildingsOnPos(FIND_STRUCTURES, structureType, pos) || findBuildingsOnPos(FIND_MY_CONSTRUCTION_SITES, structureType, pos)) continue
-
-                if (placedSites < 10 && room.createConstructionSite(pos.x, pos.y, structureType) == 0) placedSites++
-            }
-        }
-    }
-
     function findBuildingsOnPos(constant, type, pos) {
 
         let building = room.find(constant, {
@@ -308,7 +269,208 @@ function roomPlanner(room) {
         return false
     }
 
-    // Non bunker construction
+    // Ramparts
+
+    if (Game.time % 100 == 0) placeRampartsOnRampartPositions()
+
+    function placeRampartsOnRampartPositions() {
+
+        if (room.memory.stage < 4) return
+
+        if (room.get("storedEnergy") < 30000) return
+
+        const groupedRampartPositions = room.get("groupedRampartPositions")
+        if (!groupedRampartPositions) return
+
+        for (let group of groupedRampartPositions) {
+
+            for (let pos of group) {
+
+                room.visual.circle(pos, { radius: 0.4, fill: colors.communeGreen })
+
+                if (findBuildingsOnPos(FIND_MY_STRUCTURES, STRUCTURE_RAMPART, new RoomPosition(pos.x, pos.y, room.name))) continue
+
+                if (placedSites < 10 && room.createConstructionSite(pos.x, pos.y, STRUCTURE_RAMPART) == 0) placedSites++
+            }
+        }
+    }
+
+    // Rampart paths
+
+    placeRampartPaths()
+
+    function placeRampartPaths() {
+
+        if (room.memory.stage < 4) return
+
+        if (room.get("storedEnergy") < 30000) return
+
+        const groupedRampartPositions = room.get("groupedRampartPositions")
+        if (!groupedRampartPositions) return
+
+        let roomPathDelay = 0
+
+        for (let group of groupedRampartPositions) {
+
+            if (Game.time % (roomPathDelay + 104) != 0) continue
+
+            roomPathDelay++
+
+            let closestRampartPos = anchorPoint.findClosestByRange(group)
+            closestRampartPos = new RoomPosition(closestRampartPos.x, closestRampartPos.y, room.name)
+
+            let origin = closestRampartPos
+
+            let rangeFromAnchorpoint = anchorPoint.getRangeTo(closestRampartPos.x, closestRampartPos.y)
+            let goal = { pos: anchorPoint, range: rangeFromAnchorpoint - 2 }
+
+            var path = PathFinder.search(origin, goal, {
+                plainCost: 4,
+                swampCost: 8,
+                maxRooms: 1,
+
+                roomCallback: function(roomName) {
+
+                    let room = Game.rooms[roomName]
+
+                    if (!room) return
+
+                    let cm
+
+                    cm = new PathFinder.CostMatrix
+
+                    let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+                        filter: s => s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
+                    })
+
+                    for (let site of constructionSites) {
+
+                        cm.set(site.pos.x, site.pos.y, 255)
+                    }
+
+                    let structures = room.find(FIND_STRUCTURES, {
+                        filter: s => s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
+                    })
+
+                    for (let structure of structures) {
+
+                        cm.set(structure.pos.x, structure.pos.y, 255)
+                    }
+
+                    return cm
+                }
+            }).path
+
+            room.visual.poly(path, { stroke: colors.communeGreen, strokeWidth: .15, opacity: .5, lineStyle: 'normal' })
+
+            for (let pos of path) {
+
+                if (placedSites < 10 && room.createConstructionSite(pos.x, pos.y, STRUCTURE_RAMPART) == 0) placedSites++
+            }
+        }
+    }
+
+    // Rampart roads
+
+    placeRampartRoads()
+
+    function placeRampartRoads() {
+
+        if (room.memory.stage < 4) return
+
+        const groupedRampartPositions = room.get("groupedRampartPositions")
+        if (!groupedRampartPositions) return
+
+        let roomPathDelay = 0
+
+        for (let group of groupedRampartPositions) {
+
+            for (let pos of group) {
+
+                if (Game.time % (roomPathDelay + 104) != 0) continue
+
+                roomPathDelay++
+
+                pos = new RoomPosition(pos.x, pos.y, room.name)
+
+                let origin = anchorPoint
+
+                let goal = { pos: pos, range: 3 }
+
+                if (origin && goal) {
+
+                    var path = PathFinder.search(origin, goal, {
+                        plainCost: 4,
+                        swampCost: 8,
+                        maxRooms: 1,
+
+                        roomCallback: function(roomName) {
+
+                            let room = Game.rooms[roomName]
+
+                            if (!room) return
+
+                            let cm
+
+                            cm = new PathFinder.CostMatrix
+
+                            let roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+                                filter: s => s.structureType == STRUCTURE_ROAD
+                            })
+
+                            for (let roadSite of roadConstructionSites) {
+
+                                cm.set(roadSite.pos.x, roadSite.pos.y, 1)
+                            }
+
+                            let roads = room.find(FIND_STRUCTURES, {
+                                filter: s => s.structureType == STRUCTURE_ROAD
+                            })
+
+                            for (let road of roads) {
+
+                                cm.set(road.pos.x, road.pos.y, 1)
+                            }
+
+                            for (let group of groupedRampartPositions) {
+
+                                for (let pos of group) cm.set(pos.x, pos.y, 32)
+                            }
+
+                            let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+                                filter: s => s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                            })
+
+                            for (let site of constructionSites) {
+
+                                cm.set(site.pos.x, site.pos.y, 255)
+                            }
+
+                            let structures = room.find(FIND_STRUCTURES, {
+                                filter: s => s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                            })
+
+                            for (let structure of structures) {
+
+                                cm.set(structure.pos.x, structure.pos.y, 255)
+                            }
+
+                            return cm
+                        }
+                    }).path
+
+                    room.visual.poly(path, { stroke: colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
+
+                    for (let pos of path) {
+
+                        if (placedSites < 10 && room.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD) == 0) placedSites++
+                    }
+                }
+            }
+        }
+    }
+
+    // Other construction
 
     let sourceContainer1 = room.get("sourceContainer1")
     let sourceContainer2 = room.get("sourceContainer2")
@@ -357,7 +519,7 @@ function roomPlanner(room) {
             room.get("source2HarvestPositions")
         ]
 
-        let origin = room.get("anchorPoint")
+        let origin = anchorPoint
 
         let roomPathDelay = 0
 
@@ -496,7 +658,7 @@ function roomPlanner(room) {
 
                 let source = findObjectWithId(sourceId)
 
-                let origin = room.memory.anchorPoint
+                let origin = anchorPoint
 
                 let goal = { pos: source.pos, range: 1 }
 

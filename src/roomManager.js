@@ -189,8 +189,25 @@ function roomManager() {
 
             //
 
-            /* if (room.name == "W8N3") */
-            /* findRampartPlacement(room) */
+            cpuUsed = Game.cpu.getUsed()
+
+            findAnchor(room)
+
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `findAnchor: ` + cpuUsed.toFixed(2) + `
+                        `
+
+            //
+
+            cpuUsed = Game.cpu.getUsed()
+
+            findRampartPlacement(room)
+
+            totalCpuUsed += Game.cpu.getUsed()
+            cpuUsed = Game.cpu.getUsed() - cpuUsed
+            consoleMessage += `findRampartPlacement: ` + cpuUsed.toFixed(2) + `
+                        `
 
             //
 
@@ -292,17 +309,6 @@ function roomManager() {
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed
             consoleMessage += `labs: ` + cpuUsed.toFixed(2) + `
-            `
-
-            //
-
-            cpuUsed = Game.cpu.getUsed()
-
-            findAnchor(room)
-
-            totalCpuUsed += Game.cpu.getUsed()
-            cpuUsed = Game.cpu.getUsed() - cpuUsed
-            consoleMessage += `findAnchor: ` + cpuUsed.toFixed(2) + `
             `
 
             //

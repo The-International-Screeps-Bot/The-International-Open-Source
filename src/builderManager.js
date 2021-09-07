@@ -2,6 +2,8 @@ var roleUpgrader = require('role.upgrader')
 
 function builderManager(room, creepsWithRole) {
 
+    if (!room.get("controller").my) return
+
     const anchorPoint = room.get("anchorPoint")
 
     function findBuildableSites(mySites) {

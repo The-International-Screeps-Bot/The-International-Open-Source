@@ -66,7 +66,7 @@ function scoutManager(room, creepsWithRole) {
 
             // If it's a neutral are right sign the controller
 
-            signController()
+            if (signController()) continue
 
             function signController() {
 
@@ -90,12 +90,13 @@ function scoutManager(room, creepsWithRole) {
                 if (controller.my) {
 
                     creep.signController(controller, "A commune of The Internationale. Bourgeoisie not welcome here.")
-                    return
+                    return true
                 }
 
                 // If neutral room sign it with a random neutral message
 
                 creep.signWithMessage()
+                return true
             }
 
             // Find what type of room this is and gather and record data on it
@@ -356,5 +357,4 @@ function scoutManager(room, creepsWithRole) {
     }
 }
 
-module.exports = scoutManager
 module.exports = scoutManager

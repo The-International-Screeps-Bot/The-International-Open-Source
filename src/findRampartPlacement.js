@@ -1,6 +1,8 @@
 function findRampartPlacement(room) {
 
-    // Terrain type constants
+    if (room.get("groupedRampartPositions")) return
+
+    // Terrain types
 
     const UNWALKABLE = -1;
     const NORMAL = 0;
@@ -11,7 +13,7 @@ function findRampartPlacement(room) {
     /**
      * An Array with Terrain information: -1 not usable, 2 Sink (Leads to Exit)
      */
-    function room_2d_array(roomname, bounds = { x1: 0, y1: 0, x2: 49, y2: 49 }) {
+    function formatRoomTerrain(roomName, bounds = { x1: 0, y1: 0, x2: 49, y2: 49 }) {
 
         let room_2d = Array(50).fill(0).map(x => Array(50).fill(UNWALKABLE)); // Array for room tiles
 
@@ -23,7 +25,9 @@ function findRampartPlacement(room) {
 
         const jmax = bounds.y2;
 
-        const terrain = Game.map.getRoomTerrain(roomname);
+        const terrain = Game.map.getRoomTerrain(roomName);
+
+        // Loop through each tile and find terrain type, assign to usable terrain values
 
         for (; i <= imax; i++) {
 
@@ -48,9 +52,12 @@ function findRampartPlacement(room) {
         }
 
         // Marks tiles Near Exits for sink- where you cannot build wall/rampart
+
         let y = 1;
         const max = 49;
+
         for (; y < max; y++) {
+
             if (room_2d[0][y - 1] === EXIT) room_2d[1][y] = TO_EXIT;
             if (room_2d[0][y] === EXIT) room_2d[1][y] = TO_EXIT;
             if (room_2d[0][y + 1] === EXIT) room_2d[1][y] = TO_EXIT;
@@ -58,8 +65,11 @@ function findRampartPlacement(room) {
             if (room_2d[49][y] === EXIT) room_2d[48][y] = TO_EXIT;
             if (room_2d[49][y + 1] === EXIT) room_2d[48][y] = TO_EXIT;
         }
+
         let x = 1;
+
         for (; x < max; x++) {
+
             if (room_2d[x - 1][0] === EXIT) room_2d[x][1] = TO_EXIT;
             if (room_2d[x][0] === EXIT) room_2d[x][1] = TO_EXIT;
             if (room_2d[x + 1][0] === EXIT) room_2d[x][1] = TO_EXIT;
@@ -72,11 +82,15 @@ function findRampartPlacement(room) {
 
         y = 1;
         for (; y < max; y++) {
+
             room_2d[0][y] == UNWALKABLE;
             room_2d[49][y] == UNWALKABLE;
         }
+
         x = 1;
+
         for (; x < max; x++) {
+
             room_2d[x][0] == UNWALKABLE;
             room_2d[x][49] == UNWALKABLE;
         }
@@ -84,34 +98,47 @@ function findRampartPlacement(room) {
     }
 
     function Graph(menge_v) {
+
         this.v = menge_v; // Vertex count
         this.level = Array(menge_v);
         this.edges = Array(menge_v).fill(0).map(x => []); // Array: for every vertex an edge Array mit {v,r,c,f} vertex_to,res_edge,capacity,flow
-        this.New_edge = function(u, v, c) { // Adds new edge from u to v
+
+        this.newEdge = function(u, v, c) { // Adds new edge from u to v
+
             this.edges[u].push({ v: v, r: this.edges[v].length, c: c, f: 0 }); // Normal forward Edge
             this.edges[v].push({ v: u, r: this.edges[u].length - 1, c: 0, f: 0 }); // reverse Edge for Residal Graph
         };
+
         this.Bfs = function(s, t) { // calculates Level Graph and if theres a path from s to t
-            if (t >= this.v)
-                return false;
+
+            if (t >= this.v) return false;
+
             this.level.fill(-1); // reset old levels
             this.level[s] = 0;
             let q = []; // queue with s as starting point
+
             q.push(s);
+
             let u = 0;
             let edge = null;
+
             while (q.length) {
+
                 u = q.splice(0, 1)[0];
                 let i = 0;
                 const imax = this.edges[u].length;
+
                 for (; i < imax; i++) {
+
                     edge = this.edges[u][i];
                     if (this.level[edge.v] < 0 && edge.f < edge.c) {
+
                         this.level[edge.v] = this.level[u] + 1;
                         q.push(edge.v);
                     }
                 }
             }
+
             return this.level[t] >= 0; // return if theres a path to t -> no level, no path!
         };
 
@@ -119,6 +146,7 @@ function findRampartPlacement(room) {
         // u vertex, f flow on path, t =Sink , c Array, c[i] saves the count of edges explored from vertex i
 
         this.Dfsflow = function(u, f, t, c) {
+
             if (u === t) // Sink reached , aboard recursion
                 return f;
 
@@ -147,7 +175,8 @@ function findRampartPlacement(room) {
             }
 
             return 0;
-        };
+        }
+
         this.Bfsthecut = function(s) { // breadth-first-search which uses the level array to mark the vertices reachable from s
 
             let e_in_cut = [];
@@ -217,10 +246,14 @@ function findRampartPlacement(room) {
     // Function to create Source, Sink, Tiles arrays: takes a rectangle-Array as input for Tiles that are to Protect
     // rects have top-left/bottom_right Coordinates {x1,y1,x2,y2}
 
-    function create_graph(roomname, rect, bounds) {
+    function createGraph(roomName, rect, bounds) {
 
-        let room_array = room_2d_array(roomname, bounds); // An Array with Terrain information: -1 not usable, 2 Sink (Leads to Exit)
+        // Create array with terrain usable information
+
+        let room_array = formatRoomTerrain(roomName, bounds)
+
         // For all Rectangles, set edges as source (to protect area) and area as unused
+
         let r = null;
         let j = 0;
         const jmax = rect.length;
@@ -276,7 +309,7 @@ function findRampartPlacement(room) {
 
         if (true) {
 
-            let visual = new RoomVisual(roomname);
+            let visual = new RoomVisual(roomName);
 
             let x = 0;
             let y = 0;
@@ -355,62 +388,68 @@ function findRampartPlacement(room) {
 
                     // If normal tile do x
 
-                    g.New_edge(top, bottom, 1);
+                    g.newEdge(top, bottom, 1);
 
                     for (let i = 0; i < 8; i++) {
 
                         dx = x + surr[i][0];
                         dy = y + surr[i][1];
 
-                        if (room_array[dx][dy] === NORMAL || room_array[dx][dy] === TO_EXIT) g.New_edge(bottom, dy * 50 + dx, infini);
+                        if (room_array[dx][dy] === NORMAL || room_array[dx][dy] === TO_EXIT) g.newEdge(bottom, dy * 50 + dx, infini);
                     }
                 } else if (room_array[x][y] === PROTECTED) {
 
                     // If protected tile do x
 
-                    g.New_edge(source, top, infini);
-                    g.New_edge(top, bottom, 1);
+                    g.newEdge(source, top, infini);
+                    g.newEdge(top, bottom, 1);
 
                     for (let i = 0; i < 8; i++) {
 
                         dx = x + surr[i][0];
                         dy = y + surr[i][1];
 
-                        if (room_array[dx][dy] === NORMAL || room_array[dx][dy] === TO_EXIT) g.New_edge(bottom, dy * 50 + dx, infini);
+                        if (room_array[dx][dy] === NORMAL || room_array[dx][dy] === TO_EXIT) g.newEdge(bottom, dy * 50 + dx, infini);
                     }
                 } else if (room_array[x][y] === TO_EXIT) {
 
                     // If exit tile do x
 
-                    g.New_edge(top, sink, infini);
+                    g.newEdge(top, sink, infini);
                 }
             }
         }
+
         return g;
     }
 
-    function delete_tiles_to_dead_ends(roomname, cut_tiles_array) { // Removes unneccary cut-tiles if bounds are set to include some 	dead ends
-        // Get Terrain and set all cut-tiles as unwalkable
-        let room_array = room_2d_array(roomname);
+    function deleteTilesToDeadEnds(roomName, cut_tiles_array) {
+
+        // make any tiles that don't have a path to the exits unwalkable terrain
+        let room_array = room_2d_array(roomName);
         for (let i = cut_tiles_array.length - 1; i >= 0; i--) {
             room_array[cut_tiles_array[i].x][cut_tiles_array[i].y] = UNWALKABLE;
         }
 
         // Floodfill from exits: save exit tiles in array and do a bfs-like search
-
+        // I think that they are just making any tile that is at the edge and not a dark blue tile an exit; they then add those tiles to the Breadth's first search algorithm
         let unvisited_pos = [];
-        let y = 0;
-        const max = 49;
-        for (; y < max; y++) {
+        for (let y = 0; y < 49; y++) {
             if (room_array[1][y] === TO_EXIT) unvisited_pos.push(50 * y + 1)
             if (room_array[48][y] === TO_EXIT) unvisited_pos.push(50 * y + 48)
         }
-        let x = 0;
-        for (; x < max; x++) {
+
+        for (let x = 0; x < 49; x++) {
             if (room_array[x][1] === TO_EXIT) unvisited_pos.push(50 + x)
             if (room_array[x][48] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
         }
+
         // Iterate over all unvisited TO_EXIT- Tiles and mark neigbours as TO_EXIT tiles, if walkable (NORMAL), and add to unvisited
+        /* This array holds all of the relative positions of each neighboring tile, including diagonally
+         * * *
+         * # *
+         * * *
+         */
         let surr = [
             [0, -1],
             [-1, -1],
@@ -423,31 +462,46 @@ function findRampartPlacement(room) {
         ];
         let index, dx, dy;
         while (unvisited_pos.length > 0) {
+            // Take the last tile from the unvisited tiles array, and set it as the current tile to be "inspected"
             index = unvisited_pos.pop();
+
             x = index % 50;
             y = Math.floor(index / 50);
+
+            // Loop through all neighboring tiles as determined by the relative positions in "surr"
             for (let i = 0; i < 8; i++) {
+                // Current neighbor
                 dx = x + surr[i][0];
                 dy = y + surr[i][1];
+
+                // If the neighboring tile is walkable (NORMAL), add it to the unvisited tiles array to continue the Breadths first search
+                // Since the search began at the exit, we know that if this tile has been reached, it has a path to the exit, so we mark it as such
                 if (room_array[dx][dy] === NORMAL) {
                     unvisited_pos.push(50 * dy + dx);
                     room_array[dx][dy] = TO_EXIT;
                 }
             }
         }
-        // Remove min-Cut-Tile if there is no TO-EXIT  surrounding it
+
+        // Remove tile if there is no TO-EXIT surrounding it
         let leads_to_exit = false;
         for (let i = cut_tiles_array.length - 1; i >= 0; i--) {
             leads_to_exit = false;
+
+            // Loop through the tile's neighbors once again
             x = cut_tiles_array[i].x;
             y = cut_tiles_array[i].y;
             for (let i = 0; i < 8; i++) {
                 dx = x + surr[i][0];
                 dy = y + surr[i][1];
+
+                // If the tile has a path to the exit, then set the flag to skip it
                 if (room_array[dx][dy] === TO_EXIT) {
                     leads_to_exit = true;
                 }
             }
+
+            // If the tile doesn't lead to an exit, remove it from the array (this should remove it from the "positions" array that was originally passed to this function)
             if (!leads_to_exit) {
                 cut_tiles_array.splice(i, 1);
             }
@@ -456,9 +510,9 @@ function findRampartPlacement(room) {
 
     // Function for user: calculate min cut tiles from room, rect[]
 
-    function GetCutTiles(roomname, rect, bounds, verbose = false) {
+    function GetCutTiles(roomName, rect, bounds, verbose = false) {
 
-        let graph = create_graph(roomname, rect, bounds);
+        let graph = createGraph(roomName, rect, bounds); // Get the map 
         let source = 2 * 50 * 50; // Position Source / Sink in Room-Graph
         let sink = 2 * 50 * 50 + 1;
         let count = graph.Calcmincut(source, sink);
@@ -469,21 +523,21 @@ function findRampartPlacement(room) {
 
         if (count > 0) {
 
+            // I think by cut_edges, they mean any edge that is not unwalkable
+
             let cut_edges = graph.Bfsthecut(source);
 
             // Get Positions from Edge
 
             let u, x, y;
-            let i = 0;
-            const imax = cut_edges.length;
 
-            for (; i < imax; i++) {
+            for (let i = 0; i < cut_edges.length; i++) {
 
                 u = cut_edges[i]; // x= v % 50  y=v/50 (math.floor?)
                 x = u % 50;
                 y = Math.floor(u / 50);
 
-                positions.push({ "x": x, "y": y });
+                positions.push(new RoomPosition(x, y, room.name))
             }
         }
 
@@ -492,29 +546,32 @@ function findRampartPlacement(room) {
 
         let whole_room = (bounds.x1 == 0 && bounds.y1 == 0 && bounds.x2 == 49 && bounds.y2 == 49);
         if (positions.length > 0 && !whole_room)
-            delete_tiles_to_dead_ends(roomname, positions);
+            deleteTilesToDeadEnds(roomName, positions);
 
         // Visualise Result
 
         if (true && positions.length > 0) {
 
-            let visual = new RoomVisual(roomname);
+            let visual = new RoomVisual(roomName);
 
             for (let i = positions.length - 1; i >= 0; i--) {
-
-                visual.circle(positions[i].x, positions[i].y, { radius: 0.5, fill: colors.communeGreen, opacity: 0.8 });
+                // These must be the walls
+                visual.circle(positions[i].x, positions[i].y, { radius: 0.4, fill: colors.communeGreen, opacity: 0.8 });
             }
         }
+
         return positions;
     }
 
-    function test(roomname) {
-
-        //let room=Game.rooms[roomname];
-        //if (!room)
-        //    return 'O noes, no room';
+    function test(roomName) {
 
         let cpu = Game.cpu.getUsed()
+
+        // Boundary for Maximum Range
+
+        let bounds = { x1: 0, y1: 0, x2: 49, y2: 49 }
+
+        // Requirements for protectedAreas
 
         let anchorPoint = room.get("anchorPoint")
 
@@ -534,31 +591,145 @@ function findRampartPlacement(room) {
 
             // If not near give position for protection
 
-            return { x1: pos.x - 4, y1: pos.y - 4, x2: pos.x + 4, y2: pos.y + 4 }
+            return { x1: pos.x - 3, y1: pos.y - 3, x2: pos.x + 3, y2: pos.y + 3 }
         }
 
         let controllerPos = room.get("controller").pos
 
         // Rectangle Array, the Rectangles will be protected by the returned tiles
 
-        let rect_array = [
+        let protectedAreas = [
             { x1: anchorPoint.x - 9, y1: anchorPoint.y - 9, x2: anchorPoint.x + 9, y2: anchorPoint.y + 9 }, // Protect bunker
             sourceRect(source1Pos), // Protect source 1
             sourceRect(source2Pos), // Protect source 2
             { x1: controllerPos.x - 1, y1: controllerPos.y - 1, x2: controllerPos.x + 1, y2: controllerPos.y + 1 }, // Protect controller
         ]
 
-        // Boundary Array for Maximum Range
+        // Run floodfill + mincut to find rampartPositions
 
-        let bounds = { x1: 0, y1: 0, x2: 49, y2: 49 };
+        let rampartPositions = GetCutTiles(roomName, protectedAreas, bounds)
 
-        // Get Min cut
+        if (rampartPositions.length == 0) return false
 
-        let rampartPositions = GetCutTiles(roomname, rect_array, bounds); // Positions is an array where to build walls/ramparts
+        // Group the ramparts for future use
+
+        let groupedRampartPositions = []
+
+        let maxGroupSize = 15 // Set to infinity for no group size
+
+        class PositionSet {
+            constructor(x, y) {
+
+                this.top = new RoomPosition(x, y - 1, room.name)
+                this.left = new RoomPosition(x - 1, y, room.name)
+                this.bottom = new RoomPosition(x, y + 1, room.name)
+                this.right = new RoomPosition(x + 1, y, room.name)
+            }
+        }
+
+        groupRampartPositions()
+
+        function findContiguousRamparts(rampartPos) {
+
+            // group will contain all contiguous rampartPositions
+
+            let group = [rampartPos]
+
+            // searchPositions will provide positions the algorithm where to look for rampartPositions
+
+            let searchPositions = {
+                [rampartPos.x * rampartPos.y]: new PositionSet(rampartPos.x, rampartPos.y),
+            }
+
+            // So long as we have positions to search, search them
+
+            let i = 1
+
+            while (Object.keys(searchPositions).length > 0 && i < maxGroupSize) {
+
+                let zPos = Object.keys(searchPositions)[0]
+
+                for (let direction in searchPositions[zPos]) {
+
+                    let pos = searchPositions[zPos][direction]
+
+                    // Check if position is a rampartPos
+
+                    let matchingRampartPos = rampartPositions.filter(rampartPos => rampartPos.isEqualTo(pos))[0]
+                    if (!matchingRampartPos) continue
+
+                    // Check if in the group already
+
+                    let matchingGroupPos = group.filter(rampartPos => rampartPos.isEqualTo(pos))[0]
+                    if (matchingGroupPos) continue
+
+                    // Check if in any group already if maxGroupSize is less than infinity
+
+                    if (maxGroupSize != Infinity) {
+
+                        var groupWithPos = groupedRampartPositions.filter(group => group.filter(rampartPos => rampartPos.isEqualTo(pos))[0])[0]
+                    }
+                    if (groupWithPos) continue
+
+                    // Add pos to group
+
+                    group.push(pos)
+
+                    // Add new positions around the pos for us to continue searching at
+
+                    searchPositions[pos.x * pos.y] = new PositionSet(pos.x, pos.y)
+
+                    i++
+                }
+
+                // After searching the positions delete them
+
+                delete searchPositions[zPos]
+            }
+
+            return group
+        }
+
+        function groupRampartPositions() {
+
+            for (let rampartPos of rampartPositions) {
+
+                // Make sure it's not in a group
+
+                let groupWithRampart = groupedRampartPositions.filter(group => group.filter(pos => pos.isEqualTo(rampartPos))[0])[0]
+                if (groupWithRampart) continue
+
+                // If not in a group compile contiguous ramparts into group
+
+                let group = findContiguousRamparts(rampartPos)
+
+                // Add group to grouped array of groups
+
+                groupedRampartPositions.push(group)
+            }
+        }
+
+        // Visualize rampart groups
+
+        let i = 0
+
+        for (let group of groupedRampartPositions) {
+
+            for (let rampartPos of group) {
+
+                room.visual.text(i, rampartPos, {})
+            }
+
+            i++
+        }
+
+        // Assign positions to memory
+
+        room.memory.groupedRampartPositions = groupedRampartPositions
 
         // Test output
 
-        console.log('Positions count: ', rampartPositions.length);
+        console.log('RampartPositions amount: ', rampartPositions.length);
         cpu = Game.cpu.getUsed() - cpu;
         console.log('Needed', cpu, ' cpu time');
         return 'Finished';
@@ -567,6 +738,5 @@ function findRampartPlacement(room) {
     test(room.name)
 }
 
-module.exports = findRampartPlacement
 module.exports = findRampartPlacement
 module.exports = findRampartPlacement

@@ -93,6 +93,7 @@ Room.prototype.get = function(roomVar, cache) {
 
     // Other
     roomVars.anchorPoint = room.memory.anchorPoint ? new RoomPosition(room.memory.anchorPoint.x, room.memory.anchorPoint.y, room.memory.anchorPoint.roomName) : false
+    roomVars.groupedRampartPositions = findGroupedRampartPositions()
     roomVars.storedEnergy = findStoredEnergy()
 
     roomVars.source1HarvestPositions = findHarvestPositions("source1")
@@ -367,6 +368,28 @@ Room.prototype.get = function(roomVar, cache) {
         if (roomVars.terminal) storedEnergy += roomVars.terminal.store.getUsedCapacity(RESOURCE_ENERGY)
 
         return storedEnergy
+    }
+
+    function findGroupedRampartPositions() {
+
+        const groupedRampartPositions = room.memory.groupedRampartPositions
+        if (!groupedRampartPositions) return
+
+        let newGroupedRampartPositions = []
+
+        for (let group of groupedRampartPositions) {
+
+            let newGroup = []
+
+            for (let pos of group) {
+
+                newGroup.push(new RoomPosition(pos.x, pos.y, pos.roomName))
+            }
+
+            newGroupedRampartPositions.push(newGroup)
+        }
+
+        return newGroupedRampartPositions
     }
 
     // Assign new values to cachedValues

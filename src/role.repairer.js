@@ -6,7 +6,7 @@ module.exports = {
         if (creep.memory.isFull) {
 
             let lowLogisticStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: (s) => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits <= (s.hitsMax - creep.findParts("work") * 100)
+                filter: s => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits <= (s.hitsMax - creep.findParts("work") * 100)
             })
 
             if (lowLogisticStructure) {
@@ -42,6 +42,16 @@ module.exports = {
                         creep.say("SC")
 
                         creep.advancedWithdraw(container)
+                    } else {
+
+                        let droppedEnergy = creep.findDroppedEnergyOfAmount(creep.store.getFreeCapacity())
+
+                        if (droppedEnergy) {
+
+                            creep.say("💡")
+
+                            creep.pickupDroppedEnergy(droppedEnergy)
+                        }
                     }
                 }
             }

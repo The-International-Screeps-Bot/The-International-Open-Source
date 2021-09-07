@@ -1,4 +1,4 @@
-Creep.prototype.findHostile = function() {
+Creep.prototype.findHostiles = function() {
 
     let creep = this
     let room = creep.room
@@ -38,7 +38,7 @@ Creep.prototype.findHostile = function() {
     return { enemyCreeps: enemyCreeps, enemyCreep: findClosestEnemyCreep(), enemyAttacker: findClosestEnemyAttacker() }
 }
 
-Creep.prototype.attackHostiles = function(enemyCreeps, enemyCreep, enemyAttacker) {
+Creep.prototype.advancedAttackHostiles = function(enemyCreeps, enemyCreep, enemyAttacker) {
 
     let creep = this
 

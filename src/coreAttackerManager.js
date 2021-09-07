@@ -1,6 +1,6 @@
-require("coreAttackerFunctions")
-
 function coreAttackerManager(room, creepsWithRole) {
+
+    require("coreAttackerFunctions")
 
     if (creepsWithRole.length == 0) return
 
@@ -24,6 +24,15 @@ function coreAttackerManager(room, creepsWithRole) {
         if (remoteRoom) {
             if (room.name == remoteRoom) {
 
+                let invaderCores = room.find(FIND_HOSTILE_STRUCTURES, {
+                    filter: structure => structure.structureType == STRUCTURE_INVADER_CORE
+                })
+
+                if (invaderCores.length == 0) {
+
+                    Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].invaderCore = false
+                }
+
                 if (creep.findAndAttackInvaderCores()) continue
 
                 continue
@@ -44,11 +53,11 @@ function coreAttackerManager(room, creepsWithRole) {
         }
         if (room.name == roomFrom) {
 
-            let enemyCreepsObject = creep.findHostile()
+            let enemyCreepsObject = creep.findHostiles()
 
             if (creep.defendRamparts(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyAttacker)) continue
 
-            if (creep.attackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
+            if (creep.advancedAttackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
 
             if (creep.wait()) continue
 

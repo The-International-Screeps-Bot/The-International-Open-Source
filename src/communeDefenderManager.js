@@ -1,6 +1,6 @@
-require("communeDefenderFunctions")
-
 function communeDefenderManager(room, creepsWithRole) {
+
+    require("communeDefenderFunctions")
 
     if (creepsWithRole.length == 0) return
 
@@ -24,16 +24,25 @@ function communeDefenderManager(room, creepsWithRole) {
         if (remoteRoom) {
             if (room.name == remoteRoom) {
 
-                let enemyCreepsObject = creep.findHostile()
+                let enemyCreeps = room.find(FIND_HOSTILE_CREEPS, {
+                    filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM, HEAL])
+                })
 
-                creep.heal(enemyCreepsObject.enemyAttacker)
+                if (enemyCreeps.length == 0) {
 
-                if (creep.attackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
+                    Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].enemy = false
+                }
 
-                /* if (creep.findAndAttackInvaderCores()) continue */
+                let enemyCreepsObject = creep.findHostiles()
+
+                creep.healMyCreeps(enemyCreepsObject.enemyAttacker)
+
+                if (creep.advancedAttackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
 
                 continue
             }
+
+            creep.say(remoteRoom)
 
             creep.advancedPathing({
                 origin: creep.pos,
@@ -50,13 +59,13 @@ function communeDefenderManager(room, creepsWithRole) {
         }
         if (room.name == roomFrom) {
 
-            let enemyCreepsObject = creep.findHostile()
+            let enemyCreepsObject = creep.findHostiles()
 
-            creep.heal(enemyCreepsObject.enemyAttacker)
+            creep.healMyCreeps(enemyCreepsObject.enemyAttacker)
 
             if (creep.defendRamparts(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyAttacker)) continue
 
-            if (creep.attackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
+            if (creep.advancedAttackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
 
             if (creep.wait()) continue
 

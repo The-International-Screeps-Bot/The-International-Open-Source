@@ -1,4 +1,3 @@
-var AttackWhitelist = ["cplive", me];
 module.exports = {
     run: function(creep) {
 
@@ -20,6 +19,17 @@ module.exports = {
         if (remoteRoom) {
 
             if (creep.room.name == remoteRoom) {
+
+                let mySites = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
+
+                let lowEcoStructures = creep.room.find(FIND_STRUCTURES, {
+                    filter: s => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax - creep.findParts(WORK) * 100
+                })
+
+                if (mySites.length == 0 && lowEcoStructures.length == 0) {
+
+                    Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].builderNeed = false
+                }
 
                 creep.isFull()
 

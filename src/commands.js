@@ -16,16 +16,15 @@ global.removeSites = function(roomName, type) {
 
 global.destroyStructures = function(roomName, type) {
 
-    if (!roomName || !Game.rooms[roomName]) return "room is undefined"
+    let room = Game.rooms[roomName]
+
+    if (!roomName || !room) return "room is undefined"
 
     let structures = room.find(FIND_STRUCTURES, {
         filter: s => !type || (type && s.structureType == type)
     })
 
-    for (let structure of structures) {
-
-        structure.destroy()
-    }
+    for (let structure of structures) structure.destroy()
 
     return "destroyed structures in " + roomName
 }
@@ -44,14 +43,16 @@ global.removeAllSites = function() {
 
 global.destroyAllStructures = function(type) {
 
-    let structures = room.find(FIND_STRUCTURES, {
-        filter: s => {
-            if (type && s.structureType == type) return s
-            if (!type) return s
-        }
-    })
+    for (let roomName in Game.rooms) {
 
-    for (let structure of structures) structure.destroy()
+        let room = Game.rooms[roomName]
+
+        let structures = room.find(FIND_STRUCTURES, {
+            filter: s => !type || (type && s.structureType == type)
+        })
+
+        for (let structure of structures) structure.destroy()
+    }
 
     return "destroyed all structures " + type
 }

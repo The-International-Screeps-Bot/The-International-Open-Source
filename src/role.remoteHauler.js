@@ -95,7 +95,7 @@ module.exports = {
 
                             let controllerContainer = creep.room.get("controllerContainer")
 
-                            if (controllerContainer && controllerContainer.store[RESOURCE_ENERGY] <= creep.store.getUsedCapacity()) {
+                            if (controllerContainer && controllerContainer.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
 
                                 creep.say("CC")
 

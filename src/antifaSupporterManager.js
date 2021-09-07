@@ -12,7 +12,7 @@ function antifaSupporterManager(room, assaulters, supporters) {
 
         if (room.name == attackTarget) {
 
-            // Creep is in room to attack
+            // Creep is in room to attack 
 
             if (creep.isEdge()) {
 

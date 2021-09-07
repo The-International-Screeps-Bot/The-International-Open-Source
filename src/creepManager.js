@@ -51,7 +51,6 @@ function creepManager(room, myCreeps) {
     roles["hauler"] = require("role.hauler")
     roles["upgrader"] = require('role.upgrader')
     roles["repairer"] = require('role.repairer')
-    roles["upgradeHauler"] = require("role.upgradeHauler")
     roles["claimer"] = require('role.claimer')
     roles["revolutionaryBuilder"] = require('role.revolutionaryBuilder')
     roles["rangedDefender"] = require('role.rangedDefender')
@@ -59,9 +58,7 @@ function creepManager(room, myCreeps) {
     roles["scientist"] = require("role.scientist")
     roles["reserver"] = require("role.reserver")
     roles["robber"] = require("role.robber")
-        /* roles["scout"] = require("role.scout") */
     roles["stationaryHauler"] = require("role.stationaryHauler")
-        /* roles["communeDefender"] = require("role.communeDefender") */
     roles["remoteHauler"] = require("role.remoteHauler")
     roles["remoteBuilder"] = require("role.remoteBuilder")
 
@@ -76,8 +73,6 @@ function creepManager(room, myCreeps) {
     for (let creep of myCreeps) {
 
         cpuUsed = Game.cpu.getUsed()
-
-        //creep.suicide()
 
         if (creep && creep.memory.role) {
             if (creep.ticksToLive <= creep.body.length * 3) {
