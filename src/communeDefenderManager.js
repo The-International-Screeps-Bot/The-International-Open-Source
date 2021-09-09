@@ -1,8 +1,8 @@
 function communeDefenderManager(room, creepsWithRole) {
 
-    require("communeDefenderFunctions")
-
     if (creepsWithRole.length == 0) return
+
+    require("communeDefenderFunctions")
 
     for (let creep of creepsWithRole) {
 

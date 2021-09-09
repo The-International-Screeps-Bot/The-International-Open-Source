@@ -250,7 +250,7 @@ function findRampartPlacement(room) {
 
         // Create array with terrain usable information
 
-        let room_array = formatRoomTerrain(roomName, bounds)
+        let roomArray = formatRoomTerrain(roomName, bounds)
 
         // For all Rectangles, set edges as source (to protect area) and area as unused
 
@@ -284,25 +284,27 @@ function findRampartPlacement(room) {
 
             if (r.x1 >= r.x2 || r.y1 >= r.y2) {
 
-                return console.log('ERROR: Rectangle Nr.', j, JSON.stringify(r), 'invalid.');
+                return console.log('ERROR: Rectangle Nr.', j, JSON.stringify(r), 'invalid.')
             }
 
-            let x = r.x1;
-            const maxx = r.x2 + 1;
-            let y = r.y1;
-            const maxy = r.y2 + 1;
+            let x = r.x1
+            const maxx = r.x2 + 1
+            let y = r.y1
+            const maxy = r.y2 + 1
 
             for (; x < maxx; x++) {
 
                 y = r.y1;
 
+                if (!roomArray[x]) continue
+
                 for (; y < maxy; y++) {
 
                     if (x === r.x1 || x === r.x2 || y === r.y1 || y === r.y2) {
 
-                        if (room_array[x][y] === NORMAL) room_array[x][y] = PROTECTED
+                        if (roomArray[x][y] === NORMAL) roomArray[x][y] = PROTECTED
 
-                    } else room_array[x][y] = UNWALKABLE
+                    } else roomArray[x][y] = UNWALKABLE
                 }
             }
         }
@@ -322,19 +324,19 @@ function findRampartPlacement(room) {
 
                 for (; y < max; y++) {
 
-                    if (room_array[x][y] === UNWALKABLE)
+                    if (roomArray[x][y] === UNWALKABLE)
 
                         visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#111166', opacity: 0.3, stroke: "#111166", strokeWidth: 0.05 })
 
-                    else if (room_array[x][y] === NORMAL)
+                    else if (roomArray[x][y] === NORMAL)
 
                         visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#e8e863', opacity: 0.3, stroke: "#e8e863", strokeWidth: 0.05 })
 
-                    else if (room_array[x][y] === PROTECTED)
+                    else if (roomArray[x][y] === PROTECTED)
 
                         visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#75e863', opacity: 0.3, stroke: "#75e863", strokeWidth: 0.05 })
 
-                    else if (room_array[x][y] === TO_EXIT)
+                    else if (roomArray[x][y] === TO_EXIT)
 
                         visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#b063e8', opacity: 0.3, stroke: "#b063e8", strokeWidth: 0.05 })
                 }
@@ -344,8 +346,8 @@ function findRampartPlacement(room) {
         // initialise graph
         // possible 2*50*50 +2 (st) Vertices (Walls etc set to unused later)
 
-        let g = new Graph(2 * 50 * 50 + 2);
-        let infini = Number.MAX_VALUE;
+        let g = new Graph(2 * 50 * 50 + 2)
+        let infini = Number.MAX_VALUE
         let surr = [
             [0, -1],
             [-1, -1],
@@ -365,15 +367,15 @@ function findRampartPlacement(room) {
         // top vertices <-> x,y : v=y*50+x   and x= v % 50  y=v/50 (math.floor?)
         // bottom vertices <-> top + 2500
 
-        let source = 2 * 50 * 50;
-        let sink = 2 * 50 * 50 + 1;
-        let top = 0;
-        let bottom = 0;
-        let dx = 0;
-        let dy = 0;
-        let x = 1;
-        let y = 1;
-        const max = 49;
+        let source = 2 * 50 * 50
+        let sink = 2 * 50 * 50 + 1
+        let top = 0
+        let bottom = 0
+        let dx = 0
+        let dy = 0
+        let x = 1
+        let y = 1
+        const max = 49
 
         for (; x < max; x++) {
 
@@ -384,7 +386,7 @@ function findRampartPlacement(room) {
                 top = y * 50 + x;
                 bottom = top + 2500;
 
-                if (room_array[x][y] === NORMAL) { // normal Tile
+                if (roomArray[x][y] === NORMAL) { // normal Tile
 
                     // If normal tile do x
 
@@ -395,9 +397,9 @@ function findRampartPlacement(room) {
                         dx = x + surr[i][0];
                         dy = y + surr[i][1];
 
-                        if (room_array[dx][dy] === NORMAL || room_array[dx][dy] === TO_EXIT) g.newEdge(bottom, dy * 50 + dx, infini);
+                        if (roomArray[dx][dy] === NORMAL || roomArray[dx][dy] === TO_EXIT) g.newEdge(bottom, dy * 50 + dx, infini);
                     }
-                } else if (room_array[x][y] === PROTECTED) {
+                } else if (roomArray[x][y] === PROTECTED) {
 
                     // If protected tile do x
 
@@ -409,9 +411,9 @@ function findRampartPlacement(room) {
                         dx = x + surr[i][0];
                         dy = y + surr[i][1];
 
-                        if (room_array[dx][dy] === NORMAL || room_array[dx][dy] === TO_EXIT) g.newEdge(bottom, dy * 50 + dx, infini);
+                        if (roomArray[dx][dy] === NORMAL || roomArray[dx][dy] === TO_EXIT) g.newEdge(bottom, dy * 50 + dx, infini);
                     }
-                } else if (room_array[x][y] === TO_EXIT) {
+                } else if (roomArray[x][y] === TO_EXIT) {
 
                     // If exit tile do x
 
@@ -426,22 +428,22 @@ function findRampartPlacement(room) {
     function deleteTilesToDeadEnds(roomName, cut_tiles_array) {
 
         // make any tiles that don't have a path to the exits unwalkable terrain
-        let room_array = room_2d_array(roomName);
+        let roomArray = room_2d_array(roomName);
         for (let i = cut_tiles_array.length - 1; i >= 0; i--) {
-            room_array[cut_tiles_array[i].x][cut_tiles_array[i].y] = UNWALKABLE;
+            roomArray[cut_tiles_array[i].x][cut_tiles_array[i].y] = UNWALKABLE;
         }
 
         // Floodfill from exits: save exit tiles in array and do a bfs-like search
         // I think that they are just making any tile that is at the edge and not a dark blue tile an exit; they then add those tiles to the Breadth's first search algorithm
         let unvisited_pos = [];
         for (let y = 0; y < 49; y++) {
-            if (room_array[1][y] === TO_EXIT) unvisited_pos.push(50 * y + 1)
-            if (room_array[48][y] === TO_EXIT) unvisited_pos.push(50 * y + 48)
+            if (roomArray[1][y] === TO_EXIT) unvisited_pos.push(50 * y + 1)
+            if (roomArray[48][y] === TO_EXIT) unvisited_pos.push(50 * y + 48)
         }
 
         for (let x = 0; x < 49; x++) {
-            if (room_array[x][1] === TO_EXIT) unvisited_pos.push(50 + x)
-            if (room_array[x][48] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
+            if (roomArray[x][1] === TO_EXIT) unvisited_pos.push(50 + x)
+            if (roomArray[x][48] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
         }
 
         // Iterate over all unvisited TO_EXIT- Tiles and mark neigbours as TO_EXIT tiles, if walkable (NORMAL), and add to unvisited
@@ -476,9 +478,9 @@ function findRampartPlacement(room) {
 
                 // If the neighboring tile is walkable (NORMAL), add it to the unvisited tiles array to continue the Breadths first search
                 // Since the search began at the exit, we know that if this tile has been reached, it has a path to the exit, so we mark it as such
-                if (room_array[dx][dy] === NORMAL) {
+                if (roomArray[dx][dy] === NORMAL) {
                     unvisited_pos.push(50 * dy + dx);
-                    room_array[dx][dy] = TO_EXIT;
+                    roomArray[dx][dy] = TO_EXIT;
                 }
             }
         }
@@ -496,7 +498,7 @@ function findRampartPlacement(room) {
                 dy = y + surr[i][1];
 
                 // If the tile has a path to the exit, then set the flag to skip it
-                if (room_array[dx][dy] === TO_EXIT) {
+                if (roomArray[dx][dy] === TO_EXIT) {
                     leads_to_exit = true;
                 }
             }
@@ -517,7 +519,7 @@ function findRampartPlacement(room) {
         let sink = 2 * 50 * 50 + 1;
         let count = graph.Calcmincut(source, sink);
 
-        if (verbose) console.log('NUmber of Tiles in Cut:', count);
+        if (verbose) console.log('Number of Tiles in Cut:', count);
 
         let positions = [];
 
@@ -738,5 +740,4 @@ function findRampartPlacement(room) {
     test(room.name)
 }
 
-module.exports = findRampartPlacement
 module.exports = findRampartPlacement

@@ -1,6 +1,4 @@
-Room.prototype.get = function(roomVar, cache) {
-
-    if (!cache) cache = true
+Room.prototype.get = function(roomVar) {
 
     let room = this
 

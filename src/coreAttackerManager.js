@@ -1,8 +1,8 @@
 function coreAttackerManager(room, creepsWithRole) {
 
-    require("coreAttackerFunctions")
-
     if (creepsWithRole.length == 0) return
+
+    require("coreAttackerFunctions")
 
     for (let creep of creepsWithRole) {
 

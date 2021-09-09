@@ -8,8 +8,6 @@ global.allyList = [
     "SBense",
 ]
 
-global.cachedValues = {}
-
 global.colors = {
     communeGreen: '#00e600',
     allyBlue: "#2b92f1",

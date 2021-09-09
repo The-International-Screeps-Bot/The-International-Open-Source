@@ -1,9 +1,6 @@
 function rampartUpgraderManager(room, creepsWithRole) {
 
-    let ramparts = room.find(FIND_MY_STRUCTURES, {
-        filter: s => s.structureType == STRUCTURE_RAMPART
-    })
-
+    let ramparts = room.get("myRamparts")
     if (ramparts.length == 0) return
 
     for (let creep of creepsWithRole) {

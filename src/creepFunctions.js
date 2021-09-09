@@ -496,7 +496,6 @@ Creep.prototype.remoteRequests = function() {
     if (mySites.length > 0 || lowEcoStructures.length > 0) {
 
         remoteRoomMemory.builderNeed = true
-
     }
 }
 Creep.prototype.isEdge = function() {

@@ -33,3 +33,38 @@ global.removePropertyFromArray = function(array, property) {
 
     return array
 }
+
+global.findBestNewCommune = function() {
+
+    let establishingInfo = []
+
+    for (let potentialNewCommune of Memory.global.claimableRooms) {
+        for (let stage = 8; stage > 3; stage--) {
+            for (let maxDistance = 0; maxDistance < 10; maxDistance++) {
+                for (let roomName of Memory.global.communes) {
+
+                    let room = Game.rooms[roomName]
+
+                    if (!room || !room.controller || stage != room.memory.stage) continue
+
+                    const anchorPoint = room.get("anchorPoint")
+
+                    let distance = room.findSafeDistance(anchorPoint, { pos: new RoomPosition(25, 25, potentialNewCommune), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
+
+                    if (distance != maxDistance) continue
+
+                    console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
+
+                    establishingInfo.push({ communeEstablisher: room.name, newCommune: potentialNewCommune, distance: distance })
+                }
+            }
+        }
+    }
+
+    var bestEstablishingInfo = establishingInfo.reduce(function(bestEstablishingInfo, info) {
+
+        return info.distance < bestEstablishingInfo.distance ? info : bestEstablishingInfo;
+    }, establishingInfo[0])
+
+    return bestEstablishingInfo
+}

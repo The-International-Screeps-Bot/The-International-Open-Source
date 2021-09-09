@@ -905,7 +905,10 @@ function spawnRequests(room) {
                     storedEnergyReducer = 10000
                 }
 
-                let bodySize = Math.max(Math.floor(room.get("storedEnergy") / storedEnergyReducer) * 3, 15)
+                let myRamparts = room.get("myRamparts")
+                let minParts = Math.min(Math.floor(myRamparts.length / 10), 2)
+
+                let bodySize = Math.max(Math.floor(room.get("storedEnergy") / storedEnergyReducer) * 3, minParts)
 
                 this.defaultParts = []
                 this.extraParts = [workPart, carryPart, movePart]

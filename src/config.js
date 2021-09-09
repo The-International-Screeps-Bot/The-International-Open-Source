@@ -1,5 +1,9 @@
 function config() {
 
+    //
+
+    global.cachedValues = { time: Game.time }
+
     // Eventually move this to tickConfig
 
     if (!Memory.data) {

@@ -301,6 +301,8 @@ function roomPlanner(room) {
 
     function placeRampartPaths() {
 
+        if (Game.time % 100 != 0) return
+
         if (room.memory.stage < 4) return
 
         if (room.get("storedEnergy") < 30000) return
@@ -308,13 +310,7 @@ function roomPlanner(room) {
         const groupedRampartPositions = room.get("groupedRampartPositions")
         if (!groupedRampartPositions) return
 
-        let roomPathDelay = 0
-
         for (let group of groupedRampartPositions) {
-
-            if (Game.time % (roomPathDelay + 104) != 0) continue
-
-            roomPathDelay++
 
             let closestRampartPos = anchorPoint.findClosestByRange(group)
             closestRampartPos = new RoomPosition(closestRampartPos.x, closestRampartPos.y, room.name)
