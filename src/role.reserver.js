@@ -7,7 +7,7 @@ module.exports = {
 
         if (creep.room.name == remoteRoom) {
 
-            const controller = creep.room.controller
+            const controller = creep.room.get("controller")
 
             if (controller) {
 

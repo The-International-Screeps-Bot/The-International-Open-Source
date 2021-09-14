@@ -107,6 +107,8 @@ function scoutManager(room, creepsWithRole) {
 
             function isRemoteRoom() {
 
+                //
+
                 if (room.memory.stage == "remoteRoom") {
 
                     let nearCommune
@@ -128,7 +130,7 @@ function scoutManager(room, creepsWithRole) {
 
                 if (controller.owner) return
 
-                if (controller.reservation && controller.reservation != "Invader") return
+                if (controller.reservation && controller.reservation.username != me && controller.reservation.username != "Invader") return
 
                 // Make sure the commune can have more rooms
 
@@ -218,20 +220,6 @@ function scoutManager(room, creepsWithRole) {
 
                     if (room.get("sources").length == 2 && room.memory.claimable != true && room.memory.claimable != "notViable" && room.memory.stage != "remoteRoom") {
 
-                        if (creep.isEdge()) {
-
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: controller.pos, range: 1 },
-                                plainCost: 1,
-                                swampCost: 1,
-                                defaultCostMatrix: room.memory.defaultCostMatrix,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 50,
-                            })
-                        }
-
                         // Make sure room doesn't share an exit with slowmotionghost, a commune, or a possible commune
 
                         let nearRoom = false
@@ -261,7 +249,7 @@ function scoutManager(room, creepsWithRole) {
                                 defaultCostMatrix: room.memory.defaultCostMatrix,
                                 avoidStages: [],
                                 flee: false,
-                                cacheAmount: 50,
+                                cacheAmount: 2,
                             })
 
                             if (findAnchor(room)) {

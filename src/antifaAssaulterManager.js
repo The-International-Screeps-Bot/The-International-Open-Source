@@ -1,5 +1,3 @@
-const findAnchor = require("./findAnchor")
-
 function antifaAssaulterManager(room, assaulters) {
 
     for (let creep of assaulters) {
@@ -27,18 +25,35 @@ function antifaAssaulterManager(room, assaulters) {
 
             // Creep is in room to attack
 
-            if (creep.isEdge()) {
+            let enteringRoom = creep.memory.enteringRoom
 
-                creep.advancedPathing({
-                    origin: creep.pos,
-                    goal: { pos: new RoomPosition(25, 25, creep.room.name), range: 1 },
-                    plainCost: false,
-                    swampCost: false,
-                    defaultCostMatrix: false,
-                    avoidStages: [],
-                    flee: false,
-                    cacheAmount: 1,
-                })
+            if (creep.isEdge()) creep.memory.enteringRoom = true
+
+            if (enteringRoom) {
+
+                if (part == "front") {
+
+                    creep.memory.enteringRoom = creep.moveFromExit(members)
+
+                } else if (part == "middle2") {
+
+                    if (creep.pos.getRangeTo(secondSupporter) > 1) {
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: secondSupporter.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: false,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 1,
+                        })
+                    } else {
+
+                        creep.move(creep.pos.getDirectionTo(secondSupporter))
+                    }
+                }
             } else if (creep.isSquadFull()) {
 
                 creep.say(part)
@@ -47,7 +62,9 @@ function antifaAssaulterManager(room, assaulters) {
 
                     if (creep.squadCanMove(members) && creep.squadInRange(members)) {
 
-                        if (room.get("controller")) {
+                        let controller = room.get("controller")
+
+                        if (controller && creep.pos.getRangeTo(controller) > 1) {
 
                             creep.advancedPathing({
                                 origin: creep.pos,
@@ -56,29 +73,28 @@ function antifaAssaulterManager(room, assaulters) {
                                 swampCost: false,
                                 defaultCostMatrix: false,
                                 avoidStages: [],
-
                                 flee: false,
                                 cacheAmount: 10,
                             })
                         }
-                    } else if (part == "middle2") {
+                    }
+                } else if (part == "middle2") {
 
-                        if (creep.pos.getRangeTo(secondSupporter) > 1) {
+                    if (creep.pos.getRangeTo(secondSupporter) > 1) {
 
-                            creep.advancedPathing({
-                                origin: creep.pos,
-                                goal: { pos: secondSupporter.pos, range: 1 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: false,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 1,
-                            })
-                        } else {
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: secondSupporter.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: false,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 1,
+                        })
+                    } else {
 
-                            creep.move(creep.pos.getDirectionTo(secondSupporter))
-                        }
+                        creep.move(creep.pos.getDirectionTo(secondSupporter))
                     }
                 } else {
 
@@ -188,18 +204,35 @@ function antifaAssaulterManager(room, assaulters) {
 
             // Creep is traveling to attackTarget
 
-            if (creep.isEdge()) {
+            let enteringRoom = creep.memory.enteringRoom
 
-                creep.advancedPathing({
-                    origin: creep.pos,
-                    goal: { pos: new RoomPosition(25, 25, creep.room.name), range: 1 },
-                    plainCost: false,
-                    swampCost: false,
-                    defaultCostMatrix: false,
-                    avoidStages: [],
-                    flee: false,
-                    cacheAmount: 1,
-                })
+            if (creep.isEdge()) creep.memory.enteringRoom = true
+
+            if (enteringRoom) {
+
+                if (part == "front") {
+
+                    creep.memory.enteringRoom = creep.moveFromExit(members)
+
+                } else if (part == "middle2") {
+
+                    if (creep.pos.getRangeTo(secondSupporter) > 1) {
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: secondSupporter.pos, range: 1 },
+                            plainCost: false,
+                            swampCost: false,
+                            defaultCostMatrix: false,
+                            avoidStages: [],
+                            flee: false,
+                            cacheAmount: 1,
+                        })
+                    } else {
+
+                        creep.move(creep.pos.getDirectionTo(secondSupporter))
+                    }
+                }
             } else if (creep.isSquadFull()) {
 
                 creep.say(part)

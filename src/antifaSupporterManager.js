@@ -16,16 +16,22 @@ function antifaSupporterManager(room, assaulters, supporters) {
 
             if (creep.isEdge()) {
 
-                creep.advancedPathing({
-                    origin: creep.pos,
-                    goal: { pos: new RoomPosition(25, 25, creep.room.name), range: 1 },
-                    plainCost: false,
-                    swampCost: false,
-                    defaultCostMatrix: false,
-                    avoidStages: [],
-                    flee: false,
-                    cacheAmount: 1,
-                })
+                if (creep.pos.getRangeTo(assaulter) > 1) {
+
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: new RoomPosition(25, 25, room.name), range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 1,
+                    })
+                } else {
+
+                    creep.move(creep.pos.getDirectionTo(assaulter))
+                }
             } else if (assaulter) {
 
                 creep.say("A")
@@ -95,16 +101,22 @@ function antifaSupporterManager(room, assaulters, supporters) {
 
             if (creep.isEdge()) {
 
-                creep.advancedPathing({
-                    origin: creep.pos,
-                    goal: { pos: new RoomPosition(25, 25, creep.room.name), range: 1 },
-                    plainCost: false,
-                    swampCost: false,
-                    defaultCostMatrix: false,
-                    avoidStages: [],
-                    flee: false,
-                    cacheAmount: 1,
-                })
+                if (creep.pos.getRangeTo(assaulter) > 1) {
+
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: new RoomPosition(25, 25, room.name), range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 1,
+                    })
+                } else {
+
+                    creep.move(creep.pos.getDirectionTo(assaulter))
+                }
             } else if (assaulter) {
 
                 creep.say("A")

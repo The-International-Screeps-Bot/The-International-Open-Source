@@ -1,8 +1,8 @@
-function communeDefenderManager(room, creepsWithRole) {
+function remoteBuilderManager(room, creepsWithRole) {
 
     if (creepsWithRole.length == 0) return
 
-    require("communeDefenderFunctions")
+    require("remoteBuilderFunctions")
 
     for (let creep of creepsWithRole) {
 
@@ -13,7 +13,7 @@ function communeDefenderManager(room, creepsWithRole) {
 
             let remoteRoomMemory = Memory.rooms[roomFrom].remoteRooms[remoteRoomName]
 
-            if (!remoteRoomMemory.enemy) continue
+            if (!remoteRoomMemory.builderNeed) continue
 
             remoteRoom = remoteRoomName
             break
@@ -22,19 +22,20 @@ function communeDefenderManager(room, creepsWithRole) {
         creep.memory.remoteRoom = remoteRoom
 
         if (remoteRoom) {
-
-            let enemyCreepsObject = creep.findHostiles()
-
-            creep.healMyCreeps(enemyCreepsObject.enemyAttacker)
-
             if (room.name == remoteRoom) {
 
-                if (enemyCreepsObject.enemyCreeps.length == 0) {
+                let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
 
-                    Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].enemy = false
+                let lowEcoStructures = room.find(FIND_STRUCTURES, {
+                    filter: s => (s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_ROAD) && s.hits < s.hitsMax - creep.findParts(WORK) * 100
+                })
+
+                if (mySites.length == 0 && lowEcoStructures.length == 0) {
+
+                    remoteRoomMemory.builderNeed = true
                 }
 
-                if (creep.advancedAttackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
+
 
                 continue
             }
@@ -54,16 +55,7 @@ function communeDefenderManager(room, creepsWithRole) {
 
             continue
         }
-
-        let enemyCreepsObject = creep.findHostiles()
-
-        creep.healMyCreeps(enemyCreepsObject.enemyAttacker)
-
         if (room.name == roomFrom) {
-
-            if (creep.defendRamparts(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyAttacker)) continue
-
-            if (creep.advancedAttackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
 
             if (creep.wait()) continue
 
@@ -85,4 +77,4 @@ function communeDefenderManager(room, creepsWithRole) {
     }
 }
 
-module.exports = communeDefenderManager
+module.exports = remoteBuilderManager

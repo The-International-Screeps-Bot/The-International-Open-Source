@@ -329,11 +329,9 @@ function roomPlanner(room) {
 
                     let room = Game.rooms[roomName]
 
-                    if (!room) return
+                    if (!room) return false
 
-                    let cm
-
-                    cm = new PathFinder.CostMatrix
+                    let cm = new PathFinder.CostMatrix
 
                     let constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                         filter: s => s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART
@@ -404,7 +402,7 @@ function roomPlanner(room) {
 
                             let room = Game.rooms[roomName]
 
-                            if (!room) return
+                            if (!room) return false
 
                             let cm
 
@@ -538,7 +536,7 @@ function roomPlanner(room) {
 
                         let room = Game.rooms[roomName]
 
-                        if (!room) return
+                        if (!room) return false
 
                         let cm
 

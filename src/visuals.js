@@ -62,7 +62,30 @@ function visuals(room) {
             }
         } else if (controller.reservation) {
 
-            room.visual.text(controller.reservation.ticksToEnd, controller.pos.x, controller.pos.y + 0.25, { align: 'center', color: colors.communeGreen, opacity: "0.8" })
+            let reservationColor = findReservationColor()
+
+            function findReservationColor() {
+
+                if (controller.reservation.username == me) {
+
+                    let color = colors.communeGreen
+                    return color
+                }
+
+                if (controller.reservation.username == "Invader") {
+
+                    let color = colors.invaderOrange
+                    return color
+                }
+
+                if (controller.reservation.username != me) {
+
+                    let color = colors.enemyRed
+                    return color
+                }
+            }
+
+            room.visual.text(controller.reservation.ticksToEnd, controller.pos.x, controller.pos.y + 0.25, { align: 'center', color: reservationColor, opacity: "0.8" })
         }
     }
 
@@ -398,4 +421,5 @@ function visuals(room) {
     }
 }
 
+module.exports = visuals
 module.exports = visuals

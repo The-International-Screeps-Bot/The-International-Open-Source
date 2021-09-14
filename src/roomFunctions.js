@@ -409,10 +409,7 @@ Room.prototype.findExitRooms = function(roomName) {
     let exits = Game.map.describeExits(roomName)
     let exitRoomNames = []
 
-    for (let property in exits) {
-
-        exitRoomNames.push(exits[property])
-    }
+    for (let property in exits) exitRoomNames.push(exits[property])
 
     return exitRoomNames
 }
@@ -430,6 +427,8 @@ Room.prototype.findSafeDistance = function(origin, goal, avoidStages) {
             return Infinity
         }
     })
+
+    if (route == ERR_NO_PATH) return
 
     return route.length
 }

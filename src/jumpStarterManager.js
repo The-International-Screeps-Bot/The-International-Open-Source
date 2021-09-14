@@ -4,6 +4,8 @@ function jumpStarterManager(room, creepsWithRole) {
 
     for (let creep of creepsWithRole) {
 
+        if (creep.avoidHostiles()) continue
+
         creep.isFull()
 
         if (creep.memory.isFull) {
@@ -235,8 +237,6 @@ function jumpStarterManager(room, creepsWithRole) {
                 }
             }
         }
-
-        creep.avoidHostiles()
     }
 }
 

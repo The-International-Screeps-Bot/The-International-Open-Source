@@ -60,12 +60,20 @@ function globalManager() {
 
     // New commune logic
 
-    if ((!Memory.global.newCommune || !Memory.global.communeEstablisher) && Game.gcl.level > Memory.global.communes.length && Memory.global.claimableRooms.length > 0) {
+    newCommuneFinder()
 
-        let establishingInfo = findBestNewCommune()
+    function newCommuneFinder() {
 
-        Memory.global.newCommune = establishingInfo.newCommune
-        Memory.global.communeEstablisher = establishingInfo.communeEstablisher
+        if ((!Memory.global.newCommune || !Memory.global.communeEstablisher) && Game.gcl.level > Memory.global.communes.length && Memory.global.claimableRooms.length > 0) {
+
+            let establishingInfo = findBestNewCommune()
+
+            if (!establishingInfo) return
+
+            Memory.global.newCommune = establishingInfo.newCommune
+            Memory.global.communeEstablisher = establishingInfo.communeEstablisher
+        }
+
     }
 
     // Attack room logic

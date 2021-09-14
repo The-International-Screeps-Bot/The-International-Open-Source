@@ -1,134 +1,172 @@
 Creep.prototype.findHostiles = function() {
 
-    creep = this
-    let room = creep.room
+        creep = this
+        let room = creep.room
 
-    let enemyCreeps = room.find(FIND_HOSTILE_CREEPS, {
-        filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM, HEAL])
-    })
-
-    if (enemyCreeps.length == 0) return { enemyCreeps: enemyCreeps }
-
-    function findClosestEnemyCreep() {
-
-        let enemiesNotOnEdge = enemyCreeps.filter(enemyCreep => !enemyCreep.isEdge())
-
-        if (enemiesNotOnEdge.length == 0) return false
-
-        let enemyCreep = creep.pos.findClosestByRange(enemiesNotOnEdge)
-        return enemyCreep
-    }
-
-    function findClosestEnemyAttacker() {
-
-        let enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-            filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK])
+        let enemyCreeps = room.find(FIND_HOSTILE_CREEPS, {
+            filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM, HEAL])
         })
 
-        if (enemyAttackers.length == 0) return false
+        if (enemyCreeps.length == 0) return { enemyCreeps: enemyCreeps }
 
-        let enemiesNotOnEdge = enemyAttackers.filter(enemyCreep => !enemyCreep.isEdge())
+        function findClosestEnemyCreep() {
 
-        if (enemiesNotOnEdge.length == 0) return false
+            let enemiesNotOnEdge = enemyCreeps.filter(enemyCreep => !enemyCreep.isEdge())
 
-        let enemyAttacker = creep.pos.findClosestByRange(enemiesNotOnEdge)
-        return enemyAttacker
-    }
+            if (enemiesNotOnEdge.length == 0) return false
 
-    return { enemyCreeps: enemyCreeps, enemyCreep: findClosestEnemyCreep(), enemyAttacker: findClosestEnemyAttacker() }
-}
+            let enemyCreep = creep.pos.findClosestByRange(enemiesNotOnEdge)
+            return enemyCreep
+        }
 
-Creep.prototype.healMyCreeps = function(enemyAttacker) {
+        function findClosestEnemyAttacker() {
 
-    creep = this
-    let room = creep.room
+            let enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+                filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK])
+            })
 
-    if ((enemyAttacker && creep.pos.getRangeTo(enemyAttacker) <= 3) || creep.hits < creep.hitsMax) {
+            if (enemyAttackers.length == 0) return false
 
-        creep.heal(creep)
-        return true
-    }
+            let enemiesNotOnEdge = enemyAttackers.filter(enemyCreep => !enemyCreep.isEdge())
 
-    findAndHealDamagedCreepsInRange()
+            if (enemiesNotOnEdge.length == 0) return false
 
-    function findAndHealDamagedCreepsInRange() {
+            let enemyAttacker = creep.pos.findClosestByRange(enemiesNotOnEdge)
+            return enemyAttacker
+        }
 
-        if (enemyAttacker) return
+        return { enemyCreeps: enemyCreeps, enemyCreep: findClosestEnemyCreep(), enemyAttacker: findClosestEnemyAttacker() }
+    },
 
-        let myDamagedCreeps = room.find(FIND_MY_CREEPS, {
-            filter: myCreep => myCreep.hits < myCreep.hitsMax
-        })
+    Creep.prototype.healMyCreeps = function(enemyAttacker) {
 
-        if (myDamagedCreeps.length == 0) return
+        creep = this
+        let room = creep.room
 
-        let closestDamagedCreep = creep.pos.findClosestByRange(myDamagedCreeps)
+        if ((enemyAttacker && creep.pos.getRangeTo(enemyAttacker) <= 3) || creep.hits < creep.hitsMax) {
 
-        if (creep.pos.getRangeTo(closestDamagedCreep) == 1) {
-
-            creep.heal(closestDamagedCreep)
+            creep.heal(creep)
             return true
         }
 
-        creep.rangedHeal(closestDamagedCreep)
-        return true
-    }
-}
+        findAndHealDamagedCreepsInRange()
 
-Creep.prototype.advancedAttackHostiles = function(enemyCreeps, enemyCreep, enemyAttacker) {
+        function findAndHealDamagedCreepsInRange() {
 
-    creep = this
+            if (enemyAttacker) return
 
-    if (attackEnemyAttacker()) return true
+            let myDamagedCreeps = room.find(FIND_MY_CREEPS, {
+                filter: myCreep => myCreep.hits < myCreep.hitsMax
+            })
 
-    function attackEnemyAttacker() {
+            if (myDamagedCreeps.length == 0) return
 
-        if (!enemyAttacker) return
+            let closestDamagedCreep = creep.pos.findClosestByRange(myDamagedCreeps)
 
-        moveToEnemy()
+            if (creep.pos.getRangeTo(closestDamagedCreep) == 1) {
 
-        function moveToEnemy() {
+                creep.heal(closestDamagedCreep)
+                return true
+            }
 
-            if ((enemyAttacker.hasActivePartsOfTypes([ATTACK]) || enemyAttacker.getActiveBodyparts(RANGED_ATTACK) >= creep.findParts(RANGED_ATTACK))) {
+            creep.rangedHeal(closestDamagedCreep)
+            return true
+        }
+    },
 
-                if (creep.pos.getRangeTo(enemyAttacker) <= 2) {
+    Creep.prototype.advancedAttackHostiles = function(enemyCreeps, enemyCreep, enemyAttacker) {
 
-                    creep.say("F")
+        creep = this
+
+        if (attackEnemyAttacker()) return true
+
+        function attackEnemyAttacker() {
+
+            if (!enemyAttacker) return
+
+            moveToEnemy()
+
+            function moveToEnemy() {
+
+                if ((enemyAttacker.hasActivePartsOfTypes([ATTACK]) || enemyAttacker.getActiveBodyparts(RANGED_ATTACK) >= creep.findParts(RANGED_ATTACK))) {
+
+                    if (creep.pos.getRangeTo(enemyAttacker) <= 2) {
+
+                        creep.say("F")
+
+                        creep.advancedPathing({
+                            origin: creep.pos,
+                            goal: { pos: enemyAttacker.pos, range: 5 },
+                            plainCost: 1,
+                            swampCost: false,
+                            defaultCostMatrix: false,
+                            avoidStages: [],
+                            flee: true,
+                            cacheAmount: 1,
+                        })
+
+                        return
+                    }
+
+                    creep.say("M")
 
                     creep.advancedPathing({
                         origin: creep.pos,
-                        goal: { pos: enemyAttacker.pos, range: 5 },
+                        goal: { pos: enemyAttacker.pos, range: 3 },
                         plainCost: 1,
                         swampCost: false,
                         defaultCostMatrix: false,
                         avoidStages: [],
-                        flee: true,
+                        flee: false,
                         cacheAmount: 1,
                     })
 
                     return
                 }
 
-                creep.say("M")
+                creep.say("C")
 
                 creep.advancedPathing({
                     origin: creep.pos,
-                    goal: { pos: enemyAttacker.pos, range: 3 },
+                    goal: { pos: enemyAttacker.pos, range: 1 },
                     plainCost: 1,
                     swampCost: false,
                     defaultCostMatrix: false,
                     avoidStages: [],
                     flee: false,
-                    cacheAmount: 1,
+                    cacheAmount: 2,
                 })
-
-                return
             }
 
-            creep.say("C")
+            let enemyCreepsInRange = creep.pos.findInRange(enemyCreeps, 3)
+
+            if (enemyCreepsInRange.length >= 3) {
+
+                creep.rangedMassAttack()
+                return true
+            }
+
+            if (creep.pos.getRangeTo(enemyAttacker) > 1) {
+
+                creep.rangedAttack(enemyAttacker)
+                return true
+            }
+
+            creep.rangedMassAttack()
+            return true
+        }
+
+        if (attackEnemyCreep()) return true
+
+        function attackEnemyCreep() {
+
+            if (!enemyCreep) return
+
+            creep.say("EC")
 
             creep.advancedPathing({
                 origin: creep.pos,
-                goal: { pos: enemyAttacker.pos, range: 1 },
+                goal: { pos: enemyCreep.pos, range: 1 },
                 plainCost: 1,
                 swampCost: false,
                 defaultCostMatrix: false,
@@ -136,167 +174,32 @@ Creep.prototype.advancedAttackHostiles = function(enemyCreeps, enemyCreep, enemy
                 flee: false,
                 cacheAmount: 2,
             })
-        }
 
-        let enemyCreepsInRange = creep.pos.findInRange(enemyCreeps, 3)
+            let enemyCreepsInRange = creep.pos.findInRange(enemyCreeps, 3)
 
-        if (enemyCreepsInRange.length >= 3) {
+            if (enemyCreepsInRange.length >= 3) {
 
-            creep.rangedMassAttack()
-            return true
-        }
+                creep.rangedMassAttack()
+                return true
+            }
 
-        if (creep.pos.getRangeTo(enemyAttacker) > 1) {
+            if (creep.pos.getRangeTo(enemyCreep) > 1) {
 
-            creep.rangedAttack(enemyAttacker)
-            return true
-        }
-
-        creep.rangedMassAttack()
-        return true
-    }
-
-    if (attackEnemyCreep()) return true
-
-    function attackEnemyCreep() {
-
-        if (!enemyCreep) return
-
-        creep.say("EC")
-
-        creep.advancedPathing({
-            origin: creep.pos,
-            goal: { pos: enemyCreep.pos, range: 1 },
-            plainCost: 1,
-            swampCost: false,
-            defaultCostMatrix: false,
-            avoidStages: [],
-            flee: false,
-            cacheAmount: 2,
-        })
-
-        let enemyCreepsInRange = creep.pos.findInRange(enemyCreeps, 3)
-
-        if (enemyCreepsInRange.length >= 3) {
+                creep.rangedAttack(enemyCreep)
+                return true
+            }
 
             creep.rangedMassAttack()
             return true
         }
+    },
 
-        if (creep.pos.getRangeTo(enemyCreep) > 1) {
+    Creep.prototype.defendRamparts = function(enemyCreeps, enemyAttacker) {
 
-            creep.rangedAttack(enemyCreep)
-            return true
-        }
+        let creep = this
+        let room = creep.room
 
-        creep.rangedMassAttack()
-        return true
-    }
-}
-
-Creep.prototype.defendRamparts = function(enemyCreeps, enemyAttacker) {
-
-    let creep = this
-    let room = creep.room
-
-    if (!enemyAttacker) return
-
-    let ramparts = room.find(FIND_MY_STRUCTURES, {
-        filter: structure => structure.structureType == STRUCTURE_RAMPART
-    })
-
-    if (ramparts.length == 0) return
-
-    let cm = new PathFinder.CostMatrix
-
-    let myCreeps = room.find(FIND_MY_CREEPS)
-
-    for (let creep of myCreeps) {
-
-        cm.set(creep.pos.x, creep.pos.y, 255)
-    }
-
-    cm.set(creep.pos.x, creep.pos.y, 1)
-
-    let walkableRamparts = ramparts.filter(rampart => cm.get(rampart.pos.x, rampart.pos.y) < 255)
-
-    if (walkableRamparts.length == 0) return
-
-    let rampart = enemyAttacker.pos.findClosestByRange(walkableRamparts)
-
-    let goal = _.map([rampart], function(target) {
-        return { pos: target.pos, range: 0 }
-    })
-
-    if (creep.pos.getRangeTo(rampart) > 0) {
-
-        creep.rampartPathing(creep.pos, goal)
-    }
-
-    let enemyCreepsInRange = creep.pos.findInRange(enemyCreeps, 3)
-
-    if (enemyCreepsInRange.length >= 3) {
-
-        creep.rangedMassAttack()
-        return true
-    }
-
-    if (creep.pos.getRangeTo(enemyAttacker) > 1) {
-
-        creep.rangedAttack(enemyAttacker)
-        return true
-    }
-
-    creep.rangedMassAttack()
-    return true
-}
-
-Creep.prototype.wait = function() {
-
-    let creep = this
-    let room = creep.room
-
-    if (healCreeps()) return true
-
-    function healCreeps() {
-
-        let myDamagedCreeps = room.find(FIND_MY_CREEPS, {
-            filter: myCreep => myCreep.hits < myCreep.hitsMax
-        })
-
-        if (myDamagedCreeps.length == 0) return
-
-        let healTarget = creep.pos.findClosestByRange(myDamagedCreeps)
-
-        if (creep.pos.getRangeTo(healTarget) > 1) {
-
-            creep.rangedHeal(healTarget)
-
-            creep.advancedPathing({
-                origin: creep.pos,
-                goal: { pos: healTarget.pos, range: 1 },
-                plainCost: 1,
-                swampCost: false,
-                defaultCostMatrix: false,
-                avoidStages: [],
-                flee: false,
-                cacheAmount: 10,
-            })
-
-            return true
-        }
-
-        creep.heal(healTarget)
-        return true
-    }
-
-    creep.say("🚬")
-
-    const anchorPoint = room.get("anchorPoint")
-
-    if (waitOnRampart()) return true
-
-    function waitOnRampart() {
+        if (!enemyAttacker) return
 
         let ramparts = room.find(FIND_MY_STRUCTURES, {
             filter: structure => structure.structureType == STRUCTURE_RAMPART
@@ -315,39 +218,114 @@ Creep.prototype.wait = function() {
 
         cm.set(creep.pos.x, creep.pos.y, 1)
 
-        let walkableRamparts = ramparts.filter(rampart => cm.get(rampart.pos.x, rampart.pos.y) < 255 && rampart.pos.getRangeTo(anchorPoint) == 6)
+        let walkableRamparts = ramparts.filter(rampart => cm.get(rampart.pos.x, rampart.pos.y) < 255)
 
         if (walkableRamparts.length == 0) return
 
-        let rampart = creep.pos.findClosestByRange(walkableRamparts)
+        let rampart = enemyAttacker.pos.findClosestByRange(walkableRamparts)
 
-        if (creep.pos.getRangeTo(rampart) == 0) return true
-
-        creep.advancedPathing({
-            origin: creep.pos,
-            goal: { pos: rampart.pos, range: 0 },
-            plainCost: 1,
-            swampCost: false,
-            defaultCostMatrix: false,
-            avoidStages: [],
-            flee: false,
-            cacheAmount: 10,
+        let goal = _.map([rampart], function(target) {
+            return { pos: target.pos, range: 0 }
         })
 
+        if (creep.pos.getRangeTo(rampart) > 0) {
+
+            creep.rampartPathing(creep.pos, goal)
+        }
+
+        let enemyCreepsInRange = creep.pos.findInRange(enemyCreeps, 3)
+
+        if (enemyCreepsInRange.length >= 3) {
+
+            creep.rangedMassAttack()
+            return true
+        }
+
+        if (creep.pos.getRangeTo(enemyAttacker) > 1) {
+
+            creep.rangedAttack(enemyAttacker)
+            return true
+        }
+
+        creep.rangedMassAttack()
         return true
-    }
+    },
 
-    if (waitAwayFromAnchorPoint()) return true
+    Creep.prototype.wait = function() {
 
-    function waitAwayFromAnchorPoint() {
+        let creep = this
+        let room = creep.room
 
-        if (creep.pos.getRangeTo(anchorPoint) == 6) return true
+        if (healCreeps()) return true
 
-        if (creep.pos.getRangeTo(anchorPoint) > 6) {
+        function healCreeps() {
+
+            let myDamagedCreeps = room.find(FIND_MY_CREEPS, {
+                filter: myCreep => myCreep.hits < myCreep.hitsMax
+            })
+
+            if (myDamagedCreeps.length == 0) return
+
+            let healTarget = creep.pos.findClosestByRange(myDamagedCreeps)
+
+            if (creep.pos.getRangeTo(healTarget) > 1) {
+
+                creep.rangedHeal(healTarget)
+
+                creep.advancedPathing({
+                    origin: creep.pos,
+                    goal: { pos: healTarget.pos, range: 1 },
+                    plainCost: 1,
+                    swampCost: false,
+                    defaultCostMatrix: false,
+                    avoidStages: [],
+                    flee: false,
+                    cacheAmount: 10,
+                })
+
+                return true
+            }
+
+            creep.heal(healTarget)
+            return true
+        }
+
+        creep.say("🚬")
+
+        const anchorPoint = room.get("anchorPoint")
+
+        if (waitOnRampart()) return true
+
+        function waitOnRampart() {
+
+            let ramparts = room.find(FIND_MY_STRUCTURES, {
+                filter: structure => structure.structureType == STRUCTURE_RAMPART
+            })
+
+            if (ramparts.length == 0) return
+
+            let cm = new PathFinder.CostMatrix
+
+            let myCreeps = room.find(FIND_MY_CREEPS)
+
+            for (let creep of myCreeps) {
+
+                cm.set(creep.pos.x, creep.pos.y, 255)
+            }
+
+            cm.set(creep.pos.x, creep.pos.y, 1)
+
+            let walkableRamparts = ramparts.filter(rampart => cm.get(rampart.pos.x, rampart.pos.y) < 255 && rampart.pos.getRangeTo(anchorPoint) == 6)
+
+            if (walkableRamparts.length == 0) return
+
+            let rampart = creep.pos.findClosestByRange(walkableRamparts)
+
+            if (creep.pos.getRangeTo(rampart) == 0) return true
 
             creep.advancedPathing({
                 origin: creep.pos,
-                goal: { pos: anchorPoint, range: 6 },
+                goal: { pos: rampart.pos, range: 0 },
                 plainCost: 1,
                 swampCost: false,
                 defaultCostMatrix: false,
@@ -359,17 +337,39 @@ Creep.prototype.wait = function() {
             return true
         }
 
-        creep.advancedPathing({
-            origin: creep.pos,
-            goal: { pos: anchorPoint, range: 6 },
-            plainCost: 1,
-            swampCost: false,
-            defaultCostMatrix: false,
-            avoidStages: [],
-            flee: true,
-            cacheAmount: 10,
-        })
+        if (waitAwayFromAnchorPoint()) return true
 
-        return true
+        function waitAwayFromAnchorPoint() {
+
+            if (creep.pos.getRangeTo(anchorPoint) == 6) return true
+
+            if (creep.pos.getRangeTo(anchorPoint) > 6) {
+
+                creep.advancedPathing({
+                    origin: creep.pos,
+                    goal: { pos: anchorPoint, range: 6 },
+                    plainCost: 1,
+                    swampCost: false,
+                    defaultCostMatrix: false,
+                    avoidStages: [],
+                    flee: false,
+                    cacheAmount: 10,
+                })
+
+                return true
+            }
+
+            creep.advancedPathing({
+                origin: creep.pos,
+                goal: { pos: anchorPoint, range: 6 },
+                plainCost: 1,
+                swampCost: false,
+                defaultCostMatrix: false,
+                avoidStages: [],
+                flee: true,
+                cacheAmount: 10,
+            })
+
+            return true
+        }
     }
-}

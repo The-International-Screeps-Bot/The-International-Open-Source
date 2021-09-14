@@ -228,7 +228,7 @@ function spawnRequests(room) {
         if (Memory.global.attackingRoom == room.name) {
 
             minCreeps["antifaAssaulter"] = 4
-            minCreeps["antifaSupporter"] = minCreeps["antifaAssaulter"]
+            minCreeps["antifaSupporter"] = creepsOfRole[["antifaAssaulter", room.name]]
         }
     })()
 

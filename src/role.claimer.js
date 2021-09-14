@@ -7,28 +7,34 @@ module.exports = {
 
         if (creep.room.name == newCommune) {
 
-            creep.say("C")
+            const controller = creep.room.get("controller")
 
-            let controller = creep.room.controller
+            if (controller) {
 
-            if (creep.pos.getRangeTo(controller) == 1) {
+                if (creep.pos.getRangeTo(controller) <= 1) {
 
-                creep.claimController(controller)
+                    if (controller.reservation && controller.reservation.username != me) {
 
-                creep.signController(controller, "A commune of The Internationale. Bourgeoisie not welcome here.")
+                        creep.say("A")
 
-            } else {
+                        creep.attackController(controller)
+                    }
 
-                creep.advancedPathing({
-                    origin: creep.pos,
-                    goal: { pos: controller.pos, range: 1 },
-                    plainCost: 1,
-                    swampCost: 1,
-                    defaultCostMatrix: false,
-                    avoidStages: [],
-                    flee: false,
-                    cacheAmount: 10,
-                })
+                    creep.signController(controller, "A commune of The Internationale. Bourgeoisie not welcome here.")
+
+                } else {
+
+                    creep.advancedPathing({
+                        origin: creep.pos,
+                        goal: { pos: controller.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: creep.memory.defaultCostMatrix,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
+                    })
+                }
             }
 
             creep.avoidHostiles()

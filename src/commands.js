@@ -91,33 +91,6 @@ global.roomVisuals = function(state) {
     return "room visuals " + state
 }
 
-global.newCommune = function(newCommune) {
-
-    for (let stage = 8; stage != 0; stage--) {
-        for (let maxDistance = 1; maxDistance < 11; maxDistance++) {
-
-            for (let roomName in Game.rooms) {
-
-                room = Game.rooms[roomName]
-
-                if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.memory.stage >= 3 && room.memory.anchorPoint) {
-
-                    let distance = room.findSafeDistance(room.memory.anchorPoint, { pos: new RoomPosition(25, 25, newCommune), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
-
-                    if (distance < maxDistance) {
-
-                        Memory.global.newCommune = newCommune
-                        Memory.global.communeEstablisher = room.name
-                        return room.name
-                    }
-                }
-            }
-        }
-    }
-
-    return "No commune able to establish " + newCommune
-}
-
 global.attackTarget = function(attackTarget) {
 
     Memory.global.attackTarget = attackTarget
@@ -129,11 +102,11 @@ global.attackTarget = function(attackTarget) {
 
                 room = Game.rooms[room]
 
-                if (room.controller && room.controller.my && room.memory.stage && room.memory.stage >= stage && room.memory.totalEnergy && room.memory.totalEnergy >= 30000) {
+                if (room.controller && room.controller.my && room.memory.stage && room.memory.stage == stage && room.memory.storedEnergy && room.memory.storedEnergy >= 30000) {
 
                     let distance = Game.map.getRoomLinearDistance(attackTarget, room.name)
 
-                    if (distance < maxDistance) {
+                    if (distance == maxDistance) {
 
                         console.log("AT, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
 

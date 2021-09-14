@@ -33,11 +33,6 @@ Creep.prototype.attackMode = function(attackTarget) {
     return false
 }
 
-Creep.prototype.squadPart = function() {
-
-
-}
-
 Creep.prototype.findAssaulter = function(assaulters) {
 
     creep = this
@@ -54,6 +49,54 @@ Creep.prototype.findAssaulter = function(assaulters) {
     }
 
     return false
+}
+
+Creep.prototype.findMembersInRoom = function(members) {
+
+    let creep = this
+    let room = creep.room
+
+    let membersInRoom = members.filter(member => member.room.name == room.name)
+    return membersInRoom
+}
+
+Creep.prototype.moveFromExit = function(members) {
+
+    let creep = this
+    let room = creep.room
+
+    let exit = creep.memory.exit
+
+    if (!exit || exit.roomName != room.name) {
+
+        let exits = room.find(FIND_EXIT)
+
+        let closestExit = creep.pos.findClosestByRange(exits)
+
+        exit = closestExit
+        creep.memory.exit = exit
+    }
+
+    let membersInRoomAmount = creep.findMembersInRoom(members).length
+
+    let enteringRoom = true
+    if (membersInRoomAmount == 4) enteringRoom = false
+
+    if (creep.pos.getRangeTo(exit.x, exit.y) <= membersInRoomAmount) {
+
+        creep.advancedPathing({
+            origin: creep.pos,
+            goal: { pos: exit, range: membersInRoomAmount },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: false,
+            avoidStages: [],
+            flee: true,
+            cacheAmount: 1,
+        })
+    }
+
+    return enteringRoom
 }
 
 Creep.prototype.findDuo = function(assaulters) {
