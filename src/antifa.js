@@ -61,7 +61,7 @@ function antifa(room, creeps) {
                     } else {
 
                         if (creep.fatigue == 0 && assaulter.fatigue == 0) {
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: assaulter.pos, range: 1 },
                                 plainCost: 1,
@@ -77,7 +77,7 @@ function antifa(room, creeps) {
                     creep.say("NS")
 
                     if (creep.fatigue == 0 && assaulter.fatigue == 0) {
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
                             plainCost: 1,
@@ -101,7 +101,7 @@ function antifa(room, creeps) {
                 creep.say("NA")
 
                 if (creep.fatigue == 0) {
-                    creep.advancedPathing({
+                    creep.travel({
                         origin: creep.pos,
                         goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
                         plainCost: 1,
@@ -380,7 +380,7 @@ function antifa(room, creeps) {
 
                                 if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                    creep.advancedPathing({
+                                    creep.travel({
                                         origin: creep.pos,
                                         goal: { pos: new RoomPosition(25, 25, Memory.global.attackTarget), range: 1 },
                                         plainCost: 1,
@@ -426,7 +426,7 @@ function antifa(room, creeps) {
 
                                     if (outerRampart) {
 
-                                        creep.advancedPathing({
+                                        creep.travel({
                                             origin: creep.pos,
                                             goal: { pos: outerRampart.pos, range: 0 },
                                             plainCost: false,
@@ -475,7 +475,7 @@ function antifa(room, creeps) {
 
                                 if (outerRampart) {
 
-                                    creep.advancedPathing({
+                                    creep.travel({
                                         origin: creep.pos,
                                         goal: { pos: outerRampart.pos, range: 0 },
                                         plainCost: false,
@@ -551,7 +551,7 @@ function antifa(room, creeps) {
 
                             if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                creep.advancedPathing({
+                                creep.travel({
                                     origin: creep.pos,
                                     goal: { pos: new RoomPosition(25, 25, Memory.global.attackTarget), range: 1 },
                                     plainCost: 1,
@@ -590,7 +590,7 @@ function antifa(room, creeps) {
 
                             if (creep.fatigue == 0 && supporter.fatigue == 0) {
 
-                                creep.advancedPathing({
+                                creep.travel({
                                     origin: creep.pos,
                                     goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
                                     plainCost: 1,
@@ -609,7 +609,7 @@ function antifa(room, creeps) {
 
                     if (creep.fatigue == 0) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: new RoomPosition(25, 25, creep.room.name), range: 1 },
                             plainCost: 1,
@@ -623,7 +623,7 @@ function antifa(room, creeps) {
 
                     if (creep.fatigue == 0) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 },
                             plainCost: 1,

@@ -10,7 +10,7 @@ module.exports = {
         if (mineralContainer && mineral) {
             if (creep.pos.getRangeTo(mineralContainer) != 0) {
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: mineralContainer.pos, range: 0 },
                     plainCost: false,

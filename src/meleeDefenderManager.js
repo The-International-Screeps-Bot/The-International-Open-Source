@@ -64,7 +64,7 @@ function meleeDefenderManager(room, creepsWithRole) {
 
                     if (creep.pos.getRangeTo(hostile) > 1) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: hostile.pos, range: 1 },
                             plainCost: false,
@@ -91,7 +91,7 @@ function meleeDefenderManager(room, creepsWithRole) {
 
                     if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: anchorPoint, range: 6 },
                             plainCost: false,
@@ -103,7 +103,7 @@ function meleeDefenderManager(room, creepsWithRole) {
                         })
                     } else {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: anchorPoint, range: 6 },
                             plainCost: false,

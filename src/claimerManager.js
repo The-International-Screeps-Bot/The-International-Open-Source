@@ -20,7 +20,7 @@ function claimerManager(room, creepsWithRole) {
 
             creep.say("NC " + newCommune)
 
-            creep.advancedPathing({
+            creep.travel({
                 origin: creep.pos,
                 goal: { pos: new RoomPosition(25, 25, newCommune), range: 1 },
                 plainCost: 1,

@@ -28,7 +28,7 @@ Creep.prototype.advancedClaim = function() {
 
     creep.say("M")
 
-    creep.advancedPathing({
+    creep.travel({
         origin: creep.pos,
         goal: { pos: controller.pos, range: 1 },
         plainCost: false,

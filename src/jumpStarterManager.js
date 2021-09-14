@@ -87,7 +87,7 @@ function jumpStarterManager(room, creepsWithRole) {
 
                         if (creep.pos.getRangeTo(essentialStructureAlt) > 1) {
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: essentialStructureAlt.pos, range: 1 },
                                 plainCost: false,
@@ -100,7 +100,7 @@ function jumpStarterManager(room, creepsWithRole) {
                         }
                     } else if (storage && storage.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: storage.pos, range: 1 },
                             plainCost: false,
@@ -140,7 +140,7 @@ function jumpStarterManager(room, creepsWithRole) {
 
                     if (creep.pull(harvester) == ERR_NOT_IN_RANGE) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: harvester.pos, range: 1 },
                             plainCost: false,
@@ -154,7 +154,7 @@ function jumpStarterManager(room, creepsWithRole) {
 
                         harvester.move(creep)
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: source.pos, range: 1 },
                             plainCost: false,
@@ -186,7 +186,7 @@ function jumpStarterManager(room, creepsWithRole) {
 
                         if (creep.advancedHarvest(closestSource) == ERR_NOT_IN_RANGE) {
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: closestSource.pos, range: 1 },
                                 plainCost: false,
@@ -209,7 +209,7 @@ function jumpStarterManager(room, creepsWithRole) {
 
                             if (creep.pos.getRangeTo(closestSource) > 3) {
 
-                                creep.advancedPathing({
+                                creep.travel({
                                     origin: creep.pos,
                                     goal: { pos: closestSource.pos, range: 1 },
                                     plainCost: false,
@@ -221,7 +221,7 @@ function jumpStarterManager(room, creepsWithRole) {
                                 })
                             } else if (creep.pos.getRangeTo(closestSource) < 3) {
 
-                                creep.advancedPathing({
+                                creep.travel({
                                     origin: creep.pos,
                                     goal: { pos: closestSource.pos, range: 3 },
                                     plainCost: false,

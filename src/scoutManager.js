@@ -74,7 +74,7 @@ function scoutManager(room, creepsWithRole) {
                 if (controller.reservation) return
                 if (controller.owner && !controller.my) return
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: controller.pos, range: 1 },
                     plainCost: 1,
@@ -241,7 +241,7 @@ function scoutManager(room, creepsWithRole) {
 
                             creep.say("NNC")
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: controller.pos, range: 1 },
                                 plainCost: 1,
@@ -274,7 +274,7 @@ function scoutManager(room, creepsWithRole) {
 
             // Continue to targetRoom
 
-            creep.advancedPathing({
+            creep.travel({
                 origin: creep.pos,
                 goal: { pos: new RoomPosition(25, 25, targetRoom), range: 1 },
                 plainCost: 1,
@@ -332,7 +332,7 @@ function scoutManager(room, creepsWithRole) {
 
         // Go to next room
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: new RoomPosition(25, 25, targetRoom), range: 1 },
             plainCost: 1,

@@ -29,7 +29,7 @@ Creep.prototype.wait = function() {
 
         if (creep.pos.getRangeTo(anchorPoint) > 6) {
 
-            creep.advancedPathing({
+            creep.travel({
                 origin: creep.pos,
                 goal: { pos: anchorPoint, range: 6 },
                 plainCost: 1,
@@ -43,7 +43,7 @@ Creep.prototype.wait = function() {
             return true
         }
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: anchorPoint, range: 6 },
             plainCost: 1,

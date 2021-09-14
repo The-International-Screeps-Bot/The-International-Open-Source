@@ -65,7 +65,7 @@ module.exports = {
 
                                         if (creep.pos.getRangeTo(essentialStructureAlt) > 1) {
 
-                                            creep.advancedPathing({
+                                            creep.travel({
                                                 origin: creep.pos,
                                                 goal: { pos: essentialStructureAlt.pos, range: 1 },
                                                 plainCost: false,
@@ -78,7 +78,7 @@ module.exports = {
                                         }
                                     } else if (storage && storage.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
 
-                                        creep.advancedPathing({
+                                        creep.travel({
                                             origin: creep.pos,
                                             goal: { pos: storage.pos, range: 1 },
                                             plainCost: false,
@@ -107,7 +107,7 @@ module.exports = {
 
                                 creep.say("C")
 
-                                creep.advancedPathing({
+                                creep.travel({
                                     origin: creep.pos,
                                     goal: { pos: controller.pos, range: 5 },
                                     plainCost: false,
@@ -132,7 +132,7 @@ module.exports = {
 
                 creep.say(roomFrom)
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
                     plainCost: false,
@@ -177,7 +177,7 @@ module.exports = {
 
                         if (creep.pos.getRangeTo(closestSource) > 3) {
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: closestSource.pos, range: 1 },
                                 plainCost: false,
@@ -189,7 +189,7 @@ module.exports = {
                             })
                         } else if (creep.pos.getRangeTo(closestSource) < 3) {
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: closestSource.pos, range: 3 },
                                 plainCost: false,
@@ -206,7 +206,7 @@ module.exports = {
 
                 creep.say(remoteRoom)
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: new RoomPosition(25, 25, remoteRoom), range: 1 },
                     plainCost: 1,

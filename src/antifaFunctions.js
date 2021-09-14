@@ -84,7 +84,7 @@ Creep.prototype.moveFromExit = function(members) {
 
     if (creep.pos.getRangeTo(exit.x, exit.y) <= membersInRoomAmount) {
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: exit, range: membersInRoomAmount },
             plainCost: false,

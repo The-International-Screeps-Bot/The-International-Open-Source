@@ -55,7 +55,7 @@ Creep.prototype.moveToNextTarget = function(state, target, range) {
 
     if (creep.pos.getRangeTo != range) {
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: target, range: 1 },
             plainCost: false,
@@ -109,7 +109,7 @@ Creep.prototype.repairRamparts = function(target, ramparts) {
 
         creep.say("MR")
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: target.pos, range: 3 },
             plainCost: false,
@@ -242,7 +242,7 @@ Creep.prototype.pickupDroppedEnergy = function(target) {
 
     } else {
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
             plainCost: false,
@@ -276,7 +276,7 @@ Creep.prototype.advancedWithdraw = function(target, resource, amount) {
 
     } else {
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
             plainCost: false,
@@ -305,7 +305,7 @@ Creep.prototype.advancedTransfer = function(target, resource) {
 
     } else {
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
             plainCost: false,
@@ -327,7 +327,7 @@ Creep.prototype.repairStructure = function(target) {
 
     if (creep.pos.getRangeTo(target) > 3) {
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: target.pos, range: 3 },
             plainCost: false,
@@ -351,7 +351,7 @@ Creep.prototype.buildSite = function(target) {
 
     if (creep.pos.getRangeTo(target) > 3) {
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: target.pos, range: 3 },
             plainCost: false,
@@ -373,7 +373,7 @@ Creep.prototype.controllerUpgrade = function(target) {
 
     if (creep.pos.getRangeTo(target) > 3) {
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: target.pos, range: 3 },
             plainCost: false,
@@ -472,7 +472,7 @@ Creep.prototype.avoidHostiles = function() {
 
     creep.say("H R")
 
-    creep.advancedPathing({
+    creep.travel({
         origin: creep.pos,
         goal: { pos: hostile.pos, range: 6 },
         plainCost: false,
@@ -552,7 +552,7 @@ Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTo
 }
 
 /* 
-creep.advancedPathing({
+creep.travel({
     origin: creep.pos,
     goal: { pos: target.pos, range: 1 },
     plainCost: 1,
@@ -563,7 +563,7 @@ creep.advancedPathing({
     cacheAmount: 50,
 })
  */
-Creep.prototype.advancedPathing = function(opts) {
+Creep.prototype.travel = function(opts) {
 
     let creep = this
 
@@ -722,7 +722,7 @@ Creep.prototype.advancedPathing = function(opts) {
                     // Set unwalkable mySites as unwalkable
 
                     let mySites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-                        filter: s => s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                        filter: s => (s.structureType != STRUCTURE_RAMPART || (s.structureType == STRUCTURE_RAMPART && !s.my)) && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                     })
 
                     for (let site of mySites) {
@@ -733,7 +733,7 @@ Creep.prototype.advancedPathing = function(opts) {
                     // Set unwalkable structures as unwalkable
 
                     let structures = room.find(FIND_STRUCTURES, {
-                        filter: s => (s.structureType != STRUCTURE_RAMPART | (s.structureType == STRUCTURE_RAMPART && !s.my)) && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
+                        filter: s => (s.structureType != STRUCTURE_RAMPART || (s.structureType == STRUCTURE_RAMPART && !s.my)) && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                     })
 
                     for (let structure of structures) {

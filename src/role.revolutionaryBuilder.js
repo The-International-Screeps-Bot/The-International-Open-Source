@@ -21,7 +21,7 @@ module.exports = {
 
             creep.say("NC " + newCommune)
 
-            creep.advancedPathing({
+            creep.travel({
                 origin: creep.pos,
                 goal: { pos: new RoomPosition(25, 25, newCommune), range: 1 },
                 plainCost: 1,
@@ -122,7 +122,7 @@ module.exports = {
                                         creep.advancedHarvest(closestSource)
                                     } else {
 
-                                        creep.advancedPathing({
+                                        creep.travel({
                                             origin: creep.pos,
                                             goal: { pos: closestSource.pos, range: 1 },
                                             plainCost: 3,
@@ -147,7 +147,7 @@ module.exports = {
 
                                             if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
 
-                                                creep.advancedPathing({
+                                                creep.travel({
                                                     origin: creep.pos,
                                                     goal: { pos: anchorPoint, range: 6 },
                                                     plainCost: false,
@@ -159,7 +159,7 @@ module.exports = {
                                                 })
                                             } else {
 
-                                                creep.advancedPathing({
+                                                creep.travel({
                                                     origin: creep.pos,
                                                     goal: { pos: anchorPoint, range: 6 },
                                                     plainCost: false,

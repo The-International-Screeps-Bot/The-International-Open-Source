@@ -94,7 +94,7 @@ Creep.prototype.findHostiles = function() {
 
                         creep.say("F")
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: enemyAttacker.pos, range: 5 },
                             plainCost: 1,
@@ -110,7 +110,7 @@ Creep.prototype.findHostiles = function() {
 
                     creep.say("M")
 
-                    creep.advancedPathing({
+                    creep.travel({
                         origin: creep.pos,
                         goal: { pos: enemyAttacker.pos, range: 3 },
                         plainCost: 1,
@@ -126,7 +126,7 @@ Creep.prototype.findHostiles = function() {
 
                 creep.say("C")
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: enemyAttacker.pos, range: 1 },
                     plainCost: 1,
@@ -164,7 +164,7 @@ Creep.prototype.findHostiles = function() {
 
             creep.say("EC")
 
-            creep.advancedPathing({
+            creep.travel({
                 origin: creep.pos,
                 goal: { pos: enemyCreep.pos, range: 1 },
                 plainCost: 1,
@@ -272,7 +272,7 @@ Creep.prototype.findHostiles = function() {
 
                 creep.rangedHeal(healTarget)
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: healTarget.pos, range: 1 },
                     plainCost: 1,
@@ -323,7 +323,7 @@ Creep.prototype.findHostiles = function() {
 
             if (creep.pos.getRangeTo(rampart) == 0) return true
 
-            creep.advancedPathing({
+            creep.travel({
                 origin: creep.pos,
                 goal: { pos: rampart.pos, range: 0 },
                 plainCost: 1,
@@ -345,7 +345,7 @@ Creep.prototype.findHostiles = function() {
 
             if (creep.pos.getRangeTo(anchorPoint) > 6) {
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: anchorPoint, range: 6 },
                     plainCost: 1,
@@ -359,7 +359,7 @@ Creep.prototype.findHostiles = function() {
                 return true
             }
 
-            creep.advancedPathing({
+            creep.travel({
                 origin: creep.pos,
                 goal: { pos: anchorPoint, range: 6 },
                 plainCost: 1,

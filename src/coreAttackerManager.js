@@ -38,7 +38,7 @@ function coreAttackerManager(room, creepsWithRole) {
                 continue
             }
 
-            creep.advancedPathing({
+            creep.travel({
                 origin: creep.pos,
                 goal: { pos: new RoomPosition(25, 25, remoteRoom), range: 1 },
                 plainCost: 1,
@@ -66,7 +66,7 @@ function coreAttackerManager(room, creepsWithRole) {
 
         creep.say(roomFrom)
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
             plainCost: 1,

@@ -15,7 +15,7 @@ module.exports = {
 
             creep.say("NIP")
 
-            creep.advancedPathing({
+            creep.travel({
                 origin: creep.pos,
                 goal: { pos: anchorPoint, range: 0 },
                 plainCost: 1,

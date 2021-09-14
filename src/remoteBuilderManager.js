@@ -42,7 +42,7 @@ function remoteBuilderManager(room, creepsWithRole) {
 
             creep.say(remoteRoom)
 
-            creep.advancedPathing({
+            creep.travel({
                 origin: creep.pos,
                 goal: { pos: new RoomPosition(25, 25, remoteRoom), range: 1 },
                 plainCost: 1,
@@ -64,7 +64,7 @@ function remoteBuilderManager(room, creepsWithRole) {
 
         creep.say(roomFrom)
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
             plainCost: 1,

@@ -85,7 +85,7 @@ module.exports = {
 
                             if (creep.harvest(closestSource) == ERR_NOT_IN_RANGE) {
 
-                                creep.advancedPathing({
+                                creep.travel({
                                     origin: creep.pos,
                                     goal: { pos: closestSource.pos, range: 1 },
                                     plainCost: false,
@@ -103,7 +103,7 @@ module.exports = {
 
                 creep.say(remoteRoom)
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: new RoomPosition(25, 25, remoteRoom), range: 1 },
                     plainCost: false,
@@ -129,7 +129,7 @@ module.exports = {
 
                         if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: anchorPoint, range: 6 },
                                 plainCost: false,
@@ -141,7 +141,7 @@ module.exports = {
                             })
                         } else {
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: anchorPoint, range: 6 },
                                 plainCost: false,
@@ -158,7 +158,7 @@ module.exports = {
 
                 creep.say(roomFrom)
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
                     plainCost: false,

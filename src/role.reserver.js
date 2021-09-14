@@ -31,7 +31,7 @@ module.exports = {
                     }
                 } else {
 
-                    creep.advancedPathing({
+                    creep.travel({
                         origin: creep.pos,
                         goal: { pos: controller.pos, range: 1 },
                         plainCost: false,
@@ -47,7 +47,7 @@ module.exports = {
 
             creep.say(remoteRoom)
 
-            creep.advancedPathing({
+            creep.travel({
                 origin: creep.pos,
                 goal: { pos: new RoomPosition(25, 25, remoteRoom), range: 1 },
                 plainCost: false,

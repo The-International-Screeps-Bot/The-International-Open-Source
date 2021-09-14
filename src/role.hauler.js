@@ -49,7 +49,7 @@ module.exports = {
 
             if (creep.pos.getRangeTo(anchorPoint) > 1) {
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: anchorPoint, range: 1 },
                     plainCost: false,
@@ -135,7 +135,7 @@ module.exports = {
 
                     if (lowTower) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: lowTower.pos, range: 1 },
                             plainCost: false,
@@ -148,7 +148,7 @@ module.exports = {
                     } else {
                         if (essentialStructure) {
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: essentialStructure.pos, range: 1 },
                                 plainCost: false,
@@ -161,7 +161,7 @@ module.exports = {
                         } else {
                             if (storage) {
 
-                                creep.advancedPathing({
+                                creep.travel({
                                     origin: creep.pos,
                                     goal: { pos: storage.pos, range: 1 },
                                     plainCost: false,
@@ -189,7 +189,7 @@ module.exports = {
 
                     if (lowTower) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: lowTower.pos, range: 1 },
                             plainCost: false,
@@ -202,7 +202,7 @@ module.exports = {
                     } else {
                         if (essentialStructure) {
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: essentialStructure.pos, range: 1 },
                                 plainCost: false,
@@ -215,7 +215,7 @@ module.exports = {
                         } else {
                             if (storage) {
 
-                                creep.advancedPathing({
+                                creep.travel({
                                     origin: creep.pos,
                                     goal: { pos: storage.pos, range: 1 },
                                     plainCost: false,
@@ -445,7 +445,7 @@ module.exports = {
 
                     if (creep.pos.getRangeTo(essentialStructureAlt) > 1) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: essentialStructureAlt.pos, range: 1 },
                             plainCost: false,
@@ -458,7 +458,7 @@ module.exports = {
                     }
                 } else if (storage) {
 
-                    creep.advancedPathing({
+                    creep.travel({
                         origin: creep.pos,
                         goal: { pos: storage.pos, range: 1 },
                         plainCost: false,

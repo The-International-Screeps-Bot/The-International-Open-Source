@@ -38,7 +38,7 @@ function remoteHarvesterManager(room, creepsWithRole) {
                         }
                     } else {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: sourceContainer1.pos, range: 0 },
                             plainCost: false,
@@ -62,7 +62,7 @@ function remoteHarvesterManager(room, creepsWithRole) {
                         }
                     } else {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: source1.pos, range: 1 },
                             plainCost: false,
@@ -94,7 +94,7 @@ function remoteHarvesterManager(room, creepsWithRole) {
                         }
                     } else {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: sourceContainer2.pos, range: 0 },
                             plainCost: false,
@@ -118,7 +118,7 @@ function remoteHarvesterManager(room, creepsWithRole) {
 
                     } else {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: source2.pos, range: 1 },
                             plainCost: false,
@@ -137,7 +137,7 @@ function remoteHarvesterManager(room, creepsWithRole) {
 
         creep.say(remoteRoom)
 
-        creep.advancedPathing({
+        creep.travel({
             origin: creep.pos,
             goal: { pos: new RoomPosition(25, 25, remoteRoom), range: 1 },
             plainCost: false,

@@ -41,7 +41,7 @@ module.exports = {
 
                     if (creep.pos.getRangeTo(fleeTarget) < 2) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: fleeTarget, range: 2 },
                             plainCost: 1,

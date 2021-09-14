@@ -81,7 +81,7 @@ function harvesterManager(room, creepsWithRole) {
 
             } else {
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: sourceContainer.pos, range: 0 },
                     plainCost: false,
@@ -98,7 +98,7 @@ function harvesterManager(room, creepsWithRole) {
 
             if (creep.advancedHarvest(source) != 0) {
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: source.pos, range: 1 },
                     plainCost: false,

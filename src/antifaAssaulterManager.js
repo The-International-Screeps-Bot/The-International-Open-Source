@@ -39,7 +39,7 @@ function antifaAssaulterManager(room, assaulters) {
 
                     if (creep.pos.getRangeTo(secondSupporter) > 1) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: secondSupporter.pos, range: 1 },
                             plainCost: false,
@@ -66,7 +66,7 @@ function antifaAssaulterManager(room, assaulters) {
 
                         if (controller && creep.pos.getRangeTo(controller) > 1) {
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: room.get("controller").pos, range: 1 },
                                 plainCost: false,
@@ -82,7 +82,7 @@ function antifaAssaulterManager(room, assaulters) {
 
                     if (creep.pos.getRangeTo(secondSupporter) > 1) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: secondSupporter.pos, range: 1 },
                             plainCost: false,
@@ -98,7 +98,7 @@ function antifaAssaulterManager(room, assaulters) {
                     }
                 } else {
 
-                    creep.advancedPathing({
+                    creep.travel({
                         origin: creep.pos,
                         goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
                         plainCost: false,
@@ -122,7 +122,7 @@ function antifaAssaulterManager(room, assaulters) {
 
                     if (creep.squadCanMove(members) && creep.squadInRange(members)) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: new RoomPosition(25, 25, attackTarget), range: 1 },
                             plainCost: false,
@@ -137,7 +137,7 @@ function antifaAssaulterManager(room, assaulters) {
 
                     if (creep.pos.getRangeTo(secondSupporter) > 1) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: secondSupporter.pos, range: 1 },
                             plainCost: false,
@@ -164,7 +164,7 @@ function antifaAssaulterManager(room, assaulters) {
 
                         if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: anchorPoint, range: 6 },
                                 plainCost: false,
@@ -176,7 +176,7 @@ function antifaAssaulterManager(room, assaulters) {
                             })
                         } else {
 
-                            creep.advancedPathing({
+                            creep.travel({
                                 origin: creep.pos,
                                 goal: { pos: anchorPoint, range: 6 },
                                 plainCost: false,
@@ -218,7 +218,7 @@ function antifaAssaulterManager(room, assaulters) {
 
                     if (creep.pos.getRangeTo(secondSupporter) > 1) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: secondSupporter.pos, range: 1 },
                             plainCost: false,
@@ -241,7 +241,7 @@ function antifaAssaulterManager(room, assaulters) {
 
                     if (creep.squadCanMove(members) && creep.squadInRange(members)) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: new RoomPosition(25, 25, attackTarget), range: 1 },
                             plainCost: false,
@@ -256,7 +256,7 @@ function antifaAssaulterManager(room, assaulters) {
 
                     if (creep.pos.getRangeTo(secondSupporter) > 1) {
 
-                        creep.advancedPathing({
+                        creep.travel({
                             origin: creep.pos,
                             goal: { pos: secondSupporter.pos, range: 1 },
                             plainCost: false,
@@ -273,7 +273,7 @@ function antifaAssaulterManager(room, assaulters) {
                 }
             } else {
 
-                creep.advancedPathing({
+                creep.travel({
                     origin: creep.pos,
                     goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
                     plainCost: false,
