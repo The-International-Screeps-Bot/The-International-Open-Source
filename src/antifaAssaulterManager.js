@@ -64,11 +64,11 @@ function antifaAssaulterManager(room, assaulters) {
 
                         let controller = room.get("controller")
 
-                        if (controller && creep.pos.getRangeTo(controller) > 1) {
+                        if (controller && creep.pos.getRangeTo(controller) > 6) {
 
                             creep.travel({
                                 origin: creep.pos,
-                                goal: { pos: room.get("controller").pos, range: 1 },
+                                goal: { pos: room.get("controller").pos, range: 6 },
                                 plainCost: false,
                                 swampCost: false,
                                 defaultCostMatrix: false,

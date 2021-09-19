@@ -77,7 +77,7 @@ Creep.prototype.moveFromExit = function(members) {
         creep.memory.exit = exit
     }
 
-    let membersInRoomAmount = creep.findMembersInRoom(members).length
+    let membersInRoomAmount = Math.max(1, creep.findMembersInRoom(members).length)
 
     let enteringRoom = true
     if (membersInRoomAmount == 4) enteringRoom = false
@@ -127,6 +127,19 @@ Creep.prototype.findDuo = function(assaulters) {
     }
 }
 
+Creep.prototype.findDirectionToTarget = function(target) {
+
+    let creep = this
+
+    let direction = creep.pos.getDirectionTo(target.x, target.y)
+    return direction
+}
+
+Creep.prototype.findRampartTarget = function() {
+
+
+}
+
 // Squad functions
 
 Creep.prototype.squadCanMove = function(members) {
@@ -153,4 +166,42 @@ Creep.prototype.squadInRange = function(members) {
     }
 
     return true
+}
+
+Creep.prototype.quadMove = function() {
+
+
+}
+
+Creep.prototype.quadRotate = function() {
+
+
+}
+
+Creep.prototype.isQuadInFormation = function(members) {
+
+    let creep = this
+
+    let secondAssaulter = members.secondAssaulter
+    let assaulterDirection = assaulter.pos.getRangeTo(secondAssaulter.pos.x, secondAssaulter.pos.y)
+
+    let secondSupporter = members.secondSupporter
+    let supporterDirection = assaulter.pos.getRangeTo(secondSupporter.pos.x, secondSupporter.pos.y)
+
+    // Check left and right
+
+    if ((assaulterDirection == LEFT && supporterDirection == BOTTOM_LEFT) || (assaulterDirection == RIGHT && supporterDirection == BOTTOM_RIGHT)) {
+
+        return true
+    }
+}
+
+Creep.prototype.quadGetInFormation = function() {
+
+
+}
+
+Creep.prototype.quadRetreat = function() {
+
+
 }

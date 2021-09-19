@@ -474,7 +474,7 @@ Creep.prototype.avoidHostiles = function() {
 
     creep.travel({
         origin: creep.pos,
-        goal: { pos: hostile.pos, range: 6 },
+        goal: { pos: hostile.pos, range: 8 },
         plainCost: false,
         swampCost: false,
         defaultCostMatrix: creep.memory.defaultCostMatrix,

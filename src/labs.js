@@ -1,9 +1,7 @@
 function labs(room, labs, primaryLabs, secondaryLabs, tertiaryLabs) {
 
-    if (labs.length == 0) {
+    if (labs.length == 0) return
 
-        return
-    }
 
     if (primaryLabs && primaryLabs.length > 0 && secondaryLabs) {
         if (secondaryLabs[0].cooldown == 0) {

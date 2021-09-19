@@ -603,7 +603,7 @@ function spawnRequests(room) {
         // Get array of spawningStructures
 
         let spawnStructures = room.find(FIND_MY_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN
+            filter: s => (s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN) && s.isActive()
         })
 
         // Add each spawnStructures with their range to the object

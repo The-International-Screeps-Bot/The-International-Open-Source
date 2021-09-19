@@ -9,6 +9,7 @@ function creepManager(room, myCreeps) {
     managers["jumpStarter"] = { import: require("jumpStarterManager"), creeps: [] }
     managers["harvester"] = { import: require("harvesterManager"), creeps: [] }
     managers["builder"] = { import: require("builderManager"), creeps: [] }
+    managers["upgrader"] = { import: require("upgraderManager"), creeps: [] }
     managers["scout"] = { import: require("scoutManager"), creeps: [] }
 
     managers["claimer"] = { import: require("claimerManager"), creeps: [] }
@@ -51,7 +52,7 @@ function creepManager(room, myCreeps) {
     // Import creep roles
 
     roles["hauler"] = require("role.hauler")
-    roles["upgrader"] = require('role.upgrader')
+        /* roles["upgrader"] = require('role.upgrader') */
     roles["repairer"] = require('role.repairer')
         /* roles["claimer"] = require('role.claimer') */
     roles["revolutionaryBuilder"] = require('role.revolutionaryBuilder')
