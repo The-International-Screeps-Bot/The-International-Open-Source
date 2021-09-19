@@ -7,11 +7,6 @@ function visuals(room) {
     let controllerContainer = room.get("controllerContainer")
     let baseContainer = room.get("baseContainer")
 
-    for (let container of room.get("containers")) {
-
-        room.visual.text(container.store.getUsedCapacity(), container.pos.x, container.pos.y, { font: 0.5, backgroundColor: "#b4b4b4", backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
-    }
-
     if (sourceContainer1) {
 
         room.visual.circle(sourceContainer1.pos, {
@@ -20,6 +15,8 @@ function visuals(room) {
             stroke: '#2DF0C9',
             strokeWidth: 0.125
         })
+
+        room.visual.text(sourceContainer1.store.getUsedCapacity(), sourceContainer1.pos.x, sourceContainer1.pos.y, { font: 0.5, backgroundColor: colors.neutralYellow, backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
     }
     if (sourceContainer2) {
 
@@ -29,6 +26,8 @@ function visuals(room) {
             stroke: '#2DF0C9',
             strokeWidth: 0.125
         })
+
+        room.visual.text(sourceContainer2.store.getUsedCapacity(), sourceContainer2.pos.x, sourceContainer2.pos.y, { font: 0.5, backgroundColor: colors.neutralYellow, backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
     }
     if (controllerContainer) {
 
@@ -38,6 +37,8 @@ function visuals(room) {
             stroke: '#39A0ED',
             strokeWidth: 0.125
         })
+
+        room.visual.text(controllerContainer.store.getUsedCapacity(), controllerContainer.pos.x, controllerContainer.pos.y, { font: 0.5, backgroundColor: colors.neutralYellow, backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
     }
     if (baseContainer) {
 
@@ -47,6 +48,8 @@ function visuals(room) {
             stroke: '#39A0ED',
             strokeWidth: 0.125
         })
+
+        room.visual.text(baseContainer.store.getUsedCapacity(), baseContainer.pos.x, baseContainer.pos.y, { font: 0.5, backgroundColor: colors.neutralYellow, backgroundPadding: "0.1", align: 'center', opacity: "0.8" })
     }
 
     let controller = room.get("controller")

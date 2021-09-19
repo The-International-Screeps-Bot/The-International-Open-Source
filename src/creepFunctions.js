@@ -369,7 +369,8 @@ Creep.prototype.buildSite = function(target) {
         Memory.data.energySpentOnConstruction += creep.findParts("work")
     }
 }
-Creep.prototype.controllerUpgrade = function(target) {
+
+Creep.prototype.advancedUpgrade = function(target) {
 
     if (creep.pos.getRangeTo(target) > 3) {
 
@@ -390,6 +391,7 @@ Creep.prototype.controllerUpgrade = function(target) {
         Memory.data.controlPoints += creep.findParts("work")
     }
 }
+
 Creep.prototype.searchSourceContainers = function() {
 
     creep = this

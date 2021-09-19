@@ -18,7 +18,7 @@ function upgradeManager(room, creepsWithRole) {
 
         if (controllerContainer) {
 
-            creep.upgradeController(controller)
+            creep.advancedUpgrade(controller)
 
             // If controller container is empty move away so it can be refilled
 
@@ -79,7 +79,7 @@ function upgradeManager(room, creepsWithRole) {
 
             creep.say("CL")
 
-            creep.upgradeController(controller)
+            creep.advancedUpgrade(controller)
 
             // If creep needs energy to upgrade move to controllerLink
 
@@ -95,7 +95,7 @@ function upgradeManager(room, creepsWithRole) {
 
         if (creep.memory.isFull) {
 
-            creep.upgradeController(controller)
+            creep.advancedUpgrade(controller)
 
             if (creep.pos.getRangeTo(controller) > 3) {
 

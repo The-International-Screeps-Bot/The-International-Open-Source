@@ -19,7 +19,7 @@ module.exports = {
 
             creep.say("🔋")
 
-            creep.controllerUpgrade(creep.room.controller)
+            creep.advancedUpgrade(creep.room.controller)
 
             if (controllerLink || controllerContainer) {
 

@@ -100,7 +100,7 @@ Room.prototype.get = function(roomVar) {
     roomVars.source1LinkPosition = findLinkPositions("source1")
     roomVars.source2LinkPosition = findLinkPositions("source2")
 
-    roomVars.controllerUpgradePosition = []
+    roomVars.advancedUpgradePosition = []
     roomVars.mineraHarvestPosition = []
 
     //

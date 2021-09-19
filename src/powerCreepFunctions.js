@@ -249,7 +249,7 @@ PowerCreep.prototype.buildSite = function(target) {
         creep.intraRoomPathing(origin, goal)
     }
 }
-PowerCreep.prototype.controllerUpgrade = function(target) {
+PowerCreep.prototype.advancedUpgrade = function(target) {
 
     if (!creep.pos.inRangeTo(creep.room.controller, 3)) {
 
