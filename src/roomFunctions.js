@@ -413,6 +413,7 @@ Room.prototype.findExitRooms = function(roomName) {
 
     return exitRoomNames
 }
+
 Room.prototype.findSafeDistance = function(origin, goal, avoidStages) {
 
     let route = Game.map.findRoute(origin.roomName, goal.pos.roomName, {
@@ -428,10 +429,11 @@ Room.prototype.findSafeDistance = function(origin, goal, avoidStages) {
         }
     })
 
-    if (route == ERR_NO_PATH) return
+    if (!route || route == ERR_NO_PATH) return
 
     return route.length
 }
+
 Room.prototype.findTowerDamage = function(towers, hostile) {
 
     room = this
@@ -460,6 +462,7 @@ Room.prototype.findTowerDamage = function(towers, hostile) {
 
     return totalDamage
 }
+
 Room.prototype.findHealPower = function(hostile, creeps) {
 
     room = this

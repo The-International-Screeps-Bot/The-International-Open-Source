@@ -372,20 +372,9 @@ Creep.prototype.buildSite = function(target) {
 
 Creep.prototype.advancedUpgrade = function(target) {
 
-    if (creep.pos.getRangeTo(target) > 3) {
+    let creep = this
 
-        creep.travel({
-            origin: creep.pos,
-            goal: { pos: target.pos, range: 3 },
-            plainCost: false,
-            swampCost: false,
-            defaultCostMatrix: creep.memory.defaultCostMatrix,
-            avoidStages: [],
-            flee: false,
-            cacheAmount: 10,
-        })
-
-    } else if (creep.upgradeController(target) == 0) {
+    if (creep.upgradeController(target) == 0) {
 
         creep.say("🔋 " + creep.findParts("work"))
         Memory.data.controlPoints += creep.findParts("work")
