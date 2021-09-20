@@ -50,7 +50,6 @@ global.findBestNewCommune = function() {
                     const anchorPoint = room.get("anchorPoint")
 
                     let distance = room.findSafeDistance(anchorPoint, { pos: new RoomPosition(25, 25, potentialNewCommune), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
-
                     if (distance != maxDistance) continue
 
                     console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
