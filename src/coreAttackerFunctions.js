@@ -7,7 +7,7 @@ Creep.prototype.findHostiles = function() {
         filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM, HEAL])
     })
 
-    if (enemyCreeps.length == 0) return []
+    if (enemyCreeps.length == 0) return { enemyCreeps: enemyCreeps }
 
     function findClosestEnemyCreep() {
 
