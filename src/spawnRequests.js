@@ -340,7 +340,7 @@ function spawnRequests(room) {
         minCreeps["meleeDefender"] = 2
     }
 
-    if (Game.flags.R && stage >= 4) {
+    if (Memory.global.robTarget && stage >= 4) {
         minCreeps["robber"] = 2
     }
 
@@ -1180,10 +1180,12 @@ function spawnRequests(room) {
             300: {
                 defaultParts: [],
                 extraParts: [carryPart, movePart],
-                maxParts: 24
+                maxParts: 48
             }
         },
-        memoryAdditions: {}
+        memoryAdditions: {
+            robTarget: Memory.global.robTarget
+        }
     })
 
     roleOpts["scout"] = roleValues({

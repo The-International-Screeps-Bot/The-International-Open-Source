@@ -799,4 +799,3 @@ function roomPlanner(room) {
 }
 
 module.exports = roomPlanner
-module.exports = roomPlanner
