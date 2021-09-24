@@ -124,9 +124,22 @@ Creep.prototype.repairRamparts = function(target, ramparts) {
 
         if (temporaryTarget) {
 
-            if (creep.repair(temporaryTarget) == 0) return
+            if (creep.repair(temporaryTarget) == 0) {
+
+                let energySpentOnBarricades = creep.findParts("work") * 100
+
+                creep.say("🧱 " + energySpentOnBarricades)
+                Memory.data.energySpentOnBarricades += energySpentOnBarricades
+
+                return
+            }
         }
     }
+
+    let energySpentOnBarricades = creep.findParts("work") * 100
+
+    creep.say("🧱 " + energySpentOnBarricades)
+    Memory.data.energySpentOnBarricades += energySpentOnBarricades
 }
 
 Creep.prototype.findParts = function(partType) {

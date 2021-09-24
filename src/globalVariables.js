@@ -5,7 +5,7 @@ global.allyList = [
     "Orlet",
     "BarryOSeven",
     "slowmotionghost",
-    "SBense",
+    /* "SBense", */
 ]
 
 global.colors = {
