@@ -1,5 +1,7 @@
 function robberManager(room, creepsWithRole) {
 
+    if (creepsWithRole.length == 0) return
+
     for (let creep of creepsWithRole) {
 
         if (creep.avoidHostiles()) continue

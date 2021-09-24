@@ -126,7 +126,7 @@ Creep.prototype.repairRamparts = function(target, ramparts) {
 
             if (creep.repair(temporaryTarget) == 0) {
 
-                let energySpentOnBarricades = creep.findParts("work") * 100
+                let energySpentOnBarricades = creep.findParts("work")
 
                 creep.say("🧱 " + energySpentOnBarricades)
                 Memory.data.energySpentOnBarricades += energySpentOnBarricades
@@ -136,7 +136,7 @@ Creep.prototype.repairRamparts = function(target, ramparts) {
         }
     }
 
-    let energySpentOnBarricades = creep.findParts("work") * 100
+    let energySpentOnBarricades = creep.findParts("work")
 
     creep.say("🧱 " + energySpentOnBarricades)
     Memory.data.energySpentOnBarricades += energySpentOnBarricades
