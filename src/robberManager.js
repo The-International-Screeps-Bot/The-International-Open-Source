@@ -37,9 +37,11 @@ module.exports = function robberManager(room, creepsWithRole) {
 
                 creep.say("S")
 
-                for (let resourceType in creep.store) creep.advancedTransfer(storage, resourceType)
+                for (let resourceType in creep.store) {
 
-                continue
+                    creep.advancedTransfer(storage, resourceType)
+                    continue
+                }
             }
 
             let terminal = room.get("terminal")
@@ -48,9 +50,11 @@ module.exports = function robberManager(room, creepsWithRole) {
 
                 creep.say("T")
 
-                for (let resourceType in creep.store) creep.advancedTransfer(terminal, resourceType)
+                for (let resourceType in creep.store) {
 
-                continue
+                    creep.advancedTransfer(terminal, resourceType)
+                    continue
+                }
             }
 
             continue
@@ -63,8 +67,8 @@ module.exports = function robberManager(room, creepsWithRole) {
             creep.travel({
                 origin: creep.pos,
                 goal: { pos: new RoomPosition(25, 25, robTarget), range: 1 },
-                plainCost: false,
-                swampCost: false,
+                plainCost: 0,
+                swampCost: 0,
                 defaultCostMatrix: creep.memory.defaultCostMatrix,
                 avoidStages: ["enemyRoom", "keeperRoom", "enemyReservation", "allyRoom"],
                 flee: false,
@@ -80,9 +84,11 @@ module.exports = function robberManager(room, creepsWithRole) {
 
             creep.say("S")
 
-            for (let resourceType in storage.store) creep.advancedWithdraw(storage, resourceType)
+            for (let resourceType in storage.store) {
 
-            continue
+                creep.advancedWithdraw(storage, resourceType)
+                continue
+            }
         }
 
         let terminal = room.get("terminal")
@@ -91,9 +97,11 @@ module.exports = function robberManager(room, creepsWithRole) {
 
             creep.say("T")
 
-            for (let resourceType in terminal.store) creep.advancedWithdraw(terminal, resourceType)
+            for (let resourceType in terminal.store) {
 
-            continue
+                creep.advancedWithdraw(terminal, resourceType)
+                continue
+            }
         }
     }
 }

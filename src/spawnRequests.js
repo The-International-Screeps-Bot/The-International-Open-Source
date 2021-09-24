@@ -1180,7 +1180,7 @@ function spawnRequests(room) {
             300: {
                 defaultParts: [],
                 extraParts: [carryPart, movePart],
-                maxParts: 48
+                maxParts: 50
             }
         },
         memoryAdditions: {
