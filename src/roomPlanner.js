@@ -174,10 +174,6 @@ function roomPlanner(room) {
 
             if (structureType == STRUCTURE_ROAD && room.memory.stage < 4) continue
 
-            if (structureType == STRUCTURE_LAB) continue
-            if (structureType == STRUCTURE_NUKER) continue
-            if (structureType == STRUCTURE_OBSERVER) continue
-
             for (let pos of collection[structureType].pos) {
 
                 pos.x += anchorPoint.x - 6
