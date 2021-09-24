@@ -2,6 +2,8 @@ module.exports = function robberManager(room, creepsWithRole) {
 
     if (creepsWithRole.length == 0) return
 
+    require("robberFunctions")
+
     for (let creep of creepsWithRole) {
 
         if (creep.avoidHostiles()) continue
@@ -31,31 +33,7 @@ module.exports = function robberManager(room, creepsWithRole) {
                 continue
             }
 
-            let storage = room.get("storage")
-
-            if (storage && storage.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
-
-                creep.say("S")
-
-                for (let resourceType in creep.store) {
-
-                    creep.advancedTransfer(storage, resourceType)
-                    continue
-                }
-            }
-
-            let terminal = room.get("terminal")
-
-            if (terminal && terminal.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
-
-                creep.say("T")
-
-                for (let resourceType in creep.store) {
-
-                    creep.advancedTransfer(terminal, resourceType)
-                    continue
-                }
-            }
+            if (creep.transferToStorageOrTerminal()) continue
 
             continue
         }
@@ -78,30 +56,6 @@ module.exports = function robberManager(room, creepsWithRole) {
             continue
         }
 
-        let storage = room.get("storage")
-
-        if (storage && storage.store.getUsedCapacity() > 0) {
-
-            creep.say("S")
-
-            for (let resourceType in storage.store) {
-
-                creep.advancedWithdraw(storage, resourceType)
-                continue
-            }
-        }
-
-        let terminal = room.get("terminal")
-
-        if (terminal && terminal.store.getUsedCapacity() > 0) {
-
-            creep.say("T")
-
-            for (let resourceType in terminal.store) {
-
-                creep.advancedWithdraw(terminal, resourceType)
-                continue
-            }
-        }
+        if (creep.withdrawRoomResources()) continue
     }
 }
