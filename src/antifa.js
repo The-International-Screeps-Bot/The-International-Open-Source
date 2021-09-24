@@ -43,7 +43,7 @@ function antifa(room, creeps) {
 
                     creep.say("IS")
 
-                    if (creep.room == assaulter.room) {
+                    if (room == assaulter.room) {
 
                         if (creep.pos.isNearTo(assaulter)) {
 
@@ -118,7 +118,7 @@ function antifa(room, creeps) {
 
             for (let assaulter of collection) {
 
-                if (assaulter.memory.roomFrom == creep.room.name) {
+                if (assaulter.memory.roomFrom == room.name) {
 
                     if (!assaulter.memory.inSquad) {
 
@@ -362,7 +362,7 @@ function antifa(room, creeps) {
                         creep.memory.squadType = "rangedAttack"
                     }
                 }
-                if (creep.room.name == creep.memory.roomFrom) {
+                if (room.name == creep.memory.roomFrom) {
 
                     if (inSquad) {
 
@@ -393,7 +393,7 @@ function antifa(room, creeps) {
                             }
                         } else {
 
-                            let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
+                            let ramparts = room.find(FIND_MY_STRUCTURES, {
                                 filter: s => s.structureType == STRUCTURE_RAMPART
                             })
 
@@ -405,7 +405,7 @@ function antifa(room, creeps) {
 
                                 for (let rampart of ramparts) {
 
-                                    let creeps = creep.room.find(FIND_CREEPS)
+                                    let creeps = room.find(FIND_CREEPS)
 
                                     for (let creep of creeps) {
 
@@ -442,7 +442,7 @@ function antifa(room, creeps) {
                         }
                     } else {
 
-                        let ramparts = creep.room.find(FIND_MY_STRUCTURES, {
+                        let ramparts = room.find(FIND_MY_STRUCTURES, {
                             filter: s => s.structureType == STRUCTURE_RAMPART
                         })
 
@@ -454,7 +454,7 @@ function antifa(room, creeps) {
 
                             for (let rampart of ramparts) {
 
-                                let creeps = creep.room.find(FIND_CREEPS)
+                                let creeps = room.find(FIND_CREEPS)
 
                                 for (let creep of creeps) {
 
@@ -489,7 +489,7 @@ function antifa(room, creeps) {
                             }
                         }
                     }
-                } else if (creep.room.name == Memory.global.attackTarget) {
+                } else if (room.name == Memory.global.attackTarget) {
 
                     if (inSquad) {
 
@@ -515,7 +515,7 @@ function antifa(room, creeps) {
 
                                 } else {
 
-                                    let goal = _.map([creep.room.controller], function(target) {
+                                    let goal = _.map([room.controller], function(target) {
                                         return { pos: target.pos, range: 2 }
                                     })
 
@@ -527,7 +527,7 @@ function antifa(room, creeps) {
                             }
                         } else {
 
-                            let goal = _.map([creep.room.controller], function(target) {
+                            let goal = _.map([room.controller], function(target) {
                                 return { pos: target.pos, range: 2 }
                             })
 
@@ -567,7 +567,7 @@ function antifa(room, creeps) {
 
                             if (creep.isEdge()) {
 
-                                let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
+                                let goal = _.map([new RoomPosition(25, 25, room.name)], function(target) {
                                     return { pos: target, range: 24 }
                                 })
 
@@ -580,7 +580,7 @@ function antifa(room, creeps) {
 
                         if (creep.isEdge()) {
 
-                            let goal = _.map([new RoomPosition(25, 25, creep.room.name)], function(target) {
+                            let goal = _.map([new RoomPosition(25, 25, room.name)], function(target) {
                                 return { pos: target, range: 1 }
                             })
 
@@ -611,7 +611,7 @@ function antifa(room, creeps) {
 
                         creep.travel({
                             origin: creep.pos,
-                            goal: { pos: new RoomPosition(25, 25, creep.room.name), range: 1 },
+                            goal: { pos: new RoomPosition(25, 25, room.name), range: 1 },
                             plainCost: 1,
                             swampCost: 6,
                             defaultCostMatrix: false,

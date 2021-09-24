@@ -19,6 +19,7 @@ function communeDefenderManager(room, creepsWithRole) {
             break
         }
 
+
         creep.memory.remoteRoom = remoteRoom
 
         if (remoteRoom) {

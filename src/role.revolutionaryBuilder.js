@@ -35,7 +35,7 @@ module.exports = {
 
             let controller = creep.room.get("controller")
 
-            if ((controller.owner && !controller.my) || controller.reservation || creep.room.memory.stage >= 3) {
+            if ((controller.owner && !controller.my) || controller.reservation || creep.room.memory.stage >= 3 || creep.room.get("hostileCreeps").length > 0) {
 
                 console.log("AQ")
 

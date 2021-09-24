@@ -183,10 +183,10 @@ Creep.prototype.isQuadInFormation = function(members) {
     let creep = this
 
     let secondAssaulter = members.secondAssaulter
-    let assaulterDirection = assaulter.pos.getRangeTo(secondAssaulter.pos.x, secondAssaulter.pos.y)
+    let assaulterDirection = assaulter.pos.getDirectionTo(secondAssaulter.pos.x, secondAssaulter.pos.y)
 
     let secondSupporter = members.secondSupporter
-    let supporterDirection = assaulter.pos.getRangeTo(secondSupporter.pos.x, secondSupporter.pos.y)
+    let supporterDirection = assaulter.pos.getDirectionTo(secondSupporter.pos.x, secondSupporter.pos.y)
 
     // Check left and right
 
