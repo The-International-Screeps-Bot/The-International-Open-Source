@@ -483,7 +483,7 @@ function spawnRequests(room) {
 
         if (requiredCreeps[role] > 0) {
 
-            console.log(role + ", " + requiredCreeps[role] + ", " + room.name)
+            /* console.log(role + ", " + requiredCreeps[role] + ", " + room.name) */
         }
     }
 
@@ -567,7 +567,7 @@ function spawnRequests(room) {
 
                 requiredRemoteCreeps[[role, remoteRoomName]] = minRemoteCreeps[[role, remoteRoomName]] - creepsOfRemoteRole[[role, remoteRoomName]]
 
-                console.log(role + ", " + requiredRemoteCreeps[[role, remoteRoomName]] + ", " + remoteRoomName)
+                /* console.log(role + ", " + requiredRemoteCreeps[[role, remoteRoomName]] + ", " + remoteRoomName) */
             }
         }
     }

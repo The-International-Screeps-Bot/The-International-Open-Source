@@ -117,7 +117,7 @@ function scoutManager(room, creepsWithRole) {
 
                         let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, roomName), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation", "emptyRoom"])
 
-                        if (safeDistance > 2) continue
+                        if (!safeDistance || safeDistance > 2) continue
 
                         nearCommune = true
                         break
@@ -148,7 +148,7 @@ function scoutManager(room, creepsWithRole) {
                 // Make sure the room is in a range of 2 from the commune
 
                 let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"])
-                if (safeDistance > 2) return
+                if (!safeDistance || safeDistance > 2) return
 
                 // record room in memory
 
@@ -306,28 +306,36 @@ function scoutManager(room, creepsWithRole) {
 
         // Check for deposits
 
-        if (Memory.rooms[creep.memory.roomFrom].deposits) {
+        findDeposits()
+
+        function findDeposits() {
+
+            if (!Memory.rooms[creep.memory.roomFrom].deposits) return
+
+            // Only find deposits that are above 1k ticks left
 
             let deposits = creep.room.find(FIND_DEPOSITS, {
                 filter: deposit => deposit.ticksToDecay > 1000
             })
 
-            if (deposits.length > 0) {
+            if (deposits.length == 0) return
 
-                let safeDistance = creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"]) <= 6
+            // Make sure the deposit is close
 
-                if (safeDistance) {
+            let safeDistance = creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
+            if (!safeDistance || safeDistance > 10) return
 
-                    for (let deposit of deposits) {
+            for (let deposit of deposits) {
 
-                        // Iterate if memory already contians deposit
+                // Iterate if memory already contians deposit
 
-                        if (Memory.rooms[creep.memory.roomFrom].deposits[deposit.id]) continue
+                if (Memory.rooms[creep.memory.roomFrom].deposits[deposit.id]) continue
 
-                        Memory.rooms[creep.memory.roomFrom].deposits[deposit.id] = { roomName: creep.room.name, decayBy: Game.time + deposit.ticksToDecay }
-                    }
-                }
+                // Otherwise record deposit in mmory
+
+                Memory.rooms[creep.memory.roomFrom].deposits[deposit.id] = { roomName: creep.room.name, decayBy: Game.time + deposit.ticksToDecay }
             }
+
         }
 
         // Go to next room

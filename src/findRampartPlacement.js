@@ -640,7 +640,7 @@ function findRampartPlacement(room) {
             // searchPositions will provide positions the algorithm where to look for rampartPositions
 
             let searchPositions = {
-                [rampartPos.x * rampartPos.y]: new PositionSet(rampartPos.x, rampartPos.y),
+                [rampartPos.x * 50 + rampartPos.y]: new PositionSet(rampartPos.x, rampartPos.y),
             }
 
             // So long as we have positions to search, search them
@@ -679,7 +679,7 @@ function findRampartPlacement(room) {
 
                     // Add new positions around the pos for us to continue searching at
 
-                    searchPositions[pos.x * pos.y] = new PositionSet(pos.x, pos.y)
+                    searchPositions[pos.x * 50 + pos.y] = new PositionSet(pos.x, pos.y)
 
                     i++
                 }

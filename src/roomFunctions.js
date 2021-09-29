@@ -1,3 +1,5 @@
+const informationManager = require("./informationManager")
+
 Room.prototype.get = function(roomVar) {
 
     let room = this
@@ -421,9 +423,9 @@ Room.prototype.findSafeDistance = function(origin, goal, avoidStages) {
 
             if (roomName == goal.pos.roomName) return 1
 
-            if (Memory.rooms[roomName] && !avoidStages.includes(Memory.rooms[roomName].stage)) return 1
+            if (!Memory.rooms[roomName] || !Memory.rooms[roomName].stage) return infinity
 
-            if (!Memory.rooms[roomName]) return 5
+            if (!avoidStages.includes(Memory.rooms[roomName].stage)) return 1
 
             return Infinity
         }

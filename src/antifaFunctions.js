@@ -170,35 +170,146 @@ Creep.prototype.squadInRange = function(members) {
 
 Creep.prototype.quadMove = function() {
 
+    let creep = this
+
 
 }
 
 Creep.prototype.quadRotate = function() {
 
+    let creep = this
+
 
 }
 
-Creep.prototype.isQuadInFormation = function(members) {
+Creep.prototype.quadIsInFormation = function(members) {
 
     let creep = this
 
-    let secondAssaulter = members.secondAssaulter
-    let assaulterDirection = assaulter.pos.getDirectionTo(secondAssaulter.pos.x, secondAssaulter.pos.y)
+    function checkLeft() {
 
-    let secondSupporter = members.secondSupporter
-    let supporterDirection = assaulter.pos.getDirectionTo(secondSupporter.pos.x, secondSupporter.pos.y)
+        let checkPositions = [
+            { x: -1, y: 0, type: "secondAssaulter", value: 2 },
+            { x: -1, y: -1, type: "supporter", value: 1 },
+            { x: 0, y: -1, type: "secondSupporter", value: 3 },
+        ]
 
-    // Check left and right
+        for (let posOffset of checkPositions) {
 
-    if ((assaulterDirection == LEFT && supporterDirection == BOTTOM_LEFT) || (assaulterDirection == RIGHT && supporterDirection == BOTTOM_RIGHT)) {
+            let member = members[posOffset.type]
+
+            let x = creep.pos.x + posOffset.x
+            let y = creep.pos.y + posOffset.y
+
+            if (member.pos.x == x && member.pos.y == y) return
+        }
 
         return true
     }
+
+    function checkRight() {
+
+        let member = members[posOffset.type]
+
+        let checkPositions = [
+            { x: +1, y: 0, type: "secondAssaulter", value: 2 },
+            { x: +1, y: +1, type: "supporter", value: 1 },
+            { x: 0, y: +1, type: "secondSupporter", value: 3 },
+        ]
+
+        for (let posOffset of checkPositions) {
+
+            let x = creep.pos.x + posOffset.x
+            let y = creep.pos.y + posOffset.y
+
+            if (member.pos.x == x && member.pos.y == y) return
+        }
+
+        return true
+    }
+
+    if (checkLeft()) return true
+
+    if (checkRight()) return true
 }
 
-Creep.prototype.quadGetInFormation = function() {
+Creep.prototype.quadEnterAttackMode = function(members) {
 
+    let creep = this
+    let room = creep.room
 
+    let checkPositions = {
+        left: [
+            { x: -1, y: 0, type: "secondAssaulter", value: 2 },
+            { x: -1, y: -1, type: "supporter", value: 1 },
+            { x: 0, y: -1, type: "secondSupporter", value: 3 },
+        ],
+        right: [
+            { x: +1, y: 0, type: "secondAssaulter", value: 2 },
+            { x: +1, y: +1, type: "supporter", value: 1 },
+            { x: 0, y: +1, type: "secondSupporter", value: 3 },
+        ]
+    }
+
+    function findDirection() {
+
+        let cm = new PathFinder.CostMatrix
+
+        function isOpenSpace(directionName) {
+
+            let pos = checkPositions[directionName]
+
+            let x = creep.pos.x + pos.x
+            let y = creep.pos.y + pos.y
+
+            if (cm.get(x, y) == 255) return
+
+            return true
+        }
+
+        for (let directionName in checkPositions) {
+
+            if (isOpenSpace(directionName)) return directionName
+        }
+    }
+
+    let directionName = findDirection()
+    if (!directionName) return
+
+    let directions = checkPositions[directionName]
+
+    // Loop through each member
+    // Skip the first member, which would be members[0]
+
+    let i = 1
+
+    for (let pos of directions) {
+
+        let member = members[i]
+
+        let x = creep.pos.x + pos.x
+        let y = creep.pos.y + pos.y
+
+        if (member.pos.x != x || member.pos.y != y) {
+
+            console.log(y)
+
+            room.visual.circle(x, y, {})
+
+            creep.travel({
+                origin: creep.pos,
+                goal: { pos: new RoomPosition(x, y, room.name), range: 0 },
+                plainCost: false,
+                swampCost: false,
+                defaultCostMatrix: false,
+                avoidStages: [],
+                flee: true,
+                cacheAmount: 1,
+            })
+        }
+
+        i++
+    }
 }
 
 Creep.prototype.quadRetreat = function() {

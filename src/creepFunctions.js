@@ -624,7 +624,7 @@ Creep.prototype.travel = function(opts) {
 
                     if (roomName == goal.pos.roomName) return 1
 
-                    if (!Memory.rooms[roomName]) return 5
+                    if (!Memory.rooms[roomName] || !Memory.rooms[roomName].stage) return infinity
 
                     if (!opts.avoidStages.includes(Memory.rooms[roomName].stage)) return 1
 

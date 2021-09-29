@@ -76,6 +76,9 @@ function antifaAssaulterManager(room, assaulters) {
                                 flee: false,
                                 cacheAmount: 10,
                             })
+                        } else {
+
+                            creep.quadEnterAttackMode(members)
                         }
                     }
                 } else if (part == "middle2") {
