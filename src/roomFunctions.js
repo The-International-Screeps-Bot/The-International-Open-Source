@@ -423,7 +423,7 @@ Room.prototype.findSafeDistance = function(origin, goal, avoidStages) {
 
             if (roomName == goal.pos.roomName) return 1
 
-            if (!Memory.rooms[roomName] || !Memory.rooms[roomName].stage) return infinity
+            if (!Memory.rooms[roomName] || !Memory.rooms[roomName].stage) return Infinity
 
             if (!avoidStages.includes(Memory.rooms[roomName].stage)) return 1
 

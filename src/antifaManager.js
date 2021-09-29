@@ -10,10 +10,9 @@ function antifaManager(room, assaulters, supporters) {
 
     // Run each antifa unit
 
-    /* for (let creep of assaulters.concat(supporters)) {
-
-        creep.suicide()
-    } */
+    /* 
+        for (let creep of assaulters.concat(supporters)) creep.suicide()
+    */
 
     antifaAssaulterManager(room, assaulters)
 

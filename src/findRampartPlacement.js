@@ -617,7 +617,7 @@ function findRampartPlacement(room) {
 
         let groupedRampartPositions = []
 
-        let maxGroupSize = 15 // Set to infinity for no group size
+        let maxGroupSize = 15 // Set to Infinity for no group size
 
         class PositionSet {
             constructor(x, y) {
@@ -665,7 +665,7 @@ function findRampartPlacement(room) {
                     let matchingGroupPos = group.filter(rampartPos => rampartPos.isEqualTo(pos))[0]
                     if (matchingGroupPos) continue
 
-                    // Check if in any group already if maxGroupSize is less than infinity
+                    // Check if in any group already if maxGroupSize is less than Infinity
 
                     if (maxGroupSize != Infinity) {
 

@@ -1,15 +1,3 @@
-Creep.prototype.squadFatigued = function(squad) {
-
-    creep = this
-
-    let isFatigued = true
-
-    for (let creep of squad) {
-
-
-    }
-}
-
 Creep.prototype.isSquadFull = function() {
 
     creep = this
@@ -17,7 +5,7 @@ Creep.prototype.isSquadFull = function() {
     return creep.memory.amount == creep.memory.requiredAmount
 }
 
-Creep.prototype.findAmount = function(members) {
+Creep.prototype.findMemberCount = function(members) {
 
     creep = this
 
@@ -167,6 +155,168 @@ Creep.prototype.squadInRange = function(members) {
 
     return true
 }
+
+Creep.prototype.squadEnterRoom = function(members, supporter, secondAssaulter, secondSupporter) {
+
+    // assaulter enter room
+
+    let enteringRoom = creep.memory.enteringRoom
+
+    if (creep.isEdge()) {
+
+        enteringRoom = true
+        creep.memory.enteringRoom = enteringRoom
+    }
+
+    if (!enteringRoom) return
+
+    if (enteringRoom) creep.memory.enteringRoom = creep.moveFromExit(members)
+
+    // supporter enter room
+
+    if (supporter.isEdge()) {
+
+        if (supporter.pos.getRangeTo(creep) > 1) {
+
+            supporter.travel({
+                origin: supporter.pos,
+                goal: { pos: new RoomPosition(25, 25, room.name), range: 1 },
+                plainCost: false,
+                swampCost: false,
+                defaultCostMatrix: supporter.memory.defaultCostMatrix,
+                avoidStages: [],
+                flee: false,
+                cacheAmount: 1,
+            })
+        } else {
+
+            supporter.move(supporter.pos.getDirectionTo(creep))
+        }
+    }
+
+    if (creep.memory.type != "quad") return
+
+    // secondAssaulter enter room
+
+    if (secondAssaulter.pos.getRangeTo(secondSupporter) > 1) {
+
+        secondAssaulter.travel({
+            origin: secondAssaulter.pos,
+            goal: { pos: secondSupporter.pos, range: 1 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: false,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 1,
+        })
+    } else {
+
+        secondAssaulter.move(secondAssaulter.pos.getDirectionTo(secondSupporter))
+    }
+
+    // secondSupporter enter room
+
+    if (supporter.isEdge()) {
+
+        if (supporter.pos.getRangeTo(creep) > 1) {
+
+            supporter.travel({
+                origin: supporter.pos,
+                goal: { pos: new RoomPosition(25, 25, room.name), range: 1 },
+                plainCost: false,
+                swampCost: false,
+                defaultCostMatrix: supporter.memory.defaultCostMatrix,
+                avoidStages: [],
+                flee: false,
+                cacheAmount: 1,
+            })
+        } else {
+
+            supporter.move(supporter.pos.getDirectionTo(creep))
+        }
+    }
+
+    return true
+}
+
+Creep.prototype.squadTravel = function(members, supporter, secondAssaulter, secondSupporter, goal) {
+
+    // Move assaulter
+
+    if (creep.squadCanMove(members) && creep.squadInRange(members)) {
+
+        creep.travel({
+            origin: creep.pos,
+            goal: goal,
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: false,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 10,
+        })
+    }
+
+    // Move supporter
+
+    if (supporter.pos.getRangeTo(creep) > 1) {
+
+        supporter.travel({
+            origin: supporter.pos,
+            goal: { pos: creep.pos, range: 1 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: supporter.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 1,
+        })
+    } else {
+
+        supporter.move(supporter.pos.getDirectionTo(creep))
+    }
+
+    // Move secondAssaulter
+
+    if (supporter.pos.getRangeTo(supporter) > 1) {
+
+        secondAssaulter.travel({
+            origin: secondAssaulter.pos,
+            goal: { pos: supporter.pos, range: 1 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: secondAssaulter.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 1,
+        })
+    } else {
+
+        secondAssaulter.move(secondAssaulter.pos.getDirectionTo(supporter))
+    }
+
+    // Move secondSupporter
+
+    if (secondSupporter.pos.getRangeTo(secondAssaulter) > 1) {
+
+        secondSupporter.travel({
+            origin: secondSupporter.pos,
+            goal: { pos: secondAssaulter.pos, range: 1 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: secondSupporter.memory.defaultCostMatrix,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 1,
+        })
+    } else {
+
+        secondSupporter.move(secondSupporter.pos.getDirectionTo(secondAssaulter))
+    }
+}
+
+// Quad functions
 
 Creep.prototype.quadMove = function() {
 
