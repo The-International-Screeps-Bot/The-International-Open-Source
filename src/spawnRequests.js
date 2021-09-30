@@ -1093,11 +1093,6 @@ function spawnRequests(room) {
     roleOpts["meleeDefender"] = roleValues({
         role: "meleeDefender",
         parts: {
-            1800: {
-                defaultParts: [],
-                extraParts: [attackPart, attackPart, movePart],
-                maxParts: 50
-            },
             300: {
                 defaultParts: [],
                 extraParts: [attackPart, movePart],

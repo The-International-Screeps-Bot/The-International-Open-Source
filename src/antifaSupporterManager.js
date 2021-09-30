@@ -10,146 +10,49 @@ function antifaSupporterManager(room, assaulters, supporters) {
 
         const assaulter = Game.creeps[creep.memory.assaulter]
 
-        if (room.name == attackTarget) {
+        // Stop if creep is in a squad
 
-            // Creep is in room to attack 
+        if (assaulter) continue
 
-            if (creep.isEdge()) {
+        if (room.name == roomFrom) {
 
-                if (creep.pos.getRangeTo(assaulter) > 1) {
+            inRoomFrom()
+            continue
+        }
 
-                    creep.travel({
-                        origin: creep.pos,
-                        goal: { pos: new RoomPosition(25, 25, room.name), range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: creep.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 1,
-                    })
-                } else {
+        inOtherRoom()
+        continue
 
-                    creep.move(creep.pos.getDirectionTo(assaulter))
-                }
-            } else if (assaulter) {
+        function inRoomFrom() {
 
-                creep.say("A")
+            // Try to find an assaulter
 
-                if (creep.pos.getRangeTo(assaulter) > 1) {
+            if (creep.findAssaulter(assaulters)) return
 
-                    creep.travel({
-                        origin: creep.pos,
-                        goal: { pos: assaulter.pos, range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: creep.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 1,
-                    })
-                } else {
+            creep.travel({
+                origin: creep.pos,
+                goal: { pos: new RoomPosition(25, 25, roomFrom), range: 24 },
+                plainCost: false,
+                swampCost: false,
+                defaultCostMatrix: false,
+                avoidStages: [],
+                flee: false,
+                cacheAmount: 10,
+            })
+        }
 
-                    creep.move(creep.pos.getDirectionTo(assaulter))
-                }
-            } else {
+        function inOtherRoom() {
 
-                creep.travel({
-                    origin: creep.pos,
-                    goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
-                    plainCost: false,
-                    swampCost: false,
-                    defaultCostMatrix: false,
-                    avoidStages: [],
-                    flee: false,
-                    cacheAmount: 10,
-                })
-            }
-        } else if (room.name == roomFrom) {
-
-            // Creep is at home
-
-            if (assaulter) {
-
-                creep.say("A")
-
-                if (creep.pos.getRangeTo(assaulter) > 1) {
-
-                    creep.travel({
-                        origin: creep.pos,
-                        goal: { pos: assaulter.pos, range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: creep.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 1,
-                    })
-                } else {
-
-                    creep.move(creep.pos.getDirectionTo(assaulter))
-                }
-            } else {
-
-                creep.say("FA")
-
-                creep.findAssaulter(assaulters)
-            }
-        } else {
-
-            // Creep is traveling to attackTarget
-
-            if (creep.isEdge()) {
-
-                if (creep.pos.getRangeTo(assaulter) > 1) {
-
-                    creep.travel({
-                        origin: creep.pos,
-                        goal: { pos: new RoomPosition(25, 25, room.name), range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: creep.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 1,
-                    })
-                } else {
-
-                    creep.move(creep.pos.getDirectionTo(assaulter))
-                }
-            } else if (assaulter) {
-
-                creep.say("A")
-
-                if (creep.pos.getRangeTo(assaulter) > 1) {
-
-                    creep.travel({
-                        origin: creep.pos,
-                        goal: { pos: assaulter.pos, range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: creep.memory.defaultCostMatrix,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 1,
-                    })
-                } else {
-
-                    creep.move(creep.pos.getDirectionTo(assaulter))
-                }
-            } else {
-
-                creep.travel({
-                    origin: creep.pos,
-                    goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
-                    plainCost: false,
-                    swampCost: false,
-                    defaultCostMatrix: false,
-                    avoidStages: [],
-                    flee: false,
-                    cacheAmount: 10,
-                })
-            }
+            creep.travel({
+                origin: creep.pos,
+                goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
+                plainCost: false,
+                swampCost: false,
+                defaultCostMatrix: false,
+                avoidStages: [],
+                flee: false,
+                cacheAmount: 10,
+            })
         }
     }
 }

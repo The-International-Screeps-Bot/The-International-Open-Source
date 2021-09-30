@@ -35,8 +35,6 @@ Creep.prototype.findAssaulter = function(assaulters) {
             return true
         }
     }
-
-    return false
 }
 
 Creep.prototype.findMembersInRoom = function(members) {
@@ -132,9 +130,9 @@ Creep.prototype.findRampartTarget = function() {
 
 Creep.prototype.squadCanMove = function(members) {
 
-    for (let creep of members) {
+    for (let member of members) {
 
-        if (creep.fatigue > 0) return false
+        if (member.fatigue > 0) return false
     }
 
     return true
@@ -146,17 +144,20 @@ Creep.prototype.squadInRange = function(members) {
 
     for (let i = 0; i < members.length; i++) {
 
-        let creep = members[i]
+        let member = members[i]
 
-        if (creep.pos.getRangeTo(lastCreep) > 1) return false
+        if (member.pos.getRangeTo(lastCreep) > 1) return false
 
-        lastCreep = creep
+        lastCreep = member
     }
 
     return true
 }
 
 Creep.prototype.squadEnterRoom = function(members, supporter, secondAssaulter, secondSupporter) {
+
+    let creep = this
+    let room = creep.room
 
     // assaulter enter room
 
@@ -168,41 +169,19 @@ Creep.prototype.squadEnterRoom = function(members, supporter, secondAssaulter, s
         creep.memory.enteringRoom = enteringRoom
     }
 
+    // Check if we are trying to enter a room
+
     if (!enteringRoom) return
 
-    if (enteringRoom) creep.memory.enteringRoom = creep.moveFromExit(members)
+    creep.memory.enteringRoom = creep.moveFromExit(members)
 
     // supporter enter room
 
-    if (supporter.isEdge()) {
+    if (supporter.room.name != room.name || supporter.pos.getRangeTo(creep) > 1) {
 
-        if (supporter.pos.getRangeTo(creep) > 1) {
-
-            supporter.travel({
-                origin: supporter.pos,
-                goal: { pos: new RoomPosition(25, 25, room.name), range: 1 },
-                plainCost: false,
-                swampCost: false,
-                defaultCostMatrix: supporter.memory.defaultCostMatrix,
-                avoidStages: [],
-                flee: false,
-                cacheAmount: 1,
-            })
-        } else {
-
-            supporter.move(supporter.pos.getDirectionTo(creep))
-        }
-    }
-
-    if (creep.memory.type != "quad") return
-
-    // secondAssaulter enter room
-
-    if (secondAssaulter.pos.getRangeTo(secondSupporter) > 1) {
-
-        secondAssaulter.travel({
-            origin: secondAssaulter.pos,
-            goal: { pos: secondSupporter.pos, range: 1 },
+        supporter.travel({
+            origin: supporter.pos,
+            goal: { pos: creep.pos, range: 1 },
             plainCost: false,
             swampCost: false,
             defaultCostMatrix: false,
@@ -210,37 +189,53 @@ Creep.prototype.squadEnterRoom = function(members, supporter, secondAssaulter, s
             flee: false,
             cacheAmount: 1,
         })
-    } else {
+    } else supporter.move(supporter.pos.getDirectionTo(creep))
 
-        secondAssaulter.move(secondAssaulter.pos.getDirectionTo(secondSupporter))
-    }
+    if (creep.memory.size != "quad") return true
+
+    // secondAssaulter enter room
+
+    if (secondAssaulter.room.name != supporter.room.name || secondAssaulter.pos.getRangeTo(supporter) > 1) {
+
+        secondAssaulter.travel({
+            origin: secondAssaulter.pos,
+            goal: { pos: supporter.pos, range: 1 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: false,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 1,
+        })
+    } else secondAssaulter.move(secondAssaulter.pos.getDirectionTo(supporter))
+
 
     // secondSupporter enter room
 
-    if (supporter.isEdge()) {
+    if (secondSupporter.room.name != secondAssaulter.room.name || secondSupporter.pos.getRangeTo(secondAssaulter) > 1) {
 
-        if (supporter.pos.getRangeTo(creep) > 1) {
+        secondSupporter.travel({
+            origin: secondSupporter.pos,
+            goal: { pos: secondAssaulter.pos, range: 1 },
+            plainCost: false,
+            swampCost: false,
+            defaultCostMatrix: false,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 1,
+        })
+    } else secondSupporter.move(secondSupporter.pos.getDirectionTo(secondAssaulter))
 
-            supporter.travel({
-                origin: supporter.pos,
-                goal: { pos: new RoomPosition(25, 25, room.name), range: 1 },
-                plainCost: false,
-                swampCost: false,
-                defaultCostMatrix: supporter.memory.defaultCostMatrix,
-                avoidStages: [],
-                flee: false,
-                cacheAmount: 1,
-            })
-        } else {
-
-            supporter.move(supporter.pos.getDirectionTo(creep))
-        }
-    }
 
     return true
 }
 
 Creep.prototype.squadTravel = function(members, supporter, secondAssaulter, secondSupporter, goal) {
+
+    let creep = this
+    let room = creep.room
+
+    /* for (let member of members) member.say(member.memory.part) */
 
     // Move assaulter
 
@@ -267,7 +262,7 @@ Creep.prototype.squadTravel = function(members, supporter, secondAssaulter, seco
             goal: { pos: creep.pos, range: 1 },
             plainCost: false,
             swampCost: false,
-            defaultCostMatrix: supporter.memory.defaultCostMatrix,
+            defaultCostMatrix: room.memory.defaultCostMatrix,
             avoidStages: [],
             flee: false,
             cacheAmount: 1,
@@ -279,14 +274,14 @@ Creep.prototype.squadTravel = function(members, supporter, secondAssaulter, seco
 
     // Move secondAssaulter
 
-    if (supporter.pos.getRangeTo(supporter) > 1) {
+    if (secondAssaulter.pos.getRangeTo(supporter) > 1) {
 
         secondAssaulter.travel({
             origin: secondAssaulter.pos,
             goal: { pos: supporter.pos, range: 1 },
             plainCost: false,
             swampCost: false,
-            defaultCostMatrix: secondAssaulter.memory.defaultCostMatrix,
+            defaultCostMatrix: room.memory.defaultCostMatrix,
             avoidStages: [],
             flee: false,
             cacheAmount: 1,
@@ -305,7 +300,7 @@ Creep.prototype.squadTravel = function(members, supporter, secondAssaulter, seco
             goal: { pos: secondAssaulter.pos, range: 1 },
             plainCost: false,
             swampCost: false,
-            defaultCostMatrix: secondSupporter.memory.defaultCostMatrix,
+            defaultCostMatrix: room.memory.defaultCostMatrix,
             avoidStages: [],
             flee: false,
             cacheAmount: 1,
@@ -325,79 +320,69 @@ Creep.prototype.quadMove = function() {
 
 }
 
-Creep.prototype.quadRotate = function() {
+Creep.prototype.quadRotate = function(membersObject) {
 
     let creep = this
 
 
 }
 
-Creep.prototype.quadIsInFormation = function(members) {
+Creep.prototype.quadIsInFormation = function(membersObject) {
 
     let creep = this
 
-    function checkLeft() {
-
-        let checkPositions = [
-            { x: -1, y: 0, type: "secondAssaulter", value: 2 },
-            { x: -1, y: -1, type: "supporter", value: 1 },
-            { x: 0, y: -1, type: "secondSupporter", value: 3 },
+    let checkPositions = {
+        left: [
+            { x: -1, y: -1, part: "supporter" },
+            { x: 0, y: -1, part: "secondAssaulter" },
+            { x: -1, y: 0, part: "secondSupporter" },
+        ],
+        right: [
+            { x: +1, y: +1, part: "supporter" },
+            { x: +1, y: 0, part: "secondAssaulter" },
+            { x: 0, y: +1, part: "secondSupporter" },
         ]
-
-        for (let posOffset of checkPositions) {
-
-            let member = members[posOffset.type]
-
-            let x = creep.pos.x + posOffset.x
-            let y = creep.pos.y + posOffset.y
-
-            if (member.pos.x == x && member.pos.y == y) return
-        }
-
-        return true
     }
 
-    function checkRight() {
+    for (let directionName in checkPositions) {
 
-        let member = members[posOffset.type]
+        let directions = checkPositions[directionName]
 
-        let checkPositions = [
-            { x: +1, y: 0, type: "secondAssaulter", value: 2 },
-            { x: +1, y: +1, type: "supporter", value: 1 },
-            { x: 0, y: +1, type: "secondSupporter", value: 3 },
-        ]
+        for (let pos of directions) {
 
-        for (let posOffset of checkPositions) {
+            let member = membersObject[pos.part]
 
-            let x = creep.pos.x + posOffset.x
-            let y = creep.pos.y + posOffset.y
+            let x = creep.pos.x + pos.x
+            let y = creep.pos.y + pos.y
 
-            if (member.pos.x == x && member.pos.y == y) return
+            if (member.pos.x != x || member.pos.y != y || member.room.name != room.name) {
+
+                continue
+            }
         }
-
-        return true
     }
-
-    if (checkLeft()) return true
-
-    if (checkRight()) return true
 }
 
-Creep.prototype.quadEnterAttackMode = function(members) {
+Creep.prototype.quadEnterAttackMode = function(membersObject) {
 
     let creep = this
     let room = creep.room
 
+    for (let memberName in membersObject) {
+
+        membersObject[memberName].memory.rotation = { x: 0, y: 0 }
+    }
+
     let checkPositions = {
         left: [
-            { x: -1, y: 0, type: "secondAssaulter", value: 2 },
-            { x: -1, y: -1, type: "supporter", value: 1 },
-            { x: 0, y: -1, type: "secondSupporter", value: 3 },
+            { x: -1, y: -1, part: "supporter" },
+            { x: 0, y: -1, part: "secondAssaulter" },
+            { x: -1, y: 0, part: "secondSupporter" },
         ],
         right: [
-            { x: +1, y: 0, type: "secondAssaulter", value: 2 },
-            { x: +1, y: +1, type: "supporter", value: 1 },
-            { x: 0, y: +1, type: "secondSupporter", value: 3 },
+            { x: +1, y: +1, part: "supporter" },
+            { x: +1, y: 0, part: "secondAssaulter" },
+            { x: 0, y: +1, part: "secondSupporter" },
         ]
     }
 
@@ -428,37 +413,28 @@ Creep.prototype.quadEnterAttackMode = function(members) {
 
     let directions = checkPositions[directionName]
 
-    // Loop through each member
-    // Skip the first member, which would be members[0]
-
-    let i = 1
-
     for (let pos of directions) {
 
-        let member = members[i]
+        let member = membersObject[pos.part]
 
         let x = creep.pos.x + pos.x
         let y = creep.pos.y + pos.y
 
-        if (member.pos.x != x || member.pos.y != y) {
-
-            console.log(y)
+        if (member.pos.x != x || member.pos.y != y || member.room.name != room.name) {
 
             room.visual.circle(x, y, {})
 
-            creep.travel({
-                origin: creep.pos,
+            member.travel({
+                origin: member.pos,
                 goal: { pos: new RoomPosition(x, y, room.name), range: 0 },
                 plainCost: false,
                 swampCost: false,
                 defaultCostMatrix: false,
                 avoidStages: [],
-                flee: true,
+                flee: false,
                 cacheAmount: 1,
             })
         }
-
-        i++
     }
 }
 

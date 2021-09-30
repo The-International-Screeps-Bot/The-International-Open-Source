@@ -18,6 +18,12 @@ module.exports = function antifaAssaulterManager(room, assaulters) {
         const secondSupporter = Game.creeps[creep.memory.secondSupporter]
 
         const members = [creep, supporter, secondAssaulter, secondSupporter]
+        const membersObject = {
+            creep: creep,
+            supporter: supporter,
+            secondAssaulter: secondAssaulter,
+            secondSupporter: secondSupporter
+        }
 
         creep.findMemberCount(members)
 
@@ -45,7 +51,7 @@ module.exports = function antifaAssaulterManager(room, assaulters) {
 
                 const anchorPoint = room.get("anchorPoint")
 
-                if (creep.pos.getRangeTo(anchorPoint) != 6) {
+                if (creep.pos.getRangeTo(anchorPoint) != 7) {
 
                     creep.say("AIR" + creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y))
 
@@ -53,7 +59,7 @@ module.exports = function antifaAssaulterManager(room, assaulters) {
 
                         creep.travel({
                             origin: creep.pos,
-                            goal: { pos: anchorPoint, range: 6 },
+                            goal: { pos: anchorPoint, range: 7 },
                             plainCost: false,
                             swampCost: false,
                             defaultCostMatrix: false,
@@ -67,7 +73,7 @@ module.exports = function antifaAssaulterManager(room, assaulters) {
 
                     creep.travel({
                         origin: creep.pos,
-                        goal: { pos: anchorPoint, range: 6 },
+                        goal: { pos: anchorPoint, range: 7 },
                         plainCost: false,
                         swampCost: false,
                         defaultCostMatrix: false,
@@ -82,15 +88,45 @@ module.exports = function antifaAssaulterManager(room, assaulters) {
 
             creep.say("🚬")
 
-            if (size == "quad" && supporter && creep.pos.getRangeTo(supporter) == 1) {
+            createQuad()
 
-                creep.say("FD")
+            function createQuad() {
+
+                // Make sure creep wants to be a quad
+
+                if (size != "quad") return
+
+                // Make sure creep is at least in a duo
+
+                if (!supporter) return
+
+                // If creep is not next to supporter get next to supporter
+
+                if (creep.pos.getRangeTo(supporter) > 1) {
+
+                    supporter.travel({
+                        origin: supporter.pos,
+                        goal: { pos: creep.pos, range: 1 },
+                        plainCost: false,
+                        swampCost: false,
+                        defaultCostMatrix: false,
+                        avoidStages: [],
+                        flee: false,
+                        cacheAmount: 10,
+                    })
+
+                    return
+                }
 
                 creep.findDuo(assaulters)
             }
+
+            continue
         }
 
         if (part != "front") continue
+
+        creep.say("F")
 
         // State machine for room
 
@@ -116,7 +152,9 @@ module.exports = function antifaAssaulterManager(room, assaulters) {
 
             if (creep.squadEnterRoom(members, supporter, secondAssaulter, secondSupporter)) return
 
-            creep.quadEnterAttackMode(members)
+            // check if quad is in formation. If not enter attackMode
+
+            creep.quadEnterAttackMode(membersObject)
         }
 
         function inRoomFrom() {
@@ -143,247 +181,6 @@ module.exports = function antifaAssaulterManager(room, assaulters) {
                     pos: new RoomPosition(25, 25, attackTarget),
                     range: 1
                 })
-        }
-
-        if (room.name == attackTarget) {
-
-            // Creep is in room to attack
-
-            let enteringRoom = creep.memory.enteringRoom
-
-            if (creep.isEdge()) creep.memory.enteringRoom = true
-
-            if (enteringRoom) {
-
-                if (part == "front") {
-
-                    creep.memory.enteringRoom = creep.moveFromExit(members)
-
-                } else if (part == "middle2") {
-
-                    if (creep.pos.getRangeTo(secondSupporter) > 1) {
-
-                        creep.travel({
-                            origin: creep.pos,
-                            goal: { pos: secondSupporter.pos, range: 1 },
-                            plainCost: false,
-                            swampCost: false,
-                            defaultCostMatrix: false,
-                            avoidStages: [],
-                            flee: false,
-                            cacheAmount: 1,
-                        })
-                    } else {
-
-                        creep.move(creep.pos.getDirectionTo(secondSupporter))
-                    }
-                }
-            } else if (creep.isSquadFull()) {
-
-                creep.say(part)
-
-                if (part == "front") {
-
-                    if (creep.squadCanMove(members) && creep.squadInRange(members)) {
-
-                        let controller = room.get("controller")
-
-                        if (controller && creep.pos.getRangeTo(controller) > 6) {
-
-                            creep.travel({
-                                origin: creep.pos,
-                                goal: { pos: room.get("controller").pos, range: 6 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: false,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 10,
-                            })
-                        } else {
-
-                            creep.quadEnterAttackMode(members)
-                        }
-                    }
-                } else if (part == "middle2") {
-
-                    if (creep.pos.getRangeTo(secondSupporter) > 1) {
-
-                        creep.travel({
-                            origin: creep.pos,
-                            goal: { pos: secondSupporter.pos, range: 1 },
-                            plainCost: false,
-                            swampCost: false,
-                            defaultCostMatrix: false,
-                            avoidStages: [],
-                            flee: false,
-                            cacheAmount: 1,
-                        })
-                    } else {
-
-                        creep.move(creep.pos.getDirectionTo(secondSupporter))
-                    }
-                } else {
-
-                    creep.travel({
-                        origin: creep.pos,
-                        goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
-                        plainCost: false,
-                        swampCost: false,
-                        defaultCostMatrix: false,
-                        avoidStages: [],
-                        flee: false,
-                        cacheAmount: 1,
-                    })
-                }
-            }
-        } else if (room.name == roomFrom) {
-
-            // Creep is at home
-
-            if (creep.isSquadFull()) {
-
-                creep.say(part)
-
-                if (part == "front") {
-
-                    if (creep.squadCanMove(members) && creep.squadInRange(members)) {
-
-                        creep.travel({
-                            origin: creep.pos,
-                            goal: { pos: new RoomPosition(25, 25, attackTarget), range: 1 },
-                            plainCost: false,
-                            swampCost: false,
-                            defaultCostMatrix: false,
-                            avoidStages: [],
-                            flee: false,
-                            cacheAmount: 10,
-                        })
-                    }
-                } else if (part == "middle2") {
-
-                    if (creep.pos.getRangeTo(secondSupporter) > 1) {
-
-                        creep.travel({
-                            origin: creep.pos,
-                            goal: { pos: secondSupporter.pos, range: 1 },
-                            plainCost: false,
-                            swampCost: false,
-                            defaultCostMatrix: false,
-                            avoidStages: [],
-                            flee: false,
-                            cacheAmount: 1,
-                        })
-                    } else {
-
-                        creep.move(creep.pos.getDirectionTo(secondSupporter))
-                    }
-                }
-            } else {
-
-                const anchorPoint = creep.room.memory.anchorPoint
-
-                if (anchorPoint) {
-
-                    if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) != 6) {
-
-                        creep.say("AIR" + creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y))
-
-                        if (creep.pos.getRangeTo(anchorPoint.x, anchorPoint.y) > 6) {
-
-                            creep.travel({
-                                origin: creep.pos,
-                                goal: { pos: anchorPoint, range: 6 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: false,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 10,
-                            })
-                        } else {
-
-                            creep.travel({
-                                origin: creep.pos,
-                                goal: { pos: anchorPoint, range: 6 },
-                                plainCost: false,
-                                swampCost: false,
-                                defaultCostMatrix: false,
-                                avoidStages: [],
-                                flee: true,
-                                cacheAmount: 10,
-                            })
-                        }
-                    } else {
-
-                        creep.say("🚬")
-
-                        if (size == "quad" && supporter && creep.pos.getRangeTo(supporter) == 1) {
-
-                            creep.say("FD")
-
-                            creep.findDuo(assaulters)
-                        }
-                    }
-                }
-            }
-        } else {
-
-            // Creep is traveling to attackTarget
-
-            if (creep.squadEnterRoom(members, supporter, secondAssaulter, secondSupporter)) continue
-
-            if (creep.isSquadFull()) {
-
-                creep.say(part)
-
-                if (part == "front") {
-
-                    if (creep.squadCanMove(members) && creep.squadInRange(members)) {
-
-                        creep.travel({
-                            origin: creep.pos,
-                            goal: { pos: new RoomPosition(25, 25, attackTarget), range: 1 },
-                            plainCost: false,
-                            swampCost: false,
-                            defaultCostMatrix: false,
-                            avoidStages: [],
-                            flee: false,
-                            cacheAmount: 10,
-                        })
-                    }
-                } else if (part == "middle2") {
-
-                    if (creep.pos.getRangeTo(secondSupporter) > 1) {
-
-                        creep.travel({
-                            origin: creep.pos,
-                            goal: { pos: secondSupporter.pos, range: 1 },
-                            plainCost: false,
-                            swampCost: false,
-                            defaultCostMatrix: false,
-                            avoidStages: [],
-                            flee: false,
-                            cacheAmount: 1,
-                        })
-                    } else {
-
-                        creep.move(creep.pos.getDirectionTo(secondSupporter))
-                    }
-                }
-            } else {
-
-                creep.travel({
-                    origin: creep.pos,
-                    goal: { pos: new RoomPosition(25, 25, roomFrom), range: 1 },
-                    plainCost: false,
-                    swampCost: false,
-                    defaultCostMatrix: false,
-                    avoidStages: [],
-                    flee: false,
-                    cacheAmount: 1,
-                })
-            }
         }
     }
 }

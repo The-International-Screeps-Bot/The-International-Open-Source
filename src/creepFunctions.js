@@ -665,7 +665,7 @@ Creep.prototype.travel = function(opts) {
 
     function findNewPath() {
 
-        if (!path || lastRoom != creep.room.name || !lastCache || Game.time - lastCache >= opts.cacheAmount) {
+        if (!path || path.length == 0 || lastRoom != creep.room.name || !lastCache || Game.time - lastCache >= opts.cacheAmount) {
 
             if (path && path.length == 1) {
 
