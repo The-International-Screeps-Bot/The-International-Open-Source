@@ -12,8 +12,6 @@ Creep.prototype.isEdge = function() {
     creep = this
 
     if (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49) return true
-
-    return false
 }
 
 Creep.prototype.withdrawStoredResource = function(minAmount, withdrawAmount, resource) {
@@ -577,25 +575,18 @@ Creep.prototype.travel = function(opts) {
 
     // Assign defaults if values arn't provided
 
-    if (!opts.plainCost) {
-
-        opts.plainCost = 2
+    let defaultValues = {
+        plainCost: 2,
+        swampCost: 6,
+        avoidStages: [],
+        flee: false,
+        cacheAmount: 20,
+        avoidHostileRanges: false,
     }
-    if (!opts.swampCost) {
 
-        opts.swampCost = 6
-    }
-    if (!opts.avoidStages) {
+    for (let defaultName in defaultValues) {
 
-        opts.avoidStages = []
-    }
-    if (!opts.flee) {
-
-        opts.flee = false
-    }
-    if (!opts.cacheAmount) {
-
-        opts.cacheAmount = 20
+        if (!opts[defaultName]) opts[defaultName] = defaultValues[defaultName]
     }
 
     let origin = opts.origin

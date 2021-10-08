@@ -218,7 +218,7 @@ function scoutManager(room, creepsWithRole) {
 
                     // See if room can be a new commune
 
-                    if (room.get("sources").length == 2 && room.memory.claimable != true && room.memory.claimable != "notViable" && room.memory.stage != "remoteRoom") {
+                    if (room.get("sources").length == 2 && room.memory.claimable != true && room.memory.claimable != "notViable" && (!room.memory.avoidClaiming || Game.time >= room.memory.avoidClaiming) && room.memory.stage != "remoteRoom") {
 
                         // Make sure room doesn't share an exit with slowmotionghost, a commune, or a possible commune
 

@@ -39,6 +39,7 @@ module.exports = {
 
                 console.log("AQ")
 
+                creep.room.memory.avoidClaiming = Game.time + 20000
                 creep.room.memory.claimable = false
                 Memory.global.newCommune = false
                 Memory.global.communeEstablisher = false
