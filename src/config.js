@@ -1,9 +1,5 @@
 function config() {
 
-    //
-
-    global.cachedValues = { time: Game.time }
-
     // Eventually move this to tickConfig
 
     if (!Memory.data) {
@@ -82,17 +78,31 @@ function config() {
         let room = Game.rooms[roomName]
 
         let controller = room.get("controller")
+
+        // Make sure room has a controller and the controller is mine
+
         if (!controller || !controller.my) continue
 
+        // Add commune name to communes list
+
         Memory.global.communes.push(roomName)
+
+        // Add energy in room to total energy
+
+        Memory.global.totalEnergy += room.get("storedEnergy")
+
+        // If room is stage 8 add it to establishedCommunes list
+
         if (room.memory.stage == 8) Memory.global.establishedRooms.push(roomName)
+
+        // Create values for the room
 
         let roomValues = {
             remoteRooms: {},
             deposits: {},
-            boosts: {},
-            storedEnergy: 0,
         }
+
+        // Assign values to the room memory
 
         for (let value in roomValues) {
 

@@ -35,24 +35,17 @@ function globalManager() {
         Memory.global.globalStage = 0
     }
 
-    //
-
-    for (let roomName in Game.rooms) {
-
-        room = Game.rooms[roomName]
-
-        if (!room.controller || !room.controller.my) continue
-
-        Memory.global.totalEnergy += room.get("storedEnergy")
-    }
-
     if (Game.shard.name == "shard2") {
 
-        if (Game.cpu.bucket == 10000) {
-            Game.cpu.generatePixel();
-        }
+        // If bucket is full generate a pixel
 
-        if (Game.resources.pixel > 10 && Object.values(Game.market.orders).length < 100) {
+        if (Game.cpu.bucket == 10000) Game.cpu.generatePixel()
+
+        // If there are more than 10 pixels and no pixel sell orders
+
+        if (Game.resources.pixel > 10 && findOrders(ORDER_SELL, PIXEL).length == 0) {
+
+            // Make a pixel sell order
 
             Game.market.createOrder({ type: ORDER_SELL, resourceType: PIXEL, price: avgPrice(PIXEL) * 0.7, totalAmount: 10 })
         }
@@ -64,16 +57,30 @@ function globalManager() {
 
     function newCommuneFinder() {
 
-        if ((!Memory.global.newCommune || !Memory.global.communeEstablisher) && Game.gcl.level > Memory.global.communes.length && Memory.global.claimableRooms.length > 0) {
+        // Confirm that there isn't already a valid newCommune and communeEstablisher
 
-            let establishingInfo = findBestNewCommune()
+        if (Memory.global.newCommune && Memory.global.communeEstablisher && Memory.global.communes.includes(Memory.global.communeEstablisher)) return
 
-            if (!establishingInfo) return
+        // Make sure we have the GCL to claim a new room
 
-            Memory.global.newCommune = establishingInfo.newCommune
-            Memory.global.communeEstablisher = establishingInfo.communeEstablisher
-        }
+        if (Game.gcl.level == Memory.global.communes.length) return
 
+        // Make sure claimable rooms exist
+
+        if (Memory.global.claimableRooms.length == 0) return
+
+        // Get establishing information
+
+        let establishingInfo = findBestNewCommune()
+
+        // Make sure it is valid
+
+        if (!establishingInfo) return
+
+        // If so fulfill claim request data
+
+        Memory.global.newCommune = establishingInfo.newCommune
+        Memory.global.communeEstablisher = establishingInfo.communeEstablisher
     }
 
     // Attack room logic
