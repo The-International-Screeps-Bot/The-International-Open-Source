@@ -11,7 +11,9 @@
 
 The Internationale is my bot for the MMO server, thematically based after communist aesthetics. The goal of The Internationale is to set up a fully autonomous communism zone in shard 2. Owned rooms are called communes, offensive and defensive forces are called the Red Army, economic workers are known as the Proletariat, and the Revolutionaries establish new communes and rebuild destroyed ones.
 
-The bot is not meant for use or forking, please do not use it as such. It is simply intented to provide experienced and new players a reference for when they get stuck, need inspiration, or want to laugh at some terrible code. The bot is intended to be automated, but can perform manual actions via the console, and has an information panel showing progress, events, economy and military, as well as, if integrated, the current state and events allies are undergoing.
+This bot intented to provide experienced and new players a reference for when they get stuck, need inspiration, or want to laugh at some terrible code. Feel welcome to fork it and otherwise use it, however do not be overly agressive on the Screeps world, especially to newer players. The bot is intended to be automated, but can perform manual actions via the console, and has an information panel showing progress, events, economy and military, as well as, if integrated, the current state and events allies are undergoing.
+
+Please create an issue for feature requests or help. I'll add a usage guide sometime soon. If you have specific questions or want to discuss the bot, DM me on discord: Carson Burke A&0#6757.
 
 ![Information Panel](images/infopanel.png)
 
@@ -25,64 +27,6 @@ https://trello.com/b/BIZ8G8je/the-internationale-screeps-bot
 
 ### Flowchart
 
-https://cloud.smartdraw.com/share.aspx/?pubDocShare=253503CFB284B9C4323DA9A85219E9857F3
+(I haven't done much work on the flowchart yet)
 
-- [x] Setup info to be displayed in Grafana
-- [x] Automated spawning
-- [x] Claim and operation of multiple rooms
-- [x] Remote mining
-- [x] Primitive defence code
-- [x] Operation of multiple spawns in a room
-- [x] Spawn que
-- [x] Automated road placement
-- [x] Automated base construction and room planning
-- [x] Automatic market buy and sell orders
-- [x] Produce boosts
-- [x] Attacker dous
-- [ ] Have resources come into terminal when room under attack
-- [x] Spawning of power creeps
-- [x] Power creep operations
-- [ ] Creep boosting
-- [x] Automated wall and rampart placement
-- [ ] Power bank collection
-- [ ] Commodity collection
-- [x] Automated scouting
-- [x] Basic factory operations
-- [ ] Commodity factory opperations
-- [x] Automated intel on enemies
-- [ ] Automated attacking
-- [ ] Different, functional room blueprints depending on room size and shape
-- [x] Automated recording of viable rooms to claim
-- [x] Automated claiming of rooms
-- [x] Automated recording of viable remote harvesting rooms
-- [x] Add room and map visuals to display important information
-- [ ] Power creep offensive capabilities
-- [ ] Automatic safemode when boosted attackers
-- [x] Advanced targeting for towers
-- [ ] Recording and predicting for like attackers
-- [ ] Assisting of defending rooms using safe rooms in case of power creep assisted attack
-- [ ] Weighting of rooms from economic to military depending on recent history and neighbours
-- [x] Communication and coordination between rooms about global stage, economy, threats
-- [x] Advanced pathing to avoid rooms with known threats
-- [x] Have nearest rooms establish and claim rooms
-- [ ] Spawn specific defender creeps depending on attackers
-- [ ] Determine if boosting is necessary for defenders or attackers
-- [x] Have defenders move to ramparts near attackers
-- [x] Spawn new civilian creeps when TTL is less than time to spawn
-- [x] Information panel to provide information about the development of the bot
-- [ ] Communication with allies via the public segment
-- [x] Create a task manager to avoid creeps switching tasks halfway through
-- [x] Make the task manager track and tell creeps what jobs to do
-- [ ] Track remote room attacks from enemy players and run logic to abolish it, defend it, or leave it as is
-- [ ] Create GCL temples if there is excess energy and proper globalStage
-- [x] Operation of nukers
-- [ ] Automated use of nukers
-- [ ] Squads morph size shape and amount depending on situation
-- [x] Squads flee when overwhelmed or avoiding range of enemy
-- [x] Haulers to manage mineral containers
-- [ ] Traffic manager to improve pathing
-- [ ] Stationary builders harvesters and upgraders at low rcl
-- [x] Commodity scouting and recording
-- [ ] Power bank scouting and recording
-- [ ] Hauler re-write based purely on commands
-- [x] Squad different possible sizes (duo, quad, etc.)
+https://cloud.smartdraw.com/share.aspx/?pubDocShare=253503CFB284B9C4323DA9A85219E9857F3
