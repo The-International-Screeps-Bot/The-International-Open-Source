@@ -28,5 +28,3 @@ https://trello.com/b/BIZ8G8je/the-internationale-screeps-bot
 ### Flowchart
 
 (I haven't done much work on the flowchart yet)
-
-https://cloud.smartdraw.com/share.aspx/?pubDocShare=253503CFB284B9C4323DA9A85219E9857F3
