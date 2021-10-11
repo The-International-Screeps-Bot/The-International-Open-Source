@@ -41,7 +41,7 @@ module.exports = {
                 filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK]) && enemyCreep.owner.username != "Invader"
             })
 
-            if ((controller.owner && !controller.my) || controller.reservation || creep.room.memory.stage >= 3 || creep.room.get("hostileCreeps").length > 0) {
+            if ((controller.owner && !controller.my) || controller.reservation || creep.room.memory.stage >= 3 || enemyAttackers.length > 0) {
 
                 console.log("AQ")
 
