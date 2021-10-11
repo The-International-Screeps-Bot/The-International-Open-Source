@@ -6,6 +6,8 @@ module.exports = {
 
         const newCommune = Memory.global.newCommune
 
+        const room = creep.room
+
         if (!newCommune) {
 
             roleBuilder.run(creep)
@@ -34,6 +36,10 @@ module.exports = {
         } else {
 
             let controller = creep.room.get("controller")
+
+            let enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+                filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK]) && enemyCreep.owner.username != "Invader"
+            })
 
             if ((controller.owner && !controller.my) || controller.reservation || creep.room.memory.stage >= 3 || creep.room.get("hostileCreeps").length > 0) {
 

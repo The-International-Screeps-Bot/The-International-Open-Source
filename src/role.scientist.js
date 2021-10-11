@@ -20,6 +20,17 @@ module.exports = {
 
         const task = creep.memory.task
 
+        function findTask() {
+
+
+        }
+
+        if (!task) findTask()
+
+        if (!task) return
+
+
+
         /* if (!creep.memory.reaction) {
 
             for (let baseResource of Object.values(resources)) {

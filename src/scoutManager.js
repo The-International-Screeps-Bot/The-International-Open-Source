@@ -128,7 +128,11 @@ function scoutManager(room, creepsWithRole) {
                     return
                 }
 
+                // Make sure there isn't an owner
+
                 if (controller.owner) return
+
+                // Make sure there is no reservation, or if there is that I nor an invader is reserving
 
                 if (controller.reservation && controller.reservation.username != me && controller.reservation.username != "Invader") return
 
@@ -160,6 +164,78 @@ function scoutManager(room, creepsWithRole) {
                 Memory.rooms[creep.memory.roomFrom].remoteRooms[room.name] = { inUse: false, sources: sourceIds, roads: false, builderNeed: false, enemy: false, invaderCore: false, distance: undefined }
 
                 room.memory.stage = "remoteRoom"
+            }
+
+            // See if room is claimable
+
+            isClaimable()
+
+            function isClaimable() {
+
+                // Make sure room hasn't already been checked
+
+                if (room.memory.claimable == "notViable") return
+
+                // Make sure room isn't already decided as claimable
+
+                if (room.memory.claimable) return
+
+                // Make sure room hasn't been market as to temporarily avoid claiming
+
+                if (room.memory.avoidClaiming && Game.time < room.memory.avoidClaiming) return
+
+                // Make sure room isn't a remote room
+
+                if (room.memory.stage == "remoteRoom") return
+
+                // Make sure room has two sources
+
+                if (room.get("sources").length != 2) {
+
+                    room.memory.claimable = "notViable"
+                    return
+                }
+
+                // Make sure room doesn't share an exit with slowmotionghost, a commune, or a claimable room
+
+                let exits = Game.map.describeExits(room.name)
+
+                for (let property in exits) {
+
+                    let roomName = exits[property]
+
+                    // If room doesn't have a memory continue
+
+                    if (!Memory.rooms[roomName]) return
+
+                    // Check if room has an owner and the owner is slowmotionghost
+
+                    if (Memory.rooms[roomName].owner && Memory.rooms[roomName].owner == "slowmotionghost") return
+
+                    // Confirm room isn't a commune
+
+                    if (Memory.global.communes.includes(roomName)) return
+
+                    // Make sure room isn't claimable
+
+                    if (Memory.rooms[roomName].claimable) return
+                }
+
+                // Make sure there is a spot to put the bunker
+
+                if (!findAnchor(room)) {
+
+                    room.memory.claimable = "notViable"
+                    return
+                }
+
+                // Inform us that this room is claimable
+
+                room.memory.claimable = true
+
+                // If claimableRooms doesn't include this roomName then add it
+
+                if (!Memory.global.claimableRooms.includes(room.name)) Memory.global.claimableRooms.push(room.name)
             }
 
             if (controller.owner) {
@@ -214,60 +290,6 @@ function scoutManager(room, creepsWithRole) {
                     if (room.memory.stage != "remoteRoom") {
 
                         room.memory.stage = "neutralRoom"
-                    }
-
-                    // See if room can be a new commune
-
-                    if (room.get("sources").length == 2 && room.memory.claimable != true && room.memory.claimable != "notViable" && (!room.memory.avoidClaiming || Game.time >= room.memory.avoidClaiming) && room.memory.stage != "remoteRoom") {
-
-                        // Make sure room doesn't share an exit with slowmotionghost, a commune, or a possible commune
-
-                        let nearRoom = false
-
-                        let exits = Game.map.describeExits(room.name)
-
-                        for (let property in exits) {
-
-                            let roomName = exits[property]
-
-                            if (!Memory.rooms[roomName]) continue
-
-                            if ((Memory.rooms[roomName].owner && Memory.rooms[roomName].owner == "slowmotionghost") || Memory.rooms[roomName].stage >= 0 || Memory.rooms[roomName].claimable == true) nearRoom = true
-                        }
-
-                        creep.say("N")
-
-                        if (!nearRoom) {
-
-                            creep.say("NNC")
-
-                            creep.travel({
-                                origin: creep.pos,
-                                goal: { pos: controller.pos, range: 1 },
-                                plainCost: 1,
-                                swampCost: 1,
-                                defaultCostMatrix: room.memory.defaultCostMatrix,
-                                avoidStages: [],
-                                flee: false,
-                                cacheAmount: 2,
-                            })
-
-                            if (findAnchor(room)) {
-
-                                creep.say("CR")
-
-                                room.memory.claimable = true
-
-                                if (!Memory.global.claimableRooms.includes(room.name)) Memory.global.claimableRooms.push(room.name)
-
-                            } else {
-
-                                room.memory.claimable = "notViable"
-                            }
-                        } else {
-
-                            room.memory.claimable = "notViable"
-                        }
                     }
                 }
             }

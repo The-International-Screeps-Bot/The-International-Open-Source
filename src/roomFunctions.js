@@ -487,3 +487,30 @@ Room.prototype.findHealPower = function(hostile, creeps) {
 
     return healPower
 }
+
+Room.prototype.findStoredResourceAmount = function(resourceType) {
+
+    let room = this
+
+    let amount = 0
+
+    // Define structures to search
+
+    let storingStructures = [
+        room.get("storage"),
+        room.get("terminal")
+    ]
+
+    for (let structure of storingStructures) {
+
+        // Make sure structure exists
+
+        if (!structure) continue
+
+        // Add to total amount
+
+        amount += structure.store.getUsedCapacity(resourceType)
+    }
+
+    return amount
+}

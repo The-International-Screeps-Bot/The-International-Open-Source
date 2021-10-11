@@ -7,6 +7,8 @@ module.exports = {
 
         const roomFrom = creep.memory.roomFrom
 
+        const room = creep.room
+
         creep.isFull()
 
         if (creep.memory.isFull) {

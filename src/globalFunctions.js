@@ -45,14 +45,28 @@ global.findBestNewCommune = function() {
 
                     let room = Game.rooms[roomName]
 
-                    if (!room || !room.controller || stage != room.memory.stage) continue
+                    // Make sure room is a commune
+
+                    if (!Memory.global.communes.includes(room.name)) continue
+
+                    // Make sure room isn't owned
+
+                    if (room.memory.stage != "neutralRoom") continue
+
+                    // Make sure the stage is equal to the required stage
+
+                    if (stage != room.memory.stage) continue
+
+                    // Make sure the distance is equal to the maxDistance
 
                     const anchorPoint = room.get("anchorPoint")
 
                     let distance = room.findSafeDistance(anchorPoint, { pos: new RoomPosition(25, 25, potentialNewCommune), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
                     if (distance != maxDistance) continue
 
-                    console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name)
+                    // Add establishing info to array
+
+                    /* console.log("NC, D: " + distance + ", MD: " + maxDistance + ", RN: " + room.name) */
 
                     establishingInfo.push({ communeEstablisher: room.name, newCommune: potentialNewCommune, distance: distance })
                 }
@@ -70,9 +84,9 @@ global.findBestNewCommune = function() {
 
 global.findRobbingRoom = function() {
 
+    // Make sure there isn't already a robTarget and robbingRoom
+
     if (Memory.global.robTarget && Memory.global.robbingRoom) return
-
-
 
     for (let stage = 8; stage > 3; stage--) {
         for (let maxDistance = 0; maxDistance < 10; maxDistance++) {
