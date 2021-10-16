@@ -23,7 +23,7 @@ Creep.prototype.transferToStorageOrTerminal = function(resourceType) {
 
     if (storage && storage.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
 
-        creep.say("S")
+        creep.say("TS")
 
         creep.advancedTransfer(storage, resourceType)
         return true
@@ -33,7 +33,7 @@ Creep.prototype.transferToStorageOrTerminal = function(resourceType) {
 
     if (terminal && terminal.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
 
-        creep.say("T")
+        creep.say("TT")
 
         creep.advancedTransfer(terminal, resourceType)
         return true
@@ -49,7 +49,7 @@ Creep.prototype.withdrawRoomResources = function() {
 
     if (storage && storage.store.getUsedCapacity() > 0) {
 
-        creep.say("S")
+        creep.say("WS")
 
         for (let resourceType in storage.store) {
 
@@ -62,7 +62,7 @@ Creep.prototype.withdrawRoomResources = function() {
 
     if (terminal && terminal.store.getUsedCapacity() > 0) {
 
-        creep.say("T")
+        creep.say("WT")
 
         for (let resourceType in terminal.store) {
 
@@ -85,25 +85,30 @@ Creep.prototype.withdrawStoredResource = function(minAmount, withdrawAmount, res
 
     if (storage) var storageAmount = storage.store.getUsedCapacity(resourceType)
     if (terminal) var terminalAmount = terminal.store.getUsedCapacity(resourceType)
+
     let storedResourceAmount = storageAmount + terminalAmount
+
+    // Stop if storing structures have less than minAmount
 
     if (storedResourceAmount < minAmount) return false
 
-    function targetWithdrawAmount() {
+    function targetWithdrawAmount(structure) {
 
-        if (withdrawAmount) return
+        if (withdrawAmount) return withdrawAmount
 
-        return Math.min(creep.store.getFreeCapacity(), storage.store.getUsedCapacity(resourceType))
+        return Math.min(creep.store.getFreeCapacity(), structure.store.getUsedCapacity(resourceType))
     }
 
     if (storage && storage.store.getUsedCapacity(resourceType) >= targetWithdrawAmount(storage)) {
 
-        creep.say("S")
+        creep.say("WS")
         return creep.advancedWithdraw(storage, resourceType, targetWithdrawAmount(storage))
 
-    } else if (terminal && terminal.store.getUsedCapacity(resourceType) >= targetWithdrawAmount(terminal)) {
+    }
 
-        creep.say("T")
+    if (terminal && terminal.store.getUsedCapacity(resourceType) >= targetWithdrawAmount(terminal)) {
+
+        creep.say("TT")
         return creep.advancedWithdraw(terminal, resourceType, targetWithdrawAmount(terminal))
     }
 

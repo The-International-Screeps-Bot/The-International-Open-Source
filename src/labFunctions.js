@@ -10,6 +10,8 @@ StructureLab.prototype.hasOnlyResource = function(resource) {
 
         if (resourceType == RESOURCE_ENERGY) continue
 
-        return true
+        return
     }
+
+    return true
 }

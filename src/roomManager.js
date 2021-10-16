@@ -304,7 +304,7 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            labs(room, structures, specialStructures)
+            labs(room)
 
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed

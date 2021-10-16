@@ -25,11 +25,15 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
         function findTask() {
 
+            creep.say("FT")
+
             for (let input1 in REACTIONS) {
 
                 if (room.findStoredResourceAmount(input1) < 5000) continue
 
                 for (let input2 in REACTIONS[input1]) {
+
+                    console.log("RESOURCE: " + input2)
 
                     if (room.findStoredResourceAmount(input2) < 5000) continue
 
@@ -51,50 +55,67 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
         creep.isFull()
 
+        //
+
+        let input1 = task.input1
+        let input2 = task.input2
+        let output = task.output
+
         // Check if creep should continue with this task
 
         if (!isTaskActive()) creep.memory.task = undefined
 
         function isTaskActive() {
 
-            if (room.findStoredResourceAmount(task.input1) < creep.store.getCapacity()) return
+            creep.say("NA")
 
-            if (room.findStoredResourceAmount(task.input2) < creep.store.getCapacity()) return
+            if (room.findStoredResourceAmount(input1) < creep.store.getCapacity()) return
 
-            if (room.findStoredResourceAmount(task.output) >= 5000) return
+            if (room.findStoredResourceAmount(input2) < creep.store.getCapacity()) return
+
+            if (room.findStoredResourceAmount(output) >= 5000) return
+
+            creep.say("IA")
 
             return true
         }
-
-        // Make sure none of the labs have the wrong resources
 
         if (emptyPrimaryLab1()) continue
 
         function emptyPrimaryLab1() {
 
+            // Make sure lab only has input1
+
+            if (primaryLabs[0].hasOnlyResource(input1)) return
+
+            creep.say("OR")
+
             // If creep is full
 
             if (creep.memory.isFull) {
+
+                creep.say("EC")
 
                 // Empty all resources to storing structures
 
                 for (let resourceType in creep.store) {
 
                     creep.transferToStorageOrTerminal(resourceType)
+                    return true
                 }
             }
 
-            // Make sure lab only has input1
+            // Withdraw all resources besides input1
 
-            if (primaryLabs[0].hasOnlyResource(task.input1)) return
-
-            creep.withdrawAllResources(primaryLabs[0], [task.input1])
+            creep.withdrawAllResources(primaryLabs[0], [input1])
             return true
         }
 
         if (fillPrimaryLab1()) continue
 
         function fillPrimaryLab1() {
+
+            creep.say("LF")
 
             // Stop if lab has more than half of creeps capacity
 
@@ -104,6 +125,8 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
             if (creep.store.getUsedCapacity() > 0 && creep.store.getUsedCapacity() != creep.store.getUsedCapacity(input1)) {
 
+                creep.say("OR")
+
                 // Then put the other resources in storage
 
                 for (let resourceType in creep.store) {
@@ -111,6 +134,7 @@ module.exports = function scientistManager(room, creepsWithRole) {
                     if (resourceType == input1) continue
 
                     creep.transferToStorageOrTerminal(resourceType)
+                    return true
                 }
             }
 
@@ -118,14 +142,101 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
             if (!creep.memory.isFull) {
 
+                console.log(creep.store.getUsedCapacity() + ", " + creep.memory.isFull)
+
+                creep.say("WR")
+
                 // Get the resource from a storing structure
 
-                creep.withdrawStoredResource(creep.store.getFreeCapacity(), creep.store.getFreeCapacity(), task.input1)
+                creep.withdrawStoredResource(creep.store.getFreeCapacity(), creep.store.getFreeCapacity(), input1)
+                return true
             }
 
             // Transfer correct resource to lab
 
+            creep.say("TR")
+
             creep.advancedTransfer(primaryLabs[0], input1)
+            return true
+        }
+
+        if (emptyPrimaryLab2()) continue
+
+        function emptyPrimaryLab2() {
+
+            // Make sure lab only has input2
+
+            if (primaryLabs[1].hasOnlyResource(input2)) return
+
+            creep.say("OR")
+
+            // If creep is full
+
+            if (creep.memory.isFull) {
+
+                creep.say("EC")
+
+                // Empty all resources to storing structures
+
+                for (let resourceType in creep.store) {
+
+                    creep.transferToStorageOrTerminal(resourceType)
+                    return true
+                }
+            }
+
+            // Withdraw all resources besides input2
+
+            creep.withdrawAllResources(primaryLabs[1], [input2])
+            return true
+        }
+
+        if (fillPrimaryLab2()) continue
+
+        function fillPrimaryLab2() {
+
+            creep.say("LF")
+
+            // Stop if lab has more than half of creeps capacity
+
+            if (primaryLabs[1].store.getUsedCapacity(input2) > creep.store.getCapacity() * 0.5) return
+
+            // If creep has resources that aren't input2
+
+            if (creep.store.getUsedCapacity() > 0 && creep.store.getUsedCapacity() != creep.store.getUsedCapacity(input2)) {
+
+                creep.say("OR")
+
+                // Then put the other resources in storage
+
+                for (let resourceType in creep.store) {
+
+                    if (resourceType == input2) continue
+
+                    creep.transferToStorageOrTerminal(resourceType)
+                    return true
+                }
+            }
+
+            // If creep is not full
+
+            if (!creep.memory.isFull) {
+
+                console.log(creep.store.getUsedCapacity() + ", " + creep.memory.isFull)
+
+                creep.say("WR")
+
+                // Get the resource from a storing structure
+
+                creep.withdrawStoredResource(creep.store.getFreeCapacity(), creep.store.getFreeCapacity(), input2)
+                return true
+            }
+
+            // Transfer correct resource to lab
+
+            creep.say("TR")
+
+            creep.advancedTransfer(primaryLabs[1], input2)
             return true
         }
 

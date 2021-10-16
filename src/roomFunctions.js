@@ -514,3 +514,8 @@ Room.prototype.findStoredResourceAmount = function(resourceType) {
 
     return amount
 }
+
+Room.prototype.scoreRoomClaimability = function() {
+
+
+}
