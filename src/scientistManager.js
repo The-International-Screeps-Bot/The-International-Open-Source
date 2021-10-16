@@ -267,7 +267,7 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
                     // Withdraw it
 
-                    creep.withdrawAllResources(primaryLabs[1], [input2])
+                    creep.withdrawAllResources(secondaryLab, [output])
                     return true
                 }
 

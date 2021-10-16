@@ -221,6 +221,8 @@ module.exports = function visuals(room) {
             })
         }
 
+        // Minerals
+
         if (lab.store[RESOURCE_HYDROGEN]) {
 
             room.visual.text("H", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
@@ -249,7 +251,8 @@ module.exports = function visuals(room) {
 
             room.visual.text("X", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
         }
-        //Base
+
+        // Base
         else if (lab.store[RESOURCE_HYDROXIDE]) {
 
             room.visual.text("OH", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
@@ -267,7 +270,8 @@ module.exports = function visuals(room) {
             room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
 
         }
-        //Tier 1
+
+        // Tier 
         else if (lab.store[RESOURCE_UTRIUM_HYDRIDE]) {
 
             room.visual.text("OH", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
@@ -309,7 +313,8 @@ module.exports = function visuals(room) {
             room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
 
         }
-        //Tier 2
+
+        // Tier 2
         else if (lab.store[RESOURCE_UTRIUM_ACID]) {
 
             room.visual.text("OH", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
@@ -351,7 +356,8 @@ module.exports = function visuals(room) {
             room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
 
         }
-        //Tier 3
+
+        // Tier 3
         else if (lab.store[RESOURCE_CATALYZED_UTRIUM_ACID]) {
 
             room.visual.text("XOH", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
