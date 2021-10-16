@@ -503,7 +503,7 @@ Creep.prototype.withdrawAllResources = function(target, blacklist) {
 
         // Withdraw resource and exit the function
 
-        creep.advancedWithdraw(target, resource)
+        creep.advancedWithdraw(target, resourceType)
         return true
     }
 }
