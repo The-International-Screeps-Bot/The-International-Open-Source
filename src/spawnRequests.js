@@ -1123,9 +1123,9 @@ module.exports = function spawnRequests(room) {
         role: "scientist",
         parts: {
             300: {
-                defaultParts: [carryPart, carryPart, movePart, carryPart, carryPart, movePart, carryPart, carryPart, movePart],
-                extraParts: [],
-                maxParts: 8
+                defaultParts: [],
+                extraParts: [carryPart, carryPart, movePart],
+                maxParts: 0
             }
         },
         memoryAdditions: {}
