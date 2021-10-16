@@ -33,8 +33,6 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
                 for (let input2 in REACTIONS[input1]) {
 
-                    console.log("RESOURCE: " + input2)
-
                     if (room.findStoredResourceAmount(input2) < 5000) continue
 
                     let output = REACTIONS[input1][input2]
@@ -144,8 +142,6 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
             if (!creep.memory.isFull) {
 
-                console.log(creep.store.getUsedCapacity() + ", " + creep.memory.isFull)
-
                 creep.say("WR")
 
                 // Get the resource from a storing structure
@@ -226,8 +222,6 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
             if (!creep.memory.isFull) {
 
-                console.log(creep.store.getUsedCapacity() + ", " + creep.memory.isFull)
-
                 creep.say("WR")
 
                 // Get the resource from a storing structure
@@ -264,8 +258,6 @@ module.exports = function scientistManager(room, creepsWithRole) {
                     return true
                 }
             }
-
-            console.log("HERE: " + secondaryLabs)
 
             for (let secondaryLab of secondaryLabs) {
 

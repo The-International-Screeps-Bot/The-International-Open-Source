@@ -294,8 +294,6 @@ Room.prototype.get = function(roomVar) {
             cache.harvestPositions[sourceName].closest = roomVars.anchorPoint.findClosestByRange(cache.harvestPositions[sourceName].positions)
         }
 
-        console.log("hi")
-
         for (let object in cache) {
 
             room.memory[object] = cache[object]
@@ -346,8 +344,6 @@ Room.prototype.get = function(roomVar) {
 
             cache.linkPositions[sourceName] = roomVars.anchorPoint.findClosestByRange(cache.linkPositions[sourceName].positions)
         }
-
-        console.log("hi")
 
         for (let object in cache) {
 
