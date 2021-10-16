@@ -1,4 +1,4 @@
-function visuals(room) {
+module.exports = function visuals(room) {
 
     if (!Memory.global.roomVisuals) return
 
@@ -195,7 +195,7 @@ function visuals(room) {
 
     for (let lab of room.get("labs")) {
 
-        if (primaryLabs && primaryLabs.includes(lab)) {
+        if (primaryLabs.includes(lab)) {
 
             room.visual.circle(lab.pos, {
                 fill: 'transparent',
@@ -203,7 +203,7 @@ function visuals(room) {
                 stroke: '#39A0ED',
                 strokeWidth: 0.125
             })
-        } else if (secondaryLabs && secondaryLabs.includes(lab)) {
+        } else if (secondaryLabs.includes(lab)) {
 
             room.visual.circle(lab.pos, {
                 fill: 'transparent',
@@ -211,7 +211,7 @@ function visuals(room) {
                 stroke: '#2DF0C9',
                 strokeWidth: 0.125
             })
-        } else if (tertiaryLabs && tertiaryLabs.includes(lab)) {
+        } else if (tertiaryLabs.includes(lab)) {
 
             room.visual.circle(lab.pos, {
                 fill: 'transparent',
@@ -423,6 +423,3 @@ function visuals(room) {
         room.visual.text(densityDisplay, mineral.pos.x, mineral.pos.y - 2, { align: 'center', color: colors.neutralYellow, opacity: "0.8" })
     }
 }
-
-module.exports = visuals
-module.exports = visuals

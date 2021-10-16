@@ -334,6 +334,95 @@ Creep.prototype.pickupDroppedEnergy = function(target) {
     }
 }
 
+Creep.prototype.waitAwayFromAnchorPoint = function() {
+
+    const creep = this
+    const room = creep.room
+
+    const anchorPoint = room.get("anchorPoint")
+
+    // Stop if creep is 6 away from anchorPoint
+
+    if (creep.pos.getRangeTo(anchorPoint) == 6) return true
+
+    // If creep is more than 6 from anchorPoint
+
+    if (creep.pos.getRangeTo(anchorPoint) > 6) {
+
+        // Move to anchorPoint
+
+        creep.travel({
+            origin: creep.pos,
+            goal: { pos: anchorPoint, range: 6 },
+            plainCost: 1,
+            swampCost: false,
+            defaultCostMatrix: false,
+            avoidStages: [],
+            flee: false,
+            cacheAmount: 10,
+        })
+
+        return true
+    }
+
+    // Otherwise flee from anchorPoint
+
+    creep.travel({
+        origin: creep.pos,
+        goal: { pos: anchorPoint, range: 6 },
+        plainCost: 1,
+        swampCost: false,
+        defaultCostMatrix: false,
+        avoidStages: [],
+        flee: true,
+        cacheAmount: 10,
+    })
+
+    return true
+}
+
+Creep.prototype.wait = function() {
+
+    let creep = this
+    let room = creep.room
+
+    if (waitAwayFromAnchorPoint()) return true
+
+    function waitAwayFromAnchorPoint() {
+
+        if (creep.pos.getRangeTo(anchorPoint) == 6) return true
+
+        if (creep.pos.getRangeTo(anchorPoint) > 6) {
+
+            creep.travel({
+                origin: creep.pos,
+                goal: { pos: anchorPoint, range: 6 },
+                plainCost: 1,
+                swampCost: false,
+                defaultCostMatrix: false,
+                avoidStages: [],
+                flee: false,
+                cacheAmount: 10,
+            })
+
+            return true
+        }
+
+        creep.travel({
+            origin: creep.pos,
+            goal: { pos: anchorPoint, range: 6 },
+            plainCost: 1,
+            swampCost: false,
+            defaultCostMatrix: false,
+            avoidStages: [],
+            flee: true,
+            cacheAmount: 10,
+        })
+
+        return true
+    }
+}
+
 Creep.prototype.advancedWithdraw = function(target, resource, amount) {
 
     creep = this

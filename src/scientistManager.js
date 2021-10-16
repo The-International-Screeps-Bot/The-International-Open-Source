@@ -80,6 +80,8 @@ module.exports = function scientistManager(room, creepsWithRole) {
             return true
         }
 
+        // Operate primaryLab1
+
         if (emptyPrimaryLab1()) continue
 
         function emptyPrimaryLab1() {
@@ -159,6 +161,8 @@ module.exports = function scientistManager(room, creepsWithRole) {
             creep.advancedTransfer(primaryLabs[0], input1)
             return true
         }
+
+        // Operate primaryLab2
 
         if (emptyPrimaryLab2()) continue
 
@@ -240,20 +244,49 @@ module.exports = function scientistManager(room, creepsWithRole) {
             return true
         }
 
-        //
+        // Operate secondaryLabs
 
-        /* if (isSecondaryLabsIncorrect()) continue
+        if (emptySecondaryLabs()) continue
 
-        function isSecondaryLabsIncorrect() {
+        function emptySecondaryLabs() {
 
-            for (let lab of secondaryLabs) {
+            // If creep is full
 
-                if (!lab.hasOnlyResource(task.output)) {
+            if (creep.memory.isFull) {
 
-                    creep.withdrawAllResources(lab, [task.output])
+                creep.say("EC")
+
+                // Empty all resources to storing structures
+
+                for (let resourceType in creep.store) {
+
+                    creep.transferToStorageOrTerminal(resourceType)
                     return true
                 }
             }
-        } */
+
+            console.log("HERE: " + secondaryLabs)
+
+            for (let secondaryLab of secondaryLabs) {
+
+                // If lab has resource besides output
+
+                if (!secondaryLab.hasOnlyResource(output)) {
+
+                    // Withdraw it
+
+                    creep.withdrawAllResources(primaryLabs[1], [input2])
+                    return true
+                }
+
+                if (secondaryLab.store.getUsedCapacity(output) >= creep.store.getFreeCapacity()) {
+
+                    creep.advancedWithdraw(secondaryLab, output)
+                    return true
+                }
+            }
+        }
+
+        if (creep.waitAwayFromAnchorPoint()) continue
     }
 }
