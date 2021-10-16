@@ -1,4 +1,6 @@
-function labs(room, labs, primaryLabs, secondaryLabs, tertiaryLabs) {
+require("labFunctions")
+
+module.exports = function labs(room, labs, primaryLabs, secondaryLabs, tertiaryLabs) {
 
     if (labs.length == 0) return
 
@@ -13,5 +15,3 @@ function labs(room, labs, primaryLabs, secondaryLabs, tertiaryLabs) {
         }
     }
 }
-
-module.exports = labs
