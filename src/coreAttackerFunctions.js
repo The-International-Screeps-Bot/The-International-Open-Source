@@ -1,44 +1,4 @@
-Creep.prototype.findHostiles = function() {
-
-    let creep = this
-    let room = creep.room
-
-    let enemyCreeps = room.find(FIND_HOSTILE_CREEPS, {
-        filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM, HEAL])
-    })
-
-    if (enemyCreeps.length == 0) return { enemyCreeps: enemyCreeps }
-
-    function findClosestEnemyCreep() {
-
-        let enemiesNotOnEdge = enemyCreeps.filter(enemyCreep => !enemyCreep.isEdge())
-
-        if (enemiesNotOnEdge.length == 0) return false
-
-        let enemyCreep = creep.pos.findClosestByRange(enemiesNotOnEdge)
-        return enemyCreep
-    }
-
-    function findClosestEnemyAttacker() {
-
-        let enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-            filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK])
-        })
-
-        if (enemyAttackers.length == 0) return false
-
-        let enemiesNotOnEdge = enemyAttackers.filter(enemyCreep => !enemyCreep.isEdge())
-
-        if (enemiesNotOnEdge.length == 0) return false
-
-        let enemyAttacker = creep.pos.findClosestByRange(enemiesNotOnEdge)
-        return enemyAttacker
-    }
-
-    return { enemyCreeps: enemyCreeps, enemyCreep: findClosestEnemyCreep(), enemyAttacker: findClosestEnemyAttacker() }
-}
-
-Creep.prototype.advancedAttackHostiles = function(enemyCreeps, enemyCreep, enemyAttacker) {
+Creep.prototype.advancedAttackEnemys = function(enemyCreeps, enemyCreep, enemyAttacker) {
 
     let creep = this
 

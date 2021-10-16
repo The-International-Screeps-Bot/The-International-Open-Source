@@ -3,17 +3,17 @@ module.exports = {
 
         creep.say("Broke")
 
-        let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-            filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+        let closestEnemy = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+            filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
         })
 
         creep.say("No Enemy")
 
-        if (closestHostile) {
+        if (closestEnemy) {
 
             creep.say("Enemy")
 
-            let rampart = closestHostile.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+            let rampart = closestEnemy.pos.findClosestByRange(FIND_MY_STRUCTURES, {
                 filter: s => s.structureType == STRUCTURE_RAMPART
             })
 
@@ -27,24 +27,24 @@ module.exports = {
 
                 creep.rampartPathing(creep.pos, goal)
 
-                if (creep.pos.getRangeTo(closestHostile) == 1) {
+                if (creep.pos.getRangeTo(closestEnemy) == 1) {
 
                     creep.rangedMassAttack()
                 } else {
 
-                    creep.rangedAttack(closestHostile)
+                    creep.rangedAttack(closestEnemy)
                 }
             } else {
 
                 creep.say("NE")
 
-                if (!(closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) {
+                if (!(closestEnemy.pos.x <= 0 || closestEnemy.pos.x >= 49 || closestEnemy.pos.y <= 0 || closestEnemy.pos.y >= 49)) {
 
                     creep.say("H")
 
-                    if (creep.pos.getRangeTo(closestHostile) > 3) {
+                    if (creep.pos.getRangeTo(closestEnemy) > 3) {
 
-                        let goal = _.map([closestHostile], function(rampart) {
+                        let goal = _.map([closestEnemy], function(rampart) {
                             return { pos: rampart.pos, range: 1 }
                         })
 
@@ -52,18 +52,18 @@ module.exports = {
 
                     } else {
 
-                        if (creep.pos.getRangeTo(closestHostile) == 1) {
+                        if (creep.pos.getRangeTo(closestEnemy) == 1) {
 
                             creep.rangedMassAttack()
 
-                        } else if (creep.pos.getRangeTo(closestHostile) <= 3) {
+                        } else if (creep.pos.getRangeTo(closestEnemy) <= 3) {
 
-                            creep.rangedAttack(closestHostile)
+                            creep.rangedAttack(closestEnemy)
                         }
                     }
-                    if (creep.pos.getRangeTo(closestHostile) <= 2) {
+                    if (creep.pos.getRangeTo(closestEnemy) <= 2) {
 
-                        let goal = _.map([closestHostile], function(rampart) {
+                        let goal = _.map([closestEnemy], function(rampart) {
                             return { pos: rampart.pos, range: 3 }
                         })
 

@@ -37,7 +37,7 @@ module.exports = {
                 }
             }
 
-            creep.avoidHostiles()
+            creep.avoidEnemys()
 
         } else {
 

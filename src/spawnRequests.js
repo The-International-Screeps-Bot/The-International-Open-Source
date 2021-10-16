@@ -1,6 +1,6 @@
 let creepData = require("creepData")
 
-function spawnRequests(room) {
+module.exports = function spawnRequests(room) {
 
     // Import variables we need
 
@@ -11,6 +11,8 @@ function spawnRequests(room) {
         creepsOfRemoteRole
     } = creepData()
 
+    //
+
     for (let role of rolesList) {
 
         if (!creepsOfRole[[role, room.name]]) {
@@ -18,6 +20,8 @@ function spawnRequests(room) {
             creepsOfRole[[role, room.name]] = 0
         }
     }
+
+    //
 
     for (let role of remoteRoles) {
 
@@ -30,26 +34,28 @@ function spawnRequests(room) {
         }
     }
 
+    //
+
     if (room.memory.stage && room.memory.stage < 3) {
 
-        var hostiles = room.find(FIND_HOSTILE_CREEPS, {
+        var enemys = room.find(FIND_HOSTILE_CREEPS, {
             filter: (c) => {
-                return (allyList.indexOf(c.owner.username) === -1 && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+                return (allyList.includes(c.owner.username) && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
             }
         })
 
     } else {
 
-        var hostiles = room.find(FIND_HOSTILE_CREEPS, {
+        var enemys = room.find(FIND_HOSTILE_CREEPS, {
             filter: (c) => {
-                return (allyList.indexOf(c.owner.username) === -1 && c.owner.username != "Invader" && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
+                return (allyList.includes(c.owner.username) && c.owner.username != "Invader" && (c.body.some(i => i.type === ATTACK) || c.body.some(i => i.type === RANGED_ATTACK) || c.body.some(i => i.type === HEAL) || c.body.some(i => i.type === WORK) || c.body.some(i => i.type === CLAIM) || c.body.some(i => i.type === CARRY)))
             }
         })
     }
 
-    if (hostiles.length > 0) {
+    if (enemys.length > 0) {
 
-        Memory.global.lastDefence.attacker = hostiles[0].owner.username
+        Memory.global.lastDefence.attacker = enemys[0].owner.username
         Memory.global.lastDefence.time = Game.time
         Memory.global.lastDefence.room = room.name
     }
@@ -179,13 +185,11 @@ function spawnRequests(room) {
 
             minCreeps["hauler"] = 2
 
-            /* minCreeps["scientist"] = 1 */
             break
         case 8:
 
             minCreeps["hauler"] = 2
 
-            /* minCreeps["scientist"] = 1 */
             break
     }
 
@@ -218,7 +222,9 @@ function spawnRequests(room) {
         }
     }
 
-    (function() {
+    attackCreeps()
+
+    function attackCreeps() {
 
         if (storage && storage.store[RESOURCE_ENERGY] <= 20000) {
 
@@ -230,7 +236,7 @@ function spawnRequests(room) {
             minCreeps["antifaAssaulter"] = 4
             minCreeps["antifaSupporter"] = creepsOfRole[["antifaAssaulter", room.name]]
         }
-    })()
+    }
 
     if (roomConstructionSite.length > 0) {
         if (!storage) {
@@ -321,7 +327,7 @@ function spawnRequests(room) {
                 minCreeps["rampartUpgrader"] = 1
             }
 
-            if (hostiles.length > 0 && room.get("storedEnergy") > 10000 && creepsOfRole[["meleeDefender", room.name]] > 0) {
+            if (enemys.length > 0 && room.get("storedEnergy") > 10000 && creepsOfRole[["meleeDefender", room.name]] > 0) {
 
                 minCreeps["rampartUpgrader"] += 2
             }
@@ -333,7 +339,7 @@ function spawnRequests(room) {
         minCreeps["stationaryHauler"] = 1
     }
 
-    if (hostiles.length > 0) {
+    if (enemys.length > 0) {
 
         minCreeps["rangedDefender"] = 0
 
@@ -473,6 +479,17 @@ function spawnRequests(room) {
 
         minCreeps["upgradeHauler"] = 1
         minCreeps["upgrader"] += 2
+    }
+
+    minScientists()
+
+    function minScientists() {
+
+        // Make sure room has a terminal
+
+        if (!room.get("terminal")) return
+
+        minCreeps.scientist = 1
     }
 
     let requiredCreeps = {}
@@ -900,7 +917,7 @@ function spawnRequests(room) {
                 // For every x stored energy add y parts
                 let storedEnergyReducer = 12000
 
-                if (hostiles.length > 0 && room.get("storedEnergy") > 10000 && creepsOfRole[["meleeDefender", room.name]] > 0) {
+                if (enemys.length > 0 && room.get("storedEnergy") > 10000 && creepsOfRole[["meleeDefender", room.name]] > 0) {
 
                     storedEnergyReducer = 10000
                 }
@@ -1392,5 +1409,3 @@ function spawnRequests(room) {
         roleOpts: roleOpts,
     }
 }
-
-module.exports = spawnRequests

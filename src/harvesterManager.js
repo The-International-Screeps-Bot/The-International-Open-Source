@@ -111,7 +111,7 @@ function harvesterManager(room, creepsWithRole) {
             }
         }
 
-        creep.avoidHostiles()
+        creep.avoidEnemys()
     }
 }
 

@@ -472,6 +472,6 @@ module.exports = {
             }
         }
 
-        if (creep.room.controller && creep.room.controller.level < 4) creep.avoidHostiles()
+        if (creep.room.controller && creep.room.controller.level < 4) creep.avoidEnemys()
     }
 };

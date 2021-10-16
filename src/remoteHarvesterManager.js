@@ -10,7 +10,7 @@ function remoteHarvesterManager(room, creepsWithRole) {
 
         if (!remoteRoom) return false
 
-        if (creep.avoidHostiles()) continue
+        if (creep.avoidEnemys()) continue
 
         if (room.name == remoteRoom) {
 

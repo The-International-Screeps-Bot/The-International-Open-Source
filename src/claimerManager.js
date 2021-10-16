@@ -6,7 +6,7 @@ function claimerManager(room, creepsWithRole) {
 
     for (let creep of creepsWithRole) {
 
-        if (creep.avoidHostiles()) continue
+        if (creep.avoidEnemys()) continue
 
         const newCommune = Memory.global.newCommune
 

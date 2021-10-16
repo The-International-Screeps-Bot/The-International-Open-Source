@@ -64,7 +64,7 @@ function builderManager(room, creepsWithRole) {
 
     for (let creep of creepsWithRole) {
 
-        if (creep.avoidHostiles()) continue
+        if (creep.avoidEnemys()) continue
 
         creep.isFull()
         const isFull = creep.memory.isFull

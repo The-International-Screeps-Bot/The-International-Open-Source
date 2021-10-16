@@ -1,8 +1,8 @@
+require("coreAttackerFunctions")
+
 function coreAttackerManager(room, creepsWithRole) {
 
     if (creepsWithRole.length == 0) return
-
-    require("coreAttackerFunctions")
 
     for (let creep of creepsWithRole) {
 
@@ -53,11 +53,11 @@ function coreAttackerManager(room, creepsWithRole) {
         }
         if (room.name == roomFrom) {
 
-            let enemyCreepsObject = creep.findHostiles()
+            let enemyCreepsObject = creep.findEnemies()
 
             if (creep.defendRamparts(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyAttacker)) continue
 
-            if (creep.advancedAttackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
+            if (creep.advancedAttackEnemys(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
 
             if (creep.wait()) continue
 

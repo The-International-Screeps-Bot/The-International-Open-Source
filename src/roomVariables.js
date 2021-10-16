@@ -9,7 +9,7 @@ function roomVariables(room) {
 
         myCreeps: myCreeps,
         /* allyCreeps: allyCreeps,
-        hostileCreeps: hostileCreeps,
+        enemyCreeps: enemyCreeps,
         invaderCreeps: invaderCreeps, */
     }
 
@@ -20,7 +20,7 @@ function roomVariables(room) {
 
         myCreeps: "",
         allyCreeps: "",
-        hostileCreeps: "",
+        enemyCreeps: "",
     }
 
     function findBuildingConstantOfType(constant, type) {

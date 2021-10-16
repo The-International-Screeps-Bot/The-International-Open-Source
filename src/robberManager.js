@@ -6,7 +6,7 @@ module.exports = function robberManager(room, creepsWithRole) {
 
     for (let creep of creepsWithRole) {
 
-        if (creep.avoidHostiles()) continue
+        if (creep.avoidEnemys()) continue
 
         const roomFrom = creep.memory.roomFrom
         const robTarget = creep.memory.robTarget

@@ -167,9 +167,9 @@ function antifa(room, creeps) {
                 }
             }
 
-            function attackHostile() {
+            function attackEnemy() {
 
-                let closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                let closestEnemy = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
                     filter: (c) => {
                         return (!allyList.includes(c.owner.username))
                     }
@@ -181,7 +181,7 @@ function antifa(room, creeps) {
                     }
                 })
 
-                if (!closestHostile || (closestHostile.pos.x <= 0 || closestHostile.pos.x >= 49 || closestHostile.pos.y <= 0 || closestHostile.pos.y >= 49)) return false
+                if (!closestEnemy || (closestEnemy.pos.x <= 0 || closestEnemy.pos.x >= 49 || closestEnemy.pos.y <= 0 || closestEnemy.pos.y >= 49)) return false
 
                 if (squadType == "attack") {
 
@@ -246,13 +246,13 @@ function antifa(room, creeps) {
 
                             creep.intraRoomPathing(creep.pos, goal)
                         }
-                    } else if (closestHostile) {
+                    } else if (closestEnemy) {
 
                         creep.say("CH")
 
-                        if (creep.pos.getRangeTo(closestHostile) > 3) {
+                        if (creep.pos.getRangeTo(closestEnemy) > 3) {
 
-                            let goal = _.map([closestHostile], function(target) {
+                            let goal = _.map([closestEnemy], function(target) {
                                 return { pos: target.pos, range: 1 }
                             })
 
@@ -260,13 +260,13 @@ function antifa(room, creeps) {
 
                         } else {
 
-                            if (creep.pos.getRangeTo(closestHostile) == 1) {
+                            if (creep.pos.getRangeTo(closestEnemy) == 1) {
 
                                 creep.rangedMassAttack()
 
-                            } else if (creep.pos.getRangeTo(closestHostile) <= 3) {
+                            } else if (creep.pos.getRangeTo(closestEnemy) <= 3) {
 
-                                creep.rangedAttack(closestHostile)
+                                creep.rangedAttack(closestEnemy)
                             }
                         }
                     } else return false
@@ -374,7 +374,7 @@ function antifa(room, creeps) {
 
                             healCreep()
 
-                            if (attackHostile()) {
+                            if (attackEnemy()) {
 
                             } else {
 
@@ -501,17 +501,17 @@ function antifa(room, creeps) {
 
                             healCreep()
 
-                            if (attackHostile()) {
+                            if (attackEnemy()) {
 
                             } else {
 
-                                let closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
+                                let closestEnemyStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
                                     filter: s => (!allyList.includes(toLowerCase(s.owner.username)) && s.structureType != STRUCTURE_CONTROLLER)
                                 })
 
-                                if (closestHostileStructure) {
+                                if (closestEnemyStructure) {
 
-                                    attackStructure(closestHostileStructure)
+                                    attackStructure(closestEnemyStructure)
 
                                 } else {
 

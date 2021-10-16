@@ -1,8 +1,8 @@
+require("communeDefenderFunctions")
+
 function communeDefenderManager(room, creepsWithRole) {
 
     if (creepsWithRole.length == 0) return
-
-    require("communeDefenderFunctions")
 
     for (let creep of creepsWithRole) {
 
@@ -19,12 +19,11 @@ function communeDefenderManager(room, creepsWithRole) {
             break
         }
 
-
         creep.memory.remoteRoom = remoteRoom
 
         if (remoteRoom) {
 
-            let enemyCreepsObject = creep.findHostiles()
+            let enemyCreepsObject = creep.findEnemies()
 
             creep.healMyCreeps(enemyCreepsObject.enemyAttacker)
 
@@ -35,7 +34,7 @@ function communeDefenderManager(room, creepsWithRole) {
                     Memory.rooms[creep.memory.roomFrom].remoteRooms[creep.memory.remoteRoom].enemy = false
                 }
 
-                if (creep.advancedAttackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
+                if (creep.advancedRangedAttackEnemies(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
 
                 continue
             }
@@ -56,7 +55,7 @@ function communeDefenderManager(room, creepsWithRole) {
             continue
         }
 
-        let enemyCreepsObject = creep.findHostiles()
+        let enemyCreepsObject = creep.findEnemies()
 
         creep.healMyCreeps(enemyCreepsObject.enemyAttacker)
 
@@ -64,7 +63,7 @@ function communeDefenderManager(room, creepsWithRole) {
 
             if (creep.defendRamparts(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyAttacker)) continue
 
-            if (creep.advancedAttackHostiles(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
+            if (creep.advancedRangedAttackEnemies(enemyCreepsObject.enemyCreeps, enemyCreepsObject.enemyCreep, enemyCreepsObject.enemyAttacker)) continue
 
             if (creep.wait()) continue
 

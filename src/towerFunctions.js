@@ -1,17 +1,17 @@
-Room.prototype.attackHostiles = function(towers) {
+Room.prototype.attackEnemys = function(towers) {
 
     room = this
 
     let target
 
-    let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username)
+    let enemys = room.find(FIND_HOSTILE_CREEPS, {
+        filter: enemyCreep => !allyList.includes(enemyCreep.owner.username)
     })
 
-    if (hostiles.length == 0) return false
+    if (enemys.length == 0) return false
 
     let enemyHealers = room.find(FIND_HOSTILE_CREEPS, {
-        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([HEAL])
+        filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([HEAL])
     })
 
     if (enemyHealers.length > 0) {
@@ -22,11 +22,11 @@ Room.prototype.attackHostiles = function(towers) {
 
             for (let minDamage = towers.length * TOWER_POWER_ATTACK; minDamage > 100; minDamage -= 100) {
 
-                for (let hostile of hostiles) {
+                for (let enemy of enemys) {
 
-                    if (hostile.isEdge()) continue
+                    if (enemy.isEdge()) continue
 
-                    if (room.findTowerDamage(towers, hostile) - room.findHealPower(hostile, enemyHealers) >= minDamage) return hostile
+                    if (room.findTowerDamage(towers, enemy) - room.findHealPower(enemy, enemyHealers) >= minDamage) return enemy
                 }
             }
         }
@@ -35,10 +35,10 @@ Room.prototype.attackHostiles = function(towers) {
 
     } else {
 
-        // Filter hostiles and find target towers can do the most damage to
+        // Filter enemys and find target towers can do the most damage to
 
-        target = hostiles.reduce(function(highestDamage, hostile) {
-            return hostile.num > highestDamage.num ? hostile : highestDamage
+        target = enemys.reduce(function(highestDamage, enemy) {
+            return enemy.num > highestDamage.num ? enemy : highestDamage
         })
     }
 

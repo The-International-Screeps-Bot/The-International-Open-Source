@@ -6,7 +6,7 @@ function towerManager(room) {
 
     if (towers.length == 0) return
 
-    if (room.attackHostiles(towers)) return
+    if (room.attackEnemys(towers)) return
 
     if (room.healCreeps(towers)) return
 

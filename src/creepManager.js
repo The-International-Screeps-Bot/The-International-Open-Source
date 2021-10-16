@@ -10,6 +10,7 @@ function creepManager(room, myCreeps) {
     managers["harvester"] = { import: require("harvesterManager"), creeps: [] }
     managers["builder"] = { import: require("builderManager"), creeps: [] }
     managers["upgrader"] = { import: require("upgraderManager"), creeps: [] }
+    managers["scientist"] = { import: require("scientistManager"), creeps: [] }
 
     managers["robber"] = { import: require("robberManager"), creeps: [] }
     managers["scout"] = { import: require("scoutManager"), creeps: [] }

@@ -177,11 +177,11 @@ function roomManager() {
 
             //
 
-            let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+            let enemys = room.find(FIND_HOSTILE_CREEPS, {
+                filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.owner.username != "Invader" && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
             })
 
-            if (combatHappened && hostiles.length > 0) room.controller.activateSafeMode()
+            if (combatHappened && enemys.length > 0) room.controller.activateSafeMode()
 
             //
 

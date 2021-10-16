@@ -1,18 +1,18 @@
 function meleeDefenderManager(room, creepsWithRole) {
 
-    let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-        filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+    let enemys = room.find(FIND_HOSTILE_CREEPS, {
+        filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
     })
 
     for (let creep of creepsWithRole) {
 
         creep.say("NH")
 
-        if (hostiles.length > 0) {
+        if (enemys.length > 0) {
 
             creep.say("H")
 
-            let hostile = creep.pos.findClosestByRange(hostiles)
+            let enemy = creep.pos.findClosestByRange(enemys)
 
             let ramparts = room.find(FIND_MY_STRUCTURES, {
                 filter: s => s.structureType == STRUCTURE_RAMPART
@@ -42,7 +42,7 @@ function meleeDefenderManager(room, creepsWithRole) {
 
                     creep.say("OR")
 
-                    let rampart = hostile.pos.findClosestByRange(openRamparts)
+                    let rampart = enemy.pos.findClosestByRange(openRamparts)
 
                     let goal = _.map([rampart], function(target) {
                         return { pos: target.pos, range: 0 }
@@ -50,23 +50,23 @@ function meleeDefenderManager(room, creepsWithRole) {
 
                     creep.rampartPathing(creep.pos, goal)
 
-                    creep.attack(hostile)
+                    creep.attack(enemy)
                 }
             } else {
 
                 creep.say("NE")
 
-                if (!hostile.isEdge()) {
+                if (!enemy.isEdge()) {
 
                     creep.say("H")
 
-                    creep.attack(hostile)
+                    creep.attack(enemy)
 
-                    if (creep.pos.getRangeTo(hostile) > 1) {
+                    if (creep.pos.getRangeTo(enemy) > 1) {
 
                         creep.travel({
                             origin: creep.pos,
-                            goal: { pos: hostile.pos, range: 1 },
+                            goal: { pos: enemy.pos, range: 1 },
                             plainCost: false,
                             swampCost: false,
                             defaultCostMatrix: false,

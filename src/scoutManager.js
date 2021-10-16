@@ -142,12 +142,12 @@ function scoutManager(room, creepsWithRole) {
                 let activeRemotes = Object.values(Memory.rooms[creep.memory.roomFrom].remoteRooms).length
                 if (activeRemotes >= maxRemoteRooms) return
 
-                // Make sure there are no hostiles
+                // Make sure there are no enemys
 
-                let hostiles = room.find(FIND_HOSTILE_CREEPS, {
-                    filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.owner.username != "Invader" && hostileCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
+                let enemys = room.find(FIND_HOSTILE_CREEPS, {
+                    filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.owner.username != "Invader" && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
                 })
-                if (hostiles.length > 0) return
+                if (enemys.length > 0) return
 
                 // Make sure the room is in a range of 2 from the commune
 

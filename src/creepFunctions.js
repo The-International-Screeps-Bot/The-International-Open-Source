@@ -14,34 +14,97 @@ Creep.prototype.isEdge = function() {
     if (creep.pos.x <= 0 || creep.pos.x >= 49 || creep.pos.y <= 0 || creep.pos.y >= 49) return true
 }
 
-Creep.prototype.withdrawStoredResource = function(minAmount, withdrawAmount, resource) {
+Creep.prototype.transferToStorageOrTerminal = function(resourceType) {
+
+    let creep = this
+    let room = creep.room
+
+    let storage = room.get("storage")
+
+    if (storage && storage.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
+
+        creep.say("S")
+
+        creep.advancedTransfer(storage, resourceType)
+        return true
+    }
+
+    let terminal = room.get("terminal")
+
+    if (terminal && terminal.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
+
+        creep.say("T")
+
+        creep.advancedTransfer(terminal, resourceType)
+        return true
+    }
+}
+
+Creep.prototype.withdrawRoomResources = function() {
+
+    let creep = this
+    let room = creep.room
+
+    let storage = room.get("storage")
+
+    if (storage && storage.store.getUsedCapacity() > 0) {
+
+        creep.say("S")
+
+        for (let resourceType in storage.store) {
+
+            creep.advancedWithdraw(storage, resourceType)
+            return true
+        }
+    }
+
+    let terminal = room.get("terminal")
+
+    if (terminal && terminal.store.getUsedCapacity() > 0) {
+
+        creep.say("T")
+
+        for (let resourceType in terminal.store) {
+
+            creep.advancedWithdraw(terminal, resourceType)
+            return true
+        }
+    }
+}
+
+Creep.prototype.withdrawStoredResource = function(minAmount, withdrawAmount, resourceType) {
 
     creep = this
 
-    let storedEnergy = creep.room.get("storedEnergy")
     let storage = creep.room.get("storage")
     let terminal = creep.room.get("terminal")
 
-    if (storedEnergy < minAmount || (!storage && !terminal)) return false
+    if (!storage && !terminal) return false
 
-    if (!resource) resource = RESOURCE_ENERGY
+    if (!resourceType) resourceType = RESOURCE_ENERGY
 
-    function targetWithdrawAmount(target) {
+    if (storage) var storageAmount = storage.store.getUsedCapacity(resourceType)
+    if (terminal) var terminalAmount = terminal.store.getUsedCapacity(resourceType)
+    let storedResourceAmount = storageAmount + terminalAmount
+
+    if (storedResourceAmount < minAmount) return false
+
+    function targetWithdrawAmount() {
 
         if (withdrawAmount) return
 
-        return Math.min(creep.store.getFreeCapacity(), storage.store.getUsedCapacity(resource))
+        return Math.min(creep.store.getFreeCapacity(), storage.store.getUsedCapacity(resourceType))
     }
 
-    if (storage && storage.store.getUsedCapacity(resource) >= targetWithdrawAmount(storage)) {
+    if (storage && storage.store.getUsedCapacity(resourceType) >= targetWithdrawAmount(storage)) {
 
         creep.say("S")
-        return creep.advancedWithdraw(storage, resource, targetWithdrawAmount(storage))
+        return creep.advancedWithdraw(storage, resourceType, targetWithdrawAmount(storage))
 
-    } else if (terminal && terminal.store.getUsedCapacity(resource) >= targetWithdrawAmount(terminal)) {
+    } else if (terminal && terminal.store.getUsedCapacity(resourceType) >= targetWithdrawAmount(terminal)) {
 
         creep.say("T")
-        return creep.advancedWithdraw(terminal, resource, targetWithdrawAmount(terminal))
+        return creep.advancedWithdraw(terminal, resourceType, targetWithdrawAmount(terminal))
     }
 
     return -100
@@ -265,6 +328,7 @@ Creep.prototype.pickupDroppedEnergy = function(target) {
         })
     }
 }
+
 Creep.prototype.advancedWithdraw = function(target, resource, amount) {
 
     creep = this
@@ -328,6 +392,28 @@ Creep.prototype.advancedTransfer = function(target, resource) {
         })
     }
 }
+
+Creep.prototype.withdrawAllResources = function(target, blacklist) {
+
+    let creep = this
+
+    // Add energy to the blacklist
+
+    blacklist.push(RESOURCE_ENERGY)
+
+    for (let resourceType in target.store) {
+
+        // Make sure the resourceType isn't in the blacklist
+
+        if (blacklist.includes(resourceType)) continue
+
+        // Withdraw resource and exit the function
+
+        creep.advancedWithdraw(target, resource)
+        return true
+    }
+}
+
 Creep.prototype.repairStructure = function(target) {
 
     if (!target) return
@@ -458,25 +544,65 @@ Creep.prototype.remoteRequests = function() {
         remoteRoomMemory.builderNeed = true
     }
 }
-Creep.prototype.avoidHostiles = function() {
+Creep.prototype.findEnemies = function() {
+
+    creep = this
+    let room = creep.room
+
+    let enemyCreeps = room.find(FIND_HOSTILE_CREEPS, {
+        filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM, HEAL])
+    })
+
+    if (enemyCreeps.length == 0) return { enemyCreeps: enemyCreeps }
+
+    function findClosestEnemyCreep() {
+
+        let enemiesNotOnEdge = enemyCreeps.filter(enemyCreep => !enemyCreep.isEdge())
+
+        if (enemiesNotOnEdge.length == 0) return false
+
+        let enemyCreep = creep.pos.findClosestByRange(enemiesNotOnEdge)
+        return enemyCreep
+    }
+
+    function findEnemyAttackers() {
+
+        let enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+            filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK])
+        })
+
+        if (enemyAttackers.length == 0) return false
+
+        let enemiesNotOnEdge = enemyAttackers.filter(enemyCreep => !enemyCreep.isEdge())
+
+        if (enemiesNotOnEdge.length == 0) return false
+
+        let enemyAttacker = creep.pos.findClosestByRange(enemiesNotOnEdge)
+
+        return { enemyAttackers: enemyAttackers, enemyAttacker: enemyAttacker }
+    }
+
+    return { enemyCreeps: enemyCreeps, enemyCreep: findClosestEnemyCreep(), enemyAttackers: findEnemyAttackers().enemyAttackers, enemyAttacker: findEnemyAttackers().enemyAttacker }
+}
+Creep.prototype.avoidEnemys = function() {
 
     let creep = this
 
-    let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
-        filter: hostile => !allyList.includes(hostile.owner.username) && hostile.hasActivePartsOfTypes([ATTACK, RANGED_ATTACK])
+    let enemys = creep.room.find(FIND_HOSTILE_CREEPS, {
+        filter: enemy => !allyList.includes(enemy.owner.username) && enemy.hasActivePartsOfTypes([ATTACK, RANGED_ATTACK])
     })
 
-    if (hostiles.length == 0) return false
+    if (enemys.length == 0) return false
 
-    let hostile = creep.pos.findClosestByRange(hostiles)
+    let enemy = creep.pos.findClosestByRange(enemys)
 
-    if (creep.pos.getRangeTo(hostile) > 5) return false
+    if (creep.pos.getRangeTo(enemy) > 5) return false
 
     creep.say("H R")
 
     creep.travel({
         origin: creep.pos,
-        goal: { pos: hostile.pos, range: 8 },
+        goal: { pos: enemy.pos, range: 8 },
         plainCost: false,
         swampCost: false,
         defaultCostMatrix: creep.memory.defaultCostMatrix,
@@ -581,7 +707,7 @@ Creep.prototype.travel = function(opts) {
         avoidStages: [],
         flee: false,
         cacheAmount: 20,
-        avoidHostileRanges: false,
+        avoidEnemyRanges: false,
     }
 
     for (let defaultName in defaultValues) {
@@ -707,11 +833,11 @@ Creep.prototype.travel = function(opts) {
                         }
                     }
 
-                    // Set sorrounding area of hostileCreeps to unwalkable if position does not have a rampart
+                    // Set sorrounding area of enemyCreeps to unwalkable if position does not have a rampart
 
-                    for (let hostile of room.get("hostileCreeps")) {
+                    for (let enemy of room.get("enemyCreeps")) {
 
-                        cm.set(hostile.pos.x, hostile.pos.y, 255)
+                        cm.set(enemy.pos.x, enemy.pos.y, 255)
                     }
 
                     // Set unwalkable mySites as unwalkable

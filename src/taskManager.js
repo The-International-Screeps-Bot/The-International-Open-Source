@@ -1,4 +1,4 @@
-function taskManger(room, myCreeps) {
+function taskManager(room, myCreeps) {
 
     function findCreepsOfTask(collection, task, requiredAmount) {
 
@@ -219,4 +219,4 @@ function taskManger(room, myCreeps) {
     }
 }
 
-module.exports = taskManger
+module.exports = taskManager

@@ -77,7 +77,7 @@ Room.prototype.get = function(roomVar) {
     roomVars.allCreeps = room.find(FIND_CREEPS)
     roomVars.myCreeps = findObjectWithOwner(FIND_CREEPS, [me])
     roomVars.allyCreeps = findObjectWithOwner(FIND_HOSTILE_CREEPS, allyList)
-    roomVars.hostileCreeps = room.find(FIND_HOSTILE_CREEPS, {
+    roomVars.enemyCreeps = room.find(FIND_HOSTILE_CREEPS, {
         filter: creep => !allyList.includes(creep.owner.username)
     })
 
@@ -85,7 +85,7 @@ Room.prototype.get = function(roomVar) {
     roomVars.allPowerCreeps = room.find(FIND_POWER_CREEPS)
     roomVars.myPowerCreeps = findObjectWithOwner(FIND_POWER_CREEPS, [me])
     roomVars.allyPowerCreeps = findObjectWithOwner(FIND_HOSTILE_POWER_CREEPS, allyList)
-    roomVars.hostilePowerCreeps = room.find(FIND_HOSTILE_POWER_CREEPS, {
+    roomVars.enemyPowerCreeps = room.find(FIND_HOSTILE_POWER_CREEPS, {
         filter: creep => !allyList.includes(creep.owner.username)
     })
 
@@ -291,7 +291,7 @@ Room.prototype.get = function(roomVar) {
                 cache.harvestPositions[sourceName].positions.push(pos)
             }
 
-            cache.harvestPositions[sourceName].closest = roomVars.anchorPoint.findClosestByPath(cache.harvestPositions[sourceName].positions)
+            cache.harvestPositions[sourceName].closest = roomVars.anchorPoint.findClosestByRange(cache.harvestPositions[sourceName].positions)
         }
 
         console.log("hi")
@@ -344,7 +344,7 @@ Room.prototype.get = function(roomVar) {
                 cache.linkPositions[sourceName].positions.push(pos)
             }
 
-            cache.linkPositions[sourceName] = roomVars.anchorPoint.findClosestByPath(cache.linkPositions[sourceName].positions)
+            cache.linkPositions[sourceName] = roomVars.anchorPoint.findClosestByRange(cache.linkPositions[sourceName].positions)
         }
 
         console.log("hi")
@@ -436,7 +436,7 @@ Room.prototype.findSafeDistance = function(origin, goal, avoidStages) {
     return route.length
 }
 
-Room.prototype.findTowerDamage = function(towers, hostile) {
+Room.prototype.findTowerDamage = function(towers, enemy) {
 
     room = this
 
@@ -444,7 +444,7 @@ Room.prototype.findTowerDamage = function(towers, hostile) {
 
     for (let tower of towers) {
 
-        let range = tower.pos.getRangeTo(hostile.pos)
+        let range = tower.pos.getRangeTo(enemy.pos)
 
         if (range <= TOWER_OPTIMAL_RANGE) {
 
@@ -456,16 +456,16 @@ Room.prototype.findTowerDamage = function(towers, hostile) {
         totalDamage += Math.floor(TOWER_POWER_ATTACK * (1 - TOWER_FALLOFF * factor));
     }
 
-    if (hostile.hasBoost(TOUGH, "GO")) totalDamage -= totalDamage * 0.3
-    if (hostile.hasBoost(TOUGH, "GHO2")) totalDamage -= totalDamage * 0.5
-    if (hostile.hasBoost(TOUGH, "XGHO2")) totalDamage -= totalDamage * 0.7
+    if (enemy.hasBoost(TOUGH, "GO")) totalDamage -= totalDamage * 0.3
+    if (enemy.hasBoost(TOUGH, "GHO2")) totalDamage -= totalDamage * 0.5
+    if (enemy.hasBoost(TOUGH, "XGHO2")) totalDamage -= totalDamage * 0.7
 
-    room.visual.text(totalDamage, hostile.pos.x, hostile.pos.y + 0.25, { align: 'center', color: colors.allyBlue, font: "0.7" })
+    room.visual.text(totalDamage, enemy.pos.x, enemy.pos.y + 0.25, { align: 'center', color: colors.allyBlue, font: "0.7" })
 
     return totalDamage
 }
 
-Room.prototype.findHealPower = function(hostile, creeps) {
+Room.prototype.findHealPower = function(enemy, creeps) {
 
     room = this
 
@@ -473,7 +473,7 @@ Room.prototype.findHealPower = function(hostile, creeps) {
 
     for (let creep of creeps) {
 
-        if (creep.pos.getRangeTo(hostile.pos) <= 1) {
+        if (creep.pos.getRangeTo(enemy.pos) <= 1) {
 
             healPower += creep.findParts("heal") * HEAL_POWER
 
@@ -483,7 +483,7 @@ Room.prototype.findHealPower = function(hostile, creeps) {
         }
     }
 
-    room.visual.text(healPower, hostile.pos.x, hostile.pos.y + 0.75, { align: 'center', color: colors.communeGreen, font: "0.7" })
+    room.visual.text(healPower, enemy.pos.x, enemy.pos.y + 0.75, { align: 'center', color: colors.communeGreen, font: "0.7" })
 
     return healPower
 }

@@ -120,15 +120,15 @@ module.exports = {
                 }
             }
 
-            let hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
-                filter: hostileCreep => !allyList.includes(hostileCreep.owner.username) && hostileCreep.hasActivePartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
+            let enemys = creep.room.find(FIND_HOSTILE_CREEPS, {
+                filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.hasActivePartsOfTypes([ATTACK, RANGED_ATTACK, WORK, CARRY, CLAIM])
             })
 
-            let hostileStructure = creep.room.find(FIND_HOSTILE_STRUCTURES, {
+            let enemyStructure = creep.room.find(FIND_HOSTILE_STRUCTURES, {
                 filter: s => !allyList.includes(s.owner.username)
             })
 
-            if (hostiles.length > 0 || hostileStructure.length > 0) {
+            if (enemys.length > 0 || enemyStructure.length > 0) {
 
                 Memory.rooms[creep.memory.roomFrom].remoteRooms[remoteRoom].enemy = true
                 creep.say(Memory.rooms[creep.memory.roomFrom].remoteRooms[remoteRoom].enemy)
@@ -165,6 +165,6 @@ module.exports = {
             })
         }
 
-        creep.avoidHostiles()
+        creep.avoidEnemys()
     }
 }

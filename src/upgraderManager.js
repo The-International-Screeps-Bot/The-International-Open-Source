@@ -13,7 +13,7 @@ function upgradeManager(room, creepsWithRole) {
 
     for (let creep of creepsWithRole) {
 
-        if (creep.avoidHostiles()) continue
+        if (creep.avoidEnemys()) continue
 
         // try to stationary upgrade with controllerContainer
 
