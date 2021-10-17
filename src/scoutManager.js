@@ -151,7 +151,7 @@ function scoutManager(room, creepsWithRole) {
 
                 // Make sure the room is in a range of 2 from the commune
 
-                let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation"])
+                let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "enemyReservation", "emptyRoom"])
                 if (!safeDistance || safeDistance > 2) return
 
                 // record room in memory
@@ -313,17 +313,17 @@ function scoutManager(room, creepsWithRole) {
 
         // Check if keeper room
 
-        let keeperLair = creep.room.find(FIND_STRUCTURES, {
+        let keeperLair = room.find(FIND_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_KEEPER_LAIR
         })
 
         if (keeperLair.length > 0) {
 
-            creep.room.memory.stage = "keeperRoom"
+            room.memory.stage = "keeperRoom"
 
         } else {
 
-            creep.room.memory.stage = "emptyRoom"
+            room.memory.stage = "emptyRoom"
         }
 
         // Check for deposits
@@ -336,7 +336,7 @@ function scoutManager(room, creepsWithRole) {
 
             // Only find deposits that are above 1k ticks left
 
-            let deposits = creep.room.find(FIND_DEPOSITS, {
+            let deposits = room.find(FIND_DEPOSITS, {
                 filter: deposit => deposit.ticksToDecay > 1000
             })
 
@@ -344,7 +344,7 @@ function scoutManager(room, creepsWithRole) {
 
             // Make sure the deposit is close
 
-            let safeDistance = creep.room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
+            let safeDistance = room.findSafeDistance(creep.pos, { pos: new RoomPosition(25, 25, creep.memory.roomFrom), range: 1 }, ["enemyRoom", "keeperRoom", "allyRoom"])
             if (!safeDistance || safeDistance > 10) return
 
             for (let deposit of deposits) {
@@ -355,7 +355,7 @@ function scoutManager(room, creepsWithRole) {
 
                 // Otherwise record deposit in mmory
 
-                Memory.rooms[creep.memory.roomFrom].deposits[deposit.id] = { roomName: creep.room.name, decayBy: Game.time + deposit.ticksToDecay }
+                Memory.rooms[creep.memory.roomFrom].deposits[deposit.id] = { roomName: room.name, decayBy: Game.time + deposit.ticksToDecay }
             }
 
         }
