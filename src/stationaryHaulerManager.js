@@ -25,7 +25,5 @@ module.exports = function stationaryHaulerManager(room, creepsWithRole) {
 
             continue
         }
-
-
     }
 }

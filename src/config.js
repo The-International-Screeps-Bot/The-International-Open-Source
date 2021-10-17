@@ -1,4 +1,4 @@
-function config() {
+module.exports = function config() {
 
     //
 
@@ -114,5 +114,3 @@ function config() {
         }
     }
 }
-
-module.exports = config

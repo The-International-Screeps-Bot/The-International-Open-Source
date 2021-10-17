@@ -1,4 +1,4 @@
-function claimerManager(room, creepsWithRole) {
+module.exports = function claimerManager(room, creepsWithRole) {
 
     if (creepsWithRole.length == 0) return
 
@@ -33,5 +33,3 @@ function claimerManager(room, creepsWithRole) {
         }
     }
 }
-
-module.exports = claimerManager

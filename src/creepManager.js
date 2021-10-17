@@ -59,7 +59,6 @@ function creepManager(room, myCreeps) {
     roles["revolutionaryBuilder"] = require('role.revolutionaryBuilder')
     roles["rangedDefender"] = require('role.rangedDefender')
     roles["miner"] = require("role.miner")
-    roles["scientist"] = require("role.scientist")
     roles["reserver"] = require("role.reserver")
     roles["stationaryHauler"] = require("role.stationaryHauler")
     roles["remoteHauler"] = require("role.remoteHauler")

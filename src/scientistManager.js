@@ -36,7 +36,7 @@ module.exports = function scientistManager(room, creepsWithRole) {
                     if (room.findStoredResourceAmount(input2) < 5000) continue
 
                     let output = REACTIONS[input1][input2]
-                    if (room.findStoredResourceAmount(output) >= 2000) continue
+                    if (room.findStoredResourceAmount(output) >= 3000) continue
 
                     return {
                         input1: input1,
@@ -71,7 +71,7 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
             if (room.findStoredResourceAmount(input2) < creep.store.getCapacity()) return
 
-            if (room.findStoredResourceAmount(output) >= 5000) return
+            if (room.findStoredResourceAmount(output) >= 2000) return
 
             creep.say("IA")
 

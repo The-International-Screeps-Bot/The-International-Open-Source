@@ -1,4 +1,4 @@
-function creepData() {
+module.exports = function creepData() {
 
     let remoteRoles = ["remoteHarvester1", "remoteHauler", "remoteHarvester2", "reserver"]
 
@@ -39,5 +39,3 @@ function creepData() {
         creepsOfRemoteRole: creepsOfRemoteRole,
     }
 }
-
-module.exports = creepData
