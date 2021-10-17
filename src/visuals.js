@@ -221,184 +221,71 @@ module.exports = function visuals(room) {
             })
         }
 
-        // Minerals
-
-        if (lab.store[RESOURCE_HYDROGEN]) {
-
-            room.visual.text("H", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_OXYGEN]) {
-
-            room.visual.text("O", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_UTRIUM]) {
-
-            room.visual.text("U", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#50d7f9", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_KEANIUM]) {
-
-            room.visual.text("K", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#a071ff", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_LEMERGIUM]) {
-
-            room.visual.text("L", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#00f4a2", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_ZYNTHIUM]) {
-
-            room.visual.text("Z", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#fdd388", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_CATALYST]) {
-
-            room.visual.text("X", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
+        let chemicalColors = {
+            // Minerals
+            H: "#b4b4b4",
+            O: "#b4b4b4",
+            U: "#50d7f9",
+            K: "#a071ff",
+            L: "#00f4a2",
+            Z: "#fdd388",
+            C: "##c70000",
+            // Bases
+            OH: "#b4b4b4",
+            ZK: "#b4b4b4",
+            UL: "#b4b4b4",
+            G: "#b4b4b4",
+            // T1 Boosts
+            GH: "#b4b4b4",
+            GO: "#b4b4b4",
+            UH: "#50d7f9",
+            UO: "#50d7f9",
+            KH: "#a071ff",
+            KO: "#a071ff",
+            LH: "#00f4a2",
+            LO: "#00f4a2",
+            ZH: "#fdd388",
+            ZO: "#fdd388",
+            // T2 Boosts
+            GH2O: "#b4b4b4",
+            GHO2: "#b4b4b4",
+            UH2O: "#50d7f9",
+            UHO2: "#50d7f9",
+            KH2O: "#a071ff",
+            KHO2: "#a071ff",
+            LHO2: "#00f4a2",
+            LHO2: "#00f4a2",
+            ZH2O: "#fdd388",
+            ZHO2: "#fdd388",
+            // T3 Boosts
+            XGH2O: "#b4b4b4",
+            XGHO2: "#b4b4b4",
+            XUH2O: "#50d7f9",
+            XUHO2: "#50d7f9",
+            XKH2O: "#a071ff",
+            XKHO2: "#a071ff",
+            XLHO2: "#00f4a2",
+            XLHO2: "#00f4a2",
+            XZH2O: "#fdd388",
+            XZHO2: "#fdd388",
         }
 
-        // Base
-        else if (lab.store[RESOURCE_HYDROXIDE]) {
+        // Stop if lab doesn't have a resource to show
 
-            room.visual.text("OH", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
+        function findChemical() {
 
-        } else if (lab.store[RESOURCE_ZYNTHIUM_KEANITE]) {
+            for (let resourceType in chemicalColors) {
 
-            room.visual.text("ZK", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
+                if (!lab.store.getUsedCapacity(resourceType)) continue
 
-        } else if (lab.store[RESOURCE_UTRIUM_LEMERGITE]) {
-
-            room.visual.text("UL", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_GHODIUM]) {
-
-            room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
+                return resourceType
+            }
         }
 
-        // Tier 
-        else if (lab.store[RESOURCE_UTRIUM_HYDRIDE]) {
+        let chemical = findChemical()
+        if (!chemical) continue
 
-            room.visual.text("OH", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_UTRIUM_OXIDE]) {
-
-            room.visual.text("ZK", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_KEANIUM_HYDRIDE]) {
-
-            room.visual.text("UL", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_KEANIUM_OXIDE]) {
-
-            room.visual.text("UL", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_LEMERGIUM_HYDRIDE]) {
-
-            room.visual.text("LH", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#00f4a2", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_LEMERGIUM_OXIDE]) {
-
-            room.visual.text("LO", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#00f4a2", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_ZYNTHIUM_HYDRIDE]) {
-
-            room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_ZYNTHIUM_OXIDE]) {
-
-            room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_GHODIUM_HYDRIDE]) {
-
-            room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_GHODIUM_OXIDE]) {
-
-            room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        }
-
-        // Tier 2
-        else if (lab.store[RESOURCE_UTRIUM_ACID]) {
-
-            room.visual.text("OH", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_UTRIUM_ALKALIDE]) {
-
-            room.visual.text("ZK", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_KEANIUM_ACID]) {
-
-            room.visual.text("UL", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_KEANIUM_ALKALIDE]) {
-
-            room.visual.text("UL", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_LEMERGIUM_ACID]) {
-
-            room.visual.text("LH", lab.pos.x, lab.pos.y, { font: 0.3, color: "black", backgroundColor: "#00f4a2", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_LEMERGIUM_ALKALIDE]) {
-
-            room.visual.text("LO", lab.pos.x, lab.pos.y, { font: 0.3, color: "black", backgroundColor: "#00f4a2", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_ZYNTHIUM_ACID]) {
-
-            room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_ZYNTHIUM_ALKALIDE]) {
-
-            room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_GHODIUM_ACID]) {
-
-            room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_GHODIUM_ALKALIDE]) {
-
-            room.visual.text("G", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        }
-
-        // Tier 3
-        else if (lab.store[RESOURCE_CATALYZED_UTRIUM_ACID]) {
-
-            room.visual.text("XOH", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE]) {
-
-            room.visual.text("XZK", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_CATALYZED_KEANIUM_ACID]) {
-
-            room.visual.text("XUL", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_CATALYZED_KEANIUM_ALKALIDE]) {
-
-            room.visual.text("XUL", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#b4b4b4", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_CATALYZED_LEMERGIUM_ACID]) {
-
-            room.visual.text("XLH", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#00f4a2", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE]) {
-
-            room.visual.text("XLO", lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: "#00f4a2", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_CATALYZED_ZYNTHIUM_ACID]) {
-
-            room.visual.text("XG", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE]) {
-
-            room.visual.text("XG", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_CATALYZED_GHODIUM_ACID]) {
-
-            room.visual.text("XG", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        } else if (lab.store[RESOURCE_CATALYZED_GHODIUM_ALKALIDE]) {
-
-            room.visual.text("XG", lab.pos.x, lab.pos.y, { font: 0.3, color: "#b4b4b4", backgroundColor: "white", backgroundPadding: "0.1" })
-
-        }
+        room.visual.text(chemical, lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: chemicalColors[chemical], backgroundPadding: "0.1" })
     }
 
     let mineral = room.get("mineral")
