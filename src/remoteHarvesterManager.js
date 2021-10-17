@@ -18,7 +18,9 @@ function remoteHarvesterManager(room, creepsWithRole) {
 
             if (controller.reservation && controller.reservation.username != "Invader" && controller.reservation.username != me) {
 
-                Memory.rooms[creep.memory.roomFrom].remoteRooms[remoteRoom].inUse = false
+                // Tell the commune to not operate in this room for the next 20,000 ticks
+
+                Memory.rooms[creep.memory.roomFrom].remoteRooms[remoteRoom].avoidUse = Game.time + 20000
             }
 
             if (creep.memory.role == "remoteHarvester1") {

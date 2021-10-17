@@ -161,7 +161,7 @@ function scoutManager(room, creepsWithRole) {
 
                 for (let source of sources) sourceIds.push(source.id)
 
-                Memory.rooms[creep.memory.roomFrom].remoteRooms[room.name] = { inUse: false, sources: sourceIds, roads: false, builderNeed: false, enemy: false, invaderCore: false, distance: undefined }
+                Memory.rooms[creep.memory.roomFrom].remoteRooms[room.name] = { avoidUse: Game.time, sources: sourceIds, roads: false, builderNeed: false, enemy: false, invaderCore: false, distance: undefined }
 
                 room.memory.stage = "remoteRoom"
             }

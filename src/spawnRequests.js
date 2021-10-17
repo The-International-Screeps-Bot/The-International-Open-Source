@@ -485,9 +485,9 @@ module.exports = function spawnRequests(room) {
 
     function minScientists() {
 
-        // Make sure room has a terminal
+        // Make sure room has at least 3 labs
 
-        if (!room.get("terminal")) return
+        if (room.get("labs").length < 3) return
 
         minCreeps.scientist = 1
     }
@@ -1119,13 +1119,13 @@ module.exports = function spawnRequests(room) {
         memoryAdditions: {}
     })
 
-    roleOpts["scientist"] = roleValues({
+    roleOpts.scientist = roleValues({
         role: "scientist",
         parts: {
             300: {
                 defaultParts: [],
                 extraParts: [carryPart, carryPart, movePart],
-                maxParts: 0
+                maxParts: 9
             }
         },
         memoryAdditions: {}
