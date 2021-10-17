@@ -1,18 +1,19 @@
-function powerSpawns(powerSpawn) {
+module.exports = function powerSpawns(room) {
 
-    if (powerSpawn) {
+    let powerSpawn = room.get("powerSpawn")
 
-        //Game.powerCreeps['1'].spawn(powerSpawn);
+    // Stop if powerspawn doesn't exist
 
-        if (powerSpawn.store[RESOURCE_ENERGY] >= 50 && powerSpawn.store[RESOURCE_POWER] >= 1) {
+    if (!powerSpawn) return
 
-            powerSpawn.processPower()
+    //Game.powerCreeps['1'].spawn(powerSpawn);
 
-            Memory.data.energySpentOnPower += 50
+    if (powerSpawn.store[RESOURCE_ENERGY] >= 50 && powerSpawn.store[RESOURCE_POWER] >= 1) {
 
-            Memory.data.powerProcessed += 1
-        }
+        powerSpawn.processPower()
+
+        Memory.data.energySpentOnPower += 50
+
+        Memory.data.powerProcessed += 1
     }
 }
-
-module.exports = powerSpawns

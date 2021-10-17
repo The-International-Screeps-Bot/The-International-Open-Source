@@ -1,15 +1,30 @@
-function factories(factory) {
+module.exports = function factories(room) {
 
-    if (factory) {
+    let factory = room.get("factory")
 
-        if (factory.store.getUsedCapacity() != factory.store.getCapacity() && factory.cooldown == 0) {
+    // Stop if factory doesn't exist
 
-            if (factory.store[RESOURCE_BATTERY] > 0) {
+    if (!factory) return
 
-                factory.produce(RESOURCE_ENERGY)
-            }
-        }
+    // Stop if factory is on cooldown
+
+    if (factory.cooldown) return
+
+    // Stop if factory is full
+
+    if (factory.store.getFreeCapacity() == 0) return
+
+    processBatteries()
+
+    function processBatteries() {
+
+        // Stop if factory has no batteries
+
+        if (factory.store.getUsedCapacity(RESOURCE_BATTERY) == 0) return
+
+        // Process batteries into energy
+
+        factory.produce(RESOURCE_ENERGY)
+        return true
     }
 }
-
-module.exports = factories

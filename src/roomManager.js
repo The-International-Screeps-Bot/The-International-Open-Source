@@ -235,7 +235,7 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            spawnManager(room, structures.spawns, specialStructures)
+            spawnManager(room)
 
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed
@@ -271,7 +271,7 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            factories(structures.factory)
+            factories(room)
 
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed
@@ -282,7 +282,7 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            powerSpawns(structures.powerSpawn)
+            powerSpawns(room)
 
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed
@@ -293,7 +293,7 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            links(room, specialStructures.links)
+            links(room)
 
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed

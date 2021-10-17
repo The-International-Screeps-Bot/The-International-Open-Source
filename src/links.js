@@ -1,49 +1,53 @@
-function links(room, specialLinks) {
+module.exports = function links(room) {
 
-    let controllerLink = specialLinks.controllerLink
-    let baseLink = specialLinks.baseLink
-    let sourceLink1 = specialLinks.sourceLink1
-    let sourceLink2 = specialLinks.sourceLink2
+    let controllerLink = room.get("controllerLink")
+    let baseLink = room.get("baseLink")
+    let sourceLink1 = room.get("sourceLink1")
+    let sourceLink2 = room.get("sourceLink2")
 
-    function findFullLink() {
+    let fullSourceLink = findFullSourceLink()
 
-        let collection = [sourceLink1, sourceLink2]
+    function findFullSourceLink() {
 
-        for (let link of collection) {
+        let sourceLinks = [sourceLink1, sourceLink2]
 
-            if (link && link != null && link.store[RESOURCE_ENERGY] >= 790) {
+        for (let link of sourceLinks) {
 
-                return link
-            }
+            // if the link doesn't exist continue
+
+            if (!link) continue
+
+            // if the link has less than link's capacity - 10 continue
+
+            if (link.store.getUsedCapacity(RESOURCE_ENERGY) < link.store.getCapacity() - 10) continue
+
+            return link
         }
-
-        return false
     }
 
-    if (findFullLink()) {
+    if (fullSourceLink) {
 
-        if (controllerLink != null) {
+        if (controllerLink) {
 
             if (controllerLink.store[RESOURCE_ENERGY] < 400 && room.controller.ticksToDowngrade <= 15000) {
 
-                findFullLink().transferEnergy(controllerLink)
+                fullSourceLink.transferEnergy(controllerLink)
+
             } else if (room.storage && room.storage.store.getUsedCapacity() >= 175000 && controllerLink.store[RESOURCE_ENERGY] < 200) {
 
-                findFullLink().transferEnergy(controllerLink)
+                fullSourceLink.transferEnergy(controllerLink)
 
             } else if (Memory.global.globalStage = 0 && room.storage && room.storage.store.getUsedCapacity() >= 30000 && controllerLink.store[RESOURCE_ENERGY] < 400) {
 
-                findFullLink().transferEnergy(controllerLink)
+                fullSourceLink.transferEnergy(controllerLink)
 
-            } else if (baseLink != null && baseLink.store[RESOURCE_ENERGY] < 700) {
+            } else if (baseLink && baseLink.store[RESOURCE_ENERGY] < 700) {
 
-                findFullLink().transferEnergy(baseLink)
+                fullSourceLink.transferEnergy(baseLink)
             }
-        } else if (baseLink != null && baseLink.store[RESOURCE_ENERGY] < 700) {
+        } else if (baseLink && baseLink.store[RESOURCE_ENERGY] < 700) {
 
-            findFullLink().transferEnergy(baseLink)
+            fullSourceLink.transferEnergy(baseLink)
         }
     }
 }
-
-module.exports = links
