@@ -54,7 +54,16 @@ module.exports = function visuals(room) {
 
     let controller = room.get("controller")
 
-    if (controller) {
+    controllerVisuals()
+
+    function controllerVisuals() {
+
+        // Stop if no controller
+
+        if (!controller) return
+
+        // If I am owner
+
         if (controller.my) {
 
             room.visual.text(controller.level, controller.pos.x, controller.pos.y + 0.25, { align: 'center', color: colors.communeGreen, opacity: "0.8" })
@@ -63,11 +72,19 @@ module.exports = function visuals(room) {
 
                 room.visual.text("%" + (controller.progress / controller.progressTotal * 100).toFixed(2), controller.pos.x, controller.pos.y - 1, { align: 'center', color: colors.communeGreen, opacity: "0.8" })
             }
-        } else if (controller.reservation) {
+
+            return
+        }
+
+        // If it is reserved
+
+        if (controller.reservation) {
 
             let reservationColor = findReservationColor()
 
             function findReservationColor() {
+
+                // If reserved by me
 
                 if (controller.reservation.username == me) {
 
@@ -75,11 +92,15 @@ module.exports = function visuals(room) {
                     return color
                 }
 
+                // If reserved by Invader
+
                 if (controller.reservation.username == "Invader") {
 
                     let color = colors.invaderOrange
                     return color
                 }
+
+                // If reserved by anything else
 
                 if (controller.reservation.username != me) {
 
@@ -89,6 +110,8 @@ module.exports = function visuals(room) {
             }
 
             room.visual.text(controller.reservation.ticksToEnd, controller.pos.x, controller.pos.y + 0.25, { align: 'center', color: reservationColor, opacity: "0.8" })
+
+            return
         }
     }
 
@@ -105,6 +128,8 @@ module.exports = function visuals(room) {
 
         room.visual.text(source.energy, source.pos.x, source.pos.y - 2, { color: colors.neutralYellow, align: 'center', opacity: "0.8" })
     }
+
+    // Stop if there is a controller and I am not the owner
 
     if (controller && !controller.my) return
 
@@ -130,11 +155,17 @@ module.exports = function visuals(room) {
 
     for (let spawn of room.get("spawns")) {
 
+        // If spawn is spawning creep
+
         if (spawn.spawning) {
 
-            room.visual.text(spawn.spawning.remainingTime, spawn.pos.x, spawn.pos.y - 1, { align: 'center', color: colors.communeGreen, opacity: "0.8" })
+            // Show time left until spawned
 
-            room.visual.text(Game.creeps[spawn.spawning.name].memory.role, spawn.pos.x, spawn.pos.y, { align: 'center', color: colors.communeGreen })
+            room.visual.text(spawn.spawning.remainingTime, spawn.pos.x, spawn.pos.y + 0.25, { align: 'center', color: colors.communeGreen, opacity: "0.8" })
+
+            // Show spawning creep's role
+
+            room.visual.text(Game.creeps[spawn.spawning.name].memory.role, spawn.pos.x, spawn.pos.y - 1, { align: 'center', color: colors.communeGreen })
         }
     }
 
@@ -288,31 +319,30 @@ module.exports = function visuals(room) {
         room.visual.text(chemical, lab.pos.x, lab.pos.y, { font: 0.3, backgroundColor: chemicalColors[chemical], backgroundPadding: "0.1" })
     }
 
-    let mineral = room.get("mineral")
+    mineralVisuals()
 
-    if (mineral) {
+    function mineralVisuals() {
+
+        let mineral = room.get("mineral")
+
+        // Make sure mineral exists
+
+        if (!mineral) return
+
+        // Show mineralAmount
 
         room.visual.text((mineral.mineralAmount / 1000).toFixed(0) + "k" + ", " + (mineral.ticksToRegeneration / 1000).toFixed(0) + "k", mineral.pos.x, mineral.pos.y - 1, { align: 'center', color: colors.neutralYellow, opacity: "0.8" })
 
-        let densityDisplay
-
-        if (mineral.density == 1) {
-
-            densityDisplay = "Low"
-
-        } else if (mineral.density == 2) {
-
-            densityDisplay = "Moderate"
-
-        } else if (mineral.density == 3) {
-
-            densityDisplay = "High"
-
-        } else if (mineral.density == 4) {
-
-            densityDisplay = "Ultra"
+        let densityDisplays = {
+            1: "Low",
+            2: "Moderate",
+            3: "High",
+            4: "Ultra"
         }
 
-        room.visual.text(densityDisplay, mineral.pos.x, mineral.pos.y - 2, { align: 'center', color: colors.neutralYellow, opacity: "0.8" })
+        // Show mineralDensity
+
+        room.visual.text(densityDisplays[mineral.density], mineral.pos.x, mineral.pos.y - 2, { align: 'center', color: colors.neutralYellow, opacity: "0.8" })
+
     }
 }
