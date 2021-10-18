@@ -1,6 +1,4 @@
-function informationManager() {
+module.exports = function informationManager() {
 
 
 }
-
-module.exports = informationManager

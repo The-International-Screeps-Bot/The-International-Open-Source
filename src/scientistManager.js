@@ -33,14 +33,21 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
             for (let input1 in REACTIONS) {
 
-                if (room.findStoredResourceAmount(input1) < 5000) continue
+                // Iterate if storing structures have more than 1,500 output
+
+                if (room.findStoredResourceAmount(input1) < 1500) continue
 
                 for (let input2 in REACTIONS[input1]) {
 
-                    if (room.findStoredResourceAmount(input2) < 5000) continue
+                    // Iterate if storing structures have more than 1,500 output
+
+                    if (room.findStoredResourceAmount(input2) < 1500) continue
 
                     let output = REACTIONS[input1][input2]
-                    if (room.findStoredResourceAmount(output) >= 3000) continue
+
+                    // Iterate if storing structures have more than 1,500 output
+
+                    if (room.findStoredResourceAmount(output) >= 1500) continue
 
                     return {
                         input1: input1,
@@ -71,11 +78,17 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
             creep.say("NA")
 
+            // Stop task if storing structures doesn't have enough input1
+
             if (room.findStoredResourceAmount(input1) < creep.store.getCapacity()) return
+
+            // Stop task if storing structures doesn't have enough input2
 
             if (room.findStoredResourceAmount(input2) < creep.store.getCapacity()) return
 
-            if (room.findStoredResourceAmount(output) >= 2000) return
+            // Stop task if storing structures has more than 2,000 output
+
+            if (room.findStoredResourceAmount(output) >= 3000) return
 
             creep.say("IA")
 
