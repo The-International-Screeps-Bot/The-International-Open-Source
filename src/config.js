@@ -112,5 +112,22 @@ module.exports = function config() {
 
             if (!room.memory[value]) room.memory[value] = roomValues[value]
         }
+
+        // Give properties that last 1 tick
+
+        room.orders = {}
+    }
+
+    // Add market orders to their respective rooms
+
+    for (let order in Game.market.orders) {
+
+        // Find room with order
+
+        let roomWithOrder = Memory.global.communes[order.roomName]
+
+        // Add order to the room
+
+        roomWithOrder.orders[order.id] = order
     }
 }

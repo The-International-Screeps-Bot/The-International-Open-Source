@@ -17,6 +17,7 @@ Room.prototype.get = function(roomVar) {
     let roomVars = {}
 
     // Resources
+
     roomVars.mineral = room.find(FIND_MINERALS)[0]
 
     roomVars.sources = room.find(FIND_SOURCES)
@@ -28,6 +29,7 @@ Room.prototype.get = function(roomVar) {
     })
 
     // Structures
+
     roomVars.allStructures = room.find(FIND_STRUCTURES)
     roomVars.allyStructures = findObjectWithOwner(FIND_HOSTILE_STRUCTURES, allyList)
     roomVars.enemyStructures = room.find(FIND_HOSTILE_STRUCTURES, {
@@ -70,10 +72,12 @@ Room.prototype.get = function(roomVar) {
     roomVars.tertiaryLabs = findLabs("tertiaryLabs")
 
     // Construction sites
+
     roomVars.allSites = room.find(FIND_CONSTRUCTION_SITES)
     roomVars.mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
 
     // Creeps
+
     roomVars.allCreeps = room.find(FIND_CREEPS)
     roomVars.myCreeps = findObjectWithOwner(FIND_CREEPS, [me])
     roomVars.allyCreeps = findObjectWithOwner(FIND_HOSTILE_CREEPS, allyList)
@@ -82,6 +86,7 @@ Room.prototype.get = function(roomVar) {
     })
 
     // Power creeps
+
     roomVars.allPowerCreeps = room.find(FIND_POWER_CREEPS)
     roomVars.myPowerCreeps = findObjectWithOwner(FIND_POWER_CREEPS, [me])
     roomVars.allyPowerCreeps = findObjectWithOwner(FIND_HOSTILE_POWER_CREEPS, allyList)
@@ -91,10 +96,13 @@ Room.prototype.get = function(roomVar) {
 
     // CostMatrixes
 
+
     // Other
+
     roomVars.anchorPoint = room.memory.anchorPoint ? new RoomPosition(room.memory.anchorPoint.x, room.memory.anchorPoint.y, room.memory.anchorPoint.roomName) : false
     roomVars.groupedRampartPositions = findGroupedRampartPositions()
     roomVars.storedEnergy = findStoredEnergy()
+    roomVars.orders = room.orders
 
     roomVars.source1HarvestPositions = findHarvestPositions("source1")
     roomVars.source2HarvestPositions = findHarvestPositions("source2")

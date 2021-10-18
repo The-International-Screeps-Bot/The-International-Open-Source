@@ -13,6 +13,11 @@ global.findOrders = function(orderType, resourceType) {
     return orders
 }
 
+global.findMyOrdersAmount = function() {
+
+    return Object.keys(Game.market.orders).length < 300
+}
+
 global.findObjectWithId = function(id) {
 
     if (!id || Game.getObjectById(id) == null) return false
