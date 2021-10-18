@@ -3,11 +3,8 @@ let config = require("config")
 require("commands")
 
 let globalManager = require("globalManager")
-
 let roomManager = require("roomManager")
-
 let informationManager = require("informationManager")
-
 let data = require("data")
 let logging = require("logging")
 

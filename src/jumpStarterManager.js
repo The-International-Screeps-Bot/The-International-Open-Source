@@ -1,4 +1,4 @@
-function jumpStarterManager(room, creepsWithRole) {
+module.exports = function jumpStarterManager(room, creepsWithRole) {
 
     if (creepsWithRole.length == 0) return
 
@@ -239,5 +239,3 @@ function jumpStarterManager(room, creepsWithRole) {
         }
     }
 }
-
-module.exports = jumpStarterManager

@@ -1,8 +1,12 @@
 module.exports = function scientistManager(room, creepsWithRole) {
 
+    // Stop if there are no creeps
+
     if (creepsWithRole.length == 0) return
 
     let labs = room.get("labs")
+
+    // Stop if there are no labs
 
     if (labs.length == 0) return
 

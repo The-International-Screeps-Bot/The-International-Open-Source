@@ -1,4 +1,6 @@
-function mapVisuals() {
+module.exports = function mapVisuals() {
+
+    // Stop if map visuals are disabled
 
     if (!Memory.global.mapVisuals) return
 
@@ -75,10 +77,12 @@ function mapVisuals() {
             }
         }
     }
+
     if (Memory.global.attackingRoom && Memory.global.attackTarget) {
 
         Game.map.visual.line(new RoomPosition(25, 25, Memory.global.attackingRoom), new RoomPosition(25, 25, Memory.global.attackTarget), { width: 2.5, color: '#FE411E', lineStyle: "dashed", opacity: 0.8 })
     }
+
     if (Memory.global.attackTarget) {
 
         Game.map.visual.circle(new RoomPosition(50 - 8, 8, Memory.global.attackTarget), { radius: 8, fill: '#FF0000', opacity: 0.5 })
@@ -96,5 +100,3 @@ function mapVisuals() {
         Game.map.visual.text("NC", new RoomPosition(50 - 8, 8, Memory.global.newCommune), { color: '#ffffff', fontSize: 8 })
     }
 }
-
-module.exports = mapVisuals

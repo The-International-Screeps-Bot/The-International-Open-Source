@@ -1,5 +1,3 @@
-const informationManager = require("./informationManager")
-
 Room.prototype.get = function(roomVar) {
 
     let room = this

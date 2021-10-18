@@ -1,4 +1,4 @@
-function construction(room, specialStructures) {
+module.exports = function construction(room, specialStructures) {
 
     let mineralContainer = specialStructures.containers.mineralContainer
     let controllerContainer = specialStructures.containers.controllerContainer
@@ -202,5 +202,3 @@ function construction(room, specialStructures) {
         }
     }
 }
-
-module.exports = construction

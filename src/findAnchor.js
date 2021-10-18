@@ -1,4 +1,4 @@
-function findAnchor(room) {
+module.exports = function findAnchor(room) {
 
     if (room.memory.anchorPoint) return true
 
@@ -146,5 +146,3 @@ function findAnchor(room) {
     room.memory.anchorPoint == "noAnchor"
     return false
 }
-
-module.exports = findAnchor

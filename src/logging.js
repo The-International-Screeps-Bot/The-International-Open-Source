@@ -19,25 +19,10 @@ function logging() {
         return lastDefence
     }
 
-    function myRoomsNumber() {
+    function totalEnergy() {
 
-        let i = 0
-
-        _.forEach(Game.rooms, function(room) {
-
-            if (room.controller && room.controller.my) {
-
-                i++
-            }
-        })
-
-        return i
-    }
-
-    function energyAmount() {
-
-        let energyAmount = `<th style="text-align: center; padding: 5px 0; color: #FFD180;">Total Energy: ` + (Memory.global.totalEnergy / 1000).toFixed(0) + "k" + `</th>`
-        return energyAmount
+        let totalEnergy = `<th style="text-align: center; padding: 5px 0; color: #FFD180;">Total Energy: ` + (Memory.global.totalEnergy / 1000).toFixed(0) + "k" + `</th>`
+        return totalEnergy
     }
 
     function cpuBucketMessage() {
@@ -82,11 +67,6 @@ function logging() {
         }
     }
 
-    function cpuSpecificMessage() {
-
-
-    }
-
     function getEstablishedRooms() {
 
         return Memory.global.establishedRooms.length
@@ -121,13 +101,13 @@ function logging() {
             </tr>
             <tr>
                 <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Global Stage: ` + Memory.global.globalStage + ` <br /> Time: ` + Game.time % 100 + `</th>
-                ` + energyAmount() + `
+                ` + totalEnergy() + `
                 <th style="text-align: center; padding: 5px 0;">Last Defence: ` + lastDefence() + `</th>
                 <th style="text-align: center; padding: 5px 0;">Total CR: ` + (Game.market.credits / 1000).toFixed(0) + "k" + `</th>
                 <th style="text-align: center; padding: 5px 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">Alles: ` + allyList + `</th>
             </tr>
             <tr style="background: #333">
-                <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Creeps: ` + Object.values(Memory.creeps).length + " (" + Math.floor(Object.values(Memory.creeps).length / myRoomsNumber()) + " per commune)" + `</th>
+                <th style="text-align: center; padding: 5px 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px;">Creeps: ` + Object.values(Memory.creeps).length + " (" + Math.floor(Object.values(Memory.creeps).length / Memory.global.communes.length) + " per commune)" + `</th>
                 <th style="text-align: center; padding: 5px 0;">Total Boosts: ` + "x" + `</th>
                 <th style="text-align: center; padding: 5px 0;">Last Attack: ` + "x ticks ago, room y" + `</th>
                 <th style="text-align: center; padding: 5px 0;">Market Offers: ` + Object.values(Game.market.orders).length + `</th>
