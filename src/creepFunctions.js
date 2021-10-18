@@ -341,19 +341,21 @@ Creep.prototype.waitAwayFromAnchorPoint = function() {
 
     const anchorPoint = room.get("anchorPoint")
 
+    let distance = creep.pos.getRangeTo(anchorPoint)
+
     // Stop if creep is 6 away from anchorPoint
 
-    if (creep.pos.getRangeTo(anchorPoint) == 6) return true
+    if (distance == 7) return true
 
     // If creep is more than 6 from anchorPoint
 
-    if (creep.pos.getRangeTo(anchorPoint) > 6) {
+    if (distance > 7) {
 
         // Move to anchorPoint
 
         creep.travel({
             origin: creep.pos,
-            goal: { pos: anchorPoint, range: 6 },
+            goal: { pos: anchorPoint, range: 7 },
             plainCost: 1,
             swampCost: false,
             defaultCostMatrix: false,
@@ -369,7 +371,7 @@ Creep.prototype.waitAwayFromAnchorPoint = function() {
 
     creep.travel({
         origin: creep.pos,
-        goal: { pos: anchorPoint, range: 6 },
+        goal: { pos: anchorPoint, range: 7 },
         plainCost: 1,
         swampCost: false,
         defaultCostMatrix: false,

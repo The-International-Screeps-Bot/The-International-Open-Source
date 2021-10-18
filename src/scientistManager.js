@@ -60,7 +60,11 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
         // Make sure creep has a task
 
-        if (!task) continue
+        if (!task) {
+
+            creep.waitAwayFromAnchorPoint()
+            continue
+        }
 
         creep.isFull()
 
