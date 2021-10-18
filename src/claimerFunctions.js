@@ -5,7 +5,11 @@ Creep.prototype.advancedClaim = function() {
 
     const controller = room.get("controller")
 
+    // Stop if there are no controllers
+
     if (!controller) return
+
+    //
 
     if (creep.pos.getRangeTo(controller) <= 1) {
 

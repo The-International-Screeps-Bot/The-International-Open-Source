@@ -1,10 +1,14 @@
 require("towerFunctions")
 
-function towerManager(room) {
+module.exports = function towerManager(room) {
 
     let towers = room.get("towers")
 
+    // Stop if there are no towers
+
     if (towers.length == 0) return
+
+    //
 
     if (room.attackEnemys(towers)) return
 
@@ -16,5 +20,3 @@ function towerManager(room) {
 
     if (room.repairRamparts(towers)) return
 }
-
-module.exports = towerManager

@@ -1,14 +1,18 @@
+require("claimerFunctions")
+
 module.exports = function claimerManager(room, creepsWithRole) {
 
-    if (creepsWithRole.length == 0) return
+    // Stop if there are no creeps
 
-    require("claimerFunctions")
+    if (creepsWithRole.length == 0) return
 
     for (let creep of creepsWithRole) {
 
         if (creep.avoidEnemys()) continue
 
         const newCommune = Memory.global.newCommune
+
+        // Stop if there is no newCommune
 
         if (!newCommune) continue
 

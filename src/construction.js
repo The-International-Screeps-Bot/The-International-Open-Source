@@ -15,11 +15,6 @@ function construction(room, specialStructures) {
 
             if (Game.time % 103 == 0) mineralPath()
         }
-
-        if (room.memory.stage >= 6) {
-
-            if (Game.time % 100 == 0) placeExtractor()
-        }
     }
 
     function controllerPath() {
@@ -203,23 +198,6 @@ function construction(room, specialStructures) {
 
                     room.createConstructionSite(normalValue.x, normalValue.y, STRUCTURE_CONTAINER)
                 }
-            }
-        }
-    }
-
-    function placeExtractor() {
-
-        let extractors = room.find(FIND_MY_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_EXTRACTOR
-        })
-
-        if (extractors.length == 0) {
-
-            let mineral = room.find(FIND_MINERALS)[0]
-
-            if (mineral) {
-
-                room.createConstructionSite(mineral.pos, STRUCTURE_EXTRACTOR)
             }
         }
     }

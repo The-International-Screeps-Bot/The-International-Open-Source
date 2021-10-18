@@ -1,4 +1,4 @@
-function roomPlanner(room) {
+module.exports = function roomPlanner(room) {
 
     const anchorPoint = room.get("anchorPoint")
 
@@ -6,7 +6,7 @@ function roomPlanner(room) {
 
     room.visual.rect(anchorPoint.x - 0.5, anchorPoint.y - 0.5, 1, 1, { fill: "transparent", stroke: "#45C476", strokeWidth: "0.15" })
 
-    /* if (Object.values(Game.constructionSites).length == 100) return */
+    /* if (Object.keys(Game.constructionSites).length == 100) return */
 
     let mySites = room.find(FIND_MY_CONSTRUCTION_SITES)
 
@@ -272,11 +272,6 @@ function roomPlanner(room) {
         }
     }
 
-    if (room.storage && room.memory.stage >= 4) {
-
-        /* if (Game.time % 100 == 0) placeRamparts(ramparts) */
-    }
-
     function findBuildingsOnPos(constant, type, pos) {
 
         let building = room.find(constant, {
@@ -484,6 +479,8 @@ function roomPlanner(room) {
     }
 
     // Other construction
+
+    let controller = room.get("controller")
 
     let sourceContainer1 = room.get("sourceContainer1")
     let sourceContainer2 = room.get("sourceContainer2")
@@ -795,11 +792,44 @@ function roomPlanner(room) {
         }
     }
 
+    placeExtractor()
+
+    function placeExtractor() {
+
+        // Stop if controller level is less than 6
+
+        if (controller.level < 6) return
+
+        //
+
+        let extractor = room.get("extractor")
+
+        // Stop if there is an extractor
+
+        if (extractor) return
+
+        //
+
+        let mineral = room.get("mineral")
+
+        // Stop if there is no mineral
+
+        if (!mineral) return
+
+        // Place extractor
+
+        room.createConstructionSite(mineral.pos, STRUCTURE_EXTRACTOR)
+    }
+
     removeUneeded()
 
     function removeUneeded() {
 
+        // Stop if the tick is divisible by 100
+
         if (Game.time % 100 != 0) return
+
+        //
 
         if (baseLink && controllerLink && controllerContainer) controllerContainer.destroy()
 
@@ -807,11 +837,15 @@ function roomPlanner(room) {
 
         if (sourceContainer2 && sourceLink2) sourceContainer2.destroy() */
 
+        // Find and destroy walls
+
         let walls = room.find(FIND_STRUCTURES, {
             filter: s => s.structureType == STRUCTURE_WALL
         })
 
         for (let structure of walls) structure.destroy()
+
+        // Find and destroy enemyStructures
 
         let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES, {
             filter: s => s.owner && !s.my
@@ -820,5 +854,3 @@ function roomPlanner(room) {
         for (let structure of enemyStructures) structure.destroy()
     }
 }
-
-module.exports = roomPlanner

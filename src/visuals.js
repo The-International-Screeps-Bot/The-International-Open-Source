@@ -1,6 +1,10 @@
 module.exports = function visuals(room) {
 
+    // Stop if visuals are turned off
+
     if (!Memory.global.roomVisuals) return
+
+    //
 
     let sourceContainer1 = room.get("sourceContainer1")
     let sourceContainer2 = room.get("sourceContainer2")
