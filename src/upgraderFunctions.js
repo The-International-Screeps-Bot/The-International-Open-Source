@@ -2,6 +2,8 @@ Creep.prototype.upgradeWithControllerContianer = function(controller, controller
 
     let creep = this
 
+    // Stop if there is no controllerContainer
+
     if (!controllerContainer) return
 
     creep.advancedUpgrade(controller)
@@ -12,11 +14,15 @@ Creep.prototype.upgradeWithControllerContianer = function(controller, controller
 
         creep.say("F")
 
-        // Make sure the creep is in range of 2 from controllerContainer
+        let distance = creep.pos.getRangeTo(controllerContainer)
 
-        let rangeFromControllerContainer = creep.pos.getRangeTo(controllerContainer)
+        // Stop if creep is at range of 2
 
-        if (rangeFromControllerContainer > 2) {
+        if (distance == 2) return true
+
+        // Move towards if range is more than 2
+
+        if (distance > 2) {
 
             creep.travel({
                 origin: creep.pos,
@@ -32,7 +38,9 @@ Creep.prototype.upgradeWithControllerContianer = function(controller, controller
             return true
         }
 
-        if (rangeFromControllerContainer < 2) {
+        // Move away if range is less than 2
+
+        if (distance < 2) {
 
             creep.travel({
                 origin: creep.pos,

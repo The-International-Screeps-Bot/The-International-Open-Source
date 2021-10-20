@@ -143,6 +143,6 @@ module.exports = function findAnchor(room) {
 
     if (anchorPointResult) return true
 
-    room.memory.anchorPoint == "noAnchor"
+    room.memory.anchorPoint == false
     return false
 }

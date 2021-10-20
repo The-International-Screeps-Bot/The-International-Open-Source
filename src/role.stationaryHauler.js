@@ -41,7 +41,7 @@ module.exports = {
 
                 creep.memory.terminalWithdrawBattery = true
             }
-            if (storage && storage.store[RESOURCE_ENERGY] >= 120000 && terminal && terminal.store[RESOURCE_ENERGY] < 60000 && terminal.store.getFreeCapacity() >= creep.store.getCapacity()) {
+            if (storage && storage.store[RESOURCE_ENERGY] >= 100000 && terminal && terminal.store[RESOURCE_ENERGY] < 60000 && terminal.store.getFreeCapacity() >= creep.store.getCapacity()) {
 
                 creep.memory.storageToTerminal = true
             }

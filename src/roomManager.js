@@ -14,7 +14,7 @@ let findAnchor = require("findAnchor")
 
 let roomPlanner = require("roomPlanner")
 
-let defenseManager = require("defenseManager")
+let defenceManager = require("defenceManager")
 let taskManager = require("taskManager")
 
 let spawnManager = require("spawnManager")
@@ -139,34 +139,11 @@ function roomManager() {
         consoleMessage += `visuals: ` + cpuUsed.toFixed(2) + `
                     `
 
-        //
-
-        let combatHappened = false
-
-        if ((room.controller && room.controller.my) || room.memory.stage == "remoteRoom") {
-
-            let eventLog = room.getEventLog()
-            let combatEvents = eventLog.filter(eventObject => eventObject.event == EVENT_ATTACK)
-
-            for (let event of combatEvents) {
-
-                let target = Game.getObjectById(event.data.targetId)
-
-                if (!target) continue
-                if (!target.my) continue
-
-                combatHappened = true
-                break
-            }
-        }
-
         // Commune only scripts
 
         if (room.controller && room.controller.my) {
 
             // PLEASE MOVE THIS TO A DEDICATED FILE
-
-            //
 
             for (let depositId in room.memory.deposits) {
 
@@ -174,14 +151,6 @@ function roomManager() {
 
                 if (Game.time > deposit.decayBy) delete deposit
             }
-
-            //
-
-            let enemys = room.find(FIND_HOSTILE_CREEPS, {
-                filter: enemyCreep => !allyList.includes(enemyCreep.owner.username) && enemyCreep.owner.username != "Invader" && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
-            })
-
-            if (combatHappened && enemys.length > 0) room.controller.activateSafeMode()
 
             //
 
@@ -224,11 +193,11 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            defenseManager(room, creeps)
+            defenceManager(room, creeps)
 
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed
-            consoleMessage += `defenseManager: ` + cpuUsed.toFixed(2) + `
+            consoleMessage += `defenceManager: ` + cpuUsed.toFixed(2) + `
             `
 
             //
@@ -257,10 +226,7 @@ function roomManager() {
 
             cpuUsed = Game.cpu.getUsed()
 
-            if (Game.time % 10 == 0) {
-
-                terminals(room)
-            }
+            terminals(room)
 
             totalCpuUsed += Game.cpu.getUsed()
             cpuUsed = Game.cpu.getUsed() - cpuUsed

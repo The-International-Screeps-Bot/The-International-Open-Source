@@ -709,6 +709,7 @@ Creep.prototype.avoidEnemys = function() {
 
     return true
 }
+
 Creep.prototype.findClosestDistancePossible = function(creep, healers, closestTower, towerCount) {
 
     let distance = creep.pos.getRangeTo(creep.pos.findClosestByRange(towers))
@@ -791,9 +792,13 @@ Creep.prototype.travel = function(opts) {
 
     let creep = this
 
-    // Make sure the creep can move
+    // Stop if creep can't move
 
-    if (creep.fatigue > 0 || creep.spawning) return
+    if (creep.fatigue > 0) return
+
+    // Stop if creep is spawning
+
+    if (creep.spawning) return
 
     // Assign defaults if values arn't provided
 
@@ -813,6 +818,8 @@ Creep.prototype.travel = function(opts) {
 
     let origin = opts.origin
     let goal = opts.goal
+
+    // Stop if there is no inter room path to goal
 
     if (findInterRoomGoal() == ERR_NO_PATH) return
 
@@ -991,38 +998,57 @@ Creep.prototype.travel = function(opts) {
         }
     }
 
+    // Stop if there is no path
+
     if (moveWithPath() == ERR_NO_PATH) return
 
     function moveWithPath() {
+
+        // Stop if there is no path
 
         if (!path || path.length == 0) return
 
         let pos = path[0]
 
-        if (!pos) return
-
         // Move to first position of path
 
         let direction = creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))
-        if (creep.move(direction) == ERR_NO_PATH) return
 
-        // Show path if move worked
+        // Assign direction to creep
 
-        creep.room.visual.poly(path, { stroke: colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
+        creep.direction = direction
+
+        // Try to move. Stop if move fails
+
+        if (creep.move(direction) == ERR_NO_PATH) return ERR_NO_PATH
 
         // Delete pos from path
 
         path = removePropertyFromArray(path, pos)
+
+        // Assign path to memory
+
         creep.memory.path = path
 
-        /* if (creep.move(creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))) != 0) return
-    
-                if (creep.pos != pos) return
-    
-                creep.room.visual.poly(path, { stroke: colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
-    
-                path = removePropertyFromArray(path, pos)
-                creep.memory.path = path */
+        // If creep moved
+
+        /* if (arePositionsEqual(creep.pos, pos)) {
+
+            // Delete pos from path
+
+            path = removePropertyFromArray(path, pos)
+
+            // Assign path to memory
+
+            creep.memory.path = path
+        } */
+    }
+
+    visualizePath()
+
+    function visualizePath() {
+
+        creep.room.visual.poly(path, { stroke: colors.neutralYellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
     }
 }
 Creep.prototype.roadPathing = function(origin, goal) {

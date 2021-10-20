@@ -33,13 +33,13 @@ module.exports = function scientistManager(room, creepsWithRole) {
 
             for (let input1 in REACTIONS) {
 
-                // Iterate if storing structures have more than 1,500 output
+                // Iterate if storing structures have less than 1500 input1
 
                 if (room.findStoredResourceAmount(input1) < 1500) continue
 
                 for (let input2 in REACTIONS[input1]) {
 
-                    // Iterate if storing structures have more than 1,500 output
+                    // Iterate if storing structures have less than 1500 input2
 
                     if (room.findStoredResourceAmount(input2) < 1500) continue
 
@@ -61,6 +61,8 @@ module.exports = function scientistManager(room, creepsWithRole) {
         // Make sure creep has a task
 
         if (!task) {
+
+            // If no task wait
 
             creep.waitAwayFromAnchorPoint()
             continue

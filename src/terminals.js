@@ -1,5 +1,11 @@
 module.exports = function terminals(room) {
 
+    // Stop if Game.time is not divisible by 10
+
+    if (Game.time % 10 != 0) return
+
+    //
+
     let terminal = room.get("terminal")
 
     // Stop if no terminal exists
@@ -68,35 +74,34 @@ module.exports = function terminals(room) {
 
             // Try to find and sell to a buy order
 
-            if (createBuyOrder()) return
+            if (buyResource()) return
 
-            function createBuyOrder() {
+            function buyResource() {
 
-                // Find buy orders with resource
+                // Find sell orders with resource
 
-                let orders = findOrders(ORDER_BUY, resource)
+                let orders = findOrders(ORDER_SELL, resource, avgPrice(resource) * 1.2)
 
-                // Stop if there are no orders
+                // Loop through orders so long as there are orders left and we don't have enough resource
 
-                if (orders.length == 0) return
+                let i = 0
 
-                // Loop through buy orders of this resource
+                while (i < orders.length && room.findStoredResourceAmount(resource) < requestedAmount) {
 
-                for (let order of orders) {
+                    let order = orders[i]
 
-                    // Iterate if price less fairly below avgPrice
+                    // Buy resource
 
-                    if (order.price < avgPrice(resource) * 0.9) continue
+                    Game.market.deal(order.id, requestedAmount - room.findStoredResourceAmount(resource), room.name)
 
-                    // Buy amount is the lowest of 10,000 or order amount
+                    // Record iteration
 
-                    let buyAmount = Math.min(order.amount, 10000)
-
-                    // Sell resources order
-
-                    Game.market.deal(order.id, buyAmount, room.name)
-                    return
+                    i++
                 }
+
+                // Inform the operation worked if we have enough of resource
+
+                if (room.findStoredResourceAmount(resource) >= requestedAmount) return true
             }
 
             // Try to create a sell order
@@ -116,6 +121,7 @@ module.exports = function terminals(room) {
                 // Create sell order
 
                 Game.market.createOrder({ type: ORDER_SELL, resourceType: resource, price: avgPrice(resource) * 0.9, totalAmount: 10000, roomName: room.name })
+                return true
             }
         }
     }
@@ -211,42 +217,44 @@ module.exports = function terminals(room) {
     let bases = ["OH", "ZK", "UL", "G"]
     let minerals = ["H", "O", "U", "K", "L", "Z", "X"]
 
-    if (room.controller.level >= 7) {
-        for (let resources of minerals) {
+    buyMinerals()
 
-            for (let resource of t3Boosts) {
+    function buyMinerals() {
 
-                if (resources == resource && terminal.store.getUsedCapacity([resource]) < 5000) {
+        let requestedAmount = 5000
 
-                    //console.log(resources)
+        for (let resource of minerals) {
 
-                }
-            }
-            for (let resource of minerals) {
+            // Iterate if we have enough of the resource
 
-                let filteredMinerals = []
+            if (room.findStoredResourceAmount(resource) >= requestedAmount / 2) continue
 
-                if (resources == resource && terminal.store.getUsedCapacity([resources]) < 5000) {
+            // Find sell orders with resource
 
-                    filteredMinerals.push(resources)
+            let orders = findOrders(ORDER_SELL, resource, avgPrice(resource) * 1.2)
 
-                }
+            // Loop through orders so long as there are orders left and we don't have enough resource
 
-                for (let filteredResource of filteredMinerals) {
+            let i = 0
 
-                    //console.log(filteredResource + ", " + terminal.room.name)
+            while (i < orders.length && room.findStoredResourceAmount(resource) < requestedAmount) {
 
-                    let buyOrders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == filteredResource && order.price < avgPrice(filteredResource) * 1.2 && order.amount >= (6000 - terminal.store.getUsedCapacity([filteredResource])))
+                let order = orders[i]
 
-                    if (buyOrders[0]) {
+                // Buy resource
 
-                        console.log("Found order for: " + filteredResource + ", " + room + ", " + buyOrders[0]["id"] + ", " + buyOrders[0].amount)
-                        Game.market.deal(buyOrders[0]["id"], 6000 - terminal.store.getUsedCapacity([filteredResource]), room.name)
+                Game.market.deal(order.id, requestedAmount - room.findStoredResourceAmount(resource), room.name)
 
-                    }
-                }
+                // Record iteration
+
+                i++
             }
         }
+    }
+
+    function manageResourceRequests() {
+
+
     }
 
     buyPower()
@@ -259,28 +267,33 @@ module.exports = function terminals(room) {
 
         if (controller.level != 8) return
 
+        //
+
+        let requestedAmount = 5000
+
         // Stop if there is more than 5k power in the room
 
-        if (room.findStoredResourceAmount(RESOURCE_POWER) >= 5000) return
+        if (room.findStoredResourceAmount(RESOURCE_POWER) >= requestedAmount / 2) return
 
-        // Find power orders
+        // Find sell orders with resource
 
-        let powerOrders = findOrders(ORDER_SELL, RESOURCE_POWER)
+        let orders = findOrders(ORDER_SELL, RESOURCE_POWER, avgPrice(resource) * 1.2)
 
-        for (let order of powerOrders) {
+        // Loop through orders so long as there are orders left and we don't have enough resource
 
-            // Iterate if the price is fairly above average
+        let i = 0
 
-            if (order.price >= avgPrice(RESOURCE_POWER) * 0.9) continue
+        while (i < orders.length && room.findStoredResourceAmount(resource) < requestedAmount) {
 
-            // Purchase lowest of order amount or 6000
-
-            let buyAmount = Math.min(order.amount, 6000)
+            let order = orders[i]
 
             // Buy resource
 
-            Game.market.deal(order.id, buyAmount, room.name)
-            break
+            Game.market.deal(order.id, requestedAmount - room.findStoredResourceAmount(resource), room.name)
+
+            // Record iteration
+
+            i++
         }
     }
 }

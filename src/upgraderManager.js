@@ -1,8 +1,10 @@
-function upgradeManager(room, creepsWithRole) {
+require("upgraderFunctions")
+
+module.exports = function upgradeManager(room, creepsWithRole) {
+
+    // Stop if there are no creeps
 
     if (creepsWithRole.length == 0) return
-
-    require("upgraderFunctions")
 
     const controller = room.get("controller")
 
@@ -71,5 +73,3 @@ function upgradeManager(room, creepsWithRole) {
         }
     }
 }
-
-module.exports = upgradeManager

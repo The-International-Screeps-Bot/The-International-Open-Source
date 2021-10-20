@@ -847,9 +847,7 @@ module.exports = function roomPlanner(room) {
 
         // Find and destroy enemyStructures
 
-        let enemyStructures = room.find(FIND_HOSTILE_STRUCTURES, {
-            filter: s => s.owner && !s.my
-        })
+        let enemyStructures = room.get("enemyStructures")
 
         for (let structure of enemyStructures) structure.destroy()
     }

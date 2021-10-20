@@ -101,6 +101,62 @@ function scoutManager(room, creepsWithRole) {
 
             // Find what type of room this is and gather and record data on it
 
+            if (controller.owner) {
+
+                if (controller.my) {
+
+
+                } else if (allyList.indexOf(controller.owner.username) >= 0) {
+
+                    room.memory.stage = "allyRoom"
+                    room.memory.owner = controller.owner.username
+                    room.memory.level = controller.level
+
+                } else {
+
+                    room.memory.stage = "enemyRoom"
+                    room.memory.owner = controller.owner.username
+                    room.memory.level = controller.level
+                    room.memory.threat = 0
+
+                    /* room.memory.maxRampart = */
+                    /* room.memory.towerAmount =  */
+                    /* room.memory.spawnAmount =  */
+                    /* room.memory.labAmount =  */
+                    /* room.memory.storedEnergy =  */
+                    /* room.memory.storage = boolean */
+                    /* room.memory.terminal = boolean */
+                    /* room.memory.boosts = {attack: amount, rangedAttack: amount, work: amount} */
+                }
+            } else {
+
+                if (controller.reservation && controller.reservation.username != "Invader") {
+
+                    if (controller.reservation.username == me) {
+
+
+                    } else {
+
+                        // If reserved and not reserved by me or invaders find if enemy or ally has reserved it
+
+                        if (allyList.includes(controller.reservation.username)) {
+
+                            room.memory.stage = "allyReservation"
+
+                        } else {
+
+                            room.memory.stage = "enemyReservation"
+                        }
+                    }
+                } else {
+
+                    if (room.memory.stage != "remoteRoom") {
+
+                        room.memory.stage = "neutralRoom"
+                    }
+                }
+            }
+
             // Check if viable remoteRoom
 
             isRemoteRoom()
@@ -204,7 +260,7 @@ function scoutManager(room, creepsWithRole) {
 
                     let roomName = exits[property]
 
-                    // If room doesn't have a memory continue
+                    // Stop if room has no memory
 
                     if (!Memory.rooms[roomName]) return
 
@@ -236,62 +292,6 @@ function scoutManager(room, creepsWithRole) {
                 // If claimableRooms doesn't include this roomName then add it
 
                 if (!Memory.global.claimableRooms.includes(room.name)) Memory.global.claimableRooms.push(room.name)
-            }
-
-            if (controller.owner) {
-
-                if (controller.my) {
-
-
-                } else if (allyList.indexOf(controller.owner.username) >= 0) {
-
-                    room.memory.stage = "allyRoom"
-                    room.memory.owner = controller.owner.username
-                    room.memory.level = controller.level
-
-                } else {
-
-                    room.memory.stage = "enemyRoom"
-                    room.memory.owner = controller.owner.username
-                    room.memory.level = controller.level
-                    room.memory.threat = 0
-
-                    /* room.memory.maxRampart = */
-                    /* room.memory.towerAmount =  */
-                    /* room.memory.spawnAmount =  */
-                    /* room.memory.labAmount =  */
-                    /* room.memory.storedEnergy =  */
-                    /* room.memory.storage = boolean */
-                    /* room.memory.terminal = boolean */
-                    /* room.memory.boosts = {attack: amount, rangedAttack: amount, work: amount} */
-                }
-            } else {
-
-                if (controller.reservation && controller.reservation.username != "Invader") {
-
-                    if (controller.reservation.username == me) {
-
-
-                    } else {
-
-                        // If reserved and not reserved by me or invaders find if enemy or ally has reserved it
-
-                        if (allyList.includes(controller.reservation.username)) {
-
-                            room.memory.stage = "allyReservation"
-
-                        } else {
-
-                            room.memory.stage = "enemyReservation"
-                        }
-                    }
-                } else {
-
-                    if (room.memory.stage != "remoteRoom") {
-
-                        room.memory.stage = "neutralRoom"
-                    }
-                }
             }
 
             // Continue to targetRoom

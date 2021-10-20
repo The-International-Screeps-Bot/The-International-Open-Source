@@ -6,9 +6,16 @@ global.avgPrice = function(resource) {
     return resourceHistory[0].avgPrice
 }
 
-global.findOrders = function(orderType, resourceType) {
+global.findOrders = function(orderType, resourceType, maxPrice) {
 
-    let orders = Game.market.getAllOrders({ type: orderType, resourceType: resourceType })
+    let orders = Game.market.getAllOrders(function(order) {
+
+        if (orderType && order.type != orderType) return
+        if (resourceType && order.resourceType != resourceType) return
+        if (price && order.price > maxPrice) return
+
+        return order
+    })
 
     return orders
 }
@@ -128,4 +135,9 @@ global.getPositionsInsideRect = function(rect) {
     }
 
     return positions
+}
+
+global.arePositionsEqual = function(pos1, pos2) {
+
+    if (pos1.x == pos2.x && pos1.y == pos2.y) return true
 }
