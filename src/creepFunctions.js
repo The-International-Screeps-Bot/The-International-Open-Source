@@ -788,6 +788,7 @@ creep.travel({
     cacheAmount: 50,
 })
  */
+
 Creep.prototype.travel = function(opts) {
 
     let creep = this

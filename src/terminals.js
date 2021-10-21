@@ -1,16 +1,14 @@
 module.exports = function terminals(room) {
 
-    // Stop if Game.time is not divisible by 10
-
-    if (Game.time % 10 != 0) return
-
-    //
-
     let terminal = room.get("terminal")
 
     // Stop if no terminal exists
 
     if (!terminal) return
+
+    // Stop if terminal can't do things
+
+    if (terminal.cooldown > 0) return
 
     // Stop if on my private server
 

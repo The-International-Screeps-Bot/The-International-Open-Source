@@ -57,6 +57,7 @@ module.exports = function config() {
         resourceRequests: {},
         claimableRooms: [],
         newCommune: undefined,
+        id: 0,
     }
 
     for (let value in globalValues) {
@@ -104,6 +105,7 @@ module.exports = function config() {
         let roomValues = {
             remoteRooms: {},
             deposits: {},
+            requests: {},
         }
 
         // Assign values to the room memory

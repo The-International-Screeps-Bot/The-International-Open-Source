@@ -268,13 +268,13 @@ function scoutManager(room, creepsWithRole) {
 
                     if (Memory.rooms[roomName].owner && Memory.rooms[roomName].owner == "slowmotionghost") return
 
+                    // Make sure room isn't already claimable
+
+                    if (Memory.rooms[roomName].claimable) return
+
                     // Confirm room isn't a commune
 
                     if (Memory.global.communes.includes(roomName)) return
-
-                    // Make sure room isn't claimable
-
-                    if (Memory.rooms[roomName].claimable) return
                 }
 
                 // Make sure there is a spot to put the bunker

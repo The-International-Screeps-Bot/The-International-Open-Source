@@ -1,3 +1,10 @@
+global.newID = function() {
+
+    // Increase id count and return it
+
+    return Memory.global.id += 1
+}
+
 global.avgPrice = function(resource) {
 
     let resourceHistory = Game.market.getHistory(resource)
