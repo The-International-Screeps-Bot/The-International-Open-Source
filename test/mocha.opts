@@ -1,0 +1,14 @@
+--require test/setup-mocha.js
+--require ts-node/register
+--require tsconfig-paths/register
+--ui bdd
+
+--reporter spec
+--bail
+--full-trace
+--watch-extensions tsx,ts
+--colors
+
+--recursive
+--timeout 5000
+--exit
