@@ -12,7 +12,7 @@
         "source.fixAll.eslint": true
     },
     "editor.formatOnSave": true,
-    "editor.renderWhitespace": "boundary",
+    "editor.renderWhitespace": "none",
     "files.encoding": "utf8",
     "files.insertFinalNewline": true,
     "files.trimTrailingWhitespace": true,

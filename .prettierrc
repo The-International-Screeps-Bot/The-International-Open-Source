@@ -1,0 +1,10 @@
+{
+    "editor.formatOnSave": true,
+    "semi": false,
+    "tabWidth": 5,
+    "printWidth": 120,
+    "singleQuote": false,
+    "trailingComma": "none",
+    "arrowParens": "avoid",
+    "endOfLine": "auto"
+}

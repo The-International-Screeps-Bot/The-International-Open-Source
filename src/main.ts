@@ -1,4 +1,16 @@
+// Global
+
+import { globalManager } from "global/globalManager"
+
+// Room
+
+import { roomManager } from "room/roomManager"
+
+// Other
+
 import { ErrorMapper } from "external/ErrorMapper"
+
+// Loop
 
 declare global {
   /*
