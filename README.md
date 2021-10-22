@@ -23,14 +23,28 @@ Please create an issue for feature requests or help. I'll add a usage guide some
 
 Please read the about section before installing and using this bot.
 
-``
-test
-``
-`
-test
-`
+### NPM
+
 ```
-Test
+npm install
+```
+
+### Node
+
+```
+npm install node
+```
+
+### Typescript
+
+```
+npm install -g typescript
+```
+
+### Rollup
+
+```
+npm install -g rollup
 ```
 
 ## Progress
