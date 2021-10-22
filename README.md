@@ -29,12 +29,6 @@ Please read the about section before installing and using this bot.
 npm install
 ```
 
-### Node
-
-```
-npm install node
-```
-
 ### Typescript
 
 ```
