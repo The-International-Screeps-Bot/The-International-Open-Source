@@ -1,10 +1,10 @@
 // Global
 
-import "./global/globalManager"
+import { globalManager } from "./global/globalManager"
 
 // Room
 
-import "./room/roomManager"
+import { roomManager } from "./room/roomManager"
 
 // Other
 
@@ -13,9 +13,22 @@ import { ErrorMapper } from "./external/ErrorMapper"
 // Type declareations for global
 
 declare global {
+
+    interface Room {
+        [key: string]: any
+        get(): void
+    }
+
+    interface CreepMemory {
+        [key: string]: any
+        role: string
+    }
+
     namespace NodeJS {
         interface Global {
+            [key: string]: any
             avgPrice(): void
+            createClass(): void
             allyList: string[]
         }
     }
@@ -25,5 +38,5 @@ declare global {
 
 export const loop = ErrorMapper.wrapLoop(function() {
 
-
+    globalManager()
 })

@@ -4,9 +4,41 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 global.avgPrice = function () {
 };
+global.createClass = function (className) {
+    return class className {
+    };
+};
 
 global.allyList = [];
 console.log(global.allyList);
+
+function config() {
+    // Configure rooms
+    for (let roomName in Game.rooms) {
+        let room = Game.rooms[roomName];
+        const properties = {
+            creeps: {}
+        };
+        for (let propertyName in properties) {
+            room[propertyName] = properties[propertyName];
+        }
+    }
+}
+
+function creepOrganizer() {
+    // Loop through all of my creeps
+    for (let creepName in Game.creeps) {
+        let creep = Game.creeps[creepName];
+        let room = creep.room;
+        // Organize creep by room and role
+        room.creeps[creep.memory.role] = creep;
+    }
+}
+
+function globalManager() {
+    config();
+    creepOrganizer();
+}
 
 var sourceMapGenerator = {};
 
@@ -3246,6 +3278,7 @@ ErrorMapper.cache = {};
 // Global
 // Loop
 const loop = ErrorMapper.wrapLoop(function () {
+    globalManager();
 });
 
 exports.loop = loop;
