@@ -1,4 +1,4 @@
-import "creeps/creepManager"
+import "./creeps/creepManager"
 
 export function roomManager() {
 

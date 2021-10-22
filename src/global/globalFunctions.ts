@@ -1,4 +1,4 @@
-global.avgPrice = function () {
+global.avgPrice = function() {
 
 
 }

@@ -2,6 +2,12 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+global.avgPrice = function () {
+};
+
+global.allyList = [];
+console.log(global.allyList);
+
 var sourceMapGenerator = {};
 
 var base64Vlq = {};
@@ -3238,6 +3244,7 @@ class ErrorMapper {
 ErrorMapper.cache = {};
 
 // Global
+// Loop
 const loop = ErrorMapper.wrapLoop(function () {
 });
 

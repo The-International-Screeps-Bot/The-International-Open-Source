@@ -85,6 +85,6 @@ export class ErrorMapper {
           throw e;
         }
       }
-    }
+    };
   }
 }
