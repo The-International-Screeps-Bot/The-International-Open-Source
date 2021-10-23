@@ -8,19 +8,37 @@ global.createClass = function (className) {
     return class className {
     };
 };
+global.findObjectWithId = function (id) {
+    return Game.getObjectById(id) || undefined;
+};
 
-global.allyList = [];
-console.log(global.allyList);
+const properties = {
+    allyList: [],
+    consoleMessages: {},
+    creepRoles: [
+        "harvester",
+    ],
+};
+// If global doesn't have the first aspect of properties
+if (!global[Object.keys(properties)[0]]) {
+    // Assign properties to globa
+    for (let propertyName in properties) {
+        global[propertyName] = properties[propertyName];
+    }
+}
 
 function config() {
     // Configure rooms
     for (let roomName in Game.rooms) {
         let room = Game.rooms[roomName];
         const properties = {
-            creeps: {}
+            myCreeps: {}
         };
         for (let propertyName in properties) {
             room[propertyName] = properties[propertyName];
+        }
+        for (let propertyName in properties) {
+            room.memory[propertyName] = properties[propertyName];
         }
     }
 }
@@ -31,7 +49,7 @@ function creepOrganizer() {
         let creep = Game.creeps[creepName];
         let room = creep.room;
         // Organize creep by room and role
-        room.creeps[creep.memory.role] = creep;
+        room.myCreeps[creep.memory.role] = creep;
     }
 }
 

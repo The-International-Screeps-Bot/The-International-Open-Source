@@ -16,7 +16,11 @@ declare global {
 
     interface Room {
         [key: string]: any
-        get(): void
+    }
+
+    interface Creep {
+        [key: string]: any
+        
     }
 
     interface CreepMemory {

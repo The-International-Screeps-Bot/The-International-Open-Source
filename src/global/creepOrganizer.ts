@@ -10,6 +10,6 @@ export function creepOrganizer() {
 
         // Organize creep by room and role
 
-        room.creeps[creep.memory.role] = creep
+        room.myCreeps[creep.memory.role] = creep
     }
 }

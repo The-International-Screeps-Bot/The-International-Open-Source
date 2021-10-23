@@ -1,6 +1,8 @@
+import "./creepFunctions"
+
 import { harvesterManager } from "./creepManagers/harvesterManager"
 
-export function creepManager(room: object, creepsOfRole: {[key: string]: string}) {
+export function creepManager(room: Room) {
 
     interface ManagerParent {
         manager: any
@@ -25,11 +27,11 @@ export function creepManager(room: object, creepsOfRole: {[key: string]: string}
 
         // Iterate if there are no creeps of managerParent's role
 
-        if (creepsOfRole[role].length == 0) continue
+        if (room.myCreeps[role].length == 0) continue
 
         // Add creeps of role to managerParent's creeps
 
-        managerParent.creepsOfRole = creepsOfRole[role]
+        managerParent.creepsOfRole = room.myCreeps[role]
 
         // Run manager
 

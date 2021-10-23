@@ -7,7 +7,7 @@ export function config() {
         let room = Game.rooms[roomName]
 
         const properties: {[key: string]: any} = {
-            creeps: {}
+            myCreeps: {}
         }
 
         for (let propertyName in properties) {
@@ -16,8 +16,13 @@ export function config() {
         }
 
         const memoryProperties = {
-
-
+            
         }
+
+        for (let propertyName in properties) {
+
+            room.memory[propertyName] = properties[propertyName]
+        }
+
     }
 }

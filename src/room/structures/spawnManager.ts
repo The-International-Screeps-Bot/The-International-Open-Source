@@ -1,4 +1,4 @@
-export function spawnManager(room: any) {
+export function spawnManager(room: Room) {
 
 
 }

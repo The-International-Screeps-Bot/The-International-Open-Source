@@ -1,6 +1,6 @@
-Room.prototype.get = function() {
+Room.prototype.get = function(object: string) {
 
-    let room = this
+    const room = this
 
-    
+
 }
