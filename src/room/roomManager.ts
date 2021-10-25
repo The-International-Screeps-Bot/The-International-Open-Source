@@ -1,4 +1,7 @@
+import "./creeps/taskManager"
+
 import "./creeps/creepManager"
+
 import "./structures/spawnManager"
 
 export function roomManager() {
@@ -14,7 +17,7 @@ export function roomManager() {
         if (!controller || !controller.my) continue
 
         //
-        
+
 
     }
 }

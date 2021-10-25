@@ -20,7 +20,7 @@ declare global {
 
     interface Creep {
         [key: string]: any
-        
+
     }
 
     interface CreepMemory {
