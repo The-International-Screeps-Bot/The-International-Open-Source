@@ -1,4 +1,4 @@
-# The International - a fully automated Screeps bot
+# The International - A Fully Automated Screeps Bot
 
 ![The International](images/header.png)
 
@@ -9,11 +9,13 @@
 
 ## About
 
-The International is my bot for the MMO server, thematically based after communist aesthetics. The goal of The International is to set up a fully autonomous communism zone in shard 2. Owned rooms are called communes, offensive and defensive forces are called the Red Army, economic workers are known as the Proletariat, and the Revolutionaries establish new communes and rebuild destroyed ones.
+The International is my bot for [Screeps](https://screeps.com/), thematically based after communist aesthetics. Owned rooms are called communes, offensive and defensive forces are called the Red Army, economic workers are known as the Proletariat, and the Revolutionaries establish new communes and rebuild destroyed ones.
 
-This bot intended to provide experienced and new players a reference for when they get stuck, need inspiration, or want to laugh at some terrible code. Feel welcome to fork it and otherwise use it, however do not be overly aggressive on the Screeps world, especially to newer players. The bot is intended to be automated, but can perform manual actions via the console, and has an information panel showing progress, events, economy and military, as well as, if integrated, the current state and events allies are undergoing.
+This bot intended to provide experienced and new players a reference for when they get stuck, need inspiration, or want to laugh at some terrible code. Comments are used commonly, and code is structured so it can be easily understood, replicated, and expanded upon. Please follow similar guidelines if you make a pull request 🙂.
 
-Please create an issue for feature requests or help. I'll add a usage guide sometime soon. If you have specific questions or want to discuss the bot, DM me on discord: Carson Burke A&0#6757.
+Feel welcome to fork it and otherwise use it, however do not be overly aggressive on the Screeps world, especially to newer players. The bot is intended to be automated, but can perform manual actions via the console. It has an information panel showing progress, events, economy and military, and more.
+
+If you have specific questions or want to discuss the bot, DM me on discord: Carson Burke A&0#6757.
 
 ![Room with bot](images/room.png)
 ![Map view with visuals](images/visuals.png)
