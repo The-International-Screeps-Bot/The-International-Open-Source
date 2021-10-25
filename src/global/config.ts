@@ -1,3 +1,6 @@
+/**
+ * Configures features needed to run the bot
+ */
 export function config() {
 
     // Configure rooms
@@ -16,13 +19,23 @@ export function config() {
         }
 
         const memoryProperties = {
-            
+
         }
 
-        for (let propertyName in properties) {
+        for (let propertyName in memoryProperties) {
 
-            room.memory[propertyName] = properties[propertyName]
+            room.memory[propertyName] = memoryProperties[propertyName]
         }
 
+        const globalProperties = {
+
+        }
+
+        if (!global[room.name]) global[room.name] = {}
+
+        for (let propertyName in globalProperties) {
+
+            global[room.name][propertyName] = globalProperties[propertyName]
+        }
     }
 }

@@ -1,14 +1,14 @@
 // Global
 
-import { globalManager } from "./global/globalManager"
+import { globalManager } from './global/globalManager'
 
 // Room
 
-import { roomManager } from "./room/roomManager"
+import { roomManager } from './room/roomManager'
 
 // Other
 
-import { ErrorMapper } from "./external/ErrorMapper"
+import { ErrorMapper } from './external/ErrorMapper'
 
 // Type declareations for global
 
@@ -43,4 +43,6 @@ declare global {
 export const loop = ErrorMapper.wrapLoop(function() {
 
     globalManager()
+
+    roomManager()
 })

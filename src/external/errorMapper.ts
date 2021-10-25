@@ -1,4 +1,4 @@
-import { SourceMapConsumer } from "source-map";
+import { SourceMapConsumer } from 'source-map';
 
 export class ErrorMapper {
   // Cache consumer
@@ -6,7 +6,7 @@ export class ErrorMapper {
 
   public static get consumer(): SourceMapConsumer {
     if (this._consumer == null) {
-      this._consumer = new SourceMapConsumer(require("main.js.map"));
+      this._consumer = new SourceMapConsumer(require('main.js.map'));
     }
 
     return this._consumer;
@@ -36,7 +36,7 @@ export class ErrorMapper {
     let outStack = error.toString();
 
     while ((match = re.exec(stack))) {
-      if (match[2] === "main") {
+      if (match[2] === 'main') {
         const pos = this.consumer.originalPositionFor({
           column: parseInt(match[4], 10),
           line: parseInt(match[3], 10)
@@ -74,7 +74,7 @@ export class ErrorMapper {
         loop();
       } catch (e) {
         if (e instanceof Error) {
-          if ("sim" in Game.rooms) {
+          if ('sim' in Game.rooms) {
             const message = `Source maps don't work in the simulator - displaying original error`;
             console.log(`<span style='color:red'>${message}<br>${_.escape(e.stack)}</span>`);
           } else {

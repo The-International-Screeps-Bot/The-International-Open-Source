@@ -6,7 +6,7 @@ const properties: {[key: string]: any} = {
 
     },
     creepRoles: [
-        "harvester",
+        'harvester',
     ],
     roomSize: 2500,
 }

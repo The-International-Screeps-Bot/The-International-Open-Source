@@ -20,7 +20,7 @@ export function spawnReqs(room: Room) {
 
         // Add each spawnStructures with their range to the object
 
-        const anchorPoint = room.get("anchorPoint")
+        const anchorPoint = room.get('anchorPoint')
 
         let energyStructuresWithRanges = []
 
@@ -165,8 +165,8 @@ export function spawnReqs(room: Room) {
         }
     }
 
-    let source1HarvestPositionsAmount = room.get("source1HarvestPositions").positions.length
-    let source2HarvestPositionsAmount = room.get("source2HarvestPositions").positions.length
+    let source1HarvestPositionsAmount = room.get('source1HarvestPositions').positions.length
+    let source2HarvestPositionsAmount = room.get('source2HarvestPositions').positions.length
 
     class HarvesterBodyOpts extends BodyOpts {
         constructor() {
@@ -179,7 +179,7 @@ export function spawnReqs(room: Room) {
                 this.extraParts = [WORK, WORK, WORK, MOVE]
                 this.maxParts = 8
 
-                minCreeps.harvester = minCreeps["harvester"] = 2
+                minCreeps.harvester = minCreeps['harvester'] = 2
 
                 return
             }
@@ -189,7 +189,7 @@ export function spawnReqs(room: Room) {
                 this.extraParts = [WORK]
                 this.maxParts = 6
 
-                minCreeps.harvester = minCreeps["harvester"] = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2)
+                minCreeps.harvester = minCreeps['harvester'] = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2)
 
                 return
             }

@@ -33,7 +33,7 @@ const properties = {
     allyList: [],
     consoleMessages: {},
     creepRoles: [
-        "harvester",
+        'harvester',
     ],
     roomSize: 2500,
 };
@@ -45,6 +45,9 @@ if (!global[Object.keys(properties)[0]]) {
     }
 }
 
+/**
+ * Configures features needed to run the bot
+ */
 function config() {
     // Configure rooms
     for (let roomName in Game.rooms) {
@@ -55,8 +58,15 @@ function config() {
         for (let propertyName in properties) {
             room[propertyName] = properties[propertyName];
         }
-        for (let propertyName in properties) {
-            room.memory[propertyName] = properties[propertyName];
+        const memoryProperties = {};
+        for (let propertyName in memoryProperties) {
+            room.memory[propertyName] = memoryProperties[propertyName];
+        }
+        const globalProperties = {};
+        if (!global[room.name])
+            global[room.name] = {};
+        for (let propertyName in globalProperties) {
+            global[room.name][propertyName] = globalProperties[propertyName];
         }
     }
 }
@@ -82,6 +92,143 @@ function creepOrganizer() {
 function globalManager() {
     config();
     creepOrganizer();
+}
+
+Room.prototype.get = function (roomObjectName) {
+    const room = this;
+    // Check if value is cached. If so then return it
+    let cachedValue;
+    cachedValue = findRoomObjectInGlobal(roomObjectName);
+    if (cachedValue)
+        return cachedValue;
+    cachedValue = findRoomObjectInMemory(roomObjectName);
+    if (cachedValue)
+        return cachedValue;
+    /**
+     *
+     * @param roomObjectName name of roomObject
+     * @returns roomObject
+     */
+    function findRoomObjectInGlobal(roomObjectName) {
+        // Stop if there is no stored object
+        if (!global[room.name][roomObjectName])
+            return;
+        //
+        const cacheAmount = global[room.name][roomObjectName].cacheAmount;
+        const lastCache = global[room.name][roomObjectName].lastCache;
+        // Stop if time is greater than lastCache + cacheAmount
+        if (lastCache + cacheAmount < Game.time)
+            return;
+        // See if roomObject's type is an id
+        if (global[room.name][roomObjectName].type == 'id') {
+            return global.findObjectWithId(global[room.name][roomObjectName].value);
+        }
+        // Return the value of the roomObject
+        return global[room.name][roomObjectName].value;
+    }
+    /**
+     *
+     * @param roomObjectName name of roomObject
+     * @returns roomObject
+     */
+    function findRoomObjectInMemory(roomObjectName) {
+        // Stop if there is no stored object
+        if (!room.memory[roomObjectName])
+            return;
+        // See if roomObject's type is an id
+        if (room.memory[roomObjectName].type == 'id') {
+            return global.findObjectWithId(room.memory[roomObjectName].value);
+        }
+        // Return the value of the roomObject
+        return room.memory[roomObjectName].value;
+    }
+    /**
+     * @param value roomObject
+     * @param cacheAmount if in global, how long to store roomObject for
+     * @param storeMethod where to store the roomObject
+     * @param type id or object
+     */
+    class RoomObject {
+        constructor(value, cacheAmount, storeMethod, type) {
+            this.value = value;
+            this.type = type;
+            if (storeMethod == 'global') {
+                this.cacheAmount = cacheAmount;
+                this.lastCache = Game.time;
+                return;
+            }
+        }
+    }
+    //
+    let roomObjects = {};
+    // Resources
+    roomObjects.mineral = findRoomObjectInGlobal('mineral') || new RoomObject(room.find(FIND_MINERALS)[0], Infinity, 'global', 'object');
+    roomObjects.sources = findRoomObjectInGlobal('sources') || new RoomObject(room.find(FIND_SOURCES), Infinity, 'global', 'object');
+    roomObjects.source1 = findRoomObjectInMemory('source1') || new RoomObject(roomObjects.sources.value[0], Infinity, 'memory', 'id');
+    if (roomObjects.sources[1])
+        roomObjects.source2 = findRoomObjectInMemory('source2') || new RoomObject(roomObjects.sources.value[1], Infinity, 'memory', 'id');
+    // Loop through all structres in room
+    for (let structure of room.find(FIND_STRUCTURES)) {
+        // Create catagory if it doesn't exist
+        if (!roomObjects[structure.structureType])
+            roomObjects[structure.structureType] = [];
+        // Group structure by structureType
+        roomObjects[structure.structureType].push(structure);
+    }
+    // Harvest positions
+    roomObjects.source1HarvestPositions = findRoomObjectInGlobal('source1HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source1.value), Infinity, 'global', 'object');
+    roomObjects.source1ClosestHarvestPosition = findRoomObjectInGlobal('source1ClosestHarvestPosition') || new RoomObject(roomObjects.source1HarvestPositions.value.filter(pos => pos.type == 'closest')[0], Infinity, 'memory', 'object');
+    if (roomObjects.sources[1])
+        roomObjects.source2HarvestPositions = findRoomObjectInGlobal('source2HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source2.value), Infinity, 'global', 'object');
+    if (roomObjects.sources[1])
+        roomObjects.source2ClosestHarvestPosition = findRoomObjectInGlobal('source2ClosestHarvestPosition') || new RoomObject(roomObjects.source2HarvestPositions.value.filter(pos => pos.type == 'closest')[0], Infinity, 'memory', 'object');
+    /**
+     * Finds positions adjacent to a source that a creep can harvest
+     * @param source source object
+     * @returns sources harvest positions
+     */
+    function findHarvestPositions(source) {
+        let cm = new PathFinder.CostMatrix();
+        const terrain = Game.map.getRoomTerrain(room.name);
+        // Loop through room positions
+        for (let x = 0; x < global.roomSize; x++) {
+            for (let y = 0; y < global.roomSize; y++) {
+                // Iterate if terrain for pos isn't wall
+                if (terrain.get(x, y) != TERRAIN_MASK_WALL)
+                    continue;
+                // Set pos in costMatrix to 255
+                cm.set(x, y, 255);
+            }
+        }
+        // Find positions adjacent to source
+        const rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 };
+        const adjacentPositions = global.getPositionsInsideRect(rect);
+        console.log(JSON.stringify(adjacentPositions));
+        let harvestPositions = [];
+        for (let pos of adjacentPositions) {
+            // Iterate if value for pos in costMatrix is 255
+            if (cm.get(pos.x, pos.y) == 255)
+                continue;
+            // Add pos to harvestPositions
+            harvestPositions.push(pos);
+        }
+        return harvestPositions;
+    }
+};
+
+Creep.prototype.travel = function (opts) {
+};
+
+function roomManager() {
+    for (let roomName in Game.rooms) {
+        const room = Game.rooms[roomName];
+        const controller = room.controller;
+        // Iterate if there is no controller or we don't own the controller
+        if (!controller || !controller.my)
+            continue;
+        //
+        console.log(JSON.stringify(room.get('source1HarvestPositions')));
+    }
 }
 
 var sourceMapGenerator = {};
@@ -3237,7 +3384,7 @@ var SourceMapConsumer = sourceMapConsumer.SourceMapConsumer;
 class ErrorMapper {
     static get consumer() {
         if (this._consumer == null) {
-            this._consumer = new SourceMapConsumer(require("main.js.map"));
+            this._consumer = new SourceMapConsumer(require('main.js.map'));
         }
         return this._consumer;
     }
@@ -3260,7 +3407,7 @@ class ErrorMapper {
         let match;
         let outStack = error.toString();
         while ((match = re.exec(stack))) {
-            if (match[2] === "main") {
+            if (match[2] === 'main') {
                 const pos = this.consumer.originalPositionFor({
                     column: parseInt(match[4], 10),
                     line: parseInt(match[3], 10)
@@ -3300,7 +3447,7 @@ class ErrorMapper {
             }
             catch (e) {
                 if (e instanceof Error) {
-                    if ("sim" in Game.rooms) {
+                    if ('sim' in Game.rooms) {
                         const message = `Source maps don't work in the simulator - displaying original error`;
                         console.log(`<span style='color:red'>${message}<br>${_.escape(e.stack)}</span>`);
                     }
@@ -3323,6 +3470,7 @@ ErrorMapper.cache = {};
 // Loop
 const loop = ErrorMapper.wrapLoop(function () {
     globalManager();
+    roomManager();
 });
 
 exports.loop = loop;

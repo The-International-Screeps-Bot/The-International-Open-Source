@@ -20,7 +20,7 @@ export function taskManager(room: Room) {
         }
     }
 
-    const task1 = new Task(room.get("storage"), RESOURCE_ENERGY, 'withdraw', 500)
+    const task1 = new Task(room.get('storage'), RESOURCE_ENERGY, 'withdraw', 500)
 
     console.log(task1)
 }

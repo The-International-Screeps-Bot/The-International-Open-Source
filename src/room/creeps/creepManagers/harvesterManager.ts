@@ -4,6 +4,6 @@ export function harvesterManager(room: Room, creepsOfRole: Creep[]) {
 
     for (let creep of creepsOfRole) {
 
-        creep.say("hey")
+        creep.say('hey')
     }
 }

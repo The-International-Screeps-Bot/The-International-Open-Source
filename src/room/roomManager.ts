@@ -1,8 +1,10 @@
-import "./creeps/taskManager"
+import './roomFunctions'
 
-import "./creeps/creepManager"
+import './creeps/taskManager'
 
-import "./structures/spawnManager"
+import './creeps/creepManager'
+
+import './structures/spawnManager'
 
 export function roomManager() {
 
@@ -10,7 +12,7 @@ export function roomManager() {
 
         const room = Game.rooms[roomName]
 
-        const controller = room.get("controller")
+        const controller = room.controller
 
         // Iterate if there is no controller or we don't own the controller
 
@@ -18,6 +20,6 @@ export function roomManager() {
 
         //
 
-
+        console.log(JSON.stringify(room.get('source1HarvestPositions')))
     }
 }

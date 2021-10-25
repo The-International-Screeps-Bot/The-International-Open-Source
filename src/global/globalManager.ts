@@ -1,9 +1,9 @@
-import "./globalFunctions"
-import "./globalVars"
+import './globalFunctions'
+import './globalVars'
 
-import { config } from "./config"
+import { config } from './config'
 
-import { creepOrganizer } from "./creepOrganizer"
+import { creepOrganizer } from './creepOrganizer'
 
 export function globalManager() {
 
