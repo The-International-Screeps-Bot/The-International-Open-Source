@@ -1,6 +1,7 @@
 import "./creepFunctions"
 
 import { harvesterManager } from "./creepManagers/harvesterManager"
+import { mineralHarvesterManager } from "./creepManagers/mineralHarvesterManager"
 
 export function creepManager(room: Room) {
 

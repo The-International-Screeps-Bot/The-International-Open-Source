@@ -53,12 +53,10 @@ To then run the bot, use the command `rollup -cw --environment DEST:mmo` replaci
 
 If you'd like to use this method to compile to a private server, you'll need to download and configure [screepsmod-auth](https://github.com/ScreepsMods/screepsmod-auth).
 
-## Progress
+## Progress and Design
 
-### Progress Board
+[Progress board](https://trello.com/b/l6Min9hr/typescript-international-screeps-bot)
 
-https://trello.com/b/BIZ8G8je/the-internationale-screeps-bot
+[Flowchart](https://www.zenflowchart.com/docs/view/50r4KGRb480B2bBLZQxg)
 
-### Flowchart
-
-(I haven't done much work on the flowchart yet)
+[Videos](https://www.youtube.com/playlist?list=PLGlzrjCmziEj7hQZSwcmkXkMXgkQXUQ6C)

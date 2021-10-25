@@ -119,15 +119,56 @@ Room.prototype.get = function(roomObjectName: string) {
     // Harvest positions
 
     roomObjects.source1HarvestPositions = findRoomObjectInMemory('source1HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source1), Infinity, 'global', 'object')
+    roomObjects.source1ClosestHarvestPosition = findRoomObjectInMemory('source1ClosestHarvestPosition') || new RoomObject(roomObjects.source1HarvestPositions.filter(pos => pos.type == 'closest')[0], Infinity, 'memory', 'object')
+
     roomObjects.source2HarvestPositions = findRoomObjectInMemory('source2HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source2), Infinity, 'global', 'object')
+    roomObjects.source2ClosestHarvestPosition = findRoomObjectInMemory('source2ClosestHarvestPosition') || new RoomObject(roomObjects.source2HarvestPositions.filter(pos => pos.type == 'closest')[0], Infinity, 'memory', 'object')
 
     /**
-     *
+     * Finds positions adjacent to a source that a creep can harvest
      * @param source source object
      * @returns sources harvest positions
      */
-    function findHarvestPositions(source: object) {
+    function findHarvestPositions(source: {[key: string]: any}) {
 
+        let cm = new PathFinder.CostMatrix()
 
+        const terrain = Game.map.getRoomTerrain(room.name)
+
+        // Loop through room positions
+
+        for (let x = 0; x < global.roomSize; x++) {
+            for (let y = 0; y < global.roomSize; y++) {
+
+                // Iterate if terrain for pos isn't wall
+
+                if (terrain.get(x, y) != TERRAIN_MASK_WALL) continue
+
+                // Set pos in costMatrix to 255
+
+                cm.set(x, y, 255)
+            }
+        }
+
+        // Find positions adjacent to source
+
+        const rect = global.drawRect({ x1: source.x - 1, y1: source.y - 1, x2: source.x + 1, y2: source.y + 1 })
+
+        console.log(JSON.stringify(rect))
+
+        let harvestPositions = []
+
+        for (let pos of rect) {
+
+            // Iterate if value for pos in costMatrix is 255
+
+            if (cm.get(pos.x, pos.y) == 255) continue
+
+            // Add pos to harvestPositions
+
+            harvestPositions.push(pos)
+        }
+
+        return harvestPositions
     }
 }

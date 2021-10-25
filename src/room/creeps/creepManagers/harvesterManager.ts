@@ -1,4 +1,4 @@
-export function harvesterManager(room: Room, creepsOfRole: any[]) {
+export function harvesterManager(room: Room, creepsOfRole: Creep[]) {
 
     if (creepsOfRole.length == 0) return
 

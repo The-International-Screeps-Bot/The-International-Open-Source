@@ -8,8 +8,25 @@ global.createClass = function (className) {
     return class className {
     };
 };
+/**
+ * @param id
+ * @returns
+ */
 global.findObjectWithId = function (id) {
     return Game.getObjectById(id) || undefined;
+};
+/**
+ * @param rect
+ * @returns
+ */
+global.getPositionsInsideRect = function (rect) {
+    let positions = [];
+    for (let x = rect.x1; x <= rect.x2; x++) {
+        for (let y = rect.y1; y <= rect.y2; y++) {
+            positions.push({ x: x, y: y });
+        }
+    }
+    return positions;
 };
 
 const properties = {
@@ -18,6 +35,7 @@ const properties = {
     creepRoles: [
         "harvester",
     ],
+    roomSize: 2500,
 };
 // If global doesn't have the first aspect of properties
 if (!global[Object.keys(properties)[0]]) {
