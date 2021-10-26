@@ -20,6 +20,6 @@ export function roomManager() {
 
         //
 
-        console.log(JSON.stringify(room.get('source1HarvestPositions')))
+        room.get('source1HarvestPositions')
     }
 }

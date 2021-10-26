@@ -34,3 +34,40 @@ global.getPositionsInsideRect = function(rect: {[key: string]: any}) {
 
     return positions
 }
+
+interface CustomLog {
+    title: string
+    message: string
+    color: string
+    bgColor: string
+}
+
+/**
+ * Custom console logs using HTML and CSS for special structure and styling, going beyond the conventional limits of Screeps console logging
+ * @param title title of log
+ * @param message content of message
+ * @param color text colour
+ * @param bgColor background colour
+ */
+class CustomLog {
+    constructor(title: string, message: string, color: string, bgColor: string) {
+
+        // Assign defaults if parameters were missing
+
+        if (!color) color = '#fff'
+        if (!bgColor) color = '#0f66fc'
+
+        // Assign opts
+
+        this.title = title
+        this.message = message
+        this.color = global.colors[color]
+        this.bgColor = bgColor
+
+        // Add this to customLogs for output
+
+        global.customLogs.push(this)
+    }
+}
+
+global.CustomLog = CustomLog

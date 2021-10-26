@@ -2,9 +2,11 @@ const properties: {[key: string]: any} = {
     allyList: [
 
     ],
-    consoleMessages: {
-
+    colors: {
+        white: '#fff',
+        lightBlue: '#0f66fc',
     },
+    customLogs: [],
     creepRoles: [
         'harvester',
     ],

@@ -18,6 +18,11 @@ declare global {
         [key: string]: any
     }
 
+    interface RoomMemory {
+        [key: string]: any
+        anchorPoint: {[key: string]: any}
+    }
+
     interface Creep {
         [key: string]: any
 

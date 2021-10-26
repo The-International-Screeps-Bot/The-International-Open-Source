@@ -21,6 +21,14 @@ If you have specific questions or want to discuss the bot, DM me on discord: Car
 ![Map view with visuals](images/visuals.png)
 ![Information panel](images/infopanel.png)
 
+## Progress and Design
+
+[Progress board](https://trello.com/b/l6Min9hr/typescript-international-screeps-bot)
+
+[Flowchart](https://www.zenflowchart.com/docs/view/50r4KGRb480B2bBLZQxg)
+
+[Videos](https://www.youtube.com/playlist?list=PLGlzrjCmziEj7hQZSwcmkXkMXgkQXUQ6C)
+
 ## Requirements
 
 Please read the about section before installing and using this bot.
@@ -52,11 +60,3 @@ First, rename example.screeps.json to screeps.json and fill in required informat
 To then run the bot, use the command `rollup -cw --environment DEST:mmo` replacing mmo with the environment you want to compile to. This wiil initially compile to the environment, as well as automatically compiling and pushing to the environment on code changes.
 
 If you'd like to use this method to compile to a private server, you'll need to download and configure [screepsmod-auth](https://github.com/ScreepsMods/screepsmod-auth).
-
-## Progress and Design
-
-[Progress board](https://trello.com/b/l6Min9hr/typescript-international-screeps-bot)
-
-[Flowchart](https://www.zenflowchart.com/docs/view/50r4KGRb480B2bBLZQxg)
-
-[Videos](https://www.youtube.com/playlist?list=PLGlzrjCmziEj7hQZSwcmkXkMXgkQXUQ6C)

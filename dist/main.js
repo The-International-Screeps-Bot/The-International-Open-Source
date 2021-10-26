@@ -28,10 +28,38 @@ global.getPositionsInsideRect = function (rect) {
     }
     return positions;
 };
+/**
+ * Custom console logs using HTML and CSS for special structure and styling, going beyond the conventional limits of Screeps console logging
+ * @param title title of log
+ * @param message content of message
+ * @param color text colour
+ * @param bgColor background colour
+ */
+class CustomLog {
+    constructor(title, message, color, bgColor) {
+        // Assign defaults if parameters were missing
+        if (!color)
+            color = '#fff';
+        if (!bgColor)
+            color = '#0f66fc';
+        // Assign opts
+        this.title = title;
+        this.message = message;
+        this.color = global.colors[color];
+        this.bgColor = bgColor;
+        // Add this to customLogs for output
+        global.customLogs.push(this);
+    }
+}
+global.CustomLog = CustomLog;
 
 const properties = {
     allyList: [],
-    consoleMessages: {},
+    colors: {
+        white: '#fff',
+        lightBlue: '#0f66fc',
+    },
+    customLogs: [],
     creepRoles: [
         'harvester',
     ],
@@ -123,6 +151,11 @@ Room.prototype.get = function (roomObjectName) {
         if (global[room.name][roomObjectName].type == 'id') {
             return global.findObjectWithId(global[room.name][roomObjectName].value);
         }
+        // See if roomObject's type is an pos
+        if (global[room.name][roomObjectName].type == 'pos') {
+            // Return roomPosition of pos
+            return room.newPos(global[room.name][roomObjectName].value);
+        }
         // Return the value of the roomObject
         return global[room.name][roomObjectName].value;
     }
@@ -137,7 +170,13 @@ Room.prototype.get = function (roomObjectName) {
             return;
         // See if roomObject's type is an id
         if (room.memory[roomObjectName].type == 'id') {
+            // Return roomObject with id
             return global.findObjectWithId(room.memory[roomObjectName].value);
+        }
+        // See if roomObject's type is an pos
+        if (room.memory[roomObjectName].type == 'pos') {
+            // Return roomPosition of pos
+            return room.newPos(room.memory[roomObjectName].value);
         }
         // Return the value of the roomObject
         return room.memory[roomObjectName].value;
@@ -146,7 +185,7 @@ Room.prototype.get = function (roomObjectName) {
      * @param value roomObject
      * @param cacheAmount if in global, how long to store roomObject for
      * @param storeMethod where to store the roomObject
-     * @param type id or object
+     * @param type object, id, or pos
      */
     class RoomObject {
         constructor(value, cacheAmount, storeMethod, type) {
@@ -161,6 +200,8 @@ Room.prototype.get = function (roomObjectName) {
     }
     //
     let roomObjects = {};
+    // Important Positions
+    roomObjects.anchorPoint = findRoomObjectInMemory('anchorPoint') || new RoomObject(room.newPos(room.memory.anchorPoint), Infinity, 'memory', 'pos');
     // Resources
     roomObjects.mineral = findRoomObjectInGlobal('mineral') || new RoomObject(room.find(FIND_MINERALS)[0], Infinity, 'global', 'object');
     roomObjects.sources = findRoomObjectInGlobal('sources') || new RoomObject(room.find(FIND_SOURCES), Infinity, 'global', 'object');
@@ -171,17 +212,17 @@ Room.prototype.get = function (roomObjectName) {
     for (let structure of room.find(FIND_STRUCTURES)) {
         // Create catagory if it doesn't exist
         if (!roomObjects[structure.structureType])
-            roomObjects[structure.structureType] = [];
+            roomObjects[structure.structureType] = new RoomObject([], 1, 'global', 'object');
         // Group structure by structureType
-        roomObjects[structure.structureType].push(structure);
+        roomObjects[structure.structureType].value.push(structure);
     }
     // Harvest positions
     roomObjects.source1HarvestPositions = findRoomObjectInGlobal('source1HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source1.value), Infinity, 'global', 'object');
-    roomObjects.source1ClosestHarvestPosition = findRoomObjectInGlobal('source1ClosestHarvestPosition') || new RoomObject(roomObjects.source1HarvestPositions.value.filter(pos => pos.type == 'closest')[0], Infinity, 'memory', 'object');
+    roomObjects.source1ClosestHarvestPosition = findRoomObjectInGlobal('source1ClosestHarvestPosition') || new RoomObject(findClosestHarvestPosition(roomObjects.source1HarvestPositions.value), Infinity, 'memory', 'object');
     if (roomObjects.sources[1])
         roomObjects.source2HarvestPositions = findRoomObjectInGlobal('source2HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source2.value), Infinity, 'global', 'object');
     if (roomObjects.sources[1])
-        roomObjects.source2ClosestHarvestPosition = findRoomObjectInGlobal('source2ClosestHarvestPosition') || new RoomObject(roomObjects.source2HarvestPositions.value.filter(pos => pos.type == 'closest')[0], Infinity, 'memory', 'object');
+        roomObjects.source2ClosestHarvestPosition = findRoomObjectInGlobal('source2ClosestHarvestPosition') || new RoomObject(findClosestHarvestPosition(roomObjects.source2HarvestPositions.value), Infinity, 'memory', 'object');
     /**
      * Finds positions adjacent to a source that a creep can harvest
      * @param source source object
@@ -203,17 +244,28 @@ Room.prototype.get = function (roomObjectName) {
         // Find positions adjacent to source
         const rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 };
         const adjacentPositions = global.getPositionsInsideRect(rect);
-        console.log(JSON.stringify(adjacentPositions));
         let harvestPositions = [];
         for (let pos of adjacentPositions) {
             // Iterate if value for pos in costMatrix is 255
             if (cm.get(pos.x, pos.y) == 255)
                 continue;
+            // Convert position into a RoomPosition
+            pos = room.newPos(pos);
             // Add pos to harvestPositions
             harvestPositions.push(pos);
         }
         return harvestPositions;
     }
+    function findClosestHarvestPosition(harvestPositions) {
+        // Filter harvestPositions by closest one to anchorPoint
+        console.log('iteration');
+        return roomObjects.anchorPoint.value.findClosestByRange(harvestPositions);
+    }
+};
+Room.prototype.newPos = function (object) {
+    const room = this;
+    // Create an return roomPosition
+    return new RoomPosition(object.x, object.y, room.name);
 };
 
 Creep.prototype.travel = function (opts) {
@@ -227,7 +279,7 @@ function roomManager() {
         if (!controller || !controller.my)
             continue;
         //
-        console.log(JSON.stringify(room.get('source1HarvestPositions')));
+        room.get('source1HarvestPositions');
     }
 }
 

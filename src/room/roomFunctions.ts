@@ -1,6 +1,6 @@
 Room.prototype.get = function(roomObjectName: string) {
 
-    const room = this
+    const room: Room = this
 
     // Check if value is cached. If so then return it
 
@@ -39,6 +39,15 @@ Room.prototype.get = function(roomObjectName: string) {
             return global.findObjectWithId(global[room.name][roomObjectName].value)
         }
 
+        // See if roomObject's type is an pos
+
+        if (global[room.name][roomObjectName].type == 'pos') {
+
+            // Return roomPosition of pos
+
+            return room.newPos(global[room.name][roomObjectName].value)
+        }
+
         // Return the value of the roomObject
 
         return global[room.name][roomObjectName].value
@@ -59,7 +68,18 @@ Room.prototype.get = function(roomObjectName: string) {
 
         if (room.memory[roomObjectName].type == 'id') {
 
+            // Return roomObject with id
+
             return global.findObjectWithId(room.memory[roomObjectName].value)
+        }
+
+        // See if roomObject's type is an pos
+
+        if (room.memory[roomObjectName].type == 'pos') {
+
+            // Return roomPosition of pos
+
+            return room.newPos(room.memory[roomObjectName].value)
         }
 
         // Return the value of the roomObject
@@ -78,7 +98,7 @@ Room.prototype.get = function(roomObjectName: string) {
      * @param value roomObject
      * @param cacheAmount if in global, how long to store roomObject for
      * @param storeMethod where to store the roomObject
-     * @param type id or object
+     * @param type object, id, or pos
      */
     class RoomObject {
         constructor(value: any, cacheAmount: number, storeMethod: string, type: string) {
@@ -100,6 +120,10 @@ Room.prototype.get = function(roomObjectName: string) {
 
     let roomObjects: {[key: string]: any} = {}
 
+    // Important Positions
+
+    roomObjects.anchorPoint = findRoomObjectInMemory('anchorPoint') || new RoomObject(room.newPos(room.memory.anchorPoint), Infinity, 'memory', 'pos')
+
     // Resources
 
     roomObjects.mineral = findRoomObjectInGlobal('mineral') || new RoomObject(room.find(FIND_MINERALS)[0], Infinity, 'global', 'object')
@@ -113,20 +137,20 @@ Room.prototype.get = function(roomObjectName: string) {
 
         // Create catagory if it doesn't exist
 
-        if (!roomObjects[structure.structureType]) roomObjects[structure.structureType] = []
+        if (!roomObjects[structure.structureType]) roomObjects[structure.structureType] = new RoomObject([], 1, 'global', 'object')
 
         // Group structure by structureType
 
-        roomObjects[structure.structureType].push(structure)
+        roomObjects[structure.structureType].value.push(structure)
     }
 
     // Harvest positions
 
     roomObjects.source1HarvestPositions = findRoomObjectInGlobal('source1HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source1.value), Infinity, 'global', 'object')
-    roomObjects.source1ClosestHarvestPosition = findRoomObjectInGlobal('source1ClosestHarvestPosition') || new RoomObject(roomObjects.source1HarvestPositions.value.filter(pos => pos.type == 'closest')[0], Infinity, 'memory', 'object')
+    roomObjects.source1ClosestHarvestPosition = findRoomObjectInGlobal('source1ClosestHarvestPosition') || new RoomObject(findClosestHarvestPosition(roomObjects.source1HarvestPositions.value), Infinity, 'memory', 'object')
 
     if (roomObjects.sources[1]) roomObjects.source2HarvestPositions = findRoomObjectInGlobal('source2HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source2.value), Infinity, 'global', 'object')
-    if (roomObjects.sources[1]) roomObjects.source2ClosestHarvestPosition = findRoomObjectInGlobal('source2ClosestHarvestPosition') || new RoomObject(roomObjects.source2HarvestPositions.value.filter(pos => pos.type == 'closest')[0], Infinity, 'memory', 'object')
+    if (roomObjects.sources[1]) roomObjects.source2ClosestHarvestPosition = findRoomObjectInGlobal('source2ClosestHarvestPosition') || new RoomObject(findClosestHarvestPosition(roomObjects.source2HarvestPositions.value), Infinity, 'memory', 'object')
 
     /**
      * Finds positions adjacent to a source that a creep can harvest
@@ -159,8 +183,6 @@ Room.prototype.get = function(roomObjectName: string) {
         const rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 }
         const adjacentPositions = global.getPositionsInsideRect(rect)
 
-        console.log(JSON.stringify(adjacentPositions))
-
         let harvestPositions = []
 
         for (let pos of adjacentPositions) {
@@ -169,6 +191,10 @@ Room.prototype.get = function(roomObjectName: string) {
 
             if (cm.get(pos.x, pos.y) == 255) continue
 
+            // Convert position into a RoomPosition
+
+            pos = room.newPos(pos)
+
             // Add pos to harvestPositions
 
             harvestPositions.push(pos)
@@ -176,4 +202,22 @@ Room.prototype.get = function(roomObjectName: string) {
 
         return harvestPositions
     }
+
+    function findClosestHarvestPosition(harvestPositions) {
+
+        // Filter harvestPositions by closest one to anchorPoint
+
+        console.log('iteration')
+
+        return roomObjects.anchorPoint.value.findClosestByRange(harvestPositions)
+    }
+}
+
+Room.prototype.newPos = function(object) {
+
+    const room: Room = this
+
+    // Create an return roomPosition
+
+    return new RoomPosition(object.x, object.y, room.name)
 }
