@@ -10,7 +10,7 @@ const properties: {[key: string]: any} = {
     creepRoles: [
         'harvester',
     ],
-    roomSize: 2500,
+    roomDimensions: 50,
 }
 
 // If global doesn't have the first aspect of properties

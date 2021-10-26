@@ -20,6 +20,9 @@ export function roomManager() {
 
         //
 
-        room.get('source1HarvestPositions')
+        const harvPositions = room.get('source1HarvestPositions')
+
+        let cpuUsed = Game.cpu.getUsed()
+        console.log('Used: ' + cpuUsed.toFixed(2))
     }
 }

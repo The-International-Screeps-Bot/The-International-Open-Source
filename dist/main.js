@@ -63,7 +63,7 @@ const properties = {
     creepRoles: [
         'harvester',
     ],
-    roomSize: 2500,
+    roomDimensions: 50,
 };
 // If global doesn't have the first aspect of properties
 if (!global[Object.keys(properties)[0]]) {
@@ -229,25 +229,15 @@ Room.prototype.get = function (roomObjectName) {
      * @returns sources harvest positions
      */
     function findHarvestPositions(source) {
-        let cm = new PathFinder.CostMatrix();
-        const terrain = Game.map.getRoomTerrain(room.name);
-        // Loop through room positions
-        for (let x = 0; x < global.roomSize; x++) {
-            for (let y = 0; y < global.roomSize; y++) {
-                // Iterate if terrain for pos isn't wall
-                if (terrain.get(x, y) != TERRAIN_MASK_WALL)
-                    continue;
-                // Set pos in costMatrix to 255
-                cm.set(x, y, 255);
-            }
-        }
         // Find positions adjacent to source
         const rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 };
         const adjacentPositions = global.getPositionsInsideRect(rect);
         let harvestPositions = [];
+        // Find terrain in room
+        const terrain = Game.map.getRoomTerrain(room.name);
         for (let pos of adjacentPositions) {
-            // Iterate if value for pos in costMatrix is 255
-            if (cm.get(pos.x, pos.y) == 255)
+            // Iterate if terrain for pos isn't wall
+            if (terrain.get(pos.x, pos.y) != TERRAIN_MASK_WALL)
                 continue;
             // Convert position into a RoomPosition
             pos = room.newPos(pos);
@@ -258,9 +248,10 @@ Room.prototype.get = function (roomObjectName) {
     }
     function findClosestHarvestPosition(harvestPositions) {
         // Filter harvestPositions by closest one to anchorPoint
-        console.log('iteration');
         return roomObjects.anchorPoint.value.findClosestByRange(harvestPositions);
     }
+    // Return queried value
+    return roomObjects[roomObjectName].value;
 };
 Room.prototype.newPos = function (object) {
     const room = this;
@@ -280,6 +271,8 @@ function roomManager() {
             continue;
         //
         room.get('source1HarvestPositions');
+        let cpuUsed = Game.cpu.getUsed();
+        console.log('Used: ' + cpuUsed.toFixed(2));
     }
 }
 

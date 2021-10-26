@@ -159,25 +159,6 @@ Room.prototype.get = function(roomObjectName: string) {
      */
     function findHarvestPositions(source: {[key: string]: any}) {
 
-        let cm = new PathFinder.CostMatrix()
-
-        const terrain = Game.map.getRoomTerrain(room.name)
-
-        // Loop through room positions
-
-        for (let x = 0; x < global.roomSize; x++) {
-            for (let y = 0; y < global.roomSize; y++) {
-
-                // Iterate if terrain for pos isn't wall
-
-                if (terrain.get(x, y) != TERRAIN_MASK_WALL) continue
-
-                // Set pos in costMatrix to 255
-
-                cm.set(x, y, 255)
-            }
-        }
-
         // Find positions adjacent to source
 
         const rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 }
@@ -185,11 +166,15 @@ Room.prototype.get = function(roomObjectName: string) {
 
         let harvestPositions = []
 
+        // Find terrain in room
+
+        const terrain = Game.map.getRoomTerrain(room.name)
+
         for (let pos of adjacentPositions) {
 
-            // Iterate if value for pos in costMatrix is 255
+            // Iterate if terrain for pos isn't wall
 
-            if (cm.get(pos.x, pos.y) == 255) continue
+            if (terrain.get(pos.x, pos.y) != TERRAIN_MASK_WALL) continue
 
             // Convert position into a RoomPosition
 
@@ -207,10 +192,12 @@ Room.prototype.get = function(roomObjectName: string) {
 
         // Filter harvestPositions by closest one to anchorPoint
 
-        console.log('iteration')
-
         return roomObjects.anchorPoint.value.findClosestByRange(harvestPositions)
     }
+
+    // Return queried value
+
+    return roomObjects[roomObjectName].value
 }
 
 Room.prototype.newPos = function(object) {
