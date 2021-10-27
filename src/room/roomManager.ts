@@ -8,6 +8,8 @@ import './structures/spawnManager'
 
 export function roomManager() {
 
+    let i = 0
+
     for (let roomName in Game.rooms) {
 
         const room = Game.rooms[roomName]
@@ -20,9 +22,13 @@ export function roomManager() {
 
         //
 
+        let cpuUsed = Game.cpu.getUsed()
+
         const harvPositions = room.get('source1HarvestPositions')
 
-        let cpuUsed = Game.cpu.getUsed()
-        console.log('Used: ' + cpuUsed.toFixed(2))
+        cpuUsed = Game.cpu.getUsed() - cpuUsed
+        console.log('Used: ' + cpuUsed.toFixed(2) + ' ' + i)
+
+        i++
     }
 }

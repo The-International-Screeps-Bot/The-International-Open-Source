@@ -1,16 +1,17 @@
-const properties: {[key: string]: any} = {
+const properties: {} = {
     allyList: [
 
     ],
     colors: {
         white: '#fff',
+        lightGrey: '#eaeaea',
         lightBlue: '#0f66fc',
+        black: '#000000',
     },
-    customLogs: [],
     creepRoles: [
         'harvester',
     ],
-    roomDimensions: 50,
+    roomDimensions: 50
 }
 
 // If global doesn't have the first aspect of properties
@@ -24,3 +25,7 @@ if (!global[Object.keys(properties)[0]]) {
         global[propertyName] = properties[propertyName]
     }
 }
+
+// Assign tick-only properties
+
+global.customLogs = ``

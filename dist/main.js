@@ -35,35 +35,37 @@ global.getPositionsInsideRect = function (rect) {
  * @param color text colour
  * @param bgColor background colour
  */
-class CustomLog {
+class CustomLog$1 {
     constructor(title, message, color, bgColor) {
-        // Assign defaults if parameters were missing
-        if (!color)
-            color = '#fff';
-        if (!bgColor)
-            color = '#0f66fc';
-        // Assign opts
-        this.title = title;
-        this.message = message;
-        this.color = global.colors[color];
-        this.bgColor = bgColor;
+        //
+        this.log = `
+        <div style='text-align: center; width: 100%; align-items: center; justify-content: center; display: flex; background: ` + global.colors.white + `;'>
+            <div style='font-size: 18px; border: black 1px solid; display: flex; justify-content: center;'>
+                ` + title + `
+            </div>
+            <div style='font-size: 16px; font-weight: bold; border: black 1px;'>
+                ` + message + `
+            </div>
+        </div>
+        `;
         // Add this to customLogs for output
-        global.customLogs.push(this);
+        global.customLogs += this.log;
     }
 }
-global.CustomLog = CustomLog;
+global.CustomLog = CustomLog$1;
 
 const properties = {
     allyList: [],
     colors: {
         white: '#fff',
+        lightGrey: '#eaeaea',
         lightBlue: '#0f66fc',
+        black: '#000000',
     },
-    customLogs: [],
     creepRoles: [
         'harvester',
     ],
-    roomDimensions: 50,
+    roomDimensions: 50
 };
 // If global doesn't have the first aspect of properties
 if (!global[Object.keys(properties)[0]]) {
@@ -72,6 +74,8 @@ if (!global[Object.keys(properties)[0]]) {
         global[propertyName] = properties[propertyName];
     }
 }
+// Assign tick-only properties
+global.customLogs = ``;
 
 /**
  * Configures features needed to run the bot
@@ -263,6 +267,7 @@ Creep.prototype.travel = function (opts) {
 };
 
 function roomManager() {
+    let i = 0;
     for (let roomName in Game.rooms) {
         const room = Game.rooms[roomName];
         const controller = room.controller;
@@ -270,9 +275,11 @@ function roomManager() {
         if (!controller || !controller.my)
             continue;
         //
-        room.get('source1HarvestPositions');
         let cpuUsed = Game.cpu.getUsed();
-        console.log('Used: ' + cpuUsed.toFixed(2));
+        room.get('source1HarvestPositions');
+        cpuUsed = Game.cpu.getUsed() - cpuUsed;
+        console.log('Used: ' + cpuUsed.toFixed(2) + ' ' + i);
+        i++;
     }
 }
 
@@ -3516,6 +3523,10 @@ ErrorMapper.cache = {};
 const loop = ErrorMapper.wrapLoop(function () {
     globalManager();
     roomManager();
+    new CustomLog('Title', 'Message', undefined, undefined);
+    for (let i = 0; i < 99; i++)
+        console.log("");
+    console.log(global.customLogs);
 });
 
 exports.loop = loop;

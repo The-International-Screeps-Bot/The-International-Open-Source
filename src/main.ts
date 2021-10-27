@@ -50,4 +50,9 @@ export const loop = ErrorMapper.wrapLoop(function() {
     globalManager()
 
     roomManager()
+
+    new CustomLog('Title', 'Message', undefined, undefined)
+
+    for (let i = 0; i < 99; i++) console.log("")
+    console.log(global.customLogs)
 })
