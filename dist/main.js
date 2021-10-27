@@ -74,8 +74,6 @@ if (!global[Object.keys(properties)[0]]) {
         global[propertyName] = properties[propertyName];
     }
 }
-// Assign tick-only properties
-global.customLogs = ``;
 
 /**
  * Configures features needed to run the bot
@@ -101,6 +99,8 @@ function config() {
             global[room.name][propertyName] = globalProperties[propertyName];
         }
     }
+    // Assign tick-only properties
+    global.customLogs = ``;
 }
 
 function creepOrganizer() {
@@ -3525,7 +3525,7 @@ const loop = ErrorMapper.wrapLoop(function () {
     roomManager();
     new CustomLog('Title', 'Message', undefined, undefined);
     for (let i = 0; i < 99; i++)
-        console.log("");
+        console.log();
     console.log(global.customLogs);
 });
 

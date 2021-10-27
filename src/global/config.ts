@@ -38,4 +38,8 @@ export function config() {
             global[room.name][propertyName] = globalProperties[propertyName]
         }
     }
+
+    // Assign tick-only properties
+
+    global.customLogs = ``
 }

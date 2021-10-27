@@ -25,7 +25,3 @@ if (!global[Object.keys(properties)[0]]) {
         global[propertyName] = properties[propertyName]
     }
 }
-
-// Assign tick-only properties
-
-global.customLogs = ``
