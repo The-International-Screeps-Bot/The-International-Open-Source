@@ -1,23 +1,22 @@
+import '../room/creeps/creepClasses'
+
 export function creepOrganizer() {
 
     // Loop through all of my creeps
 
-    for (let creepName in Game.creeps) {
+    for (const creepName in Game.creeps) {
 
-        let creep = Game.creeps[creepName]
+        const creep: Creep = Game.creeps[creepName]
 
-        let room = creep.room
+        const room: Room = creep.room
 
         // Organize creep by room and role
 
-        room.myCreeps[creep.memory.role].push(creep)
+        room.myCreeps[creep.memory.role].push(new creepClasses[creep.memory.role]())
 
         // See if creep is dying
 
-        if (creep.ticksToLive <= creep.body.length * 3 && !creep.memory.dying) {
-
-            creep.memory.dying = true
-        }
+        creep.isDying()
 
         // Stop if creep is dying
 

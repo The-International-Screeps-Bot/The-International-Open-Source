@@ -1,6 +1,8 @@
+import './creepClasses'
+
 import './creepFunctions'
 
-import { harvesterManager } from './creepManagers/harvesterManager'
+import { sourceHarvesterManager } from './creepManagers/sourceHarvesterManager'
 import { mineralHarvesterManager } from './creepManagers/mineralHarvesterManager'
 
 export function creepManager(room: Room) {
@@ -19,7 +21,7 @@ export function creepManager(room: Room) {
     }
 
     const managerParents: {[key: string]: any} = {
-        harvester: new ManagerParent(harvesterManager),
+        sourceHarvester: new ManagerParent(sourceHarvesterManager),
     }
 
     for (let role in managerParents) {

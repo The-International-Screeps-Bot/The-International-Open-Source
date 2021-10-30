@@ -188,7 +188,7 @@ Room.prototype.get = function(roomObjectName: string) {
         return harvestPositions
     }
 
-    function findClosestHarvestPosition(harvestPositions) {
+    function findClosestHarvestPosition(harvestPositions: {}) {
 
         // Filter harvestPositions by closest one to anchorPoint
 
@@ -200,7 +200,7 @@ Room.prototype.get = function(roomObjectName: string) {
     return roomObjects[roomObjectName].value
 }
 
-Room.prototype.newPos = function(object) {
+Room.prototype.newPos = function(object: {[key: string]: number}) {
 
     const room: Room = this
 

@@ -36,9 +36,6 @@ declare global {
     namespace NodeJS {
         interface Global {
             [key: string]: any
-            avgPrice(): void
-            createClass(): void
-            allyList: string[]
         }
     }
 }
@@ -50,8 +47,6 @@ export const loop = ErrorMapper.wrapLoop(function() {
     globalManager()
 
     roomManager()
-
-    new CustomLog('Title', 'Message', undefined, undefined)
 
     for (let i = 0; i < 99; i++) console.log()
     console.log(global.customLogs)

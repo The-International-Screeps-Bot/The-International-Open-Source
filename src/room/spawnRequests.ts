@@ -1,4 +1,4 @@
-export function spawnReqs(room: Room) {
+export function spawnRequests(room: Room) {
 
     //
 
@@ -22,13 +22,13 @@ export function spawnReqs(room: Room) {
 
         const anchorPoint = room.get('anchorPoint')
 
-        let energyStructuresWithRanges = []
+        const energyStructuresWithRanges: Array<any> = []
 
-        for (let energyStructure of unfilteredEnergyStructures) {
+        for (const energyStructure of unfilteredEnergyStructures) {
 
             // Create object ideal for sorting
 
-            let object: {[key: string]: string | number } = {
+            const object: {[key: string]: string | number } = {
                 id: energyStructure.id,
                 range: energyStructure.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5)
             }
@@ -40,11 +40,11 @@ export function spawnReqs(room: Room) {
 
         // Sort energyStructures by range
 
-        let energyStructuresByClosest = energyStructuresWithRanges.sort(function(a, b) { return a.value - b.value })
+        const energyStructuresByClosest = energyStructuresWithRanges.sort((a, b) => a.value - b.value)
 
-        let energyStructures = []
+        const energyStructures = []
 
-        for (let object of energyStructuresByClosest) {
+        for (const object of energyStructuresByClosest) {
 
             // Add structure with id of object to energyStructures
 
@@ -62,15 +62,14 @@ export function spawnReqs(room: Room) {
     // Configure options for spawning for each role
 
     interface RoleSpawningOpts {
-        role: string
         body: string[]
-        extraOpts: object
+        extraOpts: {[key: string]: any}
         tier: number
         cost: number
     }
 
     class RoleSpawningOpts {
-        constructor(role, bodyOpts: {[key: string]: any }, memoryAdditions: object) {
+        constructor(role: string, bodyOpts: {[key: string]: BodyPartConstant | any }, memoryAdditions: {[key: string]: any}) {
 
             this.body = []
             this.tier = 0
@@ -85,7 +84,7 @@ export function spawnReqs(room: Room) {
 
             if (bodyOpts.defaultParts.length > 0) {
 
-                for (let part of bodyOpts.defaultParts) {
+                for (const part of bodyOpts.defaultParts) {
 
                     // Stop loop if cost is more than or equal to maxCost
 
@@ -129,14 +128,15 @@ export function spawnReqs(room: Room) {
 
             // Construct memory
 
-            let memory = {
+            let memory: {[key: string]: any} = {
                 role: role,
                 roomFrom: room,
             }
 
             // Add additions to memory
 
-            for (let propertyName in memoryAdditions) {
+            let propertyName: string
+            for (propertyName in memoryAdditions) {
 
                 memory[propertyName] = memoryAdditions[propertyName]
             }
@@ -196,7 +196,7 @@ export function spawnReqs(room: Room) {
         }
     }
 
-    const spawningOpts = [
+    const spawningOpts: RoleSpawningOpts[] = [
         new RoleSpawningOpts('harvester', new HarvesterBodyOpts(), {}),
     ]
 

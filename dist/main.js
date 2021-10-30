@@ -37,17 +37,13 @@ global.getPositionsInsideRect = function (rect) {
  */
 class CustomLog$1 {
     constructor(title, message, color, bgColor) {
+        // Assign defaults if parameters were missing
+        if (!color)
+            color = global.colors.black;
+        if (!bgColor)
+            bgColor = global.colors.white;
         //
-        this.log = `
-        <div style='text-align: center; width: 100%; align-items: center; justify-content: center; display: flex; background: ` + global.colors.white + `;'>
-            <div style='font-size: 18px; border: black 1px solid; display: flex; justify-content: center;'>
-                ` + title + `
-            </div>
-            <div style='font-size: 16px; font-weight: bold; border: black 1px;'>
-                ` + message + `
-            </div>
-        </div>
-        `;
+        this.log = `<div style='text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div><div style='box-shadow: inset rgb(0, 0, 0, 0.2) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`;
         // Add this to customLogs for output
         global.customLogs += this.log;
     }
@@ -57,10 +53,14 @@ global.CustomLog = CustomLog$1;
 const properties = {
     allyList: [],
     colors: {
-        white: '#fff',
+        white: '#ffffff',
         lightGrey: '#eaeaea',
         lightBlue: '#0f66fc',
+        darkBlue: '#02007d',
         black: '#000000',
+        yellow: '#d8f100',
+        red: '#d10000',
+        green: '#00d137',
     },
     creepRoles: [
         'harvester',
@@ -70,7 +70,7 @@ const properties = {
 // If global doesn't have the first aspect of properties
 if (!global[Object.keys(properties)[0]]) {
     // Assign properties to globa
-    for (let propertyName in properties) {
+    for (const propertyName in properties) {
         global[propertyName] = properties[propertyName];
     }
 }
@@ -80,22 +80,25 @@ if (!global[Object.keys(properties)[0]]) {
  */
 function config() {
     // Configure rooms
-    for (let roomName in Game.rooms) {
-        let room = Game.rooms[roomName];
+    for (const roomName in Game.rooms) {
+        const room = Game.rooms[roomName];
+        // 1 Tick only properties
         const properties = {
             myCreeps: {}
         };
-        for (let propertyName in properties) {
+        for (const propertyName in properties) {
             room[propertyName] = properties[propertyName];
         }
+        // memory properties
         const memoryProperties = {};
-        for (let propertyName in memoryProperties) {
+        for (const propertyName in memoryProperties) {
             room.memory[propertyName] = memoryProperties[propertyName];
         }
+        // global properties
         const globalProperties = {};
         if (!global[room.name])
             global[room.name] = {};
-        for (let propertyName in globalProperties) {
+        for (const propertyName in globalProperties) {
             global[room.name][propertyName] = globalProperties[propertyName];
         }
     }
@@ -105,15 +108,13 @@ function config() {
 
 function creepOrganizer() {
     // Loop through all of my creeps
-    for (let creepName in Game.creeps) {
-        let creep = Game.creeps[creepName];
-        let room = creep.room;
+    for (const creepName in Game.creeps) {
+        const creep = Game.creeps[creepName];
+        const room = creep.room;
         // Organize creep by room and role
         room.myCreeps[creep.memory.role].push(creep);
         // See if creep is dying
-        if (creep.ticksToLive <= creep.body.length * 3 && !creep.memory.dying) {
-            creep.memory.dying = true;
-        }
+        creep.isDying();
         // Stop if creep is dying
         if (creep.memory.dying)
             continue;
@@ -265,21 +266,38 @@ Room.prototype.newPos = function (object) {
 
 Creep.prototype.travel = function (opts) {
 };
+Creep.prototype.isDying = function () {
+    const creep = this;
+    // Inform as dying if creep is already recorded as dying
+    if (creep.memory.dying)
+        return true;
+    // Stop if creep is spawning
+    if (!creep.ticksToLive)
+        return false;
+    // Stop if creep body parts * 3 is more or less than ticks left alive
+    if (creep.ticksToLive > creep.body.length * 3)
+        return false;
+    // Record creep as dying
+    creep.memory.dying = true;
+    return true;
+};
+
+SourceHarvester.prototype.moveToSource = function (source) {
+};
 
 function roomManager() {
-    let i = 0;
     for (let roomName in Game.rooms) {
         const room = Game.rooms[roomName];
         const controller = room.controller;
         // Iterate if there is no controller or we don't own the controller
         if (!controller || !controller.my)
             continue;
-        //
+        // Testing
         let cpuUsed = Game.cpu.getUsed();
-        room.get('source1HarvestPositions');
+        const harvPositions = room.get('source1HarvestPositions');
+        new CustomLog('HarvestPositions', harvPositions);
         cpuUsed = Game.cpu.getUsed() - cpuUsed;
-        console.log('Used: ' + cpuUsed.toFixed(2) + ' ' + i);
-        i++;
+        new CustomLog('HarvestPositions CPU', cpuUsed.toFixed(2));
     }
 }
 
@@ -3523,7 +3541,6 @@ ErrorMapper.cache = {};
 const loop = ErrorMapper.wrapLoop(function () {
     globalManager();
     roomManager();
-    new CustomLog('Title', 'Message', undefined, undefined);
     for (let i = 0; i < 99; i++)
         console.log();
     console.log(global.customLogs);

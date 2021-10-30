@@ -5,35 +5,41 @@ export function config() {
 
     // Configure rooms
 
-    for (let roomName in Game.rooms) {
+    for (const roomName in Game.rooms) {
 
-        let room = Game.rooms[roomName]
+        const room = Game.rooms[roomName]
+
+        // 1 Tick only properties
 
         const properties: {[key: string]: any} = {
             myCreeps: {}
         }
 
-        for (let propertyName in properties) {
+        for (const propertyName in properties) {
 
             room[propertyName] = properties[propertyName]
         }
 
-        const memoryProperties = {
+        // memory properties
+
+        const memoryProperties: {[key: string]: any} = {
 
         }
 
-        for (let propertyName in memoryProperties) {
+        for (const propertyName in memoryProperties) {
 
             room.memory[propertyName] = memoryProperties[propertyName]
         }
 
-        const globalProperties = {
+        // global properties
+
+        const globalProperties: {[key: string]: any} = {
 
         }
 
         if (!global[room.name]) global[room.name] = {}
 
-        for (let propertyName in globalProperties) {
+        for (const propertyName in globalProperties) {
 
             global[room.name][propertyName] = globalProperties[propertyName]
         }

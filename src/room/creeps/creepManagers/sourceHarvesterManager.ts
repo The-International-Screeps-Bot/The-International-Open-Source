@@ -1,4 +1,6 @@
-export function harvesterManager(room: Room, creepsOfRole: Creep[]) {
+import './sourceHarvesterFunctions'
+
+export function sourceHarvesterManager(room: Room, creepsOfRole: Creep[]) {
 
     if (creepsOfRole.length == 0) return
 

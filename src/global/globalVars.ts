@@ -1,27 +1,28 @@
-const properties: {} = {
-    allyList: [
+// If global is not constructed
 
-    ],
-    colors: {
-        white: '#fff',
+if (!global.active) {
+
+    // Record that global has been reconstructed
+
+    global.active = true
+
+    global.me = 'MarvinTMB' // My username
+    global.allyList = [] // Allies
+
+    global.colors = {
+        white: '#ffffff',
         lightGrey: '#eaeaea',
         lightBlue: '#0f66fc',
+        darkBlue: '#02007d',
         black: '#000000',
-    },
-    creepRoles: [
-        'harvester',
-    ],
-    roomDimensions: 50
-}
-
-// If global doesn't have the first aspect of properties
-
-if (!global[Object.keys(properties)[0]]) {
-
-    // Assign properties to globa
-
-    for (let propertyName in properties) {
-
-        global[propertyName] = properties[propertyName]
+        yellow: '#d8f100',
+        red: '#d10000',
+        green: '#00d137',
     }
+
+    global.creepRoles = [
+        'sourceHarvester'
+    ]
+
+    global.roomDimensions = 50
 }

@@ -4,7 +4,7 @@ import './creeps/taskManager'
 
 import './creeps/creepManager'
 
-import './structures/spawnManager'
+import './spawnManager'
 
 export function roomManager() {
 
@@ -20,14 +20,15 @@ export function roomManager() {
 
         if (!controller || !controller.my) continue
 
-        //
+        // Testing
 
         let cpuUsed = Game.cpu.getUsed()
 
         const harvPositions = room.get('source1HarvestPositions')
+        new CustomLog('HarvestPositions', harvPositions)
 
         cpuUsed = Game.cpu.getUsed() - cpuUsed
-        console.log('Used: ' + cpuUsed.toFixed(2) + ' ' + i)
+        new CustomLog('HarvestPositions CPU', cpuUsed.toFixed(2))
 
         i++
     }

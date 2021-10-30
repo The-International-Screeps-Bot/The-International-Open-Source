@@ -3,7 +3,7 @@ global.avgPrice = function() {
 
 }
 
-global.createClass = function(className: void) {
+global.createClass = function(className: string) {
 
     return class className {}
 }
@@ -47,25 +47,16 @@ interface CustomLog {
  * @param bgColor background colour
  */
 class CustomLog {
-    constructor(title: string, message: string, color: string, bgColor: string) {
+    constructor(title: string, message: string, color?: string, bgColor?: string) {
 
         // Assign defaults if parameters were missing
 
         if (!color) color = global.colors.black
-        if (!bgColor) color = global.colors.lightBlue
+        if (!bgColor) bgColor = global.colors.white
 
         //
 
-        this.log = `
-        <div style='text-align: center; width: 100%; align-items: center; justify-content: center; display: flex; background: ` + global.colors.white + `;'>
-            <div style='font-size: 18px; border: black 1px solid; display: flex; justify-content: center;'>
-                ` + title + `
-            </div>
-            <div style='font-size: 16px; font-weight: bold; border: black 1px;'>
-                ` + message + `
-            </div>
-        </div>
-        `
+        this.log = `<div style='text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div><div style='box-shadow: inset rgb(0, 0, 0, 0.2) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`
 
         // Add this to customLogs for output
 
