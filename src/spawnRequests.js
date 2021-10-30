@@ -819,10 +819,9 @@ module.exports = function spawnRequests(room) {
             if (storage) {
 
                 let maxParts = 31
-                if (energyCapacity >= 10300) maxParts = 22
+                if (controller.level == 8) maxParts = 19
 
                 // For every x stored energy add y parts
-
                 let storedEnergyReducer = 15000
 
                 let bodySize = Math.max(Math.floor(room.get("storedEnergy") / storedEnergyReducer) * 3 + 1, 4)
