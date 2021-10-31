@@ -2,7 +2,7 @@ import { spawnRequests } from './spawnRequests'
 
 export function spawnManager(room: Room) {
 
-    const spawns = room.get('spawns')
+    const spawns: StructureSpawn[] = room.get('spawns')
 
     // Find spawns that aren't spawning
 
@@ -20,6 +20,6 @@ export function spawnManager(room: Room) {
 
     for (let role of spawningOpts) {
 
-
+        
     }
 }

@@ -1,6 +1,6 @@
-import '../creepClasses'
+import { SourceHarvester } from '../creepClasses'
 
-SourceHarvester.prototype.moveToSource = function(source) {
+SourceHarvester.prototype.moveToSource = function(source: Source) {
 
 
 }

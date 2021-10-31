@@ -43,16 +43,20 @@ class CustomLog$1 {
         if (!bgColor)
             bgColor = global.colors.white;
         //
-        this.log = `<div style='text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div><div style='box-shadow: inset rgb(0, 0, 0, 0.2) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`;
+        this.log = `<div style='text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div><div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`;
         // Add this to customLogs for output
         global.customLogs += this.log;
     }
 }
 global.CustomLog = CustomLog$1;
 
-const properties = {
-    allyList: [],
-    colors: {
+// If global is not constructed
+if (!global.active) {
+    // Record that global has been reconstructed
+    global.active = true;
+    global.me = 'MarvinTMB'; // My username
+    global.allyList = []; // Allies
+    global.colors = {
         white: '#ffffff',
         lightGrey: '#eaeaea',
         lightBlue: '#0f66fc',
@@ -61,18 +65,11 @@ const properties = {
         yellow: '#d8f100',
         red: '#d10000',
         green: '#00d137',
-    },
-    creepRoles: [
-        'harvester',
-    ],
-    roomDimensions: 50
-};
-// If global doesn't have the first aspect of properties
-if (!global[Object.keys(properties)[0]]) {
-    // Assign properties to globa
-    for (const propertyName in properties) {
-        global[propertyName] = properties[propertyName];
-    }
+    };
+    global.creepRoles = [
+        'sourceHarvester'
+    ];
+    global.roomDimensions = 50;
 }
 
 /**
@@ -84,7 +81,8 @@ function config() {
         const room = Game.rooms[roomName];
         // 1 Tick only properties
         const properties = {
-            myCreeps: {}
+            myCreeps: {},
+            creepCount: {},
         };
         for (const propertyName in properties) {
             room[propertyName] = properties[propertyName];
@@ -106,18 +104,33 @@ function config() {
     global.customLogs = ``;
 }
 
+class SourceHarvester extends Creep {
+    constructor(creep) {
+        super(creep.id);
+    }
+}
+
+var creepClasses = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    SourceHarvester: SourceHarvester
+});
+
 function creepOrganizer() {
     // Loop through all of my creeps
     for (const creepName in Game.creeps) {
         const creep = Game.creeps[creepName];
         const room = creep.room;
+        // Construct object for role if it doesn't exist
+        if (!room.myCreeps[creep.memory.role])
+            room.myCreeps[creep.memory.role] = [];
         // Organize creep by room and role
-        room.myCreeps[creep.memory.role].push(creep);
+        room.myCreeps[creep.memory.role].push(new creepClasses[creep.memory.role](creep));
         // See if creep is dying
         creep.isDying();
         // Stop if creep is dying
         if (creep.memory.dying)
             continue;
+        // Increase creepCount for this role
         room.creepCount[creep.memory.role] += 1;
     }
 }
@@ -289,6 +302,8 @@ function roomManager() {
     for (let roomName in Game.rooms) {
         const room = Game.rooms[roomName];
         const controller = room.controller;
+        new CustomLog('Room', room.name, undefined, global.colors.lightGrey);
+        new CustomLog('Creeps', JSON.stringify(room.myCreeps));
         // Iterate if there is no controller or we don't own the controller
         if (!controller || !controller.my)
             continue;
@@ -3541,6 +3556,7 @@ ErrorMapper.cache = {};
 const loop = ErrorMapper.wrapLoop(function () {
     globalManager();
     roomManager();
+    new CustomLog('Total CPU', Game.cpu.getUsed().toFixed(2), global.colors.white, global.colors.lightBlue);
     for (let i = 0; i < 99; i++)
         console.log();
     console.log(global.customLogs);

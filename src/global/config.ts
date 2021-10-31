@@ -12,7 +12,8 @@ export function config() {
         // 1 Tick only properties
 
         const properties: {[key: string]: any} = {
-            myCreeps: {}
+            myCreeps: {},
+            creepCount: {},
         }
 
         for (const propertyName in properties) {

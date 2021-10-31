@@ -1,4 +1,4 @@
-import '../room/creeps/creepClasses'
+import * as creepClasses from '../room/creeps/creepClasses'
 
 export function creepOrganizer() {
 
@@ -10,9 +10,13 @@ export function creepOrganizer() {
 
         const room: Room = creep.room
 
+        // Construct object for role if it doesn't exist
+
+        if (!room.myCreeps[creep.memory.role]) room.myCreeps[creep.memory.role] = []
+
         // Organize creep by room and role
 
-        room.myCreeps[creep.memory.role].push(new creepClasses[creep.memory.role]())
+        room.myCreeps[creep.memory.role].push(new creepClasses[creep.memory.role](creep))
 
         // See if creep is dying
 
@@ -21,6 +25,8 @@ export function creepOrganizer() {
         // Stop if creep is dying
 
         if (creep.memory.dying) continue
+
+        // Increase creepCount for this role
 
         room.creepCount[creep.memory.role] += 1
     }

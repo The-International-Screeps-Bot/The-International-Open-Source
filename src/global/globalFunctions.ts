@@ -47,7 +47,7 @@ interface CustomLog {
  * @param bgColor background colour
  */
 class CustomLog {
-    constructor(title: string, message: string, color?: string, bgColor?: string) {
+    constructor(title: string | number, message: string | number, color?: string, bgColor?: string) {
 
         // Assign defaults if parameters were missing
 
@@ -56,7 +56,7 @@ class CustomLog {
 
         //
 
-        this.log = `<div style='text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div><div style='box-shadow: inset rgb(0, 0, 0, 0.2) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`
+        this.log = `<div style='text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div><div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`
 
         // Add this to customLogs for output
 

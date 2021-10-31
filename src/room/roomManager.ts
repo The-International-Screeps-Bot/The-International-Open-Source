@@ -16,6 +16,10 @@ export function roomManager() {
 
         const controller = room.controller
 
+        new CustomLog('Room', room.name, undefined, global.colors.lightGrey)
+
+        new CustomLog('Creeps', JSON.stringify(room.myCreeps))
+
         // Iterate if there is no controller or we don't own the controller
 
         if (!controller || !controller.my) continue

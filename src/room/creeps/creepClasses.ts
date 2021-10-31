@@ -1,9 +1,15 @@
-interface SourceHarvester {
+interface SourceHarvesterMemory extends CreepMemory {
+
+}
+
+interface SourceHarvester extends Creep {
     [key: string]: any
 }
 
-class SourceHarvester {
-    constructor() {
+class SourceHarvester extends Creep {
+    constructor(creep: Creep) {
+
+        super(creep.id)
 
     }
 }
@@ -11,3 +17,5 @@ class SourceHarvester {
 const creepClasses = {
     'sourceHarvester': SourceHarvester,
 }
+
+export { SourceHarvester }
