@@ -4,6 +4,8 @@ export function spawnRequests(room: Room) {
 
     const minCreeps: {[key: string]: any} = {}
 
+    let requiredCreeps: {} = {}
+
     // Find energy structures
 
     const energyStructures = findEnergyStructures()
@@ -200,5 +202,8 @@ export function spawnRequests(room: Room) {
         new RoleSpawningOpts('harvester', new HarvesterBodyOpts(), {}),
     ]
 
-    return spawningOpts
+    return {
+        spawningOpts,
+        requiredCreeps,
+    }
 }

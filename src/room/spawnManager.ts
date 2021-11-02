@@ -14,11 +14,40 @@ export function spawnManager(room: Room) {
 
     // Import spawningOpts
 
-    const spawningOpts = spawnRequests(room)
+    const {
+        spawningOpts,
+        requiredCreeps,
+     } = spawnRequests(room)
 
     //
 
-    for (let role of spawningOpts) {
+    let i = 0
+
+    for (let spawningObject of spawningOpts) {
+
+        // Iterate if there are no required creeps of role
+
+        if (requiredCreeps[spawningObject.extraOpts.memory.role] == 0) continue
+
+        // Try to find inactive spawn, if can't, stop
+
+        const spawn = inactiveSpawns[i]
+        if (!spawn) break
+
+        // Enable dry run
+
+        spawningObject.extraOpts.dryRun = true
+
+        // See if creep can be spawned, stop if it can't
+
+        const testSpawn = spawn.spawnCreep(spawningObject.body, spawningObject.extraOpts.memory.role, spawningObject.extraOpts)
+        if (testSpawn == 0) break
+
+        // Disable dry run
+
+spawningObject.extraOpts.dryRun = false
+
+//
 
         // Game.spawns.Spawn1.spawnCreep([MOVE], 'sourceHarvester', { memory: { role: 'sourceHarvester' } })
     }
