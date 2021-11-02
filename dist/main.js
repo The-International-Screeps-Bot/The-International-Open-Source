@@ -67,7 +67,7 @@ if (!global.active) {
         green: '#00d137',
     };
     global.creepRoles = [
-        'sourceHarvester'
+        'SourceHarvester'
     ];
     global.roomDimensions = 50;
 }
@@ -104,16 +104,14 @@ function config() {
     global.customLogs = ``;
 }
 
-class SourceHarvester extends Creep {
+class SourceHarvester$1 extends Creep {
     constructor(creep) {
         super(creep.id);
     }
 }
-
-var creepClasses = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    SourceHarvester: SourceHarvester
-});
+const creepClasses = {
+    'sourceHarvester': SourceHarvester$1,
+};
 
 function creepOrganizer() {
     // Loop through all of my creeps
@@ -295,6 +293,7 @@ Creep.prototype.isDying = function () {
     return true;
 };
 
+const SourceHarvester = creepClasses.sourceHarvester;
 SourceHarvester.prototype.moveToSource = function (source) {
 };
 
@@ -303,7 +302,6 @@ function roomManager() {
         const room = Game.rooms[roomName];
         const controller = room.controller;
         new CustomLog('Room', room.name, undefined, global.colors.lightGrey);
-        new CustomLog('Creeps', JSON.stringify(room.myCreeps));
         // Iterate if there is no controller or we don't own the controller
         if (!controller || !controller.my)
             continue;

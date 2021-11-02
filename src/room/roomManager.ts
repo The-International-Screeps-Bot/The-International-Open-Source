@@ -12,13 +12,11 @@ export function roomManager() {
 
     for (let roomName in Game.rooms) {
 
-        const room = Game.rooms[roomName]
+        const room: Room = Game.rooms[roomName]
 
         const controller = room.controller
 
         new CustomLog('Room', room.name, undefined, global.colors.lightGrey)
-
-        new CustomLog('Creeps', JSON.stringify(room.myCreeps))
 
         // Iterate if there is no controller or we don't own the controller
 

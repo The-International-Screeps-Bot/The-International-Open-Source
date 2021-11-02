@@ -21,7 +21,7 @@ if (!global.active) {
     }
 
     global.creepRoles = [
-        'sourceHarvester'
+        'SourceHarvester'
     ]
 
     global.roomDimensions = 50

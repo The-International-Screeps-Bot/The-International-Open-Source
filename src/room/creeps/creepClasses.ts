@@ -18,4 +18,4 @@ const creepClasses = {
     'sourceHarvester': SourceHarvester,
 }
 
-export { SourceHarvester }
+export { creepClasses }

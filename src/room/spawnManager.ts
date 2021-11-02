@@ -20,6 +20,6 @@ export function spawnManager(room: Room) {
 
     for (let role of spawningOpts) {
 
-        
+        // Game.spawns.Spawn1.spawnCreep([MOVE], 'sourceHarvester', { memory: { role: 'sourceHarvester' } })
     }
 }

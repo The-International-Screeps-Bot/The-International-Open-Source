@@ -47,7 +47,7 @@ interface CustomLog {
  * @param bgColor background colour
  */
 class CustomLog {
-    constructor(title: string | number, message: string | number, color?: string, bgColor?: string) {
+    constructor(title: string, message: any, color?: string, bgColor?: string) {
 
         // Assign defaults if parameters were missing
 

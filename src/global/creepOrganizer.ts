@@ -1,4 +1,4 @@
-import * as creepClasses from '../room/creeps/creepClasses'
+import { creepClasses } from '../room/creeps/creepClasses'
 
 export function creepOrganizer() {
 
@@ -17,7 +17,7 @@ export function creepOrganizer() {
         // Organize creep by room and role
 
         room.myCreeps[creep.memory.role].push(new creepClasses[creep.memory.role](creep))
-
+        
         // See if creep is dying
 
         creep.isDying()
