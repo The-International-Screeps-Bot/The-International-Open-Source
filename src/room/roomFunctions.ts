@@ -13,9 +13,8 @@ Room.prototype.get = function(roomObjectName: string) {
     if (cachedValue) return cachedValue
 
     /**
-     *
-     * @param roomObjectName name of roomObject
-     * @returns roomObject
+    @param roomObjectName name of roomObject
+    @returns roomObject
      */
     function findRoomObjectInGlobal(roomObjectName: string) {
 
@@ -54,9 +53,8 @@ Room.prototype.get = function(roomObjectName: string) {
     }
 
     /**
-     *
-     * @param roomObjectName name of roomObject
-     * @returns roomObject
+    @param roomObjectName name of roomObject
+    @returns roomObject
      */
     function findRoomObjectInMemory(roomObjectName: string) {
 

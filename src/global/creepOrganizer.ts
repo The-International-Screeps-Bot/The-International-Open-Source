@@ -4,9 +4,19 @@ export function creepOrganizer() {
 
     // Loop through all of my creeps
 
-    for (const creepName in Game.creeps) {
+    for (const creepName in Memory.creeps) {
 
         const creep: Creep = Game.creeps[creepName]
+
+        // If creep doesn't exist
+
+        if (!creep) {
+
+            // Delete creep from memory and iterate
+
+            delete Memory.creeps[creepName]
+            continue
+        }
 
         const room: Room = creep.room
 
@@ -17,7 +27,7 @@ export function creepOrganizer() {
         // Organize creep by room and role
 
         room.myCreeps[creep.memory.role].push(new creepClasses[creep.memory.role](creep))
-        
+
         // See if creep is dying
 
         creep.isDying()

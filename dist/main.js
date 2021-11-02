@@ -115,8 +115,14 @@ const creepClasses = {
 
 function creepOrganizer() {
     // Loop through all of my creeps
-    for (const creepName in Game.creeps) {
+    for (const creepName in Memory.creeps) {
         const creep = Game.creeps[creepName];
+        // If creep doesn't exist
+        if (!creep) {
+            // Delete creep from memory and iterate
+            delete Memory.creeps[creepName];
+            continue;
+        }
         const room = creep.room;
         // Construct object for role if it doesn't exist
         if (!room.myCreeps[creep.memory.role])
@@ -149,9 +155,8 @@ Room.prototype.get = function (roomObjectName) {
     if (cachedValue)
         return cachedValue;
     /**
-     *
-     * @param roomObjectName name of roomObject
-     * @returns roomObject
+    @param roomObjectName name of roomObject
+    @returns roomObject
      */
     function findRoomObjectInGlobal(roomObjectName) {
         // Stop if there is no stored object
@@ -176,9 +181,8 @@ Room.prototype.get = function (roomObjectName) {
         return global[room.name][roomObjectName].value;
     }
     /**
-     *
-     * @param roomObjectName name of roomObject
-     * @returns roomObject
+    @param roomObjectName name of roomObject
+    @returns roomObject
      */
     function findRoomObjectInMemory(roomObjectName) {
         // Stop if there is no stored object
@@ -294,7 +298,7 @@ Creep.prototype.isDying = function () {
 };
 
 const SourceHarvester = creepClasses.sourceHarvester;
-SourceHarvester.prototype.moveToSource = function (source) {
+SourceHarvester.prototype.moveToSource = function () {
 };
 
 function roomManager() {
