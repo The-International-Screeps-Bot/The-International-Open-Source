@@ -45,9 +45,16 @@ export function spawnManager(room: Room) {
 
         // Disable dry run
 
-spawningObject.extraOpts.dryRun = false
+        spawningObject.extraOpts.dryRun = false
 
-//
+        // Spawn creep
+
+        spawn.spawnCreep(spawningObject.body, spawningObject.extraOpts.memory.role, spawningObject.extraOpts)
+
+        // Record an inactive spawn was used and iterate
+
+        i++
+        continue
 
         // Game.spawns.Spawn1.spawnCreep([MOVE], 'sourceHarvester', { memory: { role: 'sourceHarvester' } })
     }

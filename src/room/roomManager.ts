@@ -6,6 +6,9 @@ import './creeps/creepManager'
 
 import './spawnManager'
 
+import './remoteManager'
+import './communeManager'
+
 export function roomManager() {
 
     let i = 0
@@ -21,7 +24,7 @@ export function roomManager() {
         // Iterate if there is no controller or we don't own the controller
 
         if (!controller || !controller.my) continue
-
+        
         // Testing
 
         let cpuUsed = Game.cpu.getUsed()

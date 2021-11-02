@@ -64,7 +64,7 @@ export function spawnRequests(room: Room) {
     // Configure options for spawning for each role
 
     interface RoleSpawningOpts {
-        body: string[]
+        body: BodyPartConstant[]
         extraOpts: {[key: string]: any}
         tier: number
         cost: number
