@@ -2,13 +2,12 @@ import './roomFunctions'
 
 import './creeps/taskManager'
 
-import './creeps/creepManager'
-
 import './spawnManager'
 
 import './remoteManager'
 import './communeManager'
 import { spawnManager } from './spawnManager'
+import { creepManager } from './creeps/creepManager'
 
 export function roomManager() {
 
@@ -21,6 +20,10 @@ export function roomManager() {
         const controller = room.controller
 
         new CustomLog('Room', room.name, undefined, global.colors.lightGrey)
+
+        //
+
+        creepManager(room)
 
         // Iterate if there is no controller or we don't own the controller
 

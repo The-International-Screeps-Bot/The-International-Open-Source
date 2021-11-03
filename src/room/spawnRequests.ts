@@ -192,7 +192,7 @@ export function spawnRequests(room: Room) {
                 this.extraParts = [WORK, WORK, WORK, MOVE]
                 this.maxParts = 8
 
-                minCreeps.harvester = minCreeps['harvester'] = 2
+                minCreeps.sourceHarvester = minCreeps['sourceHarvester'] = 2
 
                 return
             }
@@ -202,7 +202,7 @@ export function spawnRequests(room: Room) {
                 this.extraParts = [WORK]
                 this.maxParts = 6
 
-                minCreeps.harvester = minCreeps['harvester'] = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2)
+                minCreeps.sourceHarvester = minCreeps['sourceHarvester'] = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2)
 
                 return
             }
@@ -210,7 +210,7 @@ export function spawnRequests(room: Room) {
     }
 
     const spawningOpts: RoleSpawningOpts[] = [
-        new RoleSpawningOpts('harvester', new HarvesterBodyOpts(), {}),
+        new RoleSpawningOpts('sourceHarvester', new HarvesterBodyOpts(), {}),
     ]
 
     return {

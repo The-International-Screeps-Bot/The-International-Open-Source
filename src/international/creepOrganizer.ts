@@ -20,10 +20,6 @@ export function creepOrganizer() {
 
         const room: Room = creep.room
 
-        // Construct object for role if it doesn't exist
-
-        if (!room.myCreeps[creep.memory.role]) room.myCreeps[creep.memory.role] = []
-
         // Organize creep by room and role
 
         room.myCreeps[creep.memory.role].push(new creepClasses[creep.memory.role](creep))

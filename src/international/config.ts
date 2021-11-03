@@ -25,6 +25,12 @@ export function config() {
 
         for (const role of global.creepRoles) {
 
+            //
+
+            room.myCreeps[role] = []
+
+            //
+
             room.creepCount[role] = 0
         }
 

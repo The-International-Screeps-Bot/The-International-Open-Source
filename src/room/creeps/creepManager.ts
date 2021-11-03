@@ -32,12 +32,8 @@ export function creepManager(room: Room) {
 
         if (room.myCreeps[role].length == 0) continue
 
-        // Add creeps of role to managerParent's creeps
-
-        managerParent.creepsOfRole = room.myCreeps[role]
-
         // Run manager
 
-        managerParent.manager()
+        managerParent.manager(room, room.myCreeps[role])
     }
 }

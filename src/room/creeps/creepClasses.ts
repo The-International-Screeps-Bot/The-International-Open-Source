@@ -14,8 +14,6 @@ class SourceHarvester extends Creep {
     }
 }
 
-const creepClasses = {
+export const creepClasses: {[key: string]: any} = {
     'sourceHarvester': SourceHarvester,
 }
-
-export { creepClasses }

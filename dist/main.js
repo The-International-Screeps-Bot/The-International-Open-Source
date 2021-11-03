@@ -89,6 +89,9 @@ function config() {
         }
         //
         for (const role of global.creepRoles) {
+            //
+            room.myCreeps[role] = [];
+            //
             room.creepCount[role] = 0;
         }
         // memory properties
@@ -128,9 +131,6 @@ function creepOrganizer() {
             continue;
         }
         const room = creep.room;
-        // Construct object for role if it doesn't exist
-        if (!room.myCreeps[creep.memory.role])
-            room.myCreeps[creep.memory.role] = [];
         // Organize creep by room and role
         room.myCreeps[creep.memory.role].push(new creepClasses[creep.memory.role](creep));
         // See if creep is dying
@@ -281,28 +281,6 @@ Room.prototype.newPos = function (object) {
     return new RoomPosition(object.x, object.y, room.name);
 };
 
-Creep.prototype.travel = function (opts) {
-};
-Creep.prototype.isDying = function () {
-    const creep = this;
-    // Inform as dying if creep is already recorded as dying
-    if (creep.memory.dying)
-        return true;
-    // Stop if creep is spawning
-    if (!creep.ticksToLive)
-        return false;
-    // Stop if creep body parts * 3 is more or less than ticks left alive
-    if (creep.ticksToLive > creep.body.length * 3)
-        return false;
-    // Record creep as dying
-    creep.memory.dying = true;
-    return true;
-};
-
-const SourceHarvester = creepClasses.sourceHarvester;
-SourceHarvester.prototype.moveToSource = function () {
-};
-
 function spawnRequests(room) {
     //
     const minCreeps = {};
@@ -415,20 +393,20 @@ function spawnRequests(room) {
                 this.defaultParts = [];
                 this.extraParts = [WORK, WORK, WORK, MOVE];
                 this.maxParts = 8;
-                minCreeps.harvester = minCreeps['harvester'] = 2;
+                minCreeps.sourceHarvester = minCreeps['sourceHarvester'] = 2;
                 return;
             }
             if (spawnEnergyCapacity >= 300) {
                 this.defaultParts = [];
                 this.extraParts = [WORK];
                 this.maxParts = 6;
-                minCreeps.harvester = minCreeps['harvester'] = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2);
+                minCreeps.sourceHarvester = minCreeps['sourceHarvester'] = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2);
                 return;
             }
         }
     }
     const spawningOpts = [
-        new RoleSpawningOpts('harvester', new HarvesterBodyOpts(), {}),
+        new RoleSpawningOpts('sourceHarvester', new HarvesterBodyOpts(), {}),
     ];
     return {
         spawningOpts,
@@ -471,11 +449,61 @@ function spawnManager(room) {
     }
 }
 
+Creep.prototype.travel = function (opts) {
+};
+Creep.prototype.isDying = function () {
+    const creep = this;
+    // Inform as dying if creep is already recorded as dying
+    if (creep.memory.dying)
+        return true;
+    // Stop if creep is spawning
+    if (!creep.ticksToLive)
+        return false;
+    // Stop if creep body parts * 3 is more or less than ticks left alive
+    if (creep.ticksToLive > creep.body.length * 3)
+        return false;
+    // Record creep as dying
+    creep.memory.dying = true;
+    return true;
+};
+
+const SourceHarvester = creepClasses.sourceHarvester;
+SourceHarvester.prototype.moveToSource = function () {
+};
+
+function sourceHarvesterManager(room, creepsOfRole) {
+    for (let creep of creepsOfRole) {
+        creep.say('hey');
+    }
+}
+
+function creepManager(room) {
+    class ManagerParent {
+        constructor(manager) {
+            this.manager = manager;
+            this.creepsOfRole = [];
+        }
+    }
+    const managerParents = {
+        sourceHarvester: new ManagerParent(sourceHarvesterManager),
+    };
+    for (let role in managerParents) {
+        let managerParent = managerParents[role];
+        // Iterate if there are no creeps of managerParent's role
+        if (room.myCreeps[role].length == 0)
+            continue;
+        // Run manager
+        managerParent.manager(room, room.myCreeps[role]);
+    }
+}
+
 function roomManager() {
     for (let roomName in Game.rooms) {
         const room = Game.rooms[roomName];
         const controller = room.controller;
         new CustomLog('Room', room.name, undefined, global.colors.lightGrey);
+        //
+        creepManager(room);
         // Iterate if there is no controller or we don't own the controller
         if (!controller || !controller.my)
             continue;
