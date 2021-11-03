@@ -2,7 +2,7 @@ import { spawnRequests } from './spawnRequests'
 
 export function spawnManager(room: Room) {
 
-    const spawns: StructureSpawn[] = room.get('spawns')
+    const spawns: StructureSpawn[] = room.get('spawn')
 
     // Find spawns that aren't spawning
 
@@ -18,8 +18,6 @@ export function spawnManager(room: Room) {
         spawningOpts,
         requiredCreeps,
      } = spawnRequests(room)
-
-    //
 
     let i = 0
 
@@ -41,7 +39,7 @@ export function spawnManager(room: Room) {
         // See if creep can be spawned, stop if it can't
 
         const testSpawn = spawn.spawnCreep(spawningObject.body, spawningObject.extraOpts.memory.role, spawningObject.extraOpts)
-        if (testSpawn == 0) break
+        if (testSpawn != 0) break
 
         // Disable dry run
 

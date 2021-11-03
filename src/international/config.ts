@@ -21,6 +21,13 @@ export function config() {
             room[propertyName] = properties[propertyName]
         }
 
+        //
+
+        for (const role of global.creepRoles) {
+
+            room.creepCount[role] = 0
+        }
+
         // memory properties
 
         const memoryProperties: {[key: string]: any} = {

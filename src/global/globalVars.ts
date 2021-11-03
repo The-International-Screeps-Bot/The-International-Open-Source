@@ -7,7 +7,7 @@ if (!global.active) {
     global.active = true
 
     global.me = 'MarvinTMB' // My username
-    global.allyList = [] // Allies
+    global.allyList = ['hi'] // Allies
 
     global.colors = {
         white: '#ffffff',
@@ -21,7 +21,7 @@ if (!global.active) {
     }
 
     global.creepRoles = [
-        'SourceHarvester'
+        'sourceHarvester'
     ]
 
     global.roomDimensions = 50

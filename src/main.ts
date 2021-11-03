@@ -1,14 +1,23 @@
 // Global
 
-import { globalManager } from './global/globalManager'
+import './global/globalFunctions'
+import './global/globalVars'
+
+// International
+
+import { internationalManager } from './international/internationalManager'
 
 // Room
 
 import { roomManager } from './room/roomManager'
 
-// Other
+// External
 
 import { ErrorMapper } from './external/ErrorMapper'
+
+// Other
+
+import { logManager } from 'other/logManager'
 
 // Type declareations for global
 
@@ -36,6 +45,10 @@ declare global {
     namespace NodeJS {
         interface Global {
             [key: string]: any
+
+            me: string
+            allyList: string[]
+            creepRoles: string[]
         }
     }
 }
@@ -44,12 +57,9 @@ declare global {
 
 export const loop = ErrorMapper.wrapLoop(function() {
 
-    globalManager()
+    internationalManager()
 
     roomManager()
 
-    new CustomLog('Total CPU', Game.cpu.getUsed().toFixed(2), global.colors.white, global.colors.lightBlue)
-
-    for (let i = 0; i < 99; i++) console.log()
-    console.log(global.customLogs)
+    logManager()
 })

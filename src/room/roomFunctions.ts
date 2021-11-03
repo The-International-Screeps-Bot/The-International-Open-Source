@@ -147,8 +147,8 @@ Room.prototype.get = function(roomObjectName: string) {
     roomObjects.source1HarvestPositions = findRoomObjectInGlobal('source1HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source1.value), Infinity, 'global', 'object')
     roomObjects.source1ClosestHarvestPosition = findRoomObjectInGlobal('source1ClosestHarvestPosition') || new RoomObject(findClosestHarvestPosition(roomObjects.source1HarvestPositions.value), Infinity, 'memory', 'object')
 
-    if (roomObjects.sources[1]) roomObjects.source2HarvestPositions = findRoomObjectInGlobal('source2HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source2.value), Infinity, 'global', 'object')
-    if (roomObjects.sources[1]) roomObjects.source2ClosestHarvestPosition = findRoomObjectInGlobal('source2ClosestHarvestPosition') || new RoomObject(findClosestHarvestPosition(roomObjects.source2HarvestPositions.value), Infinity, 'memory', 'object')
+    roomObjects.source2HarvestPositions = roomObjects.sources[1] ? findRoomObjectInGlobal('source2HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source2.value), Infinity, 'global', 'object') : new RoomObject([], 0, 'global', 'object')
+    roomObjects.source2ClosestHarvestPosition = roomObjects.sources[1] ? findRoomObjectInGlobal('source2ClosestHarvestPosition') || new RoomObject(findClosestHarvestPosition(roomObjects.source2HarvestPositions.value), Infinity, 'memory', 'object') : undefined
 
     /**
      * Finds positions adjacent to a source that a creep can harvest
@@ -193,7 +193,7 @@ Room.prototype.get = function(roomObjectName: string) {
         return roomObjects.anchorPoint.value.findClosestByRange(harvestPositions)
     }
 
-    // Return queried value
+    // Return queried value if defined
 
     return roomObjects[roomObjectName].value
 }

@@ -4,7 +4,18 @@ export function spawnRequests(room: Room) {
 
     const minCreeps: {[key: string]: any} = {}
 
-    let requiredCreeps: {} = {}
+    // Construct minCreeps
+
+    minCreeps.sourceHarvester = 1
+
+    let requiredCreeps: {[key: string]: any} = {}
+
+    // Construct requiredCreeps
+
+    for (const role of global.creepRoles) {
+
+        requiredCreeps[role] = minCreeps[role] - room.creepCount[role]
+    }
 
     // Find energy structures
 
@@ -14,7 +25,7 @@ export function spawnRequests(room: Room) {
 
         // Get array of extensions and spawns
 
-        let unfilteredEnergyStructures = room.find(FIND_MY_STRUCTURES, {
+        const unfilteredEnergyStructures = room.find(FIND_MY_STRUCTURES, {
             filter: structure => (structure.structureType == STRUCTURE_EXTENSION
                 || structure.structureType == STRUCTURE_SPAWN)
                 && structure.isActive()
@@ -79,7 +90,7 @@ export function spawnRequests(room: Room) {
 
             let maxCost = spawnEnergyCapacity
 
-            if (Object.keys(room.myCreeps.harvester).length == 0 || Object.keys(room.myCreeps.hauler).length == 0) {
+            if (room.creepCount.harvester == 0 || room.creepCount.hauler == 0) {
 
                 maxCost = spawnEnergyAvailable
             }
@@ -167,8 +178,8 @@ export function spawnRequests(room: Room) {
         }
     }
 
-    let source1HarvestPositionsAmount = room.get('source1HarvestPositions').positions.length
-    let source2HarvestPositionsAmount = room.get('source2HarvestPositions').positions.length
+    const source1HarvestPositionsAmount = room.get('source1HarvestPositions').length
+    const source2HarvestPositionsAmount = room.get('source2HarvestPositions').length
 
     class HarvesterBodyOpts extends BodyOpts {
         constructor() {

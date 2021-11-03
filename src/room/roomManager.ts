@@ -8,6 +8,7 @@ import './spawnManager'
 
 import './remoteManager'
 import './communeManager'
+import { spawnManager } from './spawnManager'
 
 export function roomManager() {
 
@@ -24,7 +25,11 @@ export function roomManager() {
         // Iterate if there is no controller or we don't own the controller
 
         if (!controller || !controller.my) continue
-        
+
+        //
+
+        spawnManager(room)
+
         // Testing
 
         let cpuUsed = Game.cpu.getUsed()
