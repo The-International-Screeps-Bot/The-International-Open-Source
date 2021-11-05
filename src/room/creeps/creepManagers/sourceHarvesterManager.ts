@@ -1,9 +1,10 @@
+import { RoleSourceHarvester } from "../creepClasses"
 import './sourceHarvesterFunctions'
 
-export function sourceHarvesterManager(room: Room, creepsOfRole: Creep[]) {
+export function sourceHarvesterManager(room: Room, creepsOfRole: RoleSourceHarvester[]) {
 
-    for (let creep of creepsOfRole) {
+    for (const creep of creepsOfRole) {
 
-        creep.say('hey')
+        creep.sayHi()
     }
 }

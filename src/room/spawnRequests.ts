@@ -1,70 +1,29 @@
+import './spawningFunctions'
+
 export function spawnRequests(room: Room) {
-
-    //
-
-    const minCreeps: {[key: string]: any} = {}
-
-    // Construct minCreeps
-
-    minCreeps.sourceHarvester = 1
-
-    let requiredCreeps: {[key: string]: any} = {}
-
-    // Construct requiredCreeps
-
-    for (const role of global.creepRoles) {
-
-        requiredCreeps[role] = minCreeps[role] - room.creepCount[role]
-    }
 
     // Find energy structures
 
-    const energyStructures = findEnergyStructures()
+    const spawnStructures = findSpawnStructures()
 
-    function findEnergyStructures() {
+    function findSpawnStructures() {
 
-        // Get array of extensions and spawns
+        // Get array of spawns and extensions
 
-        const unfilteredEnergyStructures = room.find(FIND_MY_STRUCTURES, {
-            filter: structure => (structure.structureType == STRUCTURE_EXTENSION
-                || structure.structureType == STRUCTURE_SPAWN)
-                && structure.isActive()
-        })
+        const spawnsAndExtensions: Structure<STRUCTURE_SPAWN | STRUCTURE_EXTENSION>[] = room.get('spawn').concat(room.get('extension'))
+
+        // Filter out structures that aren't active
+
+        const unfilteredSpawnStructures = spawnsAndExtensions.filter((structure) => structure.isActive())
 
         // Add each spawnStructures with their range to the object
 
         const anchorPoint = room.get('anchorPoint')
 
-        const energyStructuresWithRanges: Array<any> = []
+        // Filter energy structures by distance from anchorPoint
 
-        for (const energyStructure of unfilteredEnergyStructures) {
-
-            // Create object ideal for sorting
-
-            const object: {[key: string]: string | number } = {
-                id: energyStructure.id,
-                range: energyStructure.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5)
-            }
-
-            // Add object to list
-
-            energyStructuresWithRanges.push(object)
-        }
-
-        // Sort energyStructures by range
-
-        const energyStructuresByClosest = energyStructuresWithRanges.sort((a, b) => a.value - b.value)
-
-        const energyStructures = []
-
-        for (const object of energyStructuresByClosest) {
-
-            // Add structure with id of object to energyStructures
-
-            energyStructures.push(global.findObjectWithId(object.id))
-        }
-
-        return energyStructures
+        const filteredSpawnStructures = unfilteredSpawnStructures.sort((a, b) => a.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5) - b.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5))
+        return filteredSpawnStructures
     }
 
     //
@@ -75,6 +34,12 @@ export function spawnRequests(room: Room) {
     // Configure options for spawning for each role
 
     interface RoleSpawningOpts {
+        role: string
+        defaultParts: BodyPartConstant[]
+        extraParts: BodyPartConstant[]
+        maxParts: number
+        memoryAdditions: {[key: string]: any}
+
         body: BodyPartConstant[]
         extraOpts: {[key: string]: any}
         tier: number
@@ -82,7 +47,15 @@ export function spawnRequests(room: Room) {
     }
 
     class RoleSpawningOpts {
-        constructor(role: string, bodyOpts: {[key: string]: BodyPartConstant | any }, memoryAdditions: {[key: string]: any}) {
+        constructor() {
+
+            this.memoryAdditions = {}
+
+            this.defaultParts = []
+            this.extraParts = []
+            this.maxParts = 50
+        }
+        constructBody(role: string, bodyOpts: {[key: string]: BodyPartConstant | any }, memoryAdditions: {[key: string]: any}) {
 
             this.body = []
             this.tier = 0
@@ -95,9 +68,9 @@ export function spawnRequests(room: Room) {
                 maxCost = spawnEnergyAvailable
             }
 
-            if (bodyOpts.defaultParts.length > 0) {
+            if (this.defaultParts.length > 0) {
 
-                for (const part of bodyOpts.defaultParts) {
+                for (const part of this.defaultParts) {
 
                     // Stop loop if cost is more than or equal to maxCost
 
@@ -112,15 +85,15 @@ export function spawnRequests(room: Room) {
 
             // Stop if the body amount is equal to maxParts or the cost of the creep is more than we can afford
 
-            while (this.body.length != bodyOpts.maxParts && this.cost < maxCost) {
+            while (this.body.length != this.maxParts && this.cost < maxCost) {
 
             // Loop through each part in extraParts
 
-            for (let part of bodyOpts.extraParts) {
+            for (let part of this.extraParts) {
 
                 // Stop function if role's body is the size of maxParts
 
-                if (this.body.length == bodyOpts.maxParts) return
+                if (this.body.length == this.maxParts) return
 
                 // Add part and cost
 
@@ -134,6 +107,11 @@ export function spawnRequests(room: Room) {
 
             while (this.cost > maxCost) {
 
+                // Take away cost of the last part
+
+                const part = this.body[this.body.length - 1]
+                this.cost -= BODYPART_COST[part]
+
                 // Take away the last part
 
                 this.body.slice(0, this.body.length - 1)
@@ -141,50 +119,47 @@ export function spawnRequests(room: Room) {
 
             // Construct memory
 
-            let memory: {[key: string]: any} = {
-                role: role,
+            const memory: {[key: string]: any} = {
+                role: this.role,
                 roomFrom: room,
             }
 
             // Add additions to memory
 
             let propertyName: string
-            for (propertyName in memoryAdditions) {
+            for (propertyName in this.memoryAdditions) {
 
-                memory[propertyName] = memoryAdditions[propertyName]
+                memory[propertyName] = this.memoryAdditions[propertyName]
             }
 
             this.extraOpts = {
                 memory: memory,
-                energyStructures: energyStructures,
+                energyStructures: spawnStructures,
             }
         }
     }
 
-    // Config creep body opts
+    //
 
-    interface BodyOpts {
-        defaultParts: string[]
-        extraParts: string[]
-        maxParts: number
-    }
+    const minCreeps: {[key: string]: any} = {}
 
-    class BodyOpts {
-        constructor() {
-
-            this.defaultParts = []
-            this.extraParts = []
-            this.maxParts = 50
-        }
-    }
+    //
 
     const source1HarvestPositionsAmount = room.get('source1HarvestPositions').length
     const source2HarvestPositionsAmount = room.get('source2HarvestPositions').length
 
-    class HarvesterBodyOpts extends BodyOpts {
+    //
+
+    interface HarvesterSpawningOpts extends RoleSpawningOpts {
+
+    }
+
+    class HarvesterSpawningOpts extends RoleSpawningOpts {
         constructor() {
 
             super()
+
+            this.role = 'sourceHarvester'
 
             if (spawnEnergyCapacity >= 700) {
 
@@ -192,7 +167,8 @@ export function spawnRequests(room: Room) {
                 this.extraParts = [WORK, WORK, WORK, MOVE]
                 this.maxParts = 8
 
-                minCreeps.sourceHarvester = minCreeps['sourceHarvester'] = 2
+                minCreeps.sourceHarvester = minCreeps.sourceHarvester = 2
+                this.memoryAdditions.moveType = 'travel'
 
                 return
             }
@@ -202,16 +178,32 @@ export function spawnRequests(room: Room) {
                 this.extraParts = [WORK]
                 this.maxParts = 6
 
-                minCreeps.sourceHarvester = minCreeps['sourceHarvester'] = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2)
+                minCreeps.sourceHarvester = minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2)
+                this.memoryAdditions.moveType = 'pull'
 
                 return
             }
         }
     }
 
+    //
+
     const spawningOpts: RoleSpawningOpts[] = [
-        new RoleSpawningOpts('sourceHarvester', new HarvesterBodyOpts(), {}),
+        new HarvesterSpawningOpts(),
     ]
+
+    //
+
+    const requiredCreeps: {[key: string]: any} = {}
+
+    // Construct requiredCreeps
+
+    for (const role of global.creepRoles) {
+
+        requiredCreeps[role] = minCreeps[role] - room.creepCount[role]
+    }
+
+    //
 
     return {
         spawningOpts,

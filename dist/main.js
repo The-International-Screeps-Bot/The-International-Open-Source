@@ -67,9 +67,34 @@ if (!global.active) {
         green: '#00d137',
     };
     global.creepRoles = [
-        'sourceHarvester'
+        'sourceHarvester',
+        'hauler'
     ];
+    //
     global.roomDimensions = 50;
+    global.allStructureTypes = [
+        STRUCTURE_SPAWN,
+        STRUCTURE_EXTENSION,
+        STRUCTURE_ROAD,
+        STRUCTURE_WALL,
+        STRUCTURE_RAMPART,
+        STRUCTURE_KEEPER_LAIR,
+        STRUCTURE_PORTAL,
+        STRUCTURE_CONTROLLER,
+        STRUCTURE_LINK,
+        STRUCTURE_STORAGE,
+        STRUCTURE_TOWER,
+        STRUCTURE_OBSERVER,
+        STRUCTURE_POWER_BANK,
+        STRUCTURE_POWER_SPAWN,
+        STRUCTURE_EXTRACTOR,
+        STRUCTURE_LAB,
+        STRUCTURE_TERMINAL,
+        STRUCTURE_CONTAINER,
+        STRUCTURE_NUKER,
+        STRUCTURE_FACTORY,
+        STRUCTURE_INVADER_CORE,
+    ];
 }
 
 /**
@@ -111,13 +136,22 @@ function config() {
     global.customLogs = ``;
 }
 
+/* interface SourceHarvesterMemory extends CreepMemory {
+
+} */
 class SourceHarvester$1 extends Creep {
+    constructor(creep) {
+        super(creep.id);
+    }
+}
+class Hauler$1 extends Creep {
     constructor(creep) {
         super(creep.id);
     }
 }
 const creepClasses = {
     'sourceHarvester': SourceHarvester$1,
+    'hauler': Hauler$1,
 };
 
 function creepOrganizer() {
@@ -232,11 +266,13 @@ Room.prototype.get = function (roomObjectName) {
     roomObjects.source1 = findRoomObjectInMemory('source1') || new RoomObject(roomObjects.sources.value[0], Infinity, 'memory', 'id');
     if (roomObjects.sources[1])
         roomObjects.source2 = findRoomObjectInMemory('source2') || new RoomObject(roomObjects.sources.value[1], Infinity, 'memory', 'id');
+    // Loop through each structureType in the game
+    for (const structureType of global.allStructureTypes) {
+        // Create roomObject for structureType
+        roomObjects[structureType] = new RoomObject([], 1, 'global', 'object');
+    }
     // Loop through all structres in room
     for (let structure of room.find(FIND_STRUCTURES)) {
-        // Create catagory if it doesn't exist
-        if (!roomObjects[structure.structureType])
-            roomObjects[structure.structureType] = new RoomObject([], 1, 'global', 'object');
         // Group structure by structureType
         roomObjects[structure.structureType].value.push(structure);
     }
@@ -281,51 +317,37 @@ Room.prototype.newPos = function (object) {
     return new RoomPosition(object.x, object.y, room.name);
 };
 
+StructureSpawn.prototype.advancedSpawn = function (spawningObject) {
+    const spawn = this;
+    const spawnResult = spawn.spawnCreep(spawningObject.body, spawningObject.extraOpts.memory.role, spawningObject.extraOpts);
+    return spawnResult;
+};
+
 function spawnRequests(room) {
-    //
-    const minCreeps = {};
-    // Construct minCreeps
-    minCreeps.sourceHarvester = 1;
-    let requiredCreeps = {};
-    // Construct requiredCreeps
-    for (const role of global.creepRoles) {
-        requiredCreeps[role] = minCreeps[role] - room.creepCount[role];
-    }
     // Find energy structures
-    const energyStructures = findEnergyStructures();
-    function findEnergyStructures() {
-        // Get array of extensions and spawns
-        const unfilteredEnergyStructures = room.find(FIND_MY_STRUCTURES, {
-            filter: structure => (structure.structureType == STRUCTURE_EXTENSION
-                || structure.structureType == STRUCTURE_SPAWN)
-                && structure.isActive()
-        });
+    const spawnStructures = findSpawnStructures();
+    function findSpawnStructures() {
+        // Get array of spawns and extensions
+        const spawnsAndExtensions = room.get('spawn').concat(room.get('extension'));
+        // Filter out structures that aren't active
+        const unfilteredSpawnStructures = spawnsAndExtensions.filter((structure) => structure.isActive());
         // Add each spawnStructures with their range to the object
         const anchorPoint = room.get('anchorPoint');
-        const energyStructuresWithRanges = [];
-        for (const energyStructure of unfilteredEnergyStructures) {
-            // Create object ideal for sorting
-            const object = {
-                id: energyStructure.id,
-                range: energyStructure.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5)
-            };
-            // Add object to list
-            energyStructuresWithRanges.push(object);
-        }
-        // Sort energyStructures by range
-        const energyStructuresByClosest = energyStructuresWithRanges.sort((a, b) => a.value - b.value);
-        const energyStructures = [];
-        for (const object of energyStructuresByClosest) {
-            // Add structure with id of object to energyStructures
-            energyStructures.push(global.findObjectWithId(object.id));
-        }
-        return energyStructures;
+        // Filter energy structures by distance from anchorPoint
+        const filteredSpawnStructures = unfilteredSpawnStructures.sort((a, b) => a.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5) - b.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5));
+        return filteredSpawnStructures;
     }
     //
     let spawnEnergyAvailable = room.energyAvailable;
     let spawnEnergyCapacity = room.energyCapacityAvailable;
     class RoleSpawningOpts {
-        constructor(role, bodyOpts, memoryAdditions) {
+        constructor() {
+            this.memoryAdditions = {};
+            this.defaultParts = [];
+            this.extraParts = [];
+            this.maxParts = 50;
+        }
+        constructBody(role, bodyOpts, memoryAdditions) {
             this.body = [];
             this.tier = 0;
             this.cost = 0;
@@ -333,8 +355,8 @@ function spawnRequests(room) {
             if (room.creepCount.harvester == 0 || room.creepCount.hauler == 0) {
                 maxCost = spawnEnergyAvailable;
             }
-            if (bodyOpts.defaultParts.length > 0) {
-                for (const part of bodyOpts.defaultParts) {
+            if (this.defaultParts.length > 0) {
+                for (const part of this.defaultParts) {
                     // Stop loop if cost is more than or equal to maxCost
                     if (this.cost >= maxCost)
                         break;
@@ -344,11 +366,11 @@ function spawnRequests(room) {
                 this.tier += 1;
             }
             // Stop if the body amount is equal to maxParts or the cost of the creep is more than we can afford
-            while (this.body.length != bodyOpts.maxParts && this.cost < maxCost) {
+            while (this.body.length != this.maxParts && this.cost < maxCost) {
                 // Loop through each part in extraParts
-                for (let part of bodyOpts.extraParts) {
+                for (let part of this.extraParts) {
                     // Stop function if role's body is the size of maxParts
-                    if (this.body.length == bodyOpts.maxParts)
+                    if (this.body.length == this.maxParts)
                         return;
                     // Add part and cost
                     this.body.push(part);
@@ -358,56 +380,66 @@ function spawnRequests(room) {
             this.tier += 1;
             // So long as cost is more than maxCost
             while (this.cost > maxCost) {
+                // Take away cost of the last part
+                const part = this.body[this.body.length - 1];
+                this.cost -= BODYPART_COST[part];
                 // Take away the last part
                 this.body.slice(0, this.body.length - 1);
             }
             // Construct memory
-            let memory = {
-                role: role,
+            const memory = {
+                role: this.role,
                 roomFrom: room,
             };
             // Add additions to memory
             let propertyName;
-            for (propertyName in memoryAdditions) {
-                memory[propertyName] = memoryAdditions[propertyName];
+            for (propertyName in this.memoryAdditions) {
+                memory[propertyName] = this.memoryAdditions[propertyName];
             }
             this.extraOpts = {
                 memory: memory,
-                energyStructures: energyStructures,
+                energyStructures: spawnStructures,
             };
         }
     }
-    class BodyOpts {
-        constructor() {
-            this.defaultParts = [];
-            this.extraParts = [];
-            this.maxParts = 50;
-        }
-    }
+    //
+    const minCreeps = {};
+    //
     const source1HarvestPositionsAmount = room.get('source1HarvestPositions').length;
     const source2HarvestPositionsAmount = room.get('source2HarvestPositions').length;
-    class HarvesterBodyOpts extends BodyOpts {
+    class HarvesterSpawningOpts extends RoleSpawningOpts {
         constructor() {
             super();
+            this.role = 'sourceHarvester';
             if (spawnEnergyCapacity >= 700) {
                 this.defaultParts = [];
                 this.extraParts = [WORK, WORK, WORK, MOVE];
                 this.maxParts = 8;
-                minCreeps.sourceHarvester = minCreeps['sourceHarvester'] = 2;
+                minCreeps.sourceHarvester = minCreeps.sourceHarvester = 2;
+                this.memoryAdditions.moveType = 'travel';
                 return;
             }
             if (spawnEnergyCapacity >= 300) {
                 this.defaultParts = [];
                 this.extraParts = [WORK];
                 this.maxParts = 6;
-                minCreeps.sourceHarvester = minCreeps['sourceHarvester'] = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2);
+                minCreeps.sourceHarvester = minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2);
+                this.memoryAdditions.moveType = 'pull';
                 return;
             }
         }
     }
+    //
     const spawningOpts = [
-        new RoleSpawningOpts('sourceHarvester', new HarvesterBodyOpts(), {}),
+        new HarvesterSpawningOpts(),
     ];
+    //
+    const requiredCreeps = {};
+    // Construct requiredCreeps
+    for (const role of global.creepRoles) {
+        requiredCreeps[role] = minCreeps[role] - room.creepCount[role];
+    }
+    //
     return {
         spawningOpts,
         requiredCreeps,
@@ -435,17 +467,18 @@ function spawnManager(room) {
         // Enable dry run
         spawningObject.extraOpts.dryRun = true;
         // See if creep can be spawned, stop if it can't
-        const testSpawn = spawn.spawnCreep(spawningObject.body, spawningObject.extraOpts.memory.role, spawningObject.extraOpts);
-        if (testSpawn != 0)
+        const testSpawn = spawn.advancedSpawn(spawningObject);
+        if (testSpawn != 0) {
+            new CustomLog('Failed to spawn', testSpawn + ', ' + spawningObject.cost);
             break;
+        }
         // Disable dry run
         spawningObject.extraOpts.dryRun = false;
         // Spawn creep
-        spawn.spawnCreep(spawningObject.body, spawningObject.extraOpts.memory.role, spawningObject.extraOpts);
+        spawn.advancedSpawn(spawningObject);
         // Record an inactive spawn was used and iterate
         i++;
         continue;
-        // Game.spawns.Spawn1.spawnCreep([MOVE], 'sourceHarvester', { memory: { role: 'sourceHarvester' } })
     }
 }
 
@@ -468,11 +501,23 @@ Creep.prototype.isDying = function () {
 };
 
 const SourceHarvester = creepClasses.sourceHarvester;
-SourceHarvester.prototype.moveToSource = function () {
+SourceHarvester.prototype.sayHi = function () {
+    const creep = this;
+    creep.say('hi');
 };
 
 function sourceHarvesterManager(room, creepsOfRole) {
-    for (let creep of creepsOfRole) {
+    for (const creep of creepsOfRole) {
+        creep.sayHi();
+    }
+}
+
+const Hauler = creepClasses.hauler;
+Hauler.prototype.findTask = function () {
+};
+
+function haulerManager(room, creepsOfRole) {
+    for (const creep of creepsOfRole) {
         creep.say('hey');
     }
 }
@@ -486,6 +531,7 @@ function creepManager(room) {
     }
     const managerParents = {
         sourceHarvester: new ManagerParent(sourceHarvesterManager),
+        hauler: new ManagerParent(haulerManager),
     };
     for (let role in managerParents) {
         let managerParent = managerParents[role];

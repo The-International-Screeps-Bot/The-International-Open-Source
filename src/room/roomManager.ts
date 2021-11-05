@@ -4,8 +4,8 @@ import './creeps/taskManager'
 
 import './spawnManager'
 
-import './remoteManager'
-import './communeManager'
+import { remoteManager } from './remoteManager'
+import { communeManager } from './communeManager'
 import { spawnManager } from './spawnManager'
 import { creepManager } from './creeps/creepManager'
 
@@ -26,7 +26,7 @@ export function roomManager() {
         creepManager(room)
 
         // Iterate if there is no controller or we don't own the controller
-
+        
         if (!controller || !controller.my) continue
 
         //

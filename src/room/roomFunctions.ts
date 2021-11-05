@@ -129,13 +129,18 @@ Room.prototype.get = function(roomObjectName: string) {
     roomObjects.source1 = findRoomObjectInMemory('source1') || new RoomObject(roomObjects.sources.value[0], Infinity, 'memory', 'id')
     if (roomObjects.sources[1]) roomObjects.source2 = findRoomObjectInMemory('source2') || new RoomObject(roomObjects.sources.value[1], Infinity, 'memory', 'id')
 
+    // Loop through each structureType in the game
+
+    for (const structureType of global.allStructureTypes) {
+
+        // Create roomObject for structureType
+
+        roomObjects[structureType] = new RoomObject([], 1, 'global', 'object')
+    }
+
     // Loop through all structres in room
 
     for (let structure of room.find(FIND_STRUCTURES)) {
-
-        // Create catagory if it doesn't exist
-
-        if (!roomObjects[structure.structureType]) roomObjects[structure.structureType] = new RoomObject([], 1, 'global', 'object')
 
         // Group structure by structureType
 
@@ -194,7 +199,7 @@ Room.prototype.get = function(roomObjectName: string) {
     }
 
     // Return queried value if defined
-
+    
     return roomObjects[roomObjectName].value
 }
 

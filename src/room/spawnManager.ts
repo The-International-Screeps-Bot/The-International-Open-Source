@@ -1,3 +1,4 @@
+import './spawningFunctions'
 import { spawnRequests } from './spawnRequests'
 
 export function spawnManager(room: Room) {
@@ -38,8 +39,12 @@ export function spawnManager(room: Room) {
 
         // See if creep can be spawned, stop if it can't
 
-        const testSpawn = spawn.spawnCreep(spawningObject.body, spawningObject.extraOpts.memory.role, spawningObject.extraOpts)
-        if (testSpawn != 0) break
+        const testSpawn = spawn.advancedSpawn(spawningObject)
+        if (testSpawn != 0) {
+
+            new CustomLog('Failed to spawn', testSpawn + ', ' + spawningObject.cost)
+            break
+        }
 
         // Disable dry run
 
@@ -47,13 +52,11 @@ export function spawnManager(room: Room) {
 
         // Spawn creep
 
-        spawn.spawnCreep(spawningObject.body, spawningObject.extraOpts.memory.role, spawningObject.extraOpts)
+        spawn.advancedSpawn(spawningObject)
 
         // Record an inactive spawn was used and iterate
 
         i++
         continue
-
-        // Game.spawns.Spawn1.spawnCreep([MOVE], 'sourceHarvester', { memory: { role: 'sourceHarvester' } })
     }
 }
