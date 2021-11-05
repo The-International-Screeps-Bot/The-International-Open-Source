@@ -6,5 +6,9 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: RoleSourceHarve
     for (const creep of creepsOfRole) {
 
         creep.sayHi()
+
+        continue
+
+        creep.travelToSource()
     }
 }

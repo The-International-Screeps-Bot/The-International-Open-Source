@@ -55,7 +55,7 @@ export function spawnRequests(room: Room) {
             this.extraParts = []
             this.maxParts = 50
         }
-        constructBody(role: string, bodyOpts: {[key: string]: BodyPartConstant | any }, memoryAdditions: {[key: string]: any}) {
+        constructBody() {
 
             this.body = []
             this.tier = 0
@@ -159,30 +159,39 @@ export function spawnRequests(room: Room) {
 
             super()
 
+            const opts = this
+
             this.role = 'sourceHarvester'
 
-            if (spawnEnergyCapacity >= 700) {
+            bodyOpts()
 
-                this.defaultParts = []
-                this.extraParts = [WORK, WORK, WORK, MOVE]
-                this.maxParts = 8
+            function bodyOpts() {
 
-                minCreeps.sourceHarvester = minCreeps.sourceHarvester = 2
-                this.memoryAdditions.moveType = 'travel'
+                if (spawnEnergyCapacity >= 700) {
 
-                return
+                    opts.defaultParts = []
+                    opts.extraParts = [WORK, WORK, WORK, MOVE]
+                    opts.maxParts = 8
+
+                    minCreeps.sourceHarvester = minCreeps.sourceHarvester = 2
+                    opts.memoryAdditions.moveType = 'travel'
+
+                    return
+                }
+                if (spawnEnergyCapacity >= 300) {
+
+                    opts.defaultParts = []
+                    opts.extraParts = [WORK]
+                    opts.maxParts = 6
+
+                    minCreeps.sourceHarvester = minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2)
+                    opts.memoryAdditions.moveType = 'pull'
+
+                    return
+                }
             }
-            if (spawnEnergyCapacity >= 300) {
 
-                this.defaultParts = []
-                this.extraParts = [WORK]
-                this.maxParts = 6
-
-                minCreeps.sourceHarvester = minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2)
-                this.memoryAdditions.moveType = 'pull'
-
-                return
-            }
+            this.constructBody()
         }
     }
 
