@@ -175,9 +175,9 @@ Room.prototype.get = function(roomObjectName: string) {
 
         for (let pos of adjacentPositions) {
 
-            // Iterate if terrain for pos isn't wall
+            // Iterate if terrain for pos is a wall
 
-            if (terrain.get(pos.x, pos.y) != TERRAIN_MASK_WALL) continue
+            if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
 
             // Convert position into a RoomPosition
 
@@ -198,8 +198,33 @@ Room.prototype.get = function(roomObjectName: string) {
         return roomObjects.anchorPoint.value.findClosestByRange(harvestPositions)
     }
 
+    // Source links
+
+    roomObjects.source1Link = findRoomObjectInGlobal('source1Link') || new RoomObject(findSourceLink(roomObjects.source1ClosestHarvestPosition.value), Infinity, 'global', 'object')
+    if (roomObjects.sources[1]) roomObjects.source2Link = findRoomObjectInGlobal('source2Link') || new RoomObject(findSourceLink(roomObjects.source2ClosestHarvestPosition.value), Infinity, 'global', 'object')
+
+    function findSourceLink(closestHarvestPos) {
+
+        // Find links
+
+        const links = roomObjects.link.value
+
+        // Filter links that are near closestHarvestPos, return the first one
+
+        const linksNearHarvestPos = links.filter(link => link.pos.getRangeTo(closestHarvestPos) == 1)
+        return linksNearHarvestPos[0]
+    }
+
+    // Check that queried value is in database
+
+    if (!roomObjects[roomObjectName]) {
+
+        new CustomLog('Tried to get non-existent property', roomObjectName, global.colors.white, global.colors.red)
+        return undefined
+    }
+
     // Return queried value if defined
-    
+
     return roomObjects[roomObjectName].value
 }
 

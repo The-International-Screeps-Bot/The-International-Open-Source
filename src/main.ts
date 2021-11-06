@@ -23,6 +23,11 @@ import { logManager } from 'other/logManager'
 
 declare global {
 
+    interface Memory {
+        [key: string]: any
+
+    }
+
     interface Room {
         [key: string]: any
     }

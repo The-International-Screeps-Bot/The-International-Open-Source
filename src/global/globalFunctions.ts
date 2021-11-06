@@ -35,6 +35,18 @@ global.getPositionsInsideRect = function(rect: {[key: string]: any}) {
     return positions
 }
 
+/**
+ * 
+ * @param pos1 
+ * @param pos2 
+ * @returns 
+ */
+global.arePositionsAlike = function(pos1: {[key: string]: number}, pos2: {[key: string]: number}) {
+
+    if (pos1.x == pos2.x && pos1.y == pos2.y) return true
+    return false
+}
+
 interface CustomLog {
     log: string
 }
