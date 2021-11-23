@@ -1,6 +1,6 @@
 /**
- * Configures features needed to run the bot
- */
+Configures features needed to run the bot
+*/
 export function config() {
 
     // Configure rooms
@@ -9,17 +9,10 @@ export function config() {
 
         const room = Game.rooms[roomName]
 
-        // 1 Tick only properties
+        // Single tick properties
 
-        const properties: {[key: string]: any} = {
-            myCreeps: {},
-            creepCount: {},
-        }
-
-        for (const propertyName in properties) {
-
-            room[propertyName] = properties[propertyName]
-        }
+        room.myCreeps = {}
+        room.creepCount = {}
 
         //
 
@@ -28,35 +21,23 @@ export function config() {
             //
 
             room.myCreeps[role] = []
-
-            //
-
             room.creepCount[role] = 0
+        }
+
+        room.creepsOfSourceAmount = {
+            source1: 0,
+            source2: 0,
         }
 
         // memory properties
 
-        const memoryProperties: {[key: string]: any} = {
-
-        }
-
-        for (const propertyName in memoryProperties) {
-
-            room.memory[propertyName] = memoryProperties[propertyName]
-        }
+        
 
         // global properties
 
-        const globalProperties: {[key: string]: any} = {
-
-        }
-
         if (!global[room.name]) global[room.name] = {}
 
-        for (const propertyName in globalProperties) {
 
-            global[room.name][propertyName] = globalProperties[propertyName]
-        }
     }
 
     // Assign tick-only properties

@@ -52,4 +52,24 @@ if (!global.active) {
         STRUCTURE_FACTORY,
         STRUCTURE_INVADER_CORE,
     ]
+
+    global.impassibleStructures = [
+        STRUCTURE_SPAWN,
+        STRUCTURE_EXTENSION,
+        STRUCTURE_WALL,
+        STRUCTURE_KEEPER_LAIR,
+        STRUCTURE_CONTROLLER,
+        STRUCTURE_LINK,
+        STRUCTURE_STORAGE,
+        STRUCTURE_TOWER,
+        STRUCTURE_OBSERVER,
+        STRUCTURE_POWER_BANK,
+        STRUCTURE_POWER_SPAWN,
+        STRUCTURE_EXTRACTOR,
+        STRUCTURE_LAB,
+        STRUCTURE_TERMINAL,
+        STRUCTURE_NUKER,
+        STRUCTURE_FACTORY,
+        STRUCTURE_INVADER_CORE,
+    ]
 }

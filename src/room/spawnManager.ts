@@ -23,7 +23,7 @@ export function spawnManager(room: Room) {
     let i = 0
 
     for (let spawningObject of spawningOpts) {
-        
+
         // Iterate if there are no required creeps of role
 
         if (requiredCreeps[spawningObject.extraOpts.memory.role] == 0) continue
@@ -32,7 +32,7 @@ export function spawnManager(room: Room) {
 
         const spawn = inactiveSpawns[i]
         if (!spawn) break
-
+        
         // Enable dry run
 
         spawningObject.extraOpts.dryRun = true

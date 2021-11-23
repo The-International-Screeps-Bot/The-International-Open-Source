@@ -47,6 +47,16 @@ declare global {
         role: string
     }
 
+    interface PowerCreep {
+        [key: string]: any
+
+    }
+
+    interface PowerCreepMemory {
+        [key: string]: any
+        role: string
+    }
+
     namespace NodeJS {
         interface Global {
             [key: string]: any

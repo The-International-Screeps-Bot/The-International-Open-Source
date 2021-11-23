@@ -18,11 +18,17 @@ export function creepOrganizer() {
             continue
         }
 
+        // Assign creep proper class
+
+        Game.creeps[creepName] = new creepClasses[creep.memory.role](creep)
+
+        //
+
         const room: Room = creep.room
 
         // Organize creep by room and role
 
-        room.myCreeps[creep.memory.role].push(new creepClasses[creep.memory.role](creep))
+        room.myCreeps[creep.memory.role].push(creepName)
 
         // See if creep is dying
 
@@ -36,4 +42,8 @@ export function creepOrganizer() {
 
         room.creepCount[creep.memory.role] += 1
     }
+
+    // Record number of creeps
+
+    Memory.data.creeps = Object.keys(Memory.creeps).length
 }

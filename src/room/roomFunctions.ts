@@ -2,132 +2,233 @@ Room.prototype.get = function(roomObjectName: string) {
 
     const room: Room = this
 
-    // Check if value is cached. If so then return it
-
-    let cachedValue: any
-
-    cachedValue = findRoomObjectInGlobal(roomObjectName)
-    if (cachedValue) return cachedValue
-
-    cachedValue = findRoomObjectInMemory(roomObjectName)
-    if (cachedValue) return cachedValue
-
-    /**
-    @param roomObjectName name of roomObject
-    @returns roomObject
-     */
-    function findRoomObjectInGlobal(roomObjectName: string) {
-
-        // Stop if there is no stored object
-
-        if (!global[room.name][roomObjectName]) return
-
-        //
-
-        const cacheAmount = global[room.name][roomObjectName].cacheAmount
-        const lastCache = global[room.name][roomObjectName].lastCache
-
-        // Stop if time is greater than lastCache + cacheAmount
-
-        if (lastCache + cacheAmount < Game.time) return
-
-        // See if roomObject's type is an id
-
-        if (global[room.name][roomObjectName].type == 'id') {
-
-            return global.findObjectWithId(global[room.name][roomObjectName].value)
-        }
-
-        // See if roomObject's type is an pos
-
-        if (global[room.name][roomObjectName].type == 'pos') {
-
-            // Return roomPosition of pos
-
-            return room.newPos(global[room.name][roomObjectName].value)
-        }
-
-        // Return the value of the roomObject
-
-        return global[room.name][roomObjectName].value
-    }
-
-    /**
-    @param roomObjectName name of roomObject
-    @returns roomObject
-     */
-    function findRoomObjectInMemory(roomObjectName: string) {
-
-        // Stop if there is no stored object
-
-        if (!room.memory[roomObjectName]) return
-
-        // See if roomObject's type is an id
-
-        if (room.memory[roomObjectName].type == 'id') {
-
-            // Return roomObject with id
-
-            return global.findObjectWithId(room.memory[roomObjectName].value)
-        }
-
-        // See if roomObject's type is an pos
-
-        if (room.memory[roomObjectName].type == 'pos') {
-
-            // Return roomPosition of pos
-
-            return room.newPos(room.memory[roomObjectName].value)
-        }
-
-        // Return the value of the roomObject
-
-        return room.memory[roomObjectName].value
-    }
+    const roomObjects: {[key: string]: RoomObject} = {}
 
     interface RoomObject {
-        value: object
+        name: string
+        value: any
+        valueType: string
+        cacheMethod: string
         cacheAmount: number
         lastCache: number
-        type: string
     }
 
     /**
-     * @param value roomObject
-     * @param cacheAmount if in global, how long to store roomObject for
-     * @param storeMethod where to store the roomObject
-     * @param type object, id, or pos
-     */
+    @param opts properties to apply to the RoomObject
+    */
     class RoomObject {
-        constructor(value: any, cacheAmount: number, storeMethod: string, type: string) {
+        constructor(opts: {}) {
 
-            this.value = value
-            this.type = type
+            const roomObject = this
 
-            if (storeMethod == 'global') {
+            // Apply opts
 
-                this.cacheAmount = cacheAmount
-                this.lastCache = Game.time
+            let propertyName: string
+            for (propertyName in opts) {
 
+                roomObject[propertyName] = opts[propertyName]
+            }
+
+            // If cacheMethod is global
+
+            if (roomObject.cacheMethod == 'global') {
+
+                // Add lastCache property and stop
+
+                roomObject.lastCache = Game.time
                 return
             }
         }
+        cache(): void {
+
+            const roomObject: RoomObject = this
+
+            if (roomObject.cacheMethod == 'memory') {
+
+                // Store value in room's memory
+
+                room.memory[roomObject.name] = roomObject.value
+                return
+            }
+
+            if (roomObject.cacheMethod == 'global') {
+
+                // Set the roomObjects last cache to this tick
+
+                roomObject.lastCache = Game.time
+
+                // Store roomObject in the room's global
+
+                global[room.name][roomObject.name] = roomObject
+                return
+            }
+        }
+        getValue(): any {
+
+            const roomObject: RoomObject = this
+
+            // If roomObject's valueType is id, return it as an object with the ID
+
+            if (roomObject.valueType == 'id') return global.findObjectWithId(roomObject.value)
+
+            // If roomObject's type is pos, return the it as a RoomPosition
+
+            if (roomObject.valueType == 'pos') return room.newPos(roomObject.value)
+
+            // return the value of the roomObject
+
+            return roomObject.value
+        }
+        getValueIfViable() {
+
+            const roomObject: RoomObject = this
+
+            let cachedRoomObject: RoomObject
+
+            if (roomObject.cacheMethod == 'memory') {
+
+                // Query room memory for cachedRoomObject
+
+                cachedRoomObject = room.memory[roomObject.name]
+
+                // If cachedRoomObject inform true, otherwise inform false
+
+                return cachedRoomObject
+            }
+
+            if (roomObject.cacheMethod == 'global') {
+
+                // Query room's global for cachedRoomObject
+
+                cachedRoomObject = room.memory[roomObject.name]
+
+                // If cachedRoomObject doesn't exist inform false
+
+                if (!cachedRoomObject) return false
+
+                // If roomObject is past renewal date inform false, otherwise inform true
+
+                if (cachedRoomObject.lastCache + cachedRoomObject.cacheAmount > Game.time) return false
+                return true
+            }
+
+            return false
+        }
     }
 
-    //
+    function getRoomObjectValueIfViable(name) {
 
-    let roomObjects: {[key: string]: any} = {}
+        let cachedRoomObject: RoomObject
+
+            if (roomObject.cacheMethod == 'memory') {
+
+                // Query room memory for cachedRoomObject
+
+                cachedRoomObject = room.memory[roomObject.name]
+
+                // If cachedRoomObject inform true, otherwise inform false
+
+                return cachedRoomObject
+            }
+
+            if (roomObject.cacheMethod == 'global') {
+
+                // Query room's global for cachedRoomObject
+
+                cachedRoomObject = room.memory[roomObject.name]
+
+                // If cachedRoomObject doesn't exist inform false
+
+                if (!cachedRoomObject) return false
+
+                // If roomObject is past renewal date inform false, otherwise inform true
+
+                if (cachedRoomObject.lastCache + cachedRoomObject.cacheAmount > Game.time) return false
+                return true
+            }
+
+            return false
+    }
+
+    /**
+    @param name name of the RoomObject
+    @param value RoomObject value
+    @param valueType the type of the value
+    @param cacheMethod where to store the RoomObject
+    @param cacheAmount if in global, how long to store RoomObject for before reset
+    @returns a RoomObject
+    */
+    function getRoomObject(name: string, value: any, valueType: string, cacheMethod: string, cacheAmount?: number): RoomObject {
+
+        // Find roomObject
+
+        let roomObject: RoomObject = roomObjects[name]
+
+        // If the roomObject exists see if it's viable, otherwise inform undefined
+
+        const roomObjectValue = roomObject ? roomObject.getValueIfViable() : undefined
+
+        // If roomObject is viable
+
+        if (roomObjectValue) {
+
+            // Inform the roomObject
+
+            return roomObject
+        }
+
+        // Create the new RoomObject
+
+        roomObject = new RoomObject({
+            name: name,
+            value: value,
+            valueType: valueType,
+            cacheMethod: cacheMethod,
+            cacheAmount: cacheAmount,
+        })
+
+        // Cache the roomObject based on its cacheMethod and inform the roomObject
+
+        roomObject.cache()
+        return roomObject
+    }
 
     // Important Positions
 
-    roomObjects.anchorPoint = findRoomObjectInMemory('anchorPoint') || new RoomObject(room.newPos(room.memory.anchorPoint), Infinity, 'memory', 'pos')
+    getRoomObject('anchorPoint', room.memory.anchorPoint, 'pos', 'memory', Infinity)
 
     // Resources
 
-    roomObjects.mineral = findRoomObjectInGlobal('mineral') || new RoomObject(room.find(FIND_MINERALS)[0], Infinity, 'global', 'object')
-    roomObjects.sources = findRoomObjectInGlobal('sources') || new RoomObject(room.find(FIND_SOURCES), Infinity, 'global', 'object')
-    roomObjects.source1 = findRoomObjectInMemory('source1') || new RoomObject(roomObjects.sources.value[0], Infinity, 'memory', 'id')
-    if (roomObjects.sources[1]) roomObjects.source2 = findRoomObjectInMemory('source2') || new RoomObject(roomObjects.sources.value[1], Infinity, 'memory', 'id')
+    const mineral: Mineral = room.find(FIND_MINERALS)[0]
+    getRoomObject('mineral', mineral, 'object', 'global', Infinity)
+
+    function findSourcesWithIDs() {
+
+        // Find sources
+
+        const sources: Source[] = room.find(FIND_SOURCES)
+
+        let sourceIDs: Id<Source>[] = []
+
+        // Loop through each source
+
+        for (const source of sources) {
+
+            // Add source's id to sourceIDs
+
+            sourceIDs.push(source.id)
+        }
+
+        return sourceIDs
+    }
+
+    getRoomObject('sources', findSourcesWithIDs(), 'object', 'memory', Infinity)
+
+    const source1ID: string = roomObjects.sources.getValue()[0]
+    getRoomObject('source1', source1ID, 'id', 'global', Infinity)
+
+    const source2ID: string = roomObjects.sources.getValue()[1]
+    getRoomObject('source2', source2ID, 'id', 'global', Infinity)
 
     // Loop through each structureType in the game
 
@@ -135,12 +236,13 @@ Room.prototype.get = function(roomObjectName: string) {
 
         // Create roomObject for structureType
 
-        roomObjects[structureType] = new RoomObject([], 1, 'global', 'object')
+        getRoomObject(structureType, [], 'object', 'global', 1)
     }
 
     // Loop through all structres in room
 
-    for (let structure of room.find(FIND_STRUCTURES)) {
+    let structure: Structure
+    for (structure of room.find(FIND_STRUCTURES)) {
 
         // Group structure by structureType
 
@@ -149,25 +251,35 @@ Room.prototype.get = function(roomObjectName: string) {
 
     // Harvest positions
 
-    roomObjects.source1HarvestPositions = findRoomObjectInGlobal('source1HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source1.value), Infinity, 'global', 'object')
-    roomObjects.source1ClosestHarvestPosition = findRoomObjectInGlobal('source1ClosestHarvestPosition') || new RoomObject(findClosestHarvestPosition(roomObjects.source1HarvestPositions.value), Infinity, 'memory', 'object')
+    const source1HarvestPositions: RoomPosition[] = findHarvestPositions(roomObjects.source1.getValue())
+    getRoomObject('source1HarvestPositions', source1HarvestPositions, 'object', 'global', Infinity)
 
-    roomObjects.source2HarvestPositions = roomObjects.sources[1] ? findRoomObjectInGlobal('source2HarvestPositions') || new RoomObject(findHarvestPositions(roomObjects.source2.value), Infinity, 'global', 'object') : new RoomObject([], 0, 'global', 'object')
-    roomObjects.source2ClosestHarvestPosition = roomObjects.sources[1] ? findRoomObjectInGlobal('source2ClosestHarvestPosition') || new RoomObject(findClosestHarvestPosition(roomObjects.source2HarvestPositions.value), Infinity, 'memory', 'object') : undefined
+    const source1ClosestHarvestPosition: RoomPosition = findClosestHarvestPosition(roomObjects.source1HarvestPositions.getValue())
+    getRoomObject('source2', source1ClosestHarvestPosition, 'pos', 'global', Infinity)
+
+    const source2HarvestPositions: RoomPosition[] = findHarvestPositions(roomObjects.source2.getValue())
+    getRoomObject('source2HarvestPositions', source2HarvestPositions, 'object', 'global', Infinity)
+
+    const source2ClosestHarvestPosition: RoomPosition = findClosestHarvestPosition(roomObjects.source2HarvestPositions.getValue())
+    getRoomObject('source2ClosestHarvestPosition', source2ClosestHarvestPosition, 'pos', 'global', Infinity)
 
     /**
      * Finds positions adjacent to a source that a creep can harvest
-     * @param source source object
-     * @returns sources harvest positions
+     * @param source source of which to find harvestPositions for
+     * @returns source's harvestPositions, a list of RoomPositions
      */
-    function findHarvestPositions(source: {[key: string]: any}) {
+    function findHarvestPositions(source: Source): RoomPosition[] {
+
+        // Stop and inform empty array if there is no source
+
+        if (!source) return []
 
         // Find positions adjacent to source
 
         const rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 }
         const adjacentPositions = global.getPositionsInsideRect(rect)
 
-        let harvestPositions = []
+        let harvestPositions: RoomPosition[] = []
 
         // Find terrain in room
 
@@ -191,23 +303,31 @@ Room.prototype.get = function(roomObjectName: string) {
         return harvestPositions
     }
 
-    function findClosestHarvestPosition(harvestPositions: {}) {
+    /**
+    * @param harvestPositions array of RoomPositions to filter
+    * @returns the closest harvestPosition to the room's anchorPoint
+    */
+    function findClosestHarvestPosition(harvestPositions: RoomPosition[]): RoomPosition {
 
         // Filter harvestPositions by closest one to anchorPoint
 
-        return roomObjects.anchorPoint.value.findClosestByRange(harvestPositions)
+        return roomObjects.anchorPoint.getValue().findClosestByRange(harvestPositions)
     }
 
     // Source links
 
-    roomObjects.source1Link = findRoomObjectInGlobal('source1Link') || new RoomObject(findSourceLink(roomObjects.source1ClosestHarvestPosition.value), Infinity, 'global', 'object')
-    if (roomObjects.sources[1]) roomObjects.source2Link = findRoomObjectInGlobal('source2Link') || new RoomObject(findSourceLink(roomObjects.source2ClosestHarvestPosition.value), Infinity, 'global', 'object')
+    const source1Link: StructureLink | false = findSourceLink(roomObjects.source1ClosestHarvestPosition.getValue())
+    getRoomObject('source1Link', source1Link, 'pos', 'global', Infinity)
 
-    function findSourceLink(closestHarvestPos) {
+    function findSourceLink(closestHarvestPos: RoomPosition) {
+
+        // Stop and inform false if no closestHarvestPos
+
+        if (!closestHarvestPos) return false
 
         // Find links
 
-        const links = roomObjects.link.value
+        const links: StructureLink[] = roomObjects.link.getValue()
 
         // Filter links that are near closestHarvestPos, return the first one
 
@@ -215,24 +335,322 @@ Room.prototype.get = function(roomObjectName: string) {
         return linksNearHarvestPos[0]
     }
 
-    // Check that queried value is in database
+    //
 
-    if (!roomObjects[roomObjectName]) {
+    const roomObject = roomObjects[roomObjectName]
+
+    // If the queries roomObject isn't in roomObjects
+
+    if (!roomObject) {
+
+        // Log an invalid query and inform undefined
 
         new CustomLog('Tried to get non-existent property', roomObjectName, global.colors.white, global.colors.red)
         return undefined
     }
 
-    // Return queried value if defined
+    // Return the roomObject's queried value
 
-    return roomObjects[roomObjectName].value
+    const value = roomObject.getValue()
+    return value
 }
 
-Room.prototype.newPos = function(object: {[key: string]: number}) {
+Room.prototype.newPos = function(pos: RoomPosition) {
 
     const room: Room = this
 
     // Create an return roomPosition
 
-    return new RoomPosition(object.x, object.y, room.name)
+    return new RoomPosition(pos.x, pos.y, room.name)
+}
+
+/**
+    @param pos1 pos of the object performing the action
+    @param pos2 pos of the object getting acted on
+    @param [type] The status of action performed
+*/
+Room.prototype.actionVisual = function(pos1: RoomPosition, pos2: RoomPosition, type?: string) {
+
+    const room = this
+
+    // Construct colors for each type
+
+    const colorsForTypes: {[key: string]: string} = {
+        success: global.colors.lightBlue,
+        fail: global.colors.red,
+    }
+
+    // If no type, type is success. Construct type from color
+
+    if (!type) type = 'success'
+    const color: string = colorsForTypes[type]
+
+    // Create visuals
+
+    room.visual.circle(pos2, { color: color })
+    room.visual.line(pos1, pos2, { color: color })
+}
+
+interface PathGoal {
+    pos: RoomPosition
+    range: number
+}
+
+interface PathOpts {
+    origin: RoomPosition
+    goal: PathGoal
+    avoidTypes: string[]
+    plainCost: number
+    swampCost: number
+    maxRooms: number
+    flee: boolean
+    creep: Creep
+    useRoads: boolean
+    avoidEnemyRanges: boolean
+    avoidImpassibleStructures: boolean
+    prioritizeRamparts: boolean
+}
+
+interface RoomRoute {
+    exit: ExitConstant
+    room: string
+}
+
+interface PathObject {
+    route: RoomRoute[] | -2 | undefined
+    path: PathFinderPath
+}
+
+/**
+ * @param opts options
+ * @returns an array of RoomPositions
+ */
+Room.prototype.advancedFindPath = function(opts: PathOpts): PathObject {
+
+    const room: Room = this
+
+    // Construct pathObject
+
+    const pathObject: PathObject = {
+        route: generateRoute(),
+        path: generatePath(),
+    }
+
+    // Construct route
+
+    function generateRoute() {
+
+        // If the goal is in the same room as the origin, inform that no route is needed
+
+        if (opts.origin.roomName == opts.goal.pos.roomName) return undefined
+
+        // Construct route by searching through rooms
+
+        const route = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
+
+            // Essentially a costMatrix for the rooms, priority is for the lower values. Infinity is impassible
+
+            routeCallback(roomName: string) {
+
+                const roomMemory = Memory.rooms[roomName]
+
+                // If room is in the goal, inform 1
+
+                if (roomName == opts.goal.pos.roomName) return 1
+
+                // If there is no memory for the room inform impassible
+
+                if (!roomMemory) return Infinity
+
+                // If the roomMemory's type isn't a type in avoidTypes inform 1
+
+                if (!opts.avoidTypes.includes(roomMemory.type)) return 1
+
+                // Inform to not use this room
+
+                return Infinity
+            }
+        })
+
+        // Inform route
+
+        return route
+    }
+
+    // Construct path
+
+    function generatePath() {
+
+        const path: PathFinderPath = PathFinder.search(opts.origin, opts.goal, {
+            plainCost: opts.plainCost,
+            swampCost: opts.swampCost,
+            maxRooms: opts.maxRooms,
+            maxOps: 100000,
+            flee: opts.flee,
+
+            // Create costMatrixes for room tiles, where lower values are priority, and 255 or more is considered impassible
+
+            roomCallback(roomName: string): boolean | CostMatrix {
+
+                // If there isn't vision in this room inform to avoid this room
+
+                const room = Game.rooms[roomName]
+                if (!room) return false
+
+                // Create a costMatrix
+
+                const cm = new PathFinder.CostMatrix()
+
+                // If useRoads is enabled
+
+                if (opts.useRoads) {
+
+                    // Get roads and loop through them
+
+                    const roads: StructureRoad[] = room.get('road')
+                    for (const road of roads) {
+
+                        // Set road positions as prefered
+
+                        cm.set(road.pos.x, road.pos.y, 1)
+                    }
+                }
+
+                // If there is no route
+
+                if (!pathObject.route) {
+
+                    let y: number = 0
+                    let x: number = 0
+
+                    // Configure y and loop through top exits
+
+                    y = 0
+                    for (x = 0; x < 50; x++) {
+
+                        cm.set(x, y, 255)
+                    }
+
+                    // Configure x and loop through left exits
+
+                    x = 0
+                    for (y = 0; y < 50; y++) {
+
+                        cm.set(x, y, 255)
+                    }
+
+                    // Configure y and loop through bottom exits
+
+                    y = 49
+                    for (x = 0; x < 50; x++) {
+
+                        cm.set(x, y, 255)
+                    }
+
+                    // Configure x and loop through right exits
+
+                    x = 49
+                    for (y = 0; y < 50; y++) {
+
+                        cm.set(x, y, 255)
+                    }
+                }
+
+                // If there is a request to avoid enemy ranges
+
+                if (opts.avoidEnemyRanges) {
+
+                    // Get enemies and loop through them
+
+                    const enemyCreeps: Creep[] = room.get('enemyCreeps')
+                    for (const enemyCreep of enemyCreeps) {
+
+                        // Construct rect and get positions inside
+
+                        const rect = {
+                            x1: opts.creep.pos.x,
+                            y1: opts.creep.pos.y,
+                            x2: opts.creep.pos.x,
+                            y2: opts.creep.pos.y
+                        }
+                        const positions: RoomPosition[] = global.getPositionsInsideRect(rect)
+
+                        // Loop through positions
+
+                        for (const pos of positions) {
+
+                            // Set pos as impassible
+
+                            cm.set(pos.x, pos.y, 255)
+                        }
+                    }
+                }
+
+                // If avoiding structures that can't be walked on is enabled
+
+                if (opts.avoidImpassibleStructures) {
+
+                    // Get and loop through ramparts
+
+                    const ramparts: StructureRampart[] = room.get('rampart')
+                    for (const rampart of ramparts) {
+
+                        // If my rampart
+
+                        if (rampart.my) {
+
+                            // If prioritize ramparts is on
+
+                            if (opts.prioritizeRamparts) {
+
+                                // Set rampart pos as prefered
+
+                                cm.set(rampart.pos.x, rampart.pos.y, 1)
+                            }
+
+                            // Iterate
+
+                            continue
+                        }
+
+                        // Set pos as impassible
+
+                        cm.set(rampart.pos.x, rampart.pos.y, 255)
+                    }
+
+                    // Loop through structureTypes of impassibleStructures
+
+                    for (const structureType of global.impassibleStructures) {
+
+                        // Get structures of type and loop through them
+
+                        const structuresOfType = room.get(structureType)
+                        for (const structure of structuresOfType) {
+
+                            // Set pos as impassible
+
+                            cm.set(structure.pos.x, structure.pos.y, 255)
+                        }
+                    }
+                }
+
+                // Define values for the costMatrix
+
+                return cm
+            }
+        })
+
+        return path
+    }
+
+    // Inform pathObject
+
+    return pathObject
+}
+
+Room.prototype.scout = function() {
+
+    const room: Room = this
+
+
 }

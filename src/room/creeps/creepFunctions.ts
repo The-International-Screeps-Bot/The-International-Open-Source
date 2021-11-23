@@ -1,13 +1,8 @@
-Creep.prototype.travel = function(opts: {[key: string]: any}): any {
-
-    const creep = this
-
-
-}
+import { creepOrganizer } from "international/creepOrganizer"
 
 Creep.prototype.isDying = function() {
 
-    const creep = this
+    const creep: Creep = this
 
     // Inform as dying if creep is already recorded as dying
 
@@ -27,9 +22,103 @@ Creep.prototype.isDying = function() {
     return true
 }
 
+Creep.prototype.advancedTrafer = function(target: any, resource?: ResourceConstant, amount?: number) {
+
+    const creep: Creep = this
+    const room: Room = creep.room
+
+    // If creep isn't in transfer range
+
+    if (creep.pos.getRangeTo(target.pos) > 1) {
+
+        // Travel to target and return that creep tried to move
+
+        creep.travel({
+            origin: creep.pos,
+            goal: { pos: target.pos, range: 1 },
+            cacheAmount: 50,
+        })
+        return 'travel'
+    }
+
+    // If there wasn't a defined resource, define it as energy
+
+    if (!resource) resource = 'energy'
+
+    // If there wasn't an amount provided
+
+    if (!amount) amount = Math.min(creep.store.getUsedCapacity(resource), target.store.getFreeCapacity(resource))
+
+    // Try to transfer
+
+    const transferResult = creep.transfer(target, resource, amount)
+
+    // If transfer is not a success
+
+    if (transferResult != 0) {
+
+        // Create visual and return transferResult
+
+        room.actionVisual(creep.pos, target.pos, 'fail')
+        return transferResult
+    }
+
+    // Create visual and return success
+
+    room.actionVisual(creep.pos, target.pos)
+    return 'success'
+}
+
+Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceConstant, amount?: number) {
+
+    const creep: Creep = this
+    const room: Room = creep.room
+
+    // If creep isn't in transfer range
+
+    if (creep.pos.getRangeTo(target.pos) > 1) {
+
+        // Travel to target and return that creep tried to move
+
+        creep.travel({
+            origin: creep.pos,
+            goal: { pos: target.pos, range: 1 },
+            cacheAmount: 50,
+        })
+        return 'travel'
+    }
+
+    // If there wasn't a defined resource, define it as energy
+
+    if (!resource) resource = 'energy'
+
+    // If there wasn't an amount provided
+
+    if (!amount) amount = Math.min(creep.store.getFreeCapacity(resource), target.store.getUsedCapacity(resource))
+
+    // Try to withdraw
+
+    const withdrawResult = creep.withdraw(target, resource, amount)
+
+    // If withdraw is not a success
+
+    if (withdrawResult != 0) {
+
+        // Create visual and return withdrawResult
+
+        room.actionVisual(creep.pos, target.pos, 'fail')
+        return withdrawResult
+    }
+
+    // Create visual and return success
+
+    room.actionVisual(creep.pos, target.pos)
+    return 'success'
+}
+
 Creep.prototype.advancedHarvestSource = function(source: Source) {
 
-    const creep = this
+    const creep: Creep = this
 
     const harvestResult: number = creep.harvest(source)
     if (harvestResult != 0) return harvestResult
@@ -46,7 +135,7 @@ Creep.prototype.advancedHarvestSource = function(source: Source) {
 
 Creep.prototype.partsOfType = function(type: BodyPartConstant) {
 
-    const creep = this
+    const creep: Creep = this
 
     // Filter body parts that are of type, return number of them
 
@@ -54,9 +143,22 @@ Creep.prototype.partsOfType = function(type: BodyPartConstant) {
     return partsOfType.length
 }
 
+Creep.prototype.advancedMove = function() {
+
+    const creep: Creep = this
+    const room: Room = creep.room
+
+
+}
+
+interface TravelOpts {
+
+}
+
 Creep.prototype.travel = function(opts) {
 
     const creep = this
+    const room: Room = creep.room
 
     // Stop if creep can't move
 
@@ -103,7 +205,7 @@ Creep.prototype.travel = function(opts) {
 
         function findNewRoute() {
 
-            creep.room.visual.text("New Route", creep.pos.x, creep.pos.y - 0.5, { color: '#AAF837' })
+            room.visual.text("New Route", creep.pos.x, creep.pos.y - 0.5, { color: '#AAF837' })
 
             const newRoute = Game.map.findRoute(origin.roomName, goal.pos.roomName, {
                 routeCallback(roomName) {
@@ -132,7 +234,7 @@ Creep.prototype.travel = function(opts) {
 
         let goalRoom = route[0].room
 
-        if (goalRoom == creep.room.name) {
+        if (goalRoom == room.name) {
 
             route = route.slice(1)
             creep.memory.route = route
@@ -152,7 +254,7 @@ Creep.prototype.travel = function(opts) {
 
     function findNewPath() {
 
-        if (!path || path.length == 0 || lastRoom != creep.room.name || !lastCache || Game.time - lastCache >= opts.cacheAmount) {
+        if (!path || path.length == 0 || lastRoom != room.name || !lastCache || Game.time - lastCache >= opts.cacheAmount) {
 
             if (path && path.length == 1) {
 
@@ -163,7 +265,7 @@ Creep.prototype.travel = function(opts) {
                 if (rangeFromGoal == 0) return
             }
 
-            creep.room.visual.text("New Path", creep.pos.x, creep.pos.y + 0.5, { color: global.colors.yellow })
+            room.visual.text("New Path", creep.pos.x, creep.pos.y + 0.5, { color: global.colors.yellow })
 
             let newPath = PathFinder.search(origin, goal, {
                 plainCost: opts.plainCost,
@@ -258,7 +360,7 @@ Creep.prototype.travel = function(opts) {
 
             // Record room to track if we enter a new room
 
-            creep.memory.lastRoom = creep.room.name
+            creep.memory.lastRoom = room.name
 
             // Record time to find next time to path
 
@@ -280,7 +382,7 @@ Creep.prototype.travel = function(opts) {
 
         // Move to first position of path
 
-        let direction = creep.pos.getDirectionTo(new RoomPosition(pos.x, pos.y, creep.room.name))
+        let direction = creep.pos.getDirectionTo(room.newPos(pos))
 
         // Assign direction to creep
 
@@ -298,7 +400,7 @@ Creep.prototype.travel = function(opts) {
 
         creep.memory.path = path
 
-        creep.room.visual.poly(path, { stroke: global.colors.yellow, strokeWidth: .15, opacity: .2, lineStyle: 'normal' })
+        room.visual.poly(path, { stroke: global.colors.yellow, strokeWidth: .15, opacity: .2 })
 
         // If creep moved
 
@@ -313,4 +415,12 @@ Creep.prototype.travel = function(opts) {
 
 
     return true
+}
+
+Creep.prototype.advancedMove = function(opts) {
+
+    const creep: Creep = this
+    const room: Room = this
+
+
 }

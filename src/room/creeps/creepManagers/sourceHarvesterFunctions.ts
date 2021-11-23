@@ -1,12 +1,24 @@
 import { creepClasses } from "../creepClasses"
 const SourceHarvester = creepClasses.sourceHarvester
 
-SourceHarvester.prototype.travelToSource = function(source: Source) {
+SourceHarvester.prototype.recordSource = function() {
+
+    const creep: Creep = this
+    const room: Room = creep.room
+
+    const sourceName: string = creep.memory.sourceName
+
+    room.creepsOfSourceAmount[sourceName]++
+}
+
+SourceHarvester.prototype.travelToSource = function() {
 
     const creep = this
     const room = creep.room
 
-    const closestHarvestPos = room.get('source1ClosestHarvestPosition')
+    const sourceName: string = creep.memory.sourceName
+
+    const closestHarvestPos = room.get(sourceName + 'ClosestHarvestPosition')
 
     if (global.arePositionsAlike(creep.pos, closestHarvestPos)) return 'atSource'
 
@@ -35,7 +47,7 @@ SourceHarvester.prototype.travelToSource = function(source: Source) {
 
         // If creepOnHarvestPos find a harvest pos that isn't occupied
 
-        const harvestPositions = room.get('source1HarvestPositions')
+        const harvestPositions = room.get(sourceName + 'HarvestPositions')
 
         for (const harvestPos of harvestPositions) {
 
@@ -47,15 +59,11 @@ SourceHarvester.prototype.travelToSource = function(source: Source) {
 
     //
 
-    creep.say('travelToSource')
+    creep.say('⏩ ' + sourceName)
 
     creep.travel({
         origin: creep.pos,
         goal: { pos: targetPos, range: 0 },
-        plainCost: 1,
-        swampCost: 1,
-        avoidRooms: [],
-        flee: false,
         cacheAmount: 50,
     })
 
@@ -67,7 +75,9 @@ SourceHarvester.prototype.transferToSourceLink = function() {
     const creep = this
     const room = creep.room
 
-    const sourceLink = room.get('source1Link')
+    const sourceName: string = creep.memory.sourceName
+
+    const sourceLink = room.get(sourceName + 'Link')
     if (!sourceLink) return 'noLink'
 
     creep.advancedTransfer(sourceLink)

@@ -121,7 +121,7 @@ export function spawnRequests(room: Room) {
 
             const memory: {[key: string]: any} = {
                 role: this.role,
-                roomFrom: room,
+                roomFrom: room.name,
             }
 
             // Add additions to memory
@@ -148,11 +148,7 @@ export function spawnRequests(room: Room) {
     const source1HarvestPositionsAmount = room.get('source1HarvestPositions').length
     const source2HarvestPositionsAmount = room.get('source2HarvestPositions').length
 
-    //
-
-    interface HarvesterSpawningOpts extends RoleSpawningOpts {
-
-    }
+    // Harvester spawning opts
 
     class HarvesterSpawningOpts extends RoleSpawningOpts {
         constructor() {
@@ -173,7 +169,8 @@ export function spawnRequests(room: Room) {
                     opts.extraParts = [WORK, WORK, WORK, MOVE]
                     opts.maxParts = 8
 
-                    minCreeps.sourceHarvester = minCreeps.sourceHarvester = 2
+                    minCreeps.sourceHarvester = room.get('sources').length
+
                     opts.memoryAdditions.moveType = 'travel'
 
                     return
@@ -184,35 +181,74 @@ export function spawnRequests(room: Room) {
                     opts.extraParts = [WORK]
                     opts.maxParts = 6
 
-                    minCreeps.sourceHarvester = minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, 2) + Math.min(source2HarvestPositionsAmount, 2)
+                    let maxCreepsPerSource: number = 2
+                    minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, maxCreepsPerSource) + Math.min(source2HarvestPositionsAmount, maxCreepsPerSource)
+
                     opts.memoryAdditions.moveType = 'pull'
 
                     return
                 }
             }
 
+            function findSourceToHarvest() {
+
+                // Structure data on sources that relates to spawning
+
+                const spawningDataForSources: {[key: string]: any} = {
+                    source1: {
+                        amount: room.creepsOfSourceAmount.source1,
+                        max: Math.min(source1HarvestPositionsAmount, minCreeps.sourceHarvester / 2),
+                    },
+                    source2: {
+                        amount: room.creepsOfSourceAmount.source2,
+                        max: Math.min(source2HarvestPositionsAmount, minCreeps.sourceHarvester / 2),
+                    }
+                }
+
+                // Loop through each sourceName
+
+                for (const sourceName in spawningDataForSources) {
+
+                    const sourceData = spawningDataForSources[sourceName]
+
+                    // Select sourceData with less creeps than max
+
+                    if (sourceData.amount < sourceData.max) return sourceName
+                }
+
+                return 'noSourceFound'
+            }
+
+            // Assign ideal sourceName to creep
+
+            opts.memoryAdditions.sourceName = findSourceToHarvest()
+
+            // Use previously constructed opts to produce a viable spawning body
+
             this.constructBody()
         }
     }
 
-    //
+    // Construct spawning opts for each role
 
-    const spawningOpts: RoleSpawningOpts[] = [
-        new HarvesterSpawningOpts(),
-    ]
+    const spawningOpts: RoleSpawningOpts[] = []
 
-    //
-
-    const requiredCreeps: {[key: string]: any} = {}
+    spawningOpts.push(new HarvesterSpawningOpts())
 
     // Construct requiredCreeps
 
+    const requiredCreeps: {[key: string]: any} = {}
+
+    // Loop through each role
+
     for (const role of global.creepRoles) {
+
+        // Define requiredCreeps for the role as minCreeps - existing creeps
 
         requiredCreeps[role] = minCreeps[role] - room.creepCount[role]
     }
 
-    //
+    // return info on the structure of new creeps and what amount of them to spawn
 
     return {
         spawningOpts,
