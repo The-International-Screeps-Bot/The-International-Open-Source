@@ -19,7 +19,7 @@ global.findOrders = function(orderType, resourceType, maxPrice) {
 
         if (orderType && order.type != orderType) return
         if (resourceType && order.resourceType != resourceType) return
-        if (price && order.price > maxPrice) return
+        if (maxPrice && order.price > maxPrice) return
 
         return order
     })

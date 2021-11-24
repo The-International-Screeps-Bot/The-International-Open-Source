@@ -848,3 +848,8 @@ PowerCreep.prototype.creepFlee = function(origin, target) {
 
     new RoomVisual(creep.room.name).poly(creep.memory.path, { stroke: '#fff', strokeWidth: .15, opacity: .1, lineStyle: 'dashed' })
 }
+
+PowerCreep.prototype.hasPower = function(powerID) {
+
+    if (creep.powers[powerID]) return true
+}

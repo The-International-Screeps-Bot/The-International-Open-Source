@@ -70,6 +70,8 @@ module.exports = function terminals(room) {
 
             if (orderBlacklist.includes(resource)) continue
 
+            let requestedAmount = room.findStoredResourceAmount(resource) / 2
+
             // Try to find and sell to a buy order
 
             if (buyResource()) return
@@ -124,89 +126,6 @@ module.exports = function terminals(room) {
         }
     }
 
-    if (Memory.global.globalStage <= 2 && Game.market.credits >= 100000 && terminal.store[RESOURCE_ENERGY] <= 100000 && room.controller.level <= 7) {
-
-        //console.log(RESOURCE_ENERGY + ", " + terminal.room.name)
-
-        let factory = room.find(FIND_MY_STRUCTURES, {
-            filter: s => s.structureType == STRUCTURE_FACTORY
-        })[0]
-
-        if (factory) {
-
-            let batteryQuota = 10000 // 10k
-
-            let batterySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_BATTERY && order.price <= avgPrice(RESOURCE_BATTERY) * 1.2 && order.amount >= (batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])))
-
-            if (terminal.store[RESOURCE_BATTERY] < batteryQuota && batterySellOffers[0]) {
-
-                //console.log("Found order for: " + RESOURCE_BATTERY + ", " + terminal.room + ", " + batterySellOffers[0]["id"] + ", " + batterySellOffers[0].amount + batterySellOffers[0].roomName)
-                //console.log(batteryQuota - terminal.store[RESOURCE_BATTERY])
-
-                let buyAmount = batteryQuota - terminal.store.getUsedCapacity([RESOURCE_BATTERY])
-                let buyCost = Game.market.calcTransactionCost(buyAmount, room.name, batterySellOffers[0].roomName)
-
-                //console.log(buyCost + "BC")
-
-                for (let i = batteryQuota; i > 0; i -= 1000) {
-
-                    Game.market.deal(batterySellOffers[0]["id"], i, room.name)
-                }
-            }
-
-            let energyQuota = 50000 // 50k
-
-            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= avgPrice(RESOURCE_ENERGY) * 1.2 && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
-
-            if (energySellOffers[0]) {
-
-                //console.log("Found order for: " + RESOURCE_ENERGY + ", " + terminal.room + ", " + energySellOffers[0]["id"] + ", " + energySellOffers[0].amount + energySellOffers[0].roomName)
-                //console.log(energyQuota - terminal.store[RESOURCE_ENERGY])
-
-                let buyAmount = energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])
-                let buyCost = Game.market.calcTransactionCost(buyAmount, room.name, energySellOffers[0].roomName)
-
-                //console.log(buyCost + "BC")
-
-                for (let i = energyQuota; i > 0; i -= 1000) {
-
-                    Game.market.deal(energySellOffers[0]["id"], i, room.name)
-                }
-            }
-        } else {
-
-            let energyQuota = 100000 // 100k
-
-            let energySellOffers = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.price <= avgPrice(RESOURCE_ENERGY) * 1.2 && order.amount >= (energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])))
-
-            if (energySellOffers[0]) {
-
-                //console.log("Found order for: " + RESOURCE_ENERGY + ", " + terminal.room + ", " + energySellOffers[0]["id"] + ", " + energySellOffers[0].amount + energySellOffers[0].roomName)
-                //console.log(energyQuota - terminal.store[RESOURCE_ENERGY])
-
-                let buyAmount = energyQuota - terminal.store.getUsedCapacity([RESOURCE_ENERGY])
-                let buyCost = Game.market.calcTransactionCost(buyAmount, room.name, energySellOffers[0].roomName)
-
-                //console.log(buyCost + "BC")
-
-                for (let i = energyQuota; i > 0; i -= 1000) {
-
-                    Game.market.deal(energySellOffers[0]["id"], i, room.name)
-                }
-            }
-        }
-    }
-
-    if (room.controller.level == 8) {
-
-        //Check if room needs to support another room
-
-        if (Memory.global.needsEnergy.length > 0 && terminal.store[RESOURCE_ENERGY] >= 100000) {
-
-            terminal.send(RESOURCE_ENERGY, 50000, Memory.global.needsEnergy[0], 'needsEnergy Fulfillment')
-        }
-    }
-
     let commodities = []
 
     let t3Boosts = ["XUH2O", "XUHO2", "XKH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2"]
@@ -215,7 +134,7 @@ module.exports = function terminals(room) {
     let bases = ["OH", "ZK", "UL", "G"]
     let minerals = ["H", "O", "U", "K", "L", "Z", "X"]
 
-    buyMinerals()
+    // buyMinerals()
 
     function buyMinerals() {
 
@@ -268,14 +187,15 @@ module.exports = function terminals(room) {
         //
 
         let requestedAmount = 5000
+        let resource = RESOURCE_POWER
 
         // Stop if there is more than 5k power in the room
 
-        if (room.findStoredResourceAmount(RESOURCE_POWER) >= requestedAmount / 2) return
+        if (room.findStoredResourceAmount(resource) >= requestedAmount / 2) return
 
         // Find sell orders with resource
 
-        let orders = findOrders(ORDER_SELL, RESOURCE_POWER, avgPrice(resource) * 1.2)
+        let orders = findOrders(ORDER_SELL, resource, avgPrice(resource) * 1.2)
 
         // Loop through orders so long as there are orders left and we don't have enough resource
 

@@ -1,100 +1,152 @@
 require("powerCreepFunctions")
 
-function powerCreepManager(room) {
+module.exports = function powerCreepManager(room) {
 
-    let powerCreeps = room.get("myPowerCreeps")
+    const powerCreeps = room.get("myPowerCreeps")
 
-    if (!powerCreeps.length == 0) return
+    if (powerCreeps.length == 0) return
 
-    for (let creep of powerCreeps) {
+    for (const creep of powerCreeps) {
 
-        if (creep.ticksToLive) {
-            if (!creep.room.controller.isPowerEnabled) {
+        if (!creep.ticksToLive) continue
 
-                creep.say("PE")
+        function enablePower() {
 
-                if (creep.enableRoom(creep.room.controller) == ERR_NOT_IN_RANGE) {
+            if (room.controller.isPowerEnabled) return
 
-                    let goal = _.map([creep.room.controller], function(target) {
-                        return { pos: target.pos, range: 1 }
-                    })
+            creep.say("PE")
 
-                    creep.intraRoomPathing(creep.pos, goal)
-                }
+            if (creep.enableRoom(creep.room.controller) == ERR_NOT_IN_RANGE) {
+
+                let goal = _.map([creep.room.controller], function(target) {
+                    return { pos: target.pos, range: 1 }
+                })
+
+                creep.intraRoomPathing(creep.pos, goal)
+            }
+
+            return true
+        }
+
+        if (enablePower()) continue
+
+        const powerSpawn = room.get('powerSpawn')
+
+        function renew() {
+
+            if (creep.ticksToLive > 1000) return
+
+            if (!powerSpawn) return
+
+
+            creep.say("R")
+
+            if (creep.pos.isNearTo(powerSpawn)) {
+
+                creep.renew(powerSpawn)
+
             } else {
 
-                let powerSpawn = creep.room.find(FIND_MY_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_POWER_SPAWN
-                })[0]
+                let goal = _.map([powerSpawn], function(target) {
+                    return { pos: target.pos, range: 1 }
+                })
 
-                if (creep.ticksToLive <= 1000 && powerSpawn) {
+                creep.intraRoomPathing(creep.pos, goal)
+            }
 
-                    creep.say("R")
+            return true
+        }
 
-                    if (creep.pos.isNearTo(powerSpawn)) {
+        if (renew()) continue
 
-                        creep.renew(powerSpawn)
+        creep.isFull()
 
-                    } else {
+        if (creep.memory.isFull) {
 
-                        let goal = _.map([powerSpawn], function(target) {
+            let terminal = creep.room.terminal
+            let storage = creep.room.storage
+
+            if (terminal && terminal.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
+
+                creep.say("T")
+
+                creep.advancedTransfer(terminal, RESOURCE_OPS)
+
+            } else if (storage && storage.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
+
+                creep.say("S")
+
+                creep.advancedTransfer(storage, RESOURCE_OPS)
+            }
+        } else {
+
+            if (creep.usePower(PWR_GENERATE_OPS) == 0) {
+
+                creep.say("Ops")
+
+                Memory.data.opsGenerated += creep.powers[PWR_GENERATE_OPS].level
+            }
+
+            if (regenSource()) continue
+
+            function regenSource() {
+
+                const power = PWR_REGEN_SOURCE
+
+                if (!creep.hasPower(power)) return
+
+                creep.say("RS")
+
+                const sources = room.get('sources')
+
+                for (const source of sources) {
+
+                    if (source.effects) {
+
+                        const effectsWithPower = source.effects.filter(effectObj => effectObj.effect == power)[0]
+                        if (effectsWithPower) continue
+                    }
+
+                    if (creep.usePower(power, source) == ERR_NOT_IN_RANGE) {
+
+                        let goal = _.map([source], function(target) {
                             return { pos: target.pos, range: 1 }
                         })
 
                         creep.intraRoomPathing(creep.pos, goal)
+                        return true
                     }
-                } else {
+                }
+            }
 
-                    creep.isFull()
+            if (idle()) continue
 
-                    if (creep.memory.isFull) {
+            function idle() {
 
-                        let terminal = creep.room.terminal
-                        let storage = creep.room.storage
+                creep.say("🚬")
 
-                        if (terminal && terminal.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
+                const anchorPoint = room.get('anchorPoint')
 
-                            creep.say("T")
+                if (creep.pos.getRangeTo(anchorPoint) < 6) {
 
-                            creep.advancedTransfer(terminal, RESOURCE_OPS)
+                    let goal = _.map([anchorPoint], function(target) {
+                        return { pos: target, range: 6 }
+                    })
 
-                        } else if (storage && storage.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
+                    creep.intraRoomPathing(creep.pos, goal)
+                    return true
+                }
 
-                            creep.say("S")
+                if (creep.pos.getRangeTo(anchorPoint) > 6) {
 
-                            creep.advancedTransfer(storage, RESOURCE_OPS)
-                        }
-                    } else {
+                    let goal = _.map([anchorPoint], function(target) {
+                        return { pos: target, range: 6 }
+                    })
 
-                        if (creep.usePower(PWR_GENERATE_OPS) == 0) {
-
-                            creep.say("Ops")
-
-                            Memory.data.opsGenerated += creep.powers[PWR_GENERATE_OPS].level
-                        }
-
-                        function findPowers() {
-
-
-                        }
-
-                        creep.say("🚬")
-
-                        if (powerSpawn && creep.pos.getRangeTo(powerSpawn) > 1) {
-
-                            creep.say("PS")
-
-                            let goal = _.map([powerSpawn], function(target) {
-                                return { pos: target.pos, range: 1 }
-                            })
-
-                            creep.intraRoomPathing(creep.pos, goal)
-                        }
-                    }
+                    creep.creepFlee(creep.pos, goal)
+                    return true
                 }
             }
         }
     }
 }
-
-module.exports = powerCreepManager
