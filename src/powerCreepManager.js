@@ -103,7 +103,7 @@ module.exports = function powerCreepManager(room) {
 
                     if (source.effects) {
 
-                        const effectsWithPower = source.effects.filter(effectObj => effectObj.effect == power)[0]
+                        const effectsWithPower = source.effects.filter(effectObj => effectObj.effect == power && effectObj.ticksRemaining > 50)[0]
                         if (effectsWithPower) continue
                     }
 
