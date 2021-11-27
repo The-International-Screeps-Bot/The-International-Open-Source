@@ -1,3 +1,5 @@
+// Imports
+
 // Global
 
 import './global/globalFunctions'
@@ -18,15 +20,25 @@ import { ErrorMapper } from './external/ErrorMapper'
 // Other
 
 import { logManager } from 'other/logManager'
+import { memHack } from 'other/memHack'
 
 // Type declareations for global
 
 declare global {
 
+    // Memory
+
     interface Memory {
         [key: string]: any
 
     }
+
+    interface RawMemory {
+        [key: string]: any
+
+    }
+
+    // Room
 
     interface Room {
         [key: string]: any
@@ -36,6 +48,8 @@ declare global {
         [key: string]: any
         anchorPoint: {[key: string]: any}
     }
+
+    // Creeps
 
     interface Creep {
         [key: string]: any
@@ -47,6 +61,8 @@ declare global {
         role: string
     }
 
+    // PowerCreeps
+
     interface PowerCreep {
         [key: string]: any
 
@@ -56,6 +72,14 @@ declare global {
         [key: string]: any
         role: string
     }
+
+    // Structures
+
+    interface StructureSpawn {
+        [key: string]: any
+    }
+
+    // Global
 
     namespace NodeJS {
         interface Global {
@@ -71,6 +95,8 @@ declare global {
 // Loop
 
 export const loop = ErrorMapper.wrapLoop(function() {
+
+    memHack.modifyMemory()
 
     internationalManager()
 

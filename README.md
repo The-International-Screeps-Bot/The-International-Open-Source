@@ -35,21 +35,18 @@ Please read the about section before installing and using this bot.
 
 ### NPM
 
+First install Nope Package Manager so we can install other things
+
 ```
 npm install
 ```
 
-### Typescript
+Then when in the project folder use npm to install devDependencies in package.json
 
 ```
-npm install -g typescript
+npm install --only=dev
 ```
 
-### Rollup
-
-```
-npm install -g rollup
-```
 
 ## Usage
 

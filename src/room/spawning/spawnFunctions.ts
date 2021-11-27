@@ -1,8 +1,4 @@
-interface StructureSpawn {
-    [key: string]: any
-}
-
-StructureSpawn.prototype.advancedSpawn = function(spawningObject: any) {
+StructureSpawn.prototype.advancedSpawn = function(spawningObject: {[key: string]: any}) {
 
     const spawn: StructureSpawn = this
 

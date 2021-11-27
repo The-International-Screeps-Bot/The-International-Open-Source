@@ -1,4 +1,4 @@
-export function remoteManager(room) {
+export function remoteManager(room: Room) {
 
-    
+
 }

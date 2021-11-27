@@ -1,4 +1,4 @@
-import './spawningFunctions'
+import './spawnFunctions'
 
 export function spawnRequests(room: Room) {
 

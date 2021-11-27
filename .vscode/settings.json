@@ -25,5 +25,12 @@
     },
     "typescript.tsdk": "./node_modules/typescript/lib",
     "eslint.enable": true,
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "spellright.language": [
+        "en"
+    ],
+    "spellright.documentTypes": [
+        "latex",
+        "plaintext"
+    ]
 }

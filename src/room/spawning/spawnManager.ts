@@ -1,4 +1,4 @@
-import './spawningFunctions'
+import './spawnFunctions'
 import { spawnRequests } from './spawnRequests'
 
 export function spawnManager(room: Room) {
@@ -32,7 +32,7 @@ export function spawnManager(room: Room) {
 
         const spawn = inactiveSpawns[i]
         if (!spawn) break
-        
+
         // Enable dry run
 
         spawningObject.extraOpts.dryRun = true
