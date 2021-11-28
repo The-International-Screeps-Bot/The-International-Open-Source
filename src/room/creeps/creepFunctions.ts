@@ -152,10 +152,16 @@ Creep.prototype.advancedMove = function() {
 }
 
 interface TravelOpts {
-
+    [key: string]: any
+    plainCost: number,
+    swampCost: number,
+    avoidStages: [],
+    flee: boolean,
+    cacheAmount: number,
+    avoidEnemyRanges: boolean,
 }
 
-Creep.prototype.travel = function(opts) {
+Creep.prototype.travel = function(opts: TravelOpts) {
 
     const creep = this
     const room: Room = creep.room
@@ -170,7 +176,7 @@ Creep.prototype.travel = function(opts) {
 
     // Assign defaults if values arn't provided
 
-    let defaultValues = {
+    const defaultValues: TravelOpts = {
         plainCost: 2,
         swampCost: 6,
         avoidStages: [],
@@ -179,12 +185,12 @@ Creep.prototype.travel = function(opts) {
         avoidEnemyRanges: false,
     }
 
-    for (let defaultName in defaultValues) {
+    for (const defaultName in defaultValues) {
 
         if (!opts[defaultName]) opts[defaultName] = defaultValues[defaultName]
     }
 
-    let origin = opts.origin
+    const origin = opts.origin
     let goal = opts.goal
 
     // Stop if there is no inter room path to goal
@@ -214,7 +220,7 @@ Creep.prototype.travel = function(opts) {
 
                     if (!Memory.rooms[roomName] || !Memory.rooms[roomName].stage) return Infinity
 
-                    if (!opts.avoidStages.includes(Memory.rooms[roomName].stage)) return 1
+                    /* if (!opts.avoidStages.includes(Memory.rooms[roomName].stage)) return 1 */
 
                     return Infinity
                 }
@@ -417,7 +423,11 @@ Creep.prototype.travel = function(opts) {
     return true
 }
 
-Creep.prototype.advancedMove = function(opts) {
+interface moveOpts {
+
+}
+
+Creep.prototype.advancedMove = function(opts: moveOpts) { 
 
     const creep: Creep = this
     const room: Room = this

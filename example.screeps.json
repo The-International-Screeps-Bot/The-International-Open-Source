@@ -8,7 +8,7 @@
         "branch": "branch name"
     },
     "pServer": {
-        "email": "your email",
+        "email": "your email (case sensitive!)",
         "password": "your password",
         "protocol": "http",
         "hostname": "127.0.0.1",

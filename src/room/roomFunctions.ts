@@ -5,6 +5,7 @@ Room.prototype.get = function(roomObjectName: string) {
     const roomObjects: {[key: string]: RoomObject} = {}
 
     interface RoomObjectOpts {
+        [key: string]: any
         name: string,
         value: any,
         valueType: string,
@@ -13,19 +14,17 @@ Room.prototype.get = function(roomObjectName: string) {
     }
 
     interface RoomObject extends RoomObjectOpts {
-        cacheAmount?: number
         lastCache?: number
     }
 
-    class RoomObject {
+    class RoomObject  {
         constructor(opts: RoomObjectOpts) {
 
             const roomObject: RoomObject = this
 
             // Apply opts
 
-            let propertyName: string
-            for (propertyName in opts) {
+            for (const propertyName in opts) {
 
                 roomObject[propertyName] = opts[propertyName]
             }
@@ -215,19 +214,28 @@ Room.prototype.get = function(roomObjectName: string) {
         cacheAmount: Infinity,
     })
 
+    // Dynamically create RoomObjects for each structureType
+
     // Loop through each structureType in the game
 
     for (const structureType of global.allStructureTypes) {
 
         // Create roomObject for structureType
 
-        manageRoomObject(structureType, [], 'object', 'global', 1)
+        manageRoomObject({
+            name: structureType,
+            value: [],
+            valueType: 'object',
+            cacheMethod: 'global',
+            cacheAmount: 1,
+        })
     }
+
+    // Dynamically add each structure to their RoomObject structureType
 
     // Loop through all structres in room
 
-    let structure: Structure
-    for (structure of room.find(FIND_STRUCTURES)) {
+    for (const structure of room.find(FIND_STRUCTURES)) {
 
         // Group structure by structureType
 
@@ -236,24 +244,17 @@ Room.prototype.get = function(roomObjectName: string) {
 
     // Harvest positions
 
-    const source1HarvestPositions: RoomPosition[] = findHarvestPositions(roomObjects.source1.getValue())
-    manageRoomObject('source1HarvestPositions', source1HarvestPositions, 'object', 'global', Infinity)
-
-    const source1ClosestHarvestPosition: RoomPosition = findClosestHarvestPosition(roomObjects.source1HarvestPositions.getValue())
-    manageRoomObject('source2', source1ClosestHarvestPosition, 'pos', 'global', Infinity)
-
-    const source2HarvestPositions: RoomPosition[] = findHarvestPositions(roomObjects.source2.getValue())
-    manageRoomObject('source2HarvestPositions', source2HarvestPositions, 'object', 'global', Infinity)
-
-    const source2ClosestHarvestPosition: RoomPosition = findClosestHarvestPosition(roomObjects.source2HarvestPositions.getValue())
-    manageRoomObject('source2ClosestHarvestPosition', source2ClosestHarvestPosition, 'pos', 'global', Infinity)
+    interface HarvestPosObj {
+        type: string
+        pos: RoomPosition
+    }
 
     /**
      * Finds positions adjacent to a source that a creep can harvest
      * @param source source of which to find harvestPositions for
      * @returns source's harvestPositions, a list of RoomPositions
      */
-    function findHarvestPositions(source: Source): RoomPosition[] {
+    function findHarvestPositions(source: Source): HarvestPosObj[] {
 
         // Stop and inform empty array if there is no source
 
@@ -262,15 +263,15 @@ Room.prototype.get = function(roomObjectName: string) {
         // Find positions adjacent to source
 
         const rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 }
-        const adjacentPositions = global.getPositionsInsideRect(rect)
+        const adjacentPositions: RoomPosition[] = global.getPositionsInsideRect(rect)
 
-        let harvestPositions: RoomPosition[] = []
+        const harvestPositions: HarvestPosObj[] = []
 
         // Find terrain in room
 
         const terrain = Game.map.getRoomTerrain(room.name)
 
-        for (let pos of adjacentPositions) {
+        for (const pos of adjacentPositions) {
 
             // Iterate if terrain for pos is a wall
 
@@ -278,11 +279,14 @@ Room.prototype.get = function(roomObjectName: string) {
 
             // Convert position into a RoomPosition
 
-            pos = room.newPos(pos)
+            const harvestPosObj: HarvestPosObj = {
+                type: 'normal',
+                pos: room.newPos(pos),
+            }
 
             // Add pos to harvestPositions
 
-            harvestPositions.push(pos)
+            harvestPositions.push(harvestPosObj)
         }
 
         return harvestPositions
@@ -299,22 +303,43 @@ Room.prototype.get = function(roomObjectName: string) {
         return roomObjects.anchorPoint.getValue().findClosestByRange(harvestPositions)
     }
 
+    manageRoomObject({
+        name: 'source1HarvestPositions',
+        value: findHarvestPositions(roomObjects.source1.getValue()),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
+    manageRoomObject({
+        name: 'source2HarvestPositions',
+        value: findHarvestPositions(roomObjects.source2.getValue()),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
     // Source links
 
-    const source1Link: StructureLink | false = findSourceLink(roomObjects.source1ClosestHarvestPosition.getValue())
-    manageRoomObject('source1Link', source1Link, 'pos', 'global', Infinity)
+    manageRoomObject({
+        name: 'source1Link',
+        value: findSourceLink(roomObjects.source1ClosestHarvestPosition.getValue()),
+        valueType: 'pos',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
 
     function findSourceLink(closestHarvestPos: RoomPosition) {
 
         // Stop and inform false if no closestHarvestPos
 
-        if (!closestHarvestPos) return false
+        if (!closestHarvestPos) return undefined
 
         // Find links
 
         const links: StructureLink[] = roomObjects.link.getValue()
 
-        // Filter links that are near closestHarvestPos, return the first one
+        // Filter links that are near closestHarvestPos, inform the first one
 
         const linksNearHarvestPos = links.filter(link => link.pos.getRangeTo(closestHarvestPos) == 1)
         return linksNearHarvestPos[0]

@@ -8,17 +8,9 @@ global.createClass = function (className) {
     return class className {
     };
 };
-/**
- * @param id
- * @returns
- */
 global.findObjectWithId = function (id) {
     return Game.getObjectById(id) || undefined;
 };
-/**
- * @param rect
- * @returns
- */
 global.getPositionsInsideRect = function (rect) {
     let positions = [];
     for (let x = rect.x1; x <= rect.x2; x++) {
@@ -28,45 +20,27 @@ global.getPositionsInsideRect = function (rect) {
     }
     return positions;
 };
-/**
- *
- * @param pos1
- * @param pos2
- * @returns
- */
 global.arePositionsAlike = function (pos1, pos2) {
     if (pos1.x == pos2.x && pos1.y == pos2.y)
         return true;
     return false;
 };
-/**
- * Custom console logs using HTML and CSS for special structure and styling, going beyond the conventional limits of Screeps console logging
- * @param title title of log
- * @param message content of message
- * @param color text colour
- * @param bgColor background colour
- */
 class CustomLog$1 {
     constructor(title, message, color, bgColor) {
-        // Assign defaults if parameters were missing
         if (!color)
             color = global.colors.black;
         if (!bgColor)
             bgColor = global.colors.white;
-        //
         this.log = `<div style='text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div><div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`;
-        // Add this to customLogs for output
         global.customLogs += this.log;
     }
 }
 global.CustomLog = CustomLog$1;
 
-// If global is not constructed
 if (!global.active) {
-    // Record that global has been reconstructed
     global.active = true;
-    global.me = 'MarvinTMB'; // My username
-    global.allyList = ['hi']; // Allies
+    global.me = 'MarvinTMB';
+    global.allyList = ['hi'];
     global.colors = {
         white: '#ffffff',
         lightGrey: '#eaeaea',
@@ -81,7 +55,6 @@ if (!global.active) {
         'sourceHarvester',
         'hauler'
     ];
-    //
     global.roomDimensions = 50;
     global.allStructureTypes = [
         STRUCTURE_SPAWN,
@@ -106,21 +79,33 @@ if (!global.active) {
         STRUCTURE_FACTORY,
         STRUCTURE_INVADER_CORE,
     ];
+    global.impassibleStructures = [
+        STRUCTURE_SPAWN,
+        STRUCTURE_EXTENSION,
+        STRUCTURE_WALL,
+        STRUCTURE_KEEPER_LAIR,
+        STRUCTURE_CONTROLLER,
+        STRUCTURE_LINK,
+        STRUCTURE_STORAGE,
+        STRUCTURE_TOWER,
+        STRUCTURE_OBSERVER,
+        STRUCTURE_POWER_BANK,
+        STRUCTURE_POWER_SPAWN,
+        STRUCTURE_EXTRACTOR,
+        STRUCTURE_LAB,
+        STRUCTURE_TERMINAL,
+        STRUCTURE_NUKER,
+        STRUCTURE_FACTORY,
+        STRUCTURE_INVADER_CORE,
+    ];
 }
 
-/**
-Configures features needed to run the bot
-*/
 function config() {
-    // Configure rooms
     for (const roomName in Game.rooms) {
         const room = Game.rooms[roomName];
-        // Single tick properties
         room.myCreeps = {};
         room.creepCount = {};
-        //
         for (const role of global.creepRoles) {
-            //
             room.myCreeps[role] = [];
             room.creepCount[role] = 0;
         }
@@ -128,28 +113,20 @@ function config() {
             source1: 0,
             source2: 0,
         };
-        // memory properties
-        // global properties
         if (!global[room.name])
             global[room.name] = {};
     }
-    // Assign tick-only properties
     global.customLogs = ``;
 }
 
 function dataManager() {
-    // Construct data in memory if doesn't exist
     if (!Memory.data) {
         Memory.data = {};
     }
-    // Tick-only data construction
     Memory.data.creeps = 0;
     Memory.data.energyHarvested = 0;
 }
 
-/* interface SourceHarvesterMemory extends CreepMemory {
-
-} */
 class SourceHarvester$1 extends Creep {
     constructor(creep) {
         super(creep.id);
@@ -166,30 +143,20 @@ const creepClasses = {
 };
 
 function creepOrganizer() {
-    // Loop through all of my creeps
     for (const creepName in Memory.creeps) {
         const creep = Game.creeps[creepName];
-        // If creep doesn't exist
         if (!creep) {
-            // Delete creep from memory and iterate
             delete Memory.creeps[creepName];
             continue;
         }
-        // Assign creep proper class
         Game.creeps[creepName] = new creepClasses[creep.memory.role](creep);
-        //
         const room = creep.room;
-        // Organize creep by room and role
         room.myCreeps[creep.memory.role].push(creepName);
-        // See if creep is dying
         creep.isDying();
-        // Stop if creep is dying
         if (creep.memory.dying)
             continue;
-        // Increase creepCount for this role
         room.creepCount[creep.memory.role] += 1;
     }
-    // Record number of creeps
     Memory.data.creeps = Object.keys(Memory.creeps).length;
 }
 
@@ -202,20 +169,13 @@ function internationalManager() {
 Room.prototype.get = function (roomObjectName) {
     const room = this;
     const roomObjects = {};
-    /**
-    @param opts properties to apply to the RoomObject
-    */
     class RoomObject {
         constructor(opts) {
             const roomObject = this;
-            // Apply opts
-            let propertyName;
-            for (propertyName in opts) {
+            for (const propertyName in opts) {
                 roomObject[propertyName] = opts[propertyName];
             }
-            // If cacheMethod is global
             if (roomObject.cacheMethod == 'global') {
-                // Add lastCache property and stop
                 roomObject.lastCache = Game.time;
                 return;
             }
@@ -223,228 +183,198 @@ Room.prototype.get = function (roomObjectName) {
         cache() {
             const roomObject = this;
             if (roomObject.cacheMethod == 'memory') {
-                // Store value in room's memory
                 room.memory[roomObject.name] = roomObject.value;
                 return;
             }
             if (roomObject.cacheMethod == 'global') {
-                // Set the roomObjects last cache to this tick
                 roomObject.lastCache = Game.time;
-                // Store roomObject in the room's global
                 global[room.name][roomObject.name] = roomObject;
                 return;
             }
         }
         getValue() {
             const roomObject = this;
-            // If roomObject's valueType is id, return it as an object with the ID
             if (roomObject.valueType == 'id')
                 return global.findObjectWithId(roomObject.value);
-            // If roomObject's type is pos, return the it as a RoomPosition
             if (roomObject.valueType == 'pos')
                 return room.newPos(roomObject.value);
-            // return the value of the roomObject
             return roomObject.value;
         }
         getValueIfViable() {
             const roomObject = this;
             let cachedRoomObject;
             if (roomObject.cacheMethod == 'memory') {
-                // Query room memory for cachedRoomObject
                 cachedRoomObject = room.memory[roomObject.name];
-                // If cachedRoomObject inform true, otherwise inform false
-                return cachedRoomObject;
-            }
-            if (roomObject.cacheMethod == 'global') {
-                // Query room's global for cachedRoomObject
-                cachedRoomObject = room.memory[roomObject.name];
-                // If cachedRoomObject doesn't exist inform false
                 if (!cachedRoomObject)
                     return false;
-                // If roomObject is past renewal date inform false, otherwise inform true
+                return cachedRoomObject.getValue();
+            }
+            if (roomObject.cacheMethod == 'global') {
+                cachedRoomObject = room.memory[roomObject.name];
+                if (!cachedRoomObject)
+                    return false;
                 if (cachedRoomObject.lastCache + cachedRoomObject.cacheAmount > Game.time)
                     return false;
-                return true;
+                return cachedRoomObject.getValue();
             }
             return false;
         }
     }
-    /**
-    @param name name of the RoomObject
-    @param value RoomObject value
-    @param valueType the type of the value
-    @param cacheMethod where to store the RoomObject
-    @param cacheAmount if in global, how long to store RoomObject for before reset
-    @returns a RoomObject
-    */
-    function getRoomObject(name, value, valueType, cacheMethod, cacheAmount) {
-        // Find roomObject
-        let roomObject = roomObjects[name];
-        // If the roomObject exists see if it's viable, otherwise inform undefined
+    function manageRoomObject(opts) {
+        let roomObject = roomObjects[opts.name];
         const roomObjectValue = roomObject ? roomObject.getValueIfViable() : undefined;
-        // If roomObject is viable
         if (roomObjectValue) {
-            // Inform the roomObject
             return roomObject;
         }
-        // Create the new RoomObject
-        roomObject = new RoomObject({
-            name: name,
-            value: value,
-            valueType: valueType,
-            cacheMethod: cacheMethod,
-            cacheAmount: cacheAmount,
-        });
-        // Cache the roomObject based on its cacheMethod and inform the roomObject
+        roomObject = new RoomObject(opts);
         roomObject.cache();
         return roomObject;
     }
-    // Important Positions
-    getRoomObject('anchorPoint', room.memory.anchorPoint, 'pos', 'memory', Infinity);
-    // Resources
-    const mineral = room.find(FIND_MINERALS)[0];
-    getRoomObject('mineral', mineral, 'object', 'global', Infinity);
-    function findSourcesWithIDs() {
-        // Find sources
+    manageRoomObject({
+        name: 'anchorPoint',
+        value: room.memory.anchorPoint,
+        valueType: 'pos',
+        cacheMethod: 'memory',
+    });
+    manageRoomObject({
+        name: 'mineral',
+        value: room.find(FIND_MINERALS)[0],
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    });
+    function findIDsOfSources() {
         const sources = room.find(FIND_SOURCES);
         let sourceIDs = [];
-        // Loop through each source
         for (const source of sources) {
-            // Add source's id to sourceIDs
             sourceIDs.push(source.id);
         }
         return sourceIDs;
     }
-    getRoomObject('sources', findSourcesWithIDs(), 'object', 'memory', Infinity);
-    const source1ID = roomObjects.sources.getValue()[0];
-    getRoomObject('source1', source1ID, 'id', 'global', Infinity);
-    const source2ID = roomObjects.sources.getValue()[1];
-    getRoomObject('source2', source2ID, 'id', 'global', Infinity);
-    // Loop through each structureType in the game
+    manageRoomObject({
+        name: 'sources',
+        value: findIDsOfSources()[0],
+        valueType: 'object',
+        cacheMethod: 'memory',
+    });
+    manageRoomObject({
+        name: 'source1',
+        value: roomObjects.sources.getValue()[0],
+        valueType: 'id',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    });
+    manageRoomObject({
+        name: 'source2',
+        value: roomObjects.sources.getValue()[1],
+        valueType: 'id',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    });
     for (const structureType of global.allStructureTypes) {
-        // Create roomObject for structureType
-        getRoomObject(structureType, [], 'object', 'global', 1);
+        manageRoomObject({
+            name: structureType,
+            value: [],
+            valueType: 'object',
+            cacheMethod: 'global',
+            cacheAmount: 1,
+        });
     }
-    // Loop through all structres in room
-    let structure;
-    for (structure of room.find(FIND_STRUCTURES)) {
-        // Group structure by structureType
+    for (const structure of room.find(FIND_STRUCTURES)) {
         roomObjects[structure.structureType].value.push(structure);
     }
-    // Harvest positions
-    const source1HarvestPositions = findHarvestPositions(roomObjects.source1.getValue());
-    getRoomObject('source1HarvestPositions', source1HarvestPositions, 'object', 'global', Infinity);
-    const source1ClosestHarvestPosition = findClosestHarvestPosition(roomObjects.source1HarvestPositions.getValue());
-    getRoomObject('source2', source1ClosestHarvestPosition, 'pos', 'global', Infinity);
-    const source2HarvestPositions = findHarvestPositions(roomObjects.source2.getValue());
-    getRoomObject('source2HarvestPositions', source2HarvestPositions, 'object', 'global', Infinity);
-    const source2ClosestHarvestPosition = findClosestHarvestPosition(roomObjects.source2HarvestPositions.getValue());
-    getRoomObject('source2ClosestHarvestPosition', source2ClosestHarvestPosition, 'pos', 'global', Infinity);
-    /**
-     * Finds positions adjacent to a source that a creep can harvest
-     * @param source source of which to find harvestPositions for
-     * @returns source's harvestPositions, a list of RoomPositions
-     */
     function findHarvestPositions(source) {
-        // Stop and inform empty array if there is no source
         if (!source)
             return [];
-        // Find positions adjacent to source
         const rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 };
         const adjacentPositions = global.getPositionsInsideRect(rect);
-        let harvestPositions = [];
-        // Find terrain in room
+        const harvestPositions = [];
         const terrain = Game.map.getRoomTerrain(room.name);
-        for (let pos of adjacentPositions) {
-            // Iterate if terrain for pos is a wall
+        for (const pos of adjacentPositions) {
             if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL)
                 continue;
-            // Convert position into a RoomPosition
-            pos = room.newPos(pos);
-            // Add pos to harvestPositions
-            harvestPositions.push(pos);
+            const harvestPosObj = {
+                type: 'normal',
+                pos: room.newPos(pos),
+            };
+            harvestPositions.push(harvestPosObj);
         }
         return harvestPositions;
     }
-    /**
-    * @param harvestPositions array of RoomPositions to filter
-    * @returns the closest harvestPosition to the room's anchorPoint
-    */
-    function findClosestHarvestPosition(harvestPositions) {
-        // Filter harvestPositions by closest one to anchorPoint
-        return roomObjects.anchorPoint.getValue().findClosestByRange(harvestPositions);
-    }
-    // Source links
-    const source1Link = findSourceLink(roomObjects.source1ClosestHarvestPosition.getValue());
-    getRoomObject('source1Link', source1Link, 'pos', 'global', Infinity);
+    manageRoomObject({
+        name: 'source1HarvestPositions',
+        value: findHarvestPositions(roomObjects.source1.getValue()),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    });
+    manageRoomObject({
+        name: 'source2HarvestPositions',
+        value: findHarvestPositions(roomObjects.source2.getValue()),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    });
+    manageRoomObject({
+        name: 'source1Link',
+        value: findSourceLink(roomObjects.source1ClosestHarvestPosition.getValue()),
+        valueType: 'pos',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    });
     function findSourceLink(closestHarvestPos) {
-        // Stop and inform false if no closestHarvestPos
         if (!closestHarvestPos)
-            return false;
-        // Find links
+            return undefined;
         const links = roomObjects.link.getValue();
-        // Filter links that are near closestHarvestPos, return the first one
         const linksNearHarvestPos = links.filter(link => link.pos.getRangeTo(closestHarvestPos) == 1);
         return linksNearHarvestPos[0];
     }
-    //
     const roomObject = roomObjects[roomObjectName];
-    // If the queries roomObject isn't in roomObjects
     if (!roomObject) {
-        // Log an invalid query and inform undefined
         new CustomLog('Tried to get non-existent property', roomObjectName, global.colors.white, global.colors.red);
         return undefined;
     }
-    // Return the roomObject's queried value
     const value = roomObject.getValue();
     return value;
 };
 Room.prototype.newPos = function (pos) {
     const room = this;
-    // Create an return roomPosition
     return new RoomPosition(pos.x, pos.y, room.name);
 };
-/**
-    @param pos1 pos of the object performing the action
-    @param pos2 pos of the object getting acted on
-    @param [type] The status of action performed
-*/
 Room.prototype.actionVisual = function (pos1, pos2, type) {
     const room = this;
-    // Construct colors for each type
     const colorsForTypes = {
         success: global.colors.lightBlue,
         fail: global.colors.red,
     };
-    // If no type, type is success. Construct type from color
     if (!type)
         type = 'success';
     const color = colorsForTypes[type];
-    // Create visuals
     room.visual.circle(pos2, { color: color });
     room.visual.line(pos1, pos2, { color: color });
 };
-/**
- * @param opts options
- * @returns an array of RoomPositions
- */
-Room.prototype.generatePath = function (opts) {
-    //
-    const origin = opts.origin;
-    const goal = opts.goal;
+Room.prototype.advancedFindPath = function (opts) {
     const pathObject = {
         route: generateRoute(),
         path: generatePath(),
     };
-    // Construct route
     function generateRoute() {
-        const route = Game.map.findRoute(origin.roomName, goal.pos.roomName, {
-            routeCallback: function (roomName) {
+        if (opts.origin.roomName == opts.goal.pos.roomName)
+            return undefined;
+        const route = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
+            routeCallback(roomName) {
+                const roomMemory = Memory.rooms[roomName];
+                if (roomName == opts.goal.pos.roomName)
+                    return 1;
+                if (!roomMemory)
+                    return Infinity;
+                if (!opts.avoidTypes.includes(roomMemory.type))
+                    return 1;
+                return Infinity;
             }
         });
         return route;
     }
-    // Construct path
     function generatePath() {
         const path = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost,
@@ -452,16 +382,90 @@ Room.prototype.generatePath = function (opts) {
             maxRooms: opts.maxRooms,
             maxOps: 100000,
             flee: opts.flee,
-            roomCallback: function (roomName) {
+            roomCallback(roomName) {
+                const room = Game.rooms[roomName];
+                if (!room)
+                    return false;
                 const cm = new PathFinder.CostMatrix();
+                if (opts.useRoads) {
+                    const roads = room.get('road');
+                    for (const road of roads) {
+                        cm.set(road.pos.x, road.pos.y, 1);
+                    }
+                }
+                if (!pathObject.route) {
+                    let y = 0;
+                    let x = 0;
+                    y = 0;
+                    for (x = 0; x < 50; x++) {
+                        cm.set(x, y, 255);
+                    }
+                    x = 0;
+                    for (y = 0; y < 50; y++) {
+                        cm.set(x, y, 255);
+                    }
+                    y = 49;
+                    for (x = 0; x < 50; x++) {
+                        cm.set(x, y, 255);
+                    }
+                    x = 49;
+                    for (y = 0; y < 50; y++) {
+                        cm.set(x, y, 255);
+                    }
+                }
+                if (opts.avoidEnemyRanges) {
+                    const enemyCreeps = room.get('enemyCreeps');
+                    for (const enemyCreep of enemyCreeps) {
+                        const rect = {
+                            x1: opts.creep.pos.x,
+                            y1: opts.creep.pos.y,
+                            x2: opts.creep.pos.x,
+                            y2: opts.creep.pos.y
+                        };
+                        const positions = global.getPositionsInsideRect(rect);
+                        for (const pos of positions) {
+                            cm.set(pos.x, pos.y, 255);
+                        }
+                    }
+                }
+                if (opts.avoidImpassibleStructures) {
+                    const ramparts = room.get('rampart');
+                    for (const rampart of ramparts) {
+                        if (rampart.my) {
+                            if (opts.prioritizeRamparts) {
+                                cm.set(rampart.pos.x, rampart.pos.y, 1);
+                            }
+                            continue;
+                        }
+                        cm.set(rampart.pos.x, rampart.pos.y, 255);
+                    }
+                    for (const structureType of global.impassibleStructures) {
+                        const structuresOfType = room.get(structureType);
+                        for (const structure of structuresOfType) {
+                            cm.set(structure.pos.x, structure.pos.y, 255);
+                        }
+                    }
+                }
                 return cm;
             }
         });
         return path;
     }
-    // Inform pathObject
     return pathObject;
 };
+Room.prototype.scout = function () {
+};
+
+Room.prototype.advancedSell = function (resource, amount) {
+};
+Room.prototype.advancedSell = function (resource, amount) {
+};
+
+function marketManager(room) {
+    const terminal = room.terminal;
+    if (!terminal)
+        return;
+}
 
 StructureSpawn.prototype.advancedSpawn = function (spawningObject) {
     const spawn = this;
@@ -470,20 +474,14 @@ StructureSpawn.prototype.advancedSpawn = function (spawningObject) {
 };
 
 function spawnRequests(room) {
-    // Find energy structures
     const spawnStructures = findSpawnStructures();
     function findSpawnStructures() {
-        // Get array of spawns and extensions
         const spawnsAndExtensions = room.get('spawn').concat(room.get('extension'));
-        // Filter out structures that aren't active
         const unfilteredSpawnStructures = spawnsAndExtensions.filter((structure) => structure.isActive());
-        // Add each spawnStructures with their range to the object
         const anchorPoint = room.get('anchorPoint');
-        // Filter energy structures by distance from anchorPoint
         const filteredSpawnStructures = unfilteredSpawnStructures.sort((a, b) => a.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5) - b.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5));
         return filteredSpawnStructures;
     }
-    //
     let spawnEnergyAvailable = room.energyAvailable;
     let spawnEnergyCapacity = room.energyCapacityAvailable;
     class RoleSpawningOpts {
@@ -503,7 +501,6 @@ function spawnRequests(room) {
             }
             if (this.defaultParts.length > 0) {
                 for (const part of this.defaultParts) {
-                    // Stop loop if cost is more than or equal to maxCost
                     if (this.cost >= maxCost)
                         break;
                     this.body.push(part);
@@ -511,33 +508,24 @@ function spawnRequests(room) {
                 }
                 this.tier += 1;
             }
-            // Stop if the body amount is equal to maxParts or the cost of the creep is more than we can afford
             while (this.body.length != this.maxParts && this.cost < maxCost) {
-                // Loop through each part in extraParts
                 for (let part of this.extraParts) {
-                    // Stop function if role's body is the size of maxParts
                     if (this.body.length == this.maxParts)
                         return;
-                    // Add part and cost
                     this.body.push(part);
                     this.cost += BODYPART_COST[part];
                 }
             }
             this.tier += 1;
-            // So long as cost is more than maxCost
             while (this.cost > maxCost) {
-                // Take away cost of the last part
                 const part = this.body[this.body.length - 1];
                 this.cost -= BODYPART_COST[part];
-                // Take away the last part
                 this.body.slice(0, this.body.length - 1);
             }
-            // Construct memory
             const memory = {
                 role: this.role,
                 roomFrom: room.name,
             };
-            // Add additions to memory
             let propertyName;
             for (propertyName in this.memoryAdditions) {
                 memory[propertyName] = this.memoryAdditions[propertyName];
@@ -548,12 +536,9 @@ function spawnRequests(room) {
             };
         }
     }
-    //
     const minCreeps = {};
-    //
     const source1HarvestPositionsAmount = room.get('source1HarvestPositions').length;
     const source2HarvestPositionsAmount = room.get('source2HarvestPositions').length;
-    // Harvester spawning opts
     class HarvesterSpawningOpts extends RoleSpawningOpts {
         constructor() {
             super();
@@ -580,7 +565,6 @@ function spawnRequests(room) {
                 }
             }
             function findSourceToHarvest() {
-                // Structure data on sources that relates to spawning
                 const spawningDataForSources = {
                     source1: {
                         amount: room.creepsOfSourceAmount.source1,
@@ -591,32 +575,23 @@ function spawnRequests(room) {
                         max: Math.min(source2HarvestPositionsAmount, minCreeps.sourceHarvester / 2),
                     }
                 };
-                // Loop through each sourceName
                 for (const sourceName in spawningDataForSources) {
                     const sourceData = spawningDataForSources[sourceName];
-                    // Select sourceData with less creeps than max
                     if (sourceData.amount < sourceData.max)
                         return sourceName;
                 }
                 return 'noSourceFound';
             }
-            // Assign ideal sourceName to creep
             opts.memoryAdditions.sourceName = findSourceToHarvest();
-            // Use previously constructed opts to produce a viable spawning body
             this.constructBody();
         }
     }
-    // Construct spawning opts for each role
     const spawningOpts = [];
     spawningOpts.push(new HarvesterSpawningOpts());
-    // Construct requiredCreeps
     const requiredCreeps = {};
-    // Loop through each role
     for (const role of global.creepRoles) {
-        // Define requiredCreeps for the role as minCreeps - existing creeps
         requiredCreeps[role] = minCreeps[role] - room.creepCount[role];
     }
-    // return info on the structure of new creeps and what amount of them to spawn
     return {
         spawningOpts,
         requiredCreeps,
@@ -625,61 +600,50 @@ function spawnRequests(room) {
 
 function spawnManager(room) {
     const spawns = room.get('spawn');
-    // Find spawns that aren't spawning
     const inactiveSpawns = spawns.filter(function (spawn) { return !spawn.spawning; });
-    // Stop if there are no inactiveSpawns
     if (inactiveSpawns.length == 0)
         return;
-    // Import spawningOpts
     const { spawningOpts, requiredCreeps, } = spawnRequests(room);
     let i = 0;
     for (let spawningObject of spawningOpts) {
-        // Iterate if there are no required creeps of role
         if (requiredCreeps[spawningObject.extraOpts.memory.role] == 0)
             continue;
-        // Try to find inactive spawn, if can't, stop
         const spawn = inactiveSpawns[i];
         if (!spawn)
             break;
-        // Enable dry run
         spawningObject.extraOpts.dryRun = true;
-        // See if creep can be spawned, stop if it can't
         const testSpawn = spawn.advancedSpawn(spawningObject);
         if (testSpawn != 0) {
             new CustomLog('Failed to spawn', testSpawn + ', ' + spawningObject.cost);
             break;
         }
-        // Disable dry run
         spawningObject.extraOpts.dryRun = false;
-        // Spawn creep
         spawn.advancedSpawn(spawningObject);
-        // Record an inactive spawn was used and iterate
         i++;
         continue;
     }
 }
 
+function communeManager(room) {
+    marketManager(room);
+    spawnManager(room);
+}
+
 Creep.prototype.isDying = function () {
     const creep = this;
-    // Inform as dying if creep is already recorded as dying
     if (creep.memory.dying)
         return true;
-    // Stop if creep is spawning
     if (!creep.ticksToLive)
         return false;
-    // Stop if creep body parts * 3 is more or less than ticks left alive
     if (creep.ticksToLive > creep.body.length * 3)
         return false;
-    // Record creep as dying
     creep.memory.dying = true;
     return true;
 };
 Creep.prototype.advancedTrafer = function (target, resource, amount) {
     const creep = this;
     const room = creep.room;
-    // If creep isn't in transfer range
     if (creep.pos.getRangeTo(target.pos) > 1) {
-        // Travel to target and return that creep tried to move
         creep.travel({
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
@@ -687,30 +651,22 @@ Creep.prototype.advancedTrafer = function (target, resource, amount) {
         });
         return 'travel';
     }
-    // If there wasn't a defined resource, define it as energy
     if (!resource)
         resource = 'energy';
-    // If there wasn't an amount provided
     if (!amount)
         amount = Math.min(creep.store.getUsedCapacity(resource), target.store.getFreeCapacity(resource));
-    // Try to transfer
     const transferResult = creep.transfer(target, resource, amount);
-    // If transfer is not a success
     if (transferResult != 0) {
-        // Create visual and return transferResult
         room.actionVisual(creep.pos, target.pos, 'fail');
         return transferResult;
     }
-    // Create visual and return success
     room.actionVisual(creep.pos, target.pos);
     return 'success';
 };
 Creep.prototype.advancedWithdraw = function (target, resource, amount) {
     const creep = this;
     const room = creep.room;
-    // If creep isn't in transfer range
     if (creep.pos.getRangeTo(target.pos) > 1) {
-        // Travel to target and return that creep tried to move
         creep.travel({
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
@@ -718,21 +674,15 @@ Creep.prototype.advancedWithdraw = function (target, resource, amount) {
         });
         return 'travel';
     }
-    // If there wasn't a defined resource, define it as energy
     if (!resource)
         resource = 'energy';
-    // If there wasn't an amount provided
     if (!amount)
         amount = Math.min(creep.store.getFreeCapacity(resource), target.store.getUsedCapacity(resource));
-    // Try to withdraw
     const withdrawResult = creep.withdraw(target, resource, amount);
-    // If withdraw is not a success
     if (withdrawResult != 0) {
-        // Create visual and return withdrawResult
         room.actionVisual(creep.pos, target.pos, 'fail');
         return withdrawResult;
     }
-    // Create visual and return success
     room.actionVisual(creep.pos, target.pos);
     return 'success';
 };
@@ -741,7 +691,6 @@ Creep.prototype.advancedHarvestSource = function (source) {
     const harvestResult = creep.harvest(source);
     if (harvestResult != 0)
         return harvestResult;
-    // Find amount of energy harvested and record it in data
     const energyHarvested = Math.min(creep.partsOfType(WORK) * 2, source.energy);
     Memory.data.energyHarvested += energyHarvested;
     creep.say('⛏️' + energyHarvested);
@@ -749,7 +698,6 @@ Creep.prototype.advancedHarvestSource = function (source) {
 };
 Creep.prototype.partsOfType = function (type) {
     const creep = this;
-    // Filter body parts that are of type, return number of them
     const partsOfType = creep.body.filter(part => part.type == type);
     return partsOfType.length;
 };
@@ -760,14 +708,11 @@ Creep.prototype.advancedMove = function () {
 Creep.prototype.travel = function (opts) {
     const creep = this;
     const room = creep.room;
-    // Stop if creep can't move
     if (creep.fatigue > 0)
         return false;
-    // Stop if creep is spawning
     if (creep.spawning)
         return false;
-    // Assign defaults if values arn't provided
-    let defaultValues = {
+    const defaultValues = {
         plainCost: 2,
         swampCost: 6,
         avoidStages: [],
@@ -775,21 +720,18 @@ Creep.prototype.travel = function (opts) {
         cacheAmount: 20,
         avoidEnemyRanges: false,
     };
-    for (let defaultName in defaultValues) {
+    for (const defaultName in defaultValues) {
         if (!opts[defaultName])
             opts[defaultName] = defaultValues[defaultName];
     }
-    let origin = opts.origin;
+    const origin = opts.origin;
     let goal = opts.goal;
-    // Stop if there is no inter room path to goal
     if (findInterRoomGoal() == ERR_NO_PATH)
         return ERR_NO_PATH;
     function findInterRoomGoal() {
-        // If we are in the room of the goal exit function
         if (origin.roomName == goal.pos.roomName)
             return false;
         let route = creep.memory.route;
-        // Check if we need a new route. If so make one
         if (!route || route.length == 0)
             findNewRoute();
         function findNewRoute() {
@@ -800,18 +742,14 @@ Creep.prototype.travel = function (opts) {
                         return 1;
                     if (!Memory.rooms[roomName] || !Memory.rooms[roomName].stage)
                         return Infinity;
-                    if (!opts.avoidStages.includes(Memory.rooms[roomName].stage))
-                        return 1;
                     return Infinity;
                 }
             });
             route = newRoute;
             creep.memory.route = route;
         }
-        // Make sure we can path to the goal's room
         if (route == ERR_NO_PATH)
             return ERR_NO_PATH;
-        // Make sure we have a valid route
         if (!route || route.length == 0)
             return false;
         let goalRoom = route[0].room;
@@ -819,7 +757,6 @@ Creep.prototype.travel = function (opts) {
             route = route.slice(1);
             creep.memory.route = route;
         }
-        // Set new goal in the goalRoom
         goal = { pos: new RoomPosition(25, 25, goalRoom), range: 1 };
         return 0;
     }
@@ -848,95 +785,50 @@ Creep.prototype.travel = function (opts) {
                     if (!room)
                         return false;
                     let cm = new PathFinder.CostMatrix;
-                    // Prioritize roads if creep will benefit from them
                     if (opts.swampCost != 1) {
                         for (let road of room.get("road")) {
                             cm.set(road.pos.x, road.pos.y, 1);
                         }
                     }
-                    // Find each exit pos and set to unwalkable if goal is in room
-                    /* if (goal.pos.roomName == room.name) {
-
-                        for (let x = 0; x < 50; x++) {
-
-                            for (let y = 0; y < 50; y++) {
-
-                                if (x <= 0 || x >= 49 || y <= 0 || y >= 49) cm.set(x, y, 255)
-                            }
-                        }
-                    } */
-                    // Set sorrounding area of enemyCreeps to unwalkable if position does not have a rampart
-                    /* for (let enemy of room.get("enemyCreeps")) {
-
-                        cm.set(enemy.pos.x, enemy.pos.y, 255)
-                    } */
-                    // Set unwalkable mySites as unwalkable
                     let mySites = room.find(FIND_MY_CONSTRUCTION_SITES, {
                         filter: s => (s.structureType != STRUCTURE_RAMPART || (s.structureType == STRUCTURE_RAMPART && !s.my)) && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                     });
                     for (let site of mySites) {
                         cm.set(site.pos.x, site.pos.y, 255);
                     }
-                    // Set unwalkable structures as unwalkable
                     let structures = room.find(FIND_STRUCTURES, {
                         filter: s => (s.structureType != STRUCTURE_RAMPART || (s.structureType == STRUCTURE_RAMPART && !s.my)) && s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_CONTAINER
                     });
                     for (let structure of structures) {
                         cm.set(structure.pos.x, structure.pos.y, 255);
                     }
-                    // Set all creeps as unwalkable
-                    /* let creep: Creep
-                    for (creep of room.myCreeps) {
-
-                        cm.set(creep.pos.x, creep.pos.y, 255)
-                    } */
-                    // Set all power creeps as unwalkable
-                    /* for (let creep of room.get("allPowerCreeps")) {
-
-                        cm.set(creep.pos.x, creep.pos.y, 255)
-                    } */
                     return cm;
                 }
             }).path;
-            // Change path to newPath
             path = newPath;
             creep.memory.path = path;
-            // Record room to track if we enter a new room
             creep.memory.lastRoom = room.name;
-            // Record time to find next time to path
             creep.memory.lastCache = Game.time;
         }
     }
-    // Stop if there is no path
     if (moveWithPath() == ERR_NO_PATH)
         return false;
     function moveWithPath() {
-        // Stop if there is no path
         if (!path || path.length == 0)
             return false;
         let pos = path[0];
-        // Move to first position of path
         let direction = creep.pos.getDirectionTo(room.newPos(pos));
-        // Assign direction to creep
         creep.direction = direction;
-        // Try to move. Stop if move fails
         if (creep.move(direction) == ERR_NO_PATH)
             return ERR_NO_PATH;
-        // Delete pos from path
         path = path.slice(1);
-        // Assign path to memory
         creep.memory.path = path;
         room.visual.poly(path, { stroke: global.colors.yellow, strokeWidth: .15, opacity: .2 });
-        // If creep moved
-        /* if (arePositionsEqual(creep.pos, pos)) {
-            // Delete pos from path
-            path = removePropertyFromArray(path, pos)
-            // Assign path to memory
-            creep.memory.path = path
-        } */
         return true;
     }
     return true;
+};
+Creep.prototype.advancedMove = function (opts) {
 };
 
 const SourceHarvester = creepClasses.sourceHarvester;
@@ -955,19 +847,14 @@ SourceHarvester.prototype.travelToSource = function () {
         return 'atSource';
     const targetPos = findTargetPos();
     function findTargetPos() {
-        // Create costMatrix
         const cm = new PathFinder.CostMatrix();
-        // Assign impassible to tiles with sourceHarvesters
         for (const sourceHarvester of room.myCreeps.sourceHarvester) {
-            // Iterate if sourceHarvester is this creep
             if (sourceHarvester.id == creep.id)
                 continue;
             cm.set(sourceHarvester.x, sourceHarvester.y, 255);
         }
-        // return closestHarvestPositions if there is a sourceHarvester on the closestHarvestPosition
         if (cm.get(closestHarvestPos.x, closestHarvestPos.y) != 255)
             return closestHarvestPos;
-        // If creepOnHarvestPos find a harvest pos that isn't occupied
         const harvestPositions = room.get(sourceName + 'HarvestPositions');
         for (const harvestPos of harvestPositions) {
             if (cm.get(harvestPos.x, harvestPos.y) == 255)
@@ -975,7 +862,6 @@ SourceHarvester.prototype.travelToSource = function () {
             return harvestPos;
         }
     }
-    //
     creep.say('⏩ ' + sourceName);
     creep.travel({
         origin: creep.pos,
@@ -998,23 +884,17 @@ SourceHarvester.prototype.transferToSourceLink = function () {
 function sourceHarvesterManager(room, creepsOfRole) {
     for (const creepName of creepsOfRole) {
         const creep = Game.creeps[creepName];
-        //
         const source = room.get(creep.memory.sourceName);
-        // Record that the creep has source target
         creep.recordSource();
-        // Try to move to source. If creep moved then iterate
         const travelToSourceResult = creep.travelToSource();
         if (travelToSourceResult == 0)
             continue;
-        // Try to normally harvest. Iterate if creep harvested iterate
         const advancedHarvestResult = creep.advancedHarvestSource(source);
         if (advancedHarvestResult == 0)
             continue;
-        // Try to harvest using the sourceLink. If creep harvested iterate
         const transferToSourceLinkResult = creep.transferToSourceLink();
         if (transferToSourceLinkResult == 0 || transferToSourceLinkResult == 'noLink')
             continue;
-        // If the source is empty repair contianer if it exists. Iterate if success
         creep.repairSourceContainer();
         if (advancedHarvestResult == 0 || advancedHarvestResult == 'noContainer')
             continue;
@@ -1031,40 +911,34 @@ function haulerManager(room, creepsOfRole) {
     }
 }
 
-function creepManager(room) {
-    class ManagerParent {
-        constructor(manager) {
-            this.manager = manager;
-            this.creepsOfRole = [];
-        }
-    }
-    const managerParents = {
-        sourceHarvester: new ManagerParent(sourceHarvesterManager),
-        hauler: new ManagerParent(haulerManager),
+function roleManager(room) {
+    const managers = {
+        sourceHarvester: sourceHarvesterManager,
+        hauler: haulerManager,
     };
-    for (let role in managerParents) {
-        let managerParent = managerParents[role];
-        // Iterate if there are no creeps of managerParent's role
+    let role;
+    for (role in managers) {
+        const manager = managers[role];
         if (room.myCreeps[role].length == 0)
             continue;
-        // Run manager
-        managerParent.manager(room, room.myCreeps[role]);
+        manager(room, room.myCreeps[role]);
     }
 }
 
+const specificRoomManagers = {
+    remote: roomManager,
+    commune: communeManager,
+};
 function roomManager() {
     for (let roomName in Game.rooms) {
         const room = Game.rooms[roomName];
-        const controller = room.controller;
+        room.controller;
         new CustomLog('Room', room.name, undefined, global.colors.lightGrey);
-        //
-        creepManager(room);
-        // Iterate if there is no controller or we don't own the controller
-        if (!controller || !controller.my)
-            continue;
-        //
-        spawnManager(room);
-        // Testing
+        roleManager(room);
+        const specificRoomManager = specificRoomManagers[room.memory.type];
+        if (specificRoomManager) {
+            specificRoomManager(room);
+        }
         let cpuUsed = Game.cpu.getUsed();
         const harvPositions = room.get('source1HarvestPositions');
         new CustomLog('HarvestPositions', harvPositions);
@@ -4230,21 +4104,11 @@ class ErrorMapper {
         }
         return this._consumer;
     }
-    /**
-     * Generates a stack trace using a source map generate original symbol names.
-     *
-     * WARNING - EXTREMELY high CPU cost for first call after reset - >30 CPU! Use sparingly!
-     * (Consecutive calls after a reset are more reasonable, ~0.1 CPU/ea)
-     *
-     * @param {Error | string} error The error or original stack trace
-     * @returns {string} The source-mapped stack trace
-     */
     static sourceMappedStackTrace(error) {
         const stack = error instanceof Error ? error.stack : error;
         if (Object.prototype.hasOwnProperty.call(this.cache, stack)) {
             return this.cache[stack];
         }
-        // eslint-disable-next-line no-useless-escape
         const re = /^\s+at\s+(.+?\s+)?\(?([0-z._\-\\\/]+):(\d+):(\d+)\)?$/gm;
         let match;
         let outStack = error.toString();
@@ -4260,22 +4124,18 @@ class ErrorMapper {
                     }
                     else {
                         if (match[1]) {
-                            // no original source file name known - use file name from given trace
                             outStack += `\n    at ${match[1]} (${pos.source}:${pos.line}:${pos.column})`;
                         }
                         else {
-                            // no original source file name known or in given trace - omit name
                             outStack += `\n    at ${pos.source}:${pos.line}:${pos.column}`;
                         }
                     }
                 }
                 else {
-                    // no known position
                     break;
                 }
             }
             else {
-                // no more parseable lines
                 break;
             }
         }
@@ -4298,14 +4158,12 @@ class ErrorMapper {
                     }
                 }
                 else {
-                    // can't handle it
                     throw e;
                 }
             }
         };
     }
 }
-// Cache previously mapped traces to improve performance
 ErrorMapper.cache = {};
 
 function logManager() {
@@ -4315,9 +4173,25 @@ function logManager() {
     console.log(global.customLogs);
 }
 
-// Global
-// Loop
+const memHack = {
+    memory: null,
+    parseTime: -1,
+    init() {
+        let cpu = Game.cpu.getUsed();
+        this.memory = Memory;
+        Game.cpu.getUsed() - cpu;
+        this.memory = RawMemory._parsed;
+    },
+    modifyMemory() {
+        delete global.Memory;
+        global.Memory = this.memory;
+        RawMemory._parsed = this.memory;
+    }
+};
+memHack.init();
+
 const loop = ErrorMapper.wrapLoop(function () {
+    memHack.modifyMemory();
     internationalManager();
     roomManager();
     logManager();

@@ -2,16 +2,17 @@ import './roomFunctions'
 
 import './taskManager'
 
-import './spawnManager'
-
 import { remoteManager } from './remoteManager'
 import { communeManager } from './communeManager'
-
-import { spawnManager } from './spawning/spawnManager'
 
 import { roleManager } from './creeps/roleManager'
 
 import { powerCreepManager } from './powerCreeps/powerCreepManager'
+
+const specificRoomManagers: {[key: string]: Function} = {
+    remote: roomManager,
+    commune: communeManager,
+}
 
 export function roomManager() {
 
@@ -29,17 +30,15 @@ export function roomManager() {
 
         roleManager(room)
 
-        // Iterate if there is no controller or we don't own the controller
+        // Check if there is a roomManager for this room's type
 
-        if (!controller || !controller.my) continue
+        const specificRoomManager = specificRoomManagers[room.memory.type]
+        if (specificRoomManager) {
 
-        //
+            // Run specific manager
 
-        communeManager(room)
-
-        //
-
-        spawnManager(room)
+            specificRoomManager(room)
+        }
 
         // Testing
 
