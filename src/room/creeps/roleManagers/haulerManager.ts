@@ -1,4 +1,4 @@
-import { RoleHauler } from '../creepClasses'
+import '../creepClasses'
 import './haulerFunctions'
 
 export function haulerManager(room: Room, creepsOfRole: RoleHauler[]) {

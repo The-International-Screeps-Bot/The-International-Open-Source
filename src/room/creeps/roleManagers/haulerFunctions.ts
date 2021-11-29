@@ -1,5 +1,4 @@
-import { creepClasses } from "../creepClasses"
-const Hauler = creepClasses.hauler
+import "../creepClasses"
 
 Hauler.prototype.findTask = function() {
 

@@ -26,9 +26,38 @@ class Hauler extends Creep {
     }
 }
 
-export { RoleSourceHarvester, RoleHauler }
+interface RoleMineralHarvester extends Creep {
+    [key: string]: any
+}
 
-export const creepClasses: {[key: string]: any} = {
-    'sourceHarvester': SourceHarvester,
-    'hauler': Hauler,
+class MineralHarvester extends Creep {
+    constructor(creep: Creep) {
+
+        super(creep.id)
+
+    }
+}
+
+interface RoleAntifaAssaulter extends Creep {
+    [key: string]: any
+}
+
+
+class AntifaAssaulter {
+    constructor() {
+
+
+    }
+}
+
+interface RoleAntifaSupporter extends Creep {
+    [key: string]: any
+}
+
+
+class AntifaSupporter {
+    constructor() {
+
+
+    }
 }
