@@ -28,8 +28,8 @@ export function spawnRequests(room: Room) {
 
     //
 
-    let spawnEnergyAvailable = room.energyAvailable
-    let spawnEnergyCapacity = room.energyCapacityAvailable
+    const spawnEnergyAvailable = room.energyAvailable
+    const spawnEnergyCapacity = room.energyCapacityAvailable
 
     // Configure options for spawning for each role
 
@@ -89,7 +89,7 @@ export function spawnRequests(room: Room) {
 
             // Loop through each part in extraParts
 
-            for (let part of this.extraParts) {
+            for (const part of this.extraParts) {
 
                 // Stop function if role's body is the size of maxParts
 
@@ -126,8 +126,7 @@ export function spawnRequests(room: Room) {
 
             // Add additions to memory
 
-            let propertyName: string
-            for (propertyName in this.memoryAdditions) {
+            for (const propertyName in this.memoryAdditions) {
 
                 memory[propertyName] = this.memoryAdditions[propertyName]
             }
@@ -181,7 +180,7 @@ export function spawnRequests(room: Room) {
                     opts.extraParts = [WORK]
                     opts.maxParts = 6
 
-                    let maxCreepsPerSource: number = 2
+                    const maxCreepsPerSource: number = 2
                     minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, maxCreepsPerSource) + Math.min(source2HarvestPositionsAmount, maxCreepsPerSource)
 
                     opts.memoryAdditions.moveType = 'pull'
@@ -237,7 +236,7 @@ export function spawnRequests(room: Room) {
 
     // Construct requiredCreeps
 
-    const requiredCreeps: {[key: string]: any} = {}
+    const requiredCreeps: {[key: string]: number} = {}
 
     // Loop through each role
 

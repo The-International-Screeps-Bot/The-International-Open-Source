@@ -1,6 +1,6 @@
 import './antifaAssaulterFunctions'
 
-export function antifaAssaulterManager(room: Room, creepsOfRole: RoleAntifaAssaulter[]) {
+export function antifaAssaulterManager(room: Room, creepsOfRole: string[]) {
 
 
 }

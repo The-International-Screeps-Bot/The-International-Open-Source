@@ -1,4 +1,5 @@
-import "../creepClasses"
+import creepClasses from "../creepClasses"
+const SourceHarvester = creepClasses.SourceHarvester
 
 SourceHarvester.prototype.recordSource = function() {
 

@@ -1,63 +1,37 @@
-/* interface SourceHarvesterMemory extends CreepMemory {
+const creepClasses: {[key: string]: any} = {
+    SourceHarvester: class extends Creep {
+        constructor(creep: Creep) {
 
-} */
+            super(creep.id)
 
-interface RoleSourceHarvester extends Creep {
-    [key: string]: any
+        }
+    },
+    Hauler: class extends Creep {
+        constructor(creep: Creep) {
+
+            super(creep.id)
+
+        }
+    },
+    MineralHarvester: class extends Creep {
+        constructor(creep: Creep) {
+
+            super(creep.id)
+
+        }
+    },
+    AntifaAssaulter: class {
+        constructor() {
+
+
+        }
+    },
+    AntifaSupporter: class {
+        constructor() {
+
+
+        }
+    },
 }
 
-class SourceHarvester extends Creep {
-    constructor(creep: Creep) {
-
-        super(creep.id)
-
-    }
-}
-
-interface RoleHauler extends Creep {
-    [key: string]: any
-}
-
-class Hauler extends Creep {
-    constructor(creep: Creep) {
-
-        super(creep.id)
-
-    }
-}
-
-interface RoleMineralHarvester extends Creep {
-    [key: string]: any
-}
-
-class MineralHarvester extends Creep {
-    constructor(creep: Creep) {
-
-        super(creep.id)
-
-    }
-}
-
-interface RoleAntifaAssaulter extends Creep {
-    [key: string]: any
-}
-
-
-class AntifaAssaulter {
-    constructor() {
-
-
-    }
-}
-
-interface RoleAntifaSupporter extends Creep {
-    [key: string]: any
-}
-
-
-class AntifaSupporter {
-    constructor() {
-
-
-    }
-}
+export default creepClasses

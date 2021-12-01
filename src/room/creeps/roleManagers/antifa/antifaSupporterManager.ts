@@ -1,6 +1,6 @@
 import './antifaSupporterFunctions'
 
-export function antifaSupporterManager(room: Room, creepsOfRole: RoleAntifaSupporter[]) {
+export function antifaSupporterManager(room: Room, creepsOfRole: string[]) {
 
 
 }

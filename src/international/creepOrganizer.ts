@@ -1,4 +1,4 @@
-import { creepClasses } from '../room/creeps/creepClasses'
+import creepClasses from '../room/creeps/creepClasses'
 
 export function creepOrganizer() {
 
@@ -18,9 +18,13 @@ export function creepOrganizer() {
             continue
         }
 
+        // Find class for creep's role
+
+        const creepsClass = creepClasses[creep.memory.role[0].toUpperCase()]
+
         // Assign creep proper class
 
-        Game.creeps[creepName] = new creepClasses[creep.memory.role](creep)
+        Game.creeps[creepName] = new creepsClass(creep)
 
         //
 

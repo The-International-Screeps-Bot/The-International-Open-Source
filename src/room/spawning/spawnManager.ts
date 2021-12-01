@@ -7,7 +7,7 @@ export function spawnManager(room: Room) {
 
     // Find spawns that aren't spawning
 
-    const inactiveSpawns = spawns.filter(function(spawn: StructureSpawn) { return !spawn.spawning })
+    const inactiveSpawns = spawns.filter(spawn => !spawn.spawning)
 
     // Stop if there are no inactiveSpawns
 
@@ -18,7 +18,7 @@ export function spawnManager(room: Room) {
     const {
         spawningOpts,
         requiredCreeps,
-     } = spawnRequests(room)
+    } = spawnRequests(room)
 
     let i = 0
 
@@ -37,10 +37,15 @@ export function spawnManager(room: Room) {
 
         spawningObject.extraOpts.dryRun = true
 
-        // See if creep can be spawned, stop if it can't
+        // See if creep can be spawned
 
         const testSpawn = spawn.advancedSpawn(spawningObject)
+
+        // If creep can't be spawned
+
         if (testSpawn != 0) {
+
+            // Log the error and stop
 
             new CustomLog('Failed to spawn', testSpawn + ', ' + spawningObject.cost)
             break
@@ -53,6 +58,10 @@ export function spawnManager(room: Room) {
         // Spawn creep
 
         spawn.advancedSpawn(spawningObject)
+
+        // Remove one from requireCreeps of role
+
+        requiredCreeps[spawningObject.extraOpts.memory.role] -= 1
 
         // Record an inactive spawn was used and iterate
 

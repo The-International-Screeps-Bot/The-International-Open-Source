@@ -3,44 +3,52 @@ Configures features needed to run the bot
 */
 export function config() {
 
-    // Configure rooms
+    // Construct global if it isn't constructed yet
 
-    for (const roomName in Game.rooms) {
+    // Check if global is constructed
 
-        const room = Game.rooms[roomName]
+    if (!global.constructed) {
 
-        // Single tick properties
+        // Record that global is now constructed
 
-        room.myCreeps = {}
-        room.creepCount = {}
-
-        //
-
-        for (const role of global.creepRoles) {
-
-            //
-
-            room.myCreeps[role] = []
-            room.creepCount[role] = 0
-        }
-
-        room.creepsOfSourceAmount = {
-            source1: 0,
-            source2: 0,
-        }
-
-        // memory properties
-
-        
-
-        // global properties
-
-        if (!global[room.name]) global[room.name] = {}
+        global.constructed = true
 
 
     }
 
-    // Assign tick-only properties
+    // Construct Memory if it isn't constructed yet
 
-    global.customLogs = ``
+    // Check if Memory is constructed
+
+    if (!Memory.constructed) {
+
+        // Record that Memory is now constructed
+
+        Memory.constructed = true
+
+        // Config settings
+
+        Memory.roomVisuals = false
+        Memory.mapVisuals = false
+        Memory.cpuLogging = false
+
+        // General
+
+        Memory.communes = []
+
+        Memory.energy = 0
+
+        Memory.boosts = {}
+
+        // CPU
+
+        Memory.cpuUsage = 0
+        Memory.cpuLimit = Game.cpu.limit
+        Memory.cpuBucket = Game.cpu.bucket
+
+        // Memory
+
+        Memory.memorUsage = Math.floor(RawMemory.get().length / 1000)
+        Memory.memoryLimit = 2097
+    }
 }

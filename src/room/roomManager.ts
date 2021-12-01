@@ -28,7 +28,7 @@ export function roomManager() {
 
         //
 
-        roleManager(room)
+        global.advancedRun(() => roleManager(room))
 
         // Check if there is a roomManager for this room's type
 

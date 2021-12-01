@@ -127,19 +127,30 @@ function dataManager() {
     Memory.data.energyHarvested = 0;
 }
 
-class SourceHarvester$1 extends Creep {
-    constructor(creep) {
-        super(creep.id);
-    }
-}
-class Hauler$1 extends Creep {
-    constructor(creep) {
-        super(creep.id);
-    }
-}
 const creepClasses = {
-    'sourceHarvester': SourceHarvester$1,
-    'hauler': Hauler$1,
+    SourceHarvester: class extends Creep {
+        constructor(creep) {
+            super(creep.id);
+        }
+    },
+    Hauler: class extends Creep {
+        constructor(creep) {
+            super(creep.id);
+        }
+    },
+    MineralHarvester: class extends Creep {
+        constructor(creep) {
+            super(creep.id);
+        }
+    },
+    AntifaAssaulter: class {
+        constructor() {
+        }
+    },
+    AntifaSupporter: class {
+        constructor() {
+        }
+    },
 };
 
 function creepOrganizer() {
@@ -149,7 +160,8 @@ function creepOrganizer() {
             delete Memory.creeps[creepName];
             continue;
         }
-        Game.creeps[creepName] = new creepClasses[creep.memory.role](creep);
+        const creepsClass = creepClasses[creep.memory.role[0].toUpperCase()];
+        Game.creeps[creepName] = new creepsClass(creep);
         const room = creep.room;
         room.myCreeps[creep.memory.role].push(creepName);
         creep.isDying();
@@ -831,7 +843,7 @@ Creep.prototype.travel = function (opts) {
 Creep.prototype.advancedMove = function (opts) {
 };
 
-const SourceHarvester = creepClasses.sourceHarvester;
+const SourceHarvester = creepClasses.SourceHarvester;
 SourceHarvester.prototype.recordSource = function () {
     const creep = this;
     const room = creep.room;
@@ -901,12 +913,13 @@ function sourceHarvesterManager(room, creepsOfRole) {
     }
 }
 
-const Hauler = creepClasses.hauler;
+const Hauler = creepClasses.Hauler;
 Hauler.prototype.findTask = function () {
 };
 
 function haulerManager(room, creepsOfRole) {
-    for (const creep of creepsOfRole) {
+    for (const creepName of creepsOfRole) {
+        const creep = Game.creeps[creepName];
         creep.say('hey');
     }
 }

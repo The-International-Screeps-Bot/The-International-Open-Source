@@ -31,6 +31,58 @@ declare global {
     interface Memory {
         [key: string]: any
 
+        /**
+         * Determines if roomVisuals will be generated
+         */
+        roomVisuals: boolean
+        /**
+         * Determines if mapVisuals will be generated
+         */
+        mapVisuals: boolean
+        /**
+         * Determines if cpu usage for modules will be logged
+         */
+        cpuLogging: boolean
+
+        /**
+         * An array of roomNames that have controllers we own
+         */
+        communes: string[]
+
+        /**
+         * The amount of energy in storages and terminals in owned rooms
+         */
+        energy: number
+
+        /**
+         * An object of boosts representing the amount of each boost in storages and terminals in owned rooms
+         */
+        boosts: {[key: string]: MineralBoostConstant}
+
+        /**
+         * The total amount of CPU used
+         */
+        cpuUsage: number
+
+        /**
+         * The amount of CPU generated per tick
+         */
+        cpuLimit: number
+
+        /**
+         * The amount of CPU left in the bucket
+         */
+        cpuBucket: number
+
+        /**
+         * The amount of memory used by the bot
+         */
+         memorUsage: number
+
+        /**
+         * The maximum memory the bot can use
+         */
+        memoryLimit: number
     }
 
     interface RawMemory {

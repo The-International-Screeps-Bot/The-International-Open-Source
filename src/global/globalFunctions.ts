@@ -36,10 +36,44 @@ global.getPositionsInsideRect = function(rect: {[key: string]: any}) {
 }
 
 /**
- * 
- * @param pos1 
- * @param pos2 
- * @returns 
+ * Runs a function and CustomLogs the cpu used if cpuLogging is enabled
+ * @param functionName The name of the function to run
+ */
+global.advancedRun = function(functionName: Function) {
+
+    // If logging is disabled
+
+    if (!global.cpuLogging) {
+
+        // Run function and stop
+
+        functionName()
+        return
+    }
+
+    // Record cpu usage
+
+    let CPU = Game.cpu.getUsed()
+
+    // Run function
+
+    functionName()
+
+    // Use past CPU to find how much CPU the function used
+
+    CPU = Game.cpu.getUsed() - CPU
+
+    // Log CPU and stop
+
+    new CustomLog(functionName + ' CPU', CPU)
+    return
+}
+
+/**
+ *
+ * @param pos1
+ * @param pos2
+ * @returns
  */
 global.arePositionsAlike = function(pos1: {[key: string]: number}, pos2: {[key: string]: number}) {
 

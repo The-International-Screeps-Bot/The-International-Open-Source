@@ -20,3 +20,10 @@ class Squad {
         }
     }
 }
+
+Squad.prototype.enterAttackMode = function() {
+
+    const squad: Squad = this
+
+
+}

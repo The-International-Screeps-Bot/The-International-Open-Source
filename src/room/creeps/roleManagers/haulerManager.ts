@@ -1,9 +1,10 @@
-import '../creepClasses'
 import './haulerFunctions'
 
-export function haulerManager(room: Room, creepsOfRole: RoleHauler[]) {
+export function haulerManager(room: Room, creepsOfRole: string[]) {
 
-    for (const creep of creepsOfRole) {
+    for (const creepName of creepsOfRole) {
+
+        const creep: Creep = Game.creeps[creepName]
 
         creep.say('hey')
     }

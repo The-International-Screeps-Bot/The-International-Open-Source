@@ -1,5 +1,3 @@
-import './creepClasses'
-
 import './creepFunctions'
 
 import { sourceHarvesterManager } from './roleManagers/sourceHarvesterManager'
