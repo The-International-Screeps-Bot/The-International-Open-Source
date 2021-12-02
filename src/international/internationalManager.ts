@@ -1,13 +1,13 @@
 import { config } from '../international/config'
-import { dataManager } from 'data/dataManager'
+import { tickConfig } from './tickConfig'
 
 import { creepOrganizer } from '../international/creepOrganizer'
 
 export function internationalManager() {
 
     config()
-
-    dataManager()
+    tickConfig()
 
     creepOrganizer()
+
 }

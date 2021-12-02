@@ -20,6 +20,17 @@ global.getPositionsInsideRect = function (rect) {
     }
     return positions;
 };
+global.advancedRun = function (functionName) {
+    if (!global.cpuLogging) {
+        functionName();
+        return;
+    }
+    let CPU = Game.cpu.getUsed();
+    functionName();
+    CPU = Game.cpu.getUsed() - CPU;
+    new CustomLog$1(functionName + ' CPU', CPU);
+    return;
+};
 global.arePositionsAlike = function (pos1, pos2) {
     if (pos1.x == pos2.x && pos1.y == pos2.y)
         return true;
@@ -101,22 +112,84 @@ if (!global.active) {
 }
 
 function config() {
-    for (const roomName in Game.rooms) {
-        const room = Game.rooms[roomName];
-        room.myCreeps = {};
-        room.creepCount = {};
-        for (const role of global.creepRoles) {
-            room.myCreeps[role] = [];
-            room.creepCount[role] = 0;
-        }
-        room.creepsOfSourceAmount = {
-            source1: 0,
-            source2: 0,
+    if (!global.constructed) {
+        global.constructed = true;
+        global.me = 'MarvinTMB';
+        global.allyList = ['hi'];
+        global.tradeBlacklist = ['hi'];
+        global.colors = {
+            white: '#ffffff',
+            lightGrey: '#eaeaea',
+            lightBlue: '#0f66fc',
+            darkBlue: '#02007d',
+            black: '#000000',
+            yellow: '#d8f100',
+            red: '#d10000',
+            green: '#00d137',
         };
-        if (!global[room.name])
-            global[room.name] = {};
+        global.creepRoles = [
+            'sourceHarvester',
+            'hauler'
+        ];
+        global.roomDimensions = 50;
+        global.allStructureTypes = [
+            STRUCTURE_SPAWN,
+            STRUCTURE_EXTENSION,
+            STRUCTURE_ROAD,
+            STRUCTURE_WALL,
+            STRUCTURE_RAMPART,
+            STRUCTURE_KEEPER_LAIR,
+            STRUCTURE_PORTAL,
+            STRUCTURE_CONTROLLER,
+            STRUCTURE_LINK,
+            STRUCTURE_STORAGE,
+            STRUCTURE_TOWER,
+            STRUCTURE_OBSERVER,
+            STRUCTURE_POWER_BANK,
+            STRUCTURE_POWER_SPAWN,
+            STRUCTURE_EXTRACTOR,
+            STRUCTURE_LAB,
+            STRUCTURE_TERMINAL,
+            STRUCTURE_CONTAINER,
+            STRUCTURE_NUKER,
+            STRUCTURE_FACTORY,
+            STRUCTURE_INVADER_CORE,
+        ];
+        global.impassibleStructures = [
+            STRUCTURE_SPAWN,
+            STRUCTURE_EXTENSION,
+            STRUCTURE_WALL,
+            STRUCTURE_KEEPER_LAIR,
+            STRUCTURE_CONTROLLER,
+            STRUCTURE_LINK,
+            STRUCTURE_STORAGE,
+            STRUCTURE_TOWER,
+            STRUCTURE_OBSERVER,
+            STRUCTURE_POWER_BANK,
+            STRUCTURE_POWER_SPAWN,
+            STRUCTURE_EXTRACTOR,
+            STRUCTURE_LAB,
+            STRUCTURE_TERMINAL,
+            STRUCTURE_NUKER,
+            STRUCTURE_FACTORY,
+            STRUCTURE_INVADER_CORE,
+        ];
+        global.tradeBlacklist = [];
     }
-    global.customLogs = ``;
+    if (!Memory.constructed) {
+        Memory.constructed = true;
+        Memory.roomVisuals = false;
+        Memory.mapVisuals = false;
+        Memory.cpuLogging = false;
+        Memory.communes = [];
+        Memory.energy = 0;
+        Memory.boosts = {};
+        Memory.cpuUsage = 0;
+        Memory.cpuLimit = Game.cpu.limit;
+        Memory.cpuBucket = Game.cpu.bucket;
+        Memory.memorUsage = Math.floor(RawMemory.get().length / 1000);
+        Memory.memoryLimit = 2097;
+    }
 }
 
 function dataManager() {
@@ -494,8 +567,8 @@ function spawnRequests(room) {
         const filteredSpawnStructures = unfilteredSpawnStructures.sort((a, b) => a.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5) - b.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5));
         return filteredSpawnStructures;
     }
-    let spawnEnergyAvailable = room.energyAvailable;
-    let spawnEnergyCapacity = room.energyCapacityAvailable;
+    const spawnEnergyAvailable = room.energyAvailable;
+    const spawnEnergyCapacity = room.energyCapacityAvailable;
     class RoleSpawningOpts {
         constructor() {
             this.memoryAdditions = {};
@@ -521,7 +594,7 @@ function spawnRequests(room) {
                 this.tier += 1;
             }
             while (this.body.length != this.maxParts && this.cost < maxCost) {
-                for (let part of this.extraParts) {
+                for (const part of this.extraParts) {
                     if (this.body.length == this.maxParts)
                         return;
                     this.body.push(part);
@@ -538,8 +611,7 @@ function spawnRequests(room) {
                 role: this.role,
                 roomFrom: room.name,
             };
-            let propertyName;
-            for (propertyName in this.memoryAdditions) {
+            for (const propertyName in this.memoryAdditions) {
                 memory[propertyName] = this.memoryAdditions[propertyName];
             }
             this.extraOpts = {
@@ -570,7 +642,7 @@ function spawnRequests(room) {
                     opts.defaultParts = [];
                     opts.extraParts = [WORK];
                     opts.maxParts = 6;
-                    let maxCreepsPerSource = 2;
+                    const maxCreepsPerSource = 2;
                     minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, maxCreepsPerSource) + Math.min(source2HarvestPositionsAmount, maxCreepsPerSource);
                     opts.memoryAdditions.moveType = 'pull';
                     return;
@@ -612,7 +684,7 @@ function spawnRequests(room) {
 
 function spawnManager(room) {
     const spawns = room.get('spawn');
-    const inactiveSpawns = spawns.filter(function (spawn) { return !spawn.spawning; });
+    const inactiveSpawns = spawns.filter(spawn => !spawn.spawning);
     if (inactiveSpawns.length == 0)
         return;
     const { spawningOpts, requiredCreeps, } = spawnRequests(room);
@@ -631,6 +703,7 @@ function spawnManager(room) {
         }
         spawningObject.extraOpts.dryRun = false;
         spawn.advancedSpawn(spawningObject);
+        requiredCreeps[spawningObject.extraOpts.memory.role] -= 1;
         i++;
         continue;
     }
@@ -947,7 +1020,7 @@ function roomManager() {
         const room = Game.rooms[roomName];
         room.controller;
         new CustomLog('Room', room.name, undefined, global.colors.lightGrey);
-        roleManager(room);
+        global.advancedRun(() => roleManager(room));
         const specificRoomManager = specificRoomManagers[room.memory.type];
         if (specificRoomManager) {
             specificRoomManager(room);

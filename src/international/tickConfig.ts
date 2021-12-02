@@ -1,6 +1,6 @@
-import common from "mocha/lib/interfaces/common"
+export function tickConfig() {
 
-function tickConfig() {
+    //
 
     // Configure rooms
 
@@ -9,6 +9,22 @@ function tickConfig() {
         const room = Game.rooms[roomName]
 
         const controller = room.controller
+
+        // Add roomName to global if it isn't already there
+
+        if (!global[room.name]) global[room.name] = {}
+
+        // Iterate if there isn't a controller
+
+        if (!controller) continue
+
+        // Iterate if the controller is not mine
+
+        if (!controller.my) continue
+
+        // Add roomName to commune list
+
+        Memory.communes.push(roomName)
 
         // Single tick properties
 
@@ -30,16 +46,8 @@ function tickConfig() {
             source2: 0,
         }
 
-        // Add roomName to global if it isn't already there
+        //
 
-        if (!global[room.name]) global[room.name] = {}
-
-        // Iterate if there isn't a controller
-
-        if (!controller) continue
-
-        // Add roomName to commune list
-
-        Memory.communes.push(roomName)
+        if (!global[room.name].tasks) global[room.name].tasks = {}
     }
 }

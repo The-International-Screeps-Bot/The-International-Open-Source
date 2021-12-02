@@ -2,6 +2,10 @@ import creepClasses from '../room/creeps/creepClasses'
 
 export function creepOrganizer() {
 
+    // Construct counter for creeps
+
+    let totalCreepCount: number = 0
+
     // Loop through all of my creeps
 
     for (const creepName in Memory.creeps) {
@@ -45,9 +49,13 @@ export function creepOrganizer() {
         // Increase creepCount for this role
 
         room.creepCount[creep.memory.role] += 1
+
+        // Increase total creep counter
+
+        totalCreepCount += 1
     }
 
     // Record number of creeps
 
-    Memory.data.creeps = Object.keys(Memory.creeps).length
+    Memory.creepCount = totalCreepCount
 }

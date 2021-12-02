@@ -1,6 +1,6 @@
 export function taskManager(room: Room) {
 
-    interface Task {
+    interface RoomTask {
         structure: object
         resourceType: string
         taskType: string
@@ -13,14 +13,14 @@ export function taskManager(room: Room) {
      * @param taskType type of task. Either withdraw or transfer
      * @param amount number of resources to act on
      */
-    class Task {
-        constructor(structure: object, resourceType: string, taskType: string, amount: number) {
+    class RoomTask {
+        constructor(taskType: string, structure: object, resourceType: string, amount: number) {
 
 
         }
     }
 
-    const task1 = new Task(room.get('storage'), RESOURCE_ENERGY, 'withdraw', 500)
+    const task1 = new RoomTask('withdraw', room.get('storage'), RESOURCE_ENERGY, 500)
 
     console.log(task1)
 }

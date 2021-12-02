@@ -126,7 +126,7 @@ Creep.prototype.advancedHarvestSource = function(source: Source) {
     // Find amount of energy harvested and record it in data
 
     const energyHarvested = Math.min(creep.partsOfType(WORK) * 2, source.energy)
-    Memory.data.energyHarvested += energyHarvested
+    Memory.energyHarvested += energyHarvested
 
     creep.say('⛏️' + energyHarvested)
 
@@ -427,7 +427,7 @@ interface moveOpts {
 
 }
 
-Creep.prototype.advancedMove = function(opts: moveOpts) { 
+Creep.prototype.advancedMove = function(opts: moveOpts) {
 
     const creep: Creep = this
     const room: Room = this

@@ -1,6 +1,6 @@
 import './roomFunctions'
 
-import './taskManager'
+import './roomTaskManager'
 
 import { remoteManager } from './remoteManager'
 import { communeManager } from './communeManager'

@@ -32,6 +32,11 @@ declare global {
         [key: string]: any
 
         /**
+         * Whether Memory is constructed or not
+         */
+        constructed: true | undefined
+
+        /**
          * Determines if roomVisuals will be generated
          */
         roomVisuals: boolean
@@ -83,6 +88,16 @@ declare global {
          * The maximum memory the bot can use
          */
         memoryLimit: number
+
+        /**
+         * The total number of creeps the bot owns
+         */
+        creepCount: number
+
+        /**
+         * The total amount of energy harvested by the bot per tick
+         */
+        energyHarvested: number
     }
 
     interface RawMemory {
@@ -94,10 +109,26 @@ declare global {
 
     interface Room {
         [key: string]: any
+
+        /**
+         * The amount of creeps with a task of harvesting sources in the room
+         */
+        creepsOfSourceAmount: {[key: string]: number}
+
+        /**
+         * An object with keys of roles with properties of arrays of creep names belonging to the role from this room
+         */
+        myCreeps: {[key: string]: string[]}
+
+        /**
+         * An object with keys of roles and properties of the number of creeps with the role from this room
+         */
+        creepCount: {[key: string]: number}
     }
 
     interface RoomMemory {
         [key: string]: any
+
         anchorPoint: {[key: string]: any}
     }
 
@@ -105,6 +136,7 @@ declare global {
 
     interface Creep {
         [key: string]: any
+
 
     }
 
@@ -137,9 +169,50 @@ declare global {
         interface Global {
             [key: string]: any
 
+            /**
+             * Whether global is constructed or not
+             */
+            constructed: true | undefined
+
+            /**
+             * The username of the account running the bot
+             */
             me: string
+
+            /**
+             * An array of usernames for which to treat as allies
+             */
             allyList: string[]
+
+            /**
+             * An array of names for each role creeps can have
+             */
             creepRoles: string[]
+
+            /**
+             * An array of usernames for which to not trade with
+             */
+            tradeBlacklist: string[]
+
+            /**
+             * An object with labels of colour names and properties of hex codes
+             */
+            colors: {[key: string]: string}
+
+            /**
+             *
+             */
+            roomDimensions: number
+
+            /**
+             * An array of all structureTypes in the game
+             */
+            allStructureTypes: StructureConstant[]
+
+             /**
+             * An array of structureTypes that can't be walked on by creeps
+             */
+            impassibleStructures: StructureConstant[]
         }
     }
 }
