@@ -26,6 +26,18 @@ import { memHack } from 'other/memHack'
 
 declare global {
 
+    interface Pos {
+        x: number,
+        y: number
+    }
+
+    interface Rect {
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number
+    }
+
     // Memory
 
     interface Memory {
@@ -213,6 +225,37 @@ declare global {
              * An array of structureTypes that can't be walked on by creeps
              */
             impassibleStructures: StructureConstant[]
+
+            // Functions
+
+            /**
+             * Finds the average trading price of a resourceType over a set amount of days
+             */
+            findAvgPrice(resourceType: ResourceConstant, days: number): number
+
+            /**
+             * Uses a provided ID to find an object associated with it
+             */
+            findObjectWithId(ID: string): any
+
+            /**
+             * Takes a rectange and returns the positions inside of it in an array
+             */
+            findPositionsInsideRect(rect: Rect): Pos[]
+
+            /**
+             * Checks if two positions are alike
+             */
+            arePositionsAlike(pos1: Pos, pos2: Pos): boolean
+
+            /**
+             * Outputs HTML and CSS styled console logs
+             * @param title Title of the log
+             * @param message Main content of the log
+             * @param color Colour of the text. Default is black
+             * @param bgColor Colour of the background. Default is white
+             */
+            customLog(title: string, message: any, color: string, bgColor: string): void
         }
     }
 }

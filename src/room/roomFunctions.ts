@@ -263,7 +263,7 @@ Room.prototype.get = function(roomObjectName: string) {
         // Find positions adjacent to source
 
         const rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 }
-        const adjacentPositions: RoomPosition[] = global.getPositionsInsideRect(rect)
+        const adjacentPositions: RoomPosition[] = global.findPositionsInsideRect(rect)
 
         const harvestPositions: HarvestPosObj[] = []
 
@@ -583,7 +583,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): PathObject {
                             x2: opts.creep.pos.x,
                             y2: opts.creep.pos.y
                         }
-                        const positions: RoomPosition[] = global.getPositionsInsideRect(rect)
+                        const positions: RoomPosition[] = global.findPositionsInsideRect(rect)
 
                         // Loop through positions
 
