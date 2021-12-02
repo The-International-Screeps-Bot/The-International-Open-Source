@@ -255,7 +255,7 @@ declare global {
              * @param color Colour of the text. Default is black
              * @param bgColor Colour of the background. Default is white
              */
-            customLog(title: string, message: any, color: string, bgColor: string): void
+            customLog(title: string, message: any, color?: string, bgColor?: string): void
         }
     }
 }

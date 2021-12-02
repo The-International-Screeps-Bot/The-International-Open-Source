@@ -24,7 +24,7 @@ export function roomManager() {
 
         const controller = room.controller
 
-        new CustomLog('Room', room.name, undefined, global.colors.lightGrey)
+        global.customLog('Room', room.name, undefined, global.colors.lightGrey)
 
         //
 
@@ -45,10 +45,10 @@ export function roomManager() {
         let cpuUsed = Game.cpu.getUsed()
 
         const harvPositions = room.get('source1HarvestPositions')
-        new CustomLog('HarvestPositions', harvPositions)
+        global.customLog('HarvestPositions', harvPositions)
 
         cpuUsed = Game.cpu.getUsed() - cpuUsed
-        new CustomLog('HarvestPositions CPU', cpuUsed.toFixed(2))
+        global.customLog('HarvestPositions CPU', cpuUsed.toFixed(2))
 
         i++
     }

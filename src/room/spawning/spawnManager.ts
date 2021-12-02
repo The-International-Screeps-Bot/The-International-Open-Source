@@ -47,7 +47,7 @@ export function spawnManager(room: Room) {
 
             // Log the error and stop
 
-            new CustomLog('Failed to spawn', testSpawn + ', ' + spawningObject.cost)
+            global.customLog('Failed to spawn', testSpawn + ', ' + spawningObject.cost)
             break
         }
 

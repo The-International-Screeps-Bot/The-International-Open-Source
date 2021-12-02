@@ -1,3 +1,6 @@
+/**
+ * Configures tick important or tick-only pre-roomManager settings required to run the bot
+ */
 export function tickConfig() {
 
     //

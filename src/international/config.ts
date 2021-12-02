@@ -1,6 +1,6 @@
 /**
-Configures features needed to run the bot
-*/
+ * Configures features like Memory, global and object prototypes required to run the bot
+ */
 export function config() {
 
     // Construct global if it isn't constructed yet

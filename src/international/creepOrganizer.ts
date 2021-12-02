@@ -1,5 +1,8 @@
 import creepClasses from '../room/creeps/creepClasses'
 
+/**
+ * Organizes creeps into properties for their roomFrom, and tracks total creep count
+ */
 export function creepOrganizer() {
 
     // Construct counter for creeps
@@ -32,7 +35,7 @@ export function creepOrganizer() {
 
         //
 
-        const room: Room = creep.room
+        const room: Room = creep.roomFrom
 
         // Organize creep by room and role
 
