@@ -2,17 +2,15 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-global.avgPrice = function () {
-};
-global.createClass = function (className) {
-    return class className {
-    };
+global.findAvgPrice = function (resourceType, days) {
+    let avgPrice = 0;
+    return avgPrice;
 };
 global.findObjectWithId = function (id) {
     return Game.getObjectById(id) || undefined;
 };
-global.getPositionsInsideRect = function (rect) {
-    let positions = [];
+global.findPositionsInsideRect = function (rect) {
+    const positions = [];
     for (let x = rect.x1; x <= rect.x2; x++) {
         for (let y = rect.y1; y <= rect.y2; y++) {
             positions.push({ x: x, y: y });
@@ -20,103 +18,64 @@ global.getPositionsInsideRect = function (rect) {
     }
     return positions;
 };
-global.advancedRun = function (functionName) {
-    if (!global.cpuLogging) {
-        functionName();
-        return;
-    }
-    let CPU = Game.cpu.getUsed();
-    functionName();
-    CPU = Game.cpu.getUsed() - CPU;
-    new CustomLog$1(functionName + ' CPU', CPU);
-    return;
-};
 global.arePositionsAlike = function (pos1, pos2) {
     if (pos1.x == pos2.x && pos1.y == pos2.y)
         return true;
     return false;
 };
-class CustomLog$1 {
-    constructor(title, message, color, bgColor) {
-        if (!color)
-            color = global.colors.black;
-        if (!bgColor)
-            bgColor = global.colors.white;
-        this.log = `<div style='text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div><div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`;
-        global.customLogs += this.log;
-    }
-}
-global.CustomLog = CustomLog$1;
-
-if (!global.active) {
-    global.active = true;
-    global.me = 'MarvinTMB';
-    global.allyList = ['hi'];
-    global.colors = {
-        white: '#ffffff',
-        lightGrey: '#eaeaea',
-        lightBlue: '#0f66fc',
-        darkBlue: '#02007d',
-        black: '#000000',
-        yellow: '#d8f100',
-        red: '#d10000',
-        green: '#00d137',
-    };
-    global.creepRoles = [
-        'sourceHarvester',
-        'hauler'
-    ];
-    global.roomDimensions = 50;
-    global.allStructureTypes = [
-        STRUCTURE_SPAWN,
-        STRUCTURE_EXTENSION,
-        STRUCTURE_ROAD,
-        STRUCTURE_WALL,
-        STRUCTURE_RAMPART,
-        STRUCTURE_KEEPER_LAIR,
-        STRUCTURE_PORTAL,
-        STRUCTURE_CONTROLLER,
-        STRUCTURE_LINK,
-        STRUCTURE_STORAGE,
-        STRUCTURE_TOWER,
-        STRUCTURE_OBSERVER,
-        STRUCTURE_POWER_BANK,
-        STRUCTURE_POWER_SPAWN,
-        STRUCTURE_EXTRACTOR,
-        STRUCTURE_LAB,
-        STRUCTURE_TERMINAL,
-        STRUCTURE_CONTAINER,
-        STRUCTURE_NUKER,
-        STRUCTURE_FACTORY,
-        STRUCTURE_INVADER_CORE,
-    ];
-    global.impassibleStructures = [
-        STRUCTURE_SPAWN,
-        STRUCTURE_EXTENSION,
-        STRUCTURE_WALL,
-        STRUCTURE_KEEPER_LAIR,
-        STRUCTURE_CONTROLLER,
-        STRUCTURE_LINK,
-        STRUCTURE_STORAGE,
-        STRUCTURE_TOWER,
-        STRUCTURE_OBSERVER,
-        STRUCTURE_POWER_BANK,
-        STRUCTURE_POWER_SPAWN,
-        STRUCTURE_EXTRACTOR,
-        STRUCTURE_LAB,
-        STRUCTURE_TERMINAL,
-        STRUCTURE_NUKER,
-        STRUCTURE_FACTORY,
-        STRUCTURE_INVADER_CORE,
-    ];
-}
+global.customLog = function (title, message, color, bgColor) {
+    if (!color)
+        color = global.colors.black;
+    if (!bgColor)
+        bgColor = global.colors.white;
+    let log = ``;
+    log += `<div style='text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div>`;
+    log += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`;
+    global.logs += log;
+};
 
 function config() {
     if (!global.constructed) {
         global.constructed = true;
         global.me = 'MarvinTMB';
-        global.allyList = ['hi'];
+        global.allyList = [
+            "Q13214",
+            "Orlet",
+            "BarryOSeven",
+            "slowmotionghost",
+        ];
         global.tradeBlacklist = ['hi'];
+        global.tasks = {};
+        global.creepRoles = [
+            'sourceHarvester',
+            'hauler'
+        ];
+        global.internationalTaskTypes = [
+            'recieve',
+            'attack',
+            'claim',
+            'establish',
+        ];
+        global.roomTaskTypes = [
+            'withdraw',
+            'transfer',
+            'build',
+            'pull',
+            'harvestSource',
+            'harvestMineral',
+            'linkTransfer',
+        ];
+        global.communeSignMessages = [
+            'A commune of the proletariat. Bourgeoisie not welcome here!'
+        ];
+        global.nonCommuneSignMessages = [
+            'The top 1% have more money than the poorest 4.5 billion',
+            'McDonalds workers in the US make $10/hour. In Denmark, as a result of unions, they make $22/hour',
+            'We have democracy in our policial system, why do we not have it in our companies?',
+            'Workers of the world, unite!',
+            'Real democracy requires democracy in the workplace - Richard Wolff',
+            'Adults spend a combined 13 years of their life under a dictatorship: the workplace',
+        ];
         global.colors = {
             white: '#ffffff',
             lightGrey: '#eaeaea',
@@ -127,10 +86,6 @@ function config() {
             red: '#d10000',
             green: '#00d137',
         };
-        global.creepRoles = [
-            'sourceHarvester',
-            'hauler'
-        ];
         global.roomDimensions = 50;
         global.allStructureTypes = [
             STRUCTURE_SPAWN,
@@ -174,10 +129,15 @@ function config() {
             STRUCTURE_FACTORY,
             STRUCTURE_INVADER_CORE,
         ];
-        global.tradeBlacklist = [];
+        global.log = ``;
     }
     if (!Memory.constructed) {
         Memory.constructed = true;
+        Memory.rooms = {};
+        Memory.creeps = {};
+        Memory.powerCreeps = {};
+        Memory.flags = {};
+        Memory.spawns = {};
         Memory.roomVisuals = false;
         Memory.mapVisuals = false;
         Memory.cpuLogging = false;
@@ -192,12 +152,30 @@ function config() {
     }
 }
 
-function dataManager() {
-    if (!Memory.data) {
-        Memory.data = {};
+function tickConfig() {
+    for (const roomName in Game.rooms) {
+        const room = Game.rooms[roomName];
+        const controller = room.controller;
+        if (!global[room.name])
+            global[room.name] = {};
+        if (!controller)
+            continue;
+        if (!controller.my)
+            continue;
+        Memory.communes.push(roomName);
+        room.myCreeps = {};
+        room.creepCount = {};
+        for (const role of global.creepRoles) {
+            room.myCreeps[role] = [];
+            room.creepCount[role] = 0;
+        }
+        room.creepsOfSourceAmount = {
+            source1: 0,
+            source2: 0,
+        };
+        if (!global[room.name].tasks)
+            global[room.name].tasks = {};
     }
-    Memory.data.creeps = 0;
-    Memory.data.energyHarvested = 0;
 }
 
 const creepClasses = {
@@ -227,6 +205,7 @@ const creepClasses = {
 };
 
 function creepOrganizer() {
+    let totalCreepCount = 0;
     for (const creepName in Memory.creeps) {
         const creep = Game.creeps[creepName];
         if (!creep) {
@@ -235,19 +214,21 @@ function creepOrganizer() {
         }
         const creepsClass = creepClasses[creep.memory.role[0].toUpperCase()];
         Game.creeps[creepName] = new creepsClass(creep);
-        const room = creep.room;
+        const room = creep.roomFrom;
         room.myCreeps[creep.memory.role].push(creepName);
         creep.isDying();
         if (creep.memory.dying)
             continue;
         room.creepCount[creep.memory.role] += 1;
+        totalCreepCount += 1;
     }
-    Memory.data.creeps = Object.keys(Memory.creeps).length;
+    Memory.creepCount = totalCreepCount;
 }
 
 function internationalManager() {
     config();
-    dataManager();
+    tickConfig();
+    advancedGeneratePixel();
     creepOrganizer();
 }
 
@@ -372,7 +353,7 @@ Room.prototype.get = function (roomObjectName) {
         if (!source)
             return [];
         const rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 };
-        const adjacentPositions = global.getPositionsInsideRect(rect);
+        const adjacentPositions = global.findPositionsInsideRect(rect);
         const harvestPositions = [];
         const terrain = Game.map.getRoomTerrain(room.name);
         for (const pos of adjacentPositions) {
@@ -416,7 +397,7 @@ Room.prototype.get = function (roomObjectName) {
     }
     const roomObject = roomObjects[roomObjectName];
     if (!roomObject) {
-        new CustomLog('Tried to get non-existent property', roomObjectName, global.colors.white, global.colors.red);
+        global.customLog('Tried to get non-existent property', roomObjectName, global.colors.white, global.colors.red);
         return undefined;
     }
     const value = roomObject.getValue();
@@ -507,7 +488,7 @@ Room.prototype.advancedFindPath = function (opts) {
                             x2: opts.creep.pos.x,
                             y2: opts.creep.pos.y
                         };
-                        const positions = global.getPositionsInsideRect(rect);
+                        const positions = global.findPositionsInsideRect(rect);
                         for (const pos of positions) {
                             cm.set(pos.x, pos.y, 255);
                         }
@@ -698,7 +679,7 @@ function spawnManager(room) {
         spawningObject.extraOpts.dryRun = true;
         const testSpawn = spawn.advancedSpawn(spawningObject);
         if (testSpawn != 0) {
-            new CustomLog('Failed to spawn', testSpawn + ', ' + spawningObject.cost);
+            global.customLog('Failed to spawn', testSpawn + ', ' + spawningObject.cost);
             break;
         }
         spawningObject.extraOpts.dryRun = false;
@@ -777,7 +758,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
     if (harvestResult != 0)
         return harvestResult;
     const energyHarvested = Math.min(creep.partsOfType(WORK) * 2, source.energy);
-    Memory.data.energyHarvested += energyHarvested;
+    Memory.energyHarvested += energyHarvested;
     creep.say('⛏️' + energyHarvested);
     return 0;
 };
@@ -1019,17 +1000,17 @@ function roomManager() {
     for (let roomName in Game.rooms) {
         const room = Game.rooms[roomName];
         room.controller;
-        new CustomLog('Room', room.name, undefined, global.colors.lightGrey);
-        global.advancedRun(() => roleManager(room));
+        global.customLog('Room', room.name, undefined, global.colors.lightGrey);
+        roleManager(room);
         const specificRoomManager = specificRoomManagers[room.memory.type];
         if (specificRoomManager) {
             specificRoomManager(room);
         }
         let cpuUsed = Game.cpu.getUsed();
         const harvPositions = room.get('source1HarvestPositions');
-        new CustomLog('HarvestPositions', harvPositions);
+        global.customLog('HarvestPositions', harvPositions);
         cpuUsed = Game.cpu.getUsed() - cpuUsed;
-        new CustomLog('HarvestPositions CPU', cpuUsed.toFixed(2));
+        global.customLog('HarvestPositions CPU', cpuUsed.toFixed(2));
     }
 }
 
@@ -4253,10 +4234,10 @@ class ErrorMapper {
 ErrorMapper.cache = {};
 
 function logManager() {
-    new CustomLog('Total CPU', Game.cpu.getUsed().toFixed(2), global.colors.white, global.colors.lightBlue);
+    global.customLog('Total CPU', Game.cpu.getUsed().toFixed(2), global.colors.white, global.colors.lightBlue);
     for (let i = 0; i < 99; i++)
         console.log();
-    console.log(global.customLogs);
+    console.log(global.logs);
 }
 
 const memHack = {

@@ -5,9 +5,9 @@ import './roomTaskManager'
 import { remoteManager } from './remoteManager'
 import { communeManager } from './communeManager'
 
-import { roleManager } from './creeps/roleManager'
+import { roleManager } from './creeps/creepRoleManager'
 
-import { powerCreepManager } from './powerCreeps/powerCreepManager'
+import { powerCreepManager } from './powerCreeps/powerCreepRoleManager'
 
 const specificRoomManagers: {[key: string]: Function} = {
     remote: roomManager,
@@ -28,7 +28,7 @@ export function roomManager() {
 
         //
 
-        global.advancedRun(() => roleManager(room))
+        roleManager(room)
 
         // Check if there is a roomManager for this room's type
 

@@ -3,7 +3,6 @@
 // Global
 
 import './global/globalFunctions'
-import './global/globalVars'
 
 // International
 
@@ -105,6 +104,11 @@ declare global {
          * The total number of creeps the bot owns
          */
         creepCount: number
+
+        /**
+         * The total number of powerCreeps the bot owns
+         */
+        powerCreepCount: number
 
         /**
          * The total amount of energy harvested by the bot per tick
