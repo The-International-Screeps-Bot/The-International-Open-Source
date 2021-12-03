@@ -3,7 +3,30 @@
  */
 export function tickConfig() {
 
-    //
+    // Memory
+
+    // General
+
+    Memory.communes = []
+
+    Memory.energy = 0
+
+    Memory.boosts = {}
+
+    Memory.creepCount = 0
+    Memory.powerCreepCount = 0
+
+    // CPU
+
+    Memory.cpuUsage = 0
+    Memory.cpuLimit = Game.cpu.limit
+    Memory.cpuBucket = Game.cpu.bucket
+
+    // Memory memory
+
+    Memory.memorUsage = Math.floor(RawMemory.get().length / 1000)
+
+    // Other
 
     // Configure rooms
 
@@ -16,18 +39,6 @@ export function tickConfig() {
         // Add roomName to global if it isn't already there
 
         if (!global[room.name]) global[room.name] = {}
-
-        // Iterate if there isn't a controller
-
-        if (!controller) continue
-
-        // Iterate if the controller is not mine
-
-        if (!controller.my) continue
-
-        // Add roomName to commune list
-
-        Memory.communes.push(roomName)
 
         // Single tick properties
 
@@ -49,8 +60,25 @@ export function tickConfig() {
             source2: 0,
         }
 
+        // Iterate if there isn't a controller
+
+        if (!controller) continue
+
+        // Iterate if the controller is not mine
+
+        if (!controller.my) continue
+
+        // Add roomName to commune list
+
+        Memory.communes.push(roomName)
+
         //
 
         if (!global[room.name].tasks) global[room.name].tasks = {}
+
+        //
+
+        room.creepsFromRoom = {}
+        room.creepsFromRoomAmount = 0
     }
 }

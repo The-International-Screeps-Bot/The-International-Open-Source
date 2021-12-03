@@ -156,23 +156,8 @@ export function config() {
         Memory.mapVisuals = false
         Memory.cpuLogging = false
 
-        // General
+        //
 
-        Memory.communes = []
-
-        Memory.energy = 0
-
-        Memory.boosts = {}
-
-        // CPU
-
-        Memory.cpuUsage = 0
-        Memory.cpuLimit = Game.cpu.limit
-        Memory.cpuBucket = Game.cpu.bucket
-
-        // Memory
-
-        Memory.memorUsage = Math.floor(RawMemory.get().length / 1000)
         Memory.memoryLimit = 2097
     }
 }

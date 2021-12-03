@@ -40,6 +40,13 @@ global.advancedGeneratePixel = function () {
         return false;
     return Game.cpu.generatePixel();
 };
+global.killAllCreeps = function () {
+    for (const creepName in Game.creeps) {
+        const creep = Game.creeps[creepName];
+        creep.suicide();
+    }
+    return 'Killed all creeps';
+};
 
 function config() {
     if (!global.constructed) {
@@ -155,28 +162,25 @@ function config() {
         Memory.roomVisuals = false;
         Memory.mapVisuals = false;
         Memory.cpuLogging = false;
-        Memory.communes = [];
-        Memory.energy = 0;
-        Memory.boosts = {};
-        Memory.cpuUsage = 0;
-        Memory.cpuLimit = Game.cpu.limit;
-        Memory.cpuBucket = Game.cpu.bucket;
-        Memory.memorUsage = Math.floor(RawMemory.get().length / 1000);
         Memory.memoryLimit = 2097;
     }
 }
 
 function tickConfig() {
+    Memory.communes = [];
+    Memory.energy = 0;
+    Memory.boosts = {};
+    Memory.creepCount = 0;
+    Memory.powerCreepCount = 0;
+    Memory.cpuUsage = 0;
+    Memory.cpuLimit = Game.cpu.limit;
+    Memory.cpuBucket = Game.cpu.bucket;
+    Memory.memorUsage = Math.floor(RawMemory.get().length / 1000);
     for (const roomName in Game.rooms) {
         const room = Game.rooms[roomName];
         const controller = room.controller;
         if (!global[room.name])
             global[room.name] = {};
-        if (!controller)
-            continue;
-        if (!controller.my)
-            continue;
-        Memory.communes.push(roomName);
         room.myCreeps = {};
         room.creepCount = {};
         for (const role of global.creepRoles) {
@@ -187,8 +191,15 @@ function tickConfig() {
             source1: 0,
             source2: 0,
         };
+        if (!controller)
+            continue;
+        if (!controller.my)
+            continue;
+        Memory.communes.push(roomName);
         if (!global[room.name].tasks)
             global[room.name].tasks = {};
+        room.creepsFromRoom = {};
+        room.creepsFromRoomAmount = 0;
     }
 }
 
@@ -226,7 +237,7 @@ function creepOrganizer() {
             delete Memory.creeps[creepName];
             continue;
         }
-        const creepsClass = creepClasses[creep.memory.role[0].toUpperCase()];
+        const creepsClass = creepClasses[creep.memory.role[0].toUpperCase() + creep.memory.role.substr(1)];
         Game.creeps[creepName] = new creepsClass(creep);
         const room = creep.roomFrom;
         room.myCreeps[creep.memory.role].push(creepName);
@@ -239,11 +250,17 @@ function creepOrganizer() {
     Memory.creepCount = totalCreepCount;
 }
 
+function mapVisualsManager() {
+    if (!Memory.mapVisuals)
+        return;
+}
+
 function internationalManager() {
     config();
     tickConfig();
     global.advancedGeneratePixel();
     creepOrganizer();
+    mapVisualsManager();
 }
 
 Room.prototype.get = function (roomObjectName) {
@@ -262,6 +279,7 @@ Room.prototype.get = function (roomObjectName) {
         }
         cache() {
             const roomObject = this;
+            roomObjects[roomObject.name] = roomObject;
             if (roomObject.cacheMethod == 'memory') {
                 room.memory[roomObject.name] = roomObject.value;
                 return;
@@ -304,50 +322,46 @@ Room.prototype.get = function (roomObjectName) {
         let roomObject = roomObjects[opts.name];
         const roomObjectValue = roomObject ? roomObject.getValueIfViable() : undefined;
         if (roomObjectValue) {
-            return roomObject;
+            return;
         }
         roomObject = new RoomObject(opts);
         roomObject.cache();
-        return roomObject;
+        return;
     }
     manageRoomObject({
         name: 'anchorPoint',
-        value: room.memory.anchorPoint,
+        value: { x: 25, y: 25 },
         valueType: 'pos',
         cacheMethod: 'memory',
     });
     manageRoomObject({
         name: 'mineral',
-        value: room.find(FIND_MINERALS)[0],
-        valueType: 'object',
+        value: room.find(FIND_MINERALS)[0].id,
+        valueType: 'id',
         cacheMethod: 'global',
         cacheAmount: Infinity,
     });
-    function findIDsOfSources() {
-        const sources = room.find(FIND_SOURCES);
-        let sourceIDs = [];
-        for (const source of sources) {
-            sourceIDs.push(source.id);
-        }
-        return sourceIDs;
+    function findSourceIdIfExists(source) {
+        if (!source)
+            return false;
+        return source.id;
     }
     manageRoomObject({
-        name: 'sources',
-        value: findIDsOfSources()[0],
-        valueType: 'object',
+        name: 'source1',
+        value: findSourceIdIfExists(room.find(FIND_SOURCES)[0]),
+        valueType: 'id',
         cacheMethod: 'memory',
     });
     manageRoomObject({
-        name: 'source1',
-        value: roomObjects.sources.getValue()[0],
+        name: 'source2',
+        value: findSourceIdIfExists(room.find(FIND_SOURCES)[1]),
         valueType: 'id',
-        cacheMethod: 'global',
-        cacheAmount: Infinity,
+        cacheMethod: 'memory',
     });
     manageRoomObject({
-        name: 'source2',
-        value: roomObjects.sources.getValue()[1],
-        valueType: 'id',
+        name: 'sources',
+        value: [roomObjects.source1.getValue(), roomObjects.source2.getValue()],
+        valueType: 'object',
         cacheMethod: 'global',
         cacheAmount: Infinity,
     });
@@ -373,13 +387,12 @@ Room.prototype.get = function (roomObjectName) {
         for (const pos of adjacentPositions) {
             if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL)
                 continue;
-            const harvestPosObj = {
-                type: 'normal',
-                pos: room.newPos(pos),
-            };
-            harvestPositions.push(harvestPosObj);
+            harvestPositions.push(pos);
         }
         return harvestPositions;
+    }
+    function findClosestHarvestPosition(harvestPositions) {
+        return roomObjects.anchorPoint.getValue().findClosestByRange(harvestPositions);
     }
     manageRoomObject({
         name: 'source1HarvestPositions',
@@ -389,8 +402,22 @@ Room.prototype.get = function (roomObjectName) {
         cacheAmount: Infinity,
     });
     manageRoomObject({
+        name: 'source1ClosestHarvestPosition',
+        value: findClosestHarvestPosition(roomObjects.source1HarvestPositions.getValue()),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    });
+    manageRoomObject({
         name: 'source2HarvestPositions',
         value: findHarvestPositions(roomObjects.source2.getValue()),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    });
+    manageRoomObject({
+        name: 'source2ClosestHarvestPosition',
+        value: findClosestHarvestPosition(roomObjects.source2HarvestPositions.getValue()),
         valueType: 'object',
         cacheMethod: 'global',
         cacheAmount: Infinity,
@@ -544,6 +571,11 @@ Room.prototype.advancedSell = function (resource, amount) {
 function marketManager(room) {
     const terminal = room.terminal;
     if (!terminal)
+        return;
+}
+
+function roomVisualsManager(room) {
+    if (!Memory.roomVisuals)
         return;
 }
 
@@ -707,6 +739,7 @@ function spawnManager(room) {
 function communeManager(room) {
     marketManager(room);
     spawnManager(room);
+    roomVisualsManager();
 }
 
 Creep.prototype.isDying = function () {

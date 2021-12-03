@@ -43,6 +43,12 @@ Room.prototype.get = function(roomObjectName: string) {
 
             const roomObject: RoomObject = this
 
+            // Add roomObject to roomObjects
+
+            roomObjects[roomObject.name] = roomObject
+
+            // If cacheMethod is memory
+
             if (roomObject.cacheMethod == 'memory') {
 
                 // Store value in room's memory
@@ -50,6 +56,8 @@ Room.prototype.get = function(roomObjectName: string) {
                 room.memory[roomObject.name] = roomObject.value
                 return
             }
+
+            // If cacheMethod is global
 
             if (roomObject.cacheMethod == 'global') {
 
@@ -123,7 +131,7 @@ Room.prototype.get = function(roomObjectName: string) {
         }
     }
 
-    function manageRoomObject(opts: RoomObjectOpts): RoomObject {
+    function manageRoomObject(opts: RoomObjectOpts): void {
 
         // Find roomObject
 
@@ -139,7 +147,7 @@ Room.prototype.get = function(roomObjectName: string) {
 
             // Inform the roomObject
 
-            return roomObject
+            return
         }
 
         // Create the new RoomObject
@@ -149,14 +157,14 @@ Room.prototype.get = function(roomObjectName: string) {
         // Cache the roomObject based on its cacheMethod and inform the roomObject
 
         roomObject.cache()
-        return roomObject
+        return
     }
 
     // Important Positions
 
     manageRoomObject({
         name: 'anchorPoint',
-        value: room.memory.anchorPoint,
+        value: { x: 25, y: 25 } /* room.memory.anchorPoint */,
         valueType: 'pos',
         cacheMethod: 'memory',
     })
@@ -165,51 +173,37 @@ Room.prototype.get = function(roomObjectName: string) {
 
     manageRoomObject({
         name: 'mineral',
-        value: room.find(FIND_MINERALS)[0],
-        valueType: 'object',
+        value: room.find(FIND_MINERALS)[0].id,
+        valueType: 'id',
         cacheMethod: 'global',
         cacheAmount: Infinity,
     })
 
-    function findIDsOfSources() {
+    function findSourceIdIfExists(source: Source): false | string {
 
-        // Find sources
+        if (!source) return false
 
-        const sources: Source[] = room.find(FIND_SOURCES)
-
-        let sourceIDs: Id<Source>[] = []
-
-        // Loop through each source
-
-        for (const source of sources) {
-
-            // Add source's id to sourceIDs
-
-            sourceIDs.push(source.id)
-        }
-
-        return sourceIDs
+        return source.id
     }
 
     manageRoomObject({
-        name: 'sources',
-        value: findIDsOfSources()[0],
-        valueType: 'object',
+        name: 'source1',
+        value: findSourceIdIfExists(room.find(FIND_SOURCES)[0]),
+        valueType: 'id',
         cacheMethod: 'memory',
     })
 
     manageRoomObject({
-        name: 'source1',
-        value: roomObjects.sources.getValue()[0],
+        name: 'source2',
+        value: findSourceIdIfExists(room.find(FIND_SOURCES)[1]),
         valueType: 'id',
-        cacheMethod: 'global',
-        cacheAmount: Infinity,
+        cacheMethod: 'memory',
     })
 
     manageRoomObject({
-        name: 'source2',
-        value: roomObjects.sources.getValue()[1],
-        valueType: 'id',
+        name: 'sources',
+        value: [roomObjects.source1.getValue(), roomObjects.source2.getValue()],
+        valueType: 'object',
         cacheMethod: 'global',
         cacheAmount: Infinity,
     })
@@ -252,9 +246,9 @@ Room.prototype.get = function(roomObjectName: string) {
     /**
      * Finds positions adjacent to a source that a creep can harvest
      * @param source source of which to find harvestPositions for
-     * @returns source's harvestPositions, a list of RoomPositions
+     * @returns source's harvestPositions, a list of positions
      */
-    function findHarvestPositions(source: Source): HarvestPosObj[] {
+    function findHarvestPositions(source: Source): Pos[] {
 
         // Stop and inform empty array if there is no source
 
@@ -262,10 +256,10 @@ Room.prototype.get = function(roomObjectName: string) {
 
         // Find positions adjacent to source
 
-        const rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 }
+        const rect: Rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 }
         const adjacentPositions: Pos[] = global.findPositionsInsideRect(rect)
 
-        const harvestPositions: HarvestPosObj[] = []
+        const harvestPositions: Pos[] = []
 
         // Find terrain in room
 
@@ -277,16 +271,9 @@ Room.prototype.get = function(roomObjectName: string) {
 
             if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
 
-            // Convert position into a RoomPosition
-
-            const harvestPosObj: HarvestPosObj = {
-                type: 'normal',
-                pos: room.newPos(pos),
-            }
-
             // Add pos to harvestPositions
 
-            harvestPositions.push(harvestPosObj)
+            harvestPositions.push(pos)
         }
 
         return harvestPositions
@@ -312,8 +299,24 @@ Room.prototype.get = function(roomObjectName: string) {
     })
 
     manageRoomObject({
+        name: 'source1ClosestHarvestPosition',
+        value: findClosestHarvestPosition(roomObjects.source1HarvestPositions.getValue()),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
+    manageRoomObject({
         name: 'source2HarvestPositions',
         value: findHarvestPositions(roomObjects.source2.getValue()),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
+    manageRoomObject({
+        name: 'source2ClosestHarvestPosition',
+        value: findClosestHarvestPosition(roomObjects.source2HarvestPositions.getValue()),
         valueType: 'object',
         cacheMethod: 'global',
         cacheAmount: Infinity,
@@ -365,7 +368,7 @@ Room.prototype.get = function(roomObjectName: string) {
     return value
 }
 
-Room.prototype.newPos = function(pos: RoomPosition) {
+Room.prototype.newPos = function(pos: Pos) {
 
     const room: Room = this
 

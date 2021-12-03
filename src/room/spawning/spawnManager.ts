@@ -25,7 +25,7 @@ export function spawnManager(room: Room) {
     for (let spawningObject of spawningOpts) {
 
         // Iterate if there are no required creeps of role
-
+        
         if (requiredCreeps[spawningObject.extraOpts.memory.role] == 0) continue
 
         // Try to find inactive spawn, if can't, stop

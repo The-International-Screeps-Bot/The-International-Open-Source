@@ -132,14 +132,24 @@ declare global {
         creepsOfSourceAmount: {[key: string]: number}
 
         /**
-         * An object with keys of roles with properties of arrays of creep names belonging to the role from this room
+         * An object with keys of roles with properties of arrays of creep names belonging to the role
          */
         myCreeps: {[key: string]: string[]}
 
         /**
-         * An object with keys of roles and properties of the number of creeps with the role from this room
+         * An object with keys of roles and properties of the number of creeps with the role
          */
         creepCount: {[key: string]: number}
+
+        /**
+         * An object with keys of roles and properties of the number of creeps with the role from this room
+         */
+        creepsFromRoom: {[key: string]: string[]}
+
+        /**
+         * The amount of alive creeps that were spawned from this room
+         */
+        creepsFromRoomAmount: number
     }
 
     interface RoomMemory {
@@ -265,6 +275,13 @@ declare global {
              * Generates a pixel at the cost of depleting the bucket if the bucket is full
              */
             advancedGeneratePixel(): false | 0 | -6
+
+            // Commands
+
+            /**
+             * Kills all owned creeps
+             */
+            killAllCreeps(): string
         }
     }
 }

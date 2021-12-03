@@ -5,16 +5,15 @@
     "main": "index.js",
     "//": "If you add or change the names of destinations in screeps.json, make sure you update these scripts to reflect the changes",
     "scripts": {
-        "lint": "eslint \"src/**/*.ts\"",
         "build": "rollup -c",
-        "push-main": "rollup -c --environment DEST:main",
+        "push-mmo": "rollup -c --environment DEST:mmo",
         "push-pserver": "rollup -c --environment DEST:pserver",
         "push-season": "rollup -c --environment DEST:season",
         "push-sim": "rollup -c --environment DEST:sim",
         "test": "npm run test-unit",
         "test-unit": "mocha test/unit/**/*.ts",
         "test-integration": "echo 'See docs/in-depth/testing.md for instructions on enabling integration tests'",
-        "watch-main": "rollup -cw --environment DEST:main",
+        "watch-mmo": "rollup -cw --environment DEST:mmo",
         "watch-pserver": "rollup -cw --environment DEST:pserver",
         "watch-season": "rollup -cw --environment DEST:season",
         "watch-sim": "rollup -cw --environment DEST:sim"
