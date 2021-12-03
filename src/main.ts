@@ -260,6 +260,11 @@ declare global {
              * @param bgColor Colour of the background. Default is white
              */
             customLog(title: string, message: any, color?: string, bgColor?: string): void
+
+            /**
+             * Generates a pixel at the cost of depleting the bucket if the bucket is full
+             */
+            advancedGeneratePixel(): false | 0 | -6
         }
     }
 }

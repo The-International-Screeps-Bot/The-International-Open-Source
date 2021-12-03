@@ -14,6 +14,14 @@ export function config() {
         global.constructed = true
 
         global.me = 'MarvinTMB'
+        global.privateServerName = 'CarsonComputer'
+        global.mmoShards = [
+            'shard0',
+            'shard1',
+            'shard2',
+            'shard3'
+        ]
+
         global.allyList = [
             "Q13214",
             "Orlet",

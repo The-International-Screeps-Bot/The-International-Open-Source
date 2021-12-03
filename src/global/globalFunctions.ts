@@ -53,3 +53,18 @@ global.customLog = function(title, message, color, bgColor) {
 
     global.logs += log
 }
+
+global.advancedGeneratePixel = function() {
+
+    // Stop if the bot is not running on MMO
+
+    if (!global.mmoShards.includes(Game.shard.name)) return false
+
+    // Stop if the cpu bucket isn't full
+
+    if (Game.cpu.bucket != 10000) return false
+
+    // Try to generate a pixel
+
+    return Game.cpu.generatePixel()
+}

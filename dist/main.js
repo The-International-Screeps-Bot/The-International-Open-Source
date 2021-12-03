@@ -33,11 +33,25 @@ global.customLog = function (title, message, color, bgColor) {
     log += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`;
     global.logs += log;
 };
+global.advancedGeneratePixel = function () {
+    if (!global.mmoShards.includes(Game.shard.name))
+        return false;
+    if (Game.cpu.bucket != 10000)
+        return false;
+    return Game.cpu.generatePixel();
+};
 
 function config() {
     if (!global.constructed) {
         global.constructed = true;
         global.me = 'MarvinTMB';
+        global.privateServerName = 'CarsonComputer';
+        global.mmoShards = [
+            'shard0',
+            'shard1',
+            'shard2',
+            'shard3'
+        ];
         global.allyList = [
             "Q13214",
             "Orlet",
@@ -228,7 +242,7 @@ function creepOrganizer() {
 function internationalManager() {
     config();
     tickConfig();
-    advancedGeneratePixel();
+    global.advancedGeneratePixel();
     creepOrganizer();
 }
 
