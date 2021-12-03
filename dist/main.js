@@ -29,7 +29,7 @@ global.customLog = function (title, message, color, bgColor) {
     if (!bgColor)
         bgColor = global.colors.white;
     let log = ``;
-    log += `<div style='text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div>`;
+    log += `<div style='width: 90vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div>`;
     log += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`;
     global.logs += log;
 };
@@ -150,7 +150,6 @@ function config() {
             STRUCTURE_FACTORY,
             STRUCTURE_INVADER_CORE,
         ];
-        global.log = ``;
     }
     if (!Memory.constructed) {
         Memory.constructed = true;
@@ -176,6 +175,7 @@ function tickConfig() {
     Memory.cpuLimit = Game.cpu.limit;
     Memory.cpuBucket = Game.cpu.bucket;
     Memory.memorUsage = Math.floor(RawMemory.get().length / 1000);
+    global.logs = ``;
     for (const roomName in Game.rooms) {
         const room = Game.rooms[roomName];
         const controller = room.controller;
@@ -258,8 +258,8 @@ function mapVisualsManager() {
 function internationalManager() {
     config();
     tickConfig();
-    global.advancedGeneratePixel();
     creepOrganizer();
+    global.advancedGeneratePixel();
     mapVisualsManager();
 }
 
@@ -1054,10 +1054,9 @@ function roomManager() {
             specificRoomManager(room);
         }
         let cpuUsed = Game.cpu.getUsed();
-        const harvPositions = room.get('source1HarvestPositions');
-        global.customLog('HarvestPositions', harvPositions);
+        room.get('source1');
         cpuUsed = Game.cpu.getUsed() - cpuUsed;
-        global.customLog('HarvestPositions CPU', cpuUsed.toFixed(2));
+        global.customLog('Testing CPU', cpuUsed.toFixed(2));
     }
 }
 
@@ -4281,7 +4280,17 @@ class ErrorMapper {
 ErrorMapper.cache = {};
 
 function logManager() {
-    global.customLog('Total CPU', Game.cpu.getUsed().toFixed(2), global.colors.white, global.colors.lightBlue);
+    const CPULimit = Game.cpu.limit;
+    function findCPUColor(CPU) {
+        if (CPU > CPULimit * 0.6)
+            return global.colors.green;
+        if (CPU > CPULimit * 0.9)
+            return global.colors.green;
+        return global.colors.green;
+    }
+    const CPU = Game.cpu.getUsed();
+    const CPUColor = findCPUColor(CPU);
+    global.customLog('Total CPU', (CPU).toFixed(2) + ' / ' + Game.cpu.limit, global.colors.white, CPUColor);
     for (let i = 0; i < 99; i++)
         console.log();
     console.log(global.logs);

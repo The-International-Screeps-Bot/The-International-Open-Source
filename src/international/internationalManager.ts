@@ -12,9 +12,9 @@ export function internationalManager() {
     config()
     tickConfig()
 
-    global.advancedGeneratePixel()
-
     creepOrganizer()
+
+    global.advancedGeneratePixel()
 
     mapVisualsManager()
 }

@@ -44,11 +44,10 @@ export function roomManager() {
 
         let cpuUsed = Game.cpu.getUsed()
 
-        const harvPositions = room.get('source1HarvestPositions')
-        global.customLog('HarvestPositions', harvPositions)
+        room.get('source1')
 
         cpuUsed = Game.cpu.getUsed() - cpuUsed
-        global.customLog('HarvestPositions CPU', cpuUsed.toFixed(2))
+        global.customLog('Testing CPU', cpuUsed.toFixed(2))
 
         i++
     }

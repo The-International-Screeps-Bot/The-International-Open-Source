@@ -37,6 +37,17 @@ declare global {
         y2: number
     }
 
+    interface Colors {
+        white: string
+        lightGrey: string
+        lightBlue: string
+        darkBlue: string
+        black: string
+        yellow: string
+        red: string
+        green: string
+    }
+
     // Memory
 
     interface Memory {
@@ -223,7 +234,7 @@ declare global {
             /**
              * An object with labels of colour names and properties of hex codes
              */
-            colors: {[key: string]: string}
+            colors: Colors
 
             /**
              *

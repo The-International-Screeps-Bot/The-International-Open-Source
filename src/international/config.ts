@@ -129,7 +129,6 @@ export function config() {
             STRUCTURE_FACTORY,
             STRUCTURE_INVADER_CORE,
         ]
-        global.log = ``
     }
 
     // Construct Memory if it isn't constructed yet

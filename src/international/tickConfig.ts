@@ -26,6 +26,10 @@ export function tickConfig() {
 
     Memory.memorUsage = Math.floor(RawMemory.get().length / 1000)
 
+    // global
+
+    global.logs = ``
+
     // Other
 
     // Configure rooms
