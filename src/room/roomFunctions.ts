@@ -665,5 +665,159 @@ Room.prototype.scout = function() {
 
     const room: Room = this
 
+    const roomType = room.findType()
 
+
+}
+
+Room.prototype.findType = function() {
+
+    const room: Room = this
+    const controller: StructureController = room.get('controller')
+
+    // If there is a controller
+
+    if (controller) {
+
+        // If the contoller is owned
+
+        if (controller.owner) {
+
+            // Stop if the controller is owned by me
+
+            if (controller.my) return
+
+            // If the controller is owned by an ally
+
+            if (global.allyList.includes(controller.owner.username)) {
+
+                // Set the type to ally and stop
+
+                room.memory.type = 'ally'
+                return
+            }
+
+            // If the controller is not owned by an ally
+
+            // Set the type to enemy and stop
+
+            room.memory.type = 'enemy'
+            return
+        }
+
+        // Get sources
+
+        const sources: Source[] = room.get('sources')
+
+        // Filter sources that have been harvested
+
+        const harvestedSources = sources.filter(source => source.ticksToRegeneration > 0)
+
+        if (isReservedRemote()) return
+
+        function isReservedRemote(): boolean {
+
+            // If there is no reservation inform false
+
+            if (!controller.reservation) return false
+
+            // Get roads
+
+            const roads = room.get('roads')
+
+            // Get containers
+
+            const containers = room.get('containers')
+
+            // If there are roads or containers or sources harvested inform false
+
+            if (roads.length == 0 && containers.length == 0 && !harvestedSources) return false
+
+            // If the controller is reserved by an ally
+
+            if (global.allyList.includes(controller.reservation.username)) {
+
+                // Set type to allyRemote and stop
+
+                room.memory.type = 'allyRemote'
+                return true
+            }
+
+            // If the controller is not reserved by an ally
+
+            // Set type to enemyRemote and stop
+
+            room.memory.type = 'enemyRemote'
+            return true
+        }
+
+        if (isUnReservedRemote()) return
+
+        function isUnReservedRemote() {
+
+            // If there are no sources harvested
+
+            if (harvestedSources.length == 0) return false
+
+            // Find creeps that I don't own
+
+            const creepsNotMine = room.get('enemyCreeps').concat(room.get('allyCreeps'))
+
+            
+
+            let creepWithWorkParts: Creep
+
+            for (const creep of creepsNotMine) {
+
+                // inform creep if it has work parts
+
+                if (creep.hasPartsOfTypes(['work'])) return creep
+            }
+
+            // Set type to remote and stop
+
+            room.memory.type = 'enemyRemote'
+            return true
+        }
+
+        // Set type to neutral and stop
+
+        room.memory.type = 'neutral'
+        return
+    }
+
+    // If there is no controller
+
+    // Get keeperLair
+
+    const keeperLairs = room.get('keeperLair')
+
+    // If there are keeperLairs
+
+    if (keeperLairs.length > 0) {
+
+        // Set type to keeper and stop
+
+        room.memory.type = 'keeper'
+        return
+    }
+
+    // Get sources
+
+    const sources = room.get('sources')
+
+    // If there are sources
+
+    if (sources.length > 0) {
+
+        // Set type to keeperCenter and stop
+
+        room.memory.type = 'keeperCenter'
+        return
+    }
+
+    // Set type to highway and stop
+
+    room.memory.type == 'highway'
+    return
 }

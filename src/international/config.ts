@@ -32,6 +32,72 @@ export function config() {
 
         global.tasks = {}
 
+        global.roomTypeProperties = {
+            type: true,
+
+            commune: true,
+            source1: true,
+            source2: true,
+            remotes: true,
+            commodities: true,
+            powerBanks: true,
+
+            owner: true,
+            level: true,
+
+            powerEnabled: true,
+            nuker: true,
+            towers: true,
+            terminal: true,
+            storedEnergy: true,
+        }
+
+        global.roomTypes = {
+            commune: {
+                source1: true,
+                source2: true,
+                remotes: true,
+                commodities: true,
+                powerBanks: true,
+            },
+            remote: {
+                commune: true,
+                source1: true,
+                source2: true,
+            },
+            ally: {
+                level: true,
+            },
+            allyRemote: {
+                owner: true,
+            },
+            enemy: {
+                level: true,
+                powerEnabled: true,
+                nuker: true,
+                towers: true,
+                terminal: true,
+                storedEnergy: true,
+            },
+            enemyRemote: {
+                owner: true,
+            },
+            keeper: {
+                owner: true,
+            },
+            keeperCenter: {
+                owner: true,
+            },
+            neutral: {
+
+            },
+            highway: {
+
+            },
+        }
+
+        global.roomTasks = {}
+
         global.creepRoles = [
             'sourceHarvester',
             'hauler'

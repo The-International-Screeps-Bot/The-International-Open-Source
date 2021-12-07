@@ -8,7 +8,7 @@ import './linkManager'
 import './factoryManager'
 
 export function communeManager(room: Room) {
-
+    
     marketManager(room)
 
     spawnManager(room)

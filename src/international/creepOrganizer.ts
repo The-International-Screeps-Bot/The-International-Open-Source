@@ -12,8 +12,8 @@ export function creepOrganizer() {
     // Loop through all of my creeps
 
     for (const creepName in Memory.creeps) {
-        
-        const creep: Creep = Game.creeps[creepName]
+
+        const creep = Game.creeps[creepName]
 
         // If creep doesn't exist
 
@@ -29,13 +29,13 @@ export function creepOrganizer() {
 
         const creepsClass = creepClasses[creep.memory.role[0].toUpperCase() + creep.memory.role.substr(1)]
 
-        // Assign creep proper class
+        // Assign the creep its relevant class
 
         Game.creeps[creepName] = new creepsClass(creep)
 
         //
 
-        const room: Room = creep.roomFrom
+        const room = Game.rooms[creep.roomFrom]
 
         // Organize creep by room and role
 

@@ -39,12 +39,10 @@ export function roomManager() {
 
             specificRoomManager(room)
         }
-
+        
         // Testing
 
         let cpuUsed = Game.cpu.getUsed()
-
-        room.get('source1')
 
         cpuUsed = Game.cpu.getUsed() - cpuUsed
         global.customLog('Testing CPU', cpuUsed.toFixed(2))

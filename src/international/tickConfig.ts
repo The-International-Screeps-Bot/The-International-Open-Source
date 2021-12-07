@@ -72,6 +72,10 @@ export function tickConfig() {
 
         if (!controller.my) continue
 
+        // Set type to commune
+
+        room.memory.type = 'commune'
+
         // Add roomName to commune list
 
         Memory.communes.push(roomName)

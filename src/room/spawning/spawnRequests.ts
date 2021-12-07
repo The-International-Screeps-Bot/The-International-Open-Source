@@ -107,12 +107,12 @@ export function spawnRequests(room: Room) {
 
             while (this.cost > maxCost) {
 
-                // Take away cost of the last part
+                // Find last part and take away its cost
 
                 const part = this.body[this.body.length - 1]
                 this.cost -= BODYPART_COST[part]
 
-                // Take away the last part
+                // Take away the last part from body
 
                 this.body.slice(0, this.body.length - 1)
             }
@@ -174,19 +174,19 @@ export function spawnRequests(room: Room) {
 
                     return
                 }
-                if (spawnEnergyCapacity >= 300) {
 
-                    opts.defaultParts = []
-                    opts.extraParts = [WORK]
-                    opts.maxParts = 6
+                // Default
 
-                    const maxCreepsPerSource: number = 2
-                    minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, maxCreepsPerSource) + Math.min(source2HarvestPositionsAmount, maxCreepsPerSource)
+                opts.defaultParts = []
+                opts.extraParts = [WORK]
+                opts.maxParts = 6
 
-                    opts.memoryAdditions.moveType = 'pull'
+                const maxCreepsPerSource: number = 2
+                minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, maxCreepsPerSource) + Math.min(source2HarvestPositionsAmount, maxCreepsPerSource)
 
-                    return
-                }
+                opts.memoryAdditions.moveType = 'pull'
+
+                return
             }
 
             function findSourceToHarvest() {

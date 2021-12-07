@@ -133,6 +133,18 @@ Creep.prototype.advancedHarvestSource = function(source: Source) {
     return 0
 }
 
+Creep.prototype.hasPartsOfTypes = function(partTypes: BodyPartConstant[]): boolean {
+
+    const creep: Creep = this
+
+    for (const partType of partTypes) {
+
+        if (creep.body.some(part => part.type == partType)) return true
+    }
+
+    return false
+}
+
 Creep.prototype.partsOfType = function(type: BodyPartConstant) {
 
     const creep: Creep = this

@@ -2,7 +2,7 @@ import './spawnFunctions'
 import { spawnRequests } from './spawnRequests'
 
 export function spawnManager(room: Room) {
-
+    global.customLog('test', 'hi')
     const spawns: StructureSpawn[] = room.get('spawn')
 
     // Find spawns that aren't spawning
@@ -22,10 +22,10 @@ export function spawnManager(room: Room) {
 
     let i = 0
 
-    for (let spawningObject of spawningOpts) {
+    for (const spawningObject of spawningOpts) {
 
         // Iterate if there are no required creeps of role
-        
+
         if (requiredCreeps[spawningObject.extraOpts.memory.role] == 0) continue
 
         // Try to find inactive spawn, if can't, stop
@@ -39,15 +39,15 @@ export function spawnManager(room: Room) {
 
         // See if creep can be spawned
 
-        const testSpawn = spawn.advancedSpawn(spawningObject)
+        const testSpawnResult = spawn.advancedSpawn(spawningObject)
 
         // If creep can't be spawned
 
-        if (testSpawn != 0) {
+        if (testSpawnResult != 0) {
 
             // Log the error and stop
 
-            global.customLog('Failed to spawn', testSpawn + ', ' + spawningObject.cost)
+            global.customLog('Failed to spawn', testSpawnResult + ', ' + spawningObject.cost)
             break
         }
 

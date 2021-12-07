@@ -157,16 +157,18 @@ declare global {
          */
         creepsFromRoom: {[key: string]: string[]}
 
-        /**
-         * The amount of alive creeps that were spawned from this room
-         */
-        creepsFromRoomAmount: number
+        // Functions
+
+
     }
 
     interface RoomMemory {
         [key: string]: any
 
-        anchorPoint: {[key: string]: any}
+        /**
+         * A description of the room's defining properties that can be used to assume other properties
+         */
+        type: string
     }
 
     // Creeps
@@ -250,6 +252,11 @@ declare global {
              * An array of structureTypes that can't be walked on by creeps
              */
             impassibleStructures: StructureConstant[]
+
+            /**
+             * An object with keys of roomTypes and properties of an object of properties rooms of the type should have
+             */
+            roomTypes: {[key: string]: any}
 
             // Functions
 

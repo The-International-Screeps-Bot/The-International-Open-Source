@@ -67,6 +67,62 @@ function config() {
         ];
         global.tradeBlacklist = ['hi'];
         global.tasks = {};
+        global.roomTypeProperties = {
+            type: true,
+            commune: true,
+            source1: true,
+            source2: true,
+            remotes: true,
+            commodities: true,
+            powerBanks: true,
+            owner: true,
+            level: true,
+            powerEnabled: true,
+            nuker: true,
+            towers: true,
+            terminal: true,
+            storedEnergy: true,
+        };
+        global.roomTypes = {
+            commune: {
+                source1: true,
+                source2: true,
+                remotes: true,
+                commodities: true,
+                powerBanks: true,
+            },
+            remote: {
+                commune: true,
+                source1: true,
+                source2: true,
+            },
+            ally: {
+                level: true,
+            },
+            allyRemote: {
+                owner: true,
+            },
+            enemy: {
+                level: true,
+                powerEnabled: true,
+                nuker: true,
+                towers: true,
+                terminal: true,
+                storedEnergy: true,
+            },
+            enemyRemote: {
+                owner: true,
+            },
+            keeper: {
+                owner: true,
+            },
+            keeperCenter: {
+                owner: true,
+            },
+            neutral: {},
+            highway: {},
+        };
+        global.roomTasks = {};
         global.creepRoles = [
             'sourceHarvester',
             'hauler'
@@ -195,6 +251,7 @@ function tickConfig() {
             continue;
         if (!controller.my)
             continue;
+        room.memory.type = 'commune';
         Memory.communes.push(roomName);
         if (!global[room.name].tasks)
             global[room.name].tasks = {};
@@ -239,7 +296,7 @@ function creepOrganizer() {
         }
         const creepsClass = creepClasses[creep.memory.role[0].toUpperCase() + creep.memory.role.substr(1)];
         Game.creeps[creepName] = new creepsClass(creep);
-        const room = creep.roomFrom;
+        const room = Game.rooms[creep.roomFrom];
         room.myCreeps[creep.memory.role].push(creepName);
         creep.isDying();
         if (creep.memory.dying)
@@ -561,6 +618,47 @@ Room.prototype.advancedFindPath = function (opts) {
     return pathObject;
 };
 Room.prototype.scout = function () {
+    const room = this;
+    room.findType();
+};
+Room.prototype.findType = function () {
+    const room = this;
+    const controller = room.get('controller');
+    if (controller) {
+        if (controller.owner) {
+            if (controller.my)
+                return;
+            if (global.allyList.includes(controller.owner.username)) {
+                room.memory.type = 'ally';
+                return;
+            }
+            room.memory.type = 'enemy';
+            return;
+        }
+        const sources = room.get('sources');
+        const harvestedSources = sources.filter(source => source.ticksToRegeneration > 0);
+        if (harvestedSources.length > 0) {
+            room.memory.type = 'enemyRemote';
+            return;
+        }
+        const roads = room.get('roads');
+        const containers = room.get('containers');
+        if ((roads.length > 0 || containers.length > 0) && controller.reservation) ;
+        room.memory.type = 'neutral';
+        return;
+    }
+    const keeperLairs = room.get('keeperLair');
+    if (keeperLairs.length > 0) {
+        room.memory.type = 'keeper';
+        return;
+    }
+    const sources = room.get('sources');
+    if (sources.length > 0) {
+        room.memory.type = 'keeperCenter';
+        return;
+    }
+    room.memory.type == 'highway';
+    return;
 };
 
 Room.prototype.advancedSell = function (resource, amount) {
@@ -665,15 +763,13 @@ function spawnRequests(room) {
                     opts.memoryAdditions.moveType = 'travel';
                     return;
                 }
-                if (spawnEnergyCapacity >= 300) {
-                    opts.defaultParts = [];
-                    opts.extraParts = [WORK];
-                    opts.maxParts = 6;
-                    const maxCreepsPerSource = 2;
-                    minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, maxCreepsPerSource) + Math.min(source2HarvestPositionsAmount, maxCreepsPerSource);
-                    opts.memoryAdditions.moveType = 'pull';
-                    return;
-                }
+                opts.defaultParts = [];
+                opts.extraParts = [WORK];
+                opts.maxParts = 6;
+                const maxCreepsPerSource = 2;
+                minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, maxCreepsPerSource) + Math.min(source2HarvestPositionsAmount, maxCreepsPerSource);
+                opts.memoryAdditions.moveType = 'pull';
+                return;
             }
             function findSourceToHarvest() {
                 const spawningDataForSources = {
@@ -710,22 +806,23 @@ function spawnRequests(room) {
 }
 
 function spawnManager(room) {
+    global.customLog('test', 'hi');
     const spawns = room.get('spawn');
     const inactiveSpawns = spawns.filter(spawn => !spawn.spawning);
     if (inactiveSpawns.length == 0)
         return;
     const { spawningOpts, requiredCreeps, } = spawnRequests(room);
     let i = 0;
-    for (let spawningObject of spawningOpts) {
+    for (const spawningObject of spawningOpts) {
         if (requiredCreeps[spawningObject.extraOpts.memory.role] == 0)
             continue;
         const spawn = inactiveSpawns[i];
         if (!spawn)
             break;
         spawningObject.extraOpts.dryRun = true;
-        const testSpawn = spawn.advancedSpawn(spawningObject);
-        if (testSpawn != 0) {
-            global.customLog('Failed to spawn', testSpawn + ', ' + spawningObject.cost);
+        const testSpawnResult = spawn.advancedSpawn(spawningObject);
+        if (testSpawnResult != 0) {
+            global.customLog('Failed to spawn', testSpawnResult + ', ' + spawningObject.cost);
             break;
         }
         spawningObject.extraOpts.dryRun = false;
@@ -1054,7 +1151,6 @@ function roomManager() {
             specificRoomManager(room);
         }
         let cpuUsed = Game.cpu.getUsed();
-        room.get('source1');
         cpuUsed = Game.cpu.getUsed() - cpuUsed;
         global.customLog('Testing CPU', cpuUsed.toFixed(2));
     }

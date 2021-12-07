@@ -13,7 +13,7 @@ export function creepOrganizer() {
 
     for (const creepName in Memory.powerCreeps) {
 
-        const creep: Creep = Game.creeps[creepName]
+        const creep = Game.powerCreeps[creepName]
 
         // If creep doesn't exist
 
@@ -35,7 +35,7 @@ export function creepOrganizer() {
 
         //
 
-        const room: Room = creep.roomFrom
+        const room = Game.rooms[creep.roomFrom]
 
         // Organize creep by room and role
 
