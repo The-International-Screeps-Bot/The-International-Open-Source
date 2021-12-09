@@ -6,12 +6,13 @@
         "moduleResolution": "Node",
         "outDir": "dist",
         "baseUrl": "src/",
-        "strict": false,
+        "strict": true,
         "noImplicitAny": true,
         "removeComments": true,
         "noImplicitReturns": true,
         "allowSyntheticDefaultImports": true,
-        "allowUnreachableCode": false
+        "allowUnreachableCode": false,
+        "strictNullChecks": false
     },
     "exclude": [
         "node_modules"

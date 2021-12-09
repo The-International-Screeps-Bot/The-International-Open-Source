@@ -661,7 +661,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): PathObject {
     return pathObject
 }
 
-Room.prototype.scout = function() {
+Room.prototype.scout = function(scoutingRoom: Room) {
 
     const room: Room = this
 
@@ -670,7 +670,7 @@ Room.prototype.scout = function() {
 
 }
 
-Room.prototype.findType = function() {
+Room.prototype.findType = function(scoutingRoom: Room) {
 
     const room: Room = this
     const controller: StructureController = room.get('controller')
@@ -694,6 +694,7 @@ Room.prototype.findType = function() {
                 // Set the type to ally and stop
 
                 room.memory.type = 'ally'
+                room.memory.owner = controller.owner.username
                 return
             }
 
@@ -702,6 +703,11 @@ Room.prototype.findType = function() {
             // Set the type to enemy and stop
 
             room.memory.type = 'enemy'
+            room.memory.owner = controller.owner
+            room.memory.level = controller.level
+            room.memory.powerEnabled = controller.isPowerEnabled
+            room.memory.terminal = room.terminal != undefined
+            room.memory.storedEnergy = room.findStoredResourceAmount(RESOURCE_ENERGY)
             return
         }
 
@@ -740,6 +746,7 @@ Room.prototype.findType = function() {
                 // Set type to allyRemote and stop
 
                 room.memory.type = 'allyRemote'
+                room.memory.owner = controller.reservation.username
                 return true
             }
 
@@ -748,6 +755,7 @@ Room.prototype.findType = function() {
             // Set type to enemyRemote and stop
 
             room.memory.type = 'enemyRemote'
+            room.memory.owner = controller.reservation.username
             return true
         }
 
@@ -761,23 +769,38 @@ Room.prototype.findType = function() {
 
             // Find creeps that I don't own
 
-            const creepsNotMine = room.get('enemyCreeps').concat(room.get('allyCreeps'))
+            const creepsNotMine: Creep[] = room.get('enemyCreeps').concat(room.get('allyCreeps'))
 
-            
-
-            let creepWithWorkParts: Creep
+            // Iterate through them
 
             for (const creep of creepsNotMine) {
 
                 // inform creep if it has work parts
 
-                if (creep.hasPartsOfTypes(['work'])) return creep
+                if (creep.hasPartsOfTypes(['work'])) {
+
+                    // If the creep is owned by an ally
+
+                    if (global.allyList.includes(creep.reservation.username)) {
+
+                        // Set type to allyRemote and stop
+
+                        room.memory.type = 'allyRemote'
+                        room.memory.owner = creep.owner.username
+                        return true
+                    }
+
+                    // If the creep is not owned by an ally
+
+                    // Set type to enemyRemote and stop
+
+                    room.memory.type = 'enemyRemote'
+                    room.memory.owner = creep.owner.username
+                    return true
+                }
             }
 
-            // Set type to remote and stop
-
-            room.memory.type = 'enemyRemote'
-            return true
+            return false
         }
 
         // Set type to neutral and stop
@@ -820,4 +843,74 @@ Room.prototype.findType = function() {
 
     room.memory.type == 'highway'
     return
+}
+
+Room.prototype.advancedFindDistance = function(originRoomName, goalRoomName, avoidTypes)  {
+
+    const room: Room = this
+
+    // Try to find a route from the origin room to the goal room
+
+    const findRouteResult = Game.map.findRoute(originRoomName, goalRoomName, {
+        routeCallback(roomName) {
+
+            // If the room is the goal use the room as normal
+
+            if (roomName == goalRoomName) return 1
+
+            // If the room has no memory prefer to not use the room
+
+            if (!Memory.rooms[roomName]) return 10
+
+            // If the room has no type prefer to not use the room
+
+            if (!Memory.rooms[roomName].type) return 10
+
+            // If the room type is an avoidType, never use the room
+
+            if (avoidTypes.includes(Memory.rooms[roomName].type)) return Infinity
+
+            // If the type isn't an avoidType then use the room as normal
+
+            return 1
+        }
+    })
+
+    if (findRouteResult == ERR_NO_PATH) return ERR_NO_PATH
+
+    return findRouteResult.length
+}
+
+Room.prototype.findStoredResourceAmount = function(resourceType) {
+
+    const room: Room = this
+
+    // If the rooms stored resources of this resourceType exist, inform it
+
+    if (room.storedResources[resourceType]) return room.storedResources[resourceType]
+
+    // Otherwise construct the variable
+
+    room.storedResources[resourceType] = 0
+
+    // Create array of room and terminal
+
+    const storageStructures = [room.storage, room.terminal]
+
+    // Iterate through storageStructures
+
+    for (const storageStructure of storageStructures) {
+
+        // Iterate if storageStructure isn't defined
+
+        if (!storageStructure) continue
+
+        // Add the amount of resources in the storageStructure to the rooms storedResources of resourceType
+
+        room.storedResources[resourceType] += storageStructure.store.getUsedCapacity(resourceType)
+    }
+
+    // Inform room's storedResources of resourceType
+
+    return room.storedResources[resourceType]
 }

@@ -46,7 +46,6 @@ export function config() {
             level: true,
 
             powerEnabled: true,
-            nuker: true,
             towers: true,
             terminal: true,
             storedEnergy: true,
@@ -74,7 +73,6 @@ export function config() {
             enemy: {
                 level: true,
                 powerEnabled: true,
-                nuker: true,
                 towers: true,
                 terminal: true,
                 storedEnergy: true,

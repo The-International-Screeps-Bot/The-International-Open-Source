@@ -49,6 +49,8 @@ export function tickConfig() {
         room.myCreeps = {}
         room.creepCount = {}
 
+        room.storedResources = {}
+
         //
 
         for (const role of global.creepRoles) {

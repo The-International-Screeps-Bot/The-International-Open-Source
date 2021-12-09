@@ -157,9 +157,22 @@ declare global {
          */
         creepsFromRoom: {[key: string]: string[]}
 
+        /**
+         *
+         */
+        storedResources: {[key: string]: number }
+
         // Functions
 
+        /**
+         * Finds the number of rooms between two rooms while avoiding rooms with specified types
+         */
+        advancedFindDistance(originRoomName: string, goalRoomName: string, avoidTypes?: string[]): number
 
+        /**
+         * Finds the amount of a specified resourceType in the room's storage and teminal
+         */
+        findStoredResourceAmount(resourceType: ResourceConstant): number
     }
 
     interface RoomMemory {
