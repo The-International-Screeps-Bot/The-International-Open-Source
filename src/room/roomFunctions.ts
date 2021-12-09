@@ -803,6 +803,21 @@ Room.prototype.findType = function(scoutingRoom: Room) {
             return false
         }
 
+        // Find distance from scoutingRoom
+
+        const distanceFromScoutingRoom = room.advancedFindDistance(scoutingRoom.name, room.name, ['keeper', 'enemy', 'enemyRemote', 'ally', 'allyRemote', 'highway'])
+
+        // If distance from scoutingRoom is less than 3
+
+        if (distanceFromScoutingRoom < 3) {
+
+            // Set roomType as remote and assign commune as scoutingRoom's name
+
+            room.memory.type = 'remote'
+            room.memory.commune = scoutingRoom.name
+            return
+        }
+
         // Set type to neutral and stop
 
         room.memory.type = 'neutral'
@@ -876,7 +891,11 @@ Room.prototype.advancedFindDistance = function(originRoomName, goalRoomName, avo
         }
     })
 
-    if (findRouteResult == ERR_NO_PATH) return ERR_NO_PATH
+    // If findRouteResult didn't work, inform a path length of Infinity
+
+    if (findRouteResult == ERR_NO_PATH) return Infinity
+
+    // inform the path's length
 
     return findRouteResult.length
 }
