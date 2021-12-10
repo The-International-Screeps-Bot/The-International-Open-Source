@@ -24,7 +24,7 @@ global.findPositionsInsideRect = function(rect) {
     return positions
 }
 
-global.arePositionsAlike = function(pos1, pos2) {
+global.arePositionsEqual = function(pos1, pos2) {
 
     if (pos1.x == pos2.x && pos1.y == pos2.y) return true
     return false

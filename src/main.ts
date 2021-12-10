@@ -294,9 +294,9 @@ declare global {
             findPositionsInsideRect(rect: Rect): Pos[]
 
             /**
-             * Checks if two positions are alike
+             * Checks if two positions are equal
              */
-            arePositionsAlike(pos1: Pos, pos2: Pos): boolean
+            arePositionsEqual(pos1: Pos, pos2: Pos): boolean
 
             /**
              * Outputs HTML and CSS styled console logs
