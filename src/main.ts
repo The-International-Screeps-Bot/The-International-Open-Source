@@ -165,6 +165,11 @@ declare global {
         // Functions
 
         /**
+         * Removes roomType-based values in the room's memory that don't match its type
+         */
+        cleanRoomMemory(): void
+
+        /**
          * Finds the number of rooms between two rooms while avoiding rooms with specified types
          */
         advancedFindDistance(originRoomName: string, goalRoomName: string, avoidTypes?: string[]): number

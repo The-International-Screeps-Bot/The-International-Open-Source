@@ -661,19 +661,14 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): PathObject {
     return pathObject
 }
 
-Room.prototype.scout = function(scoutingRoom: Room) {
-
-    const room: Room = this
-
-    const roomType = room.findType()
-
-
-}
-
 Room.prototype.findType = function(scoutingRoom: Room) {
 
     const room: Room = this
     const controller: StructureController = room.get('controller')
+
+    // Record that the room was scouted this tick
+
+    room.memory.lastScout = Game.time
 
     // If there is a controller
 
@@ -858,6 +853,32 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
     room.memory.type == 'highway'
     return
+}
+
+Room.prototype.cleanRoomMemory = function() {
+
+    const room: Room = this
+
+    // Stop if the room doesn't have a type
+
+    if (!room.memory.type) return
+
+    // Loop through keys in the room's memory
+
+    for (const key in room.memory) {
+
+        // Iterate if key is not part of roomTypeProperties
+
+        if (!global.roomTypeProperties[key]) continue
+
+        // Iterate if key part of this roomType's properties
+
+        if (global.roomTypes[room.memory.type][key]) continue
+
+        // Delete the property
+
+        delete room.memory[key]
+    }
 }
 
 Room.prototype.advancedFindDistance = function(originRoomName, goalRoomName, avoidTypes)  {
