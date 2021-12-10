@@ -213,6 +213,8 @@ export function config() {
         Memory.flags = {}
         Memory.spawns = {}
 
+        Memory.constructionSites = {}
+
         // Config settings
 
         Memory.roomVisuals = false

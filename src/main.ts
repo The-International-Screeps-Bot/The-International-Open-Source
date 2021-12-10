@@ -72,6 +72,11 @@ declare global {
         cpuLogging: boolean
 
         /**
+         * An object of constrctionsSites with keys of site IDs and properties of the site's age
+         */
+        constructionSites: {[key: string]: number}
+
+        /**
          * An array of roomNames that have controllers we own
          */
         communes: string[]
@@ -104,7 +109,7 @@ declare global {
         /**
          * The amount of memory used by the bot
          */
-         memorUsage: number
+        memorUsage: number
 
         /**
          * The maximum memory the bot can use
