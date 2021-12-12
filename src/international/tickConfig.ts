@@ -50,6 +50,7 @@ export function tickConfig() {
         room.creepCount = {}
 
         room.storedResources = {}
+        room.constructionSites = {}
 
         //
 
