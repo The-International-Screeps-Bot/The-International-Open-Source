@@ -281,6 +281,11 @@ declare global {
              */
             roomTypes: {[key: string]: any}
 
+            /**
+             * The number of construction sites placed by the bot
+             */
+            constructionSitesCount: number
+
             // Functions
 
             /**
