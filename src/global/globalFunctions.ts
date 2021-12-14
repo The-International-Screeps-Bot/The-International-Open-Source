@@ -69,6 +69,11 @@ global.advancedGeneratePixel = function() {
     return Game.cpu.generatePixel()
 }
 
+global.newID = function() {
+
+    return Memory.ID++
+}
+
 // Commands
 
 global.killAllCreeps = function() {

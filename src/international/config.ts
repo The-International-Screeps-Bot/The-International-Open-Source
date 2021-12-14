@@ -213,6 +213,7 @@ export function config() {
         Memory.flags = {}
         Memory.spawns = {}
 
+        Memory.ID = 0
         Memory.constructionSites = {}
 
         // Config settings

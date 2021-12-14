@@ -72,6 +72,11 @@ declare global {
         cpuLogging: boolean
 
         /**
+         * An ongoing record of the latest ID assigned by the bot
+         */
+        ID: number
+
+        /**
          * An object of constrctionsSites with keys of site IDs and properties of the site's age
          */
         constructionSites: {[key: string]: number}
@@ -322,7 +327,12 @@ declare global {
              */
             advancedGeneratePixel(): false | 0 | -6
 
-            // Commands
+            /**
+             * Incrememnts Memory.ID and informs the result 
+             */
+            newID(): number
+
+            // Command functions
 
             /**
              * Kills all owned creeps

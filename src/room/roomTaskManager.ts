@@ -14,13 +14,13 @@ export function taskManager(room: Room) {
      * @param amount number of resources to act on
      */
     class RoomTask {
-        constructor(taskType: string, structure: object, resourceType: string, amount: number) {
+        constructor(taskType: string, targetID: string, resourceType: string, amount: number) {
 
-
+            
         }
     }
 
-    const task1 = new RoomTask('withdraw', room.get('storage'), RESOURCE_ENERGY, 500)
+    const task1 = new RoomTask('withdraw', room.get('storage').id, RESOURCE_ENERGY, 500)
 
     console.log(task1)
 }
