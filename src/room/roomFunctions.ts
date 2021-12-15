@@ -1,12 +1,12 @@
-Room.prototype.get = function(roomObjectName: string) {
+Room.prototype.get = function(roomObjectName) {
 
     const room: Room = this
 
-    const roomObjects: {[key: string]: RoomObject} = {}
+    const roomObjects: Partial<Record<RoomObjectName | string, RoomObject>> = {}
 
     interface RoomObjectOpts {
         [key: string]: any
-        name: string,
+        name: RoomObjectName,
         value: any,
         valueType: string,
         cacheMethod: string,
@@ -238,11 +238,6 @@ Room.prototype.get = function(roomObjectName: string) {
 
     // Harvest positions
 
-    interface HarvestPosObj {
-        type: string
-        pos: RoomPosition
-    }
-
     /**
      * Finds positions adjacent to a source that a creep can harvest
      * @param source source of which to find harvestPositions for
@@ -396,6 +391,66 @@ Room.prototype.get = function(roomObjectName: string) {
         valueType: 'pos',
         cacheMethod: 'global',
         cacheAmount: Infinity,
+    })
+
+    //
+
+    function findStructuresForSpawning() {
+
+        // Get array of spawns and extensions
+
+        const spawnsAndExtensions: Structure<STRUCTURE_SPAWN | STRUCTURE_EXTENSION>[] = roomObjects.spawn.getValue().concat(roomObjects.extension.getValue())
+
+        // Filter out structures that aren't active
+
+        const unfilteredSpawnStructures = spawnsAndExtensions.filter((structure) => structure.isActive())
+
+        // Add each spawnStructures with their range to the object
+
+        const anchorPoint = roomObjects.anchorPoint.getValue()
+
+        // Filter energy structures by distance from anchorPoint
+
+        const filteredSpawnStructures = unfilteredSpawnStructures.sort((a, b) => a.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5) - b.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5))
+        return filteredSpawnStructures
+    }
+
+    manageRoomObject({
+        name: 'structuresForSpawning',
+        value: findStructuresForSpawning(),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: 1,
+    })
+
+    // Creeps
+
+    manageRoomObject({
+        name: 'notMyCreeps',
+        value: room.find(FIND_HOSTILE_CREEPS),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: 1,
+    })
+
+    manageRoomObject({
+        name: 'enemyCreeps',
+        value: room.find(FIND_HOSTILE_CREEPS, {
+            filter: creep => !global.allyList.includes(creep.owner.username)
+        }),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: 1,
+    })
+
+    manageRoomObject({
+        name: 'allyCreeps',
+        value: room.find(FIND_HOSTILE_CREEPS, {
+            filter: creep => !global.allyList.includes(creep.owner.username)
+        }),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: 1,
     })
 
     //
@@ -774,11 +829,11 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // Get roads
 
-            const roads = room.get('roads')
+            const roads = room.get('road')
 
             // Get containers
 
-            const containers = room.get('containers')
+            const containers = room.get('container')
 
             // If there are roads or containers or sources harvested inform false
 

@@ -25,6 +25,26 @@ import { memHack } from 'other/memHack'
 
 declare global {
 
+    type RoomObjectName =
+    'anchorPoint' |
+    'mineral' |
+    'source1' |
+    'source2' |
+    'sources' |
+    StructureConstant |
+    'source1HarvestPositions' |
+    'source1ClosestHarvestPosition' |
+    'source2HarvestPositions' |
+    'source2ClosestHarvestPosition' |
+    'source1Link' |
+    'source2Link' |
+    'source1Container' |
+    'source2Container' |
+    'structuresForSpawning' |
+    'notMyCreeps' |
+    'enemyCreeps' |
+    'allyCreeps'
+
     interface Pos {
         x: number,
         y: number
@@ -173,6 +193,12 @@ declare global {
         storedResources: {[key: string]: number }
 
         // Functions
+        /**
+         * Uses caching and only operating on request to construct and get a specific roomObject based on its name
+         * @param roomObjectName The name of the requested roomObject
+         * @returns Either the roomObject's value, or, if the request failed, undefined
+         */
+        get(roomObjectName: RoomObjectName): any | undefined
 
         /**
          * Removes roomType-based values in the room's memory that don't match its type
@@ -328,7 +354,7 @@ declare global {
             advancedGeneratePixel(): false | 0 | -6
 
             /**
-             * Incrememnts Memory.ID and informs the result 
+             * Incrememnts Memory.ID and informs the result
              */
             newID(): number
 

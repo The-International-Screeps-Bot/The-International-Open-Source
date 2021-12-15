@@ -6,7 +6,7 @@
         "editor.formatOnSave": true
     },
     "[typescript]": {
-        "editor.formatOnSave": false
+        "editor.formatOnSave": true
     },
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true

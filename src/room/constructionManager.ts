@@ -15,7 +15,7 @@ export function constructionManager(room: Room) {
 
         // Construct sourceNames
 
-        const sourceNames = [
+        const sourceNames: ('source1' | 'source2')[] = [
             'source1',
             'source2'
         ]
@@ -26,7 +26,7 @@ export function constructionManager(room: Room) {
 
             // Try to find the source with the sourceName
 
-            const source = room.get(sourceName)
+            const source: Source = room.get(sourceName)
 
             // Iterate if there is no resource
 
@@ -34,7 +34,7 @@ export function constructionManager(room: Room) {
 
             // Try to find an existing sourceContainer for the source
 
-            const sourceContainer = room.get(sourceName + 'Container')
+            const sourceContainer = room.get(`${sourceName}Container`)
 
             // Iterate if there is a sourceContainer
 
@@ -42,7 +42,7 @@ export function constructionManager(room: Room) {
 
             // Try to find the closestHarvestPos for the source
 
-            const closestHarvestPos = room.get(sourceName + 'ClosestHarvestPosition')
+            const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPosition`)
 
             // Iterate if it doesn't exist
 

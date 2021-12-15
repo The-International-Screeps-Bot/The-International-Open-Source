@@ -4,27 +4,7 @@ export function spawnRequests(room: Room) {
 
     // Find energy structures
 
-    const spawnStructures = findSpawnStructures()
-
-    function findSpawnStructures() {
-
-        // Get array of spawns and extensions
-
-        const spawnsAndExtensions: Structure<STRUCTURE_SPAWN | STRUCTURE_EXTENSION>[] = room.get('spawn').concat(room.get('extension'))
-
-        // Filter out structures that aren't active
-
-        const unfilteredSpawnStructures = spawnsAndExtensions.filter((structure) => structure.isActive())
-
-        // Add each spawnStructures with their range to the object
-
-        const anchorPoint = room.get('anchorPoint')
-
-        // Filter energy structures by distance from anchorPoint
-
-        const filteredSpawnStructures = unfilteredSpawnStructures.sort((a, b) => a.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5) - b.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5))
-        return filteredSpawnStructures
-    }
+    const spawnStructures = room.get('structuresForSpawning')
 
     //
 

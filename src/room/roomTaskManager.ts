@@ -1,22 +1,31 @@
 export function taskManager(room: Room) {
 
     interface RoomTask {
-        structure: object
+        type: string
+        targetID: string
         resourceType: string
-        taskType: string
         amount: number
+
+        ID: number
     }
 
     /**
      * @param structure roomObject with a structureType
-     * @param resourceType the type of resource to act upon
+     * @param type the type of resource to act upon
      * @param taskType type of task. Either withdraw or transfer
      * @param amount number of resources to act on
      */
     class RoomTask {
-        constructor(taskType: string, targetID: string, resourceType: string, amount: number) {
+        constructor(type: string, targetID: string, resourceType: string, amount: number) {
 
-            
+            const task = this
+
+            task.type = type
+            task.targetID = targetID
+            task.resourceType = resourceType
+            task.amount = amount
+
+            task.ID = global.newID()
         }
     }
 
