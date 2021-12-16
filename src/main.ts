@@ -355,6 +355,7 @@ declare global {
 
             /**
              * Incrememnts Memory.ID and informs the result
+             * @returns a new ID
              */
             newID(): number
 
