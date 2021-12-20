@@ -1,3 +1,6 @@
+import { constants } from '../international/constants'
+
+
 Room.prototype.get = function(roomObjectName) {
 
     const room: Room = this
@@ -212,7 +215,7 @@ Room.prototype.get = function(roomObjectName) {
 
     // Loop through each structureType in the game
 
-    for (const structureType of global.allStructureTypes) {
+    for (const structureType of constants.allStructureTypes) {
 
         // Create roomObject for structureType
 
@@ -436,7 +439,7 @@ Room.prototype.get = function(roomObjectName) {
     manageRoomObject({
         name: 'enemyCreeps',
         value: room.find(FIND_HOSTILE_CREEPS, {
-            filter: creep => !global.allyList.includes(creep.owner.username)
+            filter: creep => !constants.allyList.includes(creep.owner.username)
         }),
         valueType: 'object',
         cacheMethod: 'global',
@@ -446,7 +449,7 @@ Room.prototype.get = function(roomObjectName) {
     manageRoomObject({
         name: 'allyCreeps',
         value: room.find(FIND_HOSTILE_CREEPS, {
-            filter: creep => !global.allyList.includes(creep.owner.username)
+            filter: creep => !constants.allyList.includes(creep.owner.username)
         }),
         valueType: 'object',
         cacheMethod: 'global',
@@ -494,8 +497,8 @@ Room.prototype.actionVisual = function(pos1: RoomPosition, pos2: RoomPosition, t
     // Construct colors for each type
 
     const colorsForTypes: {[key: string]: string} = {
-        success: global.colors.lightBlue,
-        fail: global.colors.red,
+        success: constants.colors.lightBlue,
+        fail: constants.colors.red,
     }
 
     // If no type, type is success. Construct type from color
@@ -505,7 +508,7 @@ Room.prototype.actionVisual = function(pos1: RoomPosition, pos2: RoomPosition, t
 
     // Create visuals
 
-    room.visual.circle(pos2, { color: color })
+    room.visual.circle(pos2.x, pos2.y, { stroke: color })
     room.visual.line(pos1, pos2, { color: color })
 }
 
@@ -738,7 +741,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): PathObject {
 
                     // Loop through structureTypes of impassibleStructures
 
-                    for (const structureType of global.impassibleStructures) {
+                    for (const structureType of constants.impassibleStructures) {
 
                         // Get structures of type and loop through them
 
@@ -789,7 +792,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // If the controller is owned by an ally
 
-            if (global.allyList.includes(controller.owner.username)) {
+            if (constants.allyList.includes(controller.owner.username)) {
 
                 // Set the type to ally and stop
 
@@ -841,7 +844,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // If the controller is reserved by an ally
 
-            if (global.allyList.includes(controller.reservation.username)) {
+            if (constants.allyList.includes(controller.reservation.username)) {
 
                 // Set type to allyRemote and stop
 
@@ -881,7 +884,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                     // If the creep is owned by an ally
 
-                    if (global.allyList.includes(creep.reservation.username)) {
+                    if (constants.allyList.includes(creep.reservation.username)) {
 
                         // Set type to allyRemote and stop
 
@@ -974,11 +977,11 @@ Room.prototype.cleanRoomMemory = function() {
 
         // Iterate if key is not part of roomTypeProperties
 
-        if (!global.roomTypeProperties[key]) continue
+        if (!constants.roomTypeProperties[key]) continue
 
         // Iterate if key part of this roomType's properties
 
-        if (global.roomTypes[room.memory.type][key]) continue
+        if (constants.roomTypes[room.memory.type][key]) continue
 
         // Delete the property
 
@@ -1058,4 +1061,11 @@ Room.prototype.findStoredResourceAmount = function(resourceType) {
     // Inform room's storedResources of resourceType
 
     return room.storedResources[resourceType]
+}
+
+Room.prototype.deleteTask = function(taskID) {
+
+    const room: Room = this
+
+    delete global[room.name].tasks[taskID]
 }

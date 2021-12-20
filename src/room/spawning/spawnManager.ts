@@ -2,7 +2,7 @@ import './spawnFunctions'
 import { spawnRequests } from './spawnRequests'
 
 export function spawnManager(room: Room) {
-    global.customLog('test', 'hi')
+    
     const spawns: StructureSpawn[] = room.get('spawn')
 
     // Find spawns that aren't spawning

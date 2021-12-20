@@ -20,6 +20,12 @@ const creepClasses: {[key: string]: any} = {
 
         }
     },
+    Upgrader: class extends Creep {
+        constructor(creep: Creep) {
+
+            super(creep.id)
+        }
+    },
     AntifaAssaulter: class {
         constructor() {
 

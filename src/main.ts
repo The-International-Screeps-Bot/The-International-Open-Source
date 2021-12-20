@@ -25,6 +25,29 @@ import { memHack } from 'other/memHack'
 
 declare global {
 
+    interface Pos {
+        x: number
+        y: number
+    }
+
+    interface Rect {
+        x1: number
+        y1: number
+        x2: number
+        y2: number
+    }
+
+    interface Colors {
+        white: string
+        lightGrey: string
+        lightBlue: string
+        darkBlue: string
+        black: string
+        yellow: string
+        red: string
+        green: string
+    }
+
     type RoomObjectName =
     'anchorPoint' |
     'mineral' |
@@ -44,29 +67,6 @@ declare global {
     'notMyCreeps' |
     'enemyCreeps' |
     'allyCreeps'
-
-    interface Pos {
-        x: number,
-        y: number
-    }
-
-    interface Rect {
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number
-    }
-
-    interface Colors {
-        white: string
-        lightGrey: string
-        lightBlue: string
-        darkBlue: string
-        black: string
-        yellow: string
-        red: string
-        green: string
-    }
 
     // Memory
 
@@ -193,6 +193,7 @@ declare global {
         storedResources: {[key: string]: number }
 
         // Functions
+
         /**
          * Uses caching and only operating on request to construct and get a specific roomObject based on its name
          * @param roomObjectName The name of the requested roomObject
@@ -214,6 +215,11 @@ declare global {
          * Finds the amount of a specified resourceType in the room's storage and teminal
          */
         findStoredResourceAmount(resourceType: ResourceConstant): number
+
+        /**
+         * Tries to delete a task with the provided ID
+         */
+        deleteTask(taskID: number): void
     }
 
     interface RoomMemory {
@@ -259,8 +265,7 @@ declare global {
     // Global
 
     namespace NodeJS {
-        interface Global {
-            [key: string]: any
+        interface globaThis {
 
             /**
              * Whether global is constructed or not
@@ -293,7 +298,7 @@ declare global {
             colors: Colors
 
             /**
-             *
+             * The dimensions of a room
              */
             roomDimensions: number
 

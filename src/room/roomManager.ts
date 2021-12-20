@@ -1,6 +1,9 @@
+import { constants } from '../international/constants'
+
 import './roomFunctions'
 
 import './roomTaskManager'
+import { distanceTransform } from './distanceTransform'
 
 import { remoteManager } from './remoteManager'
 import { communeManager } from './communeManager'
@@ -10,7 +13,7 @@ import { roleManager } from './creeps/creepRoleManager'
 import { powerCreepManager } from './powerCreeps/powerCreepRoleManager'
 
 const specificRoomManagers: {[key: string]: Function} = {
-    remote: roomManager,
+    remote: remoteManager,
     commune: communeManager,
 }
 
@@ -24,7 +27,7 @@ export function roomManager() {
 
         const controller = room.controller
 
-        global.customLog('Room', room.name, undefined, global.colors.lightGrey)
+        global.customLog('Room', room.name, undefined, constants.colors.lightGrey)
 
         //
 
@@ -39,7 +42,7 @@ export function roomManager() {
 
             specificRoomManager(room)
         }
-        
+
         // Testing
 
         let cpuUsed = Game.cpu.getUsed()

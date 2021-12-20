@@ -1,3 +1,5 @@
+import { constants } from '../../international/constants'
+
 import './spawnFunctions'
 
 export function spawnRequests(room: Room) {
@@ -144,13 +146,26 @@ export function spawnRequests(room: Room) {
 
                 if (spawnEnergyCapacity >= 700) {
 
-                    opts.defaultParts = []
+                    opts.defaultParts = [CARRY]
                     opts.extraParts = [WORK, WORK, WORK, MOVE]
                     opts.maxParts = 8
 
                     minCreeps.sourceHarvester = room.get('sources').length
 
                     opts.memoryAdditions.moveType = 'travel'
+
+                    return
+                }
+
+                if (spawnEnergyCapacity >= 550) {
+
+                    opts.defaultParts = [CARRY]
+                    opts.extraParts = [WORK]
+                    opts.maxParts = 7
+
+                    minCreeps.sourceHarvester = room.get('sources').length
+
+                    opts.memoryAdditions.moveType = 'pull'
 
                     return
                 }
@@ -220,7 +235,7 @@ export function spawnRequests(room: Room) {
 
     // Loop through each role
 
-    for (const role of global.creepRoles) {
+    for (const role of constants.creepRoles) {
 
         // Define requiredCreeps for the role as minCreeps - existing creeps
 
