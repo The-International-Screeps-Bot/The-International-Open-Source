@@ -1,3 +1,5 @@
+import './towerFunctions'
+
 /**
  * Dictates and operates tasks for towers
  */

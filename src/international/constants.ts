@@ -117,6 +117,8 @@ constants.roomTypes = {
         commune: true,
         source1: true,
         source2: true,
+        reserverNeed: true,
+        builderNeed: true,
     },
     ally: {
         level: true,

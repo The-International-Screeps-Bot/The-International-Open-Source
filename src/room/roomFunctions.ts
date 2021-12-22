@@ -1069,3 +1069,10 @@ Room.prototype.deleteTask = function(taskID) {
 
     delete global[room.name].tasks[taskID]
 }
+
+Room.prototype.findScore = function() {
+
+    const room: Room = this
+
+    
+}

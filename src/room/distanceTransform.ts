@@ -15,7 +15,7 @@ export function distanceTransform(room: Room) {
 
     let x = 0
     let y = 0
-    
+
     // Iterate through
 
     for (x = 0; x < constants.roomDimensions; x++) {
@@ -47,4 +47,14 @@ export function distanceTransform(room: Room) {
     const distanceCM = new PathFinder.CostMatrix()
 
     console.log(JSON.stringify(terrainCM))
+
+    /* for (const pos in terrainCM) {
+
+        const rect = { x1: pos.x - 1, y1: pos.1 - 1, x2: pos.x + 1, y2: pos.y + 2}
+        const positions = global.findPositionsInsideRect(rect)
+
+        const positionsByValue = positions.sort((a: Pos, b: Pos) => terrainCM.get(a.x, a.y) - terrainCM.get(b.x, b.y))
+
+        positionsByValue.reverse()
+    } */
 }

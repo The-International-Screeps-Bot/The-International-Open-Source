@@ -92,5 +92,7 @@ export function tickConfig() {
 
         room.creepsFromRoom = {}
         room.creepsFromRoomAmount = 0
+
+        room.actionableTowers = room.get('tower')
     }
 }

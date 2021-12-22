@@ -66,7 +66,9 @@ declare global {
     'structuresForSpawning' |
     'notMyCreeps' |
     'enemyCreeps' |
-    'allyCreeps'
+    'allyCreeps' |
+    'myDamagedCreeps' |
+    'damagedAllyCreeps'
 
     // Memory
 
@@ -192,6 +194,11 @@ declare global {
          */
         storedResources: {[key: string]: number }
 
+        /**
+         * An array of towers that have not yet used intents
+         */
+        actionableTowers: StructureTower[]
+
         // Functions
 
         /**
@@ -220,6 +227,16 @@ declare global {
          * Tries to delete a task with the provided ID
          */
         deleteTask(taskID: number): void
+
+        /**
+         * Finds the score of rooms for potential communes
+         */
+        findScore(): void
+
+        /**
+         * Finds and heals damaged my or allied creeps
+         */
+        healCreeps(towers: StructureTower): void
     }
 
     interface RoomMemory {
@@ -265,7 +282,8 @@ declare global {
     // Global
 
     namespace NodeJS {
-        interface globaThis {
+        interface Global {
+            [key: string | number]: any
 
             /**
              * Whether global is constructed or not
