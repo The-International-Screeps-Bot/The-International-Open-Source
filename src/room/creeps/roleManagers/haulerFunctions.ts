@@ -3,14 +3,6 @@ import { RoomTask, RoomDeliverTask, RoomPullTask } from "room/tasks"
 import creepClasses from "../creepClasses"
 const Hauler = creepClasses.Hauler
 
-Hauler.prototype.findTask = function() {
-
-    const creep: Creep = this
-    const room: Room = creep.room
-
-
-}
-
 Hauler.prototype.fulfillTask = function() {
 
     const creep: Creep = this

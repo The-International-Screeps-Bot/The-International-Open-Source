@@ -1,3 +1,5 @@
+import { RoomTask } from "room/tasks"
+
 Creep.prototype.isDying = function() {
 
     const creep: Creep = this
@@ -446,4 +448,29 @@ Creep.prototype.advancedMove = function(opts: moveOpts) {
     const room: Room = creep.room
 
 
+}
+
+Creep.prototype.findTask = function(allowedTaskTypes) {
+
+    const creep: Creep = this
+    const room: Room = creep.room
+
+    // Iterate through taskIDs in room
+
+    for (const taskID in global[room.name].tasksWithoutResponders) {
+
+        const task: RoomTask = global[room.name].tasksWithoutResponders[taskID]
+
+        // Iterate if the task's type isn't an allowedTaskType
+
+        if (!allowedTaskTypes[task.type]) continue
+
+        // Otherwise set the creep's task as the task's ID and stop
+
+        creep.memory.taskID = task
+        global[room.name].tasksWithoutResponders[taskID]
+        return true
+    }
+
+    return false
 }

@@ -1,4 +1,7 @@
 export interface RoomTask {
+    /**
+     * What the task is generally expected to entail for responders
+     */
     type: string
     ID: number
 }
@@ -17,7 +20,7 @@ export class RoomDeliverTask {
 
         // Default properties
 
-        task.type = 'transfer'
+        task.type = 'deliver'
         task.ID = global.newID()
 
         // Assign paramaters
@@ -42,7 +45,7 @@ export class RoomPullTask {
 
         // Default properties
 
-        task.type = 'transfer'
+        task.type = 'pull'
         task.ID = global.newID()
 
         // Assign paramaters
