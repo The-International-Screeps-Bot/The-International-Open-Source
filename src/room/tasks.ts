@@ -3,40 +3,17 @@ export interface RoomTask {
     ID: number
 }
 
-export interface RoomWithdrawTask extends RoomTask {
-    targetID: string
+export interface RoomDeliverTask extends RoomTask {
     resourceType: ResourceConstant
-    withdrawAmount: number
+    deliverAmount: number
+    withdrawTargetID: string | undefined
+    transferTargetID: string
 }
 
-export class RoomWithdrawTask {
-    constructor(targetID: string, resourceType: ResourceConstant, withdrawAmount: number) {
+export class RoomDeliverTask {
+    constructor(resourceType: ResourceConstant, deliverAmount: number, withdrawTargetID: string | undefined, transferTargetID: string) {
 
-        const task: RoomWithdrawTask = this
-
-        // Default properties
-
-        task.type = 'withdraw'
-        task.ID = global.newID()
-
-        // Assign paramaters
-
-        task.targetID = targetID
-        task.resourceType = resourceType
-        task.withdrawAmount = withdrawAmount
-    }
-}
-
-export interface RoomTransferTask extends RoomTask {
-    targetIDs: string[]
-    resourceType: ResourceConstant
-    transferAmount: number
-}
-
-export class RoomTransferTask {
-    constructor(targetIDs: string[], resourceType: ResourceConstant, transferAmount: number) {
-
-        const task: RoomTransferTask = this
+        const task: RoomDeliverTask = this
 
         // Default properties
 
@@ -45,19 +22,21 @@ export class RoomTransferTask {
 
         // Assign paramaters
 
-        task.targetIDs = targetIDs
         task.resourceType = resourceType
-        task.transferAmount = transferAmount
+        task.deliverAmount = deliverAmount
+
+        task.withdrawTargetID = withdrawTargetID
+        task.transferTargetID = transferTargetID
     }
 }
 
 export interface RoomPullTask extends RoomTask {
-    targetID: string
-    targetPos: Pos
+    targetName: string
+    targetPos: RoomPosition
 }
 
 export class RoomPullTask {
-    constructor(targetID: string, targetPos: Pos) {
+    constructor(targetName: string, targetPos: RoomPosition) {
 
         const task: RoomPullTask = this
 
@@ -68,7 +47,7 @@ export class RoomPullTask {
 
         // Assign paramaters
 
-        task.targetID = targetID
+        task.targetName = targetName
         task.targetPos = targetPos
     }
 }

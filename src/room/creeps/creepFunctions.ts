@@ -1,5 +1,3 @@
-import { creepOrganizer } from "international/creepOrganizer"
-
 Creep.prototype.isDying = function() {
 
     const creep: Creep = this
@@ -386,11 +384,7 @@ Creep.prototype.travel = function(opts: TravelOpts) {
         }
     }
 
-    // Stop if there is no path
-
-    if (moveWithPath() == ERR_NO_PATH) return false
-
-    function moveWithPath() {
+    function moveWithPath(): boolean | CreepMoveReturnCode {
 
         // Stop if there is no path
 
@@ -406,9 +400,13 @@ Creep.prototype.travel = function(opts: TravelOpts) {
 
         creep.direction = direction
 
-        // Try to move. Stop if move fails
+        // Try to move
 
-        if (creep.move(direction) == ERR_NO_PATH) return ERR_NO_PATH
+        const moveResult = creep.move(direction)
+
+        // If the move didn't work stop and inform the result
+
+        if (moveResult != OK) return moveResult
 
         // Delete pos from path
 
@@ -431,8 +429,11 @@ Creep.prototype.travel = function(opts: TravelOpts) {
         return true
     }
 
+    // Stop if there is no path
 
-    return true
+    if (moveWithPath() == OK) return true
+
+    return false
 }
 
 interface moveOpts {
@@ -442,7 +443,7 @@ interface moveOpts {
 Creep.prototype.advancedMove = function(opts: moveOpts) {
 
     const creep: Creep = this
-    const room: Room = this
+    const room: Room = creep.room
 
 
 }

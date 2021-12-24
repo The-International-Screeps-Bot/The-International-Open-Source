@@ -1,4 +1,4 @@
-import { RoomWithdrawTask, RoomTransferTask, RoomPullTask } from "room/tasks"
+import { RoomTask, RoomDeliverTask, RoomPullTask } from "room/tasks"
 
 import creepClasses from "../creepClasses"
 const Hauler = creepClasses.Hauler
@@ -17,85 +17,110 @@ Hauler.prototype.fulfillTask = function() {
     const room: Room = creep.room
 
     const functionsForTasks: {[key: string]: any} = {
-        withdraw: creep.fulfillWithdrawTask(),
-        transfer: creep.fulfillTransferTask(),
+        deliver: creep.fulfillDeliverTask(),
         pull: creep.fulfillPullTask(),
     }
 
-    const task: RoomWithdrawTask = global[room.name].tasks[creep.memory.taskID]
+    const task: RoomTask = global[room.name].tasks[creep.memory.taskID]
     creep[functionsForTasks[task.type]]()
 }
 
-Hauler.prototype.fulfillWithdrawTask = function() {
+Hauler.prototype.fulfillDeliverTask = function() {
 
     const creep: Creep = this
     const room: Room = creep.room
 
-    // Get the task and the task's target
+    // Get the task using the taskID in the creeps' memory
 
-    const task: RoomWithdrawTask = global[room.name].tasks[creep.memory.taskID]
-    const taskTarget = global.findObjectWithId(task.targetID)
+    const task: RoomDeliverTask = global[room.name].tasks[creep.memory.taskID]
 
-    // Try to transfer to the target and record the result
+    function withdrawAttempt(): boolean {
 
-    const advancedTransferResult = creep.advancedTransfer(taskTarget, task.resourceType, task.amount)
+        // Inform false if there isn't a withdrawTarget
 
-    // If transfering informed the creep wasn't in range
+        if (!task.withdrawTargetID) return false
 
-    if (advancedTransferResult == ERR_NOT_IN_RANGE) {
+        // Get withdraw target using the task's withdrawTargetID
 
-        // Move the the target and stop
+        const withdrawTarget: Creep | Structure | undefined = global.findObjectWithId(task.withdrawTargetID)
 
+        // If there is no withdrawTarget
+
+        if (!withdrawTarget) {
+
+            // Set the task's withdraw target ID to undefined and inform false
+
+            // Delete the task
+
+            room.deleteTask(task.ID)
+
+            // Try to find a new task
+
+            Hauler.findTask()
+
+            // If creep found a task, stop with this task and try to fulfill it
+
+            if (creep.memory.taskID) creep.fulfillTask()
+            return true
+        }
+
+        // Try to withdraw based on the task's request
+
+        const advancedWithdrawResult = creep.advancedWithdraw(withdrawTarget, task.deliverAmount, task.resourceType)
+
+        // Inform true if the advanced withdraw worked. Otherwise inform false
+
+        if (advancedWithdrawResult == OK) return true
+        return false
+    }
+
+    // Attempt to withdraw. If success then stop
+
+    if (withdrawAttempt()) return
+
+    // Get transfer target using the task's transferTargetID
+
+    const transferTarget: Creep | Structure | undefined = global.findObjectWithId(task.withdrawTargetID)
+
+    // If there is no transfer target
+
+    if (!transferTarget) {
+
+        // Delete the task
+
+        room.deleteTask(task.ID)
+
+        // Try to find a new task
+
+        Hauler.findTask()
+
+        // If creep found a task, stop with this task and try to fulfill it
+
+        if (creep.memory.taskID) creep.fulfillTask()
         return
     }
 
-    // Otherwise delete the task
+    // Try to transfer to the transferTarget based on the task' request
 
-    room.deleteTask(task.ID)
+    const advancedTransferResult = creep.advancedWithdraw(transferTarget, task.deliverAmount, task.resourceType)
 
-    // Try to find a new task
+    // If the advanced transfer was a success
 
-    Hauler.findTask()
+    if (advancedTransferResult == OK) {
 
-    // If creep found a task, try to fulfill it
+        // Delete the task
 
-    if (creep.memory.taskID) creep.fulfillTask()
-}
+        room.deleteTask(task.ID)
 
-Hauler.prototype.fulfillTransferTask = function() {
+        // Try to find a new task
 
-    const creep: Creep = this
-    const room: Room = creep.room
+        Hauler.findTask()
 
-    // Get the task and the task's target
+        // If creep found a task, stop with this task and try to fulfill it
 
-    const task: RoomTransferTask = global[room.name].tasks[creep.memory.taskID]
-    const taskTarget = global.findObjectWithId(task.targetID)
-
-    // Try to transfer to the target and record the result
-
-    const advancedTransferResult = creep.advancedTransfer(taskTarget, task.resourceType, task.amount)
-
-    // If transfering informed the creep wasn't in range
-
-    if (advancedTransferResult == ERR_NOT_IN_RANGE) {
-
-        // Move the the target and stop
-
+        if (creep.memory.taskID) creep.fulfillTask()
         return
     }
-
-    // Otherwise delete the task
-
-    room.deleteTask(task.ID)
-
-    // Try to find a new task
-
-    Hauler.findTask()
-
-    // If creep found a task, try to fulfill it
-
-    if (creep.memory.taskID) creep.fulfillTask()
 }
 
 Hauler.prototype.fulfillPullTask = function() {
@@ -103,25 +128,66 @@ Hauler.prototype.fulfillPullTask = function() {
     const creep: Creep = this
     const room: Room = creep.room
 
-    // Get the task and the task's target
+    // Get the task
 
     const task: RoomPullTask = global[room.name].tasks[creep.memory.taskID]
-    const taskTarget = global.findObjectWithId(task.targetID)
+    const taskTarget = Game.creeps[task.targetName]
 
-    // Try to transfer to the target and record the result
+    // If there is no taskTarget
 
-    const advancedTransferResult = creep.advancedTransfer(taskTarget, task.resourceType, task.amount)
+    if (!taskTarget) {
 
-    // If transfering informed the creep wasn't in range
+        // Delete the task
 
-    if (advancedTransferResult == ERR_NOT_IN_RANGE) {
+        room.deleteTask(task.ID)
 
-        // Move the the target and stop
+        // Try to find a new task
 
+        Hauler.findTask()
+
+        // If creep found a task, stop with this task and try to fulfill it
+
+        if (creep.memory.taskID) creep.fulfillTask()
         return
     }
 
-    // Otherwise delete the task
+    // If the creep is not close enough to pull the target
+
+    if (creep.pos.getRangeTo(taskTarget.pos) > 1) {
+
+        // Move to the target
+
+        creep.moveTo(taskTarget.pos)
+    }
+
+    // Otherwise
+
+    // Find the targetPos
+
+    const targetPos = task.targetPos
+
+    // If the creep is not in range of the targetPos
+
+    if (creep.pos.getRangeTo(targetPos) > 1) {
+
+        // Have the creep pull the target and have it move with the creep
+
+        creep.pull(taskTarget)
+        taskTarget.move(creep)
+    }
+
+    // Otherwise
+
+    // Have the creep move to where the taskTarget is
+
+    creep.move(creep.pos.getDirectionTo(taskTarget.pos))
+
+    // Have the creep pull the taskTarget to trade places with the creep
+
+    creep.pull(taskTarget)
+    taskTarget.move(creep)
+
+    // Delete the task
 
     room.deleteTask(task.ID)
 
