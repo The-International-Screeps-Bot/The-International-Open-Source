@@ -20,6 +20,7 @@ import { ErrorMapper } from './external/ErrorMapper'
 
 import { logManager } from 'other/logManager'
 import { memHack } from 'other/memHack'
+import { RoomTask } from 'room/tasks'
 
 // Type declareations for global
 
@@ -69,6 +70,30 @@ declare global {
     'allyCreeps' |
     'myDamagedCreeps' |
     'damagedAllyCreeps'
+
+    interface PathGoal {
+        pos: RoomPosition
+        range: number
+    }
+
+    interface PathOpts {
+        origin: RoomPosition
+        goal: PathGoal
+        avoidTypes: string[]
+        plainCost: number
+        swampCost: number
+        maxRooms: number
+        flee: boolean
+        creep: Creep
+        useRoads: boolean
+        avoidEnemyRanges: boolean
+        avoidImpassibleStructures: boolean
+        prioritizeRamparts: boolean
+    }
+
+    interface Commune {
+
+    }
 
     // Memory
 
@@ -167,7 +192,6 @@ declare global {
     // Room
 
     interface Room {
-        [key: string]: any
 
         /**
          * The amount of creeps with a task of harvesting sources in the room
@@ -190,14 +214,33 @@ declare global {
         creepsFromRoom: {[key: string]: string[]}
 
         /**
-         *
+         * The cumulative amount of creeps with a roomFrom value of this room's name
          */
-        storedResources: {[key: string]: number }
+        creepsFromRoomAmount: number
 
         /**
          * An array of towers that have not yet used intents
          */
         actionableTowers: StructureTower[]
+
+        /**
+         * Tasks that currently have a creep trying to fulfill them
+         */
+        tasksWithResponders: {[key: string]: RoomTask}
+
+        /**
+         * Tasks that don't currently have a responder
+         */
+        tasksWithoutResponders: {[key: string]: RoomTask}
+
+        /**
+         * An object, if constructed, containing keys of resource types and values of the number of those resources in the room's terminal and storage
+         */
+        storedResources: {[key: string]: number}
+
+        creepPositions: {[key: string]: any}
+
+        moveRequests: {[key: string]: any}
 
         // Functions
 
@@ -214,7 +257,28 @@ declare global {
         cleanRoomMemory(): void
 
         /**
-         * Finds the number of rooms between two rooms while avoiding rooms with specified types
+         * Converts a custom Pos into a Game's RoomPosition
+         */
+        newPos(pos: Pos): RoomPosition
+
+        /**
+         *
+         * @param pos1 The position of the thing performing the action
+         * @param pos2 The position of the thing getting intereacted with
+         * @param type The type of interaction, success if not provided
+         */
+        actionVisual(pos1: RoomPosition, pos2: RoomPosition, type?: string): void
+
+        /**
+         *
+         * @param originRoomName
+         * @param goalRoomName
+         * @param avoidTypes
+         */
+        advancedFindPath(opts: PathOpts): RoomPosition[]
+
+        /**
+         * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
          */
         advancedFindDistance(originRoomName: string, goalRoomName: string, avoidTypes?: string[]): number
 
@@ -227,6 +291,12 @@ declare global {
          * Tries to delete a task with the provided ID
          */
         deleteTask(taskID: number): void
+
+        /**
+         * Finds the type of a room and initializes its custom properties
+         * @param scoutingRoom The room that is performing the scout operation
+         */
+        findType(scoutingRoom: Room): void
 
         /**
          * Finds the score of rooms for potential communes
@@ -259,6 +329,11 @@ declare global {
          * Tries to find a task for the creep with a type that matches the allowedTaskTypes
          */
         findTask(allowedTaskTypes: {[key: string]: boolean}): boolean
+
+        /**
+         * Try to enforce a moveRequest and inform the result
+         */
+        runMoveRequest(pos: RoomPosition): ScreepsReturnCode
     }
 
     interface CreepMemory {

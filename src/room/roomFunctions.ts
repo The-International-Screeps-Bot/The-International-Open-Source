@@ -490,9 +490,13 @@ Room.prototype.newPos = function(pos: Pos) {
     @param pos2 pos of the object getting acted on
     @param [type] The status of action performed
 */
-Room.prototype.actionVisual = function(pos1: RoomPosition, pos2: RoomPosition, type?: string) {
+Room.prototype.actionVisual = function(pos1, pos2, type?) {
 
     const room = this
+
+    // Stop if roomVisuals are disabled
+
+    if (!Memory.roomVisuals) return
 
     // Construct colors for each type
 
@@ -512,54 +516,24 @@ Room.prototype.actionVisual = function(pos1: RoomPosition, pos2: RoomPosition, t
     room.visual.line(pos1, pos2, { color: color })
 }
 
-interface PathGoal {
-    pos: RoomPosition
-    range: number
-}
-
-interface PathOpts {
-    origin: RoomPosition
-    goal: PathGoal
-    avoidTypes: string[]
-    plainCost: number
-    swampCost: number
-    maxRooms: number
-    flee: boolean
-    creep: Creep
-    useRoads: boolean
-    avoidEnemyRanges: boolean
-    avoidImpassibleStructures: boolean
-    prioritizeRamparts: boolean
-}
-
-interface RoomRoute {
+interface RoutePart {
     exit: ExitConstant
     room: string
 }
 
-interface PathObject {
-    route: RoomRoute[] | -2 | undefined
-    path: PathFinderPath
-}
+type Route = RoutePart[]
 
 /**
  * @param opts options
- * @returns an array of RoomPositions
+ * @returns An array of RoomPositions
  */
-Room.prototype.advancedFindPath = function(opts: PathOpts): PathObject {
+Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
     const room: Room = this
 
-    // Construct pathObject
-
-    const pathObject: PathObject = {
-        route: generateRoute(),
-        path: generatePath(),
-    }
-
     // Construct route
 
-    function generateRoute() {
+    function generateRoute(): Route | undefined  {
 
         // If the goal is in the same room as the origin, inform that no route is needed
 
@@ -567,7 +541,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): PathObject {
 
         // Construct route by searching through rooms
 
-        const route = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
+        const route: Route | -2 = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
 
             // Essentially a costMatrix for the rooms, priority is for the lower values. Infinity is impassible
 
@@ -593,16 +567,30 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): PathObject {
             }
         })
 
-        // Inform route
+        // If route doesn't work inform undefined
+
+        if (route == ERR_NO_PATH) return undefined
+
+        // If the route is less than 2 inform undefined
+
+        if (route.length < 2) return undefined
+
+        // Otherwise inform the route
 
         return route
     }
 
     // Construct path
 
-    function generatePath() {
+    function generatePath(): RoomPosition[] {
 
-        const path: PathFinderPath = PathFinder.search(opts.origin, opts.goal, {
+        const route = generateRoute()
+        if (route) opts.goal = {
+            pos: room.newPos({ x: 25, y: 25 }),
+            range: 25
+        }
+
+        const pathFinderResult: PathFinderPath = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost,
             swampCost: opts.swampCost,
             maxRooms: opts.maxRooms,
@@ -639,7 +627,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): PathObject {
 
                 // If there is no route
 
-                if (!pathObject.route) {
+                if (!route) {
 
                     let y: number = 0
                     let x: number = 0
@@ -761,12 +749,15 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): PathObject {
             }
         })
 
-        return path
+        // Inform the path from pathFinderResult
+
+        return pathFinderResult.path
     }
 
-    // Inform pathObject
+    // Call path generation and inform the result
 
-    return pathObject
+    const path = generatePath()
+    return path
 }
 
 Room.prototype.findType = function(scoutingRoom: Room) {
@@ -1074,5 +1065,5 @@ Room.prototype.findScore = function() {
 
     const room: Room = this
 
-    
+
 }

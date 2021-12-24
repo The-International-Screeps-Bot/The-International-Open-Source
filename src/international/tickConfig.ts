@@ -50,9 +50,6 @@ export function tickConfig() {
         room.myCreeps = {}
         room.creepCount = {}
 
-        room.storedResources = {}
-        room.constructionSites = {}
-
         //
 
         for (const role of global.creepRoles) {
@@ -86,12 +83,15 @@ export function tickConfig() {
 
         //
 
-        if (!global[room.name].tasks) global[room.name].tasks = {}
+        if (!global[room.name].tasksWithoutResponders) global[room.name].tasksWithoutResponders = {}
+        if (!global[room.name].tasksWithResponders) global[room.name].tasksWithResponders = {}
 
         //
 
         room.creepsFromRoom = {}
         room.creepsFromRoomAmount = 0
+
+        room.storedResources = {}
 
         room.actionableTowers = room.get('tower')
     }

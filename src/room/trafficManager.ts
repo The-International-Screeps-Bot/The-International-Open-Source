@@ -1,13 +1,36 @@
 export function trafficManager(room: Room) {
 
+    const creepPositions = room.creepPositions
     const moveRequests = room.moveRequests
 
-    for (const requestPos in moveRequests) {
+    for (const pos in moveRequests) {
 
-        const creepName = moveRequests[requestPos]
+        let i = 0
 
-        const creep = Game.creeps[creepName]
+        for (let i = 0; i < moveRequests[pos].length; i++) {
 
+            const creepAtPos = creepPositions[pos]
 
+            // If there is a creep at the requested move pos
+
+            if (creepAtPos.length > 0) {
+
+                // If they are making a moveRequest
+
+                if (creepAtPos.moveRequest) {
+
+                    //
+
+                    creepAtPos.runMoveRequest(pos)
+                }
+            }
+
+            const creep = moveRequests[i]
+
+            //
+
+            creep.move(creep.pos.getDirectionTo(pos))
+            break
+        }
     }
 }

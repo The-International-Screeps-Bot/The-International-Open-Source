@@ -474,3 +474,12 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
 
     return false
 }
+
+Creep.prototype.runMoveRequest = function(pos) {
+
+    const creep: Creep = this
+    const room: Room = creep.room
+
+    room.moveRequests[pos]
+    return creep.move(creep.pos.getDirectionTo(pos))
+}
