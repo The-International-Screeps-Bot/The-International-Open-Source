@@ -50,6 +50,9 @@ export function tickConfig() {
         room.myCreeps = {}
         room.creepCount = {}
 
+        room.creepPositions = new Map()
+        room.moveRequests = new Map()
+
         //
 
         for (const role of global.creepRoles) {

@@ -96,7 +96,7 @@ export function spawnRequests(room: Room) {
 
                 // Take away the last part from body
 
-                this.body.slice(0, this.body.length - 1)
+                this.body.splice(-1, 1)
             }
 
             // Construct memory

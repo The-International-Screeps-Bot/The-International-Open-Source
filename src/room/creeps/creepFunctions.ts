@@ -480,6 +480,23 @@ Creep.prototype.runMoveRequest = function(pos) {
     const creep: Creep = this
     const room: Room = creep.room
 
-    room.moveRequests[pos]
+    // Delete all moveRequests to the position
+
+    room.moveRequests.delete(pos)
+
+    // Get the position of the creep
+
+    const creepNames = room.creepPositions.get(creep.pos)
+
+    // Find the index of the creep's name in creepNames
+
+    const creepPosIndex = creepNames.indexOf(creep.name)
+
+    // Remove the creep's name from the array of creep positions
+
+    creepNames.splice(creepPosIndex, 1)
+
+    // Move the creep to the position and inform the result
+
     return creep.move(creep.pos.getDirectionTo(pos))
 }
