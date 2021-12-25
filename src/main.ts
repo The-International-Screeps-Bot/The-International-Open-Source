@@ -91,6 +91,10 @@ declare global {
         prioritizeRamparts: boolean
     }
 
+    interface MoveRequestOpts extends PathOpts {
+        cacheAmount: number
+    }
+
     interface Commune {
 
     }
@@ -330,12 +334,15 @@ declare global {
          */
         findTask(allowedTaskTypes: {[key: string]: boolean}): boolean
 
-        needNewPath()
+        /**
+         *
+         */
+        needsNewPath(goalPos: RoomPosition, cacheAmount: number): boolean
 
         /**
          *
          */
-        createMoveRequest(opts: PathOpts): boolean
+        createMoveRequest(opts: MoveRequestOpts): boolean
 
         /**
          * Try to enforce a moveRequest and inform the result
@@ -345,7 +352,16 @@ declare global {
 
     interface CreepMemory {
         [key: string]: any
+
+        /**
+         * Generally describes the body parts and tasks the creep is expected to do
+         */
         role: string
+
+        /**
+         * The last time a path was cached in memory
+         */
+        lastCache: number
     }
 
     // PowerCreeps
