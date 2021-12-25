@@ -1,9 +1,8 @@
 export function trafficManager(room: Room) {
 
-    const creepPositions = room.creepPositions
-    const moveRequests = room.moveRequests
+    // Loop through moveRequests
 
-    for (const [pos, creepNames] of moveRequests) {
+    for (const [pos, creepNames] of room.moveRequests) {
 
         // Record iterations
 
@@ -17,13 +16,8 @@ export function trafficManager(room: Room) {
 
             // Try to find creepPositions at pos. Iterate if there are none
 
-            const creepNamesAtPos = creepPositions.get(pos)
-            if (!creepNamesAtPos) continue
-
-            // Try to find the name of the creep at the pos. Iterate if there is none
-
-            const creepNameAtPos = creepNamesAtPos[i]
-            if (!creepNamesAtPos) continue
+            const creepNameAtPos = room.creepPositions.get(pos)
+            if (!creepNameAtPos) continue
 
             // Get the creep with the name
 
@@ -44,7 +38,7 @@ export function trafficManager(room: Room) {
 
             // Get the creep's name
 
-            const creepName = moveRequests.get(pos)[i]
+            const creepName = room.moveRequests.get(pos)[i]
 
             // Get the creep with the name of creepName
 

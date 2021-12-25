@@ -238,7 +238,7 @@ declare global {
          */
         storedResources: {[key: string]: number}
 
-        creepPositions: Map<RoomPosition, string[]>
+        creepPositions: Map<RoomPosition, string>
 
         moveRequests: Map<RoomPosition, string[]>
 

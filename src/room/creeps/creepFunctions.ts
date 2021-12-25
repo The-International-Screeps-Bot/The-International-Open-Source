@@ -484,17 +484,9 @@ Creep.prototype.runMoveRequest = function(pos) {
 
     room.moveRequests.delete(pos)
 
-    // Get the position of the creep
+    // Remove record of the creep being on its current position
 
-    const creepNames = room.creepPositions.get(creep.pos)
-
-    // Find the index of the creep's name in creepNames
-
-    const creepPosIndex = creepNames.indexOf(creep.name)
-
-    // Remove the creep's name from the array of creep positions
-
-    creepNames.splice(creepPosIndex, 1)
+    room.creepPositions.delete(creep.pos)
 
     // Move the creep to the position and inform the result
 
