@@ -83,8 +83,8 @@ declare global {
         plainCost: number
         swampCost: number
         maxRooms: number
-        flee: boolean
-        creep: Creep
+        flee?: boolean
+        creep?: Creep
         useRoads: boolean
         avoidEnemyRanges: boolean
         avoidImpassibleStructures: boolean
@@ -329,6 +329,13 @@ declare global {
          * Tries to find a task for the creep with a type that matches the allowedTaskTypes
          */
         findTask(allowedTaskTypes: {[key: string]: boolean}): boolean
+
+        needNewPath()
+
+        /**
+         *
+         */
+        createMoveRequest(opts: PathOpts): boolean
 
         /**
          * Try to enforce a moveRequest and inform the result

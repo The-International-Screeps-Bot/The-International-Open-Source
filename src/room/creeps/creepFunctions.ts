@@ -155,12 +155,79 @@ Creep.prototype.partsOfType = function(type: BodyPartConstant) {
     return partsOfType.length
 }
 
-Creep.prototype.advancedMove = function() {
+Creep.prototype.needsNewPath = function() {
 
-    const creep: Creep = this
+
+}
+
+Creep.prototype.createMoveRequest = function(opts) {
+
+    const creep = this
     const room: Room = creep.room
 
+    // Stop if creep can't move
 
+    if (creep.fatigue > 0) return false
+
+    // Stop if creep is spawning
+
+    if (creep.spawning) return false
+
+    // Stop if the creep already has a moveRequest
+
+    if (creep.moveRequest) return false
+
+    // See if the creep needs a new path
+
+    const needsNewPathResult = creep.needsNewPath()
+
+    // If the creep need a new path, make one
+
+    if (needsNewPathResult) {
+
+        opts.creep = creep
+
+        creep.memory.path = room.advancedFindPath(opts)
+    }
+
+    const path = creep.memory.path
+
+    // Stop if there are no positions left in the path
+
+    if (path.length == 0) return false
+
+    let movePos
+
+    let i = -1
+
+    // So long as the creep is standing on the first position in the path
+
+    while (global.arePositionsEqual(creep.pos, movePos)) {
+
+        i++
+
+        movePos = path[i]
+
+        // Stop if there is no movePos
+
+        if (!movePos) return false
+    }
+
+    // If there isn't a moveRequest value for this position create one
+
+    if (!room.moveRequests.get(movePos)) room.moveRequests.set(movePos, [])
+
+    // Add the creep's name to its moveRequest position
+
+    room.moveRequests.get(movePos).push(creep.name)
+
+    // Add the creep's moveRequest to its memory
+
+    creep.moveRequest = movePos
+
+    // Inform success
+
+    return true
 }
 
 interface TravelOpts {

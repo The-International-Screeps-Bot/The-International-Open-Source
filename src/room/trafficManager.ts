@@ -19,7 +19,7 @@ export function trafficManager(room: Room) {
 
                 // Get the creep with the name
 
-                const creepAtPos: Creep = Game.creeps[creepNameAtPos]
+                const creepAtPos = Game.creeps[creepNameAtPos]
 
                 // Iterate if they aren't making a moveRequest
 
