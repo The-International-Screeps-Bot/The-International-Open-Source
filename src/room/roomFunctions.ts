@@ -456,6 +456,56 @@ Room.prototype.get = function(roomObjectName) {
         cacheAmount: 1,
     })
 
+    // costMatrixes
+
+    function generateTerrainCM() {
+
+        const terrain = room.getTerrain()
+
+        // Create a CostMatrix for terrain types
+
+        const terrainCM = new PathFinder.CostMatrix()
+
+        // Construct positions
+
+        let x = 0
+        let y = 0
+
+        // Iterate through
+
+        for (x = 0; x < constants.roomDimensions; x++) {
+            for (y = 0; y < constants.roomDimensions; y++) {
+
+                // Try to find the terrainValue
+
+                const terrainValue = terrain.get(x, y)
+
+                // If terrain is a wall
+
+                if (terrainValue == TERRAIN_MASK_WALL) {
+
+                    // Set this positions as 1 in the terrainCM
+
+                    terrainCM.set(x, y, 1)
+                    continue
+                }
+
+                // Otherwise set this positions as 0 in the terrainCM
+
+                terrainCM.set(x, y, 0)
+                continue
+            }
+        }
+    }
+
+    manageRoomObject({
+        name: 'terrainCM',
+        value: generateTerrainCM(),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: 1,
+    })
+
     //
 
     const roomObject = roomObjects[roomObjectName]
@@ -1066,4 +1116,37 @@ Room.prototype.findScore = function() {
     const room: Room = this
 
 
+}
+
+Room.prototype.distanceTransform = function() {
+
+    const room: Room = this
+
+    const terrainCM = room.get('terrainCM')
+
+    //
+
+    const distanceCM = new PathFinder.CostMatrix()
+
+    console.log(JSON.stringify(terrainCM))
+
+    /* for (const pos in terrainCM) {
+
+        // Construct a rect and get the positions in a range of 1
+
+        const rect = { x1: pos.x - 1, y1: pos.1 - 1, x2: pos.x + 1, y2: pos.y + 2}
+        const positions = global.findPositionsInsideRect(rect)
+
+        // Sort positions by their CM value
+
+        const positionsByValue = positions.sort((a: Pos, b: Pos) => terrainCM.get(a.x, a.y) - terrainCM.get(b.x, b.y))
+
+        // Record the value of the pos with the lowest value
+
+        const lowestNearbyValue = terrainCM.get(positionsByValue[0].x, positionsByValue[0].y)
+
+        // Set this position in distanceCM to the lowestNearbyValue + 1
+
+        distanceCM.set(pos.x, pos.y, lowestNearbyValue)
+    } */
 }

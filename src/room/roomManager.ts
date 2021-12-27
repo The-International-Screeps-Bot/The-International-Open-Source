@@ -3,7 +3,6 @@ import { constants } from '../international/constants'
 import './roomFunctions'
 
 import './roomTaskManager'
-import { distanceTransform } from './distanceTransform'
 
 import { remoteManager } from './remoteManager'
 import { communeManager } from './communeManager'

@@ -69,7 +69,8 @@ declare global {
     'enemyCreeps' |
     'allyCreeps' |
     'myDamagedCreeps' |
-    'damagedAllyCreeps'
+    'damagedAllyCreeps' |
+    'terrainCM'
 
     interface PathGoal {
         pos: RoomPosition
@@ -311,6 +312,11 @@ declare global {
          * Finds and heals damaged my or allied creeps
          */
         healCreeps(towers: StructureTower): void
+
+        /**
+         * Finds open spaces in a room
+         */
+        distanceTransform(): void
     }
 
     interface RoomMemory {
