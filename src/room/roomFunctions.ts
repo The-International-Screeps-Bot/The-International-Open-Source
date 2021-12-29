@@ -496,6 +496,8 @@ Room.prototype.get = function(roomObjectName) {
                 continue
             }
         }
+
+        return terrainCM
     }
 
     manageRoomObject({
@@ -1149,4 +1151,6 @@ Room.prototype.distanceTransform = function() {
 
         distanceCM.set(pos.x, pos.y, lowestNearbyValue)
     } */
+
+    return distanceCM
 }

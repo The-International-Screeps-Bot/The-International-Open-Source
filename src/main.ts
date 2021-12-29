@@ -316,7 +316,7 @@ declare global {
         /**
          * Finds open spaces in a room
          */
-        distanceTransform(): void
+        distanceTransform(): any
     }
 
     interface RoomMemory {

@@ -24,7 +24,15 @@ export function tickConfig() {
 
     // Memory memory
 
-    Memory.memorUsage = Math.floor(RawMemory.get().length / 1000)
+    Memory.memoryUsage = Math.floor(RawMemory.get().length / 1000)
+
+    //
+
+    Memory.data.gclPercent = (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2)
+    Memory.totalGCL = (Math.pow(Game.gcl.level - 1, 2.4) * 1000000).toFixed(2)
+
+    Memory.data.gplPercent = (Game.gpl.progress / Game.gpl.progressTotal * 100).toFixed(2)
+    Memory.totalPower = (Math.pow(Game.gpl.level - 1, 2) * 1000).toFixed(2)
 
     // global
 
