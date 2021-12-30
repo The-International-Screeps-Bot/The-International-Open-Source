@@ -1,5 +1,3 @@
-import creepClasses from '../room/creeps/creepClasses'
-
 /**
  * Organizes creeps into properties for their roomFrom, and tracks total creep count
  */
@@ -24,16 +22,6 @@ export function creepOrganizer() {
             delete Memory.creeps[creepName]
             continue
         }
-
-        // Find class for creep's role
-
-        const creepsClass = creepClasses[creep.memory.role[0].toUpperCase() + creep.memory.role.substr(1)]
-
-        // Assign the creep its relevant class
-
-        Game.creeps[creepName] = new creepsClass(creep)
-
-        //
 
         const room = Game.rooms[creep.roomFrom]
 

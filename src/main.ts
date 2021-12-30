@@ -12,6 +12,14 @@ import { internationalManager } from './international/internationalManager'
 
 import { roomManager } from './room/roomManager'
 
+import {
+    SourceHarvester,
+    Hauler,
+    ControllerUpgrader,
+    MineralHarvester,
+    Antifa
+} from './room/creeps/creepClasses'
+
 // External
 
 import { ErrorMapper } from './external/ErrorMapper'
@@ -80,25 +88,34 @@ declare global {
     interface PathOpts {
         origin: RoomPosition
         goal: PathGoal
-        avoidTypes: string[]
-        plainCost: number
-        swampCost: number
-        maxRooms: number
+        avoidTypes?: string[]
+        plainCost?: number
+        swampCost?: number
+        maxRooms?: number
         flee?: boolean
         creep?: Creep
-        useRoads: boolean
-        avoidEnemyRanges: boolean
-        avoidImpassibleStructures: boolean
-        prioritizeRamparts: boolean
+        useRoads?: boolean
+        avoidEnemyRanges?: boolean
+        avoidImpassibleStructures?: boolean
+        prioritizeRamparts?: boolean
     }
 
     interface MoveRequestOpts extends PathOpts {
-        cacheAmount: number
+        cacheAmount?: number
+    }
+
+    interface creepClasses {
+        [key: string]: SourceHarvester |
+        Hauler |
+        ControllerUpgrader |
+        MineralHarvester |
+        Antifa
     }
 
     interface Commune {
 
     }
+
 
     // Memory
 
@@ -341,6 +358,11 @@ declare global {
         findTask(allowedTaskTypes: {[key: string]: boolean}): boolean
 
         /**
+         * Attempt to upgrade the controller optimally
+         */
+        advancedUpgradeController(): boolean
+
+        /**
          *
          */
         needsNewPath(goalPos: RoomPosition, cacheAmount: number): boolean
@@ -368,6 +390,8 @@ declare global {
          * The last time a path was cached in memory
          */
         lastCache: number
+
+        sourceName: 'source1' | 'source2'
     }
 
     // PowerCreeps

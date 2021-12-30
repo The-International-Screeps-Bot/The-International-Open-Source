@@ -1,10 +1,9 @@
-import creepClasses from "../creepClasses"
-const SourceHarvester = creepClasses.SourceHarvester
+import { SourceHarvester } from "../creepClasses"
 
 SourceHarvester.prototype.recordSource = function() {
 
-    const creep: Creep = this
-    const room: Room = creep.room
+    const creep: SourceHarvester = this
+    const room = creep.room
 
     const sourceName: string = creep.memory.sourceName
 
@@ -13,16 +12,14 @@ SourceHarvester.prototype.recordSource = function() {
 
 SourceHarvester.prototype.travelToSource = function() {
 
-    const creep = this
+    const creep: SourceHarvester = this
     const room = creep.room
 
-    const sourceName: string = creep.memory.sourceName
+    const sourceName = creep.memory.sourceName
 
-    const closestHarvestPos = room.get(sourceName + 'ClosestHarvestPosition')
+    const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPosition`)
 
     if (global.arePositionsAlike(creep.pos, closestHarvestPos)) return 'atSource'
-
-    const targetPos = findTargetPos()
 
     function findTargetPos() {
 
@@ -32,7 +29,11 @@ SourceHarvester.prototype.travelToSource = function() {
 
         // Assign impassible to tiles with sourceHarvesters
 
-        for (const sourceHarvester of room.myCreeps.sourceHarvester) {
+        for (const sourceHarvesterName of room.myCreeps.sourceHarvester) {
+
+            // Find the sourceHarvester using its name
+
+            const sourceHarvester = Game.creeps[sourceHarvesterName]
 
             // Iterate if sourceHarvester is this creep
 
@@ -47,7 +48,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
         // If creepOnHarvestPos find a harvest pos that isn't occupied
 
-        const harvestPositions = room.get(sourceName + 'HarvestPositions')
+        const harvestPositions = room.get(`${sourceName}HarvestPositions`)
 
         for (const harvestPos of harvestPositions) {
 
@@ -56,6 +57,8 @@ SourceHarvester.prototype.travelToSource = function() {
             return harvestPos
         }
     }
+
+    const targetPos = findTargetPos()
 
     //
 
@@ -72,12 +75,12 @@ SourceHarvester.prototype.travelToSource = function() {
 
 SourceHarvester.prototype.transferToSourceLink = function() {
 
-    const creep = this
+    const creep: SourceHarvester = this
     const room = creep.room
 
-    const sourceName: string = creep.memory.sourceName
+    const sourceName = creep.memory.sourceName
 
-    const sourceLink = room.get(sourceName + 'Link')
+    const sourceLink = room.get(`${sourceName}Link`)
     if (!sourceLink) return 'noLink'
 
     creep.advancedTransfer(sourceLink)

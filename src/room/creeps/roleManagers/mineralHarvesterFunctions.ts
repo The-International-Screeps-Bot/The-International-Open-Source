@@ -1,9 +1,9 @@
-import creepClasses from "../creepClasses"
-const MineralHarvester = creepClasses.MineralHarvester
+import { MineralHarvester } from "../creepClasses"
 
 MineralHarvester.prototype.advancedHarvestMineral = function() {
 
-    const creep = this
+    const creep: MineralHarvester = this
+    const room = creep.room
 
 
 }

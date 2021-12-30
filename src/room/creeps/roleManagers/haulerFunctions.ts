@@ -1,11 +1,10 @@
 import { RoomTask, RoomDeliverTask, RoomPullTask } from "room/tasks"
 
-import creepClasses from "../creepClasses"
-const Hauler = creepClasses.Hauler
+import { Hauler } from "../creepClasses"
 
 Hauler.prototype.fulfillTask = function() {
 
-    const creep: Creep = this
+    const creep: Hauler = this
     const room: Room = creep.room
 
     const functionsForTasks: {[key: string]: any} = {
@@ -19,7 +18,7 @@ Hauler.prototype.fulfillTask = function() {
 
 Hauler.prototype.fulfillDeliverTask = function() {
 
-    const creep: Creep = this
+    const creep: Hauler = this
     const room: Room = creep.room
 
     // Get the task using the taskID in the creeps' memory
@@ -48,7 +47,10 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
             // Try to find a new task
 
-            Hauler.findTask()
+            creep.findTask({
+                deliver: true,
+                pull: true,
+            })
 
             // If creep found a task, stop with this task and try to fulfill it
 
@@ -84,7 +86,10 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
         // Try to find a new task
 
-        Hauler.findTask()
+        creep.findTask({
+            deliver: true,
+            pull: true,
+        })
 
         // If creep found a task, stop with this task and try to fulfill it
 
@@ -106,7 +111,10 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
         // Try to find a new task
 
-        Hauler.findTask()
+        creep.findTask({
+            deliver: true,
+            pull: true,
+        })
 
         // If creep found a task, stop with this task and try to fulfill it
 
@@ -117,7 +125,7 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
 Hauler.prototype.fulfillPullTask = function() {
 
-    const creep: Creep = this
+    const creep: Hauler = this
     const room: Room = creep.room
 
     // Get the task
@@ -135,7 +143,10 @@ Hauler.prototype.fulfillPullTask = function() {
 
         // Try to find a new task
 
-        Hauler.findTask()
+        creep.findTask({
+            deliver: true,
+            pull: true,
+        })
 
         // If creep found a task, stop with this task and try to fulfill it
 
@@ -185,7 +196,10 @@ Hauler.prototype.fulfillPullTask = function() {
 
     // Try to find a new task
 
-    Hauler.findTask()
+    creep.findTask({
+        deliver: true,
+        pull: true,
+    })
 
     // If creep found a task, try to fulfill it
 

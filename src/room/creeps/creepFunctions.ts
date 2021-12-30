@@ -25,7 +25,7 @@ Creep.prototype.isDying = function() {
 Creep.prototype.advancedTrafer = function(target: any, resource?: ResourceConstant, amount?: number) {
 
     const creep: Creep = this
-    const room: Room = creep.room
+    const room = creep.room
 
     // If creep isn't in transfer range
 
@@ -72,7 +72,7 @@ Creep.prototype.advancedTrafer = function(target: any, resource?: ResourceConsta
 Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceConstant, amount?: number) {
 
     const creep: Creep = this
-    const room: Room = creep.room
+    const room = creep.room
 
     // If creep isn't in transfer range
 
@@ -133,6 +133,60 @@ Creep.prototype.advancedHarvestSource = function(source: Source) {
     return 0
 }
 
+Creep.prototype.advancedUpgradeController = function() {
+
+    const creep: Creep = this
+    const room = creep.room
+
+    const controller = room.controller
+
+    // Inform false if there is no controller
+
+    if (!controller) return false
+
+    // If the controller is out of upgrade range
+
+    if (creep.pos.getRangeTo(controller.pos) > 3) {
+
+        // Make a move request to it
+
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: controller.pos, range: 3 }
+        })
+
+        // Inform true
+
+        return true
+    }
+
+    // Try to upgrade the controller
+
+    const upgradeControllerResult = creep.upgradeController(controller)
+
+    // If the upgrade worked
+
+    if (upgradeControllerResult == OK) {
+
+        // Calculate the control points added
+
+        const controlPoints = creep.partsOfType(WORK)
+
+        // Add control points to total controlPoints counter and say the success
+
+        Memory.controlPoints += controlPoints
+        creep.say('⛏️' + controlPoints)
+
+        // Inform true
+
+        return true
+    }
+
+    // Inform false
+
+    return false
+}
+
 Creep.prototype.hasPartsOfTypes = function(partTypes: BodyPartConstant[]): boolean {
 
     const creep: Creep = this
@@ -179,7 +233,7 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 Creep.prototype.createMoveRequest = function(opts) {
 
     const creep = this
-    const room: Room = creep.room
+    const room = creep.room
 
     // Stop if creep can't move
 
@@ -273,7 +327,7 @@ interface TravelOpts {
 Creep.prototype.travel = function(opts: TravelOpts) {
 
     const creep = this
-    const room: Room = creep.room
+    const room = creep.room
 
     // Stop if creep can't move
 
@@ -535,22 +589,10 @@ Creep.prototype.travel = function(opts: TravelOpts) {
     return false
 }
 
-interface moveOpts {
-
-}
-
-Creep.prototype.advancedMove = function(opts: moveOpts) {
-
-    const creep: Creep = this
-    const room: Room = creep.room
-
-
-}
-
 Creep.prototype.findTask = function(allowedTaskTypes) {
 
     const creep: Creep = this
-    const room: Room = creep.room
+    const room = creep.room
 
     // Iterate through taskIDs in room
 
@@ -575,7 +617,7 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
 Creep.prototype.runMoveRequest = function(pos) {
 
     const creep: Creep = this
-    const room: Room = creep.room
+    const room = creep.room
 
     // Delete all moveRequests to the position
 

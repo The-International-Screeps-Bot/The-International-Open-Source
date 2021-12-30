@@ -1,43 +1,59 @@
-const creepClasses: {[key: string]: any} = {
-    SourceHarvester: class extends Creep {
-        constructor(creep: Creep) {
+export interface SourceHarvester extends Creep {
 
-            super(creep.id)
-
-        }
-    },
-    Hauler: class extends Creep {
-        constructor(creep: Creep) {
-
-            super(creep.id)
-
-        }
-    },
-    MineralHarvester: class extends Creep {
-        constructor(creep: Creep) {
-
-            super(creep.id)
-
-        }
-    },
-    Upgrader: class extends Creep {
-        constructor(creep: Creep) {
-
-            super(creep.id)
-        }
-    },
-    AntifaAssaulter: class {
-        constructor() {
-
-
-        }
-    },
-    AntifaSupporter: class {
-        constructor() {
-
-
-        }
-    },
 }
 
-export default creepClasses
+export class SourceHarvester extends Creep {
+    constructor(creep: Creep) {
+
+        super(creep.id)
+
+    }
+}
+
+export interface Hauler extends Creep {
+
+}
+
+export class Hauler extends Creep {
+    constructor(creep: Creep) {
+
+        super(creep.id)
+
+    }
+}
+
+export interface ControllerUpgrader extends Creep {
+
+}
+
+export class ControllerUpgrader extends Creep {
+    constructor(creep: Creep) {
+
+        super(creep.id)
+
+    }
+}
+
+export interface MineralHarvester extends Creep {
+
+}
+
+export class MineralHarvester extends Creep {
+    constructor(creep: Creep) {
+
+        super(creep.id)
+
+    }
+}
+
+export interface Antifa extends Creep {
+
+}
+
+export class Antifa extends Creep {
+    constructor(creep: Creep) {
+
+        super(creep.id)
+
+    }
+}
