@@ -518,7 +518,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Log an invalid query and inform undefined
 
-        global.customLog('Tried to get non-existent property', roomObjectName, global.colors.white, global.colors.red)
+        global.customLog('Tried to get non-existent property', roomObjectName, constants.colors.white, constants.colors.red)
         return undefined
     }
 

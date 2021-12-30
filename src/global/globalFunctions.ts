@@ -1,3 +1,5 @@
+import { constants } from 'international/constants'
+
 global.findAvgPrice = function(resourceType, days) {
 
     let avgPrice: number = 0
@@ -34,8 +36,8 @@ global.customLog = function(title, message, color, bgColor) {
 
     // Assign defaults if parameters were missing
 
-    if (!color) color = global.colors.black
-    if (!bgColor) bgColor = global.colors.white
+    if (!color) color = constants.colors.black
+    if (!bgColor) bgColor = constants.colors.white
 
     // Construct log
 
@@ -58,7 +60,7 @@ global.advancedGeneratePixel = function() {
 
     // Stop if the bot is not running on MMO
 
-    if (!global.mmoShards.includes(Game.shard.name)) return false
+    if (!constants.mmoShardNames.includes(Game.shard.name)) return false
 
     // Stop if the cpu bucket isn't full
 

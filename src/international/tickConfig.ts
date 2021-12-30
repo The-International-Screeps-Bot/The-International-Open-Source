@@ -1,3 +1,5 @@
+import { constants } from './constants'
+
 /**
  * Configures tick important or tick-only pre-roomManager settings required to run the bot
  */
@@ -63,7 +65,7 @@ export function tickConfig() {
 
         //
 
-        for (const role of global.creepRoles) {
+        for (const role of constants.creepRoles) {
 
             //
 

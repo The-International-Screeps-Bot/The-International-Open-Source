@@ -1,3 +1,4 @@
+import { constants } from "international/constants"
 import { RoomTask } from "room/tasks"
 
 Creep.prototype.isDying = function() {
@@ -434,7 +435,7 @@ Creep.prototype.travel = function(opts: TravelOpts) {
                 if (rangeFromGoal == 0) return
             }
 
-            room.visual.text("New Path", creep.pos.x, creep.pos.y + 0.5, { color: global.colors.yellow })
+            room.visual.text("New Path", creep.pos.x, creep.pos.y + 0.5, { color: constants.colors.yellow })
 
             let newPath = PathFinder.search(origin, goal, {
                 plainCost: opts.plainCost,
@@ -569,7 +570,7 @@ Creep.prototype.travel = function(opts: TravelOpts) {
 
         creep.memory.path = path
 
-        room.visual.poly(path, { stroke: global.colors.yellow, strokeWidth: .15, opacity: .2 })
+        room.visual.poly(path, { stroke: constants.colors.yellow, strokeWidth: .15, opacity: .2 })
 
         // If creep moved
 

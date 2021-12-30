@@ -428,49 +428,9 @@ declare global {
             constructed: true | undefined
 
             /**
-             * The username of the account running the bot
+             * A strings to custom log as rich text
              */
-            me: string
-
-            /**
-             * An array of usernames for which to treat as allies
-             */
-            allyList: string[]
-
-            /**
-             * An array of names for each role creeps can have
-             */
-            creepRoles: string[]
-
-            /**
-             * An array of usernames for which to not trade with
-             */
-            tradeBlacklist: string[]
-
-            /**
-             * An object with labels of colour names and properties of hex codes
-             */
-            colors: Colors
-
-            /**
-             * The dimensions of a room
-             */
-            roomDimensions: number
-
-            /**
-             * An array of all structureTypes in the game
-             */
-            allStructureTypes: StructureConstant[]
-
-             /**
-             * An array of structureTypes that can't be walked on by creeps
-             */
-            impassibleStructures: StructureConstant[]
-
-            /**
-             * An object with keys of roomTypes and properties of an object of properties rooms of the type should have
-             */
-            roomTypes: {[key: string]: any}
+            logs: string
 
             /**
              * The number of construction sites placed by the bot
