@@ -301,9 +301,9 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     room.moveRequests.get(movePos).push(creep.name)
 
-    // Add the creep's moveRequest to its memory
+    // Make moveRequest true to inform a moveRequest has been made
 
-    creep.moveRequest = movePos
+    creep.moveRequest = true
 
     // Set the lastCahce to the current tick
 

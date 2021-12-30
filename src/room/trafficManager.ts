@@ -13,6 +13,10 @@ export function trafficManager(room: Room) {
             const creepNameAtPos = room.creepPositions.get(pos)
             if (!creepNameAtPos) continue
 
+            // Get the creep with the name of creepName
+
+            const creep = Game.creeps[creepName]
+
             // If there is a creep name at the moveRequest pos
 
             if (creepNameAtPos) {
@@ -21,18 +25,19 @@ export function trafficManager(room: Room) {
 
                 const creepAtPos = Game.creeps[creepNameAtPos]
 
-                // Iterate if they aren't making a moveRequest
+                // If there aren't making a moveRequest
 
-                if (!creepAtPos.moveRequest) continue
+                if (!creepAtPos.moveRequest) {
+
+                    // Move to the creep's position
+
+                    creepAtPos.runMoveRequest(creep.pos)
+                }
 
                 // Otherwise operate the moveRequest
 
-                creepAtPos.runMoveRequest(pos)
+                creepAtPos.runMoveRequest(creep.pos)
             }
-
-            // Get the creep with the name of creepName
-
-            const creep = Game.creeps[creepName]
 
             // operate the moveRequest
 
