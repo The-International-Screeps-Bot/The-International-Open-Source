@@ -334,6 +334,10 @@ declare global {
          * Finds open spaces in a room
          */
         distanceTransform(): any
+
+        advancedSell(resourceType: ResourceConstant, amount: number): boolean
+
+        advancedBuy(resourceType: ResourceConstant, amount: number): boolean
     }
 
     interface RoomMemory {

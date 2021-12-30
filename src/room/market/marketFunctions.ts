@@ -1,13 +1,13 @@
-Room.prototype.advancedSell = function(resource: ResourceConstant, amount: number) {
+Room.prototype.advancedSell = function(resourceType, amount) {
 
     const room: Room = this
 
-
+    return false
 }
 
-Room.prototype.advancedSell = function(resource: ResourceConstant, amount: number) {
+Room.prototype.advancedBuy = function(resourceType, amount) {
 
     const room: Room = this
 
-
+    return false
 }
