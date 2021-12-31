@@ -1,59 +1,46 @@
-export interface SourceHarvester extends Creep {
-
-}
+const creepClasses: {[key: string]: any} = {}
 
 export class SourceHarvester extends Creep {
-    constructor(creep: Creep) {
+    constructor(creepID: Id<Creep>) {
 
-        super(creep.id)
+        super(creepID)
 
     }
 }
-
-export interface Hauler extends Creep {
-
-}
+creepClasses.sourceHarvester = SourceHarvester
 
 export class Hauler extends Creep {
-    constructor(creep: Creep) {
+    constructor(creepID: Id<Creep>) {
 
-        super(creep.id)
+        super(creepID)
 
     }
 }
-
-export interface ControllerUpgrader extends Creep {
-
-}
+creepClasses.sourceHarvester = Hauler
 
 export class ControllerUpgrader extends Creep {
-    constructor(creep: Creep) {
+    constructor(creepID: Id<Creep>) {
 
-        super(creep.id)
+        super(creepID)
 
     }
 }
-
-export interface MineralHarvester extends Creep {
-
-}
+creepClasses.sourceHarvester = Hauler
 
 export class MineralHarvester extends Creep {
-    constructor(creep: Creep) {
+    constructor(creepID: Id<Creep>) {
 
-        super(creep.id)
+        super(creepID)
 
     }
 }
-
-export interface Antifa extends Creep {
-
-}
+creepClasses.sourceHarvester = MineralHarvester
 
 export class Antifa extends Creep {
-    constructor(creep: Creep) {
+    constructor(creepID: Id<Creep>) {
 
-        super(creep.id)
+        super(creepID)
 
     }
 }
+creepClasses.sourceHarvester = Antifa

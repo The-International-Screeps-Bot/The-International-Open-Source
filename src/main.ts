@@ -115,10 +115,9 @@ declare global {
         Antifa
     }
 
-    interface Commune {
+    interface Commune extends Room {
 
     }
-
 
     // Memory
 
