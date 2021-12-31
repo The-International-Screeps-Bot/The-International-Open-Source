@@ -148,7 +148,7 @@ export function spawnRequests(room: Room) {
             if (spawnEnergyCapacity >= 700) {
 
                 bodyOpts.defaultParts = [CARRY]
-                bodyOpts.extraParts = [WORK, WORK, WORK, MOVE]
+                bodyOpts.extraParts = [WORK, WORK, MOVE, WORK]
                 bodyOpts.maxParts = 8
 
                 minCreeps.sourceHarvester = room.get('sources').length

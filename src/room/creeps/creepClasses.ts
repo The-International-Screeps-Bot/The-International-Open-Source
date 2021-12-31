@@ -1,4 +1,8 @@
-const creepClasses: {[key: string]: any} = {}
+interface CreepClasses {
+    [key: string]: any
+}
+
+const creepClasses: CreepClasses = {}
 
 export class SourceHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -16,7 +20,7 @@ export class Hauler extends Creep {
 
     }
 }
-creepClasses.sourceHarvester = Hauler
+creepClasses.hauler = Hauler
 
 export class ControllerUpgrader extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -25,7 +29,7 @@ export class ControllerUpgrader extends Creep {
 
     }
 }
-creepClasses.sourceHarvester = Hauler
+creepClasses.controllerUpgrader = ControllerUpgrader
 
 export class MineralHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -34,7 +38,7 @@ export class MineralHarvester extends Creep {
 
     }
 }
-creepClasses.sourceHarvester = MineralHarvester
+creepClasses.mineralHarvester = MineralHarvester
 
 export class Antifa extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -43,4 +47,6 @@ export class Antifa extends Creep {
 
     }
 }
-creepClasses.sourceHarvester = Antifa
+creepClasses.antifa = Antifa
+
+export { creepClasses }

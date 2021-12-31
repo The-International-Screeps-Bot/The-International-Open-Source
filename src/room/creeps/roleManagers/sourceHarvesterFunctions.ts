@@ -18,8 +18,9 @@ SourceHarvester.prototype.travelToSource = function() {
     const sourceName = creep.memory.sourceName
 
     const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPosition`)
+    if (!closestHarvestPos) return false
 
-    if (global.arePositionsAlike(creep.pos, closestHarvestPos)) return 'atSource'
+    if (global.arePositionsEqual(creep.pos, closestHarvestPos)) return 'atSource'
 
     function findTargetPos() {
 
