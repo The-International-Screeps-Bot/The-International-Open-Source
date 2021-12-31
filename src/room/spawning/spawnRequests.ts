@@ -6,7 +6,7 @@ export function spawnRequests(room: Room) {
 
     // Find energy structures
 
-    const spawnStructures: StructureSpawn | StructureExtension = room.get('structuresForSpawning')
+    const spawnStructures: (StructureSpawn | StructureExtension)[] = room.get('structuresForSpawning')
 
     //
 
@@ -27,10 +27,22 @@ export function spawnRequests(room: Room) {
         maxParts: number
     }
 
-    interface SpawningObj extends Partial<BodyProps & BodyOpts> {
-        role: string
+    interface ExtraOptsMemory {
+        [key: string | number]: any
+        role: CreepRoles
+        roomFrom: string
+    }
 
-        extraOpts: {[key: string]: any}
+    interface ExtraOpts {
+        memory: ExtraOptsMemory
+        energyStructures: (StructureSpawn | StructureExtension)[]
+        dryRun?: boolean
+    }
+
+    interface SpawningObj extends Partial<BodyProps & BodyOpts> {
+        role: CreepRoles
+
+        extraOpts: ExtraOpts
     }
 
     //
@@ -106,22 +118,22 @@ export function spawnRequests(room: Room) {
 
     //
 
-    const minCreeps: {[key: string]: any} = {}
+    const minCreeps: Partial<Record<CreepRoles, number>> = {}
 
     //
 
     const source1HarvestPositionsAmount = room.get('source1HarvestPositions').length
     const source2HarvestPositionsAmount = room.get('source2HarvestPositions').length
 
-    // Harvester spawning opts
+    // Source harvester spawning opts
 
-    function harvesterSpawningObj(): SpawningObj {
+    function sourceHarvesterSpawningObj(): SpawningObj {
 
-        const role = 'sourceHarvester'
+        const role: CreepRoles = 'sourceHarvester'
 
         const bodyOpts: Partial<BodyOpts> = {}
 
-        const extraOpts: {[key: string | number]: any} = {
+        const extraOpts: ExtraOpts = {
             memory: {
                 role: role,
                 roomFrom: room.name,
@@ -141,8 +153,6 @@ export function spawnRequests(room: Room) {
 
                 minCreeps.sourceHarvester = room.get('sources').length
 
-                extraOpts.memory.moveType = 'travel'
-
                 return
             }
 
@@ -154,7 +164,7 @@ export function spawnRequests(room: Room) {
 
                 minCreeps.sourceHarvester = room.get('sources').length
 
-                extraOpts.memory.moveType = 'pull'
+                extraOpts.memory.getPulled = true
 
                 return
             }
@@ -168,7 +178,7 @@ export function spawnRequests(room: Room) {
             const maxCreepsPerSource: number = 2
             minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, maxCreepsPerSource) + Math.min(source2HarvestPositionsAmount, maxCreepsPerSource)
 
-            extraOpts.memory.moveType = 'pull'
+            extraOpts.memory.getPulled = true
 
             return
         }
@@ -225,15 +235,130 @@ export function spawnRequests(room: Room) {
         }
     }
 
+    // Hauler spawning opts
+
+    function haulerSpawningObj(): SpawningObj {
+
+        const role: CreepRoles = 'hauler'
+
+        const bodyOpts: Partial<BodyOpts> = {}
+
+        const extraOpts: ExtraOpts = {
+            memory: {
+                role: role,
+                roomFrom: room.name,
+            },
+            energyStructures: spawnStructures
+        }
+
+        constructBodyOpts()
+
+        function constructBodyOpts() {
+
+            // Default
+
+            bodyOpts.defaultParts = []
+            bodyOpts.extraParts = [CARRY, MOVE]
+            bodyOpts.maxParts = 6
+
+            minCreeps.hauler = 4
+
+            return
+        }
+
+        // Use previously constructed opts to produce a viable spawning body
+
+        const {
+            body,
+            tier,
+            cost
+        } = constructBody(bodyOpts)
+
+        // Inform information required to spawn the creep
+
+        return {
+            role,
+            extraOpts,
+            body,
+            tier,
+            cost
+        }
+    }
+
+    // Controller upgrader spawning opts
+
+    function controllerUpgraderSpawningObj(): SpawningObj {
+
+        const role: CreepRoles = 'controllerUpgrader'
+
+        const bodyOpts: Partial<BodyOpts> = {}
+
+        const extraOpts: ExtraOpts = {
+            memory: {
+                role: role,
+                roomFrom: room.name,
+            },
+            energyStructures: spawnStructures
+        }
+
+        constructBodyOpts()
+
+        function constructBodyOpts() {
+
+            if (room.get('controllerContainer')) {
+
+                bodyOpts.defaultParts = [CARRY]
+                bodyOpts.extraParts = [WORK, WORK, WORK, MOVE]
+                bodyOpts.maxParts = 9
+
+                minCreeps.controllerUpgrader = 3
+
+                extraOpts.memory.getPulled = true
+
+                return
+            }
+
+            // Default
+
+            bodyOpts.defaultParts = []
+            bodyOpts.extraParts = [WORK, CARRY, MOVE]
+            bodyOpts.maxParts = 6
+
+            minCreeps.controllerUpgrader = 1
+
+            return
+        }
+
+        // Use previously constructed opts to produce a viable spawning body
+
+        const {
+            body,
+            tier,
+            cost
+        } = constructBody(bodyOpts)
+
+        // Inform information required to spawn the creep
+
+        return {
+            role,
+            extraOpts,
+            body,
+            tier,
+            cost
+        }
+    }
+
     // Construct spawning opts for each role
 
-    const spawningObjs: Partial<Record<string, SpawningObj>> = {}
+    const spawningObjs: Partial<Record<CreepRoles, SpawningObj>> = {}
 
-    spawningObjs.harvester = harvesterSpawningObj()
+    spawningObjs.sourceHarvester = sourceHarvesterSpawningObj()
+    spawningObjs.hauler = haulerSpawningObj()
+    spawningObjs.controllerUpgrader = controllerUpgraderSpawningObj()
 
     // Construct requiredCreeps
 
-    const requiredCreeps: {[key: string]: number} = {}
+    const requiredCreeps: Partial<Record<CreepRoles, number>> = {}
 
     // Loop through each role
 

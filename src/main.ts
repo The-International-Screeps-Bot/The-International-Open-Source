@@ -53,6 +53,10 @@ declare global {
         green: string
     }
 
+    type CreepRoles = 'sourceHarvester' |
+    'hauler' |
+    'controllerUpgrader'
+
     type RoomObjectName =
     'anchorPoint' |
     'mineral' |
@@ -64,6 +68,9 @@ declare global {
     'source1ClosestHarvestPosition' |
     'source2HarvestPositions' |
     'source2ClosestHarvestPosition' |
+    'source1Container' |
+    'source2Container' |
+    'controllerContainer' |
     'source1Link' |
     'source2Link' |
     'source1Container' |

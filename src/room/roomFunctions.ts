@@ -8,11 +8,11 @@ Room.prototype.get = function(roomObjectName) {
     const roomObjects: Partial<Record<RoomObjectName | string, RoomObject>> = {}
 
     interface RoomObjectOpts {
-        [key: string]: any
+        [key: string | number]: any
         name: RoomObjectName,
         value: any,
-        valueType: string,
-        cacheMethod: string,
+        valueType: 'pos' | 'id' | 'object',
+        cacheMethod: 'global' | 'memory',
         cacheAmount?: number
     }
 
@@ -320,61 +320,25 @@ Room.prototype.get = function(roomObjectName) {
         cacheAmount: Infinity,
     })
 
-    // Source links
-
-    function findSourceLink(closestHarvestPos: RoomPosition): StructureLink | false {
-
-        // Stop and inform false if no closestHarvestPos
-
-        if (!closestHarvestPos) return undefined
-
-        // Find links
-
-        const links: StructureLink[] = roomObjects.link.getValue()
-
-        // Filter links that are near closestHarvestPos, inform the first one
-
-        for (const link of links) {
-
-            if (link.pos.getRangeTo(closestHarvestPos) == 1) return link
-        }
-
-        return false
-    }
-
-    manageRoomObject({
-        name: 'source1Link',
-        value: findSourceLink(roomObjects.source1ClosestHarvestPosition.getValue()),
-        valueType: 'pos',
-        cacheMethod: 'global',
-        cacheAmount: Infinity,
-    })
-
-    manageRoomObject({
-        name: 'source2Link',
-        value: findSourceLink(roomObjects.source2ClosestHarvestPosition.getValue()),
-        valueType: 'pos',
-        cacheMethod: 'global',
-        cacheAmount: Infinity,
-    })
-
     // Source containers
 
-    function findSourceContainer(closestHarvestPos: RoomPosition): StructureContainer | false {
+    function findSourceContainer(closestHarvestPos: RoomPosition): string | false {
 
         // Stop and inform false if no closestHarvestPos
 
-        if (!closestHarvestPos) return undefined
+        if (!closestHarvestPos) return false
 
-        // Find links
+        // Find containers
 
-        const containers: StructureContainer[] = roomObjects.link.getValue()
+        const containers: StructureContainer[] = roomObjects.container.getValue()
 
-        // Filter links that are near closestHarvestPos, inform the first one
+        // Iterate through containers
 
         for (const container of containers) {
 
-            if (global.arePositionsEqual(container.pos, closestHarvestPos)) return container
+            // If the container is near the harvestPos inform its id
+
+            if (container.pos.getRangeTo(closestHarvestPos) == 1) return container.id
         }
 
         return false
@@ -383,7 +347,7 @@ Room.prototype.get = function(roomObjectName) {
     manageRoomObject({
         name: 'source1Container',
         value: findSourceContainer(roomObjects.source1ClosestHarvestPosition.getValue()),
-        valueType: 'pos',
+        valueType: 'id',
         cacheMethod: 'global',
         cacheAmount: Infinity,
     })
@@ -391,7 +355,79 @@ Room.prototype.get = function(roomObjectName) {
     manageRoomObject({
         name: 'source2Container',
         value: findSourceContainer(roomObjects.source2ClosestHarvestPosition.getValue()),
-        valueType: 'pos',
+        valueType: 'id',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
+    // controllerContainer
+
+    function findControllerContainer(): string | false {
+
+        // Stop and inform false if no closestHarvestPos
+
+        if (!room.controller) return false
+
+        // Find containers
+
+        const containers: StructureContainer[] = roomObjects.container.getValue()
+
+        // Iterate through containers
+
+        for (const container of containers) {
+
+            // If the container is near the harvestPos inform its id
+
+            if (container.pos.getRangeTo(room.controller.pos) <= 2) return container.id
+        }
+
+        return false
+    }
+
+    manageRoomObject({
+        name: 'controllerContainer',
+        value: findControllerContainer(),
+        valueType: 'id',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
+    // Source links
+
+    function findSourceLink(closestHarvestPos: RoomPosition): string | false {
+
+        // Stop and inform false if no closestHarvestPos
+
+        if (!closestHarvestPos) return false
+
+        // Find links
+
+        const links: StructureLink[] = roomObjects.link.getValue()
+
+        // Iterate through links
+
+        for (const link of links) {
+
+            // If the link is near the harvestPos inform its id
+
+            if (link.pos.getRangeTo(closestHarvestPos) == 1) return link.id
+        }
+
+        return false
+    }
+
+    manageRoomObject({
+        name: 'source1Link',
+        value: findSourceLink(roomObjects.source1ClosestHarvestPosition.getValue()),
+        valueType: 'id',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
+    manageRoomObject({
+        name: 'source2Link',
+        value: findSourceLink(roomObjects.source2ClosestHarvestPosition.getValue()),
+        valueType: 'id',
         cacheMethod: 'global',
         cacheAmount: Infinity,
     })

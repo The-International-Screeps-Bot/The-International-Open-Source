@@ -22,7 +22,11 @@ export function spawnManager(room: Room) {
 
     let i = 0
 
-    for (const role in spawningObjs) {
+    // Construct role and iterate through each key in spawnObjs
+
+    let role: CreepRoles
+
+    for (role in spawningObjs) {
 
         // Iterate if there are no required creeps of role
 

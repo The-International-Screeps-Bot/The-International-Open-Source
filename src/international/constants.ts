@@ -33,7 +33,7 @@ interface Constants {
     /**
      * an array of strings of names of roles
      */
-    creepRoles: string[]
+    creepRoles: CreepRoles[]
 
     /**
      * An array of messages of what to sign comunes with

@@ -12,7 +12,7 @@
         "noImplicitReturns": true,
         "allowSyntheticDefaultImports": true,
         "allowUnreachableCode": false,
-        "strictNullChecks": false,
+        "strictNullChecks": true,
     },
     "exclude": [
         "node_modules"
