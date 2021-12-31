@@ -152,7 +152,8 @@ constants.roomTypes = {
 
 constants.creepRoles = [
     'sourceHarvester',
-    'hauler'
+    'hauler',
+    'controllerUpgrader'
 ]
 
 // Set of messages to randomly apply to commune rooms

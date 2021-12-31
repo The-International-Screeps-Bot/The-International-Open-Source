@@ -20,10 +20,6 @@ import {
     Antifa
 } from './room/creeps/creepClasses'
 
-// External
-
-import { ErrorMapper } from './external/ErrorMapper'
-
 // Other
 
 import { logManager } from 'other/logManager'
@@ -491,7 +487,7 @@ declare global {
 
 // Loop
 
-export const loop = ErrorMapper.wrapLoop(function() {
+export const loop = function() {
 
     memHack.modifyMemory()
 
@@ -500,4 +496,4 @@ export const loop = ErrorMapper.wrapLoop(function() {
     roomManager()
 
     logManager()
-})
+}

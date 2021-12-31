@@ -16,52 +16,56 @@ export function spawnManager(room: Room) {
     // Import spawningOpts
 
     const {
-        spawningOpts,
+        spawningObjs,
         requiredCreeps,
     } = spawnRequests(room)
 
     let i = 0
 
-    for (const spawningObject of spawningOpts) {
+    for (const role in spawningObjs) {
 
         // Iterate if there are no required creeps of role
 
-        if (requiredCreeps[spawningObject.extraOpts.memory.role] == 0) continue
+        if (requiredCreeps[role] == 0) continue
 
         // Try to find inactive spawn, if can't, stop
 
         const spawn = inactiveSpawns[i]
         if (!spawn) break
 
+        // Find a spawningObject with a role of role
+
+        const spawningObj = spawningObjs[role]
+
         // Enable dry run
 
-        spawningObject.extraOpts.dryRun = true
+        spawningObj.extraOpts.dryRun = true
 
         // See if creep can be spawned
 
-        const testSpawnResult = spawn.advancedSpawn(spawningObject)
+        const testSpawnResult = spawn.advancedSpawn(spawningObj)
 
         // If creep can't be spawned
 
         if (testSpawnResult != 0) {
 
             // Log the error and stop
-            global.customLog('Info on failure to spawn', spawningObject.body)
-            global.customLog('Failed to spawn', testSpawnResult + ', ' + spawningObject.cost)
+            global.customLog('Info on failure to spawn', spawningObj.body)
+            global.customLog('Failed to spawn', testSpawnResult + ', ' + spawningObj.cost)
             break
         }
 
         // Disable dry run
 
-        spawningObject.extraOpts.dryRun = false
+        spawningObj.extraOpts.dryRun = false
 
         // Spawn creep
 
-        spawn.advancedSpawn(spawningObject)
+        spawn.advancedSpawn(spawningObj)
 
         // Remove one from requireCreeps of role
 
-        requiredCreeps[spawningObject.extraOpts.memory.role] -= 1
+        requiredCreeps[spawningObj.extraOpts.memory.role] -= 1
 
         // Record an inactive spawn was used and iterate
 

@@ -6,7 +6,7 @@ export function spawnRequests(room: Room) {
 
     // Find energy structures
 
-    const spawnStructures = room.get('structuresForSpawning')
+    const spawnStructures: StructureSpawn | StructureExtension = room.get('structuresForSpawning')
 
     //
 
@@ -15,108 +15,92 @@ export function spawnRequests(room: Room) {
 
     // Configure options for spawning for each role
 
-    interface RoleSpawningOpts {
-        role: string
-        defaultParts: BodyPartConstant[]
-        extraParts: BodyPartConstant[]
-        maxParts: number
-        memoryAdditions: {[key: string]: any}
-
+    interface BodyProps {
         body: BodyPartConstant[]
-        extraOpts: {[key: string]: any}
         tier: number
         cost: number
     }
 
-    class RoleSpawningOpts {
-        constructor() {
+    interface BodyOpts {
+        defaultParts: BodyPartConstant[]
+        extraParts: BodyPartConstant[]
+        maxParts: number
+    }
 
-            this.memoryAdditions = {}
+    interface SpawningObj extends Partial<BodyProps & BodyOpts> {
+        role: string
 
-            this.defaultParts = []
-            this.extraParts = []
-            this.maxParts = 50
+        extraOpts: {[key: string]: any}
+    }
+
+    //
+
+    function constructBody(opts: Partial<BodyOpts>): BodyProps {
+
+        let body: BodyPartConstant[] = []
+        let tier = 0
+        let cost = 0
+
+        let maxCost = spawnEnergyCapacity
+
+        if (room.creepCount.harvester == 0 || room.creepCount.hauler == 0) {
+
+            maxCost = spawnEnergyAvailable
         }
-        constructBody() {
 
-            this.body = []
-            this.tier = 0
-            this.cost = 0
+        if (opts.defaultParts.length > 0) {
 
-            let maxCost = spawnEnergyCapacity
+            for (const part of opts.defaultParts) {
 
-            if (room.creepCount.harvester == 0 || room.creepCount.hauler == 0) {
+                // Stop loop if cost is more than or equal to maxCost
 
-                maxCost = spawnEnergyAvailable
+                if (cost >= maxCost) break
+
+                body.push(part)
+                cost += BODYPART_COST[part]
             }
 
-            if (this.defaultParts.length > 0) {
+            tier += 1
+        }
 
-                for (const part of this.defaultParts) {
+        // Stop if the body amount is equal to maxParts or the cost of the creep is more than we can afford
 
-                    // Stop loop if cost is more than or equal to maxCost
+        while (body.length != opts.maxParts && cost < maxCost) {
 
-                    if (this.cost >= maxCost) break
+        // Loop through each part in extraParts
 
-                    this.body.push(part)
-                    this.cost += BODYPART_COST[part]
-                }
+        for (const part of opts.extraParts) {
 
-                this.tier += 1
-            }
+            // Stop loop if role's body is the size of maxParts
 
-            // Stop if the body amount is equal to maxParts or the cost of the creep is more than we can afford
+            if (body.length == opts.maxParts) break
 
-            while (this.body.length != this.maxParts && this.cost < maxCost) {
+            // Add part and cost
 
-            // Loop through each part in extraParts
+            body.push(part)
+            cost += BODYPART_COST[part]
+        }}
 
-            for (const part of this.extraParts) {
+        tier += 1
 
-                // Stop function if role's body is the size of maxParts
+        // So long as cost is more than maxCost
 
-                if (this.body.length == this.maxParts) return
+        while (cost > maxCost) {
 
-                // Add part and cost
+            // Find last part and take away its cost
 
-                this.body.push(part)
-                this.cost += BODYPART_COST[part]
-            }}
+            const part = body[body.length - 1]
+            cost -= BODYPART_COST[part]
 
-            this.tier += 1
+            // Take away the last part from body
 
-            // So long as cost is more than maxCost
+            body.splice(-1, 1)
+        }
 
-            while (this.cost > maxCost) {
-
-                // Find last part and take away its cost
-
-                const part = this.body[this.body.length - 1]
-                this.cost -= BODYPART_COST[part]
-
-                // Take away the last part from body
-
-                this.body.splice(-1, 1)
-            }
-
-            // Construct memory
-
-            const memory: {[key: string]: any} = {
-                role: this.role,
-                roomFrom: room.name,
-            }
-
-            // Add additions to memory
-
-            for (const propertyName in this.memoryAdditions) {
-
-                memory[propertyName] = this.memoryAdditions[propertyName]
-            }
-
-            this.extraOpts = {
-                memory: memory,
-                energyStructures: spawnStructures,
-            }
+        return {
+            body,
+            tier,
+            cost
         }
     }
 
@@ -131,103 +115,121 @@ export function spawnRequests(room: Room) {
 
     // Harvester spawning opts
 
-    class HarvesterSpawningOpts extends RoleSpawningOpts {
-        constructor() {
+    function harvesterSpawningObj(): SpawningObj {
 
-            super()
+        const role = 'sourceHarvester'
 
-            const opts = this
+        const bodyOpts: Partial<BodyOpts> = {}
 
-            this.role = 'sourceHarvester'
+        const extraOpts: {[key: string | number]: any} = {
+            memory: {
+                role: role,
+                roomFrom: room.name,
+            },
+            energyStructures: spawnStructures
+        }
 
-            bodyOpts()
+        constructBodyOpts()
 
-            function bodyOpts() {
+        function constructBodyOpts() {
 
-                if (spawnEnergyCapacity >= 700) {
+            if (spawnEnergyCapacity >= 700) {
 
-                    opts.defaultParts = [CARRY]
-                    opts.extraParts = [WORK, WORK, WORK, MOVE]
-                    opts.maxParts = 8
+                bodyOpts.defaultParts = [CARRY]
+                bodyOpts.extraParts = [WORK, WORK, WORK, MOVE]
+                bodyOpts.maxParts = 8
 
-                    minCreeps.sourceHarvester = room.get('sources').length
+                minCreeps.sourceHarvester = room.get('sources').length
 
-                    opts.memoryAdditions.moveType = 'travel'
-
-                    return
-                }
-
-                if (spawnEnergyCapacity >= 550) {
-
-                    opts.defaultParts = [CARRY]
-                    opts.extraParts = [WORK]
-                    opts.maxParts = 7
-
-                    minCreeps.sourceHarvester = room.get('sources').length
-
-                    opts.memoryAdditions.moveType = 'pull'
-
-                    return
-                }
-
-                // Default
-
-                opts.defaultParts = []
-                opts.extraParts = [WORK]
-                opts.maxParts = 6
-
-                const maxCreepsPerSource: number = 2
-                minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, maxCreepsPerSource) + Math.min(source2HarvestPositionsAmount, maxCreepsPerSource)
-
-                opts.memoryAdditions.moveType = 'pull'
+                extraOpts.memory.moveType = 'travel'
 
                 return
             }
 
-            function findSourceToHarvest() {
+            if (spawnEnergyCapacity >= 550) {
 
-                // Structure data on sources that relates to spawning
+                bodyOpts.defaultParts = [CARRY]
+                bodyOpts.extraParts = [WORK]
+                bodyOpts.maxParts = 7
 
-                const spawningDataForSources: {[key: string]: any} = {
-                    source1: {
-                        amount: room.creepsOfSourceAmount.source1,
-                        max: Math.min(source1HarvestPositionsAmount, minCreeps.sourceHarvester / 2),
-                    },
-                    source2: {
-                        amount: room.creepsOfSourceAmount.source2,
-                        max: Math.min(source2HarvestPositionsAmount, minCreeps.sourceHarvester / 2),
-                    }
-                }
+                minCreeps.sourceHarvester = room.get('sources').length
 
-                // Loop through each sourceName
+                extraOpts.memory.moveType = 'pull'
 
-                for (const sourceName in spawningDataForSources) {
-
-                    const sourceData = spawningDataForSources[sourceName]
-
-                    // Select sourceData with less creeps than max
-
-                    if (sourceData.amount < sourceData.max) return sourceName
-                }
-
-                return 'noSourceFound'
+                return
             }
 
-            // Assign ideal sourceName to creep
+            // Default
 
-            opts.memoryAdditions.sourceName = findSourceToHarvest()
+            bodyOpts.defaultParts = []
+            bodyOpts.extraParts = [WORK]
+            bodyOpts.maxParts = 6
 
-            // Use previously constructed opts to produce a viable spawning body
+            const maxCreepsPerSource: number = 2
+            minCreeps.sourceHarvester = Math.min(source1HarvestPositionsAmount, maxCreepsPerSource) + Math.min(source2HarvestPositionsAmount, maxCreepsPerSource)
 
-            this.constructBody()
+            extraOpts.memory.moveType = 'pull'
+
+            return
+        }
+
+        function findSourceToHarvest() {
+
+            // Structure data on sources that relates to spawning
+
+            const spawningDataForSources: {[key: string]: any} = {
+                source1: {
+                    amount: room.creepsOfSourceAmount.source1,
+                    max: Math.min(source1HarvestPositionsAmount, minCreeps.sourceHarvester / 2),
+                },
+                source2: {
+                    amount: room.creepsOfSourceAmount.source2,
+                    max: Math.min(source2HarvestPositionsAmount, minCreeps.sourceHarvester / 2),
+                }
+            }
+
+            // Loop through each sourceName
+
+            for (const sourceName in spawningDataForSources) {
+
+                const sourceData = spawningDataForSources[sourceName]
+
+                // Select sourceData with less creeps than max
+
+                if (sourceData.amount < sourceData.max) return sourceName
+            }
+
+            return 'noSourceFound'
+        }
+
+        // Assign ideal sourceName to creep
+
+        extraOpts.memory.sourceName = findSourceToHarvest()
+
+        // Use previously constructed opts to produce a viable spawning body
+
+        const {
+            body,
+            tier,
+            cost
+        } = constructBody(bodyOpts)
+
+        // Inform information required to spawn the creep
+
+        return {
+            role,
+            extraOpts,
+            body,
+            tier,
+            cost
         }
     }
 
     // Construct spawning opts for each role
 
-    const spawningOpts: RoleSpawningOpts[] = []
+    const spawningObjs: Partial<Record<string, SpawningObj>> = {}
 
-    spawningOpts.push(new HarvesterSpawningOpts())
+    spawningObjs.harvester = harvesterSpawningObj()
 
     // Construct requiredCreeps
 
@@ -245,7 +247,7 @@ export function spawnRequests(room: Room) {
     // return info on the structure of new creeps and what amount of them to spawn
 
     return {
-        spawningOpts,
+        spawningObjs,
         requiredCreeps,
     }
 }
