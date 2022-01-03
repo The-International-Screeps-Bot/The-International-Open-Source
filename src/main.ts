@@ -42,17 +42,6 @@ declare global {
         y2: number
     }
 
-    interface Colors {
-        white: string
-        lightGrey: string
-        lightBlue: string
-        darkBlue: string
-        black: string
-        yellow: string
-        red: string
-        green: string
-    }
-
     type CreepRoles = 'sourceHarvester' |
     'hauler' |
     'controllerUpgrader'
@@ -312,9 +301,9 @@ declare global {
         findStoredResourceAmount(resourceType: ResourceConstant): number
 
         /**
-         * Tries to delete a task with the provided ID
+         * Tries to delete a task with the provided ID and response state
          */
-        deleteTask(taskID: number): void
+        deleteTask(taskID: number, responder: boolean): void
 
         /**
          * Finds the type of a room and initializes its custom properties

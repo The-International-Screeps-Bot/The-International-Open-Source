@@ -1,3 +1,14 @@
+interface Colors {
+    white: string
+    lightGrey: string
+    lightBlue: string
+    darkBlue: string
+    black: string
+    yellow: string
+    red: string
+    green: string
+}
+
 interface Constants {
 
     /**
@@ -53,7 +64,7 @@ interface Constants {
     /**
      * An object with colour names as keys and hex codes as properties
      */
-    colors: {[key: string]: string}
+    colors: Colors
 
     /**
      * An array of all the structureTypes in the game

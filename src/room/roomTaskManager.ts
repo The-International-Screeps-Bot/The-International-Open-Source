@@ -1,8 +1,9 @@
+import { constants } from 'international/constants'
 import { RoomDeliverTask } from './tasks'
 
 export function taskManager(room: Room) {
 
-    const task1 = new RoomDeliverTask(RESOURCE_ENERGY, 500, undefined, room.get('storage').id)
+    const task1 = new RoomDeliverTask(room.name, RESOURCE_ENERGY, 500, undefined, room.get('storage').id)
 
-    console.log(task1)
+    global.customLog('TASK TEST: ', global[room.name].tasksWithoutResponders, undefined, constants.colors.green)
 }

@@ -60,6 +60,16 @@ export function spawnRequests(room: Room) {
             maxCost = spawnEnergyAvailable
         }
 
+        //
+
+        if (maxCost < 300) return {
+            body,
+            tier,
+            cost
+        }
+
+        //
+
         if (opts.defaultParts.length > 0) {
 
             for (const part of opts.defaultParts) {

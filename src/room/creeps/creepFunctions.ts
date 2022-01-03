@@ -608,7 +608,18 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
         // Otherwise set the creep's task as the task's ID and stop
 
         creep.memory.taskID = task
-        global[room.name].tasksWithoutResponders[taskID]
+
+        //
+
+        task.responderID = creep.id
+
+        //
+
+        delete global[room.name].tasksWithoutResponders[taskID]
+
+        //
+
+        global[room.name].tasksWithResponders[taskID] = task
         return true
     }
 

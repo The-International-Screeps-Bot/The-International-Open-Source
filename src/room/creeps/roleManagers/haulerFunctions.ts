@@ -1,3 +1,4 @@
+import { Console } from "console"
 import { RoomTask, RoomDeliverTask, RoomPullTask } from "room/tasks"
 
 import { Hauler } from "../creepClasses"
@@ -12,7 +13,8 @@ Hauler.prototype.fulfillTask = function() {
         pull: creep.fulfillPullTask(),
     }
 
-    const task: RoomTask = global[room.name].tasks[creep.memory.taskID]
+    const task: RoomTask = global[room.name].tasksWithResponders[creep.memory.taskID]\
+    console.log(task)
     creep[functionsForTasks[task.type]]()
 }
 
@@ -23,7 +25,7 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
     // Get the task using the taskID in the creeps' memory
 
-    const task: RoomDeliverTask = global[room.name].tasks[creep.memory.taskID]
+    const task: RoomDeliverTask = global[room.name].tasksWithResponders[creep.memory.taskID]
 
     function withdrawAttempt(): boolean {
 
@@ -43,7 +45,7 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
             // Delete the task
 
-            room.deleteTask(task.ID)
+            room.deleteTask(task.ID, true)
 
             // Try to find a new task
 
@@ -82,7 +84,7 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
         // Delete the task
 
-        room.deleteTask(task.ID)
+        room.deleteTask(task.ID, true)
 
         // Try to find a new task
 
@@ -107,7 +109,7 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
         // Delete the task
 
-        room.deleteTask(task.ID)
+        room.deleteTask(task.ID, true)
 
         // Try to find a new task
 
@@ -130,7 +132,7 @@ Hauler.prototype.fulfillPullTask = function() {
 
     // Get the task
 
-    const task: RoomPullTask = global[room.name].tasks[creep.memory.taskID]
+    const task: RoomPullTask = global[room.name].tasksWithResponders[creep.memory.taskID]
     const taskTarget = Game.creeps[task.targetName]
 
     // If there is no taskTarget
@@ -139,7 +141,7 @@ Hauler.prototype.fulfillPullTask = function() {
 
         // Delete the task
 
-        room.deleteTask(task.ID)
+        room.deleteTask(task.ID, true)
 
         // Try to find a new task
 
@@ -192,7 +194,7 @@ Hauler.prototype.fulfillPullTask = function() {
 
     // Delete the task
 
-    room.deleteTask(task.ID)
+    room.deleteTask(task.ID, true)
 
     // Try to find a new task
 

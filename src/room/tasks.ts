@@ -3,6 +3,11 @@ export interface RoomTask {
      * What the task is generally expected to entail for responders
      */
     type: string
+    /**
+     * The name of the room that the task will be recorded in
+     */
+    roomName: string
+    responderID: string
     ID: number
 }
 
@@ -14,7 +19,7 @@ export interface RoomDeliverTask extends RoomTask {
 }
 
 export class RoomDeliverTask {
-    constructor(resourceType: ResourceConstant, deliverAmount: number, withdrawTargetID: string | undefined, transferTargetID: string) {
+    constructor(roomName: string, resourceType: ResourceConstant, deliverAmount: number, withdrawTargetID: string | undefined, transferTargetID: string) {
 
         const task: RoomDeliverTask = this
 
@@ -30,6 +35,10 @@ export class RoomDeliverTask {
 
         task.withdrawTargetID = withdrawTargetID
         task.transferTargetID = transferTargetID
+
+        // Record the task in the room with the requested roomName
+
+        global[roomName].tasksWithoutResponders[task.ID] = task
     }
 }
 
@@ -39,7 +48,7 @@ export interface RoomPullTask extends RoomTask {
 }
 
 export class RoomPullTask {
-    constructor(targetName: string, targetPos: RoomPosition) {
+    constructor(roomName: string, targetName: string, targetPos: RoomPosition) {
 
         const task: RoomPullTask = this
 
@@ -52,5 +61,9 @@ export class RoomPullTask {
 
         task.targetName = targetName
         task.targetPos = targetPos
+
+        // Record the task in the room with the requested roomName
+
+        global[roomName].tasksWithoutResponders[task.ID] = task
     }
 }

@@ -1142,11 +1142,23 @@ Room.prototype.findStoredResourceAmount = function(resourceType) {
     return room.storedResources[resourceType]
 }
 
-Room.prototype.deleteTask = function(taskID) {
+Room.prototype.deleteTask = function(taskID, responder) {
 
     const room: Room = this
 
-    delete global[room.name].tasks[taskID]
+    // If there is a responder
+
+    if (responder) {
+
+        // Remove if from tasksWithResponders and stop
+
+        delete global[room.name].tasksWithResponders[taskID]
+        return
+    }
+
+    // Otherwise remove it from tasksWithoutResponders
+
+    delete global[room.name].tasksWithoutResponders[taskID]
 }
 
 Room.prototype.findScore = function() {
