@@ -92,3 +92,14 @@ global.killAllCreeps = function() {
 
     return 'Killed all creeps'
 }
+
+global.advancedGetValue = function(key, defaultValue) {
+
+    // If there is no value for the global reference of the key create one
+    
+    if (!global[key]) global[key] = defaultValue
+
+    // Inform the global key reference's value
+
+    return global[key]
+}

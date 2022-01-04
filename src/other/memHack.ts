@@ -2,7 +2,7 @@
 Ripped from https://github.com/AlinaNova21/ZeSwarm/
 only slightly modified and adjusted for Typescript
 Usage:
-At top of main: import memHack from './memHack
+At top of main: import memHack from 'memHack
 At top of loop() in main: MemHack.modifyMemory()
 */
 

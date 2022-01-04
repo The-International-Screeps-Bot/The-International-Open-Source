@@ -9,7 +9,7 @@ import { communeManager } from './communeManager'
 
 import { roleManager } from './creeps/creepRoleManager'
 
-import { powerCreepManager } from './powerCreeps/powerCreepRoleManager'
+import { powerCreepManager } from './powerCreeps/powerCreepManager'
 
 const specificRoomManagers: {[key: string]: Function} = {
     remote: remoteManager,

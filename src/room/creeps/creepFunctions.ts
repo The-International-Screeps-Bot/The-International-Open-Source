@@ -1,5 +1,5 @@
 import { constants } from "international/constants"
-import { RoomTask } from "room/tasks"
+import { RoomTask } from "room/roomTasks"
 
 Creep.prototype.isDying = function() {
 
@@ -602,7 +602,7 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
     const room = creep.room
 
     creep.say('FT')
-
+    global.customLog('tasks', JSON.stringify(global[room.name].tasksWithoutResponders))
     // Iterate through taskIDs in room
 
     for (const taskID in global[room.name].tasksWithoutResponders) {
@@ -613,9 +613,9 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
 
         if (!allowedTaskTypes[task.type]) continue
 
-        // Otherwise set the creep's task as the task's ID and stop
+        // Otherwise set the creep's task as the task's ID
 
-        creep.memory.taskID = taskID
+        global[creep.id].taskID = taskID
 
         // Set the responderID to the creepID
 
@@ -625,9 +625,16 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
 
         global[room.name].tasksWithResponders[taskID] = task
 
-        // Delete the task from tasksWithoutResponders and inform true
+        // Delete the task from tasksWithoutResponders
 
         delete global[room.name].tasksWithoutResponders[taskID]
+
+        // Inform the task creator that the task now has a responder
+
+        global.advancedGetValue(task.creatorID, { createdTasks: {} }).createdTasks[taskID] = true
+
+        // Inform true
+
         return true
     }
 

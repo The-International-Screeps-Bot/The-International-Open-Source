@@ -1,4 +1,4 @@
-import { RoomPullTask } from "room/tasks"
+import { RoomPullTask } from "room/roomTasks"
 import { SourceHarvester } from "../creepClasses"
 
 SourceHarvester.prototype.recordSource = function() {
@@ -79,9 +79,13 @@ SourceHarvester.prototype.travelToSource = function() {
 
         creep.say('GP')
 
+        // If the creep already has created a task
+
+        if (room.hasTaskOfTypes(global.advancedGetValue(creep.id, { createdTasks: {} }).createdTasks, ['pull'])) return OK
+
         // Create a task to get pulled to the source and stop
 
-        new RoomPullTask(room.name, creep.name, targetPos)
+        new RoomPullTask(room.name, creep.id, creep.name, targetPos)
         return OK
     }
 

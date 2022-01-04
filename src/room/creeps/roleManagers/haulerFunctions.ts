@@ -1,5 +1,5 @@
 import { Console } from "console"
-import { RoomTask, RoomDeliverTask, RoomPullTask } from "room/tasks"
+import { RoomTask, RoomDeliverTask, RoomPullTask } from "room/roomTasks"
 
 import { Hauler } from "../creepClasses"
 
@@ -12,7 +12,7 @@ Hauler.prototype.fulfillTask = function() {
 
     // If the creep has no task
 
-    if (!creep.memory.taskID) return
+    if (!global[creep.id].taskID) return
 
     // Otherwise
 
@@ -25,7 +25,7 @@ Hauler.prototype.fulfillTask = function() {
 
     // Get the creep's function and run it
 
-    const task: RoomTask = global[room.name].tasksWithResponders[creep.memory.taskID]
+    const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].taskID]
 
     // If there is no task
 
@@ -33,7 +33,7 @@ Hauler.prototype.fulfillTask = function() {
 
         // Remove the creep's taskID and stop
 
-        delete creep.memory.taskID
+        delete global[creep.id].taskID
         return
     }
 
@@ -48,8 +48,8 @@ Hauler.prototype.fulfillDeliverTask = function() {
     creep.say('WT')
 
     // Get the task using the taskID in the creeps' memory
-    console.log(creep.memory.taskID)
-    const task: RoomDeliverTask = global[room.name].tasksWithResponders[creep.memory.taskID]
+    console.log(global[creep.id].taskID)
+    const task: RoomDeliverTask = global[room.name].tasksWithResponders[global[creep.id].taskID]
 
     function withdrawAttempt(): boolean {
 
@@ -80,7 +80,7 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
             // If creep found a task, stop with this task and try to fulfill it
 
-            if (creep.memory.taskID) creep.fulfillTask()
+            if (global[creep.id].taskID) creep.fulfillTask()
             return true
         }
 
@@ -119,7 +119,7 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
         // If creep found a task, stop with this task and try to fulfill it
 
-        if (creep.memory.taskID) creep.fulfillTask()
+        if (global[creep.id].taskID) creep.fulfillTask()
         return
     }
 
@@ -144,7 +144,7 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
         // If creep found a task, stop with this task and try to fulfill it
 
-        if (creep.memory.taskID) creep.fulfillTask()
+        if (global[creep.id].taskID) creep.fulfillTask()
         return
     }
 }
@@ -158,7 +158,7 @@ Hauler.prototype.fulfillPullTask = function() {
 
     // Get the task
 
-    const task: RoomPullTask = global[room.name].tasksWithResponders[creep.memory.taskID]
+    const task: RoomPullTask = global[room.name].tasksWithResponders[global[creep.id].taskID]
     const taskTarget = Game.creeps[task.targetName]
 
     // If there is no taskTarget
@@ -178,7 +178,7 @@ Hauler.prototype.fulfillPullTask = function() {
 
         // If creep found a task, stop with this task and try to fulfill it
 
-        if (creep.memory.taskID) creep.fulfillTask()
+        if (global[creep.id].taskID) creep.fulfillTask()
         return
     }
 
@@ -202,12 +202,13 @@ Hauler.prototype.fulfillPullTask = function() {
 
     if (creep.pos.getRangeTo(targetPos) > 0) {
 
-        // Have the creep pull the target and have it move with the creep
+        // Have the creep pull the target and have it move with the creep and stop
 
         creep.pull(taskTarget)
         taskTarget.move(creep)
 
         creep.moveTo(targetPos)
+        return
     }
 
     // Otherwise
@@ -222,7 +223,7 @@ Hauler.prototype.fulfillPullTask = function() {
     taskTarget.move(creep)
 
     // Delete the task
-
+    creep.say('DT')
     room.deleteTask(task.ID, true)
 
     // Try to find a new task
@@ -234,5 +235,5 @@ Hauler.prototype.fulfillPullTask = function() {
 
     // If creep found a task, try to fulfill it
 
-    if (creep.memory.taskID) creep.fulfillTask()
+    if (global[creep.id].taskID) creep.fulfillTask()
 }

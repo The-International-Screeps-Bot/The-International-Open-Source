@@ -2,8 +2,9 @@ import './creepFunctions'
 
 import { sourceHarvesterManager } from './roleManagers/sourceHarvesterManager'
 import { haulerManager } from './roleManagers/haulerManager'
-import { mineralHarvesterManager } from './roleManagers/mineralHarvesterManager'
 import { controllerUpgraderManager } from './roleManagers/controllerUpgraderManager'
+import { mineralHarvesterManager } from './roleManagers/mineralHarvesterManager'
+import { antifaManager } from './roleManagers/antifa/antifaManager'
 
 export function roleManager(room: Room) {
 
@@ -11,6 +12,8 @@ export function roleManager(room: Room) {
         sourceHarvester: sourceHarvesterManager,
         hauler: haulerManager,
         controllerUpgrader: controllerUpgraderManager,
+        mineralHarvester: mineralHarvesterManager,
+        antifa: antifaManager,
     }
 
     let role: string

@@ -2,15 +2,15 @@
 
 // Global
 
-import './global/globalFunctions'
+import 'global/globalFunctions'
 
 // International
 
-import { internationalManager } from './international/internationalManager'
+import { internationalManager } from 'international/internationalManager'
 
 // Room
 
-import { roomManager } from './room/roomManager'
+import { roomManager } from 'room/roomManager'
 
 import {
     SourceHarvester,
@@ -18,13 +18,13 @@ import {
     ControllerUpgrader,
     MineralHarvester,
     Antifa
-} from './room/creeps/creepClasses'
+} from 'room/creeps/creepClasses'
 
 // Other
 
 import { logManager } from 'other/logManager'
 import { memHack } from 'other/memHack'
-import { RoomTask } from 'room/tasks'
+import { RoomTask } from 'room/roomTasks'
 
 // Type declareations for global
 
@@ -44,7 +44,9 @@ declare global {
 
     type CreepRoles = 'sourceHarvester' |
     'hauler' |
-    'controllerUpgrader'
+    'controllerUpgrader' |
+    'mineralHarvester' |
+    'antifa'
 
     type RoomObjectName =
     'anchorPoint' |
@@ -255,6 +257,8 @@ declare global {
 
         moveRequests: Map<RoomPosition, string[]>
 
+        constructionSites: {[key: string]: ConstructionSite}
+
         // Functions
 
         /**
@@ -329,6 +333,11 @@ declare global {
         advancedSell(resourceType: ResourceConstant, amount: number): boolean
 
         advancedBuy(resourceType: ResourceConstant, amount: number): boolean
+
+        /**
+         * Checks if the creator has a task of with specified types
+         */
+        hasTaskOfTypes(createdTasks: {[key: string]: boolean}, types: string[]): boolean
     }
 
     interface RoomMemory {
@@ -371,6 +380,11 @@ declare global {
          * Try to enforce a moveRequest and inform the result
          */
         runMoveRequest(pos: RoomPosition): ScreepsReturnCode
+
+        /**
+         * 
+         */
+        advancedUpgraderController(): boolean
     }
 
     interface CreepMemory {
@@ -476,6 +490,11 @@ declare global {
              * Kills all owned creeps
              */
             killAllCreeps(): string
+
+            /**
+             * Gets the value of a key in global, or creates a default if it doesn't exist
+             */
+            advancedGetValue(key: string | number, defaultValue: any): any
         }
     }
 }

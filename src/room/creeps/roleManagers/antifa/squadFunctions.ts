@@ -1,8 +1,8 @@
-import { Squad } from "./squad"
+import { Squad } from "./squads"
 
 Squad.prototype.enterAttackMode = function() {
 
-    const squad: Squad = this
+    const squad = this
 
-
+    return true
 }

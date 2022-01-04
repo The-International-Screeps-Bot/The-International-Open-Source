@@ -1,4 +1,6 @@
-import { constants } from '../international/constants'
+import { retry } from 'async'
+import { constants } from 'international/constants'
+import { RoomTask } from './roomTasks'
 
 
 Room.prototype.get = function(roomObjectName) {
@@ -336,9 +338,9 @@ Room.prototype.get = function(roomObjectName) {
 
         for (const container of containers) {
 
-            // If the container is near the harvestPos inform its id
+            // If the container is on the closestHarvestPos, inform its id
 
-            if (container.pos.getRangeTo(closestHarvestPos) == 1) return container.id
+            if (container.pos.getRangeTo(closestHarvestPos) == 0) return container.id
         }
 
         return false
@@ -1145,20 +1147,83 @@ Room.prototype.findStoredResourceAmount = function(resourceType) {
 Room.prototype.deleteTask = function(taskID, hasResponder) {
 
     const room: Room = this
+    global.customLog('deleted task', taskID)
+    type taskLocation = {[key: string]: RoomTask}
 
-    // If there is a responder
+    function getTaskLocation(): taskLocation {
 
-    if (hasResponder) {
+        let task: RoomTask
 
-        // Remove if from tasksWithResponders and stop
+        // If the task has a responder inform tasksWithResponders
 
-        delete global[room.name].tasksWithResponders[taskID]
-        return
+        if (hasResponder) return global[room.name].tasksWithResponders
+
+        // Otherwise inform tasksWithoutResponders
+
+        return global[room.name].tasksWithoutResponders[taskID]
     }
 
-    // Otherwise remove it from tasksWithoutResponders
+    // Construct task info based on found location
 
-    delete global[room.name].tasksWithoutResponders[taskID]
+    const taskLocation = getTaskLocation()
+    const task = taskLocation[taskID]
+
+    // If the task has a creator
+
+    if (task.creatorID) {
+
+        // Remove the taskID from the creator
+
+        delete global[task.creatorID].createdTasks[task.ID]
+    }
+
+    // If the task has a responder
+
+    if (task.responderID) {
+
+        // Remove the taskID from the responder
+
+        delete global[task.responderID].taskID
+    }
+
+    // Delete the task
+
+    delete taskLocation[taskID]
+}
+
+Room.prototype.hasTaskOfTypes = function(createdTasks, types) {
+
+    const room = this
+
+    // Iterate through IDs of createdTasks
+
+    for (const taskID in createdTasks) {
+
+        // Get info on if the task has a responder
+
+        const hasResponder = createdTasks[taskID]
+
+        function getTask() {
+
+            // If the task has a responder inform from tasksWithResponders
+
+            if (hasResponder) return global[room.name].tasksWithResponders[taskID]
+
+            // Otherwise inform from tasksWithoutResponders
+
+            return global[room.name].tasksWithoutResponders[taskID]
+        }
+
+        const task: RoomTask = getTask()
+
+        // If the task has a type of specified types inform true
+
+        if (types.includes(task.type)) return true
+    }
+
+    // Inform false if no tasks had the specified types
+
+    return false
 }
 
 Room.prototype.findScore = function() {

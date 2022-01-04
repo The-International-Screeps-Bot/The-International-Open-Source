@@ -1,5 +1,5 @@
 import { constants } from 'international/constants'
-import { RoomDeliverTask } from './tasks'
+import { RoomDeliverTask } from './roomTasks'
 
 export function taskManager(room: Room) {
 
