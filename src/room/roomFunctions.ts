@@ -271,7 +271,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // Add pos to harvestPositions
 
-            harvestPositions.push(pos)
+            harvestPositions.push(room.newPos(pos))
         }
 
         return harvestPositions
@@ -285,7 +285,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Filter harvestPositions by closest one to anchorPoint
 
-        return roomObjects.anchorPoint.getValue().findClosestByRange(harvestPositions)
+        return room.find(FIND_MY_SPAWNS)[0].pos.findClosestByRange(harvestPositions)
     }
 
     manageRoomObject({
@@ -1142,13 +1142,13 @@ Room.prototype.findStoredResourceAmount = function(resourceType) {
     return room.storedResources[resourceType]
 }
 
-Room.prototype.deleteTask = function(taskID, responder) {
+Room.prototype.deleteTask = function(taskID, hasResponder) {
 
     const room: Room = this
 
     // If there is a responder
 
-    if (responder) {
+    if (hasResponder) {
 
         // Remove if from tasksWithResponders and stop
 

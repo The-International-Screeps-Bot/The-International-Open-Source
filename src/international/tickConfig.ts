@@ -30,10 +30,10 @@ export function tickConfig() {
 
     //
 
-    Memory.data.gclPercent = (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2)
+    Memory.gclPercent = (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2)
     Memory.totalGCL = (Math.pow(Game.gcl.level - 1, 2.4) * 1000000).toFixed(2)
 
-    Memory.data.gplPercent = (Game.gpl.progress / Game.gpl.progressTotal * 100).toFixed(2)
+    Memory.gplPercent = (Game.gpl.progress / Game.gpl.progressTotal * 100).toFixed(2)
     Memory.totalPower = (Math.pow(Game.gpl.level - 1, 2) * 1000).toFixed(2)
 
     // global
@@ -62,6 +62,9 @@ export function tickConfig() {
 
         room.creepPositions = new Map()
         room.moveRequests = new Map()
+
+        if (!global[room.name].tasksWithoutResponders) global[room.name].tasksWithoutResponders = {}
+        if (!global[room.name].tasksWithResponders) global[room.name].tasksWithResponders = {}
 
         //
 
@@ -93,11 +96,6 @@ export function tickConfig() {
         // Add roomName to commune list
 
         Memory.communes.push(roomName)
-
-        //
-
-        if (!global[room.name].tasksWithoutResponders) global[room.name].tasksWithoutResponders = {}
-        if (!global[room.name].tasksWithResponders) global[room.name].tasksWithResponders = {}
 
         //
 

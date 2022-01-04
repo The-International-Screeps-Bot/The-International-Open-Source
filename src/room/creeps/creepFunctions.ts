@@ -216,7 +216,7 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
     // Inform true if the creep's memory targetPos and goalPos aren't the same
 
-    if (!global.arePositionsEqual(creep.memory.targetPos, goalPos)) return true
+    /* if (!global.arePositionsEqual(creep.memory.targetPos, goalPos)) return true */
 
     // Inform true if there is no lastCache value in the creep's memory
 
@@ -276,6 +276,12 @@ Creep.prototype.createMoveRequest = function(opts) {
     // Stop if there are no positions left in the path
 
     if (path.length == 0) return false
+
+    // Visualize path
+
+    room.visual.poly(path, { stroke: constants.colors.lightBlue, strokeWidth: .15, opacity: .2, lineStyle: 'solid' })
+
+    //
 
     let movePos
 
@@ -595,6 +601,8 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
     const creep: Creep = this
     const room = creep.room
 
+    creep.say('FT')
+
     // Iterate through taskIDs in room
 
     for (const taskID in global[room.name].tasksWithoutResponders) {
@@ -607,21 +615,23 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
 
         // Otherwise set the creep's task as the task's ID and stop
 
-        creep.memory.taskID = task
+        creep.memory.taskID = taskID
 
-        //
+        // Set the responderID to the creepID
 
         task.responderID = creep.id
 
-        //
-
-        delete global[room.name].tasksWithoutResponders[taskID]
-
-        //
+        // Add the task to tasksWithResponders
 
         global[room.name].tasksWithResponders[taskID] = task
+
+        // Delete the task from tasksWithoutResponders and inform true
+
+        delete global[room.name].tasksWithoutResponders[taskID]
         return true
     }
+
+    creep.say('NT')
 
     return false
 }

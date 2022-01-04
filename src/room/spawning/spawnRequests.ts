@@ -132,9 +132,6 @@ export function spawnRequests(room: Room) {
 
     //
 
-    const source1HarvestPositionsAmount = room.get('source1HarvestPositions').length
-    const source2HarvestPositionsAmount = room.get('source2HarvestPositions').length
-
     // Source harvester spawning opts
 
     function sourceHarvesterSpawningObj(): SpawningObj {
@@ -150,6 +147,11 @@ export function spawnRequests(room: Room) {
             },
             energyStructures: spawnStructures
         }
+
+        // Get the number of positions that are harvest positions for each source
+
+        const source1HarvestPositionsAmount = room.get('source1HarvestPositions').length
+        const source2HarvestPositionsAmount = room.get('source2HarvestPositions').length
 
         constructBodyOpts()
 
@@ -219,12 +221,20 @@ export function spawnRequests(room: Room) {
                 if (sourceData.amount < sourceData.max) return sourceName
             }
 
-            return 'noSourceFound'
+            return false
         }
-
+        minCreeps.sourceHarvester = 1
         // Assign ideal sourceName to creep
 
-        extraOpts.memory.sourceName = findSourceToHarvest()
+        const findSourceToHarvestResult = findSourceToHarvest()
+
+        // Stop if a source to harvest couldn't be found
+
+        if (!findSourceToHarvestResult) return undefined
+
+        // Otherwise assign the source's name to the creep's memory sourceName
+
+        extraOpts.memory.sourceName = findSourceToHarvestResult
 
         // Use previously constructed opts to produce a viable spawning body
 
@@ -275,7 +285,7 @@ export function spawnRequests(room: Room) {
 
             return
         }
-
+        minCreeps.hauler = 1
         // Use previously constructed opts to produce a viable spawning body
 
         const {

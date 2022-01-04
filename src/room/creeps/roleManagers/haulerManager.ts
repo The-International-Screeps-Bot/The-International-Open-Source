@@ -6,7 +6,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
     for (const creepName of creepsOfRole) {
 
         const creep: Hauler = Game.creeps[creepName]
-
+        
         // If creep has a task
 
         if (creep.memory.taskID) {

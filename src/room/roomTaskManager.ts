@@ -3,7 +3,9 @@ import { RoomDeliverTask } from './tasks'
 
 export function taskManager(room: Room) {
 
-    const task1 = new RoomDeliverTask(room.name, RESOURCE_ENERGY, 500, undefined, room.get('storage').id)
+    const tasksWithoutResponders = global[room.name].tasksWithoutResponders
+    const tasksWithResponders = global[room.name].tasksWithResponders
 
-    global.customLog('TASK TEST: ', global[room.name].tasksWithoutResponders, undefined, constants.colors.green)
+    global.customLog('TWOR', JSON.stringify(tasksWithoutResponders))
+    global.customLog('TWR', JSON.stringify(tasksWithResponders))
 }

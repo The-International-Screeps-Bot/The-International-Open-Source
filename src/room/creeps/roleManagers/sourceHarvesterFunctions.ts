@@ -1,3 +1,4 @@
+import { RoomPullTask } from "room/tasks"
 import { SourceHarvester } from "../creepClasses"
 
 SourceHarvester.prototype.recordSource = function() {
@@ -15,10 +16,21 @@ SourceHarvester.prototype.travelToSource = function() {
     const creep: SourceHarvester = this
     const room = creep.room
 
+    creep.say('TTS')
+
+    // Define the creep's designated source
+
     const sourceName = creep.memory.sourceName
 
+    // Get the closetHarvestPos for the creep's designated source
+
     const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPosition`)
+
+    // Inform false if there is no closestHarvestPos
+
     if (!closestHarvestPos) return false
+
+    // Inform message if the creep is at the closestHarvestPos
 
     if (global.arePositionsEqual(creep.pos, closestHarvestPos)) return 'atSource'
 
@@ -61,17 +73,27 @@ SourceHarvester.prototype.travelToSource = function() {
 
     const targetPos = findTargetPos()
 
-    //
+    // If the creep's movement type is pull
+
+    if (creep.memory.getPulled) {
+
+        creep.say('GP')
+
+        // Create a task to get pulled to the source and stop
+
+        new RoomPullTask(room.name, creep.name, targetPos)
+        return OK
+    }
+
+    // Otherwise say the intention to travel the the source and travel to it, informing the result
 
     creep.say('⏩ ' + sourceName)
 
-    creep.travel({
+    return creep.travel({
         origin: creep.pos,
         goal: { pos: targetPos, range: 0 },
         cacheAmount: 50,
     })
-
-    return 0
 }
 
 SourceHarvester.prototype.transferToSourceLink = function() {
@@ -79,10 +101,16 @@ SourceHarvester.prototype.transferToSourceLink = function() {
     const creep: SourceHarvester = this
     const room = creep.room
 
+    // Define the creep's designated source
+
     const sourceName = creep.memory.sourceName
+
+    // Find the sourceLink for the creep's source, stop if the link doesn't exist
 
     const sourceLink = room.get(`${sourceName}Link`)
     if (!sourceLink) return 'noLink'
+
+    // Try to transfer to the sourceLink
 
     creep.advancedTransfer(sourceLink)
 

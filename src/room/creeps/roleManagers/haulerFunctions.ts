@@ -8,13 +8,35 @@ Hauler.prototype.fulfillTask = function() {
     const creep: Hauler = this
     const room: Room = creep.room
 
+    creep.say('FT')
+
+    // If the creep has no task
+
+    if (!creep.memory.taskID) return
+
+    // Otherwise
+
+    // Construct names for different functions based on tasks
+
     const functionsForTasks: {[key: string]: any} = {
-        deliver: creep.fulfillDeliverTask(),
-        pull: creep.fulfillPullTask(),
+        deliver: 'fulfillDeliverTask',
+        pull: 'fulfillPullTask',
     }
 
-    const task: RoomTask = global[room.name].tasksWithResponders[creep.memory.taskID]\
-    console.log(task)
+    // Get the creep's function and run it
+
+    const task: RoomTask = global[room.name].tasksWithResponders[creep.memory.taskID]
+
+    // If there is no task
+
+    if (!task) {
+
+        // Remove the creep's taskID and stop
+
+        delete creep.memory.taskID
+        return
+    }
+
     creep[functionsForTasks[task.type]]()
 }
 
@@ -23,8 +45,10 @@ Hauler.prototype.fulfillDeliverTask = function() {
     const creep: Hauler = this
     const room: Room = creep.room
 
-    // Get the task using the taskID in the creeps' memory
+    creep.say('WT')
 
+    // Get the task using the taskID in the creeps' memory
+    console.log(creep.memory.taskID)
     const task: RoomDeliverTask = global[room.name].tasksWithResponders[creep.memory.taskID]
 
     function withdrawAttempt(): boolean {
@@ -130,6 +154,8 @@ Hauler.prototype.fulfillPullTask = function() {
     const creep: Hauler = this
     const room: Room = creep.room
 
+    creep.say('PT')
+
     // Get the task
 
     const task: RoomPullTask = global[room.name].tasksWithResponders[creep.memory.taskID]
@@ -160,9 +186,10 @@ Hauler.prototype.fulfillPullTask = function() {
 
     if (creep.pos.getRangeTo(taskTarget.pos) > 1) {
 
-        // Move to the target
+        // Move to the target and stop
 
         creep.moveTo(taskTarget.pos)
+        return
     }
 
     // Otherwise
@@ -173,12 +200,14 @@ Hauler.prototype.fulfillPullTask = function() {
 
     // If the creep is not in range of the targetPos
 
-    if (creep.pos.getRangeTo(targetPos) > 1) {
+    if (creep.pos.getRangeTo(targetPos) > 0) {
 
         // Have the creep pull the target and have it move with the creep
 
         creep.pull(taskTarget)
         taskTarget.move(creep)
+
+        creep.moveTo(targetPos)
     }
 
     // Otherwise
