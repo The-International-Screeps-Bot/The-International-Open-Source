@@ -42,6 +42,17 @@ declare global {
         y2: number
     }
 
+    interface Colors {
+        white: string
+        lightGrey: string
+        lightBlue: string
+        darkBlue: string
+        black: string
+        yellow: string
+        red: string
+        green: string
+    }
+
     type CreepRoles = 'sourceHarvester' |
     'hauler' |
     'controllerUpgrader' |
@@ -338,6 +349,11 @@ declare global {
          * Checks if the creator has a task of with specified types
          */
         hasTaskOfTypes(createdTasks: {[key: string]: boolean}, types: string[]): boolean
+
+        /**
+         *
+         */
+        pathVisual(path: RoomPosition[], color: keyof Colors): void
     }
 
     interface RoomMemory {
@@ -371,7 +387,7 @@ declare global {
         /**
          *
          */
-        needsNewPath(goalPos: RoomPosition, cacheAmount: number): boolean
+        needsNewPath(cacheAmount: number): boolean
 
         /**
          *

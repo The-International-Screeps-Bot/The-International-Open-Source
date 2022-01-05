@@ -34,10 +34,11 @@ Creep.prototype.advancedTrafer = function(target: any, resource?: ResourceConsta
 
         // Travel to target and return that creep tried to move
 
-        creep.travel({
+        creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
-            cacheAmount: 50,
+            avoidImpassibleStructures: true,
+            avoidEnemyRanges: true,
         })
         return 'travel'
     }
@@ -74,10 +75,11 @@ Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceCons
 
         // Travel to target and return that creep tried to move
 
-        creep.travel({
+        creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
-            cacheAmount: 50,
+            avoidImpassibleStructures: true,
+            avoidEnemyRanges: true,
         })
         return 'travel'
     }
@@ -118,7 +120,7 @@ Creep.prototype.advancedPickup = function(target) {
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
             avoidImpassibleStructures: true,
-            cacheAmount: 20,
+            avoidEnemyRanges: true,
         })
         return false
     }
@@ -170,6 +172,8 @@ Creep.prototype.advancedUpgradeController = function() {
 
     if (creep.needsResources()) {
 
+        creep.say('DR')
+
         const droppedResources = room.find(FIND_DROPPED_RESOURCES, {
             filter: resource => resource.resourceType == RESOURCE_ENERGY
         })
@@ -177,6 +181,7 @@ Creep.prototype.advancedUpgradeController = function() {
         if (droppedResources.length == 0) return false
 
         creep.advancedPickup(creep.pos.findClosestByRange(droppedResources))
+        return true
     }
 
     // Otherwise if the creep doesn't need resources
@@ -191,9 +196,9 @@ Creep.prototype.advancedUpgradeController = function() {
 
         creep.createMoveRequest({
             origin: creep.pos,
-            goal: { pos: controller.pos, range: 3 },
+            goal: { pos: controller.pos, range: 1 },
             avoidImpassibleStructures: true,
-            cacheAmount: 20,
+            avoidEnemyRanges: true,
         })
 
         // Inform true
@@ -252,13 +257,17 @@ Creep.prototype.partsOfType = function(type: BodyPartConstant) {
     return partsOfType.length
 }
 
-Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
+Creep.prototype.needsNewPath = function(cacheAmount) {
 
     const creep = this
 
-    // Inform true if the creep's memory targetPos and goalPos aren't the same
+    // Inform true if there is no path
 
-    if (!global.arePositionsEqual(creep.memory.targetPos, goalPos)) return true
+    if (!creep.memory.path) return true
+
+    // Inform true if the path is at its end
+
+    if (creep.memory.path.length == 0) return true
 
     // Inform true if there is no lastCache value in the creep's memory
 
@@ -266,7 +275,7 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
     // Inform true if the path is out of caching time
 
-    if (creep.memory.lastCache + cacheAmount >= Game.time) return true
+    if (creep.memory.lastCache + cacheAmount < Game.time) return true
 
     // Otherwise inform false
 
@@ -290,11 +299,15 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     if (creep.moveRequest) return false
 
+    // Assign default opts
+
+    if (!opts.cacheAmount) opts.cacheAmount = 20
+
     // See if the creep needs a new path
 
-    const needsNewPathResult = creep.needsNewPath(opts.goal.pos, opts.cacheAmount)
+    const needsNewPathResult = creep.needsNewPath(opts.cacheAmount)
 
-    //
+    // Set path to the path in the creep's memory
 
     let path: RoomPosition[] = creep.memory.path
 
@@ -316,20 +329,16 @@ Creep.prototype.createMoveRequest = function(opts) {
 
         path.splice(opts.cacheAmount, path.length)
 
-        // Set the path in the creep's memory
+        // Show that a new path has been created
 
-        creep.memory.path = path
+        if (Memory.roomVisuals) room.visual.text('New path', path[0], { align: 'center' })
     }
 
     // Stop if there are no positions left in the path
 
     if (path.length == 0) return false
 
-    // Visualize path
-
-    room.visual.poly(path, { stroke: constants.colors.lightBlue, strokeWidth: .15, opacity: .3, lineStyle: 'solid' })
-
-    //
+    // Assign movePos to the first pos in path
 
     let movePos = path[0]
 
@@ -339,14 +348,23 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     while (global.arePositionsEqual(creep.pos, movePos)) {
 
-        i++
+        // Remove the first pos of the path
 
+        path.shift()
+
+        // Increment i and set movePos as the pos in path with an index of i
+
+        i++
         movePos = path[i]
 
         // Stop if there is no movePos
 
         if (!movePos) return false
     }
+
+    // Visualize path
+
+    room.pathVisual(path, 'lightBlue')
 
     // Turn the creep's pos into a string
 
@@ -367,6 +385,10 @@ Creep.prototype.createMoveRequest = function(opts) {
     // Set the lastCahce to the current tick
 
     creep.memory.lastCache = Game.time
+
+    // Set the path in the creep's memory
+
+    creep.memory.path = path
 
     // Inform success
 

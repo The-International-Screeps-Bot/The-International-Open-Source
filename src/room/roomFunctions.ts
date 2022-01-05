@@ -622,7 +622,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
     const room: Room = this
 
     // Construct route
-    
+
     function generateRoute(): Route | undefined  {
 
         // If the goal is in the same room as the origin, inform that no route is needed
@@ -794,9 +794,9 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                     const ramparts: StructureRampart[] = room.get('rampart')
                     for (const rampart of ramparts) {
 
-                        // If my rampart
+                        // If the rampart is mine or public
 
-                        if (rampart.my) {
+                        if (rampart.my || rampart.isPublic) {
 
                             // If prioritize ramparts is on
 
@@ -1265,4 +1265,17 @@ Room.prototype.distanceTransform = function() {
     } */
 
     return distanceCM
+}
+
+Room.prototype.pathVisual = function(path, color) {
+
+    const room = this
+
+    // Stop if roomVisuals are disabled
+
+    if (!Memory.roomVisuals) return
+
+    // Otherwise generate the path visual
+
+    room.visual.poly(path, { stroke: constants.colors[color], strokeWidth: .15, opacity: .3, lineStyle: 'solid' })
 }

@@ -1,14 +1,3 @@
-interface Colors {
-    white: string
-    lightGrey: string
-    lightBlue: string
-    darkBlue: string
-    black: string
-    yellow: string
-    red: string
-    green: string
-}
-
 interface Constants {
 
     /**
