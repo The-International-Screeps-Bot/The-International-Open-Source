@@ -341,8 +341,8 @@ export function spawnRequests(room: Room) {
             // Default
 
             bodyOpts.defaultParts = []
-            bodyOpts.extraParts = [WORK, CARRY, MOVE]
-            bodyOpts.maxParts = 3
+            bodyOpts.extraParts = [WORK, MOVE, CARRY, MOVE]
+            bodyOpts.maxParts = 4
 
             minCreeps.controllerUpgrader = 1
 
