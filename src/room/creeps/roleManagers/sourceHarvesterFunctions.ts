@@ -89,15 +89,17 @@ SourceHarvester.prototype.travelToSource = function() {
         return OK
     }
 
-    // Otherwise say the intention to travel the the source and travel to it, informing the result
+    // Otherwise say the intention and create a moveRequest to targetPos, informing the attempt
 
     creep.say('⏩ ' + sourceName)
 
-    return creep.travel({
+    creep.createMoveRequest({
         origin: creep.pos,
-        goal: { pos: targetPos, range: 0 },
-        cacheAmount: 50,
+        goal: { pos: targetPos, range: 1 },
+        avoidImpassibleStructures: true,
+        avoidEnemyRanges: true,
     })
+    return true
 }
 
 SourceHarvester.prototype.transferToSourceLink = function() {

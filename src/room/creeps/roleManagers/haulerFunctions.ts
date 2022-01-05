@@ -186,9 +186,14 @@ Hauler.prototype.fulfillPullTask = function() {
 
     if (creep.pos.getRangeTo(taskTarget.pos) > 1) {
 
-        // Move to the target and stop
+        // Create a moveRequest to the target and stop
 
-        creep.moveTo(taskTarget.pos)
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: taskTarget.pos, range: 1 },
+            avoidImpassibleStructures: true,
+            avoidEnemyRanges: true,
+        })
         return
     }
 
@@ -207,7 +212,12 @@ Hauler.prototype.fulfillPullTask = function() {
         creep.pull(taskTarget)
         taskTarget.move(creep)
 
-        creep.moveTo(targetPos)
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: targetPos, range: 0 },
+            avoidImpassibleStructures: true,
+            avoidEnemyRanges: true,
+        })
         return
     }
 

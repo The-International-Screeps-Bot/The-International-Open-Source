@@ -23,7 +23,7 @@ Creep.prototype.isDying = function() {
     return true
 }
 
-Creep.prototype.advancedTrafer = function(target: any, resource?: ResourceConstant, amount?: number) {
+Creep.prototype.advancedTransfer = function(target: any, resource?: ResourceConstant, amount?: number) {
 
     const creep: Creep = this
     const room = creep.room
@@ -32,7 +32,7 @@ Creep.prototype.advancedTrafer = function(target: any, resource?: ResourceConsta
 
     if (creep.pos.getRangeTo(target.pos) > 1) {
 
-        // Travel to target and return that creep tried to move
+        // Make a moveRequest to target and return that creep tried to move
 
         creep.createMoveRequest({
             origin: creep.pos,
