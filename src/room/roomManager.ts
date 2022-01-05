@@ -10,6 +10,7 @@ import { communeManager } from './communeManager'
 import { roleManager } from './creeps/creepRoleManager'
 
 import { powerCreepManager } from './powerCreeps/powerCreepManager'
+import { trafficManager } from './trafficManager'
 
 const specificRoomManagers: {[key: string]: Function} = {
     remote: remoteManager,
@@ -31,6 +32,10 @@ export function roomManager() {
         //
 
         roleManager(room)
+
+        //
+
+        trafficManager(room)
 
         // Check if there is a roomManager for this room's type
 

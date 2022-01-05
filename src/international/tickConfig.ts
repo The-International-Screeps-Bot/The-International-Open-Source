@@ -60,8 +60,8 @@ export function tickConfig() {
         room.myCreeps = {}
         room.creepCount = {}
 
-        room.creepPositions = new Map()
-        room.moveRequests = new Map()
+        room.creepPositions = {}
+        room.moveRequests = {}
 
         if (!global[room.name].tasksWithoutResponders) global[room.name].tasksWithoutResponders = {}
         if (!global[room.name].tasksWithResponders) global[room.name].tasksWithResponders = {}

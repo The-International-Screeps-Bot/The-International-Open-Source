@@ -223,7 +223,7 @@ Hauler.prototype.fulfillPullTask = function() {
     taskTarget.move(creep)
 
     // Delete the task
-    creep.say('DT')
+
     room.deleteTask(task.ID, true)
 
     // Try to find a new task

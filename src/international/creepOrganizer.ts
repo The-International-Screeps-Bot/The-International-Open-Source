@@ -47,6 +47,10 @@ export function creepOrganizer() {
 
         room.myCreeps[creep.memory.role].push(creepName)
 
+        // Add the creep's name to the position in its room
+
+        room.creepPositions[JSON.stringify(creep.pos)] = creep.name
+
         // See if creep is dying
 
         creep.isDying()

@@ -253,9 +253,9 @@ declare global {
          */
         storedResources: {[key: string]: number}
 
-        creepPositions: Map<RoomPosition, string>
+        creepPositions: {[key: string]: string}
 
-        moveRequests: Map<RoomPosition, string[]>
+        moveRequests: {[key: string]: string[]}
 
         constructionSites: {[key: string]: ConstructionSite}
 
@@ -361,6 +361,8 @@ declare global {
          */
         findTask(allowedTaskTypes: {[key: string]: boolean}): boolean
 
+        advancedPickup(target: Resource): boolean
+
         /**
          * Attempt to upgrade the controller optimally
          */
@@ -379,12 +381,17 @@ declare global {
         /**
          * Try to enforce a moveRequest and inform the result
          */
-        runMoveRequest(pos: RoomPosition): ScreepsReturnCode
+        runMoveRequest(pos: Pos): ScreepsReturnCode
 
         /**
          * Attempts multiple methods to upgrade the controller
          */
         advancedUpgraderController(): boolean
+
+        /**
+         * Decides if the creep needs to get more resources or not
+         */
+        needsResources(): boolean
     }
 
     interface CreepMemory {
@@ -396,14 +403,17 @@ declare global {
         role: string
 
         /**
+         * A name of the creep's designated source
+         */
+        sourceName: 'source1' | 'source2'
+
+        /**
          * The last time a path was cached in memory
          */
         lastCache: number
 
-        sourceName: 'source1' | 'source2'
-
         /**
-         * 
+         * An array of positions desciring where the creep neeeds to move to get to its goal
          */
         path: RoomPosition[]
     }

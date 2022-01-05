@@ -622,7 +622,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
     const room: Room = this
 
     // Construct route
-    console.log('hi')
+    
     function generateRoute(): Route | undefined  {
 
         // If the goal is in the same room as the origin, inform that no route is needed
@@ -825,7 +825,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         const structuresOfType = room.get(structureType)
                         for (const structure of structuresOfType) {
-                            
+
                             // Set pos as impassible
 
                             cm.set(structure.pos.x, structure.pos.y, 255)

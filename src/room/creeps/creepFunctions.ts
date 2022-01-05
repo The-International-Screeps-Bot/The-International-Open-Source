@@ -44,7 +44,7 @@ Creep.prototype.advancedTrafer = function(target: any, resource?: ResourceConsta
 
     // If there wasn't a defined resource, define it as energy
 
-    if (!resource) resource = 'energy'
+    if (!resource) resource = RESOURCE_ENERGY
 
     // If there wasn't an amount provided
 
@@ -54,20 +54,13 @@ Creep.prototype.advancedTrafer = function(target: any, resource?: ResourceConsta
 
     const transferResult = creep.transfer(target, resource, amount)
 
-    // If transfer is not a success
+    // If the transfer is not a success inform the failure
 
-    if (transferResult != 0) {
+    if (transferResult != 0) return false
 
-        // Create visual and return transferResult
+    // Otherwise inform the success
 
-        room.actionVisual(creep.pos, target.pos, 'fail')
-        return transferResult
-    }
-
-    // Create visual and return success
-
-    room.actionVisual(creep.pos, target.pos)
-    return 'success'
+    return true
 }
 
 Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceConstant, amount?: number) {
@@ -91,7 +84,7 @@ Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceCons
 
     // If there wasn't a defined resource, define it as energy
 
-    if (!resource) resource = 'energy'
+    if (!resource) resource = RESOURCE_ENERGY
 
     // If there wasn't an amount provided
 
@@ -101,20 +94,46 @@ Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceCons
 
     const withdrawResult = creep.withdraw(target, resource, amount)
 
-    // If withdraw is not a success
+    // If the withdraw is not a success inform the failure
 
-    if (withdrawResult != 0) {
+    if (withdrawResult != 0) return false
 
-        // Create visual and return withdrawResult
+    // Otherwise inform the success
 
-        room.actionVisual(creep.pos, target.pos, 'fail')
-        return withdrawResult
+    return true
+}
+
+Creep.prototype.advancedPickup = function(target) {
+
+    const creep = this
+    const room = creep.room
+
+    // If creep isn't in transfer range
+
+    if (creep.pos.getRangeTo(target.pos) > 1) {
+
+        // Travel to target and return that creep tried to move
+
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: target.pos, range: 1 },
+            avoidImpassibleStructures: true,
+            cacheAmount: 20,
+        })
+        return false
     }
 
-    // Create visual and return success
+    // Try to pickup
 
-    room.actionVisual(creep.pos, target.pos)
-    return 'success'
+    const pickupResult = creep.pickup(target)
+
+    // If the pickup is not a success inform the failure
+
+    if (pickupResult != 0) return false
+
+    // Otherwise inform the success
+
+    return true
 }
 
 Creep.prototype.advancedHarvestSource = function(source: Source) {
@@ -146,6 +165,21 @@ Creep.prototype.advancedUpgradeController = function() {
     // Inform false if there is no controller
 
     if (!controller) return false
+
+    // If the creep needs resources
+
+    if (creep.needsResources()) {
+
+        const droppedResources = room.find(FIND_DROPPED_RESOURCES, {
+            filter: resource => resource.resourceType == RESOURCE_ENERGY
+        })
+
+        if (droppedResources.length == 0) return false
+
+        creep.advancedPickup(creep.pos.findClosestByRange(droppedResources))
+    }
+
+    // Otherwise if the creep doesn't need resources
 
     // If the controller is out of upgrade range
 
@@ -184,7 +218,7 @@ Creep.prototype.advancedUpgradeController = function() {
         // Add control points to total controlPoints counter and say the success
 
         Memory.controlPoints += controlPoints
-        creep.say('⛏️' + controlPoints)
+        creep.say('🔋' + controlPoints)
 
         // Inform true
 
@@ -292,14 +326,12 @@ Creep.prototype.createMoveRequest = function(opts) {
     if (path.length == 0) return false
 
     // Visualize path
-    global.customLog('path', path)
-    const visualPath = [creep.pos].concat(path)
-    global.customLog('visualsPath', visualPath)
-    room.visual.poly(visualPath, { stroke: constants.colors.lightBlue, strokeWidth: .15, opacity: .3, lineStyle: 'solid' })
+
+    room.visual.poly(path, { stroke: constants.colors.lightBlue, strokeWidth: .15, opacity: .3, lineStyle: 'solid' })
 
     //
 
-    let movePos
+    let movePos = path[0]
 
     let i = -1
 
@@ -316,13 +348,17 @@ Creep.prototype.createMoveRequest = function(opts) {
         if (!movePos) return false
     }
 
+    // Turn the creep's pos into a string
+
+    const movePosString = JSON.stringify(movePos)
+
     // If there isn't a moveRequest value for this position create one
 
-    if (!room.moveRequests.get(movePos)) room.moveRequests.set(movePos, [])
+    if (!room.moveRequests[movePosString]) room.moveRequests[movePosString] = []
 
     // Add the creep's name to its moveRequest position
 
-    room.moveRequests.get(movePos).push(creep.name)
+    room.moveRequests[movePosString].push(creep.name)
 
     // Make moveRequest true to inform a moveRequest has been made
 
@@ -386,18 +422,38 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
 
 Creep.prototype.runMoveRequest = function(pos) {
 
-    const creep: Creep = this
+    const creep = this
     const room = creep.room
 
     // Delete all moveRequests to the position
 
-    room.moveRequests.delete(pos)
+    delete room.moveRequests[JSON.stringify(pos)]
 
     // Remove record of the creep being on its current position
 
-    room.creepPositions.delete(creep.pos)
+    delete room.creepPositions[JSON.stringify(creep.pos)]
 
     // Move the creep to the position and inform the result
 
-    return creep.move(creep.pos.getDirectionTo(pos))
+    return creep.move(creep.pos.getDirectionTo(room.newPos(pos)))
+}
+
+Creep.prototype.needsResources = function() {
+
+    const creep = this
+
+    // If the creep is empty
+
+    if (creep.store.getUsedCapacity() == 0) {
+
+        // Record and inform that the creep needs resources
+
+        creep.memory.needsResources = true
+        return true
+    }
+
+    // Otherwise inform that the creep does not need resources
+
+    creep.memory.needsResouces = undefined
+    return false
 }
