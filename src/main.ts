@@ -382,7 +382,7 @@ declare global {
         runMoveRequest(pos: RoomPosition): ScreepsReturnCode
 
         /**
-         * 
+         * Attempts multiple methods to upgrade the controller
          */
         advancedUpgraderController(): boolean
     }
@@ -401,6 +401,11 @@ declare global {
         lastCache: number
 
         sourceName: 'source1' | 'source2'
+
+        /**
+         * 
+         */
+        path: RoomPosition[]
     }
 
     // PowerCreeps

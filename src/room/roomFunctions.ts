@@ -5,7 +5,7 @@ import { RoomTask } from './roomTasks'
 
 Room.prototype.get = function(roomObjectName) {
 
-    const room: Room = this
+    const room = this
 
     const roomObjects: Partial<Record<RoomObjectName | string, RoomObject>> = {}
 
@@ -117,7 +117,7 @@ Room.prototype.get = function(roomObjectName) {
 
                 // Query room's global for cachedRoomObject
 
-                cachedRoomObject = room.memory[roomObject.name]
+                cachedRoomObject = global[room.name][roomObject.name]
 
                 // If cachedRoomObject doesn't exist inform false
 
@@ -169,7 +169,7 @@ Room.prototype.get = function(roomObjectName) {
 
     manageRoomObject({
         name: 'anchorPoint',
-        value: { x: 25, y: 25 } /* room.memory.anchorPoint */,
+        value: room.newPos({ x: 25, y: 25 }) /* room.memory.anchorPoint */,
         valueType: 'pos',
         cacheMethod: 'memory',
     })
@@ -622,7 +622,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
     const room: Room = this
 
     // Construct route
-
+    console.log('hi')
     function generateRoute(): Route | undefined  {
 
         // If the goal is in the same room as the origin, inform that no route is needed
@@ -767,10 +767,10 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                         // Construct rect and get positions inside
 
                         const rect = {
-                            x1: opts.creep.pos.x,
-                            y1: opts.creep.pos.y,
-                            x2: opts.creep.pos.x,
-                            y2: opts.creep.pos.y
+                            x1: opts.creep.pos.x - 2,
+                            y1: opts.creep.pos.y - 2,
+                            x2: opts.creep.pos.x + 2,
+                            y2: opts.creep.pos.y + 2
                         }
                         const positions: Pos[] = global.findPositionsInsideRect(rect)
 
@@ -825,7 +825,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         const structuresOfType = room.get(structureType)
                         for (const structure of structuresOfType) {
-
+                            
                             // Set pos as impassible
 
                             cm.set(structure.pos.x, structure.pos.y, 255)
@@ -833,7 +833,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                // Define values for the costMatrix
+                // Inform the CostMatrix
 
                 return cm
             }
@@ -846,8 +846,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
     // Call path generation and inform the result
 
-    const path = generatePath()
-    return path
+    return generatePath()
 }
 
 Room.prototype.findType = function(scoutingRoom: Room) {
