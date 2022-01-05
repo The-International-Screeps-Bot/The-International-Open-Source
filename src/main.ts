@@ -318,7 +318,7 @@ declare global {
         /**
          * Tries to delete a task with the provided ID and response state
          */
-        deleteTask(taskID: number, responder: boolean): void
+        deleteTask(taskID: any, responder: boolean): void
 
         /**
          * Finds the type of a room and initializes its custom properties
@@ -472,6 +472,8 @@ declare global {
              * The number of construction sites placed by the bot
              */
             constructionSitesCount: number
+
+            tasksWithoutResponders: {[key: number]: any}
 
             // Functions
 

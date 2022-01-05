@@ -1,15 +1,13 @@
 import { constants } from 'international/constants'
-import { RoomDeliverTask } from './roomTasks'
+import { RoomDeliverTask, RoomTask } from './roomTasks'
 
 export function taskManager(room: Room) {
 
-    const tasksWithoutResponders = global[room.name].tasksWithoutResponders
+    // Iterate through tasks without responders
 
-    // Iterate through tasks with responders
+    for (const taskID in global[room.name].tasksWithoutResponders) {
 
-    for (const taskID in tasksWithoutResponders) {
-
-        const task = tasksWithoutResponders[taskID]
+        const task: RoomTask = global[room.name].tasksWithoutResponders[taskID]
 
         // Try to find the creator using the task's creatorID
 
@@ -17,16 +15,14 @@ export function taskManager(room: Room) {
 
         // If the creator doesn't exist, delete the task
 
-        if (!creator) delete tasksWithoutResponders[taskID]
+        if (!creator) room.deleteTask(taskID, false)
     }
-
-    const tasksWithResponders = global[room.name].tasksWithResponders
 
     // Iterate through tasks with responders
 
-    for (const taskID in tasksWithResponders) {
+    for (const taskID in global[room.name].tasksWithResponders) {
 
-        const task = tasksWithResponders[taskID]
+        const task: RoomTask = global[room.name].tasksWithResponders[taskID]
 
         // Try to find the responder using the task's responderID
 
@@ -34,7 +30,7 @@ export function taskManager(room: Room) {
 
         // If the responder doesn't exist, delete the task
 
-        if (!responder) delete tasksWithResponders[taskID]
+        if (!responder) room.deleteTask(taskID, true)
 
         // Try to find the creator using the task's creatorID
 
@@ -42,9 +38,9 @@ export function taskManager(room: Room) {
 
         // If the creator doesn't exist, delete the task
 
-        if (!creator) delete tasksWithResponders[taskID]
+        if (!creator) room.deleteTask(taskID, true)
     }
 
-    global.customLog('TWOR', JSON.stringify(tasksWithoutResponders))
-    global.customLog('TWR', JSON.stringify(tasksWithResponders))
+    global.customLog('TWOR', JSON.stringify(global[room.name].tasksWithoutResponders))
+    global.customLog('TWR', JSON.stringify(global[room.name].tasksWithResponders))
 }

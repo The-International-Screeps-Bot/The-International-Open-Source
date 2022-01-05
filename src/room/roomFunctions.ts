@@ -1147,7 +1147,7 @@ Room.prototype.deleteTask = function(taskID, hasResponder) {
 
     const room: Room = this
     global.customLog('deleted task', taskID)
-    type taskLocation = {[key: string]: RoomTask}
+    type taskLocation = {[key: number]: RoomTask}
 
     function getTaskLocation(): taskLocation {
 

@@ -78,32 +78,45 @@ export function spawnRequests(room: Room) {
 
                 if (cost >= maxCost) break
 
+                // Add part and cost
+
                 body.push(part)
                 cost += BODYPART_COST[part]
             }
 
-            tier += 1
+            tier++
         }
 
-        // Stop if the body amount is equal to maxParts or the cost of the creep is more than we can afford
+        let partIndex = 0
 
-        while (body.length != opts.maxParts && cost < maxCost) {
+        // So long as body amount is less than maxParts and the cost of the creep is below maxCost
 
-        // Loop through each part in extraParts
+        while (body.length < opts.maxParts && cost < maxCost) {
 
-        for (const part of opts.extraParts) {
+            // Get the part based on the partIndex
 
-            // Stop loop if role's body is the size of maxParts
-
-            if (body.length == opts.maxParts) break
+            const part = opts.extraParts[partIndex]
 
             // Add part and cost
 
             body.push(part)
             cost += BODYPART_COST[part]
-        }}
 
-        tier += 1
+            // If the partIndex is at the last element of extraParts
+
+            if (partIndex == opts.extraParts.length - 1) {
+
+                // Reset partIndex, increment tier and iterate
+
+                partIndex = 0
+                tier++
+                continue
+            }
+
+            // Otherwise incrememt partIndex
+
+            partIndex++
+        }
 
         // So long as cost is more than maxCost
 
@@ -116,7 +129,7 @@ export function spawnRequests(room: Room) {
 
             // Take away the last part from body
 
-            body.splice(-1, 1)
+            body.pop()
         }
 
         return {

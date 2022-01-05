@@ -32,7 +32,7 @@ Creep.prototype.advancedTransfer = function(target: any, resource?: ResourceCons
 
     if (creep.pos.getRangeTo(target.pos) > 1) {
 
-        // Make a moveRequest to target and return that creep tried to move
+        // Make a moveRequest to target and inform failure
 
         creep.createMoveRequest({
             origin: creep.pos,
@@ -40,7 +40,7 @@ Creep.prototype.advancedTransfer = function(target: any, resource?: ResourceCons
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
         })
-        return 'travel'
+        return false
     }
 
     // If there wasn't a defined resource, define it as energy
@@ -73,7 +73,7 @@ Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceCons
 
     if (creep.pos.getRangeTo(target.pos) > 1) {
 
-        // Travel to target and return that creep tried to move
+        // Create a moveRequest to the target and inform failure
 
         creep.createMoveRequest({
             origin: creep.pos,
@@ -81,7 +81,7 @@ Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceCons
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
         })
-        return 'travel'
+        return false
     }
 
     // If there wasn't a defined resource, define it as energy
@@ -114,7 +114,7 @@ Creep.prototype.advancedPickup = function(target) {
 
     if (creep.pos.getRangeTo(target.pos) > 1) {
 
-        // Travel to target and return that creep tried to move
+        // Make a moveReqyest to the target and inform failure
 
         creep.createMoveRequest({
             origin: creep.pos,
@@ -180,8 +180,9 @@ Creep.prototype.advancedUpgradeController = function() {
 
         if (droppedResources.length == 0) return false
 
-        creep.advancedPickup(creep.pos.findClosestByRange(droppedResources))
-        return true
+        // If the pickup wasn't a success inform failure
+
+        if (!creep.advancedPickup(creep.pos.findClosestByRange(droppedResources))) return false
     }
 
     // Otherwise if the creep doesn't need resources
@@ -196,7 +197,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
         creep.createMoveRequest({
             origin: creep.pos,
-            goal: { pos: controller.pos, range: 1 },
+            goal: { pos: controller.pos, range: 3 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
         })
