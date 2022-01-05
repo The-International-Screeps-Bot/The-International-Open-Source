@@ -757,7 +757,17 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                 // If there is a request to avoid enemy ranges
 
-                if (opts.avoidEnemyRanges) {
+                avoidEnemyRanges()
+
+                function avoidEnemyRanges() {
+
+                    // Stop if avoidEnemyRanges isn't specified
+
+                    if (!opts.avoidEnemyRanges) return
+
+                    // Stop if the controller is mine and it's in safemode
+
+                    if (room.controller.my && room.controller.safeMode) return
 
                     // Get enemies and loop through them
 

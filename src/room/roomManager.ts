@@ -52,7 +52,7 @@ export function roomManager() {
         let cpuUsed = Game.cpu.getUsed()
 
         cpuUsed = Game.cpu.getUsed() - cpuUsed
-        global.customLog('Testing CPU', cpuUsed.toFixed(2))
+        /* global.customLog('Testing CPU', cpuUsed.toFixed(2)) */
 
         i++
     }
