@@ -95,7 +95,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
     creep.createMoveRequest({
         origin: creep.pos,
-        goal: { pos: targetPos, range: 1 },
+        goal: { pos: targetPos, range: 0 },
         avoidImpassibleStructures: true,
         avoidEnemyRanges: true,
     })

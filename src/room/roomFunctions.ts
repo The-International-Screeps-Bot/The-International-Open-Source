@@ -1,5 +1,6 @@
 import { retry } from 'async'
 import { constants } from 'international/constants'
+import { filter } from 'lodash'
 import { RoomTask } from './roomTasks'
 
 
@@ -219,10 +220,20 @@ Room.prototype.get = function(roomObjectName) {
 
     for (const structureType of constants.allStructureTypes) {
 
-        // Create roomObject for structureType
+        // Create roomObject for structures with the structureType
 
         manageRoomObject({
             name: structureType,
+            value: [],
+            valueType: 'object',
+            cacheMethod: 'global',
+            cacheAmount: 1,
+        })
+
+        // Create a roomObject for sites with the structureType
+
+        manageRoomObject({
+            name: `${structureType}CSite`,
             value: [],
             valueType: 'object',
             cacheMethod: 'global',
@@ -240,6 +251,53 @@ Room.prototype.get = function(roomObjectName) {
 
         roomObjects[structure.structureType].value.push(structure)
     }
+
+    // Dynamically add each cSite to their RoomObject structureType
+
+    // Loop through all cSites in room
+
+    for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
+
+        // Group cSites by structureType
+
+        roomObjects[cSite.structureType].value.push(cSite)
+    }
+
+    // Construction sites based on owner
+
+    function findEnemySites() {
+
+        // Inform constuction sites that aren't owned by a member of the allyList
+
+        return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
+            filter: cSite => !constants.allyList.includes(cSite.owner.username)
+        })
+    }
+
+    manageRoomObject({
+        name: 'enemyCSites',
+        value: findEnemySites(),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: 1,
+    })
+
+    function findAllySites() {
+
+        // Inform constuction sites that aren't owned by a member of the allyList
+
+        return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
+            filter: cSite => constants.allyList.includes(cSite.owner.username)
+        })
+    }
+
+    manageRoomObject({
+        name: 'allyCSites',
+        value: findAllySites(),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: 1,
+    })
 
     // Harvest positions
 
@@ -504,15 +562,10 @@ Room.prototype.get = function(roomObjectName) {
 
         const terrainCM = new PathFinder.CostMatrix()
 
-        // Construct positions
-
-        let x = 0
-        let y = 0
-
         // Iterate through
 
-        for (x = 0; x < constants.roomDimensions; x++) {
-            for (y = 0; y < constants.roomDimensions; y++) {
+        for (let x = 0; x < constants.roomDimensions; x++) {
+            for (let y = 0; y < constants.roomDimensions; y++) {
 
                 // Try to find the terrainValue
 
@@ -699,6 +752,15 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                 // Create a costMatrix
 
                 const cm = new PathFinder.CostMatrix()
+
+                // Loop trough each construction site belonging to an ally
+
+                for (const cSite of room.get('allyCSites')) {
+
+                    // Set the site as impassible
+
+                    cm.set(cSite.x, cSite.y, 255)
+                }
 
                 // If useRoads is enabled
 
@@ -1246,33 +1308,158 @@ Room.prototype.distanceTransform = function() {
 
     const room: Room = this
 
-    const terrainCM = room.get('terrainCM')
+    // Get the terrain for this room
 
-    //
+    const terrain = room.getTerrain()
+
+    // Create a costMatrix to record distances
 
     const distanceCM = new PathFinder.CostMatrix()
 
-    console.log(JSON.stringify(terrainCM))
+    function setIfWall(x: number, y: number): boolean {
 
-    /* for (const pos in terrainCM) {
+        // Try to find the terrainValue
 
-        // Construct a rect and get the positions in a range of 1
+        const terrainValue = terrain.get(x, y)
 
-        const rect = { x1: pos.x - 1, y1: pos.1 - 1, x2: pos.x + 1, y2: pos.y + 2}
-        const positions = global.findPositionsInsideRect(rect)
+        // inform false if terrain is not a wall
 
-        // Sort positions by their CM value
+        if (terrainValue != TERRAIN_MASK_WALL) return false
 
-        const positionsByValue = positions.sort((a: Pos, b: Pos) => terrainCM.get(a.x, a.y) - terrainCM.get(b.x, b.y))
+        // Otherwise set this position as 255 and inform true
 
-        // Record the value of the pos with the lowest value
+        distanceCM.set(x, y, 255)
+        return true
+    }
 
-        const lowestNearbyValue = terrainCM.get(positionsByValue[0].x, positionsByValue[0].y)
+    for (let x = 0; x < constants.roomDimensions; x++) {
+        for (let y = 0; y < constants.roomDimensions; y++) {
 
-        // Set this position in distanceCM to the lowestNearbyValue + 1
+            // Iterate if pos is a wall
 
-        distanceCM.set(pos.x, pos.y, lowestNearbyValue)
-    } */
+            if(setIfWall(x, y)) continue
+
+            // Otherwise construct a rect and get the positions in a range of 1
+
+            const rect = { x1: x - 1, y1: y - 1, x2: x + 1, y2: y + 1 }
+            const positions = global.findPositionsInsideRect(rect)
+
+            // Construct the smallest pos value as the wall value
+
+            let smallestNearbyPosValue = 255
+
+            // Iterate through positions
+
+            for (const pos of positions) {
+
+                // Get the value of the pos in distanceCM
+
+                let value = distanceCM.get(pos.x, pos.y)
+
+                // If the pos is a wall set the value to the value of a wall
+
+                if(setIfWall(pos.x, pos.y)) value = 255
+
+                // Iterate if the pos's value hasn't yet been defined
+
+                if (!value) continue
+
+                // If the value is that of a wall
+
+                if (value == 255) {
+
+                    // set the nearby pos value to 0 and stop the loop
+
+                    smallestNearbyPosValue = 0
+                    break
+                }
+
+                // Otherwise check if the value is smaller than the smallestNearbyPosValue, and set it to 0 if so
+
+                if (value < smallestNearbyPosValue) smallestNearbyPosValue = value
+            }
+
+            // Construct the distance value as the wall value
+
+            let distanceValue = 255
+
+            // If the smallest pos value isn't 255, set distanceValue as the smallest pos value + 1
+
+            if (smallestNearbyPosValue != 255) distanceValue = smallestNearbyPosValue + 1
+
+            // Record the distanceValue in the distance cost matrix
+
+            distanceCM.set(x, y, distanceValue)
+
+            // If roomVisuals are enabled, show the terrain's distanceValue
+
+            /* if (Memory.roomVisuals) room.visual.text(`${distanceValue}`, x, y) */
+        }
+    }
+
+    for (let x = constants.roomDimensions -1; x > -1; x--) {
+        for (let y = constants.roomDimensions -1; y > -1; y--) {
+
+            // Try to find the terrainValue
+
+            const terrainValue = terrain.get(x, y)
+
+            // Iterate if terrain is a wall
+
+            if (terrainValue == TERRAIN_MASK_WALL) continue
+
+            // Construct a rect and get the positions in a range of 1
+
+            const rect = { x1: x - 1, y1: y - 1, x2: x + 1, y2: y + 1 }
+            const positions = global.findPositionsInsideRect(rect)
+
+            // Construct the smallest pos value as the wall value
+
+            let smallestNearbyPosValue = 255
+
+            // Iterate through positions
+
+            for (const pos of positions) {
+
+                // Get the value of the pos in distanceCM
+
+                const value = distanceCM.get(pos.x, pos.y)
+
+                // If the value is that of a wall
+
+                if (value == 255) {
+
+                    // set the nearby pos value to 0 and stop the loop
+
+                    smallestNearbyPosValue = 0
+                    break
+                }
+
+                // Otherwise check if the value is smaller than the smallestNearbyPosValue, and set it to 0 if so
+
+                if (value < smallestNearbyPosValue) smallestNearbyPosValue = value
+            }
+
+            // Construct the distance value as the wall value
+
+            let distanceValue = 255
+
+            // If the smallest pos value isn't 255, set distanceValue as the smallest pos value + 1
+
+            if (smallestNearbyPosValue != 255) distanceValue = smallestNearbyPosValue + 1
+
+            // Record the distanceValue in the distance cost matrix
+
+            distanceCM.set(x, y, distanceValue)
+
+            // If roomVisuals are enabled, show the terrain's distanceValue
+
+            if (Memory.roomVisuals) room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+                fill: 'hsl(' + 200 + distanceValue * 10 + ', 100%, 60%)',
+                opacity: 0.4,
+            })
+        }
+    }
 
     return distanceCM
 }

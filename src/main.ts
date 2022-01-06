@@ -66,6 +66,9 @@ declare global {
     'source2' |
     'sources' |
     StructureConstant |
+    `${StructureConstant}CSite` |
+    'enemyCSites' |
+    'allyCSites' |
     'source1HarvestPositions' |
     'source1ClosestHarvestPosition' |
     'source2HarvestPositions' |
