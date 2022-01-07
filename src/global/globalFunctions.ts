@@ -96,10 +96,46 @@ global.killAllCreeps = function() {
 global.advancedGetValue = function(key, defaultValue) {
 
     // If there is no value for the global reference of the key create one
-    
+
     if (!global[key]) global[key] = defaultValue
 
     // Inform the global key reference's value
 
     return global[key]
+}
+
+global.advancedFindDistance = function(originRoomName, goalRoomName, typeWeights)  {
+
+    // Try to find a route from the origin room to the goal room
+
+    const findRouteResult = Game.map.findRoute(originRoomName, goalRoomName, {
+        routeCallback(roomName) {
+
+            const roomMemory = Memory.rooms[roomName]
+
+            // If the goal is in the room, inform 1
+
+            if (roomName == goalRoomName) return 1
+
+            // If there is no memory for the room inform impassible
+
+            if (!roomMemory) return Infinity
+
+            // If the type is in typeWeights, inform the weight for the type
+
+            if (typeWeights[roomMemory.type]) return typeWeights[roomMemory.type]
+
+            // Inform to consider this room
+
+            return 2
+        }
+    })
+
+    // If findRouteResult didn't work, inform a path length of Infinity
+
+    if (findRouteResult == ERR_NO_PATH) return Infinity
+
+    // inform the path's length
+
+    return findRouteResult.length
 }

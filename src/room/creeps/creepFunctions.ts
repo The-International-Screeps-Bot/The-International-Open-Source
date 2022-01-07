@@ -475,7 +475,7 @@ Creep.prototype.needsResources = function() {
         return true
     }
 
-    // Otherwise inform that the creep does not need resources
+    // Otherwise Record and inform that the creep does not need resources
 
     creep.memory.needsResouces = undefined
     return false

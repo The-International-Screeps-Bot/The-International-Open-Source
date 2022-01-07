@@ -692,7 +692,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                 const roomMemory = Memory.rooms[roomName]
 
-                // If room is in the goal, inform 1
+                // If the goal is in the room, inform 1
 
                 if (roomName == opts.goal.pos.roomName) return 1
 
@@ -700,13 +700,13 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                 if (!roomMemory) return Infinity
 
-                // If the roomMemory's type isn't a type in avoidTypes inform 1
+                // If the type is in typeWeights, inform the weight for the type
 
-                if (!opts.avoidTypes.includes(roomMemory.type)) return 1
+                if (opts.typeWeights[roomMemory.type]) return opts.typeWeights[roomMemory.type]
 
-                // Inform to not use this room
+                // Inform to consider this room
 
-                return Infinity
+                return 2
             }
         })
 
@@ -742,7 +742,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
             // Create costMatrixes for room tiles, where lower values are priority, and 255 or more is considered impassible
 
-            roomCallback(roomName: string): boolean | CostMatrix {
+            roomCallback(roomName) {
 
                 // If there isn't vision in this room inform to avoid this room
 
@@ -1060,7 +1060,15 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
         // Find distance from scoutingRoom
 
-        const distanceFromScoutingRoom = room.advancedFindDistance(scoutingRoom.name, room.name, ['keeper', 'enemy', 'enemyRemote', 'ally', 'allyRemote', 'highway'])
+        const distanceFromScoutingRoom = global.advancedFindDistance(scoutingRoom.name, room.name,
+            {
+                keeper: Infinity,
+                enemy: Infinity,
+                enemyRemote: Infinity,
+                ally: Infinity,
+                allyRemote: Infinity,
+                highway: Infinity,
+            })
 
         // If distance from scoutingRoom is less than 3
 
@@ -1139,46 +1147,6 @@ Room.prototype.cleanRoomMemory = function() {
 
         delete room.memory[key]
     }
-}
-
-Room.prototype.advancedFindDistance = function(originRoomName, goalRoomName, avoidTypes)  {
-
-    const room: Room = this
-
-    // Try to find a route from the origin room to the goal room
-
-    const findRouteResult = Game.map.findRoute(originRoomName, goalRoomName, {
-        routeCallback(roomName) {
-
-            // If the room is the goal use the room as normal
-
-            if (roomName == goalRoomName) return 1
-
-            // If the room has no memory prefer to not use the room
-
-            if (!Memory.rooms[roomName]) return 10
-
-            // If the room has no type prefer to not use the room
-
-            if (!Memory.rooms[roomName].type) return 10
-
-            // If the room type is an avoidType, never use the room
-
-            if (avoidTypes.includes(Memory.rooms[roomName].type)) return Infinity
-
-            // If the type isn't an avoidType then use the room as normal
-
-            return 1
-        }
-    })
-
-    // If findRouteResult didn't work, inform a path length of Infinity
-
-    if (findRouteResult == ERR_NO_PATH) return Infinity
-
-    // inform the path's length
-
-    return findRouteResult.length
 }
 
 Room.prototype.findStoredResourceAmount = function(resourceType) {

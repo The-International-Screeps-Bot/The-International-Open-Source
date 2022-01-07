@@ -96,7 +96,7 @@ declare global {
     interface PathOpts {
         origin: RoomPosition
         goal: PathGoal
-        avoidTypes?: string[]
+        typeWeights?: {[key: string]: number}
         plainCost?: number
         swampCost?: number
         maxRooms?: number
@@ -301,17 +301,9 @@ declare global {
         actionVisual(pos1: RoomPosition, pos2: RoomPosition, type?: string): void
 
         /**
-         *
-         * @param originRoomName
-         * @param goalRoomName
-         * @param avoidTypes
+         * Generates a path between two positions
          */
         advancedFindPath(opts: PathOpts): RoomPosition[]
-
-        /**
-         * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
-         */
-        advancedFindDistance(originRoomName: string, goalRoomName: string, avoidTypes?: string[]): number
 
         /**
          * Finds the amount of a specified resourceType in the room's storage and teminal
@@ -340,9 +332,9 @@ declare global {
         healCreeps(towers: StructureTower): void
 
         /**
-         * Finds open spaces in a room
+         * Finds open spaces in a room and records them in a cost matrix
          */
-        distanceTransform(): any
+        distanceTransform(): CostMatrix
 
         advancedSell(resourceType: ResourceConstant, amount: number): boolean
 
@@ -531,6 +523,11 @@ declare global {
              * Gets the value of a key in global, or creates a default if it doesn't exist
              */
             advancedGetValue(key: string | number, defaultValue: any): any
+
+            /**
+             * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
+             */
+            advancedFindDistance(originRoomName: string, goalRoomName: string, typeWeights?: {[key: string]: number}): number
         }
     }
 }
