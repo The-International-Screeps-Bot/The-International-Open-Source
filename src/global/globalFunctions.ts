@@ -19,6 +19,11 @@ global.findPositionsInsideRect = function(rect) {
     for (let x = rect.x1; x <= rect.x2; x++) {
         for (let y = rect.y1; y <= rect.y2; y++) {
 
+            // Iterate if the pos doesn't map onto a room
+
+            if (x < 0 || x >= constants.roomDimensions ||
+                y < 0 || y >= constants.roomDimensions) continue
+
             positions.push({ x: x, y: y })
         }
     }
@@ -138,4 +143,9 @@ global.advancedFindDistance = function(originRoomName, goalRoomName, typeWeights
     // inform the path's length
 
     return findRouteResult.length
+}
+
+global.findCarryPartsRequired = function(distance, income) {
+
+    return distance * 2 * income / CARRY_CAPACITY
 }

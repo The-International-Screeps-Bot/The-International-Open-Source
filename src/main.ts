@@ -53,6 +53,14 @@ declare global {
         green: string
     }
 
+    type BuldingTypes = 'main' |
+    'hub' |
+    'extensions' |
+    'towers' |
+    'labs'
+
+    type Buildings = Record<BuldingTypes, Partial<Record<StructureConstant,  Record<'pos', Pos[]>>>>
+
     type CreepRoles = 'sourceHarvester' |
     'hauler' |
     'controllerUpgrader' |
@@ -86,6 +94,7 @@ declare global {
     'allyCreeps' |
     'myDamagedCreeps' |
     'damagedAllyCreeps' |
+    'terrain' |
     'terrainCM'
 
     interface PathGoal {
@@ -327,14 +336,19 @@ declare global {
         findScore(): void
 
         /**
-         * Finds and heals damaged my or allied creeps
+         * Finds and has towers heal damaged my or allied creeps
          */
-        healCreeps(towers: StructureTower): void
+        towersHealCreeps(): void
 
         /**
          * Finds open spaces in a room and records them in a cost matrix
          */
         distanceTransform(): CostMatrix
+
+        /**
+         * Gets ranges from for each position from a certain point
+         */
+        floodFill(seeds: Pos[]): CostMatrix
 
         advancedSell(resourceType: ResourceConstant, amount: number): boolean
 
@@ -528,6 +542,13 @@ declare global {
              * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
              */
             advancedFindDistance(originRoomName: string, goalRoomName: string, typeWeights?: {[key: string]: number}): number
+
+            /**
+             *
+             * @param distance The number of tiles between the hauling target and source
+             * @param income The number of resources added to the pile each tick
+             */
+            findCarryPartsRequired(distance: number, income: number): number
         }
     }
 }

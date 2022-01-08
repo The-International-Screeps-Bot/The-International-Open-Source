@@ -5,5 +5,5 @@ import './towerFunctions'
  */
 export function towerManager(room: Room) {
 
-
+    room.towersHealCreeps()
 }

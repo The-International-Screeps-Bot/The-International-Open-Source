@@ -1,6 +1,10 @@
-Room.prototype.healCreeps = function(towers) {
+Room.prototype.towersHealCreeps = function() {
 
     const room: Room = this
+
+    // Stop if there are no actionable towers left
+
+    if (room.actionableTowers.length == 0) return
 
     // Construct heal targets from my and allied damaged creeps in the room
 

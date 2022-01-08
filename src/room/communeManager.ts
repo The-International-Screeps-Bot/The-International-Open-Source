@@ -4,9 +4,8 @@ import { taskManager } from "./roomTaskManager"
 
 import { spawnManager } from './spawning/spawnManager'
 
-import './towerManager'
-import './linkManager'
-import './factoryManager'
+import { towerManager } from "./towerManager"
+import { constructionManager } from "./constructionManager"
 
 export function communeManager(room: Room) {
 
@@ -16,5 +15,13 @@ export function communeManager(room: Room) {
 
     spawnManager(room)
 
+    towerManager(room)
+
     roomVisualsManager(room)
+
+    constructionManager(room)
+
+    room.floodFill([
+        room.controller.pos
+    ])
 }

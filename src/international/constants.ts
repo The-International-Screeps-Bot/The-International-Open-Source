@@ -63,7 +63,9 @@ interface Constants {
     /**
      * An array of structureTypes that cannot be walked over
      */
-     impassibleStructures: StructureConstant[]
+    impassibleStructures: StructureConstant[]
+
+    buildings: Buildings
 }
 
 export const constants: Partial<Constants> = {}
@@ -233,3 +235,35 @@ constants.impassibleStructures = [
     STRUCTURE_FACTORY,
     STRUCTURE_INVADER_CORE,
 ]
+
+constants.buildings = {
+    main: {
+        "extension": { "pos": [{ "x": 2, "y": 1 }, { "x": 1, "y": 1 }, { "x": 4, "y": 1 }, { "x": 1, "y": 2 }, { "x": 2, "y": 3 }, { "x": 3, "y": 2 }, { "x": 5, "y": 2 }, { "x": 5, "y": 1 }, { "x": 4, "y": 3 }, { "x": 3, "y": 4 }, { "x": 1, "y": 5 }, { "x": 1, "y": 4 }, { "x": 2, "y": 5 }, { "x": 4, "y": 5 }, { "x": 5, "y": 5 }, { "x": 5, "y": 4 }] },
+        "road": { "pos": [{ "x": 3, "y": 0 }, { "x": 2, "y": 0 }, { "x": 1, "y": 0 }, { "x": 0, "y": 1 }, { "x": 0, "y": 2 }, { "x": 0, "y": 3 }, { "x": 0, "y": 4 }, { "x": 4, "y": 0 }, { "x": 5, "y": 0 }, { "x": 6, "y": 1 }, { "x": 6, "y": 2 }, { "x": 6, "y": 4 }, { "x": 6, "y": 3 }, { "x": 6, "y": 5 }, { "x": 5, "y": 6 }, { "x": 4, "y": 6 }, { "x": 3, "y": 6 }, { "x": 2, "y": 6 }, { "x": 1, "y": 6 }, { "x": 0, "y": 5 }, { "x": 24, "y": 3 }] },
+        "spawn": { "pos": [{ "x": 3, "y": 5 }, { "x": 3, "y": 1 }] },
+        "container": { "pos": [{ "x": 5, "y": 3 }, { "x": 1, "y": 3 }] },
+        "link": { "pos": [{ "x": 3, "y": 3 }] }
+    },
+    hub: {
+        "spawn": { "pos": [{ "x": 1, "y": 2 }] },
+        "link": { "pos": [{ "x": 0, "y": 0 }] },
+        "factory": { "pos": [{ "x": 1, "y": 0 }] },
+        "nuker": { "pos": [{ "x": 0, "y": 1 }] },
+        "terminal": { "pos": [{ "x": 0, "y": 2 }] },
+        "storage": { "pos": [{ "x": 2, "y": 0 }] },
+        "powerSpawn": { "pos": [{ "x": 2, "y": 1 }] },
+        "observer": { "pos": [{ "x": 2, "y": 2 }] }
+    },
+    extensions: {
+        "extension": { "pos": [{ "x": 1, "y": 2 }, { "x": 2, "y": 1 }, { "x": 2, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 2 }] },
+        "road": { "pos": [{ "x": 1, "y": 3 }, { "x": 0, "y": 2 }, { "x": 1, "y": 1 }, { "x": 2, "y": 0 }, { "x": 3, "y": 1 }, { "x": 4, "y": 2 }, { "x": 3, "y": 3 }, { "x": 2, "y": 4 }] }
+    },
+    towers: {
+        "road": { "pos": [{ "x": 0, "y": 0 }, { "x": 1, "y": 1 }, { "x": 2, "y": 2 }] },
+        "tower": { "pos": [{ "x": 0, "y": 1 }, { "x": 0, "y": 2 }, { "x": 1, "y": 2 }, { "x": 1, "y": 0 }, { "x": 2, "y": 0 }, { "x": 2, "y": 1 }] }
+    },
+    labs: {
+        "road": { "pos": [{ "x": 3, "y": 3 }, { "x": 2, "y": 2 }, { "x": 1, "y": 1 }, { "x": 0, "y": 0 }] },
+        "lab": { "pos": [{ "x": 0, "y": 1 }, { "x": 0, "y": 2 }, { "x": 1, "y": 2 }, { "x": 1, "y": 3 }, { "x": 2, "y": 3 }, { "x": 1, "y": 0 }, { "x": 2, "y": 0 }, { "x": 2, "y": 1 }, { "x": 3, "y": 1 }, { "x": 3, "y": 2 }] }
+    },
+}

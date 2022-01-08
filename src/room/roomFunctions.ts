@@ -8,7 +8,7 @@ Room.prototype.get = function(roomObjectName) {
 
     const room = this
 
-    const roomObjects: Partial<Record<RoomObjectName | string, RoomObject>> = {}
+    const roomObjects: Partial<Record<RoomObjectName, RoomObject>> = {}
 
     interface RoomObjectOpts {
         [key: string | number]: any
@@ -552,11 +552,21 @@ Room.prototype.get = function(roomObjectName) {
         cacheAmount: 1,
     })
 
-    // costMatrixes
+    // Terrain
+
+    manageRoomObject({
+        name: 'terrain',
+        value: room.getTerrain(),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
+    // Cost matrixes
 
     function generateTerrainCM() {
 
-        const terrain = room.getTerrain()
+        const terrain = roomObjects.terrain.getValue()
 
         // Create a CostMatrix for terrain types
 
@@ -621,7 +631,7 @@ Room.prototype.get = function(roomObjectName) {
 
 Room.prototype.newPos = function(pos: Pos) {
 
-    const room: Room = this
+    const room = this
 
     // Create an return roomPosition
 
@@ -1125,7 +1135,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
 Room.prototype.cleanRoomMemory = function() {
 
-    const room: Room = this
+    const room = this
 
     // Stop if the room doesn't have a type
 
@@ -1151,7 +1161,7 @@ Room.prototype.cleanRoomMemory = function() {
 
 Room.prototype.findStoredResourceAmount = function(resourceType) {
 
-    const room: Room = this
+    const room = this
 
     // If the rooms stored resources of this resourceType exist, inform it
 
@@ -1185,13 +1195,11 @@ Room.prototype.findStoredResourceAmount = function(resourceType) {
 
 Room.prototype.deleteTask = function(taskID, hasResponder) {
 
-    const room: Room = this
-    global.customLog('deleted task', taskID)
-    type taskLocation = {[key: number]: RoomTask}
+    const room = this
 
-    function getTaskLocation(): taskLocation {
+    type TaskLocation = {[key: number]: RoomTask}
 
-        let task: RoomTask
+    function getTaskLocation(): TaskLocation {
 
         // If the task has a responder inform tasksWithResponders
 
@@ -1267,18 +1275,18 @@ Room.prototype.hasTaskOfTypes = function(createdTasks, types) {
 
 Room.prototype.findScore = function() {
 
-    const room: Room = this
+    const room = this
 
 
 }
 
 Room.prototype.distanceTransform = function() {
 
-    const room: Room = this
+    const room = this
 
     // Get the terrain for this room
 
-    const terrain = room.getTerrain()
+    const terrain = room.get('terrain')
 
     // Create a costMatrix to record distances
 
@@ -1328,10 +1336,6 @@ Room.prototype.distanceTransform = function() {
 
                 if(setIfWall(pos.x, pos.y)) value = 255
 
-                // Iterate if the pos's value hasn't yet been defined
-
-                if (!value) continue
-
                 // If the value is that of a wall
 
                 if (value == 255) {
@@ -1358,10 +1362,6 @@ Room.prototype.distanceTransform = function() {
             // Record the distanceValue in the distance cost matrix
 
             distanceCM.set(x, y, distanceValue)
-
-            // If roomVisuals are enabled, show the terrain's distanceValue
-
-            /* if (Memory.roomVisuals) room.visual.text(`${distanceValue}`, x, y) */
         }
     }
 
@@ -1430,6 +1430,97 @@ Room.prototype.distanceTransform = function() {
     }
 
     return distanceCM
+}
+
+Room.prototype.floodFill = function(seeds) {
+
+    const room = this
+
+    // Get the terrain of this room
+
+    const terrain = room.get('terrain')
+
+    // Construct a cost matrix for the flood
+
+    const floodCM = new PathFinder.CostMatrix()
+
+    // Construct a cost matrix for visited tiles and add seeds to it
+
+    const visitedCM = new PathFinder.CostMatrix()
+    for (const seedPos of seeds) visitedCM.set(seedPos.x, seedPos.y, 1)
+
+    // Construct values for the flood
+
+    let depth = 0
+
+    let thisGeneration: Pos[] = seeds
+    let nextGeneration: Pos[] = []
+
+    // So long as there are positions in this gen
+
+    while (thisGeneration.length) {
+
+        // Reset next gen
+
+        nextGeneration = []
+
+        // Iterate through positions of this gen
+
+        for (const pos of thisGeneration) {
+
+            // If the depth isn't 0
+
+            if (depth != 0) {
+
+                // Iterate if the terrain is a wall
+
+                if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
+
+                // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
+
+                floodCM.set(pos.x, pos.y, depth)
+
+                // If visuals are enabled, show the depth on the pos
+
+                if (Memory.roomVisuals) room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, {
+                    fill: 'hsl(' + 200 + depth * 10 + ', 100%, 60%)',
+                    opacity: 0.4,
+                })
+            }
+
+            // Construct a rect and get the positions in a range of 1
+
+            const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 }
+            const adjacentPositions = global.findPositionsInsideRect(rect)
+
+            // Loop through adjacent positions
+
+            for (const adjacentPos of adjacentPositions) {
+
+                // Iterate if the adjacent pos has been visited or isn't a tile
+
+                if(visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
+
+                // Otherwise record that it has been visited
+
+                visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+
+                // Add it to the next gen
+
+                nextGeneration.push(adjacentPos)
+            }
+        }
+
+        // Set this gen to next gen
+
+        thisGeneration = nextGeneration
+
+        // Increment depth
+
+        depth++
+    }
+
+    return floodCM
 }
 
 Room.prototype.pathVisual = function(path, color) {

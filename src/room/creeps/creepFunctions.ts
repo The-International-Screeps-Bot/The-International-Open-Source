@@ -25,7 +25,7 @@ Creep.prototype.isDying = function() {
 
 Creep.prototype.advancedTransfer = function(target: any, resource?: ResourceConstant, amount?: number) {
 
-    const creep: Creep = this
+    const creep = this
     const room = creep.room
 
     // If creep isn't in transfer range
@@ -57,7 +57,7 @@ Creep.prototype.advancedTransfer = function(target: any, resource?: ResourceCons
 
     // If the transfer is not a success inform the failure
 
-    if (transferResult != 0) return false
+    if (transferResult != OK) return false
 
     // Otherwise inform the success
 
@@ -66,7 +66,7 @@ Creep.prototype.advancedTransfer = function(target: any, resource?: ResourceCons
 
 Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceConstant, amount?: number) {
 
-    const creep: Creep = this
+    const creep = this
     const room = creep.room
 
     // If creep isn't in transfer range
@@ -98,7 +98,7 @@ Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceCons
 
     // If the withdraw is not a success inform the failure
 
-    if (withdrawResult != 0) return false
+    if (withdrawResult != OK) return false
 
     // Otherwise inform the success
 
@@ -114,7 +114,7 @@ Creep.prototype.advancedPickup = function(target) {
 
     if (creep.pos.getRangeTo(target.pos) > 1) {
 
-        // Make a moveReqyest to the target and inform failure
+        // Make a moveRequest to the target and inform failure
 
         creep.createMoveRequest({
             origin: creep.pos,
@@ -131,7 +131,7 @@ Creep.prototype.advancedPickup = function(target) {
 
     // If the pickup is not a success inform the failure
 
-    if (pickupResult != 0) return false
+    if (pickupResult != OK) return false
 
     // Otherwise inform the success
 
@@ -204,7 +204,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
         // Inform true
 
-        return true
+        return false
     }
 
     // Try to upgrade the controller
@@ -303,6 +303,35 @@ Creep.prototype.createMoveRequest = function(opts) {
     // Assign default opts
 
     if (!opts.cacheAmount) opts.cacheAmount = 20
+
+    // If there is a path in the creep's memory
+
+    if (creep.memory.path) {
+
+        // Construct a variable for the first pos in path
+
+        let firstPos = creep.memory.path[0]
+
+        let i = -1
+
+        // So long as the creep is standing on the first position in the path
+
+        while (global.arePositionsEqual(creep.pos, firstPos)) {
+
+            // Remove the first pos of the path
+
+            creep.memory.path.shift()
+
+            // Increment i and set firstPos as the pos in path with an index of i
+
+            i++
+            firstPos = creep.memory.path[i]
+
+            // Stop if there is no firstPos
+
+            if (!firstPos) return false
+        }
+    }
 
     // See if the creep needs a new path
 

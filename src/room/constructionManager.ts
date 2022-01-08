@@ -1,3 +1,5 @@
+import { constants } from "international/constants"
+
 /**
  * Creates construction sites and deletes structures in a room
  */
@@ -55,4 +57,6 @@ export function constructionManager(room: Room) {
 
         return true
     }
+
+    
 }
