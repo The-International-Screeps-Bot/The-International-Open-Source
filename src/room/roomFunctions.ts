@@ -905,12 +905,24 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         // Get structures of type and loop through them
 
-                        const structuresOfType = room.get(structureType)
+                        const structuresOfType: Structure<StructureConstant>[] = room.get(structureType)
+
                         for (const structure of structuresOfType) {
 
                             // Set pos as impassible
 
                             cm.set(structure.pos.x, structure.pos.y, 255)
+                        }
+
+                        // Get cSites of type and loop through them
+
+                        const cSitesOfType: ConstructionSite<BuildableStructureConstant>[] = room.get(`${structureType}CSite`)
+
+                        for (const cSite of cSitesOfType) {
+
+                            // Set pos as impassible
+
+                            cm.set(cSite.pos.x, cSite.pos.y, 255)
                         }
                     }
                 }

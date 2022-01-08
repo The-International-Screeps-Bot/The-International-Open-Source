@@ -312,28 +312,13 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     if (creep.memory.path) {
 
-        // Construct a variable for the first pos in path
-
-        let firstPos = creep.memory.path[0]
-
-        let i = -1
-
         // So long as the creep is standing on the first position in the path
 
-        while (global.arePositionsEqual(creep.pos, firstPos)) {
+        while (global.arePositionsEqual(creep.pos, creep.memory.path[0])) {
 
             // Remove the first pos of the path
 
             creep.memory.path.shift()
-
-            // Increment i and set firstPos as the pos in path with an index of i
-
-            i++
-            firstPos = creep.memory.path[i]
-
-            // Stop if there is no firstPos
-
-            if (!firstPos) return false
         }
     }
 
@@ -372,29 +357,22 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     if (path.length == 0) return false
 
-    // Assign movePos to the first pos in path
-
-    let movePos = path[0]
-
-    let i = -1
-
     // So long as the creep is standing on the first position in the path
 
-    while (global.arePositionsEqual(creep.pos, movePos)) {
+    while (global.arePositionsEqual(creep.pos, path[0])) {
 
         // Remove the first pos of the path
 
         path.shift()
 
-        // Increment i and set movePos as the pos in path with an index of i
+        // Stop if there is no first pos in path
 
-        i++
-        movePos = path[i]
-
-        // Stop if there is no movePos
-
-        if (!movePos) return false
+        if (!path[0]) return false
     }
+
+    // Assign movePos to the first pos in path
+
+    let movePos = path[0]
 
     // Visualize path
 
