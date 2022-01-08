@@ -20,8 +20,4 @@ export function communeManager(room: Room) {
     roomVisualsManager(room)
 
     constructionManager(room)
-
-    room.floodFill([
-        room.controller.pos
-    ])
 }

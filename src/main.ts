@@ -53,7 +53,7 @@ declare global {
         green: string
     }
 
-    type BuldingTypes = 'main' |
+    type BuldingTypes = 'fastfiller' |
     'hub' |
     'extensions' |
     'towers' |
@@ -396,7 +396,7 @@ declare global {
         /**
          *
          */
-        needsNewPath(cacheAmount: number): boolean
+        needsNewPath(goalPos: RoomPosition, cacheAmount: number): boolean
 
         /**
          *
@@ -441,6 +441,10 @@ declare global {
          * An array of positions desciring where the creep neeeds to move to get to its goal
          */
         path: RoomPosition[]
+
+        targetPos: RoomPosition
+
+        moveRequest: boolean
     }
 
     // PowerCreeps
@@ -549,6 +553,11 @@ declare global {
              * @param income The number of resources added to the pile each tick
              */
             findCarryPartsRequired(distance: number, income: number): number
+
+            /**
+             * Finds a position equally between two positions
+             */
+            findAvgBetweenPosotions(pos1: Pos, pos2: Pos): Pos
         }
     }
 }

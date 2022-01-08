@@ -258,7 +258,7 @@ Creep.prototype.partsOfType = function(type: BodyPartConstant) {
     return partsOfType.length
 }
 
-Creep.prototype.needsNewPath = function(cacheAmount) {
+Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
     const creep = this
 
@@ -277,6 +277,10 @@ Creep.prototype.needsNewPath = function(cacheAmount) {
     // Inform true if the path is out of caching time
 
     if (creep.memory.lastCache + cacheAmount < Game.time) return true
+
+    // Inform true if the creep's previous target isn't its current
+
+    if (!global.arePositionsEqual(creep.memory.targetPos, goalPos)) return true
 
     // Otherwise inform false
 
@@ -335,7 +339,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     // See if the creep needs a new path
 
-    const needsNewPathResult = creep.needsNewPath(opts.cacheAmount)
+    const needsNewPathResult = creep.needsNewPath(opts.goal.pos, opts.cacheAmount)
 
     // Set path to the path in the creep's memory
 

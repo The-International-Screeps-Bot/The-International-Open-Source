@@ -149,3 +149,8 @@ global.findCarryPartsRequired = function(distance, income) {
 
     return distance * 2 * income / CARRY_CAPACITY
 }
+
+global.findAvgBetweenPosotions = function(pos1, pos2) {
+
+    return pos1
+}

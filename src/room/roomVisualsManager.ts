@@ -13,6 +13,10 @@ export function roomVisualsManager(room: Room) {
 
     function controllerVisuals() {
 
+        // Stop if there is no controller
+
+        if (!room.controller) return
+
         // If the controller is mine
 
         if (room.controller.my) {
@@ -72,4 +76,49 @@ export function roomVisualsManager(room: Room) {
             return
         }
     }
+
+    spawnVisuals()
+
+    function spawnVisuals() {
+
+        // Get the spawns in the room
+
+        const spawns: StructureSpawn[] = room.get('spawn')
+
+        // Loop through them
+
+        for (const spawn of spawns) {
+
+            // Iterate if the spawn isn't spawning
+
+            if (!spawn.spawning) continue
+
+            // Otherwise display the role of the creep being spawn
+
+            room.visual.text(`${Game.creeps[spawn.spawning.name].memory.role}`, spawn.pos, {
+                backgroundColor: 'rgb(255, 0, 0, 0)',
+                font: 0.5,
+                opacity: 1,
+                color: constants.colors.lightBlue,
+            })
+
+            // And display how many ticks left until spawned
+
+            room.visual.text(`${spawn.spawning.remainingTime}`, spawn.pos.x, spawn.pos.y - 1, {
+                backgroundColor: 'rgb(255, 0, 0, 0)',
+                font: 0.5,
+                opacity: 1,
+                color: constants.colors.lightBlue,
+            })
+        }
+    }
+
+    function towerVisuals() {}
+    function labVisuals() {}
+    function factoryVisuals() {}
+    function powerSpawnVisuals() {}
+    function nukerVisuals() {}
+    function observerVisuals() {}
+    function sourceVisuals() {}
+    function mineralVisuals() {}
 }

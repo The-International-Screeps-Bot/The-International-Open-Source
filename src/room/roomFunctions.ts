@@ -1215,9 +1215,9 @@ Room.prototype.deleteTask = function(taskID, hasResponder) {
     const taskLocation = getTaskLocation()
     const task = taskLocation[taskID]
 
-    // If the task has a creator
+    // If the task has a creator and it still exists
 
-    if (task.creatorID) {
+    if (task.creatorID && global[task.creatorID]) {
 
         // Remove the taskID from the creator
 
