@@ -1,4 +1,5 @@
 import { constants } from "international/constants"
+import { generalFuncs } from "international/generalFunctions"
 import { RoomTask } from "room/roomTasks"
 
 Creep.prototype.isDying = function() {
@@ -280,7 +281,7 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
     // Inform true if the creep's previous target isn't its current
 
-    if (!global.arePositionsEqual(creep.memory.targetPos, goalPos)) return true
+    if (!generalFuncs.arePositionsEqual(creep.memory.targetPos, goalPos)) return true
 
     // Otherwise inform false
 
@@ -314,7 +315,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
         // So long as the creep is standing on the first position in the path
 
-        while (global.arePositionsEqual(creep.pos, creep.memory.path[0])) {
+        while (generalFuncs.arePositionsEqual(creep.pos, creep.memory.path[0])) {
 
             // Remove the first pos of the path
 
@@ -359,7 +360,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     // So long as the creep is standing on the first position in the path
 
-    while (global.arePositionsEqual(creep.pos, path[0])) {
+    while (generalFuncs.arePositionsEqual(creep.pos, path[0])) {
 
         // Remove the first pos of the path
 
@@ -442,7 +443,7 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
 
         // Inform the task creator that the task now has a responder
 
-        global.advancedGetValue(task.creatorID, { createdTasks: {} }).createdTasks[taskID] = true
+        generalFuncs.advancedGetValue(task.creatorID, { createdTasks: {} }).createdTasks[taskID] = true
 
         // Inform true
 

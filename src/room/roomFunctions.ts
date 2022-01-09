@@ -1,5 +1,6 @@
 import { retry } from 'async'
 import { constants } from 'international/constants'
+import { generalFuncs } from 'international/generalFunctions'
 import { filter } from 'lodash'
 import { RoomTask } from './roomTasks'
 
@@ -83,7 +84,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // If roomObject's valueType is id, return it as an object with the ID
 
-            if (roomObject.valueType == 'id') return global.findObjectWithId(roomObject.value)
+            if (roomObject.valueType == 'id') return generalFuncs.findObjectWithId(roomObject.value)
 
             // If roomObject's type is pos, return the it as a RoomPosition
 
@@ -315,7 +316,7 @@ Room.prototype.get = function(roomObjectName) {
         // Find positions adjacent to source
 
         const rect: Rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 }
-        const adjacentPositions: Pos[] = global.findPositionsInsideRect(rect)
+        const adjacentPositions: Pos[] = generalFuncs.findPositionsInsideRect(rect)
 
         const harvestPositions: Pos[] = []
 
@@ -619,7 +620,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Log an invalid query and inform undefined
 
-        global.customLog('Tried to get non-existent property', roomObjectName, constants.colors.white, constants.colors.red)
+        generalFuncs.customLog('Tried to get non-existent property', roomObjectName, constants.colors.white, constants.colors.red)
         return undefined
     }
 
@@ -854,7 +855,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                             x2: opts.creep.pos.x + 2,
                             y2: opts.creep.pos.y + 2
                         }
-                        const positions: Pos[] = global.findPositionsInsideRect(rect)
+                        const positions: Pos[] = generalFuncs.findPositionsInsideRect(rect)
 
                         // Loop through positions
 
@@ -1082,7 +1083,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
         // Find distance from scoutingRoom
 
-        const distanceFromScoutingRoom = global.advancedFindDistance(scoutingRoom.name, room.name,
+        const distanceFromScoutingRoom = generalFuncs.advancedFindDistance(scoutingRoom.name, room.name,
             {
                 keeper: Infinity,
                 enemy: Infinity,
@@ -1292,7 +1293,7 @@ Room.prototype.findScore = function() {
 
 }
 
-Room.prototype.distanceTransform = function() {
+Room.prototype.distanceTransform = function(initalCM) {
 
     const room = this
 
@@ -1300,9 +1301,9 @@ Room.prototype.distanceTransform = function() {
 
     const terrain = room.get('terrain')
 
-    // Create a costMatrix to record distances
+    // Use a costMatrix to record distances. Use the initalCM if provided, otherwise create one
 
-    const distanceCM = new PathFinder.CostMatrix()
+    const distanceCM = initalCM || new PathFinder.CostMatrix()
 
     function setIfWall(x: number, y: number): boolean {
 
@@ -1330,7 +1331,7 @@ Room.prototype.distanceTransform = function() {
             // Otherwise construct a rect and get the positions in a range of 1
 
             const rect = { x1: x - 1, y1: y - 1, x2: x + 1, y2: y + 1 }
-            const positions = global.findPositionsInsideRect(rect)
+            const positions = generalFuncs.findPositionsInsideRect(rect)
 
             // Construct the smallest pos value as the wall value
 
@@ -1391,7 +1392,7 @@ Room.prototype.distanceTransform = function() {
             // Construct a rect and get the positions in a range of 1
 
             const rect = { x1: x - 1, y1: y - 1, x2: x + 1, y2: y + 1 }
-            const positions = global.findPositionsInsideRect(rect)
+            const positions = generalFuncs.findPositionsInsideRect(rect)
 
             // Construct the smallest pos value as the wall value
 
@@ -1503,7 +1504,7 @@ Room.prototype.floodFill = function(seeds) {
             // Construct a rect and get the positions in a range of 1
 
             const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 }
-            const adjacentPositions = global.findPositionsInsideRect(rect)
+            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
 
             // Loop through adjacent positions
 

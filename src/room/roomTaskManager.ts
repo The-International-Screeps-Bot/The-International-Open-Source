@@ -1,4 +1,5 @@
 import { constants } from 'international/constants'
+import { generalFuncs } from 'international/generalFunctions'
 import { RoomDeliverTask, RoomTask } from './roomTasks'
 
 export function taskManager(room: Room) {
@@ -11,7 +12,7 @@ export function taskManager(room: Room) {
 
         // Try to find the creator using the task's creatorID
 
-        const creator = global.findObjectWithId(task.creatorID)
+        const creator = generalFuncs.findObjectWithId(task.creatorID)
 
         // If the creator doesn't exist, delete the task
 
@@ -26,7 +27,7 @@ export function taskManager(room: Room) {
 
         // Try to find the responder using the task's responderID
 
-        const responder = global.findObjectWithId(task.responderID)
+        const responder = generalFuncs.findObjectWithId(task.responderID)
 
         // If the responder doesn't exist, delete the task
 
@@ -34,13 +35,13 @@ export function taskManager(room: Room) {
 
         // Try to find the creator using the task's creatorID
 
-        const creator = global.findObjectWithId(task.creatorID)
+        const creator = generalFuncs.findObjectWithId(task.creatorID)
 
         // If the creator doesn't exist, delete the task
 
         if (!creator) room.deleteTask(taskID, true)
     }
 
-    global.customLog('TWOR', JSON.stringify(global[room.name].tasksWithoutResponders))
-    global.customLog('TWR', JSON.stringify(global[room.name].tasksWithResponders))
+    generalFuncs.customLog('TWOR', JSON.stringify(global[room.name].tasksWithoutResponders))
+    generalFuncs.customLog('TWR', JSON.stringify(global[room.name].tasksWithResponders))
 }

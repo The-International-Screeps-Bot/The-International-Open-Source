@@ -1,3 +1,5 @@
+import { generalFuncs } from "international/generalFunctions"
+
 /**
  * Creates tasks for spawns and extensions when they are empty
  */
@@ -21,7 +23,7 @@ export function structuresForSpawningManager(room: Room) {
 
         // Iterate if the structure has already created a task
 
-        if (room.hasTaskOfTypes(global.advancedGetValue(structure.id, { createdTasks: {} }).createdTasks, ['deliver'])) continue
+        if (room.hasTaskOfTypes(generalFuncs.advancedGetValue(structure.id, { createdTasks: {} }).createdTasks, ['deliver'])) continue
 
         //
     }

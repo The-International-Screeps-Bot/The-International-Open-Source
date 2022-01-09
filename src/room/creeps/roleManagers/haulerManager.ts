@@ -1,3 +1,4 @@
+import { generalFuncs } from 'international/generalFunctions'
 import { Hauler } from '../creepClasses'
 import './haulerFunctions'
 
@@ -9,7 +10,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
         // If creep has a task
 
-        if (global.advancedGetValue(creep.id, { taskID: undefined }).taskID) {
+        if (generalFuncs.advancedGetValue(creep.id, { taskID: undefined }).taskID) {
 
             // Try to filfill task and stop
 

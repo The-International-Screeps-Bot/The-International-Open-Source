@@ -1,4 +1,5 @@
 import { constants } from "international/constants"
+import { generalFuncs } from "international/generalFunctions"
 
 /**
  * Creates construction sites and deletes structures in a room
@@ -58,5 +59,10 @@ export function constructionManager(room: Room) {
         return true
     }
 
-    
+    function placeBase() {
+
+        const distanceCM = room.distanceTransform()
+
+        generalFuncs.customLog('DCM', distanceCM)
+    }
 }

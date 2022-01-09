@@ -1,3 +1,5 @@
+import { generalFuncs } from "international/generalFunctions"
+
 export interface RoomTask {
     /**
      * What the task is generally expected to entail for responders
@@ -27,7 +29,7 @@ export class RoomDeliverTask {
         // Default properties
 
         task.type = 'deliver'
-        task.ID = global.newID()
+        task.ID = generalFuncs.newID()
 
         // Assign paramaters
 
@@ -40,7 +42,7 @@ export class RoomDeliverTask {
 
         // Set a value for the creator's ID if it doesn't exist, then assign the taskID and repsonder state
 
-        global.advancedGetValue(creatorID, {}).createdTasks[task.ID] = false
+        generalFuncs.advancedGetValue(creatorID, {}).createdTasks[task.ID] = false
 
         // Record the task in the room with the requested roomName
 
@@ -61,7 +63,7 @@ export class RoomPullTask {
         // Default properties
 
         task.type = 'pull'
-        task.ID = global.newID()
+        task.ID = generalFuncs.newID()
 
         // Assign paramaters
 
@@ -70,8 +72,8 @@ export class RoomPullTask {
         task.targetPos = targetPos
 
         // Set a value for the creator's ID if it doesn't exist, then assign the taskID and repsonder state
-        
-        global.advancedGetValue(creatorID, { createdTasks: {} }).createdTasks[task.ID] = false
+
+        generalFuncs.advancedGetValue(creatorID, { createdTasks: {} }).createdTasks[task.ID] = false
 
         // Record the task in the room with the requested roomName
 

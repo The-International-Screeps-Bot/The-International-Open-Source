@@ -1,4 +1,5 @@
 import { Console } from "console"
+import { generalFuncs } from "international/generalFunctions"
 import { RoomTask, RoomDeliverTask, RoomPullTask } from "room/roomTasks"
 
 import { Hauler } from "../creepClasses"
@@ -59,7 +60,7 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
         // Get withdraw target using the task's withdrawTargetID
 
-        const withdrawTarget: Creep | Structure | undefined = global.findObjectWithId(task.withdrawTargetID)
+        const withdrawTarget: Creep | Structure | undefined = generalFuncs.findObjectWithId(task.withdrawTargetID)
 
         // If there is no withdrawTarget
 
@@ -100,7 +101,7 @@ Hauler.prototype.fulfillDeliverTask = function() {
 
     // Get transfer target using the task's transferTargetID
 
-    const transferTarget: Creep | Structure | undefined = global.findObjectWithId(task.withdrawTargetID)
+    const transferTarget: Creep | Structure | undefined = generalFuncs.findObjectWithId(task.withdrawTargetID)
 
     // If there is no transfer target
 

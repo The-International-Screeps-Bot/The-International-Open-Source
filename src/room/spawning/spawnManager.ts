@@ -1,3 +1,4 @@
+import { generalFuncs } from 'international/generalFunctions'
 import './spawnFunctions'
 import { spawnRequests } from './spawnRequests'
 
@@ -55,7 +56,7 @@ export function spawnManager(room: Room) {
 
             // Log the error and stop
 
-            global.customLog('Failed to spawn', testSpawnResult + ', ' + spawningObj.cost + ', ' + spawningObj.body)
+            generalFuncs.customLog('Failed to spawn', testSpawnResult + ', ' + spawningObj.cost + ', ' + spawningObj.body)
             break
         }
 

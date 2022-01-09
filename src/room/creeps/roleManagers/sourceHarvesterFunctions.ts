@@ -1,3 +1,4 @@
+import { generalFuncs } from "international/generalFunctions"
 import { RoomPullTask } from "room/roomTasks"
 import { SourceHarvester } from "../creepClasses"
 
@@ -32,7 +33,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
     // Inform message if the creep is at the closestHarvestPos
 
-    if (global.arePositionsEqual(creep.pos, closestHarvestPos)) return 'atSource'
+    if (generalFuncs.arePositionsEqual(creep.pos, closestHarvestPos)) return 'atSource'
 
     function findTargetPos() {
 
@@ -81,7 +82,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
         // If the creep already has created a task
 
-        if (room.hasTaskOfTypes(global.advancedGetValue(creep.id, { createdTasks: {} }).createdTasks, ['pull'])) return OK
+        if (room.hasTaskOfTypes(generalFuncs.advancedGetValue(creep.id, { createdTasks: {} }).createdTasks, ['pull'])) return OK
 
         // Create a task to get pulled to the source and stop
 
