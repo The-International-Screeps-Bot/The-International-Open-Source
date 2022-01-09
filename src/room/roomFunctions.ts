@@ -1,7 +1,7 @@
 import { retry } from 'async'
 import { constants } from 'international/constants'
 import { generalFuncs } from 'international/generalFunctions'
-import { filter } from 'lodash'
+import { filter, transform } from 'lodash'
 import { RoomTask } from './roomTasks'
 
 
@@ -588,7 +588,7 @@ Room.prototype.get = function(roomObjectName) {
 
                     // Set this positions as 1 in the terrainCM
 
-                    terrainCM.set(x, y, 1)
+                    terrainCM.set(x, y, 255)
                     continue
                 }
 
@@ -607,7 +607,15 @@ Room.prototype.get = function(roomObjectName) {
         value: generateTerrainCM(),
         valueType: 'object',
         cacheMethod: 'global',
-        cacheAmount: 1,
+        cacheAmount: Infinity,
+    })
+
+    manageRoomObject({
+        name: 'baseCM',
+        value: undefined,
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
     })
 
     //
@@ -792,13 +800,15 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                 if (!route) {
 
-                    let y: number = 0
-                    let x: number = 0
+                    let y = 0
+                    let x = 0
 
                     // Configure y and loop through top exits
 
                     y = 0
                     for (x = 0; x < 50; x++) {
+
+                        // Record the exit to be avoided
 
                         cm.set(x, y, 255)
                     }
@@ -808,6 +818,8 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                     x = 0
                     for (y = 0; y < 50; y++) {
 
+                        // Record the exit to be avoided
+
                         cm.set(x, y, 255)
                     }
 
@@ -816,6 +828,8 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                     y = 49
                     for (x = 0; x < 50; x++) {
 
+                        // Record the exit to be avoided
+
                         cm.set(x, y, 255)
                     }
 
@@ -823,6 +837,8 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     x = 49
                     for (y = 0; y < 50; y++) {
+
+                        // Record the exit to be avoided
 
                         cm.set(x, y, 255)
                     }
@@ -1297,80 +1313,54 @@ Room.prototype.distanceTransform = function(initalCM) {
 
     const room = this
 
-    // Get the terrain for this room
-
-    const terrain = room.get('terrain')
-
     // Use a costMatrix to record distances. Use the initalCM if provided, otherwise create one
 
     const distanceCM = initalCM || new PathFinder.CostMatrix()
 
-    function setIfWall(x: number, y: number): boolean {
-
-        // Try to find the terrainValue
-
-        const terrainValue = terrain.get(x, y)
-
-        // inform false if terrain is not a wall
-
-        if (terrainValue != TERRAIN_MASK_WALL) return false
-
-        // Otherwise set this position as 255 and inform true
-
-        distanceCM.set(x, y, 255)
-        return true
-    }
-
     for (let x = 0; x < constants.roomDimensions; x++) {
         for (let y = 0; y < constants.roomDimensions; y++) {
 
-            // Iterate if pos is a wall
+            // Iterate if pos is to be avoided
 
-            if(setIfWall(x, y)) continue
+            if (distanceCM.get(x, y) == 255) continue
 
             // Otherwise construct a rect and get the positions in a range of 1
 
             const rect = { x1: x - 1, y1: y - 1, x2: x + 1, y2: y + 1 }
-            const positions = generalFuncs.findPositionsInsideRect(rect)
+            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
 
-            // Construct the smallest pos value as the wall value
-
-            let smallestNearbyPosValue = 255
-
-            // Iterate through positions
-
-            for (const pos of positions) {
-
-                // Get the value of the pos in distanceCM
-
-                let value = distanceCM.get(pos.x, pos.y)
-
-                // If the pos is a wall set the value to the value of a wall
-
-                if(setIfWall(pos.x, pos.y)) value = 255
-
-                // If the value is that of a wall
-
-                if (value == 255) {
-
-                    // set the nearby pos value to 0 and stop the loop
-
-                    smallestNearbyPosValue = 0
-                    break
-                }
-
-                // Otherwise check if the value is smaller than the smallestNearbyPosValue, and set it to 0 if so
-
-                if (value < smallestNearbyPosValue) smallestNearbyPosValue = value
-            }
-
-            // Construct the distance value as the wall value
+            // Construct the distance value as the avoid value
 
             let distanceValue = 255
 
-            // If the smallest pos value isn't 255, set distanceValue as the smallest pos value + 1
+            // Iterate through positions
 
-            if (smallestNearbyPosValue != 255) distanceValue = smallestNearbyPosValue + 1
+            for (const adjacentPos of adjacentPositions) {
+
+                // Get the value of the pos in distanceCM
+
+                const value = distanceCM.get(adjacentPos.x, adjacentPos.y)
+
+                // Iterate if the value has yet to be configured
+
+                if (value == 0) continue
+
+                // If the value is to be avoided, stop the loop
+
+                if (value == 255) {
+
+                    distanceValue = 1
+                    break
+                }
+
+                // Otherwise check if the depth is less than the distance value. If so make it the new distance value plus one
+
+                if (value < distanceValue) distanceValue = 1 + value
+            }
+
+            // If the distance value is that of avoid, set it to 1
+
+            if (distanceValue == 255) distanceValue = 1
 
             // Record the distanceValue in the distance cost matrix
 
@@ -1381,53 +1371,47 @@ Room.prototype.distanceTransform = function(initalCM) {
     for (let x = constants.roomDimensions -1; x > -1; x--) {
         for (let y = constants.roomDimensions -1; y > -1; y--) {
 
-            // Try to find the terrainValue
+            // Iterate if pos is to be avoided
 
-            const terrainValue = terrain.get(x, y)
+            if (distanceCM.get(x, y) == 255) continue
 
-            // Iterate if terrain is a wall
-
-            if (terrainValue == TERRAIN_MASK_WALL) continue
-
-            // Construct a rect and get the positions in a range of 1
+            // Otherwise construct a rect and get the positions in a range of 1
 
             const rect = { x1: x - 1, y1: y - 1, x2: x + 1, y2: y + 1 }
-            const positions = generalFuncs.findPositionsInsideRect(rect)
+            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
 
-            // Construct the smallest pos value as the wall value
-
-            let smallestNearbyPosValue = 255
-
-            // Iterate through positions
-
-            for (const pos of positions) {
-
-                // Get the value of the pos in distanceCM
-
-                const value = distanceCM.get(pos.x, pos.y)
-
-                // If the value is that of a wall
-
-                if (value == 255) {
-
-                    // set the nearby pos value to 0 and stop the loop
-
-                    smallestNearbyPosValue = 0
-                    break
-                }
-
-                // Otherwise check if the value is smaller than the smallestNearbyPosValue, and set it to 0 if so
-
-                if (value < smallestNearbyPosValue) smallestNearbyPosValue = value
-            }
-
-            // Construct the distance value as the wall value
+            // Construct the distance value as the avoid value
 
             let distanceValue = 255
 
-            // If the smallest pos value isn't 255, set distanceValue as the smallest pos value + 1
+            // Iterate through positions
 
-            if (smallestNearbyPosValue != 255) distanceValue = smallestNearbyPosValue + 1
+            for (const adjacentPos of adjacentPositions) {
+
+                // Get the value of the pos in distanceCM
+
+                const value = distanceCM.get(adjacentPos.x, adjacentPos.y)
+
+                // Iterate if the value has yet to be configured
+
+                if (value == 0) continue
+
+                // If the value is to be avoided, stop the loop
+
+                if (value == 255) {
+
+                    distanceValue = 1
+                    break
+                }
+
+                // Otherwise check if the depth is less than the distance value. If so make it the new distance value plus one
+
+                if (value < distanceValue) distanceValue = 1 + value
+            }
+
+            // If the distance value is that of avoid, set it to 1
+
+            if (distanceValue == 255) distanceValue = 1
 
             // Record the distanceValue in the distance cost matrix
 
@@ -1460,14 +1444,23 @@ Room.prototype.floodFill = function(seeds) {
     // Construct a cost matrix for visited tiles and add seeds to it
 
     const visitedCM = new PathFinder.CostMatrix()
-    for (const seedPos of seeds) visitedCM.set(seedPos.x, seedPos.y, 1)
 
     // Construct values for the flood
 
     let depth = 0
 
     let thisGeneration: Pos[] = seeds
+
     let nextGeneration: Pos[] = []
+
+    // Loop through weights in seeds
+
+    for (const pos of seeds) {
+
+        // Record the weight of the seedPos and add the pos to this gen
+
+        visitedCM.set(pos.x, pos.y, 0)
+    }
 
     // So long as there are positions in this gen
 

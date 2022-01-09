@@ -91,7 +91,8 @@ declare global {
     'myDamagedCreeps' |
     'damagedAllyCreeps' |
     'terrain' |
-    'terrainCM'
+    'terrainCM' |
+    'baseCM'
 
     interface PathGoal {
         pos: RoomPosition
@@ -127,6 +128,10 @@ declare global {
 
     interface Commune extends Room {
 
+    }
+    interface seedObj {
+        weight: number
+        pos: Pos
     }
 
     // Memory
