@@ -171,6 +171,47 @@ export function constructionManager(room: Room) {
 
         const distanceCM = room.distanceTransform(baseCM)
 
-        /* generalFuncs.customLog('DCM', JSON.stringify(distanceCM)) */
+        // Get the sources in the room
+
+        const source1: Source = room.get('source1')
+        const source2: Source = room.get('source2')
+
+        // Find the average pos between the sources
+
+        const avgSourcePos = generalFuncs.findAvgBetweenPosotions(source1.pos, source2.pos)
+
+        // Find the average pos between the two sources and the controller
+
+        const avgControllerSourcePos = generalFuncs.findAvgBetweenPosotions(room.controller.pos, avgSourcePos)
+
+        room.visual.text('avg', avgControllerSourcePos.x, avgControllerSourcePos.y)
+
+        //
+
+        const anchor = room.findClosestPosOfValue(distanceCM, avgControllerSourcePos, Math.floor(constants.buildings.fastFiller.dimensions / 2))
+
+        room.memory.anchor = anchor
+
+        if (!anchor) return
+
+        const offsetX = anchor.x
+        const offsetY = anchor.y
+
+        const fastFiller = constants.buildings.fastFiller
+
+        const fastFillerSide = Math.floor(constants.buildings.fastFiller.dimensions / 2)
+
+        for(const structureType in fastFiller.structures) {
+
+            const positions = fastFiller.structures[structureType]
+
+            for (const pos of positions) {
+
+                const x = pos.x + offsetX - fastFillerSide
+                const y = pos.y + offsetY - fastFillerSide
+
+                room.visual.circle(x, y)
+            }
+        }
     }
 }

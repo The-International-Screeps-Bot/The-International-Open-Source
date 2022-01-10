@@ -203,5 +203,10 @@ generalFuncs.findCarryPartsRequired = function(distance, income) {
 
 generalFuncs.findAvgBetweenPosotions = function(pos1, pos2) {
 
-    return pos1
+    // Inform the rounded average of the two positions
+
+    return {
+        x: Math.floor((pos1.x + pos2.x) / 2),
+        y: Math.floor((pos1.y + pos2.y) / 2),
+    }
 }

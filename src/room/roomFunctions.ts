@@ -82,11 +82,15 @@ Room.prototype.get = function(roomObjectName) {
 
             const roomObject: RoomObject = this
 
+            // Stop if the value is not defined
+
+            if (!roomObject.value) return false
+
             // If roomObject's valueType is id, return it as an object with the ID
 
             if (roomObject.valueType == 'id') return generalFuncs.findObjectWithId(roomObject.value)
 
-            // If roomObject's type is pos, return the it as a RoomPosition
+            // If roomObject's type is pos, return it as a RoomPosition
 
             if (roomObject.valueType == 'pos') return room.newPos(roomObject.value)
 
@@ -170,8 +174,8 @@ Room.prototype.get = function(roomObjectName) {
     // Important Positions
 
     manageRoomObject({
-        name: 'anchorPoint',
-        value: room.newPos({ x: 25, y: 25 }) /* room.memory.anchorPoint */,
+        name: 'anchor',
+        value: room.memory.anchor,
         valueType: 'pos',
         cacheMethod: 'memory',
     })
@@ -340,11 +344,11 @@ Room.prototype.get = function(roomObjectName) {
 
     /**
     * @param harvestPositions array of RoomPositions to filter
-    * @returns the closest harvestPosition to the room's anchorPoint
+    * @returns the closest harvestPosition to the room's anchor
     */
     function findClosestHarvestPosition(harvestPositions: RoomPosition[]): RoomPosition {
 
-        // Filter harvestPositions by closest one to anchorPoint
+        // Filter harvestPositions by closest one to anchor
 
         return room.find(FIND_MY_SPAWNS)[0].pos.findClosestByRange(harvestPositions)
     }
@@ -499,7 +503,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get array of spawns and extensions
 
-        const spawnsAndExtensions: Structure<STRUCTURE_SPAWN | STRUCTURE_EXTENSION>[] = roomObjects.spawn.getValue().concat(roomObjects.extension.getValue())
+        const spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = roomObjects.spawn.getValue().concat(roomObjects.extension.getValue())
 
         // Filter out structures that aren't active
 
@@ -507,11 +511,12 @@ Room.prototype.get = function(roomObjectName) {
 
         // Add each spawnStructures with their range to the object
 
-        const anchorPoint = roomObjects.anchorPoint.getValue()
+        const anchor = roomObjects.anchor.getValue()
+        if (!anchor) return false
 
-        // Filter energy structures by distance from anchorPoint
+        // Filter energy structures by distance from anchor
 
-        const filteredSpawnStructures = unfilteredSpawnStructures.sort((a, b) => a.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5) - b.pos.getRangeTo(anchorPoint.x, anchorPoint.y + 5))
+        const filteredSpawnStructures = unfilteredSpawnStructures.sort((a, b) => a.pos.getRangeTo(anchor.x, anchor.y + 5) - b.pos.getRangeTo(anchor.x, anchor.y + 5))
         return filteredSpawnStructures
     }
 
@@ -1433,13 +1438,9 @@ Room.prototype.floodFill = function(seeds) {
 
     const room = this
 
-    // Get the terrain of this room
-
-    const terrain = room.get('terrain')
-
     // Construct a cost matrix for the flood
 
-    const floodCM = new PathFinder.CostMatrix()
+    const floodCM = room.get('terrainCM')
 
     // Construct a cost matrix for visited tiles and add seeds to it
 
@@ -1453,13 +1454,13 @@ Room.prototype.floodFill = function(seeds) {
 
     let nextGeneration: Pos[] = []
 
-    // Loop through weights in seeds
+    // Loop through positions of seeds
 
     for (const pos of seeds) {
 
-        // Record the weight of the seedPos and add the pos to this gen
+        // Record the seedsPos as visited
 
-        visitedCM.set(pos.x, pos.y, 0)
+        visitedCM.set(pos.x, pos.y, 1)
     }
 
     // So long as there are positions in this gen
@@ -1480,7 +1481,7 @@ Room.prototype.floodFill = function(seeds) {
 
                 // Iterate if the terrain is a wall
 
-                if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
+                if (floodCM.get(pos.x, pos.y) == 255) continue
 
                 // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
 
@@ -1527,6 +1528,84 @@ Room.prototype.floodFill = function(seeds) {
     }
 
     return floodCM
+}
+
+Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue) {
+
+    const room = this
+
+    // Construct a cost matrix for visited tiles and add seeds to it
+
+    const visitedCM = new PathFinder.CostMatrix()
+
+    // Construct values for the check
+
+    let thisGeneration: Pos[] = [startPos]
+
+    let nextGeneration: Pos[] = []
+
+    // Record startPos as visited
+
+    visitedCM.set(startPos.x, startPos.y, 1)
+
+    // So long as there are positions in this gen
+
+    while (thisGeneration.length) {
+
+        // Reset next gen
+
+        nextGeneration = []
+
+        // Iterate through positions of this gen
+
+        for (const pos of thisGeneration) {
+
+            const posValue = CM.get(pos.x, pos.y)
+
+            // Iterate if the terrain is a wall
+
+            if (posValue == 255) continue
+
+            // Otherwise if the value of the pos is greater than of equal to the required value
+
+            if (posValue >= requiredValue) {
+
+                // Inform this position
+
+                return pos
+            }
+
+            // Construct a rect and get the positions in a range of 1
+
+            const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 }
+            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+
+            // Loop through adjacent positions
+
+            for (const adjacentPos of adjacentPositions) {
+
+                // Iterate if the adjacent pos has been visited or isn't a tile
+
+                if(visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
+
+                // Otherwise record that it has been visited
+
+                visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+
+                // Add it tofastFillerSide the next gen
+
+                nextGeneration.push(adjacentPos)
+            }
+        }
+
+        // Set this gen to next gen
+
+        thisGeneration = nextGeneration
+    }
+
+    // Inform false if no value was found
+
+    return false
 }
 
 Room.prototype.pathVisual = function(path, color) {

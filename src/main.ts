@@ -49,13 +49,17 @@ declare global {
         green: string
     }
 
-    type BuldingTypes = 'fastfiller' |
+    type BuldingTypes = 'fastFiller' |
     'hub' |
     'extensions' |
-    'towers' |
     'labs'
 
-    type Buildings = Record<BuldingTypes, Partial<Record<StructureConstant,  Record<'pos', Pos[]>>>>
+    interface Building {
+        dimensions: number
+        structures: {[key: string]: Pos[]}
+    }
+
+    type Buildings = Record<BuldingTypes, Building>
 
     type CreepRoles = 'sourceHarvester' |
     'hauler' |
@@ -64,7 +68,7 @@ declare global {
     'antifa'
 
     type RoomObjectName =
-    'anchorPoint' |
+    'anchor' |
     'mineral' |
     'source1' |
     'source2' |
@@ -350,6 +354,11 @@ declare global {
          * Gets ranges from for each position from a certain point
          */
         floodFill(seeds: Pos[]): CostMatrix
+
+        /**
+         * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
+         */
+        findClosestPosOfValue(CM: CostMatrix, startPos: Pos, requiredValue: number): Pos | false
 
         advancedSell(resourceType: ResourceConstant, amount: number): boolean
 
