@@ -59,9 +59,15 @@ export function constructionManager(room: Room) {
         return true
     }
 
-    placeBase()
+    const placeBaseResult = placeBase()
 
-    function placeBase() {
+    function placeBase(): BuildObj[] | false {
+
+        // Construct an array of build objects
+
+        const buildObjects: BuildObj[] = []
+
+        // Construct a cost matrix based off terrain cost matrix
 
         const baseCM = room.get('terrainCM')
 
@@ -169,7 +175,7 @@ export function constructionManager(room: Room) {
 
         // Run distance transform with the baseCM
 
-        const distanceCM = room.distanceTransform(baseCM)
+        let distanceCM = room.distanceTransform(baseCM)
 
         // Get the sources in the room
 
@@ -184,34 +190,320 @@ export function constructionManager(room: Room) {
 
         const avgControllerSourcePos = generalFuncs.findAvgBetweenPosotions(room.controller.pos, avgSourcePos)
 
-        room.visual.text('avg', avgControllerSourcePos.x, avgControllerSourcePos.y)
-
         //
 
-        const anchor = room.findClosestPosOfValue(distanceCM, avgControllerSourcePos, Math.floor(constants.buildings.fastFiller.dimensions / 2))
+        class Stamp {
+            constructor() {
+
+
+            }
+        }
+
+        // Define stamp
+
+        let stamp = constants.buildings.fastFiller
+
+        // Get the radius of the stamp
+
+        let stampRadius = Math.round(stamp.dimensions / 2)
+
+        // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
+
+        const anchor = room.findClosestPosOfValue(distanceCM, avgControllerSourcePos, stampRadius)
+
+        // Top if there is no anchor
+
+        if (!anchor) {
+
+            // Record that the room is not claimable and stop
+
+            room.memory.notClaimable = true
+            return false
+        }
+
+        // Otherwise add the anchor to the room memory
 
         room.memory.anchor = anchor
 
-        if (!anchor) return
+        // Define the offset from the top left of the room
 
-        const offsetX = anchor.x
-        const offsetY = anchor.y
+        let offsetX = anchor.x
+        let offsetY = anchor.y
 
-        const fastFiller = constants.buildings.fastFiller
+        // Loop through structure types in fastFiller structures
 
-        const fastFillerSide = Math.floor(constants.buildings.fastFiller.dimensions / 2)
+        for(const structureType in stamp.structures) {
 
-        for(const structureType in fastFiller.structures) {
+            // Get the color based on the structure type
 
-            const positions = fastFiller.structures[structureType]
+            const color = constants.colorsForStructureTypes[structureType]
+
+            // Get the positions for this structre type
+
+            const positions = stamp.structures[structureType]
+
+            // Loop through positions
 
             for (const pos of positions) {
 
-                const x = pos.x + offsetX - fastFillerSide
-                const y = pos.y + offsetY - fastFillerSide
+                // Get the proper x and y using the offset and stamp radius
 
-                room.visual.circle(x, y)
+                const x = pos.x + offsetX - stampRadius
+                const y = pos.y + offsetY - stampRadius
+
+                // If the structure isn't a road
+
+                if (structureType != STRUCTURE_ROAD) {
+
+                    // Add the pos to the base cost matrix as avoid
+
+                    baseCM.set(x, y, 255)
+                }
+
+                // Add the structureType and position info to buildObjects
+
+                buildObjects.push({
+                    structureType: structureType,
+                    x: x,
+                    y: y
+                })
+
+                // Display visuals if enabled
+
+                if (Memory.roomVisuals) room.visual.circle(x, y, {
+                    fill: color,
+                    opacity: 0.8,
+                })
             }
         }
+
+        // Run distance transform with the baseCM
+
+        distanceCM = room.distanceTransform(baseCM)
+
+        // Define stamp
+
+        stamp = constants.buildings.hub
+
+        // Get the radius of the stamp
+
+        stampRadius = stamp.dimensions / 2
+
+        // Try to find a stamp anchor
+
+        let stampAnchor = room.findClosestPosOfValue(distanceCM, anchor, stampRadius)
+
+        // Stop if a stamp anchor wasn't found
+
+        if (!stampAnchor) return false
+
+        // Otherwise fefine the offset from the top left of the room
+
+        offsetX = stampAnchor.x - Math.floor(stamp.dimensions / 2)
+        offsetY = stampAnchor.y - Math.floor(stamp.dimensions / 2)
+
+        // Loop through structure types in fastFiller structures
+
+        for(const structureType in stamp.structures) {
+
+            // Get the color based on the structure type
+
+            const color = constants.colorsForStructureTypes[structureType]
+
+            // Get the positions for this structre type
+
+            const positions = stamp.structures[structureType]
+
+            // Loop through positions
+
+            for (const pos of positions) {
+
+                // Get the proper x and y using the offset and stamp radius
+
+                const x = pos.x + offsetX
+                const y = pos.y + offsetY
+
+                // If the structure isn't a road
+
+                if (structureType != STRUCTURE_ROAD) {
+
+                    // Add the pos to the base cost matrix as avoid
+
+                    baseCM.set(x, y, 255)
+                }
+
+                // Add the structureType and position info to buildObjects
+
+                buildObjects.push({
+                    structureType: structureType,
+                    x: x,
+                    y: y
+                })
+
+                // Display visuals if enabled
+
+                if (Memory.roomVisuals) room.visual.circle(x, y, {
+                    fill: color,
+                    opacity: 0.8,
+                })
+            }
+        }
+
+        //
+
+        let i = 0
+
+        while (i < 4) {
+
+            // Run distance transform with the baseCM
+
+            distanceCM = room.specialDT(baseCM)
+
+            // Define stamp
+
+            stamp = constants.buildings.extensions
+
+            // Get the radius of the stamp
+
+            stampRadius = stamp.dimensions / 2
+
+            // Try to find a stamp anchor
+
+            stampAnchor = room.findClosestPosOfValue(distanceCM, anchor, stampRadius)
+
+            // Stop if a stamp anchor wasn't found
+
+            if (!stampAnchor) return false
+
+            // Otherwise fefine the offset from the top left of the room
+
+            offsetX = stampAnchor.x - Math.floor(stamp.dimensions / 2)
+            offsetY = stampAnchor.y - Math.floor(stamp.dimensions / 2)
+
+            // Loop through structure types in fastFiller structures
+
+            for(const structureType in stamp.structures) {
+
+                // Get the color based on the structure type
+
+                const color = constants.colorsForStructureTypes[structureType]
+
+                // Get the positions for this structre type
+
+                const positions = stamp.structures[structureType]
+
+                // Loop through positions
+
+                for (const pos of positions) {
+
+                    // Get the proper x and y using the offset and stamp radius
+
+                    const x = pos.x + offsetX
+                    const y = pos.y + offsetY
+
+                    // If the structure isn't a road
+
+                    if (structureType != STRUCTURE_ROAD) {
+
+                        // Add the pos to the base cost matrix as avoid
+
+                        baseCM.set(x, y, 255)
+                    }
+
+                    // Add the structureType and position info to buildObjects
+
+                    buildObjects.push({
+                        structureType: structureType,
+                        x: x,
+                        y: y
+                    })
+
+                    // Display visuals if enabled
+
+                    if (Memory.roomVisuals) room.visual.circle(x, y, {
+                        fill: color,
+                        opacity: 0.8,
+                    })
+                }
+            }
+
+            i++
+        }
+
+        // Run distance transform with the baseCM
+
+        distanceCM = room.distanceTransform(baseCM)
+
+        // Define stamp
+
+        stamp = constants.buildings.labs
+
+        // Get the radius of the stamp
+
+        stampRadius = stamp.dimensions / 2
+
+        // Try to find a stamp anchor
+
+        stampAnchor = room.findClosestPosOfValue(distanceCM, anchor, stampRadius)
+
+        // Stop if a stamp anchor wasn't found
+
+        if (!stampAnchor) return false
+
+        // Otherwise fefine the offset from the top left of the room
+
+        offsetX = stampAnchor.x - Math.floor(stamp.dimensions / 2)
+        offsetY = stampAnchor.y - Math.floor(stamp.dimensions / 2)
+
+        // Loop through structure types in fastFiller structures
+
+        for(const structureType in stamp.structures) {
+
+            // Get the color based on the structure type
+
+            const color = constants.colorsForStructureTypes[structureType]
+
+            // Get the positions for this structre type
+
+            const positions = stamp.structures[structureType]
+
+            // Loop through positions
+
+            for (const pos of positions) {
+
+                // Get the proper x and y using the offset and stamp radius
+
+                const x = pos.x + offsetX
+                const y = pos.y + offsetY
+
+                // If the structure isn't a road
+
+                if (structureType != STRUCTURE_ROAD) {
+
+                    // Add the pos to the base cost matrix as avoid
+
+                    baseCM.set(x, y, 255)
+                }
+
+                // Add the structureType and position info to buildObjects
+
+                buildObjects.push({
+                    structureType: structureType,
+                    x: x,
+                    y: y
+                })
+
+                // Display visuals if enabled
+
+                if (Memory.roomVisuals) room.visual.circle(x, y, {
+                    fill: color,
+                    opacity: 0.8,
+                })
+            }
+        }
+
+        distanceCM = room.distanceTransform(baseCM, true)
+
+        return buildObjects
     }
 }

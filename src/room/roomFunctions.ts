@@ -1314,13 +1314,13 @@ Room.prototype.findScore = function() {
 
 }
 
-Room.prototype.distanceTransform = function(initalCM) {
+Room.prototype.distanceTransform = function(initialCM, enableVisuals) {
 
     const room = this
 
-    // Use a costMatrix to record distances. Use the initalCM if provided, otherwise create one
+    // Use a costMatrix to record distances. Use the initialCM if provided, otherwise create one
 
-    const distanceCM = initalCM || new PathFinder.CostMatrix()
+    const distanceCM = initialCM || new PathFinder.CostMatrix()
 
     for (let x = 0; x < constants.roomDimensions; x++) {
         for (let y = 0; y < constants.roomDimensions; y++) {
@@ -1424,7 +1424,159 @@ Room.prototype.distanceTransform = function(initalCM) {
 
             // If roomVisuals are enabled, show the terrain's distanceValue
 
-            if (Memory.roomVisuals) room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+            if (enableVisuals && Memory.roomVisuals) room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+                fill: 'hsl(' + 200 + distanceValue * 10 + ', 100%, 60%)',
+                opacity: 0.4,
+            })
+        }
+    }
+
+    return distanceCM
+}
+
+Room.prototype.specialDT = function(initialCM, enableVisuals) {
+
+    const room = this
+
+    // Use a costMatrix to record distances. Use the initialCM if provided, otherwise create one
+
+    const distanceCM = initialCM || new PathFinder.CostMatrix()
+
+    for (let x = 0; x < constants.roomDimensions; x++) {
+        for (let y = 0; y < constants.roomDimensions; y++) {
+
+            // Iterate if pos is to be avoided
+
+            if (distanceCM.get(x, y) == 255) continue
+
+            // Otherwise construct a rect and get the positions in a range of 1
+
+            const adjacentPositions = [
+                {
+                    x: x - 1,
+                    y: y
+                },
+                {
+                    x: x + 1,
+                    y: y
+                },
+                {
+                    x: x,
+                    y: y - 1
+                },
+                {
+                    x: x,
+                    y: y + 1
+                },
+            ]
+
+            // Construct the distance value as the avoid value
+
+            let distanceValue = 255
+
+            // Iterate through positions
+
+            for (const adjacentPos of adjacentPositions) {
+
+                // Get the value of the pos in distanceCM
+
+                const value = distanceCM.get(adjacentPos.x, adjacentPos.y)
+
+                // Iterate if the value has yet to be configured
+
+                if (value == 0) continue
+
+                // If the value is to be avoided, stop the loop
+
+                if (value == 255) {
+
+                    distanceValue = 1
+                    break
+                }
+
+                // Otherwise check if the depth is less than the distance value. If so make it the new distance value plus one
+
+                if (value < distanceValue) distanceValue = 1 + value
+            }
+
+            // If the distance value is that of avoid, set it to 1
+
+            if (distanceValue == 255) distanceValue = 1
+
+            // Record the distanceValue in the distance cost matrix
+
+            distanceCM.set(x, y, distanceValue)
+        }
+    }
+
+    for (let x = constants.roomDimensions -1; x > -1; x--) {
+        for (let y = constants.roomDimensions -1; y > -1; y--) {
+
+            // Iterate if pos is to be avoided
+
+            if (distanceCM.get(x, y) == 255) continue
+
+            // Otherwise construct a rect and get the positions in a range of 1
+
+            const adjacentPositions = [
+                {
+                    x: x - 1,
+                    y: y
+                },
+                {
+                    x: x + 1,
+                    y: y
+                },
+                {
+                    x: x,
+                    y: y - 1
+                },
+                {
+                    x: x,
+                    y: y + 1
+                },
+            ]
+
+            // Construct the distance value as the avoid value
+
+            let distanceValue = 255
+
+            // Iterate through positions
+
+            for (const adjacentPos of adjacentPositions) {
+
+                // Get the value of the pos in distanceCM
+
+                const value = distanceCM.get(adjacentPos.x, adjacentPos.y)
+
+                // Iterate if the value has yet to be configured
+
+                if (value == 0) continue
+
+                // If the value is to be avoided, stop the loop
+
+                if (value == 255) {
+
+                    distanceValue = 1
+                    break
+                }
+
+                // Otherwise check if the depth is less than the distance value. If so make it the new distance value plus one
+
+                if (value < distanceValue) distanceValue = 1 + value
+            }
+
+            // If the distance value is that of avoid, set it to 1
+
+            if (distanceValue == 255) distanceValue = 1
+
+            // Record the distanceValue in the distance cost matrix
+
+            distanceCM.set(x, y, distanceValue)
+
+            // If roomVisuals are enabled, show the terrain's distanceValue
+
+            if (enableVisuals && Memory.roomVisuals) room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                 fill: 'hsl(' + 200 + distanceValue * 10 + ', 100%, 60%)',
                 opacity: 0.4,
             })
@@ -1560,15 +1712,13 @@ Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue) {
 
         for (const pos of thisGeneration) {
 
+            // Get the value of the pos
+
             const posValue = CM.get(pos.x, pos.y)
 
-            // Iterate if the terrain is a wall
+            // If the value of the pos isn't to avoid and is greater than of equal to the required value
 
-            if (posValue == 255) continue
-
-            // Otherwise if the value of the pos is greater than of equal to the required value
-
-            if (posValue >= requiredValue) {
+            if (posValue != 255 && posValue >= requiredValue) {
 
                 // Inform this position
 

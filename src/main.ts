@@ -133,9 +133,16 @@ declare global {
     interface Commune extends Room {
 
     }
+
     interface seedObj {
         weight: number
         pos: Pos
+    }
+
+    interface BuildObj {
+        structureType: string
+        x: number
+        y: number
     }
 
     // Memory
@@ -348,7 +355,9 @@ declare global {
         /**
          * Finds open spaces in a room and records them in a cost matrix
          */
-        distanceTransform(initalCM?: CostMatrix): CostMatrix
+        distanceTransform(initialCM?: CostMatrix, enableVisuals?: boolean): CostMatrix
+
+        specialDT(initialCM?: CostMatrix, enableVisuals?: boolean): CostMatrix
 
         /**
          * Gets ranges from for each position from a certain point

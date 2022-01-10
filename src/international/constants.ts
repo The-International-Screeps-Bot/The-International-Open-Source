@@ -66,6 +66,8 @@ interface Constants {
     impassibleStructures: StructureConstant[]
 
     buildings: Buildings
+
+    colorsForStructureTypes: {[key: string]: string}
 }
 
 export const constants: Partial<Constants> = {}
@@ -248,7 +250,7 @@ constants.buildings = {
         },
     },
     hub: {
-        dimensions: 7,
+        dimensions: 5,
         structures: {
             "spawn": [{ "x": 1, "y": 2 }],
             "link": [{ "x": 0, "y": 0 }],
@@ -261,18 +263,39 @@ constants.buildings = {
         },
     },
     extensions: {
-        dimensions: 7,
+        dimensions: 5,
         structures: {
             "extension": [{ "x": 1, "y": 2 }, { "x": 2, "y": 1 }, { "x": 2, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 2 }],
             "road": [{ "x": 1, "y": 3 }, { "x": 0, "y": 2 }, { "x": 1, "y": 1 }, { "x": 2, "y": 0 }, { "x": 3, "y": 1 }, { "x": 4, "y": 2 }, { "x": 3, "y": 3 }, { "x": 2, "y": 4 }]
         },
 },
     labs: {
-        dimensions: 7,
+        dimensions: 5,
         structures: {
             "road": [{ "x": 3, "y": 3 }, { "x": 2, "y": 2 }, { "x": 1, "y": 1 }, { "x": 0, "y": 0 }],
             "lab": [{ "x": 0, "y": 1 }, { "x": 0, "y": 2 }, { "x": 1, "y": 2 }, { "x": 1, "y": 3 }, { "x": 2, "y": 3 }, { "x": 1, "y": 0 }, { "x": 2, "y": 0 }, { "x": 2, "y": 1 }, { "x": 3, "y": 1 }, { "x": 3, "y": 2 }]
 
         },
     },
+}
+
+constants.colorsForStructureTypes = {
+    spawn: {
+        color: constants.colors.yellow
+    },
+    extension: constants.colors.yellow,
+    road: constants.colors.lightGrey,
+    wall: constants.colors.yellow,
+    rampart: constants.colors.yellow,
+    link: constants.colors.black,
+    storage: constants.colors.yellow,
+    tower: constants.colors.yellow,
+    observer: constants.colors.green,
+    powerSpawn: constants.colors.red,
+    extractor: constants.colors.yellow,
+    lab: constants.colors.black,
+    terminal: constants.colors.yellow,
+    container: constants.colors.yellow,
+    nuker: constants.colors.yellow,
+    factory: constants.colors.yellow,
 }

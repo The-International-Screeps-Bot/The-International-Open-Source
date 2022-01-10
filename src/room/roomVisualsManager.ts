@@ -9,6 +9,17 @@ export function roomVisualsManager(room: Room) {
 
     if (!Memory.roomVisuals) return
 
+    // Get the anchor
+
+    const anchor: RoomPosition = room.get('anchor')
+
+    // If there is an anchor, show a rectangle around it
+
+    if (anchor) room.visual.rect(anchor.x - 0.5, anchor.y - 0.5, 1, 1, {
+        stroke: constants.colors.lightBlue,
+        fill: 'transparent',
+    })
+
     controllerVisuals()
 
     function controllerVisuals() {
