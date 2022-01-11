@@ -65,7 +65,7 @@ interface Constants {
      */
     impassibleStructures: StructureConstant[]
 
-    buildings: Buildings
+    stamps: Stamps
 
     styleForStructureTypes: {[key: string]: CircleStyle}
 }
@@ -239,7 +239,7 @@ constants.impassibleStructures = [
     STRUCTURE_INVADER_CORE,
 ]
 
-constants.buildings = {
+constants.stamps = {
     fastFiller: {
         dimensions: 7,
         structures: {

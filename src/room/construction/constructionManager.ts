@@ -201,7 +201,7 @@ export function constructionManager(room: Room) {
 
         // Define stamp
 
-        let stamp = constants.buildings.fastFiller
+        let stamp = constants.stamps.fastFiller
 
         // Get the radius of the stamp
 
@@ -276,7 +276,7 @@ export function constructionManager(room: Room) {
 
         // Define stamp
 
-        stamp = constants.buildings.hub
+        stamp = constants.stamps.hub
 
         // Get the radius of the stamp
 
@@ -352,7 +352,7 @@ export function constructionManager(room: Room) {
 
             // Define stamp
 
-            stamp = constants.buildings.extensions
+            stamp = constants.stamps.extensions
 
             // Get the radius of the stamp
 
@@ -420,7 +420,7 @@ export function constructionManager(room: Room) {
 
         // Define stamp
 
-        stamp = constants.buildings.labs
+        stamp = constants.stamps.labs
 
         // Get the radius of the stamp
 

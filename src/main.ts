@@ -50,17 +50,17 @@ declare global {
         brown: string
     }
 
-    type BuldingTypes = 'fastFiller' |
+    type StampTypes = 'fastFiller' |
     'hub' |
     'extensions' |
     'labs'
 
-    interface Building {
+    interface Stamp {
         dimensions: number
         structures: {[key: string]: Pos[]}
     }
 
-    type Buildings = Record<BuldingTypes, Building>
+    type Stamps = Record<StampTypes, Stamp>
 
     type CreepRoles = 'sourceHarvester' |
     'hauler' |
