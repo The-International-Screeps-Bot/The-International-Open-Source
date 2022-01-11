@@ -175,7 +175,7 @@ export function constructionManager(room: Room) {
 
         // Run distance transform with the baseCM
 
-        let distanceCM = room.distanceTransform(baseCM)
+        let distanceCM = room.specialDT(baseCM)
 
         // Get the sources in the room
 
@@ -205,7 +205,7 @@ export function constructionManager(room: Room) {
 
         // Get the radius of the stamp
 
-        let stampRadius = Math.round(stamp.dimensions / 2)
+        let stampRadius = stamp.dimensions / 2
 
         // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 
@@ -227,88 +227,12 @@ export function constructionManager(room: Room) {
 
         // Define the offset from the top left of the room
 
-        let offsetX = anchor.x
-        let offsetY = anchor.y
+        let offsetX = anchor.x - Math.floor(stamp.dimensions / 2)
+        let offsetY = anchor.y - Math.floor(stamp.dimensions / 2)
 
         // Loop through structure types in fastFiller structures
 
         for(const structureType in stamp.structures) {
-
-            // Get the color based on the structure type
-
-            const color = constants.colorsForStructureTypes[structureType]
-
-            // Get the positions for this structre type
-
-            const positions = stamp.structures[structureType]
-
-            // Loop through positions
-
-            for (const pos of positions) {
-
-                // Get the proper x and y using the offset and stamp radius
-
-                const x = pos.x + offsetX - stampRadius
-                const y = pos.y + offsetY - stampRadius
-
-                // If the structure isn't a road
-
-                if (structureType != STRUCTURE_ROAD) {
-
-                    // Add the pos to the base cost matrix as avoid
-
-                    baseCM.set(x, y, 255)
-                }
-
-                // Add the structureType and position info to buildObjects
-
-                buildObjects.push({
-                    structureType: structureType,
-                    x: x,
-                    y: y
-                })
-
-                // Display visuals if enabled
-
-                if (Memory.roomVisuals) room.visual.circle(x, y, {
-                    fill: color,
-                    opacity: 0.8,
-                })
-            }
-        }
-
-        // Run distance transform with the baseCM
-
-        distanceCM = room.distanceTransform(baseCM)
-
-        // Define stamp
-
-        stamp = constants.buildings.hub
-
-        // Get the radius of the stamp
-
-        stampRadius = stamp.dimensions / 2
-
-        // Try to find a stamp anchor
-
-        let stampAnchor = room.findClosestPosOfValue(distanceCM, anchor, stampRadius)
-
-        // Stop if a stamp anchor wasn't found
-
-        if (!stampAnchor) return false
-
-        // Otherwise fefine the offset from the top left of the room
-
-        offsetX = stampAnchor.x - Math.floor(stamp.dimensions / 2)
-        offsetY = stampAnchor.y - Math.floor(stamp.dimensions / 2)
-
-        // Loop through structure types in fastFiller structures
-
-        for(const structureType in stamp.structures) {
-
-            // Get the color based on the structure type
-
-            const color = constants.colorsForStructureTypes[structureType]
 
             // Get the positions for this structre type
 
@@ -342,10 +266,77 @@ export function constructionManager(room: Room) {
 
                 // Display visuals if enabled
 
-                if (Memory.roomVisuals) room.visual.circle(x, y, {
-                    fill: color,
-                    opacity: 0.8,
+                if (Memory.roomVisuals) room.visual.circle(x, y, constants.styleForStructureTypes[structureType])
+            }
+        }
+
+        // Run distance transform with the baseCM
+
+        distanceCM = room.specialDT(baseCM)
+
+        // Define stamp
+
+        stamp = constants.buildings.hub
+
+        // Get the radius of the stamp
+
+        stampRadius = stamp.dimensions / 2
+
+        // Try to find a stamp anchor
+
+        let stampAnchor = room.findClosestPosOfValue(distanceCM, anchor, stampRadius)
+
+
+        // Stop if a stamp anchor wasn't found
+
+        if (!stampAnchor) return false
+
+        // Set the hubAnchor as the stamp anchor for the hub
+
+        const hubAnchor = stampAnchor
+
+        // Otherwise fefine the offset from the top left of the room
+
+        offsetX = stampAnchor.x - Math.floor(stamp.dimensions / 2)
+        offsetY = stampAnchor.y - Math.floor(stamp.dimensions / 2)
+
+        // Loop through structure types in fastFiller structures
+
+        for(const structureType in stamp.structures) {
+
+            // Get the positions for this structre type
+
+            const positions = stamp.structures[structureType]
+
+            // Loop through positions
+
+            for (const pos of positions) {
+
+                // Get the proper x and y using the offset and stamp radius
+
+                const x = pos.x + offsetX
+                const y = pos.y + offsetY
+
+                // If the structure isn't a road
+
+                if (structureType != STRUCTURE_ROAD) {
+
+                    // Add the pos to the base cost matrix as avoid
+
+                    baseCM.set(x, y, 255)
+                }
+
+                // Add the structureType and position info to buildObjects
+
+                buildObjects.push({
+                    structureType: structureType,
+                    x: x,
+                    y: y
                 })
+
+                // Display visuals if enabled
+
+                if (Memory.roomVisuals) room.visual.circle(x, y, constants.styleForStructureTypes[structureType])
             }
         }
 
@@ -353,7 +344,7 @@ export function constructionManager(room: Room) {
 
         let i = 0
 
-        while (i < 4) {
+        while (i < 8) {
 
             // Run distance transform with the baseCM
 
@@ -369,7 +360,7 @@ export function constructionManager(room: Room) {
 
             // Try to find a stamp anchor
 
-            stampAnchor = room.findClosestPosOfValue(distanceCM, anchor, stampRadius)
+            stampAnchor = room.findClosestPosOfValue(distanceCM, hubAnchor, stampRadius)
 
             // Stop if a stamp anchor wasn't found
 
@@ -383,10 +374,6 @@ export function constructionManager(room: Room) {
             // Loop through structure types in fastFiller structures
 
             for(const structureType in stamp.structures) {
-
-                // Get the color based on the structure type
-
-                const color = constants.colorsForStructureTypes[structureType]
 
                 // Get the positions for this structre type
 
@@ -420,10 +407,7 @@ export function constructionManager(room: Room) {
 
                     // Display visuals if enabled
 
-                    if (Memory.roomVisuals) room.visual.circle(x, y, {
-                        fill: color,
-                        opacity: 0.8,
-                    })
+                    if (Memory.roomVisuals) room.visual.circle(x, y, constants.styleForStructureTypes[structureType])
                 }
             }
 
@@ -432,7 +416,7 @@ export function constructionManager(room: Room) {
 
         // Run distance transform with the baseCM
 
-        distanceCM = room.distanceTransform(baseCM)
+        distanceCM = room.specialDT(baseCM)
 
         // Define stamp
 
@@ -444,7 +428,7 @@ export function constructionManager(room: Room) {
 
         // Try to find a stamp anchor
 
-        stampAnchor = room.findClosestPosOfValue(distanceCM, anchor, stampRadius)
+        stampAnchor = room.findClosestPosOfValue(distanceCM, hubAnchor, stampRadius)
 
         // Stop if a stamp anchor wasn't found
 
@@ -458,10 +442,6 @@ export function constructionManager(room: Room) {
         // Loop through structure types in fastFiller structures
 
         for(const structureType in stamp.structures) {
-
-            // Get the color based on the structure type
-
-            const color = constants.colorsForStructureTypes[structureType]
 
             // Get the positions for this structre type
 
@@ -493,16 +473,12 @@ export function constructionManager(room: Room) {
                     y: y
                 })
 
+
                 // Display visuals if enabled
 
-                if (Memory.roomVisuals) room.visual.circle(x, y, {
-                    fill: color,
-                    opacity: 0.8,
-                })
+                if (Memory.roomVisuals) room.visual.circle(x, y, constants.styleForStructureTypes[structureType])
             }
         }
-
-        distanceCM = room.distanceTransform(baseCM, true)
 
         return buildObjects
     }

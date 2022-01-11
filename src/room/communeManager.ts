@@ -5,7 +5,7 @@ import { taskManager } from "./roomTaskManager"
 import { spawnManager } from './spawning/spawnManager'
 
 import { towerManager } from "./towerManager"
-import { constructionManager } from "./constructionManager"
+import { constructionManager } from "./construction/constructionManager"
 
 export function communeManager(room: Room) {
 

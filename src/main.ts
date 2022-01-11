@@ -47,6 +47,7 @@ declare global {
         yellow: string
         red: string
         green: string
+        brown: string
     }
 
     type BuldingTypes = 'fastFiller' |

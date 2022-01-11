@@ -67,7 +67,7 @@ interface Constants {
 
     buildings: Buildings
 
-    colorsForStructureTypes: {[key: string]: string}
+    styleForStructureTypes: {[key: string]: CircleStyle}
 }
 
 export const constants: Partial<Constants> = {}
@@ -190,6 +190,7 @@ constants.colors = {
     yellow: '#d8f100',
     red: '#d10000',
     green: '#00d137',
+    brown: '#aa7253'
 }
 
 constants.roomDimensions = 50
@@ -250,7 +251,7 @@ constants.buildings = {
         },
     },
     hub: {
-        dimensions: 5,
+        dimensions: 6,
         structures: {
             "spawn": [{ "x": 1, "y": 2 }],
             "link": [{ "x": 0, "y": 0 }],
@@ -270,7 +271,7 @@ constants.buildings = {
         },
 },
     labs: {
-        dimensions: 5,
+        dimensions: 6,
         structures: {
             "road": [{ "x": 3, "y": 3 }, { "x": 2, "y": 2 }, { "x": 1, "y": 1 }, { "x": 0, "y": 0 }],
             "lab": [{ "x": 0, "y": 1 }, { "x": 0, "y": 2 }, { "x": 1, "y": 2 }, { "x": 1, "y": 3 }, { "x": 2, "y": 3 }, { "x": 1, "y": 0 }, { "x": 2, "y": 0 }, { "x": 2, "y": 1 }, { "x": 3, "y": 1 }, { "x": 3, "y": 2 }]
@@ -279,23 +280,89 @@ constants.buildings = {
     },
 }
 
-constants.colorsForStructureTypes = {
+constants.styleForStructureTypes = {
     spawn: {
-        color: constants.colors.yellow
+        fill: constants.colors.yellow,
+        opacity: 1,
+        radius: 0.4,
     },
-    extension: constants.colors.yellow,
-    road: constants.colors.lightGrey,
-    wall: constants.colors.yellow,
-    rampart: constants.colors.yellow,
-    link: constants.colors.black,
-    storage: constants.colors.yellow,
-    tower: constants.colors.yellow,
-    observer: constants.colors.green,
-    powerSpawn: constants.colors.red,
-    extractor: constants.colors.yellow,
-    lab: constants.colors.black,
-    terminal: constants.colors.yellow,
-    container: constants.colors.yellow,
-    nuker: constants.colors.yellow,
-    factory: constants.colors.yellow,
+    extension: {
+        fill: constants.colors.yellow,
+        opacity: 1,
+        radius: 0.25,
+    },
+    road: {
+        fill: constants.colors.lightGrey,
+        opacity: 1,
+        radius: 0.2,
+    },
+    wall: {
+        fill: constants.colors.black,
+        opacity: 1,
+        radius: 0.4,
+    },
+    rampart: {
+        fill: constants.colors.yellow,
+        opacity: 1,
+        radius: 0.4,
+    },
+    link: {
+        fill: constants.colors.yellow,
+        opacity: 1,
+        radius: 0.4,
+    },
+    storage: {
+        fill: constants.colors.yellow,
+        opacity: 1,
+        radius: 0.4,
+    },
+    tower: {
+        fill: constants.colors.yellow,
+        opacity: 1,
+        radius: 0.3,
+        stroke: constants.colors.black
+    },
+    observer: {
+        fill: constants.colors.green,
+        opacity: 1,
+        radius: 0.4,
+    },
+    powerSpawn: {
+        fill: constants.colors.red,
+        opacity: 1,
+        radius: 0.4,
+    },
+    extractor: {
+        fill: constants.colors.yellow,
+        opacity: 1,
+        radius: 0.4,
+    },
+    lab: {
+        fill: constants.colors.black,
+        opacity: 1,
+        radius: 0.4,
+    },
+    terminal: {
+        fill: constants.colors.lightGrey,
+        opacity: 1,
+        radius: 0.4,
+        stroke: constants.colors.black
+    },
+    container: {
+        fill: constants.colors.lightGrey,
+        opacity: 1,
+        radius: 0.4,
+    },
+    nuker: {
+        fill: constants.colors.yellow,
+        opacity: 1,
+        radius: 0.3,
+        stroke: constants.colors.black,
+    },
+    factory: {
+        fill: constants.colors.lightGrey,
+        opacity: 1,
+        radius: 0.4,
+        stroke: constants.colors.black
+    },
 }
