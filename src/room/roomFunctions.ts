@@ -594,13 +594,7 @@ Room.prototype.get = function(roomObjectName) {
                     // Set this positions as 1 in the terrainCM
 
                     terrainCM.set(x, y, 255)
-                    continue
                 }
-
-                // Otherwise set this positions as 0 in the terrainCM
-
-                terrainCM.set(x, y, 0)
-                continue
             }
         }
 
@@ -615,9 +609,100 @@ Room.prototype.get = function(roomObjectName) {
         cacheAmount: Infinity,
     })
 
+    function generateBaseCM() {
+
+        // Construct a cost matrix based off terrain cost matrix
+
+        const baseCM = roomObjects.terrainCM.getValue()
+
+        function recordAdjacentPositions(x: number, y: number, range: number) {
+
+            // Construct a rect and get the positions in a range of 1
+
+            const rect = { x1: x - range, y1: y - range, x2: x + range, y2: y + range }
+            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+
+            // Loop through adjacent positions
+
+            for (const adjacentPos of adjacentPositions) {
+
+                // Iterate if the adjacent pos is a wall
+
+                if (baseCM.get(adjacentPos.x, adjacentPos.y) == 255) continue
+
+                // Otherwise record the position as a wall
+
+                baseCM.set(adjacentPos.x, adjacentPos.y, 255)
+            }
+        }
+
+        // Record exits and adjacent positions to exits as something to avoid
+
+        let y = 0
+        let x = 0
+
+        // Configure y and loop through top exits
+
+        y = 0
+        for (x = 0; x < 50; x++) {
+
+            // Record the exit as a pos to avoid
+
+            baseCM.set(x, y, 255)
+
+            // Record adjacent positions to avoid
+
+            recordAdjacentPositions(x, y, 1)
+        }
+
+        // Configure x and loop through left exits
+
+        x = 0
+        for (y = 0; y < 50; y++) {
+
+            // Record the exit as a pos to avoid
+
+            baseCM.set(x, y, 255)
+
+            // Record adjacent positions to avoid
+
+            recordAdjacentPositions(x, y, 1)
+        }
+
+        // Configure y and loop through bottom exits
+
+        y = 49
+        for (x = 0; x < 50; x++) {
+
+            // Record the exit as a pos to avoid
+
+            baseCM.set(x, y, 255)
+
+            // Record adjacent positions to avoid
+
+            recordAdjacentPositions(x, y, 1)
+        }
+
+        // Configure x and loop through right exits
+
+        x = 49
+        for (y = 0; y < 50; y++) {
+
+            // Record the exit as a pos to avoid
+
+            baseCM.set(x, y, 255)
+
+            // Record adjacent positions to avoid
+
+            recordAdjacentPositions(x, y, 1)
+        }
+
+        return baseCM
+    }
+
     manageRoomObject({
         name: 'baseCM',
-        value: undefined,
+        value: generateBaseCM(),
         valueType: 'object',
         cacheMethod: 'global',
         cacheAmount: Infinity,
@@ -1592,7 +1677,11 @@ Room.prototype.floodFill = function(seeds) {
 
     // Construct a cost matrix for the flood
 
-    const floodCM = room.get('terrainCM')
+    const floodCM = new PathFinder.CostMatrix()
+
+    // Get the terrain cost matrix
+
+    const terrain = room.get('terrain')
 
     // Construct a cost matrix for visited tiles and add seeds to it
 
@@ -1633,7 +1722,7 @@ Room.prototype.floodFill = function(seeds) {
 
                 // Iterate if the terrain is a wall
 
-                if (floodCM.get(pos.x, pos.y) == 255) continue
+                if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
 
                 // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
 
@@ -1642,7 +1731,7 @@ Room.prototype.floodFill = function(seeds) {
                 // If visuals are enabled, show the depth on the pos
 
                 if (Memory.roomVisuals) room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, {
-                    fill: 'hsl(' + 200 + depth * 10 + ', 100%, 60%)',
+                    fill: 'hsl(' + 200 + depth * 2 + ', 100%, 60%)',
                     opacity: 0.4,
                 })
             }

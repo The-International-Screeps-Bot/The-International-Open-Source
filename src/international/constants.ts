@@ -241,7 +241,8 @@ constants.impassibleStructures = [
 
 constants.stamps = {
     fastFiller: {
-        dimensions: 7,
+        offset: 3,
+        size: 3,
         structures: {
             "extension": [{ "x": 2, "y": 1 }, { "x": 1, "y": 1 }, { "x": 4, "y": 1 }, { "x": 1, "y": 2 }, { "x": 2, "y": 3 }, { "x": 3, "y": 2 }, { "x": 5, "y": 2 }, { "x": 5, "y": 1 }, { "x": 4, "y": 3 }, { "x": 3, "y": 4 }, { "x": 1, "y": 5 }, { "x": 1, "y": 4 }, { "x": 2, "y": 5 }, { "x": 4, "y": 5 }, { "x": 5, "y": 5 }, { "x": 5, "y": 4 }] ,
             "road": [{ "x": 3, "y": 0 }, { "x": 2, "y": 0 }, { "x": 1, "y": 0 }, { "x": 0, "y": 1 }, { "x": 0, "y": 2 }, { "x": 0, "y": 3 }, { "x": 0, "y": 4 }, { "x": 4, "y": 0 }, { "x": 5, "y": 0 }, { "x": 6, "y": 1 }, { "x": 6, "y": 2 }, { "x": 6, "y": 4 }, { "x": 6, "y": 3 }, { "x": 6, "y": 5 }, { "x": 5, "y": 6 }, { "x": 4, "y": 6 }, { "x": 3, "y": 6 }, { "x": 2, "y": 6 }, { "x": 1, "y": 6 }, { "x": 0, "y": 5 }],
@@ -251,7 +252,8 @@ constants.stamps = {
         },
     },
     hub: {
-        dimensions: 6,
+        offset: 1,
+        size: 4,
         structures: {
             "spawn": [{ "x": 1, "y": 2 }],
             "link": [{ "x": 0, "y": 0 }],
@@ -264,18 +266,19 @@ constants.stamps = {
         },
     },
     extensions: {
-        dimensions: 5,
+        offset: 2,
+        size: 3,
         structures: {
             "extension": [{ "x": 1, "y": 2 }, { "x": 2, "y": 1 }, { "x": 2, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 2 }],
             "road": [{ "x": 1, "y": 3 }, { "x": 0, "y": 2 }, { "x": 1, "y": 1 }, { "x": 2, "y": 0 }, { "x": 3, "y": 1 }, { "x": 4, "y": 2 }, { "x": 3, "y": 3 }, { "x": 2, "y": 4 }]
         },
 },
     labs: {
-        dimensions: 6,
+        offset: 2,
+        size: 5,
         structures: {
             "road": [{ "x": 3, "y": 3 }, { "x": 2, "y": 2 }, { "x": 1, "y": 1 }, { "x": 0, "y": 0 }],
             "lab": [{ "x": 0, "y": 1 }, { "x": 0, "y": 2 }, { "x": 1, "y": 2 }, { "x": 1, "y": 3 }, { "x": 2, "y": 3 }, { "x": 1, "y": 0 }, { "x": 2, "y": 0 }, { "x": 2, "y": 1 }, { "x": 3, "y": 1 }, { "x": 3, "y": 2 }]
-
         },
     },
 }
@@ -294,7 +297,7 @@ constants.styleForStructureTypes = {
     road: {
         fill: constants.colors.lightGrey,
         opacity: 1,
-        radius: 0.2,
+        radius: 0.1,
     },
     wall: {
         fill: constants.colors.black,

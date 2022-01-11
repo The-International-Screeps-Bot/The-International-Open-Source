@@ -56,7 +56,8 @@ declare global {
     'labs'
 
     interface Stamp {
-        dimensions: number
+        offset: number
+        size: number
         structures: {[key: string]: Pos[]}
     }
 

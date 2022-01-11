@@ -4,64 +4,64 @@ interface GeneralFunctions {
     /**
      * Finds the average trading price of a resourceType over a set amount of days
      */
-     findAvgPrice(resourceType: ResourceConstant, days: number): number
+    findAvgPrice(resourceType: ResourceConstant, days: number): number
 
-     /**
-      * Uses a provided ID to find an object associated with it
-      */
-     findObjectWithId(ID: string): any
+    /**
+     * Uses a provided ID to find an object associated with it
+     */
+    findObjectWithId(ID: string): any
 
-     /**
-      * Takes a rectange and returns the positions inside of it in an array
-      */
-     findPositionsInsideRect(rect: Rect): Pos[]
+    /**
+     * Takes a rectange and returns the positions inside of it in an array
+     */
+    findPositionsInsideRect(rect: Rect): Pos[]
 
-     /**
-      * Checks if two positions are equal
-      */
-     arePositionsEqual(pos1: Pos, pos2: Pos): boolean
+    /**
+     * Checks if two positions are equal
+     */
+    arePositionsEqual(pos1: Pos, pos2: Pos): boolean
 
-     /**
-      * Outputs HTML and CSS styled console logs
-      * @param title Title of the log
-      * @param message Main content of the log
-      * @param color Colour of the text. Default is black
-      * @param bgColor Colour of the background. Default is white
-      */
-     customLog(title: string, message: any, color?: string, bgColor?: string): void
+    /**
+     * Outputs HTML and CSS styled console logs
+     * @param title Title of the log
+     * @param message Main content of the log
+     * @param color Colour of the text. Default is black
+     * @param bgColor Colour of the background. Default is white
+     */
+    customLog(title: string, message: any, color?: string, bgColor?: string): void
 
-     /**
-      * Generates a pixel at the cost of depleting the bucket if the bucket is full
-      */
-     advancedGeneratePixel(): false | 0 | -6
+    /**
+     * Generates a pixel at the cost of depleting the bucket if the bucket is full
+     */
+    advancedGeneratePixel(): false | 0 | -6
 
-     /**
-      * Incrememnts Memory.ID and informs the result
-      * @returns a new ID
-      */
-     newID(): number
+    /**
+     * Incrememnts Memory.ID and informs the result
+     * @returns a new ID
+     */
+    newID(): number
 
-     /**
-      * Gets the value of a key in global, or creates a default if it doesn't exist
-      */
-     advancedGetValue(key: string | number, defaultValue: any): any
+    /**
+     * Gets the value of a key in global, or creates a default if it doesn't exist
+     */
+    advancedGetValue(key: string | number, defaultValue: any): any
 
-     /**
-      * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
-      */
-     advancedFindDistance(originRoomName: string, goalRoomName: string, typeWeights?: {[key: string]: number}): number
+    /**
+     * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
+     */
+    advancedFindDistance(originRoomName: string, goalRoomName: string, typeWeights?: {[key: string]: number}): number
 
-     /**
-      *
-      * @param distance The number of tiles between the hauling target and source
-      * @param income The number of resources added to the pile each tick
-      */
-     findCarryPartsRequired(distance: number, income: number): number
+    /**
+     *
+     * @param distance The number of tiles between the hauling target and source
+     * @param income The number of resources added to the pile each tick
+     */
+    findCarryPartsRequired(distance: number, income: number): number
 
-     /**
-      * Finds a position equally between two positions
-      */
-     findAvgBetweenPosotions(pos1: Pos, pos2: Pos): Pos
+    /**
+     * Finds a position equally between two positions
+     */
+    findAvgBetweenPosotions(pos1: Pos, pos2: Pos): Pos
 }
 
 export const generalFuncs: Partial<GeneralFunctions> = {}
@@ -89,6 +89,8 @@ generalFuncs.findPositionsInsideRect = function(rect) {
 
             if (x < 0 || x >= constants.roomDimensions ||
                 y < 0 || y >= constants.roomDimensions) continue
+
+            // Otherwise ass the x and y to positions
 
             positions.push({ x: x, y: y })
         }

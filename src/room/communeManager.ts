@@ -6,6 +6,7 @@ import { spawnManager } from './spawning/spawnManager'
 
 import { towerManager } from "./towerManager"
 import { constructionManager } from "./construction/constructionManager"
+import { basePlanner } from "./construction/basePlanner"
 
 export function communeManager(room: Room) {
 
@@ -20,4 +21,13 @@ export function communeManager(room: Room) {
     roomVisualsManager(room)
 
     constructionManager(room)
+
+    basePlanner(room)
+
+    room.floodFill([
+        {
+            x: 35,
+            y: 49
+        }
+    ])
 }
