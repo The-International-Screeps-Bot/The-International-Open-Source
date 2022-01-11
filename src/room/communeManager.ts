@@ -23,11 +23,4 @@ export function communeManager(room: Room) {
     constructionManager(room)
 
     basePlanner(room)
-
-    room.floodFill([
-        {
-            x: 35,
-            y: 49
-        }
-    ])
 }

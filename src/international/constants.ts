@@ -83,10 +83,9 @@ constants.mmoShardNames = [
 ]
 
 constants.allyList = [
-    "Q13214",
-    "Orlet",
-    "BarryOSeven",
-    "slowmotionghost",
+    'Q13214',
+    'Orlet',
+    'slowmotionghost',
 ]
 constants.tradeBlacklist = ['hi']
 
@@ -244,42 +243,83 @@ constants.stamps = {
         offset: 3,
         size: 3,
         structures: {
-            "extension": [{ "x": 2, "y": 1 }, { "x": 1, "y": 1 }, { "x": 4, "y": 1 }, { "x": 1, "y": 2 }, { "x": 2, "y": 3 }, { "x": 3, "y": 2 }, { "x": 5, "y": 2 }, { "x": 5, "y": 1 }, { "x": 4, "y": 3 }, { "x": 3, "y": 4 }, { "x": 1, "y": 5 }, { "x": 1, "y": 4 }, { "x": 2, "y": 5 }, { "x": 4, "y": 5 }, { "x": 5, "y": 5 }, { "x": 5, "y": 4 }] ,
-            "road": [{ "x": 3, "y": 0 }, { "x": 2, "y": 0 }, { "x": 1, "y": 0 }, { "x": 0, "y": 1 }, { "x": 0, "y": 2 }, { "x": 0, "y": 3 }, { "x": 0, "y": 4 }, { "x": 4, "y": 0 }, { "x": 5, "y": 0 }, { "x": 6, "y": 1 }, { "x": 6, "y": 2 }, { "x": 6, "y": 4 }, { "x": 6, "y": 3 }, { "x": 6, "y": 5 }, { "x": 5, "y": 6 }, { "x": 4, "y": 6 }, { "x": 3, "y": 6 }, { "x": 2, "y": 6 }, { "x": 1, "y": 6 }, { "x": 0, "y": 5 }],
-            "spawn": [{ "x": 3, "y": 5 }, { "x": 3, "y": 1 }],
-            "container": [{ "x": 5, "y": 3 }, { "x": 1, "y": 3 }],
-            "link": [{ "x": 3, "y": 3 }]
+            extension: [{ x: 2, y: 1 }, { x: 1, y: 1 }, { x: 4, y: 1 }, { x: 1, y: 2 }, { x: 2, y: 3 }, { x: 3, y: 2 }, { x: 5, y: 2 }, { x: 5, y: 1 }, { x: 4, y: 3 }, { x: 3, y: 4 }, { x: 1, y: 5 }, { x: 1, y: 4 }, { x: 2, y: 5 }, { x: 4, y: 5 }, { x: 5, y: 5 }, { x: 5, y: 4 }] ,
+            road: [{ x: 3, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }, { x: 0, y: 3 }, { x: 0, y: 4 }, { x: 4, y: 0 }, { x: 5, y: 0 }, { x: 6, y: 1 }, { x: 6, y: 2 }, { x: 6, y: 4 }, { x: 6, y: 3 }, { x: 6, y: 5 }, { x: 5, y: 6 }, { x: 4, y: 6 }, { x: 3, y: 6 }, { x: 2, y: 6 }, { x: 1, y: 6 }, { x: 0, y: 5 }],
+            spawn: [{ x: 3, y: 5 }, { x: 3, y: 1 }],
+            container: [{ x: 5, y: 3 }, { x: 1, y: 3 }],
+            link: [{ x: 3, y: 3 }],
+            empty: [{
+                x: 2,
+                y: 2
+            },
+            {
+                x: 4,
+                y: 2
+            },
+            {
+                x: 2,
+                y: 4
+            },
+            {
+                x: 4,
+                y: 4
+            }]
         },
     },
     hub: {
-        offset: 1,
+        offset: 2,
         size: 4,
         structures: {
-            "spawn": [{ "x": 1, "y": 2 }],
-            "link": [{ "x": 0, "y": 0 }],
-            "factory": [{ "x": 1, "y": 0 }],
-            "nuker": [{ "x": 0, "y": 1 }],
-            "terminal": [{ "x": 0, "y": 2 }],
-            "storage": [{ "x": 2, "y": 0 }],
-            "powerSpawn": [{ "x": 2, "y": 1 }],
-            "observer": [{ "x": 2, "y": 2 }]
+            road: [{ x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }, { x: 0, y: 3 }, { x: 0, y: 2 }, { x: 0, y: 1 }, { x: 1, y: 4 }, { x: 2, y: 4 }, { x: 3, y: 4 }, { x: 4, y: 3 }, { x: 4, y: 2 }, { x: 4, y: 1 }],
+            spawn: [{ x: 2, y: 3 }],
+            link: [{ x: 1, y: 1 }],
+            factory: [{ x: 2, y: 1 }],
+            nuker: [{ x: 1, y: 2 }],
+            terminal: [{ x: 1, y: 3 }],
+            storage: [{ x: 3, y: 1 }],
+            powerSpawn: [{ x: 3, y: 2 }],
+            observer: [{ x: 3, y: 3 }],
+            empty: [{
+                x: 2,
+                y: 2
+            }]
         },
     },
     extensions: {
         offset: 2,
         size: 3,
         structures: {
-            "extension": [{ "x": 1, "y": 2 }, { "x": 2, "y": 1 }, { "x": 2, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 2 }],
-            "road": [{ "x": 1, "y": 3 }, { "x": 0, "y": 2 }, { "x": 1, "y": 1 }, { "x": 2, "y": 0 }, { "x": 3, "y": 1 }, { "x": 4, "y": 2 }, { "x": 3, "y": 3 }, { "x": 2, "y": 4 }]
+            extension: [{ x: 1, y: 2 }, { x: 2, y: 1 }, { x: 2, y: 3 }, { x: 2, y: 2 }, { x: 3, y: 2 }],
+            road: [{ x: 1, y: 3 }, { x: 0, y: 2 }, { x: 1, y: 1 }, { x: 2, y: 0 }, { x: 3, y: 1 }, { x: 4, y: 2 }, { x: 3, y: 3 }, { x: 2, y: 4 }]
         },
-},
+    },
     labs: {
         offset: 2,
         size: 5,
         structures: {
-            "road": [{ "x": 3, "y": 3 }, { "x": 2, "y": 2 }, { "x": 1, "y": 1 }, { "x": 0, "y": 0 }],
-            "lab": [{ "x": 0, "y": 1 }, { "x": 0, "y": 2 }, { "x": 1, "y": 2 }, { "x": 1, "y": 3 }, { "x": 2, "y": 3 }, { "x": 1, "y": 0 }, { "x": 2, "y": 0 }, { "x": 2, "y": 1 }, { "x": 3, "y": 1 }, { "x": 3, "y": 2 }]
+            road: [{ x: 3, y: 3 }, { x: 2, y: 2 }, { x: 1, y: 1 }, { x: 0, y: 0 }],
+            lab: [{ x: 0, y: 1 }, { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 1 }, { x: 3, y: 2 }]
         },
+    },
+    tower: {
+        offset: 0,
+        size: 1,
+        structures: {
+            tower: [{
+                x: 0,
+                y: 0
+             }]
+        }
+    },
+    extension: {
+        offset: 0,
+        size: 1,
+        structures: {
+            extension: [{
+                x: 0,
+                y: 0
+             }]
+        }
     },
 }
 
@@ -310,9 +350,11 @@ constants.styleForStructureTypes = {
         radius: 0.4,
     },
     link: {
-        fill: constants.colors.yellow,
+        fill: constants.colors.black,
         opacity: 1,
-        radius: 0.4,
+        radius: 0.3,
+        stroke: constants.colors.yellow,
+        strokeWidth: 0.05,
     },
     storage: {
         fill: constants.colors.yellow,
@@ -320,15 +362,17 @@ constants.styleForStructureTypes = {
         radius: 0.4,
     },
     tower: {
-        fill: constants.colors.yellow,
+        fill: constants.colors.red,
         opacity: 1,
         radius: 0.3,
         stroke: constants.colors.black
     },
     observer: {
-        fill: constants.colors.green,
+        fill: constants.colors.black,
         opacity: 1,
-        radius: 0.4,
+        radius: 0.3,
+        stroke: constants.colors.green,
+        strokeWidth: 0.05,
     },
     powerSpawn: {
         fill: constants.colors.red,
@@ -363,9 +407,13 @@ constants.styleForStructureTypes = {
         stroke: constants.colors.black,
     },
     factory: {
-        fill: constants.colors.lightGrey,
+        fill: constants.colors.black,
         opacity: 1,
         radius: 0.4,
-        stroke: constants.colors.black
+        stroke: constants.colors.lightGrey
     },
+    empty: {
+        opacity: 0.4,
+        radius: 0.1,
+    }
 }

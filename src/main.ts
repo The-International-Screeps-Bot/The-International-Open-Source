@@ -53,7 +53,9 @@ declare global {
     type StampTypes = 'fastFiller' |
     'hub' |
     'extensions' |
-    'labs'
+    'labs' |
+    'tower' |
+    'extension'
 
     interface Stamp {
         offset: number

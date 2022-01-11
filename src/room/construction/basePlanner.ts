@@ -4,7 +4,7 @@ import { generalFuncs } from "international/generalFunctions";
 /**
  * Checks if a room can be planner. If it can, it informs information on how to build the room
  */
-export function basePlanner(room: Room): false | BuildObj[] {
+export function basePlanner(room: Room): false | {[key: string]: StructureConstant} {
 
     // Get a cost matrix of walls and exit areas
 
@@ -63,7 +63,7 @@ export function basePlanner(room: Room): false | BuildObj[] {
     // Find the average pos between the two sources and the controller
 
     const avgControllerSourcePos = generalFuncs.findAvgBetweenPosotions(room.controller.pos, avgSourcePos)
-
+/*
     // Construct seeds for the floodfill
 
     const seeds = []
@@ -75,17 +75,21 @@ export function basePlanner(room: Room): false | BuildObj[] {
     for (const pos of exits) {
 
         // Add the pos into seeds
-        
+
         seeds.push(pos)
     }
 
     // Use the seeds in a floodfill
 
     const floodCM = room.floodFill(seeds)
+ */
+    // Construct an foundation for recording base plans
 
-    // Construct an foundation for recording info about the base structure
+    const buildLocations: {[key: string]: StructureConstant} = {}
 
-    const buildObjects: BuildObj[] = []
+    // Construct a foundation for recording road locations
+
+    const roadBuildLocations: {[key: string]: boolean} = {}
 
     /**
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
@@ -103,11 +107,6 @@ export function basePlanner(room: Room): false | BuildObj[] {
         // Inform false if no anchor was generated
 
         if (!anchor) return false
-        room.visual.text('A', anchor.x, anchor.y)
-        // Define the offset from the top left of the room
-
-        let offsetX = anchor.x - stamp.offset
-        let offsetY = anchor.y - stamp.offset
 
         // Loop through structure types in fastFiller structures
 
@@ -123,29 +122,44 @@ export function basePlanner(room: Room): false | BuildObj[] {
 
                 // Get the proper x and y using the offset and stamp radius
 
-                const x = pos.x + offsetX
-                const y = pos.y + offsetY
-
-                // If the structure isn't a road
-
-                if (structureType != STRUCTURE_ROAD) {
-
-                    // Add the pos to the base cost matrix as avoid
-
-                    baseCM.set(x, y, 255)
-                }
-
-                // Add the structureType and position info to buildObjects
-
-                buildObjects.push({
-                    structureType: structureType,
-                    x: x,
-                    y: y
-                })
+                const x = pos.x + anchor.x - stamp.offset
+                const y = pos.y + anchor.y - stamp.offset
 
                 // Display visuals if enabled
 
                 if (Memory.roomVisuals) room.visual.circle(x, y, constants.styleForStructureTypes[structureType])
+
+                // Convert the pos into a string
+
+                const stringPos = JSON.stringify({x: x, y: y})
+
+                // If the structure is empty
+
+                if (structureType == 'empty') {
+
+                    // Add the pos in the cost matrix and iterate
+
+                    baseCM.set(x, y, 255)
+                    continue
+                }
+
+                // Record the pos and structureType in build locations
+
+                buildLocations[stringPos] = structureType as StructureConstant
+
+                // If the structure is a road
+
+                if (structureType == STRUCTURE_ROAD) {
+
+                    // Record the road and its position in road and general build locations
+
+                    roadBuildLocations[stringPos] = true
+                    continue
+                }
+
+                // Otherwise record the pos as avoid in the base cost matrix
+
+                baseCM.set(x, y, 255)
             }
         }
 
@@ -195,7 +209,33 @@ export function basePlanner(room: Room): false | BuildObj[] {
 
     if (!labsAnchor) return false
 
+    // Loop through all stringified positions in road build locations
+
+    for (const stringPos in roadBuildLocations) {
+
+        // Cover the stringPos into a pos
+
+        const pos: Pos = JSON.parse(stringPos)
+
+        // Record it in the base cost matrix
+
+        baseCM.set(pos.x, pos.y, 255)
+    }
+
+    // Loop 6 times
+
+    for(let i = 0; i < 6; i++) {
+
+        // Try to plan the stamp
+
+        const towerAnchor = planStamp(constants.stamps.tower, hubAnchor)
+
+        // Inform false if the stamp failed to be planned
+
+        if (!towerAnchor) return false
+    }
+
     // Inform information to build based on the plans
 
-    return buildObjects
+    return buildLocations
 }
