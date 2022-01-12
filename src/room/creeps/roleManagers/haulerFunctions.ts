@@ -1,6 +1,6 @@
 import { Console } from "console"
 import { generalFuncs } from "international/generalFunctions"
-import { RoomTask, RoomDeliverTask, RoomPullTask } from "room/roomTasks"
+import { RoomTask, RoomPullTask } from "room/roomTasks"
 
 import { Hauler } from "../creepClasses"
 
@@ -20,7 +20,6 @@ Hauler.prototype.fulfillTask = function() {
     // Construct names for different functions based on tasks
 
     const functionsForTasks: {[key: string]: any} = {
-        deliver: 'fulfillDeliverTask',
         pull: 'fulfillPullTask',
     }
 
@@ -41,7 +40,7 @@ Hauler.prototype.fulfillTask = function() {
     creep[functionsForTasks[task.type]]()
 }
 
-Hauler.prototype.fulfillDeliverTask = function() {
+/* Hauler.prototype.fulfillDeliverTask = function() {
 
     const creep: Hauler = this
     const room: Room = creep.room
@@ -148,7 +147,7 @@ Hauler.prototype.fulfillDeliverTask = function() {
         if (global[creep.id].taskID) creep.fulfillTask()
         return
     }
-}
+} */
 
 Hauler.prototype.fulfillPullTask = function() {
 

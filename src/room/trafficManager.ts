@@ -1,4 +1,11 @@
+import { generalFuncs } from "international/generalFunctions"
+
 export function trafficManager(room: Room) {
+
+    function canRunMoveRequest() {
+
+
+    }
 
     // Loop through moveRequests
 
@@ -25,7 +32,7 @@ export function trafficManager(room: Room) {
             if (!creepNameAtPos) {
 
                 // Operate if there are no creeps at pos
-                
+
                 creep.runMoveRequest(pos)
                 break
             }
@@ -37,6 +44,10 @@ export function trafficManager(room: Room) {
                 // Get the creep with the name
 
                 const creepAtPos = Game.creeps[creepNameAtPos]
+
+                // Stop loop if the creep at pos is meant to be pulled
+
+                if (creepAtPos.memory.getPulled) break
 
                 // If there aren't making a moveRequest
 

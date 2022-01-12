@@ -100,7 +100,8 @@ declare global {
     'damagedAllyCreeps' |
     'terrain' |
     'terrainCM' |
-    'baseCM'
+    'baseCM' |
+    'test'
 
     interface PathGoal {
         pos: RoomPosition
@@ -468,6 +469,11 @@ declare global {
         targetPos: RoomPosition
 
         moveRequest: boolean
+
+        /**
+         * Wether the creep is intended to move on its own or not
+         */
+        getPulled: boolean
     }
 
     // PowerCreeps

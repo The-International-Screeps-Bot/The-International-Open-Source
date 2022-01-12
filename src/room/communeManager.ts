@@ -7,6 +7,7 @@ import { spawnManager } from './spawning/spawnManager'
 import { towerManager } from "./towerManager"
 import { constructionManager } from "./construction/constructionManager"
 import { basePlanner } from "./construction/basePlanner"
+import { generalFuncs } from "international/generalFunctions"
 
 export function communeManager(room: Room) {
 
@@ -21,6 +22,6 @@ export function communeManager(room: Room) {
     roomVisualsManager(room)
 
     constructionManager(room)
-
-    basePlanner(room)
+    
+    /* basePlanner(room) */
 }

@@ -14,17 +14,50 @@ export interface RoomTask {
     ID: number
 }
 
-export interface RoomDeliverTask extends RoomTask {
+export interface RoomWithdrawTask extends RoomTask {
     resourceType: ResourceConstant
     deliverAmount: number
-    withdrawTargetID: string | undefined
-    transferTargetID: string
+    withdrawAmount: number
+    withdrawTargetID: string
 }
 
-export class RoomDeliverTask {
-    constructor(roomName: string, creatorID: string, resourceType: ResourceConstant, deliverAmount: number, withdrawTargetID: string | undefined, transferTargetID: string) {
+export class RoomWithdrawTask {
+    constructor(roomName: string, creatorID: string, resourceType: ResourceConstant, withdrawAmount: number, withdrawTargetID: string) {
 
-        const task: RoomDeliverTask = this
+        const task = this
+
+        // Default properties
+
+        task.type = 'deliver'
+        task.ID = generalFuncs.newID()
+
+        // Assign paramaters
+
+        task.resourceType = resourceType
+        task.withdrawAmount = withdrawAmount
+
+        task.withdrawTargetID = withdrawTargetID
+
+        // Set a value for the creator's ID if it doesn't exist, then assign the taskID and repsonder state
+
+        generalFuncs.advancedGetValue(creatorID, {}).createdTasks[task.ID] = false
+
+        // Record the task in the room with the requested roomName
+
+        global[roomName].tasksWithoutResponders[task.ID] = task
+    }
+}
+
+export interface RoomTraansferTask extends RoomTask {
+    resourceType: ResourceConstant
+    transferAmount: number
+    transferTargetIDs: string[]
+}
+
+export class RoomTraansferTask {
+    constructor(roomName: string, creatorID: string, resourceType: ResourceConstant, transferAmount: number, transferTargetIDs: string[]) {
+
+        const task = this
 
         // Default properties
 
@@ -35,10 +68,40 @@ export class RoomDeliverTask {
 
         task.creatorID = creatorID
         task.resourceType = resourceType
-        task.deliverAmount = deliverAmount
+        task.transferAmount = transferAmount
 
-        task.withdrawTargetID = withdrawTargetID
-        task.transferTargetID = transferTargetID
+        task.transferTargetIDs = transferTargetIDs
+
+        // Set a value for the creator's ID if it doesn't exist, then assign the taskID and repsonder state
+
+        generalFuncs.advancedGetValue(creatorID, {}).createdTasks[task.ID] = false
+
+        // Record the task in the room with the requested roomName
+
+        global[roomName].tasksWithoutResponders[task.ID] = task
+    }
+}
+
+export interface RoomPickupTask extends RoomTask {
+    resourceType: ResourceConstant
+    pickupAmount: number
+}
+
+export class RoomPickupTask {
+    constructor(roomName: string, creatorID: string, resourceType: ResourceConstant, pickupAmount: number) {
+
+        const task = this
+
+        // Default properties
+
+        task.type = 'deliver'
+        task.ID = generalFuncs.newID()
+
+        // Assign paramaters
+
+        task.creatorID = creatorID
+        task.resourceType = resourceType
+        task.pickupAmount = pickupAmount
 
         // Set a value for the creator's ID if it doesn't exist, then assign the taskID and repsonder state
 
@@ -58,7 +121,7 @@ export interface RoomPullTask extends RoomTask {
 export class RoomPullTask {
     constructor(roomName: string, creatorID: string, targetName: string, targetPos: RoomPosition) {
 
-        const task: RoomPullTask = this
+        const task = this
 
         // Default properties
 
