@@ -20,7 +20,7 @@ import {
 
 import { logManager } from 'other/logManager'
 import { memHack } from 'other/memHack'
-import { RoomPullTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
+import { RoomPickupTask, RoomPullTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
 
 // Type declareations for global
 
@@ -487,6 +487,11 @@ declare global {
          * Has the creep attempt to fulfill its withdraw task
          */
         fulfillWithdrawTask(task: RoomWithdrawTask): void
+
+        /**
+         * Have the creep attempt to fulfill its pickup task
+         */
+        fulfillPickupTask(task: RoomPickupTask): void
     }
 
     interface CreepMemory {

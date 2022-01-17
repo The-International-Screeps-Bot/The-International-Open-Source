@@ -92,13 +92,12 @@ SourceHarvester.prototype.travelToSource = function() {
 
         const creepsPullTasks = room.findTasksOfTypes(global[creep.id].createdTaskIDs, new Set(['pull']))
 
-        // If there are no pull tasks for the creep, inform false
+        // If there are no pull tasks for the creep, make one
 
-        if (creepsPullTasks.length == 0) return true
+        if (creepsPullTasks.length == 0) new RoomPullTask(room.name, creep.id, targetPos)
 
-        // Otherwise create a task to get pulled to the source and stop
+        // Inform false
 
-        new RoomPullTask(room.name, creep.id, targetPos)
         return true
     }
 

@@ -823,7 +823,7 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
     if (findTaskResult) creep.fulfillTask()
 }
 
-Creep.prototype.fulfillWithdrawTask = function(task) {
+Creep.prototype.fulfillPickupTask = function(task) {
 
     const creep = this
     const room = creep.room
@@ -837,17 +837,17 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
         //
     }
 
-    // Get the withdraw target
+    // Get the pickup target
 
-    const withdrawTarget = generalFuncs.findObjectWithId(task.withdrawTargetID)
+    const pickupTarget = generalFuncs.findObjectWithId(task.resourceID)
 
-    // Try to withdraw from the target
+    // Try to pickup from the target
 
-    const withdrawResult = creep.advancedWithdraw(withdrawTarget, task.resourceType, task.withdrawAmount)
+    const pickupResult = creep.advancedPickup(pickupTarget)
 
-    // Stop if the withdraw failed
+    // Stop if the pickup failed
 
-    if (!withdrawResult) return
+    if (!pickupResult) return
 
     // Otherwise
 
@@ -860,7 +860,8 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
     const findTaskResult = creep.findTask(new Set([
         'transfer',
         'withdraw',
-        'pull'
+        'pull',
+        'pickup'
     ]))
 
     // If a task was created, try to fulfill it
