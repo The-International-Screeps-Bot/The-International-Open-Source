@@ -3,22 +3,22 @@ interface Constants {
     /**
      * The username of the account the bot is running for
      */
-    me: string
+    me: 'MarvinTMB'
 
     /**
      * The names of the shards for the mmo server
      */
-    mmoShardNames: string[]
+    mmoShardNames: Set<string>
 
     /**
      * An array of usernames of players to treat as allies
      */
-    allyList: string[]
+    allyList: Set<string>
 
     /**
      * An array of usernames of players to avoid trading with
      */
-    tradeBlacklist: string[]
+    tradeBlacklist: Set<''>
 
     /**
      * A set of properties that are relative to a room's type
@@ -75,19 +75,23 @@ export const constants: Partial<Constants> = {}
 constants.roomDimensions = 50
 
 constants.me = 'MarvinTMB'
-constants.mmoShardNames = [
+constants.mmoShardNames = new Set([
     'shard0',
     'shard1',
     'shard2',
     'shard3'
-]
+])
 
-constants.allyList = [
+constants.allyList = new Set([
     'Q13214',
     'Orlet',
     'slowmotionghost',
-]
-constants.tradeBlacklist = ['hi']
+    'Arnice123'
+])
+
+constants.tradeBlacklist = new Set([
+
+])
 
 constants.roomTypeProperties = {
     type: true,
@@ -248,22 +252,7 @@ constants.stamps = {
             spawn: [{ x: 3, y: 5 }, { x: 3, y: 1 }],
             container: [{ x: 5, y: 3 }, { x: 1, y: 3 }],
             link: [{ x: 3, y: 3 }],
-            empty: [{
-                x: 2,
-                y: 2
-            },
-            {
-                x: 4,
-                y: 2
-            },
-            {
-                x: 2,
-                y: 4
-            },
-            {
-                x: 4,
-                y: 4
-            }]
+            empty: [{ x: 2, y: 2 },{ x: 4,y: 2 },{ x: 2,y: 4 },{ x: 4,y: 4 }]
         },
     },
     hub: {
@@ -279,10 +268,7 @@ constants.stamps = {
             storage: [{ x: 3, y: 1 }],
             powerSpawn: [{ x: 3, y: 2 }],
             observer: [{ x: 3, y: 3 }],
-            empty: [{
-                x: 2,
-                y: 2
-            }]
+            empty: [{ x: 2, y: 2 }]
         },
     },
     extensions: {
@@ -305,20 +291,14 @@ constants.stamps = {
         offset: 0,
         size: 1,
         structures: {
-            tower: [{
-                x: 0,
-                y: 0
-             }]
+            tower: [{ x: 0, y: 0 }]
         }
     },
     extension: {
         offset: 0,
         size: 1,
         structures: {
-            extension: [{
-                x: 0,
-                y: 0
-             }]
+            extension: [{ x: 0, y: 0 }]
         }
     },
 }

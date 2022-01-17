@@ -7,31 +7,32 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         const creep: SourceHarvester = Game.creeps[creepName]
 
-        //
+        // Get the source using the source name in the creep's memory
 
         const source: Source = room.get(creep.memory.sourceName)
 
         // Record that the creep has source target
+
         creep.recordSource()
 
         // Try to move to source. If creep moved then iterate
 
         const travelToSourceResult = creep.travelToSource()
-        if (travelToSourceResult == 0) continue
+        if (travelToSourceResult) continue
 
-        // Try to normally harvest. Iterate if creep harvested iterate
+        // Try to normally harvest. Iterate if creep harvested
 
         const advancedHarvestResult = creep.advancedHarvestSource(source)
-        if (advancedHarvestResult == 0) continue
+        if (advancedHarvestResult) continue
 
-        // Try to harvest using the sourceLink. If creep harvested iterate
+        // Try to transfer to the source link. Iterate if it transfered
 
         const transferToSourceLinkResult = creep.transferToSourceLink()
-        if (transferToSourceLinkResult == 0 || transferToSourceLinkResult == 'noLink') continue
+        if (transferToSourceLinkResult) continue
 
-        // If the source is empty repair contianer if it exists. Iterate if success
+        // If the source is empty repair the source contianer if it exists. Iterate if it repaired
 
         const advancedRepairResult = creep.repairSourceContainer()
-        if (advancedHarvestResult == 0 || advancedHarvestResult == 'noContainer') continue
+        if (advancedRepairResult) continue
     }
 }

@@ -42,11 +42,6 @@ interface GeneralFunctions {
     newID(): number
 
     /**
-     * Gets the value of a key in global, or creates a default if it doesn't exist
-     */
-    advancedGetValue(key: string | number, defaultValue: any): any
-
-    /**
      * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
      */
     advancedFindDistance(originRoomName: string, goalRoomName: string, typeWeights?: {[key: string]: number}): number
@@ -133,7 +128,7 @@ generalFuncs.advancedGeneratePixel = function() {
 
     // Stop if the bot is not running on MMO
 
-    if (!constants.mmoShardNames.includes(Game.shard.name)) return false
+    if (!constants.mmoShardNames.has(Game.shard.name)) return false
 
     // Stop if the cpu bucket isn't full
 
@@ -147,19 +142,6 @@ generalFuncs.advancedGeneratePixel = function() {
 generalFuncs.newID = function() {
 
     return Memory.ID++
-}
-
-// Commands
-
-generalFuncs.advancedGetValue = function(key, defaultValue) {
-
-    // If there is no value for the global reference of the key create one
-
-    if (!global[key]) global[key] = defaultValue
-
-    // Inform the global key reference's value
-
-    return global[key]
 }
 
 generalFuncs.advancedFindDistance = function(originRoomName, goalRoomName, typeWeights)  {

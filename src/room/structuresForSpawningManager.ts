@@ -21,9 +21,18 @@ export function structuresForSpawningManager(room: Room) {
 
     for (const structure of structuresForSpawning) {
 
+        // If there is no created task IDs object for the creator
+
+        if (!global[structure.id].createdTaskIDs) {
+
+            // Create it
+
+            global[structure.id].createdTaskIDs = {}
+        }
+
         // Iterate if the structure has already created a task
 
-        if (room.hasTaskOfTypes(generalFuncs.advancedGetValue(structure.id, { createdTasks: {} }).createdTasks, ['deliver'])) continue
+        if (global[structure.id].createdTaskIDs, new Set(['withdraw'])) continue
 
         //
     }

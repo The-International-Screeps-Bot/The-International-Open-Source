@@ -275,7 +275,7 @@ Room.prototype.get = function(roomObjectName) {
         // Inform constuction sites that aren't owned by a member of the allyList
 
         return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-            filter: cSite => !constants.allyList.includes(cSite.owner.username)
+            filter: cSite => !constants.allyList.has(cSite.owner.username)
         })
     }
 
@@ -292,7 +292,7 @@ Room.prototype.get = function(roomObjectName) {
         // Inform constuction sites that aren't owned by a member of the allyList
 
         return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-            filter: cSite => constants.allyList.includes(cSite.owner.username)
+            filter: cSite => constants.allyList.has(cSite.owner.username)
         })
     }
 
@@ -541,7 +541,7 @@ Room.prototype.get = function(roomObjectName) {
     manageRoomObject({
         name: 'enemyCreeps',
         value: room.find(FIND_HOSTILE_CREEPS, {
-            filter: creep => !constants.allyList.includes(creep.owner.username)
+            filter: creep => !constants.allyList.has(creep.owner.username)
         }),
         valueType: 'object',
         cacheMethod: 'global',
@@ -551,7 +551,7 @@ Room.prototype.get = function(roomObjectName) {
     manageRoomObject({
         name: 'allyCreeps',
         value: room.find(FIND_HOSTILE_CREEPS, {
-            filter: creep => !constants.allyList.includes(creep.owner.username)
+            filter: creep => !constants.allyList.has(creep.owner.username)
         }),
         valueType: 'object',
         cacheMethod: 'global',
@@ -1073,7 +1073,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // If the controller is owned by an ally
 
-            if (constants.allyList.includes(controller.owner.username)) {
+            if (constants.allyList.has(controller.owner.username)) {
 
                 // Set the type to ally and stop
 
@@ -1125,7 +1125,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // If the controller is reserved by an ally
 
-            if (constants.allyList.includes(controller.reservation.username)) {
+            if (constants.allyList.has(controller.reservation.username)) {
 
                 // Set type to allyRemote and stop
 
@@ -1165,7 +1165,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                     // If the creep is owned by an ally
 
-                    if (constants.allyList.includes(creep.reservation.username)) {
+                    if (constants.allyList.has(creep.reservation.username)) {
 
                         // Set type to allyRemote and stop
 
@@ -1312,64 +1312,19 @@ Room.prototype.findStoredResourceAmount = function(resourceType) {
     return room.storedResources[resourceType]
 }
 
-Room.prototype.deleteTask = function(taskID, hasResponder) {
-
-    const room = this
-
-    type TaskLocation = {[key: number]: RoomTask}
-
-    function getTaskLocation(): TaskLocation {
-
-        // If the task has a responder inform tasksWithResponders
-
-        if (hasResponder) return global[room.name].tasksWithResponders
-
-        // Otherwise inform tasksWithoutResponders
-
-        return global[room.name].tasksWithoutResponders[taskID]
-    }
-
-    // Construct task info based on found location
-
-    const taskLocation = getTaskLocation()
-    const task = taskLocation[taskID]
-
-    // If the task has a creator and it still exists
-
-    if (task.creatorID && global[task.creatorID]) {
-
-        // Remove the taskID from the creator
-
-        delete global[task.creatorID].createdTasks[task.ID]
-    }
-
-    // If the task has a responder
-
-    if (task.responderID) {
-
-        // Remove the taskID from the responder
-
-        delete global[task.responderID].taskID
-    }
-
-    // Delete the task
-
-    delete taskLocation[taskID]
-}
-
-Room.prototype.hasTaskOfTypes = function(createdTasks, types) {
+Room.prototype.hasTaskOfTypes = function(createdTaskIDs, types) {
 
     const room = this
 
     // Iterate through IDs of createdTasks
 
-    for (const taskID in createdTasks) {
+    for (const taskID in createdTaskIDs) {
 
         // Get info on if the task has a responder
 
-        const hasResponder = createdTasks[taskID]
+        const hasResponder = createdTaskIDs[taskID]
 
-        function getTask() {
+        function getTask(): RoomTask {
 
             // If the task has a responder inform from tasksWithResponders
 
@@ -1380,11 +1335,11 @@ Room.prototype.hasTaskOfTypes = function(createdTasks, types) {
             return global[room.name].tasksWithoutResponders[taskID]
         }
 
-        const task: RoomTask = getTask()
+        const task = getTask()
 
         // If the task has a type of specified types inform true
 
-        if (types.includes(task.type)) return true
+        if (types.has(task.type)) return true
     }
 
     // Inform false if no tasks had the specified types

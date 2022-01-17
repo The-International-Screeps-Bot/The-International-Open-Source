@@ -11,9 +11,11 @@ export function trafficManager(room: Room) {
 
     for (const stringPos in room.moveRequests) {
 
+        // Get creeps making move requests to this pos
+
         const creepNames = room.moveRequests[stringPos]
 
-        // Record iterations
+        // Loop through those creeps
 
         for (const creepName of creepNames) {
 
@@ -25,13 +27,15 @@ export function trafficManager(room: Room) {
 
             const pos = JSON.parse(stringPos)
 
-            // Try to find creepPositions at pos
+            // Try to find the name of the creep at pos
 
             const creepNameAtPos = room.creepPositions[stringPos]
 
+            // If there is no creep at the pos
+
             if (!creepNameAtPos) {
 
-                // Operate if there are no creeps at pos
+                // Operate and stop loop if there are no creeps at pos
 
                 creep.runMoveRequest(pos)
                 break
@@ -63,7 +67,7 @@ export function trafficManager(room: Room) {
                 creepAtPos.runMoveRequest(creep.pos)
             }
 
-            // operate the moveRequest
+            // Operate the moveRequest and stop loop
 
             creep.runMoveRequest(pos)
             break

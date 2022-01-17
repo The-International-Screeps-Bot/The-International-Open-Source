@@ -413,7 +413,7 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
     const creep: Creep = this
     const room = creep.room
 
-    creep.say('FT')
+    creep.say('🔍')
 
     // Iterate through taskIDs in room
 
@@ -423,15 +423,32 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
 
         // Iterate if the task's type isn't an allowedTaskType
 
-        if (!allowedTaskTypes[task.type]) continue
+        if (!allowedTaskTypes.has(task.type)) continue
 
-        // Otherwise set the creep's task as the task's ID
+        // if there is no global for the creep, make one
 
-        global[creep.id].taskID = taskID
+        if (!global[creep.id]) global[creep.id] = {}
+
+        // Otherwise if there is no responding task ID set for the creep's global, create one
+
+        if (!global[creep.id].respondingTaskIDs) global[creep.id].respondingTaskIDs = []
+
+        // Add the task's ID to the creep's responding tasks IDs
+
+        global[creep.id].respondingTaskIDs.push(taskID)
 
         // Set the responderID to the creepID
 
         task.responderID = creep.id
+
+        // Loop through the task's creators
+
+        for (const creatorID of task.creatorIDs) {
+
+            // And record that the task now has a responder
+
+            global[creatorID].createdTaskIDs[taskID] = true
+        }
 
         // Add the task to tasksWithResponders
 
@@ -440,10 +457,6 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
         // Delete the task from tasksWithoutResponders
 
         delete global[room.name].tasksWithoutResponders[taskID]
-
-        // Inform the task creator that the task now has a responder
-
-        generalFuncs.advancedGetValue(task.creatorID, { createdTasks: {} }).createdTasks[taskID] = true
 
         // Inform true
 
@@ -491,4 +504,104 @@ Creep.prototype.needsResources = function() {
 
     creep.memory.needsResouces = undefined
     return false
+}
+
+Creep.prototype.fulfillPullTask = function(task) {
+
+    const creep = this
+    const room: Room = creep.room
+
+    creep.say('PT')
+
+    // Get the task info
+
+    const taskTarget: Creep = generalFuncs.findObjectWithId(task.targetID)
+
+    // If there is no taskTarget
+
+    if (!taskTarget) {
+
+        // Delete the task
+
+        room.deleteTask(task.ID, true)
+
+        // Try to find a new task
+
+        const findTaskResult = creep.findTask(new Set([
+            'transfer',
+            'withdraw',
+            'pull'
+        ]))
+
+        // If creep found a task, stop with this task and try to fulfill it
+
+        if (findTaskResult) creep.fulfillTask()
+        return
+    }
+
+    // If the creep is not close enough to pull the target
+
+    if (creep.pos.getRangeTo(taskTarget.pos) > 1) {
+
+        // Create a moveRequest to the target and stop
+
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: taskTarget.pos, range: 1 },
+            avoidImpassibleStructures: true,
+            avoidEnemyRanges: true,
+        })
+        return
+    }
+
+    // Otherwise
+
+    // Find the targetPos
+
+    const targetPos = task.targetPos
+
+    // If the creep is not in range of the targetPos
+
+    if (creep.pos.getRangeTo(targetPos) > 0) {
+
+        // Have the creep pull the target and have it move with the creep and stop
+
+        creep.pull(taskTarget)
+        taskTarget.move(creep)
+
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: targetPos, range: 0 },
+            avoidImpassibleStructures: true,
+            avoidEnemyRanges: true,
+        })
+        return
+    }
+
+    // Otherwise
+
+    // Have the creep move to where the taskTarget is
+
+    creep.move(creep.pos.getDirectionTo(taskTarget.pos))
+
+    // Have the creep pull the taskTarget to trade places with the creep
+
+    creep.pull(taskTarget)
+    taskTarget.move(creep)
+
+    // Delete the task
+
+    room.deleteTask(task.ID, true)
+
+    // Try to find a new task
+
+    const findTaskResult = creep.findTask(new Set([
+        'transfer',
+        'withdraw',
+        'pull'
+    ]))
+
+    // If creep found a task, try to fulfill it
+
+    if (findTaskResult) creep.fulfillTask()
 }

@@ -10,13 +10,9 @@ export function taskManager(room: Room) {
 
         const task: RoomTask = global[room.name].tasksWithoutResponders[taskID]
 
-        // Try to find the creator using the task's creatorID
+        // If the task should be deleted, delete it
 
-        const creator = generalFuncs.findObjectWithId(task.creatorID)
-
-        // If the creator doesn't exist, delete the task
-
-        if (!creator) room.deleteTask(taskID, false)
+        if (!task.shouldStayActive()) task.delete()
     }
 
     // Iterate through tasks with responders
@@ -25,21 +21,9 @@ export function taskManager(room: Room) {
 
         const task: RoomTask = global[room.name].tasksWithResponders[taskID]
 
-        // Try to find the responder using the task's responderID
+        // If the task should be deleted, delete it
 
-        const responder = generalFuncs.findObjectWithId(task.responderID)
-
-        // If the responder doesn't exist, delete the task
-
-        if (!responder) room.deleteTask(taskID, true)
-
-        // Try to find the creator using the task's creatorID
-
-        const creator = generalFuncs.findObjectWithId(task.creatorID)
-
-        // If the creator doesn't exist, delete the task
-
-        if (!creator) room.deleteTask(taskID, true)
+        if (!task.shouldStayActive()) task.delete()
     }
 
     generalFuncs.customLog('TWOR', JSON.stringify(global[room.name].tasksWithoutResponders))

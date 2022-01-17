@@ -20,7 +20,7 @@ import {
 
 import { logManager } from 'other/logManager'
 import { memHack } from 'other/memHack'
-import { RoomTask } from 'room/roomTasks'
+import { RoomPullTask, RoomTask } from 'room/roomTasks'
 
 // Type declareations for global
 
@@ -149,6 +149,13 @@ declare global {
         x: number
         y: number
     }
+
+    type RoomTaskTypes = 'withdraw' |
+    'transfer' |
+    'pull' |
+    'pickup' |
+    'repair' |
+    'harvest'
 
     // Memory
 
@@ -381,7 +388,7 @@ declare global {
         /**
          * Checks if the creator has a task of with specified types
          */
-        hasTaskOfTypes(createdTasks: {[key: string]: boolean}, types: string[]): boolean
+        hasTaskOfTypes(createdTaskIDs: {[key: string]: boolean}, types: Set<string>): boolean
 
         /**
          *
@@ -408,7 +415,7 @@ declare global {
         /**
          * Tries to find a task for the creep with a type that matches the allowedTaskTypes
          */
-        findTask(allowedTaskTypes: {[key: string]: boolean}): boolean
+        findTask(allowedTaskTypes: Set<RoomTaskTypes>): boolean
 
         advancedPickup(target: Resource): boolean
 
@@ -441,6 +448,11 @@ declare global {
          * Decides if the creep needs to get more resources or not
          */
         needsResources(): boolean
+
+        /**
+         * Has the creep attempt to fulfill its pull task
+         */
+        fulfillPullTask(task: RoomPullTask): void
     }
 
     interface CreepMemory {

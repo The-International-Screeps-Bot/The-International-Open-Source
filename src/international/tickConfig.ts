@@ -30,11 +30,11 @@ export function tickConfig() {
 
     //
 
-    Memory.gclPercent = (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2)
-    Memory.totalGCL = (Math.pow(Game.gcl.level - 1, 2.4) * 1000000).toFixed(2)
+    Memory.GCLPercent = (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2)
+    Memory.totalGCL = (Math.pow(Game.gcl.level - 1, 2.4) * 1000000 + Game.gcl.progress).toFixed(2)
 
-    Memory.gplPercent = (Game.gpl.progress / Game.gpl.progressTotal * 100).toFixed(2)
-    Memory.totalPower = (Math.pow(Game.gpl.level - 1, 2) * 1000).toFixed(2)
+    Memory.GPLPercent = (Game.gpl.progress / Game.gpl.progressTotal * 100).toFixed(2)
+    Memory.totalGPL = (Math.pow(Game.gpl.level - 1, 2) * 1000 + Game.gpl.progress).toFixed(2)
 
     // global
 

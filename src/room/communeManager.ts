@@ -22,6 +22,6 @@ export function communeManager(room: Room) {
     roomVisualsManager(room)
 
     constructionManager(room)
-    
+
     /* basePlanner(room) */
 }

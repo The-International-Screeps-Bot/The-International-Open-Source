@@ -11,12 +11,6 @@ Hauler.prototype.fulfillTask = function() {
 
     creep.say('FT')
 
-    // If the creep has no task
-
-    if (!global[creep.id].taskID) return
-
-    // Otherwise
-
     // Construct names for different functions based on tasks
 
     const functionsForTasks: {[key: string]: any} = {
@@ -25,19 +19,9 @@ Hauler.prototype.fulfillTask = function() {
 
     // Get the creep's function and run it
 
-    const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].taskID]
+    const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
-    // If there is no task
-
-    if (!task) {
-
-        // Remove the creep's taskID and stop
-
-        delete global[creep.id].taskID
-        return
-    }
-
-    creep[functionsForTasks[task.type]]()
+    creep[functionsForTasks[task.type]](task)
 }
 
 /* Hauler.prototype.fulfillDeliverTask = function() {
@@ -48,7 +32,7 @@ Hauler.prototype.fulfillTask = function() {
     creep.say('WT')
 
     // Get the task using the taskID in the creeps' memory
-    console.log(global[creep.id].taskID)
+
     const task: RoomDeliverTask = global[room.name].tasksWithResponders[global[creep.id].taskID]
 
     function withdrawAttempt(): boolean {
@@ -148,102 +132,3 @@ Hauler.prototype.fulfillTask = function() {
         return
     }
 } */
-
-Hauler.prototype.fulfillPullTask = function() {
-
-    const creep: Hauler = this
-    const room: Room = creep.room
-
-    creep.say('PT')
-
-    // Get the task
-
-    const task: RoomPullTask = global[room.name].tasksWithResponders[global[creep.id].taskID]
-    const taskTarget = Game.creeps[task.targetName]
-
-    // If there is no taskTarget
-
-    if (!taskTarget) {
-
-        // Delete the task
-
-        room.deleteTask(task.ID, true)
-
-        // Try to find a new task
-
-        creep.findTask({
-            deliver: true,
-            pull: true,
-        })
-
-        // If creep found a task, stop with this task and try to fulfill it
-
-        if (global[creep.id].taskID) creep.fulfillTask()
-        return
-    }
-
-    // If the creep is not close enough to pull the target
-
-    if (creep.pos.getRangeTo(taskTarget.pos) > 1) {
-
-        // Create a moveRequest to the target and stop
-
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: taskTarget.pos, range: 1 },
-            avoidImpassibleStructures: true,
-            avoidEnemyRanges: true,
-        })
-        return
-    }
-
-    // Otherwise
-
-    // Find the targetPos
-
-    const targetPos = task.targetPos
-
-    // If the creep is not in range of the targetPos
-
-    if (creep.pos.getRangeTo(targetPos) > 0) {
-
-        // Have the creep pull the target and have it move with the creep and stop
-
-        creep.pull(taskTarget)
-        taskTarget.move(creep)
-
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: targetPos, range: 0 },
-            avoidImpassibleStructures: true,
-            avoidEnemyRanges: true,
-        })
-        return
-    }
-
-    // Otherwise
-
-    // Have the creep move to where the taskTarget is
-
-    creep.move(creep.pos.getDirectionTo(taskTarget.pos))
-
-    // Have the creep pull the taskTarget to trade places with the creep
-
-    creep.pull(taskTarget)
-    taskTarget.move(creep)
-
-    // Delete the task
-
-    room.deleteTask(task.ID, true)
-
-    // Try to find a new task
-
-    creep.findTask({
-        deliver: true,
-        pull: true,
-    })
-
-    // If creep found a task, try to fulfill it
-
-    if (global[creep.id].taskID) creep.fulfillTask()
-}

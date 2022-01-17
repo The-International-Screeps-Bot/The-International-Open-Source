@@ -10,7 +10,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
         // If creep has a task
 
-        if (generalFuncs.advancedGetValue(creep.id, { taskID: undefined }).taskID) {
+        if (global[creep.id] && global[creep.id].respondingTaskIDs && global[creep.id].respondingTaskIDs.length > 0) {
 
             // Try to filfill task and stop
 
@@ -20,10 +20,11 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
         // Try to find a new task
 
-        const findTaskResult = creep.findTask({
-            deliver: true,
-            pull: true,
-        })
+        const findTaskResult = creep.findTask(new Set([
+            'transfer',
+            'withdraw',
+            'pull'
+        ]))
 
         // Stop if the creep wasn't able to find a task
 

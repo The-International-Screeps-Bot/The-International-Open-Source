@@ -139,13 +139,17 @@ export function spawnRequests(room: Room) {
         }
     }
 
-    //
+    // Record how many creeps should be spawned for each role
 
     const minCreeps: Partial<Record<CreepRoles, number>> = {}
 
-    //
+    // Record spawning opts
+
+    const spawningObjs: Partial<Record<CreepRoles, SpawningObj>> = {}
 
     // Source harvester spawning opts
+
+    spawningObjs.sourceHarvester = sourceHarvesterSpawningObj()
 
     function sourceHarvesterSpawningObj(): SpawningObj {
 
@@ -270,6 +274,8 @@ export function spawnRequests(room: Room) {
 
     // Hauler spawning opts
 
+    spawningObjs.hauler = haulerSpawningObj()
+
     function haulerSpawningObj(): SpawningObj {
 
         const role: CreepRoles = 'hauler'
@@ -319,6 +325,8 @@ export function spawnRequests(room: Room) {
     }
 
     // Controller upgrader spawning opts
+
+    spawningObjs.controllerUpgrader = controllerUpgraderSpawningObj()
 
     function controllerUpgraderSpawningObj(): SpawningObj {
 
@@ -380,14 +388,6 @@ export function spawnRequests(room: Room) {
             cost
         }
     }
-
-    // Construct spawning opts for each role
-
-    const spawningObjs: Partial<Record<CreepRoles, SpawningObj>> = {}
-
-    spawningObjs.sourceHarvester = sourceHarvesterSpawningObj()
-    spawningObjs.hauler = haulerSpawningObj()
-    spawningObjs.controllerUpgrader = controllerUpgraderSpawningObj()
 
     // Construct requiredCreeps
 

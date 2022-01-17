@@ -67,7 +67,7 @@ export function roomVisualsManager(room: Room) {
                     return
                 }
 
-                if (constants.allyList.includes(room.controller.reservation.username)) {
+                if (constants.allyList.has(room.controller.reservation.username)) {
 
                     color = constants.colors.green
                     return
