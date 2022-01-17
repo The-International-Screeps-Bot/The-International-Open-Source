@@ -4,7 +4,7 @@ import { SourceHarvester } from "../creepClasses"
 
 SourceHarvester.prototype.recordSource = function() {
 
-    const creep: SourceHarvester = this
+    const creep = this
     const room = creep.room
 
     const sourceName: string = creep.memory.sourceName
@@ -14,7 +14,7 @@ SourceHarvester.prototype.recordSource = function() {
 
 SourceHarvester.prototype.travelToSource = function() {
 
-    const creep: SourceHarvester = this
+    const creep = this
     const room = creep.room
 
     creep.say('TTS')
@@ -29,11 +29,11 @@ SourceHarvester.prototype.travelToSource = function() {
 
     // Inform false if there is no closestHarvestPos
 
-    if (!closestHarvestPos) return false
+    if (!closestHarvestPos) return true
 
-    // Inform false if the creep is at the closestHarvestPos
+    // Inform true if the creep is at the closestHarvestPos
 
-    if (generalFuncs.arePositionsEqual(creep.pos, closestHarvestPos)) return true
+    if (generalFuncs.arePositionsEqual(creep.pos, closestHarvestPos)) return false
 
     function findTargetPos() {
 
@@ -88,9 +88,13 @@ SourceHarvester.prototype.travelToSource = function() {
 
         if (!global[creep.id].createdTaskIDs) global[creep.id].createdTaskIDs = {}
 
-        // If the creep already has created a task inform true
+        // Find the creep's task of type pull
 
-        if (room.hasTaskOfTypes(global[creep.id].createdTaskIDs, new Set(['pull']))) return true
+        const creepsPullTasks = room.findTasksOfTypes(global[creep.id].createdTaskIDs, new Set(['pull']))
+
+        // If there are no pull tasks for the creep, inform false
+
+        if (creepsPullTasks.length == 0) return true
 
         // Otherwise create a task to get pulled to the source and stop
 
@@ -113,7 +117,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
 SourceHarvester.prototype.transferToSourceLink = function() {
 
-    const creep: SourceHarvester = this
+    const creep = this
     const room = creep.room
 
     // Define the creep's designated source
@@ -128,6 +132,28 @@ SourceHarvester.prototype.transferToSourceLink = function() {
     // Try to transfer to the sourceLink
 
     creep.advancedTransfer(sourceLink)
+
+    return true
+}
+
+SourceHarvester.prototype.repairSourceContainer = function() {
+
+    const creep = this
+    const room = creep.room
+
+    // Get the creeps source
+
+    const sourceName = creep.memory.sourceName
+
+    // Get the sourceContainer for the creep's source
+
+    const sourceContainer = room.get(`${sourceName}Container`)
+
+    // Stop if there is no source container
+
+    if (!sourceContainer) return true
+
+    // Otherwise check if the creep can upgrade the sourceContainer
 
     return true
 }

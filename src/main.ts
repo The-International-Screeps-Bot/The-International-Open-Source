@@ -20,7 +20,7 @@ import {
 
 import { logManager } from 'other/logManager'
 import { memHack } from 'other/memHack'
-import { RoomPullTask, RoomTask } from 'room/roomTasks'
+import { RoomPullTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
 
 // Type declareations for global
 
@@ -388,7 +388,7 @@ declare global {
         /**
          * Checks if the creator has a task of with specified types
          */
-        hasTaskOfTypes(createdTaskIDs: {[key: string]: boolean}, types: Set<string>): boolean
+        findTasksOfTypes(createdTaskIDs: {[key: string]: boolean}, types: Set<string>): RoomTask[]
 
         /**
          *
@@ -410,14 +410,33 @@ declare global {
     interface Creep {
         [key: string]: any
 
+        /**
+         * Wether the creep has made a moveRequest or not
+         */
+        moveRequest: boolean
+
         // Functions
+
+        /**
+         * Tries to create a withdraw task for the room's storage or terminal
+         */
+        createStoringStructureWithdrawTask(resourceType: ResourceConstant, amount: number): boolean
+
+        /**
+         * Sets a task to be responded by a creep
+         */
+        acceptTask(task: RoomTask): void
 
         /**
          * Tries to find a task for the creep with a type that matches the allowedTaskTypes
          */
-        findTask(allowedTaskTypes: Set<RoomTaskTypes>): boolean
+        findTask(allowedTaskTypes: Set<RoomTaskTypes>, resourceType?: ResourceConstant): boolean
 
         advancedPickup(target: Resource): boolean
+
+        advancedTransfer(target: any, resourceType?: ResourceConstant, amount?: number): boolean
+
+        advancedWithdraw(target: any, resourceType?: ResourceConstant, amount?: number): boolean
 
         /**
          * Attempt to upgrade the controller optimally
@@ -450,9 +469,24 @@ declare global {
         needsResources(): boolean
 
         /**
+         * Runs the appropriate task for the creep's task
+         */
+        fulfillTask(): void
+
+        /**
          * Has the creep attempt to fulfill its pull task
          */
         fulfillPullTask(task: RoomPullTask): void
+
+        /**
+         * Has the creep attempt to fulfill its transfer task
+         */
+        fulfillTransferTask(task: RoomTransferTask): void
+
+        /**
+         * Has the creep attempt to fulfill its withdraw task
+         */
+        fulfillWithdrawTask(task: RoomWithdrawTask): void
     }
 
     interface CreepMemory {
@@ -479,8 +513,6 @@ declare global {
         path: RoomPosition[]
 
         targetPos: RoomPosition
-
-        moveRequest: boolean
 
         /**
          * Wether the creep is intended to move on its own or not

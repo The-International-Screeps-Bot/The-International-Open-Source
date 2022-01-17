@@ -1,6 +1,6 @@
 import { constants } from "international/constants"
 import { generalFuncs } from "international/generalFunctions"
-import { RoomTask } from "room/roomTasks"
+import { RoomTask, RoomWithdrawTask } from "room/roomTasks"
 
 Creep.prototype.isDying = function() {
 
@@ -24,7 +24,7 @@ Creep.prototype.isDying = function() {
     return true
 }
 
-Creep.prototype.advancedTransfer = function(target: any, resource?: ResourceConstant, amount?: number) {
+Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENERGY, amount) {
 
     const creep = this
     const room = creep.room
@@ -44,17 +44,13 @@ Creep.prototype.advancedTransfer = function(target: any, resource?: ResourceCons
         return false
     }
 
-    // If there wasn't a defined resource, define it as energy
-
-    if (!resource) resource = RESOURCE_ENERGY
-
     // If there wasn't an amount provided
 
-    if (!amount) amount = Math.min(creep.store.getUsedCapacity(resource), target.store.getFreeCapacity(resource))
+    if (!amount) amount = Math.min(creep.store.getUsedCapacity(resourceType), target.store.getFreeCapacity(resourceType))
 
     // Try to transfer
 
-    const transferResult = creep.transfer(target, resource, amount)
+    const transferResult = creep.transfer(target, resourceType, amount)
 
     // If the transfer is not a success inform the failure
 
@@ -65,7 +61,7 @@ Creep.prototype.advancedTransfer = function(target: any, resource?: ResourceCons
     return true
 }
 
-Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceConstant, amount?: number) {
+Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENERGY, amount) {
 
     const creep = this
     const room = creep.room
@@ -85,17 +81,13 @@ Creep.prototype.advancedWithdraw = function(target: any, resource?: ResourceCons
         return false
     }
 
-    // If there wasn't a defined resource, define it as energy
-
-    if (!resource) resource = RESOURCE_ENERGY
-
     // If there wasn't an amount provided
 
-    if (!amount) amount = Math.min(creep.store.getFreeCapacity(resource), target.store.getUsedCapacity(resource))
+    if (!amount) amount = Math.min(creep.store.getFreeCapacity(resourceType), target.store.getUsedCapacity(resourceType))
 
     // Try to withdraw
 
-    const withdrawResult = creep.withdraw(target, resource, amount)
+    const withdrawResult = creep.withdraw(target, resourceType, amount)
 
     // If the withdraw is not a success inform the failure
 
@@ -408,9 +400,84 @@ Creep.prototype.createMoveRequest = function(opts) {
     return true
 }
 
-Creep.prototype.findTask = function(allowedTaskTypes) {
+Creep.prototype.createStoringStructureWithdrawTask = function(resourceType = RESOURCE_ENERGY, amount) {
 
-    const creep: Creep = this
+    const creep = this
+    const room = creep.room
+
+    // Construct the room's storing structures
+
+    const storingStrutures = [room.storage, room.terminal]
+
+    // Loop through them
+
+    for (const structure of storingStrutures) {
+
+        // Iterate if the structure isn't defined
+
+        if (!structure) continue
+
+        // Iterate if the structure doesn't have enough resources
+
+        if (structure.store.getUsedCapacity(resourceType) < amount) continue
+
+        // Otherwise create a withdraw task for the structure
+
+        const task = new RoomWithdrawTask(room.name, resourceType, amount, structure.id)
+
+        // And have the creep accept the task and inform true
+
+        creep.acceptTask(task)
+        return true
+    }
+
+    // If no task was created and accepted, inform false
+
+    return false
+}
+
+Creep.prototype.acceptTask = function(task) {
+
+    const creep = this
+    const room = creep.room
+
+    // if there is no global for the creep, make one
+
+    if (!global[creep.id]) global[creep.id] = {}
+
+    // Otherwise if there is no responding task ID array for the creep's global, create one
+
+    if (!global[creep.id].respondingTaskIDs) global[creep.id].respondingTaskIDs = []
+
+    // Add the task's ID to the start of the creep's responding task IDs
+
+    global[creep.id].respondingTaskIDs.splice(0, 0, task.ID)
+
+    // Set the responderID to the creepID
+
+    task.responderID = creep.id
+
+    // Loop through the task's creators
+
+    for (const creatorID of task.creatorIDs) {
+
+        // And record that the task now has a responder
+
+        global[creatorID].createdTaskIDs[task.ID] = true
+    }
+
+    // Add the task to tasksWithResponders
+
+    global[room.name].tasksWithResponders[task.ID] = task
+
+    // Delete the task from tasksWithoutResponders
+
+    delete global[room.name].tasksWithoutResponders[task.ID]
+}
+
+Creep.prototype.findTask = function(allowedTaskTypes, resourceType) {
+
+    const creep = this
     const room = creep.room
 
     creep.say('🔍')
@@ -425,38 +492,11 @@ Creep.prototype.findTask = function(allowedTaskTypes) {
 
         if (!allowedTaskTypes.has(task.type)) continue
 
-        // if there is no global for the creep, make one
+        // Iterate of there is a requested resourceType and the task doesn't have it
 
-        if (!global[creep.id]) global[creep.id] = {}
+        if (resourceType && task.resourceType != resourceType) continue
 
-        // Otherwise if there is no responding task ID set for the creep's global, create one
-
-        if (!global[creep.id].respondingTaskIDs) global[creep.id].respondingTaskIDs = []
-
-        // Add the task's ID to the creep's responding tasks IDs
-
-        global[creep.id].respondingTaskIDs.push(taskID)
-
-        // Set the responderID to the creepID
-
-        task.responderID = creep.id
-
-        // Loop through the task's creators
-
-        for (const creatorID of task.creatorIDs) {
-
-            // And record that the task now has a responder
-
-            global[creatorID].createdTaskIDs[taskID] = true
-        }
-
-        // Add the task to tasksWithResponders
-
-        global[room.name].tasksWithResponders[taskID] = task
-
-        // Delete the task from tasksWithoutResponders
-
-        delete global[room.name].tasksWithoutResponders[taskID]
+        creep.acceptTask(task)
 
         // Inform true
 
@@ -506,38 +546,42 @@ Creep.prototype.needsResources = function() {
     return false
 }
 
+Creep.prototype.fulfillTask = function() {
+
+    const creep = this
+    const room = creep.room
+
+    creep.say('FT')
+
+    // Construct names for different functions based on tasks
+
+    const functionsForTasks: {[key: string]: any} = {
+        pull: 'fulfillPullTask',
+        transfer: 'fulfillTransferTask',
+        withdraw: 'fulfillWithdrawTask',
+        pickup: 'fulfillPickupTask',
+    }
+
+    // Get the creep's function
+
+    const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+
+    // Run the creep's function
+
+    creep[functionsForTasks[task.type]](task)
+}
+
+
 Creep.prototype.fulfillPullTask = function(task) {
 
     const creep = this
-    const room: Room = creep.room
+    const room = creep.room
 
     creep.say('PT')
 
     // Get the task info
 
     const taskTarget: Creep = generalFuncs.findObjectWithId(task.targetID)
-
-    // If there is no taskTarget
-
-    if (!taskTarget) {
-
-        // Delete the task
-
-        room.deleteTask(task.ID, true)
-
-        // Try to find a new task
-
-        const findTaskResult = creep.findTask(new Set([
-            'transfer',
-            'withdraw',
-            'pull'
-        ]))
-
-        // If creep found a task, stop with this task and try to fulfill it
-
-        if (findTaskResult) creep.fulfillTask()
-        return
-    }
 
     // If the creep is not close enough to pull the target
 
@@ -591,7 +635,7 @@ Creep.prototype.fulfillPullTask = function(task) {
 
     // Delete the task
 
-    room.deleteTask(task.ID, true)
+    task.delete()
 
     // Try to find a new task
 
@@ -602,6 +646,224 @@ Creep.prototype.fulfillPullTask = function(task) {
     ]))
 
     // If creep found a task, try to fulfill it
+
+    if (findTaskResult) creep.fulfillTask()
+}
+
+Creep.prototype.fulfillTransferTask = function(task) {
+
+    const creep = this
+    const room = creep.room
+
+    creep.say('TT')
+
+    // If the creep is empty
+
+    if (creep.store.getUsedCapacity() == 0) {
+
+        // Try to find a withdraw task with energy
+
+        const findTaskResult = creep.findTask(new Set([
+            'withdraw',
+            'pickup'
+        ]))
+
+        // If the creep found a task
+
+        if (findTaskResult) {
+
+            // Try to fulfill the new task and stop
+
+            creep.fulfillTask()
+            return
+        }
+
+        // Otherwise try to create a withdraw task from storing structures
+
+        const createTaskResult = creep.createStoringStructureWithdrawTask(task.resourceType, task.transferAmount)
+
+        // If a task was created, try to fulfill it
+
+        if (createTaskResult) creep.fulfillTask()
+
+        // Stop
+
+        return
+    }
+
+    // Get the transfer target using the task's transfer target IDs
+
+    let transferTarget = generalFuncs.findObjectWithId(task.transferTargetIDs[0])
+
+    // Transfer to the target
+
+    let advancedTransferResult = creep.advancedTransfer(transferTarget, task.resourceType)
+
+    // Stop if the transfer failed
+
+    if (!advancedTransferResult) return
+
+    // Otherwise remove the transfer target's ID from the task's transfer target IDs
+
+    task.transferTargetIDs.splice(0, 1)
+
+    // If there are no transfer target left
+
+    if (task.transferTargetIDs.length == 0) {
+
+        // Delete the task
+
+        task.delete()
+
+        // Try to find a new task
+
+        const findTaskResult = creep.findTask(new Set([
+            'transfer',
+            'withdraw',
+            'pull'
+        ]))
+
+        // If a task was created, try to fulfill it
+
+        if (findTaskResult) creep.fulfillTask()
+
+        // Stop
+
+        return
+    }
+
+    // Otherwise stop if the creep has made a move request
+
+    if (creep.moveRequest) return
+
+    // Otherwise get the next transfer target using the task's transfer target IDs
+
+    transferTarget = generalFuncs.findObjectWithId(task.transferTargetIDs[0])
+
+    // And try to transfer to it
+
+    advancedTransferResult = creep.advancedTransfer(transferTarget, task.resourceType)
+
+    // Stop if the transfer failed
+
+    if (!advancedTransferResult) return
+
+    // Otherwise remove the transfer target's ID from the task's transfer target IDs
+
+    task.transferTargetIDs.splice(0, 1)
+
+    // If there are no transfer target left
+
+    if (task.transferTargetIDs.length == 0) {
+
+        // Delete the task
+
+        task.delete()
+
+        // Try to find a new task
+
+        const findTaskResult = creep.findTask(new Set([
+            'transfer',
+            'withdraw',
+            'pull'
+        ]))
+
+        // If a task was created, try to fulfill it
+
+        if (findTaskResult) creep.fulfillTask()
+
+        // Stop
+
+        return
+    }
+}
+
+Creep.prototype.fulfillWithdrawTask = function(task) {
+
+    const creep = this
+    const room = creep.room
+
+    creep.say('WT')
+
+    // If the creep is full
+
+    if (creep.store.getFreeCapacity() == 0) {
+
+        //
+    }
+
+    // Get the withdraw target
+
+    const withdrawTarget = generalFuncs.findObjectWithId(task.withdrawTargetID)
+
+    // Try to withdraw from the target
+
+    const withdrawResult = creep.advancedWithdraw(withdrawTarget, task.resourceType, task.withdrawAmount)
+
+    // Stop if the withdraw failed
+
+    if (!withdrawResult) return
+
+    // Otherwise
+
+    // Delete the task
+
+    task.delete()
+
+    // Try to find a new task
+
+    const findTaskResult = creep.findTask(new Set([
+        'transfer',
+        'withdraw',
+        'pull'
+    ]))
+
+    // If a task was created, try to fulfill it
+
+    if (findTaskResult) creep.fulfillTask()
+}
+
+Creep.prototype.fulfillWithdrawTask = function(task) {
+
+    const creep = this
+    const room = creep.room
+
+    creep.say('WT')
+
+    // If the creep is full
+
+    if (creep.store.getFreeCapacity() == 0) {
+
+        //
+    }
+
+    // Get the withdraw target
+
+    const withdrawTarget = generalFuncs.findObjectWithId(task.withdrawTargetID)
+
+    // Try to withdraw from the target
+
+    const withdrawResult = creep.advancedWithdraw(withdrawTarget, task.resourceType, task.withdrawAmount)
+
+    // Stop if the withdraw failed
+
+    if (!withdrawResult) return
+
+    // Otherwise
+
+    // Delete the task
+
+    task.delete()
+
+    // Try to find a new task
+
+    const findTaskResult = creep.findTask(new Set([
+        'transfer',
+        'withdraw',
+        'pull'
+    ]))
+
+    // If a task was created, try to fulfill it
 
     if (findTaskResult) creep.fulfillTask()
 }

@@ -13,6 +13,8 @@ export interface RoomTask {
     responderID: string
     ID: number
 
+    resourceType?: ResourceConstant
+
     // Functions
 
     /**
@@ -35,7 +37,7 @@ export class RoomTask {
     constructor(type: RoomTaskTypes, creatorIDs: string[], roomName: string) {
 
         const task = this
-
+        generalFuncs.customLog('Created task', type)
         // Assign parameters
 
         task.type = type
@@ -105,7 +107,7 @@ RoomTask.prototype.delete = function() {
     const task = this
 
     // Construct task info based on found location
-
+    generalFuncs.customLog('Deleted task', task.type)
     const taskLocation = task.findLocation()
 
     // Loop through the task's creators
@@ -127,7 +129,6 @@ RoomTask.prototype.delete = function() {
 }
 
 export interface RoomWithdrawTask extends RoomTask {
-    resourceType: ResourceConstant
     withdrawAmount: number
     withdrawTargetID: string
 }
@@ -151,7 +152,6 @@ export class RoomWithdrawTask extends RoomTask {
 }
 
 export interface RoomTransferTask extends RoomTask {
-    resourceType: ResourceConstant
     transferAmount: number
     transferTargetIDs: string[]
 }
@@ -175,13 +175,12 @@ export class RoomTransferTask extends RoomTask {
 }
 
 export interface RoomRepairTask extends RoomTask {
-    resourceType: ResourceConstant
     repairThreshold: number
     repairTargetID: string
 }
 
 export class RoomRepairTask extends RoomTask {
-    constructor(roomName: string, resourceType: ResourceConstant, repairThreshold: number, repairTargetID: string) {
+    constructor(roomName: string, repairTargetID: string, repairThreshold: number) {
 
         // Inherit from RoomTask
 
@@ -191,20 +190,18 @@ export class RoomRepairTask extends RoomTask {
 
         // Assign paramaters
 
-        task.resourceType = resourceType
         task.repairThreshold = repairThreshold
-
         task.repairTargetID = repairTargetID
     }
 }
 
 export interface RoomPickupTask extends RoomTask {
     tick: number
-    resourceID: string
+    resourceID: Id<Resource>
 }
 
 export class RoomPickupTask extends RoomTask {
-    constructor(roomName: string, resourceID: string, tick: number) {
+    constructor(roomName: string, resourceID: Id<Resource>, resourceType: ResourceConstant, tick: number) {
 
         // Inherit from RoomTask
 
@@ -215,6 +212,7 @@ export class RoomPickupTask extends RoomTask {
         // Assign paramaters
 
         task.resourceID = resourceID
+        task.resourceType = resourceType
         task.tick = tick
     }
 }

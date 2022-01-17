@@ -1312,9 +1312,13 @@ Room.prototype.findStoredResourceAmount = function(resourceType) {
     return room.storedResources[resourceType]
 }
 
-Room.prototype.hasTaskOfTypes = function(createdTaskIDs, types) {
+Room.prototype.findTasksOfTypes = function(createdTaskIDs, types) {
 
     const room = this
+
+    // Initialize tasks of types
+
+    const tasksOfTypes = []
 
     // Iterate through IDs of createdTasks
 
@@ -1337,14 +1341,14 @@ Room.prototype.hasTaskOfTypes = function(createdTaskIDs, types) {
 
         const task = getTask()
 
-        // If the task has a type of specified types inform true
+        // If the task has a type of specified types, add the task to tasksOfTypes
 
-        if (types.has(task.type)) return true
+        if (types.has(task.type)) tasksOfTypes.push(task)
     }
 
     // Inform false if no tasks had the specified types
 
-    return false
+    return tasksOfTypes
 }
 
 Room.prototype.findScore = function() {

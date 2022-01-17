@@ -5,6 +5,9 @@ interface CreepClasses {
 const creepClasses: CreepClasses = {}
 
 export class SourceHarvester extends Creep {
+
+    repairSourceContainer?(): boolean
+
     constructor(creepID: Id<Creep>) {
 
         super(creepID)

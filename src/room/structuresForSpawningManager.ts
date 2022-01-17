@@ -1,4 +1,5 @@
 import { generalFuncs } from "international/generalFunctions"
+import { RoomTransferTask } from "./roomTasks"
 
 /**
  * Creates tasks for spawns and extensions when they are empty
@@ -9,31 +10,92 @@ export function structuresForSpawningManager(room: Room) {
 
     const haulerCapacity = Game.creeps[room.myCreeps.hauler[0]].store.getCapacity()
 
+    // Construct group data
+
+    let groupIndex = 0
+
     // Construct structure groups
 
-    const stuctureGroups = {}
+    interface StructureGroup {
+        totalTransferAmount: number
+        structures: (Id<StructureSpawn> | Id<StructureExtension>)[]
+    }
+
+    const structureGroups: StructureGroup[] = [
+        {
+            totalTransferAmount: 0,
+            structures: []
+        }
+    ]
 
     // Get exensions and spawns
 
-    const structuresForSpawning = room.get('structuresForSpawning')
+    const structuresForSpawning: (StructureSpawn | StructureExtension)[] = room.get('structuresForSpawning')
 
     // Iterate through structures in structureForSpawning
 
     for (const structure of structuresForSpawning) {
 
-        // If there is no created task IDs object for the creator
+        // if there is no global for the structure, make one
 
-        if (!global[structure.id].createdTaskIDs) {
+        if (!global[structure.id]) global[structure.id] = {}
 
-            // Create it
+        // Otherwise if there is no created task ID obj for the structure's global, create one
 
-            global[structure.id].createdTaskIDs = {}
+        if (!global[structure.id].createdTaskIDs) global[structure.id].createdTaskIDs = {}
+
+        // Otherwise
+
+        else {
+
+            // Find the creep's tasks of type tansfer
+
+            const structuresTransferTasks = room.findTasksOfTypes(global[structure.id].createdTaskIDs, new Set(['transfer']))
+
+            // Iterate if there are already transfer requests for the structure
+
+            if (structuresTransferTasks.length > 0) continue
         }
 
-        // Iterate if the structure has already created a task
+        // Get the amount of energy the structure needs at a max of the hauler's capacity
 
-        if (global[structure.id].createdTaskIDs, new Set(['withdraw'])) continue
+        const transferAmount: number = Math.min(structure.store.getFreeCapacity(RESOURCE_ENERGY), haulerCapacity)
 
-        //
+        // If the groupTransferAmount plus transferAmount is more than hauler capacity
+
+        if (structureGroups[groupIndex].totalTransferAmount + transferAmount > haulerCapacity) {
+
+            // Create a new group
+
+            structureGroups.push({
+                totalTransferAmount: 0,
+                structures: []
+            })
+
+            // And increment the groupIndex
+
+            groupIndex++
+        }
+
+        // Add the transferAmount to the group's totalTransferAmount
+
+        structureGroups[groupIndex].totalTransferAmount += transferAmount
+
+        // And add the structure's ID to the group's structures
+
+        structureGroups[groupIndex].structures.push(structure.id)
+    }
+
+    // Loop through each group of structureGroups
+
+    for (const group of structureGroups) {
+
+        // Iterate if there is no transfer amount for the group
+
+        if (group.totalTransferAmount == 0) continue
+
+        // Create a transfer task based on the group's data
+
+        new RoomTransferTask(room.name, RESOURCE_ENERGY, group.totalTransferAmount, group.structures)
     }
 }
