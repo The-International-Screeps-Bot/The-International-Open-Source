@@ -304,7 +304,7 @@ export function spawnRequests(room: Room) {
 
             return
         }
-        minCreeps.hauler = 1
+        minCreeps.hauler = 2
         // Use previously constructed opts to produce a viable spawning body
 
         const {
@@ -365,7 +365,7 @@ export function spawnRequests(room: Room) {
             bodyOpts.extraParts = [WORK, MOVE, CARRY, MOVE]
             bodyOpts.maxParts = 4
 
-            minCreeps.controllerUpgrader = 1
+            minCreeps.controllerUpgrader = 3
 
             return
         }

@@ -12,7 +12,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
         if (global[creep.id] && global[creep.id].respondingTaskIDs && global[creep.id].respondingTaskIDs.length > 0) {
 
-            // Try to filfill task and stop
+            // Try to filfill task and iterate
 
             creep.fulfillTask()
             continue
@@ -26,7 +26,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
             'pull'
         ]))
 
-        // Stop if the creep wasn't able to find a task
+        // Iterate if the creep wasn't able to find a task
 
         if (!findTaskResult) continue
 

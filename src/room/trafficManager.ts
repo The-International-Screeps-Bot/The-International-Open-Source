@@ -49,9 +49,9 @@ export function trafficManager(room: Room) {
 
                 const creepAtPos = Game.creeps[creepNameAtPos]
 
-                // Stop loop if the creep at pos is meant to be pulled
+                /* // Stop loop if the creep at pos is meant to be pulled
 
-                if (creepAtPos.memory.getPulled) break
+                if (creepAtPos.memory.getPulled) break */
 
                 // If there aren't making a moveRequest
 

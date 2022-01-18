@@ -167,15 +167,23 @@ Creep.prototype.advancedUpgradeController = function() {
 
         creep.say('DR')
 
-        const droppedResources = room.find(FIND_DROPPED_RESOURCES, {
-            filter: resource => resource.resourceType == RESOURCE_ENERGY
-        })
+        // If creep has a task
 
-        if (droppedResources.length == 0) return false
+        if (global[creep.id] && global[creep.id].respondingTaskIDs && global[creep.id].respondingTaskIDs.length > 0) {
 
-        // If the pickup wasn't a success inform failure
+            // Try to filfill task and stop
 
-        if (!creep.advancedPickup(creep.pos.findClosestByRange(droppedResources))) return false
+            creep.fulfillTask()
+            return false
+        }
+
+        // Otherwise try to find a new task
+
+        creep.findTask(new Set([
+            'pickup',
+        ]))
+
+        return false
     }
 
     // Otherwise if the creep doesn't need resources
@@ -703,7 +711,11 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     if (!advancedTransferResult) return
 
-    // Otherwise remove the transfer target's ID from the task's transfer target IDs
+    // Otherwise delete the task's ID from the creator that was transfered to
+
+    delete global[task.creatorIDs[0]].createdTaskIDs[task.ID]
+
+    // And remove the transfer target's ID from the task's transfer target IDs
 
     task.transferTargetIDs.splice(0, 1)
 
@@ -720,7 +732,8 @@ Creep.prototype.fulfillTransferTask = function(task) {
         const findTaskResult = creep.findTask(new Set([
             'transfer',
             'withdraw',
-            'pull'
+            'pull',
+            'pickup'
         ]))
 
         // If a task was created, try to fulfill it
@@ -765,7 +778,8 @@ Creep.prototype.fulfillTransferTask = function(task) {
         const findTaskResult = creep.findTask(new Set([
             'transfer',
             'withdraw',
-            'pull'
+            'pull',
+            'pickup'
         ]))
 
         // If a task was created, try to fulfill it
@@ -828,7 +842,7 @@ Creep.prototype.fulfillPickupTask = function(task) {
     const creep = this
     const room = creep.room
 
-    creep.say('WT')
+    creep.say('PUT')
 
     // If the creep is full
 

@@ -48,8 +48,8 @@ export function structuresForSpawningManager(room: Room) {
 
         else {
 
-            // Find the creep's tasks of type tansfer
-
+            // Find the structures's tasks of type tansfer
+            
             const structuresTransferTasks = room.findTasksOfTypes(global[structure.id].createdTaskIDs, new Set(['transfer']))
 
             // Iterate if there are already transfer requests for the structure

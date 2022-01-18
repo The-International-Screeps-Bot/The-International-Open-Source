@@ -1324,22 +1324,13 @@ Room.prototype.findTasksOfTypes = function(createdTaskIDs, types) {
 
     for (const taskID in createdTaskIDs) {
 
-        // Get info on if the task has a responder
+        // Set the task from tasks with no responders
 
-        const hasResponder = createdTaskIDs[taskID]
+        let task = global[room.name].tasksWithoutResponders[taskID]
 
-        function getTask(): RoomTask {
+        // If the task doesn't exist there, try to find it in tasks with responders
 
-            // If the task has a responder inform from tasksWithResponders
-
-            if (hasResponder) return global[room.name].tasksWithResponders[taskID]
-
-            // Otherwise inform from tasksWithoutResponders
-
-            return global[room.name].tasksWithoutResponders[taskID]
-        }
-
-        const task = getTask()
+        if (!task) task = global[room.name].tasksWithResponders[taskID]
 
         // If the task has a type of specified types, add the task to tasksOfTypes
 

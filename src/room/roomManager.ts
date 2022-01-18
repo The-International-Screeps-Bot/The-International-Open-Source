@@ -30,14 +30,6 @@ export function roomManager() {
 
         generalFuncs.customLog('Room', room.name, undefined, constants.colors.lightGrey)
 
-        //
-
-        roleManager(room)
-
-        //
-
-        trafficManager(room)
-
         // Check if there is a roomManager for this room's type
 
         const specificRoomManager = specificRoomManagers[room.memory.type]
@@ -47,6 +39,14 @@ export function roomManager() {
 
             specificRoomManager(room)
         }
+
+        //
+
+        roleManager(room)
+
+        //
+
+        trafficManager(room)
 
         // Testing
 

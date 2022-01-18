@@ -75,13 +75,13 @@ RoomTask.prototype.findLocation = function() {
 
     const task = this
 
-    // If the task has a responder inform tasksWithResponders
+    // If the task is in tasks with responders, inform that location
 
-    if (task.responderID) return global[task.roomName].tasksWithResponders
+    if (global[task.roomName].tasksWithResponders[task.ID]) return global[task.roomName].tasksWithResponders
 
-    // Otherwise inform tasksWithoutResponders
+    // Otherwise inform tasks without responders
 
-    return global[task.roomName].tasksWithoutResponders[task.ID]
+    return global[task.roomName].tasksWithoutResponders
 }
 
 RoomTask.prototype.shouldStayActive = function() {
@@ -111,7 +111,7 @@ RoomTask.prototype.delete = function() {
     const taskLocation = task.findLocation()
 
     // Loop through the task's creators
-
+    generalFuncs.customLog('creatorIDs', task.creatorIDs)
     for (const creatorID of task.creatorIDs) {
 
         // And delete the taskID from their task list
