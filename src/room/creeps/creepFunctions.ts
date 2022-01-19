@@ -570,13 +570,13 @@ Creep.prototype.fulfillTask = function() {
         pickup: 'fulfillPickupTask',
     }
 
-    // Get the creep's function
+    // Get the creep's task
 
     const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
-    // Run the creep's function
+    // Run the creep's function based on the task type and inform its result
 
-    creep[functionsForTasks[task.type]](task)
+    return creep[functionsForTasks[task.type]](task)
 }
 
 
@@ -595,7 +595,7 @@ Creep.prototype.fulfillPullTask = function(task) {
 
     if (creep.pos.getRangeTo(taskTarget.pos) > 1) {
 
-        // Create a moveRequest to the target and stop
+        // Create a moveRequest to the target and inform false
 
         creep.createMoveRequest({
             origin: creep.pos,
@@ -603,7 +603,8 @@ Creep.prototype.fulfillPullTask = function(task) {
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
         })
-        return
+
+        return false
     }
 
     // Otherwise
@@ -616,7 +617,7 @@ Creep.prototype.fulfillPullTask = function(task) {
 
     if (creep.pos.getRangeTo(targetPos) > 0) {
 
-        // Have the creep pull the target and have it move with the creep and stop
+        // Have the creep pull the target and have it move with the creep and inform false
 
         creep.pull(taskTarget)
         taskTarget.move(creep)
@@ -627,7 +628,7 @@ Creep.prototype.fulfillPullTask = function(task) {
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
         })
-        return
+        return false
     }
 
     // Otherwise
@@ -641,21 +642,9 @@ Creep.prototype.fulfillPullTask = function(task) {
     creep.pull(taskTarget)
     taskTarget.move(creep)
 
-    // Delete the task
+    // Inform true
 
-    task.delete()
-
-    // Try to find a new task
-
-    const findTaskResult = creep.findTask(new Set([
-        'transfer',
-        'withdraw',
-        'pull'
-    ]))
-
-    // If creep found a task, try to fulfill it
-
-    if (findTaskResult) creep.fulfillTask()
+    return true
 }
 
 Creep.prototype.fulfillTransferTask = function(task) {
@@ -680,23 +669,20 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
         if (findTaskResult) {
 
-            // Try to fulfill the new task and stop
+            // Try to fulfill the new task and inform false
 
             creep.fulfillTask()
-            return
+            return false
         }
 
         // Otherwise try to create a withdraw task from storing structures
 
         const createTaskResult = creep.createStoringStructureWithdrawTask(task.resourceType, task.transferAmount)
 
-        // If a task was created, try to fulfill it
+        // If a task was created, try to fulfill it and inform false
 
         if (createTaskResult) creep.fulfillTask()
-
-        // Stop
-
-        return
+        return false
     }
 
     // Get the transfer target using the task's transfer target IDs
@@ -707,9 +693,9 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     let advancedTransferResult = creep.advancedTransfer(transferTarget, task.resourceType)
 
-    // Stop if the transfer failed
+    // If the transfer failed, inform false
 
-    if (!advancedTransferResult) return
+    if (!advancedTransferResult) return false
 
     // Otherwise delete the task's ID from the creator that was transfered to
 
@@ -719,35 +705,13 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     task.transferTargetIDs.splice(0, 1)
 
-    // If there are no transfer target left
+    // Inform true if there are no transfer target left
 
-    if (task.transferTargetIDs.length == 0) {
+    if (task.transferTargetIDs.length == 0) return true
 
-        // Delete the task
+    // Otherwise if the creep has made a move request, inform false
 
-        task.delete()
-
-        // Try to find a new task
-
-        const findTaskResult = creep.findTask(new Set([
-            'transfer',
-            'withdraw',
-            'pull',
-            'pickup'
-        ]))
-
-        // If a task was created, try to fulfill it
-
-        if (findTaskResult) creep.fulfillTask()
-
-        // Stop
-
-        return
-    }
-
-    // Otherwise stop if the creep has made a move request
-
-    if (creep.moveRequest) return
+    if (creep.moveRequest) return false
 
     // Otherwise get the next transfer target using the task's transfer target IDs
 
@@ -757,39 +721,21 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     advancedTransferResult = creep.advancedTransfer(transferTarget, task.resourceType)
 
-    // Stop if the transfer failed
+    // If the transfer failed, inform false
 
-    if (!advancedTransferResult) return
+    if (!advancedTransferResult) return false
 
     // Otherwise remove the transfer target's ID from the task's transfer target IDs
 
     task.transferTargetIDs.splice(0, 1)
 
-    // If there are no transfer target left
+    // If there are no transfer target left, inform true
 
-    if (task.transferTargetIDs.length == 0) {
+    if (task.transferTargetIDs.length == 0) return true
 
-        // Delete the task
+    // Otherwise inform false
 
-        task.delete()
-
-        // Try to find a new task
-
-        const findTaskResult = creep.findTask(new Set([
-            'transfer',
-            'withdraw',
-            'pull',
-            'pickup'
-        ]))
-
-        // If a task was created, try to fulfill it
-
-        if (findTaskResult) creep.fulfillTask()
-
-        // Stop
-
-        return
-    }
+    return false
 }
 
 Creep.prototype.fulfillWithdrawTask = function(task) {
@@ -814,27 +760,13 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
 
     const withdrawResult = creep.advancedWithdraw(withdrawTarget, task.resourceType, task.withdrawAmount)
 
-    // Stop if the withdraw failed
+    // If the withdraw failed, inform false
 
-    if (!withdrawResult) return
+    if (!withdrawResult) return false
 
-    // Otherwise
+    // Otherwise inform true
 
-    // Delete the task
-
-    task.delete()
-
-    // Try to find a new task
-
-    const findTaskResult = creep.findTask(new Set([
-        'transfer',
-        'withdraw',
-        'pull'
-    ]))
-
-    // If a task was created, try to fulfill it
-
-    if (findTaskResult) creep.fulfillTask()
+    return true
 }
 
 Creep.prototype.fulfillPickupTask = function(task) {
@@ -859,26 +791,11 @@ Creep.prototype.fulfillPickupTask = function(task) {
 
     const pickupResult = creep.advancedPickup(pickupTarget)
 
-    // Stop if the pickup failed
+    // If the pickup failed, inform false
 
-    if (!pickupResult) return
+    if (!pickupResult) return false
 
-    // Otherwise
+    // Otherwise inform true
 
-    // Delete the task
-
-    task.delete()
-
-    // Try to find a new task
-
-    const findTaskResult = creep.findTask(new Set([
-        'transfer',
-        'withdraw',
-        'pull',
-        'pickup'
-    ]))
-
-    // If a task was created, try to fulfill it
-
-    if (findTaskResult) creep.fulfillTask()
+    return true
 }

@@ -471,27 +471,27 @@ declare global {
         /**
          * Runs the appropriate task for the creep's task
          */
-        fulfillTask(): void
+        fulfillTask(): boolean
 
         /**
          * Has the creep attempt to fulfill its pull task
          */
-        fulfillPullTask(task: RoomPullTask): void
+        fulfillPullTask(task: RoomPullTask): boolean
 
         /**
          * Has the creep attempt to fulfill its transfer task
          */
-        fulfillTransferTask(task: RoomTransferTask): void
+        fulfillTransferTask(task: RoomTransferTask): boolean
 
         /**
          * Has the creep attempt to fulfill its withdraw task
          */
-        fulfillWithdrawTask(task: RoomWithdrawTask): void
+        fulfillWithdrawTask(task: RoomWithdrawTask): boolean
 
         /**
          * Have the creep attempt to fulfill its pickup task
          */
-        fulfillPickupTask(task: RoomPickupTask): void
+        fulfillPickupTask(task: RoomPickupTask): boolean
     }
 
     interface CreepMemory {

@@ -1,4 +1,5 @@
 import { generalFuncs } from 'international/generalFunctions'
+import { RoomTask } from 'room/roomTasks'
 import { Hauler } from '../creepClasses'
 import './haulerFunctions'
 
@@ -12,9 +13,34 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
         if (global[creep.id] && global[creep.id].respondingTaskIDs && global[creep.id].respondingTaskIDs.length > 0) {
 
-            // Try to filfill task and iterate
+            // Try to filfill task
 
-            creep.fulfillTask()
+            const fulfillTaskResult = creep.fulfillTask()
+
+            // Iterate if the task wasn't fulfilled
+
+            if (!fulfillTaskResult) continue
+
+            // Otherwise find the task
+
+            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+
+            // Delete it
+
+            task.delete()
+
+            // Try to find a new task
+
+            const findTaskResult = creep.findTask(new Set([
+                'transfer',
+                'withdraw',
+                'pull',
+                'pickup'
+            ]))
+
+            // If creep found a task, try to fulfill it and iterate
+
+            if (findTaskResult) creep.fulfillTask()
             continue
         }
 
@@ -23,15 +49,12 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
         const findTaskResult = creep.findTask(new Set([
             'transfer',
             'withdraw',
-            'pull'
+            'pull',
+            'pickup'
         ]))
 
-        // Iterate if the creep wasn't able to find a task
+        // If there is a task, try to fulfill it
 
-        if (!findTaskResult) continue
-
-        // Otherwise try to fulfill task
-
-        creep.fulfillTask()
+        if (findTaskResult) creep.fulfillTask()
     }
 }
