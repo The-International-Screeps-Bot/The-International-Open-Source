@@ -53,8 +53,24 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
             'pickup'
         ]))
 
-        // If there is a task, try to fulfill it
+        // If a task wasn't found, iterate
 
-        if (findTaskResult) creep.fulfillTask()
+        if (!findTaskResult) continue
+
+        // Try to filfill task
+
+        const fulfillTaskResult = creep.fulfillTask()
+
+        // Iterate if the task wasn't fulfilled
+
+        if (!fulfillTaskResult) continue
+
+        // Otherwise find the task
+
+        const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+
+        // Delete it
+
+        task.delete()
     }
 }

@@ -171,9 +171,21 @@ Creep.prototype.advancedUpgradeController = function() {
 
         if (global[creep.id] && global[creep.id].respondingTaskIDs && global[creep.id].respondingTaskIDs.length > 0) {
 
-            // Try to filfill task and stop
+            // Try to filfill task
 
-            creep.fulfillTask()
+            const fulfillTaskResult = creep.fulfillTask()
+
+            // If the task wasn't fulfilled, inform false
+
+            if (!fulfillTaskResult) return false
+
+            // Otherwise find the task
+
+            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+
+            // Delete it and inform false
+
+            task.delete()
             return false
         }
 
@@ -633,7 +645,7 @@ Creep.prototype.fulfillPullTask = function(task) {
 
     // Otherwise
 
-    // Have the creep move to where the taskTarget is
+    // Have the creep move to where the taskTarget is and inform false
 
     creep.move(creep.pos.getDirectionTo(taskTarget.pos))
 
@@ -749,7 +761,25 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
 
     if (creep.store.getFreeCapacity() == 0) {
 
-        //
+        // Try to find a transfer task
+
+        const findTaskResult = creep.findTask(new Set([
+            'transfer',
+        ]))
+
+        // If the creep found a task
+
+        if (findTaskResult) {
+
+            // Try to fulfill the new task and inform false
+
+            creep.fulfillTask()
+            return false
+        }
+
+        // Otherwise inform true
+
+        return true
     }
 
     // Get the withdraw target
@@ -780,7 +810,25 @@ Creep.prototype.fulfillPickupTask = function(task) {
 
     if (creep.store.getFreeCapacity() == 0) {
 
-        //
+        // Try to find a transfer task
+
+        const findTaskResult = creep.findTask(new Set([
+            'transfer',
+        ]))
+
+        // If the creep found a task
+
+        if (findTaskResult) {
+
+            // Try to fulfill the new task and inform false
+
+            creep.fulfillTask()
+            return false
+        }
+
+        // Otherwise inform true
+
+        return true
     }
 
     // Get the pickup target
