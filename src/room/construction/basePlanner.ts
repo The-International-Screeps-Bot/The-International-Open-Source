@@ -4,7 +4,7 @@ import { generalFuncs } from "international/generalFunctions";
 /**
  * Checks if a room can be planner. If it can, it informs information on how to build the room
  */
-export function basePlanner(room: Room): false | {[key: string]: StructureConstant} {
+export function basePlanner(room: Room): false | BuildLocations {
 
     // Get a cost matrix of walls and exit areas
 
@@ -85,16 +85,18 @@ export function basePlanner(room: Room): false | {[key: string]: StructureConsta
  */
     // Construct an foundation for recording base plans
 
-    const buildLocations: {[key: string]: StructureConstant} = {}
+    const buildLocations: BuildLocations = {}
 
-    // Construct a foundation for recording road locations
-
-    const roadBuildLocations: {[key: string]: boolean} = {}
+    const roadLocations: {[key: string]: Pos[]} = {}
 
     /**
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
      */
-    function planStamp(stamp: Stamp, anchorOrient: Pos): false | Pos {
+    function planStamp(stampType: StampTypes, anchorOrient: Pos): false | Pos {
+
+        // Define the stamp using the stampType
+
+        const stamp = constants.stamps[stampType]
 
         // Run distance transform with the baseCM
 
@@ -108,9 +110,19 @@ export function basePlanner(room: Room): false | {[key: string]: StructureConsta
 
         if (!anchor) return false
 
+        // If base locations aren't configured for this stamp yet
+
+        if (!buildLocations[stampType]) {
+
+            // Configure base locations and road locations
+
+            buildLocations[stampType] = []
+            roadLocations[stampType] = []
+        }
+
         // Loop through structure types in fastFiller structures
 
-        for(const structureType in stamp.structures) {
+        for (const structureType in stamp.structures) {
 
             // Get the positions for this structre type
 
@@ -129,10 +141,6 @@ export function basePlanner(room: Room): false | {[key: string]: StructureConsta
 
                 if (Memory.roomVisuals) room.visual.circle(x, y, constants.styleForStructureTypes[structureType])
 
-                // Convert the pos into a string
-
-                const stringPos = JSON.stringify({x: x, y: y})
-
                 // If the structure is empty
 
                 if (structureType == 'empty') {
@@ -143,21 +151,31 @@ export function basePlanner(room: Room): false | {[key: string]: StructureConsta
                     continue
                 }
 
-                // Record the pos and structureType in build locations
+                // Add the positions to the buildLocations under it's stamp and structureType
 
-                buildLocations[stringPos] = structureType as StructureConstant
+                buildLocations[stampType].push({
+                    structureType,
+                    x,
+                    y
+                })
 
                 // If the structure is a road
 
-                if (structureType == STRUCTURE_ROAD) {
+                if (structureType === STRUCTURE_ROAD) {
 
-                    // Record the road and its position in road and general build locations
+                    // Add the x and y to the stampType in road locations
 
-                    roadBuildLocations[stringPos] = true
+                    roadLocations[stampType].push({
+                        x,
+                        y
+                    })
+
+                    // And iterate
+
                     continue
                 }
 
-                // Otherwise record the pos as avoid in the base cost matrix
+                // Otheriwse record the pos as avoid in the base cost matrix
 
                 baseCM.set(x, y, 255)
             }
@@ -168,7 +186,7 @@ export function basePlanner(room: Room): false | {[key: string]: StructureConsta
 
     // Try to plan the stamp
 
-    const fulfillerAnchor = planStamp(constants.stamps.fastFiller, avgControllerSourcePos)
+    const fulfillerAnchor = planStamp('fastFiller', avgControllerSourcePos)
 
     // If the stamp failed to be planned
 
@@ -182,7 +200,7 @@ export function basePlanner(room: Room): false | {[key: string]: StructureConsta
 
     // Try to plan the stamp
 
-    const hubAnchor = planStamp(constants.stamps.hub, fulfillerAnchor)
+    const hubAnchor = planStamp('hub', fulfillerAnchor)
 
     // Inform false if the stamp failed to be planned
 
@@ -194,7 +212,7 @@ export function basePlanner(room: Room): false | {[key: string]: StructureConsta
 
         // Try to plan the stamp
 
-        const extensionsAnchor = planStamp(constants.stamps.extensions, hubAnchor)
+        const extensionsAnchor = planStamp('extensions', hubAnchor)
 
         // Inform false if the stamp failed to be planned
 
@@ -203,13 +221,13 @@ export function basePlanner(room: Room): false | {[key: string]: StructureConsta
 
     // Try to plan the stamp
 
-    const labsAnchor = planStamp(constants.stamps.labs, hubAnchor)
+    const labsAnchor = planStamp('labs', hubAnchor)
 
     // Inform false if the stamp failed to be planned
 
     if (!labsAnchor) return false
 
-    // Loop through all stringified positions in road build locations
+/*     // Loop through all stringified positions in road build locations
 
     for (const stringPos in roadBuildLocations) {
 
@@ -220,19 +238,50 @@ export function basePlanner(room: Room): false | {[key: string]: StructureConsta
         // Record it in the base cost matrix
 
         baseCM.set(pos.x, pos.y, 255)
+    } */
+
+    // Loop through each stamp type in road locations
+
+    for (const stampType in roadLocations) {
+
+        // Get the road positions using the stamp type
+
+        const roadPositions = roadLocations[stampType]
+
+        // Loop through positions of road positions
+
+        for (const pos of roadPositions) {
+
+            // Record the pos to avoid in the base cost matrix
+
+            baseCM.set(pos.x, pos.y, 255)
+        }
     }
 
     // Loop 6 times
 
-    for(let i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
 
         // Try to plan the stamp
 
-        const towerAnchor = planStamp(constants.stamps.tower, hubAnchor)
+        const towerAnchor = planStamp('tower', hubAnchor)
 
         // Inform false if the stamp failed to be planned
 
         if (!towerAnchor) return false
+    }
+
+    // Loop 10 times
+
+    for (let i = 0; i < 8; i++) {
+
+        // Try to plan the stamp
+
+        const extensionAnchor = planStamp('extension', hubAnchor)
+
+        // Inform false if the stamp failed to be planned
+
+        if (!extensionAnchor) return false
     }
 
     // Inform information to build based on the plans

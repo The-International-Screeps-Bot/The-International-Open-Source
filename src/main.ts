@@ -129,22 +129,11 @@ declare global {
         cacheAmount?: number
     }
 
-    interface creepClasses {
-        [key: string]: SourceHarvester |
-        Hauler |
-        ControllerUpgrader |
-        MineralHarvester |
-        Antifa
-    }
-
     interface Commune extends Room {
 
     }
 
-    interface seedObj {
-        weight: number
-        pos: Pos
-    }
+    type BuildLocations = {[key: string]: BuildObj[]}
 
     interface BuildObj {
         structureType: string

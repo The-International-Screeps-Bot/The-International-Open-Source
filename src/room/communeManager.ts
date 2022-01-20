@@ -28,6 +28,4 @@ export function communeManager(room: Room) {
     droppedResourceManager(room)
 
     structuresForSpawningManager(room)
-
-    /* basePlanner(room) */
 }
