@@ -265,7 +265,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Group cSites by structureType
 
-        roomObjects[cSite.structureType].value.push(cSite)
+        roomObjects[`${cSite.structureType}CSite`].value.push(cSite)
     }
 
     // Construction sites based on owner
@@ -505,10 +505,6 @@ Room.prototype.get = function(roomObjectName) {
 
         const spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = roomObjects.spawn.getValue().concat(roomObjects.extension.getValue())
 
-        // Filter out structures that aren't active
-
-        const unfilteredSpawnStructures = spawnsAndExtensions.filter((structure) => structure.isActive())
-
         // Add each spawnStructures with their range to the object
 
         const anchor = roomObjects.anchor.getValue()
@@ -516,7 +512,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Filter energy structures by distance from anchor
 
-        const filteredSpawnStructures = unfilteredSpawnStructures.sort((a, b) => a.pos.getRangeTo(anchor.x, anchor.y + 5) - b.pos.getRangeTo(anchor.x, anchor.y + 5))
+        const filteredSpawnStructures = spawnsAndExtensions.sort((a, b) => a.pos.getRangeTo(anchor.x, anchor.y + 5) - b.pos.getRangeTo(anchor.x, anchor.y + 5))
         return filteredSpawnStructures
     }
 

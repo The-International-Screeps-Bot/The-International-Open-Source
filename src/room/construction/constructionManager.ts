@@ -1,5 +1,6 @@
 import { constants } from "international/constants"
 import { generalFuncs } from "international/generalFunctions"
+import { basePlanner } from "./basePlanner"
 
 /**
  * Creates construction sites and deletes structures in a room
@@ -9,6 +10,10 @@ export function constructionManager(room: Room) {
     // If the construction site count is at its limit, stop
 
     if (global.constructionSitesCount == 100) return
+
+    // If the room is above 1 construction site, stop
+
+    if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 5) return
 
     // Stop if placing containers was a success
 
@@ -57,5 +62,41 @@ export function constructionManager(room: Room) {
         }
 
         return true
+    }
+
+    manageBasePlanning()
+
+    function manageBasePlanning() {
+
+        // If there are build locations for the base
+
+        if (global[room.name].buildLocations) {
+
+            const baseLocations: BuildLocations = global[room.name].buildLocations
+
+            // Loop through each stamp type in base locations
+
+            for (const stampType in baseLocations) {
+
+                // Get the build object using the stamp type
+
+                const BuildObjects = baseLocations[stampType]
+
+                // Loop through positions of road positions
+
+                for (const BuildObj of BuildObjects) {
+                    room.visual.text('1', BuildObj.x, BuildObj.y)
+                    // Place construction sites for the base
+
+                    const createConstructionSiteResult = room.createConstructionSite(BuildObj.x, BuildObj.y, BuildObj.structureType)
+                }
+            }
+
+            return
+        }
+
+        // Otherwise generate them
+
+        global[room.name].buildLocations = basePlanner(room)
     }
 }

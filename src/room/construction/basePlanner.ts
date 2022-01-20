@@ -154,7 +154,7 @@ export function basePlanner(room: Room): false | BuildLocations {
                 // Add the positions to the buildLocations under it's stamp and structureType
 
                 buildLocations[stampType].push({
-                    structureType,
+                    structureType: structureType as BuildableStructureConstant,
                     x,
                     y
                 })
@@ -226,19 +226,6 @@ export function basePlanner(room: Room): false | BuildLocations {
     // Inform false if the stamp failed to be planned
 
     if (!labsAnchor) return false
-
-/*     // Loop through all stringified positions in road build locations
-
-    for (const stringPos in roadBuildLocations) {
-
-        // Cover the stringPos into a pos
-
-        const pos: Pos = JSON.parse(stringPos)
-
-        // Record it in the base cost matrix
-
-        baseCM.set(pos.x, pos.y, 255)
-    } */
 
     // Loop through each stamp type in road locations
 

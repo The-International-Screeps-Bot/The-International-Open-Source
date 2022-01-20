@@ -68,7 +68,7 @@ interface Constants {
     /**
      * an array of structureTypes ordered by build priority
      */
-    structureTypesByBuildPriority: StructureConstant[]
+    structureTypesByBuildPriority: BuildableStructureConstant[]
 
     stamps: Stamps
 

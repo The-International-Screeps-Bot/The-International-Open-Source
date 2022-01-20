@@ -136,7 +136,7 @@ declare global {
     type BuildLocations = {[key: string]: BuildObj[]}
 
     interface BuildObj {
-        structureType: string
+        structureType: BuildableStructureConstant
         x: number
         y: number
     }
