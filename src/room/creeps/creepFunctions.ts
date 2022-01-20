@@ -14,9 +14,9 @@ Creep.prototype.isDying = function() {
 
     if (!creep.ticksToLive) return false
 
-    // Stop if creep body parts * 3 is more or less than ticks left alive
+    // Stop if creep body parts * creep spawn time is more than ticks left alive
 
-    if (creep.ticksToLive > creep.body.length * 3) return false
+    if (creep.ticksToLive > creep.body.length * CREEP_SPAWN_TIME) return false
 
     // Record creep as dying
 
@@ -131,12 +131,12 @@ Creep.prototype.advancedPickup = function(target) {
     return true
 }
 
-Creep.prototype.advancedHarvestSource = function(source: Source) {
+Creep.prototype.advancedHarvestSource = function(source) {
 
-    const creep: Creep = this
+    const creep = this
 
-    const harvestResult: number = creep.harvest(source)
-    if (harvestResult != 0) return harvestResult
+    const harvestResult = creep.harvest(source)
+    if (harvestResult != OK) return harvestResult
 
     // Find amount of energy harvested and record it in data
 
@@ -145,12 +145,12 @@ Creep.prototype.advancedHarvestSource = function(source: Source) {
 
     creep.say('⛏️' + energyHarvested)
 
-    return 0
+    return OK
 }
 
 Creep.prototype.advancedUpgradeController = function() {
 
-    const creep: Creep = this
+    const creep = this
     const room = creep.room
 
     creep.say('AUC')
@@ -249,7 +249,303 @@ Creep.prototype.advancedUpgradeController = function() {
     return false
 }
 
-Creep.prototype.hasPartsOfTypes = function(partTypes: BodyPartConstant[]): boolean {
+Creep.prototype.advancedBuildCSite = function(cSite) {
+
+    const creep = this
+    const room = creep.room
+
+    creep.say('ABCS')
+
+    // If the creep needs resources
+
+    if (creep.needsResources()) {
+
+        creep.say('DR')
+
+        // If creep has a task
+
+        if (global[creep.id] && global[creep.id].respondingTaskIDs && global[creep.id].respondingTaskIDs.length > 0) {
+
+            // Try to filfill task
+
+            const fulfillTaskResult = creep.fulfillTask()
+
+            // If the task wasn't fulfilled, inform false
+
+            if (!fulfillTaskResult) return false
+
+            // Otherwise find the task
+
+            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+
+            // Delete it and inform false
+
+            task.delete()
+            return false
+        }
+
+        // Otherwise try to find a new task
+
+        creep.findTask(new Set([
+            'pickup',
+        ]))
+
+        return false
+    }
+
+    // Otherwise if the creep doesn't need resources
+
+    // If the cSite is out of build range
+
+    if (creep.pos.getRangeTo(cSite.pos) > 3) {
+
+        creep.say('MC')
+
+        // Make a move request to it
+
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: cSite.pos, range: 3 },
+            avoidImpassibleStructures: true,
+            avoidEnemyRanges: true,
+        })
+
+        // Inform true
+
+        return false
+    }
+
+    // Otherwise
+
+    // Try to build the construction site
+
+    const buildResult = creep.build(cSite)
+
+    // If the build worked
+
+    if (buildResult == OK) {
+
+        // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
+
+        const energySpentBuilding = Math.min(creep.partsOfType(WORK) * 5, (cSite.progressTotal - cSite.progress) * BUILD_POWER)
+
+        // Add control points to total controlPoints counter and say the success
+
+        Memory.controlPoints += energySpentBuilding
+        creep.say('🚧' + energySpentBuilding * BUILD_POWER)
+
+        // Inform true
+
+        return true
+    }
+
+    // Inform failure
+
+    return false
+}
+
+Creep.prototype.findRepairTarget = function(workPartCount) {
+
+    const creep = this
+    const room = creep.room
+
+    // Get roads and containers in the room
+
+    const repairStructures: (StructureRoad | StructureContainer)[] = room.get('road').concat(room.get('container'))
+
+    // Iterate through repair structures and find inform one if it's worth repairing
+
+    for (const structure of repairStructures) {
+
+        // If the structure is somewhat low on hits, inform it
+
+        if (structure.hitsMax - structure.hits <= workPartCount * REPAIR_POWER * 2) return structure
+    }
+
+    // If no ideal structure was found, inform false
+
+    return false
+}
+
+Creep.prototype.advancedRepair = function() {
+
+    const creep = this
+    const room = creep.room
+
+    creep.say('AR')
+
+    // If the creep needs resources
+
+    if (creep.needsResources()) {
+
+        creep.say('DR')
+
+        // If creep has a task
+
+        if (global[creep.id] && global[creep.id].respondingTaskIDs && global[creep.id].respondingTaskIDs.length > 0) {
+
+            // Try to filfill task
+
+            const fulfillTaskResult = creep.fulfillTask()
+
+            // If the task wasn't fulfilled, inform false
+
+            if (!fulfillTaskResult) return false
+
+            // Otherwise find the task
+
+            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+
+            // Delete it and inform false
+
+            task.delete()
+            return false
+        }
+
+        // Otherwise try to find a new task
+
+        creep.findTask(new Set([
+            'pickup',
+        ]))
+
+        return false
+    }
+
+    // Otherwise if the creep doesn't need resources
+
+    // Get the creep's work part count
+
+    const workPartCount = creep.partsOfType(WORK)
+
+    // Try to get the creep's repair target ID from memory. If it doesn't exist, find a new one
+
+    const repairTargetID = creep.memory.repairTargetID
+
+    // Set the repair target to defineRepairTarget's result
+
+    const repairTarget = defineRepairTarget()
+
+    function defineRepairTarget(): Structure | false {
+
+        // If there is a repair target ID
+
+        if (repairTargetID) {
+
+            // Find the structure with the ID
+
+            const structure = generalFuncs.findObjectWithID(repairTargetID)
+
+            // If the structure exists, inform it
+
+            if (structure) return structure
+        }
+
+        // Otherwise inform the results of finding a new target
+
+        return creep.findRepairTarget(workPartCount)
+    }
+
+    // Inform false if repair target wasn't defined
+
+    if (!repairTarget) return false
+
+    // Otherwise
+
+    // Add the repair target to memory
+
+    creep.memory.repairTargetID = repairTarget.id
+
+    // If the repairTarget is out of repair range
+
+    if (creep.pos.getRangeTo(repairTarget.pos) > 3) {
+
+        creep.say('MC')
+
+        // Make a move request to it
+
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: repairTarget.pos, range: 3 },
+            avoidImpassibleStructures: true,
+            avoidEnemyRanges: true,
+        })
+
+        // Inform true
+
+        return false
+    }
+
+    // Otherwise
+
+    // Try to repair the target
+
+    const repairResult = creep.repair(repairTarget)
+
+    // If the build worked
+
+    if (repairResult == OK) {
+
+        // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
+
+        const energySpentOnRepairs = Math.min(workPartCount, (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER)
+
+        // Add control points to total controlPoints counter and say the success
+
+        Memory.controlPoints += energySpentOnRepairs
+        creep.say('🔧' + energySpentOnRepairs * REPAIR_POWER)
+
+        // Find the hits left on the repairTarget
+
+        const newRepairTargetHits = repairTarget.hits + workPartCount * REPAIR_POWER
+
+        // If the repair target won't be viable to repair next tick
+
+        if (newRepairTargetHits > repairTarget.hitsMax - energySpentOnRepairs * REPAIR_POWER) {
+
+            // Delete the target from memory
+
+            delete creep.memory.repairTargetID
+
+            // Find a new repair target
+
+            const newRepairTarget = creep.findRepairTarget(workPartCount)
+
+            // Inform true if no new target was found
+
+            if (!newRepairTarget) return true
+
+            // If the new repair target is out of repair range
+
+            if (creep.pos.getRangeTo(newRepairTarget.pos) > 3) {
+
+                creep.say('MC')
+
+                // Make a move request to it
+
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goal: { pos: newRepairTarget.pos, range: 3 },
+                    avoidImpassibleStructures: true,
+                    avoidEnemyRanges: true,
+                })
+
+                // Inform true
+
+                return false
+            }
+        }
+
+        // Inform true
+
+        return true
+    }
+
+    // Inform failure
+
+    return false
+}
+
+Creep.prototype.hasPartsOfTypes = function(partTypes) {
 
     const creep: Creep = this
 
@@ -261,7 +557,7 @@ Creep.prototype.hasPartsOfTypes = function(partTypes: BodyPartConstant[]): boole
     return false
 }
 
-Creep.prototype.partsOfType = function(type: BodyPartConstant) {
+Creep.prototype.partsOfType = function(type) {
 
     const creep: Creep = this
 
@@ -601,7 +897,7 @@ Creep.prototype.fulfillPullTask = function(task) {
 
     // Get the task info
 
-    const taskTarget: Creep = generalFuncs.findObjectWithId(task.targetID)
+    const taskTarget: Creep = generalFuncs.findObjectWithID(task.targetID)
 
     // If the creep is not close enough to pull the target
 
@@ -699,7 +995,7 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     // Get the transfer target using the task's transfer target IDs
 
-    let transferTarget = generalFuncs.findObjectWithId(task.transferTargetIDs[0])
+    let transferTarget = generalFuncs.findObjectWithID(task.transferTargetIDs[0])
 
     // Transfer to the target
 
@@ -727,7 +1023,7 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     // Otherwise get the next transfer target using the task's transfer target IDs
 
-    transferTarget = generalFuncs.findObjectWithId(task.transferTargetIDs[0])
+    transferTarget = generalFuncs.findObjectWithID(task.transferTargetIDs[0])
 
     // And try to transfer to it
 
@@ -784,7 +1080,7 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
 
     // Get the withdraw target
 
-    const withdrawTarget = generalFuncs.findObjectWithId(task.withdrawTargetID)
+    const withdrawTarget = generalFuncs.findObjectWithID(task.withdrawTargetID)
 
     // Try to withdraw from the target
 
@@ -833,7 +1129,7 @@ Creep.prototype.fulfillPickupTask = function(task) {
 
     // Get the pickup target
 
-    const pickupTarget = generalFuncs.findObjectWithId(task.resourceID)
+    const pickupTarget = generalFuncs.findObjectWithID(task.resourceID)
 
     // Try to pickup from the target
 

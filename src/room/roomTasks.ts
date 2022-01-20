@@ -94,7 +94,7 @@ RoomTask.prototype.shouldStayActive = function() {
 
         // If the creator no longer exits, infom false
 
-        if (!generalFuncs.findObjectWithId(creatorID)) return false
+        if (!generalFuncs.findObjectWithID(creatorID)) return false
     }
 
     // Otherwise inform true

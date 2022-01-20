@@ -5,6 +5,8 @@ import { haulerManager } from './roleManagers/haulerManager'
 import { controllerUpgraderManager } from './roleManagers/controllerUpgraderManager'
 import { mineralHarvesterManager } from './roleManagers/mineralHarvesterManager'
 import { antifaManager } from './roleManagers/antifa/antifaManager'
+import { maintainerManager } from './roleManagers/maintainerManager'
+import { builderManager } from './roleManagers/builderManager'
 
 export function roleManager(room: Room) {
 
@@ -12,6 +14,8 @@ export function roleManager(room: Room) {
         sourceHarvester: sourceHarvesterManager,
         hauler: haulerManager,
         controllerUpgrader: controllerUpgraderManager,
+        builder: builderManager,
+        maintainer: maintainerManager,
         mineralHarvester: mineralHarvesterManager,
         antifa: antifaManager,
     }

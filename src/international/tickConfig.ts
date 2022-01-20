@@ -36,6 +36,14 @@ export function tickConfig() {
     Memory.GPLPercent = (Game.gpl.progress / Game.gpl.progressTotal * 100).toFixed(2)
     Memory.totalGPL = (Math.pow(Game.gpl.level - 1, 2) * 1000 + Game.gpl.progress).toFixed(2)
 
+    //
+
+    Memory.energyHarvested = 0
+    Memory.controlPoints = 0
+    Memory.energySpentOnBuilding = 0
+    Memory.energySpentOnRepairing = 0
+    Memory.energySpentOnBarricades = 0
+
     // global
 
     global.constructionSitesCount = Object.keys(Game.constructionSites).length

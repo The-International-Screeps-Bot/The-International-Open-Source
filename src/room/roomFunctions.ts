@@ -88,7 +88,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // If roomObject's valueType is id, return it as an object with the ID
 
-            if (roomObject.valueType == 'id') return generalFuncs.findObjectWithId(roomObject.value)
+            if (roomObject.valueType == 'id') return generalFuncs.findObjectWithID(roomObject.value)
 
             // If roomObject's type is pos, return it as a RoomPosition
 
@@ -1006,9 +1006,9 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                         cm.set(rampart.pos.x, rampart.pos.y, 255)
                     }
 
-                    // Loop through structureTypes of impassibleStructures
+                    // Loop through structureTypes of impassibleStructureTypes
 
-                    for (const structureType of constants.impassibleStructures) {
+                    for (const structureType of constants.impassibleStructureTypes) {
 
                         // Get structures of type and loop through them
 
@@ -1808,4 +1808,53 @@ Room.prototype.pathVisual = function(path, color) {
     // Otherwise generate the path visual
 
     room.visual.poly(path, { stroke: constants.colors[color], strokeWidth: .15, opacity: .3, lineStyle: 'solid' })
+}
+
+Room.prototype.findCSiteTargetID = function(creep) {
+
+    const room = this
+
+    // Find my construction sites
+
+    const myCSites = room.find(FIND_MY_CONSTRUCTION_SITES)
+
+    // If there are no sites inform false
+
+    if (!myCSites.length) return false
+
+    // Get the anchor
+
+    let anchor: RoomPosition = room.get('anchor')
+
+    // If there is no anchor, set it as the creep's pos
+
+    if (!anchor) anchor = creep.pos
+
+    // Otherwise construct structure options
+
+    let targetCSites: Structure[]
+
+    // Loop through structuretypes of the build priority
+
+    for (const structureType of constants.structureTypesByBuildPriority) {
+
+        // Get the structures with the relevant type
+
+        const cSitesOfType: Structure[] = room.get(`${structureType}CSite`)
+
+        if(cSitesOfType.length > 0) {
+
+            targetCSites = cSitesOfType
+            break
+        }
+    }
+
+    // Get the closest site to the anchor
+
+    const cSiteTarget = anchor.findClosestByRange(targetCSites)
+
+    // Record the cSiteTarget in the room's global and inform true
+
+    global[room.name].cSiteTargetID = cSiteTarget.id
+    return true
 }

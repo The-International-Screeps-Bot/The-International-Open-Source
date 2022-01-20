@@ -68,6 +68,8 @@ declare global {
     type CreepRoles = 'sourceHarvester' |
     'hauler' |
     'controllerUpgrader' |
+    'builder' |
+    'maintainer' |
     'mineralHarvester' |
     'antifa'
 
@@ -244,6 +246,14 @@ declare global {
          * The total amount of energy harvested by the bot per tick
          */
         energyHarvested: number
+
+        controlPoint: number
+
+        energySpentOnBuilding: number
+
+        energySpentOnRepairing: number
+
+        energySpentOnBarricades: number
     }
 
     interface RawMemory {
@@ -394,6 +404,11 @@ declare global {
          *
          */
         pathVisual(path: RoomPosition[], color: keyof Colors): void
+
+        /**
+         * Finds amd records a construction site for builders to target
+         */
+        findCSiteTargetID(creep: Creep): boolean
     }
 
     interface RoomMemory {
@@ -439,9 +454,39 @@ declare global {
         advancedWithdraw(target: any, resourceType?: ResourceConstant, amount?: number): boolean
 
         /**
-         * Attempt to upgrade the controller optimally
+         * Harvests a source and informs the result, while recording the result if successful
          */
-        advancedUpgradeController(): boolean
+        advancedHarvestSource(source: Source): ScreepsReturnCode
+
+        /**
+         * Attempts multiple methods to upgrade the controller
+         */
+        advancedUpgraderController(): boolean
+
+        /**
+         * Attempts multiple methods to build a construction site
+         */
+        advancedBuildCSite(cSite: ConstructionSite): boolean
+
+        /**
+         * Tries to find a new repair target for the creep
+         */
+         findRepairTarget(workPartCount: number): false | Structure
+
+        /**
+         *
+         */
+        advancedRepair(): boolean
+
+        /**
+         * Checks if the creep has some parts of specified types
+         */
+        hasPartsOfTypes(partTypes: BodyPartConstant[]): boolean
+
+        /**
+         * Gets the number of parts of a specified type a creep has
+         */
+        partsOfType(type: BodyPartConstant): number
 
         /**
          *
@@ -457,11 +502,6 @@ declare global {
          * Try to enforce a moveRequest and inform the result
          */
         runMoveRequest(pos: Pos): ScreepsReturnCode
-
-        /**
-         * Attempts multiple methods to upgrade the controller
-         */
-        advancedUpgraderController(): boolean
 
         /**
          * Decides if the creep needs to get more resources or not
@@ -523,6 +563,11 @@ declare global {
          * Wether the creep is intended to move on its own or not
          */
         getPulled: boolean
+
+        /**
+         *
+         */
+        repairTargetID: Id<Structure>
     }
 
     // PowerCreeps

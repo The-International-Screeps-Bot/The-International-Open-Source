@@ -63,7 +63,12 @@ interface Constants {
     /**
      * An array of structureTypes that cannot be walked over
      */
-    impassibleStructures: StructureConstant[]
+    impassibleStructureTypes: StructureConstant[]
+
+    /**
+     * an array of structureTypes ordered by build priority
+     */
+    structureTypesByBuildPriority: StructureConstant[]
 
     stamps: Stamps
 
@@ -161,6 +166,8 @@ constants.creepRoles = [
     'sourceHarvester',
     'hauler',
     'controllerUpgrader',
+    'builder',
+    'maintainer',
     'mineralHarvester',
     'antifa',
 ]
@@ -222,7 +229,7 @@ constants.allStructureTypes = [
     STRUCTURE_INVADER_CORE,
 ]
 
-constants.impassibleStructures = [
+constants.impassibleStructureTypes = [
     STRUCTURE_SPAWN,
     STRUCTURE_EXTENSION,
     STRUCTURE_WALL,
@@ -240,6 +247,25 @@ constants.impassibleStructures = [
     STRUCTURE_NUKER,
     STRUCTURE_FACTORY,
     STRUCTURE_INVADER_CORE,
+]
+
+const structureTypesByBuildPriority = [
+    STRUCTURE_SPAWN,
+    STRUCTURE_EXTENSION,
+    STRUCTURE_CONTAINER,
+    STRUCTURE_TOWER,
+    STRUCTURE_STORAGE,
+    STRUCTURE_ROAD,
+    STRUCTURE_WALL,
+    STRUCTURE_RAMPART,
+    STRUCTURE_TERMINAL,
+    STRUCTURE_EXTRACTOR,
+    STRUCTURE_LINK,
+    STRUCTURE_LAB,
+    STRUCTURE_FACTORY,
+    STRUCTURE_POWER_SPAWN,
+    STRUCTURE_NUKER,
+    STRUCTURE_OBSERVER,
 ]
 
 constants.stamps = {

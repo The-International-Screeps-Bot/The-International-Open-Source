@@ -34,6 +34,24 @@ export class ControllerUpgrader extends Creep {
 }
 creepClasses.controllerUpgrader = ControllerUpgrader
 
+export class Builder extends Creep {
+    constructor(creepID: Id<Creep>) {
+
+        super(creepID)
+
+    }
+}
+creepClasses.builder = Builder
+
+export class Maintainer extends Creep {
+    constructor(creepID: Id<Creep>) {
+
+        super(creepID)
+
+    }
+}
+creepClasses.maintainer = Maintainer
+
 export class MineralHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
 

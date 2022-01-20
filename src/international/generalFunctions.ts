@@ -9,7 +9,7 @@ interface GeneralFunctions {
     /**
      * Uses a provided ID to find an object associated with it
      */
-    findObjectWithId(ID: string): any
+    findObjectWithID(ID: string): any
 
     /**
      * Takes a rectange and returns the positions inside of it in an array
@@ -68,7 +68,7 @@ generalFuncs.findAvgPrice = function(resourceType, days) {
     return avgPrice
 }
 
-generalFuncs.findObjectWithId = function(id) {
+generalFuncs.findObjectWithID = function(id) {
 
     return Game.getObjectById(id) || undefined
 }
