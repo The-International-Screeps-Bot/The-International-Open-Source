@@ -17,9 +17,9 @@ export function constructionManager(room: Room) {
 
     // Stop if placing containers was a success
 
-    placeContainers()
+    placeSourceContainers()
 
-    function placeContainers(): boolean {
+    function placeSourceContainers(): boolean {
 
         // Construct sourceNames
 
@@ -50,7 +50,7 @@ export function constructionManager(room: Room) {
 
             // Try to find the closestHarvestPos for the source
 
-            const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPosition`)
+            const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPosition`)
 
             // Iterate if it doesn't exist
 
@@ -62,6 +62,23 @@ export function constructionManager(room: Room) {
         }
 
         return true
+    }
+
+    placeControllerContainer()
+
+    function placeControllerContainer() {
+
+        // Get the center upgrade pos
+
+        const centerUpgadePos: RoomPosition = room.get('centerUpgradePos')
+
+        // Stop if it isn't defined
+
+        if (!centerUpgadePos) return
+
+        // Otherwise place a container on the pos
+
+        room.createConstructionSite(centerUpgadePos, STRUCTURE_CONTAINER)
     }
 
     manageBasePlanning()
@@ -88,13 +105,13 @@ export function constructionManager(room: Room) {
 
                     // Place construction sites for the base
 
-                    // room.createConstructionSite(BuildObj.x, BuildObj.y, BuildObj.structureType)
+                    room.createConstructionSite(BuildObj.x, BuildObj.y, BuildObj.structureType)
                 }
             }
 
             // Stop
 
-            // return
+            return
         }
 
         // Otherwise generate the build locations
