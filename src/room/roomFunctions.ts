@@ -561,6 +561,34 @@ Room.prototype.get = function(roomObjectName) {
         cacheAmount: Infinity,
     })
 
+    function findUpgradePositions() {
+
+        // Get the center upgrade pos
+
+        const centerUpgradePos = roomObjects.centerUpgradePos.getValue()
+
+        // If the center upgrade pos isn't defined, inform false
+
+        if (!centerUpgradePos) return false
+
+        // Draw a rect around the center upgrade pos
+
+        const rect = { x1: centerUpgradePos.x - 1, y1: centerUpgradePos.y - 1, x2: centerUpgradePos.x + 1, y2: centerUpgradePos.y + 1 }
+        const upgradePositions = generalFuncs.findPositionsInsideRect(rect)
+
+        // Inform the centerUpgadePos and its adjacent positions
+
+        return upgradePositions
+    }
+
+    manageRoomObject({
+        name: 'upgradePositions',
+        value: findUpgradePositions(),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
     // Source containers
 
     function findSourceContainer(closestHarvestPos: RoomPosition): string | false {

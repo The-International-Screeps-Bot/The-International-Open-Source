@@ -91,6 +91,7 @@ declare global {
     'source2HarvestPositions' |
     'source2ClosestHarvestPosition' |
     'centerUpgradePos' |
+    'upgradePositions' |
     'source1Container' |
     'source2Container' |
     'controllerContainer' |

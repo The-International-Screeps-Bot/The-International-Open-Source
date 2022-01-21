@@ -29,12 +29,15 @@ export function communeManager(room: Room) {
 
     structuresForSpawningManager(room)
 
-    const centerUpgradePos: Pos = room.get('centerUpgradePos')
+    const upgradePositions: Pos[] = room.get('upgradePositions')
 
-    if (centerUpgradePos) {
+    generalFuncs.customLog('testing', JSON.stringify(upgradePositions))
 
-        generalFuncs.customLog('centerUpgradePos', true)
+    if (upgradePositions) {
 
-        room.visual.text('1', centerUpgradePos.x, centerUpgradePos.y)
+        for (const pos of upgradePositions) {
+
+            room.visual.text('A', pos.x, pos.y)
+        }
     }
 }
