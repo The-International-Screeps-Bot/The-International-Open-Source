@@ -74,6 +74,9 @@ declare global {
     'antifa'
 
     type RoomObjectName =
+    'terrain' |
+    'terrainCM' |
+    'baseCM' |
     'anchor' |
     'mineral' |
     'source1' |
@@ -87,6 +90,7 @@ declare global {
     'source1ClosestHarvestPosition' |
     'source2HarvestPositions' |
     'source2ClosestHarvestPosition' |
+    'centerUpgradePos' |
     'source1Container' |
     'source2Container' |
     'controllerContainer' |
@@ -99,11 +103,7 @@ declare global {
     'enemyCreeps' |
     'allyCreeps' |
     'myDamagedCreeps' |
-    'damagedAllyCreeps' |
-    'terrain' |
-    'terrainCM' |
-    'baseCM' |
-    'test'
+    'damagedAllyCreeps'
 
     interface PathGoal {
         pos: RoomPosition
@@ -366,7 +366,7 @@ declare global {
         /**
          * Finds open spaces in a room and records them in a cost matrix
          */
-        distanceTransform(initialCM?: CostMatrix, enableVisuals?: boolean): CostMatrix
+        distanceTransform(initialCM?: CostMatrix, enableVisuals?: boolean, x1?: number, y1?: number, x2?: number, y2?: number): CostMatrix
 
         specialDT(initialCM?: CostMatrix, enableVisuals?: boolean): CostMatrix
 

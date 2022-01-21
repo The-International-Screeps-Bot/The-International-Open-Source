@@ -171,6 +171,156 @@ Room.prototype.get = function(roomObjectName) {
         return
     }
 
+    // Terrain
+
+    manageRoomObject({
+        name: 'terrain',
+        value: room.getTerrain(),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
+    // Cost matrixes
+
+    function generateTerrainCM() {
+
+        const terrain = roomObjects.terrain.getValue()
+
+        // Create a CostMatrix for terrain types
+
+        const terrainCM = new PathFinder.CostMatrix()
+
+        // Iterate through
+
+        for (let x = 0; x < constants.roomDimensions; x++) {
+            for (let y = 0; y < constants.roomDimensions; y++) {
+
+                // Try to find the terrainValue
+
+                const terrainValue = terrain.get(x, y)
+
+                // If terrain is a wall
+
+                if (terrainValue == TERRAIN_MASK_WALL) {
+
+                    // Set this positions as 1 in the terrainCM
+
+                    terrainCM.set(x, y, 255)
+                }
+            }
+        }
+
+        return terrainCM
+    }
+
+    manageRoomObject({
+        name: 'terrainCM',
+        value: generateTerrainCM(),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
+    function generateBaseCM() {
+
+        // Construct a cost matrix based off terrain cost matrix
+
+        const baseCM = roomObjects.terrainCM.getValue()
+
+        function recordAdjacentPositions(x: number, y: number, range: number) {
+
+            // Construct a rect and get the positions in a range of 1
+
+            const rect = { x1: x - range, y1: y - range, x2: x + range, y2: y + range }
+            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+
+            // Loop through adjacent positions
+
+            for (const adjacentPos of adjacentPositions) {
+
+                // Iterate if the adjacent pos is a wall
+
+                if (baseCM.get(adjacentPos.x, adjacentPos.y) == 255) continue
+
+                // Otherwise record the position as a wall
+
+                baseCM.set(adjacentPos.x, adjacentPos.y, 255)
+            }
+        }
+
+        // Record exits and adjacent positions to exits as something to avoid
+
+        let y = 0
+        let x = 0
+
+        // Configure y and loop through top exits
+
+        y = 0
+        for (x = 0; x < 50; x++) {
+
+            // Record the exit as a pos to avoid
+
+            baseCM.set(x, y, 255)
+
+            // Record adjacent positions to avoid
+
+            recordAdjacentPositions(x, y, 1)
+        }
+
+        // Configure x and loop through left exits
+
+        x = 0
+        for (y = 0; y < 50; y++) {
+
+            // Record the exit as a pos to avoid
+
+            baseCM.set(x, y, 255)
+
+            // Record adjacent positions to avoid
+
+            recordAdjacentPositions(x, y, 1)
+        }
+
+        // Configure y and loop through bottom exits
+
+        y = 49
+        for (x = 0; x < 50; x++) {
+
+            // Record the exit as a pos to avoid
+
+            baseCM.set(x, y, 255)
+
+            // Record adjacent positions to avoid
+
+            recordAdjacentPositions(x, y, 1)
+        }
+
+        // Configure x and loop through right exits
+
+        x = 49
+        for (y = 0; y < 50; y++) {
+
+            // Record the exit as a pos to avoid
+
+            baseCM.set(x, y, 255)
+
+            // Record adjacent positions to avoid
+
+            recordAdjacentPositions(x, y, 1)
+        }
+
+        return baseCM
+    }
+
+    manageRoomObject({
+        name: 'baseCM',
+        value: generateBaseCM(),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
     // Important Positions
 
     manageRoomObject({
@@ -385,6 +535,32 @@ Room.prototype.get = function(roomObjectName) {
         cacheAmount: Infinity,
     })
 
+    // Upgrade positions
+
+    function findCenterUpgradePos() {
+
+        // Get the open areas in a range of 3 to the controller
+
+        const distanceCM = room.distanceTransform(roomObjects.terrainCM.getValue(), false, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
+
+        // Get the average pos between the two sources
+
+        const sourcesAvgPos = generalFuncs.findAvgBetweenPosotions(roomObjects.source1.getValue().pos, roomObjects.source2.getValue().pos)
+
+        // Find the closest value greater than two to the centerUpgradePos and inform it
+
+        const centerUpgradePos = room.findClosestPosOfValue(distanceCM, sourcesAvgPos, 2)
+        return centerUpgradePos
+    }
+
+    manageRoomObject({
+        name: 'centerUpgradePos',
+        value: findCenterUpgradePos(),
+        valueType: 'pos',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
     // Source containers
 
     function findSourceContainer(closestHarvestPos: RoomPosition): string | false {
@@ -552,156 +728,6 @@ Room.prototype.get = function(roomObjectName) {
         valueType: 'object',
         cacheMethod: 'global',
         cacheAmount: 1,
-    })
-
-    // Terrain
-
-    manageRoomObject({
-        name: 'terrain',
-        value: room.getTerrain(),
-        valueType: 'object',
-        cacheMethod: 'global',
-        cacheAmount: Infinity,
-    })
-
-    // Cost matrixes
-
-    function generateTerrainCM() {
-
-        const terrain = roomObjects.terrain.getValue()
-
-        // Create a CostMatrix for terrain types
-
-        const terrainCM = new PathFinder.CostMatrix()
-
-        // Iterate through
-
-        for (let x = 0; x < constants.roomDimensions; x++) {
-            for (let y = 0; y < constants.roomDimensions; y++) {
-
-                // Try to find the terrainValue
-
-                const terrainValue = terrain.get(x, y)
-
-                // If terrain is a wall
-
-                if (terrainValue == TERRAIN_MASK_WALL) {
-
-                    // Set this positions as 1 in the terrainCM
-
-                    terrainCM.set(x, y, 255)
-                }
-            }
-        }
-
-        return terrainCM
-    }
-
-    manageRoomObject({
-        name: 'terrainCM',
-        value: generateTerrainCM(),
-        valueType: 'object',
-        cacheMethod: 'global',
-        cacheAmount: Infinity,
-    })
-
-    function generateBaseCM() {
-
-        // Construct a cost matrix based off terrain cost matrix
-
-        const baseCM = roomObjects.terrainCM.getValue()
-
-        function recordAdjacentPositions(x: number, y: number, range: number) {
-
-            // Construct a rect and get the positions in a range of 1
-
-            const rect = { x1: x - range, y1: y - range, x2: x + range, y2: y + range }
-            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
-
-            // Loop through adjacent positions
-
-            for (const adjacentPos of adjacentPositions) {
-
-                // Iterate if the adjacent pos is a wall
-
-                if (baseCM.get(adjacentPos.x, adjacentPos.y) == 255) continue
-
-                // Otherwise record the position as a wall
-
-                baseCM.set(adjacentPos.x, adjacentPos.y, 255)
-            }
-        }
-
-        // Record exits and adjacent positions to exits as something to avoid
-
-        let y = 0
-        let x = 0
-
-        // Configure y and loop through top exits
-
-        y = 0
-        for (x = 0; x < 50; x++) {
-
-            // Record the exit as a pos to avoid
-
-            baseCM.set(x, y, 255)
-
-            // Record adjacent positions to avoid
-
-            recordAdjacentPositions(x, y, 1)
-        }
-
-        // Configure x and loop through left exits
-
-        x = 0
-        for (y = 0; y < 50; y++) {
-
-            // Record the exit as a pos to avoid
-
-            baseCM.set(x, y, 255)
-
-            // Record adjacent positions to avoid
-
-            recordAdjacentPositions(x, y, 1)
-        }
-
-        // Configure y and loop through bottom exits
-
-        y = 49
-        for (x = 0; x < 50; x++) {
-
-            // Record the exit as a pos to avoid
-
-            baseCM.set(x, y, 255)
-
-            // Record adjacent positions to avoid
-
-            recordAdjacentPositions(x, y, 1)
-        }
-
-        // Configure x and loop through right exits
-
-        x = 49
-        for (y = 0; y < 50; y++) {
-
-            // Record the exit as a pos to avoid
-
-            baseCM.set(x, y, 255)
-
-            // Record adjacent positions to avoid
-
-            recordAdjacentPositions(x, y, 1)
-        }
-
-        return baseCM
-    }
-
-    manageRoomObject({
-        name: 'baseCM',
-        value: generateBaseCM(),
-        valueType: 'object',
-        cacheMethod: 'global',
-        cacheAmount: Infinity,
     })
 
     //
@@ -1345,7 +1371,7 @@ Room.prototype.findScore = function() {
 
 }
 
-Room.prototype.distanceTransform = function(initialCM, enableVisuals) {
+Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = constants.roomDimensions, y1 = constants.roomDimensions, x2 = -1, y2 = -1) {
 
     const room = this
 
@@ -1353,8 +1379,8 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals) {
 
     const distanceCM = initialCM || new PathFinder.CostMatrix()
 
-    for (let x = 0; x < constants.roomDimensions; x++) {
-        for (let y = 0; y < constants.roomDimensions; y++) {
+    for (let x = x1; x <= x2; x++) {
+        for (let y = y1; y <= y2; y++) {
 
             // Iterate if pos is to be avoided
 
@@ -1404,8 +1430,8 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals) {
         }
     }
 
-    for (let x = constants.roomDimensions -1; x > -1; x--) {
-        for (let y = constants.roomDimensions -1; y > -1; y--) {
+    for (let x = x2; x >= x1; x--) {
+        for (let y = y2; y >= y1; y--) {
 
             // Iterate if pos is to be avoided
 

@@ -28,4 +28,13 @@ export function communeManager(room: Room) {
     droppedResourceManager(room)
 
     structuresForSpawningManager(room)
+
+    const centerUpgradePos: Pos = room.get('centerUpgradePos')
+
+    if (centerUpgradePos) {
+
+        generalFuncs.customLog('centerUpgradePos', true)
+
+        room.visual.text('1', centerUpgradePos.x, centerUpgradePos.y)
+    }
 }
