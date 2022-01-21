@@ -597,18 +597,20 @@ Room.prototype.get = function(roomObjectName) {
 
         if (!closestHarvestPos) return false
 
-        // Find containers
+        // Look at the closestHarvestPos for structures
 
-        const containers: StructureContainer[] = roomObjects.container.getValue()
+        const structuresAsPos = closestHarvestPos.lookFor(LOOK_STRUCTURES)
 
-        // Iterate through containers
+        // Loop through structuresAtPos
 
-        for (const container of containers) {
+        for (const structure of structuresAsPos) {
 
-            // If the container is on the closestHarvestPos, inform its id
+            // If the structureType is container, inform the container's ID
 
-            if (container.pos.getRangeTo(closestHarvestPos) == 0) return container.id
+            if (structure.structureType == STRUCTURE_CONTAINER) return structure.id
         }
+
+        // Otherwise inform false
 
         return false
     }
@@ -633,22 +635,28 @@ Room.prototype.get = function(roomObjectName) {
 
     function findControllerContainer(): string | false {
 
-        // Stop and inform false if no closestHarvestPos
+        // Get the centerUpgradePos
 
-        if (!room.controller) return false
+        const centerUpgradePos: RoomPosition = roomObjects.centerUpgradePos.getValue()
 
-        // Find containers
+        // Stop and inform false if no centerUpgradePos
 
-        const containers: StructureContainer[] = roomObjects.container.getValue()
+        if (!centerUpgradePos) return false
 
-        // Iterate through containers
+        // Look at the centerUpgradePos for structures
 
-        for (const container of containers) {
+        const structuresAsPos = centerUpgradePos.lookFor(LOOK_STRUCTURES)
 
-            // If the container is near the harvestPos inform its id
+        // Loop through structuresAtPos
 
-            if (container.pos.getRangeTo(room.controller.pos) <= 2) return container.id
+        for (const structure of structuresAsPos) {
+
+            // If the structureType is container, inform the container's ID
+
+            if (structure.structureType == STRUCTURE_CONTAINER) return structure.id
         }
+
+        // Otherwise inform false
 
         return false
     }

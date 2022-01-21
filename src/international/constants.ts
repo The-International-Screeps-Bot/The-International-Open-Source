@@ -249,7 +249,7 @@ constants.impassibleStructureTypes = [
     STRUCTURE_INVADER_CORE,
 ]
 
-const structureTypesByBuildPriority = [
+constants.structureTypesByBuildPriority = [
     STRUCTURE_SPAWN,
     STRUCTURE_EXTENSION,
     STRUCTURE_CONTAINER,

@@ -103,6 +103,10 @@ export function constructionManager(room: Room) {
 
                 for (const BuildObj of BuildObjects) {
 
+                    // If the room controller level is less than 3 and the structureType is a road, iterate
+
+                    if (room.controller.level < 3 && BuildObj.structureType == STRUCTURE_ROAD) continue
+
                     // Place construction sites for the base
 
                     room.createConstructionSite(BuildObj.x, BuildObj.y, BuildObj.structureType)
