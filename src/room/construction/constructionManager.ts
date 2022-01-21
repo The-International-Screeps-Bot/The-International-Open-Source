@@ -107,6 +107,10 @@ export function constructionManager(room: Room) {
 
                     if (room.controller.level < 3 && BuildObj.structureType == STRUCTURE_ROAD) continue
 
+                    // If the structure is a container and there aren't source containers for each source and a controller container, iterate
+
+                    if (BuildObj.structureType == STRUCTURE_CONTAINER && (!room.get('source1Container') || !room.get('source2Container') || !room.get('controllerContainer'))) continue
+
                     // Place construction sites for the base
 
                     room.createConstructionSite(BuildObj.x, BuildObj.y, BuildObj.structureType)

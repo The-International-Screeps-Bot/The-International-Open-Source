@@ -10,6 +10,7 @@ import { basePlanner } from "./construction/basePlanner"
 import { generalFuncs } from "international/generalFunctions"
 import { structuresForSpawningManager } from "./structuresForSpawningManager"
 import { droppedResourceManager } from "./droppedResourceManager"
+import { defenceManager } from "./defenceManager"
 
 export function communeManager(room: Room) {
 
@@ -24,6 +25,8 @@ export function communeManager(room: Room) {
     roomVisualsManager(room)
 
     constructionManager(room)
+
+    defenceManager(room)
 
     droppedResourceManager(room)
 
