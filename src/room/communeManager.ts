@@ -28,16 +28,4 @@ export function communeManager(room: Room) {
     droppedResourceManager(room)
 
     structuresForSpawningManager(room)
-
-    const upgradePositions: Pos[] = room.get('upgradePositions')
-
-    generalFuncs.customLog('testing', JSON.stringify(upgradePositions))
-
-    if (upgradePositions) {
-
-        for (const pos of upgradePositions) {
-
-            room.visual.text('A', pos.x, pos.y)
-        }
-    }
 }

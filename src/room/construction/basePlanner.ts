@@ -21,19 +21,33 @@ export function basePlanner(room: Room): false | BuildLocations {
 
         for (const adjacentPos of adjacentPositions) {
 
-            // Iterate if the adjacent pos is a wall
+            // Iterate if the adjacent pos is to avoid
 
             if (baseCM.get(adjacentPos.x, adjacentPos.y) == 255) continue
 
-            // Otherwise record the position as a wall
+            // Otherwise record the position in the base cost matrix as avoid
 
             baseCM.set(adjacentPos.x, adjacentPos.y, 255)
         }
     }
 
-    // Record postions around the controller as unusable
+    // Get the room's upgrade positions
 
-    recordAdjacentPositions(room.controller.pos.x, room.controller.pos.y, 3)
+    const upgradePositions: Pos[] = room.get('upgradePositions')
+
+    // If the upgrade positions are defined
+
+    if (upgradePositions) {
+
+        // Loop through them
+
+        for (const pos of upgradePositions) {
+
+            // Record the pos as avoid in the base cost matrix
+
+            baseCM.set(pos.x, pos.y, 255)
+        }
+    }
 
     // Record positions around the mineral as unusable
 

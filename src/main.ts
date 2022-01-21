@@ -2,6 +2,7 @@
 
 // International
 
+import 'international/commands'
 import { internationalManager } from 'international/internationalManager'
 
 // Room
@@ -607,6 +608,11 @@ declare global {
              * Kills all owned creeps
              */
             killAllCreeps(): string
+
+            /**
+             * Destroys all owned construction sites
+             */
+            destroyAllCSites(types: StructureConstant[]): string
         }
     }
 }

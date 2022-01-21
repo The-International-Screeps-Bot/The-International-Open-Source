@@ -82,20 +82,22 @@ export function constructionManager(room: Room) {
 
                 const BuildObjects = baseLocations[stampType]
 
-                // Loop through positions of road positions
+                // Loop through build objects inside build locations for this stamp type
 
                 for (const BuildObj of BuildObjects) {
-                    room.visual.text('1', BuildObj.x, BuildObj.y)
+
                     // Place construction sites for the base
 
-                    const createConstructionSiteResult = room.createConstructionSite(BuildObj.x, BuildObj.y, BuildObj.structureType)
+                    // room.createConstructionSite(BuildObj.x, BuildObj.y, BuildObj.structureType)
                 }
             }
 
-            return
+            // Stop
+
+            // return
         }
 
-        // Otherwise generate them
+        // Otherwise generate the build locations
 
         global[room.name].buildLocations = basePlanner(room)
     }
