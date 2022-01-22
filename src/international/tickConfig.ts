@@ -71,9 +71,6 @@ export function tickConfig() {
         room.creepPositions = {}
         room.moveRequests = {}
 
-        if (!global[room.name].tasksWithoutResponders) global[room.name].tasksWithoutResponders = {}
-        if (!global[room.name].tasksWithResponders) global[room.name].tasksWithResponders = {}
-
         //
 
         for (const role of constants.creepRoles) {
@@ -109,6 +106,9 @@ export function tickConfig() {
 
         room.creepsFromRoom = {}
         room.creepsFromRoomAmount = 0
+
+        if (!global[room.name].tasksWithoutResponders) global[room.name].tasksWithoutResponders = {}
+        if (!global[room.name].tasksWithResponders) global[room.name].tasksWithResponders = {}
 
         room.storedResources = {}
 

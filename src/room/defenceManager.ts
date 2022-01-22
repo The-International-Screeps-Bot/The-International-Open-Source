@@ -51,9 +51,10 @@ export function defenceManager(room: Room) {
 
             if (!attackTarget.structureType) continue
 
-            // Otherwise activate safeMode
+            // Otherwise activate safeMode and stop the loop
 
             room.controller.activateSafeMode()
+            break
         }
     }
 }

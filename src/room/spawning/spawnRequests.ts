@@ -30,7 +30,7 @@ export function spawnRequests(room: Room) {
     interface ExtraOptsMemory {
         [key: string | number]: any
         role: CreepRoles
-        roomFrom: string
+        communeName: string
     }
 
     interface ExtraOpts {
@@ -160,7 +160,7 @@ export function spawnRequests(room: Room) {
         const extraOpts: ExtraOpts = {
             memory: {
                 role: role,
-                roomFrom: room.name,
+                communeName: room.name,
             },
             energyStructures: spawnStructures
         }
@@ -285,7 +285,7 @@ export function spawnRequests(room: Room) {
         const extraOpts: ExtraOpts = {
             memory: {
                 role: role,
-                roomFrom: room.name,
+                communeName: room.name,
             },
             energyStructures: spawnStructures
         }
@@ -337,7 +337,7 @@ export function spawnRequests(room: Room) {
         const extraOpts: ExtraOpts = {
             memory: {
                 role: role,
-                roomFrom: room.name,
+                communeName: room.name,
             },
             energyStructures: spawnStructures
         }

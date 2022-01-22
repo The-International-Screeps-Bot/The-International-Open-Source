@@ -181,7 +181,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+            const task: RoomTask = global[creep.memory.communeName].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
             // Delete it and inform false
 
@@ -193,6 +193,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
         creep.findTask(new Set([
             'pickup',
+            'withdraw'
         ]))
 
         return false
@@ -276,7 +277,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+            const task: RoomTask = global[creep.memory.communeName].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
             // Delete it and inform false
 
@@ -288,6 +289,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
         creep.findTask(new Set([
             'pickup',
+            'withdraw'
         ]))
 
         return false
@@ -370,7 +372,6 @@ Creep.prototype.findRepairTarget = function(workPartCount) {
 Creep.prototype.advancedRepair = function() {
 
     const creep = this
-    const room = creep.room
 
     creep.say('AR')
 
@@ -394,7 +395,7 @@ Creep.prototype.advancedRepair = function() {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+            const task: RoomTask = global[creep.memory.communeName].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
             // Delete it and inform false
 
@@ -406,6 +407,7 @@ Creep.prototype.advancedRepair = function() {
 
         creep.findTask(new Set([
             'pickup',
+            'withdraw'
         ]))
 
         return false
@@ -755,7 +757,6 @@ Creep.prototype.createStoringStructureWithdrawTask = function(resourceType = RES
 Creep.prototype.acceptTask = function(task) {
 
     const creep = this
-    const room = creep.room
 
     // if there is no global for the creep, make one
 
@@ -784,25 +785,24 @@ Creep.prototype.acceptTask = function(task) {
 
     // Add the task to tasksWithResponders
 
-    global[room.name].tasksWithResponders[task.ID] = task
+    global[creep.memory.communeName].tasksWithResponders[task.ID] = task
 
     // Delete the task from tasksWithoutResponders
 
-    delete global[room.name].tasksWithoutResponders[task.ID]
+    delete global[creep.memory.communeName].tasksWithoutResponders[task.ID]
 }
 
 Creep.prototype.findTask = function(allowedTaskTypes, resourceType) {
 
     const creep = this
-    const room = creep.room
 
     creep.say('🔍')
 
     // Iterate through taskIDs in room
 
-    for (const taskID in global[room.name].tasksWithoutResponders) {
+    for (const taskID in global[creep.memory.communeName].tasksWithoutResponders) {
 
-        const task: RoomTask = global[room.name].tasksWithoutResponders[taskID]
+        const task: RoomTask = global[creep.memory.communeName].tasksWithoutResponders[taskID]
 
         // Iterate if the task's type isn't an allowedTaskType
 
@@ -865,7 +865,6 @@ Creep.prototype.needsResources = function() {
 Creep.prototype.fulfillTask = function() {
 
     const creep = this
-    const room = creep.room
 
     creep.say('FT')
 
@@ -880,7 +879,7 @@ Creep.prototype.fulfillTask = function() {
 
     // Get the creep's task
 
-    const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+    const task: RoomTask = global[creep.memory.communeName].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
     // Run the creep's function based on the task type and inform its result
 

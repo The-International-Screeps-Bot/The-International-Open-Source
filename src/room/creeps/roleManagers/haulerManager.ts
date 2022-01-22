@@ -23,7 +23,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+            const task: RoomTask = global[creep.memory.communeName].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
             // Delete it
 
@@ -67,7 +67,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
         // Otherwise find the task
 
-        const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+        const task: RoomTask = global[creep.memory.communeName].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
         // Delete it
 

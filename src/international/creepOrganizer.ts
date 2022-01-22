@@ -1,7 +1,7 @@
 import { creepClasses } from "room/creeps/creepClasses"
 
 /**
- * Organizes creeps into properties for their roomFrom, and tracks total creep count
+ * Organizes creeps into properties for their communeName, and tracks total creep count
  */
 export function creepOrganizer() {
 
@@ -28,7 +28,7 @@ export function creepOrganizer() {
         // Get the creep's current room and the room it's from
 
         const room = creep.room
-        const roomFrom = Game.rooms[creep.memory.roomFrom]
+        const communeName = Game.rooms[creep.memory.communeName]
 
         // Assign the creep a class based on its role
 

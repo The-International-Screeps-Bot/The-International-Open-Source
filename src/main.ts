@@ -277,7 +277,7 @@ declare global {
         creepsFromRoom: {[key: string]: string[]}
 
         /**
-         * The cumulative amount of creeps with a roomFrom value of this room's name
+         * The cumulative amount of creeps with a communeName value of this room's name
          */
         creepsFromRoomAmount: number
 
@@ -532,6 +532,11 @@ declare global {
          * Generally describes the body parts and tasks the creep is expected to do
          */
         role: string
+
+        /**
+         * The name of the room the creep is from
+         */
+        communeName: string
 
         /**
          * A name of the creep's designated source
