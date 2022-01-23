@@ -447,6 +447,11 @@ declare global {
         pulling: boolean
 
         /**
+         * Wether the creep is actively getting pulled by another creep or not
+         */
+        gettingPulled: boolean
+
+        /**
          * The creep's opts when trying to make a moveRequest intra tick
          */
         pathOpts: PathOpts

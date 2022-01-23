@@ -35,7 +35,7 @@ export function trafficManager(room: Room) {
 
             if (!creepNameAtPos) {
 
-                // Operate and stop loop if there are no creeps at pos
+                // If there are no creeps at the pos, operate the moveRequest and stop the loop
 
                 creep.runMoveRequest(pos)
                 break
@@ -46,6 +46,77 @@ export function trafficManager(room: Room) {
             // Get the creep with the name
 
             const creepAtPos = Game.creeps[creepNameAtPos]
+
+            // If there is a creep that moves through pull in the way and it isn't actively getting pulled
+
+            if (creepAtPos.memory.getPulled && !creepAtPos.gettingPulled) {
+
+                // Remove information about previous move requests from the creep
+
+                delete creep.moveRequest
+                delete creep.memory.goalPos
+
+                // Try to path to the targetPos while avoiding the creep
+
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goal: creep.pathOpts.goal,
+                    avoidImpassibleStructures: true,
+                    avoidEnemyRanges: true,
+                    weightPositions: {
+                        255: [pos]
+                    },
+                })
+
+                // If the creep failed to generate a new path, stop the loop
+
+                if (creep.memory.path.length == 0) break
+
+                // Operate the creep's moveRequest and stop the loop
+
+                creep.runMoveRequest(pos)
+                break
+            }
+
+            // If the creep is pulling
+
+            if (creep.pulling) {
+
+                // Remove information about previous move requests from creepAtPos
+
+                delete creepAtPos.moveRequest
+                delete creepAtPos.memory.goalPos
+
+                // Force creepAtPos to repath to its target while avoiding the creep
+
+                creepAtPos.createMoveRequest({
+                    origin: creepAtPos.pos,
+                    goal: { pos: creepAtPos.memory.goalPos, range: 1 },
+                    avoidImpassibleStructures: true,
+                    avoidEnemyRanges: true,
+                    weightPositions: {
+                        255: [pos, creep.pos]
+                    },
+                })
+
+                // If the creep failed to generate a new path, stop the loop
+
+                if (creepAtPos.memory.path.length == 0) {
+
+                    // Push the creep
+
+                    creepAtPos.getPushed()
+                }
+
+                // Otherwise operate creepAtPos's moveRequest
+
+                else creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
+
+                // Operate the creep's moveRequest and stop the loop
+
+                creep.runMoveRequest(pos)
+                break
+            }
 
             // If the creepAtPos has a moveRequest
 
@@ -70,40 +141,18 @@ export function trafficManager(room: Room) {
 
             if (creepAtPos.memory.getPulled) break
 
-            // If the creep is fatigued, stop the loop
+            // If the creepAtPos is fatigued, stop the loop
 
             if(creepAtPos.fatigue > 0) break
 
-            // If the creep's final path pos is the same as the pos
+            // If the last pos in the creep's path has creepAtPos
 
-            if (creep.memory.getPulled) {
+            if (generalFuncs.arePositionsEqual(creep.memory.path[creep.memory.path.length - 1], pos)) {
 
-                // Remove information about previous move requests
+                // Remove information about previous move requests from creepAtPos
 
-                delete creep.moveRequest
-                delete creep.memory.goalPos
-
-                // Try to path to the targetPos while avoiding the creep
-
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goal: creep.pathOpts.goal,
-                    avoidImpassibleStructures: true,
-                    avoidEnemyRanges: true,
-                    weightPositions: {
-                        255: [pos]
-                    },
-                })
-
-                // Operate the moveRequest and stop the loop
-
-                creep.runMoveRequest(creep.memory.path[0])
-                break
-            }
-
-            // If the creep is pulling or the last pos in the creep's path has creepAtPos
-
-            if (creep.pulling || generalFuncs.arePositionsEqual(creep.memory.path[creep.memory.path.length - 1], pos)) {
+                delete creepAtPos.moveRequest
+                delete creepAtPos.memory.goalPos
 
                 // Force creepAtPos to repath to its target while avoiding the creep
 
@@ -117,9 +166,13 @@ export function trafficManager(room: Room) {
                     },
                 })
 
-                // If creepAtPos generated a new path, operate its moveRequest
+                // If the creepAtPos failed to generate a new path, stop the loop
 
-                if (creepAtPos.memory.path.length > 0) creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
+                if (creepAtPos.memory.path.length == 0) break
+
+                // Operate creepAtPos's moveRequest
+
+                creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
 
                 // Operate the creep's moveRequest and stop the loop
 
@@ -140,23 +193,6 @@ export function trafficManager(room: Room) {
             // And stop the loop
 
             break
-
-            /* // If the creep is responding to a pull request
-
-            if (global[creep.id]) {
-
-                // Push the creepAtPos
-
-                creepAtPos.getPushed()
-
-                // Have the creep move to the pos
-
-                creep.runMoveRequest(pos)
-
-                // And stop the loop
-
-                break
-            } */
         }
     }
 }

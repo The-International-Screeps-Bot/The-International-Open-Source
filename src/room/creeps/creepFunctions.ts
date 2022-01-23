@@ -627,7 +627,7 @@ Creep.prototype.createMoveRequest = function(opts) {
         // So long as the creep is standing on the first position in the path
 
         while (generalFuncs.arePositionsEqual(creep.pos, creep.memory.path[0])) {
-
+            
             // Remove the first pos of the path
 
             creep.memory.path.shift()
@@ -997,9 +997,10 @@ Creep.prototype.fulfillPullTask = function(task) {
 
     if (creep.fatigue > 0) return false
 
-    // Otherwise record that the creep is pulling
+    // Otherwise record that the creep is pulling and the taskTarget is getting pulled
 
     creep.pulling = true
+    taskTarget.gettingPulled = true
 
     // Have the creep move to where the taskTarget pos is
 
