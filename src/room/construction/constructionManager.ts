@@ -13,7 +13,7 @@ export function constructionManager(room: Room) {
 
     // If the room is above 1 construction site, stop
 
-    if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 5) return
+    if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
 
     // Stop if placing containers was a success
 
@@ -85,45 +85,38 @@ export function constructionManager(room: Room) {
 
     function manageBasePlanning() {
 
-        // If there are build locations for the base
+        // Get the base locations
 
-        if (global[room.name].buildLocations) {
+        const baseLocations: BuildLocations = global[room.name].buildLocations
 
-            const baseLocations: BuildLocations = global[room.name].buildLocations
+        // If there are no build locations, generate them
 
-            // Loop through each stamp type in base locations
+        if (!baseLocations) global[room.name].buildLocations = basePlanner(room)
 
-            for (const stampType in baseLocations) {
+        // Loop through each stamp type in base locations
 
-                // Get the build object using the stamp type
+        for (const stampType in baseLocations) {
 
-                const BuildObjects = baseLocations[stampType]
+            // Get the build object using the stamp type
 
-                // Loop through build objects inside build locations for this stamp type
+            const BuildObjects = baseLocations[stampType]
 
-                for (const BuildObj of BuildObjects) {
+            // Loop through build objects inside build locations for this stamp type
 
-                    // If the room controller level is less than 3 and the structureType is a road, iterate
+            for (const BuildObj of BuildObjects) {
 
-                    if (room.controller.level < 3 && BuildObj.structureType == STRUCTURE_ROAD) continue
+                // If the room controller level is less than 3 and the structureType is a road, iterate
 
-                    // If the structure is a container and there aren't source containers for each source and a controller container, iterate
+                if (room.controller.level < 3 && BuildObj.structureType == STRUCTURE_ROAD) continue
 
-                    if (BuildObj.structureType == STRUCTURE_CONTAINER && (!room.get('source1Container') || !room.get('source2Container') || !room.get('controllerContainer'))) continue
+                // If the structure is a container and there aren't source containers for each source and a controller container, iterate
 
-                    // Place construction sites for the base
+                if (BuildObj.structureType == STRUCTURE_CONTAINER && (!room.get('source1Container') || !room.get('source2Container') || !room.get('controllerContainer'))) continue
 
-                    room.createConstructionSite(BuildObj.x, BuildObj.y, BuildObj.structureType)
-                }
+                // Place construction sites for the base
+
+                room.createConstructionSite(BuildObj.x, BuildObj.y, BuildObj.structureType)
             }
-
-            // Stop
-
-            return
         }
-
-        // Otherwise generate the build locations
-
-        global[room.name].buildLocations = basePlanner(room)
     }
 }

@@ -8,7 +8,7 @@ export function structuresForSpawningManager(room: Room) {
 
     // Find a hauler in the room and get it's capacity
 
-    const haulerCapacity = Game.creeps[room.myCreeps.hauler[0]].store.getCapacity()
+    const haulerCapacity = Game.creeps[room.myCreeps.hauler[0]] ? Game.creeps[room.myCreeps.hauler[0]].store.getCapacity() : 100
 
     // Construct group data
 
@@ -49,7 +49,7 @@ export function structuresForSpawningManager(room: Room) {
         else {
 
             // Find the structures's tasks of type tansfer
-            
+
             const structuresTransferTasks = room.findTasksOfTypes(global[structure.id].createdTaskIDs, new Set(['transfer']))
 
             // Iterate if there are already transfer requests for the structure

@@ -121,9 +121,27 @@ declare global {
         maxRooms?: number
         flee?: boolean
         creep?: Creep
+
+        /**
+         * An object with keys of weights and values of structures / creeps / cSites to weight
+         */
+        weightGamebjects?: {[key: string]: (Structure | Creep | ConstructionSite)[]}
+        /**
+         * An object with keys of weights and values of positions
+         */
+        weightPositions?: {[key: string]: Pos[]}
+        /**
+         * Deprecate
+         */
         useRoads?: boolean
         avoidEnemyRanges?: boolean
+        /**
+         * Deprecate
+         */
         avoidImpassibleStructures?: boolean
+        /**
+         * Deprecate
+         */
         prioritizeRamparts?: boolean
     }
 
@@ -405,6 +423,8 @@ declare global {
     interface RoomMemory {
         [key: string]: any
 
+        anchor: Pos
+
         /**
          * A description of the room's defining properties that can be used to assume other properties
          */
@@ -420,6 +440,16 @@ declare global {
          * Wether the creep has made a moveRequest or not
          */
         moveRequest: boolean
+
+        /**
+         * Wether the creep is actively pulling another creep or not
+         */
+        pulling: boolean
+
+        /**
+         * The creep's opts when trying to make a moveRequest intra tick
+         */
+        pathOpts: PathOpts
 
         // Functions
 
@@ -495,6 +525,11 @@ declare global {
         runMoveRequest(pos: Pos): ScreepsReturnCode
 
         /**
+         *
+         */
+        getPushed(): void
+
+        /**
          * Decides if the creep needs to get more resources or not
          */
         needsResources(): boolean
@@ -553,7 +588,7 @@ declare global {
          */
         path: RoomPosition[]
 
-        targetPos: RoomPosition
+        goalPos: RoomPosition
 
         /**
          * Wether the creep is intended to move on its own or not
@@ -605,7 +640,9 @@ declare global {
              */
             constructionSitesCount: number
 
-            tasksWithoutResponders: {[key: number]: any}
+            tasksWithoutResponders: {[key: string]: RoomTask}
+
+            tasksWithResponders: {[key: string]: RoomTask}
 
             // Command functions
 

@@ -196,12 +196,12 @@ export class RoomRepairTask extends RoomTask {
 }
 
 export interface RoomPickupTask extends RoomTask {
-    tick: number
     resourceID: Id<Resource>
+    pickupAmount: number
 }
 
 export class RoomPickupTask extends RoomTask {
-    constructor(roomName: string, resourceID: Id<Resource>, resourceType: ResourceConstant, tick: number) {
+    constructor(roomName: string, resourceID: Id<Resource>, resourceType: ResourceConstant) {
 
         // Inherit from RoomTask
 
@@ -213,7 +213,10 @@ export class RoomPickupTask extends RoomTask {
 
         task.resourceID = resourceID
         task.resourceType = resourceType
-        task.tick = tick
+
+        // Assign defaults
+
+        task.pickupAmount = 100000
     }
 }
 

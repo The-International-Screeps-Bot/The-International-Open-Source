@@ -1,6 +1,6 @@
 import { constants } from "international/constants"
 import { generalFuncs } from "international/generalFunctions"
-import { RoomTask, RoomWithdrawTask } from "room/roomTasks"
+import { RoomPickupTask, RoomTask, RoomWithdrawTask } from "room/roomTasks"
 
 Creep.prototype.isDying = function() {
 
@@ -181,7 +181,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[creep.memory.communeName].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
             // Delete it and inform false
 
@@ -277,7 +277,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[creep.memory.communeName].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
             // Delete it and inform false
 
@@ -372,6 +372,7 @@ Creep.prototype.findRepairTarget = function(workPartCount) {
 Creep.prototype.advancedRepair = function() {
 
     const creep = this
+    const room = creep.room
 
     creep.say('AR')
 
@@ -395,7 +396,7 @@ Creep.prototype.advancedRepair = function() {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[creep.memory.communeName].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
             // Delete it and inform false
 
@@ -591,7 +592,7 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
     // Inform true if the creep's previous target isn't its current
 
-    if (!generalFuncs.arePositionsEqual(creep.memory.targetPos, goalPos)) return true
+    if (!generalFuncs.arePositionsEqual(creep.memory.goalPos, goalPos)) return true
 
     // Otherwise inform false
 
@@ -603,15 +604,15 @@ Creep.prototype.createMoveRequest = function(opts) {
     const creep = this
     const room = creep.room
 
-    // Stop if creep can't move
+    // If creep can't move, inform false
 
     if (creep.fatigue > 0) return false
 
-    // Stop if creep is spawning
+    // If creep is spawning, inform false
 
     if (creep.spawning) return false
 
-    // Stop if the creep already has a moveRequest
+    // If the creep already has a moveRequest, inform false
 
     if (creep.moveRequest) return false
 
@@ -650,10 +651,6 @@ Creep.prototype.createMoveRequest = function(opts) {
         // Generate a new path
 
         path = room.advancedFindPath(opts)
-
-        // Set the creep's memory targetPos to the goal's pos
-
-        creep.memory.targetPos = opts.goal.pos
 
         // Limit the path's length to the cacheAmount
 
@@ -700,6 +697,14 @@ Creep.prototype.createMoveRequest = function(opts) {
     // Add the creep's name to its moveRequest position
 
     room.moveRequests[movePosString].push(creep.name)
+
+    // Set the creep's pathOpts to reflect this moveRequest's opts
+
+    creep.pathOpts = opts
+
+    // Assign the goal's pos to the creep's goalPos
+
+    creep.memory.goalPos = opts.goal.pos
 
     // Make moveRequest true to inform a moveRequest has been made
 
@@ -757,6 +762,7 @@ Creep.prototype.createStoringStructureWithdrawTask = function(resourceType = RES
 Creep.prototype.acceptTask = function(task) {
 
     const creep = this
+    const room = creep.room
 
     // if there is no global for the creep, make one
 
@@ -785,37 +791,60 @@ Creep.prototype.acceptTask = function(task) {
 
     // Add the task to tasksWithResponders
 
-    global[creep.memory.communeName].tasksWithResponders[task.ID] = task
+    global[room.name].tasksWithResponders[task.ID] = task
 
     // Delete the task from tasksWithoutResponders
 
-    delete global[creep.memory.communeName].tasksWithoutResponders[task.ID]
+    delete global[room.name].tasksWithoutResponders[task.ID]
+
+    // If the task is of type pickup
+
+    if (task.type == 'pickup') {
+
+        // Set the pickupAmount to the hauler's free capacity and stop
+
+        (task as RoomPickupTask).pickupAmount = creep.store.getFreeCapacity()
+        return
+    }
 }
 
 Creep.prototype.findTask = function(allowedTaskTypes, resourceType) {
 
     const creep = this
+    const room = creep.room
 
     creep.say('🔍')
 
     // Iterate through taskIDs in room
 
-    for (const taskID in global[creep.memory.communeName].tasksWithoutResponders) {
+    for (const taskID in global[room.name].tasksWithoutResponders) {
 
-        const task: RoomTask = global[creep.memory.communeName].tasksWithoutResponders[taskID]
+        const task: RoomTask = global[room.name].tasksWithoutResponders[taskID]
 
         // Iterate if the task's type isn't an allowedTaskType
 
         if (!allowedTaskTypes.has(task.type)) continue
 
+        // If the creep is full
+
+        if (creep.store.getFreeCapacity() == 0) {
+
+            // Iterate if the task is of type pickup
+
+            if (task.type == 'pickup') continue
+
+            // Iterate if the task is of type withdraw
+
+            if (task.type == 'withdraw') continue
+        }
+
         // Iterate of there is a requested resourceType and the task doesn't have it
 
         if (resourceType && task.resourceType != resourceType) continue
 
+        // Accept the task and inform true
+
         creep.acceptTask(task)
-
-        // Inform true
-
         return true
     }
 
@@ -842,6 +871,30 @@ Creep.prototype.runMoveRequest = function(pos) {
     return creep.move(creep.pos.getDirectionTo(room.newPos(pos)))
 }
 
+Creep.prototype.getPushed = function() {
+
+    const creep = this
+    const room = creep.room
+
+    // Create a moveRequest to flee the current position
+
+    const createMoveRequestResult = creep.createMoveRequest({
+        origin: creep.pos,
+        goal: { pos: creep.pos, range: 1 },
+        flee: true,
+        avoidImpassibleStructures: true,
+        avoidEnemyRanges: true,
+    })
+
+    // Stop if the moveRequest wasn't created
+
+    if (!createMoveRequestResult) return
+
+    // Otherwise enforce the moveRequest
+
+    creep.runMoveRequest(creep.memory.path[0])
+}
+
 Creep.prototype.needsResources = function() {
 
     const creep = this
@@ -865,6 +918,7 @@ Creep.prototype.needsResources = function() {
 Creep.prototype.fulfillTask = function() {
 
     const creep = this
+    const room = creep.room
 
     creep.say('FT')
 
@@ -879,7 +933,7 @@ Creep.prototype.fulfillTask = function() {
 
     // Get the creep's task
 
-    const task: RoomTask = global[creep.memory.communeName].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+    const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
 
     // Run the creep's function based on the task type and inform its result
 
@@ -890,7 +944,6 @@ Creep.prototype.fulfillTask = function() {
 Creep.prototype.fulfillPullTask = function(task) {
 
     const creep = this
-    const room = creep.room
 
     creep.say('PT')
 
@@ -940,7 +993,15 @@ Creep.prototype.fulfillPullTask = function(task) {
 
     // Otherwise
 
-    // Have the creep move to where the taskTarget is and inform false
+    // If the creep is fatigued, inform false
+
+    if (creep.fatigue > 0) return false
+
+    // Otherwise record that the creep is pulling
+
+    creep.pulling = true
+
+    // Have the creep move to where the taskTarget pos is
 
     creep.move(creep.pos.getDirectionTo(taskTarget.pos))
 
@@ -957,7 +1018,6 @@ Creep.prototype.fulfillPullTask = function(task) {
 Creep.prototype.fulfillTransferTask = function(task) {
 
     const creep = this
-    const room = creep.room
 
     creep.say('TT')
 
@@ -1048,7 +1108,6 @@ Creep.prototype.fulfillTransferTask = function(task) {
 Creep.prototype.fulfillWithdrawTask = function(task) {
 
     const creep = this
-    const room = creep.room
 
     creep.say('WT')
 
@@ -1097,36 +1156,14 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
 Creep.prototype.fulfillPickupTask = function(task) {
 
     const creep = this
-    const room = creep.room
 
     creep.say('PUT')
 
     // If the creep is full
 
-    if (creep.store.getFreeCapacity() == 0) {
+    if (creep.store.getFreeCapacity() == 0) return true
 
-        // Try to find a transfer task
-
-        const findTaskResult = creep.findTask(new Set([
-            'transfer',
-        ]))
-
-        // If the creep found a task
-
-        if (findTaskResult) {
-
-            // Try to fulfill the new task and inform false
-
-            creep.fulfillTask()
-            return false
-        }
-
-        // Otherwise inform true
-
-        return true
-    }
-
-    // Get the pickup target
+    // Otherwise get the pickup target
 
     const pickupTarget = generalFuncs.findObjectWithID(task.resourceID)
 

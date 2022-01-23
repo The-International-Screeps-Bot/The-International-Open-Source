@@ -496,11 +496,19 @@ Room.prototype.get = function(roomObjectName) {
     * @param harvestPositions array of RoomPositions to filter
     * @returns the closest harvestPosition to the room's anchor
     */
-    function findClosestHarvestPosition(harvestPositions: RoomPosition[]): RoomPosition {
+    function findClosestHarvestPos(harvestPositions: RoomPosition[]): false | RoomPosition {
+
+        // Get the room anchor
+
+        const anchor = roomObjects.anchor.getValue()
+
+        // Stop if there is no anchor
+
+        if (!anchor) return false
 
         // Filter harvestPositions by closest one to anchor
 
-        return room.find(FIND_MY_SPAWNS)[0].pos.findClosestByRange(harvestPositions)
+        return anchor.findClosestByRange(harvestPositions)
     }
 
     manageRoomObject({
@@ -513,7 +521,7 @@ Room.prototype.get = function(roomObjectName) {
 
     manageRoomObject({
         name: 'source1ClosestHarvestPosition',
-        value: findClosestHarvestPosition(roomObjects.source1HarvestPositions.getValue()),
+        value: findClosestHarvestPos(roomObjects.source1HarvestPositions.getValue()),
         valueType: 'object',
         cacheMethod: 'global',
         cacheAmount: Infinity,
@@ -529,7 +537,7 @@ Room.prototype.get = function(roomObjectName) {
 
     manageRoomObject({
         name: 'source2ClosestHarvestPosition',
-        value: findClosestHarvestPosition(roomObjects.source2HarvestPositions.getValue()),
+        value: findClosestHarvestPos(roomObjects.source2HarvestPositions.getValue()),
         valueType: 'object',
         cacheMethod: 'global',
         cacheAmount: Infinity,
@@ -717,10 +725,10 @@ Room.prototype.get = function(roomObjectName) {
 
         const spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = roomObjects.spawn.getValue().concat(roomObjects.extension.getValue())
 
-        // Add each spawnStructures with their range to the object
+        // Get the room anchor. If not defined, inform an empty array
 
         const anchor = roomObjects.anchor.getValue()
-        if (!anchor) return false
+        if (!anchor) return []
 
         // Filter energy structures by distance from anchor
 
@@ -989,6 +997,42 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                         // Record the exit to be avoided
 
                         cm.set(x, y, 255)
+                    }
+                }
+
+                weightGamebjects()
+
+                function weightGamebjects() {
+
+                    // Loop through weights in weightGameObjects
+
+                    for (const weight in opts.weightGamebjects) {
+
+                        // Use the weight to get the gameObjects
+
+                        const gameObjects = opts.weightGamebjects[weight]
+
+                        // Loop through each gameObject and set their pos to the weight in the cm
+
+                        for (const gameObj of gameObjects) cm.set(gameObj.pos.x, gameObj.pos.y, parseInt(weight))
+                    }
+                }
+
+                weightPositions()
+
+                function weightPositions() {
+
+                    // Loop through weights in weightGameObjects
+
+                    for (const weight in opts.weightPositions) {
+
+                        // Use the weight to get the positions
+
+                        const positions = opts.weightPositions[weight]
+
+                        // Loop through each gameObject and set their pos to the weight in the cm
+
+                        for (const pos of positions) cm.set(pos.x, pos.y, parseInt(weight))
                     }
                 }
 
@@ -1384,15 +1428,19 @@ Room.prototype.findTasksOfTypes = function(createdTaskIDs, types) {
 
         // Set the task from tasks with no responders
 
-        let task = global[room.name].tasksWithoutResponders[taskID]
+        let task: RoomTask = global[room.name].tasksWithoutResponders[taskID]
 
         // If the task doesn't exist there, try to find it in tasks with responders
 
         if (!task) task = global[room.name].tasksWithResponders[taskID]
 
-        // If the task has a type of specified types, add the task to tasksOfTypes
+        // If the task is not of the specified types, iterate
 
-        if (types.has(task.type)) tasksOfTypes.push(task)
+        if (!types.has(task.type)) continue
+
+        // Otherwise add the task to tasksOfTypes
+
+        tasksOfTypes.push(task)
     }
 
     // Inform false if no tasks had the specified types

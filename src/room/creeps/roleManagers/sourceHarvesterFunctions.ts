@@ -28,7 +28,7 @@ SourceHarvester.prototype.travelToSource = function() {
     const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPosition`)
 
     // Inform false if there is no closestHarvestPos
-
+    
     if (!closestHarvestPos) return true
 
     // Inform true if the creep is at the closestHarvestPos

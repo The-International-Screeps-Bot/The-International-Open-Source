@@ -9,7 +9,7 @@ export function droppedResourceManager(room: Room) {
     // Find dropped resources and loop through them
 
     const droppedResources = room.find(FIND_DROPPED_RESOURCES)
-    
+
     for (const droppedResource of droppedResources) {
 
         // if there is no global for the droppedResource, make one
@@ -24,17 +24,30 @@ export function droppedResourceManager(room: Room) {
 
         else {
 
-            // Find the creep's tasks of type pickup
+            // Find the resource's tasks of type pickup
 
-            const droppedResourcePickupTasks = room.findTasksOfTypes(global[droppedResource.id].createdTaskIDs, new Set(['pickup']))
+            const droppedResourcePickupTasks = room.findTasksOfTypes(global[droppedResource.id].createdTaskIDs, new Set(['pickup'])) as RoomPickupTask[]
 
-            // Iterate if there are already a pickup task for the droppedResource
+            // Track the amount of energy the resource has offered in tasks
 
-            if (droppedResourcePickupTasks.length > 0) continue
+            let totalResourcesOffered = 0
+
+            // Loop through each pickup task
+
+            for (const task of droppedResourcePickupTasks) {
+
+                // Otherwise find how many resources the task has requested to pick up
+
+                totalResourcesOffered += task.pickupAmount
+            }
+
+            // If there are more or equal resources offered than the droppedResource has in amount, iterate
+            
+            if (totalResourcesOffered >= droppedResource.amount) continue
         }
 
         // Create a pickup task for the droppedResource
 
-        new RoomPickupTask(room.name, droppedResource.id, droppedResource.resourceType, Game.time)
+        new RoomPickupTask(room.name, droppedResource.id, droppedResource.resourceType)
     }
 }

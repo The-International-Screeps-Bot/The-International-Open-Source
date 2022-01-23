@@ -212,6 +212,10 @@ export function basePlanner(room: Room): false | BuildLocations {
         return false
     }
 
+    // Otherwise store the fulfillerAnchor as anchor in the room's memory
+
+    room.memory.anchor = fulfillerAnchor
+
     // Try to plan the stamp
 
     const hubAnchor = planStamp('hub', fulfillerAnchor)
