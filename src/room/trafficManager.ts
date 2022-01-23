@@ -47,16 +47,19 @@ export function trafficManager(room: Room) {
 
             const creepAtPos = Game.creeps[creepNameAtPos]
 
-            // If there is a creep that moves through pull in the way and it isn't actively getting pulled
+            // If there is a creep that moves through pull is in the way and it isn't actively getting pulled
 
             if (creepAtPos.memory.getPulled && !creepAtPos.gettingPulled) {
 
                 // Remove information about previous move requests from the creep
 
                 delete creep.moveRequest
-                delete creep.memory.goalPos
 
-                // Try to path to the targetPos while avoiding the creep
+                // If the creep has no goalPos in memory, stop the loop
+
+                if (creep.memory.goalPos) break
+
+                // Otherwise try to path to the targetPos while avoiding the pos
 
                 creep.createMoveRequest({
                     origin: creep.pos,
@@ -68,13 +71,12 @@ export function trafficManager(room: Room) {
                     },
                 })
 
-                // If the creep failed to generate a new path, stop the loop
+                // If the creep generated a new path, enforce a moveRequest using it
 
-                if (creep.memory.path.length == 0) break
+                if (creep.memory.path.length > 0) creep.runMoveRequest(creep.memory.path[0])
 
-                // Operate the creep's moveRequest and stop the loop
+                // And stop the loop
 
-                creep.runMoveRequest(pos)
                 break
             }
 
@@ -85,32 +87,35 @@ export function trafficManager(room: Room) {
                 // Remove information about previous move requests from creepAtPos
 
                 delete creepAtPos.moveRequest
-                delete creepAtPos.memory.goalPos
 
-                // Force creepAtPos to repath to its target while avoiding the creep
+                // If the creepAtPos has a goalPos in memory
 
-                creepAtPos.createMoveRequest({
-                    origin: creepAtPos.pos,
-                    goal: { pos: creepAtPos.memory.goalPos, range: 1 },
-                    avoidImpassibleStructures: true,
-                    avoidEnemyRanges: true,
-                    weightPositions: {
-                        255: [pos, creep.pos]
-                    },
-                })
+                if (creepAtPos.memory.goalPos) {
 
-                // If the creep failed to generate a new path, stop the loop
+                    // Force creepAtPos to repath to its target while avoiding the creep
 
-                if (creepAtPos.memory.path.length == 0) {
+                    creepAtPos.createMoveRequest({
+                        origin: creepAtPos.pos,
+                        goal: { pos: creepAtPos.memory.goalPos, range: 1 },
+                        avoidImpassibleStructures: true,
+                        avoidEnemyRanges: true,
+                        weightPositions: {
+                            255: [pos, creep.pos]
+                        },
+                    })
 
-                    // Push the creep
+                    // If the creepAtPos failed to generate a new path, push the it
 
-                    creepAtPos.getPushed()
+                    if (creepAtPos.memory.path.length == 0) creepAtPos.getPushed()
+
+                    // OOtherwise operate creepAtPos's moveRequest
+
+                    else creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
                 }
 
-                // Otherwise operate creepAtPos's moveRequest
+                // Otherwise push the creepAtPos
 
-                else creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
+                else creepAtPos.getPushed()
 
                 // Operate the creep's moveRequest and stop the loop
 
@@ -135,12 +140,6 @@ export function trafficManager(room: Room) {
                 break
             }
 
-            // Otherwise
-
-            // if the creepAtPos is meant to be pulled, stop the loop
-
-            if (creepAtPos.memory.getPulled) break
-
             // If the creepAtPos is fatigued, stop the loop
 
             if(creepAtPos.fatigue > 0) break
@@ -152,27 +151,35 @@ export function trafficManager(room: Room) {
                 // Remove information about previous move requests from creepAtPos
 
                 delete creepAtPos.moveRequest
-                delete creepAtPos.memory.goalPos
 
-                // Force creepAtPos to repath to its target while avoiding the creep
+                // If the creepAtPos has a goalPos in memory
 
-                creepAtPos.createMoveRequest({
-                    origin: creepAtPos.pos,
-                    goal: { pos: creepAtPos.memory.goalPos, range: 1 },
-                    avoidImpassibleStructures: true,
-                    avoidEnemyRanges: true,
-                    weightPositions: {
-                        255: [pos, creep.pos]
-                    },
-                })
+                if (creepAtPos.memory.goalPos) {
 
-                // If the creepAtPos failed to generate a new path, stop the loop
+                    // Force creepAtPos to repath to its target while avoiding the creep
 
-                if (creepAtPos.memory.path.length == 0) break
+                    creepAtPos.createMoveRequest({
+                        origin: creepAtPos.pos,
+                        goal: { pos: creepAtPos.memory.goalPos, range: 1 },
+                        avoidImpassibleStructures: true,
+                        avoidEnemyRanges: true,
+                        weightPositions: {
+                            255: [pos, creep.pos]
+                        },
+                    })
 
-                // Operate creepAtPos's moveRequest
+                    // If the creepAtPos failed to generate a new path, push the creep
 
-                creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
+                    if (creepAtPos.memory.path.length == 0) creepAtPos.getPushed()
+
+                    // OOtherwise operate creepAtPos's moveRequest
+
+                    else creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
+                }
+
+                // Otherwise push the creepAtPos
+
+                else creepAtPos.getPushed()
 
                 // Operate the creep's moveRequest and stop the loop
 
