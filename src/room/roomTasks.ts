@@ -23,7 +23,7 @@ export interface RoomTask {
     findLocation(): {[key: number]: RoomTask}
 
     /**
-     * Informs wether the task needs to be deleted or not
+     * Informs whether the task needs to be deleted or not
      */
     shouldStayActive(): boolean
 

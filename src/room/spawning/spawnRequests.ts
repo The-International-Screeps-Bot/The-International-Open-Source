@@ -27,18 +27,6 @@ export function spawnRequests(room: Room) {
         maxParts: number
     }
 
-    interface ExtraOptsMemory {
-        [key: string | number]: any
-        role: CreepRoles
-        communeName: string
-    }
-
-    interface ExtraOpts {
-        memory: ExtraOptsMemory
-        energyStructures: (StructureSpawn | StructureExtension)[]
-        dryRun?: boolean
-    }
-
     interface SpawningObj extends Partial<BodyProps & BodyOpts> {
         role: CreepRoles
 

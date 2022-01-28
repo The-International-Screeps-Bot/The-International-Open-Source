@@ -15,9 +15,6 @@ export function tickConfig() {
 
     Memory.boosts = {}
 
-    Memory.creepCount = 0
-    Memory.powerCreepCount = 0
-
     // CPU
 
     Memory.cpuUsage = 0

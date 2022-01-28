@@ -6,19 +6,13 @@ import { spawnManager } from './spawning/spawnManager'
 
 import { towerManager } from "./towerManager"
 import { constructionManager } from "./construction/constructionManager"
-import { basePlanner } from "./construction/basePlanner"
-import { generalFuncs } from "international/generalFunctions"
 import { structuresForSpawningManager } from "./structuresForSpawningManager"
 import { droppedResourceManager } from "./droppedResourceManager"
 import { defenceManager } from "./defenceManager"
 
 export function communeManager(room: Room) {
 
-    marketManager(room)
-
     taskManager(room)
-
-    spawnManager(room)
 
     towerManager(room)
 
@@ -26,9 +20,13 @@ export function communeManager(room: Room) {
 
     constructionManager(room)
 
+    marketManager(room)
+
     defenceManager(room)
 
     droppedResourceManager(room)
 
     structuresForSpawningManager(room)
+
+    spawnManager(room)
 }

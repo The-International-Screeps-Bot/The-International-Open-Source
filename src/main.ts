@@ -168,6 +168,30 @@ declare global {
     'repair' |
     'harvest'
 
+    interface SpawnRequestOpts {
+        defaultParts: BodyPartConstant[]
+        extraParts: BodyPartConstant[]
+        partsMultiplier: number
+        minCreeps: number | undefined
+        maxCreeps: number
+        minCost: number
+        priority: number
+        memoryAdditions: any
+    }
+
+    interface ExtraOpts {
+        memory: CreepMemory
+        energyStructures: (StructureSpawn | StructureExtension)[]
+        dryRun?: boolean
+    }
+
+    interface SpawnRequest {
+        body: BodyPartConstant[]
+        tier: number
+        cost: number
+        extraOpts: ExtraOpts
+    }
+
     // Memory
 
     interface Memory {
@@ -292,7 +316,7 @@ declare global {
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room
          */
-        creepsFromRoom: {[key: string]: string[]}
+        creepsFromRoom: Partial<Record<CreepRoles, number>>
 
         /**
          * The cumulative amount of creeps with a communeName value of this room's name
@@ -437,17 +461,17 @@ declare global {
         [key: string]: any
 
         /**
-         * Wether the creep has made a moveRequest or not
+         * Whether the creep has made a moveRequest or not
          */
         moveRequest: boolean
 
         /**
-         * Wether the creep is actively pulling another creep or not
+         * Whether the creep is actively pulling another creep or not
          */
         pulling: boolean
 
         /**
-         * Wether the creep is actively getting pulled by another creep or not
+         * Whether the creep is actively getting pulled by another creep or not
          */
         gettingPulled: boolean
 
@@ -596,7 +620,7 @@ declare global {
         goalPos: RoomPosition
 
         /**
-         * Wether the creep is intended to move on its own or not
+         * Whether the creep is intended to move on its own or not
          */
         getPulled: boolean
 
@@ -622,6 +646,8 @@ declare global {
 
     interface StructureSpawn {
         [key: string]: any
+
+        advancedSpawn(spawnRequest: SpawnRequest): ScreepsReturnCode
     }
 
     // Global

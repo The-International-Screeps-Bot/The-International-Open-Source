@@ -1142,7 +1142,11 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
             }
         })
 
-        // Inform the path from pathFinderResult
+        // If the pathFindResult is incomplete, inform an empty array
+
+        if (pathFinderResult.incomplete) return []
+
+        // Otherwise inform the path from pathFinderResult
 
         return pathFinderResult.path
     }
