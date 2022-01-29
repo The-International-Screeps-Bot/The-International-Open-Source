@@ -58,13 +58,13 @@ export function spawnRequester(room: Room) {
 
         if (maxCostPerCreep < opts.minCost) return
 
-        // if minCreeps is a number
+        // if minCreeps is defined
 
-        if (opts.minCreeps > 0) {
+        if (opts.minCreeps) {
 
-            // So long as minCreeps is more than 0
+            // So long as minCreeps is more than the current number of creeps
 
-            while (opts.minCreeps > 0) {
+            while (opts.minCreeps > room.creepCount[opts.memoryAdditions.role]) {
 
                 // Construct important imformation for the spawnRequest
 
@@ -211,6 +211,15 @@ export function spawnRequester(room: Room) {
 
         let totalExtraParts = opts.extraParts.length * opts.partsMultiplier
 
+        // Loop through creep names of the requested role
+
+        for (const creepName of room.myCreeps[opts.memoryAdditions.role]) {
+
+            // Take away the amount of parts the creep with the name has from totalExtraParts
+
+            totalExtraParts -= (Game.creeps[creepName].body.length - opts.defaultParts.length)
+        }
+
         // So long as there are totalExtraParts left to assign
 
         while (totalExtraParts > 0) {
@@ -266,10 +275,10 @@ export function spawnRequester(room: Room) {
                 // Get the cost of the part
 
                 let partCost = BODYPART_COST[part]
+                generalFuncs.customLog('extraParts, bodyLength', totalExtraParts + ', ' + body.length)
+                // If the cost of the creep plus the part is more than the maxCostPerCreep, or if there are too few totalExtraParts, or if the body is too long
 
-                // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, or if there are too few totalExtraParts, or if the body is too long
-
-                if (cost + partCost >= maxCostPerCreep || totalExtraParts == 0 || body.length + 1 == 50) {
+                if (cost + partCost > maxCostPerCreep || totalExtraParts == 0 || body.length + 1 == 50) {
 
                     // So long as the partIndex is more than 0
 
@@ -283,9 +292,13 @@ export function spawnRequester(room: Room) {
 
                         partCost = BODYPART_COST[part]
 
-                        // If the cost of the creep minus the part is less than or equal to the minCost, stop the loop
+                        // If the cost of the creep is below minCost, stop the function
 
-                        if (cost - partCost <= opts.minCost) break
+                        if (cost < opts.minCreeps) return
+
+                        // If the cost of the creep minus the part is less than the minCost, stop the loop
+
+                        if (cost - partCost < opts.minCost) break
 
                         // Otherwise remove the last part in the body
 
@@ -345,9 +358,7 @@ export function spawnRequester(room: Room) {
     // Construct requests for sourceHarvesters
 
     constructSpawnRequests((function(): SpawnRequestOpts {
-
         if (spawnEnergyCapacity >= 800) {
-
             return {
                 defaultParts: [CARRY],
                 extraParts: [WORK, MOVE, WORK, WORK],
@@ -363,7 +374,6 @@ export function spawnRequester(room: Room) {
             }
         }
         if (spawnEnergyCapacity >= 650) {
-
             return {
                 defaultParts: [CARRY],
                 extraParts: [WORK],
@@ -378,7 +388,6 @@ export function spawnRequester(room: Room) {
                 }
             }
         }
-
         return {
             defaultParts: [],
             extraParts: [WORK],
@@ -392,130 +401,9 @@ export function spawnRequester(room: Room) {
                 getPulled: true,
             }
         }
-
     })())
 
-    const prioritySource: Source = room.get('prioritySource')
-
-    constructSpawnRequests((function(): SpawnRequestOpts {
-
-        const sourceName = 'source1'
-
-        // Set the priority to the number of sourceHarvesters plus if the source isn't the prioritySource
-
-        const priority = room.creepsFromRoom.sourceHarvester + room.get(sourceName).id == prioritySource.id ? 0 : 1
-
-        if (spawnEnergyCapacity >= 800) {
-
-            return {
-                defaultParts: [CARRY],
-                extraParts: [WORK, MOVE, WORK, WORK],
-                partsMultiplier: 2,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 200,
-                priority: priority,
-                memoryAdditions: {
-                    role: 'sourceHarvester',
-                    getPulled: true,
-                    sourceName
-                }
-            }
-        }
-        if (spawnEnergyCapacity >= 650) {
-
-            return {
-                defaultParts: [CARRY],
-                extraParts: [WORK],
-                partsMultiplier: 6,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 250,
-                priority: priority,
-                memoryAdditions: {
-                    role: 'sourceHarvester',
-                    getPulled: true,
-                    sourceName
-                }
-            }
-        }
-
-        return {
-            defaultParts: [],
-            extraParts: [WORK],
-            partsMultiplier: 6,
-            minCreeps: undefined,
-            maxCreeps: Math.max(2, room.get(`${sourceName}HarvestPositions`).length),
-            minCost: 200,
-            priority: priority,
-            memoryAdditions: {
-                role: 'sourceHarvester',
-                getPulled: true,
-                sourceName
-            }
-        }
-
-    })())
-
-    constructSpawnRequests((function(): SpawnRequestOpts {
-
-        const sourceName = 'source2'
-
-        // Set the priority to the number of sourceHarvesters plus if the source isn't the prioritySource
-
-        const priority = room.creepsFromRoom.sourceHarvester + room.get(sourceName).id == prioritySource.id ? 0 : 1
-
-        if (spawnEnergyCapacity >= 800) {
-
-            return {
-                defaultParts: [CARRY],
-                extraParts: [WORK, MOVE, WORK, WORK],
-                partsMultiplier: 2,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 200,
-                priority: priority,
-                memoryAdditions: {
-                    role: 'sourceHarvester',
-                    getPulled: true,
-                    sourceName
-                }
-            }
-        }
-        if (spawnEnergyCapacity >= 650) {
-
-            return {
-                defaultParts: [CARRY],
-                extraParts: [WORK],
-                partsMultiplier: 6,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 250,
-                priority: priority,
-                memoryAdditions: {
-                    role: 'sourceHarvester',
-                    getPulled: true,
-                    sourceName
-                }
-            }
-        }
-
-        return {
-            defaultParts: [],
-            extraParts: [WORK],
-            partsMultiplier: 6,
-            minCreeps: undefined,
-            maxCreeps: Math.max(2, room.get(`${sourceName}HarvestPositions`).length),
-            minCost: 200,
-            priority: priority,
-            memoryAdditions: {
-                role: 'sourceHarvester',
-                getPulled: true,
-                sourceName
-            }
-        }
-
-    })())
+    // Inform spawnRequests
 
     return spawnRequests
 }

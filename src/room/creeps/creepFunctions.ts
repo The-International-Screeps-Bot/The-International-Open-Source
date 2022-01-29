@@ -548,6 +548,20 @@ Creep.prototype.advancedRepair = function() {
     return false
 }
 
+Creep.prototype.findSourceName = function() {
+
+    const creep = this
+    const room = creep.room
+
+    // Sort the room's sourceNames by their range from the anchor
+
+    const sourcesNamesByRangeFromAnchor = (['source1', 'source2'] as ('source1' | 'source2')[]).sort((a, b) => creep.pos.getRangeTo(room.get(a).pos) - creep.pos.getRangeTo(room.get(b).pos))
+
+    // Inform the name of the source with the least sourceHarvesters that can still have sourceHarvesters
+
+    return sourcesNamesByRangeFromAnchor.sort((a, b) => Math.min(room.get(`${a}HarvestPositions`), room.creepsOfSourceAmount[a]) - Math.min(room.get(`${b}HarvestPositions`), room.creepsOfSourceAmount[b]))[0]
+}
+
 Creep.prototype.hasPartsOfTypes = function(partTypes) {
 
     const creep = this

@@ -7,9 +7,9 @@ SourceHarvester.prototype.recordSource = function() {
     const creep = this
     const room = creep.room
 
-    const sourceName: string = creep.memory.sourceName
+    // Increase the creep's memory sourceName amount in creepsOfSourceAmount
 
-    room.creepsOfSourceAmount[sourceName]++
+    room.creepsOfSourceAmount[creep.memory.sourceName]++
 }
 
 SourceHarvester.prototype.travelToSource = function() {
@@ -28,7 +28,7 @@ SourceHarvester.prototype.travelToSource = function() {
     const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPosition`)
 
     // Inform false if there is no closestHarvestPos
-    
+
     if (!closestHarvestPos) return true
 
     // Inform true if the creep is at the closestHarvestPos

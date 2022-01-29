@@ -7,6 +7,10 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         const creep: SourceHarvester = Game.creeps[creepName]
 
+        // If there is no source, find one
+
+        if (!creep.memory.sourceName) creep.memory.sourceName = creep.findSourceName()
+
         // Get the source using the source name in the creep's memory
 
         const source: Source = room.get(creep.memory.sourceName)

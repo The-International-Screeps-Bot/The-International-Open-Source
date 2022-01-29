@@ -369,33 +369,6 @@ Room.prototype.get = function(roomObjectName) {
         cacheAmount: Infinity,
     })
 
-    function findPrioritySource(): false | Source {
-
-        // Get the room anchor
-
-        const anchor = roomObjects.anchor.getValue()
-
-        // Stop if there is no anchor
-
-        if (!anchor) return false
-
-        // Get the room's sources
-
-        const sources = roomObjects.sources.getValue()
-
-        // inform the closest source to the anchor
-
-        return anchor.findClosestByRange(sources)
-    }
-
-    manageRoomObject({
-        name: 'prioritySource',
-        value: findPrioritySource(),
-        valueType: 'object',
-        cacheMethod: 'global',
-        cacheAmount: Infinity,
-    })
-
     // Dynamically create RoomObjects for each structureType
 
     // Loop through each structureType in the game

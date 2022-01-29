@@ -83,7 +83,6 @@ declare global {
     'source1' |
     'source2' |
     'sources' |
-    'prioritySource' |
     StructureConstant |
     `${StructureConstant}CSite` |
     'enemyCSites' |
@@ -317,7 +316,7 @@ declare global {
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room
          */
-        creepsFromRoom: Partial<Record<CreepRoles, number>>
+        creepsFromRoom: {[key: string]: number}
 
         /**
          * The cumulative amount of creeps with a communeName value of this room's name
@@ -528,6 +527,11 @@ declare global {
          *
          */
         advancedRepair(): boolean
+
+        /**
+         *
+         */
+        findSourceName(): 'source1' | 'source2'
 
         /**
          * Checks if the creep has some parts of specified types
