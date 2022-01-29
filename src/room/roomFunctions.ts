@@ -369,6 +369,33 @@ Room.prototype.get = function(roomObjectName) {
         cacheAmount: Infinity,
     })
 
+    function findPrioritySource(): false | Source {
+
+        // Get the room anchor
+
+        const anchor = roomObjects.anchor.getValue()
+
+        // Stop if there is no anchor
+
+        if (!anchor) return false
+
+        // Get the room's sources
+
+        const sources = roomObjects.sources.getValue()
+
+        // inform the closest source to the anchor
+
+        return anchor.findClosestByRange(sources)
+    }
+
+    manageRoomObject({
+        name: 'prioritySource',
+        value: findPrioritySource(),
+        valueType: 'object',
+        cacheMethod: 'global',
+        cacheAmount: Infinity,
+    })
+
     // Dynamically create RoomObjects for each structureType
 
     // Loop through each structureType in the game
@@ -721,18 +748,18 @@ Room.prototype.get = function(roomObjectName) {
 
     function findStructuresForSpawning() {
 
-        // Get array of spawns and extensions
-
-        const spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = roomObjects.spawn.getValue().concat(roomObjects.extension.getValue())
-
         // Get the room anchor. If not defined, inform an empty array
 
         const anchor = roomObjects.anchor.getValue()
         if (!anchor) return []
 
+        // Get array of spawns and extensions
+
+        const spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = roomObjects.spawn.getValue().concat(roomObjects.extension.getValue())
+
         // Filter energy structures by distance from anchor
 
-        const filteredSpawnStructures = spawnsAndExtensions.sort((a, b) => a.pos.getRangeTo(anchor.x, anchor.y + 5) - b.pos.getRangeTo(anchor.x, anchor.y + 5))
+        const filteredSpawnStructures = spawnsAndExtensions.sort((a, b) => a.pos.getRangeTo(anchor.x, anchor.y) - b.pos.getRangeTo(anchor.x, anchor.y))
         return filteredSpawnStructures
     }
 

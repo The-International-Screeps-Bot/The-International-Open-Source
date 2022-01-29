@@ -45,11 +45,11 @@ export function spawnManager(room: Room) {
 
         // If creep can't be spawned
 
-        if (!testSpawnResult) {
+        if (testSpawnResult != OK) {
 
             // Log the error and stop the loop
 
-            generalFuncs.customLog('Failed to spawn', testSpawnResult + ', ' + spawnRequest.cost + ', ' + spawningObj.body)
+            generalFuncs.customLog('Failed to spawn', testSpawnResult + ', ' + spawnRequest.cost + ', ' + spawnRequest.body)
             break
         }
 

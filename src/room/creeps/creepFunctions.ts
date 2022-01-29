@@ -550,7 +550,7 @@ Creep.prototype.advancedRepair = function() {
 
 Creep.prototype.hasPartsOfTypes = function(partTypes) {
 
-    const creep: Creep = this
+    const creep = this
 
     for (const partType of partTypes) {
 
@@ -562,7 +562,7 @@ Creep.prototype.hasPartsOfTypes = function(partTypes) {
 
 Creep.prototype.partsOfType = function(type) {
 
-    const creep: Creep = this
+    const creep = this
 
     // Filter body parts that are of type, return number of them
 
@@ -627,7 +627,7 @@ Creep.prototype.createMoveRequest = function(opts) {
         // So long as the creep is standing on the first position in the path
 
         while (generalFuncs.arePositionsEqual(creep.pos, creep.memory.path[0])) {
-            
+
             // Remove the first pos of the path
 
             creep.memory.path.shift()

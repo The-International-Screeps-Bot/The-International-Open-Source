@@ -83,6 +83,7 @@ declare global {
     'source1' |
     'source2' |
     'sources' |
+    'prioritySource' |
     StructureConstant |
     `${StructureConstant}CSite` |
     'enemyCSites' |
@@ -182,7 +183,7 @@ declare global {
     interface ExtraOpts {
         memory: CreepMemory
         energyStructures: (StructureSpawn | StructureExtension)[]
-        dryRun?: boolean
+        dryRun: boolean
     }
 
     interface SpawnRequest {
