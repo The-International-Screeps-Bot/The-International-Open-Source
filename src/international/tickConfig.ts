@@ -109,6 +109,8 @@ export function tickConfig() {
 
         room.storedResources = {}
 
+        room.usedHarvestPositions = new PathFinder.CostMatrix()
+
         room.actionableTowers = room.get('tower')
     }
 }

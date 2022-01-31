@@ -324,6 +324,11 @@ declare global {
         creepsFromRoomAmount: number
 
         /**
+         * A CostMatrix of harvest positions reserved by creeps
+         */
+        usedHarvestPositions: CostMatrix
+
+        /**
          * An array of towers that have not yet used intents
          */
         actionableTowers: StructureTower[]
@@ -442,6 +447,16 @@ declare global {
          * Finds amd records a construction site for builders to target
          */
         findCSiteTargetID(creep: Creep): boolean
+
+        /**
+         * Finds and records certain information about the room's sourceHarvesters
+         */
+        findSourceHarvesterInfo(): void
+
+        /**
+         * Finds and records a room's usedHarvestPositions
+         */
+        findUsedHarvestPositions(): void
     }
 
     interface RoomMemory {
@@ -495,7 +510,7 @@ declare global {
         /**
          * Tries to find a task for the creep with a type that matches the allowedTaskTypes
          */
-        findTask(allowedTaskTypes: Set<RoomTaskTypes>, resourceType?: ResourceConstant): boolean
+        findTask(allowedTaskTypes: Set<RoomTaskTypes>): boolean
 
         advancedPickup(target: Resource): boolean
 
@@ -528,10 +543,9 @@ declare global {
          */
         advancedRepair(): boolean
 
-        /**
-         *
-         */
-        findSourceName(): 'source1' | 'source2'
+        findOptimalSourceName(): boolean
+
+        findHarvestPosition(): boolean
 
         /**
          * Checks if the creep has some parts of specified types
@@ -611,6 +625,11 @@ declare global {
          * A name of the creep's designated source
          */
         sourceName: 'source1' | 'source2'
+
+        /**
+         *
+         */
+        harvestPos: Pos
 
         /**
          * The last time a path was cached in memory

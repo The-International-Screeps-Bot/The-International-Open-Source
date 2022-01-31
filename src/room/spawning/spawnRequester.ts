@@ -275,7 +275,7 @@ export function spawnRequester(room: Room) {
                 // Get the cost of the part
 
                 let partCost = BODYPART_COST[part]
-                generalFuncs.customLog('extraParts, bodyLength', totalExtraParts + ', ' + body.length)
+
                 // If the cost of the creep plus the part is more than the maxCostPerCreep, or if there are too few totalExtraParts, or if the body is too long
 
                 if (cost + partCost > maxCostPerCreep || totalExtraParts == 0 || body.length + 1 == 50) {
@@ -369,13 +369,12 @@ export function spawnRequester(room: Room) {
                 priority: room.creepsFromRoom.sourceHarvester,
                 memoryAdditions: {
                     role: 'sourceHarvester',
-                    getPulled: true,
                 }
             }
         }
         if (spawnEnergyCapacity >= 650) {
             return {
-                defaultParts: [CARRY],
+                defaultParts: [MOVE],
                 extraParts: [WORK],
                 partsMultiplier: 12,
                 minCreeps: 2,
@@ -384,21 +383,37 @@ export function spawnRequester(room: Room) {
                 priority: room.creepsFromRoom.sourceHarvester,
                 memoryAdditions: {
                     role: 'sourceHarvester',
-                    getPulled: true,
                 }
             }
         }
         return {
-            defaultParts: [],
+            defaultParts: [MOVE],
             extraParts: [WORK],
             partsMultiplier: 12,
             minCreeps: undefined,
-            maxCreeps: Math.max(2, room.get('source1HarvestPositions').length) + Math.max(2, room.get('source2HarvestPositions')),
-            minCost: 200,
+            maxCreeps: Math.max(3, room.get('source1HarvestPositions').length) + Math.max(3, room.get('source2HarvestPositions')),
+            minCost: 250,
             priority: room.creepsFromRoom.sourceHarvester,
             memoryAdditions: {
                 role: 'sourceHarvester',
-                getPulled: true,
+            }
+        }
+    })())
+
+    // Construct requests for haulers
+
+    constructSpawnRequests((function(): SpawnRequestOpts {
+
+        return {
+            defaultParts: [],
+            extraParts: [CARRY, MOVE],
+            partsMultiplier: 10,
+            minCreeps: 0,
+            maxCreeps: 2,
+            minCost: 100,
+            priority: 0.5 + room.creepsFromRoom.hauler,
+            memoryAdditions: {
+                role: 'hauler',
             }
         }
     })())

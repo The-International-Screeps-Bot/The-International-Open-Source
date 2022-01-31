@@ -2,16 +2,6 @@ import { generalFuncs } from "international/generalFunctions"
 import { RoomPullTask } from "room/roomTasks"
 import { SourceHarvester } from "../creepClasses"
 
-SourceHarvester.prototype.recordSource = function() {
-
-    const creep = this
-    const room = creep.room
-
-    // Increase the creep's memory sourceName amount in creepsOfSourceAmount
-
-    room.creepsOfSourceAmount[creep.memory.sourceName]++
-}
-
 SourceHarvester.prototype.travelToSource = function() {
 
     const creep = this
@@ -23,56 +13,13 @@ SourceHarvester.prototype.travelToSource = function() {
 
     const sourceName = creep.memory.sourceName
 
-    // Get the closetHarvestPos for the creep's designated source
+    // Try to find a harvestPosition, inform false if it failed
 
-    const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPosition`)
+    if (!creep.findHarvestPosition()) return false
 
-    // Inform false if there is no closestHarvestPos
+    // Inform true if the creep is at the creep's harvestPos
 
-    if (!closestHarvestPos) return true
-
-    // Inform true if the creep is at the closestHarvestPos
-
-    if (generalFuncs.arePositionsEqual(creep.pos, closestHarvestPos)) return false
-
-    function findTargetPos() {
-
-        // Create costMatrix
-
-        const cm = new PathFinder.CostMatrix()
-
-        // Assign impassible to tiles with sourceHarvesters
-
-        for (const sourceHarvesterName of room.myCreeps.sourceHarvester) {
-
-            // Find the sourceHarvester using its name
-
-            const sourceHarvester = Game.creeps[sourceHarvesterName]
-
-            // Iterate if sourceHarvester is this creep
-
-            if (sourceHarvester.id == creep.id) continue
-
-            cm.set(sourceHarvester.x, sourceHarvester.y, 255)
-        }
-
-        // return closestHarvestPositions if there is a sourceHarvester on the closestHarvestPosition
-
-        if (cm.get(closestHarvestPos.x, closestHarvestPos.y) != 255) return closestHarvestPos
-
-        // If creepOnHarvestPos find a harvest pos that isn't occupied
-
-        const harvestPositions = room.get(`${sourceName}HarvestPositions`)
-
-        for (const harvestPos of harvestPositions) {
-
-            if (cm.get(harvestPos.x, harvestPos.y) == 255) continue
-
-            return harvestPos
-        }
-    }
-
-    const targetPos = findTargetPos()
+    if (generalFuncs.arePositionsEqual(creep.pos, creep.memory.harvestPos)) return false
 
     // If the creep's movement type is pull
 
@@ -92,22 +39,22 @@ SourceHarvester.prototype.travelToSource = function() {
 
         const creepsPullTasks = room.findTasksOfTypes(global[creep.id].createdTaskIDs, new Set(['pull']))
 
-        // If there are no pull tasks for the creep, make one
+        // If there are no pull tasks for the creep, make one for the creep's harvestPos
 
-        if (creepsPullTasks.length == 0) new RoomPullTask(room.name, creep.id, targetPos)
+        if (creepsPullTasks.length == 0) new RoomPullTask(room.name, creep.id, room.newPos(creep.memory.harvestPos))
 
         // Inform false
 
         return true
     }
 
-    // Otherwise say the intention and create a moveRequest to targetPos, informing the attempt
+    // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
     creep.say('⏩ ' + sourceName)
 
     creep.createMoveRequest({
         origin: creep.pos,
-        goal: { pos: targetPos, range: 0 },
+        goal: { pos: room.newPos(creep.memory.harvestPos), range: 0 },
         avoidImpassibleStructures: true,
         avoidEnemyRanges: true,
     })
@@ -119,13 +66,9 @@ SourceHarvester.prototype.transferToSourceLink = function() {
     const creep = this
     const room = creep.room
 
-    // Define the creep's designated source
-
-    const sourceName = creep.memory.sourceName
-
     // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
-    const sourceLink = room.get(`${sourceName}Link`)
+    const sourceLink = room.get(`${creep.memory.sourceName}Link`)
     if (!sourceLink) return false
 
     // Try to transfer to the sourceLink

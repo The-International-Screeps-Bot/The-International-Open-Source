@@ -12,6 +12,8 @@ import { defenceManager } from "./defenceManager"
 
 export function communeManager(room: Room) {
 
+    room.findSourceHarvesterInfo()
+
     taskManager(room)
 
     towerManager(room)

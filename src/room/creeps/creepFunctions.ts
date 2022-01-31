@@ -1,6 +1,6 @@
 import { constants } from "international/constants"
 import { generalFuncs } from "international/generalFunctions"
-import { RoomPickupTask, RoomTask, RoomWithdrawTask } from "room/roomTasks"
+import { RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
 
 Creep.prototype.isDying = function() {
 
@@ -548,18 +548,97 @@ Creep.prototype.advancedRepair = function() {
     return false
 }
 
-Creep.prototype.findSourceName = function() {
+Creep.prototype.findOptimalSourceName = function() {
 
     const creep = this
     const room = creep.room
 
-    // Sort the room's sourceNames by their range from the anchor
+    // If the creep already has a sourceName, inform true
 
-    const sourcesNamesByRangeFromAnchor = (['source1', 'source2'] as ('source1' | 'source2')[]).sort((a, b) => creep.pos.getRangeTo(room.get(a).pos) - creep.pos.getRangeTo(room.get(b).pos))
+    if (creep.memory.sourceName) return true
 
-    // Inform the name of the source with the least sourceHarvesters that can still have sourceHarvesters
+    // Get the rooms anchor, if it's undefined inform false
 
-    return sourcesNamesByRangeFromAnchor.sort((a, b) => Math.min(room.get(`${a}HarvestPositions`), room.creepsOfSourceAmount[a]) - Math.min(room.get(`${b}HarvestPositions`), room.creepsOfSourceAmount[b]))[0]
+    const anchor = room.get('anchor')
+    if (!anchor) return false
+
+    // Otherwise, define source names
+
+    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+
+    // Sort them by their range from the anchor
+
+    const sourceNamesByAnchorRange = sourceNames.sort((a, b) => anchor.getRangeTo(room.get(a).pos) - anchor.getRangeTo(room.get(b).pos))
+
+    // Then loop through the source names and find the first one with open spots
+
+    for (const sourceName of sourceNamesByAnchorRange) {
+
+        // If there are still creeps needed to harvest a source
+
+        if (Math.min(3, room.get(`${sourceName}HarvestPositions`).length) - room.creepsOfSourceAmount[sourceName] > 0) {
+
+            // Assign the sourceName to the creep's memory and Inform true
+
+            creep.memory.sourceName = sourceName
+            return true
+        }
+    }
+
+    // No source was found, inform false
+
+    return false
+}
+
+Creep.prototype.findHarvestPosition = function() {
+
+    const creep = this
+    const room = creep.room
+
+    // Stop if the creep already has a harvestPos
+
+    if (creep.memory.harvestPos) return true
+
+    // Otherwise define the creep's designated source
+
+    const sourceName = creep.memory.sourceName
+
+    // Get the closestHarvestPos for the creep's source
+
+    const closestHarvestPos: Pos = room.get(`${sourceName}ClosestHarvestPosition`)
+
+    // If the closestHarvestPos isn't used, set it as the harvestPos
+
+    if (room.usedHarvestPositions.get(closestHarvestPos.x, closestHarvestPos.y) != 255) {
+
+        // Set it as the harvestPos and inform true
+
+        creep.memory.harvestPos = closestHarvestPos
+        return true
+    }
+
+    // Otherwise get the harvest positions for the source
+
+    const harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`)
+
+    // Loop through each harvest position
+
+    for (const harvestPos of harvestPositions) {
+
+        // If the harvestPos isn't used
+
+        if (room.usedHarvestPositions.get(harvestPos.x, harvestPos.y) != 255) {
+
+            // Set it as the harvestPos and inform true
+
+            creep.memory.harvestPos = harvestPos
+            return true
+        }
+    }
+
+    // No harvestPos was found, inform false
+
+    return false
 }
 
 Creep.prototype.hasPartsOfTypes = function(partTypes) {
@@ -810,19 +889,9 @@ Creep.prototype.acceptTask = function(task) {
     // Delete the task from tasksWithoutResponders
 
     delete global[room.name].tasksWithoutResponders[task.ID]
-
-    // If the task is of type pickup
-
-    if (task.type == 'pickup') {
-
-        // Set the pickupAmount to the hauler's free capacity and stop
-
-        (task as RoomPickupTask).pickupAmount = creep.store.getFreeCapacity()
-        return
-    }
 }
 
-Creep.prototype.findTask = function(allowedTaskTypes, resourceType) {
+Creep.prototype.findTask = function(allowedTaskTypes) {
 
     const creep = this
     const room = creep.room
@@ -839,28 +908,60 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType) {
 
         if (!allowedTaskTypes.has(task.type)) continue
 
-        // If the creep is full
+        // Perform actions based on the task's type
 
-        if (creep.store.getFreeCapacity() == 0) {
+        switch(task.type) {
 
-            // Iterate if the task is of type pickup
+            // If pull
 
-            if (task.type == 'pickup') continue
+            case 'pull':
 
-            // Iterate if the task is of type withdraw
+            // Iterate if the creep isn't empty
 
-            if (task.type == 'withdraw') continue
+            if (creep.store.getUsedCapacity() > 0) continue
+            break
+
+            // If pickup
+
+            case 'pickup':
+
+            // Iterate if the creep is full
+
+            if (creep.store.getFreeCapacity() == 0) continue
+
+            // Otherwise set the task's pickupAmount to the creep's free capacity
+
+            (task as RoomPickupTask).pickupAmount = creep.store.getFreeCapacity()
+
+            break
+
+            // If withdraw
+
+            case 'withdraw':
+
+            // Iterate if the creep is full
+
+            if (creep.store.getFreeCapacity() == 0) continue
+
+            break
+
+            // If transfer
+
+            case 'transfer':
+
+            // If the creep isn't full of the requested resourceType and amount, iterate
+
+            if (creep.store.getUsedCapacity(task.resourceType) < (task as RoomTransferTask).transferAmount) continue
+
+            break
         }
 
-        // Iterate of there is a requested resourceType and the task doesn't have it
-
-        if (resourceType && task.resourceType != resourceType) continue
-
-        // Accept the task and inform true
+        // Accept the task
 
         creep.acceptTask(task)
-        return true
     }
+
+    // Say and inform that the creep found no task
 
     creep.say('NT')
 

@@ -1968,3 +1968,57 @@ Room.prototype.findCSiteTargetID = function(creep) {
     global[room.name].cSiteTargetID = cSiteTarget.id
     return true
 }
+
+Room.prototype.findUsedHarvestPositions = function() {
+
+    const room = this
+
+    // Loop through each sourceHarvester's name in the room
+
+    for (const creepName of room.myCreeps.sourceHarvester) {
+
+        // Get the creep using its name
+
+        const creep = Game.creeps[creepName]
+
+        // Get the creep's harvestPos
+
+        const harvestPos = creep.memory.harvestPos
+
+        // If the creep has a harvestPos, record it in usedHarvestPositions
+
+        if (harvestPos) room.usedHarvestPositions.set(harvestPos.x, harvestPos.y, 255)
+    }
+}
+
+Room.prototype.findSourceHarvesterInfo = function() {
+
+    const room = this
+
+    // Loop through each sourceHarvester's name in the room
+
+    for (const creepName of room.myCreeps.sourceHarvester) {
+
+        // Get the creep using its name
+
+        const creep = Game.creeps[creepName]
+
+        // Get the creep's sourceName, if there is none iterate
+
+        const sourceName = creep.memory.sourceName
+        if (!sourceName) continue
+
+        // Record that the creep has this sourceName in creepsOfSouceAmount
+
+        room.creepsOfSourceAmount[sourceName]++
+
+        // Get the creep's harvestPos, if not defined iterate
+
+        const harvestPos = creep.memory.harvestPos
+        if (!harvestPos) continue
+
+        // Record the harvestPos in usedHarvestPositions
+
+        room.usedHarvestPositions.set(harvestPos.x, harvestPos.y, 255)
+    }
+}

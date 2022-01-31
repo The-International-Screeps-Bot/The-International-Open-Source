@@ -4,7 +4,7 @@ interface GeneralFunctions {
     /**
      * Finds the average trading price of a resourceType over a set amount of days
      */
-    findAvgPrice(resourceType: ResourceConstant, days: number): number
+    findAvgPrice(resourceType: ResourceConstant, days?: number): number
 
     /**
      * Uses a provided ID to find an object associated with it
@@ -61,7 +61,7 @@ interface GeneralFunctions {
 
 export const generalFuncs: Partial<GeneralFunctions> = {}
 
-generalFuncs.findAvgPrice = function(resourceType, days) {
+generalFuncs.findAvgPrice = function(resourceType, days = 14) {
 
     let avgPrice: number = 0
 
