@@ -148,13 +148,16 @@ export function trafficManager(room: Room) {
 
             if (generalFuncs.arePositionsEqual(creep.memory.path[creep.memory.path.length - 1], pos)) {
 
-                // Remove information about previous move requests from creepAtPos
-
-                delete creepAtPos.moveRequest
-
-                // If the creepAtPos has a goalPos in memory
+                /* // If the creepAtPos has a goalPos in memory
 
                 if (creepAtPos.memory.goalPos) {
+
+                    // If creepAtPos is in range to its goalPos
+
+                    if (creepAtPos.pos.getRangeTo(creepAtPos.memory.goalPos)) {
+
+
+                    }
 
                     // Force creepAtPos to repath to its target while avoiding the creep
 
@@ -172,14 +175,14 @@ export function trafficManager(room: Room) {
 
                     if (creepAtPos.memory.path.length == 0) creepAtPos.getPushed()
 
-                    // OOtherwise operate creepAtPos's moveRequest
+                    // Otherwise operate creepAtPos's moveRequest
 
                     else creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
                 }
 
                 // Otherwise push the creepAtPos
 
-                else creepAtPos.getPushed()
+                else */ creepAtPos.getPushed()
 
                 // Operate the creep's moveRequest and stop the loop
 

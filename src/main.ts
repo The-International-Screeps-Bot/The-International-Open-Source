@@ -510,7 +510,7 @@ declare global {
         /**
          * Tries to find a task for the creep with a type that matches the allowedTaskTypes
          */
-        findTask(allowedTaskTypes: Set<RoomTaskTypes>): boolean
+        findTask(allowedTaskTypes: Set<RoomTaskTypes>, resourceType?: ResourceConstant): boolean
 
         advancedPickup(target: Resource): boolean
 

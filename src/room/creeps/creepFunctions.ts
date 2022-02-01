@@ -101,7 +101,6 @@ Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENER
 Creep.prototype.advancedPickup = function(target) {
 
     const creep = this
-    const room = creep.room
 
     // If creep isn't in transfer range
 
@@ -194,7 +193,7 @@ Creep.prototype.advancedUpgradeController = function() {
         creep.findTask(new Set([
             'pickup',
             'withdraw'
-        ]))
+        ]), RESOURCE_ENERGY)
 
         return false
     }
@@ -290,7 +289,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
         creep.findTask(new Set([
             'pickup',
             'withdraw'
-        ]))
+        ]), RESOURCE_ENERGY)
 
         return false
     }
@@ -333,7 +332,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
         // Add control points to total controlPoints counter and say the success
 
-        Memory.controlPoints += energySpentBuilding
+        Memory.energySpentOnBuilding += energySpentBuilding
         creep.say('🚧' + energySpentBuilding * BUILD_POWER)
 
         // Inform true
@@ -891,7 +890,7 @@ Creep.prototype.acceptTask = function(task) {
     delete global[room.name].tasksWithoutResponders[task.ID]
 }
 
-Creep.prototype.findTask = function(allowedTaskTypes) {
+Creep.prototype.findTask = function(allowedTaskTypes, resourceType) {
 
     const creep = this
     const room = creep.room

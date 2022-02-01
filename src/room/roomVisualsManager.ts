@@ -1,4 +1,5 @@
 import { constants } from "international/constants"
+import { generalFuncs } from "international/generalFunctions"
 
 /**
  * Adds annotations to the room if roomVisuals are enabled
@@ -121,6 +122,24 @@ export function roomVisualsManager(room: Room) {
                 opacity: 1,
                 color: constants.colors.lightBlue,
             })
+        }
+    }
+
+    constructionTargetVisuals()
+
+    function constructionTargetVisuals() {
+
+        // If there is a construction target ID
+
+        if (global[room.name].cSiteTargetID) {
+
+            // Convert the construction target ID into a game object
+
+            const constructionTarget = generalFuncs.findObjectWithID(global[room.name].cSiteTargetID)
+
+            // Show a visual on the contructionTarget
+
+            room.visual.text('🚧', constructionTarget.pos)
         }
     }
 

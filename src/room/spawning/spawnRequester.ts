@@ -418,6 +418,42 @@ export function spawnRequester(room: Room) {
         }
     })())
 
+    // Construct requests for upgraders
+
+    constructSpawnRequests((function(): SpawnRequestOpts {
+
+        return {
+            defaultParts: [],
+            extraParts: [WORK, MOVE, CARRY, MOVE],
+            partsMultiplier: 6,
+            minCreeps: 0,
+            maxCreeps: 2,
+            minCost: 250,
+            priority: 2.5 + room.creepsFromRoom.controllerUpgrader,
+            memoryAdditions: {
+                role: 'controllerUpgrader',
+            }
+        }
+    })())
+
+    // Construct requests for builders
+
+    constructSpawnRequests((function(): SpawnRequestOpts {
+
+        return {
+            defaultParts: [],
+            extraParts: [WORK, MOVE, CARRY, MOVE],
+            partsMultiplier: 6,
+            minCreeps: 0,
+            maxCreeps: 2,
+            minCost: 250,
+            priority: 3.5 + room.creepsFromRoom.builder,
+            memoryAdditions: {
+                role: 'builder',
+            }
+        }
+    })())
+
     // Inform spawnRequests
 
     return spawnRequests
