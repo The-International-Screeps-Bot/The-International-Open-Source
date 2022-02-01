@@ -1,5 +1,4 @@
 import { marketManager } from "./market/marketManager"
-import { roomVisualsManager } from "./roomVisualsManager"
 import { taskManager } from "./roomTaskManager"
 
 import { spawnManager } from './spawning/spawnManager'
@@ -17,8 +16,6 @@ export function communeManager(room: Room) {
     taskManager(room)
 
     towerManager(room)
-
-    roomVisualsManager(room)
 
     constructionManager(room)
 

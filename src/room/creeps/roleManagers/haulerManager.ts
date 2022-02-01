@@ -11,7 +11,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
         // If creep has a task
 
-        if (global[creep.id] && global[creep.id].respondingTaskIDs && global[creep.id].respondingTaskIDs.length > 0) {
+        if (global[creep.id] && global[creep.id].respondingTaskID) {
 
             // Try to filfill task
 
@@ -23,7 +23,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
 
             // Delete it
 
@@ -67,7 +67,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
         // Otherwise find the task
 
-        const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskIDs[0]]
+        const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
 
         // Delete it
 

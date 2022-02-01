@@ -366,7 +366,7 @@ export function spawnRequester(room: Room) {
                 minCreeps: 2,
                 maxCreeps: Infinity,
                 minCost: 200,
-                priority: room.creepsFromRoom.sourceHarvester,
+                priority: room.creepCount.sourceHarvester,
                 memoryAdditions: {
                     role: 'sourceHarvester',
                 }
@@ -380,7 +380,7 @@ export function spawnRequester(room: Room) {
                 minCreeps: 2,
                 maxCreeps: Infinity,
                 minCost: 250,
-                priority: room.creepsFromRoom.sourceHarvester,
+                priority: room.creepCount.sourceHarvester,
                 memoryAdditions: {
                     role: 'sourceHarvester',
                 }
@@ -393,7 +393,7 @@ export function spawnRequester(room: Room) {
             minCreeps: undefined,
             maxCreeps: Math.max(3, room.get('source1HarvestPositions').length) + Math.max(3, room.get('source2HarvestPositions')),
             minCost: 250,
-            priority: room.creepsFromRoom.sourceHarvester,
+            priority: room.creepCount.sourceHarvester,
             memoryAdditions: {
                 role: 'sourceHarvester',
             }
@@ -411,7 +411,7 @@ export function spawnRequester(room: Room) {
             minCreeps: 0,
             maxCreeps: 2,
             minCost: 100,
-            priority: 0.5 + room.creepsFromRoom.hauler,
+            priority: 0.5 + room.creepCount.hauler,
             memoryAdditions: {
                 role: 'hauler',
             }
@@ -425,11 +425,11 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier: 6,
+            partsMultiplier: 3,
             minCreeps: 0,
             maxCreeps: 2,
             minCost: 250,
-            priority: 2.5 + room.creepsFromRoom.controllerUpgrader,
+            priority: 2.5 + room.creepCount.controllerUpgrader,
             memoryAdditions: {
                 role: 'controllerUpgrader',
             }
@@ -443,11 +443,11 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier: 6,
+            partsMultiplier: 3,
             minCreeps: 0,
             maxCreeps: 2,
             minCost: 250,
-            priority: 3.5 + room.creepsFromRoom.builder,
+            priority: 3.5 + room.creepCount.builder,
             memoryAdditions: {
                 role: 'builder',
             }

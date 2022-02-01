@@ -12,6 +12,7 @@ import { roleManager } from './creeps/creepRoleManager'
 import { powerCreepManager } from './powerCreeps/powerCreepManager'
 import { trafficManager } from './trafficManager'
 import { generalFuncs } from 'international/generalFunctions'
+import { roomVisualsManager } from './roomVisualsManager'
 
 const specificRoomManagers: {[key: string]: Function} = {
     remote: remoteManager,
@@ -26,9 +27,7 @@ export function roomManager() {
 
         const room: Room = Game.rooms[roomName]
 
-        const controller = room.controller
-
-        generalFuncs.customLog('Room', room.name, undefined, constants.colors.lightGrey)
+        generalFuncs.customLog('Room', room.name, Game.cpu.getUsed().toFixed(2), constants.colors.lightGrey)
 
         // Check if there is a roomManager for this room's type
 
@@ -47,6 +46,10 @@ export function roomManager() {
         //
 
         trafficManager(room)
+
+        //
+
+        roomVisualsManager(room)
 
         // Testing
 

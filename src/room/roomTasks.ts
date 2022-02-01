@@ -111,7 +111,7 @@ RoomTask.prototype.delete = function() {
     const taskLocation = task.findLocation()
 
     // Loop through the task's creators
-    generalFuncs.customLog('creatorIDs', task.creatorIDs)
+
     for (const creatorID of task.creatorIDs) {
 
         // And delete the taskID from their task list
@@ -121,7 +121,7 @@ RoomTask.prototype.delete = function() {
 
     // If the task has a responder remove the task ID from it
 
-    if (task.responderID) global[task.responderID].respondingTaskIDs.shift()
+    if (task.responderID) delete global[task.responderID].respondingTaskID
 
     // Delete the task
 

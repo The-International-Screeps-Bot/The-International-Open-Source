@@ -144,11 +144,11 @@ export function trafficManager(room: Room) {
 
             if(creepAtPos.fatigue > 0) break
 
-            // If the last pos in the creep's path has creepAtPos
+            /* // If the last pos in the creep's path has creepAtPos
 
             if (generalFuncs.arePositionsEqual(creep.memory.path[creep.memory.path.length - 1], pos)) {
 
-                /* // If the creepAtPos has a goalPos in memory
+                // If the creepAtPos has a goalPos in memory
 
                 if (creepAtPos.memory.goalPos) {
 
@@ -182,13 +182,13 @@ export function trafficManager(room: Room) {
 
                 // Otherwise push the creepAtPos
 
-                else */ creepAtPos.getPushed()
+                else creepAtPos.getPushed()
 
                 // Operate the creep's moveRequest and stop the loop
 
                 creep.runMoveRequest(pos)
                 break
-            }
+            } */
 
             // Otherwise have the creeps trade positions
 
