@@ -26,7 +26,7 @@ export function droppedResourceManager(room: Room) {
 
             // Find the resource's tasks of type pickup
 
-            const droppedResourcePickupTasks = room.findTasksOfTypes(global[droppedResource.id].createdTaskIDs, new Set(['pickup'])) as RoomPickupTask[]
+            const droppedResourcePickupTasks: RoomPickupTask[] = room.findTasksOfTypes(global[droppedResource.id].createdTaskIDs, new Set(['pickup'])) as RoomPickupTask[]
 
             // Track the amount of energy the resource has offered in tasks
 
@@ -42,7 +42,7 @@ export function droppedResourceManager(room: Room) {
             }
 
             // If there are more or equal resources offered than the droppedResource has in amount, iterate
-            
+
             if (totalResourcesOffered >= droppedResource.amount) continue
         }
 

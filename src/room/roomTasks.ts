@@ -88,7 +88,11 @@ RoomTask.prototype.shouldStayActive = function() {
 
     const task = this
 
-    // Loop through task cretor IDs
+    // If the task has a responderID and the object with its ID is undefined, inform false
+
+    if (task.responderID && !generalFuncs.findObjectWithID(task.responderID)) return false
+
+    // Loop through task creatorIDs
 
     for (const creatorID of task.creatorIDs) {
 
@@ -216,7 +220,7 @@ export class RoomPickupTask extends RoomTask {
 
         // Assign defaults
 
-        task.pickupAmount = 100000
+        task.pickupAmount = 10000000
     }
 }
 

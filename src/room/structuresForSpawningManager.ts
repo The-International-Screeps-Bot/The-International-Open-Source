@@ -50,11 +50,24 @@ export function structuresForSpawningManager(room: Room) {
 
             // Find the structures's tasks of type tansfer
 
-            const structuresTransferTasks = room.findTasksOfTypes(global[structure.id].createdTaskIDs, new Set(['transfer']))
+            const structuresTransferTasks = room.findTasksOfTypes(global[structure.id].createdTaskIDs, new Set(['transfer'])) as RoomTransferTask[]
 
-            // Iterate if there are already transfer requests for the structure
+            // Track the amount of energy the resource has offered in tasks
 
-            if (structuresTransferTasks.length > 0) continue
+            let totalResourcesRequested = 0
+
+            // Loop through each pickup task
+
+            for (const task of structuresTransferTasks) {
+
+                // Otherwise find how many resources the task has requested to pick up
+
+                totalResourcesRequested += task.transferAmount
+            }
+
+            // If there are more or equal resources offered than the free energy capacity of the structure, iterate
+
+            if (totalResourcesRequested >= structure.store.getFreeCapacity(RESOURCE_ENERGY)) continue
         }
 
         // Get the amount of energy the structure needs at a max of the hauler's capacity
