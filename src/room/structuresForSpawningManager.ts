@@ -10,24 +10,6 @@ export function structuresForSpawningManager(room: Room) {
 
     const haulerCapacity = Game.creeps[room.myCreeps.hauler[0]] ? Game.creeps[room.myCreeps.hauler[0]].store.getCapacity() : 100
 
-    // Construct group data
-
-    let groupIndex = 0
-
-    // Construct structure groups
-
-    interface StructureGroup {
-        totalTransferAmount: number
-        structures: (Id<StructureSpawn> | Id<StructureExtension>)[]
-    }
-
-    const structureGroups: StructureGroup[] = [
-        {
-            totalTransferAmount: 0,
-            structures: []
-        }
-    ]
-
     // Get exensions and spawns
 
     const structuresForSpawning: (StructureSpawn | StructureExtension)[] = room.get('structuresForSpawning')
@@ -72,43 +54,15 @@ export function structuresForSpawningManager(room: Room) {
 
         // Get the amount of energy the structure needs at a max of the hauler's capacity
 
-        const transferAmount: number = Math.min(structure.store.getFreeCapacity(RESOURCE_ENERGY), haulerCapacity)
+        const transferAmount = Math.min(structure.store.getFreeCapacity(RESOURCE_ENERGY), haulerCapacity)
 
-        // If the groupTransferAmount plus transferAmount is more than hauler capacity
+        // If the transferAmount is more than 0
 
-        if (structureGroups[groupIndex].totalTransferAmount + transferAmount > haulerCapacity) {
+        if (transferAmount > 0) {
 
-            // Create a new group
+            // Create a new transfer task for the structure
 
-            structureGroups.push({
-                totalTransferAmount: 0,
-                structures: []
-            })
-
-            // And increment the groupIndex
-
-            groupIndex++
+            new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, structure.id)
         }
-
-        // Add the transferAmount to the group's totalTransferAmount
-
-        structureGroups[groupIndex].totalTransferAmount += transferAmount
-
-        // And add the structure's ID to the group's structures
-
-        structureGroups[groupIndex].structures.push(structure.id)
-    }
-
-    // Loop through each group of structureGroups
-
-    for (const group of structureGroups) {
-
-        // Iterate if there is no transfer amount for the group
-
-        if (group.totalTransferAmount == 0) continue
-
-        // Create a transfer task based on the group's data
-
-        new RoomTransferTask(room.name, RESOURCE_ENERGY, group.totalTransferAmount, group.structures)
     }
 }

@@ -8,7 +8,7 @@ export interface RoomTask {
     /**
      * The name of the room that the task will be recorded in
      */
-    creatorIDs: string[]
+    creatorID: string
     roomName: string
     responderID: string
     ID: number
@@ -34,36 +34,31 @@ export interface RoomTask {
 }
 
 export class RoomTask {
-    constructor(type: RoomTaskTypes, creatorIDs: string[], roomName: string) {
+    constructor(type: RoomTaskTypes, creatorID: string, roomName: string) {
 
         const task = this
         generalFuncs.customLog('Created task', type)
         // Assign parameters
 
         task.type = type
-        task.creatorIDs = creatorIDs
+        task.creatorID = creatorID
         task.roomName = roomName
 
         // Generate an ID
 
         task.ID = generalFuncs.newID()
 
-        // Loop through task creator IDs
+        // if there is no global for the creator, make one
 
-        for (const creatorID of creatorIDs) {
+        if (!global[creatorID]) global[creatorID] = {}
 
-            // if there is no global for the creep, make one
+        // If there is no created task IDs object for the creator, make it
 
-            if (!global[creatorID]) global[creatorID] = {}
+        if (!global[creatorID].createdTaskIDs) global[creatorID].createdTaskIDs = {}
 
-            // If there is no created task IDs object for the creator, make it
+        // Set a value for the creator's ID if it doesn't exist, then assign the taskID and responder state
 
-            if (!global[creatorID].createdTaskIDs) global[creatorID].createdTaskIDs = {}
-
-            // Set a value for the creator's ID if it doesn't exist, then assign the taskID and responder state
-
-            global[creatorID].createdTaskIDs[task.ID] = false
-        }
+        global[creatorID].createdTaskIDs[task.ID] = false
 
         // Record the task in the room with the requested roomName
 
@@ -92,14 +87,9 @@ RoomTask.prototype.shouldStayActive = function() {
 
     if (task.responderID && !generalFuncs.findObjectWithID(task.responderID)) return false
 
-    // Loop through task creatorIDs
+    // If the creator no longer exits, infom false
 
-    for (const creatorID of task.creatorIDs) {
-
-        // If the creator no longer exits, infom false
-
-        if (!generalFuncs.findObjectWithID(creatorID)) return false
-    }
+    if (!generalFuncs.findObjectWithID(task.creatorID)) return false
 
     // Otherwise inform true
 
@@ -114,14 +104,9 @@ RoomTask.prototype.delete = function() {
     generalFuncs.customLog('Deleted task', task.type)
     const taskLocation = task.findLocation()
 
-    // Loop through the task's creators
+    // And delete the taskID from the creator's list
 
-    for (const creatorID of task.creatorIDs) {
-
-        // And delete the taskID from their task list
-
-        delete global[creatorID].createdTaskIDs[task.ID]
-    }
+    delete global[task.creatorID].createdTaskIDs[task.ID]
 
     // If the task has a responder remove the task ID from it
 
@@ -138,11 +123,11 @@ export interface RoomWithdrawTask extends RoomTask {
 }
 
 export class RoomWithdrawTask extends RoomTask {
-    constructor(roomName: string, resourceType: ResourceConstant, withdrawAmount: number, withdrawTargetID: string) {
+    constructor(roomName: string, resourceType: ResourceConstant, withdrawAmount: number, withdrawTargetID: Id<any>) {
 
         // Inherit from RoomTask
 
-        super('withdraw', [withdrawTargetID], roomName)
+        super('withdraw', withdrawTargetID, roomName)
 
         const task = this
 
@@ -157,15 +142,15 @@ export class RoomWithdrawTask extends RoomTask {
 
 export interface RoomTransferTask extends RoomTask {
     transferAmount: number
-    transferTargetIDs: string[]
+    transferTargetID: Id<any>
 }
 
 export class RoomTransferTask extends RoomTask {
-    constructor(roomName: string, resourceType: ResourceConstant, transferAmount: number, transferTargetIDs: string[]) {
+    constructor(roomName: string, resourceType: ResourceConstant, transferAmount: number, transferTargetID: Id<any>) {
 
         // Inherit from RoomTask
 
-        super('transfer', transferTargetIDs, roomName)
+        super('transfer', transferTargetID, roomName)
 
         const task = this
 
@@ -174,7 +159,7 @@ export class RoomTransferTask extends RoomTask {
         task.resourceType = resourceType
         task.transferAmount = transferAmount
 
-        task.transferTargetIDs = transferTargetIDs
+        task.transferTargetID = transferTargetID
     }
 }
 
@@ -184,11 +169,11 @@ export interface RoomRepairTask extends RoomTask {
 }
 
 export class RoomRepairTask extends RoomTask {
-    constructor(roomName: string, repairTargetID: string, repairThreshold: number) {
+    constructor(roomName: string, repairTargetID: Id<Structure>, repairThreshold: number) {
 
         // Inherit from RoomTask
 
-        super('repair', [repairTargetID], roomName)
+        super('repair', repairTargetID, roomName)
 
         const task = this
 
@@ -209,7 +194,7 @@ export class RoomPickupTask extends RoomTask {
 
         // Inherit from RoomTask
 
-        super('pickup', [resourceID], roomName)
+        super('pickup', resourceID, roomName)
 
         const task = this
 
@@ -230,11 +215,11 @@ export interface RoomPullTask extends RoomTask {
 }
 
 export class RoomPullTask extends RoomTask {
-    constructor(roomName: string, targetID: string, targetPos: RoomPosition) {
+    constructor(roomName: string, targetID: Id<Creep>, targetPos: RoomPosition) {
 
         // Inherit from RoomTask
 
-        super('pull', [targetID], roomName)
+        super('pull', targetID, roomName)
 
         const task = this
 

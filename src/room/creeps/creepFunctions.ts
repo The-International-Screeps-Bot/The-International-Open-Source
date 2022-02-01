@@ -27,7 +27,6 @@ Creep.prototype.isDying = function() {
 Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENERGY, amount) {
 
     const creep = this
-    const room = creep.room
 
     // If creep isn't in transfer range
 
@@ -51,7 +50,7 @@ Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENER
     // Try to transfer
 
     const transferResult = creep.transfer(target, resourceType, amount)
-
+    creep.say(`${transferResult}, ${amount}`)
     // Inform the result of the transfer
 
     return transferResult == OK
@@ -864,14 +863,9 @@ Creep.prototype.acceptTask = function(task) {
 
     task.responderID = creep.id
 
-    // Loop through the task's creators
+    // And record in the creator that the task now has a responder
 
-    for (const creatorID of task.creatorIDs) {
-
-        // And record that the task now has a responder
-
-        global[creatorID].createdTaskIDs[task.ID] = true
-    }
+    global[task.creatorID].createdTaskIDs[task.ID] = true
 
     // Add the task to tasksWithResponders
 
@@ -1127,57 +1121,17 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     creep.say('TT')
 
+    // If the creep is empty of the task resource, inform true
+
+    if (creep.store.getUsedCapacity(task.resourceType) == 0) return true
+
     // Get the transfer target using the task's transfer target IDs
 
-    let transferTarget = generalFuncs.findObjectWithID(task.transferTargetIDs[0])
+    const transferTarget = generalFuncs.findObjectWithID(task.transferTargetID)
 
-    // Transfer to the target
+    // Inform the result of the adancedTransfer to the transferTarget
 
-    let advancedTransferResult = creep.advancedTransfer(transferTarget, task.resourceType)
-
-    // If the transfer failed, inform false
-
-    if (!advancedTransferResult) return false
-
-    // Otherwise delete the task's ID from the creator that was transfered to
-
-    delete global[task.creatorIDs[0]].createdTaskIDs[task.ID]
-
-    // And remove the transfer target's ID from the task's transfer target IDs
-
-    task.transferTargetIDs.shift()
-
-    // Inform true if there are no transfer target left
-
-    if (task.transferTargetIDs.length == 0) return true
-
-    // Otherwise if the creep has made a move request, inform false
-
-    if (creep.moveRequest) return false
-
-    // Otherwise get the next transfer target using the task's transfer target IDs
-
-    transferTarget = generalFuncs.findObjectWithID(task.transferTargetIDs[0])
-
-    // And try to transfer to it
-
-    advancedTransferResult = creep.advancedTransfer(transferTarget, task.resourceType)
-
-    // If the transfer failed, inform false
-
-    if (!advancedTransferResult) return false
-
-    // Otherwise remove the transfer target's ID from the task's transfer target IDs
-
-    task.transferTargetIDs.shift()
-
-    // If there are no transfer target left, inform true
-
-    if (task.transferTargetIDs.length == 0) return true
-
-    // Otherwise inform false
-
-    return false
+    return creep.advancedTransfer(transferTarget, task.resourceType)
 }
 
 Creep.prototype.fulfillWithdrawTask = function(task) {
@@ -1190,17 +1144,9 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
 
     const withdrawTarget = generalFuncs.findObjectWithID(task.withdrawTargetID)
 
-    // Try to withdraw from the target
+    // Try to withdraw from the target, informing the amount
 
-    const withdrawResult = creep.advancedWithdraw(withdrawTarget, task.resourceType, task.withdrawAmount)
-
-    // If the withdraw failed, inform false
-
-    if (!withdrawResult) return false
-
-    // Otherwise inform true
-
-    return true
+    return creep.advancedWithdraw(withdrawTarget, task.resourceType, task.withdrawAmount)
 }
 
 Creep.prototype.fulfillPickupTask = function(task) {
@@ -1217,15 +1163,7 @@ Creep.prototype.fulfillPickupTask = function(task) {
 
     const pickupTarget = generalFuncs.findObjectWithID(task.resourceID)
 
-    // Try to pickup from the target
+    // Try to pickup from the target, informing the result
 
-    const pickupResult = creep.advancedPickup(pickupTarget)
-
-    // If the pickup failed, inform false
-
-    if (!pickupResult) return false
-
-    // Otherwise inform true
-
-    return true
+    return creep.advancedPickup(pickupTarget)
 }
