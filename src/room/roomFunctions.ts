@@ -859,19 +859,21 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
         // Construct route by searching through rooms
 
-        const route: Route | -2 = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
+        const route = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
 
             // Essentially a costMatrix for the rooms, priority is for the lower values. Infinity is impassible
 
             routeCallback(roomName: string) {
 
-                const roomMemory = Memory.rooms[roomName]
-
                 // If the goal is in the room, inform 1
 
                 if (roomName == opts.goal.pos.roomName) return 1
 
-                // If there is no memory for the room inform impassible
+                // Get the room's memory
+
+                const roomMemory = Memory.rooms[roomName]
+
+                // If there is no memory for the room, inform impassible
 
                 if (!roomMemory) return Infinity
 
@@ -889,10 +891,6 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
         if (route == ERR_NO_PATH) return undefined
 
-        // If the route is less than 2 inform undefined
-
-        if (route.length < 2) return undefined
-
         // Otherwise inform the route
 
         return route
@@ -904,14 +902,14 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
         const route = generateRoute()
         if (route) opts.goal = {
-            pos: room.newPos({ x: 25, y: 25 }),
+            pos: new RoomPosition(25, 25, route[0].room),
             range: 25
         }
 
-        const pathFinderResult: PathFinderPath = PathFinder.search(opts.origin, opts.goal, {
+        const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost,
             swampCost: opts.swampCost,
-            maxRooms: opts.maxRooms,
+            maxRooms: route ? route.length + 1 : opts.maxRooms,
             maxOps: 100000,
             flee: opts.flee,
 
@@ -919,38 +917,13 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
             roomCallback(roomName) {
 
-                // If there isn't vision in this room inform to avoid this room
+                // Get the room using the roomName
 
                 const room = Game.rooms[roomName]
-                if (!room) return false
 
-                // Create a costMatrix
+                // Create a costMatrix for the room
 
                 const cm = new PathFinder.CostMatrix()
-
-                // Loop trough each construction site belonging to an ally
-
-                for (const cSite of room.get('allyCSites')) {
-
-                    // Set the site as impassible
-
-                    cm.set(cSite.x, cSite.y, 255)
-                }
-
-                // If useRoads is enabled
-
-                if (opts.useRoads) {
-
-                    // Get roads and loop through them
-
-                    const roads: StructureRoad[] = room.get('road')
-                    for (const road of roads) {
-
-                        // Set road positions as prefered
-
-                        cm.set(road.pos.x, road.pos.y, 1)
-                    }
-                }
 
                 // If there is no route
 
@@ -1036,6 +1009,34 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                     }
                 }
 
+                // If there is no vision in the room, inform the costMatrix
+
+                if (!room) return cm
+
+                // Loop trough each construction site belonging to an ally
+
+                for (const cSite of room.get('allyCSites')) {
+
+                    // Set the site as impassible
+
+                    cm.set(cSite.x, cSite.y, 255)
+                }
+
+                // If useRoads is enabled
+
+                if (opts.useRoads) {
+
+                    // Get roads and loop through them
+
+                    const roads: StructureRoad[] = room.get('road')
+                    for (const road of roads) {
+
+                        // Set road positions as prefered
+
+                        cm.set(road.pos.x, road.pos.y, 1)
+                    }
+                }
+
                 // If there is a request to avoid enemy ranges
 
                 avoidEnemyRanges()
@@ -1063,7 +1064,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                             x2: opts.creep.pos.x + 2,
                             y2: opts.creep.pos.y + 2
                         }
-                        const positions: Pos[] = generalFuncs.findPositionsInsideRect(rect)
+                        const positions = generalFuncs.findPositionsInsideRect(rect)
 
                         // Loop through positions
 
@@ -1144,7 +1145,11 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
         // If the pathFindResult is incomplete, inform an empty array
 
-        if (pathFinderResult.incomplete) return []
+        if (pathFinderResult.incomplete) {
+
+            generalFuncs.customLog('Incomplete Path', JSON.stringify(opts.origin), constants.colors.white, constants.colors.red)
+            return []
+        }
 
         // Otherwise inform the path from pathFinderResult
 

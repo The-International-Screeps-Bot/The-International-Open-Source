@@ -1,3 +1,4 @@
+import { generalFuncs } from "international/generalFunctions";
 import { Scout } from "../creepClasses";
 
 Scout.prototype.findScoutTarget = function() {
@@ -7,12 +8,12 @@ Scout.prototype.findScoutTarget = function() {
 
     // Construct storage of exit information
 
-    const scoutedRooms = []
-    const unscoutedRooms = []
+    const scoutedRooms: string[] = [],
+    unscoutedRooms: string[] = [],
 
     // Get information about the room's exits
 
-    const exits = Game.map.describeExits(room.name)
+    exits = Game.map.describeExits(room.name)
 
     // Loop through each exit type
 
@@ -41,25 +42,25 @@ Scout.prototype.findScoutTarget = function() {
         unscoutedRooms.push(roomName)
     }
 
-    // If scoutedRooms has elements
+    // If unscoutedRooms has elements
 
-    if (scoutedRooms.length > 0) {
+    if (unscoutedRooms.length) {
 
-        // Sort the scoutedRooms by their scoutTick, selecting the oldest one
+        // Sort unscoutedRooms by their distance from the creep's room, selecting the closest
 
-        const oldestScoutedRoom = scoutedRooms.sort((a, b) => Memory[a].scoutTick - Memory[b].scoutTick)[0]
+        const preferedUnscoutedRoom = unscoutedRooms.sort((a, b) => Game.map.getRoomLinearDistance(creep.memory.communeName, a) - Game.map.getRoomLinearDistance(creep.memory.communeName, b))[0]
 
-        // Record the oldestScoutedRoom in the creep's memory and stop
+        // Record the preferedUnscoutedRoom in the creep's memory and stop
 
-        creep.memory.scoutTarget = oldestScoutedRoom
+        creep.memory.scoutTarget = preferedUnscoutedRoom
         return
     }
 
-    // Otherwise sort unscoutedRooms by their distance from the creep's room, selecting the closest
+    // Otherwise ort the scoutedRooms by their scoutTick, selecting the oldest one
 
-    const preferedUnscoutedRoom = unscoutedRooms.sort((a, b) => Game.map.getRoomLinearDistance(creep.memory.communeName, a) - Game.map.getRoomLinearDistance(creep.memory.communeName, b))[0]
+    const oldestScoutedRoom = scoutedRooms.sort((a, b) => Memory.rooms[a].scoutTick - Memory.rooms[b].scoutTick)[0]
 
-    // Record the preferedUnscoutedRoom in the creep's memory
+    // Record the oldestScoutedRoom in the creep's memory
 
-    creep.memory.scoutTarget = preferedUnscoutedRoom
+    creep.memory.scoutTarget = oldestScoutedRoom
 }

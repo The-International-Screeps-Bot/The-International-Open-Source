@@ -27,17 +27,11 @@ export function roomManager() {
 
         const room: Room = Game.rooms[roomName]
 
-        generalFuncs.customLog('Room', room.name, Game.cpu.getUsed().toFixed(2), constants.colors.lightGrey)
+        generalFuncs.customLog(room.name, Game.cpu.getUsed().toFixed(2), undefined, constants.colors.lightGrey)
 
-        // Check if there is a roomManager for this room's type
+        // If there is a specific manager for this room's type, run it
 
-        const specificRoomManager = specificRoomManagers[room.memory.type]
-        if (specificRoomManager) {
-
-            // Run specific manager
-
-            specificRoomManager(room)
-        }
+        if (specificRoomManagers[room.memory.type]) specificRoomManagers[room.memory.type](room)
 
         //
 

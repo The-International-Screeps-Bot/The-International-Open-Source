@@ -151,11 +151,13 @@ generalFuncs.advancedFindDistance = function(originRoomName, goalRoomName, typeW
     const findRouteResult = Game.map.findRoute(originRoomName, goalRoomName, {
         routeCallback(roomName) {
 
-            const roomMemory = Memory.rooms[roomName]
-
             // If the goal is in the room, inform 1
 
             if (roomName == goalRoomName) return 1
+
+            // Get the room's memory
+
+            const roomMemory = Memory.rooms[roomName]
 
             // If there is no memory for the room inform impassible
 

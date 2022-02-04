@@ -7,6 +7,7 @@ import { mineralHarvesterManager } from './roleManagers/mineralHarvesterManager'
 import { antifaManager } from './roleManagers/antifa/antifaManager'
 import { maintainerManager } from './roleManagers/maintainerManager'
 import { builderManager } from './roleManagers/builderManager'
+import { scoutManager } from './roleManagers/scoutManager'
 
 export function roleManager(room: Room) {
 
@@ -16,6 +17,7 @@ export function roleManager(room: Room) {
         controllerUpgrader: controllerUpgraderManager,
         builder: builderManager,
         maintainer: maintainerManager,
+        scout: scoutManager,
         mineralHarvester: mineralHarvesterManager,
         antifa: antifaManager,
     }

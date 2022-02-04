@@ -766,9 +766,9 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     let movePos = path[0]
 
-    // Visualize path
+    // If visuals are enabled, visualize the path
 
-    room.pathVisual(path, 'lightBlue')
+    if (Memory.roomVisuals) room.pathVisual(path, 'lightBlue')
 
     // Turn the creep's pos into a string
 
@@ -1176,7 +1176,7 @@ Creep.prototype.advancedSignController = function() {
 
         // If the room already has a correct sign, inform true
 
-        if (constants.communeSigns.includes(room.controller.sign.text)) return true
+        if (room.controller.sign && constants.communeSigns.includes(room.controller.sign.text)) return true
 
         // Otherwise assign the signMessage the commune sign
 
@@ -1189,7 +1189,7 @@ Creep.prototype.advancedSignController = function() {
 
         // If the room already has a correct sign, inform true
 
-        if (constants.nonCommuneSigns.includes(room.controller.sign.text)) return true
+        if (room.controller.sign && constants.nonCommuneSigns.includes(room.controller.sign.text)) return true
 
         // Otherwise get a rounded random value based on the length of nonCommuneSign
 

@@ -1,7 +1,7 @@
 import { Scout } from '../creepClasses'
 import './scoutFunctions'
 
-export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
+export function scoutManager(room: Room, creepsOfRole: string[]) {
 
     // Loop through the names of the creeps of the role
 
@@ -13,11 +13,15 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         // If the creep is in the scoutTarget
 
-        if (creep.memory.sourceTarget == room.name) {
+        if (creep.memory.scoutTarget == room.name) {
 
             // Get information about the room
 
             Game.rooms[creep.memory.communeName].findType(room)
+
+            // Assign the room this tick as its scoutTick
+
+            room.memory.scoutTick = Game.time
 
             // And delete the creep's scoutTarget
 
@@ -27,6 +31,10 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
         // If there is no scoutTarget, find one
 
         if (!creep.memory.scoutTarget) creep.findScoutTarget()
+
+        // Say the scoutTarget
+
+        creep.say(`${creep.memory.scoutTarget}`)
 
         // If there is a controller and it isn't in safeMode
 
@@ -44,6 +52,8 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
             goal: { pos: new RoomPosition(25, 25, creep.memory.scoutTarget), range: 0 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
+            cacheAmount: 50,
+            typeWeights: {}
         })
     }
 }

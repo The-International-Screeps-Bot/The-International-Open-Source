@@ -15,8 +15,8 @@ export function spawnRequester(room: Room) {
 
     // Structure info about the room's spawn energy
 
-    const spawnEnergyAvailable = room.energyAvailable
-    const spawnEnergyCapacity = room.energyCapacityAvailable
+    const spawnEnergyAvailable = room.energyAvailable,
+    spawnEnergyCapacity = room.energyCapacityAvailable
 
     //
 
@@ -52,7 +52,7 @@ export function spawnRequester(room: Room) {
 
         // If there are no sourceHarvesters or haulers, set the maxCostPerCreep to the spawnEnergyAvailable, otherwise set it to the lowest allowed cost
 
-        const maxCostPerCreep = (room.creepCount.sourceHarvester == 0 || room.creepCount.hauler == 0) ? spawnEnergyAvailable : opts.minCost
+        const maxCostPerCreep = (room.creepCount.sourceHarvester == 0 || room.creepCount.hauler == 0) ? spawnEnergyAvailable : spawnEnergyCapacity
 
         // If the maxCostPerCreep is less than the minCost, stop
 
@@ -90,7 +90,7 @@ export function spawnRequester(room: Room) {
 
                         // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, stop the loop
 
-                        if (cost + partCost >= maxCostPerCreep) break
+                        if (cost + partCost > maxCostPerCreep) break
 
                         // Otherwise add the part the the body
 
@@ -102,92 +102,97 @@ export function spawnRequester(room: Room) {
                     }
                 }
 
-                // Use the partsMultiplier to decide how many extraParts are needed on top of the defaultParts, at a max of 50
+                // If there are extraParts
 
-                let extraPartsAmount = Math.min(50, opts.defaultParts.length + opts.extraParts.length * opts.partsMultiplier)
+                if (opts.extraParts.length) {
 
-                // Record the partIndex
+                    // Use the partsMultiplier to decide how many extraParts are needed on top of the defaultParts, at a max of 50
 
-                let partIndex = 0
+                    let extraPartsAmount = Math.min(50, opts.extraParts.length * opts.partsMultiplier)
 
-                // So long as the cost is less than the maxCostPerCreep
+                    // Record the partIndex
 
-                while (cost < maxCostPerCreep) {
+                    let partIndex = 0
 
-                    // Get the part using the partIndex
+                    // So long as the cost is less than the maxCostPerCreep
 
-                    let part = opts.extraParts[partIndex]
+                    while (cost < maxCostPerCreep) {
 
-                    // Get the cost of the part
+                        // Get the part using the partIndex
 
-                    let partCost = BODYPART_COST[part]
+                        let part = opts.extraParts[partIndex]
 
-                    // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, or if there are too few extraPartsAmount, or if the body is too long
+                        // Get the cost of the part
 
-                    if (cost + partCost >= maxCostPerCreep || extraPartsAmount - 1 > 0 || body.length + 1 == 50) {
+                        let partCost = BODYPART_COST[part]
 
-                        // So long as the partIndex is more than 0
+                        // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, or if there are too few extraPartsAmount, or if the body is too long
 
-                        while (partIndex > 0) {
+                        if (cost + partCost >= maxCostPerCreep || extraPartsAmount - 1 > 0 || body.length + 1 == 50) {
 
-                            // Get the part using the partIndex
+                            // So long as the partIndex is more than 0
 
-                            part = opts.extraParts[partIndex]
+                            while (partIndex > 0) {
 
-                            // Get the cost of the part
+                                // Get the part using the partIndex
 
-                            partCost = BODYPART_COST[part]
+                                part = opts.extraParts[partIndex]
 
-                            // If the cost of the creep minus the part is less than or equal to the minCost, stop the loop
+                                // Get the cost of the part
 
-                            if (cost - partCost <= opts.minCost) break
+                                partCost = BODYPART_COST[part]
 
-                            // Otherwise remove the last part in the body
+                                // If the cost of the creep minus the part is less than or equal to the minCost, stop the loop
 
-                            body.pop()
+                                if (cost - partCost <= opts.minCost) break
 
-                            // Remove the partCost from the cost
+                                // Otherwise remove the last part in the body
 
-                            cost -= partCost
+                                body.pop()
 
-                            // Increase extraPartsAmount
+                                // Remove the partCost from the cost
 
-                            extraPartsAmount++
+                                cost -= partCost
 
-                            // Reduce partIndex
+                                // Increase extraPartsAmount
 
-                            partIndex--
+                                extraPartsAmount++
+
+                                // Reduce partIndex
+
+                                partIndex--
+                            }
+
+                            // Otherwise stop the loop
+
+                            break
                         }
 
-                        // Otherwise stop the loop
+                        // Otherwise add the part the the body
 
-                        break
-                    }
+                        body.push(part)
 
-                    // Otherwise add the part the the body
+                        // And add the partCost to the cost
 
-                    body.push(part)
+                        cost += partCost
 
-                    // And add the partCost to the cost
+                        // Reduce extraPartsAmount
 
-                    cost += partCost
+                        extraPartsAmount--
 
-                    // Reduce extraPartsAmount
+                        // Increase partIndex
 
-                    extraPartsAmount--
+                        partIndex++
 
-                    // Increase partIndex
+                        // If the partIndex is equal to the length of extraParts
 
-                    partIndex++
+                        if (partIndex == opts.extraParts.length) {
 
-                    // If the partIndex is equal to the length of extraParts
+                            // Set partIndex to 0 and increase tier
 
-                    if (partIndex == opts.extraParts.length) {
-
-                        // Set partIndex to 0 and increase tier
-
-                        partIndex = 0
-                        tier++
+                            partIndex = 0
+                            tier++
+                        }
                     }
                 }
 
@@ -248,7 +253,7 @@ export function spawnRequester(room: Room) {
 
                     // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, stop the loop
 
-                    if (cost + partCost >= maxCostPerCreep) break
+                    if (cost + partCost > maxCostPerCreep) break
 
                     // Otherwise add the part the the body
 
@@ -450,6 +455,24 @@ export function spawnRequester(room: Room) {
             priority: 3.5 + room.creepCount.builder,
             memoryAdditions: {
                 role: 'builder',
+            }
+        }
+    })())
+
+    // Construct requests for scouts
+
+    constructSpawnRequests((function(): SpawnRequestOpts {
+
+        return {
+            defaultParts: [MOVE],
+            extraParts: [],
+            partsMultiplier: 0,
+            minCreeps: 2,
+            maxCreeps: Infinity,
+            minCost: 50,
+            priority: 2 + room.creepCount.scout,
+            memoryAdditions: {
+                role: 'scout',
             }
         }
     })())

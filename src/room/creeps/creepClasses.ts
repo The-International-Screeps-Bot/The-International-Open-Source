@@ -74,7 +74,7 @@ export class Scout extends Creep {
 
     }
 }
-creepClasses.maintainer = Scout
+creepClasses.scout = Scout
 
 export class Antifa extends Creep {
     constructor(creepID: Id<Creep>) {
