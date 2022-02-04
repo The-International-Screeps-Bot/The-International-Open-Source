@@ -72,6 +72,7 @@ declare global {
     'builder' |
     'maintainer' |
     'mineralHarvester' |
+    'scout' |
     'antifa'
 
     type RoomObjectName =
@@ -468,6 +469,11 @@ declare global {
          * A description of the room's defining properties that can be used to assume other properties
          */
         type: string
+
+        /**
+         * The last tick the room was scouted at
+         */
+        scoutTick: number
     }
 
     // Creeps
@@ -606,6 +612,11 @@ declare global {
          * Have the creep attempt to fulfill its pickup task
          */
         fulfillPickupTask(task: RoomPickupTask): boolean
+
+        /**
+         * Tries to sign a room's controller depending on the situation
+         */
+        advancedSignController(): boolean
     }
 
     interface CreepMemory {
@@ -652,6 +663,11 @@ declare global {
          *
          */
         repairTargetID: Id<Structure>
+
+        /**
+         * The name of the room the scout is trying to scout
+         */
+        scoutTarget: string
     }
 
     // PowerCreeps

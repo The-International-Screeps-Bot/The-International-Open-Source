@@ -169,6 +169,7 @@ constants.creepRoles = [
     'builder',
     'maintainer',
     'mineralHarvester',
+    'scout',
     'antifa',
 ]
 

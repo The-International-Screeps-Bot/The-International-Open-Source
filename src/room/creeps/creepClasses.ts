@@ -61,6 +61,21 @@ export class MineralHarvester extends Creep {
 }
 creepClasses.mineralHarvester = MineralHarvester
 
+export class Scout extends Creep {
+
+    /**
+     * Finds a room name for the scout to target
+     */
+    findScoutTarget?(): void
+
+    constructor(creepID: Id<Creep>) {
+
+        super(creepID)
+
+    }
+}
+creepClasses.maintainer = Scout
+
 export class Antifa extends Creep {
     constructor(creepID: Id<Creep>) {
 

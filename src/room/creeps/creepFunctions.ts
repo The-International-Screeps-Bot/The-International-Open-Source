@@ -109,6 +109,7 @@ Creep.prototype.advancedPickup = function(target) {
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
         })
+
         return false
     }
 
@@ -116,13 +117,9 @@ Creep.prototype.advancedPickup = function(target) {
 
     const pickupResult = creep.pickup(target)
 
-    // If the pickup is not a success inform the failure
+    // Inform the result of the pickup
 
-    if (pickupResult != OK) return false
-
-    // Otherwise inform the success
-
-    return true
+    return pickupResult == OK
 }
 
 Creep.prototype.advancedHarvestSource = function(source) {
@@ -675,7 +672,7 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
     // Inform true if the path is out of caching time
 
-    if (creep.memory.lastCache + cacheAmount < Game.time) return true
+    if (creep.memory.lastCache + cacheAmount <= Game.time) return true
 
     // Inform true if the creep's previous target isn't its current
 
@@ -727,7 +724,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     // Set path to the path in the creep's memory
 
-    let path: RoomPosition[] = creep.memory.path
+    let path = creep.memory.path
 
     // If the creep need a new path, make one
 
@@ -1155,10 +1152,6 @@ Creep.prototype.fulfillPickupTask = function(task) {
 
     creep.say('PUT')
 
-    // If the creep is full
-
-    if (creep.store.getFreeCapacity() == 0) return true
-
     // Otherwise get the pickup target
 
     const pickupTarget = generalFuncs.findObjectWithID(task.resourceID)
@@ -1166,4 +1159,65 @@ Creep.prototype.fulfillPickupTask = function(task) {
     // Try to pickup from the target, informing the result
 
     return creep.advancedPickup(pickupTarget)
+}
+
+Creep.prototype.advancedSignController = function() {
+
+    const creep = this
+    const room = creep.room
+
+    // Construct the signMessage
+
+    let signMessage: string
+
+    // If the room is a commune
+
+    if (room.memory.type == 'commune') {
+
+        // If the room already has a correct sign, inform true
+
+        if (constants.communeSigns.includes(room.controller.sign.text)) return true
+
+        // Otherwise assign the signMessage the commune sign
+
+        signMessage = constants.communeSigns[0]
+    }
+
+    // Otherwise if the room is not a commune
+
+    else {
+
+        // If the room already has a correct sign, inform true
+
+        if (constants.nonCommuneSigns.includes(room.controller.sign.text)) return true
+
+        // Otherwise get a rounded random value based on the length of nonCommuneSign
+
+        const randomSign = Math.floor(Math.random() * constants.nonCommuneSigns.length)
+
+        // And assign the message according to the index of randomSign
+
+        signMessage = constants.nonCommuneSigns[randomSign]
+    }
+
+    // If the controller is not in range
+
+    if (creep.pos.getRangeTo(room.controller.pos) > 1) {
+
+        // Request to move to the controller and inform false
+
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: room.controller.pos, range: 1 },
+            avoidImpassibleStructures: true,
+            avoidEnemyRanges: true,
+        })
+
+        return false
+    }
+
+    // Otherwise Try to sign the controller, informing the result
+
+    const signResult = creep.signController(room.controller, signMessage)
+    return signResult == OK
 }
