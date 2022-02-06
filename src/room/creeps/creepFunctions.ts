@@ -674,6 +674,10 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
     if (creep.memory.lastCache + cacheAmount <= Game.time) return true
 
+    // Inform true if the path isn't in the same room as the creep
+
+    if (creep.memory.path[0].roomName != creep.room.name) return true
+
     // Inform true if the creep's previous target isn't its current
 
     if (!generalFuncs.arePositionsEqual(creep.memory.goalPos, goalPos)) return true
@@ -708,9 +712,9 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     if (creep.memory.path) {
 
-        // So long as the creep is standing on the first position in the path
+        // So long as the creep isn't standing on the first position in the path
 
-        while (generalFuncs.arePositionsEqual(creep.pos, creep.memory.path[0])) {
+        while (creep.memory.path[0] && generalFuncs.arePositionsEqual(creep.pos, creep.memory.path[0])) {
 
             // Remove the first pos of the path
 
@@ -743,28 +747,24 @@ Creep.prototype.createMoveRequest = function(opts) {
         // Show that a new path has been created
 
         if (Memory.roomVisuals) room.visual.text('NP', path[0], { align: 'center' })
+
+        // So long as the creep isn't standing on the first position in the path
+
+        while (path[0] && generalFuncs.arePositionsEqual(creep.pos, path[0])) {
+
+            // Remove the first pos of the path
+
+            path.shift()
+        }
     }
 
     // Stop if there are no positions left in the path
 
     if (path.length == 0) return false
 
-    // So long as the creep is standing on the first position in the path
-
-    while (generalFuncs.arePositionsEqual(creep.pos, path[0])) {
-
-        // Remove the first pos of the path
-
-        path.shift()
-
-        // Stop if there is no first pos in path
-
-        if (!path[0]) return false
-    }
-
     // Assign movePos to the first pos in path
 
-    let movePos = path[0]
+    const movePos = path[0]
 
     // If visuals are enabled, visualize the path
 

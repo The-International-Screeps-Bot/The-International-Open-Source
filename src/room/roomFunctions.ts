@@ -334,7 +334,7 @@ Room.prototype.get = function(roomObjectName) {
 
     manageRoomObject({
         name: 'mineral',
-        value: room.find(FIND_MINERALS)[0].id,
+        value: room.find(FIND_MINERALS)[0]?.id,
         valueType: 'id',
         cacheMethod: 'global',
         cacheAmount: Infinity,
@@ -547,9 +547,17 @@ Room.prototype.get = function(roomObjectName) {
 
     function findCenterUpgradePos() {
 
+        // Stop if there is no controller
+
+        if (!room.controller) return false
+
         // Get the open areas in a range of 3 to the controller
 
         const distanceCM = room.distanceTransform(roomObjects.terrainCM.getValue(), false, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
+
+        // Stop if there is no recorded sources
+
+        if (!roomObjects.source1.getValue() || !roomObjects.source2.getValue()) return false
 
         // Get the average pos between the two sources
 
@@ -898,18 +906,14 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
     // Construct path
 
-    function generatePath(): RoomPosition[] {
+    function generatePath() {
 
         const route = generateRoute()
-        if (route) opts.goal = {
-            pos: new RoomPosition(25, 25, route[0].room),
-            range: 25
-        }
 
         const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost,
             swampCost: opts.swampCost,
-            maxRooms: route ? route.length + 1 : opts.maxRooms,
+            maxRooms: route ? 100 : 1,
             maxOps: 100000,
             flee: opts.flee,
 
@@ -1045,11 +1049,11 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     // Stop if avoidEnemyRanges isn't specified
 
-                    if (!opts.avoidEnemyRanges) return
+                    if (opts.avoidEnemyRanges) return
 
-                    // Stop if the controller is mine and it's in safemode
+                    // Stop if the is a controller, it's mine, and it's in safemode
 
-                    if (room.controller.my && room.controller.safeMode) return
+                    if (room.controller && room.controller.my && room.controller.safeMode) return
 
                     // Get enemies and loop through them
 
@@ -1059,10 +1063,10 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                         // Construct rect and get positions inside
 
                         const rect = {
-                            x1: opts.creep.pos.x - 2,
-                            y1: opts.creep.pos.y - 2,
-                            x2: opts.creep.pos.x + 2,
-                            y2: opts.creep.pos.y + 2
+                            x1: enemyCreep.pos.x - 2,
+                            y1: enemyCreep.pos.y - 2,
+                            x2: enemyCreep.pos.x + 2,
+                            y2: enemyCreep.pos.y + 2
                         }
                         const positions = generalFuncs.findPositionsInsideRect(rect)
 
@@ -1148,6 +1152,8 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
         if (pathFinderResult.incomplete) {
 
             generalFuncs.customLog('Incomplete Path', JSON.stringify(opts.origin), constants.colors.white, constants.colors.red)
+            room.pathVisual(pathFinderResult.path, constants.colors.red as keyof Colors)
+            room.visual.circle(opts.goal.pos, { fill: constants.colors.red })
             return []
         }
 

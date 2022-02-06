@@ -49,7 +49,7 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 
         creep.createMoveRequest({
             origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, creep.memory.scoutTarget), range: 0 },
+            goal: { pos: new RoomPosition(25, 25, creep.memory.scoutTarget), range: 25 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             cacheAmount: 50,
