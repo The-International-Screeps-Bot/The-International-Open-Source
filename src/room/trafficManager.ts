@@ -49,7 +49,7 @@ export function trafficManager(room: Room) {
 
             // If there is a creep that moves through pull is in the way and it isn't actively getting pulled
 
-            if (creepAtPos.memory.getPulled && !creepAtPos.gettingPulled) {
+            /* if (creepAtPos.memory.getPulled && !creepAtPos.gettingPulled) {
 
                 // Remove information about previous move requests from the creep
 
@@ -121,7 +121,7 @@ export function trafficManager(room: Room) {
 
                 creep.runMoveRequest(pos)
                 break
-            }
+            } */
 
             // If the creepAtPos has a moveRequest
 
@@ -129,7 +129,7 @@ export function trafficManager(room: Room) {
 
                 // Enforce the creepAtPos's moveRequest
 
-                creepAtPos.runMoveRequest(creep.pos)
+                creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
 
                 // Enforce the creep's moveRequest
 
@@ -191,8 +191,6 @@ export function trafficManager(room: Room) {
             } */
 
             // Otherwise have the creeps trade positions
-
-            // Enforce the creepAtPos's moveRequest
 
             creepAtPos.runMoveRequest(creep.pos)
 
