@@ -27,21 +27,16 @@ export function creepOrganizer() {
 
         // Get the creep's current room and the room it's from
 
-        const room = creep.room
-        const communeName = Game.rooms[creep.memory.communeName]
+        const room = creep.room,
 
-        // Assign the creep a class based on its role
+        // Find the creep a class based on its role
 
-        const creepClassName = creep.memory.role
-        const creepsClass = creepClasses[creepClassName]
+        creepClassName = creep.memory.role,
+        creepsClass = creepClasses[creepClassName]
 
         // Assign creep proper class
 
         Game.creeps[creepName] = new creepsClass(creep.id)
-
-        // Create an empty array of the role if there isn't one already
-
-        if (!room.myCreeps[creep.memory.role]) room.myCreeps[creep.memory.role] = []
 
         // Organize creep by room and role
 
@@ -51,6 +46,23 @@ export function creepOrganizer() {
 
         room.creepPositions[JSON.stringify(creep.pos)] = creep.name
 
+        // Get the commune the creep is from
+
+        const commune = Game.rooms[creep.memory.communeName]
+
+        // If there is vision in the commune
+
+        if (commune) {
+
+            // Organize creep and role
+
+            commune.creepsFromRoom[creep.memory.role].push(creepName)
+
+            // Record that the creep is from the room
+
+            commune.creepsFromRoomAmount++
+        }
+
         // See if creep is dying
 
         creep.isDying()
@@ -58,10 +70,6 @@ export function creepOrganizer() {
         // Stop if creep is dying
 
         if (creep.memory.dying) continue
-
-        // Increase creepCount for this role
-
-        room.creepCount[creep.memory.role] += 1
 
         // Increase total creep counter
 

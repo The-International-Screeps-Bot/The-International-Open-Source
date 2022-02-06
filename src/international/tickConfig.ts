@@ -63,20 +63,13 @@ export function tickConfig() {
         // Single tick properties
 
         room.myCreeps = {}
-        room.creepCount = {}
 
         room.creepPositions = {}
         room.moveRequests = {}
 
-        //
+        // For each role, construct an array for myCreeps
 
-        for (const role of constants.creepRoles) {
-
-            //
-
-            room.myCreeps[role] = []
-            room.creepCount[role] = 0
-        }
+        for (const role of constants.creepRoles) room.myCreeps[role] = []
 
         room.creepsOfSourceAmount = {
             source1: 0,
@@ -99,9 +92,12 @@ export function tickConfig() {
 
         Memory.communes.push(roomName)
 
-        //
-
         room.creepsFromRoom = {}
+
+        // For each role, construct an array for creepsFromRoom
+
+        for (const role of constants.creepRoles) room.creepsFromRoom[role] = []
+
         room.creepsFromRoomAmount = 0
 
         if (!global[room.name].tasksWithoutResponders) global[room.name].tasksWithoutResponders = {}

@@ -933,7 +933,7 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType) {
 
             // If the creep isn't full of the requested resourceType and amount, iterate
 
-            if (creep.store.getUsedCapacity(task.resourceType) < (task as RoomTransferTask).transferAmount) continue
+            if (creep.store.getUsedCapacity(task.resourceType) == 0) continue
 
             break
         }

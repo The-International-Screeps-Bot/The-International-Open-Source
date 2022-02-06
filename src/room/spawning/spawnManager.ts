@@ -20,15 +20,15 @@ export function spawnManager(room: Room) {
 
     // Sort spawnRequests by their priority
 
-    const prioritiesByAmount = Object.keys(spawnRequests).sort((a, b) => parseInt(a) - parseInt(b))
-
+    const requestsByPriority = Object.keys(spawnRequests).sort((a, b) => parseInt(a) - parseInt(b))
+    generalFuncs.customLog('priorities', JSON.stringify(requestsByPriority))
     // Track the inactive spawn index
 
     let spawnIndex = inactiveSpawns.length - 1
 
-    // Loop through priorities inside prioritiesByAmount
+    // Loop through priorities inside requestsByPriority
 
-    for (const priority of prioritiesByAmount) {
+    for (const priority of requestsByPriority) {
 
         // Try to find inactive spawn, if can't, stop the loop
 
