@@ -325,11 +325,6 @@ declare global {
         usedHarvestPositions: CostMatrix
 
         /**
-         * An array of towers that have not yet used intents
-         */
-        actionableTowers: StructureTower[]
-
-        /**
          * Tasks that currently have a creep trying to fulfill them
          */
         tasksWithResponders: {[key: string]: RoomTask}
@@ -571,7 +566,12 @@ declare global {
         /**
          * Try to enforce a moveRequest and inform the result
          */
-        runMoveRequest(pos: Pos): ScreepsReturnCode
+        runMoveRequest(pos: Pos): boolean
+
+        /**
+         *
+         */
+        recurseMoveRequest(stringPos: string): boolean
 
         /**
          *
@@ -683,6 +683,10 @@ declare global {
         [key: string]: any
 
         advancedSpawn(spawnRequest: SpawnRequest): ScreepsReturnCode
+    }
+
+    interface StructureTower {
+        actionable: boolean
     }
 
     // Global

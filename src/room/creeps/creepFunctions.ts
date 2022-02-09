@@ -47,19 +47,14 @@ Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENER
 
     if (!amount) amount = Math.min(creep.store.getUsedCapacity(resourceType), target.store.getFreeCapacity(resourceType))
 
-    // Try to transfer
+    // Try to transfer, informing the result
 
-    const transferResult = creep.transfer(target, resourceType, amount)
-    creep.say(`${transferResult}, ${amount}`)
-    // Inform the result of the transfer
-
-    return transferResult == OK
+    return creep.transfer(target, resourceType, amount) == OK
 }
 
 Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENERGY, amount) {
 
     const creep = this
-    const room = creep.room
 
     // If creep isn't in transfer range
 
@@ -80,17 +75,9 @@ Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENER
 
     if (!amount) amount = Math.min(creep.store.getFreeCapacity(resourceType), target.store.getUsedCapacity(resourceType))
 
-    // Try to withdraw
+    // Try to withdraw, informing the result
 
-    const withdrawResult = creep.withdraw(target, resourceType, amount)
-
-    // If the withdraw is not a success inform the failure
-
-    if (withdrawResult != OK) return false
-
-    // Otherwise inform the success
-
-    return true
+    return creep.withdraw(target, resourceType, amount) == OK
 }
 
 Creep.prototype.advancedPickup = function(target) {
@@ -113,13 +100,9 @@ Creep.prototype.advancedPickup = function(target) {
         return false
     }
 
-    // Try to pickup
+    // Try to pickup, informing the result
 
-    const pickupResult = creep.pickup(target)
-
-    // Inform the result of the pickup
-
-    return pickupResult == OK
+    return creep.pickup(target) == OK
 }
 
 Creep.prototype.advancedHarvestSource = function(source) {
@@ -965,7 +948,77 @@ Creep.prototype.runMoveRequest = function(pos) {
 
     // Move the creep to the position and inform the result
 
-    return creep.move(creep.pos.getDirectionTo(room.newPos(pos)))
+    return creep.move(creep.pos.getDirectionTo(room.newPos(pos))) == OK
+}
+
+Creep.prototype.recurseMoveRequest = function(stringPos) {
+
+    const creep = this
+    const room = creep.room
+
+    // Find the pos stringPos represents
+
+    const pos: Pos = JSON.parse(stringPos)
+
+    // Try to find the name of the creep at pos
+
+    const creepNameAtPos = room.creepPositions[stringPos]
+
+    // If there is no creep at the pos
+
+    if (!creepNameAtPos) {
+
+        // If there are no creeps at the pos, operate the moveRequest and stop
+
+        creep.runMoveRequest(pos)
+        return true
+    }
+
+    // Otherwise
+
+    // Get the creep with the name
+
+    const creepAtPos = Game.creeps[creepNameAtPos]
+
+    // If the creepAtPos has a moveRequest
+
+    if (creepAtPos.moveRequest) {
+
+        //
+        // Have the creepAtPos move to the creep
+
+        creepAtPos.runMoveRequest(creep.pos)
+
+        // Have the creep move to the creepAtPos and inform true
+
+        creep.runMoveRequest(creepAtPos.pos)
+        return true
+        /* creepAtPos.recurseMoveRequest(JSON.stringify(creepAtPos.memory.path[0]))
+        return true */
+
+        /* // Enforce the creepAtPos's moveRequest
+
+        creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
+
+        // Enforce the creep's moveRequest
+
+        creep.runMoveRequest(creepAtPos.pos) */
+    }
+
+    // Otherwise if creepAtPos is fatigued
+
+    if (creepAtPos.fatigue > 0) return false
+
+    // Otherwise have the creeps trade positions
+
+    // Have the creepAtPos move to the creep
+
+    creepAtPos.runMoveRequest(creep.pos)
+
+    // Have the creep move to the creepAtPos and inform true
+
+    creep.runMoveRequest(creepAtPos.pos)
+    return true
 }
 
 Creep.prototype.getPushed = function() {
@@ -1211,6 +1264,8 @@ Creep.prototype.advancedSignController = function() {
             goal: { pos: room.controller.pos, range: 1 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
+            plainCost: 0,
+            swampCost: 0,
         })
 
         return false

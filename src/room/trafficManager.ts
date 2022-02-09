@@ -2,11 +2,6 @@ import { generalFuncs } from "international/generalFunctions"
 
 export function trafficManager(room: Room) {
 
-    function canRunMoveRequest() {
-
-
-    }
-
     // Loop through moveRequests
 
     for (const stringPos in room.moveRequests) {
@@ -23,7 +18,11 @@ export function trafficManager(room: Room) {
 
             const creep = Game.creeps[creepName]
 
-            // Find the pos stringPos represents
+            // Handle traffic for this position
+
+            creep.recurseMoveRequest(stringPos)
+
+            /* // Find the pos stringPos represents
 
             const pos: Pos = JSON.parse(stringPos)
 
@@ -45,7 +44,7 @@ export function trafficManager(room: Room) {
 
             // Get the creep with the name
 
-            const creepAtPos = Game.creeps[creepNameAtPos]
+            const creepAtPos = Game.creeps[creepNameAtPos] */
 
             // If there is a creep that moves through pull is in the way and it isn't actively getting pulled
 
@@ -123,7 +122,7 @@ export function trafficManager(room: Room) {
                 break
             } */
 
-            // If the creepAtPos has a moveRequest
+            /* // If the creepAtPos has a moveRequest
 
             if (creepAtPos.moveRequest) {
 
@@ -142,7 +141,7 @@ export function trafficManager(room: Room) {
 
             // If the creepAtPos is fatigued, stop the loop
 
-            if(creepAtPos.fatigue > 0) break
+            if(creepAtPos.fatigue > 0) break */
 
             /* // If the last pos in the creep's path has creepAtPos
 
@@ -190,17 +189,11 @@ export function trafficManager(room: Room) {
                 break
             } */
 
-            // Otherwise have the creeps trade positions
-
-            creepAtPos.runMoveRequest(creep.pos)
-
-            // Enforce the creep's moveRequest
-
-            creep.runMoveRequest(pos)
+            /* creep.tradePositions(creepAtPos)
 
             // And stop the loop
 
-            break
+            break */
         }
     }
 }
