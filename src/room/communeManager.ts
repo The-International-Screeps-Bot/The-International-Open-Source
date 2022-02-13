@@ -14,6 +14,9 @@ export function communeManager(room: Room) {
 
     room.findSourceHarvesterInfo()
 
+    const anchor = room.newGet('anchor')
+    generalFuncs.customLog('newGet Result', anchor)
+
     taskManager(room)
 
     towerManager(room)

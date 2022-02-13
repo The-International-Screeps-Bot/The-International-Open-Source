@@ -1205,6 +1205,10 @@ Creep.prototype.fulfillPickupTask = function(task) {
 
     creep.say('PUT')
 
+    // If the creep is full, inform true
+
+    if (creep.store.getFreeCapacity() == 0) return true
+
     // Otherwise get the pickup target
 
     const pickupTarget = generalFuncs.findObjectWithID(task.resourceID)

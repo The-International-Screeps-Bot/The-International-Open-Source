@@ -22,6 +22,7 @@ import {
 import { logManager } from 'other/logManager'
 import { memHack } from 'other/memHack'
 import { RoomPickupTask, RoomPullTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
+import { RoomObject } from 'room/roomObject'
 
 // Type declareations for global
 
@@ -309,6 +310,8 @@ declare global {
          */
         myCreeps: {[key: string]: string[]}
 
+        roomObjects: Partial<Record<RoomObjectName, RoomObject>>
+
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room
          */
@@ -346,6 +349,13 @@ declare global {
         constructionSites: {[key: string]: ConstructionSite}
 
         // Functions
+
+        /**
+         * Uses caching and only operating on request to construct and get a specific roomObject based on its name
+         * @param roomObjectName The name of the requested roomObject
+         * @returns Either the roomObject's value, or, if the request failed, undefined
+         */
+        newGet(roomObjectName: RoomObjectName): any
 
         /**
          * Uses caching and only operating on request to construct and get a specific roomObject based on its name

@@ -23,9 +23,9 @@ Scout.prototype.findScoutTarget = function() {
 
         const roomName = exits[exitType as ExitKey]
 
-        // Iterate if the room status isn't normal
+        // Iterate if the room statuses aren't the same
 
-        if (Game.map.getRoomStatus(roomName).status != "normal") continue
+        if (Game.map.getRoomStatus(roomName).status != Game.map.getRoomStatus(room.name).status) continue
 
         // If the room has memory and a scoutTick
 
