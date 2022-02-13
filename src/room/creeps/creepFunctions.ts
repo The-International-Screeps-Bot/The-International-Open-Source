@@ -239,7 +239,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
         // If creep has a task
 
-        if (global[creep.id] && global[creep.id].respondingTaskID && global[creep.id].respondingTaskID.length > 0) {
+        if (global[creep.id] && global[creep.id].respondingTaskID) {
 
             // Try to filfill task
 
@@ -251,7 +251,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID[0]]
+            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
 
             // Delete it and inform false
 
@@ -303,12 +303,12 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
         // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
-        const energySpentBuilding = Math.min(creep.partsOfType(WORK) * 5, (cSite.progressTotal - cSite.progress) * BUILD_POWER)
+        const energySpentBuilding = Math.min(creep.partsOfType(WORK) * BUILD_POWER, (cSite.progressTotal - cSite.progress) * BUILD_POWER)
 
         // Add control points to total controlPoints counter and say the success
 
         Memory.energySpentOnBuilding += energySpentBuilding
-        creep.say('🚧' + energySpentBuilding * BUILD_POWER)
+        creep.say('🚧' + energySpentBuilding)
 
         // Inform true
 

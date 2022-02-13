@@ -61,5 +61,5 @@ export function roleManager(room: Room) {
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.cpuLogging) generalFuncs.customLog('Role Manager', 'CPU: ' + (Game.cpu.getUsed() - managerCPUStart).toFixed(2) + ', CPU Per Creep' + (Game.cpu.getUsed() - managerCPUStart / room.myCreepsAmount).toFixed(2), undefined, constants.colors.lightGrey)
+    if (Memory.cpuLogging) generalFuncs.customLog('Role Manager', 'CPU: ' + (Game.cpu.getUsed() - managerCPUStart).toFixed(2) + ', CPU Per Creep: ' + ((Game.cpu.getUsed() - managerCPUStart) / room.myCreepsAmount).toFixed(2), undefined, constants.colors.lightGrey)
 }
