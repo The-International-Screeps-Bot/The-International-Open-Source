@@ -85,6 +85,8 @@ declare global {
     'source1' |
     'source2' |
     'sources' |
+    'structuresByType' |
+    'cSitesByType' |
     StructureConstant |
     `${StructureConstant}CSite` |
     'enemyCSites' |

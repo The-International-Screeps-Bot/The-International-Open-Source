@@ -241,42 +241,73 @@ Room.prototype.get = function(roomObjectName) {
         }
     })
 
-    // Dynamically create RoomObjects for each structureType
+    // Structures and cSites
 
-    // Construct storage of structures and cSites based on their structureType
+    function findStructuresByType() {
 
-    const structuresByType: Partial<Record<StructureConstant, Structure[]>> = {},
-    cSitesByType: Partial<Record<`${StructureConstant}CSite`, ConstructionSite[]>> = {}
+        // Construct storage of structures based on structureType
 
-    // Dynamically add each structure to their RoomObject structureType
+        const structuresByType: Partial<Record<StructureConstant, Structure[]>> = {}
 
-    // Loop through all structres in room
+        // Loop through all structres in room
 
-    for (const structure of room.find(FIND_STRUCTURES)) {
+        for (const structure of room.find(FIND_STRUCTURES)) {
 
-        // If there is no key for the structureType, create it and assign it an empty array
+            // If there is no key for the structureType, create it and assign it an empty array
 
-        if (!structuresByType[structure.structureType]) structuresByType[structure.structureType] = []
+            if (!structuresByType[structure.structureType]) structuresByType[structure.structureType] = []
 
-        // Group structure by structureType
+            // Group structure by structureType
 
-        structuresByType[structure.structureType].push(structure)
+            structuresByType[structure.structureType].push(structure)
+        }
+
+        // Inform structuresByType
+
+        return structuresByType
     }
 
-    // Dynamically add each cSite to their RoomObject structureType
+    new RoomObject({
+        name: 'structuresByType',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 1,
+        room,
+        valueConstructor: findStructuresByType
+    })
 
-    // Loop through all cSites in room
+    function findCSitesByType() {
 
-    for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
+        // Construct storage of cSites based on structureType
 
-        // If there is no key for the structureType, create it and assign it an empty array
+        const cSitesByType: Partial<Record<StructureConstant, ConstructionSite[]>> = {}
 
-        if (!cSitesByType[`${cSite.structureType}CSite`]) cSitesByType[`${cSite.structureType}CSite`] = []
+        // Loop through all structres in room
 
-        // Group cSites by structureType
+        for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
 
-        cSitesByType[`${cSite.structureType}CSite`].push(cSite)
+            // If there is no key for the structureType, create it and assign it an empty array
+
+            if (!cSitesByType[cSite.structureType]) cSitesByType[cSite.structureType] = []
+
+            // Group cSite by structureType
+
+            cSitesByType[cSite.structureType].push(cSite)
+        }
+
+        // Inform structuresByType
+        console.log(cSitesByType)
+        return cSitesByType
     }
+
+    new RoomObject({
+        name: 'cSitesByType',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 1,
+        room,
+        valueConstructor: findCSitesByType
+    })
 
     // Loop through each structureType in the game
 
@@ -291,7 +322,7 @@ Room.prototype.get = function(roomObjectName) {
             cacheAmount: 1,
             room,
             valueConstructor: function() {
-                return structuresByType[structureType] || []
+                return room.roomObjects.structuresByType.getValue()[structureType] || []
             }
         })
 
@@ -304,7 +335,7 @@ Room.prototype.get = function(roomObjectName) {
             cacheAmount: 1,
             room,
             valueConstructor: function() {
-                return cSitesByType[`${structureType}CSite`] || []
+                return room.roomObjects.cSitesByType.getValue()[structureType] || []
             }
         })
     }
@@ -659,10 +690,11 @@ Room.prototype.get = function(roomObjectName) {
         // Get array of spawns and extensions
 
         const spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = room.roomObjects.spawn.getValue().concat(room.roomObjects.extension.getValue())
-        
+
         // Filter energy structures by distance from anchor
 
         const filteredSpawnStructures = spawnsAndExtensions.sort((a, b) => a.pos.getRangeTo(anchor.x, anchor.y) - b.pos.getRangeTo(anchor.x, anchor.y))
+
         return filteredSpawnStructures
     }
 
