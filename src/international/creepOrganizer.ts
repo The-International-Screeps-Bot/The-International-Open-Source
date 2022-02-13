@@ -38,9 +38,13 @@ export function creepOrganizer() {
 
         Game.creeps[creepName] = new creepsClass(creep.id)
 
-        // Organize creep by room and role
+        // Organize creep in its room by its role
 
         room.myCreeps[creep.memory.role].push(creepName)
+
+        // Record the creep's presence in the room
+
+        room.myCreepsAmount++
 
         // Add the creep's name to the position in its room
 
@@ -54,11 +58,11 @@ export function creepOrganizer() {
 
         if (commune) {
 
-            // Organize creep and role
+            // Organize creep by its roomFrom and role
 
             commune.creepsFromRoom[creep.memory.role].push(creepName)
 
-            // Record that the creep is from the room
+            // Record that the creep's existence in its roomFrom
 
             commune.creepsFromRoomAmount++
         }

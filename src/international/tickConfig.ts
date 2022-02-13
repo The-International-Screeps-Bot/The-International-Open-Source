@@ -64,14 +64,16 @@ export function tickConfig() {
 
         room.myCreeps = {}
 
+        // For each role, construct an array for myCreeps
+
+        for (const role of constants.creepRoles) room.myCreeps[role] = []
+
+        room.myCreepsAmount = 0
+
         room.creepPositions = {}
         room.moveRequests = {}
 
         room.roomObjects = {}
-
-        // For each role, construct an array for myCreeps
-
-        for (const role of constants.creepRoles) room.myCreeps[role] = []
 
         room.creepsOfSourceAmount = {
             source1: 0,

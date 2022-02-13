@@ -312,6 +312,11 @@ declare global {
          */
         myCreeps: {[key: string]: string[]}
 
+        /**
+         * The number of my creeps in the room
+         */
+        myCreepsAmount: number
+
         roomObjects: Partial<Record<RoomObjectName, RoomObject>>
 
         /**

@@ -21,13 +21,21 @@ const specificRoomManagers: {[key: string]: Function} = {
 
 export function roomManager() {
 
-    let i = 0
+    // If CPU logging is enabled, get the CPU used at the start
 
-    for (let roomName in Game.rooms) {
+    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-        const room: Room = Game.rooms[roomName]
+    // Loop through room names in Game.rooms
 
-        generalFuncs.customLog(room.name, Game.cpu.getUsed().toFixed(2), undefined, constants.colors.lightGrey)
+    for (const roomName in Game.rooms) {
+
+        // Get the CPU used at the start
+
+        const roomCPUStart = Game.cpu.getUsed()
+
+        // Get the room using the roomName
+
+        const room = Game.rooms[roomName]
 
         // If there is a specific manager for this room's type, run it
 
@@ -52,6 +60,12 @@ export function roomManager() {
         cpuUsed = Game.cpu.getUsed() - cpuUsed
         /* generalFuncs.customLog('Testing CPU', cpuUsed.toFixed(2)) */
 
-        i++
+        // Log room stats
+
+        generalFuncs.customLog(room.name, 'Creeps: ' + room.myCreepsAmount + ', CPU: ' + (Game.cpu.getUsed() - roomCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
     }
+
+    // If CPU logging is enabled, log the CPU used by this manager
+
+    if (Memory.cpuLogging) generalFuncs.customLog('Room Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
 }

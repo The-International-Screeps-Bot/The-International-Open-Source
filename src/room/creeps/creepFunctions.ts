@@ -856,7 +856,7 @@ Creep.prototype.acceptTask = function(task) {
     delete global[room.name].tasksWithoutResponders[task.ID]
 }
 
-Creep.prototype.findTask = function(allowedTaskTypes, resourceType) {
+Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_ENERGY) {
 
     const creep = this
     const room = creep.room
@@ -894,6 +894,10 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType) {
 
             if (creep.store.getFreeCapacity() == 0) continue
 
+            // Iterate if the resourceType doesn't match the requested one
+
+            if (task.resourceType != resourceType) continue
+
             // Otherwise set the task's pickupAmount to the creep's free capacity
 
             (task as RoomPickupTask).pickupAmount = creep.store.getFreeCapacity()
@@ -903,6 +907,10 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType) {
             // If withdraw
 
             case 'withdraw':
+
+            // Iterate if the resourceType doesn't match the requested one
+
+            if (task.resourceType != resourceType) continue
 
             // Iterate if the creep is full
 
@@ -917,6 +925,10 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType) {
             // If the creep isn't full of the requested resourceType and amount, iterate
 
             if (creep.store.getUsedCapacity(task.resourceType) == 0) continue
+
+            // Iterate if the resourceType doesn't match the requested one
+
+            if (task.resourceType != resourceType) continue
 
             break
         }
