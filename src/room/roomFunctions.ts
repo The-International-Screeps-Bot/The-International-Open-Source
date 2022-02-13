@@ -296,7 +296,7 @@ Room.prototype.get = function(roomObjectName) {
         }
 
         // Inform structuresByType
-        console.log(cSitesByType)
+        
         return cSitesByType
     }
 
