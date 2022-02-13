@@ -1,6 +1,6 @@
 Room.prototype.towersHealCreeps = function() {
 
-    const room: Room = this
+    const room = this
 
     // Stop if there are no actionable towers left
 

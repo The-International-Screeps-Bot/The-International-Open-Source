@@ -355,13 +355,6 @@ declare global {
          * @param roomObjectName The name of the requested roomObject
          * @returns Either the roomObject's value, or, if the request failed, undefined
          */
-        newGet(roomObjectName: RoomObjectName): any
-
-        /**
-         * Uses caching and only operating on request to construct and get a specific roomObject based on its name
-         * @param roomObjectName The name of the requested roomObject
-         * @returns Either the roomObject's value, or, if the request failed, undefined
-         */
         get(roomObjectName: RoomObjectName): any | undefined
 
         /**
