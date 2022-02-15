@@ -29,4 +29,6 @@ export function communeManager(room: Room) {
     structuresForSpawningManager(room)
 
     spawnManager(room)
+
+    room.floodFill([ room.controller.pos ])
 }

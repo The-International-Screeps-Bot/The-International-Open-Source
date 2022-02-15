@@ -19,22 +19,11 @@ Room.prototype.get = function(roomObjectName) {
         }
     })
 
-    // Terrain
-
-    new RoomObject({
-        name: 'terrain',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor: room.getTerrain
-    })
-
     // Cost matrixes
 
     function generateTerrainCM() {
 
-        const terrain = room.roomObjects.terrain.getValue()
+        const terrain = room.getTerrain()
 
         // Create a CostMatrix for terrain types
 
@@ -296,7 +285,7 @@ Room.prototype.get = function(roomObjectName) {
         }
 
         // Inform structuresByType
-        
+
         return cSitesByType
     }
 
@@ -1708,7 +1697,7 @@ Room.prototype.floodFill = function(seeds) {
 
     // Get the terrain cost matrix
 
-    const terrain = room.get('terrain')
+    const terrain = room.getTerrain()
 
     // Construct a cost matrix for visited tiles and add seeds to it
 

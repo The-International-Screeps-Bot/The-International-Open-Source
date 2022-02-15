@@ -48,7 +48,11 @@ export function spawnRequester(room: Room) {
         }
     }
 
-    function constructSpawnRequests(opts: SpawnRequestOpts): void {
+    function constructSpawnRequests(opts: SpawnRequestOpts | false): void {
+
+        // If the opts aren't defined, stop
+
+        if (!opts) return
 
         // If there are no sourceHarvesters or haulers, set the maxCostPerCreep to the spawnEnergyAvailable, otherwise set it to the lowest allowed cost
 
@@ -416,7 +420,7 @@ export function spawnRequester(room: Room) {
             extraParts: [CARRY, MOVE],
             partsMultiplier: 10,
             minCreeps: 0,
-            maxCreeps: 2,
+            maxCreeps: Infinity,
             minCost: 100,
             priority: 0.5 + room.creepsFromRoom.hauler.length,
             memoryAdditions: {
@@ -445,7 +449,11 @@ export function spawnRequester(room: Room) {
 
     // Construct requests for builders
 
-    constructSpawnRequests((function(): SpawnRequestOpts {
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+        // Stop if there are no construction sites
+
+        if (room.find(FIND_MY_CONSTRUCTION_SITES).length == 0) return false
 
         return {
             defaultParts: [],
@@ -457,6 +465,24 @@ export function spawnRequester(room: Room) {
             priority: 3.5 + room.creepsFromRoom.builder.length,
             memoryAdditions: {
                 role: 'builder',
+            }
+        }
+    })())
+
+    // Construct requests for mainainers
+
+    constructSpawnRequests((function(): SpawnRequestOpts {
+
+        return {
+            defaultParts: [],
+            extraParts: [WORK, MOVE, CARRY, MOVE],
+            partsMultiplier: 3,
+            minCreeps: 0,
+            maxCreeps: 1,
+            minCost: 250,
+            priority: 3.5 + room.creepsFromRoom.maintainer.length,
+            memoryAdditions: {
+                role: 'maintainer',
             }
         }
     })())

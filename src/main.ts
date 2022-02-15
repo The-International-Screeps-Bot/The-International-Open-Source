@@ -77,7 +77,6 @@ declare global {
     'antifa'
 
     type RoomObjectName =
-    'terrain' |
     'terrainCM' |
     'baseCM' |
     'anchor' |

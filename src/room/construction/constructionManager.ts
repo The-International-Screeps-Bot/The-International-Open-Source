@@ -90,7 +90,7 @@ export function constructionManager(room: Room) {
         const baseLocations: BuildLocations = global[room.name].buildLocations
 
         // If there are no build locations, generate them
-
+        
         if (!baseLocations) global[room.name].buildLocations = basePlanner(room)
 
         // Loop through each stamp type in base locations
