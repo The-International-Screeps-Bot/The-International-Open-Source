@@ -665,6 +665,10 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
     if (!generalFuncs.arePositionsEqual(creep.memory.goalPos, goalPos)) return true
 
+    // If next pos in the path is not in range, inform true
+
+    if (creep.pos.getRangeTo(creep.memory.path[0]) > 1) return true
+
     // Otherwise inform false
 
     return false
@@ -786,7 +790,7 @@ Creep.prototype.createMoveRequest = function(opts) {
     creep.memory.path = path
 
     // Inform success
-
+    room.visual.circle(movePos, { stroke: constants.colors.red, fill: undefined, })
     return true
 }
 

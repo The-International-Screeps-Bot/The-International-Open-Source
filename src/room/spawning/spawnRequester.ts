@@ -436,7 +436,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier: 3,
+            partsMultiplier: 4,
             minCreeps: 0,
             maxCreeps: 2,
             minCost: 250,
@@ -458,7 +458,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier: 3,
+            partsMultiplier: 4,
             minCreeps: 0,
             maxCreeps: 2,
             minCost: 250,
@@ -476,7 +476,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier: 3,
+            partsMultiplier: 4,
             minCreeps: 0,
             maxCreeps: 1,
             minCost: 250,
@@ -494,7 +494,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [MOVE],
             extraParts: [],
-            partsMultiplier: 0,
+            partsMultiplier: 1,
             minCreeps: 2,
             maxCreeps: Infinity,
             minCost: 50,
