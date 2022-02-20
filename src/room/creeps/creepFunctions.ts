@@ -790,7 +790,7 @@ Creep.prototype.createMoveRequest = function(opts) {
     creep.memory.path = path
 
     // Inform success
-    room.visual.circle(movePos, { stroke: constants.colors.red, fill: undefined, })
+    
     return true
 }
 
