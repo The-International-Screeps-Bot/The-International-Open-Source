@@ -6,10 +6,6 @@ import { RoomTransferTask } from "./roomTasks"
  */
 export function structuresForSpawningManager(room: Room) {
 
-    // Find a hauler in the room and get it's capacity
-
-    const haulerCapacity = Game.creeps[room.myCreeps.hauler[0]] ? Game.creeps[room.myCreeps.hauler[0]].store.getCapacity() : 100
-
     // Get exensions and spawns
 
     const structuresForSpawning: (StructureSpawn | StructureExtension)[] = room.get('structuresForSpawning')
@@ -22,7 +18,7 @@ export function structuresForSpawningManager(room: Room) {
 
         if (!global[structure.id]) global[structure.id] = {}
 
-        // Otherwise if there is no created task ID obj for the structure's global, create one
+        // If there is no created task ID obj for the structure's global, create one
 
         if (!global[structure.id].createdTaskIDs) global[structure.id].createdTaskIDs = {}
 
@@ -54,7 +50,7 @@ export function structuresForSpawningManager(room: Room) {
 
         // Get the amount of energy the structure needs at a max of the hauler's capacity
 
-        const transferAmount = Math.min(structure.store.getFreeCapacity(RESOURCE_ENERGY), haulerCapacity)
+        const transferAmount = Math.min(structure.store.getFreeCapacity(RESOURCE_ENERGY), 100)
 
         // If the transferAmount is more than 0
 

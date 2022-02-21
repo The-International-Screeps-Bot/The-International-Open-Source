@@ -681,7 +681,7 @@ Room.prototype.get = function(roomObjectName) {
         const spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = room.roomObjects.spawn.getValue().concat(room.roomObjects.extension.getValue())
 
         // Filter energy structures by distance from anchor
-
+        
         const filteredSpawnStructures = spawnsAndExtensions.sort((a, b) => a.pos.getRangeTo(anchor.x, anchor.y) - b.pos.getRangeTo(anchor.x, anchor.y))
 
         return filteredSpawnStructures

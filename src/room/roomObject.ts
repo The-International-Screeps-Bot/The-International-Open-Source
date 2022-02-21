@@ -63,7 +63,7 @@ RoomObject.prototype.formatValue = function() {
     if (roomObject.valueType == 'id') roomObject.value = generalFuncs.findObjectWithID(roomObject.value)
 
     // If roomObject's type is pos, return it as a RoomPosition
-    
+
     if (roomObject.valueType == 'pos') roomObject.value = room.newPos(roomObject.value)
 }
 
@@ -104,7 +104,7 @@ RoomObject.prototype.getCachedValue = function() {
 
         // If cachedRoomObject is past renewal date, stop
 
-        if (cachedRoomObject.lastCache + roomObject.cacheAmount > Game.time) return
+        if (cachedRoomObject.lastCache + roomObject.cacheAmount >= Game.time) return
 
         // Otherwise assign the cachedRoomObject's value to the roomObject and stop
 
