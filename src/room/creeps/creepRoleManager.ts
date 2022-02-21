@@ -19,20 +19,20 @@ export function roleManager(room: Room) {
 
     // Construct managers
 
-    const managers: {[key: string]: Function} = {
+    const managers: Record<CreepRoles, Function> = {
         sourceHarvester: sourceHarvesterManager,
         hauler: haulerManager,
         controllerUpgrader: controllerUpgraderManager,
         builder: builderManager,
         maintainer: maintainerManager,
-        scout: scoutManager,
         mineralHarvester: mineralHarvesterManager,
+        scout: scoutManager,
         antifa: antifaManager,
     }
 
     // Loop through each role in managers
 
-    for (const role in managers) {
+    for (const role of constants.creepRoles) {
 
         // Get the CPU used at the start
 

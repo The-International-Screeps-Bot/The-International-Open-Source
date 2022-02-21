@@ -83,9 +83,18 @@ RoomTask.prototype.shouldStayActive = function() {
 
     const task = this
 
-    // If the task has a responderID and the object with its ID is undefined, inform false
+    // If the task has a responderID
 
-    if (task.responderID && !generalFuncs.findObjectWithID(task.responderID)) return false
+    if (task.responderID) {
+
+        // If it doesn't exist, inform false
+
+        if (!generalFuncs.findObjectWithID(task.responderID)) return false
+
+        // Otherwise if it has no respondingtaskID, inform false
+
+        if (!global[task.responderID].respondingTaskID) return false
+    }
 
     // If the creator no longer exits, infom false
 

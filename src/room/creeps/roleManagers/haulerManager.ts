@@ -5,7 +5,11 @@ import './haulerFunctions'
 
 export function haulerManager(room: Room, creepsOfRole: string[]) {
 
+    // Loop through creep names of this role
+
     for (const creepName of creepsOfRole) {
+
+        // Get the creep using its name
 
         const creep: Hauler = Game.creeps[creepName]
 

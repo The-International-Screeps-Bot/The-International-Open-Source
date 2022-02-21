@@ -790,7 +790,7 @@ Creep.prototype.createMoveRequest = function(opts) {
     creep.memory.path = path
 
     // Inform success
-    
+
     return true
 }
 
@@ -1088,22 +1088,13 @@ Creep.prototype.fulfillTask = function() {
 
     creep.say('FT')
 
-    // Construct names for different functions based on tasks
-
-    const functionsForTasks: {[key: string]: any} = {
-        pull: 'fulfillPullTask',
-        transfer: 'fulfillTransferTask',
-        withdraw: 'fulfillWithdrawTask',
-        pickup: 'fulfillPickupTask',
-    }
-
     // Get the creep's task
 
     const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
 
     // Run the creep's function based on the task type and inform its result
 
-    return creep[functionsForTasks[task.type]](task)
+    return creep[`fulfill${task.type.charAt(0).toUpperCase()}${task.type.slice(1)}Task`](task)
 }
 
 Creep.prototype.fulfillPullTask = function(task) {
