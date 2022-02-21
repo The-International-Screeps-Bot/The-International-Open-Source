@@ -58,13 +58,29 @@ RoomObject.prototype.formatValue = function() {
     const roomObject = this
     const room = roomObject.room
 
-    // If roomObject's valueType is id, return it as an object with the ID
+    // If roomObject's valueType is an ID
 
-    if (roomObject.valueType == 'id') roomObject.value = generalFuncs.findObjectWithID(roomObject.value)
+    if (roomObject.valueType == 'id') {
 
-    // If roomObject's type is pos, return it as a RoomPosition
+        // Assign its value to the object with the ID and stop
 
-    if (roomObject.valueType == 'pos') roomObject.value = room.newPos(roomObject.value)
+        roomObject.value = generalFuncs.findObjectWithID(roomObject.value)
+        return
+    }
+
+    // If roomObject's type is pos
+
+    if (roomObject.valueType == 'pos') {
+
+        // Stop if the roomObject's value isn't defined
+
+        if (!roomObject.value) return
+
+        // Otherwise assign its value as a new RoomPosition and stop
+
+        roomObject.value = room.newPos(roomObject.value)
+        return
+    }
 }
 
 RoomObject.prototype.getCachedValue = function() {
@@ -106,9 +122,13 @@ RoomObject.prototype.getCachedValue = function() {
 
         if (cachedRoomObject.lastCache + roomObject.cacheAmount >= Game.time) return
 
-        // Otherwise assign the cachedRoomObject's value to the roomObject and stop
+        // Otherwise assign the cachedRoomObject's value to the roomObject
 
         roomObject.value = cachedRoomObject.value
+
+        // Format the roomObject's value and stop
+
+        roomObject.formatValue()
         return
     }
 }
@@ -146,9 +166,9 @@ RoomObject.prototype.cache = function() {
 
     // If cacheMethod is memory
 
-    if (roomObject.cacheMethod == 'memory') {
+    if (roomObject.cacheType == 'memory') {
 
-        // Store value in room's memory
+        // Store value in room's memory and stop
 
         room.memory[roomObject.name] = roomObject.value
         return
@@ -156,14 +176,11 @@ RoomObject.prototype.cache = function() {
 
     // If cacheMethod is global
 
-    if (roomObject.cacheMethod == 'global') {
+    if (roomObject.cacheType == 'global') {
 
-        // Store parts of the roomObject in the room's global
+        // Store the roomObject in global and stop
 
-        global[room.name][roomObject.name] = {
-            lastCache: Game.time,
-            value: roomObject.value
-        }
+        global[room.name][roomObject.name] = roomObject
         return
     }
 }

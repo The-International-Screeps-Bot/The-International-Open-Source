@@ -52,6 +52,7 @@ export function basePlanner(room: Room): false | BuildLocations {
     // Record positions around the mineral as unusable
 
     const mineral: Mineral = room.get('mineral')
+    console.log(mineral)
     recordAdjacentPositions(mineral.pos.x, mineral.pos.y, 1)
 
     // Record the positions around sources as unusable

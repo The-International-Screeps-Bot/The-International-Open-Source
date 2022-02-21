@@ -255,7 +255,7 @@ export function spawnRequester(room: Room) {
             // Construct from totalExtraParts at a max of 50, at equal to extraOpts's length
 
             let remainingAllowedParts = Math.min(50, Math.max(totalExtraParts, opts.extraParts.length))
-            
+
             // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
 
             while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
@@ -385,7 +385,7 @@ export function spawnRequester(room: Room) {
 
         return {
             defaultParts: [],
-            extraParts: [MOVE, CARRY],
+            extraParts: [CARRY, MOVE],
             partsMultiplier: 10,
             minCreeps: undefined,
             maxCreeps: Infinity,
@@ -403,7 +403,7 @@ export function spawnRequester(room: Room) {
 
         return {
             defaultParts: [],
-            extraParts: [MOVE, WORK, MOVE, CARRY],
+            extraParts: [WORK, MOVE, CARRY, MOVE],
             partsMultiplier: 4,
             minCreeps: undefined,
             maxCreeps: Infinity,
@@ -425,7 +425,7 @@ export function spawnRequester(room: Room) {
 
         return {
             defaultParts: [],
-            extraParts: [MOVE, WORK, MOVE, CARRY],
+            extraParts: [WORK, MOVE, CARRY, MOVE],
             partsMultiplier: 4,
             minCreeps: undefined,
             maxCreeps: Infinity,
@@ -443,7 +443,7 @@ export function spawnRequester(room: Room) {
 
         return {
             defaultParts: [],
-            extraParts: [MOVE, WORK, MOVE, CARRY],
+            extraParts: [WORK, MOVE, CARRY, MOVE],
             partsMultiplier: 4,
             minCreeps: undefined,
             maxCreeps: Infinity,

@@ -13,6 +13,7 @@ import { powerCreepManager } from './powerCreeps/powerCreepManager'
 import { trafficManager } from './trafficManager'
 import { generalFuncs } from 'international/generalFunctions'
 import { roomVisualsManager } from './roomVisualsManager'
+import { containerManager } from './containerManager'
 
 const specificRoomManagers: {[key: string]: Function} = {
     remote: remoteManager,
@@ -44,6 +45,10 @@ export function roomManager() {
         //
 
         roleManager(room)
+
+        //
+
+        containerManager(room)
 
         //
 
