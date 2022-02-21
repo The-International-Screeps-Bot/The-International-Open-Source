@@ -57,7 +57,7 @@ export function structuresForSpawningManager(room: Room) {
         if (transferAmount > 0) {
 
             // Create a new transfer task for the structure
-
+            generalFuncs.customLog('New SS Task', transferAmount + ', ' + structure.store.getFreeCapacity(RESOURCE_ENERGY))
             new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, structure.id)
         }
     }

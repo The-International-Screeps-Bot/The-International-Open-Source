@@ -37,7 +37,7 @@ export class RoomTask {
     constructor(type: RoomTaskTypes, creatorID: string, roomName: string) {
 
         const task = this
-        generalFuncs.customLog('Created task', type)
+        generalFuncs.customLog('Created Task', 'Type: ' + type + ', creatorID: ' + creatorID)
         // Assign parameters
 
         task.type = type
@@ -87,13 +87,13 @@ RoomTask.prototype.shouldStayActive = function() {
 
     if (task.responderID) {
 
-        // If it doesn't exist, inform false
+        // If the responder doesn't exist, inform false
 
         if (!generalFuncs.findObjectWithID(task.responderID)) return false
 
-        // Otherwise if it has no respondingtaskID, inform false
+        /* // Otherwise if the responder has no respondingtaskID, inform false
 
-        if (!global[task.responderID].respondingTaskID) return false
+        if (global[task.responderID].respondingTaskID != task.ID) return false */
     }
 
     // If the creator no longer exits, infom false
@@ -110,7 +110,7 @@ RoomTask.prototype.delete = function() {
     const task = this
 
     // Construct task info based on found location
-    generalFuncs.customLog('Deleted task', task.type)
+    generalFuncs.customLog('Deleted task', 'Type: ' + task.type + ', creatorID: ' + task.creatorID)
     const taskLocation = task.findLocation()
 
     // And delete the taskID from the creator's list

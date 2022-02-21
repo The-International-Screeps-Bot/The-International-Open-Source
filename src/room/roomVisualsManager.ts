@@ -107,7 +107,7 @@ export function roomVisualsManager(room: Room) {
 
             // Otherwise display the role of the creep being spawn
 
-            room.visual.text(`${Game.creeps[spawn.spawning.name].memory.role}`, spawn.pos, {
+            room.visual.text(Game.creeps[spawn.spawning.name].memory.role, spawn.pos, {
                 backgroundColor: 'rgb(255, 0, 0, 0)',
                 font: 0.5,
                 opacity: 1,
@@ -116,7 +116,7 @@ export function roomVisualsManager(room: Room) {
 
             // And display how many ticks left until spawned
 
-            room.visual.text(`${spawn.spawning.remainingTime}`, spawn.pos.x, spawn.pos.y - 1, {
+            room.visual.text(spawn.spawning.remainingTime.toString(), spawn.pos.x, spawn.pos.y - 1, {
                 backgroundColor: 'rgb(255, 0, 0, 0)',
                 font: 0.5,
                 opacity: 1,

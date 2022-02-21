@@ -32,20 +32,6 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
             // Delete it
 
             task.delete()
-
-            // Try to find a new task
-
-            const findTaskResult = creep.findTask(new Set([
-                'transfer',
-                'withdraw',
-                'pull',
-                'pickup'
-            ]))
-
-            // If creep found a task, try to fulfill it and iterate
-
-            if (findTaskResult) creep.fulfillTask()
-            continue
         }
 
         // Try to find a new task
@@ -56,7 +42,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
             'pull',
             'pickup'
         ]))
-
+        
         // If a task wasn't found, iterate
 
         if (!findTaskResult) continue
