@@ -335,7 +335,7 @@ Creep.prototype.findRepairTarget = function(workPartCount) {
 
         // If the structure is somewhat low on hits, inform it
 
-        if (structure.hitsMax - structure.hits <= workPartCount * REPAIR_POWER * 2) return structure
+        if (structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER * 2) return structure
     }
 
     // If no ideal structure was found, inform false
