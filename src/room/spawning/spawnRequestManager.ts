@@ -130,6 +130,14 @@ export function spawnRequester(room: Room) {
 
                         partCost = BODYPART_COST[part]
 
+                        // If the cost plus partCost is over maxCostPerCreep, stop the loop
+
+                        if (cost + partCost > maxCostPerCreep) break
+
+                        // If the remainingAllowedParts plus 1 is less than 0, stop the loop
+
+                        if (remainingAllowedParts + 1 < 0) break
+
                         // Otherwise add the part the the body
 
                         body.push(part)
@@ -154,44 +162,6 @@ export function spawnRequester(room: Room) {
 
                             partIndex = 0
                             tier++
-                        }
-                    }
-
-                    // So long as the creep's cost is larger than the maxCost or there are more than the remainingAllowedParts
-
-                    if (cost > maxCostPerCreep && remainingAllowedParts < 0) {
-
-                        // So long as the partIndex is more than 0
-
-                        while (partIndex > 0) {
-
-                            // Get the part using the partIndex
-
-                            const part = opts.extraParts[partIndex],
-
-                            // Get the cost of the part
-
-                            partCost = BODYPART_COST[part]
-
-                            // If the cost of the creep minus the part is less than or equal to the minCost, stop the loop
-
-                            if (cost - partCost <= opts.minCost) break
-
-                            // Otherwise remove the last part in the body
-
-                            body.pop()
-
-                            // Remove the partCost from the cost
-
-                            cost -= partCost
-
-                            // Increase remainingAllowedParts
-
-                            remainingAllowedParts++
-
-                            // Reduce partIndex
-
-                            partIndex--
                         }
                     }
                 }
@@ -281,6 +251,14 @@ export function spawnRequester(room: Room) {
 
                 partCost = BODYPART_COST[part]
 
+                // If the cost plus partCost is over maxCostPerCreep, stop the loop
+
+                if (cost + partCost > maxCostPerCreep) break
+
+                // If the totalExtraParts plus 1 is less than 0, stop the loop
+
+                if (totalExtraParts + 1 < 0) break
+
                 // Otherwise add the part the the body
 
                 body.push(part)
@@ -308,44 +286,6 @@ export function spawnRequester(room: Room) {
                 }
             }
 
-            // So long as the creep's cost is larger than the maxCost or there are more than the totalExtraParts
-
-            if (cost > maxCostPerCreep && totalExtraParts < 0) {
-
-                // So long as the partIndex is more than 0
-
-                while (partIndex > 0) {
-
-                    // Get the part using the partIndex
-
-                    const part = opts.extraParts[partIndex],
-
-                    // Get the cost of the part
-
-                    partCost = BODYPART_COST[part]
-
-                    // If the cost of the creep minus the part is less than or equal to the minCost, stop the loop
-
-                    if (cost - partCost <= opts.minCost) break
-
-                    // Otherwise remove the last part in the body
-
-                    body.pop()
-
-                    // Remove the partCost from the cost
-
-                    cost -= partCost
-
-                    // Increase totalExtraParts
-
-                    totalExtraParts++
-
-                    // Reduce partIndex
-
-                    partIndex--
-                }
-            }
-
             // Create a spawnRequest using previously constructed information
 
             createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
@@ -363,7 +303,7 @@ export function spawnRequester(room: Room) {
                 partsMultiplier: 2,
                 minCreeps: 2,
                 maxCreeps: Infinity,
-                minCost: 200,
+                minCost: 150,
                 priority: room.creepsFromRoom.sourceHarvester.length,
                 memoryAdditions: {
                     role: 'sourceHarvester',
@@ -377,7 +317,7 @@ export function spawnRequester(room: Room) {
                 partsMultiplier: 12,
                 minCreeps: 2,
                 maxCreeps: Infinity,
-                minCost: 250,
+                minCost: 100,
                 priority: room.creepsFromRoom.sourceHarvester.length,
                 memoryAdditions: {
                     role: 'sourceHarvester',
@@ -391,7 +331,7 @@ export function spawnRequester(room: Room) {
             partsMultiplier: 12,
             minCreeps: undefined,
             maxCreeps: Math.max(3, room.get('source1HarvestPositions').length) + Math.max(3, room.get('source2HarvestPositions')),
-            minCost: 250,
+            minCost: 100,
             priority: room.creepsFromRoom.sourceHarvester.length,
             memoryAdditions: {
                 role: 'sourceHarvester',
@@ -405,7 +345,7 @@ export function spawnRequester(room: Room) {
 
         return {
             defaultParts: [],
-            extraParts: [CARRY, MOVE],
+            extraParts: [MOVE, CARRY],
             partsMultiplier: 10,
             minCreeps: undefined,
             maxCreeps: Infinity,
@@ -423,10 +363,10 @@ export function spawnRequester(room: Room) {
 
         return {
             defaultParts: [],
-            extraParts: [WORK, MOVE, CARRY, MOVE],
+            extraParts: [MOVE, WORK, MOVE, CARRY],
             partsMultiplier: 4,
             minCreeps: undefined,
-            maxCreeps: 2,
+            maxCreeps: Infinity,
             minCost: 250,
             priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
             memoryAdditions: {
@@ -445,7 +385,7 @@ export function spawnRequester(room: Room) {
 
         return {
             defaultParts: [],
-            extraParts: [WORK, MOVE, CARRY, MOVE],
+            extraParts: [MOVE, WORK, MOVE, CARRY],
             partsMultiplier: 4,
             minCreeps: undefined,
             maxCreeps: Infinity,
@@ -463,7 +403,7 @@ export function spawnRequester(room: Room) {
 
         return {
             defaultParts: [],
-            extraParts: [WORK, MOVE, CARRY, MOVE],
+            extraParts: [MOVE, WORK, MOVE, CARRY],
             partsMultiplier: 4,
             minCreeps: undefined,
             maxCreeps: Infinity,

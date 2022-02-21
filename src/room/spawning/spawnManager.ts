@@ -1,6 +1,6 @@
 import { generalFuncs } from 'international/generalFunctions'
 import './spawnFunctions'
-import { spawnRequester } from './spawnRequester'
+import { spawnRequester } from './spawnRequestManager'
 
 export function spawnManager(room: Room) {
 
@@ -49,7 +49,7 @@ export function spawnManager(room: Room) {
 
             // Log the error and stop the loop
 
-            generalFuncs.customLog('Failed to spawn', testSpawnResult + ', ' + spawnRequest.cost + ', ' + spawnRequest.body)
+            generalFuncs.customLog('Failed to spawn', testSpawnResult + ', ' + spawnRequest.extraOpts.memory.role + ', ' + spawnRequest.cost + ', ' + spawnRequest.body)
             break
         }
 
