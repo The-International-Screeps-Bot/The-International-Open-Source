@@ -16,7 +16,7 @@ export function containerManager(room: Room) {
         // If the container isn't defined, iterate
 
         if (!container) continue
-
+        
         // if there is no global for the container, make one
 
         if (!global[container.id]) global[container.id] = {}

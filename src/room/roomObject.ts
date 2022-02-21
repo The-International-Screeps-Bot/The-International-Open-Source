@@ -149,9 +149,16 @@ RoomObject.prototype.getValue = function() {
 
     roomObject.value = roomObject.valueConstructor()
 
-    // Cache the value, and inform it
+    // Cache the value
 
     roomObject.cache()
+
+    // Then format it
+
+    roomObject.formatValue()
+
+    // Then inform it
+
     return roomObject.value
 }
 
@@ -177,6 +184,10 @@ RoomObject.prototype.cache = function() {
     // If cacheMethod is global
 
     if (roomObject.cacheType == 'global') {
+
+        // Update the roomObject's lastCache to the current tick
+
+        roomObject.lastCache = Game.time
 
         // Store the roomObject in global and stop
 
