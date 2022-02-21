@@ -32,7 +32,7 @@ Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENER
 
     if (creep.pos.getRangeTo(target.pos) > 1) {
 
-        // Make a moveRequest to target and inform failure
+        // Make a moveRequest to target and inform false
 
         creep.createMoveRequest({
             origin: creep.pos,
@@ -43,13 +43,13 @@ Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENER
         return false
     }
 
-    // If there wasn't an amount provided, assign one based on the smaller of the creep's amount of resource and the target's free amount of resource
+    // Try to transfer, recording the result
 
-    if (!amount) amount = Math.min(creep.store.getUsedCapacity(resourceType), target.store.getFreeCapacity(resourceType))
+    const transferResult = creep.transfer(target, resourceType, amount)
 
-    // Try to transfer, informing the result
+    // Inform true if the result is acceptable
 
-    return creep.transfer(target, resourceType, amount) == OK
+    return transferResult == OK || transferResult == ERR_FULL
 }
 
 Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENERGY, amount) {
@@ -71,13 +71,13 @@ Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENER
         return false
     }
 
-    // If there wasn't an amount provided
+    // Try to withdraw, recording the result
 
-    if (!amount) amount = Math.min(creep.store.getFreeCapacity(resourceType), target.store.getUsedCapacity(resourceType))
+    const withdrawResult = creep.withdraw(target, resourceType, amount)
+    creep.say(`${withdrawResult}`)
+    // Inform true if the result is acceptable
 
-    // Try to withdraw, informing the result
-
-    return creep.withdraw(target, resourceType, amount) == OK
+    return withdrawResult == OK || withdrawResult == ERR_FULL
 }
 
 Creep.prototype.advancedPickup = function(target) {
@@ -1179,7 +1179,7 @@ Creep.prototype.fulfillTransferTask = function(task) {
     creep.say('TT')
 
     // If the creep is empty of the task resource, inform true
-
+    
     if (creep.store.getUsedCapacity(task.resourceType) == 0) return true
 
     // Get the transfer target using the task's transfer target IDs
@@ -1188,7 +1188,7 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     // Inform the result of the adancedTransfer to the transferTarget
 
-    return creep.advancedTransfer(transferTarget, task.resourceType)
+    return creep.advancedTransfer(transferTarget, task.resourceType, task.transferAmount)
 }
 
 Creep.prototype.fulfillWithdrawTask = function(task) {
