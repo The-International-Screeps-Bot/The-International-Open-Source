@@ -320,7 +320,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
     return false
 }
 
-Creep.prototype.findRepairTarget = function(workPartCount) {
+Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs) {
 
     const creep = this
     const room = creep.room
@@ -333,7 +333,11 @@ Creep.prototype.findRepairTarget = function(workPartCount) {
 
     for (const structure of repairStructures) {
 
-        // If the structure is somewhat low on hits, inform it
+        // If the structure's ID is excluded, iterate
+
+        if (excludedIDs.has(structure.id)) continue
+
+        // Otherwise if the structure is somewhat low on hits, inform it
 
         if (structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER) return structure
     }
@@ -432,6 +436,10 @@ Creep.prototype.advancedRepair = function() {
 
     creep.memory.repairTargetID = repairTarget.id
 
+    // If roomVisuals are enabled
+
+    if (Memory.roomVisuals) room.visual.text('🔧' + `${repairTarget.hitsMax - repairTarget.hits}`, repairTarget.pos)
+
     // If the repairTarget is out of repair range
 
     if (creep.pos.getRangeTo(repairTarget.pos) > 3) {
@@ -469,56 +477,49 @@ Creep.prototype.advancedRepair = function() {
         // Add control points to total controlPoints counter and say the success
 
         Memory.energySpentOnRepairing += energySpentOnRepairs
-        creep.say('🔧' + energySpentOnRepairs)
-
-        // If roomVisuals are enabled
-
-        if (Memory.roomVisuals) room.visual.text('🔧' + `${repairTarget.hitsMax - repairTarget.hits}`, repairTarget.pos)
+        creep.say('🔧' + energySpentOnRepairs * REPAIR_POWER)
 
         // Find the hits left on the repairTarget
 
         const newRepairTargetHits = repairTarget.hits + workPartCount * REPAIR_POWER
 
-        // If the repair target won't be viable to repair next tick
+        // If the repair target won't be viable to repair next tick, inform true
+        creep.say((repairTarget.hitsMax - newRepairTargetHits).toString())
+        if (repairTarget.hitsMax - newRepairTargetHits >= workPartCount * REPAIR_POWER) return true
 
-        if (repairTarget.hitsMax - newRepairTargetHits >= workPartCount * REPAIR_POWER) {
+        // Otherwise
 
-            // Delete the target from memory
+        // Delete the target from memory
 
-            delete creep.memory.repairTargetID
+        delete creep.memory.repairTargetID
 
-            // Find a new repair target
+        // Find a new repair target
 
-            const newRepairTarget = creep.findRepairTarget(workPartCount)
+        const newRepairTarget = creep.findRepairTarget(workPartCount, new Set([repairTargetID]))
 
-            // Inform true if no new target was found
+        // Inform true if no new target was found
 
-            if (!newRepairTarget) return true
+        if (!newRepairTarget) return true
 
-            // If the new repair target is out of repair range
+        // Otherwise, if the new repair target is out of repair range
 
-            if (creep.pos.getRangeTo(newRepairTarget.pos) > 3) {
+        if (creep.pos.getRangeTo(newRepairTarget.pos) > 3) {
 
-                creep.say('MC')
+            creep.say('MC')
 
-                // Make a move request to it
+            // Make a move request to it
 
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goal: { pos: newRepairTarget.pos, range: 3 },
-                    avoidImpassibleStructures: true,
-                    avoidEnemyRanges: true,
-                })
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goal: { pos: newRepairTarget.pos, range: 3 },
+                avoidImpassibleStructures: true,
+                avoidEnemyRanges: true,
+            })
 
-                // Inform true
+            // Inform true
 
-                return false
-            }
+            return false
         }
-
-        // Inform true
-
-        return true
     }
 
     // Inform failure

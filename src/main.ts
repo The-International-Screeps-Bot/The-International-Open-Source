@@ -541,7 +541,7 @@ declare global {
         /**
          * Tries to find a new repair target for the creep
          */
-         findRepairTarget(workPartCount: number): false | Structure
+         findRepairTarget(workPartCount: number, excludedIDs?: Set<Id<Structure>>): false | Structure
 
         /**
          *
