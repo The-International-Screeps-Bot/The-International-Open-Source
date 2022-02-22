@@ -8,7 +8,7 @@ Room.prototype.towersHealCreeps = function() {
 
     // Construct heal targets from my and allied damaged creeps in the room
 
-    const healTargets: Creep[] = room.get('myDamagedCreeps').concat(room.get('damagedAllyCreeps'))
+    const healTargets: Creep[] = room.find(FIND_MY_CREEPS).concat(room.get('allyCreeps')).filter(creep => creep.hits < creep.hitsMax)
 
     // Get the room's towers
 
