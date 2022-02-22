@@ -126,7 +126,7 @@ RoomObject.prototype.getCachedValue = function() {
         }
 
         // Otherwise assign the cachedRoomObject's value to the roomObject and inform true
-
+        if (roomObject.name == 'source1Container') generalFuncs.customLog('source1Container', cachedRoomObject.value, undefined, constants.colors.red)
         roomObject.value = cachedRoomObject.value
         return true
     }
@@ -190,13 +190,30 @@ RoomObject.prototype.cache = function() {
 
     if (roomObject.cacheType == 'global') {
 
-        // Update the roomObject's lastCache to the current tick
+        // Create a copy of the roomObject
 
-        roomObject.lastCache = Game.time
+        const roomObjectCopy = new RoomObject({
+            name: roomObject.name,
+            valueType: roomObject.valueType,
+            cacheType: roomObject.cacheType,
+            cacheAmount: roomObject.cacheAmount,
+            room,
+            valueConstructor: undefined
+        })
 
-        // Store the roomObject in global and stop
+        // Assign special properties to the copy
 
-        global[room.name][roomObject.name] = roomObject
+        // Such as the current tick as the lastCache
+
+        roomObjectCopy.lastCache = Game.time
+
+        // And the roomObject's value
+
+        roomObjectCopy.value = roomObject.value
+
+        // Store the copy in global and stop
+
+        global[room.name][roomObject.name] = roomObjectCopy
         return
     }
 }

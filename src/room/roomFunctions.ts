@@ -532,7 +532,7 @@ Room.prototype.get = function(roomObjectName) {
 
     // Source containers
 
-    function findSourceContainer(closestHarvestPos: RoomPosition): string | false {
+    function findSourceContainer(closestHarvestPos: RoomPosition): Id<Structure> | false {
 
         // Stop and inform false if no closestHarvestPos
 
