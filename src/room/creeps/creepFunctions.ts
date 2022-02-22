@@ -74,7 +74,7 @@ Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENER
     // Try to withdraw, recording the result
 
     const withdrawResult = creep.withdraw(target, resourceType, amount)
-    creep.say(`${withdrawResult}`)
+
     // Inform true if the result is acceptable
 
     return withdrawResult == OK || withdrawResult == ERR_FULL
@@ -226,8 +226,8 @@ Creep.prototype.advancedUpgradeController = function() {
 
 Creep.prototype.advancedBuildCSite = function(cSite) {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room
 
     creep.say('ABCS')
 
@@ -468,8 +468,12 @@ Creep.prototype.advancedRepair = function() {
 
         // Add control points to total controlPoints counter and say the success
 
-        Memory.controlPoints += energySpentOnRepairs
-        creep.say('🔧' + energySpentOnRepairs * REPAIR_POWER)
+        Memory.energySpentOnRepairing += energySpentOnRepairs
+        creep.say('🔧' + energySpentOnRepairs)
+
+        // If roomVisuals are enabled
+
+        if (Memory.roomVisuals) room.visual.text('🔧', repairTarget.pos)
 
         // Find the hits left on the repairTarget
 
@@ -477,7 +481,7 @@ Creep.prototype.advancedRepair = function() {
 
         // If the repair target won't be viable to repair next tick
 
-        if (newRepairTargetHits > repairTarget.hitsMax - energySpentOnRepairs * REPAIR_POWER) {
+        if (repairTarget.hitsMax - energySpentOnRepairs * REPAIR_POWER > newRepairTargetHits) {
 
             // Delete the target from memory
 

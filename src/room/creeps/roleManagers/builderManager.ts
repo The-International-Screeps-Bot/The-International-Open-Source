@@ -21,10 +21,6 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
 
     if (!constructionTarget) {
 
-        // Delete the ID from global
-
-        delete global[room.name].cSiteTargetID
-
         // Try to find a construction target. If none are found, stop
 
         const findCSiteResult = room.findCSiteTargetID(Game.creeps[creepsOfRole[0]])

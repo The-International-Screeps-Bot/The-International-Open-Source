@@ -681,7 +681,7 @@ Room.prototype.get = function(roomObjectName) {
         const spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = room.roomObjects.spawn.getValue().concat(room.roomObjects.extension.getValue())
 
         // Filter energy structures by distance from anchor
-        
+
         const filteredSpawnStructures = spawnsAndExtensions.sort((a, b) => a.pos.getRangeTo(anchor.x, anchor.y) - b.pos.getRangeTo(anchor.x, anchor.y))
 
         return filteredSpawnStructures
@@ -1888,18 +1888,6 @@ Room.prototype.findCSiteTargetID = function(creep) {
 
     if (!myCSites.length) return false
 
-    // Get the anchor
-
-    let anchor: RoomPosition = room.get('anchor')
-
-    // If there is no anchor, set it as the creep's pos
-
-    if (!anchor) anchor = creep.pos
-
-    // Otherwise construct structure options
-
-    let targetCSites: Structure[]
-
     // Loop through structuretypes of the build priority
 
     for (const structureType of constants.structureTypesByBuildPriority) {
@@ -1908,21 +1896,24 @@ Room.prototype.findCSiteTargetID = function(creep) {
 
         const cSitesOfType: Structure[] = room.get(`${structureType}CSite`)
 
-        if(cSitesOfType.length > 0) {
+        // If there are more than 0 cSites of this type
 
-            targetCSites = cSitesOfType
-            break
+        if (cSitesOfType.length) {
+
+            // Get the anchor
+
+            const anchor: RoomPosition = room.get('anchor') || creep?.pos || new RoomPosition(25, 25, room.name)
+
+            // Record the closest site to the anchor in the room's global and inform true
+
+            global[room.name].cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id
+            return true
         }
     }
 
-    // Get the closest site to the anchor
+    // If no cSiteTarget was found, inform false
 
-    const cSiteTarget = anchor.findClosestByRange(targetCSites)
-
-    // Record the cSiteTarget in the room's global and inform true
-
-    global[room.name].cSiteTargetID = cSiteTarget.id
-    return true
+    return false
 }
 
 Room.prototype.findUsedHarvestPositions = function() {
