@@ -320,7 +320,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
     return false
 }
 
-Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs) {
+Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs = new Set()) {
 
     const creep = this
     const room = creep.room
