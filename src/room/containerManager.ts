@@ -1,3 +1,4 @@
+import { generalFuncs } from "international/generalFunctions"
 import { RoomWithdrawTask } from "./roomTasks"
 
 /**
@@ -14,7 +15,7 @@ export function containerManager(room: Room) {
     for (const container of sourceContainers) {
 
         // If the container isn't defined, iterate
-
+        generalFuncs.customLog('Container Test', container)
         if (!container) continue
 
         // if there is no global for the container, make one
@@ -54,7 +55,7 @@ export function containerManager(room: Room) {
         // Get the amount of energy the container needs at a max of the hauler's capacity
 
         const withdrawAmount = Math.min(container.store.getUsedCapacity(RESOURCE_ENERGY), 100)
-
+        room.visual.text(`${withdrawAmount}`, container.pos)
         // If the withdrawAmount is more than 0
 
         if (withdrawAmount > 0) {

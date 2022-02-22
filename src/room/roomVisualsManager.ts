@@ -129,18 +129,17 @@ export function roomVisualsManager(room: Room) {
 
     function constructionTargetVisuals() {
 
-        // If there is a construction target ID
+        // If there is not a cSiteTargetID, stop
 
-        if (global[room.name].cSiteTargetID) {
+        if (!global[room.name].cSiteTargetID) return
 
-            // Convert the construction target ID into a game object
+        // Convert the construction target ID into a game object
 
-            const constructionTarget = generalFuncs.findObjectWithID(global[room.name].cSiteTargetID)
+        const constructionTarget = generalFuncs.findObjectWithID(global[room.name].cSiteTargetID)
 
-            // Show a visual on the contructionTarget
+        // If the constructionTarget exists, show visuals for it
 
-            room.visual.text('🚧', constructionTarget.pos)
-        }
+        if (constructionTarget) room.visual.text('🚧', constructionTarget.pos)
     }
 
     function towerVisuals() {}

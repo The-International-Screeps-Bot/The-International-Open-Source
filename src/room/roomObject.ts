@@ -124,7 +124,7 @@ RoomObject.prototype.getCachedValue = function() {
             delete global[room.name][roomObject.name]
             return false
         }
-        
+
         // Otherwise assign the cachedRoomObject's value to the roomObject and inform true
 
         roomObject.value = cachedRoomObject.value
