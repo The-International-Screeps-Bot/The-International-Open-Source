@@ -335,7 +335,7 @@ Creep.prototype.findRepairTarget = function(workPartCount) {
 
         // If the structure is somewhat low on hits, inform it
 
-        if (structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER * 2) return structure
+        if (structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER) return structure
     }
 
     // If no ideal structure was found, inform false
@@ -473,7 +473,7 @@ Creep.prototype.advancedRepair = function() {
 
         // If roomVisuals are enabled
 
-        if (Memory.roomVisuals) room.visual.text('🔧', repairTarget.pos)
+        if (Memory.roomVisuals) room.visual.text('🔧' + `${repairTarget.hitsMax - repairTarget.hits}`, repairTarget.pos)
 
         // Find the hits left on the repairTarget
 
@@ -481,7 +481,7 @@ Creep.prototype.advancedRepair = function() {
 
         // If the repair target won't be viable to repair next tick
 
-        if (repairTarget.hitsMax - energySpentOnRepairs * REPAIR_POWER > newRepairTargetHits) {
+        if (repairTarget.hitsMax - newRepairTargetHits >= workPartCount * REPAIR_POWER) {
 
             // Delete the target from memory
 
