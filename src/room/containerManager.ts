@@ -18,7 +18,7 @@ export function containerManager(room: Room) {
         // If the container isn't defined, iterate
 
         if (!container) continue
-        room.visual.circle(container.pos, {fill: constants.colors.red})
+
         // if there is no global for the container, make one
 
         if (!global[container.id]) global[container.id] = {}

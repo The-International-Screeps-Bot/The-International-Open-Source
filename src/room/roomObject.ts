@@ -126,7 +126,7 @@ RoomObject.prototype.getCachedValue = function() {
         }
 
         // Otherwise assign the cachedRoomObject's value to the roomObject and inform true
-        if (roomObject.name == 'source1Container') generalFuncs.customLog('source1Container', cachedRoomObject.value, undefined, constants.colors.red)
+
         roomObject.value = cachedRoomObject.value
         return true
     }
