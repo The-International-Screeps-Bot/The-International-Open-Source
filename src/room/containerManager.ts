@@ -16,7 +16,7 @@ export function containerManager(room: Room) {
         // If the container isn't defined, iterate
 
         if (!container) continue
-        
+
         // if there is no global for the container, make one
 
         if (!global[container.id]) global[container.id] = {}
@@ -31,7 +31,7 @@ export function containerManager(room: Room) {
 
             // Find the container's tasks of type tansfer
 
-            const containersTransferTasks = room.findTasksOfTypes(global[container.id].createdTaskIDs, new Set(['withdraw'])) as RoomWithdrawTask[]
+            const containersWithdrawTasks = room.findTasksOfTypes(global[container.id].createdTaskIDs, new Set(['withdraw'])) as RoomWithdrawTask[]
 
             // Track the amount of energy the resource has offered in tasks
 
@@ -39,7 +39,7 @@ export function containerManager(room: Room) {
 
             // Loop through each pickup task
 
-            for (const task of containersTransferTasks) {
+            for (const task of containersWithdrawTasks) {
 
                 // Otherwise find how many resources the task has requested to pick up
 

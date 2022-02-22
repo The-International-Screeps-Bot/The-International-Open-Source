@@ -112,7 +112,7 @@ export function spawnRequester(room: Room) {
 
                     // Use the partsMultiplier to decide how many extraParts are needed on top of the defaultParts, at a max of 50
 
-                    let remainingAllowedParts = Math.min(50 - opts.defaultParts.length, opts.extraParts.length * opts.partsMultiplier - opts.defaultParts.length)
+                    let remainingAllowedParts = Math.min(50 - opts.defaultParts.length, opts.extraParts.length * opts.partsMultiplier)
 
                     // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
 
@@ -336,7 +336,7 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts {
 
-        if (spawnEnergyCapacity >= 800) {
+        if (spawnEnergyCapacity >= 750) {
             return {
                 defaultParts: [CARRY],
                 extraParts: [WORK, MOVE, WORK, WORK],

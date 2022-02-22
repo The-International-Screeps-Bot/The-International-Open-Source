@@ -438,7 +438,7 @@ Creep.prototype.advancedRepair = function() {
 
     // If roomVisuals are enabled
 
-    if (Memory.roomVisuals) room.visual.text('🔧' + `${repairTarget.hitsMax - repairTarget.hits}`, repairTarget.pos)
+    if (Memory.roomVisuals) room.visual.text('🔧', repairTarget.pos)
 
     // If the repairTarget is out of repair range
 
@@ -484,7 +484,7 @@ Creep.prototype.advancedRepair = function() {
         const newRepairTargetHits = repairTarget.hits + workPartCount * REPAIR_POWER
 
         // If the repair target won't be viable to repair next tick, inform true
-        creep.say((repairTarget.hitsMax - newRepairTargetHits).toString())
+
         if (repairTarget.hitsMax - newRepairTargetHits >= workPartCount * REPAIR_POWER) return true
 
         // Otherwise
