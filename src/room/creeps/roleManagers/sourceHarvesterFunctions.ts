@@ -7,8 +7,6 @@ SourceHarvester.prototype.travelToSource = function() {
     const creep = this
     const room = creep.room
 
-    creep.say('TTS')
-
     // Define the creep's designated source
 
     const sourceName = creep.memory.sourceName
@@ -16,6 +14,8 @@ SourceHarvester.prototype.travelToSource = function() {
     // Try to find a harvestPosition, inform false if it failed
 
     if (!creep.findHarvestPosition()) return false
+
+    creep.say('🚬')
 
     // Inform true if the creep is at the creep's harvestPos
 

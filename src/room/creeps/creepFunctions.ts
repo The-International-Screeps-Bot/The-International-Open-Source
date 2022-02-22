@@ -549,19 +549,27 @@ Creep.prototype.findOptimalSourceName = function() {
 
     const sourceNamesByAnchorRange = sourceNames.sort((a, b) => anchor.getRangeTo(room.get(a).pos) - anchor.getRangeTo(room.get(b).pos))
 
+    // Construct a creep threshold
+
+    let creepThreshold = 1
+
     // Then loop through the source names and find the first one with open spots
 
     for (const sourceName of sourceNamesByAnchorRange) {
 
-        // If there are still creeps needed to harvest a source
+        // If there are still creeps needed to harvest a source under the creepThreshold
 
-        if (Math.min(3, room.get(`${sourceName}HarvestPositions`).length) - room.creepsOfSourceAmount[sourceName] > 0) {
+        if (Math.min(creepThreshold, room.get(`${sourceName}HarvestPositions`).length) - room.creepsOfSourceAmount[sourceName] > 0) {
 
             // Assign the sourceName to the creep's memory and Inform true
 
             creep.memory.sourceName = sourceName
             return true
         }
+
+        // Otherwise increase the creepThreshold
+
+        creepThreshold++
     }
 
     // No source was found, inform false
