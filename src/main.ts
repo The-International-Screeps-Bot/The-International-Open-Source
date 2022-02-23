@@ -133,10 +133,6 @@ declare global {
          * An object with keys of weights and values of positions
          */
         weightPositions?: {[key: string]: Pos[]}
-        /**
-         * Deprecate
-         */
-        useRoads?: boolean
         avoidEnemyRanges?: boolean
         /**
          * Deprecate

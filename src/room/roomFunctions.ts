@@ -971,21 +971,6 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                     cm.set(cSite.x, cSite.y, 255)
                 }
 
-                // If useRoads is enabled
-
-                if (opts.useRoads) {
-
-                    // Get roads and loop through them
-
-                    const roads: StructureRoad[] = room.get('road')
-                    for (const road of roads) {
-
-                        // Set road positions as prefered
-
-                        cm.set(road.pos.x, road.pos.y, 1)
-                    }
-                }
-
                 // If there is a request to avoid enemy ranges
 
                 avoidEnemyRanges()

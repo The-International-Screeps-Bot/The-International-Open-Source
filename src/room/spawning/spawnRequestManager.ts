@@ -383,6 +383,24 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts {
 
+        // If there is a tower
+
+        if (room.get('tower').length > 0) {
+
+            return {
+                defaultParts: [],
+                extraParts: [CARRY, CARRY, MOVE],
+                partsMultiplier: 10,
+                minCreeps: undefined,
+                maxCreeps: Infinity,
+                minCost: 150,
+                priority: 0.5 + room.creepsFromRoom.hauler.length,
+                memoryAdditions: {
+                    role: 'hauler',
+                }
+            }
+        }
+
         return {
             defaultParts: [],
             extraParts: [CARRY, MOVE],
@@ -409,7 +427,7 @@ export function spawnRequester(room: Room) {
                 partsMultiplier: 8,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
-                minCost: 250,
+                minCost: 200,
                 priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
                 memoryAdditions: {
                     role: 'controllerUpgrader',
@@ -452,10 +470,28 @@ export function spawnRequester(room: Room) {
 
         if (room.find(FIND_MY_CONSTRUCTION_SITES).length == 0) return false
 
+        // If there is a tower
+
+        if (room.get('tower').length > 0) {
+
+            return {
+                defaultParts: [],
+                extraParts: [WORK, CARRY, MOVE],
+                partsMultiplier: 6,
+                minCreeps: undefined,
+                maxCreeps: Infinity,
+                minCost: 200,
+                priority: 3.5 + room.creepsFromRoom.builder.length,
+                memoryAdditions: {
+                    role: 'builder',
+                }
+            }
+        }
+
         return {
             defaultParts: [],
             extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier: 4,
+            partsMultiplier: 6,
             minCreeps: undefined,
             maxCreeps: Infinity,
             minCost: 250,
@@ -469,6 +505,24 @@ export function spawnRequester(room: Room) {
     // Construct requests for mainainers
 
     constructSpawnRequests((function(): SpawnRequestOpts {
+
+        // If there is a tower
+
+        if (room.get('tower').length > 0) {
+
+            return {
+                defaultParts: [],
+                extraParts: [WORK, CARRY, MOVE],
+                partsMultiplier: 4,
+                minCreeps: undefined,
+                maxCreeps: Infinity,
+                minCost: 200,
+                priority: 3.5 + room.creepsFromRoom.maintainer.length,
+                memoryAdditions: {
+                    role: 'maintainer',
+                }
+            }
+        }
 
         return {
             defaultParts: [],

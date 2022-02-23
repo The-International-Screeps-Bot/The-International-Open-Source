@@ -57,6 +57,9 @@ SourceHarvester.prototype.travelToSource = function() {
         goal: { pos: room.newPos(creep.memory.harvestPos), range: 0 },
         avoidImpassibleStructures: true,
         avoidEnemyRanges: true,
+        weightGamebjects: {
+            1: room.get('road')
+        }
     })
     return true
 }

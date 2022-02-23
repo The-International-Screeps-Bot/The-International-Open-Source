@@ -26,7 +26,8 @@ Creep.prototype.isDying = function() {
 
 Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENERGY, amount) {
 
-    const creep = this
+    const creep = this,
+    room = creep.room
 
     // If creep isn't in transfer range
 
@@ -39,6 +40,9 @@ Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENER
             goal: { pos: target.pos, range: 1 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
+            weightGamebjects: {
+                1: room.get('road')
+            }
         })
         return false
     }
@@ -54,7 +58,8 @@ Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENER
 
 Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENERGY, amount) {
 
-    const creep = this
+    const creep = this,
+    room = creep.room
 
     // If creep isn't in transfer range
 
@@ -67,6 +72,9 @@ Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENER
             goal: { pos: target.pos, range: 1 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
+            weightGamebjects: {
+                1: room.get('road')
+            }
         })
         return false
     }
@@ -82,7 +90,8 @@ Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENER
 
 Creep.prototype.advancedPickup = function(target) {
 
-    const creep = this
+    const creep = this,
+    room = creep.room
 
     // If creep isn't in transfer range
 
@@ -95,6 +104,9 @@ Creep.prototype.advancedPickup = function(target) {
             goal: { pos: target.pos, range: 1 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
+            weightGamebjects: {
+                1: room.get('road')
+            }
         })
 
         return false
@@ -188,6 +200,9 @@ Creep.prototype.advancedUpgradeController = function() {
             goal: { pos: controller.pos, range: 3 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
+            weightGamebjects: {
+                1: room.get('road')
+            }
         })
 
         // Inform true
@@ -284,6 +299,9 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
             goal: { pos: cSite.pos, range: 3 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
+            weightGamebjects: {
+                1: room.get('road')
+            }
         })
 
         // Inform true
@@ -453,6 +471,9 @@ Creep.prototype.advancedRepair = function() {
             goal: { pos: repairTarget.pos, range: 3 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
+            weightGamebjects: {
+                1: room.get('road')
+            }
         })
 
         // Inform true
@@ -514,6 +535,9 @@ Creep.prototype.advancedRepair = function() {
                 goal: { pos: newRepairTarget.pos, range: 3 },
                 avoidImpassibleStructures: true,
                 avoidEnemyRanges: true,
+                weightGamebjects: {
+                    1: room.get('road')
+                }
             })
 
             // Inform true
@@ -1072,6 +1096,9 @@ Creep.prototype.getPushed = function() {
         flee: true,
         avoidImpassibleStructures: true,
         avoidEnemyRanges: true,
+        weightGamebjects: {
+            1: room.get('road')
+        }
     })
 
     // Stop if the moveRequest wasn't created
@@ -1121,7 +1148,8 @@ Creep.prototype.fulfillTask = function() {
 
 Creep.prototype.fulfillPullTask = function(task) {
 
-    const creep = this
+    const creep = this,
+    room = creep.room
 
     creep.say('PT')
 
@@ -1140,6 +1168,9 @@ Creep.prototype.fulfillPullTask = function(task) {
             goal: { pos: taskTarget.pos, range: 1 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
+            weightGamebjects: {
+                1: room.get('road')
+            }
         })
 
         return false
@@ -1165,6 +1196,9 @@ Creep.prototype.fulfillPullTask = function(task) {
             goal: { pos: targetPos, range: 0 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
+            weightGamebjects: {
+                1: room.get('road')
+            }
         })
         return false
     }
