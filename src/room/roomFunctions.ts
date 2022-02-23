@@ -1227,7 +1227,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                     // If the creep is owned by an ally
 
-                    if (constants.allyList.has(creep.reservation.username)) {
+                    if (constants.allyList.has(creep.owner.username)) {
 
                         // Set type to allyRemote and stop
 

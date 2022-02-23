@@ -933,6 +933,10 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
 
             if (creep.store.getFreeCapacity() == 0) continue
 
+            // Otherwise adjust the task's resource minimized to the creep's free capacity
+
+            (task as RoomWithdrawTask).withdrawAmount = Math.min(creep.store.getFreeCapacity(), (task as RoomWithdrawTask).withdrawAmount)
+
             break
 
             // If transfer
@@ -946,6 +950,10 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
             // Iterate if the resourceType doesn't match the requested one
 
             if (task.resourceType != resourceType) continue
+
+            // Otherwise adjust the task's resource minimized to the creep's used capacity of the requested resource
+
+            (task as RoomTransferTask).transferAmount = Math.min(creep.store.getUsedCapacity(task.resourceType), (task as RoomTransferTask).transferAmount)
 
             break
         }

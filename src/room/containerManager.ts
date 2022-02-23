@@ -55,7 +55,7 @@ export function containerManager(room: Room) {
 
         // Get the amount of energy the container needs at a max of the hauler's capacity
 
-        const withdrawAmount = Math.min(container.store.getUsedCapacity(RESOURCE_ENERGY), 100)
+        const withdrawAmount = Math.min(container.store.getUsedCapacity(RESOURCE_ENERGY))
 
         // If the withdrawAmount is more than 0
 
