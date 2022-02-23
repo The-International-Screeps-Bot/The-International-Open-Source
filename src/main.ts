@@ -407,6 +407,8 @@ declare global {
          */
         findScore(): void
 
+        towersRequestResources(): void
+
         /**
          * Finds and has towers heal damaged my or allied creeps
          */
