@@ -65,7 +65,7 @@ Room.prototype.towersHealCreeps = function() {
 
     const room = this
 
-    // Stop if there are no actionable towers left
+    // Stop if there are no towers
 
     if (room.get('tower').length == 0) return
 
@@ -81,9 +81,9 @@ Room.prototype.towersHealCreeps = function() {
 
     for (const tower of towers) {
 
-        // Iterate if the tower is not actionable
+        // Iterate if the tower is inactionable
 
-        if (!tower.actionable) continue
+        if (tower.inactionable) continue
 
         // Otherwise, get the first heal target
 
@@ -97,13 +97,13 @@ Room.prototype.towersHealCreeps = function() {
 
         if (healResult != OK) continue
 
-        // Otherwise record that the tower is no longer actionable
+        // Otherwise record that the tower is no longer inactionable
 
-        tower.actionable = false
+        tower.inactionable = true
 
-        // Remove healTarget if it is fully healed
+        /* // Remove healTarget if it is fully healed
 
-        if (creep.hitsMax - creep.hits == 0) delete healTargets[0]
+        if (creep.hitsMax - creep.hits == 0) delete healTargets[0] */
 
         // And iterate
 

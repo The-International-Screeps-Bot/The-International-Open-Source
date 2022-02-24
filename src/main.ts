@@ -693,7 +693,7 @@ declare global {
     }
 
     interface StructureTower {
-        actionable: boolean
+        inactionable: boolean
     }
 
     // Global
