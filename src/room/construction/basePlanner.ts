@@ -238,6 +238,14 @@ export function basePlanner(room: Room): false | BuildLocations {
 
     if (!hubAnchor) return false
 
+    // Configure base locations for roads
+
+    buildLocations.roads = []
+
+    // Construct path
+
+    let path: RoomPosition[] = []
+
     // Plan the stamp 7 times
 
     for (let i = 0; i < 7; i++) {
@@ -249,6 +257,38 @@ export function basePlanner(room: Room): false | BuildLocations {
         // Inform false if the stamp failed to be planned
 
         if (!extensionsAnchor) return false
+
+        // Path from the extensionsAnchor to the hubAnchor
+
+        path = room.advancedFindPath({
+            origin: room.newPos(extensionsAnchor),
+            goal: { pos: room.newPos(hubAnchor), range: 2 },
+            weightPositions: {
+                255: buildPositions,
+                1: roadPositions,
+            }
+        })
+
+        // Loop through positions of the path
+
+        for (const pos of path) {
+
+            // Add the position to roadPositions
+
+            roadPositions.push(pos)
+
+            // Record the pos as avoid in the base cost matrix
+
+            baseCM.set(pos.x, pos.y, 255)
+
+            // Add the positions to the buildLocations under it's stamp and structureType
+
+            buildLocations.roads.push({
+                structureType: STRUCTURE_ROAD,
+                x: pos.x,
+                y: pos.y
+            })
+        }
     }
 
     // Try to plan the stamp
@@ -260,14 +300,6 @@ export function basePlanner(room: Room): false | BuildLocations {
     if (!labsAnchor) return false
 
     // Plan roads
-
-    // Configure base locations for roads
-
-    buildLocations.roads = []
-
-    // Construct path
-
-    let path: RoomPosition[] = []
 
     // Get the room's closestSourceHarvestPositions
 
