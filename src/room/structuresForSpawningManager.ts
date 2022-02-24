@@ -48,9 +48,9 @@ export function structuresForSpawningManager(room: Room) {
             if (totalResourcesRequested >= structure.store.getFreeCapacity(RESOURCE_ENERGY)) continue
         }
 
-        // Get the amount of energy the structure needs at a max of the hauler's capacity
+        // Get the amount of energy the structure needs
 
-        const transferAmount = Math.min(structure.store.getFreeCapacity(RESOURCE_ENERGY))
+        const transferAmount = structure.store.getFreeCapacity(RESOURCE_ENERGY)
 
         // If the transferAmount is more than 0
 

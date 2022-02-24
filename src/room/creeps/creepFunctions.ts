@@ -141,11 +141,80 @@ Creep.prototype.advancedUpgradeController = function() {
 
     creep.say('AUC')
 
-    const controller = room.controller
+    // The the controller
 
-    // Inform false if there is no controller
+    const controller = room.controller,
 
-    if (!controller) return false
+    // Get the controllerContainer
+
+    controllerContainer: StructureContainer = room.get('controllerContainer')
+
+    // If there is a controllerContainer
+
+    if (controllerContainer) {
+
+        // If the controllerContainer is out of upgrade range
+
+        if (creep.pos.getRangeTo(controllerContainer.pos) > 1) {
+
+            creep.say('MC')
+
+            // Make a move request to it
+
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goal: { pos: controllerContainer.pos, range: 1 },
+                avoidImpassibleStructures: true,
+                avoidEnemyRanges: true,
+                weightGamebjects: {
+                    1: room.get('road')
+                }
+            })
+
+            // Inform false
+
+            return false
+        }
+
+        // Otherwise
+
+        // Get the number of work parts for the creep
+
+        const workPartCount = creep.partsOfType(WORK)
+
+        // If the creep has less energy than its workPartCount
+
+        if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount) {
+
+            // Withdraw from the controllerContainer
+
+            creep.withdraw(controllerContainer, RESOURCE_ENERGY)
+        }
+
+        // Try to upgrade the controller, and if the result is a success
+
+        if (creep.upgradeController(controller) == OK) {
+
+            creep.say('UC')
+
+            // Calculate the control points added
+
+            const controlPoints = creep.partsOfType(WORK)
+
+            // Add control points to total controlPoints counter and say the success
+
+            Memory.controlPoints += controlPoints
+            creep.say('🔋' + controlPoints)
+
+            // Inform true
+
+            return true
+        }
+
+        // Inform true
+
+        return true
+    }
 
     // If the creep needs resources
 
@@ -205,18 +274,14 @@ Creep.prototype.advancedUpgradeController = function() {
             }
         })
 
-        // Inform true
+        // Inform false
 
         return false
     }
 
-    // Try to upgrade the controller
+    // Try to upgrade the controller, and if it worked
 
-    const upgradeControllerResult = creep.upgradeController(controller)
-
-    // If the upgrade worked
-
-    if (upgradeControllerResult == OK) {
+    if (creep.upgradeController(controller) == OK) {
 
         creep.say('UC')
 

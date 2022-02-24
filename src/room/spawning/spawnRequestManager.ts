@@ -419,12 +419,14 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts {
 
+        // If the controllerContainer exists
+
         if (room.get('controllerContainer')) {
 
             return {
-                defaultParts: [],
-                extraParts: [WORK, CARRY, MOVE],
-                partsMultiplier: 8,
+                defaultParts: [CARRY],
+                extraParts: [WORK, MOVE, WORK, WORK],
+                partsMultiplier: 5,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 200,
@@ -433,19 +435,6 @@ export function spawnRequester(room: Room) {
                     role: 'controllerUpgrader',
                 }
             }
-
-            /* return {
-                defaultParts: [CARRY],
-                extraParts: [WORK, MOVE, WORK, WORK],
-                partsMultiplier: 8,
-                minCreeps: undefined,
-                maxCreeps: Infinity,
-                minCost: 200,
-                priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
-                memoryAdditions: {
-                    role: 'controllerUpgrader',
-                }
-            } */
         }
 
         return {

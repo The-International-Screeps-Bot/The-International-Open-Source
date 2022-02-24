@@ -1,6 +1,6 @@
 import { constants } from "international/constants"
 import { generalFuncs } from "international/generalFunctions"
-import { RoomWithdrawTask } from "./roomTasks"
+import { RoomTransferTask, RoomWithdrawTask } from "./roomTasks"
 
 /**
  * Creates tasks for containers in the room
@@ -53,9 +53,9 @@ export function containerManager(room: Room) {
             if (totalResourcesOffered >= container.store.getUsedCapacity(RESOURCE_ENERGY)) continue
         }
 
-        // Get the amount of energy the container needs at a max of the hauler's capacity
+        // Get the amount of energy the container needs at a max of the container's used capacity
 
-        const withdrawAmount = Math.min(container.store.getUsedCapacity(RESOURCE_ENERGY))
+        const withdrawAmount = container.store.getUsedCapacity(RESOURCE_ENERGY)
 
         // If the withdrawAmount is more than 0
 
@@ -64,6 +64,70 @@ export function containerManager(room: Room) {
             // Create a new transfer task for the container
 
             new RoomWithdrawTask(room.name, RESOURCE_ENERGY, withdrawAmount, container.id)
+        }
+    }
+
+    //
+
+    controllerContainer()
+
+    function controllerContainer() {
+
+        // Get the controllerContainer
+
+        const controllerContainer = room.get('controllerContainer')
+
+        // If it doesn't exist, stop
+
+        if (!controllerContainer) return
+
+        // Otherwise
+
+        // if there is no global for the container, make one
+
+        if (!global[controllerContainer.id]) global[controllerContainer.id] = {}
+
+        // If there is no created task ID obj for the container's global, create one
+
+        if (!global[controllerContainer.id].createdTaskIDs) global[controllerContainer.id].createdTaskIDs = {}
+
+        // Otherwise
+
+        else {
+
+            // Find the container's tasks of type tansfer
+
+            const containersTransferTasks = room.findTasksOfTypes(global[controllerContainer.id].createdTaskIDs, new Set(['transfer'])) as RoomTransferTask[]
+
+            // Track the amount of energy the resource has offered in tasks
+
+            let totalResourcesRequested = 0
+
+            // Loop through each pickup task
+
+            for (const task of containersTransferTasks) {
+
+                // Otherwise find how many resources the task has requested to pick up
+
+                totalResourcesRequested += task.transferAmount
+            }
+
+            // If there are more or equal resources offered than the free capacity of the container, stop
+
+            if (totalResourcesRequested >= controllerContainer.store.getFreeCapacity(RESOURCE_ENERGY)) return
+        }
+
+        // Get the amount of energy the container can offer at a max of the container's free capacity
+
+        const transferAmount = controllerContainer.store.getFreeCapacity(RESOURCE_ENERGY)
+
+        // If the transferAmount is more than 0
+
+        if (transferAmount > 0) {
+
+            // Create a new transfer task for the container
+
+            new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, controllerContainer.id)
         }
     }
 }
