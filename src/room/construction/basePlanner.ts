@@ -52,7 +52,7 @@ export function basePlanner(room: Room): false | BuildLocations {
     // Record positions around the mineral as unusable
 
     const mineral: Mineral = room.get('mineral')
-    console.log(mineral)
+
     recordAdjacentPositions(mineral.pos.x, mineral.pos.y, 1)
 
     // Record the positions around sources as unusable
@@ -100,9 +100,12 @@ export function basePlanner(room: Room): false | BuildLocations {
  */
     // Construct an foundation for recording base plans
 
-    const buildLocations: BuildLocations = {}
+    const buildLocations: BuildLocations = {},
 
-    const roadLocations: {[key: string]: Pos[]} = {}
+    roadLocations: {[key: string]: Pos[]} = {},
+
+    buildPositions: Pos[] = [],
+    roadPositions: Pos[] = []
 
     /**
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
@@ -185,12 +188,22 @@ export function basePlanner(room: Room): false | BuildLocations {
                         y
                     })
 
+                    // Add the x and y to roadPositions
+
+                    roadPositions.push({ x, y })
+
                     // And iterate
 
                     continue
                 }
 
-                // Otheriwse record the pos as avoid in the base cost matrix
+                // Otherwise if the structure isn't a road
+
+                // Add the x and y to buildPositions
+
+                buildPositions.push({ x, y })
+
+                // Record the pos as avoid in the base cost matrix
 
                 baseCM.set(x, y, 255)
             }
@@ -245,6 +258,121 @@ export function basePlanner(room: Room): false | BuildLocations {
     // Inform false if the stamp failed to be planned
 
     if (!labsAnchor) return false
+
+    // Plan roads
+
+    // Configure base locations for roads
+
+    buildLocations.roads = []
+
+    // Construct path
+
+    let path: RoomPosition[] = []
+
+    // Get the room's closestSourceHarvestPositions
+
+    const closestSourceHarvestPositions: RoomPosition[] = [room.get('source1ClosestHarvestPosition'), room.get('source2ClosestHarvestPosition')]
+
+    // loop through closestSourceHarvestPositions
+
+    for (const closestHarvestPos of closestSourceHarvestPositions) {
+
+        // Path from the hubAnchor to the closestHarvestPos
+
+        path = room.advancedFindPath({
+            origin: closestHarvestPos,
+            goal: { pos: room.newPos(hubAnchor), range: 2 },
+            weightPositions: {
+                255: buildPositions,
+                1: roadPositions,
+            }
+        })
+
+        // Loop through positions of the path
+
+        for (const pos of path) {
+
+            // Add the position to roadPositions
+
+            roadPositions.push(pos)
+
+            // Record the pos as avoid in the base cost matrix
+
+            baseCM.set(pos.x, pos.y, 255)
+
+            // Add the positions to the buildLocations under it's stamp and structureType
+
+            buildLocations.roads.push({
+                structureType: STRUCTURE_ROAD,
+                x: pos.x,
+                y: pos.y
+            })
+        }
+    }
+
+    // Path from the hubAnchor to the centerUpgradePos
+
+    path = room.advancedFindPath({
+        origin: room.get('centerUpgradePos'),
+        goal: { pos: room.newPos(hubAnchor), range: 2 },
+        weightPositions: {
+            255: buildPositions,
+            1: roadPositions,
+        }
+    })
+
+    // Loop through positions of the path
+
+    for (const pos of path) {
+
+        // Add the position to roadPositions
+
+        roadPositions.push(pos)
+
+        // Record the pos as avoid in the base cost matrix
+
+        baseCM.set(pos.x, pos.y, 255)
+
+        // Add the positions to the buildLocations under it's stamp and structureType
+
+        buildLocations.roads.push({
+            structureType: STRUCTURE_ROAD,
+            x: pos.x,
+            y: pos.y
+        })
+    }
+
+    // Path from the hubAnchor to the labsAnchor
+
+    path = room.advancedFindPath({
+        origin: room.newPos(labsAnchor),
+        goal: { pos: room.newPos(hubAnchor), range: 2 },
+        weightPositions: {
+            255: buildPositions,
+            1: roadPositions,
+        }
+    })
+
+    // Loop through positions of the path
+
+    for (const pos of path) {
+
+        // Add the position to roadPositions
+
+        roadPositions.push(pos)
+
+        // Record the pos as avoid in the base cost matrix
+
+        baseCM.set(pos.x, pos.y, 255)
+
+        // Add the positions to the buildLocations under it's stamp and structureType
+
+        buildLocations.roads.push({
+            structureType: STRUCTURE_ROAD,
+            x: pos.x,
+            y: pos.y
+        })
+    }
 
     // Loop through each stamp type in road locations
 

@@ -36,3 +36,31 @@ global.destroyAllCSites = function(types) {
 
     return 'Destroyed all construction sites of types ' + types
 }
+
+global.destroyAllStructures = function(roomName: string, types?: StructureConstant[]) {
+
+    // Get the room with the roomName
+
+    const room = Game.rooms[roomName]
+
+    // Stop if the room isn't defined
+
+    if (!room) return 'You have no vision in ' + roomName
+
+    // Otherwise loop through each structureType
+
+    for (const structureType of constants.allStructureTypes) {
+        if (structureType == STRUCTURE_SPAWN) continue
+        // Get the structures of the type
+
+        const structures: Structure[] = room.get(structureType)
+
+        // Loop through the structures
+
+        for (const structure of structures) structure.destroy()
+    }
+
+    // Inform the result
+
+    return 'Destroyed all structures of types ' + types + ' in ' + roomName
+}

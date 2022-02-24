@@ -856,8 +856,8 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
         const route = generateRoute()
 
         const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
-            plainCost: opts.plainCost,
-            swampCost: opts.swampCost,
+            plainCost: opts.plainCost || 2,
+            swampCost: opts.swampCost || 8,
             maxRooms: route ? 100 : 1,
             maxOps: 100000,
             flee: opts.flee,
@@ -934,9 +934,13 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         const gameObjects = opts.weightGamebjects[weight]
 
+                        // Get the numeric value of the weight
+
+                        const weightNumber = parseInt(weight)
+
                         // Loop through each gameObject and set their pos to the weight in the cm
 
-                        for (const gameObj of gameObjects) cm.set(gameObj.pos.x, gameObj.pos.y, parseInt(weight))
+                        for (const gameObj of gameObjects) cm.set(gameObj.pos.x, gameObj.pos.y, weightNumber)
                     }
                 }
 
@@ -952,9 +956,13 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         const positions = opts.weightPositions[weight]
 
+                        // Get the numeric value of the weight
+
+                        const weightNumber = parseInt(weight)
+
                         // Loop through each gameObject and set their pos to the weight in the cm
 
-                        for (const pos of positions) cm.set(pos.x, pos.y, parseInt(weight))
+                        for (const pos of positions) cm.set(pos.x, pos.y, weightNumber)
                     }
                 }
 

@@ -294,8 +294,8 @@ constants.stamps = {
             terminal: [{ x: 1, y: 3 }],
             storage: [{ x: 3, y: 1 }],
             powerSpawn: [{ x: 3, y: 2 }],
-            observer: [{ x: 3, y: 3 }],
-            empty: [{ x: 2, y: 2 }]
+            /* observer: [{ x: 3, y: 3 }], */
+            empty: [{ x: 2, y: 2,  }/*  */, { x: 3, y: 3 }/*  */]
         },
     },
     extensions: {
