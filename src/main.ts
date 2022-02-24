@@ -410,6 +410,8 @@ declare global {
          */
         towersHealCreeps(): void
 
+        towersAttackCreeps(): void
+
         /**
          * Finds open spaces in a room and records them in a cost matrix
          */

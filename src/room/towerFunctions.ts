@@ -65,17 +65,17 @@ Room.prototype.towersHealCreeps = function() {
 
     const room = this
 
+    // Get the room's towers
+
+    const towers: StructureTower[] = room.get('tower')
+
     // Stop if there are no towers
 
-    if (room.get('tower').length == 0) return
+    if (!towers.length) return
 
     // Construct heal targets from my and allied damaged creeps in the room
 
     const healTargets: Creep[] = room.find(FIND_MY_CREEPS).concat(room.get('allyCreeps')).filter(creep => creep.hits < creep.hitsMax)
-
-    // Get the room's towers
-
-    const towers: StructureTower[] = room.get('tower')
 
     // Loop through the room's towers
 
@@ -85,7 +85,7 @@ Room.prototype.towersHealCreeps = function() {
 
         if (tower.inactionable) continue
 
-        // Otherwise, get the first heal target
+        // Otherwise, get the first target
 
         const creep = healTargets[0]
 
@@ -94,6 +94,57 @@ Room.prototype.towersHealCreeps = function() {
         const healResult = tower.heal(creep)
 
         // If the heal failed, iterate
+
+        if (healResult != OK) continue
+
+        // Otherwise record that the tower is no longer inactionable
+
+        tower.inactionable = true
+
+        /* // Remove healTarget if it is fully healed
+
+        if (creep.hitsMax - creep.hits == 0) delete healTargets[0] */
+
+        // And iterate
+
+        continue
+    }
+}
+
+
+Room.prototype.towersAttackCreeps = function() {
+
+    const room = this
+
+    // Get the room's towers
+
+    const towers: StructureTower[] = room.get('tower')
+
+    // Stop if there are no towers
+
+    if (!towers.length) return
+
+    // Construct attack targets from my and allied damaged creeps in the room
+
+    const attackTargets: Creep[] = room.get('enemyCreeps')
+
+    // Loop through the room's towers
+
+    for (const tower of towers) {
+
+        // Iterate if the tower is inactionable
+
+        if (tower.inactionable) continue
+
+        // Otherwise, get the first target
+
+        const creep = attackTargets[0]
+
+        // Try to attack the creep
+
+        const healResult = tower.attack(creep)
+
+        // If the attack failed, iterate
 
         if (healResult != OK) continue
 
