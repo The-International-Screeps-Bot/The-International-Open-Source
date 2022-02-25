@@ -57,7 +57,8 @@ declare global {
     'extensions' |
     'labs' |
     'tower' |
-    'extension'
+    'extension' | 
+    'observer'
 
     interface Stamp {
         offset: number

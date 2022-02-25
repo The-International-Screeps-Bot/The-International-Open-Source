@@ -483,6 +483,14 @@ export function basePlanner(room: Room): false | BuildLocations {
         if (!extensionAnchor) return false
     }
 
+    // Try to plan the stamp
+
+    const observerAnchor = planStamp('observer', hubAnchor)
+
+    // Inform false if the stamp failed to be planned
+
+    if (!observerAnchor) return false
+
     // Inform information to build based on the plans
 
     return buildLocations

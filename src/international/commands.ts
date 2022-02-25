@@ -50,7 +50,11 @@ global.destroyAllStructures = function(roomName: string, types?: StructureConsta
     // Otherwise loop through each structureType
 
     for (const structureType of constants.allStructureTypes) {
-        if (structureType == STRUCTURE_SPAWN) continue
+
+        // If types is constructed and the part isn't in types, iterate
+
+        if (types && !types.includes(structureType)) continue
+
         // Get the structures of the type
 
         const structures: Structure[] = room.get(structureType)
