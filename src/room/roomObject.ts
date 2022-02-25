@@ -144,10 +144,13 @@ RoomObject.prototype.getValue = function() {
 
     if (roomObject.getCachedValue()) {
 
-        // Format the value and inform it
+        // Format the value
 
         roomObject.formatValue()
-        return roomObject.value
+
+        // If the value is defined, inform it
+
+        if (roomObject.value) return roomObject.value
     }
 
     // Otherwise run the value constructor and set it as the roomObject's value
