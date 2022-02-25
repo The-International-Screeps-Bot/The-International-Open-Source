@@ -1,7 +1,11 @@
+// coords: integer, 50*x+y
+// getNeighbors(coords): returns an array of coords that are adjacent to the given coords
+// isntWall(coords): returns true if given coords is not a wall
+
 // Dignissi's mincut, 2022
 // "Sink" is the mincut term for what we're defending.
-const sinks = _(allstructs).map(x => getSquare(x, 2)).flatten().uniq().run();
-const exits = _.map(this.room.find(FIND_EXIT), "intCoord");
+const sinks = _(room.find(FIND_STRUCTURES)).map(x => getSquare(x, 2)).flatten().uniq().run();
+const exits = _.map(room.find(FIND_EXIT), "intCoord");
 const allnodes = _([...Array(2500).keys()]).filter(isntWall).difference(exits).run();
 const gen0 = _(exits).map(getNeighbors).flatten().uniq().filter(isntWall).difference(exits).run();
 // Maxflow part: populate parents such that parents[i] is the tile you would come from to get to i from an exit.
@@ -26,7 +30,6 @@ outer: do {
     for (const source of gen0) { // "Source" is the mincut term for the exits of the room.
         let path = [source]; // Stack representing the path from the exit to the current tile.
         while (path.length) { // DFS all possible paths
-            if (this.shouldYield) { yield; }
             const head = path[path.length - 1];
             const child = _.find(getNeighbors(head), function(x) {
                 if (!igen[x] || parents[x] || deadend.has(x)) { return false; }

@@ -5,7 +5,7 @@ import 'other/RoomVisual'
 /**
  * Checks if a room can be planner. If it can, it informs information on how to build the room
  */
-export function basePlanner(room: Room): false | BuildLocations {
+export function basePlanner(room: Room) {
 
     // Get a cost matrix of walls and exit areas
 
@@ -79,26 +79,7 @@ export function basePlanner(room: Room): false | BuildLocations {
     // Find the average pos between the two sources and the controller
 
     const avgControllerSourcePos = generalFuncs.findAvgBetweenPosotions(room.controller.pos, avgSourcePos)
-/*
-    // Construct seeds for the floodfill
 
-    const seeds = []
-
-    // Get exits and loop through them
-
-    const exits = room.find(FIND_EXIT)
-
-    for (const pos of exits) {
-
-        // Add the pos into seeds
-
-        seeds.push(pos)
-    }
-
-    // Use the seeds in a floodfill
-
-    const floodCM = room.floodFill(seeds)
- */
     // Construct an foundation for recording base plans
 
     const buildLocations: BuildLocations = {},
@@ -106,7 +87,9 @@ export function basePlanner(room: Room): false | BuildLocations {
     roadLocations: {[key: string]: Pos[]} = {},
 
     buildPositions: Pos[] = [],
-    roadPositions: Pos[] = []
+    roadPositions: Pos[] = [],
+
+    stampAnchors: StampAnchors = {}
 
     /**
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
@@ -128,6 +111,15 @@ export function basePlanner(room: Room): false | BuildLocations {
         // Inform false if no anchor was generated
 
         if (!anchor) return false
+
+        // Otherwise
+        // If the stampType isn't in stampAnchors, construct it
+
+        if (!stampAnchors[stampType]) stampAnchors[stampType] = []
+
+        // Add the anchor to stampAnchors based on its type
+
+        stampAnchors[stampType].push(anchor)
 
         // If base locations aren't configured for this stamp yet
 
@@ -493,5 +485,5 @@ export function basePlanner(room: Room): false | BuildLocations {
 
     // Inform information to build based on the plans
 
-    return buildLocations
+    return { buildLocations, stampAnchors }
 }

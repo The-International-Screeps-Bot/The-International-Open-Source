@@ -383,9 +383,9 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts {
 
-        // If there is a tower
+        // If all RCL 3 extensions are build
 
-        if (room.get('tower').length > 0) {
+        if (spawnEnergyCapacity >= 800) {
 
             return {
                 defaultParts: [],
@@ -459,9 +459,9 @@ export function spawnRequester(room: Room) {
 
         if (room.find(FIND_MY_CONSTRUCTION_SITES).length == 0) return false
 
-        // If there is a tower
+        // If all RCL 3 extensions are build
 
-        if (room.get('tower').length > 0) {
+        if (spawnEnergyCapacity >= 800) {
 
             return {
                 defaultParts: [],
@@ -495,9 +495,9 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts {
 
-        // If there is a tower
+        // If all RCL 3 extensions are build
 
-        if (room.get('tower').length > 0) {
+        if (spawnEnergyCapacity >= 800) {
 
             return {
                 defaultParts: [],

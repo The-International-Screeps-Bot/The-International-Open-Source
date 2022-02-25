@@ -319,7 +319,7 @@ RoomVisual.prototype.structure = function(x, y, type, opts = {}) {
                 stroke: undefined,
                 opacity: opts.opacity
             })
-            
+
             let box: Poly = [
                 [-0.45, 0.3],
                 [-0.45, 0.55],
@@ -365,10 +365,10 @@ RoomVisual.prototype.structure = function(x, y, type, opts = {}) {
             break;
         case STRUCTURE_RAMPART:
             this.circle(x, y, {
-                radius: 0.65,
-                fill: '#434C43',
-                stroke: '#5D735F',
-                strokeWidth: 0.10,
+                radius: 0.5,
+                fill: 'rgb(78, 104, 79)',
+                stroke: 'rgb(106, 180, 107)',
+                strokeWidth: 0.12,
                 opacity: opts.opacity
             })
             break;

@@ -272,6 +272,7 @@ constants.structureTypesByBuildPriority = [
 constants.stamps = {
     fastFiller: {
         offset: 3,
+        protectionOffset: 5,
         size: 5,
         structures: {
             extension: [{ x: 2, y: 1 }, { x: 1, y: 1 }, { x: 4, y: 1 }, { x: 1, y: 2 }, { x: 2, y: 3 }, { x: 3, y: 2 }, { x: 5, y: 2 }, { x: 5, y: 1 }, { x: 4, y: 3 }, { x: 3, y: 4 }, { x: 1, y: 5 }, { x: 1, y: 4 }, { x: 2, y: 5 }, { x: 4, y: 5 }, { x: 5, y: 5 }, { x: 5, y: 4 }] ,
@@ -284,6 +285,7 @@ constants.stamps = {
     },
     hub: {
         offset: 2,
+        protectionOffset: 4,
         size: 4,
         structures: {
             road: [{ x: 1, y: 0 },{ x: 2, y: 0 },{ x: 3, y: 0 },{ x: 0, y: 3 },{ x: 0, y: 2 },{ x: 0, y: 1 },{ x: 1, y: 4 },{ x: 2, y: 4 },{ x: 4, y: 2 },{ x: 4, y: 1 },{ x: 3, y: 3 }],
@@ -300,6 +302,7 @@ constants.stamps = {
     },
     extensions: {
         offset: 2,
+        protectionOffset: 3,
         size: 3,
         structures: {
             extension: [{ x: 1, y: 2 }, { x: 2, y: 1 }, { x: 2, y: 3 }, { x: 2, y: 2 }, { x: 3, y: 2 }],
@@ -308,6 +311,7 @@ constants.stamps = {
     },
     labs: {
         offset: 2,
+        protectionOffset: 3,
         size: 5,
         structures: {
             road: [{ x: 3, y: 3 }, { x: 2, y: 2 }, { x: 1, y: 1 }, { x: 0, y: 0 }],
@@ -316,6 +320,7 @@ constants.stamps = {
     },
     tower: {
         offset: 0,
+        protectionOffset: 3,
         size: 1,
         structures: {
             tower: [{ x: 0, y: 0 }]
@@ -323,6 +328,7 @@ constants.stamps = {
     },
     extension: {
         offset: 0,
+        protectionOffset: 0,
         size: 1,
         structures: {
             extension: [{ x: 0, y: 0 }]
@@ -330,6 +336,7 @@ constants.stamps = {
     },
     observer: {
         offset: 0,
+        protectionOffset: 0,
         size: 1,
         structures: {
             observer: [{ x: 0, y: 0 }]

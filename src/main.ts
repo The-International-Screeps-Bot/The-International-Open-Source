@@ -57,16 +57,22 @@ declare global {
     'extensions' |
     'labs' |
     'tower' |
-    'extension' | 
+    'extension' |
     'observer'
 
     interface Stamp {
         offset: number
+        /**
+         * The range of protection from the anchor to provide when deciding rampart placement
+         */
+         protectionOffset: number
         size: number
         structures: {[key: string]: Pos[]}
     }
 
     type Stamps = Record<StampTypes, Stamp>
+
+    type StampAnchors = Partial<Record<StampTypes, Pos[]>>
 
     type CreepRoles = 'sourceHarvester' |
     'hauler' |

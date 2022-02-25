@@ -1,6 +1,7 @@
 import { constants } from "international/constants"
 import { generalFuncs } from "international/generalFunctions"
 import { basePlanner } from "./basePlanner"
+import { rampartPlanner } from "./rampartPlanner"
 
 /**
  * Creates construction sites and deletes structures in a room
@@ -89,10 +90,24 @@ export function constructionManager(room: Room) {
 
         const baseLocations: BuildLocations = global[room.name].buildLocations
 
-        // If there are no build locations, generate them
+        // If there are no build locations
 
-        if (!baseLocations) global[room.name].buildLocations = basePlanner(room)
-        
+        if (!baseLocations) {
+
+            // Generate and record base plans
+
+            const basePlannerResult = basePlanner(room)
+
+            // Stop if there base planning failed
+
+            if (!basePlannerResult) return
+
+            // Otherwise record aspects of the results in the room's global
+
+            global[room.name].buildLocations = basePlannerResult.buildLocations
+            global[room.name].stampAnchors = basePlannerResult.stampAnchors
+        }
+
         // Loop through each stamp type in base locations
 
         for (const stampType in baseLocations) {
@@ -117,6 +132,32 @@ export function constructionManager(room: Room) {
 
                 room.createConstructionSite(BuildObj.x, BuildObj.y, BuildObj.structureType)
             }
+        }
+    }
+
+    manageRampartPlanning()
+
+    function manageRampartPlanning() {
+
+        // Get the rampartLocations
+
+        const rampartLocations: Pos[] = global[room.name].rampartLocations
+
+        // If there are no rampartLocations
+
+        if (!rampartLocations) {
+
+            // Generate and record rampart plans
+
+            const rampartPlannerResult = rampartPlanner(room)
+
+            // Stop if there rampart planning failed
+
+            if (!rampartPlannerResult) return
+
+            // Otherwise record the result in the room's global rampartLocations
+
+            global[room.name].rampartLocations = rampartPlannerResult
         }
     }
 }
