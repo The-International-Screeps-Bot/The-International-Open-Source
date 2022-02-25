@@ -99,6 +99,8 @@ declare global {
     'source1Container' |
     'source2Container' |
     'controllerContainer' |
+    'baseContainerLeft' |
+    'baseContainerRight' |
     'source1Link' |
     'source2Link' |
     'source1Container' |

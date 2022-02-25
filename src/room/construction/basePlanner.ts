@@ -1,5 +1,6 @@
 import { constants } from "international/constants";
 import { generalFuncs } from "international/generalFunctions";
+import 'other/RoomVisual'
 
 /**
  * Checks if a room can be planner. If it can, it informs information on how to build the room
@@ -157,7 +158,7 @@ export function basePlanner(room: Room): false | BuildLocations {
 
                 // Display visuals if enabled
 
-                if (Memory.roomVisuals) room.visual.circle(x, y, constants.styleForStructureTypes[structureType])
+                if (Memory.roomVisuals) room.visual.structure(x, y, structureType as StructureConstant)
 
                 // If the structure is empty
 
@@ -266,6 +267,9 @@ export function basePlanner(room: Room): false | BuildLocations {
             weightPositions: {
                 255: buildPositions,
                 1: roadPositions,
+            },
+            weightGamebjects: {
+                1: room.get('road')
             }
         })
 
@@ -280,6 +284,10 @@ export function basePlanner(room: Room): false | BuildLocations {
             // Record the pos as avoid in the base cost matrix
 
             baseCM.set(pos.x, pos.y, 255)
+
+            // Visualize the road's at the pos
+
+            room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD)
 
             // Add the positions to the buildLocations under it's stamp and structureType
 
@@ -317,6 +325,9 @@ export function basePlanner(room: Room): false | BuildLocations {
             weightPositions: {
                 255: buildPositions,
                 1: roadPositions,
+            },
+            weightGamebjects: {
+                1: room.get('road')
             }
         })
 
@@ -331,6 +342,10 @@ export function basePlanner(room: Room): false | BuildLocations {
             // Record the pos as avoid in the base cost matrix
 
             baseCM.set(pos.x, pos.y, 255)
+
+            // Visualize the road's at the pos
+
+            room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD)
 
             // Add the positions to the buildLocations under it's stamp and structureType
 
@@ -350,6 +365,9 @@ export function basePlanner(room: Room): false | BuildLocations {
         weightPositions: {
             255: buildPositions,
             1: roadPositions,
+        },
+        weightGamebjects: {
+            1: room.get('road')
         }
     })
 
@@ -364,6 +382,10 @@ export function basePlanner(room: Room): false | BuildLocations {
         // Record the pos as avoid in the base cost matrix
 
         baseCM.set(pos.x, pos.y, 255)
+
+        // Visualize the road's at the pos
+
+        room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD)
 
         // Add the positions to the buildLocations under it's stamp and structureType
 
@@ -382,6 +404,9 @@ export function basePlanner(room: Room): false | BuildLocations {
         weightPositions: {
             255: buildPositions,
             1: roadPositions,
+        },
+        weightGamebjects: {
+            1: room.get('road')
         }
     })
 
@@ -397,6 +422,10 @@ export function basePlanner(room: Room): false | BuildLocations {
 
         baseCM.set(pos.x, pos.y, 255)
 
+        // Visualize the road's at the pos
+
+        room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD)
+
         // Add the positions to the buildLocations under it's stamp and structureType
 
         buildLocations.roads.push({
@@ -405,6 +434,10 @@ export function basePlanner(room: Room): false | BuildLocations {
             y: pos.y
         })
     }
+
+    // Visually connect roads
+
+    room.visual.connectRoads()
 
     // Loop through each stamp type in road locations
 

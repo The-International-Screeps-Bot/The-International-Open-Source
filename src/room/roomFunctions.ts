@@ -619,6 +619,26 @@ Room.prototype.get = function(roomObjectName) {
         valueConstructor: findControllerContainer
     })
 
+    // baseContainers
+
+    new RoomObject({
+        name: 'baseContainerLeft',
+        valueType: 'id',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() {}
+    })
+
+    new RoomObject({
+        name: 'baseContainerRight',
+        valueType: 'id',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() {}
+    })
+
     // Source links
 
     function findSourceLink(closestHarvestPos: RoomPosition): string | false {

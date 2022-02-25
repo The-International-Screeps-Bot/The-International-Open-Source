@@ -44,11 +44,11 @@ export function roomManager() {
 
         //
 
-        roleManager(room)
+        containerManager(room)
 
         //
 
-        containerManager(room)
+        roleManager(room)
 
         //
 
