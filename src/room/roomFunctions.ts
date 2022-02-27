@@ -619,19 +619,53 @@ Room.prototype.get = function(roomObjectName) {
         valueConstructor: findControllerContainer
     })
 
-    // baseContainers
+    // base containers
+
+    function findFastFillerContainer(offset: number) {
+
+        // Get the anchor, stopping if it isn't defined
+
+        const anchor = room.roomObjects.anchor.getValue()
+        if (!anchor) return false
+
+        // Otherwise search based on an offset from the anchor's x
+
+        const structuresAsPos = room.getPositionAt(anchor.x + offset, anchor.y).lookFor(LOOK_STRUCTURES)
+
+        // Loop through structuresAtPos
+
+        for (const structure of structuresAsPos) {
+
+            // If the structureType is container, inform the container's ID
+
+            if (structure.structureType == STRUCTURE_CONTAINER) return structure.id
+        }
+
+        // Otherwise inform false
+
+        return false
+    }
 
     new RoomObject({
-        name: 'baseContainerLeft',
+        name: 'fastFillerContainerLeft',
         valueType: 'id',
         cacheType: 'global',
         cacheAmount: Infinity,
         room,
-        valueConstructor: function() {}
+        valueConstructor: () => { return findFastFillerContainer(-2) }
     })
 
     new RoomObject({
-        name: 'baseContainerRight',
+        name: 'fastFillerContainerRight',
+        valueType: 'id',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: () => { return findFastFillerContainer(2) }
+    })
+
+    new RoomObject({
+        name: 'labContainer',
         valueType: 'id',
         cacheType: 'global',
         cacheAmount: Infinity,

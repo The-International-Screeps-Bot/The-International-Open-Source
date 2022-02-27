@@ -130,4 +130,69 @@ export function containerManager(room: Room) {
             new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, controllerContainer.id)
         }
     }
+
+    fastFillerContainers()
+
+    function fastFillerContainers() {
+
+        // Get the room's fastFillerContainers
+
+        const fastFillerContainers: StructureContainer[] = [room.get('fastFillerContainerLeft'), room.get('fastFillerContainerRight')]
+
+        // Loop through fastFillerContainers
+
+        for (const container of fastFillerContainers) {
+
+            // If the container isn't defined, iterate
+
+            if (!container) continue
+
+            // if there is no global for the container, make one
+
+            if (!global[container.id]) global[container.id] = {}
+
+            // If there is no created task ID obj for the container's global, create one
+
+            if (!global[container.id].createdTaskIDs) global[container.id].createdTaskIDs = {}
+
+            // Otherwise
+
+            else {
+
+                // Find the container's tasks of type tansfer
+
+                const containersTransferTasks = room.findTasksOfTypes(global[container.id].createdTaskIDs, new Set(['transfer'])) as RoomTransferTask[]
+
+                // Track the amount of energy the resource has offered in tasks
+
+                let totalResourcesRequested = 0
+
+                // Loop through each pickup task
+
+                for (const task of containersTransferTasks) {
+
+                    // Otherwise find how many resources the task has requested to pick up
+
+                    totalResourcesRequested += task.transferAmount
+                }
+
+                // If there are more or equal resources offered than the free capacity of the container, stop
+
+                if (totalResourcesRequested >= container.store.getFreeCapacity(RESOURCE_ENERGY)) return
+            }
+
+            // Get the amount of energy the container can offer at a max of the container's free capacity
+
+            const transferAmount = container.store.getFreeCapacity(RESOURCE_ENERGY)
+
+            // If the transferAmount is more than 0
+
+            if (transferAmount > 0) {
+
+                // Create a new transfer task for the container
+
+                new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, container.id)
+            }
+        }
+    }
 }
