@@ -1204,13 +1204,9 @@ Room.prototype.findType = function(scoutingRoom: Room) {
             return
         }
 
-        // Get sources
-
-        const sources: Source[] = room.get('sources')
-
         // Filter sources that have been harvested
 
-        const harvestedSources = sources.filter(source => source.ticksToRegeneration > 0)
+        const harvestedSources = room.find(FIND_SOURCES).filter(source => source.ticksToRegeneration > 0)
 
         if (isReservedRemote()) return
 
@@ -1341,17 +1337,23 @@ Room.prototype.findType = function(scoutingRoom: Room) {
         return
     }
 
-    // Get sources
-
-    const sources = room.get('sources')
-
     // If there are sources
 
-    if (sources.length > 0) {
+    if (room.find(FIND_SOURCES).length > 0) {
 
         // Set type to keeperCenter and stop
 
         room.memory.type = 'keeperCenter'
+        return
+    }
+
+    // If there are portals
+
+    if (room.get('portal').length > 0) {
+
+        // Set type to intersection and stop
+
+        room.memory.type = 'intersection'
         return
     }
 
