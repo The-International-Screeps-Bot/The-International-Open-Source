@@ -2016,3 +2016,25 @@ Room.prototype.findSourceHarvesterInfo = function() {
         room.usedHarvestPositions.set(harvestPos.x, harvestPos.y, 255)
     }
 }
+
+Room.prototype.findRepairTargets = function(workPartCount, excludedIDs = new Set()) {
+
+    const room = this,
+
+    // Get roads and containers in the room
+
+    possibleRepairTargets: (StructureRoad | StructureContainer)[] = room.get('road').concat(room.get('container'))
+
+    // Inform filtered possibleRepairTargets
+
+    return possibleRepairTargets.filter(function(structure) {
+
+        // If the structure's ID is to be excluded, inform false
+
+        if (excludedIDs.has(structure.id)) return false
+
+        // Otherwise if the structure is somewhat low on hits, true
+
+        return structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER
+    })
+}

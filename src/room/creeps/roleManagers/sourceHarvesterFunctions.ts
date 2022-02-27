@@ -83,16 +83,8 @@ SourceHarvester.prototype.transferToSourceLink = function() {
 
 SourceHarvester.prototype.repairSourceContainer = function() {
 
-    const creep = this
-    const room = creep.room
-
-    // Get the creep's number of work parts
-
-    const workPartCount = creep.partsOfType(WORK)
-
-    // If the creep doesn't have enough energy, inform false
-
-    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount) return false
+    const creep = this,
+    room = creep.room
 
     // Get the creeps sourceName
 
@@ -103,9 +95,17 @@ SourceHarvester.prototype.repairSourceContainer = function() {
     sourceContainer: StructureContainer = room.get(`${sourceName}Container`)
     if (!sourceContainer) return false
 
+    // Get the creep's number of work parts
+
+    const workPartCount = creep.partsOfType(WORK)
+
     // If the sourceContainer doesn't need repairing, inform false
 
-    if (sourceContainer.hitsMax - sourceContainer.hits > workPartCount * REPAIR_POWER) return false
+    if (sourceContainer.hitsMax - sourceContainer.hits < workPartCount * REPAIR_POWER) return false
+
+    // If the creep doesn't have enough energy, withdraw from the sourceContainer
+
+    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount) creep.withdraw(sourceContainer, RESOURCE_ENERGY)
 
     // Try to repair the target
 

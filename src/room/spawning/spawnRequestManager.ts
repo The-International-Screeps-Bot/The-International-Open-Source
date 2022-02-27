@@ -334,7 +334,7 @@ export function spawnRequester(room: Room) {
 
     // Construct requests for sourceHarvesters
 
-    constructSpawnRequests((function(): SpawnRequestOpts {
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
 
         if (spawnEnergyCapacity >= 750) {
             return {
@@ -381,7 +381,7 @@ export function spawnRequester(room: Room) {
 
     // Construct requests for haulers
 
-    constructSpawnRequests((function(): SpawnRequestOpts {
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
 
         // If all RCL 3 extensions are build
 
@@ -417,7 +417,7 @@ export function spawnRequester(room: Room) {
 
     // Construct requests for upgraders
 
-    constructSpawnRequests((function(): SpawnRequestOpts {
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
 
         // If the controllerContainer exists
 
@@ -493,7 +493,18 @@ export function spawnRequester(room: Room) {
 
     // Construct requests for mainainers
 
-    constructSpawnRequests((function(): SpawnRequestOpts {
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+        // If there are no roads or containers with below threshold hits
+
+        // Get roads and containers in the room
+
+        const possibleRepairTargets: (StructureRoad | StructureContainer)[] = room.get('road').concat(room.get('container'))
+
+        // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
+
+        const repairTargets = possibleRepairTargets.filter(structure => structure.hits * 0.2 > structure.hitsMax)
+        if (!repairTargets.length) return false
 
         // If all RCL 3 extensions are build
 
@@ -529,7 +540,7 @@ export function spawnRequester(room: Room) {
 
     // Construct requests for scouts
 
-    constructSpawnRequests((function(): SpawnRequestOpts {
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
 
         return {
             defaultParts: [MOVE],

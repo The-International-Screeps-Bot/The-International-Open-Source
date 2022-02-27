@@ -407,37 +407,10 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
     return false
 }
 
-Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs = new Set()) {
-
-    const creep = this
-    const room = creep.room
-
-    // Get roads and containers in the room
-
-    const repairStructures: (StructureRoad | StructureContainer)[] = room.get('road').concat(room.get('container'))
-
-    // Iterate through repair structures and find inform one if it's worth repairing
-
-    for (const structure of repairStructures) {
-
-        // If the structure's ID is excluded, iterate
-
-        if (excludedIDs.has(structure.id)) continue
-
-        // Otherwise if the structure is somewhat low on hits, inform it
-
-        if (structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER) return structure
-    }
-
-    // If no ideal structure was found, inform false
-
-    return false
-}
-
 Creep.prototype.advancedRepair = function() {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room
 
     creep.say('AR')
 
@@ -508,9 +481,17 @@ Creep.prototype.advancedRepair = function() {
             if (structure) return structure
         }
 
-        // Otherwise inform the results of finding a new target
+        // Otherwise find repair targets that don't include the current target
 
-        return creep.findRepairTarget(workPartCount)
+        const newRepairTargets = room.findRepairTargets(workPartCount)
+
+        // Inform false if no targets exist
+
+        if (!newRepairTargets.length) return false
+
+        // Otherwise search and inform the closest newRepairTarget
+
+        return creep.pos.findClosestByRange(newRepairTargets)
     }
 
     // Inform false if repair target wasn't defined
@@ -575,7 +556,7 @@ Creep.prototype.advancedRepair = function() {
 
         // If the repair target won't be viable to repair next tick, inform true
 
-        if (repairTarget.hitsMax - newRepairTargetHits > workPartCount * REPAIR_POWER) return true
+        if (repairTarget.hitsMax - newRepairTargetHits >= workPartCount * REPAIR_POWER) return true
 
         // Otherwise
 
@@ -583,13 +564,17 @@ Creep.prototype.advancedRepair = function() {
 
         delete creep.memory.repairTargetID
 
-        // Find a new repair target
+        // Find repair targets that don't include the current target
 
-        const newRepairTarget = creep.findRepairTarget(workPartCount, new Set([repairTargetID]))
+        const newRepairTargets = room.findRepairTargets(workPartCount, new Set([repairTargetID]))
 
-        // Inform true if no new target was found
+        // Inform true if no targets exist
 
-        if (!newRepairTarget) return true
+        if (!newRepairTargets.length) return true
+
+        // Otherwise search for the closest newRepairTarget
+
+        const newRepairTarget = creep.pos.findClosestByRange(newRepairTargets)
 
         // Otherwise, if the new repair target is out of repair range
 

@@ -467,6 +467,11 @@ declare global {
          * Finds and records a room's usedHarvestPositions
          */
         findUsedHarvestPositions(): void
+
+        /**
+         * Finds targets to repair given work part counts and target IDs to avoid
+         */
+        findRepairTargets(workPartCount: number, excludedIDs?: Set<Id<Structure>>): (StructureRoad | StructureContainer)[]
     }
 
     interface RoomMemory {
@@ -547,11 +552,6 @@ declare global {
          * Attempts multiple methods to build a construction site
          */
         advancedBuildCSite(cSite: ConstructionSite): boolean
-
-        /**
-         * Tries to find a new repair target for the creep
-         */
-         findRepairTarget(workPartCount: number, excludedIDs?: Set<Id<Structure>>): false | Structure
 
         /**
          *
