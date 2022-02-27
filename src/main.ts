@@ -536,7 +536,7 @@ declare global {
         /**
          * Harvests a source and informs the result, while recording the result if successful
          */
-        advancedHarvestSource(source: Source): ScreepsReturnCode
+        advancedHarvestSource(source: Source): boolean
 
         /**
          * Attempts multiple methods to upgrade the controller

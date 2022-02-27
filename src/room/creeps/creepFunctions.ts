@@ -121,8 +121,10 @@ Creep.prototype.advancedHarvestSource = function(source) {
 
     const creep = this
 
+    // Harvest the source, informing the result if it didn't succeed
+
     const harvestResult = creep.harvest(source)
-    if (harvestResult != OK) return harvestResult
+    if (harvestResult != OK) return false
 
     // Find amount of energy harvested and record it in data
 
@@ -131,7 +133,9 @@ Creep.prototype.advancedHarvestSource = function(source) {
 
     creep.say('⛏️' + energyHarvested)
 
-    return OK
+    // Inform true
+
+    return true
 }
 
 Creep.prototype.advancedUpgradeController = function() {
@@ -552,7 +556,7 @@ Creep.prototype.advancedRepair = function() {
 
     const repairResult = creep.repair(repairTarget)
 
-    // If the build worked
+    // If the repair worked
 
     if (repairResult == OK) {
 
@@ -571,7 +575,7 @@ Creep.prototype.advancedRepair = function() {
 
         // If the repair target won't be viable to repair next tick, inform true
 
-        if (repairTarget.hitsMax - newRepairTargetHits >= workPartCount * REPAIR_POWER) return true
+        if (repairTarget.hitsMax - newRepairTargetHits > workPartCount * REPAIR_POWER) return true
 
         // Otherwise
 

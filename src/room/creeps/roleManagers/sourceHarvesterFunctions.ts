@@ -86,19 +86,50 @@ SourceHarvester.prototype.repairSourceContainer = function() {
     const creep = this
     const room = creep.room
 
-    // Get the creeps source
+    // Get the creep's number of work parts
 
-    const sourceName = creep.memory.sourceName
+    const workPartCount = creep.partsOfType(WORK)
 
-    // Get the sourceContainer for the creep's source
+    // If the creep doesn't have enough energy, inform false
 
-    const sourceContainer = room.get(`${sourceName}Container`)
+    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount) return false
 
-    // Stop if there is no source container
+    // Get the creeps sourceName
 
-    if (!sourceContainer) return true
+    const sourceName = creep.memory.sourceName,
 
-    // Otherwise check if the creep can upgrade the sourceContainer
+    // Get the sourceContainer for the creep's source, informing false if it's undefined
 
-    return true
+    sourceContainer: StructureContainer = room.get(`${sourceName}Container`)
+    if (!sourceContainer) return false
+
+    // If the sourceContainer doesn't need repairing, inform false
+
+    if (sourceContainer.hitsMax - sourceContainer.hits > workPartCount * REPAIR_POWER) return false
+
+    // Try to repair the target
+
+    const repairResult = creep.repair(sourceContainer)
+
+    // If the repair worked
+
+    if (repairResult == OK) {
+
+        // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
+
+        const energySpentOnRepairs = Math.min(workPartCount, (sourceContainer.hitsMax - sourceContainer.hits) / REPAIR_POWER)
+
+        // Add control points to total controlPoints counter and say the success
+
+        Memory.energySpentOnRepairing += energySpentOnRepairs
+        creep.say('🔧' + energySpentOnRepairs * REPAIR_POWER)
+
+        // Inform success
+
+        return true
+    }
+
+    // Inform failure
+
+    return false
 }

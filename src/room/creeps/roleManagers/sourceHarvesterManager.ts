@@ -19,13 +19,13 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         if (creep.travelToSource()) continue
 
-        // Try to normally harvest. Iterate if creep harvested
-
-        if (creep.advancedHarvestSource(room.get(creep.memory.sourceName))) continue
-
         // Try to transfer to the source link. Iterate if it transfered
 
         if (creep.transferToSourceLink()) continue
+
+        // Try to normally harvest. Iterate if creep harvested
+
+        if (creep.advancedHarvestSource(room.get(creep.memory.sourceName))) continue
 
         // If the source is empty repair the source contianer if it exists. Iterate if it repaired
 
