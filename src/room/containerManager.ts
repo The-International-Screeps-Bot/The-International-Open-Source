@@ -7,63 +7,68 @@ import { RoomTransferTask, RoomWithdrawTask } from "./roomTasks"
  */
 export function containerManager(room: Room) {
 
-    // Get the room's sourceContainers
+    sourceContainers()
 
-    const sourceContainers: StructureContainer[] = [room.get('source1Container'), room.get('source2Container')]
+    function sourceContainers() {
 
-    // Loop through sourceContainers
+        // Get the room's sourceContainers
 
-    for (const container of sourceContainers) {
+        const sourceContainers: StructureContainer[] = [room.get('source1Container'), room.get('source2Container')]
 
-        // If the container isn't defined, iterate
+        // Loop through sourceContainers
 
-        if (!container) continue
+        for (const container of sourceContainers) {
 
-        // if there is no global for the container, make one
+            // If the container isn't defined, iterate
 
-        if (!global[container.id]) global[container.id] = {}
+            if (!container) continue
 
-        // If there is no created task ID obj for the container's global, create one
+            // if there is no global for the container, make one
 
-        if (!global[container.id].createdTaskIDs) global[container.id].createdTaskIDs = {}
+            if (!global[container.id]) global[container.id] = {}
 
-        // Otherwise
+            // If there is no created task ID obj for the container's global, create one
 
-        else {
+            if (!global[container.id].createdTaskIDs) global[container.id].createdTaskIDs = {}
 
-            // Find the container's tasks of type tansfer
+            // Otherwise
 
-            const containersWithdrawTasks = room.findTasksOfTypes(global[container.id].createdTaskIDs, new Set(['withdraw'])) as RoomWithdrawTask[]
+            else {
 
-            // Track the amount of energy the resource has offered in tasks
+                // Find the container's tasks of type tansfer
 
-            let totalResourcesOffered = 0
+                const containersWithdrawTasks = room.findTasksOfTypes(global[container.id].createdTaskIDs, new Set(['withdraw'])) as RoomWithdrawTask[]
 
-            // Loop through each pickup task
+                // Track the amount of energy the resource has offered in tasks
 
-            for (const task of containersWithdrawTasks) {
+                let totalResourcesOffered = 0
 
-                // Otherwise find how many resources the task has requested to pick up
+                // Loop through each pickup task
 
-                totalResourcesOffered += task.withdrawAmount
+                for (const task of containersWithdrawTasks) {
+
+                    // Otherwise find how many resources the task has requested to pick up
+
+                    totalResourcesOffered += task.withdrawAmount
+                }
+
+                // If there are more or equal resources offered than the used capacity of the container, iterate
+
+                if (totalResourcesOffered >= container.store.getUsedCapacity(RESOURCE_ENERGY)) continue
             }
 
-            // If there are more or equal resources offered than the used capacity of the container, iterate
+            // Get the amount of energy the container needs at a max of the container's used capacity
 
-            if (totalResourcesOffered >= container.store.getUsedCapacity(RESOURCE_ENERGY)) continue
-        }
+            const withdrawAmount = container.store.getUsedCapacity(RESOURCE_ENERGY)
 
-        // Get the amount of energy the container needs at a max of the container's used capacity
+            // If the withdrawAmount is more than 0
 
-        const withdrawAmount = container.store.getUsedCapacity(RESOURCE_ENERGY)
+            if (withdrawAmount > 500) {
 
-        // If the withdrawAmount is more than 0
+                // Create a new transfer task for the container
 
-        if (withdrawAmount > 0) {
-
-            // Create a new transfer task for the container
-
-            new RoomWithdrawTask(room.name, RESOURCE_ENERGY, withdrawAmount, container.id)
+                new RoomWithdrawTask(room.name, RESOURCE_ENERGY, withdrawAmount, container.id)
+            }
         }
     }
 
@@ -123,7 +128,7 @@ export function containerManager(room: Room) {
 
         // If the transferAmount is more than 0
 
-        if (transferAmount > 0) {
+        if (transferAmount > 500) {
 
             // Create a new transfer task for the container
 
@@ -187,7 +192,7 @@ export function containerManager(room: Room) {
 
             // If the transferAmount is more than 0
 
-            if (transferAmount > 0) {
+            if (transferAmount > 500) {
 
                 // Create a new transfer task for the container
 
