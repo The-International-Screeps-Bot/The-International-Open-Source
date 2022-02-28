@@ -9,7 +9,7 @@ export function basePlanner(room: Room) {
 
     // Get a cost matrix of walls and exit areas
 
-    const baseCM = room.get('baseCM')
+    const baseCM: CostMatrix = room.get('baseCM')
 
     function recordAdjacentPositions(x: number, y: number, range: number) {
 
@@ -31,7 +31,7 @@ export function basePlanner(room: Room) {
             baseCM.set(adjacentPos.x, adjacentPos.y, 255)
         }
     }
-
+/*
     // Get the room's upgrade positions
 
     const upgradePositions: Pos[] = room.get('upgradePositions')
@@ -48,13 +48,17 @@ export function basePlanner(room: Room) {
 
             baseCM.set(pos.x, pos.y, 255)
         }
-    }
+    } */
 
-    // Record positions around the mineral as unusable
+    // Get the controller and set positions nearby to avoid
 
-    const mineral: Mineral = room.get('mineral')
+    const controller = room.controller
+    recordAdjacentPositions(controller.pos.x, controller.pos.y, 3)
 
-    recordAdjacentPositions(mineral.pos.x, mineral.pos.y, 1)
+    // Get and record the mineralHarvestPos as avoid
+
+    const mineralHarvestPos: RoomPosition = room.get('mineralHarvestPos')
+    baseCM.set(mineralHarvestPos.x, mineralHarvestPos.y, 255)
 
     // Record the positions around sources as unusable
 
@@ -255,9 +259,6 @@ export function basePlanner(room: Room) {
             weightPositions: {
                 255: buildPositions,
                 1: roadPositions,
-            },
-            weightGamebjects: {
-                1: room.get('road')
             }
         })
 
@@ -293,50 +294,6 @@ export function basePlanner(room: Room) {
 
     // Plan roads
 
-    // Get the room's closestSourceHarvestPositions
-
-    const closestSourceHarvestPositions: RoomPosition[] = [room.get('source1ClosestHarvestPosition'), room.get('source2ClosestHarvestPosition')]
-
-    // loop through closestSourceHarvestPositions
-
-    for (const closestHarvestPos of closestSourceHarvestPositions) {
-
-        // Path from the hubAnchor to the closestHarvestPos
-
-        path = room.advancedFindPath({
-            origin: closestHarvestPos,
-            goal: { pos: room.newPos(hubAnchor), range: 2 },
-            weightPositions: {
-                255: buildPositions,
-                1: roadPositions,
-            },
-            weightGamebjects: {
-                1: room.get('road')
-            }
-        })
-
-        // Loop through positions of the path
-
-        for (const pos of path) {
-
-            // Add the position to roadPositions
-
-            roadPositions.push(pos)
-
-            // Record the pos as avoid in the base cost matrix
-
-            baseCM.set(pos.x, pos.y, 255)
-
-            // Add the positions to the buildLocations under it's stamp and structureType
-
-            buildLocations.roads.push({
-                structureType: STRUCTURE_ROAD,
-                x: pos.x,
-                y: pos.y
-            })
-        }
-    }
-
     // Path from the hubAnchor to the centerUpgradePos
 
     path = room.advancedFindPath({
@@ -369,10 +326,115 @@ export function basePlanner(room: Room) {
         })
     }
 
+    // Get the room's closestSourceHarvestPositions
+
+    const closestSourceHarvestPositions: RoomPosition[] = [room.get('source1ClosestHarvestPos'), room.get('source2ClosestHarvestPos')]
+
+    // loop through closestSourceHarvestPositions
+
+    for (const closestHarvestPos of closestSourceHarvestPositions) {
+
+        // Path from the hubAnchor to the closestHarvestPos
+
+        path = room.advancedFindPath({
+            origin: closestHarvestPos,
+            goal: { pos: room.newPos(hubAnchor), range: 2 },
+            weightPositions: {
+                255: buildPositions,
+                1: roadPositions,
+            }
+        })
+
+        // Loop through positions of the path
+
+        for (const pos of path) {
+
+            // Add the position to roadPositions
+
+            roadPositions.push(pos)
+
+            // Record the pos as avoid in the base cost matrix
+
+            baseCM.set(pos.x, pos.y, 255)
+
+            // Add the positions to the buildLocations under it's stamp and structureType
+
+            buildLocations.roads.push({
+                structureType: STRUCTURE_ROAD,
+                x: pos.x,
+                y: pos.y
+            })
+        }
+
+        // Path from the centerUpgradePos to the closestHarvestPos
+
+        path = room.advancedFindPath({
+            origin: closestHarvestPos,
+            goal: { pos: room.get('centerUpgradePos'), range: 1 },
+            weightPositions: {
+                255: buildPositions,
+                1: roadPositions,
+            }
+        })
+
+        // Loop through positions of the path
+
+        for (const pos of path) {
+
+            // Add the position to roadPositions
+
+            roadPositions.push(pos)
+
+            // Record the pos as avoid in the base cost matrix
+
+            baseCM.set(pos.x, pos.y, 255)
+
+            // Add the positions to the buildLocations under it's stamp and structureType
+
+            buildLocations.roads.push({
+                structureType: STRUCTURE_ROAD,
+                x: pos.x,
+                y: pos.y
+            })
+        }
+    }
+
     // Path from the hubAnchor to the labsAnchor
 
     path = room.advancedFindPath({
         origin: room.newPos(labsAnchor),
+        goal: { pos: room.newPos(hubAnchor), range: 2 },
+        weightPositions: {
+            255: buildPositions,
+            1: roadPositions,
+        }
+    })
+
+    // Loop through positions of the path
+
+    for (const pos of path) {
+
+        // Add the position to roadPositions
+
+        roadPositions.push(pos)
+
+        // Record the pos as avoid in the base cost matrix
+
+        baseCM.set(pos.x, pos.y, 255)
+
+        // Add the positions to the buildLocations under it's stamp and structureType
+
+        buildLocations.roads.push({
+            structureType: STRUCTURE_ROAD,
+            x: pos.x,
+            y: pos.y
+        })
+    }
+
+    // Path from the hubAnchor to the mineralHarvestPos
+
+    path = room.advancedFindPath({
+        origin: room.get('mineralHarvestPos'),
         goal: { pos: room.newPos(hubAnchor), range: 2 },
         weightPositions: {
             255: buildPositions,

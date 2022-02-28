@@ -368,7 +368,7 @@ Room.prototype.get = function(roomObjectName) {
      * @param source source of which to find harvestPositions for
      * @returns source's harvestPositions, a list of positions
      */
-     function findHarvestPositions(source: Source): Pos[] {
+     function findSourceHarvestPositions(source: Source): Pos[] {
 
         // Stop and inform empty array if there is no source
 
@@ -403,7 +403,7 @@ Room.prototype.get = function(roomObjectName) {
     * @param harvestPositions array of RoomPositions to filter
     * @returns the closest harvestPosition to the room's anchor
     */
-    function findClosestHarvestPos(harvestPositions: RoomPosition[]): false | RoomPosition {
+    function findClosestSourceHarvestPos(harvestPositions: RoomPosition[]): false | RoomPosition {
 
         // Get the room anchor
 
@@ -426,19 +426,19 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findHarvestPositions(room.roomObjects.source1.getValue())
+            return findSourceHarvestPositions(room.roomObjects.source1.getValue())
         }
     })
 
     new RoomObject({
-        name: 'source1ClosestHarvestPosition',
+        name: 'source1ClosestHarvestPos',
         valueType: 'pos',
         cacheType: 'global',
         cacheAmount: Infinity,
         room,
         valueConstructor: function() {
 
-            return findClosestHarvestPos(room.roomObjects.source1HarvestPositions.getValue())
+            return findClosestSourceHarvestPos(room.roomObjects.source1HarvestPositions.getValue())
         }
     })
 
@@ -450,19 +450,75 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findHarvestPositions(room.roomObjects.source2.getValue())
+            return findSourceHarvestPositions(room.roomObjects.source2.getValue())
         }
     })
 
     new RoomObject({
-        name: 'source2ClosestHarvestPosition',
+        name: 'source2ClosestHarvestPos',
         valueType: 'pos',
         cacheType: 'global',
         cacheAmount: Infinity,
         room,
         valueConstructor: function() {
 
-            return findClosestHarvestPos(room.roomObjects.source2HarvestPositions.getValue())
+            return findClosestSourceHarvestPos(room.roomObjects.source2HarvestPositions.getValue())
+        }
+    })
+
+    function findMineralHarvestPos(): Pos | false {
+
+        // Get the room's mineral
+
+        const mineral: Mineral = room.roomObjects.mineral.getValue()
+
+        // Find positions adjacent to mineral
+
+        const rect: Rect = { x1: mineral.pos.x - 1, y1: mineral.pos.y - 1, x2: mineral.pos.x + 1, y2: mineral.pos.y + 1 }
+        const adjacentPositions: Pos[] = generalFuncs.findPositionsInsideRect(rect)
+
+        // Construct harvestPositions
+
+        const harvestPositions: RoomPosition[] = []
+
+        // Get terrain in room
+
+        const terrain = Game.map.getRoomTerrain(room.name)
+
+        // Loop through postions of adjacentPositions
+
+        for (const pos of adjacentPositions) {
+
+            // Iterate if terrain for pos is a wall
+
+            if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
+
+            // Add pos to harvestPositions
+
+            harvestPositions.push(room.newPos(pos))
+        }
+
+        // Get the anchor, informing false if it's undefined
+
+        const anchor: RoomPosition = room.roomObjects.anchor.getValue()
+        if (!anchor) return false
+
+        // Inform the closest pos of harvestPositions to the anchor
+
+        return anchor.findClosestByRange(harvestPositions)
+    }
+
+    // Mineral harvest pos
+
+    new RoomObject({
+        name: 'mineralHarvestPos',
+        valueType: 'pos',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() {
+
+            return findMineralHarvestPos()
         }
     })
 
@@ -474,22 +530,18 @@ Room.prototype.get = function(roomObjectName) {
 
         if (!room.controller) return false
 
+        // Get the anchor, informing false if it's undefined
+
+        const anchor = room.roomObjects.anchor.getValue()
+        if (!anchor) return false
+
         // Get the open areas in a range of 3 to the controller
 
         const distanceCM = room.distanceTransform(room.roomObjects.terrainCM.getValue(), false, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
 
-        // Stop if there is no recorded sources
-
-        if (!room.roomObjects.source1.getValue() || !room.roomObjects.source2.getValue()) return false
-
-        // Get the average pos between the two sources
-
-        const sourcesAvgPos = generalFuncs.findAvgBetweenPosotions(room.roomObjects.source1.getValue().pos, room.roomObjects.source2.getValue().pos)
-
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
-        const centerUpgradePos = room.findClosestPosOfValue(distanceCM, sourcesAvgPos, 2)
-        return centerUpgradePos
+        return room.findClosestPosOfValue(distanceCM, anchor, 2)
     }
 
     new RoomObject({
@@ -564,7 +616,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findSourceContainer(room.roomObjects.source1ClosestHarvestPosition.getValue())
+            return findSourceContainer(room.roomObjects.source1ClosestHarvestPos.getValue())
         }
     })
 
@@ -576,7 +628,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findSourceContainer(room.roomObjects.source2ClosestHarvestPosition.getValue())
+            return findSourceContainer(room.roomObjects.source2ClosestHarvestPos.getValue())
         }
     })
 
@@ -705,7 +757,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findSourceLink(room.roomObjects.source1ClosestHarvestPosition.getValue())
+            return findSourceLink(room.roomObjects.source1ClosestHarvestPos.getValue())
         }
     })
 
@@ -717,7 +769,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findSourceLink(room.roomObjects.source2ClosestHarvestPosition.getValue())
+            return findSourceLink(room.roomObjects.source2ClosestHarvestPos.getValue())
         }
     })
 
@@ -1161,8 +1213,8 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
 Room.prototype.findType = function(scoutingRoom: Room) {
 
-    const room: Room = this
-    const controller: StructureController = room.get('controller')
+    const room = this,
+    controller = room.controller
 
     // Record that the room was scouted this tick
 

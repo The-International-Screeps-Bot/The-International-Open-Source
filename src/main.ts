@@ -98,14 +98,16 @@ declare global {
     'enemyCSites' |
     'allyCSites' |
     'source1HarvestPositions' |
-    'source1ClosestHarvestPosition' |
+    'source1ClosestHarvestPos' |
     'source2HarvestPositions' |
-    'source2ClosestHarvestPosition' |
+    'source2ClosestHarvestPos' |
+    'mineralHarvestPos' |
     'centerUpgradePos' |
     'upgradePositions' |
     'source1Container' |
     'source2Container' |
     'controllerContainer' |
+    'mineralContainer' |
     'fastFillerContainerLeft' |
     'fastFillerContainerRight' |
     'labContainer' |

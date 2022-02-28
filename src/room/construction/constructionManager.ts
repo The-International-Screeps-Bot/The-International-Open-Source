@@ -51,7 +51,7 @@ export function constructionManager(room: Room) {
 
             // Try to find the closestHarvestPos for the source
 
-            const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPosition`)
+            const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`)
 
             // Iterate if it doesn't exist
 
@@ -80,6 +80,41 @@ export function constructionManager(room: Room) {
         // Otherwise place a container on the pos
 
         room.createConstructionSite(centerUpgadePos, STRUCTURE_CONTAINER)
+    }
+
+    placeMineralContainer()
+
+    function placeMineralContainer() {
+
+        // If the controller's level is below 6, stop
+
+        if (room.controller.level < 6) return
+
+        // Otherwise get the mineralHarvestPos, stopping if it's undefined
+
+        const mineralHarvestPos: RoomPosition = room.get('mineralHarvestPos')
+        if (!mineralHarvestPos) return
+
+        // Otherwise place a container on the pos
+
+        room.createConstructionSite(mineralHarvestPos, STRUCTURE_CONTAINER)
+    }
+
+    placeExtractor()
+
+    function placeExtractor() {
+
+        // If the controller's level is below 6, stop
+
+        if (room.controller.level < 6) return
+
+        // Otherwise get the mineral
+
+        const mineral: Mineral = room.get('mineral')
+
+        // Otherwise place an extractor on the pos
+
+        room.createConstructionSite(mineral.pos, STRUCTURE_EXTRACTOR)
     }
 
     manageBasePlanning()

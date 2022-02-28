@@ -511,7 +511,7 @@ export function rampartPlanner(room: Room) {
 /*
     // Get the source1ClosestHarvestPos
 
-    const source1ClosestHarvestPos: RoomPosition = room.get('source1ClosestHarvestPosition')
+    const source1ClosestHarvestPos: RoomPosition = room.get('source1ClosestHarvestPos')
 
     // Protect it
 
@@ -519,7 +519,7 @@ export function rampartPlanner(room: Room) {
 
     // Get the source2ClosestHarvestPos
 
-    const source2ClosestHarvestPos: RoomPosition = room.get('source2ClosestHarvestPosition')
+    const source2ClosestHarvestPos: RoomPosition = room.get('source2ClosestHarvestPos')
 
     // Protect it
 

@@ -670,7 +670,7 @@ Creep.prototype.findHarvestPosition = function() {
 
     // Get the closestHarvestPos for the creep's source
 
-    const closestHarvestPos: Pos = room.get(`${sourceName}ClosestHarvestPosition`)
+    const closestHarvestPos: Pos = room.get(`${sourceName}ClosestHarvestPos`)
 
     // If the closestHarvestPos isn't used, set it as the harvestPos
 
