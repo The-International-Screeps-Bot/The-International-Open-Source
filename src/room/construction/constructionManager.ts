@@ -122,7 +122,7 @@ export function constructionManager(room: Room) {
 
                 // Display visuals if enabled
 
-                /* if (Memory.roomVisuals) room.visual.structure(buildObj.x, buildObj.y, buildObj.structureType) */
+                if (Memory.roomVisuals) room.visual.structure(buildObj.x, buildObj.y, buildObj.structureType)
 
                 // If the room controller level is less than 3 and the structureType is a road, iterate
 
@@ -140,7 +140,7 @@ export function constructionManager(room: Room) {
 
         // If visuals are enabled, connect road visuals
 
-        /* if (Memory.roomVisuals) room.visual.connectRoads() */
+        if (Memory.roomVisuals) room.visual.connectRoads()
     }
 
     manageRampartPlanning()

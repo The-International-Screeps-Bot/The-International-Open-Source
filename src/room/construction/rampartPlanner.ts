@@ -508,7 +508,7 @@ export function rampartPlanner(room: Room) {
     // Protect it
 
     protectionRects.push({ x1: centerUpgradePos.x - 3, x2: centerUpgradePos.x + 3, y1: centerUpgradePos.y - 3, y2: centerUpgradePos.y + 3 })
-
+/*
     // Get the source1ClosestHarvestPos
 
     const source1ClosestHarvestPos: RoomPosition = room.get('source1ClosestHarvestPosition')
@@ -524,7 +524,7 @@ export function rampartPlanner(room: Room) {
     // Protect it
 
     protectionRects.push({ x1: source2ClosestHarvestPos.x - 3, x2: source2ClosestHarvestPos.x + 3, y1: source2ClosestHarvestPos.y - 3, y2: source2ClosestHarvestPos.y + 3 })
-
+ */
     // Get the room's stampAnchors
 
     const stampAnchors: StampAnchors = global[room.name].stampAnchors
