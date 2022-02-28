@@ -1836,29 +1836,86 @@ Room.prototype.floodFill = function(seeds) {
     return floodCM
 }
 
-Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue) {
+Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue, initialWeight = 0, adjacentToRoads, roadPositions = []) {
 
     const room = this
+
+    //
+
+    function isViableAnchor(pos: Pos): boolean {
+
+        // Get the value of the pos
+
+        const posValue = CM.get(pos.x, pos.y)
+
+        // If the value is to avoid, inform false
+
+        if (posValue == 255) return false
+
+        // If the posValue is less than the requiredValue, inform false
+
+        if (posValue < requiredValue) return false
+
+        // If adjacentToRoads is a requirement
+
+        if (adjacentToRoads) {
+
+            // Construct a rect and get the positions in a range of 1
+
+            const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 },
+            adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+
+            // Construct a default no for nearby roads
+
+            let nearbyRoad = false
+
+            // Loop through adjacent positions
+
+            for (const adjacentPos of adjacentPositions) {
+
+                // If the adjacentPos isn't a roadPosition, iterate
+
+                if (!roadPositions.filter(pos => generalFuncs.arePositionsEqual(pos, adjacentPos)).length) continue
+
+                // Otherwise set nearbyRoad to true and stop the loop
+
+                nearbyRoad = true
+                break
+            }
+
+            // If nearbyRoad is false, inform false
+
+            if (!nearbyRoad) return false
+        }
+
+        // Inform true
+
+        return true
+    }
 
     // Construct a cost matrix for visited tiles and add seeds to it
 
     const visitedCM = new PathFinder.CostMatrix()
 
-    // Construct values for the check
-
-    let thisGeneration: Pos[] = [startPos]
-
-    let nextGeneration: Pos[] = []
-
     // Record startPos as visited
 
     visitedCM.set(startPos.x, startPos.y, 1)
+
+    // Construct values for the check
+
+    let thisGeneration: Pos[] = [startPos],
+    nextGeneration: Pos[] = [],
+    canUseWalls = true
+
+    // Get the room's terrain
+
+    const terrain = room.getTerrain()
 
     // So long as there are positions in this gen
 
     while (thisGeneration.length) {
 
-        // Reset next gen
+        // Reset nextGeneration
 
         nextGeneration = []
 
@@ -1866,23 +1923,14 @@ Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue) {
 
         for (const pos of thisGeneration) {
 
-            // Get the value of the pos
+            // If the pos can be an anchor, inform it
 
-            const posValue = CM.get(pos.x, pos.y)
-
-            // If the value of the pos isn't to avoid and is greater than of equal to the required value
-
-            if (posValue != 255 && posValue >= requiredValue) {
-
-                // Inform this position
-
-                return pos
-            }
+            if (isViableAnchor(pos)) return pos
 
             // Construct a rect and get the positions in a range of 1
 
-            const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 }
-            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+            const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 },
+            adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
 
             // Loop through adjacent positions
 
@@ -1890,11 +1938,15 @@ Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue) {
 
                 // Iterate if the adjacent pos has been visited or isn't a tile
 
-                if(visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
+                if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
 
                 // Otherwise record that it has been visited
 
                 visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+
+                // If canUseWalls is enabled and the terrain isnt' a wall, disable canUseWalls
+
+                if (canUseWalls && terrain.get(adjacentPos.x, adjacentPos.y) != TERRAIN_MASK_WALL) canUseWalls = false
 
                 // Add it tofastFillerSide the next gen
 

@@ -437,7 +437,7 @@ declare global {
         /**
          * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
          */
-        findClosestPosOfValue(CM: CostMatrix, startPos: Pos, requiredValue: number): Pos | false
+        findClosestPosOfValue(CM: CostMatrix, startPos: Pos, requiredValue: number, initialWeight?: number, adjacentToRoads?: boolean, roadPositions?: Pos[]): Pos | false
 
         advancedSell(resourceType: ResourceConstant, amount: number): boolean
 

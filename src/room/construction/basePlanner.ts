@@ -94,7 +94,7 @@ export function basePlanner(room: Room) {
     /**
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
      */
-    function planStamp(stampType: StampTypes, anchorOrient: Pos): false | Pos {
+    function planStamp(stampType: StampTypes, anchorOrient: Pos, initialWeight?: number, adjacentToRoads?: boolean): false | Pos {
 
         // Define the stamp using the stampType
 
@@ -106,7 +106,7 @@ export function basePlanner(room: Room) {
 
         // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 
-        const anchor = room.findClosestPosOfValue(distanceCM, anchorOrient, stamp.size)
+        const anchor = room.findClosestPosOfValue(distanceCM, anchorOrient, stamp.size, initialWeight, adjacentToRoads, adjacentToRoads ? roadPositions : [])
 
         // Inform false if no anchor was generated
 
@@ -147,10 +147,6 @@ export function basePlanner(room: Room) {
 
                 const x = pos.x + anchor.x - stamp.offset
                 const y = pos.y + anchor.y - stamp.offset
-
-                // Display visuals if enabled
-
-                if (Memory.roomVisuals) room.visual.structure(x, y, structureType as StructureConstant)
 
                 // If the structure is empty
 
@@ -241,7 +237,7 @@ export function basePlanner(room: Room) {
 
     // Plan the stamp 7 times
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 6; i++) {
 
         // Try to plan the stamp
 
@@ -276,10 +272,6 @@ export function basePlanner(room: Room) {
             // Record the pos as avoid in the base cost matrix
 
             baseCM.set(pos.x, pos.y, 255)
-
-            // Visualize the road's at the pos
-
-            room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD)
 
             // Add the positions to the buildLocations under it's stamp and structureType
 
@@ -335,10 +327,6 @@ export function basePlanner(room: Room) {
 
             baseCM.set(pos.x, pos.y, 255)
 
-            // Visualize the road's at the pos
-
-            room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD)
-
             // Add the positions to the buildLocations under it's stamp and structureType
 
             buildLocations.roads.push({
@@ -357,9 +345,6 @@ export function basePlanner(room: Room) {
         weightPositions: {
             255: buildPositions,
             1: roadPositions,
-        },
-        weightGamebjects: {
-            1: room.get('road')
         }
     })
 
@@ -374,10 +359,6 @@ export function basePlanner(room: Room) {
         // Record the pos as avoid in the base cost matrix
 
         baseCM.set(pos.x, pos.y, 255)
-
-        // Visualize the road's at the pos
-
-        room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD)
 
         // Add the positions to the buildLocations under it's stamp and structureType
 
@@ -396,9 +377,6 @@ export function basePlanner(room: Room) {
         weightPositions: {
             255: buildPositions,
             1: roadPositions,
-        },
-        weightGamebjects: {
-            1: room.get('road')
         }
     })
 
@@ -414,10 +392,6 @@ export function basePlanner(room: Room) {
 
         baseCM.set(pos.x, pos.y, 255)
 
-        // Visualize the road's at the pos
-
-        room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD)
-
         // Add the positions to the buildLocations under it's stamp and structureType
 
         buildLocations.roads.push({
@@ -426,10 +400,6 @@ export function basePlanner(room: Room) {
             y: pos.y
         })
     }
-
-    // Visually connect roads
-
-    room.visual.connectRoads()
 
     // Loop through each stamp type in road locations
 
@@ -455,7 +425,7 @@ export function basePlanner(room: Room) {
 
         // Try to plan the stamp
 
-        const towerAnchor = planStamp('tower', hubAnchor)
+        const towerAnchor = planStamp('tower', hubAnchor, 0, true)
 
         // Inform false if the stamp failed to be planned
 
@@ -464,11 +434,11 @@ export function basePlanner(room: Room) {
 
     // Loop 10 times
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 14; i++) {
 
         // Try to plan the stamp
 
-        const extensionAnchor = planStamp('extension', hubAnchor)
+        const extensionAnchor = planStamp('extension', hubAnchor, 0, true)
 
         // Inform false if the stamp failed to be planned
 

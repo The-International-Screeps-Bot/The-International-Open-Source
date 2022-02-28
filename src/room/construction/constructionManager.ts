@@ -86,13 +86,13 @@ export function constructionManager(room: Room) {
 
     function manageBasePlanning() {
 
-        // Get the base locations
+        // Get the buildLocations
 
-        const baseLocations: BuildLocations = global[room.name].buildLocations
+        const buildLocations: BuildLocations = global[room.name].buildLocations
 
         // If there are no build locations
 
-        if (!baseLocations) {
+        if (!buildLocations) {
 
             // Generate and record base plans
 
@@ -110,29 +110,37 @@ export function constructionManager(room: Room) {
 
         // Loop through each stamp type in base locations
 
-        for (const stampType in baseLocations) {
+        for (const stampType in buildLocations) {
 
             // Get the build object using the stamp type
 
-            const BuildObjects = baseLocations[stampType]
+            const buildObjects = buildLocations[stampType]
 
             // Loop through build objects inside build locations for this stamp type
 
-            for (const BuildObj of BuildObjects) {
+            for (const buildObj of buildObjects) {
+
+                // Display visuals if enabled
+
+                /* if (Memory.roomVisuals) room.visual.structure(buildObj.x, buildObj.y, buildObj.structureType) */
 
                 // If the room controller level is less than 3 and the structureType is a road, iterate
 
-                if (room.controller.level < 3 && BuildObj.structureType == STRUCTURE_ROAD) continue
+                if (room.controller.level < 3 && buildObj.structureType == STRUCTURE_ROAD) continue
 
                 // If the structure is a container and there aren't source containers for each source and a controller container, iterate
 
-                if (BuildObj.structureType == STRUCTURE_CONTAINER && (!room.get('source1Container') || !room.get('source2Container') || !room.get('controllerContainer'))) continue
+                if (buildObj.structureType == STRUCTURE_CONTAINER && (!room.get('source1Container') || !room.get('source2Container') || !room.get('controllerContainer'))) continue
 
                 // Place construction sites for the base
 
-                room.createConstructionSite(BuildObj.x, BuildObj.y, BuildObj.structureType)
+                room.createConstructionSite(buildObj.x, buildObj.y, buildObj.structureType)
             }
         }
+
+        // If visuals are enabled, connect road visuals
+
+        /* if (Memory.roomVisuals) room.visual.connectRoads() */
     }
 
     manageRampartPlanning()
@@ -158,6 +166,15 @@ export function constructionManager(room: Room) {
             // Otherwise record the result in the room's global rampartLocations
 
             global[room.name].rampartLocations = rampartPlannerResult
+        }
+
+        // Loop through each positions in rampartLocations
+
+        for (const pos of global[room.name].rampartLocations) {
+
+            // Visualize the rampart placement
+
+            room.visual.structure(pos.x, pos.y, STRUCTURE_RAMPART)
         }
     }
 }

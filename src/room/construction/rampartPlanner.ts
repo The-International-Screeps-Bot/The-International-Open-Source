@@ -555,13 +555,6 @@ export function rampartPlanner(room: Room) {
     // Positions is an array where to build walls/ramparts
 
     const positions = GetCutTiles(room.name, protectionRects, bounds)
-    room.visual.text(positions.length.toString(), anchor)
-    //
-
-    for (const pos of positions) {
-
-        room.visual.structure(pos.x, pos.y, STRUCTURE_RAMPART)
-    }
 
     // Test output
 
