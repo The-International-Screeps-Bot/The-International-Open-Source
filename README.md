@@ -25,8 +25,6 @@ If you have specific questions or want to discuss the bot, DM me on discord: `Ca
 
 [Progress board](https://trello.com/b/l6Min9hr/typescript-international-screeps-bot)
 
-[Flowchart](https://www.zenflowchart.com/docs/view/50r4KGRb480B2bBLZQxg)
-
 [Videos](https://www.youtube.com/playlist?list=PLGlzrjCmziEj7hQZSwcmkXkMXgkQXUQ6C)
 
 ## Requirements
