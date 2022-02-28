@@ -460,7 +460,7 @@ Creep.prototype.advancedRepair = function() {
 
     // Try to get the creep's repair target ID from memory. If it doesn't exist, find a new one
 
-    const repairTargetID = creep.memory.repairTargetID
+    const creatorID = creep.memory.creatorID
 
     // Set the repair target to defineRepairTarget's result
 
@@ -470,11 +470,11 @@ Creep.prototype.advancedRepair = function() {
 
         // If there is a repair target ID
 
-        if (repairTargetID) {
+        if (creatorID) {
 
             // Find the structure with the ID
 
-            const structure = generalFuncs.findObjectWithID(repairTargetID)
+            const structure = generalFuncs.findObjectWithID(creatorID)
 
             // If the structure exists, inform it
 
@@ -502,7 +502,7 @@ Creep.prototype.advancedRepair = function() {
 
     // Add the repair target to memory
 
-    creep.memory.repairTargetID = repairTarget.id
+    creep.memory.creatorID = repairTarget.id
 
     // If roomVisuals are enabled
 
@@ -562,11 +562,11 @@ Creep.prototype.advancedRepair = function() {
 
         // Delete the target from memory
 
-        delete creep.memory.repairTargetID
+        delete creep.memory.creatorID
 
         // Find repair targets that don't include the current target
 
-        const newRepairTargets = room.findRepairTargets(workPartCount, new Set([repairTargetID]))
+        const newRepairTargets = room.findRepairTargets(workPartCount, new Set([creatorID]))
 
         // Inform true if no targets exist
 
@@ -1209,7 +1209,7 @@ Creep.prototype.fulfillPullTask = function(task) {
 
     // Get the task info
 
-    const taskTarget: Creep = generalFuncs.findObjectWithID(task.targetID)
+    const taskTarget: Creep = generalFuncs.findObjectWithID(task.creatorID)
 
     // If the creep is not close enough to pull the target
 
@@ -1294,7 +1294,7 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     // Get the transfer target using the task's transfer target IDs
 
-    const transferTarget = generalFuncs.findObjectWithID(task.transferTargetID)
+    const transferTarget = generalFuncs.findObjectWithID(task.creatorID)
 
     // Inform the result of the adancedTransfer to the transferTarget
 
@@ -1309,7 +1309,7 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
 
     // Get the withdraw target
 
-    const withdrawTarget = generalFuncs.findObjectWithID(task.withdrawTargetID)
+    const withdrawTarget = generalFuncs.findObjectWithID(task.creatorID)
 
     // Try to withdraw from the target, informing the amount
 
@@ -1328,7 +1328,7 @@ Creep.prototype.fulfillPickupTask = function(task) {
 
     // Otherwise get the pickup target
 
-    const pickupTarget = generalFuncs.findObjectWithID(task.resourceID)
+    const pickupTarget = generalFuncs.findObjectWithID(task.creatorID)
 
     // Try to pickup from the target, informing the result
 

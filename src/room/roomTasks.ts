@@ -131,15 +131,15 @@ RoomTask.prototype.delete = function() {
 
 export interface RoomWithdrawTask extends RoomTask {
     withdrawAmount: number
-    withdrawTargetID: string
+    creatorID: string
 }
 
 export class RoomWithdrawTask extends RoomTask {
-    constructor(roomName: string, resourceType: ResourceConstant, withdrawAmount: number, withdrawTargetID: Id<any>) {
+    constructor(roomName: string, resourceType: ResourceConstant, withdrawAmount: number, creatorID: Id<any>) {
 
         // Inherit from RoomTask
 
-        super('withdraw', withdrawTargetID, roomName)
+        super('withdraw', creatorID, roomName)
 
         const task = this
 
@@ -147,22 +147,20 @@ export class RoomWithdrawTask extends RoomTask {
 
         task.resourceType = resourceType
         task.withdrawAmount = withdrawAmount
-
-        task.withdrawTargetID = withdrawTargetID
     }
 }
 
 export interface RoomTransferTask extends RoomTask {
     transferAmount: number
-    transferTargetID: Id<any>
+    creatorID: Id<any>
 }
 
 export class RoomTransferTask extends RoomTask {
-    constructor(roomName: string, resourceType: ResourceConstant, transferAmount: number, transferTargetID: Id<any>) {
+    constructor(roomName: string, resourceType: ResourceConstant, transferAmount: number, creatorID: Id<any>) {
 
         // Inherit from RoomTask
 
-        super('transfer', transferTargetID, roomName)
+        super('transfer', creatorID, roomName)
 
         const task = this
 
@@ -170,49 +168,45 @@ export class RoomTransferTask extends RoomTask {
 
         task.resourceType = resourceType
         task.transferAmount = transferAmount
-
-        task.transferTargetID = transferTargetID
     }
 }
 
 export interface RoomRepairTask extends RoomTask {
     repairThreshold: number
-    repairTargetID: string
+    creatorID: string
 }
 
 export class RoomRepairTask extends RoomTask {
-    constructor(roomName: string, repairTargetID: Id<Structure>, repairThreshold: number) {
+    constructor(roomName: string, creatorID: Id<Structure>, repairThreshold: number) {
 
         // Inherit from RoomTask
 
-        super('repair', repairTargetID, roomName)
+        super('repair', creatorID, roomName)
 
         const task = this
 
         // Assign paramaters
 
         task.repairThreshold = repairThreshold
-        task.repairTargetID = repairTargetID
     }
 }
 
 export interface RoomPickupTask extends RoomTask {
-    resourceID: Id<Resource>
+    creatorID: Id<Resource>
     pickupAmount: number
 }
 
 export class RoomPickupTask extends RoomTask {
-    constructor(roomName: string, resourceID: Id<Resource>, resourceType: ResourceConstant) {
+    constructor(roomName: string, creatorID: Id<Resource>, resourceType: ResourceConstant) {
 
         // Inherit from RoomTask
 
-        super('pickup', resourceID, roomName)
+        super('pickup', creatorID, roomName)
 
         const task = this
 
         // Assign paramaters
 
-        task.resourceID = resourceID
         task.resourceType = resourceType
 
         // Assign defaults
@@ -222,22 +216,21 @@ export class RoomPickupTask extends RoomTask {
 }
 
 export interface RoomPullTask extends RoomTask {
-    targetID: string
+    creatorID: string
     targetPos: RoomPosition
 }
 
 export class RoomPullTask extends RoomTask {
-    constructor(roomName: string, targetID: Id<Creep>, targetPos: RoomPosition) {
+    constructor(roomName: string, creatorID: Id<Creep>, targetPos: RoomPosition) {
 
         // Inherit from RoomTask
 
-        super('pull', targetID, roomName)
+        super('pull', creatorID, roomName)
 
         const task = this
 
         // Assign paramaters
 
-        task.targetID = targetID
         task.targetPos = targetPos
     }
 }

@@ -678,7 +678,7 @@ declare global {
         /**
          *
          */
-        repairTargetID: Id<Structure>
+        creatorID: Id<Structure>
 
         /**
          * The name of the room the scout is trying to scout
