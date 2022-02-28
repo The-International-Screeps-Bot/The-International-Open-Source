@@ -13,7 +13,14 @@ export interface RoomTask {
     responderID: string
     ID: number
 
+    /**
+     * The resourceType relating to the task's request
+     */
     resourceType?: ResourceConstant
+    /**
+     * A metric for responders to understand the importance of this task, starting at 0 as most important
+     */
+    priority?: number
 
     // Functions
 
@@ -90,10 +97,6 @@ RoomTask.prototype.shouldStayActive = function() {
         // If the responder doesn't exist, inform false
 
         if (!generalFuncs.findObjectWithID(task.responderID)) return false
-
-        /* // Otherwise if the responder has no respondingtaskID, inform false
-
-        if (global[task.responderID].respondingTaskID != task.ID) return false */
     }
 
     // If the creator no longer exits, infom false

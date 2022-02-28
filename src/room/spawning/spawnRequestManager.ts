@@ -503,7 +503,7 @@ export function spawnRequester(room: Room) {
 
         // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
-        const repairTargets = possibleRepairTargets.filter(structure => structure.hitsMax * 0.2 > structure.hits)
+        const repairTargets = possibleRepairTargets.filter(structure => structure.hitsMax * 0.2 >= structure.hits)
         if (!repairTargets.length) return false
 
         // If all RCL 3 extensions are build
