@@ -52,8 +52,7 @@ export function basePlanner(room: Room) {
 
     // Get the controller and set positions nearby to avoid
 
-    const controller = room.controller
-    recordAdjacentPositions(controller.pos.x, controller.pos.y, 3)
+    recordAdjacentPositions(room.controller.pos.x, room.controller.pos.y, 2)
 
     // Get and record the mineralHarvestPos as avoid
 
@@ -64,21 +63,13 @@ export function basePlanner(room: Room) {
 
     const sources: Source[] = room.get('sources')
 
-    for (const source of sources) {
+    // Loop through each source, marking nearby positions as avoid
 
-        // Record adjacent positions to avoid
-
-        recordAdjacentPositions(source.pos.x, source.pos.y, 2)
-    }
-
-    // Get the sources in the room
-
-    const source1: Source = room.get('source1')
-    const source2: Source = room.get('source2')
+    for (const source of sources) recordAdjacentPositions(source.pos.x, source.pos.y, 2)
 
     // Find the average pos between the sources
 
-    const avgSourcePos = generalFuncs.findAvgBetweenPosotions(source1.pos, source2.pos)
+    const avgSourcePos = generalFuncs.findAvgBetweenPosotions(sources[0].pos, sources[1].pos)
 
     // Find the average pos between the two sources and the controller
 
@@ -230,6 +221,14 @@ export function basePlanner(room: Room) {
     // Inform false if the stamp failed to be planned
 
     if (!hubAnchor) return false
+
+    // Get the upgradePositions
+
+    const upgradePositions: RoomPosition[] = room.get('upgradePositions')
+
+    // Loop through each upgradePos marking it as avoid in the baseCM
+
+    for (const upgradePos of upgradePositions) baseCM.set(upgradePos.x, upgradePos.y, 255)
 
     // Configure base locations for roads
 
