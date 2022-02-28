@@ -584,7 +584,7 @@ Room.prototype.get = function(roomObjectName) {
 
     // Source containers
 
-    function findSourceContainer(closestHarvestPos: RoomPosition): Id<Structure> | false {
+    function findSourceContainer(closestHarvestPos: RoomPosition) {
 
         // Stop and inform false if no closestHarvestPos
 
@@ -634,7 +634,7 @@ Room.prototype.get = function(roomObjectName) {
 
     // controllerContainer
 
-    function findControllerContainer(): string | false {
+    function findControllerContainer() {
 
         // Get the centerUpgradePos
 
@@ -669,6 +669,42 @@ Room.prototype.get = function(roomObjectName) {
         cacheAmount: Infinity,
         room,
         valueConstructor: findControllerContainer
+    })
+
+    // mineralContainer
+
+    function findMineralContainer() {
+
+        // Get the mineralHarvestPos, informing false if it's undefined
+
+        const mineralHarvestPos: RoomPosition = room.roomObjects.mineralHarvestPos.getValue()
+        if (!mineralHarvestPos) return false
+
+        // Look at the mineralHarvestPos for structures
+
+        const structuresAsPos = mineralHarvestPos.lookFor(LOOK_STRUCTURES)
+
+        // Loop through structuresAtPos
+
+        for (const structure of structuresAsPos) {
+
+            // If the structureType is container, inform the container's ID
+
+            if (structure.structureType == STRUCTURE_CONTAINER) return structure.id
+        }
+
+        // Otherwise inform false
+
+        return false
+    }
+
+    new RoomObject({
+        name: 'mineralContainer',
+        valueType: 'id',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: findMineralContainer
     })
 
     // base containers
