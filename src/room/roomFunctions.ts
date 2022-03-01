@@ -1687,7 +1687,7 @@ Room.prototype.specialDT = function(initialCM, enableVisuals) {
 
             if (distanceCM.get(x, y) == 255) continue
 
-            // Otherwise construct a rect and get the positions in a range of 1
+            // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
             const adjacentPositions = [
                 {

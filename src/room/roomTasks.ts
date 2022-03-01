@@ -135,7 +135,7 @@ export interface RoomWithdrawTask extends RoomTask {
 }
 
 export class RoomWithdrawTask extends RoomTask {
-    constructor(roomName: string, resourceType: ResourceConstant, withdrawAmount: number, creatorID: Id<any>) {
+    constructor(roomName: string, resourceType: ResourceConstant, withdrawAmount: number, creatorID: Id<any>, priority: number) {
 
         // Inherit from RoomTask
 
@@ -147,6 +147,7 @@ export class RoomWithdrawTask extends RoomTask {
 
         task.resourceType = resourceType
         task.withdrawAmount = withdrawAmount
+        task.priority = priority
     }
 }
 
@@ -156,7 +157,7 @@ export interface RoomTransferTask extends RoomTask {
 }
 
 export class RoomTransferTask extends RoomTask {
-    constructor(roomName: string, resourceType: ResourceConstant, transferAmount: number, creatorID: Id<any>) {
+    constructor(roomName: string, resourceType: ResourceConstant, transferAmount: number, creatorID: Id<any>, priority: number) {
 
         // Inherit from RoomTask
 
@@ -168,6 +169,7 @@ export class RoomTransferTask extends RoomTask {
 
         task.resourceType = resourceType
         task.transferAmount = transferAmount
+        task.priority = priority
     }
 }
 
@@ -177,7 +179,7 @@ export interface RoomRepairTask extends RoomTask {
 }
 
 export class RoomRepairTask extends RoomTask {
-    constructor(roomName: string, creatorID: Id<Structure>, repairThreshold: number) {
+    constructor(roomName: string, creatorID: Id<Structure>, repairThreshold: number, priority: number) {
 
         // Inherit from RoomTask
 
@@ -188,6 +190,7 @@ export class RoomRepairTask extends RoomTask {
         // Assign paramaters
 
         task.repairThreshold = repairThreshold
+        task.priority = priority
     }
 }
 
@@ -197,7 +200,7 @@ export interface RoomPickupTask extends RoomTask {
 }
 
 export class RoomPickupTask extends RoomTask {
-    constructor(roomName: string, creatorID: Id<Resource>, resourceType: ResourceConstant) {
+    constructor(roomName: string, creatorID: Id<Resource>, resourceType: ResourceConstant, priority: number) {
 
         // Inherit from RoomTask
 
@@ -208,6 +211,7 @@ export class RoomPickupTask extends RoomTask {
         // Assign paramaters
 
         task.resourceType = resourceType
+        task.priority = priority
 
         // Assign defaults
 
@@ -221,7 +225,7 @@ export interface RoomPullTask extends RoomTask {
 }
 
 export class RoomPullTask extends RoomTask {
-    constructor(roomName: string, creatorID: Id<Creep>, targetPos: RoomPosition) {
+    constructor(roomName: string, creatorID: Id<Creep>, targetPos: RoomPosition, priority: number) {
 
         // Inherit from RoomTask
 
@@ -232,5 +236,6 @@ export class RoomPullTask extends RoomTask {
         // Assign paramaters
 
         task.targetPos = targetPos
+        task.priority = priority
     }
 }

@@ -209,7 +209,15 @@ export function constructionManager(room: Room) {
 
             // Visualize the rampart placement
 
-            room.visual.structure(pos.x, pos.y, STRUCTURE_RAMPART)
+            /* if (Memory.roomVisuals)  */room.visual.structure(pos.x, pos.y, STRUCTURE_RAMPART)
+
+            // Visualize the road placement
+
+            /* if (Memory.roomVisuals)  */room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD)
         }
+
+        // If visuals are enabled, connect road visuals
+
+        /* if (Memory.roomVisuals) room.visual.connectRoads() */
     }
 }

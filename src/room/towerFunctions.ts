@@ -56,7 +56,7 @@ Room.prototype.towersRequestResources = function() {
 
             // Create a new transfer task for the tower
 
-            new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, tower.id)
+            new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, tower.id, 1)
         }
     }
 }

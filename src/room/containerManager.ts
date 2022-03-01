@@ -67,7 +67,7 @@ export function containerManager(room: Room) {
 
                 // Create a new transfer task for the container
 
-                new RoomWithdrawTask(room.name, RESOURCE_ENERGY, withdrawAmount, container.id)
+                new RoomWithdrawTask(room.name, RESOURCE_ENERGY, withdrawAmount, container.id, 5)
             }
         }
     }
@@ -132,7 +132,7 @@ export function containerManager(room: Room) {
 
             // Create a new transfer task for the container
 
-            new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, controllerContainer.id)
+            new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, controllerContainer.id, 5)
         }
     }
 
@@ -196,7 +196,7 @@ export function containerManager(room: Room) {
 
                 // Create a new transfer task for the container
 
-                new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, container.id)
+                new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, container.id, 5)
             }
         }
     }

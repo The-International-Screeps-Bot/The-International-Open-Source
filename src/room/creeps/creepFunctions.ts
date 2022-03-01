@@ -885,42 +885,6 @@ Creep.prototype.createMoveRequest = function(opts) {
     return true
 }
 
-Creep.prototype.createStoringStructureWithdrawTask = function(resourceType = RESOURCE_ENERGY, amount) {
-
-    const creep = this
-    const room = creep.room
-
-    // Construct the room's storing structures
-
-    const storingStrutures = [room.storage, room.terminal]
-
-    // Loop through them
-
-    for (const structure of storingStrutures) {
-
-        // Iterate if the structure isn't defined
-
-        if (!structure) continue
-
-        // Iterate if the structure doesn't have enough resources
-
-        if (structure.store.getUsedCapacity(resourceType) < amount) continue
-
-        // Otherwise create a withdraw task for the structure
-
-        const task = new RoomWithdrawTask(room.name, resourceType, amount, structure.id)
-
-        // And have the creep accept the task and inform true
-
-        creep.acceptTask(task)
-        return true
-    }
-
-    // If no task was created and accepted, inform false
-
-    return false
-}
-
 Creep.prototype.acceptTask = function(task) {
 
     const creep = this

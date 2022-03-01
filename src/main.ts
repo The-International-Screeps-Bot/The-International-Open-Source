@@ -429,6 +429,9 @@ declare global {
          */
         distanceTransform(initialCM?: CostMatrix, enableVisuals?: boolean, x1?: number, y1?: number, x2?: number, y2?: number): CostMatrix
 
+        /**
+         * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix
+         */
         specialDT(initialCM?: CostMatrix, enableVisuals?: boolean): CostMatrix
 
         /**
@@ -518,11 +521,6 @@ declare global {
         pathOpts: PathOpts
 
         // Functions
-
-        /**
-         * Tries to create a withdraw task for the room's storage or terminal
-         */
-        createStoringStructureWithdrawTask(resourceType: ResourceConstant, amount: number): boolean
 
         /**
          * Sets a task to be responded by a creep
