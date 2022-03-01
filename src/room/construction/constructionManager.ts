@@ -214,6 +214,10 @@ export function constructionManager(room: Room) {
             // Visualize the road placement
 
             /* if (Memory.roomVisuals)  */room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD)
+
+            // Place a road at pos
+
+            room.createConstructionSite(pos, STRUCTURE_ROAD)
         }
 
         // If visuals are enabled, connect road visuals
