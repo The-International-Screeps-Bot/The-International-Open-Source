@@ -157,7 +157,9 @@ export function constructionManager(room: Room) {
 
                 // Display visuals if enabled
 
-                /* if (Memory.roomVisuals) room.visual.structure(buildObj.x, buildObj.y, buildObj.structureType) */
+                /* if (Memory.roomVisuals) room.visual.structure(buildObj.x, buildObj.y, buildObj.structureType, {
+                opacity: 0.5
+                }) */
 
                 // If the room controller level is less than 3 and the structureType is a road, iterate
 
@@ -184,7 +186,7 @@ export function constructionManager(room: Room) {
 
         // Get the rampartLocations
 
-        const rampartLocations: Pos[] = global[room.name].rampartLocations
+        const rampartLocations: Pos[][] = global[room.name].rampartLocations
 
         // If there are no rampartLocations
 
@@ -203,25 +205,34 @@ export function constructionManager(room: Room) {
             global[room.name].rampartLocations = rampartPlannerResult
         }
 
-        // Loop through each positions in rampartLocations
+        // Loop through each group
 
-        for (const pos of global[room.name].rampartLocations) {
+        for (const group of rampartLocations) {
 
-            // Visualize the rampart placement
+            // Loop through each pos of the group
 
-            /* if (Memory.roomVisuals)  */room.visual.structure(pos.x, pos.y, STRUCTURE_RAMPART)
+            for (const pos of group) {
 
-            // Visualize the road placement
+                // Visualize the rampart placement
 
-            /* if (Memory.roomVisuals)  */room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD)
+                /* if (Memory.roomVisuals)  */room.visual.structure(pos.x, pos.y, STRUCTURE_RAMPART, {
+                    opacity: 0.5
+                })
 
-            // Place a road at pos
+                // Visualize the road placement
 
-            room.createConstructionSite(pos, STRUCTURE_ROAD)
+                /* if (Memory.roomVisuals)  */room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD, {
+                    opacity: 0.5
+                })
+
+                // Place a road at pos
+
+                room.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD)
+            }
         }
 
         // If visuals are enabled, connect road visuals
 
-        /* if (Memory.roomVisuals) room.visual.connectRoads() */
+        /* if (Memory.roomVisuals) */ room.visual.connectRoads()
     }
 }

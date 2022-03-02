@@ -477,6 +477,11 @@ declare global {
          * Finds targets to repair given work part counts and target IDs to avoid
          */
         findRepairTargets(workPartCount: number, excludedIDs?: Set<Id<Structure>>): (StructureRoad | StructureContainer)[]
+
+        /**
+         * Groups positions with contigiousness, structured similarily to a flood fill
+         */
+        groupPositions(positions: Pos[]): Pos[][]
     }
 
     interface RoomMemory {

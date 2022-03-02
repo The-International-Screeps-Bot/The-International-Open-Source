@@ -1,4 +1,5 @@
 import { constants } from "international/constants";
+import { generalFuncs } from "international/generalFunctions";
 
 export function rampartPlanner(room: Room) {
 
@@ -556,10 +557,14 @@ export function rampartPlanner(room: Room) {
 
     const positions = GetCutTiles(room.name, protectionRects, bounds)
 
+    // Group rampart positions
+
+    const groupedRampartPositions = room.groupPositions(positions)
+    
     // Test output
 
     cpu = Game.cpu.getUsed() - cpu
     console.log('Needed', cpu, ' cpu time')
 
-    return positions
+    return groupedRampartPositions
 }

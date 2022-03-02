@@ -1830,23 +1830,23 @@ Room.prototype.floodFill = function(seeds) {
 
     // Construct a cost matrix for the flood
 
-    const floodCM = new PathFinder.CostMatrix()
+    const floodCM = new PathFinder.CostMatrix(),
 
     // Get the terrain cost matrix
 
-    const terrain = room.getTerrain()
+    terrain = room.getTerrain(),
 
     // Construct a cost matrix for visited tiles and add seeds to it
 
-    const visitedCM = new PathFinder.CostMatrix()
+    visitedCM = new PathFinder.CostMatrix()
 
     // Construct values for the flood
 
-    let depth = 0
+    let depth = 0,
 
-    let thisGeneration: Pos[] = seeds
+    thisGeneration: Pos[] = seeds,
 
-    let nextGeneration: Pos[] = []
+    nextGeneration: Pos[] = []
 
     // Loop through positions of seeds
 
@@ -1891,8 +1891,8 @@ Room.prototype.floodFill = function(seeds) {
 
             // Construct a rect and get the positions in a range of 1
 
-            const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 }
-            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+            const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 },
+            adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
 
             // Loop through adjacent positions
 
@@ -2179,4 +2179,125 @@ Room.prototype.findRepairTargets = function(workPartCount, excludedIDs = new Set
 
         return structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER
     })
+}
+
+Room.prototype.groupPositions = function(positions) {
+
+    const room = this
+
+    // Construct a costMatrix to store position locations
+
+    const positionsCM = new PathFinder.CostMatrix()
+
+    // Loop through each pos of positions, and record the pos in the positionsCM
+
+    for (const pos of positions) positionsCM.set(pos.x, pos.y, 1)
+
+    // Construct a costMatrix to store visited positions
+
+    const visitedCM = new PathFinder.CostMatrix(),
+
+    // Construct storage of position groups
+
+    groupedPositions: Pos[][] = []
+
+    // Construct the groupIndex
+
+    let groupIndex = 0
+
+    // Loop through each pos of positions
+
+    for (const pos of positions) {
+
+        // If the pos has already been visited, iterate
+
+        if (visitedCM.get(pos.x, pos.y) == 1) continue
+
+        // Record that this pos has been visited
+
+        visitedCM.set(pos.x, pos.y, 1)
+
+        // Construct the group for this index with the pos in it the group
+
+        groupedPositions[groupIndex] = [pos]
+
+        // Construct values for floodFilling
+
+        let thisGeneration: Pos[] = [pos],
+
+        nextGeneration: Pos[] = []
+
+        // So long as there are positions in this gen
+
+        while (thisGeneration.length) {
+
+            // Reset next gen
+
+            nextGeneration = []
+
+            // Iterate through positions of this gen
+
+            for (const pos of thisGeneration) {
+
+                // Construct a rect and get the positions in a range of 1 (not diagonals)
+
+                const adjacentPositions = [
+                    {
+                        x: pos.x - 1,
+                        y: pos.y
+                    },
+                    {
+                        x: pos.x + 1,
+                        y: pos.y
+                    },
+                    {
+                        x: pos.x,
+                        y: pos.y - 1
+                    },
+                    {
+                        x: pos.x,
+                        y: pos.y + 1
+                    },
+                ]
+
+                // Loop through adjacent positions
+
+                for (const adjacentPos of adjacentPositions) {
+
+                    // Iterate if the adjacent pos has been visited or isn't a tile
+
+                    if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
+
+                    // Otherwise record that it has been visited
+
+                    visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+
+                    // Filter for given positions like adjacentPos
+
+                    const positionsLikeThis = positions.filter(pos => generalFuncs.arePositionsEqual(pos, adjacentPos))
+
+                    // Iterate if there are no positionsLikeThis
+
+                    if (!positionsLikeThis.length) continue
+
+                    // Add it to the next gen and this group
+
+                    nextGeneration.push(adjacentPos)
+                    groupedPositions[groupIndex].push(adjacentPos)
+                }
+            }
+
+            // Set this gen to next gen
+
+            thisGeneration = nextGeneration
+        }
+
+        // Increase the groupIndex
+
+        groupIndex++
+    }
+
+    // Inform groupedPositions
+
+    return groupedPositions
 }
