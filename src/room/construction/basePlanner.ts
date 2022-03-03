@@ -516,5 +516,5 @@ export function basePlanner(room: Room) {
 
     // Inform information to build based on the plans
 
-    return { buildLocations, stampAnchors }
+    return { buildLocations, stampAnchors, buildPositions, roadPositions }
 }

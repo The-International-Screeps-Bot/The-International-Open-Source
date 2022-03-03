@@ -560,11 +560,8 @@ export function rampartPlanner(room: Room) {
     // Group rampart positions
 
     const groupedRampartPositions = room.groupPositions(positions)
-    
-    // Test output
 
-    cpu = Game.cpu.getUsed() - cpu
-    console.log('Needed', cpu, ' cpu time')
+    // Inform groupedRampartPositions
 
     return groupedRampartPositions
 }

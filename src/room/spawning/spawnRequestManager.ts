@@ -336,20 +336,36 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-        if (spawnEnergyCapacity >= 750) {
+        if (spawnEnergyCapacity >= 800) {
             return {
                 defaultParts: [CARRY],
-                extraParts: [WORK, MOVE, WORK, WORK],
-                partsMultiplier: 2,
+                extraParts: [WORK, MOVE, WORK],
+                partsMultiplier: 3,
                 minCreeps: 2,
                 maxCreeps: Infinity,
-                minCost: 150,
+                minCost: 200,
                 priority: room.creepsFromRoom.sourceHarvester.length,
                 memoryAdditions: {
                     role: 'sourceHarvester',
                 }
             }
         }
+
+        if (spawnEnergyCapacity >= 750) {
+            return {
+                defaultParts: [],
+                extraParts: [WORK, MOVE, WORK],
+                partsMultiplier: 3,
+                minCreeps: 2,
+                maxCreeps: Infinity,
+                minCost: 200,
+                priority: room.creepsFromRoom.sourceHarvester.length,
+                memoryAdditions: {
+                    role: 'sourceHarvester',
+                }
+            }
+        }
+
         if (spawnEnergyCapacity >= 650) {
             return {
                 defaultParts: [MOVE],
@@ -357,7 +373,7 @@ export function spawnRequester(room: Room) {
                 partsMultiplier: 12,
                 minCreeps: 2,
                 maxCreeps: Infinity,
-                minCost: 100,
+                minCost: 200,
                 priority: room.creepsFromRoom.sourceHarvester.length,
                 memoryAdditions: {
                     role: 'sourceHarvester',
@@ -371,7 +387,7 @@ export function spawnRequester(room: Room) {
             partsMultiplier: 12,
             minCreeps: undefined,
             maxCreeps: Math.max(3, room.get('source1HarvestPositions').length) + Math.max(3, room.get('source2HarvestPositions')),
-            minCost: 100,
+            minCost: 200,
             priority: room.creepsFromRoom.sourceHarvester.length,
             memoryAdditions: {
                 role: 'sourceHarvester',

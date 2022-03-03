@@ -2013,7 +2013,7 @@ Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue, ini
 
             // If the pos can be an anchor, inform it
 
-            if (isViableAnchor(pos)) return pos
+            if (isViableAnchor(pos)) return room.newPos(pos)
 
             // Construct a rect and get the positions in a range of 1
 
@@ -2199,7 +2199,7 @@ Room.prototype.groupPositions = function(positions) {
 
     // Construct storage of position groups
 
-    groupedPositions: Pos[][] = []
+    groupedPositions: RoomPosition[][] = []
 
     // Construct the groupIndex
 
@@ -2219,7 +2219,7 @@ Room.prototype.groupPositions = function(positions) {
 
         // Construct the group for this index with the pos in it the group
 
-        groupedPositions[groupIndex] = [pos]
+        groupedPositions[groupIndex] = [room.newPos(pos)]
 
         // Construct values for floodFilling
 
@@ -2283,7 +2283,7 @@ Room.prototype.groupPositions = function(positions) {
                     // Add it to the next gen and this group
 
                     nextGeneration.push(adjacentPos)
-                    groupedPositions[groupIndex].push(adjacentPos)
+                    groupedPositions[groupIndex].push(room.newPos(adjacentPos))
                 }
             }
 

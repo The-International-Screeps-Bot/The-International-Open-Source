@@ -121,13 +121,9 @@ export function constructionManager(room: Room) {
 
     function manageBasePlanning() {
 
-        // Get the buildLocations
+        // If there are no buildLocations
 
-        const buildLocations: BuildLocations = global[room.name].buildLocations
-
-        // If there are no build locations
-
-        if (!buildLocations) {
+        if (!global[room.name].buildLocations) {
 
             // Generate and record base plans
 
@@ -141,7 +137,13 @@ export function constructionManager(room: Room) {
 
             global[room.name].buildLocations = basePlannerResult.buildLocations
             global[room.name].stampAnchors = basePlannerResult.stampAnchors
+            global[room.name].buildPositions = basePlannerResult.buildPositions
+            global[room.name].roadPositions = basePlannerResult.roadPositions
         }
+
+        // Get the buildLocations
+
+        const buildLocations: BuildLocations = global[room.name].buildLocations
 
         // Loop through each stamp type in base locations
 
@@ -184,30 +186,63 @@ export function constructionManager(room: Room) {
 
     function manageRampartPlanning() {
 
-        // Get the rampartLocations
-
-        const rampartLocations: Pos[][] = global[room.name].rampartLocations
-
         // If there are no rampartLocations
 
-        if (!rampartLocations) {
+        if (!global[room.name].rampartLocations) {
 
-            // Generate and record rampart plans
+            // Record rampart plans in the room's global rampartLocations
 
-            const rampartPlannerResult = rampartPlanner(room)
-
-            // Stop if there rampart planning failed
-
-            if (!rampartPlannerResult) return
-
-            // Otherwise record the result in the room's global rampartLocations
-
-            global[room.name].rampartLocations = rampartPlannerResult
+            global[room.name].rampartLocations = rampartPlanner(room)
         }
+
+        // Get the rampartLocations, stopping if there are undefined
+
+        const rampartLocations: RoomPosition[][] = global[room.name].rampartLocations
+        if (!rampartLocations) return
 
         // Loop through each group
 
         for (const group of rampartLocations) {
+
+            // Get the hubAnchor after converting it to a roomPosition
+
+            const hubAnchor = room.newPos(global[room.name].stampAnchors.hub[0])
+
+            // Get the closest pos of the group by range to the anchor
+
+            const cloestPosToAnchor = hubAnchor.findClosestByRange(group)
+
+            // Path from the hubAnchor to the cloestPosToAnchor
+
+            const path = room.advancedFindPath({
+                origin: cloestPosToAnchor,
+                goal: { pos: hubAnchor, range: 2 },
+                weightPositions: {
+                    255: global[room.name].buildPositions,
+                    1: global[room.name].roadPositions,
+                }
+            })
+
+            // Loop through positions of the path
+
+            for (const pos of path) {
+
+                // Iterate if the pos is already
+
+                if (!(global[room.name].roadPositions as Pos[]).filter(roadPos => generalFuncs.arePositionsEqual(pos, roadPos))) continue
+
+                // Add the position to roadPositions
+
+                global[room.name].roadPositions.push(pos)
+
+                // Add the positions to the buildLocations under it's stamp and structureType
+
+                global[room.name].buildLocations.roads.push({
+                    structureType: STRUCTURE_ROAD,
+                    x: pos.x,
+                    y: pos.y
+                })
+            }
 
             // Loop through each pos of the group
 
@@ -215,24 +250,24 @@ export function constructionManager(room: Room) {
 
                 // Visualize the rampart placement
 
-                /* if (Memory.roomVisuals)  */room.visual.structure(pos.x, pos.y, STRUCTURE_RAMPART, {
+                /* if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, STRUCTURE_RAMPART, {
                     opacity: 0.5
                 })
 
                 // Visualize the road placement
 
-                /* if (Memory.roomVisuals)  */room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD, {
+                if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD, {
                     opacity: 0.5
-                })
+                }) */
 
                 // Place a road at pos
 
-                room.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD)
+                room.createConstructionSite(pos, STRUCTURE_ROAD)
             }
         }
 
         // If visuals are enabled, connect road visuals
 
-        /* if (Memory.roomVisuals) */ room.visual.connectRoads()
+        /* if (Memory.roomVisuals) room.visual.connectRoads() */
     }
 }
