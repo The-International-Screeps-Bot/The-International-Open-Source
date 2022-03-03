@@ -29,4 +29,8 @@ export function communeManager(room: Room) {
     structuresForSpawningManager(room)
 
     spawnManager(room)
+
+    let cpu = Game.cpu.getUsed()
+
+    generalFuncs.customLog('CPU USED FOR TEST', Game.cpu.getUsed() - cpu)
 }

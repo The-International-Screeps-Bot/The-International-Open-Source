@@ -229,7 +229,7 @@ export function constructionManager(room: Room) {
 
                 // Iterate if the pos is already
 
-                if (!(global[room.name].roadPositions as Pos[]).filter(roadPos => generalFuncs.arePositionsEqual(pos, roadPos))) continue
+                if (!(global[room.name].roadPositions as Pos[]).filter(roadPos => generalFuncs.arePositionsEqual(pos, roadPos)).length) continue
 
                 // Add the position to roadPositions
 
