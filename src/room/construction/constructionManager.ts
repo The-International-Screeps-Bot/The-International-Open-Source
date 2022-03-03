@@ -200,6 +200,10 @@ export function constructionManager(room: Room) {
         const rampartLocations: RoomPosition[][] = global[room.name].rampartLocations
         if (!rampartLocations) return
 
+        // Record the groupIndex
+
+        let groupIndex = 0
+
         // Loop through each group
 
         for (const group of rampartLocations) {
@@ -244,13 +248,37 @@ export function constructionManager(room: Room) {
                 })
             }
 
+            // Get the last pos in the path
+
+            const lastPos = path[0]
+
+/*             // If the pos doesn't have a rampart on it, plan for one
+
+            group.push(lastPos) */
+
+            // Visualize the rampart placement
+
+            if (Memory.roomVisuals) room.visual.structure(lastPos.x, lastPos.y, STRUCTURE_RAMPART, {
+                opacity: 0.5
+            })
+
+            // Visualize the road placement
+
+            if (Memory.roomVisuals) room.visual.structure(lastPos.x, lastPos.y, STRUCTURE_ROAD, {
+                opacity: 0.5
+            })
+
+            // Place a road at lastPos
+
+            room.createConstructionSite(lastPos, STRUCTURE_ROAD)
+
             // Loop through each pos of the group
 
             for (const pos of group) {
 
                 // Visualize the rampart placement
 
-                /* if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, STRUCTURE_RAMPART, {
+                if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, STRUCTURE_RAMPART, {
                     opacity: 0.5
                 })
 
@@ -258,12 +286,14 @@ export function constructionManager(room: Room) {
 
                 if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD, {
                     opacity: 0.5
-                }) */
+                })
 
                 // Place a road at pos
 
                 room.createConstructionSite(pos, STRUCTURE_ROAD)
             }
+
+            groupIndex++
         }
 
         // If visuals are enabled, connect road visuals

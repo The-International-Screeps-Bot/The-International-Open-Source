@@ -285,7 +285,7 @@ constants.stamps = {
     },
     hub: {
         offset: 2,
-        protectionOffset: 4,
+        protectionOffset: 5,
         size: 4,
         structures: {
             road: [{ x: 1, y: 0 },{ x: 2, y: 0 },{ x: 3, y: 0 },{ x: 0, y: 3 },{ x: 0, y: 2 },{ x: 0, y: 1 },{ x: 1, y: 4 },{ x: 2, y: 4 },{ x: 4, y: 2 },{ x: 4, y: 1 },{ x: 3, y: 3 }],
@@ -320,7 +320,7 @@ constants.stamps = {
     },
     tower: {
         offset: 0,
-        protectionOffset: 3,
+        protectionOffset: 2,
         size: 1,
         structures: {
             tower: [{ x: 0, y: 0 }]

@@ -29,7 +29,7 @@ Room.prototype.get = function(roomObjectName) {
 
         const terrainCM = new PathFinder.CostMatrix()
 
-        // Iterate through
+        // Loop through each x and y in the room
 
         for (let x = 0; x < constants.roomDimensions; x++) {
             for (let y = 0; y < constants.roomDimensions; y++) {
@@ -1679,6 +1679,8 @@ Room.prototype.specialDT = function(initialCM, enableVisuals) {
     // Use a costMatrix to record distances. Use the initialCM if provided, otherwise create one
 
     const distanceCM = initialCM || new PathFinder.CostMatrix()
+
+    // Loop through each x and y in the room
 
     for (let x = 0; x < constants.roomDimensions; x++) {
         for (let y = 0; y < constants.roomDimensions; y++) {
