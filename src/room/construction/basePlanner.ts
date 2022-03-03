@@ -67,6 +67,11 @@ export function basePlanner(room: Room) {
 
     for (const source of sources) recordAdjacentPositions(source.pos.x, source.pos.y, 2)
 
+    // Get and record the centerUpgradePos as avoid
+
+    const centerUpgradePos: RoomPosition = room.get('centerUpgradePos')
+    baseCM.set(centerUpgradePos.x, centerUpgradePos.y, 255)
+
     // Find the average pos between the sources
 
     const avgSourcePos = generalFuncs.findAvgBetweenPosotions(sources[0].pos, sources[1].pos)
@@ -296,7 +301,7 @@ export function basePlanner(room: Room) {
     // Path from the hubAnchor to the centerUpgradePos
 
     path = room.advancedFindPath({
-        origin: room.get('centerUpgradePos'),
+        origin: centerUpgradePos,
         goal: { pos: room.newPos(hubAnchor), range: 2 },
         weightPositions: {
             255: buildPositions,
@@ -369,7 +374,7 @@ export function basePlanner(room: Room) {
 
         path = room.advancedFindPath({
             origin: closestHarvestPos,
-            goal: { pos: room.get('centerUpgradePos'), range: 1 },
+            goal: { pos: centerUpgradePos, range: 1 },
             weightPositions: {
                 255: buildPositions,
                 1: roadPositions,

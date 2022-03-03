@@ -227,9 +227,9 @@ export function constructionManager(room: Room) {
 
             for (const pos of path) {
 
-                // Iterate if the pos is already
+                // Iterate if the pos is already a roadPos
 
-                if (!(global[room.name].roadPositions as Pos[]).filter(roadPos => generalFuncs.arePositionsEqual(pos, roadPos)).length) continue
+                if ((global[room.name].roadPositions as Pos[]).filter(roadPos => generalFuncs.arePositionsEqual(pos, roadPos)).length) continue
 
                 // Add the position to roadPositions
 
