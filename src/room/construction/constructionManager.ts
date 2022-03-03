@@ -195,6 +195,10 @@ export function constructionManager(room: Room) {
             global[room.name].rampartLocations = rampartPlanner(room)
         }
 
+        // Stop if there is no storage and no terminal
+
+        if (!room.get('storage') && !room.get('terminal')) return
+
         // Get the rampartLocations, stopping if there are undefined
 
         const rampartLocations: RoomPosition[][] = global[room.name].rampartLocations
