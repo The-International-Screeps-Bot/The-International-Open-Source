@@ -70,6 +70,8 @@ interface Constants {
      */
     structureTypesByBuildPriority: BuildableStructureConstant[]
 
+    structureTypesByNumber: {[key: string]: number}
+
     stamps: Stamps
 
     styleForStructureTypes: {[key: string]: CircleStyle}
@@ -268,6 +270,26 @@ constants.structureTypesByBuildPriority = [
     STRUCTURE_NUKER,
     STRUCTURE_OBSERVER,
 ]
+
+constants.structureTypesByNumber = {
+    spawn: 1,
+    extension: 2,
+    container: 3,
+    tower: 4,
+    storage: 5,
+    road: 6,
+    wall: 7,
+    rampart: 8,
+    terminal: 9,
+    extractor: 10,
+    link: 11,
+    lab: 12,
+    factory: 13,
+    powerSpawn: 14,
+    nuker: 15,
+    observer: 16,
+    empty: 17,
+}
 
 constants.stamps = {
     fastFiller: {

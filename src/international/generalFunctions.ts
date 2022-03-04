@@ -87,7 +87,7 @@ generalFuncs.findPositionsInsideRect = function(rect) {
 
             // Otherwise ass the x and y to positions
 
-            positions.push({ x: x, y: y })
+            positions.push({ x, y })
         }
     }
 

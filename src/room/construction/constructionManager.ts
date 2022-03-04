@@ -121,9 +121,9 @@ export function constructionManager(room: Room) {
 
     function manageBasePlanning() {
 
-        // If there are no buildLocations
+        // If there are no structurePlans
 
-        if (!global[room.name].buildLocations) {
+        if (!global[room.name].structurePlans) {
 
             // Generate and record base plans
 
@@ -135,54 +135,44 @@ export function constructionManager(room: Room) {
 
             // Otherwise record aspects of the results in the room's global
 
-            global[room.name].buildLocations = basePlannerResult.buildLocations
+            global[room.name].structurePlans = basePlannerResult.structurePlans
+            global[room.name].orderedStructurePlans = basePlannerResult.orderedStructurePlans
             global[room.name].stampAnchors = basePlannerResult.stampAnchors
-            global[room.name].buildPositions = basePlannerResult.buildPositions
-            global[room.name].roadPositions = basePlannerResult.roadPositions
         }
 
-        // Get the buildLocations
+        // Get the orderedStructurePlans
 
-        const buildLocations: BuildLocations = global[room.name].buildLocations
+        const orderedStructurePlans: OrderedStructurePlans = global[room.name].orderedStructurePlans
 
-        // Loop through each stamp type in base locations
+        // Loop through buildObjects of orderedStructurePlans
 
-        for (const stampType in buildLocations) {
+        for (const buildObj of orderedStructurePlans) {
 
-            // Get the build object using the stamp type
+            // Display visuals if enabled
 
-            const buildObjects = buildLocations[stampType]
-
-            // Loop through build objects inside build locations for this stamp type
-
-            for (const buildObj of buildObjects) {
-
-                // Display visuals if enabled
-
-                /* if (Memory.roomVisuals) room.visual.structure(buildObj.x, buildObj.y, buildObj.structureType, {
+            if (Memory.roomVisuals) room.visual.structure(buildObj.x, buildObj.y, buildObj.structureType, {
                 opacity: 0.5
-                }) */
+            })
 
-                // If the room controller level is less than 3 and the structureType is a road, iterate
+            // If the room controller level is less than 3 and the structureType is a road, iterate
 
-                if (room.controller.level < 3 && buildObj.structureType == STRUCTURE_ROAD) continue
+            if (room.controller.level < 3 && buildObj.structureType == STRUCTURE_ROAD) continue
 
-                // If the structure is a container and there aren't source containers for each source and a controller container, iterate
+            // If the structure is a container and there aren't source containers for each source and a controller container, iterate
 
-                if (buildObj.structureType == STRUCTURE_CONTAINER && (!room.get('source1Container') || !room.get('source2Container') || !room.get('controllerContainer'))) continue
+            if (buildObj.structureType == STRUCTURE_CONTAINER && (!room.get('source1Container') || !room.get('source2Container') || !room.get('controllerContainer'))) continue
 
-                // Place construction sites for the base
+            // Place construction sites for the base
 
-                room.createConstructionSite(buildObj.x, buildObj.y, buildObj.structureType)
-            }
+            room.createConstructionSite(buildObj.x, buildObj.y, buildObj.structureType)
         }
 
         // If visuals are enabled, connect road visuals
 
-        /* if (Memory.roomVisuals) room.visual.connectRoads() */
+        if (Memory.roomVisuals) room.visual.connectRoads()
     }
 
-    manageRampartPlanning()
+    /* manageRampartPlanning() */
 
     function manageRampartPlanning() {
 

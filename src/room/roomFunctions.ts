@@ -541,7 +541,11 @@ Room.prototype.get = function(roomObjectName) {
 
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
-        return room.findClosestPosOfValue(distanceCM, anchor, 2)
+        return room.findClosestPosOfValue({
+            CM: distanceCM,
+            startPos: anchor,
+            requiredValue: 2
+        })
     }
 
     new RoomObject({
@@ -566,7 +570,7 @@ Room.prototype.get = function(roomObjectName) {
         // Draw a rect around the center upgrade pos
 
         const rect = { x1: centerUpgradePos.x - 1, y1: centerUpgradePos.y - 1, x2: centerUpgradePos.x + 1, y2: centerUpgradePos.y + 1 }
-        const upgradePositions = generalFuncs.findPositionsInsideRect(rect)
+        const upgradePositions = room.findPositionsInsideRect(rect)
 
         // Inform the centerUpgadePos and its adjacent positions
 
@@ -1108,6 +1112,31 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                     }
                 }
 
+                weightCostMatrixes()
+
+                function weightCostMatrixes() {
+
+                    // Stop if there are no cost matrixes to weight
+
+                    if (!opts.weightCostMatrixes) return
+
+                    // Otherwise iterate through each x and y in the room
+
+                    for (let x = 0; x < constants.roomDimensions; x++) {
+                        for (let y = 0; y < constants.roomDimensions; y++) {
+
+                            // Loop through each costMatrix
+
+                            for (const weightCM of opts.weightCostMatrixes) {
+
+                                // Assign the weightCM's value of this pos to the cm's value
+
+                                cm.set(x, y, weightCM.get(x, y))
+                            }
+                        }
+                    }
+                }
+
                 // If there is no vision in the room, inform the costMatrix
 
                 if (!room) return cm
@@ -1233,7 +1262,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
             generalFuncs.customLog('Incomplete Path', JSON.stringify(opts.origin), constants.colors.white, constants.colors.red)
             room.pathVisual(pathFinderResult.path, constants.colors.red as keyof Colors)
-            room.visual.circle(opts.goal.pos, { fill: constants.colors.red })
+            room.visual.line(opts.origin, opts.goal.pos, { color: constants.colors.red, width: .15, opacity: .3, lineStyle: 'solid' })
             return []
         }
 
@@ -1926,7 +1955,7 @@ Room.prototype.floodFill = function(seeds) {
     return floodCM
 }
 
-Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue, initialWeight = 0, adjacentToRoads, roadPositions = []) {
+Room.prototype.findClosestPosOfValue = function(opts) {
 
     const room = this
 
@@ -1936,7 +1965,7 @@ Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue, ini
 
         // Get the value of the pos
 
-        const posValue = CM.get(pos.x, pos.y)
+        const posValue = opts.CM.get(pos.x, pos.y)
 
         // If the value is to avoid, inform false
 
@@ -1944,11 +1973,11 @@ Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue, ini
 
         // If the posValue is less than the requiredValue, inform false
 
-        if (posValue < requiredValue) return false
+        if (posValue < opts.requiredValue) return false
 
         // If adjacentToRoads is a requirement
 
-        if (adjacentToRoads) {
+        if (opts.adjacentToRoads) {
 
             // Construct a rect and get the positions in a range of 1
 
@@ -1965,7 +1994,7 @@ Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue, ini
 
                 // If the adjacentPos isn't a roadPosition, iterate
 
-                if (!roadPositions.filter(pos => generalFuncs.arePositionsEqual(pos, adjacentPos)).length) continue
+                if (opts.roadsCM.get(adjacentPos.x, adjacentPos.y) != 1) continue
 
                 // Otherwise set nearbyRoad to true and stop the loop
 
@@ -1989,11 +2018,11 @@ Room.prototype.findClosestPosOfValue = function(CM, startPos, requiredValue, ini
 
     // Record startPos as visited
 
-    visitedCM.set(startPos.x, startPos.y, 1)
+    visitedCM.set(opts.startPos.x, opts.startPos.y, 1)
 
     // Construct values for the check
 
-    let thisGeneration: Pos[] = [startPos],
+    let thisGeneration: Pos[] = [opts.startPos],
     nextGeneration: Pos[] = [],
     canUseWalls = true
 
@@ -2302,4 +2331,33 @@ Room.prototype.groupPositions = function(positions) {
     // Inform groupedPositions
 
     return groupedPositions
+}
+
+Room.prototype.findPositionsInsideRect = function(rect) {
+
+    const room = this,
+
+    // Construct positions
+
+    positions: RoomPosition[] = []
+
+    // Loop through coordinates inside the rect
+
+    for (let x = rect.x1; x <= rect.x2; x++) {
+        for (let y = rect.y1; y <= rect.y2; y++) {
+
+            // Iterate if the pos doesn't map onto a room
+
+            if (x < 0 || x >= constants.roomDimensions ||
+                y < 0 || y >= constants.roomDimensions) continue
+
+            // Otherwise ass the x and y to positions
+
+            positions.push(new RoomPosition(x, y, room.name))
+        }
+    }
+
+    // Inform positions
+
+    return positions
 }

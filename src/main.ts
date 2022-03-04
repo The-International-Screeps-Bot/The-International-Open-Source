@@ -145,15 +145,31 @@ declare global {
          * An object with keys of weights and values of positions
          */
         weightPositions?: {[key: string]: Pos[]}
+        /**
+         *
+         */
+        weightCostMatrixes?: CostMatrix[]
+        /**
+         *
+         */
         avoidEnemyRanges?: boolean
         /**
          * Deprecate
          */
         avoidImpassibleStructures?: boolean
         /**
-         * Deprecate
+         * Sets my non public ramparts to a value of 1
          */
         prioritizeRamparts?: boolean
+    }
+
+    interface FindClosestPosOfValueOpts {
+        CM: CostMatrix,
+        startPos: Pos
+        requiredValue: number
+        initialWeight?: number
+        adjacentToRoads?: boolean
+        roadsCM?: CostMatrix
     }
 
     interface MoveRequestOpts extends PathOpts {
@@ -164,7 +180,7 @@ declare global {
 
     }
 
-    type BuildLocations = {[key: string]: BuildObj[]}
+    type OrderedStructurePlans = BuildObj[]
 
     interface BuildObj {
         structureType: BuildableStructureConstant
@@ -442,7 +458,7 @@ declare global {
         /**
          * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
          */
-        findClosestPosOfValue(CM: CostMatrix, startPos: Pos, requiredValue: number, initialWeight?: number, adjacentToRoads?: boolean, roadPositions?: Pos[]): Pos | RoomPosition | false
+        findClosestPosOfValue(opts: FindClosestPosOfValueOpts): RoomPosition | false
 
         advancedSell(resourceType: ResourceConstant, amount: number): boolean
 
@@ -482,6 +498,8 @@ declare global {
          * Groups positions with contigiousness, structured similarily to a flood fill
          */
         groupPositions(positions: Pos[]): Pos[][]
+
+        findPositionsInsideRect(rect: Rect): RoomPosition[]
     }
 
     interface RoomMemory {
