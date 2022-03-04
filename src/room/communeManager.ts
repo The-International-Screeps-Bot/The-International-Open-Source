@@ -36,7 +36,7 @@ export function communeManager(room: Room) {
     const cm = new PathFinder.CostMatrix()
 
     // Iterate through each x and y in the room
-
+/*
     for (let x = 0; x < constants.roomDimensions; x++) {
         for (let y = 0; y < constants.roomDimensions; y++) {
 
@@ -44,6 +44,6 @@ export function communeManager(room: Room) {
             cm.get(x, y)
         }
     }
-
+ */
     generalFuncs.customLog('CPU USED FOR TEST', Game.cpu.getUsed() - cpu)
 }

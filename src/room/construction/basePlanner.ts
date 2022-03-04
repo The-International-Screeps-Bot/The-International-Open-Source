@@ -10,8 +10,8 @@ export function basePlanner(room: Room) {
     // Get a cost matrix of walls and exit areas
 
     const baseCM: CostMatrix = room.get('baseCM'),
-    roadsCM = new PathFinder.CostMatrix(),
-    structurePlans = new PathFinder.CostMatrix(),
+    roadCM: CostMatrix = room.get('roadCM'),
+    structurePlans: CostMatrix = room.get('structurePlans'),
     orderedStructurePlans: OrderedStructurePlans = [],
     stampAnchors: StampAnchors = {}
 
@@ -89,7 +89,7 @@ export function basePlanner(room: Room) {
             requiredValue: stamp.size,
             initialWeight: opts.initialWeight || 0,
             adjacentToRoads: opts.adjacentToRoads,
-            roadsCM: opts.adjacentToRoads ? roadsCM : undefined
+            roadCM: opts.adjacentToRoads ? roadCM : undefined
         })
 
         // Inform false if no anchor was generated
@@ -136,16 +136,16 @@ export function basePlanner(room: Room) {
 
                 if (structureType == STRUCTURE_ROAD) {
 
-                    // Record the position in roadsCM and iterate
+                    // Record the position in roadCM and iterate
 
-                    roadsCM.set(x, y, 1)
+                    roadCM.set(x, y, 1)
                     continue
                 }
 
                 // Otherwise record the position as avoid in baseCM and roadCM and iterate
 
                 baseCM.set(x, y, 255)
-                roadsCM.set(x, y, 255)
+                roadCM.set(x, y, 255)
             }
         }
 
@@ -184,7 +184,7 @@ export function basePlanner(room: Room) {
         // Mark as avoid in road and base cost matrixes
 
         baseCM.set(upgradePos.x, upgradePos.y, 255)
-        roadsCM.set(upgradePos.x, upgradePos.y, 255)
+        roadCM.set(upgradePos.x, upgradePos.y, 255)
     }
 
     // Try to plan the stamp
@@ -201,7 +201,7 @@ export function basePlanner(room: Room) {
     // Get the closest upgrade pos and mark it as fair use in roadCM
 
     const closestUpgradePos = hubAnchor.findClosestByRange(upgradePositions)
-    roadsCM.set(closestUpgradePos.x, closestUpgradePos.y, 5)
+    roadCM.set(closestUpgradePos.x, closestUpgradePos.y, 5)
 
     // Construct path
 
@@ -227,16 +227,16 @@ export function basePlanner(room: Room) {
         path = room.advancedFindPath({
             origin: extensionsAnchor,
             goal: { pos: hubAnchor, range: 2 },
-            weightCostMatrixes: [roadsCM]
+            weightCostMatrixes: [roadCM]
         })
 
         // Loop through positions of the path
 
         for (const pos of path) {
 
-            // Record the pos in roadsCM
+            // Record the pos in roadCM
 
-            roadsCM.set(pos.x, pos.y, 1)
+            roadCM.set(pos.x, pos.y, 1)
 
             // Plan for a road at this position
 
@@ -268,16 +268,16 @@ export function basePlanner(room: Room) {
     path = room.advancedFindPath({
         origin: room.get('centerUpgradePos'),
         goal: { pos: hubAnchor, range: 2 },
-        weightCostMatrixes: [roadsCM]
+        weightCostMatrixes: [roadCM]
     })
 
     // Loop through positions of the path
 
     for (const pos of path) {
 
-        // Record the pos in roadsCM
+        // Record the pos in roadCM
 
-        roadsCM.set(pos.x, pos.y, 1)
+        roadCM.set(pos.x, pos.y, 1)
 
         // Plan for a road at this position
 
@@ -303,16 +303,16 @@ export function basePlanner(room: Room) {
         path = room.advancedFindPath({
             origin: closestHarvestPos,
             goal: { pos: hubAnchor, range: 2 },
-            weightCostMatrixes: [roadsCM]
+            weightCostMatrixes: [roadCM]
         })
 
         // Loop through positions of the path
 
         for (const pos of path) {
 
-            // Record the pos in roadsCM
+            // Record the pos in roadCM
 
-            roadsCM.set(pos.x, pos.y, 1)
+            roadCM.set(pos.x, pos.y, 1)
 
             // Plan for a road at this position
 
@@ -330,16 +330,16 @@ export function basePlanner(room: Room) {
         path = room.advancedFindPath({
             origin: closestHarvestPos,
             goal: { pos: closestUpgradePos, range: 1 },
-            weightCostMatrixes: [roadsCM]
+            weightCostMatrixes: [roadCM]
         })
 
         // Loop through positions of the path
 
         for (const pos of path) {
 
-            // Record the pos in roadsCM
+            // Record the pos in roadCM
 
-            roadsCM.set(pos.x, pos.y, 1)
+            roadCM.set(pos.x, pos.y, 1)
 
             // Plan for a road at this position
 
@@ -358,16 +358,16 @@ export function basePlanner(room: Room) {
     path = room.advancedFindPath({
         origin: labsAnchor,
         goal: { pos: hubAnchor, range: 2 },
-        weightCostMatrixes: [roadsCM]
+        weightCostMatrixes: [roadCM]
     })
 
     // Loop through positions of the path
 
     for (const pos of path) {
 
-        // Record the pos in roadsCM
+        // Record the pos in roadCM
 
-        roadsCM.set(pos.x, pos.y, 1)
+        roadCM.set(pos.x, pos.y, 1)
 
         // Plan for a road at this position
 
@@ -385,16 +385,16 @@ export function basePlanner(room: Room) {
     path = room.advancedFindPath({
         origin: room.get('mineralHarvestPos'),
         goal: { pos: hubAnchor, range: 2 },
-        weightCostMatrixes: [roadsCM]
+        weightCostMatrixes: [roadCM]
     })
 
     // Loop through positions of the path
 
     for (const pos of path) {
 
-        // Record the pos in roadsCM
+        // Record the pos in roadCM
 
-        roadsCM.set(pos.x, pos.y, 1)
+        roadCM.set(pos.x, pos.y, 1)
 
         // Plan for a road at this position
 
@@ -414,9 +414,9 @@ export function basePlanner(room: Room) {
     for (let x = 0; x < constants.roomDimensions; x++) {
         for (let y = 0; y < constants.roomDimensions; y++) {
 
-            // Get the value of this pos in roadsCM, iterate if the value is 0, iterate
+            // Get the value of this pos in roadCM, iterate if the value is 0, iterate
 
-            const roadValue = roadsCM.get(x, y)
+            const roadValue = roadCM.get(x, y)
             if (roadValue == 0) continue
 
             // Otherwise assign 255 to this pos in baseCM
@@ -474,7 +474,9 @@ export function basePlanner(room: Room) {
 
     if (!observerAnchor) return false
 
-    // Inform information to build based on the plans
+    // Record planning results in the room's global and inform true
 
-    return { structurePlans, orderedStructurePlans, stampAnchors }
+    global[room.name].orderedStructurePlans = orderedStructurePlans
+    global[room.name].stampAnchors = stampAnchors
+    return true
 }

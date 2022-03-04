@@ -132,166 +132,96 @@ export function constructionManager(room: Room) {
             // Stop if there base planning failed
 
             if (!basePlannerResult) return
-
-            // Otherwise record aspects of the results in the room's global
-
-            global[room.name].structurePlans = basePlannerResult.structurePlans
-            global[room.name].orderedStructurePlans = basePlannerResult.orderedStructurePlans
-            global[room.name].stampAnchors = basePlannerResult.stampAnchors
         }
 
-        // Get the orderedStructurePlans
+        const structurePlans: CostMatrix = room.get('structurePlans')
 
-        const orderedStructurePlans: OrderedStructurePlans = global[room.name].orderedStructurePlans
+        // Iterate through each x and y in the room
 
-        // Loop through buildObjects of orderedStructurePlans
+        for (let x = 0; x < constants.roomDimensions; x++) {
+            for (let y = 0; y < constants.roomDimensions; y++) {
 
-        for (const buildObj of orderedStructurePlans) {
+                // Get the planned value for this pos
 
-            // Display visuals if enabled
+                const plannedValue = structurePlans.get(x, y)
 
-            if (Memory.roomVisuals) room.visual.structure(buildObj.x, buildObj.y, buildObj.structureType, {
-                opacity: 0.5
-            })
+                // If there are no ramparts planned for this pos, iterate
 
-            // If the room controller level is less than 3 and the structureType is a road, iterate
+                if (plannedValue == 0) continue
 
-            if (room.controller.level < 3 && buildObj.structureType == STRUCTURE_ROAD) continue
+                // Otherwise get the structureType
 
-            // If the structure is a container and there aren't source containers for each source and a controller container, iterate
+                const structureType = constants.numbersByStructureTypes[plannedValue]
 
-            if (buildObj.structureType == STRUCTURE_CONTAINER && (!room.get('source1Container') || !room.get('source2Container') || !room.get('controllerContainer'))) continue
+                // If the structureType is empty, iterate
 
-            // Place construction sites for the base
+                if (structureType == 'empty') continue
 
-            room.createConstructionSite(buildObj.x, buildObj.y, buildObj.structureType)
-        }
+                // Display visuals if enabled
 
-        // If visuals are enabled, connect road visuals
-
-        if (Memory.roomVisuals) room.visual.connectRoads()
-    }
-
-    /* manageRampartPlanning() */
-
-    function manageRampartPlanning() {
-
-        // If there are no rampartLocations
-
-        if (!global[room.name].rampartLocations) {
-
-            // Record rampart plans in the room's global rampartLocations
-
-            global[room.name].rampartLocations = rampartPlanner(room)
-        }
-
-        // Stop if there is no storage and no terminal
-
-        if (!room.get('storage') && !room.get('terminal')) return
-
-        // Get the rampartLocations, stopping if there are undefined
-
-        const rampartLocations: RoomPosition[][] = global[room.name].rampartLocations
-        if (!rampartLocations) return
-
-        // Record the groupIndex
-
-        let groupIndex = 0
-
-        // Loop through each group
-
-        for (const group of rampartLocations) {
-
-            // Get the hubAnchor after converting it to a roomPosition
-
-            const hubAnchor = room.newPos(global[room.name].stampAnchors.hub[0])
-
-            // Get the closest pos of the group by range to the anchor
-
-            const cloestPosToAnchor = hubAnchor.findClosestByRange(group)
-
-            // Path from the hubAnchor to the cloestPosToAnchor
-
-            const path = room.advancedFindPath({
-                origin: cloestPosToAnchor,
-                goal: { pos: hubAnchor, range: 2 },
-                weightPositions: {
-                    255: global[room.name].buildPositions,
-                    1: global[room.name].roadPositions,
-                }
-            })
-
-            // Loop through positions of the path
-
-            for (const pos of path) {
-
-                // Iterate if the pos is already a roadPos
-
-                if ((global[room.name].roadPositions as Pos[]).filter(roadPos => generalFuncs.arePositionsEqual(pos, roadPos)).length) continue
-
-                // Add the position to roadPositions
-
-                global[room.name].roadPositions.push(pos)
-
-                // Add the positions to the buildLocations under it's stamp and structureType
-
-                global[room.name].buildLocations.roads.push({
-                    structureType: STRUCTURE_ROAD,
-                    x: pos.x,
-                    y: pos.y
-                })
-            }
-
-            // Get the last pos in the path
-
-            const lastPos = path[0]
-
-/*             // If the pos doesn't have a rampart on it, plan for one
-
-            group.push(lastPos) */
-
-            // Visualize the rampart placement
-
-            if (Memory.roomVisuals) room.visual.structure(lastPos.x, lastPos.y, STRUCTURE_RAMPART, {
-                opacity: 0.5
-            })
-
-            // Visualize the road placement
-
-            if (Memory.roomVisuals) room.visual.structure(lastPos.x, lastPos.y, STRUCTURE_ROAD, {
-                opacity: 0.5
-            })
-
-            // Place a road at lastPos
-
-            room.createConstructionSite(lastPos, STRUCTURE_ROAD)
-
-            // Loop through each pos of the group
-
-            for (const pos of group) {
-
-                // Visualize the rampart placement
-
-                if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, STRUCTURE_RAMPART, {
+                /* if (Memory.roomVisuals) room.visual.structure(x, y, structureType, {
                     opacity: 0.5
-                })
+                }) */
 
-                // Visualize the road placement
+                // Create a road site at this pos
 
-                if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, STRUCTURE_ROAD, {
-                    opacity: 0.5
-                })
-
-                // Place a road at pos
-
-                room.createConstructionSite(pos, STRUCTURE_ROAD)
+                room.createConstructionSite(x, y, structureType)
             }
-
-            groupIndex++
         }
 
         // If visuals are enabled, connect road visuals
 
         /* if (Memory.roomVisuals) room.visual.connectRoads() */
+    }
+
+    manageRampartPlanning()
+
+    function manageRampartPlanning() {
+
+        // Stop if there is no storage and no terminal
+
+        if (!room.get('storage') && !room.get('terminal')) return
+
+        // If ramparts are not yet planned
+
+        if (!global[room.name].plannedRamparts) {
+
+            // Run rampart planning and record the state of the plans
+
+            global[room.name].plannedRamparts = rampartPlanner(room)
+        }
+
+        const rampartPlans: CostMatrix = room.get('rampartPlans')
+
+        // Iterate through each x and y in the room
+
+        for (let x = 0; x < constants.roomDimensions; x++) {
+            for (let y = 0; y < constants.roomDimensions; y++) {
+
+                // If there are no ramparts planned for this pos, iterate
+
+                if (rampartPlans.get(x, y) != 1) continue
+
+                // Otherwise
+
+                // Display visuals if enabled
+
+                if (Memory.roomVisuals) room.visual.structure(x, y, STRUCTURE_ROAD, {
+                    opacity: 0.5
+                })
+
+                if (Memory.roomVisuals) room.visual.structure(x, y, STRUCTURE_RAMPART, {
+                    opacity: 0.5
+                })
+
+                // Create a road site at this pos
+
+                room.createConstructionSite(x, y, STRUCTURE_ROAD)
+            }
+        }
+
+        // If visuals are enabled, connect road visuals
+
+        if (Memory.roomVisuals) room.visual.connectRoads()
     }
 }

@@ -435,7 +435,7 @@ export function rampartPlanner(room: Room) {
 
     // Function for user: calculate min cut tiles from room, rect[]
 
-    function GetCutTiles(roomname: string, rect: any, bounds: Rect = { x1: 0, y1: 0, x2: 49, y2: 49 }, verbose = false) {
+    function GetCutTiles(roomname: string, rect: any, bounds: Rect = { x1: 0, x2: constants.roomDimensions- 1, y1: 0, y2: constants.roomDimensions - 1 }, verbose = false) {
 
         let graph = create_graph(roomname, rect, bounds);
 
@@ -548,20 +548,91 @@ export function rampartPlanner(room: Room) {
         }
     }
 
-    // Boundary Array for Maximum Range
-
-    const bounds = { x1: 0, x2: 49, y1: 0, y2: 49 }
-
     // Get Min cut
     // Positions is an array where to build walls/ramparts
 
-    const positions = GetCutTiles(room.name, protectionRects, bounds)
+    const rampartPositions = GetCutTiles(room.name, protectionRects)
+
+    // Get base planning data
+
+    const baseCM: CostMatrix = room.get('baseCM'),
+    roadCM: CostMatrix = room.get('roadCM'),
+    structurePlans: CostMatrix = room.get('structurePlans'),
+    rampartPlans: CostMatrix = room.get('rampartPlans')
+
+    // Plan the positions
+
+    for (const pos of rampartPositions) {
+
+        // Record the pos in roadCM
+
+        roadCM.set(pos.x, pos.y, 1)
+
+        // And add the position to the base plans
+
+        structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+
+        rampartPlans.set(pos.x, pos.y, 1)
+    }
 
     // Group rampart positions
 
-    const groupedRampartPositions = room.groupPositions(positions)
+    const groupedRampartPositions = room.groupRampartPositions(rampartPositions)
 
-    // Inform groupedRampartPositions
+    // Get the hubAnchor after converting it to a roomPosition
 
-    return groupedRampartPositions
+    const hubAnchor = global[room.name].stampAnchors.hub[0]
+
+    // Loop through each group
+
+    for (const group of groupedRampartPositions) {
+
+        // Get the closest pos of the group by range to the anchor
+
+        const cloestPosToAnchor = hubAnchor.findClosestByRange(group)
+
+        // Path from the hubAnchor to the cloestPosToAnchor
+
+        const path = room.advancedFindPath({
+            origin: cloestPosToAnchor,
+            goal: { pos: hubAnchor, range: 2 },
+            weightCostMatrixes: [baseCM, roadCM]
+        })
+
+        // Loop through positions of the path
+
+        for (const pos of path) {
+
+            // Record the pos in roadCM
+
+            roadCM.set(pos.x, pos.y, 1)
+
+            // And add the position to the orderedStructurePlans
+
+            structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+        }
+
+        // Get the last pos in the path
+
+        const lastPos = path[0]
+
+        // If it is defined
+
+        if (lastPos) {
+
+            // Record the pos in roadCM
+
+            roadCM.set(lastPos.x, lastPos.y, 1)
+
+            // Plan for a road at pos
+
+            structurePlans.set(lastPos.x, lastPos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+
+            rampartPlans.set(lastPos.x, lastPos.y, 1)
+        }
+    }
+
+    // Inform true
+
+    return true
 }

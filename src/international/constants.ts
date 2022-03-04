@@ -72,6 +72,8 @@ interface Constants {
 
     structureTypesByNumber: {[key: string]: number}
 
+    numbersByStructureTypes: {[key: string]: BuildableStructureConstant | 'empty'}
+
     stamps: Stamps
 
     styleForStructureTypes: {[key: string]: CircleStyle}
@@ -289,6 +291,26 @@ constants.structureTypesByNumber = {
     nuker: 15,
     observer: 16,
     empty: 17,
+}
+
+constants.numbersByStructureTypes = {
+    1: STRUCTURE_SPAWN,
+    2: STRUCTURE_EXTENSION,
+    3: STRUCTURE_CONTAINER,
+    4: STRUCTURE_TOWER,
+    5: STRUCTURE_STORAGE,
+    6: STRUCTURE_ROAD,
+    7: STRUCTURE_WALL,
+    8: STRUCTURE_RAMPART,
+    9: STRUCTURE_TERMINAL,
+    10: STRUCTURE_EXTRACTOR,
+    11: STRUCTURE_LINK,
+    12: STRUCTURE_LAB,
+    13: STRUCTURE_FACTORY,
+    14: STRUCTURE_POWER_SPAWN,
+    15: STRUCTURE_NUKER,
+    16: STRUCTURE_OBSERVER,
+    17: 'empty',
 }
 
 constants.stamps = {

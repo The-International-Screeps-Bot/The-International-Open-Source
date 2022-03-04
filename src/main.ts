@@ -86,6 +86,9 @@ declare global {
     type RoomObjectName =
     'terrainCM' |
     'baseCM' |
+    'roadCM' |
+    'structurePlans' |
+    'rampartPlans' |
     'anchor' |
     'mineral' |
     'source1' |
@@ -169,7 +172,7 @@ declare global {
         requiredValue: number
         initialWeight?: number
         adjacentToRoads?: boolean
-        roadsCM?: CostMatrix
+        roadCM?: CostMatrix
     }
 
     interface MoveRequestOpts extends PathOpts {
@@ -497,7 +500,7 @@ declare global {
         /**
          * Groups positions with contigiousness, structured similarily to a flood fill
          */
-        groupPositions(positions: Pos[]): Pos[][]
+        groupRampartPositions(rampartPositions: Pos[]): Pos[][]
 
         findPositionsInsideRect(rect: Rect): RoomPosition[]
     }

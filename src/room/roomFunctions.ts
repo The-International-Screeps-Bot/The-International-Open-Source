@@ -161,6 +161,39 @@ Room.prototype.get = function(roomObjectName) {
         valueConstructor: generateBaseCM
     })
 
+    // roadCM
+
+    new RoomObject({
+        name: 'roadCM',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: () => { return new PathFinder.CostMatrix() }
+    })
+
+    // structurePlans
+
+    new RoomObject({
+        name: 'structurePlans',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: () => { return new PathFinder.CostMatrix() }
+    })
+
+    // rampartPlans
+
+    new RoomObject({
+        name: 'rampartPlans',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: () => { return new PathFinder.CostMatrix() }
+    })
+
     // Resources
 
     // Mineral
@@ -1994,7 +2027,7 @@ Room.prototype.findClosestPosOfValue = function(opts) {
 
                 // If the adjacentPos isn't a roadPosition, iterate
 
-                if (opts.roadsCM.get(adjacentPos.x, adjacentPos.y) != 1) continue
+                if (opts.roadCM.get(adjacentPos.x, adjacentPos.y) != 1) continue
 
                 // Otherwise set nearbyRoad to true and stop the loop
 
@@ -2212,21 +2245,17 @@ Room.prototype.findRepairTargets = function(workPartCount, excludedIDs = new Set
     })
 }
 
-Room.prototype.groupPositions = function(positions) {
+Room.prototype.groupRampartPositions = function(rampartPositions) {
 
     const room = this
 
-    // Construct a costMatrix to store position locations
+    // Get base planning data
 
-    const positionsCM = new PathFinder.CostMatrix()
-
-    // Loop through each pos of positions, and record the pos in the positionsCM
-
-    for (const pos of positions) positionsCM.set(pos.x, pos.y, 1)
+    const rampartPlans: CostMatrix = room.get('rampartPlans'),
 
     // Construct a costMatrix to store visited positions
 
-    const visitedCM = new PathFinder.CostMatrix(),
+    visitedCM = new PathFinder.CostMatrix(),
 
     // Construct storage of position groups
 
@@ -2238,7 +2267,7 @@ Room.prototype.groupPositions = function(positions) {
 
     // Loop through each pos of positions
 
-    for (const pos of positions) {
+    for (const pos of rampartPositions) {
 
         // If the pos has already been visited, iterate
 
@@ -2295,6 +2324,13 @@ Room.prototype.groupPositions = function(positions) {
 
                 for (const adjacentPos of adjacentPositions) {
 
+                    // Iterate if adjacentPos is out of room bounds
+
+                    if (adjacentPos.x <= 0 ||
+                        adjacentPos.x >= constants.roomDimensions ||
+                        adjacentPos.y <= 0 ||
+                        adjacentPos.y >= constants.roomDimensions) continue
+
                     // Iterate if the adjacent pos has been visited or isn't a tile
 
                     if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
@@ -2303,18 +2339,14 @@ Room.prototype.groupPositions = function(positions) {
 
                     visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
 
-                    // Filter for given positions like adjacentPos
+                    // If a rampart is not planned for this position, iterate
 
-                    const positionsLikeThis = positions.filter(pos => generalFuncs.arePositionsEqual(pos, adjacentPos))
-
-                    // Iterate if there are no positionsLikeThis
-
-                    if (!positionsLikeThis.length) continue
+                    if (rampartPlans.get(adjacentPos.x, adjacentPos.y) != 1) continue
 
                     // Add it to the next gen and this group
 
                     nextGeneration.push(adjacentPos)
-                    groupedPositions[groupIndex].push(room.newPos(adjacentPos))
+                    groupedPositions[groupIndex].push(new RoomPosition(adjacentPos.x, adjacentPos.y, room.name))
                 }
             }
 
