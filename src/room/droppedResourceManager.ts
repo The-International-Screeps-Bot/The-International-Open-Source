@@ -12,6 +12,14 @@ export function droppedResourceManager(room: Room) {
 
     for (const droppedResource of droppedResources) {
 
+        // Construct an undefined taskWithoutResponder
+
+        let taskWithoutResponder: RoomPickupTask,
+
+        // Construct totalResourcesOffered at 0
+
+        totalResourcesOffered = 0
+
         // if there is no global for the droppedResource, make one
 
         if (!global[droppedResource.id]) global[droppedResource.id] = {}
@@ -28,10 +36,6 @@ export function droppedResourceManager(room: Room) {
 
             const droppedResourcePickupTasks: RoomPickupTask[] = room.findTasksOfTypes(global[droppedResource.id].createdTaskIDs, new Set(['pickup'])) as RoomPickupTask[]
 
-            // Track the amount of energy the resource has offered in tasks
-
-            let totalResourcesOffered = 0
-
             // Loop through each pickup task
 
             for (const task of droppedResourcePickupTasks) {
@@ -39,6 +43,10 @@ export function droppedResourceManager(room: Room) {
                 // Otherwise find how many resources the task has requested to pick up
 
                 totalResourcesOffered += task.pickupAmount
+
+                // If the task doesn't have a responder, set it as taskWithoutResponder
+
+                if (!task.responderID) taskWithoutResponder = task
             }
 
             // If there are more or equal resources offered than the droppedResource has in amount, iterate
@@ -46,8 +54,25 @@ export function droppedResourceManager(room: Room) {
             if (totalResourcesOffered >= droppedResource.amount) continue
         }
 
+        // Assign amountToOffer as the energy left not assigned to tasks
+
+        const amountToOffer = droppedResource.amount - totalResourcesOffered
+
+        // If there is a taskWithoutResponder
+
+        if (taskWithoutResponder) {
+
+            // Set the pickupAmount to match amountToOffer
+
+            taskWithoutResponder.pickupAmount = amountToOffer
+
+            // Update the task's priority to match new amountToOffer
+
+            taskWithoutResponder.priority = Math.max(amountToOffer * 0.002, 1)
+        }
+
         // Create a pickup task for the droppedResource
 
-        new RoomPickupTask(room.name, droppedResource.id, droppedResource.resourceType, droppedResource.amount * 0.005)
+        new RoomPickupTask(room.name, droppedResource.id, droppedResource.resourceType, amountToOffer, Math.max(amountToOffer * 0.002, 1))
     }
 }
