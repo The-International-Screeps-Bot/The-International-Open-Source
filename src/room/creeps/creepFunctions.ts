@@ -990,7 +990,7 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
 
             // Iterate if the creep is full
 
-            if (creep.store.getFreeCapacity() == 0) continue
+            if (creep.store.getUsedCapacity() == 0) continue
 
             // Otherwise adjust the task's resource minimized to the creep's free capacity
 
@@ -1020,7 +1020,7 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
         // Accept the task and stop the loop
 
         creep.acceptTask(task)
-        break
+        return true
     }
 
     // Say and inform that the creep found no task
