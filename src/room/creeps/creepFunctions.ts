@@ -887,8 +887,12 @@ Creep.prototype.createMoveRequest = function(opts) {
 
 Creep.prototype.acceptTask = function(task) {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room
+
+    // If visuals are enabled, show the task acception
+
+    if (Memory.roomVisuals) room.visual.line(creep.pos, new RoomPosition(task.pos / 50, Math.floor(task.pos % 50), room.name), { color: constants.colors.lightBlue, width: 0.3 })
 
     // if there is no global for the creep, make one
 
@@ -917,16 +921,29 @@ Creep.prototype.acceptTask = function(task) {
 
 Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_ENERGY) {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room
+
+    // Show the creep is searching for a task
 
     creep.say('🔍')
 
-    // Iterate through taskIDs in room
+    // Get the room's tasks without responders
 
-    for (const taskID in global[room.name].tasksWithoutResponders) {
+    const tasks: Record<number, RoomTask> = global[room.name].tasksWithoutResponders,
 
-        const task: RoomTask = global[room.name].tasksWithoutResponders[taskID]
+    // Convert tasks to an array, then Sort it based on priority and range from the creep
+
+    tasksByPreference = Object.values(tasks).sort(function(a, b) {
+
+        // Inform a's range from the creep - priority - b's range from the creep - priority
+
+        return (generalFuncs.getRangeBetween(a.pos / 50, Math.floor(a.pos % 50), creep.pos.x,  creep.pos.y) - a.priority * 5) - (generalFuncs.getRangeBetween(b.pos / 50, Math.floor(b.pos % 50), creep.pos.x,  creep.pos.y) - b.priority * 5)
+    })
+
+    // Iterate through tasks of tasksByPreference
+
+    for (const task of tasksByPreference) {
 
         // Iterate if the task's type isn't an allowedTaskType
 

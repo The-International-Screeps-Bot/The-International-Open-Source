@@ -58,7 +58,7 @@ export function structuresForSpawningManager(room: Room) {
 
             // Create a new transfer task for the structure
 
-            new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, structure.id, 0)
+            new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, structure.id, 10)
         }
     }
 }

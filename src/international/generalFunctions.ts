@@ -57,6 +57,15 @@ interface GeneralFunctions {
      * Finds a position equally between two positions
      */
     findAvgBetweenPosotions(pos1: Pos, pos2: Pos): Pos
+
+    /**
+     * Gets the range between two positions' x and y
+     * @param x1 the first position's x
+     * @param y1 the first position's y
+     * @param x2 the second position's x
+     * @param y2 the second position's y
+     */
+    getRangeBetween(x1: number, y1: number, x2: number, y2: number): number
 }
 
 export const generalFuncs: Partial<GeneralFunctions> = {}
@@ -195,4 +204,16 @@ generalFuncs.findAvgBetweenPosotions = function(pos1, pos2) {
         x: Math.floor((pos1.x + pos2.x) / 2),
         y: Math.floor((pos1.y + pos2.y) / 2),
     }
+}
+
+generalFuncs.getRangeBetween = function(x1, y1, x2, y2) {
+
+    // Find the difference between the positions' axis
+
+    const xDifference = x1 - x2,
+    yDifference = y1 - y2
+
+    // Find the range using pythagorus through the axis differences
+
+    return Math.sqrt(xDifference * xDifference + yDifference * yDifference)
 }

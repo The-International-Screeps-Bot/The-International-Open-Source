@@ -41,7 +41,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
         // If there are no pull tasks for the creep, make one for the creep's harvestPos
 
-        if (creepsPullTasks.length == 0) new RoomPullTask(room.name, creep.id, room.newPos(creep.memory.harvestPos), 0)
+        if (creepsPullTasks.length == 0) new RoomPullTask(room.name, creep.id, room.newPos(creep.memory.harvestPos), 1)
 
         // Inform false
 

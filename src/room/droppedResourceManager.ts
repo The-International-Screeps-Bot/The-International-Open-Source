@@ -48,6 +48,6 @@ export function droppedResourceManager(room: Room) {
 
         // Create a pickup task for the droppedResource
 
-        new RoomPickupTask(room.name, droppedResource.id, droppedResource.resourceType, 10 - droppedResource.amount * (droppedResource.amount * 0.2))
+        new RoomPickupTask(room.name, droppedResource.id, droppedResource.resourceType, droppedResource.amount * 0.005)
     }
 }

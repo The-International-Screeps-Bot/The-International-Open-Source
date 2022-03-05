@@ -8,6 +8,10 @@ import { rampartPlanner } from "./rampartPlanner"
  */
 export function constructionManager(room: Room) {
 
+    // If CPU logging is enabled, get the CPU used at the start
+
+    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+
     // If the construction site count is at its limit, stop
 
     if (global.constructionSitesCount == 100) return
@@ -224,4 +228,8 @@ export function constructionManager(room: Room) {
 
         if (Memory.roomVisuals) room.visual.connectRoads()
     }
+
+    // If CPU logging is enabled, log the CPU used by this manager
+
+    if (Memory.cpuLogging) generalFuncs.customLog('Construction Manager', 'CPU: ' + (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
 }

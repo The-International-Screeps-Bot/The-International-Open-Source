@@ -17,10 +17,16 @@ export interface RoomTask {
      * The resourceType relating to the task's request
      */
     resourceType?: ResourceConstant
+
     /**
-     * A metric for responders to understand the importance of this task, starting at 0 as most important
+     * a packed position (x *50 + y) to provide a location basis for the task
      */
-    priority?: number
+    pos: number
+
+    /**
+     * A metric for responders to understand the importance of this task, starting with Infinity as most important
+     */
+    priority: number
 
     // Functions
 
@@ -41,7 +47,7 @@ export interface RoomTask {
 }
 
 export class RoomTask {
-    constructor(type: RoomTaskTypes, creatorID: string, roomName: string) {
+    constructor(type: RoomTaskTypes, creatorID: Id<any>, roomName: string) {
 
         const task = this
         generalFuncs.customLog('Created Task', 'Type: ' + type + ', creatorID: ' + creatorID)
@@ -70,6 +76,14 @@ export class RoomTask {
         // Record the task in the room with the requested roomName
 
         global[roomName].tasksWithoutResponders[task.ID] = task
+
+        // Get the task creator and its position
+
+        const taskCreatorPos: RoomPosition = generalFuncs.findObjectWithID(creatorID).pos
+
+        // Construct the task's position based on a formatted taskCreatorPos
+
+        task.pos = taskCreatorPos.x * 50 + taskCreatorPos.y
     }
 }
 
