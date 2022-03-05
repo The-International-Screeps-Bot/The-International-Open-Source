@@ -42,8 +42,7 @@ Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENER
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
-            },
-            weightCostMatrixes: [room.get('usedUpgradePositions')]
+            }
         })
         return false
     }

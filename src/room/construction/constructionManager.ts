@@ -168,7 +168,7 @@ export function constructionManager(room: Room) {
 
                 // If the structureType is a road and RCL 3 extensions aren't built, iterate
 
-                if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable >= 800) continue
+                if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue
 
                 // Display visuals if enabled
 

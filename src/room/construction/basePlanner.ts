@@ -12,7 +12,6 @@ export function basePlanner(room: Room) {
     const baseCM: CostMatrix = room.get('baseCM'),
     roadCM: CostMatrix = room.get('roadCM'),
     structurePlans: CostMatrix = room.get('structurePlans'),
-    orderedStructurePlans: OrderedStructurePlans = [],
     stampAnchors: StampAnchors = {}
 
     function recordAdjacentPositions(x: number, y: number, range: number, weight?: number) {
@@ -124,12 +123,6 @@ export function basePlanner(room: Room) {
 
                 // Plan for the structureType at this position
 
-                orderedStructurePlans.push({
-                    structureType: structureType as BuildableStructureConstant,
-                    x,
-                    y
-                })
-
                 structurePlans.set(x, y, constants.structureTypesByNumber[structureType])
 
                 // If the structureType is a road
@@ -240,12 +233,6 @@ export function basePlanner(room: Room) {
 
             // Plan for a road at this position
 
-            orderedStructurePlans.push({
-                structureType: STRUCTURE_ROAD,
-                x: pos.x,
-                y: pos.y
-            })
-
             structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
         }
     }
@@ -281,12 +268,6 @@ export function basePlanner(room: Room) {
 
         // Plan for a road at this position
 
-        orderedStructurePlans.push({
-            structureType: STRUCTURE_ROAD,
-            x: pos.x,
-            y: pos.y
-        })
-
         structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
     }
 
@@ -307,12 +288,6 @@ export function basePlanner(room: Room) {
         roadCM.set(pos.x, pos.y, 1)
 
         // Plan for a road at this position
-
-        orderedStructurePlans.push({
-            structureType: STRUCTURE_ROAD,
-            x: pos.x,
-            y: pos.y
-        })
 
         structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
     }
@@ -343,12 +318,6 @@ export function basePlanner(room: Room) {
 
             // Plan for a road at this position
 
-            orderedStructurePlans.push({
-                structureType: STRUCTURE_ROAD,
-                x: pos.x,
-                y: pos.y
-            })
-
             structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
         }
 
@@ -369,12 +338,6 @@ export function basePlanner(room: Room) {
             roadCM.set(pos.x, pos.y, 1)
 
             // Plan for a road at this position
-
-            orderedStructurePlans.push({
-                structureType: STRUCTURE_ROAD,
-                x: pos.x,
-                y: pos.y
-            })
 
             structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
         }
@@ -398,12 +361,6 @@ export function basePlanner(room: Room) {
 
         // Plan for a road at this position
 
-        orderedStructurePlans.push({
-            structureType: STRUCTURE_ROAD,
-            x: pos.x,
-            y: pos.y
-        })
-
         structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
     }
 
@@ -424,12 +381,6 @@ export function basePlanner(room: Room) {
         roadCM.set(pos.x, pos.y, 1)
 
         // Plan for a road at this position
-
-        orderedStructurePlans.push({
-            structureType: STRUCTURE_ROAD,
-            x: pos.x,
-            y: pos.y
-        })
 
         structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
     }
@@ -503,7 +454,6 @@ export function basePlanner(room: Room) {
 
     // Record planning results in the room's global and inform true
 
-    global[room.name].orderedStructurePlans = orderedStructurePlans
     global[room.name].stampAnchors = stampAnchors
     global[room.name].planned = true
     return true

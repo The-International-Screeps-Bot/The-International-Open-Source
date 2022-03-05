@@ -509,6 +509,22 @@ export function rampartPlanner(room: Room) {
     // Protect it
 
     protectionRects.push({ x1: centerUpgradePos.x - 3, x2: centerUpgradePos.x + 3, y1: centerUpgradePos.y - 3, y2: centerUpgradePos.y + 3 })
+
+    // Get the source1ClosestHarvestPos
+
+    const source1ClosestHarvestPos: RoomPosition = room.get('source1ClosestHarvestPos')
+
+    // Protect it
+
+    protectionRects.push({ x1: source1ClosestHarvestPos.x, x2: source1ClosestHarvestPos.x, y1: source1ClosestHarvestPos.y, y2: source1ClosestHarvestPos.y })
+
+    // Get the source2ClosestHarvestPos
+
+    const source2ClosestHarvestPos: RoomPosition = room.get('source2ClosestHarvestPos')
+
+    // Protect it
+
+    protectionRects.push({ x1: source2ClosestHarvestPos.x, x2: source2ClosestHarvestPos.x, y1: source2ClosestHarvestPos.y, y2: source2ClosestHarvestPos.y })
 /*
     // Get the source1ClosestHarvestPos
 
@@ -555,8 +571,7 @@ export function rampartPlanner(room: Room) {
 
     // Get base planning data
 
-    const baseCM: CostMatrix = room.get('baseCM'),
-    roadCM: CostMatrix = room.get('roadCM'),
+    const roadCM: CostMatrix = room.get('roadCM'),
     structurePlans: CostMatrix = room.get('structurePlans'),
     rampartPlans: CostMatrix = room.get('rampartPlans')
 
@@ -596,7 +611,7 @@ export function rampartPlanner(room: Room) {
         const path = room.advancedFindPath({
             origin: cloestPosToAnchor,
             goal: { pos: hubAnchor, range: 2 },
-            weightCostMatrixes: [baseCM, roadCM]
+            weightCostMatrixes: [roadCM]
         })
 
         // Loop through positions of the path
@@ -607,7 +622,7 @@ export function rampartPlanner(room: Room) {
 
             roadCM.set(pos.x, pos.y, 1)
 
-            // And add the position to the orderedStructurePlans
+            // And add the position to the structurePlans
 
             structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
         }

@@ -442,7 +442,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [CARRY],
                 extraParts: [WORK, MOVE, WORK, WORK, WORK],
-                partsMultiplier: 4,
+                partsMultiplier: room.find(FIND_MY_CONSTRUCTION_SITES).length ? 1 : 4,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 200,
@@ -456,7 +456,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier: 3,
+            partsMultiplier: room.find(FIND_MY_CONSTRUCTION_SITES).length ? 1 : 3,
             minCreeps: undefined,
             maxCreeps: Infinity,
             minCost: 250,

@@ -495,6 +495,11 @@ declare global {
         groupRampartPositions(rampartPositions: Pos[]): RoomPosition[][]
 
         findPositionsInsideRect(rect: Rect): RoomPosition[]
+
+        /**
+         * 
+         */
+        advancedConstructStructurePlans(): void
     }
 
     interface RoomMemory {
