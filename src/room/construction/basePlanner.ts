@@ -505,5 +505,6 @@ export function basePlanner(room: Room) {
 
     global[room.name].orderedStructurePlans = orderedStructurePlans
     global[room.name].stampAnchors = stampAnchors
+    global[room.name].planned = true
     return true
 }

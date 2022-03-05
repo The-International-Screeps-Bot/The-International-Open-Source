@@ -42,7 +42,8 @@ Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENER
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
-            }
+            },
+            weightCostMatrixes: [room.get('usedUpgradePositions')]
         })
         return false
     }
@@ -165,9 +166,10 @@ Creep.prototype.advancedUpgradeController = function() {
 
             const upgradePositions: RoomPosition[] = room.get('upgradePositions'),
 
-            // Get usedUpgradePositions
+            // Get usedUpgradePositions, informing false if they're undefined
 
             usedUpgradePositions: CostMatrix = room.get('usedUpgradePositions')
+            if (!usedUpgradePositions) return false
 
             // Loop through each upgradePositions
 
@@ -411,6 +413,8 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
     // If the cSite is out of build range
 
     if (creep.pos.getRangeTo(cSite.pos) > 3) {
+
+        creep.say('➡️CS')
 
         // Make a move request to it
 

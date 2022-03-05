@@ -12,13 +12,18 @@ export function constructionManager(room: Room) {
 
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    // If the construction site count is at its limit, stop
+    // If the room has been planned for this global
 
-    if (global.constructionSitesCount == 100) return
+    if (global[room.name].planned) {
 
-    // If the room is above 1 construction site, stop
+        // If the construction site count is at its limit, stop
 
-    if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
+        if (global.constructionSitesCount == 100) return
+
+        // If the room is above 1 construction site, stop
+
+        if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
+    }
 
     // Stop if placing containers was a success
 
@@ -161,9 +166,9 @@ export function constructionManager(room: Room) {
 
                 if (structureType == 'empty') continue
 
-                // If the structureType is a road and there are no towers, iterate
+                // If the structureType is a road and RCL 3 extensions aren't built, iterate
 
-                if (structureType == STRUCTURE_ROAD && !room.get('tower').length) continue
+                if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable >= 800) continue
 
                 // Display visuals if enabled
 
@@ -188,7 +193,7 @@ export function constructionManager(room: Room) {
 
         // Stop if there is no storage and no terminal
 
-        if (!room.get('storage') && !room.get('terminal')) return
+        if (!room.storage && !room.terminal) return
 
         // If ramparts are not yet planned
 

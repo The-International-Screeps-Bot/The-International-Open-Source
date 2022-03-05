@@ -406,7 +406,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [],
                 extraParts: [CARRY, CARRY, MOVE],
-                partsMultiplier: 18,
+                partsMultiplier: 14,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 150,
@@ -564,7 +564,7 @@ export function spawnRequester(room: Room) {
             partsMultiplier: 2,
             minCreeps: 2,
             maxCreeps: Infinity,
-            minCost: 50,
+            minCost: 100,
             priority: 2,
             memoryAdditions: {
                 role: 'scout',

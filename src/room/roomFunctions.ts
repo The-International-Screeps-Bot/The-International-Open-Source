@@ -741,14 +741,22 @@ Room.prototype.get = function(roomObjectName) {
             usedUpgradePositions.set(centerUpgadePos.x, centerUpgadePos.y, 255)
         }
 
-        // Get the hubAnchor and upgradePositions
+        // Get the hubAnchor, informing false if it's not defined
 
-        const hubAnchor: RoomPosition = global[room.name].stampAnchors.hub[0],
-        upgradePositions: RoomPosition[] = room.roomObjects.upgradePositions.getValue(),
+        const hubAnchor: RoomPosition = global[room.name].stampAnchors?.hub[0]
+        if (!hubAnchor) return false
 
-        // Get the closest pos of the upgradePositions by range to the anchor and mark it as avoid in usedUpgradePositions
+        // Get the upgradePositions, informing false if they're undefined
 
-        closestUpgradePos = hubAnchor.findClosestByRange(upgradePositions)
+        const upgradePositions: RoomPosition[] = room.roomObjects.upgradePositions.getValue()
+        if (!upgradePositions.length) return false
+
+        // Get the closest pos of the upgradePositions by range to the anchor
+
+        const closestUpgradePos = hubAnchor.findClosestByRange(upgradePositions)
+
+        // Assign closestUpgradePos in usedUpgradePositions
+
         usedUpgradePositions.set(closestUpgradePos.x, closestUpgradePos.y, 255)
 
         // Loop through each controllerUpgrader's name in the room
@@ -1276,9 +1284,9 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                             for (const weightCM of opts.weightCostMatrixes) {
 
-                                // Assign the weightCM's value of this pos to the cm's value
+                                // If weightCM is defined, assign the weightCM's value of this pos to the cm's value
 
-                                cm.set(x, y, weightCM.get(x, y))
+                                if (weightCM) cm.set(x, y, weightCM.get(x, y))
                             }
                         }
                     }
