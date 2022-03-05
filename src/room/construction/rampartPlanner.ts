@@ -577,11 +577,11 @@ export function rampartPlanner(room: Room) {
 
     // Group rampart positions
 
-    const groupedRampartPositions = room.groupRampartPositions(rampartPositions)
+    const groupedRampartPositions = room.groupRampartPositions(rampartPositions),
 
-    // Get the hubAnchor after converting it to a roomPosition
+    // Get the hubAnchor
 
-    const hubAnchor = global[room.name].stampAnchors.hub[0]
+    hubAnchor: RoomPosition = global[room.name].stampAnchors.hub[0]
 
     // Loop through each group
 

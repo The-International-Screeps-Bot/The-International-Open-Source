@@ -13,8 +13,6 @@ import { constants } from "international/constants"
 
 export function communeManager(room: Room) {
 
-    room.findSourceHarvesterInfo()
-
     taskManager(room)
 
     towerManager(room)

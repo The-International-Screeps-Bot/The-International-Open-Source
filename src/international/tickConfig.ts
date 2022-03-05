@@ -108,7 +108,5 @@ export function tickConfig() {
         if (!global[room.name].tasksWithResponders) global[room.name].tasksWithResponders = {}
 
         room.storedResources = {}
-
-        room.usedHarvestPositions = new PathFinder.CostMatrix()
     }
 }

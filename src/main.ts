@@ -118,6 +118,8 @@ declare global {
     'source2Link' |
     'source1Container' |
     'source2Container' |
+    'usedHarvestPositions' |
+    'usedUpgradePositions' |
     'structuresForSpawning' |
     'notMyCreeps' |
     'enemyCreeps' |
@@ -356,11 +358,6 @@ declare global {
         creepsFromRoomAmount: number
 
         /**
-         * A CostMatrix of harvest positions reserved by creeps
-         */
-        usedHarvestPositions: CostMatrix
-
-        /**
          * Tasks that currently have a creep trying to fulfill them
          */
         tasksWithResponders: {[key: string]: RoomTask}
@@ -488,11 +485,6 @@ declare global {
         findSourceHarvesterInfo(): void
 
         /**
-         * Finds and records a room's usedHarvestPositions
-         */
-        findUsedHarvestPositions(): void
-
-        /**
          * Finds targets to repair given work part counts and target IDs to avoid
          */
         findRepairTargets(workPartCount: number, excludedIDs?: Set<Id<Structure>>): (StructureRoad | StructureContainer)[]
@@ -500,7 +492,7 @@ declare global {
         /**
          * Groups positions with contigiousness, structured similarily to a flood fill
          */
-        groupRampartPositions(rampartPositions: Pos[]): Pos[][]
+        groupRampartPositions(rampartPositions: Pos[]): RoomPosition[][]
 
         findPositionsInsideRect(rect: Rect): RoomPosition[]
     }
@@ -678,9 +670,14 @@ declare global {
         sourceName: 'source1' | 'source2'
 
         /**
-         *
+         * The creep's harvestPos
          */
         harvestPos: Pos
+
+        /**
+         * The creep's packed upgrade pos
+         */
+        packedUpgradePos: number
 
         /**
          * The last time a path was cached in memory

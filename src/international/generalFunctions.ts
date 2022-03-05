@@ -215,5 +215,5 @@ generalFuncs.getRangeBetween = function(x1, y1, x2, y2) {
 
     // Find the range using pythagorus through the axis differences
 
-    return Math.sqrt(xDifference * xDifference + yDifference * yDifference)
+    return Math.floor(Math.sqrt(xDifference * xDifference + yDifference * yDifference))
 }

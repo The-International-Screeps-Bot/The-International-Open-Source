@@ -157,15 +157,44 @@ Creep.prototype.advancedUpgradeController = function() {
 
     if (controllerContainer) {
 
-        // If the controllerContainer is out of upgrade range
+        // if the creep doesn't have an upgrade pos
 
-        if (creep.pos.getRangeTo(controllerContainer.pos) > 1) {
+        if (!creep.memory.packedUpgradePos) {
+
+            // Get upgrade positions
+
+            const upgradePositions: RoomPosition[] = room.get('upgradePositions'),
+
+            // Get usedUpgradePositions
+
+            usedUpgradePositions: CostMatrix = room.get('usedUpgradePositions')
+
+            // Loop through each upgradePositions
+
+            for (const pos of upgradePositions) {
+
+                // Iterate if the pos is to avoid
+
+                if (usedUpgradePositions.get(pos.x, pos.y) == 255) continue
+
+                // Otherwise record the pos as packedUpgradePos in the creep's memory and stop
+
+                creep.memory.packedUpgradePos = pos.x * 50 + pos.y
+                break
+            }
+        }
+
+        // If the packedUpgradePos is out of range
+
+        if (generalFuncs.getRangeBetween(creep.pos.x, creep.pos.y, creep.memory.packedUpgradePos / 50, Math.floor(creep.memory.packedUpgradePos % 50)) > 0) {
+
+            creep.say('➡️UP')
 
             // Make a move request to it
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: controllerContainer.pos, range: 1 },
+                goal: { pos: new RoomPosition(creep.memory.packedUpgradePos / 50, Math.floor(creep.memory.packedUpgradePos % 50), room.name), range: 0 },
                 avoidImpassibleStructures: true,
                 avoidEnemyRanges: true,
                 weightGamebjects: {
@@ -188,9 +217,36 @@ Creep.prototype.advancedUpgradeController = function() {
 
         if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount) {
 
-            // Withdraw from the controllerContainer
+            // Withdraw from the controllerContainer, informing false if the withdraw failed
 
-            creep.withdraw(controllerContainer, RESOURCE_ENERGY)
+            if (creep.withdraw(controllerContainer, RESOURCE_ENERGY) != OK) return false
+        }
+
+        // If the controller is in need of repair
+
+        if (controllerContainer.hitsMax - controllerContainer.hits >= workPartCount * REPAIR_POWER * room.creepsFromRoom.controllerUpgrader.length) {
+
+            // Try to repair the controllerContainer
+
+            const repairResult = creep.repair(controllerContainer)
+
+            // If the repair worked
+
+            if (repairResult == OK) {
+
+                // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
+
+                const energySpentOnRepairs = Math.min(workPartCount, (controllerContainer.hitsMax - controllerContainer.hits) / REPAIR_POWER)
+
+                // Add control points to total controlPoints counter and say the success
+
+                Memory.energySpentOnRepairing += energySpentOnRepairs
+                creep.say('🔧' + energySpentOnRepairs * REPAIR_POWER)
+
+                // And inform true
+
+                return true
+            }
         }
 
         // Try to upgrade the controller, and if the result is a success
@@ -609,6 +665,10 @@ Creep.prototype.findOptimalSourceName = function() {
     const anchor = room.get('anchor')
     if (!anchor) return false
 
+    // Query usedHarvestPositions to get creepsOfSourceAmount
+
+    room.get('usedHarvestPositions')
+
     // Otherwise, define source names
 
     const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
@@ -647,8 +707,8 @@ Creep.prototype.findOptimalSourceName = function() {
 
 Creep.prototype.findHarvestPosition = function() {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room
 
     // Stop if the creep already has a harvestPos
 
@@ -656,15 +716,19 @@ Creep.prototype.findHarvestPosition = function() {
 
     // Otherwise define the creep's designated source
 
-    const sourceName = creep.memory.sourceName
+    const sourceName = creep.memory.sourceName,
 
     // Get the closestHarvestPos for the creep's source
 
-    const closestHarvestPos: Pos = room.get(`${sourceName}ClosestHarvestPos`)
+    closestHarvestPos: Pos = room.get(`${sourceName}ClosestHarvestPos`),
+
+    // Get usedHarvestPositions
+
+    usedHarvestPositions: CostMatrix = room.get('usedHarvestPositions')
 
     // If the closestHarvestPos isn't used, set it as the harvestPos
 
-    if (room.usedHarvestPositions.get(closestHarvestPos.x, closestHarvestPos.y) != 255) {
+    if (usedHarvestPositions.get(closestHarvestPos.x, closestHarvestPos.y) != 255) {
 
         // Set it as the harvestPos and inform true
 
@@ -682,7 +746,7 @@ Creep.prototype.findHarvestPosition = function() {
 
         // If the harvestPos isn't used
 
-        if (room.usedHarvestPositions.get(harvestPos.x, harvestPos.y) != 255) {
+        if (usedHarvestPositions.get(harvestPos.x, harvestPos.y) != 255) {
 
             // Set it as the harvestPos and inform true
 

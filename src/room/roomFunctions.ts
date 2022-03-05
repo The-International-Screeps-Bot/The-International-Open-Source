@@ -1,5 +1,6 @@
 import { constants } from 'international/constants'
 import { generalFuncs } from 'international/generalFunctions'
+import { ControllerUpgrader, SourceHarvester } from './creeps/creepClasses'
 import { RoomObject } from './roomObject'
 import { RoomTask } from './roomTasks'
 
@@ -667,6 +668,119 @@ Room.prototype.get = function(roomObjectName) {
 
             return findSourceContainer(room.roomObjects.source2ClosestHarvestPos.getValue())
         }
+    })
+
+    // usedHarvestPositions
+
+    function findUsedHarvestPositions() {
+
+        // Construct usedHarvestPositions
+
+        const usedHarvestPositions = new PathFinder.CostMatrix()
+
+        // Loop through each sourceHarvester's name in the room
+
+        for (const creepName of room.myCreeps.sourceHarvester) {
+
+            // Get the creep using its name
+
+            const creep: SourceHarvester = Game.creeps[creepName]
+
+            // Get the creep's sourceName, if there is none iterate
+
+            const sourceName = creep.memory.sourceName
+            if (!sourceName) continue
+
+            // Record that the creep has this sourceName in creepsOfSouceAmount
+
+            room.creepsOfSourceAmount[sourceName]++
+
+            // Get the creep's harvestPos, if not defined iterate
+
+            const harvestPos = creep.memory.harvestPos
+            if (!harvestPos) continue
+
+            // Record the harvestPos in usedHarvestPositions
+
+            usedHarvestPositions.set(harvestPos.x, harvestPos.y, 255)
+        }
+
+        // Inform usedHarvestPositions
+
+        return usedHarvestPositions
+    }
+
+    new RoomObject({
+        name: 'usedHarvestPositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 1,
+        room,
+        valueConstructor: findUsedHarvestPositions
+    })
+
+    // usedUpgradePositions
+
+    function findUsedUpgradePositions() {
+
+        // Construct usedUpgradePositions
+
+        const usedUpgradePositions = new PathFinder.CostMatrix(),
+
+        // Get the controllerContainer
+
+        controllerContainer: StructureContainer = room.roomObjects.controllerContainer.getValue()
+
+        // If there is no controllerContainer
+
+        if (!controllerContainer) {
+
+            // Get the centerUpgradePos and set it as avoid in usedUpgradePositions
+
+            const centerUpgadePos = room.roomObjects.centerUpgradePos.getValue()
+            usedUpgradePositions.set(centerUpgadePos.x, centerUpgadePos.y, 255)
+        }
+
+        // Get the hubAnchor and upgradePositions
+
+        const hubAnchor: RoomPosition = global[room.name].stampAnchors.hub[0],
+        upgradePositions: RoomPosition[] = room.roomObjects.upgradePositions.getValue(),
+
+        // Get the closest pos of the upgradePositions by range to the anchor and mark it as avoid in usedUpgradePositions
+
+        closestUpgradePos = hubAnchor.findClosestByRange(upgradePositions)
+        usedUpgradePositions.set(closestUpgradePos.x, closestUpgradePos.y, 255)
+
+        // Loop through each controllerUpgrader's name in the room
+
+        for (const creepName of room.myCreeps.controllerUpgrader) {
+
+            // Get the creep using its name
+
+            const creep: ControllerUpgrader = Game.creeps[creepName]
+
+            // Get the creep's upgradePos, if not defined iterate
+
+            const upgradePos = creep.memory.upgradePos
+            if (!upgradePos) continue
+
+            // Record the upgradePos in usedUpgradePositions
+
+            usedUpgradePositions.set(upgradePos / 50, Math.floor(upgradePos % 50), 255)
+        }
+
+        // Inform usedUpgradePositions
+
+        return usedUpgradePositions
+    }
+
+    new RoomObject({
+        name: 'usedUpgradePositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 1,
+        room,
+        valueConstructor: findUsedUpgradePositions
     })
 
     // controllerContainer
@@ -2167,60 +2281,6 @@ Room.prototype.findCSiteTargetID = function(creep) {
     // If no cSiteTarget was found, inform false
 
     return false
-}
-
-Room.prototype.findUsedHarvestPositions = function() {
-
-    const room = this
-
-    // Loop through each sourceHarvester's name in the room
-
-    for (const creepName of room.myCreeps.sourceHarvester) {
-
-        // Get the creep using its name
-
-        const creep = Game.creeps[creepName]
-
-        // Get the creep's harvestPos
-
-        const harvestPos = creep.memory.harvestPos
-
-        // If the creep has a harvestPos, record it in usedHarvestPositions
-
-        if (harvestPos) room.usedHarvestPositions.set(harvestPos.x, harvestPos.y, 255)
-    }
-}
-
-Room.prototype.findSourceHarvesterInfo = function() {
-
-    const room = this
-
-    // Loop through each sourceHarvester's name in the room
-
-    for (const creepName of room.myCreeps.sourceHarvester) {
-
-        // Get the creep using its name
-
-        const creep = Game.creeps[creepName]
-
-        // Get the creep's sourceName, if there is none iterate
-
-        const sourceName = creep.memory.sourceName
-        if (!sourceName) continue
-
-        // Record that the creep has this sourceName in creepsOfSouceAmount
-
-        room.creepsOfSourceAmount[sourceName]++
-
-        // Get the creep's harvestPos, if not defined iterate
-
-        const harvestPos = creep.memory.harvestPos
-        if (!harvestPos) continue
-
-        // Record the harvestPos in usedHarvestPositions
-
-        room.usedHarvestPositions.set(harvestPos.x, harvestPos.y, 255)
-    }
 }
 
 Room.prototype.findRepairTargets = function(workPartCount, excludedIDs = new Set()) {
