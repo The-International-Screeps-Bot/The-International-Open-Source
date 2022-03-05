@@ -761,7 +761,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // Get the creep's upgradePos, if not defined iterate
 
-            const upgradePos = creep.memory.upgradePos
+            const upgradePos = creep.memory.packedUpgradePos
             if (!upgradePos) continue
 
             // Record the upgradePos in usedUpgradePositions

@@ -177,9 +177,10 @@ Creep.prototype.advancedUpgradeController = function() {
 
                 if (usedUpgradePositions.get(pos.x, pos.y) == 255) continue
 
-                // Otherwise record the pos as packedUpgradePos in the creep's memory and stop
+                // Otherwise record the pos as packedUpgradePos in the creep's memory, record the pos in usedUpgradePositions, and stop
 
                 creep.memory.packedUpgradePos = pos.x * 50 + pos.y
+                usedUpgradePositions.set(pos.x, pos.y, 255)
                 break
             }
         }
@@ -730,9 +731,10 @@ Creep.prototype.findHarvestPosition = function() {
 
     if (usedHarvestPositions.get(closestHarvestPos.x, closestHarvestPos.y) != 255) {
 
-        // Set it as the harvestPos and inform true
+        // Set it as the harvestPos, record in usedHarvestPositions, and inform true
 
         creep.memory.harvestPos = closestHarvestPos
+        usedHarvestPositions.set(closestHarvestPos.x, closestHarvestPos.y, 255)
         return true
     }
 
@@ -748,9 +750,10 @@ Creep.prototype.findHarvestPosition = function() {
 
         if (usedHarvestPositions.get(harvestPos.x, harvestPos.y) != 255) {
 
-            // Set it as the harvestPos and inform true
+            // Set it as the harvestPos, record in usedHarvestPositions, and inform true
 
             creep.memory.harvestPos = harvestPos
+            usedHarvestPositions.set(harvestPos.x, harvestPos.y, 255)
             return true
         }
     }

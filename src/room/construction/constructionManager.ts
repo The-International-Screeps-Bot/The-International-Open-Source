@@ -161,6 +161,10 @@ export function constructionManager(room: Room) {
 
                 if (structureType == 'empty') continue
 
+                // If the structureType is a road and there are no towers, iterate
+
+                if (structureType == STRUCTURE_ROAD && !room.get('tower').length) continue
+
                 // Display visuals if enabled
 
                 /* if (Memory.roomVisuals) room.visual.structure(x, y, structureType, {
