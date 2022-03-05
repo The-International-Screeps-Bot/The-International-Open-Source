@@ -14,6 +14,14 @@ export function structuresForSpawningManager(room: Room) {
 
     for (const structure of structuresForSpawning) {
 
+        // Construct an undefined taskWithoutResponder
+
+        let taskWithoutResponder: RoomTransferTask,
+
+        // Construct totalResourcesRequested at 0
+
+        totalResourcesRequested = 0
+
         // if there is no global for the structure, make one
 
         if (!global[structure.id]) global[structure.id] = {}
@@ -30,10 +38,6 @@ export function structuresForSpawningManager(room: Room) {
 
             const structuresTransferTasks = room.findTasksOfTypes(global[structure.id].createdTaskIDs, new Set(['transfer'])) as RoomTransferTask[]
 
-            // Track the amount of energy the resource has offered in tasks
-
-            let totalResourcesRequested = 0
-
             // Loop through each pickup task
 
             for (const task of structuresTransferTasks) {
@@ -41,6 +45,10 @@ export function structuresForSpawningManager(room: Room) {
                 // Otherwise find how many resources the task has requested to pick up
 
                 totalResourcesRequested += task.transferAmount
+
+                // If the task doesn't have a responder, set it as taskWithoutResponder
+
+                if (!task.responderID) taskWithoutResponder = task
             }
 
             // If there are more or equal resources offered than the free energy capacity of the structure, iterate
@@ -48,17 +56,29 @@ export function structuresForSpawningManager(room: Room) {
             if (totalResourcesRequested >= structure.store.getFreeCapacity(RESOURCE_ENERGY)) continue
         }
 
-        // Get the amount of energy the structure needs
+        // Assign amountToRequest as the energy left not assigned to tasks
 
-        const transferAmount = structure.store.getFreeCapacity(RESOURCE_ENERGY)
+        const amountToRequest = structure.store.getFreeCapacity(RESOURCE_ENERGY) - totalResourcesRequested
 
-        // If the transferAmount is more than 0
+        // If there is a taskWithoutResponder
 
-        if (transferAmount > 0) {
+        if (taskWithoutResponder) {
 
-            // Create a new transfer task for the structure
+            // Set the pickupAmount to match amountToRequest
 
-            new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, structure.id, 10)
+            taskWithoutResponder.transferAmount = amountToRequest
+
+            // Update the task's priority to match new amountToRequest
+
+            taskWithoutResponder.priority = 10
+
+            // And iterate
+
+            continue
         }
+
+        // Create a new transfer task for the structure
+
+        new RoomTransferTask(room.name, RESOURCE_ENERGY, amountToRequest, structure.id, 10)
     }
 }

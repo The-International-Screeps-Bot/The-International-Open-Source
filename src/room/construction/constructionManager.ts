@@ -210,9 +210,9 @@ export function constructionManager(room: Room) {
 
                 // Display visuals if enabled
 
-                if (Memory.roomVisuals) room.visual.structure(x, y, STRUCTURE_ROAD, {
+                /* if (Memory.roomVisuals) room.visual.structure(x, y, STRUCTURE_ROAD, {
                     opacity: 0.5
-                })
+                }) */
 
                 if (Memory.roomVisuals) room.visual.structure(x, y, STRUCTURE_RAMPART, {
                     opacity: 0.5
@@ -223,10 +223,6 @@ export function constructionManager(room: Room) {
                 room.createConstructionSite(x, y, STRUCTURE_ROAD)
             }
         }
-
-        // If visuals are enabled, connect road visuals
-
-        if (Memory.roomVisuals) room.visual.connectRoads()
     }
 
     // If CPU logging is enabled, log the CPU used by this manager

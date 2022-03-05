@@ -161,8 +161,6 @@ Creep.prototype.advancedUpgradeController = function() {
 
         if (creep.pos.getRangeTo(controllerContainer.pos) > 1) {
 
-            creep.say('MC')
-
             // Make a move request to it
 
             creep.createMoveRequest({
@@ -264,8 +262,6 @@ Creep.prototype.advancedUpgradeController = function() {
 
     if (creep.pos.getRangeTo(controller.pos) > 3) {
 
-        creep.say('MC')
-
         // Make a move request to it
 
         creep.createMoveRequest({
@@ -358,8 +354,6 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
     // If the cSite is out of build range
 
     if (creep.pos.getRangeTo(cSite.pos) > 3) {
-
-        creep.say('MC')
 
         // Make a move request to it
 
@@ -512,8 +506,6 @@ Creep.prototype.advancedRepair = function() {
 
     if (creep.pos.getRangeTo(repairTarget.pos) > 3) {
 
-        creep.say('MC')
-
         // Make a move request to it
 
         creep.createMoveRequest({
@@ -579,8 +571,6 @@ Creep.prototype.advancedRepair = function() {
         // Otherwise, if the new repair target is out of repair range
 
         if (creep.pos.getRangeTo(newRepairTarget.pos) > 3) {
-
-            creep.say('MC')
 
             // Make a move request to it
 

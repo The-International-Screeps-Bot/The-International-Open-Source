@@ -69,6 +69,10 @@ export function droppedResourceManager(room: Room) {
             // Update the task's priority to match new amountToOffer
 
             taskWithoutResponder.priority = Math.max(amountToOffer * 0.002, 1)
+
+            // And iterate
+
+            continue
         }
 
         // Create a pickup task for the droppedResource
