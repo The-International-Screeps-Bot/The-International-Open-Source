@@ -959,16 +959,16 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
 
             // Iterate if the creep isn't empty
 
-            if (creep.store.getUsedCapacity() > 0) continue
+            if (creep.store.getUsedCapacity(task.resourceType) > 0) continue
             break
 
             // If pickup
 
             case 'pickup':
 
-            // Iterate if the creep is full
+            // Iterate if the creep isn't looking for resources
 
-            if (creep.store.getFreeCapacity() == 0) continue
+            if (!creep.needsResources()) continue
 
             // Iterate if the resourceType doesn't match the requested one
 
@@ -988,9 +988,9 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
 
             if (task.resourceType != resourceType) continue
 
-            // Iterate if the creep is full
+            // Iterate if the creep isn't looking for resources
 
-            if (creep.store.getUsedCapacity() == 0) continue
+            if (!creep.needsResources()) continue
 
             // Otherwise adjust the task's resource minimized to the creep's free capacity
 

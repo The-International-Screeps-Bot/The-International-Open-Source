@@ -612,23 +612,38 @@ export function rampartPlanner(room: Room) {
             structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
         }
 
-        // Get the last pos in the path
+        // Construct the onboardingIndex
 
-        const lastPos = path[0]
+        let onboardingIndex = 0
 
-        // If it is defined
+        // So long as there is a pos in path with an index of onboardingIndex
 
-        if (lastPos) {
+        while (path[onboardingIndex]) {
+
+            // Get the pos in path with an index of onboardingIndex
+
+            let onboardingPos = path[onboardingIndex]
+
+            // If there are already rampart plans at this pos
+
+           if (rampartPlans.get(onboardingPos.x, onboardingPos.y) == 1) {
+
+                // Increase the onboardingIndex and iterate
+
+                onboardingIndex++
+                continue
+           }
 
             // Record the pos in roadCM
 
-            roadCM.set(lastPos.x, lastPos.y, 1)
+            roadCM.set(onboardingPos.x, onboardingPos.y, 1)
 
-            // Plan for a road at pos
+            // Plan for a road and rampart at pos and stop
 
-            structurePlans.set(lastPos.x, lastPos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+            structurePlans.set(onboardingPos.x, onboardingPos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
 
-            rampartPlans.set(lastPos.x, lastPos.y, 1)
+            rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
+            break
         }
     }
 
