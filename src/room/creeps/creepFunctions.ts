@@ -890,10 +890,6 @@ Creep.prototype.acceptTask = function(task) {
     const creep = this,
     room = creep.room
 
-    // If visuals are enabled, show the task acception
-
-    if (Memory.roomVisuals) room.visual.line(creep.pos, new RoomPosition(task.pos / 50, Math.floor(task.pos % 50), room.name), { color: constants.colors.lightBlue, width: 0.3 })
-
     // if there is no global for the creep, make one
 
     if (!global[creep.id]) global[creep.id] = {}
@@ -1175,6 +1171,10 @@ Creep.prototype.fulfillTask = function() {
     // Get the creep's task
 
     const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
+
+    // If visuals are enabled, show the task targeting
+
+    if (Memory.roomVisuals) room.visual.line(creep.pos, new RoomPosition(task.pos / 50, Math.floor(task.pos % 50), room.name), { color: constants.colors.lightBlue, width: 0.15 })
 
     // Run the creep's function based on the task type and inform its result
 

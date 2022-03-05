@@ -263,6 +263,33 @@ export function basePlanner(room: Room) {
 
     // Plan roads
 
+    // Path from the fastFillerAnchor to the hubAnchor
+
+    path = room.advancedFindPath({
+        origin: hubAnchor,
+        goal: { pos: fastFillerAnchor, range: 3 },
+        weightCostMatrixes: [roadCM]
+    })
+
+    // Loop through positions of the path
+
+    for (const pos of path) {
+
+        // Record the pos in roadCM
+
+        roadCM.set(pos.x, pos.y, 1)
+
+        // Plan for a road at this position
+
+        orderedStructurePlans.push({
+            structureType: STRUCTURE_ROAD,
+            x: pos.x,
+            y: pos.y
+        })
+
+        structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+    }
+
     // Path from the hubAnchor to the closestUpgradePos
 
     path = room.advancedFindPath({
