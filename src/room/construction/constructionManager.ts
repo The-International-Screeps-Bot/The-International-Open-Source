@@ -143,48 +143,9 @@ export function constructionManager(room: Room) {
             if (!basePlannerResult) return
         }
 
-        const structurePlans: CostMatrix = room.get('structurePlans')
+        // Use floodfill from the anchor to plan structures
 
-        // Iterate through each x and y in the room
-
-        for (let x = 0; x < constants.roomDimensions; x++) {
-            for (let y = 0; y < constants.roomDimensions; y++) {
-
-                // Get the planned value for this pos
-
-                const plannedValue = structurePlans.get(x, y)
-
-                // If there are no ramparts planned for this pos, iterate
-
-                if (plannedValue == 0) continue
-
-                // Otherwise get the structureType
-
-                const structureType = constants.numbersByStructureTypes[plannedValue]
-
-                // If the structureType is empty, iterate
-
-                if (structureType == 'empty') continue
-
-                // If the structureType is a road and RCL 3 extensions aren't built, iterate
-
-                if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue
-
-                // Display visuals if enabled
-
-                /* if (Memory.roomVisuals) room.visual.structure(x, y, structureType, {
-                    opacity: 0.5
-                }) */
-
-                // Create a road site at this pos
-
-                room.createConstructionSite(x, y, structureType)
-            }
-        }
-
-        // If visuals are enabled, connect road visuals
-
-        /* if (Memory.roomVisuals) room.visual.connectRoads() */
+        room.advancedConstructStructurePlans()
     }
 
     manageRampartPlanning()

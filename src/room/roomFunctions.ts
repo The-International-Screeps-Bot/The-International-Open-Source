@@ -2464,11 +2464,11 @@ Room.prototype.findPositionsInsideRect = function(rect) {
 
 Room.prototype.advancedConstructStructurePlans = function() {
 
-    /* const room = this
+    const room = this,
 
-    // Construct a cost matrix for the flood
+    // Get structurePlans
 
-    const floodCM = new PathFinder.CostMatrix(),
+    structurePlans: CostMatrix = room.get('structurePlans'),
 
     // Get the terrain cost matrix
 
@@ -2476,24 +2476,21 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
     // Construct a cost matrix for visited tiles and add seeds to it
 
-    visitedCM = new PathFinder.CostMatrix()
+    visitedCM = new PathFinder.CostMatrix(),
+
+    // Get the room's anchor
+
+    anchor: RoomPosition = room.get('anchor')
+
+    // Record the anchor as visited
+
+    visitedCM.set(anchor.x, anchor.y, 1)
 
     // Construct values for the flood
 
-    let depth = 0,
-
-    thisGeneration: Pos[] = seeds,
+    let thisGeneration: Pos[] = [anchor],
 
     nextGeneration: Pos[] = []
-
-    // Loop through positions of seeds
-
-    for (const pos of seeds) {
-
-        // Record the seedsPos as visited
-
-        visitedCM.set(pos.x, pos.y, 1)
-    }
 
     // So long as there are positions in this gen
 
@@ -2507,24 +2504,45 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
         for (const pos of thisGeneration) {
 
-            // If the depth isn't 0
+            // Iterate if the terrain is a wall
 
-            if (depth != 0) {
+            if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
 
-                // Iterate if the terrain is a wall
+            // Plan structures for this pos
 
-                if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
+            planPos()
 
-                // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
+            function planPos() {
 
-                floodCM.set(pos.x, pos.y, depth)
+                // Get the planned value for this pos
 
-                // If visuals are enabled, show the depth on the pos
+                const plannedValue = structurePlans.get(pos.x, pos.y)
 
-                if (Memory.roomVisuals) room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, {
-                    fill: 'hsl(' + 200 + depth * 2 + ', 100%, 60%)',
-                    opacity: 0.4,
-                })
+                // If there are structures planned for this pos
+
+                if (plannedValue == 0) return
+
+                // Otherwise so long as the pos isn't a wall, try to build a structure
+
+                const structureType = constants.numbersByStructureTypes[plannedValue]
+
+                // If the structureType is empty, iterate
+
+                if (structureType == 'empty') return
+
+                // If the structureType is a road and RCL 3 extensions aren't built, iterate
+
+                if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) return
+
+                // Display visuals if enabled
+
+                /* if (Memory.roomVisuals) room.visual.structure(x, y, structureType, {
+                    opacity: 0.5
+                }) */
+
+                // Create a road site at this pos
+
+                room.createConstructionSite(pos.x, pos.y, structureType)
             }
 
             // Construct a rect and get the positions in a range of 1
@@ -2553,11 +2571,5 @@ Room.prototype.advancedConstructStructurePlans = function() {
         // Set this gen to next gen
 
         thisGeneration = nextGeneration
-
-        // Increment depth
-
-        depth++
     }
-
-    return floodCM */
 }

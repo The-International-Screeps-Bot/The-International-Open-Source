@@ -28,20 +28,11 @@ export function communeManager(room: Room) {
     structuresForSpawningManager(room)
 
     spawnManager(room)
-
+/*
     let cpu = Game.cpu.getUsed()
 
-    const cm = new PathFinder.CostMatrix()
 
-    // Iterate through each x and y in the room
-/*
-    for (let x = 0; x < constants.roomDimensions; x++) {
-        for (let y = 0; y < constants.roomDimensions; y++) {
 
-            cm.set(x, y, 255)
-            cm.get(x, y)
-        }
-    }
- */
     generalFuncs.customLog('CPU USED FOR TEST', Game.cpu.getUsed() - cpu)
+     */
 }
