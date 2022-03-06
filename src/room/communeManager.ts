@@ -10,6 +10,7 @@ import { droppedResourceManager } from "./droppedResourceManager"
 import { defenceManager } from "./defenceManager"
 import { generalFuncs } from "international/generalFunctions"
 import { constants } from "international/constants"
+import { storageStructuresManager } from "./storingStructuresManager"
 
 export function communeManager(room: Room) {
 
@@ -26,6 +27,8 @@ export function communeManager(room: Room) {
     droppedResourceManager(room)
 
     structuresForSpawningManager(room)
+
+    storageStructuresManager(room)
 
     spawnManager(room)
 /*
