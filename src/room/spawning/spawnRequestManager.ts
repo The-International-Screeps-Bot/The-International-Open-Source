@@ -337,6 +337,7 @@ export function spawnRequester(room: Room) {
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
         if (spawnEnergyCapacity >= 800) {
+
             return {
                 defaultParts: [CARRY],
                 extraParts: [WORK, MOVE, WORK],
@@ -352,6 +353,7 @@ export function spawnRequester(room: Room) {
         }
 
         if (spawnEnergyCapacity >= 750) {
+
             return {
                 defaultParts: [],
                 extraParts: [WORK, MOVE, WORK],
@@ -367,6 +369,7 @@ export function spawnRequester(room: Room) {
         }
 
         if (spawnEnergyCapacity >= 650) {
+
             return {
                 defaultParts: [MOVE],
                 extraParts: [WORK],
@@ -435,9 +438,25 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-        // If the controllerContainer exists
+        // If the controllerContainer or controllerLink exists
 
         if (room.get('controllerContainer')) {
+
+            if (room.storage) {
+
+                return {
+                    defaultParts: [CARRY],
+                    extraParts: [WORK, MOVE, WORK, WORK, WORK],
+                    partsMultiplier: room.find(FIND_MY_CONSTRUCTION_SITES).length ? 1 : Math.floor(room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000 / 5) * 5,
+                    minCreeps: undefined,
+                    maxCreeps: Infinity,
+                    minCost: 200,
+                    priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                    memoryAdditions: {
+                        role: 'controllerUpgrader',
+                    }
+                }
+            }
 
             return {
                 defaultParts: [CARRY],
