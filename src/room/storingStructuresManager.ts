@@ -49,9 +49,10 @@ export function storageStructuresManager(room: Room) {
         if (totalResourcesRequested >= storage.store.getFreeCapacity(RESOURCE_ENERGY)) return
     }
 
-    // Assign amountToRequest as the energy left not assigned to tasks
+    // Assign amountToRequest as the energy left not assigned to tasks, iterating if 0
 
     const amountToRequest = storage.store.getFreeCapacity(RESOURCE_ENERGY) - totalResourcesRequested
+    if (amountToRequest == 0) return
 
     // If there is a taskWithoutResponder
 
@@ -63,7 +64,7 @@ export function storageStructuresManager(room: Room) {
 
         // Update the task's priority to match new amountToRequest
 
-        taskWithoutResponder.priority = 10
+        taskWithoutResponder.priority = 1 - storage.store.getUsedCapacity(RESOURCE_ENERGY) / 2000
 
         // And stop
 
@@ -72,5 +73,5 @@ export function storageStructuresManager(room: Room) {
 
     // Create a new transfer task for the storage
 
-    new RoomTransferTask(room.name, RESOURCE_ENERGY, amountToRequest, storage.id, 0)
+    new RoomTransferTask(room.name, RESOURCE_ENERGY, amountToRequest, storage.id, 1 - storage.store.getUsedCapacity(RESOURCE_ENERGY) / 2000)
 }

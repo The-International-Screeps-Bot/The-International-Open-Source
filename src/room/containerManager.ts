@@ -83,7 +83,7 @@ export function containerManager(room: Room) {
 
                 // Update the task's priority to match new amountToOffer
 
-                taskWithoutResponder.priority = Math.max(amountToOffer * 0.002, 1)
+                taskWithoutResponder.priority = 1 + amountToOffer / 500
 
                 // And iterate
 
@@ -96,7 +96,7 @@ export function containerManager(room: Room) {
 
                 // Create a new transfer task for the container
 
-                new RoomWithdrawTask(room.name, RESOURCE_ENERGY, amountToOffer, container.id, 1)
+                new RoomWithdrawTask(room.name, RESOURCE_ENERGY, amountToOffer, container.id, 1 + amountToOffer / 500)
             }
         }
     }
@@ -177,7 +177,7 @@ export function containerManager(room: Room) {
 
             // Update the task's priority to match new amountToRequest
 
-            taskWithoutResponder.priority = 10
+            taskWithoutResponder.priority = 0 + amountToRequest / 800
 
             // And stop
 
@@ -190,7 +190,7 @@ export function containerManager(room: Room) {
 
             // Create a new transfer task for the container
 
-            new RoomTransferTask(room.name, RESOURCE_ENERGY, amountToRequest, controllerContainer.id, 0)
+            new RoomTransferTask(room.name, RESOURCE_ENERGY, amountToRequest, controllerContainer.id, 0 + amountToRequest / 800)
         }
     }
 
@@ -270,7 +270,7 @@ export function containerManager(room: Room) {
 
                 // Update the task's priority to match new amountToRequest
 
-                taskWithoutResponder.priority = 10
+                taskWithoutResponder.priority = 2 + amountToRequest / 300
 
                 // And iterate
 
@@ -283,7 +283,7 @@ export function containerManager(room: Room) {
 
                 // Create a new transfer task for the container
 
-                new RoomTransferTask(room.name, RESOURCE_ENERGY, amountToRequest, container.id, 2)
+                new RoomTransferTask(room.name, RESOURCE_ENERGY, amountToRequest, container.id, 2 + amountToRequest / 300)
             }
         }
     }

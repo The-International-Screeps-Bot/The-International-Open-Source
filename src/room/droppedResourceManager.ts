@@ -54,9 +54,10 @@ export function droppedResourceManager(room: Room) {
             if (totalResourcesOffered >= droppedResource.amount) continue
         }
 
-        // Assign amountToOffer as the energy left not assigned to tasks
+        // Assign amountToOffer as the energy left not assigned to tasks, iterating if 0
 
         const amountToOffer = droppedResource.amount - totalResourcesOffered
+        if (amountToOffer == 0) continue
 
         // If there is a taskWithoutResponder
 

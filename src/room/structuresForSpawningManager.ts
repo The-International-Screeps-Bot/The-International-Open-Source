@@ -56,9 +56,10 @@ export function structuresForSpawningManager(room: Room) {
             if (totalResourcesRequested >= structure.store.getFreeCapacity(RESOURCE_ENERGY)) continue
         }
 
-        // Assign amountToRequest as the energy left not assigned to tasks
+        // Assign amountToRequest as the energy left not assigned to tasks, iterating if 0
 
         const amountToRequest = structure.store.getFreeCapacity(RESOURCE_ENERGY) - totalResourcesRequested
+        if (amountToRequest == 0) continue
 
         // If there is a taskWithoutResponder
 
