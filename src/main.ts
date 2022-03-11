@@ -120,6 +120,9 @@ declare global {
     'source2Container' |
     'usedHarvestPositions' |
     'usedUpgradePositions' |
+    'source1PathLength' |
+    'source2PathLength' |
+    'upgradePathLength' |
     'structuresForSpawning' |
     'notMyCreeps' |
     'enemyCreeps' |
@@ -497,7 +500,7 @@ declare global {
         findPositionsInsideRect(rect: Rect): RoomPosition[]
 
         /**
-         * 
+         *
          */
         advancedConstructStructurePlans(): void
     }

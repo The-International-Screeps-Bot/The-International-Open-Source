@@ -791,6 +791,43 @@ Room.prototype.get = function(roomObjectName) {
         valueConstructor: findUsedUpgradePositions
     })
 
+    // Path lengths
+
+    // source1PathLength
+
+    new RoomObject({
+        name: 'source1PathLength',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() { return global[room.name].source1PathLength }
+    })
+
+    // source2PathLength
+
+    new RoomObject({
+        name: 'source2PathLength',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() { return global[room.name].source2PathLength }
+    })
+
+    // upgradePathLength
+
+
+    new RoomObject({
+        name: 'upgradePathLength',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() { return global[room.name].upgradePathLength }
+    })
+
+
     // controllerContainer
 
     function findControllerContainer() {

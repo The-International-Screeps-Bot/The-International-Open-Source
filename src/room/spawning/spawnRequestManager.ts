@@ -402,6 +402,12 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
+        //
+
+        const requiredCarryParts = generalFuncs.findCarryPartsRequired(room.get('source1PathLength'), 10) +
+        generalFuncs.findCarryPartsRequired(room.get('source2PathLength'), 10) +
+        generalFuncs.findCarryPartsRequired(room.get('upgradePathLength'), 10)
+        generalFuncs.customLog('REQUIRED CARRY ', requiredCarryParts)
         // If all RCL 3 extensions are build
 
         if (spawnEnergyCapacity >= 800) {
@@ -409,7 +415,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [],
                 extraParts: [CARRY, CARRY, MOVE],
-                partsMultiplier: 14,
+                partsMultiplier: requiredCarryParts * 1.5,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 150,
@@ -423,7 +429,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [CARRY, MOVE],
-            partsMultiplier: 18,
+            partsMultiplier: requiredCarryParts * 2,
             minCreeps: undefined,
             maxCreeps: Infinity,
             minCost: 100,

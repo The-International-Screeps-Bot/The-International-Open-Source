@@ -279,6 +279,10 @@ export function basePlanner(room: Room) {
         weightCostMatrixes: [roadCM]
     })
 
+    // Record the path's length in global
+
+    global[room.name].upgradePathLength = path.length
+
     // Loop through positions of the path
 
     for (const pos of path) {
@@ -292,13 +296,29 @@ export function basePlanner(room: Room) {
         structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
     }
 
-    // Get the room's closestSourceHarvestPositions
+    // Get the room's sourceNames
 
-    const closestSourceHarvestPositions: RoomPosition[] = [room.get('source1ClosestHarvestPos'), room.get('source2ClosestHarvestPos')]
+    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
 
-    // loop through closestSourceHarvestPositions
+    // loop through sourceNames
 
-    for (const closestHarvestPos of closestSourceHarvestPositions) {
+    for (const sourceName of sourceNames) {
+
+        // get the closestHarvestPos using the sourceName
+
+        const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPos`)
+
+        // Path from the hubAnchor to the closestHarvestPos
+
+        const fastFillerPath = room.advancedFindPath({
+            origin: closestHarvestPos,
+            goal: { pos: fastFillerAnchor, range: 4 },
+            weightCostMatrixes: [roadCM]
+        })
+
+        // Record the path's length in global
+
+        global[room.name][`${sourceName}PathLength`] = fastFillerPath.length
 
         // Path from the hubAnchor to the closestHarvestPos
 

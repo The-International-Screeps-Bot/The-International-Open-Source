@@ -31,6 +31,7 @@ export function communeManager(room: Room) {
     storageStructuresManager(room)
 
     spawnManager(room)
+
 /*
     let cpu = Game.cpu.getUsed()
 
