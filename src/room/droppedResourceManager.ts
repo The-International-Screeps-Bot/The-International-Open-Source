@@ -42,7 +42,7 @@ export function droppedResourceManager(room: Room) {
 
                 // Otherwise find how many resources the task has requested to pick up
 
-                totalResourcesOffered += task.pickupAmount
+                totalResourcesOffered += task.taskAmount
 
                 // If the task doesn't have a responder, set it as taskWithoutResponder
 
@@ -63,9 +63,9 @@ export function droppedResourceManager(room: Room) {
 
         if (taskWithoutResponder) {
 
-            // Set the pickupAmount to match amountToOffer
+            // Set the taskAmount to match amountToOffer
 
-            taskWithoutResponder.pickupAmount = amountToOffer
+            taskWithoutResponder.taskAmount = amountToOffer
 
             // Update the task's priority to match new amountToOffer
 

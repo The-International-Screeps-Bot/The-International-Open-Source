@@ -57,7 +57,7 @@ export function containerManager(room: Room) {
 
                     // Otherwise find how many resources the task has requested to pick up
 
-                    totalResourcesOffered += task.withdrawAmount
+                    totalResourcesOffered += task.taskAmount
 
                     // If the task doesn't have a responder, set it as taskWithoutResponder
 
@@ -77,9 +77,9 @@ export function containerManager(room: Room) {
 
             if (taskWithoutResponder) {
 
-                // Set the withdrawAmount to match amountToOffer
+                // Set the taskAmount to match amountToOffer
 
-                taskWithoutResponder.withdrawAmount = amountToOffer
+                taskWithoutResponder.taskAmount = amountToOffer
 
                 // Update the task's priority to match new amountToOffer
 
@@ -151,7 +151,7 @@ export function containerManager(room: Room) {
 
                 // Otherwise find how many resources the task has requested to pick up
 
-                totalResourcesRequested += task.transferAmount
+                totalResourcesRequested += task.taskAmount
 
                 // If the task doesn't have a responder, set it as taskWithoutResponder
 
@@ -171,9 +171,9 @@ export function containerManager(room: Room) {
 
         if (taskWithoutResponder) {
 
-            // Set the pickupAmount to match amountToRequest
+            // Set the taskAmount to match amountToRequest
 
-            taskWithoutResponder.transferAmount = amountToRequest
+            taskWithoutResponder.taskAmount = amountToRequest
 
             // Update the task's priority to match new amountToRequest
 
@@ -244,7 +244,7 @@ export function containerManager(room: Room) {
 
                     // Otherwise find how many resources the task has requested to pick up
 
-                    totalResourcesRequested += task.transferAmount
+                    totalResourcesRequested += task.taskAmount
 
                     // If the task doesn't have a responder, set it as taskWithoutResponder
 
@@ -264,9 +264,9 @@ export function containerManager(room: Room) {
 
             if (taskWithoutResponder) {
 
-                // Set the pickupAmount to match amountToRequest
+                // Set the taskAmount to match amountToRequest
 
-                taskWithoutResponder.transferAmount = amountToRequest
+                taskWithoutResponder.taskAmount = amountToRequest
 
                 // Update the task's priority to match new amountToRequest
 

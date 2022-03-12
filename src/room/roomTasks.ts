@@ -8,7 +8,7 @@ export interface RoomTask {
     /**
      * The name of the room that the task will be recorded in
      */
-    creatorID: string
+    creatorID: Id<any>
     roomName: string
     responderID: string
     ID: number
@@ -17,6 +17,11 @@ export interface RoomTask {
      * The resourceType relating to the task's request
      */
     resourceType?: ResourceConstant
+
+    /**
+     * The amount of resources involved in this task
+     */
+    taskAmount: number
 
     /**
      * a packed position (x *50 + y) to provide a location basis for the task
@@ -127,7 +132,7 @@ RoomTask.prototype.delete = function() {
     const task = this
 
     // Construct task info based on found location
-    generalFuncs.customLog('Deleted task', 'Type: ' + task.type + ', creatorID: ' + task.creatorID)
+
     const taskLocation = task.findLocation()
 
     // And delete the taskID from the creator's list
@@ -144,12 +149,11 @@ RoomTask.prototype.delete = function() {
 }
 
 export interface RoomWithdrawTask extends RoomTask {
-    withdrawAmount: number
-    creatorID: string
+
 }
 
 export class RoomWithdrawTask extends RoomTask {
-    constructor(roomName: string, resourceType: ResourceConstant, withdrawAmount: number, creatorID: Id<any>, priority: number) {
+    constructor(roomName: string, resourceType: ResourceConstant, taskAmount: number, creatorID: Id<any>, priority: number) {
 
         // Inherit from RoomTask
 
@@ -160,18 +164,16 @@ export class RoomWithdrawTask extends RoomTask {
         // Assign paramaters
 
         task.resourceType = resourceType
-        task.withdrawAmount = withdrawAmount
+        task.taskAmount = taskAmount
         task.priority = priority
     }
 }
 
 export interface RoomTransferTask extends RoomTask {
-    transferAmount: number
-    creatorID: Id<any>
 }
 
 export class RoomTransferTask extends RoomTask {
-    constructor(roomName: string, resourceType: ResourceConstant, transferAmount: number, creatorID: Id<any>, priority: number) {
+    constructor(roomName: string, resourceType: ResourceConstant, taskAmount: number, creatorID: Id<any>, priority: number) {
 
         // Inherit from RoomTask
 
@@ -182,39 +184,17 @@ export class RoomTransferTask extends RoomTask {
         // Assign paramaters
 
         task.resourceType = resourceType
-        task.transferAmount = transferAmount
-        task.priority = priority
-    }
-}
-
-export interface RoomRepairTask extends RoomTask {
-    repairThreshold: number
-    creatorID: string
-}
-
-export class RoomRepairTask extends RoomTask {
-    constructor(roomName: string, creatorID: Id<Structure>, repairThreshold: number, priority: number) {
-
-        // Inherit from RoomTask
-
-        super('repair', creatorID, roomName)
-
-        const task = this
-
-        // Assign paramaters
-
-        task.repairThreshold = repairThreshold
+        task.taskAmount = taskAmount
         task.priority = priority
     }
 }
 
 export interface RoomPickupTask extends RoomTask {
-    creatorID: Id<Resource>
-    pickupAmount: number
+    creatorId: Id<Resource>
 }
 
 export class RoomPickupTask extends RoomTask {
-    constructor(roomName: string, creatorID: Id<Resource>, resourceType: ResourceConstant, pickupAmount: number, priority: number) {
+    constructor(roomName: string, creatorID: Id<Resource>, resourceType: ResourceConstant, taskAmount: number, priority: number) {
 
         // Inherit from RoomTask
 
@@ -229,12 +209,12 @@ export class RoomPickupTask extends RoomTask {
 
         // Assign defaults
 
-        task.pickupAmount = pickupAmount
+        task.taskAmount = taskAmount
     }
 }
 
 export interface RoomPullTask extends RoomTask {
-    creatorID: string
+    creatorId: Id<Creep>
     targetPos: RoomPosition
 }
 

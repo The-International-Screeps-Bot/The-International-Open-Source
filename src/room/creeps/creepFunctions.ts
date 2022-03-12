@@ -1030,9 +1030,9 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
 
             if (task.resourceType != resourceType) continue
 
-            // Otherwise set the task's pickupAmount to the creep's free capacity
+            // Otherwise set the task's taskAmount to the creep's free capacity
 
-            (task as RoomPickupTask).pickupAmount = creep.store.getFreeCapacity()
+            (task as RoomPickupTask).taskAmount = creep.store.getFreeCapacity()
 
             break
 
@@ -1050,7 +1050,7 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
 
             // Otherwise adjust the task's resource minimized to the creep's free capacity
 
-            (task as RoomWithdrawTask).withdrawAmount = Math.min(creep.store.getFreeCapacity(), (task as RoomWithdrawTask).withdrawAmount)
+            (task as RoomWithdrawTask).taskAmount = Math.min(creep.store.getFreeCapacity(), (task as RoomWithdrawTask).taskAmount)
 
             break
 
@@ -1068,7 +1068,7 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
 
             // Otherwise adjust the task's resource minimized to the creep's used capacity of the requested resource
 
-            (task as RoomTransferTask).transferAmount = Math.min(creep.store.getUsedCapacity(task.resourceType), (task as RoomTransferTask).transferAmount)
+            (task as RoomTransferTask).taskAmount = Math.min(creep.store.getUsedCapacity(task.resourceType), (task as RoomTransferTask).taskAmount)
 
             break
         }
@@ -1339,7 +1339,7 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     // Inform the result of the adancedTransfer to the transferTarget
 
-    return creep.advancedTransfer(transferTarget, task.resourceType, Math.min(task.transferAmount, Math.min(transferTarget.store.getFreeCapacity(task.resourceType), creep.store.getUsedCapacity(task.resourceType))))
+    return creep.advancedTransfer(transferTarget, task.resourceType, Math.min(task.taskAmount, Math.min(transferTarget.store.getFreeCapacity(task.resourceType), creep.store.getUsedCapacity(task.resourceType))))
 }
 
 Creep.prototype.fulfillWithdrawTask = function(task) {
@@ -1354,7 +1354,7 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
 
     // Try to withdraw from the target, informing the amount
 
-    return creep.advancedWithdraw(withdrawTarget, task.resourceType, Math.min(task.withdrawAmount, Math.min(withdrawTarget.store.getFreeCapacity(task.resourceType), creep.store.getUsedCapacity(task.resourceType))))
+    return creep.advancedWithdraw(withdrawTarget, task.resourceType, Math.min(task.taskAmount, Math.min(withdrawTarget.store.getFreeCapacity(task.resourceType), creep.store.getUsedCapacity(task.resourceType))))
 }
 
 Creep.prototype.fulfillPickupTask = function(task) {

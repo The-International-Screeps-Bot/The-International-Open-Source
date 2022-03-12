@@ -37,7 +37,7 @@ export function storageStructuresManager(room: Room) {
 
             // Otherwise find how many resources the task has requested to pick up
 
-            totalResourcesRequested += task.transferAmount
+            totalResourcesRequested += task.taskAmount
 
             // If the task doesn't have a responder, set it as taskWithoutResponder
 
@@ -58,9 +58,9 @@ export function storageStructuresManager(room: Room) {
 
     if (taskWithoutResponder) {
 
-        // Set the pickupAmount to match amountToRequest
+        // Set the taskAmount to match amountToRequest
 
-        taskWithoutResponder.transferAmount = amountToRequest
+        taskWithoutResponder.taskAmount = amountToRequest
 
         // Update the task's priority to match new amountToRequest
 

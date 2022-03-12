@@ -38,7 +38,7 @@ Room.prototype.towersRequestResources = function() {
 
                 // Otherwise find how many resources the task has requested to pick up
 
-                totalResourcesRequested += task.transferAmount
+                totalResourcesRequested += task.taskAmount
             }
 
             // If there are more or equal resources offered than the free energy capacity of the tower, iterate
@@ -48,15 +48,15 @@ Room.prototype.towersRequestResources = function() {
 
         // Get the amount of energy the tower needs at a max of the hauler's capacity
 
-        const transferAmount = Math.min(tower.store.getFreeCapacity(RESOURCE_ENERGY))
+        const taskAmount = Math.min(tower.store.getFreeCapacity(RESOURCE_ENERGY))
 
-        // If the transferAmount is more than 0
+        // If the taskAmount is more than 0
 
-        if (transferAmount > 0) {
+        if (taskAmount > 0) {
 
             // Create a new transfer task for the tower
 
-            new RoomTransferTask(room.name, RESOURCE_ENERGY, transferAmount, tower.id, 8)
+            new RoomTransferTask(room.name, RESOURCE_ENERGY, taskAmount, tower.id, 8)
         }
     }
 }
