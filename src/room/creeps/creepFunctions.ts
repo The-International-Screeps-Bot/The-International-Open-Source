@@ -308,7 +308,8 @@ Creep.prototype.advancedUpgradeController = function() {
 
         creep.findTask(new Set([
             'pickup',
-            'withdraw'
+            'withdraw',
+            'offer'
         ]), RESOURCE_ENERGY)
 
         return false
@@ -501,7 +502,8 @@ Creep.prototype.advancedRepair = function() {
 
         creep.findTask(new Set([
             'pickup',
-            'withdraw'
+            'withdraw',
+            'offer'
         ]), RESOURCE_ENERGY)
 
         return false
