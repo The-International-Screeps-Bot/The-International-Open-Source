@@ -11,28 +11,24 @@ export function spawnRequester(room: Room) {
 
     // Construct a record of spawnRequests
 
-    const spawnRequests: {[key: string]: SpawnRequest} = {}
+    const spawnRequests: {[key: string]: SpawnRequest} = {},
 
     // Structure info about the room's spawn energy
 
-    const spawnEnergyAvailable = room.energyAvailable,
+    spawnEnergyAvailable = room.energyAvailable,
     spawnEnergyCapacity = room.energyCapacityAvailable
 
-    //
+    // Create a spawn request given some values
 
-    function createSpawnRequest(priority: number, body: BodyPartConstant[], tier: number, cost: number, memoryAdditions: any) {
+    function createSpawnRequest(priority: number, body: BodyPartConstant[], tier: number, cost: number, memory: any) {
 
-        // Construct memory based on memoryAdditions
-
-        const memory = memoryAdditions
-
-        // Set the communeName to this room's name
+        // Set the memories communeName to this room's name
 
         memory.communeName = room.name
 
-        // Construct extraOpts
+        // Create extraOpts
 
-        const extraOpts = {
+        const extraOpts: ExtraOpts = {
             memory,
             energyStructures: room.get('structuresForSpawning'),
             dryRun: true,
@@ -44,11 +40,13 @@ export function spawnRequester(room: Room) {
             body,
             tier,
             cost,
-            extraOpts
+            extraOpts,
         }
     }
 
-    function constructSpawnRequests(opts: SpawnRequestOpts | false): void {
+    // Create spawn requests using opts
+
+    function constructSpawnRequests(opts: SpawnRequestOpts | false) {
 
         // If the opts aren't defined, stop
 
@@ -62,159 +60,28 @@ export function spawnRequester(room: Room) {
 
         if (maxCostPerCreep < opts.minCost) return
 
-        // if minCreeps is defined
+        // If minCreeps is defined
 
         if (opts.minCreeps) {
 
-            // So long as minCreeps is more than the current number of creeps
+            // Construct spawn requests individually, and stop
 
-            while (opts.minCreeps > room.creepsFromRoom[opts.memoryAdditions.role].length) {
-
-                // Construct important imformation for the spawnRequest
-
-                let body: BodyPartConstant[] = [],
-                tier = 0,
-                cost = 0
-
-                // If there are defaultParts
-
-                if (opts.defaultParts.length > 0) {
-
-                    // Increment tier
-
-                    tier++
-
-                    // Loop through defaultParts
-
-                    for (const part of opts.defaultParts) {
-
-                        // Get the cost of the part
-
-                        const partCost = BODYPART_COST[part]
-
-                        // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, stop the loop
-
-                        if (cost + partCost > maxCostPerCreep) break
-
-                        // Otherwise add the part the the body
-
-                        body.push(part)
-
-                        // And add the partCost to the cost
-
-                        cost += partCost
-                    }
-                }
-
-                // If there are extraParts
-
-                if (opts.extraParts.length) {
-
-                    // Use the partsMultiplier to decide how many extraParts are needed on top of the defaultParts, at a max of 50
-
-                    let remainingAllowedParts = Math.min(50 - opts.defaultParts.length, opts.extraParts.length * opts.partsMultiplier)
-
-                    // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
-
-                    while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
-
-                        // Loop through each part in extraParts
-
-                        for (const part of opts.extraParts) {
-
-                            // And add the part's cost to the cost
-
-                            cost += BODYPART_COST[part]
-
-                            // Otherwise add the part the the body
-
-                            body.push(part)
-
-                            // Reduce remainingAllowedParts
-
-                            remainingAllowedParts--
-                        }
-
-                        // Increase tier
-
-                        tier++
-                    }
-
-                    // Assign partIndex as the length of extraParts
-
-                    let partIndex = opts.extraParts.length
-
-                    // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
-
-                    if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
-
-                        // So long as partIndex is above 0
-
-                        while (partIndex > 0) {
-
-                            // Get the part using the partIndex
-
-                            const part = opts.extraParts[partIndex]
-
-                            // Get the cost of the part
-
-                            const partCost = BODYPART_COST[part]
-
-                            // If the cost minus partCost is below minCost, stop the loop
-
-                            if (cost - partCost < opts.minCost) break
-
-                            // And remove the part's cost to the cost
-
-                            cost -= partCost
-
-                            // Remove the last part in the body
-
-                            body.pop()
-
-                            // Increase remainingAllowedParts
-
-                            remainingAllowedParts++
-
-                            // Decrease the partIndex
-
-                            partIndex--
-                        }
-                    }
-                }
-
-                // Create a spawnRequest using previously constructed information
-
-                createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
-
-                // Reduce the number of minCreeps
-
-                opts.minCreeps--
-            }
-
-            // If minCreeps is equal to 0, stop
-
+            constructSpawnRequestsIndividually(opts, maxCostPerCreep)
             return
         }
 
-        // Otherwise if minCreeps is undefined
+        // Construct spawn requests by group, and stop
 
-        // Find the totalExtraParts using the partsMultiplier
+        constructSpawnRequestsByGroup(opts, maxCostPerCreep)
+    }
 
-        let totalExtraParts = opts.extraParts.length * opts.partsMultiplier
+    // Use preset creep amounts to construct spawn requests
 
-        // Loop through creep names of the requested role
+    function constructSpawnRequestsIndividually(opts: SpawnRequestOpts, maxCostPerCreep: number) {
 
-        for (const creepName of room.creepsFromRoom[opts.memoryAdditions.role]) {
+        // So long as minCreeps is more than the current number of creeps
 
-            // Take away the amount of parts the creep with the name has from totalExtraParts
-
-            totalExtraParts -= (Game.creeps[creepName].body.length - opts.defaultParts.length)
-        }
-
-        // So long as there are totalExtraParts left to assign
-
-        while (totalExtraParts > 0) {
+        while (opts.minCreeps > room.creepsFromRoom[opts.memoryAdditions.role].length) {
 
             // Construct important imformation for the spawnRequest
 
@@ -252,9 +119,166 @@ export function spawnRequester(room: Room) {
                 }
             }
 
+            // If there are extraParts
+
+            if (opts.extraParts.length) {
+
+                // Use the partsMultiplier to decide how many extraParts are needed on top of the defaultParts, at a max of 50
+
+                let remainingAllowedParts = Math.min(50 - opts.defaultParts.length, opts.extraParts.length * opts.partsMultiplier)
+
+                // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
+
+                while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
+
+                    // Loop through each part in extraParts
+
+                    for (const part of opts.extraParts) {
+
+                        // And add the part's cost to the cost
+
+                        cost += BODYPART_COST[part]
+
+                        // Otherwise add the part the the body
+
+                        body.push(part)
+
+                        // Reduce remainingAllowedParts
+
+                        remainingAllowedParts--
+                    }
+
+                    // Increase tier
+
+                    tier++
+                }
+
+                // Assign partIndex as the length of extraParts
+
+                let partIndex = opts.extraParts.length
+
+                // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
+
+                if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
+
+                    // So long as partIndex is above 0
+
+                    while (partIndex > 0) {
+
+                        // Get the part using the partIndex
+
+                        const part = opts.extraParts[partIndex]
+
+                        // Get the cost of the part
+
+                        const partCost = BODYPART_COST[part]
+
+                        // If the cost minus partCost is below minCost, stop the loop
+
+                        if (cost - partCost < opts.minCost) break
+
+                        // And remove the part's cost to the cost
+
+                        cost -= partCost
+
+                        // Remove the last part in the body
+
+                        body.pop()
+
+                        // Increase remainingAllowedParts
+
+                        remainingAllowedParts++
+
+                        // Decrease the partIndex
+
+                        partIndex--
+                    }
+                }
+            }
+
+            // If the body has fewer parts than defaultParts amount + extraParts amount
+
+            if (body.length < opts.defaultParts.length + opts.extraParts.length) break
+
+            // Create a spawnRequest using previously constructed information
+
+            createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
+
+            // Reduce the number of minCreeps
+
+            opts.minCreeps--
+        }
+
+        // If minCreeps is equal to 0, stop
+
+        return
+    }
+
+    // Construct spawn requests while deciding on creep amounts
+
+    function constructSpawnRequestsByGroup(opts: SpawnRequestOpts, maxCostPerCreep: number) {
+
+        // Find the totalExtraParts using the partsMultiplier
+
+        let totalExtraParts = opts.extraParts.length * opts.partsMultiplier,
+        maxPartsPerCreep = Math.min(50, totalExtraParts)
+
+        // Loop through creep names of the requested role
+
+        for (const creepName of room.creepsFromRoom[opts.memoryAdditions.role]) {
+
+            // Take away the amount of parts the creep with the name has from totalExtraParts
+
+            totalExtraParts -= Game.creeps[creepName].body.length - opts.defaultParts.length
+        }
+
+        // If there arn't enough requested parts to justify spawning a creep, stop
+
+        if (totalExtraParts < maxPartsPerCreep / 2) return
+
+        // So long as there are totalExtraParts left to assign
+
+        while (totalExtraParts > 0 && opts.maxCreeps > 0) {
+
+            // Construct important imformation for the spawnRequest
+
+            let body: BodyPartConstant[] = [],
+            tier = 0,
+            cost = 0,
+
             // Construct from totalExtraParts at a max of 50, at equal to extraOpts's length
 
-            let remainingAllowedParts = Math.min(50, Math.max(totalExtraParts, opts.extraParts.length))
+            remainingAllowedParts = Math.min(50, maxPartsPerCreep)
+
+            // If there are defaultParts
+
+            if (opts.defaultParts.length > 0) {
+
+                // Increment tier
+
+                tier++
+
+                // Loop through defaultParts
+
+                for (const part of opts.defaultParts) {
+
+                    // Get the cost of the part
+
+                    const partCost = BODYPART_COST[part]
+
+                    // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, stop the loop
+
+                    if (cost + partCost > maxCostPerCreep) break
+
+                    // Otherwise add the part the the body
+
+                    body.push(part)
+
+                    // And add the partCost to the cost
+
+                    cost += partCost
+                }
+            }
 
             // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
 
@@ -287,54 +311,57 @@ export function spawnRequester(room: Room) {
 
             let partIndex = opts.extraParts.length
 
-            // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
+            // So long as the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts and partIndex is above 0
 
-            if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
+            while ((cost > maxCostPerCreep || remainingAllowedParts < 0) && partIndex > 0) {
 
-                // So long as partIndex is above 0
+                // Get the part using the partIndex
 
-                while (partIndex > 0) {
+                const part = opts.extraParts[partIndex]
 
-                    // Get the part using the partIndex
+                // Get the cost of the part
 
-                    const part = opts.extraParts[partIndex]
+                const partCost = BODYPART_COST[part]
 
-                    // Get the cost of the part
+                // If the cost minus partCost is below minCost, stop the loop
 
-                    const partCost = BODYPART_COST[part]
+                if (cost - partCost < opts.minCost) break
 
-                    // If the cost minus partCost is below minCost, stop the loop
+                // And remove the part's cost to the cost
 
-                    if (cost - partCost < opts.minCost) break
+                cost -= partCost
 
-                    // And remove the part's cost to the cost
+                // Remove the last part in the body
 
-                    cost -= partCost
+                body.pop()
 
-                    // Remove the last part in the body
+                // Increase remainingAllowedParts and totalExtraParts
 
-                    body.pop()
+                remainingAllowedParts++
+                totalExtraParts++
 
-                    // Increase remainingAllowedParts and totalExtraParts
+                // Decrease the partIndex
 
-                    remainingAllowedParts++
-                    totalExtraParts++
-
-                    // Decrease the partIndex
-
-                    partIndex--
-                }
+                partIndex--
             }
+
+            // If the body has fewer parts than defaultParts amount + extraParts amount
+
+            if (body.length < opts.defaultParts.length + opts.extraParts.length) break
 
             // Create a spawnRequest using previously constructed information
 
             createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
+
+            // Decrease maxCreeps counter
+
+            opts.maxCreeps--
         }
     }
 
     // Construct requests for sourceHarvesters
 
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
+    constructSpawnRequests((function(): SpawnRequestOpts {
 
         if (spawnEnergyCapacity >= 800) {
 
@@ -402,12 +429,13 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-        //
+        // Get the required carry parts using known path distances
 
-        const requiredCarryParts = generalFuncs.findCarryPartsRequired(room.get('source1PathLength'), 10) +
-        generalFuncs.findCarryPartsRequired(room.get('source2PathLength'), 10) +
+        const requiredCarryParts = generalFuncs.findCarryPartsRequired(room.get('source1PathLength') * 2, 10) +
+        generalFuncs.findCarryPartsRequired(room.get('source2PathLength') * 2, 10) +
         generalFuncs.findCarryPartsRequired(room.get('upgradePathLength'), 10)
-        generalFuncs.customLog('REQUIRED CARRY ', requiredCarryParts)
+
+
         // If all RCL 3 extensions are build
 
         if (spawnEnergyCapacity >= 800) {
@@ -415,7 +443,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [],
                 extraParts: [CARRY, CARRY, MOVE],
-                partsMultiplier: requiredCarryParts * 1.5,
+                partsMultiplier: requiredCarryParts / 2,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 150,
@@ -429,7 +457,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [CARRY, MOVE],
-            partsMultiplier: requiredCarryParts * 2,
+            partsMultiplier: requiredCarryParts,
             minCreeps: undefined,
             maxCreeps: Infinity,
             minCost: 100,

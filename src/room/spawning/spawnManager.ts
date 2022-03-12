@@ -32,16 +32,15 @@ export function spawnManager(room: Room) {
 
         // Try to find inactive spawn, if can't, stop the loop
 
-        const spawn = inactiveSpawns[spawnIndex]
-        if (!spawn) break
+        const spawn = inactiveSpawns[spawnIndex],
 
         // Otherwise get the spawnRequest using its priority
 
-        const spawnRequest = spawnRequests[priority]
+        spawnRequest = spawnRequests[priority],
 
         // See if creep can be spawned
 
-        const testSpawnResult = spawn.advancedSpawn(spawnRequest)
+        testSpawnResult = spawn.advancedSpawn(spawnRequest)
 
         // If creep can't be spawned
 
