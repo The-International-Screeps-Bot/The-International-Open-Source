@@ -16,7 +16,12 @@ export function spawnRequester(room: Room) {
     // Structure info about the room's spawn energy
 
     spawnEnergyAvailable = room.energyAvailable,
-    spawnEnergyCapacity = room.energyCapacityAvailable
+    spawnEnergyCapacity = room.energyCapacityAvailable,
+
+    // Get the energyStructures
+
+    energyStructures = room.get('structuresForSpawning'),
+    dryRun = true
 
     // Create a spawn request given some values
 
@@ -26,21 +31,17 @@ export function spawnRequester(room: Room) {
 
         memory.communeName = room.name
 
-        // Create extraOpts
-
-        const extraOpts: ExtraOpts = {
-            memory,
-            energyStructures: room.get('structuresForSpawning'),
-            dryRun: true,
-        }
-
         // Add the components to spawnRequests
 
         spawnRequests[priority] = {
             body,
             tier,
             cost,
-            extraOpts,
+            extraOpts: {
+                memory,
+                energyStructures,
+                dryRun
+            },
         }
     }
 
@@ -266,17 +267,13 @@ export function spawnRequester(room: Room) {
 
                     const partCost = BODYPART_COST[part]
 
-                    // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, stop the loop
-
-                    if (cost + partCost > maxCostPerCreep) break
-
-                    // Otherwise add the part the the body
-
-                    body.push(part)
-
                     // And add the partCost to the cost
 
                     cost += partCost
+
+                    // Add the part the the body
+
+                    body.push(part)
                 }
             }
 
@@ -292,7 +289,7 @@ export function spawnRequester(room: Room) {
 
                     cost += BODYPART_COST[part]
 
-                    // Otherwise add the part the the body
+                    // Add the part the the body
 
                     body.push(part)
 
@@ -309,7 +306,7 @@ export function spawnRequester(room: Room) {
 
             // Assign partIndex as the length of extraParts
 
-            let partIndex = opts.extraParts.length
+            let partIndex = opts.extraParts.length - 1
 
             // So long as the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts and partIndex is above 0
 
@@ -350,7 +347,7 @@ export function spawnRequester(room: Room) {
             if (body.length < opts.defaultParts.length + opts.extraParts.length) break
 
             // Create a spawnRequest using previously constructed information
-
+            
             createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
 
             // Decrease maxCreeps counter
@@ -573,16 +570,34 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-        // If there are no roads or containers with below threshold hits
+        // Get roads
 
-        // Get roads and containers in the room
+        const roads: StructureRoad[] = room.get('road')
 
-        const possibleRepairTargets: (StructureRoad | StructureContainer)[] = room.get('road').concat(room.get('container'))
+        // Get containers
+
+        const containers: StructureContainer[] = room.get('container')
 
         // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
-        const repairTargets = possibleRepairTargets.filter(structure => structure.hitsMax * 0.2 >= structure.hits)
+        const repairTargets = [...roads, ...containers].filter(structure => structure.hitsMax * 0.2 >= structure.hits)
         if (!repairTargets.length) return false
+
+        // Construct the partsMultiplier
+
+        let partsMultiplier = 2
+
+        // For each road, add 0.01 multiplier
+
+        partsMultiplier += roads.length * 0.01
+
+        // For each container, add 0.5 multiplier
+
+        partsMultiplier += repairTargets.length * 0.5
+
+        // For every 30,000 energy in storage, add 1 multiplier
+
+        partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 30000
 
         // If all RCL 3 extensions are build
 
@@ -591,7 +606,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [],
                 extraParts: [WORK, CARRY, MOVE],
-                partsMultiplier: 4,
+                partsMultiplier,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 200,
@@ -605,7 +620,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier: 4,
+            partsMultiplier,
             minCreeps: undefined,
             maxCreeps: Infinity,
             minCost: 250,
