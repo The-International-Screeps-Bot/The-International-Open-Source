@@ -249,7 +249,7 @@ export function spawnRequester(room: Room) {
 
             // Construct from totalExtraParts at a max of 50, at equal to extraOpts's length
 
-            remainingAllowedParts = Math.min(50, maxPartsPerCreep)
+            remainingAllowedParts = maxPartsPerCreep
 
             // If there are defaultParts
 
@@ -304,17 +304,17 @@ export function spawnRequester(room: Room) {
                 tier++
             }
 
-            // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
+            // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
 
-            if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
+            if (cost > maxCostPerCreep || remainingAllowedParts < 0 || body.length > 50) {
 
                 // Assign partIndex as the length of extraParts
 
                 let partIndex = opts.extraParts.length - 1
 
-                // So long as partIndex is above 0
+                // So long as partIndex is above -1
 
-                while (partIndex > 0) {
+                while (partIndex > -1) {
 
                     // Get the part using the partIndex
 
@@ -497,7 +497,11 @@ export function spawnRequester(room: Room) {
 
         // If the controllerContainer or controllerLink exists
 
-        if (room.get('controllerContainer')) {
+        if (room.get('controllerContainer') || room.get('controllerLink')) {
+
+            // If the controller is level 8, max out partsMultiplier at 4
+
+            if (room.controller.level == 8) partsMultiplier = Math.min(4, partsMultiplier)
 
             return {
                 defaultParts: [CARRY],
