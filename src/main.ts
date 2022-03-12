@@ -116,6 +116,7 @@ declare global {
     'labContainer' |
     'source1Link' |
     'source2Link' |
+    'controllerLink' |
     'source1Container' |
     'source2Container' |
     'usedHarvestPositions' |

@@ -429,12 +429,21 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-        // Get the required carry parts using known path distances
+        // Construct the required carry parts
 
-        const requiredCarryParts = generalFuncs.findCarryPartsRequired(room.get('source1PathLength') * 2, 10) +
-        generalFuncs.findCarryPartsRequired(room.get('source2PathLength') * 2, 10) +
-        generalFuncs.findCarryPartsRequired(room.get('upgradePathLength'), 10)
+        let requiredCarryParts = 10
 
+        // If there is no source1Link, increase requiredCarryParts using the source's path length
+
+        if (!room.get('source1Link')) requiredCarryParts += generalFuncs.findCarryPartsRequired(room.get('source1PathLength') * 2, 10)
+
+        // If there is no source2Link, increase requiredCarryParts using the source's path length
+
+        if (!room.get('source2Link')) requiredCarryParts += generalFuncs.findCarryPartsRequired(room.get('source2PathLength') * 2, 10)
+
+        // If there is no controllerLink, increase requiredCarryParts using the hub-structure path length
+
+        if (!room.get('controllerLink')) requiredCarryParts += generalFuncs.findCarryPartsRequired(room.get('upgradePathLength') * 2, 10)
 
         // If all RCL 3 extensions are build
 

@@ -957,26 +957,24 @@ Room.prototype.get = function(roomObjectName) {
         valueConstructor: function() {}
     })
 
-    // Source links
+    // Links
 
-    function findSourceLink(closestHarvestPos: RoomPosition): string | false {
+    function findLinkAtPos(pos: RoomPosition): Id<Structure> | false {
 
-        // Stop and inform false if no closestHarvestPos
+        // Otherwise search based on an offset from the anchor's x
 
-        if (!closestHarvestPos) return false
+        const structuresAsPos = room.getPositionAt(pos.x, pos.y).lookFor(LOOK_STRUCTURES)
 
-        // Find links
+        // Loop through structuresAtPos
 
-        const links: StructureLink[] = room.roomObjects.link.getValue()
+        for (const structure of structuresAsPos) {
 
-        // Iterate through links
+            // If the structureType is link, inform the structures's ID
 
-        for (const link of links) {
-
-            // If the link is near the harvestPos inform its id
-
-            if (link.pos.getRangeTo(closestHarvestPos) == 1) return link.id
+            if (structure.structureType == STRUCTURE_LINK) return structure.id
         }
+
+        // Otherwise inform false
 
         return false
     }
@@ -989,7 +987,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findSourceLink(room.roomObjects.source1ClosestHarvestPos.getValue())
+            return findLinkAtPos(room.roomObjects.source1ClosestHarvestPos.getValue())
         }
     })
 
@@ -1001,7 +999,19 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findSourceLink(room.roomObjects.source2ClosestHarvestPos.getValue())
+            return findLinkAtPos(room.roomObjects.source2ClosestHarvestPos.getValue())
+        }
+    })
+
+    new RoomObject({
+        name: 'controllerLink',
+        valueType: 'id',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() {
+
+            return findLinkAtPos(room.roomObjects.centerUpgradePos.getValue())
         }
     })
 
