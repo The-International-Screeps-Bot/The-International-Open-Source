@@ -148,6 +148,27 @@ RoomTask.prototype.delete = function() {
     delete taskLocation[task.ID]
 }
 
+export interface RoomOfferTask extends RoomTask {
+
+}
+
+export class RoomOfferTask extends RoomTask {
+    constructor(roomName: string, resourceType: ResourceConstant, taskAmount: number, creatorID: Id<any>, priority: number) {
+
+        // Inherit from RoomTask
+
+        super('withdraw', creatorID, roomName)
+
+        const task = this
+
+        // Assign paramaters
+
+        task.resourceType = resourceType
+        task.taskAmount = taskAmount
+        task.priority = priority
+    }
+}
+
 export interface RoomWithdrawTask extends RoomTask {
 
 }

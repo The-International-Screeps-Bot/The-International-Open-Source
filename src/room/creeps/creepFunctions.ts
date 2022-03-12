@@ -401,7 +401,8 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
         creep.findTask(new Set([
             'pickup',
-            'withdraw'
+            'withdraw',
+            'offer'
         ]), RESOURCE_ENERGY)
 
         return false

@@ -197,12 +197,11 @@ declare global {
         y: number
     }
 
-    type RoomTaskTypes = 'withdraw' |
+    type RoomTaskTypes = 'pull' |
+    'withdraw' |
     'transfer' |
-    'pull' |
     'pickup' |
-    'repair' |
-    'harvest'
+    'offer'
 
     interface SpawnRequestOpts {
         defaultParts: BodyPartConstant[]
