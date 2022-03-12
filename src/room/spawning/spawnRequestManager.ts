@@ -347,7 +347,7 @@ export function spawnRequester(room: Room) {
             if (body.length < opts.defaultParts.length + opts.extraParts.length) break
 
             // Create a spawnRequest using previously constructed information
-            
+
             createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
 
             // Decrease maxCreeps counter
@@ -478,30 +478,26 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
+        // Construct the partsMultiplier
+
+        let partsMultiplier = 1
+
+        // For every 30,000 energy in storage, add 1 multiplier
+
+        if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 30000
+
+        // If there are construction sites of my ownership, set multiplier to 1
+
+        if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 1
+
         // If the controllerContainer or controllerLink exists
 
         if (room.get('controllerContainer')) {
 
-            if (room.storage) {
-
-                return {
-                    defaultParts: [CARRY],
-                    extraParts: [WORK, MOVE, WORK, WORK, WORK],
-                    partsMultiplier: room.find(FIND_MY_CONSTRUCTION_SITES).length ? 1 : Math.floor(room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000 / 5) * 5,
-                    minCreeps: undefined,
-                    maxCreeps: Infinity,
-                    minCost: 200,
-                    priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
-                    memoryAdditions: {
-                        role: 'controllerUpgrader',
-                    }
-                }
-            }
-
             return {
                 defaultParts: [CARRY],
                 extraParts: [WORK, MOVE, WORK, WORK, WORK],
-                partsMultiplier: room.find(FIND_MY_CONSTRUCTION_SITES).length ? 1 : 4,
+                partsMultiplier,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 200,
@@ -515,7 +511,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier: room.find(FIND_MY_CONSTRUCTION_SITES).length ? 1 : 3,
+            partsMultiplier,
             minCreeps: undefined,
             maxCreeps: Infinity,
             minCost: 250,
@@ -597,7 +593,7 @@ export function spawnRequester(room: Room) {
 
         // For every 30,000 energy in storage, add 1 multiplier
 
-        partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 30000
+        if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 30000
 
         // If all RCL 3 extensions are build
 
