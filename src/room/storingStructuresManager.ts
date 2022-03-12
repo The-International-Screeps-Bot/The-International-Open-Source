@@ -71,7 +71,7 @@ export function storageStructuresManager(room: Room) {
 
             // Update the task's priority to match new amountToOffer
 
-            taskWithoutResponder.priority = 1 + amountToOffer / 500
+            taskWithoutResponder.priority = 1
 
             // And stop
 
@@ -84,9 +84,11 @@ export function storageStructuresManager(room: Room) {
 
             // Create a new transfer task for the structure
 
-            new RoomOfferTask(room.name, RESOURCE_ENERGY, amountToOffer, storage.id, 1 + amountToOffer / 500)
+            new RoomOfferTask(room.name, RESOURCE_ENERGY, amountToOffer, storage.id, 1)
         }
     }
+
+    storageRequests()
 
     function storageRequests() {
 

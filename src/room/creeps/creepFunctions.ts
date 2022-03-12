@@ -1343,6 +1343,21 @@ Creep.prototype.fulfillTransferTask = function(task) {
     return creep.advancedTransfer(transferTarget, task.resourceType, Math.min(task.taskAmount, Math.min(transferTarget.store.getFreeCapacity(task.resourceType), creep.store.getUsedCapacity(task.resourceType))))
 }
 
+Creep.prototype.fulfillOfferTask = function(task) {
+
+    const creep = this
+
+    creep.say('OT')
+
+    // Get the withdraw target
+
+    const offerTarget = generalFuncs.findObjectWithID(task.creatorID)
+
+    // Try to withdraw from the target, informing the amount
+
+    return creep.advancedWithdraw(offerTarget, task.resourceType, Math.min(task.taskAmount, Math.min(offerTarget.store.getFreeCapacity(task.resourceType), creep.store.getUsedCapacity(task.resourceType))))
+}
+
 Creep.prototype.fulfillWithdrawTask = function(task) {
 
     const creep = this

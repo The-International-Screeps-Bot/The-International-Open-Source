@@ -21,7 +21,7 @@ import {
 
 import { logManager } from 'other/logManager'
 import { memHack } from 'other/memHack'
-import { RoomPickupTask, RoomPullTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
+import { RoomOfferTask, RoomPickupTask, RoomPullTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
 import { RoomObject } from 'room/roomObject'
 
 // Type declareations for global
@@ -642,6 +642,11 @@ declare global {
          * Has the creep attempt to fulfill its transfer task
          */
         fulfillTransferTask(task: RoomTransferTask): boolean
+
+        /**
+         * Has the creep attempt to fulfill its offer task
+         */
+        fulfillOfferTask(task: RoomOfferTask): boolean
 
         /**
          * Has the creep attempt to fulfill its withdraw task

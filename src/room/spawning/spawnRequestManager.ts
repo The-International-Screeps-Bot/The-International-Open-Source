@@ -304,42 +304,47 @@ export function spawnRequester(room: Room) {
                 tier++
             }
 
-            // Assign partIndex as the length of extraParts
+            // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
 
-            let partIndex = opts.extraParts.length - 1
+            if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
 
-            // So long as the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts and partIndex is above 0
+                // Assign partIndex as the length of extraParts
 
-            while ((cost > maxCostPerCreep || remainingAllowedParts < 0) && partIndex > 0) {
+                let partIndex = opts.extraParts.length - 1
 
-                // Get the part using the partIndex
+                // So long as partIndex is above 0
 
-                const part = opts.extraParts[partIndex]
+                while (partIndex > 0) {
 
-                // Get the cost of the part
+                    // Get the part using the partIndex
 
-                const partCost = BODYPART_COST[part]
+                    const part = opts.extraParts[partIndex]
 
-                // If the cost minus partCost is below minCost, stop the loop
+                    // Get the cost of the part
 
-                if (cost - partCost < opts.minCost) break
+                    const partCost = BODYPART_COST[part]
 
-                // And remove the part's cost to the cost
+                    // If the cost minus partCost is below minCost, stop the loop
 
-                cost -= partCost
+                    if (cost - partCost < opts.minCost) break
 
-                // Remove the last part in the body
+                    // And remove the part's cost to the cost
 
-                body.pop()
+                    cost -= partCost
 
-                // Increase remainingAllowedParts and totalExtraParts
+                    // Remove the last part in the body
 
-                remainingAllowedParts++
-                totalExtraParts++
+                    body.pop()
 
-                // Decrease the partIndex
+                    // Increase remainingAllowedParts and totalExtraParts
 
-                partIndex--
+                    remainingAllowedParts++
+                    totalExtraParts++
+
+                    // Decrease the partIndex
+
+                    partIndex--
+                }
             }
 
             // If the body has fewer parts than defaultParts amount + extraParts amount

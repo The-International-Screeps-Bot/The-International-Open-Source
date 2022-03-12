@@ -157,7 +157,7 @@ export class RoomOfferTask extends RoomTask {
 
         // Inherit from RoomTask
 
-        super('withdraw', creatorID, roomName)
+        super('offer', creatorID, roomName)
 
         const task = this
 
