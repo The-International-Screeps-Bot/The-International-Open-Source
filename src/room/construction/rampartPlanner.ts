@@ -596,7 +596,7 @@ export function rampartPlanner(room: Room) {
 
     // Get the hubAnchor
 
-    hubAnchor: RoomPosition = global[room.name].stampAnchors.hub[0]
+    hubAnchor: RoomPosition = stampAnchors.hub[0]
 
     // Loop through each group
 

@@ -109,6 +109,9 @@ constants.roomTypeProperties = {
     powerBanks: true,
     notClaimable: true,
 
+    source1Efficacy: true,
+    source2Efficacy: true,
+
     owner: true,
     level: true,
 
@@ -132,6 +135,8 @@ constants.roomTypes = {
         commune: true,
         source1: true,
         source2: true,
+        source1Efficacy: true,
+        source2Efficacy: true,
         notClaimable: true,
     },
     ally: {

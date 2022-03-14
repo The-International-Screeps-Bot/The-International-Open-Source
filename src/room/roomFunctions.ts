@@ -1170,7 +1170,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                 // If the type is in typeWeights, inform the weight for the type
 
-                if (opts.typeWeights[roomMemory.type]) return opts.typeWeights[roomMemory.type]
+                if (opts.typeWeights && opts.typeWeights[roomMemory.type]) return opts.typeWeights[roomMemory.type]
 
                 // Inform to consider this room
 
@@ -1655,7 +1655,68 @@ Room.prototype.findType = function(scoutingRoom: Room) {
             // Set roomType as remote and assign commune as scoutingRoom's name
 
             room.memory.type = 'remote'
+
+            // Assign the room's commune as the scoutingRoom
+
             room.memory.commune = scoutingRoom.name
+
+            // Add the room's name to the scoutingRoom's remotes list
+
+            scoutingRoom.memory.remotes.add(room.name)
+
+            // Get base planning data
+
+            const /* roadCM: CostMatrix = room.get('roadCM'),
+            structurePlans: CostMatrix = room.get('structurePlans'),
+ */
+
+            // Get the hubAnchor, stopping if it's undefined
+
+            hubAnchor: RoomPosition = global[scoutingRoom.name].stampAnchors?.hub[0]
+            if (!hubAnchor) return
+
+            // Get the room's sourceNames
+
+            const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+
+            // loop through sourceNames
+
+            for (const sourceName of sourceNames) {
+
+                // Get the source using sourceName, iterating if undefined
+
+                const source: Source = room.get(sourceName)
+                if (!source) continue
+
+                // Path from the centerUpgradePos to the closestHarvestPos
+
+                const path = room.advancedFindPath({
+                    origin: source.pos,
+                    goal: { pos: hubAnchor, range: 2 },
+                    /* weightCostMatrixes: [roadCM] */
+                })
+
+                // Record the length of the path in the room's memory
+
+                room.memory[`${sourceName}Efficacy`] = path.length
+
+                /*
+                // Loop through positions of the path
+
+                for (const pos of path) {
+
+                    // Record the pos in roadCM
+
+                    roadCM.set(pos.x, pos.y, 1)
+
+                    // Plan for a road at this position
+
+                    structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+                } */
+            }
+
+            // Stop
+
             return
         }
 

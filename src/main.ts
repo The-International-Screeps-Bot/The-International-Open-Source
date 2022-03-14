@@ -65,14 +65,14 @@ declare global {
         /**
          * The range of protection from the anchor to provide when deciding rampart placement
          */
-         protectionOffset: number
+        protectionOffset: number
         size: number
         structures: {[key: string]: Pos[]}
     }
 
     type Stamps = Record<StampTypes, Stamp>
 
-    type StampAnchors = Partial<Record<StampTypes, Pos[]>>
+    type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
 
     type CreepRoles = 'sourceHarvester' |
     'hauler' |
@@ -263,7 +263,7 @@ declare global {
         /**
          * An array of roomNames that have controllers we own
          */
-        communes: string[]
+        communes: Set<string>
 
         /**
          * The amount of energy in storages and terminals in owned rooms
@@ -527,6 +527,10 @@ declare global {
 
         source1: Id<Source>
         source2: Id<Source>
+
+        source1Efficacy: number
+
+        source2Efficacy: number
 
         /**
          * The room owner
