@@ -1540,7 +1540,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
             // Set the type to enemy and stop
 
             room.memory.type = 'enemy'
-            room.memory.owner = controller.owner
+            room.memory.owner = controller.owner.username
             room.memory.level = controller.level
             room.memory.powerEnabled = controller.isPowerEnabled
             room.memory.terminal = room.terminal != undefined

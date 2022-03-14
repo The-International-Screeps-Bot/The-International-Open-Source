@@ -102,7 +102,6 @@ constants.tradeBlacklist = new Set([
 
 constants.roomTypeProperties = {
 
-    commune: true,
     source1: true,
     source2: true,
     remotes: true,
@@ -117,6 +116,8 @@ constants.roomTypeProperties = {
     towers: true,
     terminal: true,
     storedEnergy: true,
+
+    portalsTo: true,
 }
 
 constants.roomTypes = {
@@ -126,12 +127,12 @@ constants.roomTypes = {
         remotes: true,
         commodities: true,
         powerBanks: true,
-        notClaimable: true,
     },
     remote: {
         commune: true,
         source1: true,
         source2: true,
+        notClaimable: true,
     },
     ally: {
         level: true,
@@ -145,9 +146,14 @@ constants.roomTypes = {
         towers: true,
         terminal: true,
         storedEnergy: true,
+        notClaimable: true,
     },
     enemyRemote: {
         owner: true,
+        notClaimable: true,
+    },
+    neutral: {
+        notClaimable: true,
     },
     keeper: {
         owner: true,
@@ -155,11 +161,10 @@ constants.roomTypes = {
     keeperCenter: {
         owner: true,
     },
-    neutral: {
+    highway: {
     },
     intersection: {
-    },
-    highway: {
+        portalsTo: true,
     },
 }
 

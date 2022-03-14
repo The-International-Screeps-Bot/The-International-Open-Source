@@ -516,9 +516,54 @@ declare global {
         type: string
 
         /**
+         * A set of names of remotes controlled by this room
+         */
+        remotes: Set<string>
+
+        /**
+         * If the room can be constructed by the base planner
+         */
+        notClaimable: boolean
+
+        source1: Id<Source>
+        source2: Id<Source>
+
+        /**
+         * The room owner
+         */
+        owner: string
+
+        /**
+         * The controller's level
+         */
+        level: number
+
+        powerEnabled: boolean
+
+        /**
+         * The number of towers in the room
+         */
+        towers: number
+
+        /**
+         * If a terminal is present in the room
+         */
+        terminal: boolean
+
+        /**
+         * The amount of stored energy in the room
+         */
+        storedEnergy: number
+
+        /**
+         * A set of roomNames that portals in this room go to
+         */
+        portalsTo: Set<string>
+
+        /**
          * The last tick the room was scouted at
          */
-        scoutTick: number
+        lastScout: number
     }
 
     // Creeps

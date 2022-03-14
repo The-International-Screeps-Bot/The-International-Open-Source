@@ -27,9 +27,9 @@ Scout.prototype.findScoutTarget = function() {
 
         if (Game.map.getRoomStatus(roomName).status != Game.map.getRoomStatus(room.name).status) continue
 
-        // If the room has memory and a scoutTick
+        // If the room has memory and a lastScout
 
-        if (Memory.rooms[roomName] && Memory.rooms[roomName].scoutTick) {
+        if (Memory.rooms[roomName] && Memory.rooms[roomName].lastScout) {
 
             // Add it to scoutedRooms and iterate
 
@@ -56,9 +56,9 @@ Scout.prototype.findScoutTarget = function() {
         return
     }
 
-    // Otherwise ort the scoutedRooms by their scoutTick, selecting the oldest one
+    // Otherwise ort the scoutedRooms by their lastScout, selecting the oldest one
 
-    const oldestScoutedRoom = scoutedRooms.sort((a, b) => Memory.rooms[a].scoutTick - Memory.rooms[b].scoutTick)[0]
+    const oldestScoutedRoom = scoutedRooms.sort((a, b) => Memory.rooms[a].lastScout - Memory.rooms[b].lastScout)[0]
 
     // Record the oldestScoutedRoom in the creep's memory
 
