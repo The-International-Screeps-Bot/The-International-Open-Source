@@ -263,7 +263,7 @@ declare global {
         /**
          * An array of roomNames that have controllers we own
          */
-        communes: Set<string>
+        communes: string[]
 
         /**
          * The amount of energy in storages and terminals in owned rooms
@@ -518,7 +518,7 @@ declare global {
         /**
          * A set of names of remotes controlled by this room
          */
-        remotes: Set<string>
+        remotes: string[]
 
         /**
          * If the room can be constructed by the base planner
@@ -562,7 +562,7 @@ declare global {
         /**
          * A set of roomNames that portals in this room go to
          */
-        portalsTo: Set<string>
+        portalsTo: string[]
 
         /**
          * The last tick the room was scouted at

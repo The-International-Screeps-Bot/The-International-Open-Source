@@ -9,7 +9,7 @@ export function tickConfig() {
 
     // General
 
-    Memory.communes = new Set()
+    Memory.communes = []
 
     Memory.energy = 0
 
@@ -91,11 +91,11 @@ export function tickConfig() {
         // Set type to commune
 
         room.memory.type = 'commune'
-        room.memory.remotes = new Set()
+        room.memory.remotes = []
 
         // Add roomName to commune list
 
-        Memory.communes.add(roomName)
+        Memory.communes.push(roomName)
 
         room.creepsFromRoom = {}
 
