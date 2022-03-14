@@ -1477,6 +1477,41 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
     room.memory.lastScout = Game.time
 
+    // Find the numbers in the room's name
+
+	const [EWstring, NSstring] = room.name.match(/\d+/g),
+
+    // Convert he numbers from strings into actual numbers
+
+    EW = parseInt(EWstring),
+    NS = parseInt(NSstring)
+
+    // Use the numbers to deduce some room types - quickly!
+
+	if (EW % 10 == 0 && NS % 10 == 0) {
+
+        room.memory.type = 'intersection'
+        return
+    }
+
+  	if (EW % 10 == 0 || NS % 10 == 0) {
+
+        room.memory.type = 'highway'
+        return
+    }
+
+	if (EW % 5 == 0 && NS % 5 == 0) {
+
+        room.memory.type = 'keeperCenter'
+        return
+    }
+
+	if (Math.abs(5 - EW % 10) <= 1 && Math.abs(5 - NS % 10) <= 1) {
+
+        room.memory.type = 'keeper'
+        return
+    }
+
     // If there is a controller
 
     if (controller) {
@@ -1629,7 +1664,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
         room.memory.type = 'neutral'
         return
     }
-
+/*
     // If there is no controller
 
     // Get keeperLair
@@ -1669,10 +1704,10 @@ Room.prototype.findType = function(scoutingRoom: Room) {
     // Set type to highway and stop
 
     room.memory.type == 'highway'
-    return
+    return */
 }
 
-Room.prototype.cleanRoomMemory = function() {
+Room.prototype.cleanMemory = function() {
 
     const room = this
 
@@ -2238,14 +2273,35 @@ Room.prototype.findClosestPosOfValue = function(opts) {
 
             if (isViableAnchor(pos)) return room.newPos(pos)
 
-            // Construct a rect and get the positions in a range of 1
+            // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-            const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 },
-            adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+            const adjacentPositions = [
+                {
+                    x: pos.x - 1,
+                    y: pos.y
+                },
+                {
+                    x: pos.x + 1,
+                    y: pos.y
+                },
+                {
+                    x: pos.x,
+                    y: pos.y - 1
+                },
+                {
+                    x: pos.x,
+                    y: pos.y + 1
+                },
+            ]
 
             // Loop through adjacent positions
 
             for (const adjacentPos of adjacentPositions) {
+
+                // Iterate if the pos doesn't map onto a room
+
+                if (adjacentPos.x < 0 || adjacentPos.x >= constants.roomDimensions ||
+                    adjacentPos.y < 0 || adjacentPos.y >= constants.roomDimensions) continue
 
                 // Iterate if the adjacent pos has been visited or isn't a tile
 
@@ -2306,21 +2362,20 @@ Room.prototype.findCSiteTargetID = function(creep) {
 
         // Get the structures with the relevant type
 
-        const cSitesOfType: Structure[] = room.get(`${structureType}CSite`)
+        const cSitesOfType: ConstructionSite[] = room.get(`${structureType}CSite`)
 
-        // If there are more than 0 cSites of this type
+        // If there are no cSites of this type, iterate
 
-        if (cSitesOfType.length) {
+        if (!cSitesOfType.length) continue
 
-            // Get the anchor
+        // Ptherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
 
-            const anchor: RoomPosition = room.get('anchor') || creep?.pos || new RoomPosition(25, 25, room.name)
+        const anchor: RoomPosition = room.get('anchor') || creep?.pos || new RoomPosition(25, 25, room.name)
 
-            // Record the closest site to the anchor in the room's global and inform true
+        // Record the closest site to the anchor in the room's global and inform true
 
-            global[room.name].cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id
-            return true
-        }
+        global[room.name].cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id
+        return true
     }
 
     // If no cSiteTarget was found, inform false
@@ -2515,9 +2570,10 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
     visitedCM = new PathFinder.CostMatrix(),
 
-    // Get the room's anchor
+    // Get the room's anchor, stopping if it's undefined
 
     anchor: RoomPosition = room.get('anchor')
+    if (!anchor) return
 
     // Record the anchor as visited
 
@@ -2573,7 +2629,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
                 // Display visuals if enabled
 
-                /* if (Memory.roomVisuals) room.visual.structure(x, y, structureType, {
+                /* if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
                     opacity: 0.5
                 }) */
 
@@ -2582,14 +2638,35 @@ Room.prototype.advancedConstructStructurePlans = function() {
                 room.createConstructionSite(pos.x, pos.y, structureType)
             }
 
-            // Construct a rect and get the positions in a range of 1
+            // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-            const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 },
-            adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+            const adjacentPositions = [
+                {
+                    x: pos.x - 1,
+                    y: pos.y
+                },
+                {
+                    x: pos.x + 1,
+                    y: pos.y
+                },
+                {
+                    x: pos.x,
+                    y: pos.y - 1
+                },
+                {
+                    x: pos.x,
+                    y: pos.y + 1
+                },
+            ]
 
             // Loop through adjacent positions
 
             for (const adjacentPos of adjacentPositions) {
+
+                // Iterate if the pos doesn't map onto a room
+
+                if (adjacentPos.x < 0 || adjacentPos.x >= constants.roomDimensions ||
+                    adjacentPos.y < 0 || adjacentPos.y >= constants.roomDimensions) continue
 
                 // Iterate if the adjacent pos has been visited or isn't a tile
 

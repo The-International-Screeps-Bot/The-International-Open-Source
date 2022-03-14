@@ -393,7 +393,7 @@ declare global {
         /**
          * Removes roomType-based values in the room's memory that don't match its type
          */
-        cleanRoomMemory(): void
+        cleanMemory(): void
 
         /**
          * Converts a custom Pos into a Game's RoomPosition

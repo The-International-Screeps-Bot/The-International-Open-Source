@@ -101,7 +101,6 @@ constants.tradeBlacklist = new Set([
 ])
 
 constants.roomTypeProperties = {
-    type: true,
 
     commune: true,
     source1: true,
@@ -109,6 +108,7 @@ constants.roomTypeProperties = {
     remotes: true,
     commodities: true,
     powerBanks: true,
+    notClaimable: true,
 
     owner: true,
     level: true,
@@ -126,13 +126,12 @@ constants.roomTypes = {
         remotes: true,
         commodities: true,
         powerBanks: true,
+        notClaimable: true,
     },
     remote: {
         commune: true,
         source1: true,
         source2: true,
-        reserverNeed: true,
-        builderNeed: true,
     },
     ally: {
         level: true,
@@ -157,10 +156,10 @@ constants.roomTypes = {
         owner: true,
     },
     neutral: {
-
+    },
+    intersection: {
     },
     highway: {
-
     },
 }
 

@@ -17,11 +17,11 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 
             // Get information about the room
 
-            Game.rooms[creep.memory.communeName].findType(room)
+            room.findType(Game.rooms[creep.memory.communeName])
 
-            // Assign the room this tick as its scoutTick
+            // Clean the room's memory
 
-            room.memory.scoutTick = Game.time
+            room.cleanMemory()
 
             // And delete the creep's scoutTarget
 
