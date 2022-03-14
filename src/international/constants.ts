@@ -109,6 +109,7 @@ constants.roomTypeProperties = {
     powerBanks: true,
     notClaimable: true,
 
+    commune: true,
     source1Efficacy: true,
     source2Efficacy: true,
 

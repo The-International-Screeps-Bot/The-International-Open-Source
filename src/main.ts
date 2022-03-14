@@ -528,6 +528,8 @@ declare global {
         source1: Id<Source>
         source2: Id<Source>
 
+        commune: string
+
         source1Efficacy: number
 
         source2Efficacy: number
