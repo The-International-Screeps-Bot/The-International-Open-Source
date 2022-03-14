@@ -676,7 +676,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Construct usedHarvestPositions
 
-        const usedHarvestPositions = new PathFinder.CostMatrix()
+        const usedHarvestPositions: Set<number> = new Set()
 
         // Loop through each sourceHarvester's name in the room
 
@@ -695,14 +695,9 @@ Room.prototype.get = function(roomObjectName) {
 
             room.creepsOfSourceAmount[sourceName]++
 
-            // Get the creep's harvestPos, if not defined iterate
+            // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 
-            const harvestPos = creep.memory.harvestPos
-            if (!harvestPos) continue
-
-            // Record the harvestPos in usedHarvestPositions
-
-            usedHarvestPositions.set(harvestPos.x, harvestPos.y, 255)
+            if (creep.memory.packedHarvestPos) usedHarvestPositions.add(creep.memory.packedHarvestPos)
         }
 
         // Inform usedHarvestPositions
@@ -725,7 +720,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Construct usedUpgradePositions
 
-        const usedUpgradePositions = new PathFinder.CostMatrix(),
+        const usedUpgradePositions: Set<number> = new Set(),
 
         // Get the controllerContainer
 
@@ -738,7 +733,7 @@ Room.prototype.get = function(roomObjectName) {
             // Get the centerUpgradePos and set it as avoid in usedUpgradePositions
 
             const centerUpgadePos = room.roomObjects.centerUpgradePos.getValue()
-            usedUpgradePositions.set(centerUpgadePos.x, centerUpgadePos.y, 255)
+            usedUpgradePositions.add(centerUpgadePos.x * constants.roomDimensions + centerUpgadePos.y)
         }
 
         // Get the hubAnchor, informing false if it's not defined
@@ -757,7 +752,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Assign closestUpgradePos in usedUpgradePositions
 
-        usedUpgradePositions.set(closestUpgradePos.x, closestUpgradePos.y, 255)
+        usedUpgradePositions.add(closestUpgradePos.x * constants.roomDimensions + closestUpgradePos.y)
 
         // Loop through each controllerUpgrader's name in the room
 
@@ -767,14 +762,9 @@ Room.prototype.get = function(roomObjectName) {
 
             const creep: ControllerUpgrader = Game.creeps[creepName]
 
-            // Get the creep's upgradePos, if not defined iterate
+            // If the creep has a packedUpgradePos, record it in usedUpgradePositions
 
-            const upgradePos = creep.memory.packedUpgradePos
-            if (!upgradePos) continue
-
-            // Record the upgradePos in usedUpgradePositions
-
-            usedUpgradePositions.set(upgradePos / 50, Math.floor(upgradePos % 50), 255)
+            if (creep.memory.packedUpgradePos) usedUpgradePositions.add(creep.memory.packedUpgradePos)
         }
 
         // Inform usedUpgradePositions

@@ -81,8 +81,6 @@ interface Constants {
 
 export const constants: Partial<Constants> = {}
 
-constants.roomDimensions = 50
-
 constants.me = 'MarvinTMB'
 constants.mmoShardNames = new Set([
     'shard0',

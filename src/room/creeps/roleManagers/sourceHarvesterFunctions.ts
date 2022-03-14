@@ -1,3 +1,4 @@
+import { constants } from "international/constants"
 import { generalFuncs } from "international/generalFunctions"
 import { RoomPullTask } from "room/roomTasks"
 import { SourceHarvester } from "../creepClasses"
@@ -17,9 +18,9 @@ SourceHarvester.prototype.travelToSource = function() {
 
     creep.say('🚬')
 
-    // Inform true if the creep is at the creep's harvestPos
+    // If the creep is at the creep's packedHarvestPos, inform false
 
-    if (generalFuncs.arePositionsEqual(creep.pos, creep.memory.harvestPos)) return false
+    if (generalFuncs.getRangeBetween(creep.pos.x, creep.pos.y, Math.floor(creep.memory.packedHarvestPos / constants.roomDimensions), Math.floor(creep.memory.packedHarvestPos % 50)) == 0) return false
 
     // If the creep's movement type is pull
 
@@ -54,13 +55,14 @@ SourceHarvester.prototype.travelToSource = function() {
 
     creep.createMoveRequest({
         origin: creep.pos,
-        goal: { pos: room.newPos(creep.memory.harvestPos), range: 0 },
+        goal: { pos: new RoomPosition(Math.floor(creep.memory.packedHarvestPos / constants.roomDimensions), Math.floor(creep.memory.packedHarvestPos % 50), room.name), range: 0 },
         avoidImpassibleStructures: true,
         avoidEnemyRanges: true,
         weightGamebjects: {
             1: room.get('road')
         }
     })
+
     return true
 }
 

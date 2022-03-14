@@ -56,25 +56,23 @@ export function roomVisualsManager(room: Room) {
 
         if (room.controller.reservation) {
 
-            let color: string
+            // Define the reservationColor based on some conditions
 
-            reservationColor()
+            const color = reservationColor()
 
             function reservationColor() {
 
                 if (room.controller.reservation.username == constants.me) {
 
-                    color = constants.colors.lightBlue
-                    return
+                    return constants.colors.lightBlue
                 }
 
                 if (constants.allyList.has(room.controller.reservation.username)) {
 
-                    color = constants.colors.green
-                    return
+                    return constants.colors.green
                 }
 
-                color = constants.colors.red
+                return constants.colors.red
             }
 
             // Show the reservation time
@@ -116,7 +114,7 @@ export function roomVisualsManager(room: Room) {
 
             // And display how many ticks left until spawned
 
-            room.visual.text(spawn.spawning.remainingTime.toString(), spawn.pos.x, spawn.pos.y - 1, {
+            room.visual.text((spawn.spawning.remainingTime - 1).toString(), spawn.pos.x, spawn.pos.y - 1, {
                 backgroundColor: 'rgb(255, 0, 0, 0)',
                 font: 0.5,
                 opacity: 1,

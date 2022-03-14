@@ -167,28 +167,32 @@ Creep.prototype.advancedUpgradeController = function() {
 
             // Get usedUpgradePositions, informing false if they're undefined
 
-            usedUpgradePositions: CostMatrix = room.get('usedUpgradePositions')
+            usedUpgradePositions: Set<number> = room.get('usedUpgradePositions')
             if (!usedUpgradePositions) return false
 
             // Loop through each upgradePositions
 
             for (const pos of upgradePositions) {
 
-                // Iterate if the pos is to avoid
+                // Construct the packedPos using pos
 
-                if (usedUpgradePositions.get(pos.x, pos.y) == 255) continue
+                const packedPos = pos.x * 50 + pos.y
 
-                // Otherwise record the pos as packedUpgradePos in the creep's memory, record the pos in usedUpgradePositions, and stop
+                // Iterate if the pos is used
 
-                creep.memory.packedUpgradePos = pos.x * 50 + pos.y
-                usedUpgradePositions.set(pos.x, pos.y, 255)
+                if (usedUpgradePositions.has(packedPos)) continue
+
+                // Otherwise record packedPos in the creep's memory and in usedUpgradePositions
+
+                creep.memory.packedUpgradePos = packedPos
+                usedUpgradePositions.add(packedPos)
                 break
             }
         }
 
-        // If the packedUpgradePos is out of range
+        // If packedUpgradePos is out of range
 
-        if (generalFuncs.getRangeBetween(creep.pos.x, creep.pos.y, creep.memory.packedUpgradePos / 50, Math.floor(creep.memory.packedUpgradePos % 50)) > 0) {
+        if (generalFuncs.getRangeBetween(creep.pos.x, creep.pos.y, Math.floor(creep.memory.packedUpgradePos / constants.roomDimensions), Math.floor(creep.memory.packedUpgradePos % constants.roomDimensions)) > 0) {
 
             creep.say('➡️UP')
 
@@ -196,7 +200,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: new RoomPosition(creep.memory.packedUpgradePos / 50, Math.floor(creep.memory.packedUpgradePos % 50), room.name), range: 0 },
+                goal: { pos: new RoomPosition(Math.floor(creep.memory.packedUpgradePos / constants.roomDimensions), Math.floor(creep.memory.packedUpgradePos % constants.roomDimensions), room.name), range: 0 },
                 avoidImpassibleStructures: true,
                 avoidEnemyRanges: true,
                 weightGamebjects: {
@@ -717,9 +721,9 @@ Creep.prototype.findHarvestPosition = function() {
     const creep = this,
     room = creep.room
 
-    // Stop if the creep already has a harvestPos
+    // Stop if the creep already has a packedHarvestPos
 
-    if (creep.memory.harvestPos) return true
+    if (creep.memory.packedHarvestPos) return true
 
     // Otherwise define the creep's designated source
 
@@ -729,18 +733,22 @@ Creep.prototype.findHarvestPosition = function() {
 
     closestHarvestPos: Pos = room.get(`${sourceName}ClosestHarvestPos`),
 
+    // Convert the closestHarvestPos into a packed pos
+
+    packedClosestHarvestPos = closestHarvestPos.x * constants.roomDimensions + closestHarvestPos.y,
+
     // Get usedHarvestPositions
 
-    usedHarvestPositions: CostMatrix = room.get('usedHarvestPositions')
+    usedHarvestPositions: Set<number> = room.get('usedHarvestPositions')
 
-    // If the closestHarvestPos isn't used, set it as the harvestPos
+    // If the packedClosestHarvestPos isn't used
 
-    if (usedHarvestPositions.get(closestHarvestPos.x, closestHarvestPos.y) != 255) {
+    if (!usedHarvestPositions.has(packedClosestHarvestPos)) {
 
-        // Set it as the harvestPos, record in usedHarvestPositions, and inform true
+        // Set it as the packedClosestHarvestPos, record in usedHarvestPositions, and inform true
 
-        creep.memory.harvestPos = closestHarvestPos
-        usedHarvestPositions.set(closestHarvestPos.x, closestHarvestPos.y, 255)
+        creep.memory.packedHarvestPos = packedClosestHarvestPos
+        usedHarvestPositions.add(packedClosestHarvestPos)
         return true
     }
 
@@ -752,16 +760,19 @@ Creep.prototype.findHarvestPosition = function() {
 
     for (const harvestPos of harvestPositions) {
 
-        // If the harvestPos isn't used
+        // Construct a packedPos from the harvestPos
 
-        if (usedHarvestPositions.get(harvestPos.x, harvestPos.y) != 255) {
+        const packedPos = harvestPos.x * constants.roomDimensions + harvestPos.y
 
-            // Set it as the harvestPos, record in usedHarvestPositions, and inform true
+        // If the harvestPos is used, iterate
 
-            creep.memory.harvestPos = harvestPos
-            usedHarvestPositions.set(harvestPos.x, harvestPos.y, 255)
-            return true
-        }
+        if (usedHarvestPositions.has(packedPos)) continue
+
+        // Otherwise assign the creep the harvestPos, record it in usedHarvestPositions, and inform true
+
+        creep.memory.packedHarvestPos = packedPos
+        usedHarvestPositions.add(packedPos)
+        return true
     }
 
     // No harvestPos was found, inform false
@@ -773,22 +784,27 @@ Creep.prototype.hasPartsOfTypes = function(partTypes) {
 
     const creep = this
 
+    // Loop through each specified partType
+
     for (const partType of partTypes) {
 
-        if (creep.body.some(part => part.type == partType)) return true
+        // If the doesn't have any parts of the specified type, inform false
+
+        if (!creep.body.some(part => part.type == partType)) return false
     }
 
-    return false
+    // If the creep has all the parts, inform true
+
+    return true
 }
 
 Creep.prototype.partsOfType = function(type) {
 
     const creep = this
 
-    // Filter body parts that are of type, return number of them
+    // Filter body parts that are of a specified type, informing their count
 
-    const partsOfType = creep.body.filter(part => part.type == type)
-    return partsOfType.length
+    return creep.body.filter(part => part.type == type).length
 }
 
 Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {

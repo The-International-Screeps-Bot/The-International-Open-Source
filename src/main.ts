@@ -683,9 +683,9 @@ declare global {
         sourceName: 'source1' | 'source2'
 
         /**
-         * The creep's harvestPos
+         * The creep's packed pos to sit on when harvesting
          */
-        harvestPos: Pos
+        packedHarvestPos: number
 
         /**
          * The creep's packed upgrade pos
