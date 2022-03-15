@@ -192,11 +192,11 @@ export function spawnRequester(room: Room) {
                     }
                 }
             }
-
+/*
             // If the body has fewer parts than defaultParts amount + extraParts amount, disable the request
 
-            if (body.length < opts.defaultParts.length + opts.extraParts.length) body = []
-
+            if (body.length < opts.defaultParts.length + opts.extraParts.length) break
+ */
             // Create a spawnRequest using previously constructed information
 
             createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
@@ -221,8 +221,7 @@ export function spawnRequester(room: Room) {
 
         // Find the totalExtraParts using the partsMultiplier
 
-        let totalExtraParts = opts.extraParts.length * opts.partsMultiplier,
-        maxPartsPerCreep = Math.min(50, totalExtraParts)
+        let totalExtraParts = opts.extraParts.length * opts.partsMultiplier
 
         // Loop through creep names of the requested role
 
@@ -230,8 +229,12 @@ export function spawnRequester(room: Room) {
 
             // Take away the amount of parts the creep with the name has from totalExtraParts
 
-            totalExtraParts -= Game.creeps[creepName].body.length - opts.defaultParts.length
+            totalExtraParts -= (Game.creeps[creepName].body.length - opts.defaultParts.length)
         }
+
+        // Construct from totalExtraParts at a max of 50
+
+        const maxPartsPerCreep = Math.min(50, totalExtraParts)
 
         // If there aren't enough requested parts to justify spawning a creep, stop
 
@@ -350,11 +353,11 @@ export function spawnRequester(room: Room) {
                     partIndex--
                 }
             }
-
+/*
             // If the body has fewer parts than defaultParts amount + extraParts amount, disable the request
 
-            if (body.length < opts.defaultParts.length + opts.extraParts.length) body = []
-
+            if (body.length < opts.defaultParts.length + opts.extraParts.length) break
+ */
             // Create a spawnRequest using previously constructed information
 
             createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
@@ -406,7 +409,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [MOVE, CARRY],
                 extraParts: [WORK],
-                partsMultiplier: 12,
+                partsMultiplier: 6,
                 minCreeps: 2,
                 maxCreeps: Infinity,
                 minCost: 300,
