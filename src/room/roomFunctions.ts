@@ -2692,7 +2692,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
                 // Create a road site at this pos
 
-                /* room.createConstructionSite(pos.x, pos.y, structureType) */
+                room.createConstructionSite(pos.x, pos.y, structureType)
             }
 
             // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
@@ -2782,4 +2782,30 @@ Room.prototype.createWithdrawTasks = function(creator) {
     const room = this
 
 
+}
+
+Room.prototype.estimateIncome = function() {
+
+    const room = this
+
+    // Construct income starting at 0
+
+    let income = 0
+
+    // Loop through each creepName with a role of sourceHarvester from this room
+
+    for (const creepName of room.creepsFromRoom.sourceHarvester) {
+
+        // Get the creep using creepName
+
+        const creep = Game.creeps[creepName]
+
+        // Add the number of work parts owned by the creep at a max of 5, times harvest power
+
+        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER
+    }
+
+    // Inform income
+
+    return income
 }

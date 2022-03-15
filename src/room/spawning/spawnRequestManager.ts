@@ -498,7 +498,11 @@ export function spawnRequester(room: Room) {
 
         if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 30000
 
-        // If there are construction sites of my ownership, set multiplier to 1
+        // For every 8 estimated income, add 1 multiplier
+
+        partsMultiplier += Math.floor(room.estimateIncome() / 8)
+
+        // If there are construction sites of my ownership in the room, set multiplier to 1
 
         if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 1
 

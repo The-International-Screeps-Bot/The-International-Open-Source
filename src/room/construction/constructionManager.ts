@@ -79,10 +79,6 @@ export function constructionManager(room: Room) {
 
                 // Display visuals if enabled
 
-                /* if (Memory.roomVisuals) room.visual.structure(x, y, STRUCTURE_ROAD, {
-                    opacity: 0.5
-                }) */
-
                 if (Memory.roomVisuals) room.visual.structure(x, y, STRUCTURE_RAMPART, {
                     opacity: 0.5
                 })

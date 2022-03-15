@@ -522,12 +522,17 @@ declare global {
         /**
          *
          */
-         createTransferTasks(creator: Structure | Creep | Resource): void
+        createTransferTasks(creator: Structure | Creep | Resource): void
 
         /**
          *
          */
-          createWithdrawTasks(creator: Structure | Creep | Resource): void
+        createWithdrawTasks(creator: Structure | Creep | Resource): void
+
+        /**
+         * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
+         */
+        estimateIncome(): number
     }
 
     interface RoomMemory {
