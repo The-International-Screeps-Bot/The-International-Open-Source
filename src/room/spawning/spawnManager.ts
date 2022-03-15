@@ -21,7 +21,7 @@ export function spawnManager(room: Room) {
     // Sort spawnRequests by their priority
 
     const requestsByPriority = Object.keys(spawnRequests).sort((a, b) => parseInt(a) - parseInt(b))
-
+    
     // Track the inactive spawn index
 
     let spawnIndex = inactiveSpawns.length - 1

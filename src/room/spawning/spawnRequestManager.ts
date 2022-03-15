@@ -53,32 +53,28 @@ export function spawnRequester(room: Room) {
 
         if (!opts) return
 
-        // If there are no sourceHarvesters or haulers, set the maxCostPerCreep to the spawnEnergyAvailable, otherwise set it to the lowest allowed cost
-
-        const maxCostPerCreep = (room.creepsFromRoom.sourceHarvester.length == 0 || room.creepsFromRoom.hauler.length == 0) ? spawnEnergyAvailable : spawnEnergyCapacity
-
-        // If the maxCostPerCreep is less than the minCost, stop
-
-        if (maxCostPerCreep < opts.minCost) return
-
         // If minCreeps is defined
 
         if (opts.minCreeps) {
 
             // Construct spawn requests individually, and stop
 
-            constructSpawnRequestsIndividually(opts, maxCostPerCreep)
+            constructSpawnRequestsIndividually(opts)
             return
         }
 
-        // Construct spawn requests by group, and stop
+        // Construct spawn requests by group
 
-        constructSpawnRequestsByGroup(opts, maxCostPerCreep)
+        constructSpawnRequestsByGroup(opts)
     }
 
     // Use preset creep amounts to construct spawn requests
 
-    function constructSpawnRequestsIndividually(opts: SpawnRequestOpts, maxCostPerCreep: number) {
+    function constructSpawnRequestsIndividually(opts: SpawnRequestOpts) {
+
+        // If there are no sourceHarvesters or haulers, set the maxCostPerCreep to the spawnEnergyAvailable, otherwise set it to the lowest allowed cost
+
+        const maxCostPerCreep = (room.creepsFromRoom.sourceHarvester.length == 0 || room.creepsFromRoom.hauler.length == 0) ? spawnEnergyAvailable : spawnEnergyCapacity
 
         // So long as minCreeps is more than the current number of creeps
 
@@ -197,9 +193,9 @@ export function spawnRequester(room: Room) {
                 }
             }
 
-            // If the body has fewer parts than defaultParts amount + extraParts amount
+            // If the body has fewer parts than defaultParts amount + extraParts amount, disable the request
 
-            if (body.length < opts.defaultParts.length + opts.extraParts.length) break
+            if (body.length < opts.defaultParts.length + opts.extraParts.length) body = []
 
             // Create a spawnRequest using previously constructed information
 
@@ -217,7 +213,11 @@ export function spawnRequester(room: Room) {
 
     // Construct spawn requests while deciding on creep amounts
 
-    function constructSpawnRequestsByGroup(opts: SpawnRequestOpts, maxCostPerCreep: number) {
+    function constructSpawnRequestsByGroup(opts: SpawnRequestOpts) {
+
+        // If there are no sourceHarvesters or haulers, set the maxCostPerCreep to the spawnEnergyAvailable, otherwise set it to the lowest allowed cost
+
+        const maxCostPerCreep = (room.creepsFromRoom.sourceHarvester.length == 0 || room.creepsFromRoom.hauler.length == 0) ? spawnEnergyAvailable : spawnEnergyCapacity
 
         // Find the totalExtraParts using the partsMultiplier
 
@@ -233,7 +233,7 @@ export function spawnRequester(room: Room) {
             totalExtraParts -= Game.creeps[creepName].body.length - opts.defaultParts.length
         }
 
-        // If there arn't enough requested parts to justify spawning a creep, stop
+        // If there aren't enough requested parts to justify spawning a creep, stop
 
         if (totalExtraParts < maxPartsPerCreep / 2) return
 
@@ -347,9 +347,9 @@ export function spawnRequester(room: Room) {
                 }
             }
 
-            // If the body has fewer parts than defaultParts amount + extraParts amount
+            // If the body has fewer parts than defaultParts amount + extraParts amount, disable the request
 
-            if (body.length < opts.defaultParts.length + opts.extraParts.length) break
+            if (body.length < opts.defaultParts.length + opts.extraParts.length) body = []
 
             // Create a spawnRequest using previously constructed information
 
@@ -418,7 +418,7 @@ export function spawnRequester(room: Room) {
             extraParts: [WORK],
             partsMultiplier: 12,
             minCreeps: undefined,
-            maxCreeps: Math.max(3, room.get('source1HarvestPositions').length) + Math.max(3, room.get('source2HarvestPositions')),
+            maxCreeps: Math.min(3, room.get('source1HarvestPositions')?.length) + Math.min(3, room.get('source2HarvestPositions')?.length),
             minCost: 200,
             priority: room.creepsFromRoom.sourceHarvester.length,
             memoryAdditions: {
