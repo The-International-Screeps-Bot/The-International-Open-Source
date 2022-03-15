@@ -23,12 +23,24 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         if (creep.transferToSourceLink()) continue
 
+        // Get the creeps sourceName
+
+        const sourceName = creep.memory.sourceName,
+
+        // Get the sourceContainer for the creep's source
+
+        sourceContainer: StructureContainer = room.get(`${sourceName}Container`)
+
+        // Try to create a withdraw task
+
+        creep.createWithdrawTask(sourceContainer)
+
         // Try to normally harvest. Iterate if creep harvested
 
-        if (creep.advancedHarvestSource(room.get(creep.memory.sourceName))) continue
+        if (creep.advancedHarvestSource(room.get(sourceName))) continue
 
-        // If the source is empty repair the source contianer if it exists. Iterate if it repaired
+        // Try to repair the sourceContainer. Iterate if it repaired
 
-        if (creep.repairSourceContainer()) continue
+        if (creep.repairSourceContainer(sourceContainer)) continue
     }
 }

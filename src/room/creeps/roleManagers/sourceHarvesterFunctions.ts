@@ -1,6 +1,6 @@
 import { constants } from "international/constants"
 import { generalFuncs } from "international/generalFunctions"
-import { RoomPullTask } from "room/roomTasks"
+import { RoomPullTask, RoomWithdrawTask } from "room/roomTasks"
 import { SourceHarvester } from "../creepClasses"
 
 SourceHarvester.prototype.travelToSource = function() {
@@ -83,18 +83,99 @@ SourceHarvester.prototype.transferToSourceLink = function() {
     return true
 }
 
-SourceHarvester.prototype.repairSourceContainer = function() {
+SourceHarvester.prototype.createWithdrawTask = function(sourceContainer) {
 
     const creep = this,
     room = creep.room
 
-    // Get the creeps sourceName
+    // If there is a sourceContainer, stop
 
-    const sourceName = creep.memory.sourceName,
+    if (sourceContainer) return
 
-    // Get the sourceContainer for the creep's source, informing false if it's undefined
+    // Construct an undefined taskWithoutResponder
 
-    sourceContainer: StructureContainer = room.get(`${sourceName}Container`)
+    let taskWithoutResponder: RoomWithdrawTask,
+
+    // Construct totalResourcesOffered at 0
+
+    totalResourcesOffered = 0
+
+    // if there is no global for the creep, make one
+
+    if (!global[creep.id]) global[creep.id] = {}
+
+    // If there is no created task ID obj for the creep's global, create one
+
+    if (!global[creep.id].createdTaskIDs) global[creep.id].createdTaskIDs = {}
+
+    // Otherwise
+
+    else {
+
+        // Find the creep's tasks of type tansfer
+
+        const creepsWithdrawTasks = room.findTasksOfTypes(global[creep.id].createdTaskIDs, new Set(['withdraw']))
+
+        // Track the amount of energy the resource has offered in tasks
+
+        let totalResourcesOffered = 0
+
+        // Loop through each pickup task
+
+        for (const task of creepsWithdrawTasks) {
+
+            // Otherwise find how many resources the task has requested to pick up
+
+            totalResourcesOffered += task.taskAmount
+
+            // If the task doesn't have a responder, set it as taskWithoutResponder
+
+            if (!task.responderID) taskWithoutResponder = task
+        }
+
+        // If there are more or equal resources offered than the used capacity of the creep, stop
+
+        if (totalResourcesOffered >= creep.store.getUsedCapacity(RESOURCE_ENERGY)) return
+    }
+
+    // Assign amountToOffer as the energy left not assigned to tasks
+
+    const amountToOffer = creep.store.getUsedCapacity(RESOURCE_ENERGY) - totalResourcesOffered
+
+    // If there is a taskWithoutResponder
+
+    if (taskWithoutResponder) {
+
+        // Set the taskAmount to match amountToOffer
+
+        taskWithoutResponder.taskAmount = amountToOffer
+
+        // Update the task's priority to match new amountToOffer
+
+        taskWithoutResponder.priority = 1
+
+        // And stop
+
+        return
+    }
+
+    // If the amountToOffer is more than x
+
+    if (amountToOffer > 0) {
+
+        // Create a new transfer task for the creep
+
+        new RoomWithdrawTask(room.name, RESOURCE_ENERGY, amountToOffer, creep.id, 1)
+    }
+}
+
+SourceHarvester.prototype.repairSourceContainer = function(sourceContainer) {
+
+    const creep = this,
+    room = creep.room
+
+    // If there is no container, inform false
+
     if (!sourceContainer) return false
 
     // Get the creep's number of work parts

@@ -237,6 +237,10 @@ export function spawnRequester(room: Room) {
 
         if (totalExtraParts < maxPartsPerCreep / 2) return
 
+        // Subtract maxCreeps by the existing number of creeps of this role
+
+        opts.maxCreeps -= room.creepsFromRoom[opts.memoryAdditions.role].length
+
         // So long as there are totalExtraParts left to assign
 
         while (totalExtraParts > 0 && opts.maxCreeps > 0) {
@@ -397,15 +401,15 @@ export function spawnRequester(room: Room) {
             }
         }
 
-        if (spawnEnergyCapacity >= 650) {
+        if (spawnEnergyCapacity >= 600) {
 
             return {
-                defaultParts: [MOVE],
+                defaultParts: [MOVE, CARRY],
                 extraParts: [WORK],
                 partsMultiplier: 12,
                 minCreeps: 2,
                 maxCreeps: Infinity,
-                minCost: 200,
+                minCost: 300,
                 priority: room.creepsFromRoom.sourceHarvester.length,
                 memoryAdditions: {
                     role: 'sourceHarvester',
@@ -414,7 +418,7 @@ export function spawnRequester(room: Room) {
         }
 
         return {
-            defaultParts: [MOVE],
+            defaultParts: [MOVE, CARRY],
             extraParts: [WORK],
             partsMultiplier: 12,
             minCreeps: undefined,
