@@ -503,6 +503,31 @@ declare global {
          *
          */
         advancedConstructStructurePlans(): void
+
+        /**
+         *
+         */
+         createPullTask(creator: Structure | Creep | Resource): void
+
+        /**
+         *
+         */
+         createPickupTasks(creator: Structure | Creep | Resource): void
+
+        /**
+         *
+         */
+        createOfferTasks(creator: Structure | Creep | Resource): void
+
+        /**
+         *
+         */
+         createTransferTasks(creator: Structure | Creep | Resource): void
+
+        /**
+         *
+         */
+          createWithdrawTasks(creator: Structure | Creep | Resource): void
     }
 
     interface RoomMemory {

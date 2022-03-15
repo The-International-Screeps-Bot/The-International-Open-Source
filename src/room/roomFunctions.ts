@@ -408,16 +408,20 @@ Room.prototype.get = function(roomObjectName) {
 
         if (!source) return []
 
-        // Find positions adjacent to source
+        // Construct harvestPositions
 
-        const rect: Rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 }
-        const adjacentPositions: Pos[] = generalFuncs.findPositionsInsideRect(rect)
-
-        const harvestPositions: Pos[] = []
+        const harvestPositions: Pos[] = [],
 
         // Find terrain in room
 
-        const terrain = Game.map.getRoomTerrain(room.name)
+        terrain = Game.map.getRoomTerrain(room.name),
+
+        // Find positions adjacent to source
+
+        rect: Rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 },
+        adjacentPositions: Pos[] = generalFuncs.findPositionsInsideRect(rect)
+
+        // Loop through each pos
 
         for (const pos of adjacentPositions) {
 
@@ -430,6 +434,8 @@ Room.prototype.get = function(roomObjectName) {
             harvestPositions.push(room.newPos(pos))
         }
 
+        // Inform harvestPositions
+
         return harvestPositions
     }
 
@@ -439,12 +445,9 @@ Room.prototype.get = function(roomObjectName) {
     */
     function findClosestSourceHarvestPos(harvestPositions: RoomPosition[]): false | RoomPosition {
 
-        // Get the room anchor
+        // Get the room anchor, stopping if it's undefined
 
         const anchor = room.roomObjects.anchor.getValue()
-
-        // Stop if there is no anchor
-
         if (!anchor) return false
 
         // Filter harvestPositions by closest one to anchor
@@ -504,20 +507,20 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the room's mineral
 
-        const mineral: Mineral = room.roomObjects.mineral.getValue()
-
-        // Find positions adjacent to mineral
-
-        const rect: Rect = { x1: mineral.pos.x - 1, y1: mineral.pos.y - 1, x2: mineral.pos.x + 1, y2: mineral.pos.y + 1 }
-        const adjacentPositions: Pos[] = generalFuncs.findPositionsInsideRect(rect)
+        const mineral: Mineral = room.roomObjects.mineral.getValue(),
 
         // Construct harvestPositions
 
-        const harvestPositions: RoomPosition[] = []
+        harvestPositions: RoomPosition[] = [],
 
         // Get terrain in room
 
-        const terrain = Game.map.getRoomTerrain(room.name)
+        terrain = Game.map.getRoomTerrain(room.name),
+
+        // Find positions adjacent to mineral
+
+        rect: Rect = { x1: mineral.pos.x - 1, y1: mineral.pos.y - 1, x2: mineral.pos.x + 1, y2: mineral.pos.y + 1 },
+        adjacentPositions: Pos[] = generalFuncs.findPositionsInsideRect(rect)
 
         // Loop through postions of adjacentPositions
 
@@ -593,22 +596,15 @@ Room.prototype.get = function(roomObjectName) {
 
     function findUpgradePositions() {
 
-        // Get the center upgrade pos
+        // Get the center upgrade pos, stopping if it's undefined
 
         const centerUpgradePos = room.roomObjects.centerUpgradePos.getValue()
-
-        // If the center upgrade pos isn't defined, inform false
-
         if (!centerUpgradePos) return false
 
-        // Draw a rect around the center upgrade pos
+        // Draw a rect around the center upgrade pos, informing positions inside
 
         const rect = { x1: centerUpgradePos.x - 1, y1: centerUpgradePos.y - 1, x2: centerUpgradePos.x + 1, y2: centerUpgradePos.y + 1 }
-        const upgradePositions = room.findPositionsInsideRect(rect)
-
-        // Inform the centerUpgadePos and its adjacent positions
-
-        return upgradePositions
+        return room.findPositionsInsideRect(rect)
     }
 
     new RoomObject({
@@ -2684,19 +2680,19 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
                 if (structureType == 'empty') return
 
+                // Display visuals if enabled
+
+                if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
+                    opacity: 0.5
+                })
+
                 // If the structureType is a road and RCL 3 extensions aren't built, iterate
 
                 if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) return
 
-                // Display visuals if enabled
-
-                /* if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
-                    opacity: 0.5
-                }) */
-
                 // Create a road site at this pos
 
-                room.createConstructionSite(pos.x, pos.y, structureType)
+                /* room.createConstructionSite(pos.x, pos.y, structureType) */
             }
 
             // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
@@ -2731,7 +2727,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
                 // Iterate if the adjacent pos has been visited or isn't a tile
 
-                if(visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
+                if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
 
                 // Otherwise record that it has been visited
 
@@ -2747,4 +2743,43 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
         thisGeneration = nextGeneration
     }
+
+    // If visuals are enabled, visually connect roads
+
+    if (Memory.roomVisuals) room.visual.connectRoads()
+}
+
+Room.prototype.createPullTask = function(creator) {
+
+    const room = this
+
+
+}
+
+Room.prototype.createPickupTasks = function(creator) {
+
+    const room = this
+
+
+}
+
+Room.prototype.createOfferTasks = function(creator) {
+
+    const room = this
+
+
+}
+
+Room.prototype.createTransferTasks = function(creator) {
+
+    const room = this
+
+
+}
+
+Room.prototype.createWithdrawTasks = function(creator) {
+
+    const room = this
+
+
 }

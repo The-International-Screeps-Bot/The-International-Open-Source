@@ -338,7 +338,7 @@ constants.stamps = {
     hub: {
         offset: 2,
         protectionOffset: 5,
-        size: 4,
+        size: 3,
         structures: {
             road: [{ x: 1, y: 0 },{ x: 2, y: 0 },{ x: 3, y: 0 },{ x: 0, y: 3 },{ x: 0, y: 2 },{ x: 0, y: 1 },{ x: 1, y: 4 },{ x: 2, y: 4 },{ x: 4, y: 2 },{ x: 4, y: 1 },{ x: 3, y: 3 }],
             spawn: [{ x: 2, y: 3 }],

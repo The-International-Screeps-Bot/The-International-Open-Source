@@ -668,6 +668,8 @@ Creep.prototype.findOptimalSourceName = function() {
     const creep = this
     const room = creep.room
 
+    creep.say('FOSN')
+
     // If the creep already has a sourceName, inform true
 
     if (creep.memory.sourceName) return true
@@ -693,18 +695,23 @@ Creep.prototype.findOptimalSourceName = function() {
 
     let creepThreshold = 1
 
-    // Then loop through the source names and find the first one with open spots
+    // So long as the creepThreshold is less than 4
 
-    for (const sourceName of sourceNamesByAnchorRange) {
+    while (creepThreshold < 4) {
 
-        // If there are still creeps needed to harvest a source under the creepThreshold
+        // Then loop through the source names and find the first one with open spots
 
-        if (Math.min(creepThreshold, room.get(`${sourceName}HarvestPositions`).length) - room.creepsOfSourceAmount[sourceName] > 0) {
+        for (const sourceName of sourceNamesByAnchorRange) {
 
-            // Assign the sourceName to the creep's memory and Inform true
+            // If there are still creeps needed to harvest a source under the creepThreshold
 
-            creep.memory.sourceName = sourceName
-            return true
+            if (Math.min(creepThreshold, room.get(`${sourceName}HarvestPositions`).length) - room.creepsOfSourceAmount[sourceName] > 0) {
+
+                // Assign the sourceName to the creep's memory and Inform true
+
+                creep.memory.sourceName = sourceName
+                return true
+            }
         }
 
         // Otherwise increase the creepThreshold
@@ -721,6 +728,8 @@ Creep.prototype.findHarvestPosition = function() {
 
     const creep = this,
     room = creep.room
+
+    creep.say('FHP')
 
     // Stop if the creep already has a packedHarvestPos
 

@@ -31,8 +31,7 @@ export function creepOrganizer() {
 
         // Find the creep a class based on its role
 
-        creepClassName = creep.memory.role,
-        creepsClass = creepClasses[creepClassName]
+        creepsClass = creepClasses[creep.memory.role]
 
         // Assign creep proper class
 
@@ -67,6 +66,10 @@ export function creepOrganizer() {
             commune.creepsFromRoomAmount++
         }
 
+        // Increase total creep counter
+
+        totalCreepCount += 1
+
         // See if creep is dying
 
         creep.isDying()
@@ -74,10 +77,6 @@ export function creepOrganizer() {
         // Stop if creep is dying
 
         if (creep.memory.dying) continue
-
-        // Increase total creep counter
-
-        totalCreepCount += 1
     }
 
     // Record number of creeps

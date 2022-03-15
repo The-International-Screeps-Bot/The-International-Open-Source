@@ -171,8 +171,7 @@ SourceHarvester.prototype.createWithdrawTask = function(sourceContainer) {
 
 SourceHarvester.prototype.repairSourceContainer = function(sourceContainer) {
 
-    const creep = this,
-    room = creep.room
+    const creep = this
 
     // If there is no container, inform false
 

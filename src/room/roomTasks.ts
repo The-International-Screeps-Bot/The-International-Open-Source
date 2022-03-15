@@ -33,6 +33,8 @@ export interface RoomTask {
      */
     priority: number
 
+    useCapacity: boolean
+
     // Functions
 
     /**
@@ -153,7 +155,7 @@ export interface RoomOfferTask extends RoomTask {
 }
 
 export class RoomOfferTask extends RoomTask {
-    constructor(roomName: string, resourceType: ResourceConstant, taskAmount: number, creatorID: Id<any>, priority: number) {
+    constructor(roomName: string, resourceType: ResourceConstant, taskAmount: number, creatorID: Id<any>, priority: number, useCapacity?: boolean) {
 
         // Inherit from RoomTask
 
@@ -166,6 +168,7 @@ export class RoomOfferTask extends RoomTask {
         task.resourceType = resourceType
         task.taskAmount = taskAmount
         task.priority = priority
+        task.useCapacity = useCapacity
     }
 }
 
@@ -174,7 +177,7 @@ export interface RoomWithdrawTask extends RoomTask {
 }
 
 export class RoomWithdrawTask extends RoomTask {
-    constructor(roomName: string, resourceType: ResourceConstant, taskAmount: number, creatorID: Id<any>, priority: number) {
+    constructor(roomName: string, resourceType: ResourceConstant, taskAmount: number, creatorID: Id<any>, priority: number, useCapacity?: boolean) {
 
         // Inherit from RoomTask
 
@@ -187,6 +190,7 @@ export class RoomWithdrawTask extends RoomTask {
         task.resourceType = resourceType
         task.taskAmount = taskAmount
         task.priority = priority
+        task.useCapacity = useCapacity
     }
 }
 

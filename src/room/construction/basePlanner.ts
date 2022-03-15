@@ -35,6 +35,11 @@ export function basePlanner(room: Room) {
         }
     }
 
+    // Get the centerUpgradePos, informing false if it's undefined
+
+    const centerUpgadePos: RoomPosition = room.get('centerUpgradePos')
+    if (!centerUpgadePos) return false
+
     // Get the controller and set positions nearby to avoid
 
     recordAdjacentPositions(room.controller.pos.x, room.controller.pos.y, 2)
@@ -271,10 +276,18 @@ export function basePlanner(room: Room) {
         structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
     }
 
+    // Record the pos in roadCM
+
+    roadCM.set(centerUpgadePos.x, centerUpgadePos.y, 255)
+
+    // Plan for a road at the pos
+
+    structurePlans.set(centerUpgadePos.x, centerUpgadePos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER])
+
     // Path from the hubAnchor to the closestUpgradePos
 
     path = room.advancedFindPath({
-        origin: room.get('centerUpgradePos'),
+        origin: centerUpgadePos,
         goal: { pos: hubAnchor, range: 2 },
         weightCostMatrixes: [roadCM]
     })
@@ -307,6 +320,14 @@ export function basePlanner(room: Room) {
         // get the closestHarvestPos using the sourceName
 
         const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPos`)
+
+        // Record the pos in roadCM
+
+        roadCM.set(closestHarvestPos.x, closestHarvestPos.y, 255)
+
+        // Plan for a road at the pos
+
+        structurePlans.set(closestHarvestPos.x, closestHarvestPos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER])
 
         // Path from the hubAnchor to the closestHarvestPos
 
@@ -343,7 +364,7 @@ export function basePlanner(room: Room) {
 
         // Path from the centerUpgradePos to the closestHarvestPos
 
-        path = room.advancedFindPath({
+        /* path = room.advancedFindPath({
             origin: closestHarvestPos,
             goal: { pos: closestUpgradePos, range: 1 },
             weightCostMatrixes: [roadCM]
@@ -360,7 +381,7 @@ export function basePlanner(room: Room) {
             // Plan for a road at this position
 
             structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
-        }
+        } */
     }
 
     // Path from the hubAnchor to the labsAnchor
@@ -384,10 +405,18 @@ export function basePlanner(room: Room) {
         structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
     }
 
+    // Record the pos in roadCM
+
+    roadCM.set(mineralHarvestPos.x, mineralHarvestPos.y, 255)
+
+    // Plan for a road at the pos
+
+    structurePlans.set(mineralHarvestPos.x, mineralHarvestPos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER])
+
     // Path from the hubAnchor to the mineralHarvestPos
 
     path = room.advancedFindPath({
-        origin: room.get('mineralHarvestPos'),
+        origin: mineralHarvestPos,
         goal: { pos: hubAnchor, range: 2 },
         weightCostMatrixes: [roadCM]
     })
@@ -404,6 +433,14 @@ export function basePlanner(room: Room) {
 
         structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
     }
+
+    // Otherwise get the mineral
+
+    const mineral: Mineral = room.get('mineral')
+
+    // Plan for a road at the mineral's pos
+
+    structurePlans.set(mineral.pos.x, mineral.pos.y, constants.structureTypesByNumber[STRUCTURE_EXTRACTOR])
 
     // Record road plans in the baseCM
 
