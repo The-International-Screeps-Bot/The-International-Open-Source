@@ -24,7 +24,7 @@ export function spawnRequester(room: Room) {
     dryRun = true
 
     // Create a spawn request given some values
-
+    
     function createSpawnRequest(priority: number, body: BodyPartConstant[], tier: number, cost: number, memory: any) {
 
         // Set the memories communeName to this room's name

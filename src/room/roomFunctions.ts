@@ -2632,13 +2632,20 @@ Room.prototype.advancedConstructStructurePlans = function() {
     anchor: RoomPosition = room.get('anchor')
     if (!anchor) return
 
+    // Move the anchor to the top left of the fastFill
+
+    const adjustedAnchor = {
+        x: anchor.x,
+        y: anchor.y
+    }
+
     // Record the anchor as visited
 
-    visitedCM.set(anchor.x, anchor.y, 1)
+    visitedCM.set(adjustedAnchor.x, adjustedAnchor.y, 1)
 
     // Construct values for the flood
 
-    let thisGeneration: Pos[] = [anchor],
+    let thisGeneration: Pos[] = [adjustedAnchor],
 
     nextGeneration: Pos[] = []
 
@@ -2682,9 +2689,9 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
                 // Display visuals if enabled
 
-                if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
+                /* if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
                     opacity: 0.5
-                })
+                }) */
 
                 // If the structureType is a road and RCL 3 extensions aren't built, iterate
 

@@ -35,11 +35,6 @@ export function basePlanner(room: Room) {
         }
     }
 
-    // Get the centerUpgradePos, informing false if it's undefined
-
-    const centerUpgadePos: RoomPosition = room.get('centerUpgradePos')
-    if (!centerUpgadePos) return false
-
     // Get the controller and set positions nearby to avoid
 
     recordAdjacentPositions(room.controller.pos.x, room.controller.pos.y, 2)
@@ -166,7 +161,7 @@ export function basePlanner(room: Room) {
         room.memory.notClaimable = true
         return false
     }
-
+    generalFuncs.customLog('Z', 'Y')
     // Otherwise store the fastFillerAnchor as anchor in the room's memory
 
     room.memory.anchor = fastFillerAnchor
@@ -195,7 +190,7 @@ export function basePlanner(room: Room) {
     // Inform false if the stamp failed to be planned
 
     if (!hubAnchor) return false
-
+    generalFuncs.customLog('X', 'Y')
     // Get the closest upgrade pos and mark it as fair use in roadCM
 
     const closestUpgradePos = hubAnchor.findClosestByRange(upgradePositions)
@@ -275,6 +270,11 @@ export function basePlanner(room: Room) {
 
         structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
     }
+
+    // Get the centerUpgradePos, informing false if it's undefined
+
+    const centerUpgadePos: RoomPosition = room.get('centerUpgradePos')
+    if (!centerUpgadePos) return false
 
     // Record the pos in roadCM
 
