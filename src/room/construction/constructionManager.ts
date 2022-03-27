@@ -30,7 +30,7 @@ export function constructionManager(room: Room) {
     function manageBasePlanning() {
 
         // If there are no base plans yet
-        
+
         if (!global[room.name].planned) {
 
             // Generate and record base plans
@@ -79,13 +79,9 @@ export function constructionManager(room: Room) {
 
                 // Display visuals if enabled
 
-                /* if (Memory.roomVisuals) room.visual.structure(x, y, STRUCTURE_RAMPART, {
+                if (Memory.roomVisuals) room.visual.structure(x, y, STRUCTURE_RAMPART, {
                     opacity: 0.5
-                }) */
-
-                // Create a road site at this pos
-
-                /* room.createConstructionSite(x, y, STRUCTURE_ROAD) */
+                })
             }
         }
     }
