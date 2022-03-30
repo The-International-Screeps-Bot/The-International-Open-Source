@@ -1,5 +1,5 @@
 import { constants } from 'international/constants'
-import { generalFuncs } from 'international/generalFunctions'
+import { advancedFindDistance, customLog, findPositionsInsideRect } from 'international/generalFunctions'
 import { ControllerUpgrader, SourceHarvester } from './creeps/creepClasses'
 import { RoomObject } from './roomObject'
 import { RoomTask } from './roomTasks'
@@ -73,7 +73,7 @@ Room.prototype.get = function(roomObjectName) {
             // Construct a rect and get the positions in a range of 1
 
             const rect = { x1: x - range, y1: y - range, x2: x + range, y2: y + range }
-            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+            const adjacentPositions = findPositionsInsideRect(rect)
 
             // Loop through adjacent positions
 
@@ -419,7 +419,7 @@ Room.prototype.get = function(roomObjectName) {
         // Find positions adjacent to source
 
         rect: Rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 },
-        adjacentPositions: Pos[] = generalFuncs.findPositionsInsideRect(rect)
+        adjacentPositions: Pos[] = findPositionsInsideRect(rect)
 
         // Loop through each pos
 
@@ -520,7 +520,7 @@ Room.prototype.get = function(roomObjectName) {
         // Find positions adjacent to mineral
 
         rect: Rect = { x1: mineral.pos.x - 1, y1: mineral.pos.y - 1, x2: mineral.pos.x + 1, y2: mineral.pos.y + 1 },
-        adjacentPositions: Pos[] = generalFuncs.findPositionsInsideRect(rect)
+        adjacentPositions: Pos[] = findPositionsInsideRect(rect)
 
         // Loop through postions of adjacentPositions
 
@@ -1365,7 +1365,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                             x2: enemyCreep.pos.x + 2,
                             y2: enemyCreep.pos.y + 2
                         }
-                        const positions = generalFuncs.findPositionsInsideRect(rect)
+                        const positions = findPositionsInsideRect(rect)
 
                         // Loop through positions
 
@@ -1448,7 +1448,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
         if (pathFinderResult.incomplete) {
 
-            generalFuncs.customLog('Incomplete Path', JSON.stringify(opts.origin), constants.colors.white, constants.colors.red)
+            customLog('Incomplete Path', JSON.stringify(opts.origin), constants.colors.white, constants.colors.red)
             room.pathVisual(pathFinderResult.path, constants.colors.red as keyof Colors)
             room.visual.line(opts.origin, opts.goal.pos, { color: constants.colors.red, width: .15, opacity: .3, lineStyle: 'solid' })
             return []
@@ -1634,7 +1634,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
         // Find distance from scoutingRoom
 
-        const distanceFromScoutingRoom = generalFuncs.advancedFindDistance(scoutingRoom.name, room.name,
+        const distanceFromScoutingRoom = advancedFindDistance(scoutingRoom.name, room.name,
             {
                 keeper: Infinity,
                 enemy: Infinity,
@@ -1883,7 +1883,7 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = const
             // Otherwise construct a rect and get the positions in a range of 1
 
             const rect = { x1: x - 1, y1: y - 1, x2: x + 1, y2: y + 1 }
-            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+            const adjacentPositions = findPositionsInsideRect(rect)
 
             // Construct the distance value as the avoid value
 
@@ -1934,7 +1934,7 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = const
             // Otherwise construct a rect and get the positions in a range of 1
 
             const rect = { x1: x - 1, y1: y - 1, x2: x + 1, y2: y + 1 }
-            const adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+            const adjacentPositions = findPositionsInsideRect(rect)
 
             // Construct the distance value as the avoid value
 
@@ -2207,7 +2207,7 @@ Room.prototype.floodFill = function(seeds) {
             // Construct a rect and get the positions in a range of 1
 
             const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 },
-            adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+            adjacentPositions = findPositionsInsideRect(rect)
 
             // Loop through adjacent positions
 
@@ -2266,7 +2266,7 @@ Room.prototype.findClosestPosOfValue = function(opts) {
             // Construct a rect and get the positions in a range of 1
 
             const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 },
-            adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+            adjacentPositions = findPositionsInsideRect(rect)
 
             // Construct a default no for nearby roads
 

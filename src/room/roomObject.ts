@@ -1,7 +1,7 @@
 // Define roomObject types
 
 import { constants } from "international/constants"
-import { generalFuncs } from "international/generalFunctions"
+import { findObjectWithID } from "international/generalFunctions"
 
 export type RoomObjectValueTypes = 'pos' |
 'id' |
@@ -65,7 +65,7 @@ RoomObject.prototype.formatValue = function() {
 
         // Assign its value to the object with the ID and stop
 
-        roomObject.value = generalFuncs.findObjectWithID(roomObject.value)
+        roomObject.value = findObjectWithID(roomObject.value)
         return
     }
 

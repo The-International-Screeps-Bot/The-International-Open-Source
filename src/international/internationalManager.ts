@@ -3,7 +3,7 @@ import { tickConfig } from './tickConfig'
 
 import { creepOrganizer } from '../international/creepOrganizer'
 import { mapVisualsManager } from './mapVisualsManager'
-import { generalFuncs } from './generalFunctions'
+import { advancedGeneratePixel } from './generalFunctions'
 
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
@@ -15,7 +15,7 @@ export function internationalManager() {
 
     creepOrganizer()
 
-    generalFuncs.advancedGeneratePixel()
+    advancedGeneratePixel()
 
     mapVisualsManager()
 }

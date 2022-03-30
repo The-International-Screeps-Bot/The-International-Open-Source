@@ -1,4 +1,5 @@
-import { generalFuncs } from 'international/generalFunctions'
+
+import { customLog } from 'international/generalFunctions'
 import './spawnFunctions'
 import { spawnRequester } from './spawnRequestManager'
 
@@ -21,7 +22,7 @@ export function spawnManager(room: Room) {
     // Sort spawnRequests by their priority
 
     const requestsByPriority = Object.keys(spawnRequests).sort((a, b) => parseInt(a) - parseInt(b))
-    
+
     // Track the inactive spawn index
 
     let spawnIndex = inactiveSpawns.length - 1
@@ -48,7 +49,7 @@ export function spawnManager(room: Room) {
 
             // Log the error and stop the loop
 
-            generalFuncs.customLog('Failed to spawn', testSpawnResult + ', ' + spawnRequest.extraOpts.memory.role + ', ' + spawnRequest.cost + ', ' + spawnRequest.body)
+            customLog('Failed to spawn', testSpawnResult + ', ' + spawnRequest.extraOpts.memory.role + ', ' + spawnRequest.cost + ', ' + spawnRequest.body)
             break
         }
 

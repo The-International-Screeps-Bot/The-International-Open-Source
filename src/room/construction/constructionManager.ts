@@ -1,5 +1,5 @@
 import { constants } from "international/constants"
-import { generalFuncs } from "international/generalFunctions"
+import { customLog } from "international/generalFunctions"
 import { basePlanner } from "./basePlanner"
 import { rampartPlanner } from "./rampartPlanner"
 
@@ -88,5 +88,5 @@ export function constructionManager(room: Room) {
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.cpuLogging) generalFuncs.customLog('Construction Manager', 'CPU: ' + (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
+    if (Memory.cpuLogging) customLog('Construction Manager', 'CPU: ' + (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
 }

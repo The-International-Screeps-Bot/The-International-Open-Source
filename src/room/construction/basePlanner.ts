@@ -1,5 +1,5 @@
-import { constants } from "international/constants";
-import { generalFuncs } from "international/generalFunctions";
+import { constants } from "international/constants"
+import { findAvgBetweenPosotions, findPositionsInsideRect } from "international/generalFunctions"
 import 'other/RoomVisual'
 
 /**
@@ -19,7 +19,7 @@ export function basePlanner(room: Room) {
         // Construct a rect and get the positions in a range of 1
 
         const rect = { x1: x - range, y1: y - range, x2: x + range, y2: y + range },
-        adjacentPositions = generalFuncs.findPositionsInsideRect(rect)
+        adjacentPositions = findPositionsInsideRect(rect)
 
         // Loop through adjacent positions
 
@@ -54,11 +54,11 @@ export function basePlanner(room: Room) {
 
     // Find the average pos between the sources
 
-    const avgSourcePos = generalFuncs.findAvgBetweenPosotions(sources[0].pos, sources[1].pos),
+    const avgSourcePos = findAvgBetweenPosotions(sources[0].pos, sources[1].pos),
 
     // Find the average pos between the two sources and the controller
 
-    avgControllerSourcePos = generalFuncs.findAvgBetweenPosotions(room.controller.pos, avgSourcePos)
+    avgControllerSourcePos = findAvgBetweenPosotions(room.controller.pos, avgSourcePos)
 
     interface PlanStampOpts {
         stampType: StampTypes

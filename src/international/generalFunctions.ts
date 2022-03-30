@@ -1,88 +1,27 @@
 import { constants } from "./constants"
 
-interface GeneralFunctions {
-    /**
-     * Finds the average trading price of a resourceType over a set amount of days
-     */
-    findAvgPrice(resourceType: ResourceConstant, days?: number): number
-
-    /**
-     * Uses a provided ID to find an object associated with it
-     */
-    findObjectWithID(ID: string): any
-
-    /**
-     * Takes a rectange and returns the positions inside of it in an array
-     */
-    findPositionsInsideRect(rect: Rect): Pos[]
-
-    /**
-     * Checks if two positions are equal
-     */
-    arePositionsEqual(pos1: Pos, pos2: Pos): boolean
-
-    /**
-     * Outputs HTML and CSS styled console logs
-     * @param title Title of the log
-     * @param message Main content of the log
-     * @param color Colour of the text. Default is black
-     * @param bgColor Colour of the background. Default is white
-     */
-    customLog(title: string, message: any, color?: string, bgColor?: string): void
-
-    /**
-     * Generates a pixel at the cost of depleting the bucket if the bucket is full
-     */
-    advancedGeneratePixel(): false | 0 | -6
-
-    /**
-     * Incrememnts Memory.ID and informs the result
-     * @returns a new ID
-     */
-    newID(): number
-
-    /**
-     * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
-     */
-    advancedFindDistance(originRoomName: string, goalRoomName: string, typeWeights?: {[key: string]: number}): number
-
-    /**
-     *
-     * @param distance The number of tiles between the hauling target and source
-     * @param income The number of resources added to the pile each tick
-     */
-    findCarryPartsRequired(distance: number, income: number): number
-
-    /**
-     * Finds a position equally between two positions
-     */
-    findAvgBetweenPosotions(pos1: Pos, pos2: Pos): Pos
-
-    /**
-     * Gets the range between two positions' x and y
-     * @param x1 the first position's x
-     * @param y1 the first position's y
-     * @param x2 the second position's x
-     * @param y2 the second position's y
-     */
-    getRangeBetween(x1: number, y1: number, x2: number, y2: number): number
-}
-
-export const generalFuncs: Partial<GeneralFunctions> = {}
-
-generalFuncs.findAvgPrice = function(resourceType, days = 14) {
+/**
+ * Finds the average trading price of a resourceType over a set amount of days
+ */
+export function findAvgPrice(resourceType: ResourceConstant, days: number = 14) {
 
     let avgPrice: number = 0
 
     return avgPrice
 }
 
-generalFuncs.findObjectWithID = function(id) {
+/**
+ * Uses a provided ID to find an object associated with it
+ */
+export function findObjectWithID(id: Id<any>) {
 
     return Game.getObjectById(id) || undefined
 }
 
-generalFuncs.findPositionsInsideRect = function(rect) {
+/**
+ * Takes a rectange and returns the positions inside of it in an array
+ */
+export function findPositionsInsideRect(rect: Rect) {
 
     const positions: Pos[] = []
 
@@ -103,37 +42,36 @@ generalFuncs.findPositionsInsideRect = function(rect) {
     return positions
 }
 
-generalFuncs.arePositionsEqual = function(pos1, pos2) {
+/**
+ * Checks if two positions are equal
+ */
+export function arePositionsEqual(pos1: Pos, pos2: Pos) {
 
-    if (pos1?.x == pos2?.x && pos1?.y == pos2?.y) return true
-    return false
+    return (pos1?.x == pos2?.x && pos1?.y == pos2?.y)
 }
 
-generalFuncs.customLog = function(title, message, color, bgColor) {
-
-    // Assign defaults if parameters were missing
-
-    if (!color) color = constants.colors.black
-    if (!bgColor) bgColor = constants.colors.white
-
-    // Construct log
-
-    let log: string = ``
+/**
+ * Outputs HTML and CSS styled console logs
+ * @param title Title of the log
+ * @param message Main content of the log
+ * @param color Colour of the text. Default is black
+ * @param bgColor Colour of the background. Default is white
+ */
+export function customLog(title: string, message: string, color: string = constants.colors.black, bgColor: string = constants.colors.white) {
 
     // Create the title
 
-    log += `<div style='width: 90vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div>`
+    global.log += `<div style='width: 90vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div>`
 
     // Create the content
 
-    log += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`
-
-    // Add this to logs for output
-
-    global.logs += log
+    global.log += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`
 }
 
-generalFuncs.advancedGeneratePixel = function() {
+/**
+ * Generates a pixel at the cost of depleting the bucket if the bucket is full
+ */
+export function advancedGeneratePixel() {
 
     // Stop if the bot is not running on MMO
 
@@ -148,12 +86,19 @@ generalFuncs.advancedGeneratePixel = function() {
     return Game.cpu.generatePixel()
 }
 
-generalFuncs.newID = function() {
+/**
+ * Incrememnts Memory.ID and informs the result
+ * @returns an incremented ID
+ */
+export function newID() {
 
     return Memory.ID++
 }
 
-generalFuncs.advancedFindDistance = function(originRoomName, goalRoomName, typeWeights)  {
+/**
+ * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
+ */
+export function advancedFindDistance(originRoomName: string, goalRoomName: string, typeWeights?: {[key: string]: number})  {
 
     // Try to find a route from the origin room to the goal room
 
@@ -191,12 +136,20 @@ generalFuncs.advancedFindDistance = function(originRoomName, goalRoomName, typeW
     return findRouteResult.length
 }
 
-generalFuncs.findCarryPartsRequired = function(distance, income) {
+/**
+ *
+ * @param distance The number of tiles between the hauling target and source
+ * @param income The number of resources added to the pile each tick
+ */
+export function findCarryPartsRequired(distance: number, income: number) {
 
     return distance * 2 * income / CARRY_CAPACITY
 }
 
-generalFuncs.findAvgBetweenPosotions = function(pos1, pos2) {
+/**
+ * Finds a position equally between two positions
+ */
+export function findAvgBetweenPosotions(pos1: Pos, pos2: Pos) {
 
     // Inform the rounded average of the two positions
 
@@ -206,14 +159,16 @@ generalFuncs.findAvgBetweenPosotions = function(pos1, pos2) {
     }
 }
 
-generalFuncs.getRangeBetween = function(x1, y1, x2, y2) {
-
-    // Find the difference between the positions' axis
-
-    const xDifference = x1 - x2,
-    yDifference = y1 - y2
+/**
+ * Gets the range between two positions' x and y
+ * @param x1 the first position's x
+ * @param y1 the first position's y
+ * @param x2 the second position's x
+ * @param y2 the second position's y
+ */
+export function getRangeBetween(x1: number, y1: number, x2: number, y2: number) {
 
     // Find the range using pythagorus through the axis differences
 
-    return Math.floor(Math.sqrt(xDifference * xDifference + yDifference * yDifference))
+    return Math.floor(Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)))
 }
