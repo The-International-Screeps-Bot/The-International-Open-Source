@@ -447,7 +447,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the room anchor, stopping if it's undefined
 
-        const anchor = room.roomObjects.anchor.getValue()
+        const anchor: RoomPosition | false = room.roomObjects.anchor.getValue()
         if (!anchor) return false
 
         // Filter harvestPositions by closest one to anchor

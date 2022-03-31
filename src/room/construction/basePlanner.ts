@@ -464,6 +464,71 @@ export function basePlanner(room: Room) {
 
     baseCM.set(closestUpgradePos.x, closestUpgradePos.y, 255)
 
+    // Construct extraExtensions count
+
+    let extraExtensionsAmount = 14
+
+    // loop through sourceNames
+
+    for (const sourceName of sourceNames) {
+
+        // Record that the source has no link
+
+        let sourceHasLink = false
+
+        // Get the closestHarvestPos of this sourceName
+
+        const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`),
+
+        // Find positions adjacent to source
+
+        adjacentPositions = findPositionsInsideRect({ x1: closestHarvestPos.x - 1, y1: closestHarvestPos.y - 1, x2: closestHarvestPos.x + 1, y2: closestHarvestPos.y + 1 })
+
+        // Loop through each pos
+
+        for (const pos of adjacentPositions) {
+
+            // Iterate if plan for pos is in use
+
+            if (baseCM.get(pos.x, pos.y) == 255) continue
+
+            // Otherwise
+
+            // If there is no planned link for this source, plan one
+
+            if (!sourceHasLink) {
+
+                // Assign 255 to this pos in baseCM
+
+                baseCM.set(pos.x, pos.y, 255)
+
+                // Plan for a link at this position
+
+                structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_LINK])
+
+                // Record the link now has a source and iterate
+
+                sourceHasLink = true
+                continue
+            }
+
+            // Otherwise if there is a link planned for this source
+
+            // Assign 255 to this pos in baseCM
+
+            baseCM.set(pos.x, pos.y, 255)
+
+            // Plan for an extension at this position
+
+            structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_EXTENSION])
+
+            // Decrease the extraExtensionsAmount and iterate
+
+            extraExtensionsAmount--
+            continue
+        }
+    }
+
     // Loop 6 times
 
     for (let i = 0; i < 6; i++) {
@@ -483,7 +548,7 @@ export function basePlanner(room: Room) {
 
     // Loop 10 times
 
-    for (let i = 0; i < 14; i++) {
+    for (extraExtensionsAmount; extraExtensionsAmount > 0; extraExtensionsAmount--) {
 
         // Try to plan the stamp
 
