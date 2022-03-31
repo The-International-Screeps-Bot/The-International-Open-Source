@@ -1,5 +1,5 @@
 import { constants } from "international/constants"
-import { generalFuncs } from "international/generalFunctions"
+import { arePositionsEqual, findObjectWithID, getRangeBetween } from "international/generalFunctions"
 import { RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
 
 Creep.prototype.isDying = function() {
@@ -193,7 +193,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
         // If packedUpgradePos is out of range
 
-        if (generalFuncs.getRangeBetween(creep.pos.x, creep.pos.y, Math.floor(creep.memory.packedUpgradePos / constants.roomDimensions), Math.floor(creep.memory.packedUpgradePos % constants.roomDimensions)) > 0) {
+        if (getRangeBetween(creep.pos.x, creep.pos.y, Math.floor(creep.memory.packedUpgradePos / constants.roomDimensions), Math.floor(creep.memory.packedUpgradePos % constants.roomDimensions)) > 0) {
 
             creep.say('➡️UP')
 
@@ -468,6 +468,26 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
     return false
 }
 
+Creep.prototype.findRampartTarget = function() {
+
+    const creep = this,
+    room = creep.room
+
+    creep.say('ARR')
+
+    return new StructureRampart('1' as Id<any>)
+}
+
+Creep.prototype.findRepairTarget = function() {
+
+    const creep = this,
+    room = creep.room
+
+    creep.say('ARR')
+
+    return new StructureContainer('1' as Id<any>)
+}
+
 Creep.prototype.advancedRepair = function() {
 
     const creep = this,
@@ -503,7 +523,7 @@ Creep.prototype.advancedRepair = function() {
             return false
         }
 
-        // Otherwise try to find a new task
+        // Otherwise try to find a new task and stop
 
         creep.findTask(new Set([
             'pickup',
@@ -526,7 +546,7 @@ Creep.prototype.advancedRepair = function() {
 
     // Set the repair target to defineRepairTarget's result
 
-    const repairTarget = defineRepairTarget()
+    const repairTarget = defineRepairTarget() || creep.findRampartTarget()
 
     function defineRepairTarget(): Structure | false {
 
@@ -536,7 +556,7 @@ Creep.prototype.advancedRepair = function() {
 
             // Find the structure with the ID
 
-            const structure = generalFuncs.findObjectWithID(creatorID)
+            const structure = findObjectWithID(creatorID)
 
             // If the structure exists, inform it
 
@@ -556,7 +576,7 @@ Creep.prototype.advancedRepair = function() {
         return creep.pos.findClosestByRange(newRepairTargets)
     }
 
-    // Inform false if repair target wasn't defined
+    // if no repairTarget was found, inform false
 
     if (!repairTarget) return false
 
@@ -843,7 +863,7 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
     // Inform true if the creep's previous target isn't its current
 
-    if (!generalFuncs.arePositionsEqual(creep.memory.goalPos, goalPos)) return true
+    if (!arePositionsEqual(creep.memory.goalPos, goalPos)) return true
 
     // If next pos in the path is not in range, inform true
 
@@ -881,7 +901,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
         // So long as the creep isn't standing on the first position in the path
 
-        while (creep.memory.path[0] && generalFuncs.arePositionsEqual(creep.pos, creep.memory.path[0])) {
+        while (creep.memory.path[0] && arePositionsEqual(creep.pos, creep.memory.path[0])) {
 
             // Remove the first pos of the path
 
@@ -917,7 +937,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
         // So long as the creep isn't standing on the first position in the path
 
-        while (path[0] && generalFuncs.arePositionsEqual(creep.pos, path[0])) {
+        while (path[0] && arePositionsEqual(creep.pos, path[0])) {
 
             // Remove the first pos of the path
 
@@ -1023,7 +1043,7 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
 
         // Inform a's range from the creep - priority - b's range from the creep - priority
 
-        return (generalFuncs.getRangeBetween(a.pos / 50, Math.floor(a.pos % 50), creep.pos.x,  creep.pos.y) - a.priority * 5) - (generalFuncs.getRangeBetween(b.pos / 50, Math.floor(b.pos % 50), creep.pos.x,  creep.pos.y) - b.priority * 5)
+        return (getRangeBetween(a.pos / 50, Math.floor(a.pos % 50), creep.pos.x,  creep.pos.y) - a.priority * 5) - (getRangeBetween(b.pos / 50, Math.floor(b.pos % 50), creep.pos.x,  creep.pos.y) - b.priority * 5)
     })
 
     // Iterate through tasks of tasksByPreference
@@ -1279,7 +1299,7 @@ Creep.prototype.fulfillPullTask = function(task) {
 
     // Get the task info
 
-    const taskTarget: Creep = generalFuncs.findObjectWithID(task.creatorID)
+    const taskTarget: Creep = findObjectWithID(task.creatorID)
 
     // If the creep is not close enough to pull the target
 
@@ -1364,7 +1384,7 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     // Get the transfer target using the task's transfer target IDs
 
-    const transferTarget = generalFuncs.findObjectWithID(task.creatorID)
+    const transferTarget = findObjectWithID(task.creatorID)
 
     // Inform the result of the adancedTransfer to the transferTarget
 
@@ -1377,7 +1397,7 @@ Creep.prototype.fulfillOfferTask = function(task) {
 
     // Get the withdraw target
 
-    offerTarget = generalFuncs.findObjectWithID(task.creatorID)
+    offerTarget = findObjectWithID(task.creatorID)
 
     creep.say('OT')
 
@@ -1393,7 +1413,7 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
 
     // Get the withdraw target
 
-    withdrawTarget: AnyStoreStructure | Creep | Tombstone = generalFuncs.findObjectWithID(task.creatorID)
+    withdrawTarget: AnyStoreStructure | Creep | Tombstone = findObjectWithID(task.creatorID)
 
     creep.say('WT')
 
@@ -1446,7 +1466,7 @@ Creep.prototype.fulfillPickupTask = function(task) {
 
     // Otherwise get the pickup target
 
-    const pickupTarget = generalFuncs.findObjectWithID(task.creatorID)
+    const pickupTarget = findObjectWithID(task.creatorID)
 
     // Try to pickup from the target, informing the result
 

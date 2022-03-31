@@ -663,6 +663,16 @@ declare global {
         /**
          *
          */
+        findRampartTarget(): StructureRampart
+
+        /**
+         *
+         */
+        findRepairTarget(): Structure
+
+        /**
+         *
+         */
         advancedRepair(): boolean
 
         findOptimalSourceName(): boolean
