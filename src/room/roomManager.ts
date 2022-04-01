@@ -11,9 +11,9 @@ import { roleManager } from './creeps/creepRoleManager'
 
 import { powerCreepManager } from './powerCreeps/powerCreepManager'
 import { trafficManager } from './trafficManager'
-import { generalFuncs } from 'international/generalFunctions'
 import { roomVisualsManager } from './roomVisualsManager'
 import { containerManager } from './containerManager'
+import { customLog } from 'international/generalFunctions'
 
 const specificRoomManagers: {[key: string]: Function} = {
     remote: remoteManager,
@@ -67,10 +67,10 @@ export function roomManager() {
 
         // Log room stats
 
-        generalFuncs.customLog(room.name, 'Creeps: ' + room.myCreepsAmount + ', CPU: ' + (Game.cpu.getUsed() - roomCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
+        customLog(room.name, 'Creeps: ' + room.myCreepsAmount + ', CPU: ' + (Game.cpu.getUsed() - roomCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
     }
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.cpuLogging) generalFuncs.customLog('Room Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
+    if (Memory.cpuLogging) customLog('Room Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
 }

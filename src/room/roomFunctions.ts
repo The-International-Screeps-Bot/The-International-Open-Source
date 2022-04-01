@@ -2456,7 +2456,7 @@ Room.prototype.findRepairTargets = function(workPartCount, excludedIDs = new Set
 
         if (excludedIDs.has(structure.id)) return false
 
-        // Otherwise if the structure is somewhat low on hits, true
+        // Otherwise if the structure is somewhat low on hits, inform true
 
         return structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER
     })

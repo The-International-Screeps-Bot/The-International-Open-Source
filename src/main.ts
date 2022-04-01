@@ -663,12 +663,17 @@ declare global {
         /**
          *
          */
-        findRampartTarget(): StructureRampart
+        findRampartRepairTarget(workPartCount: number, excluded?: Set<Id<StructureRampart>>): Structure | false
 
         /**
          *
          */
-        findRepairTarget(): Structure
+        findRepairTarget(workPartCount: number, excluded?: Set<Id<StructureRoad | StructureContainer>>): Structure | false
+
+        /**
+         *
+         */
+        isRepairTargetValid(repairTarget: Structure | false, workPartCount: number): boolean
 
         /**
          *

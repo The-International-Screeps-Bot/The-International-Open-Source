@@ -468,24 +468,85 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
     return false
 }
 
-Creep.prototype.findRampartTarget = function() {
+Creep.prototype.findRampartRepairTarget = function(workPartCount, excludedIDs = new Set()) {
 
     const creep = this,
-    room = creep.room
+    room = creep.room,
 
-    creep.say('ARR')
+    // Get roads and containers in the room
 
-    return new StructureRampart('1' as Id<any>)
+    possibleRepairTargets: (StructureRampart)[] = room.get('rampart'),
+
+    // Inform filtered possibleRepairTargets
+
+    viableRepairTargets = possibleRepairTargets.filter(function(structure) {
+
+        // If the structure's ID is to be excluded, inform false
+
+        if (excludedIDs.has(structure.id)) return false
+
+        // Otherwise if the structure is somewhat low on hits, inform true
+
+        return structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER
+    })
+
+    // If there are no viableRepairTargets, inform false
+
+    if (!viableRepairTargets) return false
+
+    creep.say('FRT')
+
+    // Inform the closest viable repair target to the creep
+
+    return creep.pos.findClosestByRange(viableRepairTargets)
 }
 
-Creep.prototype.findRepairTarget = function() {
+Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs = new Set()) {
 
     const creep = this,
-    room = creep.room
+    room = creep.room,
 
-    creep.say('ARR')
+    // Get roads and containers in the room
 
-    return new StructureContainer('1' as Id<any>)
+    possibleRepairTargets: (StructureRoad | StructureContainer)[] = room.get('road').concat(room.get('container')),
+
+    // Inform filtered possibleRepairTargets
+
+    viableRepairTargets = possibleRepairTargets.filter(function(structure) {
+
+        // If the structure's ID is to be excluded, inform false
+
+        if (excludedIDs.has(structure.id)) return false
+
+        // Otherwise if the structure is somewhat low on hits, inform true
+
+        return structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER
+    })
+
+    // If there are no viableRepairTargets, inform false
+
+    if (!viableRepairTargets) return false
+
+    creep.say('FRT')
+
+    // Inform the closest viable repair target to the creep
+
+    return creep.pos.findClosestByRange(viableRepairTargets)
+}
+
+Creep.prototype.isRepairTargetValid = function(repairTarget, workPartCount) {
+
+    // If there is no repairTarget, inform false
+
+    if (!repairTarget) return false
+
+    // If the repairTarget is above acceptable hits, inform false
+
+    if (repairTarget.hitsMax - repairTarget.hits < workPartCount * REPAIR_POWER) return false
+
+    // Otherwise inform true
+
+    return true
 }
 
 Creep.prototype.advancedRepair = function() {
@@ -505,12 +566,9 @@ Creep.prototype.advancedRepair = function() {
 
         if (global[creep.id] && global[creep.id].respondingTaskID) {
 
-            // Try to filfill task
+            // Try to filfill task, informing false if it wasn't fulfilled
 
             const fulfillTaskResult = creep.fulfillTask()
-
-            // If the task wasn't fulfilled, inform false
-
             if (!fulfillTaskResult) return false
 
             // Otherwise find the task
@@ -540,10 +598,21 @@ Creep.prototype.advancedRepair = function() {
 
     const workPartCount = creep.partsOfType(WORK)
 
-    // Try to get the creep's repair target ID from memory. If it doesn't exist, find a new one
+    // Try to get the object with the ID stored in the creep's memory
 
-    const creatorID = creep.memory.creatorID
+    let repairTarget: Structure | false = findObjectWithID(creep.memory.creatorID)
 
+    // If the current repairTarget is invalid
+
+    if (!creep.isRepairTargetValid(repairTarget, workPartCount)) {
+
+        // Find repair targets that don't include the current target, informing true if none were found
+
+        const newRepairTargets = room.findRepairTargets(workPartCount)
+        if (!newRepairTargets.length) return true
+    }
+
+/*
     // Set the repair target to defineRepairTarget's result
 
     const repairTarget = defineRepairTarget() || creep.findRampartTarget()
@@ -575,7 +644,7 @@ Creep.prototype.advancedRepair = function() {
 
         return creep.pos.findClosestByRange(newRepairTargets)
     }
-
+ */
     // if no repairTarget was found, inform false
 
     if (!repairTarget) return false
@@ -644,12 +713,9 @@ Creep.prototype.advancedRepair = function() {
 
         delete creep.memory.creatorID
 
-        // Find repair targets that don't include the current target
+        // Find repair targets that don't include the current target, informing true if none were found
 
-        const newRepairTargets = room.findRepairTargets(workPartCount, new Set([creatorID]))
-
-        // Inform true if no targets exist
-
+        const newRepairTargets = room.findRepairTargets(workPartCount, new Set([repairTarget.id]))
         if (!newRepairTargets.length) return true
 
         // Otherwise search for the closest newRepairTarget
