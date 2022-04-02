@@ -468,37 +468,44 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
     return false
 }
 
-Creep.prototype.findRampartRepairTarget = function(workPartCount, excludedIDs = new Set()) {
+Creep.prototype.findRampartRepairTarget = function(workPartCount) {
 
     const creep = this,
     room = creep.room,
 
-    // Get roads and containers in the room
+    // Get the repairTarget using the ID in the creep's memory
 
-    possibleRepairTargets: (StructureRampart)[] = room.get('rampart'),
+    repairTarget: Structure | false = findObjectWithID(creep.memory.repairTarget)
 
-    // Inform filtered possibleRepairTargets
+    // If the repairTarget exists and it's under the quota, it
 
-    viableRepairTargets = possibleRepairTargets.filter(function(structure) {
+    if (repairTarget && repairTarget.hits < creep.memory.quota + workPartCount * 1000) return repairTarget
 
-        // If the structure's ID is to be excluded, inform false
+    // Get ramparts in the room
 
-        if (excludedIDs.has(structure.id)) return false
+    const ramparts: StructureRampart[] = room.get('rampart')
 
-        // Otherwise if the structure is somewhat low on hits, inform true
+    // Assign the quota to the value of the creep's quota, or its workPartCount times 1000, increasing it each iteration based on the creep's workPartCount
 
-        return structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER
-    })
+    for (let quota = creep.memory.quota || workPartCount * 1000; quota < ramparts[0].hitsMax; quota += workPartCount * 1000) {
 
-    // If there are no viableRepairTargets, inform false
+        // Filter ramparts thats hits are below the quota, iterating if there are none
 
-    if (!viableRepairTargets) return false
+        const rampartsUnderQuota = ramparts.filter(r => r.hits < quota)
+        if (!rampartsUnderQuota.length) continue
 
-    creep.say('FRT')
+        // Assign the quota to the creep's memory
 
-    // Inform the closest viable repair target to the creep
+        creep.memory.quota = quota
 
-    return creep.pos.findClosestByRange(viableRepairTargets)
+        // Find the closest rampart under the quota and inform it
+
+        return creep.pos.findClosestByRange(rampartsUnderQuota)
+    }
+
+    // If no rampart was found, inform false
+
+    return false
 }
 
 Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs = new Set()) {
@@ -510,7 +517,7 @@ Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs = new Set
 
     possibleRepairTargets: (StructureRoad | StructureContainer)[] = room.get('road').concat(room.get('container')),
 
-    // Inform filtered possibleRepairTargets
+    // Filter viableRepairTargets that are low enough on hits
 
     viableRepairTargets = possibleRepairTargets.filter(function(structure) {
 
@@ -523,30 +530,15 @@ Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs = new Set
         return structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER
     })
 
+    creep.say('FRT')
+
     // If there are no viableRepairTargets, inform false
 
     if (!viableRepairTargets) return false
 
-    creep.say('FRT')
-
-    // Inform the closest viable repair target to the creep
+    // Inform the closest viableRepairTarget to the creep's memory
 
     return creep.pos.findClosestByRange(viableRepairTargets)
-}
-
-Creep.prototype.isRepairTargetValid = function(repairTarget, workPartCount) {
-
-    // If there is no repairTarget, inform false
-
-    if (!repairTarget) return false
-
-    // If the repairTarget is above acceptable hits, inform false
-
-    if (repairTarget.hitsMax - repairTarget.hits < workPartCount * REPAIR_POWER) return false
-
-    // Otherwise inform true
-
-    return true
 }
 
 Creep.prototype.advancedRepair = function() {
@@ -598,62 +590,14 @@ Creep.prototype.advancedRepair = function() {
 
     const workPartCount = creep.partsOfType(WORK)
 
-    // Try to get the object with the ID stored in the creep's memory
+    // Find a repair target based on the creeps work parts. If none are found, inform false
 
-    let repairTarget: Structure | false = findObjectWithID(creep.memory.creatorID)
-
-    // If the current repairTarget is invalid
-
-    if (!creep.isRepairTargetValid(repairTarget, workPartCount)) {
-
-        // Find repair targets that don't include the current target, informing true if none were found
-
-        const newRepairTargets = room.findRepairTargets(workPartCount)
-        if (!newRepairTargets.length) return true
-    }
-
-/*
-    // Set the repair target to defineRepairTarget's result
-
-    const repairTarget = defineRepairTarget() || creep.findRampartTarget()
-
-    function defineRepairTarget(): Structure | false {
-
-        // If there is a repair target ID
-
-        if (creatorID) {
-
-            // Find the structure with the ID
-
-            const structure = findObjectWithID(creatorID)
-
-            // If the structure exists, inform it
-
-            if (structure) return structure
-        }
-
-        // Otherwise find repair targets that don't include the current target
-
-        const newRepairTargets = room.findRepairTargets(workPartCount)
-
-        // Inform false if no targets exist
-
-        if (!newRepairTargets.length) return false
-
-        // Otherwise search and inform the closest newRepairTarget
-
-        return creep.pos.findClosestByRange(newRepairTargets)
-    }
- */
-    // if no repairTarget was found, inform false
-
+    const repairTarget: Structure | false = creep.findRepairTarget(workPartCount) || creep.findRampartRepairTarget(workPartCount)
     if (!repairTarget) return false
-
-    // Otherwise
 
     // Add the repair target to memory
 
-    creep.memory.creatorID = repairTarget.id
+    creep.memory.repairTarget = repairTarget.id
 
     // If roomVisuals are enabled
 
@@ -711,7 +655,7 @@ Creep.prototype.advancedRepair = function() {
 
         // Delete the target from memory
 
-        delete creep.memory.creatorID
+        delete creep.memory.repairTarget
 
         // Find repair targets that don't include the current target, informing true if none were found
 
@@ -740,7 +684,7 @@ Creep.prototype.advancedRepair = function() {
 
             // Inform true
 
-            return false
+            return true
         }
     }
 

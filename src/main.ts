@@ -673,11 +673,6 @@ declare global {
         /**
          *
          */
-        isRepairTargetValid(repairTarget: Structure | false, workPartCount: number): boolean
-
-        /**
-         *
-         */
         advancedRepair(): boolean
 
         findOptimalSourceName(): boolean
