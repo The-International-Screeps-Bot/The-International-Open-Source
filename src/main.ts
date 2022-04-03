@@ -584,7 +584,7 @@ declare global {
         /**
          * If a terminal is present in the room
          */
-        terminal: boolean
+        hasTerminal: boolean
 
         /**
          * The amount of stored energy in the room

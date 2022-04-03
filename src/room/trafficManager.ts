@@ -145,7 +145,7 @@ export function trafficManager(room: Room) {
 
             /* // If the last pos in the creep's path has creepAtPos
 
-            if (generalFuncs.arePositionsEqual(creep.memory.path[creep.memory.path.length - 1], pos)) {
+            if (arePositionsEqual(creep.memory.path[creep.memory.path.length - 1], pos)) {
 
                 // If the creepAtPos has a goalPos in memory
 

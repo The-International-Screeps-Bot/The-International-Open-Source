@@ -1,5 +1,5 @@
 import { constants } from "international/constants"
-import { generalFuncs } from "international/generalFunctions"
+import { getRangeBetween } from "international/generalFunctions"
 import { RoomPullTask, RoomWithdrawTask } from "room/roomTasks"
 import { SourceHarvester } from "../creepClasses"
 
@@ -20,7 +20,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
     // If the creep is at the creep's packedHarvestPos, inform false
 
-    if (generalFuncs.getRangeBetween(creep.pos.x, creep.pos.y, Math.floor(creep.memory.packedHarvestPos / constants.roomDimensions), Math.floor(creep.memory.packedHarvestPos % 50)) == 0) return false
+    if (getRangeBetween(creep.pos.x, creep.pos.y, Math.floor(creep.memory.packedHarvestPos / constants.roomDimensions), Math.floor(creep.memory.packedHarvestPos % 50)) == 0) return false
 
     // If the creep's movement type is pull
 

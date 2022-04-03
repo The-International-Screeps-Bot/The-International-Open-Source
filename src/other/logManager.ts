@@ -1,5 +1,5 @@
 import { constants } from "international/constants"
-import { generalFuncs } from "international/generalFunctions"
+import { customLog } from "international/generalFunctions"
 
 export function logManager() {
 
@@ -18,7 +18,7 @@ export function logManager() {
 
     const CPUColor = findCPUColor(CPU)
 
-    generalFuncs.customLog('Total CPU', (CPU).toFixed(2) + ' / ' + Game.cpu.limit, constants.colors.white, CPUColor)
+    customLog('Total CPU', (CPU).toFixed(2) + ' / ' + Game.cpu.limit, constants.colors.white, CPUColor)
 
     for (let i = 0; i < 99; i++) console.log()
     console.log(global.logs)

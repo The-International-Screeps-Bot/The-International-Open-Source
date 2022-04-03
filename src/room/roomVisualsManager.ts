@@ -1,5 +1,5 @@
 import { constants } from "international/constants"
-import { generalFuncs } from "international/generalFunctions"
+import { findObjectWithID } from "international/generalFunctions"
 
 /**
  * Adds annotations to the room if roomVisuals are enabled
@@ -133,7 +133,7 @@ export function roomVisualsManager(room: Room) {
 
         // Convert the construction target ID into a game object
 
-        const constructionTarget = generalFuncs.findObjectWithID(global[room.name].cSiteTargetID)
+        const constructionTarget = findObjectWithID(global[room.name].cSiteTargetID)
 
         // If the constructionTarget exists, show visuals for it
 

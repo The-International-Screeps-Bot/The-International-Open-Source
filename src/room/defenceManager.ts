@@ -1,4 +1,5 @@
-import { generalFuncs } from "international/generalFunctions"
+import { findObjectWithID } from "international/generalFunctions"
+
 
 /**
  * Handles defence related situations for a commune
@@ -45,7 +46,7 @@ export function defenceManager(room: Room) {
 
             // Otherwise get the target of the attack
 
-            const attackTarget: Structure | Creep = generalFuncs.findObjectWithID(eventItem.data.targetId)
+            const attackTarget: Structure | Creep = findObjectWithID(eventItem.data.targetId as Id<any>)
 
             // If the attackTarget doesn't have a structureType, iterate
 

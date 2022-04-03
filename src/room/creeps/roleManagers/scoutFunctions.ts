@@ -1,14 +1,13 @@
-import { generalFuncs } from "international/generalFunctions";
-import { Scout } from "../creepClasses";
+import { Scout } from "../creepClasses"
 
 Scout.prototype.findScoutTarget = function() {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room,
 
     // Construct storage of exit information
 
-    const scoutedRooms: string[] = [],
+    scoutedRooms: string[] = [],
     unscoutedRooms: string[] = [],
 
     // Get information about the room's exits

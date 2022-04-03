@@ -1,5 +1,5 @@
-import { generalFuncs } from "international/generalFunctions";
-import { Builder } from "../creepClasses";
+import { findObjectWithID } from "international/generalFunctions"
+import { Builder } from "../creepClasses"
 
 export function builderManager(room: Room, creepsOfRole: string[]) {
 
@@ -14,7 +14,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
 
     // Convert the construction target ID into a game object
 
-    let constructionTarget: ConstructionSite | false = generalFuncs.findObjectWithID(global[room.name].cSiteTargetID)
+    let constructionTarget: ConstructionSite | false = findObjectWithID(global[room.name].cSiteTargetID)
 
     // If there is no construction target
 
@@ -27,7 +27,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
 
     // Convert the construction target ID into a game object, stopping if it's undefined
 
-    constructionTarget = generalFuncs.findObjectWithID(global[room.name].cSiteTargetID)
+    constructionTarget = findObjectWithID(global[room.name].cSiteTargetID)
     if (!constructionTarget) return
 
     // Loop through creep names of creeps of the manager's role

@@ -1,5 +1,4 @@
 import { constants } from "./constants"
-import { generalFuncs } from "./generalFunctions"
 
 /**
  * Adds colours and annotations to the map if mapVisuals are enabled

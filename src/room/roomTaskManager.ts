@@ -1,5 +1,5 @@
 import { constants } from 'international/constants'
-import { generalFuncs } from 'international/generalFunctions'
+import { customLog } from 'international/generalFunctions'
 import { RoomTask } from './roomTasks'
 
 export function taskManager(room: Room) {
@@ -26,6 +26,6 @@ export function taskManager(room: Room) {
         if (!task.shouldStayActive()) task.delete()
     }
 
-    generalFuncs.customLog('TWOR', JSON.stringify(global[room.name].tasksWithoutResponders))
-    generalFuncs.customLog('TWR', JSON.stringify(global[room.name].tasksWithResponders))
+    customLog('TWOR', JSON.stringify(global[room.name].tasksWithoutResponders))
+    customLog('TWR', JSON.stringify(global[room.name].tasksWithResponders))
 }

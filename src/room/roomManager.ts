@@ -63,7 +63,7 @@ export function roomManager() {
         let cpuUsed = Game.cpu.getUsed()
 
         cpuUsed = Game.cpu.getUsed() - cpuUsed
-        /* generalFuncs.customLog('Testing CPU', cpuUsed.toFixed(2)) */
+        /* customLog('Testing CPU', cpuUsed.toFixed(2)) */
 
         // Log room stats
 

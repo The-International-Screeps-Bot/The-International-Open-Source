@@ -1,4 +1,5 @@
-import { generalFuncs } from "international/generalFunctions"
+import { customLog, findObjectWithID, newID } from "international/generalFunctions"
+
 
 export interface RoomTask {
     /**
@@ -10,7 +11,7 @@ export interface RoomTask {
      */
     creatorID: Id<any>
     roomName: string
-    responderID: string
+    responderID: Id<any>
     ID: number
 
     /**
@@ -57,7 +58,7 @@ export class RoomTask {
     constructor(type: RoomTaskTypes, creatorID: Id<any>, roomName: string) {
 
         const task = this
-        generalFuncs.customLog('Created Task', 'Type: ' + type + ', creatorID: ' + creatorID)
+        customLog('Created Task', 'Type: ' + type + ', creatorID: ' + creatorID)
         // Assign parameters
 
         task.type = type
@@ -66,7 +67,7 @@ export class RoomTask {
 
         // Generate an ID
 
-        task.ID = generalFuncs.newID()
+        task.ID = newID()
 
         // if there is no global for the creator, make one
 
@@ -86,7 +87,7 @@ export class RoomTask {
 
         // Get the task creator and its position
 
-        const taskCreatorPos: RoomPosition = generalFuncs.findObjectWithID(creatorID).pos
+        const taskCreatorPos: RoomPosition = findObjectWithID(creatorID).pos
 
         // Construct the task's position based on a formatted taskCreatorPos
 
@@ -117,12 +118,12 @@ RoomTask.prototype.shouldStayActive = function() {
 
         // If the responder doesn't exist, inform false
 
-        if (!generalFuncs.findObjectWithID(task.responderID)) return false
+        if (!findObjectWithID(task.responderID)) return false
     }
 
     // If the creator no longer exits, infom false
 
-    if (!generalFuncs.findObjectWithID(task.creatorID)) return false
+    if (!findObjectWithID(task.creatorID)) return false
 
     // Otherwise inform true
 

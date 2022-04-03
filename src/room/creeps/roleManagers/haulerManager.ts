@@ -1,4 +1,3 @@
-import { generalFuncs } from 'international/generalFunctions'
 import { RoomTask } from 'room/roomTasks'
 import { Hauler } from '../creepClasses'
 import './haulerFunctions'
@@ -42,7 +41,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
             'pull',
             'pickup'
         ]))
-        
+
         // If a task wasn't found, iterate
 
         if (!findTaskResult) continue

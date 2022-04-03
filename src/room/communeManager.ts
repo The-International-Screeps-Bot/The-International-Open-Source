@@ -8,7 +8,6 @@ import { constructionManager } from "./construction/constructionManager"
 import { structuresForSpawningManager } from "./structuresForSpawningManager"
 import { droppedResourceManager } from "./droppedResourceManager"
 import { defenceManager } from "./defenceManager"
-import { generalFuncs } from "international/generalFunctions"
 import { constants } from "international/constants"
 import { storageStructuresManager } from "./storingStructuresManager"
 
@@ -37,6 +36,6 @@ export function communeManager(room: Room) {
 
 
 
-    generalFuncs.customLog('CPU USED FOR TEST', Game.cpu.getUsed() - cpu)
+    customLog('CPU USED FOR TEST', Game.cpu.getUsed() - cpu)
      */
 }

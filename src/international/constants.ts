@@ -18,7 +18,7 @@ interface Constants {
     /**
      * An array of usernames of players to avoid trading with
      */
-    tradeBlacklist: Set<''>
+    tradeBlacklist: Set<string>
 
     /**
      * A set of properties that are relative to a room's type
@@ -118,7 +118,7 @@ constants.roomTypeProperties = {
 
     powerEnabled: true,
     towers: true,
-    terminal: true,
+    hasTerminal: true,
     storedEnergy: true,
 
     portalsTo: true,
@@ -150,7 +150,7 @@ constants.roomTypes = {
         level: true,
         powerEnabled: true,
         towers: true,
-        terminal: true,
+        hasTerminal: true,
         storedEnergy: true,
         notClaimable: true,
     },
@@ -393,100 +393,5 @@ constants.stamps = {
         structures: {
             observer: [{ x: 0, y: 0 }]
         }
-    }
-}
-
-constants.styleForStructureTypes = {
-    spawn: {
-        fill: constants.colors.yellow,
-        opacity: 1,
-        radius: 0.4,
-    },
-    extension: {
-        fill: constants.colors.yellow,
-        opacity: 1,
-        radius: 0.25,
-    },
-    road: {
-        fill: constants.colors.lightGrey,
-        opacity: 1,
-        radius: 0.1,
-    },
-    wall: {
-        fill: constants.colors.black,
-        opacity: 1,
-        radius: 0.4,
-    },
-    rampart: {
-        fill: constants.colors.yellow,
-        opacity: 1,
-        radius: 0.4,
-    },
-    link: {
-        fill: constants.colors.black,
-        opacity: 1,
-        radius: 0.3,
-        stroke: constants.colors.yellow,
-        strokeWidth: 0.05,
-    },
-    storage: {
-        fill: constants.colors.yellow,
-        opacity: 1,
-        radius: 0.4,
-    },
-    tower: {
-        fill: constants.colors.red,
-        opacity: 1,
-        radius: 0.3,
-        stroke: constants.colors.black
-    },
-    observer: {
-        fill: constants.colors.black,
-        opacity: 1,
-        radius: 0.3,
-        stroke: constants.colors.green,
-        strokeWidth: 0.05,
-    },
-    powerSpawn: {
-        fill: constants.colors.red,
-        opacity: 1,
-        radius: 0.4,
-    },
-    extractor: {
-        fill: constants.colors.yellow,
-        opacity: 1,
-        radius: 0.4,
-    },
-    lab: {
-        fill: constants.colors.black,
-        opacity: 1,
-        radius: 0.4,
-    },
-    terminal: {
-        fill: constants.colors.lightGrey,
-        opacity: 1,
-        radius: 0.4,
-        stroke: constants.colors.black
-    },
-    container: {
-        fill: constants.colors.lightGrey,
-        opacity: 1,
-        radius: 0.4,
-    },
-    nuker: {
-        fill: constants.colors.yellow,
-        opacity: 1,
-        radius: 0.3,
-        stroke: constants.colors.black,
-    },
-    factory: {
-        fill: constants.colors.black,
-        opacity: 1,
-        radius: 0.4,
-        stroke: constants.colors.lightGrey
-    },
-    empty: {
-        opacity: 0.4,
-        radius: 0.1,
     }
 }

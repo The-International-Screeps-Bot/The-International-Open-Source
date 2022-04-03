@@ -8,8 +8,8 @@ import { antifaManager } from './roleManagers/antifa/antifaManager'
 import { maintainerManager } from './roleManagers/maintainerManager'
 import { builderManager } from './roleManagers/builderManager'
 import { scoutManager } from './roleManagers/scoutManager'
-import { generalFuncs } from 'international/generalFunctions'
 import { constants } from 'international/constants'
+import { customLog } from 'international/generalFunctions'
 
 export function roleManager(room: Room) {
 
@@ -56,10 +56,10 @@ export function roleManager(room: Room) {
 
         // Log role stats
 
-        generalFuncs.customLog(role + 's', 'Creeps: ' + creepsOfRoleAmount + ', CPU: ' + (Game.cpu.getUsed() - roleCPUStart).toFixed(2) + ', CPU Per Creep: ' + ((Game.cpu.getUsed() - roleCPUStart) / creepsOfRoleAmount).toFixed(2), undefined)
+        customLog(role + 's', 'Creeps: ' + creepsOfRoleAmount + ', CPU: ' + (Game.cpu.getUsed() - roleCPUStart).toFixed(2) + ', CPU Per Creep: ' + ((Game.cpu.getUsed() - roleCPUStart) / creepsOfRoleAmount).toFixed(2), undefined)
     }
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.cpuLogging) generalFuncs.customLog('Role Manager', 'CPU: ' + (Game.cpu.getUsed() - managerCPUStart).toFixed(2) + ', CPU Per Creep: ' + ((Game.cpu.getUsed() - managerCPUStart) / room.myCreepsAmount).toFixed(2), undefined, constants.colors.lightGrey)
+    if (Memory.cpuLogging) customLog('Role Manager', 'CPU: ' + (Game.cpu.getUsed() - managerCPUStart).toFixed(2) + ', CPU Per Creep: ' + ((Game.cpu.getUsed() - managerCPUStart) / room.myCreepsAmount).toFixed(2), undefined, constants.colors.lightGrey)
 }
