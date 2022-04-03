@@ -941,6 +941,10 @@ Creep.prototype.createMoveRequest = function(opts) {
 
         path.splice(opts.cacheAmount, path.length)
 
+        // Set the lastCache to the current tick
+
+        creep.memory.lastCache = Game.time
+
         // Show that a new path has been created
 
         if (Memory.roomVisuals) room.visual.text('NP', path[0], { align: 'center' })
@@ -990,10 +994,6 @@ Creep.prototype.createMoveRequest = function(opts) {
     // Make moveRequest true to inform a moveRequest has been made
 
     creep.moveRequest = true
-
-    // Set the lastCahce to the current tick
-
-    creep.memory.lastCache = Game.time
 
     // Set the path in the creep's memory
 
