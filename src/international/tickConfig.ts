@@ -17,7 +17,6 @@ export function tickConfig() {
 
     // CPU
 
-    Memory.cpuUsage = 0
     Memory.cpuLimit = Game.cpu.limit
     Memory.cpuBucket = Game.cpu.bucket
 

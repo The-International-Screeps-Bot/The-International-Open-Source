@@ -931,6 +931,8 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     if (needsNewPathResult) {
 
+        // Assign the creep to the opts
+
         opts.creep = creep
 
         // Generate a new path
@@ -939,7 +941,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
         // Limit the path's length to the cacheAmount
 
-        path.splice(opts.cacheAmount, path.length)
+        path.splice(opts.cacheAmount, path.length - 1)
 
         // Set the lastCache to the current tick
 

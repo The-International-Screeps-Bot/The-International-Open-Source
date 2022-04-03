@@ -19,7 +19,7 @@ import {
 
 // Other
 
-import { logManager } from 'other/logManager'
+import { endTickManager } from 'international/endTickManager'
 import { memHack } from 'other/memHack'
 import { RoomOfferTask, RoomPickupTask, RoomPullTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
 import { RoomObject } from 'room/roomObject'
@@ -885,5 +885,5 @@ export const loop = function() {
 
     roomManager()
 
-    logManager()
+    endTickManager()
 }

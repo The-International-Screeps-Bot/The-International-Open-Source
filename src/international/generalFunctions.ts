@@ -172,3 +172,12 @@ export function getRangeBetween(x1: number, y1: number, x2: number, y2: number) 
 
     return Math.floor(Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)))
 }
+
+export function findCPUColor(CPU: number): string {
+
+    // Inform color based on percent of cpu used of limit
+
+    if (CPU > Game.cpu.limit * 0.6) return constants.colors.green
+    if (CPU > Game.cpu.limit * 0.9) return constants.colors.green
+    return constants.colors.green
+}
