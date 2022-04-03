@@ -90,7 +90,10 @@ export function tickConfig() {
         // Set type to commune
 
         room.memory.type = 'commune'
-        room.memory.remotes = []
+
+        //
+
+        if (!room.memory.remotes) room.memory.remotes = []
 
         // Add roomName to commune list
 

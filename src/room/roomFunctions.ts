@@ -1658,7 +1658,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // Add the room's name to the scoutingRoom's remotes list
 
-            scoutingRoom.memory.remotes.push(room.name)
+            if (!scoutingRoom.memory.remotes.includes(room.name)) scoutingRoom.memory.remotes.push(room.name)
 
             // Get base planning data
 
