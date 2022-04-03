@@ -1,15 +1,16 @@
 import './creepFunctions'
 
 import { sourceHarvesterManager } from './roleManagers/sourceHarvesterManager'
-import { haulerManager } from './roleManagers/haulerManager'
-import { controllerUpgraderManager } from './roleManagers/controllerUpgraderManager'
-import { mineralHarvesterManager } from './roleManagers/mineralHarvesterManager'
+import { controllerUpgraderManager } from './roleManagers/commune/controllerUpgraderManager'
+import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvesterManager'
 import { antifaManager } from './roleManagers/antifa/antifaManager'
-import { maintainerManager } from './roleManagers/maintainerManager'
-import { builderManager } from './roleManagers/builderManager'
+import { maintainerManager } from './roleManagers/commune/maintainerManager'
+import { builderManager } from './roleManagers/commune/builderManager'
 import { scoutManager } from './roleManagers/scoutManager'
 import { constants } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
+import { haulerManager } from './roleManagers/commune/haulerManager'
+import { remoteHarvesterManager } from './roleManagers/remote/remoteHarvesterManager'
 
 export function roleManager(room: Room) {
 
@@ -26,6 +27,7 @@ export function roleManager(room: Room) {
         builder: builderManager,
         maintainer: maintainerManager,
         mineralHarvester: mineralHarvesterManager,
+        remoteHarvester: remoteHarvesterManager,
         scout: scoutManager,
         antifa: antifaManager,
     }

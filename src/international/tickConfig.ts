@@ -1,4 +1,4 @@
-import { constants } from './constants'
+import { constants, remoteNeedsIndex } from './constants'
 
 /**
  * Configures tick important or tick-only pre-roomManager settings required to run the bot
@@ -94,6 +94,13 @@ export function tickConfig() {
         //
 
         if (!room.memory.remotes) room.memory.remotes = []
+
+        for (const roomName of room.memory.remotes) {
+
+            if (!Memory.rooms[roomName].needs) Memory.rooms[roomName].needs = []
+
+            Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester] = 0
+        }
 
         // Add roomName to commune list
 

@@ -181,6 +181,12 @@ constants.creepRoles = [
     'builder',
     'maintainer',
     'mineralHarvester',
+    'remoteHarvester',
+    /* 'remoteHauler',
+    'remoteReserver',
+    'remoteScout',
+    'remoteDefender',
+    'remoteMaintainer', */
     'scout',
     'antifa',
 ]
@@ -394,4 +400,8 @@ constants.stamps = {
             observer: [{ x: 0, y: 0 }]
         }
     }
+}
+
+export const remoteNeedsIndex = {
+    remoteHarvester: 1,
 }

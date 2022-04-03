@@ -1,5 +1,5 @@
 import { findObjectWithID } from "international/generalFunctions"
-import { Builder } from "../creepClasses"
+import { Builder } from "../../creepClasses"
 
 export function builderManager(room: Room, creepsOfRole: string[]) {
 

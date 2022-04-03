@@ -1794,11 +1794,15 @@ Room.prototype.findStoredResourceAmount = function(resourceType) {
 
     const room = this
 
-    // If the rooms stored resources of this resourceType exist, inform it
+    // If room.storedResources doesn't exist, construct it
 
-    if (room.storedResources[resourceType]) return room.storedResources[resourceType]
+    if (!room.storedResources) room.storedResources = {}
 
-    // Otherwise construct the variable
+    // Otherwise if there is already data about the storedResources, inform it
+
+    else if (room.storedResources[resourceType]) return room.storedResources[resourceType]
+
+    // Otherwise construct the number for this stored resource
 
     room.storedResources[resourceType] = 0
 
@@ -2635,8 +2639,8 @@ Room.prototype.advancedConstructStructurePlans = function() {
     // Move the anchor to the top left of the fastFill
 
     const adjustedAnchor = {
-        x: anchor.x,
-        y: anchor.y
+        x: anchor.x - 1,
+        y: anchor.y - 1
     }
 
     // Record the anchor as visited

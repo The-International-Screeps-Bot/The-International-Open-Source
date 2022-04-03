@@ -1,4 +1,4 @@
-import { Maintainer } from "../creepClasses"
+import { Maintainer } from "../../creepClasses"
 
 export function maintainerManager(room: Room, creepsOfRole: string[]) {
 

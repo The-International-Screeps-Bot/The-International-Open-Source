@@ -1,4 +1,4 @@
-import { MineralHarvester } from "../creepClasses"
+import { MineralHarvester } from "../../creepClasses"
 
 MineralHarvester.prototype.advancedHarvestMineral = function() {
 

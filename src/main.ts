@@ -80,6 +80,12 @@ declare global {
     'builder' |
     'maintainer' |
     'mineralHarvester' |
+    'remoteHarvester' |
+    /* 'remoteHauler' |
+    'remoteReserver' |
+    'remoteScout' |
+    'remoteDefender' |
+    'remoteMaintainer' | */
     'scout' |
     'antifa'
 
@@ -809,6 +815,11 @@ declare global {
          * The name of the room the scout is trying to scout
          */
         scoutTarget: string
+
+        /**
+         * The name of the room the creep is remoting for
+         */
+        remoteName: string
     }
 
     // PowerCreeps

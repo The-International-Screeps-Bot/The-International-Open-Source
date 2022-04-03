@@ -1,5 +1,5 @@
 import { RoomTask } from 'room/roomTasks'
-import { Hauler } from '../creepClasses'
+import { Hauler } from '../../creepClasses'
 import './haulerFunctions'
 
 export function haulerManager(room: Room, creepsOfRole: string[]) {

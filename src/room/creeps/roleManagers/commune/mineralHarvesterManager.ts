@@ -1,4 +1,4 @@
-import { MineralHarvester } from '../creepClasses'
+import { MineralHarvester } from '../../creepClasses'
 import './mineralHarvesterFunctions'
 
 export function mineralHarvesterManager(room: Room, creepsOfRole: string[]) {
