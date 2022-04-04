@@ -521,7 +521,7 @@ export function spawnRequester(room: Room) {
                 extraParts: [WORK, MOVE, WORK, WORK, WORK],
                 partsMultiplier,
                 minCreeps: undefined,
-                maxCreeps: Infinity,
+                maxCreeps: 8,
                 minCost: 200,
                 priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
                 memoryAdditions: {
@@ -535,7 +535,7 @@ export function spawnRequester(room: Room) {
             extraParts: [WORK, MOVE, CARRY, MOVE],
             partsMultiplier,
             minCreeps: undefined,
-            maxCreeps: Infinity,
+            maxCreeps: 8,
             minCost: 250,
             priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
             memoryAdditions: {

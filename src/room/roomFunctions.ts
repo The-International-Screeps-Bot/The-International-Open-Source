@@ -1073,14 +1073,19 @@ Room.prototype.get = function(roomObjectName) {
     })
 
     new RoomObject({
-        name: 'remotesByEfficacy',
+        name: 'remoteNamesByEfficacy',
         valueType: 'object',
         cacheType: 'global',
         cacheAmount: 1,
         room,
         valueConstructor: function() {
 
-            return room.memory.remotes.sort((a, b) => )
+            // Sort the room's remotes based on the lowest source efficacy
+
+            return room.memory.remotes.sort(function(a1, b1) {
+
+                return Math.min(...Memory.rooms[a1].sourceEfficacies) - Math.min(...Memory.rooms[b1].sourceEfficacies)
+            })
         }
     })
 
@@ -1691,6 +1696,10 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
 
+            // Construct the sourceIndex
+
+            let sourceIndex = 0
+
             // loop through sourceNames
 
             for (const sourceName of sourceNames) {
@@ -1710,7 +1719,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                 // Record the length of the path in the room's memory
 
-                room.memory[`${sourceName}Efficacy`] = path.length
+                room.memory.sourceEfficacies[sourceIndex] = path.length
 
                 /*
                 // Loop through positions of the path
@@ -1725,6 +1734,10 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                     structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
                 } */
+
+                // Increment the sourceIndex
+
+                sourceIndex++
             }
 
             // Stop
@@ -2850,7 +2863,7 @@ Room.prototype.estimateIncome = function() {
 
         // Add the number of work parts owned by the creep at a max of 5, times harvest power
 
-        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER
+        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER * 0.8
     }
 
     // Inform income

@@ -136,7 +136,7 @@ declare global {
     'allyCreeps' |
     'myDamagedCreeps' |
     'damagedAllyCreeps' |
-    'remotesByEfficacy'
+    'remoteNamesByEfficacy'
 
     interface PathGoal {
         pos: RoomPosition
@@ -567,9 +567,10 @@ declare global {
 
         commune: string
 
-        source1Efficacy: number
-
-        source2Efficacy: number
+        /**
+         * A list of the efficacies of each source in the room
+         */
+        sourceEfficacies: number[]
 
         /**
          * The room owner

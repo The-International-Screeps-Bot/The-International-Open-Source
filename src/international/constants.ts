@@ -110,8 +110,7 @@ constants.roomTypeProperties = {
     notClaimable: true,
 
     commune: true,
-    source1Efficacy: true,
-    source2Efficacy: true,
+    sourceEfficacies: true,
 
     owner: true,
     level: true,
@@ -136,8 +135,7 @@ constants.roomTypes = {
         commune: true,
         source1: true,
         source2: true,
-        source1Efficacy: true,
-        source2Efficacy: true,
+        sourceEfficacies: true,
         notClaimable: true,
     },
     ally: {

@@ -12,7 +12,9 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         if (!creep.memory.remoteName) {
 
-            for (const roomName of Memory.rooms[creep.memory.communeName].remotes) {
+            const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
+
+            for (const roomName of remoteNamesByEfficacy) {
 
                 const roomMemory = Memory.rooms[roomName]
 
