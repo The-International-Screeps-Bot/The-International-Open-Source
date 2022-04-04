@@ -1,4 +1,5 @@
-import { findCarryPartsRequired } from "international/generalFunctions"
+import { remoteNeedsIndex } from "international/constants"
+import { customLog, findCarryPartsRequired } from "international/generalFunctions"
 
 
 /**
@@ -644,6 +645,33 @@ export function spawnRequester(room: Room) {
             priority: 3.5 + room.creepsFromRoom.maintainer.length,
             memoryAdditions: {
                 role: 'maintainer',
+            }
+        }
+    })())
+
+    // Construct requests for remoteHarvesters
+
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+        let partsMultiplier = 0
+
+        for (const roomName of room.memory.remotes) {
+
+            const remoteHarvesterNeed = Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester]
+
+            partsMultiplier += Math.max(10 - remoteHarvesterNeed, 0)
+        }
+
+        return {
+            defaultParts: [],
+            extraParts: [WORK, MOVE, CARRY, MOVE],
+            partsMultiplier,
+            minCreeps: undefined,
+            maxCreeps: Infinity,
+            minCost: 200,
+            priority: 4,
+            memoryAdditions: {
+                role: 'remoteHarvester',
             }
         }
     })())

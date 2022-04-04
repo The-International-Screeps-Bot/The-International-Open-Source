@@ -57,15 +57,15 @@ export function arePositionsEqual(pos1: Pos, pos2: Pos) {
  * @param color Colour of the text. Default is black
  * @param bgColor Colour of the background. Default is white
  */
-export function customLog(title: string, message: string, color: string = constants.colors.black, bgColor: string = constants.colors.white) {
+export function customLog(title: string, message: string | number, color: string = constants.colors.black, bgColor: string = constants.colors.white) {
 
     // Create the title
 
-    global.log += `<div style='width: 90vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div>`
+    global.logs += `<div style='width: 90vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ` + bgColor + `;'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ` + color + `;'>` + title + `:</div>`
 
     // Create the content
 
-    global.log += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`
+    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ` + color + `;'>` + message + `</div></div>`
 }
 
 /**

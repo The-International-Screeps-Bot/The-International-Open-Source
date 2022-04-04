@@ -12,11 +12,11 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         if (!creep.memory.remoteName) {
 
-            for (const roomName in Memory.rooms[creep.memory.communeName].remotes) {
+            for (const roomName of Memory.rooms[creep.memory.communeName].remotes) {
 
                 const roomMemory = Memory.rooms[roomName]
 
-                if (roomMemory.needs[remoteNeedsIndex.remoteHarvester] <= 0) continue
+                if (roomMemory.needs[remoteNeedsIndex.remoteHarvester] >= 10) continue
 
                 creep.memory.remoteName = roomName
                 roomMemory.needs -= creep.partsOfType('work') * HARVEST_POWER
@@ -27,13 +27,17 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         if (creep.needsResources()) {
 
-            if (creep.room.name == creep.memory.remoteName) {
+            if (room.name == creep.memory.remoteName) {
 
                 const sources: Source[] = room.get('sources'),
 
                 closestSource = creep.pos.findClosestByRange(sources)
 
-                if (creep.pos.getRangeTo(closestSource) > 1) {
+                creep.say(creep.pos.getRangeTo(closestSource.pos).toString())
+
+                if (creep.pos.getRangeTo(closestSource.pos) > 1) {
+
+                    creep.say('⏩')
 
                     creep.createMoveRequest({
                         origin: creep.pos,
@@ -49,13 +53,12 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
                 }
 
                 creep.advancedHarvestSource(closestSource)
-
                 continue
             }
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 0 },
+                goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
                 avoidImpassibleStructures: true,
                 avoidEnemyRanges: true,
                 weightGamebjects: {
@@ -68,7 +71,7 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         // Otherwise
 
-        if (creep.room.name == creep.memory.communeName) {
+        if (room.name == creep.memory.communeName) {
 
             // If creep has a task
 
@@ -121,7 +124,7 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         creep.createMoveRequest({
             origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 0 },
+            goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 25 },
             avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             weightGamebjects: {

@@ -1266,20 +1266,18 @@ Creep.prototype.needsResources = function() {
 
     const creep = this
 
-    // If the creep is empty
+    // If the creep is full
 
-    if (creep.store.getUsedCapacity() == 0) {
+    if (creep.store.getFreeCapacity() == 0) {
 
-        // Record and inform that the creep needs resources
+        // Record and inform that the creep doesn't need resources
 
-        creep.memory.needsResources = true
-        return true
+        return false
     }
 
-    // Otherwise Record and inform that the creep does not need resources
+    // Otherwise record and inform that the creep needs resources
 
-    creep.memory.needsResouces = undefined
-    return false
+    return true
 }
 
 Creep.prototype.fulfillTask = function() {
