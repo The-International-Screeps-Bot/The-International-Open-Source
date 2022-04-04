@@ -408,11 +408,11 @@ export function basePlanner(room: Room) {
     // Record the pos in roadCM
 
     roadCM.set(mineralHarvestPos.x, mineralHarvestPos.y, 255)
-
+/*
     // Plan for a road at the pos
 
     structurePlans.set(mineralHarvestPos.x, mineralHarvestPos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER])
-
+ */
     // Path from the hubAnchor to the mineralHarvestPos
 
     path = room.advancedFindPath({

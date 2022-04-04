@@ -73,25 +73,6 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         if (room.name == creep.memory.communeName) {
 
-            const anchor: RoomPosition = room.get('anchor')
-
-            //
-
-            if (creep.isOnExit() || creep.pos.getRangeTo(anchor) > 12) {
-
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goal: { pos: anchor, range: 8 },
-                    avoidImpassibleStructures: true,
-                    avoidEnemyRanges: true,
-                    weightGamebjects: {
-                        1: room.get('road')
-                    }
-                })
-
-                continue
-            }
-
             // If creep has a task
 
             if (global[creep.id] && global[creep.id].respondingTaskID) {

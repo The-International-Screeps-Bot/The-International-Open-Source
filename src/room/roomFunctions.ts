@@ -574,7 +574,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the open areas in a range of 3 to the controller
 
-        const distanceCM = room.distanceTransform(room.roomObjects.terrainCM.getValue(), false, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
+        const distanceCM = room.distanceTransform(false, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
 
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
@@ -1069,6 +1069,18 @@ Room.prototype.get = function(roomObjectName) {
             return room.find(FIND_HOSTILE_CREEPS, {
                 filter: creep => constants.allyList.has(creep.owner.username)
             })
+        }
+    })
+
+    new RoomObject({
+        name: 'remotesByEfficacy',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 1,
+        room,
+        valueConstructor: function() {
+
+            return room.memory.remotes.sort((a, b) => )
         }
     })
 
@@ -1873,20 +1885,26 @@ Room.prototype.findScore = function() {
 
 }
 
-Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = constants.roomDimensions, y1 = constants.roomDimensions, x2 = -1, y2 = -1) {
+Room.prototype.distanceTransform = function(enableVisuals, x1 = constants.roomDimensions, y1 = constants.roomDimensions, x2 = -1, y2 = -1) {
 
     const room = this
 
     // Use a costMatrix to record distances. Use the initialCM if provided, otherwise create one
 
-    const distanceCM = initialCM || new PathFinder.CostMatrix()
+    const distanceCM = new PathFinder.CostMatrix(),
+
+    // Get the room terrain
+
+    terrain = room.getTerrain()
+
+    // Loop through the xs and ys inside the bounds
 
     for (let x = x1; x <= x2; x++) {
         for (let y = y1; y <= y2; y++) {
 
-            // Iterate if pos is to be avoided
+            // If the pos is a wall, iterate
 
-            if (distanceCM.get(x, y) == 255) continue
+            if (terrain.get(x, y) == TERRAIN_MASK_WALL) continue
 
             // Otherwise construct a rect and get the positions in a range of 1
 
@@ -1932,12 +1950,14 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = const
         }
     }
 
+    // Loop through the xs and ys inside the bounds
+
     for (let x = x2; x >= x1; x--) {
         for (let y = y2; y >= y1; y--) {
 
-            // Iterate if pos is to be avoided
+            // If the pos is a wall, iterate
 
-            if (distanceCM.get(x, y) == 255) continue
+            if (terrain.get(x, y) == TERRAIN_MASK_WALL) continue
 
             // Otherwise construct a rect and get the positions in a range of 1
 
@@ -2810,6 +2830,19 @@ Room.prototype.estimateIncome = function() {
     // Loop through each creepName with a role of sourceHarvester from this room
 
     for (const creepName of room.creepsFromRoom.sourceHarvester) {
+
+        // Get the creep using creepName
+
+        const creep = Game.creeps[creepName]
+
+        // Add the number of work parts owned by the creep at a max of 5, times harvest power
+
+        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER
+    }
+
+    // Loop through each creepName with a role of remoteHarvester from this room
+
+    for (const creepName of room.creepsFromRoom.remoteHarvester) {
 
         // Get the creep using creepName
 
