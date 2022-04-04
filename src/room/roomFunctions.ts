@@ -1681,6 +1681,10 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             if (!scoutingRoom.memory.remotes.includes(room.name)) scoutingRoom.memory.remotes.push(room.name)
 
+            // Construct sourceEfficacies
+
+            room.memory.sourceEfficacies = []
+
             // Get base planning data
 
             const /* roadCM: CostMatrix = room.get('roadCM'),
@@ -2730,9 +2734,9 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
                 // Display visuals if enabled
 
-                /* if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
+                if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
                     opacity: 0.5
-                }) */
+                })
 
                 // If the structureType is a road and RCL 3 extensions aren't built, iterate
 
