@@ -403,5 +403,5 @@ constants.stamps = {
 }
 
 export const remoteNeedsIndex = {
-    remoteHarvester: 1,
+    remoteHarvester: 0,
 }

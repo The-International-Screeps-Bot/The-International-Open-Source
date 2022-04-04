@@ -1558,32 +1558,36 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // Get roads
 
-            const roads = room.get('road')
+            const roads: StructureRoad[] = room.get('road'),
 
             // Get containers
 
-            const containers = room.get('container')
+            containers: StructureContainer[] = room.get('container')
 
-            // If there are roads or containers or sources harvested inform false
+            // If there are roads or containers or sources harvested, inform false
 
             if (roads.length == 0 && containers.length == 0 && !harvestedSources) return false
 
-            // If the controller is reserved by an ally
+            // If the controller is not reserved by an ally
 
-            if (constants.allyList.has(controller.reservation.username)) {
+            if (!constants.allyList.has(controller.reservation.username)) {
 
-                // Set type to allyRemote and stop
+                // If the reserver is an Invader, inform false
 
-                room.memory.type = 'allyRemote'
+                if (controller.reservation.username != 'Invader') return false
+
+                // Set type to enemyRemote and inform true
+
+                room.memory.type = 'enemyRemote'
                 room.memory.owner = controller.reservation.username
                 return true
             }
 
-            // If the controller is not reserved by an ally
+            // Otherwise if the room is reserved by an ally
 
-            // Set type to enemyRemote and stop
+            // Set type to allyRemote and inform true
 
-            room.memory.type = 'enemyRemote'
+            room.memory.type = 'allyRemote'
             room.memory.owner = controller.reservation.username
             return true
         }
