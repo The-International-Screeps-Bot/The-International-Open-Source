@@ -1266,18 +1266,29 @@ Creep.prototype.needsResources = function() {
 
     const creep = this
 
-    // If the creep is full
+    // If the creep is empty
+
+    if (creep.store.getUsedCapacity() == 0) {
+
+        // Record and inform that the creep needs resources
+
+        creep.memory.needsResources = true
+        return true
+    }
+
+    // Otherwise if the creep is full
 
     if (creep.store.getFreeCapacity() == 0) {
 
-        // Record and inform that the creep doesn't need resources
+        // Record and inform that the creep does not resources
 
+        delete creep.memory.needsResources
         return false
     }
 
-    // Otherwise record and inform that the creep needs resources
+    // Otherwise inform the state of needsResources
 
-    return true
+    return creep.memory.needsResources
 }
 
 Creep.prototype.fulfillTask = function() {
@@ -1544,4 +1555,19 @@ Creep.prototype.advancedSignController = function() {
 
     const signResult = creep.signController(room.controller, signMessage)
     return signResult == OK
+}
+
+Creep.prototype.isOnExit = function() {
+
+    const creep = this,
+
+    // Define an x and y aligned with the creep's pos
+
+    x = creep.pos.x,
+    y = creep.pos.y
+
+    // If the creep is on an exit, inform true. Otherwise inform false
+
+    if (x <= 0 || x >= 49 || y <= 0 || y >= 49) return true
+    return false
 }

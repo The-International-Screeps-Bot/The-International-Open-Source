@@ -95,11 +95,28 @@ export function tickConfig() {
 
         if (!room.memory.remotes) room.memory.remotes = []
 
+        // Loop through the name of each of the commune's remotes
+
         for (const roomName of room.memory.remotes) {
 
-            if (!Memory.rooms[roomName].needs) Memory.rooms[roomName].needs = []
+            // If needs already exists
 
-            Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester] = 0
+            if (Memory.rooms[roomName].needs) {
+
+                // Reset aspects of needs
+                
+                Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester] = 0
+
+                // And iterate
+
+                continue
+            }
+
+            // Otherwise, construct needs
+
+            Memory.rooms[roomName].needs = []
+
+            Memory.rooms[roomName].needs.push(0)
         }
 
         // Add roomName to commune list

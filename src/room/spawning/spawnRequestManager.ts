@@ -669,7 +669,7 @@ export function spawnRequester(room: Room) {
             minCreeps: undefined,
             maxCreeps: Infinity,
             minCost: 200,
-            priority: 4,
+            priority: 4 + room.creepsFromRoom.remoteHarvester.length,
             memoryAdditions: {
                 role: 'remoteHarvester',
             }

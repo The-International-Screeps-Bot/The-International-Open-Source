@@ -64,9 +64,5 @@ export function spawnManager(room: Room) {
         // Decrease the spawnIndex
 
         spawnIndex--
-
-        // Remove the spawn from inactiveSpawns
-
-        inactiveSpawns.pop()
     }
 }

@@ -759,6 +759,8 @@ declare global {
          * Tries to sign a room's controller depending on the situation
          */
         advancedSignController(): boolean
+
+        isOnExit(): boolean
     }
 
     interface CreepMemory {
