@@ -60,6 +60,8 @@ declare global {
     'extension' |
     'observer'
 
+    type PackedPosMap = any[]
+
     interface Stamp {
         offset: number
         /**
@@ -382,9 +384,12 @@ declare global {
          */
         storedResources: {[key: string]: number}
 
-        creepPositions: {[key: string]: string}
+        /**
+         * A matrix with keys of positions and values of creep names
+         */
+        creepPositions: PackedPosMap
 
-        moveRequests: {[key: string]: string[]}
+        moveRequests: PackedPosMap
 
         constructionSites: {[key: string]: ConstructionSite}
 
@@ -710,12 +715,12 @@ declare global {
         /**
          * Try to enforce a moveRequest and inform the result
          */
-        runMoveRequest(pos: Pos): boolean
+        runMoveRequest(packedPos: number): boolean
 
         /**
          *
          */
-        recurseMoveRequest(stringPos: string): void
+        recurseMoveRequest(pos: number): void
 
         /**
          *

@@ -57,7 +57,7 @@ export function arePositionsEqual(pos1: Pos, pos2: Pos) {
  * @param color Colour of the text. Default is black
  * @param bgColor Colour of the background. Default is white
  */
-export function customLog(title: string, message: string | number, color: string = constants.colors.black, bgColor: string = constants.colors.white) {
+export function customLog(title: string, message: any, color: string = constants.colors.black, bgColor: string = constants.colors.white) {
 
     // Create the title
 
@@ -180,4 +180,50 @@ export function findCPUColor(CPU: number): string {
     if (CPU > Game.cpu.limit * 0.6) return constants.colors.green
     if (CPU > Game.cpu.limit * 0.9) return constants.colors.green
     return constants.colors.green
+}
+
+export function createPackedPosMap(innerArray?: boolean) {
+
+    // Construct the position map
+
+    const packedPosMap: PackedPosMap = []
+
+    // Loop through each x and y in the room
+
+    for (let x = 0; x < constants.roomDimensions; x++) {
+        for (let y = 0; y < constants.roomDimensions; y++) {
+
+            // Add an element for this pos
+
+            packedPosMap.push(innerArray ? [] : undefined)
+        }
+    }
+
+    // Inform the position map
+
+    return packedPosMap
+}
+
+export function unPackAsPos(packedPos: number) {
+
+    // Inform an unpacked pos
+
+    return {
+        x: Math.floor(packedPos / constants.roomDimensions),
+        y: Math.floor(packedPos % constants.roomDimensions)
+    }
+}
+
+export function unPackAsRoomPos(packedPos: number, roomName: string) {
+
+    // Inform an unpacked RoomPosition
+
+    return new RoomPosition(Math.floor(packedPos / constants.roomDimensions), Math.floor(packedPos % constants.roomDimensions), roomName)
+}
+
+export function pack(pos: Pos) {
+
+    // Inform a packed pos
+
+    return pos.x * constants.roomDimensions + pos.y
 }

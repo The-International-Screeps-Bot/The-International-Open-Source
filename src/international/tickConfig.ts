@@ -1,4 +1,5 @@
 import { constants, remoteNeedsIndex } from './constants'
+import { createPackedPosMap, customLog } from './generalFunctions'
 
 /**
  * Configures tick important or tick-only pre-roomManager settings required to run the bot
@@ -69,8 +70,13 @@ export function tickConfig() {
 
         room.myCreepsAmount = 0
 
-        room.creepPositions = {}
-        room.moveRequests = {}
+        // Assign a position map
+
+        room.creepPositions = createPackedPosMap()
+
+        // Assign a 2d position map
+
+        room.moveRequests = createPackedPosMap(true)
 
         room.roomObjects = {}
 
@@ -104,7 +110,7 @@ export function tickConfig() {
             if (Memory.rooms[roomName].needs) {
 
                 // Reset aspects of needs
-                
+
                 Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester] = 0
 
                 // And iterate

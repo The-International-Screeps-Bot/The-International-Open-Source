@@ -1,199 +1,207 @@
+import { constants } from "international/constants"
+import { customLog } from "international/generalFunctions"
 
 
 export function trafficManager(room: Room) {
 
-    // Loop through moveRequests
+    // Loop through each x and y in the room
+    
+    for (let x = 0; x < constants.roomDimensions; x++) {
+        for (let y = 0; y < constants.roomDimensions; y++) {
 
-    for (const stringPos in room.moveRequests) {
+            // Construct a packedPos from the coordinates
 
-        // Get creeps making move requests to this pos
+            const packedPos = x * constants.roomDimensions + y,
 
-        const creepNames = room.moveRequests[stringPos]
+            // Get creeps making move requests to this pos
 
-        // Loop through those creeps
+            creepNames = room.moveRequests[packedPos]
 
-        for (const creepName of creepNames) {
+            // Loop through those creeps
 
-            // Get the creep with the name of creepName
+            for (const creepName of creepNames) {
 
-            const creep = Game.creeps[creepName]
+                // Get the creep with the name of creepName
 
-            // Handle traffic for this position
+                const creep = Game.creeps[creepName]
 
-            creep.recurseMoveRequest(stringPos)
+                // Handle traffic for this position
 
-            /* // Find the pos stringPos represents
+                creep.recurseMoveRequest(packedPos)
 
-            const pos: Pos = JSON.parse(stringPos)
+                /* // Find the pos stringPos represents
 
-            // Try to find the name of the creep at pos
+                const pos: Pos = JSON.parse(stringPos)
 
-            const creepNameAtPos = room.creepPositions[stringPos]
+                // Try to find the name of the creep at pos
 
-            // If there is no creep at the pos
+                const creepNameAtPos = room.creepPositions[stringPos]
 
-            if (!creepNameAtPos) {
+                // If there is no creep at the pos
 
-                // If there are no creeps at the pos, operate the moveRequest and stop the loop
+                if (!creepNameAtPos) {
 
-                creep.runMoveRequest(pos)
-                break
-            }
+                    // If there are no creeps at the pos, operate the moveRequest and stop the loop
 
-            // Otherwise
+                    creep.runMoveRequest(pos)
+                    break
+                }
 
-            // Get the creep with the name
+                // Otherwise
 
-            const creepAtPos = Game.creeps[creepNameAtPos] */
+                // Get the creep with the name
 
-            // If there is a creep that moves through pull is in the way and it isn't actively getting pulled
+                const creepAtPos = Game.creeps[creepNameAtPos] */
 
-            /* if (creepAtPos.memory.getPulled && !creepAtPos.gettingPulled) {
+                // If there is a creep that moves through pull is in the way and it isn't actively getting pulled
 
-                // Remove information about previous move requests from the creep
+                /* if (creepAtPos.memory.getPulled && !creepAtPos.gettingPulled) {
 
-                delete creep.moveRequest
+                    // Remove information about previous move requests from the creep
 
-                // If the creep has no goalPos in memory, stop the loop
+                    delete creep.moveRequest
 
-                if (creep.memory.goalPos) break
+                    // If the creep has no goalPos in memory, stop the loop
 
-                // Otherwise try to path to the targetPos while avoiding the pos
+                    if (creep.memory.goalPos) break
 
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goal: creep.pathOpts.goal,
-                    avoidImpassibleStructures: true,
-                    avoidEnemyRanges: true,
-                    weightPositions: {
-                        255: [pos]
-                    },
-                })
+                    // Otherwise try to path to the targetPos while avoiding the pos
 
-                // If the creep generated a new path, enforce a moveRequest using it
-
-                if (creep.memory.path.length > 0) creep.runMoveRequest(creep.memory.path[0])
-
-                // And stop the loop
-
-                break
-            }
-
-            // If the creep is pulling
-
-            if (creep.pulling) {
-
-                // Remove information about previous move requests from creepAtPos
-
-                delete creepAtPos.moveRequest
-
-                // If the creepAtPos has a goalPos in memory
-
-                if (creepAtPos.memory.goalPos) {
-
-                    // Force creepAtPos to repath to its target while avoiding the creep
-
-                    creepAtPos.createMoveRequest({
-                        origin: creepAtPos.pos,
-                        goal: { pos: creepAtPos.memory.goalPos, range: 1 },
+                    creep.createMoveRequest({
+                        origin: creep.pos,
+                        goal: creep.pathOpts.goal,
                         avoidImpassibleStructures: true,
                         avoidEnemyRanges: true,
                         weightPositions: {
-                            255: [pos, creep.pos]
+                            255: [pos]
                         },
                     })
 
-                    // If the creepAtPos failed to generate a new path, push the it
+                    // If the creep generated a new path, enforce a moveRequest using it
 
-                    if (creepAtPos.memory.path.length == 0) creepAtPos.getPushed()
+                    if (creep.memory.path.length > 0) creep.runMoveRequest(creep.memory.path[0])
 
-                    // OOtherwise operate creepAtPos's moveRequest
+                    // And stop the loop
 
-                    else creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
+                    break
                 }
 
-                // Otherwise push the creepAtPos
+                // If the creep is pulling
 
-                else creepAtPos.getPushed()
+                if (creep.pulling) {
 
-                // Operate the creep's moveRequest and stop the loop
+                    // Remove information about previous move requests from creepAtPos
 
-                creep.runMoveRequest(pos)
-                break
-            } */
+                    delete creepAtPos.moveRequest
 
-            /* // If the creepAtPos has a moveRequest
+                    // If the creepAtPos has a goalPos in memory
 
-            if (creepAtPos.moveRequest) {
+                    if (creepAtPos.memory.goalPos) {
 
-                // Enforce the creepAtPos's moveRequest
+                        // Force creepAtPos to repath to its target while avoiding the creep
 
-                creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
+                        creepAtPos.createMoveRequest({
+                            origin: creepAtPos.pos,
+                            goal: { pos: creepAtPos.memory.goalPos, range: 1 },
+                            avoidImpassibleStructures: true,
+                            avoidEnemyRanges: true,
+                            weightPositions: {
+                                255: [pos, creep.pos]
+                            },
+                        })
 
-                // Enforce the creep's moveRequest
+                        // If the creepAtPos failed to generate a new path, push the it
 
-                creep.runMoveRequest(pos)
+                        if (creepAtPos.memory.path.length == 0) creepAtPos.getPushed()
 
-                // And stop the loop
+                        // OOtherwise operate creepAtPos's moveRequest
 
-                break
-            }
-
-            // If the creepAtPos is fatigued, stop the loop
-
-            if(creepAtPos.fatigue > 0) break */
-
-            /* // If the last pos in the creep's path has creepAtPos
-
-            if (arePositionsEqual(creep.memory.path[creep.memory.path.length - 1], pos)) {
-
-                // If the creepAtPos has a goalPos in memory
-
-                if (creepAtPos.memory.goalPos) {
-
-                    // If creepAtPos is in range to its goalPos
-
-                    if (creepAtPos.pos.getRangeTo(creepAtPos.memory.goalPos)) {
-
-
+                        else creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
                     }
 
-                    // Force creepAtPos to repath to its target while avoiding the creep
+                    // Otherwise push the creepAtPos
 
-                    creepAtPos.createMoveRequest({
-                        origin: creepAtPos.pos,
-                        goal: { pos: creepAtPos.memory.goalPos, range: 1 },
-                        avoidImpassibleStructures: true,
-                        avoidEnemyRanges: true,
-                        weightPositions: {
-                            255: [pos, creep.pos]
-                        },
-                    })
+                    else creepAtPos.getPushed()
 
-                    // If the creepAtPos failed to generate a new path, push the creep
+                    // Operate the creep's moveRequest and stop the loop
 
-                    if (creepAtPos.memory.path.length == 0) creepAtPos.getPushed()
+                    creep.runMoveRequest(pos)
+                    break
+                } */
 
-                    // Otherwise operate creepAtPos's moveRequest
+                /* // If the creepAtPos has a moveRequest
 
-                    else creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
+                if (creepAtPos.moveRequest) {
+
+                    // Enforce the creepAtPos's moveRequest
+
+                    creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
+
+                    // Enforce the creep's moveRequest
+
+                    creep.runMoveRequest(pos)
+
+                    // And stop the loop
+
+                    break
                 }
 
-                // Otherwise push the creepAtPos
+                // If the creepAtPos is fatigued, stop the loop
 
-                else creepAtPos.getPushed()
+                if(creepAtPos.fatigue > 0) break */
 
-                // Operate the creep's moveRequest and stop the loop
+                /* // If the last pos in the creep's path has creepAtPos
 
-                creep.runMoveRequest(pos)
-                break
-            } */
+                if (arePositionsEqual(creep.memory.path[creep.memory.path.length - 1], pos)) {
 
-            /* creep.tradePositions(creepAtPos)
+                    // If the creepAtPos has a goalPos in memory
 
-            // And stop the loop
+                    if (creepAtPos.memory.goalPos) {
 
-            break */
+                        // If creepAtPos is in range to its goalPos
+
+                        if (creepAtPos.pos.getRangeTo(creepAtPos.memory.goalPos)) {
+
+
+                        }
+
+                        // Force creepAtPos to repath to its target while avoiding the creep
+
+                        creepAtPos.createMoveRequest({
+                            origin: creepAtPos.pos,
+                            goal: { pos: creepAtPos.memory.goalPos, range: 1 },
+                            avoidImpassibleStructures: true,
+                            avoidEnemyRanges: true,
+                            weightPositions: {
+                                255: [pos, creep.pos]
+                            },
+                        })
+
+                        // If the creepAtPos failed to generate a new path, push the creep
+
+                        if (creepAtPos.memory.path.length == 0) creepAtPos.getPushed()
+
+                        // Otherwise operate creepAtPos's moveRequest
+
+                        else creepAtPos.runMoveRequest(creepAtPos.memory.path[0])
+                    }
+
+                    // Otherwise push the creepAtPos
+
+                    else creepAtPos.getPushed()
+
+                    // Operate the creep's moveRequest and stop the loop
+
+                    creep.runMoveRequest(pos)
+                    break
+                } */
+
+                /* creep.tradePositions(creepAtPos)
+
+                // And stop the loop
+
+                break */
+            }
         }
     }
 }

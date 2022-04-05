@@ -1,5 +1,6 @@
 import { constants } from "international/constants"
-import { arePositionsEqual, findObjectWithID, getRangeBetween } from "international/generalFunctions"
+import { arePositionsEqual, customLog, findObjectWithID, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
+import { repeat } from "lodash"
 import { RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
 
 Creep.prototype.isDying = function() {
@@ -886,8 +887,8 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
 Creep.prototype.createMoveRequest = function(opts) {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room
 
     // If creep can't move, inform false
 
@@ -963,27 +964,19 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     // Stop if there are no positions left in the path
 
-    if (path.length == 0) return false
-
-    // Assign movePos to the first pos in path
-
-    const movePos = path[0]
+    if (!path.length) return false
 
     // If visuals are enabled, visualize the path
 
     if (Memory.roomVisuals) room.pathVisual(path, 'lightBlue')
 
-    // Turn the creep's pos into a string
+    // Pack the first pos in the path
 
-    const movePosString = JSON.stringify(movePos)
-
-    // If there isn't a moveRequest value for this position create one
-
-    if (!room.moveRequests[movePosString]) room.moveRequests[movePosString] = []
+    const packedPos = pack(path[0])
 
     // Add the creep's name to its moveRequest position
 
-    room.moveRequests[movePosString].push(creep.name)
+    room.moveRequests[packedPos].push(creep.name)
 
     // Set the creep's pathOpts to reflect this moveRequest's opts
 
@@ -1147,44 +1140,40 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
     return false
 }
 
-Creep.prototype.runMoveRequest = function(pos) {
+Creep.prototype.runMoveRequest = function(packedPos) {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room
 
-    // Delete all moveRequests to the position
+    // Remove all moveRequests to the position
 
-    delete room.moveRequests[JSON.stringify(pos)]
+    room.moveRequests[packedPos] = []
 
     // Remove record of the creep being on its current position
 
-    delete room.creepPositions[JSON.stringify(creep.pos)]
+    room.creepPositions[packedPos] = undefined
 
     // Move the creep to the position and inform the result
 
-    return creep.move(creep.pos.getDirectionTo(room.newPos(pos))) == OK
+    return creep.move(creep.pos.getDirectionTo(unPackAsRoomPos(packedPos, room.name))) == OK
 }
 
-Creep.prototype.recurseMoveRequest = function(stringPos) {
+Creep.prototype.recurseMoveRequest = function(packedPos) {
 
-    const creep = this
-    const room = creep.room
-
-    // Find the pos stringPos represents
-
-    const pos: Pos = JSON.parse(stringPos)
+    const creep = this,
+    room = creep.room,
 
     // Try to find the name of the creep at pos
 
-    const creepNameAtPos = room.creepPositions[stringPos]
-
+    creepNameAtPos = room.creepPositions[packedPos]
+creep.say(packedPos.toString())
     // If there is no creep at the pos
 
     if (!creepNameAtPos) {
 
         // If there are no creeps at the pos, operate the moveRequest and stop
 
-        creep.runMoveRequest(pos)
+        creep.runMoveRequest(packedPos)
         return
     }
 
@@ -1200,12 +1189,13 @@ Creep.prototype.recurseMoveRequest = function(stringPos) {
 
         // Have the creepAtPos move to the creep
 
-        creepAtPos.runMoveRequest(creep.pos)
+        creepAtPos.runMoveRequest(packedPos)
 
         // Have the creep move to the creepAtPos and inform true
 
-        creep.runMoveRequest(creepAtPos.pos)
+        creep.runMoveRequest(pack(creepAtPos.pos))
         return
+
         /* creepAtPos.recurseMoveRequest(JSON.stringify(creepAtPos.memory.path[0]))
         return true */
 
@@ -1230,13 +1220,13 @@ Creep.prototype.recurseMoveRequest = function(stringPos) {
 
     // Otherwise have the creeps trade positions
 
-    // Have the creepAtPos move to the creep
+    // Have the creepAtPos move to the pos
 
-    creepAtPos.runMoveRequest(creep.pos)
+    creepAtPos.runMoveRequest(packedPos)
 
     // Have the creep move to the creepAtPos and inform true
 
-    creep.runMoveRequest(creepAtPos.pos)
+    creep.runMoveRequest(pack(creepAtPos.pos))
     return
 }
 
@@ -1264,7 +1254,7 @@ Creep.prototype.getPushed = function() {
 
     // Otherwise enforce the moveRequest
 
-    creep.runMoveRequest(creep.memory.path[0])
+    creep.runMoveRequest(pack(creep.memory.path[0]))
 }
 
 Creep.prototype.needsResources = function() {
