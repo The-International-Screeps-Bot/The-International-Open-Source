@@ -715,7 +715,7 @@ declare global {
         /**
          *
          */
-        recurseMoveRequest(stringPos: string): boolean
+        recurseMoveRequest(stringPos: string): void
 
         /**
          *

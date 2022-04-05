@@ -1185,7 +1185,7 @@ Creep.prototype.recurseMoveRequest = function(stringPos) {
         // If there are no creeps at the pos, operate the moveRequest and stop
 
         creep.runMoveRequest(pos)
-        return true
+        return
     }
 
     // Otherwise
@@ -1198,7 +1198,6 @@ Creep.prototype.recurseMoveRequest = function(stringPos) {
 
     if (creepAtPos.moveRequest) {
 
-        //
         // Have the creepAtPos move to the creep
 
         creepAtPos.runMoveRequest(creep.pos)
@@ -1206,7 +1205,7 @@ Creep.prototype.recurseMoveRequest = function(stringPos) {
         // Have the creep move to the creepAtPos and inform true
 
         creep.runMoveRequest(creepAtPos.pos)
-        return true
+        return
         /* creepAtPos.recurseMoveRequest(JSON.stringify(creepAtPos.memory.path[0]))
         return true */
 
@@ -1221,7 +1220,13 @@ Creep.prototype.recurseMoveRequest = function(stringPos) {
 
     // Otherwise if creepAtPos is fatigued
 
-    if (creepAtPos.fatigue > 0) return false
+    if (creepAtPos.fatigue > 0) {
+
+        // Delete the creep's moveRequest and stop
+
+        delete creep.moveRequest
+        return
+    }
 
     // Otherwise have the creeps trade positions
 
@@ -1232,7 +1237,7 @@ Creep.prototype.recurseMoveRequest = function(stringPos) {
     // Have the creep move to the creepAtPos and inform true
 
     creep.runMoveRequest(creepAtPos.pos)
-    return true
+    return
 }
 
 Creep.prototype.getPushed = function() {

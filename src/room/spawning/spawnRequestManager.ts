@@ -653,13 +653,16 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-        let partsMultiplier = 0
+        let partsMultiplier = 0,
+        remoteIndex
 
         for (const roomName of room.memory.remotes) {
 
             const remoteHarvesterNeed = Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester]
 
             partsMultiplier += Math.max(10 - remoteHarvesterNeed, 0)
+
+            if (!remoteIndex) remoteIndex
         }
 
         return {
