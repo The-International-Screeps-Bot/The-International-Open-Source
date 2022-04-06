@@ -621,9 +621,9 @@ declare global {
         [key: string]: any
 
         /**
-         * Whether the creep has made a moveRequest or not
+         * The packed position of the moveRequest, if one has been made
          */
-        moveRequest: boolean
+        moveRequest: number
 
         /**
          * Whether the creep is actively pulling another creep or not

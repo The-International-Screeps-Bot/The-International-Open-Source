@@ -1082,9 +1082,9 @@ Room.prototype.get = function(roomObjectName) {
 
             // Sort the room's remotes based on the lowest source efficacy
 
-            return room.memory.remotes.sort(function(a1, b1) {
+            return room.memory.remotes.sort(function(a, b) {
 
-                return Math.min(...Memory.rooms[a1].sourceEfficacies) - Math.min(...Memory.rooms[b1].sourceEfficacies)
+                return Math.min(...Memory.rooms[a].sourceEfficacies) - Math.min(...Memory.rooms[b].sourceEfficacies)
             })
         }
     })
@@ -1591,7 +1591,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                 // If the reserver is an Invader, inform false
 
-                if (controller.reservation.username != 'Invader') return false
+                if (controller.reservation.username == 'Invader') return false
 
                 // Set type to enemyRemote and inform true
 

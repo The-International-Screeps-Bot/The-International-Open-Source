@@ -31,6 +31,10 @@ export function spawnManager(room: Room) {
 
     for (const priority of requestsByPriority) {
 
+        // Stop if the spawnIndex is negative
+
+        if (spawnIndex < 0) break
+
         // Try to find inactive spawn, if can't, stop the loop
 
         const spawn = inactiveSpawns[spawnIndex],

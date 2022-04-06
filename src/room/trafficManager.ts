@@ -1,11 +1,10 @@
 import { constants } from "international/constants"
 import { customLog } from "international/generalFunctions"
 
-
 export function trafficManager(room: Room) {
 
     // Loop through each x and y in the room
-    
+
     for (let x = 0; x < constants.roomDimensions; x++) {
         for (let y = 0; y < constants.roomDimensions; y++) {
 
@@ -20,7 +19,7 @@ export function trafficManager(room: Room) {
             // Loop through those creeps
 
             for (const creepName of creepNames) {
-
+                
                 // Get the creep with the name of creepName
 
                 const creep = Game.creeps[creepName]

@@ -121,11 +121,11 @@ Creep.prototype.advancedPickup = function(target) {
 
 Creep.prototype.advancedHarvestSource = function(source) {
 
-    const creep = this
+    const creep = this,
 
     // Harvest the source, informing the result if it didn't succeed
 
-    const harvestResult = creep.harvest(source)
+    harvestResult = creep.harvest(source)
     if (harvestResult != OK) return false
 
     // Find amount of energy harvested and record it in data
@@ -142,8 +142,8 @@ Creep.prototype.advancedHarvestSource = function(source) {
 
 Creep.prototype.advancedUpgradeController = function() {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room
 
     creep.say('AUC')
 
@@ -988,7 +988,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     // Make moveRequest true to inform a moveRequest has been made
 
-    creep.moveRequest = true
+    creep.moveRequest = packedPos
 
     // Set the path in the creep's memory
 
@@ -1166,7 +1166,7 @@ Creep.prototype.recurseMoveRequest = function(packedPos) {
     // Try to find the name of the creep at pos
 
     creepNameAtPos = room.creepPositions[packedPos]
-creep.say(packedPos.toString())
+
     // If there is no creep at the pos
 
     if (!creepNameAtPos) {
@@ -1179,7 +1179,7 @@ creep.say(packedPos.toString())
 
     // Otherwise
 
-    // Get the creep with the name
+    // Get the creepAtPos with the name
 
     const creepAtPos = Game.creeps[creepNameAtPos]
 
@@ -1187,13 +1187,13 @@ creep.say(packedPos.toString())
 
     if (creepAtPos.moveRequest) {
 
-        // Have the creepAtPos move to the creep
+        // Have the creepAtPos move to the pos
 
-        creepAtPos.runMoveRequest(packedPos)
+        creep.runMoveRequest(packedPos)
 
-        // Have the creep move to the creepAtPos and inform true
+        // Have the creep move to the creepAtPos and stop
 
-        creep.runMoveRequest(pack(creepAtPos.pos))
+        creepAtPos.runMoveRequest(pack(creep.pos))
         return
 
         /* creepAtPos.recurseMoveRequest(JSON.stringify(creepAtPos.memory.path[0]))
@@ -1222,11 +1222,11 @@ creep.say(packedPos.toString())
 
     // Have the creepAtPos move to the pos
 
-    creepAtPos.runMoveRequest(packedPos)
+    creep.runMoveRequest(packedPos)
 
     // Have the creep move to the creepAtPos and inform true
 
-    creep.runMoveRequest(pack(creepAtPos.pos))
+    creepAtPos.runMoveRequest(pack(creep.pos))
     return
 }
 

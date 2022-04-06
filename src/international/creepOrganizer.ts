@@ -1,5 +1,6 @@
 import { creepClasses } from "room/creeps/creepClasses"
 import { remoteNeedsIndex } from "./constants"
+import { pack } from "./generalFunctions"
 
 /**
  * Organizes creeps into properties for their communeName, and tracks total creep count
@@ -47,8 +48,8 @@ export function creepOrganizer() {
         room.myCreepsAmount++
 
         // Add the creep's name to the position in its room
-
-        room.creepPositions[JSON.stringify(creep.pos)] = creep.name
+        
+        room.creepPositions[pack(creep.pos)] = creep.name
 
         // Get the commune the creep is from
 
