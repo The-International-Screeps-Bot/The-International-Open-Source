@@ -640,6 +640,11 @@ declare global {
          */
         pathOpts: PathOpts
 
+        /**
+         * A list of creep names to have their moveRequest met if traffic conditions are correct
+         */
+        queue: string[]
+
         // Functions
 
         /**

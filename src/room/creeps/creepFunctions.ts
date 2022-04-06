@@ -904,7 +904,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     // Assign default opts
 
-    if (!opts.cacheAmount) opts.cacheAmount = 20
+    if (!opts.cacheAmount) opts.cacheAmount = 50
 
     // If there is a path in the creep's memory
 
@@ -1151,7 +1151,7 @@ Creep.prototype.runMoveRequest = function(packedPos) {
 
     // Remove record of the creep being on its current position
 
-    room.creepPositions[packedPos] = undefined
+    room.creepPositions[pack(creep.pos)] = undefined
 
     // Move the creep to the position and inform the result
 
@@ -1171,9 +1171,29 @@ Creep.prototype.recurseMoveRequest = function(packedPos) {
 
     if (!creepNameAtPos) {
 
-        // If there are no creeps at the pos, operate the moveRequest and stop
+        // If there are no creeps at the pos, operate the moveRequest
 
         creep.runMoveRequest(packedPos)
+
+        // Stop if the creep has no queue
+
+        if (!creep.queue) return
+
+        // Loop through each creepName of the queue
+
+        for (const creepName of creep.queue) {
+
+            // Get the creep using the creepName
+
+            const queuedCreep = Game.creeps[creepName]
+
+            // Have the creep run its moveRequest
+            queuedCreep.say('QUEUE')
+            queuedCreep.runMoveRequest(queuedCreep.moveRequest)
+        }
+
+        // And stop
+
         return
     }
 
@@ -1187,13 +1207,27 @@ Creep.prototype.recurseMoveRequest = function(packedPos) {
 
     if (creepAtPos.moveRequest) {
 
-        // Have the creepAtPos move to the pos
+        // If the creep's pos and the creepAtPos's moveRequests are aligned
 
-        creep.runMoveRequest(packedPos)
+        if (pack(creep.pos) == creepAtPos.moveRequest) {
 
-        // Have the creep move to the creepAtPos and stop
+            // Have the creepAtPos move to its moveRequest
 
-        creepAtPos.runMoveRequest(pack(creep.pos))
+            creep.runMoveRequest(packedPos)
+
+            // Have the creep move to the creepAtPos and stop
+
+            creepAtPos.runMoveRequest(creepAtPos.moveRequest)
+            return
+        }
+
+        // Otherwise
+
+        // Add the creepAtPos's name to the queue if it exists, otherwise create one with the creepAtPos's name inside and stop
+
+        creep.queue?.push(creepNameAtPos) ?
+            creep.queue.push(creepNameAtPos) :
+            creep.queue = [creepNameAtPos]
         return
 
         /* creepAtPos.recurseMoveRequest(JSON.stringify(creepAtPos.memory.path[0]))
@@ -1218,9 +1252,9 @@ Creep.prototype.recurseMoveRequest = function(packedPos) {
         return
     }
 
-    // Otherwise have the creeps trade positions
+    // Otherwise the creepAtPos has no moveRequest and isn't fatigued
 
-    // Have the creepAtPos move to the pos
+    // Have the creepAtPos move to its moveRequest
 
     creep.runMoveRequest(packedPos)
 
