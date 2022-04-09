@@ -72,8 +72,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // Construct a rect and get the positions in a range of 1
 
-            const rect = { x1: x - range, y1: y - range, x2: x + range, y2: y + range }
-            const adjacentPositions = findPositionsInsideRect(rect)
+            const adjacentPositions = findPositionsInsideRect(x - range, y - range, x + range, x - range)
 
             // Loop through adjacent positions
 
@@ -418,8 +417,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Find positions adjacent to source
 
-        rect: Rect = { x1: source.pos.x - 1, y1: source.pos.y - 1, x2: source.pos.x + 1, y2: source.pos.y + 1 },
-        adjacentPositions: Pos[] = findPositionsInsideRect(rect)
+        adjacentPositions = findPositionsInsideRect(source.pos.x - 1, source.pos.y - 1, source.pos.x + 1, source.pos.y + 1)
 
         // Loop through each pos
 
@@ -519,8 +517,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Find positions adjacent to mineral
 
-        rect: Rect = { x1: mineral.pos.x - 1, y1: mineral.pos.y - 1, x2: mineral.pos.x + 1, y2: mineral.pos.y + 1 },
-        adjacentPositions: Pos[] = findPositionsInsideRect(rect)
+        adjacentPositions = findPositionsInsideRect(mineral.pos.x - 1, mineral.pos.y - 1, mineral.pos.x + 1, mineral.pos.y + 1)
 
         // Loop through postions of adjacentPositions
 
@@ -603,8 +600,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Draw a rect around the center upgrade pos, informing positions inside
 
-        const rect = { x1: centerUpgradePos.x - 1, y1: centerUpgradePos.y - 1, x2: centerUpgradePos.x + 1, y2: centerUpgradePos.y + 1 }
-        return room.findPositionsInsideRect(rect)
+        return room.findRoomPositionsInsideRect(centerUpgradePos.x - 1, centerUpgradePos.y - 1, centerUpgradePos.x + 1, centerUpgradePos.y + 1)
     }
 
     new RoomObject({
@@ -1398,22 +1394,11 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         // Construct rect and get positions inside
 
-                        const rect = {
-                            x1: enemyCreep.pos.x - 2,
-                            y1: enemyCreep.pos.y - 2,
-                            x2: enemyCreep.pos.x + 2,
-                            y2: enemyCreep.pos.y + 2
-                        }
-                        const positions = findPositionsInsideRect(rect)
+                        const positions = findPositionsInsideRect(enemyCreep.pos.x - 2, enemyCreep.pos.y - 2, enemyCreep.pos.x + 2, enemyCreep.pos.y + 2)
 
-                        // Loop through positions
+                        // Loop through positions and set them as impassible
 
-                        for (const pos of positions) {
-
-                            // Set pos as impassible
-
-                            cm.set(pos.x, pos.y, 255)
-                        }
+                        for (const pos of positions) cm.set(pos.x, pos.y, 255)
                     }
                 }
 
@@ -1997,8 +1982,7 @@ Room.prototype.distanceTransform = function(enableVisuals, x1 = constants.roomDi
 
             // Otherwise construct a rect and get the positions in a range of 1
 
-            const rect = { x1: x - 1, y1: y - 1, x2: x + 1, y2: y + 1 }
-            const adjacentPositions = findPositionsInsideRect(rect)
+            const adjacentPositions = findPositionsInsideRect(x - 1, y - 1, x + 1, y + 1)
 
             // Construct the distance value as the avoid value
 
@@ -2050,8 +2034,7 @@ Room.prototype.distanceTransform = function(enableVisuals, x1 = constants.roomDi
 
             // Otherwise construct a rect and get the positions in a range of 1
 
-            const rect = { x1: x - 1, y1: y - 1, x2: x + 1, y2: y + 1 }
-            const adjacentPositions = findPositionsInsideRect(rect)
+            const adjacentPositions = findPositionsInsideRect(x - 1, y - 1, x + 1, y + 1)
 
             // Construct the distance value as the avoid value
 
@@ -2323,8 +2306,7 @@ Room.prototype.floodFill = function(seeds) {
 
             // Construct a rect and get the positions in a range of 1
 
-            const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 },
-            adjacentPositions = findPositionsInsideRect(rect)
+            const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
 
             // Loop through adjacent positions
 
@@ -2382,8 +2364,7 @@ Room.prototype.findClosestPosOfValue = function(opts) {
 
             // Construct a rect and get the positions in a range of 1
 
-            const rect = { x1: pos.x - 1, y1: pos.y - 1, x2: pos.x + 1, y2: pos.y + 1 },
-            adjacentPositions = findPositionsInsideRect(rect)
+            const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
 
             // Construct a default no for nearby roads
 
@@ -2699,35 +2680,6 @@ Room.prototype.groupRampartPositions = function(rampartPositions) {
     return groupedPositions
 }
 
-Room.prototype.findPositionsInsideRect = function(rect) {
-
-    const room = this,
-
-    // Construct positions
-
-    positions: RoomPosition[] = []
-
-    // Loop through coordinates inside the rect
-
-    for (let x = rect.x1; x <= rect.x2; x++) {
-        for (let y = rect.y1; y <= rect.y2; y++) {
-
-            // Iterate if the pos doesn't map onto a room
-
-            if (x < 0 || x >= constants.roomDimensions ||
-                y < 0 || y >= constants.roomDimensions) continue
-
-            // Otherwise ass the x and y to positions
-
-            positions.push(new RoomPosition(x, y, room.name))
-        }
-    }
-
-    // Inform positions
-
-    return positions
-}
-
 Room.prototype.advancedConstructStructurePlans = function() {
 
     const room = this,
@@ -2945,4 +2897,33 @@ Room.prototype.estimateIncome = function() {
     // Inform income
 
     return income
+}
+
+Room.prototype.findRoomPositionsInsideRect = function(x1, y1, x2, y2) {
+
+    const room = this,
+
+    // Construct positions
+
+    positions: RoomPosition[] = []
+
+    // Loop through coordinates inside the rect
+
+    for (let x = x1; x <= x2; x++) {
+        for (let y = y1; y <= y2; y++) {
+
+            // Iterate if the pos doesn't map onto a room
+
+            if (x < 0 || x >= constants.roomDimensions ||
+                y < 0 || y >= constants.roomDimensions) continue
+
+            // Otherwise ass the x and y to positions
+
+            positions.push(new RoomPosition(x, y, room.name))
+        }
+    }
+
+    // Inform positions
+
+    return positions
 }

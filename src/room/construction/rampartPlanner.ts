@@ -1,4 +1,5 @@
 import { constants } from "international/constants"
+import { customLog } from "international/generalFunctions";
 
 export function rampartPlanner(room: Room) {
 
@@ -271,17 +272,17 @@ export function rampartPlanner(room: Room) {
         }
         // ********************** Visualisierung
         if (true) {
-            let visual = new RoomVisual(roomname);
-            let x = 0;
-            let y = 0;
-            const max = 50;
-            for (; x < max; x++) {
+
+            let x = 0
+            let y = 0
+
+            for (; x < constants.roomDimensions; x++) {
                 y = 0;
-                for (; y < max; y++) {
+                for (; y < constants.roomDimensions; y++) {
 
                     if (room_array[x][y] === NORMAL) {
 
-                        visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#e8e863', opacity: 0.3 })
+                        room.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#e8e863', opacity: 0.3 })
                         continue
                     }
                 }
@@ -500,10 +501,10 @@ export function rampartPlanner(room: Room) {
     // Protect it
 
     protectionRects.push({
-        x1: Math.max(Math.min(controller.pos.x - 1), constants.roomDimensions - 2, 2),
-        y1: Math.max(Math.min(controller.pos.y - 1), constants.roomDimensions - 2, 2),
-        x2: Math.max(Math.min(controller.pos.x + 1), constants.roomDimensions - 2, 2),
-        y2: Math.max(Math.min(controller.pos.y + 1), constants.roomDimensions - 2, 2)
+        x1: Math.max(Math.min(controller.pos.x - 1, constants.roomDimensions - 2), 2),
+        y1: Math.max(Math.min(controller.pos.y - 1, constants.roomDimensions - 2), 2),
+        x2: Math.max(Math.min(controller.pos.x + 1, constants.roomDimensions - 2), 2),
+        y2: Math.max(Math.min(controller.pos.y + 1, constants.roomDimensions - 2), 2)
     })
 
     // Get the centerUpgradePos
@@ -513,10 +514,10 @@ export function rampartPlanner(room: Room) {
     // Protect it
 
     protectionRects.push({
-        x1: Math.max(Math.min(centerUpgradePos.x - 3), constants.roomDimensions - 2, 2),
-        y1: Math.max(Math.min(centerUpgradePos.y - 3), constants.roomDimensions - 2, 2),
-        x2: Math.max(Math.min(centerUpgradePos.x + 3), constants.roomDimensions - 2, 2),
-        y2: Math.max(Math.min(centerUpgradePos.y + 3), constants.roomDimensions - 2, 2)
+        x1: Math.max(Math.min(centerUpgradePos.x - 3, constants.roomDimensions - 2), 2),
+        y1: Math.max(Math.min(centerUpgradePos.y - 3, constants.roomDimensions - 2), 2),
+        x2: Math.max(Math.min(centerUpgradePos.x + 3, constants.roomDimensions - 2), 2),
+        y2: Math.max(Math.min(centerUpgradePos.y + 3, constants.roomDimensions - 2), 2)
     })
 
     // Get the source1ClosestHarvestPos
@@ -564,10 +565,10 @@ export function rampartPlanner(room: Room) {
             // Protect the stamp
 
             protectionRects.push({
-                x1: Math.max(Math.min(stampAnchor.x - protectionOffset), constants.roomDimensions - 2, 2),
-                y1: Math.max(Math.min(stampAnchor.y - protectionOffset), constants.roomDimensions - 2, 2),
-                x2: Math.max(Math.min(stampAnchor.x + protectionOffset), constants.roomDimensions - 2, 2),
-                y2: Math.max(Math.min(stampAnchor.y + protectionOffset), constants.roomDimensions - 2, 2)
+                x1: Math.max(Math.min(stampAnchor.x - protectionOffset, constants.roomDimensions - 2), 2),
+                y1: Math.max(Math.min(stampAnchor.y - protectionOffset, constants.roomDimensions - 2), 2),
+                x2: Math.max(Math.min(stampAnchor.x + protectionOffset, constants.roomDimensions - 2), 2),
+                y2: Math.max(Math.min(stampAnchor.y + protectionOffset, constants.roomDimensions - 2), 2)
             })
         }
     }
@@ -582,7 +583,7 @@ export function rampartPlanner(room: Room) {
     roadCM: CostMatrix = room.get('roadCM'),
     structurePlans: CostMatrix = room.get('structurePlans'),
     rampartPlans: CostMatrix = room.get('rampartPlans')
-
+    customLog('RP', rampartPositions)
     // Plan the positions
 
     for (const pos of rampartPositions) {

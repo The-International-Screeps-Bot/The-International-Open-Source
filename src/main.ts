@@ -518,7 +518,10 @@ declare global {
          */
         groupRampartPositions(rampartPositions: Pos[]): RoomPosition[][]
 
-        findPositionsInsideRect(rect: Rect): RoomPosition[]
+        /**
+         * 
+         */
+        findRoomPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
 
         /**
          *

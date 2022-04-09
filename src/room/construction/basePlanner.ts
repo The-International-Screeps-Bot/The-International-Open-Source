@@ -18,8 +18,7 @@ export function basePlanner(room: Room) {
 
         // Construct a rect and get the positions in a range of 1
 
-        const rect = { x1: x - range, y1: y - range, x2: x + range, y2: y + range },
-        adjacentPositions = findPositionsInsideRect(rect)
+        const adjacentPositions = findPositionsInsideRect(x - range, y - range, x + range, y + range)
 
         // Loop through adjacent positions
 
@@ -482,7 +481,7 @@ export function basePlanner(room: Room) {
 
         // Find positions adjacent to source
 
-        adjacentPositions = findPositionsInsideRect({ x1: closestHarvestPos.x - 1, y1: closestHarvestPos.y - 1, x2: closestHarvestPos.x + 1, y2: closestHarvestPos.y + 1 })
+        adjacentPositions = findPositionsInsideRect(closestHarvestPos.x - 1, closestHarvestPos.y - 1, closestHarvestPos.x + 1, closestHarvestPos.y + 1 )
 
         // Loop through each pos
 

@@ -1,3 +1,4 @@
+import { constants } from "international/constants"
 import { findObjectWithID } from "international/generalFunctions"
 
 
@@ -31,6 +32,13 @@ export function defenceManager(room: Room) {
         if (room.controller.upgradeBlocked > 0) return
 
         // Otherwise if safeMode can be activated
+
+        // Check if there are enemy attackers in the room, stopping if there are none
+
+        const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+            filter: creep => !constants.allyList.has(creep.owner.username) && creep.hasPartsOfTypes([WORK || ATTACK || RANGED_ATTACK])
+        })
+        if (!enemyAttackers.length) return
 
         // Get the previous tick's events
 

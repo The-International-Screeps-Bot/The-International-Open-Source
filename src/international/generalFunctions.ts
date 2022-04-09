@@ -21,12 +21,12 @@ export function findObjectWithID(id: Id<any>) {
 /**
  * Takes a rectange and returns the positions inside of it in an array
  */
-export function findPositionsInsideRect(rect: Rect) {
+export function findPositionsInsideRect(x1: number, y1: number, x2: number, y2: number) {
 
     const positions: Pos[] = []
 
-    for (let x = rect.x1; x <= rect.x2; x++) {
-        for (let y = rect.y1; y <= rect.y2; y++) {
+    for (let x = x1; x <= x2; x++) {
+        for (let y = y1; y <= y2; y++) {
 
             // Iterate if the pos doesn't map onto a room
 
