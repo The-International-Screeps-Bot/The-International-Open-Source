@@ -83,8 +83,8 @@ declare global {
     'maintainer' |
     'mineralHarvester' |
     'remoteHarvester' |
-    /* 'remoteHauler' |
-    'remoteReserver' |
+    'remoteHauler' |
+    /*'remoteReserver' |
     'remoteScout' |
     'remoteDefender' |
     'remoteMaintainer' | */

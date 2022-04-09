@@ -109,24 +109,18 @@ export function tickConfig() {
 
             const roomMemory = Memory.rooms[roomName]
 
-            // If needs already exists
+            // If needs don't yet exist
 
-            if (roomMemory.needs) {
+            if (!roomMemory.needs) {
 
-                // Reset aspects of needs
+                // Construct needs
 
-                roomMemory.needs[remoteNeedsIndex.remoteHarvester] = 0
-
-                // And iterate
-
-                continue
+                roomMemory.needs = []
             }
 
-            // Otherwise, construct needs
+            // Initialize aspects of needs
 
-            roomMemory.needs = []
-
-            roomMemory.needs.push(6 * roomMemory.sourceEfficacies.length)
+            roomMemory.needs[remoteNeedsIndex.remoteHarvester] = 6 * roomMemory.sourceEfficacies.length
         }
 
         // Add roomName to commune list

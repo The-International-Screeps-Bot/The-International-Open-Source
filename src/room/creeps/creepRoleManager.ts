@@ -28,6 +28,7 @@ export function roleManager(room: Room) {
         maintainer: maintainerManager,
         mineralHarvester: mineralHarvesterManager,
         remoteHarvester: remoteHarvesterManager,
+        remoteHauler: remoteHarvesterManager,
         scout: scoutManager,
         antifa: antifaManager,
     }

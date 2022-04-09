@@ -180,8 +180,8 @@ constants.creepRoles = [
     'maintainer',
     'mineralHarvester',
     'remoteHarvester',
-    /* 'remoteHauler',
-    'remoteReserver',
+    'remoteHauler',
+    /*'remoteReserver',
     'remoteScout',
     'remoteDefender',
     'remoteMaintainer', */

@@ -1,12 +1,12 @@
 import { remoteNeedsIndex } from 'international/constants'
 import { RoomTask } from 'room/roomTasks'
-import { RemoteHarvester } from '../../creepClasses'
+import { RemoteHauler } from '../../creepClasses'
 
-export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
+export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
     for (const creepName of creepsOfRole) {
 
-        const creep: RemoteHarvester = Game.creeps[creepName]
+        const creep: RemoteHauler = Game.creeps[creepName]
 
         //
 
@@ -18,17 +18,13 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
                 const roomMemory = Memory.rooms[roomName]
 
-                if (roomMemory.needs[remoteNeedsIndex.remoteHarvester] <= 0) continue
+                if (roomMemory.needs[remoteNeedsIndex.remoteHarvester] > 0) continue
 
                 creep.memory.remoteName = roomName
                 roomMemory.needs[remoteNeedsIndex.remoteHarvester] -= creep.partsOfType('work') * HARVEST_POWER
                 break
             }
         }
-
-        //
-
-        if (!creep.memory.remoteName) continue
 
         // If the creep needs resources
 

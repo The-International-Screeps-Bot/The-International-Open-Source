@@ -656,7 +656,9 @@ export function spawnRequester(room: Room) {
         let partsMultiplier = 0,
         remoteIndex
 
-        for (const roomName of room.memory.remotes) {
+        const remoteNamesByEfficacy: string[] = room.get('remoteNamesByEfficacy')
+
+        for (const roomName of remoteNamesByEfficacy) {
 
             const remoteHarvesterNeed = Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester]
 

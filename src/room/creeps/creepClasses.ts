@@ -73,6 +73,15 @@ export class RemoteHarvester extends Creep {
 }
 creepClasses.remoteHarvester = RemoteHarvester
 
+export class RemoteHauler extends Creep {
+    constructor(creepID: Id<Creep>) {
+
+        super(creepID)
+
+    }
+}
+creepClasses.remoteHauler = RemoteHauler
+
 export class Scout extends Creep {
 
     /**

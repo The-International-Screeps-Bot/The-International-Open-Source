@@ -2806,9 +2806,9 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
                 // Display visuals if enabled
 
-                if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
+                /* if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
                     opacity: 0.5
-                })
+                }) */
 
                 // If the structureType is a road and RCL 3 extensions aren't built, iterate
 
