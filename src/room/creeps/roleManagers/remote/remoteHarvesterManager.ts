@@ -18,7 +18,7 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
                 const roomMemory = Memory.rooms[roomName]
 
-                if (roomMemory.needs[remoteNeedsIndex.remoteHarvester] >= 10) continue
+                if (roomMemory.needs[remoteNeedsIndex.remoteHarvester] >= 6 * roomMemory.sourceEfficacies.length * 2) continue
 
                 creep.memory.remoteName = roomName
                 roomMemory.needs[remoteNeedsIndex.remoteHarvester] -= creep.partsOfType('work') * HARVEST_POWER
@@ -31,11 +31,9 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
             if (room.name == creep.memory.remoteName) {
 
-                const sources: Source[] = room.get('sources'),
+                const sources = room.find(FIND_SOURCES_ACTIVE),
 
                 closestSource = creep.pos.findClosestByRange(sources)
-
-                creep.say(creep.pos.getRangeTo(closestSource.pos).toString())
 
                 if (creep.pos.getRangeTo(closestSource.pos) > 1) {
 
@@ -44,7 +42,6 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
                     creep.createMoveRequest({
                         origin: creep.pos,
                         goal: { pos: closestSource.pos, range: 1 },
-                        avoidImpassibleStructures: true,
                         avoidEnemyRanges: true,
                         weightGamebjects: {
                             1: room.get('road')
@@ -61,7 +58,6 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
             creep.createMoveRequest({
                 origin: creep.pos,
                 goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
-                avoidImpassibleStructures: true,
                 avoidEnemyRanges: true,
                 weightGamebjects: {
                     1: room.get('road')
@@ -127,7 +123,6 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 25 },
-            avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')

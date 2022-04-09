@@ -227,3 +227,21 @@ export function pack(pos: Pos) {
 
     return pos.x * constants.roomDimensions + pos.y
 }
+
+export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPos: number) {
+
+    // Loop through each creepName of the queue
+
+    for (const creepName of queue) {
+
+        // Get the creep using the creepName
+
+        const queuedCreep = Game.creeps[creepName]
+
+        // If the queuedCreep's pos is equal to the moveRequest, inform the creep
+
+        if (pack(queuedCreep.pos) == requestPackedPos) return queuedCreep
+    }
+
+    return undefined
+}

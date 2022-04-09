@@ -660,7 +660,7 @@ export function spawnRequester(room: Room) {
 
             const remoteHarvesterNeed = Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester]
 
-            partsMultiplier += Math.max(10 - remoteHarvesterNeed, 0)
+            partsMultiplier += Math.max(6 * Memory.rooms[roomName].sourceEfficacies.length * 2 - remoteHarvesterNeed, 0)
 
             if (!remoteIndex) remoteIndex
         }

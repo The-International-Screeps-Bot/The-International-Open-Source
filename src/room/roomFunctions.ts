@@ -1,5 +1,5 @@
 import { constants } from 'international/constants'
-import { advancedFindDistance, customLog, findPositionsInsideRect } from 'international/generalFunctions'
+import { advancedFindDistance, arePositionsEqual, customLog, findPositionsInsideRect } from 'international/generalFunctions'
 import { ControllerUpgrader, SourceHarvester } from './creeps/creepClasses'
 import { RoomObject } from './roomObject'
 import { RoomTask } from './roomTasks'
@@ -1273,6 +1273,28 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                     }
                 }
 
+                weightStructures()
+
+                function weightStructures() {
+
+                    // Loop through weights in weightGameObjects
+
+                    for (const weight in opts.weightStructures) {
+
+                        // Use the weight to get the gameObjects
+
+                        const gameObjects = opts.weightGamebjects[weight]
+
+                        // Get the numeric value of the weight
+
+                        const weightNumber = parseInt(weight)
+
+                        // Loop through each gameObject and set their pos to the weight in the cm
+
+                        for (const gameObj of gameObjects) cm.set(gameObj.pos.x, gameObj.pos.y, weightNumber)
+                    }
+                }
+
                 weightGamebjects()
 
                 function weightGamebjects() {
@@ -1406,23 +1428,23 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         // If the rampart is mine or public
 
-                        if (rampart.my || rampart.isPublic) {
+                        if (rampart.my) {
 
-                            // If prioritize ramparts is on
+                            // If there is no weight for my ramparts, iterate
 
-                            if (opts.prioritizeRamparts) {
+                            if (!opts.myRampartWeight) continue
 
-                                // Set rampart pos as prefered
+                            // Otherwise, record rampart by the weight and iterate
 
-                                cm.set(rampart.pos.x, rampart.pos.y, 1)
-                            }
-
-                            // Iterate
-
+                            cm.set(rampart.pos.x, rampart.pos.y, opts.myRampartWeight)
                             continue
                         }
 
-                        // Set pos as impassible
+                        // Otherwise if the rampart is public, iterate
+
+                        if (rampart.isPublic) continue
+
+                        // Otherwise set the rampart's pos as impassible
 
                         cm.set(rampart.pos.x, rampart.pos.y, 255)
                     }
@@ -1451,6 +1473,56 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                             // Set pos as impassible
 
                             cm.set(cSite.pos.x, cSite.pos.y, 255)
+                        }
+                    }
+                }
+
+                // If avoidStationaryPositions is requested
+
+                if (opts.avoidStationaryPositions) {
+
+                    // Construct the sourceNames
+
+                    const sources: ('source1' | 'source2')[] = ['source1', 'source2']
+
+                    // Loop through them
+
+                    for (const sourceName of sources) {
+
+                        // Find harvestPositions for sourceNames, iterating if there are none
+
+                        const harvestPositions = room.get(`${sourceName}HarvestPositions`)
+                        if (!harvestPositions?.length) continue
+
+                        // Loop through each position of harvestPositions, have creeps prefer to avoid
+
+                        for (const pos of harvestPositions) cm.set(pos.x, pos.y, 5)
+                    }
+
+                    // Get the anchor
+
+                    const anchor: RoomPosition = room.get('anchor')
+
+                    // If the anchor is defined
+
+                    if (anchor) {
+
+                        // Get the upgradePositions, and use the anchor to find the closest upgradePosition to the anchor
+
+                        const upgradePositions: RoomPosition[] = room.get('upgradePositions'),
+                        deliverUpgradePos = anchor.findClosestByRange(upgradePositions)
+
+                        // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
+
+                        for (const pos of upgradePositions) {
+
+                            // If the pos and deliverUpgradePos are the same, iterate
+
+                            if (arePositionsEqual(pos, deliverUpgradePos)) continue
+
+                            // Otherwise have the creep prefer to avoid the pos
+
+                            cm.set(pos.x, pos.y, 5)
                         }
                     }
                 }

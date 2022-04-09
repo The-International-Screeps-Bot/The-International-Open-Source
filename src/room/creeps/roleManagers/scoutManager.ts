@@ -50,7 +50,6 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: new RoomPosition(25, 25, creep.memory.scoutTarget), range: 25 },
-            avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             plainCost: 0,
             swampCost: 0,

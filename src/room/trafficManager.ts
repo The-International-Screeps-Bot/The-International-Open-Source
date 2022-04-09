@@ -19,7 +19,7 @@ export function trafficManager(room: Room) {
             // Loop through those creeps
 
             for (const creepName of creepNames) {
-                
+
                 // Get the creep with the name of creepName
 
                 const creep = Game.creeps[creepName]
@@ -69,7 +69,6 @@ export function trafficManager(room: Room) {
                     creep.createMoveRequest({
                         origin: creep.pos,
                         goal: creep.pathOpts.goal,
-                        avoidImpassibleStructures: true,
                         avoidEnemyRanges: true,
                         weightPositions: {
                             255: [pos]
@@ -102,7 +101,6 @@ export function trafficManager(room: Room) {
                         creepAtPos.createMoveRequest({
                             origin: creepAtPos.pos,
                             goal: { pos: creepAtPos.memory.goalPos, range: 1 },
-                            avoidImpassibleStructures: true,
                             avoidEnemyRanges: true,
                             weightPositions: {
                                 255: [pos, creep.pos]
@@ -169,7 +167,6 @@ export function trafficManager(room: Room) {
                         creepAtPos.createMoveRequest({
                             origin: creepAtPos.pos,
                             goal: { pos: creepAtPos.memory.goalPos, range: 1 },
-                            avoidImpassibleStructures: true,
                             avoidEnemyRanges: true,
                             weightPositions: {
                                 255: [pos, creep.pos]

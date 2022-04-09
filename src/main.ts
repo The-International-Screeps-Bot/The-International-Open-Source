@@ -155,30 +155,39 @@ declare global {
         flee?: boolean
         creep?: Creep
 
+        weightStructures?: {[key: string]: number}
+
         /**
          * An object with keys of weights and values of structures / creeps / cSites to weight
          */
         weightGamebjects?: {[key: string]: (Structure | Creep | ConstructionSite)[]}
+
         /**
          * An object with keys of weights and values of positions
          */
+
         weightPositions?: {[key: string]: Pos[]}
         /**
          *
          */
+
         weightCostMatrixes?: CostMatrix[]
         /**
          *
          */
         avoidEnemyRanges?: boolean
+
+        avoidStationaryPositions?: boolean
+
         /**
          * Deprecate
          */
         avoidImpassibleStructures?: boolean
+
         /**
-         * Sets my non public ramparts to a value of 1
+         * Weight my ramparts by this value
          */
-        prioritizeRamparts?: boolean
+        myRampartWeight?: number
     }
 
     interface FindClosestPosOfValueOpts {

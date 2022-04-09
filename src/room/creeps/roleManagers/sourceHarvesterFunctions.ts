@@ -56,7 +56,6 @@ SourceHarvester.prototype.travelToSource = function() {
     creep.createMoveRequest({
         origin: creep.pos,
         goal: { pos: new RoomPosition(Math.floor(creep.memory.packedHarvestPos / constants.roomDimensions), Math.floor(creep.memory.packedHarvestPos % 50), room.name), range: 0 },
-        avoidImpassibleStructures: true,
         avoidEnemyRanges: true,
         weightGamebjects: {
             1: room.get('road')

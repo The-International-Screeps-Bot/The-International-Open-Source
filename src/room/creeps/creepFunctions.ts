@@ -1,5 +1,5 @@
 import { constants } from "international/constants"
-import { arePositionsEqual, customLog, findObjectWithID, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
+import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
 import { repeat } from "lodash"
 import { RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
 
@@ -39,7 +39,6 @@ Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENER
         creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
-            avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
@@ -71,7 +70,6 @@ Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENER
         creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
-            avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
@@ -104,7 +102,6 @@ Creep.prototype.advancedPickup = function(target) {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: target.pos, range: 1 },
-            avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
@@ -203,7 +200,6 @@ Creep.prototype.advancedUpgradeController = function() {
             creep.createMoveRequest({
                 origin: creep.pos,
                 goal: { pos: new RoomPosition(Math.floor(creep.memory.packedUpgradePos / constants.roomDimensions), Math.floor(creep.memory.packedUpgradePos % constants.roomDimensions), room.name), range: 0 },
-                avoidImpassibleStructures: true,
                 avoidEnemyRanges: true,
                 weightGamebjects: {
                     1: room.get('road')
@@ -332,7 +328,6 @@ Creep.prototype.advancedUpgradeController = function() {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: controller.pos, range: 3 },
-            avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
@@ -428,7 +423,6 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: cSite.pos, range: 3 },
-            avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
@@ -613,7 +607,6 @@ Creep.prototype.advancedRepair = function() {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: repairTarget.pos, range: 3 },
-            avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
@@ -676,7 +669,6 @@ Creep.prototype.advancedRepair = function() {
             creep.createMoveRequest({
                 origin: creep.pos,
                 goal: { pos: newRepairTarget.pos, range: 3 },
-                avoidImpassibleStructures: true,
                 avoidEnemyRanges: true,
                 weightGamebjects: {
                     1: room.get('road')
@@ -935,6 +927,14 @@ Creep.prototype.createMoveRequest = function(opts) {
         // Assign the creep to the opts
 
         opts.creep = creep
+
+        // Inform opts to avoid impassible structures
+
+        opts.avoidImpassibleStructures = true
+
+        // Inform opts to avoid stationary positions
+
+        opts.avoidStationaryPositions = true
 
         // Generate a new path
 
@@ -1211,23 +1211,56 @@ Creep.prototype.recurseMoveRequest = function(packedPos) {
 
         if (pack(creep.pos) == creepAtPos.moveRequest) {
 
-            // Have the creepAtPos move to its moveRequest
+            // Have the creep move to its moveRequest
 
             creep.runMoveRequest(packedPos)
 
-            // Have the creep move to the creepAtPos and stop
+            // Have the creepAtPos move to the creepAtPos and stop
 
             creepAtPos.runMoveRequest(creepAtPos.moveRequest)
             return
         }
 
-        // Otherwise
+        // If the creep has a traffic queue
 
-        // Add the creepAtPos's name to the queue if it exists, otherwise create one with the creepAtPos's name inside and stop
+        if (creep.queue) {
 
-        creep.queue?.push(creepNameAtPos) ?
-            creep.queue.push(creepNameAtPos) :
-            creep.queue = [creepNameAtPos]
+            // Filter creepNames in the creep's traffic queue
+
+            const creepMatchingRequest = findCreepInQueueMatchingRequest(creep.queue, creepAtPos.moveRequest)
+
+            // If there is a creep in the queue matching the creepAtPos's moveRequest
+
+            if (creepMatchingRequest) {
+
+                // Loop through each creepName of the queue
+
+                for (const creepName of creep.queue) {
+
+                    // Get the creep using the creepName
+
+                    const queuedCreep = Game.creeps[creepName]
+
+                    // Have the creep run its moveRequest
+                    queuedCreep.say('QUEUE')
+                    queuedCreep.runMoveRequest(queuedCreep.moveRequest)
+                }
+
+                // Have the creepAtPos move to the creepAtPos and inform true
+
+                creepAtPos.runMoveRequest(creepAtPos.moveRequest)
+                return
+            }
+
+            // Otherwise add the creep to the traffic queue and stop
+
+            creep.queue.push(creepNameAtPos)
+            return
+        }
+
+        // Otherwise create a traffic queue and stop
+
+        creep.queue = [creepNameAtPos]
         return
 
         /* creepAtPos.recurseMoveRequest(JSON.stringify(creepAtPos.memory.path[0]))
@@ -1254,11 +1287,11 @@ Creep.prototype.recurseMoveRequest = function(packedPos) {
 
     // Otherwise the creepAtPos has no moveRequest and isn't fatigued
 
-    // Have the creepAtPos move to its moveRequest
+    // Have the creep move to its moveRequest
 
     creep.runMoveRequest(packedPos)
 
-    // Have the creep move to the creepAtPos and inform true
+    // Have the creepAtPos move to the creepAtPos and inform true
 
     creepAtPos.runMoveRequest(pack(creep.pos))
     return
@@ -1275,7 +1308,6 @@ Creep.prototype.getPushed = function() {
         origin: creep.pos,
         goal: { pos: creep.pos, range: 1 },
         flee: true,
-        avoidImpassibleStructures: true,
         avoidEnemyRanges: true,
         weightGamebjects: {
             1: room.get('road')
@@ -1360,7 +1392,6 @@ Creep.prototype.fulfillPullTask = function(task) {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: taskTarget.pos, range: 1 },
-            avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
@@ -1388,7 +1419,6 @@ Creep.prototype.fulfillPullTask = function(task) {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: targetPos, range: 0 },
-            avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
@@ -1484,7 +1514,6 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
             creep.createMoveRequest({
                 origin: creep.pos,
                 goal: { pos: withdrawTarget.pos, range: 1 },
-                avoidImpassibleStructures: true,
                 avoidEnemyRanges: true,
                 weightGamebjects: {
                     1: room.get('road')
@@ -1571,7 +1600,6 @@ Creep.prototype.advancedSignController = function() {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: { pos: room.controller.pos, range: 1 },
-            avoidImpassibleStructures: true,
             avoidEnemyRanges: true,
             plainCost: 0,
             swampCost: 0,
