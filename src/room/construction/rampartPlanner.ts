@@ -499,7 +499,12 @@ export function rampartPlanner(room: Room) {
 
     // Protect it
 
-    protectionRects.push({ x1: controller.pos.x - 1, x2: controller.pos.x + 1, y1: controller.pos.y - 1, y2: controller.pos.y + 1 })
+    protectionRects.push({
+        x1: Math.max(Math.min(controller.pos.x - 1), constants.roomDimensions - 2, 2),
+        y1: Math.max(Math.min(controller.pos.y - 1), constants.roomDimensions - 2, 2),
+        x2: Math.max(Math.min(controller.pos.x + 1), constants.roomDimensions - 2, 2),
+        y2: Math.max(Math.min(controller.pos.y + 1), constants.roomDimensions - 2, 2)
+    })
 
     // Get the centerUpgradePos
 
@@ -507,7 +512,12 @@ export function rampartPlanner(room: Room) {
 
     // Protect it
 
-    protectionRects.push({ x1: centerUpgradePos.x - 3, x2: centerUpgradePos.x + 3, y1: centerUpgradePos.y - 3, y2: centerUpgradePos.y + 3 })
+    protectionRects.push({
+        x1: Math.max(Math.min(centerUpgradePos.x - 3), constants.roomDimensions - 2, 2),
+        y1: Math.max(Math.min(centerUpgradePos.y - 3), constants.roomDimensions - 2, 2),
+        x2: Math.max(Math.min(centerUpgradePos.x + 3), constants.roomDimensions - 2, 2),
+        y2: Math.max(Math.min(centerUpgradePos.y + 3), constants.roomDimensions - 2, 2)
+    })
 
     // Get the source1ClosestHarvestPos
 
@@ -515,7 +525,12 @@ export function rampartPlanner(room: Room) {
 
     // Protect it
 
-    protectionRects.push({ x1: source1ClosestHarvestPos.x, x2: source1ClosestHarvestPos.x, y1: source1ClosestHarvestPos.y, y2: source1ClosestHarvestPos.y })
+    protectionRects.push({
+        x1: source1ClosestHarvestPos.x,
+        x2: source1ClosestHarvestPos.x,
+        y1: source1ClosestHarvestPos.y,
+        y2: source1ClosestHarvestPos.y
+    })
 
     // Get the source2ClosestHarvestPos
 
@@ -523,24 +538,13 @@ export function rampartPlanner(room: Room) {
 
     // Protect it
 
-    protectionRects.push({ x1: source2ClosestHarvestPos.x, x2: source2ClosestHarvestPos.x, y1: source2ClosestHarvestPos.y, y2: source2ClosestHarvestPos.y })
-/*
-    // Get the source1ClosestHarvestPos
+    protectionRects.push({
+        x1: source2ClosestHarvestPos.x,
+        x2: source2ClosestHarvestPos.x,
+        y1: source2ClosestHarvestPos.y,
+        y2: source2ClosestHarvestPos.y
+    })
 
-    const source1ClosestHarvestPos: RoomPosition = room.get('source1ClosestHarvestPos')
-
-    // Protect it
-
-    protectionRects.push({ x1: source1ClosestHarvestPos.x - 3, x2: source1ClosestHarvestPos.x + 3, y1: source1ClosestHarvestPos.y - 3, y2: source1ClosestHarvestPos.y + 3 })
-
-    // Get the source2ClosestHarvestPos
-
-    const source2ClosestHarvestPos: RoomPosition = room.get('source2ClosestHarvestPos')
-
-    // Protect it
-
-    protectionRects.push({ x1: source2ClosestHarvestPos.x - 3, x2: source2ClosestHarvestPos.x + 3, y1: source2ClosestHarvestPos.y - 3, y2: source2ClosestHarvestPos.y + 3 })
- */
     // Get the room's stampAnchors
 
     const stampAnchors: StampAnchors = global[room.name].stampAnchors
@@ -559,18 +563,23 @@ export function rampartPlanner(room: Room) {
 
             // Protect the stamp
 
-            protectionRects.push({ x1: stampAnchor.x - protectionOffset, x2: stampAnchor.x + protectionOffset, y1: stampAnchor.y - protectionOffset, y2: stampAnchor.y + protectionOffset })
+            protectionRects.push({
+                x1: Math.max(Math.min(stampAnchor.x - protectionOffset), constants.roomDimensions - 2, 2),
+                y1: Math.max(Math.min(stampAnchor.y - protectionOffset), constants.roomDimensions - 2, 2),
+                x2: Math.max(Math.min(stampAnchor.x + protectionOffset), constants.roomDimensions - 2, 2),
+                y2: Math.max(Math.min(stampAnchor.y + protectionOffset), constants.roomDimensions - 2, 2)
+            })
         }
     }
 
     // Get Min cut
     // Positions is an array where to build walls/ramparts
 
-    const rampartPositions = GetCutTiles(room.name, protectionRects)
+    const rampartPositions = GetCutTiles(room.name, protectionRects),
 
     // Get base planning data
 
-    const roadCM: CostMatrix = room.get('roadCM'),
+    roadCM: CostMatrix = room.get('roadCM'),
     structurePlans: CostMatrix = room.get('structurePlans'),
     rampartPlans: CostMatrix = room.get('rampartPlans')
 
