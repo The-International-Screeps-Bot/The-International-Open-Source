@@ -587,6 +587,11 @@ declare global {
         sourceEfficacies: number[]
 
         /**
+         * A list of needs the remote wants met
+         */
+        needs: number[]
+
+        /**
          * The room owner
          */
         owner: string

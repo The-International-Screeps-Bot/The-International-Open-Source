@@ -18,7 +18,7 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
                 const roomMemory = Memory.rooms[roomName]
 
-                if (roomMemory.needs[remoteNeedsIndex.remoteHarvester] >= 6 * roomMemory.sourceEfficacies.length * 2) continue
+                if (roomMemory.needs[remoteNeedsIndex.remoteHarvester] > 0) continue
 
                 creep.memory.remoteName = roomName
                 roomMemory.needs[remoteNeedsIndex.remoteHarvester] -= creep.partsOfType('work') * HARVEST_POWER

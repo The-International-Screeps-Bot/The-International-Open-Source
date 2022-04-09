@@ -48,7 +48,7 @@ export function creepOrganizer() {
         room.myCreepsAmount++
 
         // Add the creep's name to the position in its room
-        
+
         room.creepPositions[pack(creep.pos)] = creep.name
 
         // Get the commune the creep is from
@@ -74,7 +74,7 @@ export function creepOrganizer() {
 
             // If the creep is a remoteHarvester, increase the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
 
-            if (creep.memory.role == 'remoteHarvester') Memory.rooms[creep.memory.remoteName].needs[remoteNeedsIndex.remoteHarvester] += creep.partsOfType('work') * HARVEST_POWER
+            if (creep.memory.role == 'remoteHarvester') Memory.rooms[creep.memory.remoteName].needs[remoteNeedsIndex.remoteHarvester] -= creep.partsOfType('work') * HARVEST_POWER
         }
 
         // Increase total creep counter
