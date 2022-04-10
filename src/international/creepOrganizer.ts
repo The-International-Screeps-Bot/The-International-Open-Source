@@ -72,9 +72,13 @@ export function creepOrganizer() {
 
         if (creep.memory.remoteName) {
 
-            // If the creep is a remoteHarvester, increase the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
+            // If the creep is a remoteHarvester, reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
 
-            if (creep.memory.role == 'remoteHarvester') Memory.rooms[creep.memory.remoteName].needs[remoteNeedsIndex.remoteHarvester] -= creep.partsOfType(WORK) * HARVEST_POWER
+            if (creep.memory.role == 'remoteHarvester') Memory.rooms[creep.memory.remoteName].needs[remoteNeedsIndex.remoteHarvester] -= creep.partsOfType(WORK)
+
+            // Otherwise if the creep is a remoteHauler, reduce its remote's needs by their number of carry parts
+
+            else if (creep.memory.role == 'remoteHauler') Memory.rooms[creep.memory.remoteName].needs[remoteNeedsIndex.remoteHauler] -= creep.partsOfType(CARRY)
         }
 
         // Increase total creep counter

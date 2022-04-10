@@ -1631,7 +1631,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                 // inform creep if it has work parts
 
-                if (creep.hasPartsOfTypes(['work'])) {
+                if (creep.hasPartsOfTypes([WORK])) {
 
                     // If the creep is owned by an ally
 

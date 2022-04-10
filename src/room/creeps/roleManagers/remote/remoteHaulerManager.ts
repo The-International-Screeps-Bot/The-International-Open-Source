@@ -18,10 +18,10 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                 const roomMemory = Memory.rooms[roomName]
 
-                if (roomMemory.needs[remoteNeedsIndex.remoteHarvester] > 0) continue
+                if (roomMemory.needs[remoteNeedsIndex.remoteHauler] > 0) continue
 
                 creep.memory.remoteName = roomName
-                roomMemory.needs[remoteNeedsIndex.remoteHarvester] -= creep.partsOfType('work') * HARVEST_POWER
+                roomMemory.needs[remoteNeedsIndex.remoteHauler] -= creep.partsOfType(CARRY)
                 break
             }
         }
@@ -30,29 +30,56 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
         if (creep.needsResources()) {
 
+            // If the creep is in the remote
+
             if (room.name == creep.memory.remoteName) {
 
-                const sources = room.find(FIND_SOURCES_ACTIVE),
+                // If creep has a task
 
-                closestSource = creep.pos.findClosestByRange(sources)
+                if (global[creep.id] && global[creep.id].respondingTaskID) {
 
-                if (creep.pos.getRangeTo(closestSource.pos) > 1) {
+                    // Try to filfill task
 
-                    creep.say('⏩')
+                    const fulfillTaskResult = creep.fulfillTask()
 
-                    creep.createMoveRequest({
-                        origin: creep.pos,
-                        goal: { pos: closestSource.pos, range: 1 },
-                        avoidEnemyRanges: true,
-                        weightGamebjects: {
-                            1: room.get('road')
-                        }
-                    })
+                    // Iterate if the task wasn't fulfilled
 
-                    continue
+                    if (!fulfillTaskResult) continue
+
+                    // Otherwise find the task
+
+                    const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
+
+                    // Delete it
+
+                    task.delete()
                 }
 
-                creep.advancedHarvestSource(closestSource)
+                // Try to find a new task
+
+                const findTaskResult = creep.findTask(new Set([
+                    'pickup',
+                ]), RESOURCE_ENERGY)
+
+                // If a task wasn't found, iterate
+
+                if (!findTaskResult) continue
+
+                // Try to filfill task
+
+                const fulfillTaskResult = creep.fulfillTask()
+
+                // Iterate if the task wasn't fulfilled
+
+                if (!fulfillTaskResult) continue
+
+                // Otherwise find the task
+
+                const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
+
+                // Delete it and iterate
+
+                task.delete()
                 continue
             }
 
@@ -97,7 +124,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
             const findTaskResult = creep.findTask(new Set([
                 'transfer',
-            ]))
+            ]), RESOURCE_ENERGY)
 
             // If a task wasn't found, iterate
 

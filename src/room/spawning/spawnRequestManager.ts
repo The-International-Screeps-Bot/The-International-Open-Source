@@ -649,37 +649,84 @@ export function spawnRequester(room: Room) {
         }
     })())
 
-    // Construct requests for remoteHarvesters
+    // Get remotes by order of efficacy
 
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
+    const remoteNamesByEfficacy: string[] = room.get('remoteNamesByEfficacy')
 
-        let partsMultiplier = 0,
-        remoteIndex
+    /**
+     *
+     */
+    function findRemoteEconIndex() {
 
-        const remoteNamesByEfficacy: string[] = room.get('remoteNamesByEfficacy')
+        for (let index = 0; index < remoteNamesByEfficacy.length; index++) {
 
-        for (const roomName of remoteNamesByEfficacy) {
+            const remoteName = remoteNamesByEfficacy[index]
 
-            const remoteHarvesterNeed = Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester]
-
-            partsMultiplier += Math.max(remoteHarvesterNeed, 0)
-
-            if (!remoteIndex) remoteIndex
+            const remoteEconNeed = Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteHarvester], 0) + Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteHauler], 0)
+            if (remoteEconNeed > 0) return remoteEconNeed
         }
 
-        return {
-            defaultParts: [],
-            extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier,
-            minCreeps: undefined,
-            maxCreeps: Infinity,
-            minCost: 200,
-            priority: 4 + room.creepsFromRoom.remoteHarvester.length,
-            memoryAdditions: {
-                role: 'remoteHarvester',
+        return false
+    }
+
+    // Find the index of the most efficient remote with needs
+
+    const remoteEconIndex = findRemoteEconIndex()
+
+    // If there is a remote with economic needs
+
+    if (remoteEconIndex) {
+
+        // Construct requests for remoteHarvesters
+
+        constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+            let partsMultiplier = 0
+
+            for (const roomName of remoteNamesByEfficacy) {
+
+                partsMultiplier += Math.max(Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester], 0)
             }
-        }
-    })())
+
+            return {
+                defaultParts: [],
+                extraParts: [WORK, MOVE],
+                partsMultiplier,
+                minCreeps: undefined,
+                maxCreeps: Infinity,
+                minCost: 200,
+                priority: 4 + remoteEconIndex,
+                memoryAdditions: {
+                    role: 'remoteHarvester',
+                }
+            }
+        })())
+
+        // Construct requests for remoteHaulers
+
+        constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+            let partsMultiplier = 0
+
+            for (const roomName of remoteNamesByEfficacy) {
+
+                partsMultiplier += Math.max(Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHauler], 0)
+            }
+
+            return {
+                defaultParts: [],
+                extraParts: [CARRY, MOVE],
+                partsMultiplier,
+                minCreeps: undefined,
+                maxCreeps: Infinity,
+                minCost: 200,
+                priority: 4 + remoteEconIndex,
+                memoryAdditions: {
+                    role: 'remoteHauler',
+                }
+            }
+        })())
+    }
 
     // Construct requests for scouts
 

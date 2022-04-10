@@ -1,5 +1,5 @@
 import { constants, remoteNeedsIndex } from './constants'
-import { createPackedPosMap, customLog } from './generalFunctions'
+import { createPackedPosMap, customLog, findCarryPartsRequired } from './generalFunctions'
 
 /**
  * Configures tick important or tick-only pre-roomManager settings required to run the bot
@@ -126,9 +126,24 @@ export function tickConfig() {
                 roomMemory.needs = []
             }
 
+
+
             // Initialize aspects of needs
 
-            roomMemory.needs[remoteNeedsIndex.remoteHarvester] = 6 * roomMemory.sourceEfficacies.length
+            roomMemory.needs[remoteNeedsIndex.remoteReserver] = 1
+
+            roomMemory.needs[remoteNeedsIndex.remoteHarvester] = roomMemory.needs[remoteNeedsIndex.remoteReserver] == 0 ? 6 : 3 * roomMemory.sourceEfficacies.length
+
+            roomMemory.needs[remoteNeedsIndex.remoteHauler] = 0
+
+            // Loop through the efficacies of each source efficacy
+
+            for (const efficacy of roomMemory.sourceEfficacies) {
+
+                // Find the number of carry parts required for the source, and add it to the remoteHauler need
+
+                roomMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(efficacy, roomMemory.needs[remoteNeedsIndex.remoteReserver] == 0 ? 10 : 5)
+            }
         }
 
         // Add roomName to commune list
