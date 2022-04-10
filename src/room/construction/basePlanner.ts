@@ -66,6 +66,15 @@ export function basePlanner(room: Room) {
         adjacentToRoads?: boolean
     }
 
+    // Loop through each x and y in the room
+
+    for (let x = 0; x < constants.roomDimensions; x++) {
+        for (let y = 0; y < constants.roomDimensions; y++) {
+
+            room.visual.text(baseCM.get(x, y).toString(), x, y)
+        }
+    }
+
     /**
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
      */

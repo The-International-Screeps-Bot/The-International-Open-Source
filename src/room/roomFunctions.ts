@@ -66,21 +66,27 @@ Room.prototype.get = function(roomObjectName) {
 
         // Construct a cost matrix based off terrain cost matrix
 
-        const baseCM = room.roomObjects.terrainCM.getValue()
+        const baseCM = room.roomObjects.terrainCM.getValue(),
 
-        function recordAdjacentPositions(x: number, y: number, range: number) {
+        // Get the room's exits
 
-            // Construct a rect and get the positions in a range of 1
+        exits = room.find(FIND_EXIT)
 
-            const adjacentPositions = findPositionsInsideRect(x - range, y - range, x + range, x - range)
+        // Loop through each exit of exits
+
+        for (const pos of exits) {
+
+            // Record the exit as a pos to avoid
+
+            baseCM.set(pos.x, pos.y, 255)
+
+            // Construct a rect and get the positions in a range of 2
+
+            const adjacentPositions = findPositionsInsideRect(pos.x - 2, pos.y - 2, pos.x + 2, pos.y + 2)
 
             // Loop through adjacent positions
 
             for (const adjacentPos of adjacentPositions) {
-
-                // Iterate if the adjacent pos is a wall
-
-                if (baseCM.get(adjacentPos.x, adjacentPos.y) == 255) continue
 
                 // Otherwise record the position as a wall
 
@@ -88,66 +94,7 @@ Room.prototype.get = function(roomObjectName) {
             }
         }
 
-        // Record exits and adjacent positions to exits as something to avoid
-
-        let y = 0
-        let x = 0
-
-        // Configure y and loop through top exits
-
-        y = 0
-        for (x = 0; x < 50; x++) {
-
-            // Record the exit as a pos to avoid
-
-            baseCM.set(x, y, 255)
-
-            // Record adjacent positions to avoid
-
-            recordAdjacentPositions(x, y, 1)
-        }
-
-        // Configure x and loop through left exits
-
-        x = 0
-        for (y = 0; y < 50; y++) {
-
-            // Record the exit as a pos to avoid
-
-            baseCM.set(x, y, 255)
-
-            // Record adjacent positions to avoid
-
-            recordAdjacentPositions(x, y, 1)
-        }
-
-        // Configure y and loop through bottom exits
-
-        y = 49
-        for (x = 0; x < 50; x++) {
-
-            // Record the exit as a pos to avoid
-
-            baseCM.set(x, y, 255)
-
-            // Record adjacent positions to avoid
-
-            recordAdjacentPositions(x, y, 1)
-        }
-
-        // Configure x and loop through right exits
-
-        x = 49
-        for (y = 0; y < 50; y++) {
-
-            // Record the exit as a pos to avoid
-
-            baseCM.set(x, y, 255)
-
-            // Record adjacent positions to avoid
-
-            recordAdjacentPositions(x, y, 1)
-        }
+        // Inform the baseCM
 
         return baseCM
     }
@@ -2758,9 +2705,9 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
                 // Display visuals if enabled
 
-                /* if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
+                if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
                     opacity: 0.5
-                }) */
+                })
 
                 // If the structureType is a road and RCL 3 extensions aren't built, iterate
 
