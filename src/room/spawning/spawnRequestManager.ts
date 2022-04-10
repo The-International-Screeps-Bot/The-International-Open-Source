@@ -720,7 +720,7 @@ export function spawnRequester(room: Room) {
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 200,
-                priority: 4 + remoteEconIndex,
+                priority: 4.1 + remoteEconIndex,
                 memoryAdditions: {
                     role: 'remoteHauler',
                 }

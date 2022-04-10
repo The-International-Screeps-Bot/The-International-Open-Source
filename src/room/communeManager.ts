@@ -14,8 +14,6 @@ import { customLog } from "international/generalFunctions"
 
 export function communeManager(room: Room) {
 
-    taskManager(room)
-
     towerManager(room)
 
     constructionManager(room)
@@ -23,8 +21,6 @@ export function communeManager(room: Room) {
     marketManager(room)
 
     defenceManager(room)
-
-    droppedResourceManager(room)
 
     structuresForSpawningManager(room)
 

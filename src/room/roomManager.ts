@@ -14,6 +14,8 @@ import { trafficManager } from './trafficManager'
 import { roomVisualsManager } from './roomVisualsManager'
 import { containerManager } from './containerManager'
 import { customLog } from 'international/generalFunctions'
+import { droppedResourceManager } from './droppedResourceManager'
+import { taskManager } from './roomTaskManager'
 
 const specificRoomManagers: {[key: string]: Function} = {
     remote: remoteManager,
@@ -41,6 +43,10 @@ export function roomManager() {
         // If there is a specific manager for this room's type, run it
 
         if (specificRoomManagers[room.memory.type]) specificRoomManagers[room.memory.type](room)
+
+        taskManager(room)
+
+        droppedResourceManager(room)
 
         //
 

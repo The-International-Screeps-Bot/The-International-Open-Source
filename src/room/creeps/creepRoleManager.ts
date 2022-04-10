@@ -11,6 +11,7 @@ import { constants } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import { haulerManager } from './roleManagers/commune/haulerManager'
 import { remoteHarvesterManager } from './roleManagers/remote/remoteHarvesterManager'
+import { remoteHaulerManager } from './roleManagers/remote/remoteHaulerManager'
 
 export function roleManager(room: Room) {
 
@@ -28,7 +29,7 @@ export function roleManager(room: Room) {
         maintainer: maintainerManager,
         mineralHarvester: mineralHarvesterManager,
         remoteHarvester: remoteHarvesterManager,
-        remoteHauler: remoteHarvesterManager,
+        remoteHauler: remoteHaulerManager,
         scout: scoutManager,
         antifa: antifaManager,
     }

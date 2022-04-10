@@ -85,6 +85,9 @@ export function tickConfig() {
             source2: 0,
         }
 
+        if (!global[room.name].tasksWithoutResponders) global[room.name].tasksWithoutResponders = {}
+        if (!global[room.name].tasksWithResponders) global[room.name].tasksWithResponders = {}
+
         // Iterate if there isn't a controller
 
         if (!controller) continue
@@ -157,9 +160,6 @@ export function tickConfig() {
         for (const role of constants.creepRoles) room.creepsFromRoom[role] = []
 
         room.creepsFromRoomAmount = 0
-
-        if (!global[room.name].tasksWithoutResponders) global[room.name].tasksWithoutResponders = {}
-        if (!global[room.name].tasksWithResponders) global[room.name].tasksWithResponders = {}
 
         room.storedResources = {}
     }
