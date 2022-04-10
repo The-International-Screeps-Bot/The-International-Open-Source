@@ -105,9 +105,10 @@ export function tickConfig() {
 
         for (const roomName of room.memory.remotes) {
 
-            // Get the room's memory using its name
+            // Get the room's memory using its name, stopping if it's undefined
 
             const roomMemory = Memory.rooms[roomName]
+            if (!roomMemory) return
 
             // If needs don't yet exist
 
