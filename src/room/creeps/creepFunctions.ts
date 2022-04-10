@@ -951,7 +951,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
         // Show that a new path has been created
 
-        if (Memory.roomVisuals) room.visual.text('NP', path[0], { align: 'center' })
+        if (Memory.roomVisuals) room.visual.text('NP', path[0], { align: 'center', color: constants.colors.lightBlue })
 
         // So long as the creep isn't standing on the first position in the path
 

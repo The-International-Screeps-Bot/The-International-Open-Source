@@ -66,15 +66,6 @@ export function basePlanner(room: Room) {
         adjacentToRoads?: boolean
     }
 
-    // Loop through each x and y in the room
-
-    for (let x = 0; x < constants.roomDimensions; x++) {
-        for (let y = 0; y < constants.roomDimensions; y++) {
-
-            room.visual.text(baseCM.get(x, y).toString(), x, y)
-        }
-    }
-
     /**
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
      */
@@ -332,14 +323,23 @@ export function basePlanner(room: Room) {
         // Record the pos in roadCM
 
         roadCM.set(closestHarvestPos.x, closestHarvestPos.y, 255)
+    }
+
+    // loop through sourceNames
+
+    for (const sourceName of sourceNames) {
+
+        // get the closestHarvestPos using the sourceName
+
+        const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPos`)
 
         // Plan for a road at the pos
 
         structurePlans.set(closestHarvestPos.x, closestHarvestPos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER])
 
-        // Path from the hubAnchor to the closestHarvestPos
+        // Path from the fastFillerAnchor to the closestHarvestPos
 
-        const fastFillerPath = room.advancedFindPath({
+        path = room.advancedFindPath({
             origin: closestHarvestPos,
             goal: { pos: fastFillerAnchor, range: 4 },
             weightCostMatrixes: [roadCM]
@@ -347,15 +347,7 @@ export function basePlanner(room: Room) {
 
         // Record the path's length in global
 
-        global[room.name][`${sourceName}PathLength`] = fastFillerPath.length
-
-        // Path from the hubAnchor to the closestHarvestPos
-
-        path = room.advancedFindPath({
-            origin: closestHarvestPos,
-            goal: { pos: hubAnchor, range: 2 },
-            weightCostMatrixes: [roadCM]
-        })
+        global[room.name][`${sourceName}PathLength`] = path.length
 
         // Loop through positions of the path
 

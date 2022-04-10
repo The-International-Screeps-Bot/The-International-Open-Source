@@ -22,13 +22,13 @@ export function constructionManager(room: Room) {
 
         // If the room is above 1 construction site, stop
 
-        if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
+        /* if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return */
     }
 
     // Only run the planner every x ticks (temporary fix)
 
-    if (Game.time % 50 != 0) return
-
+    /* if (Game.time % 50 != 0) return */
+    
     manageBasePlanning()
 
     function manageBasePlanning() {
