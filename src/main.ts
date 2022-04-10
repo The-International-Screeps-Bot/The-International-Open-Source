@@ -715,6 +715,8 @@ declare global {
 
         findOptimalSourceName(): boolean
 
+        findOptimalRemoteSourceName(): boolean
+
         findHarvestPosition(): boolean
 
         /**

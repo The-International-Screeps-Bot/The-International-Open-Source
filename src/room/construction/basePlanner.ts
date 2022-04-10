@@ -275,11 +275,7 @@ export function basePlanner(room: Room) {
         structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
     }
 
-    // Record the pos in roadCM
-
-    roadCM.set(centerUpgadePos.x, centerUpgadePos.y, 255)
-
-    // Plan for a road at the pos
+    // Plan for a container at the pos
 
     structurePlans.set(centerUpgadePos.x, centerUpgadePos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER])
 
@@ -482,7 +478,7 @@ export function basePlanner(room: Room) {
 
         // Find positions adjacent to source
 
-        adjacentPositions = findPositionsInsideRect(closestHarvestPos.x - 1, closestHarvestPos.y - 1, closestHarvestPos.x + 1, closestHarvestPos.y + 1 )
+        adjacentPositions = findPositionsInsideRect(closestHarvestPos.x - 1, closestHarvestPos.y - 1, closestHarvestPos.x + 1, closestHarvestPos.y + 1)
 
         // Loop through each pos
 

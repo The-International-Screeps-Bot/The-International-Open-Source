@@ -1,5 +1,5 @@
 import { remoteNeedsIndex } from 'international/constants'
-import { RoomTask } from 'room/roomTasks'
+import './remoteHarvesterFunctions'
 import { RemoteHarvester } from '../../creepClasses'
 
 export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
@@ -7,7 +7,7 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
     for (const creepName of creepsOfRole) {
 
         const creep: RemoteHarvester = Game.creeps[creepName]
-        
+
         //
 
         if (!creep.memory.remoteName) {
@@ -30,11 +30,29 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         if (!creep.memory.remoteName) continue
 
+        creep.say(creep.memory.remoteName)
+
         // If the creep needs resources
 
         if (room.name == creep.memory.remoteName) {
 
-            const sources = room.find(FIND_SOURCES_ACTIVE)
+            // If the creep cannot find a sourceName, iterate
+
+            if (!creep.findOptimalRemoteSourceName()) continue
+
+            // Try to move to source. If creep moved then iterate
+
+            if (creep.travelToSource()) continue
+
+            // Get the creeps sourceName
+
+            const sourceName = creep.memory.sourceName
+
+            // Try to normally harvest. Iterate if creep harvested
+
+            if (creep.advancedHarvestSource(room.get(sourceName))) continue
+
+            /* const sources = room.find(FIND_SOURCES_ACTIVE)
             if (!sources.length) continue
 
             const closestSource = creep.pos.findClosestByRange(sources)
@@ -55,7 +73,7 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
                 continue
             }
 
-            creep.advancedHarvestSource(closestSource)
+            creep.advancedHarvestSource(closestSource) */
             continue
         }
 

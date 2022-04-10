@@ -18,7 +18,7 @@ export function endTickManager() {
 
     // customLog the CPU used
 
-    customLog('Total CPU', (CPU).toFixed(2) + ' / ' + Game.cpu.limit, constants.colors.white, CPUColor)
+    customLog('Total CPU', (CPU).toFixed(2) + ' / ' + Game.cpu.limit + ' CPU Bucket: ' + Game.cpu.bucket(), constants.colors.white, CPUColor)
 
     // Fill up the console with empty logs
 

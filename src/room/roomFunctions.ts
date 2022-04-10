@@ -1,5 +1,5 @@
 import { constants } from 'international/constants'
-import { advancedFindDistance, arePositionsEqual, customLog, findPositionsInsideRect } from 'international/generalFunctions'
+import { advancedFindDistance, arePositionsEqual, customLog, findPositionsInsideRect, unPackAsRoomPos } from 'international/generalFunctions'
 import { ControllerUpgrader, SourceHarvester } from './creeps/creepClasses'
 import { RoomObject } from './roomObject'
 import { RoomTask } from './roomTasks'
@@ -615,11 +615,15 @@ Room.prototype.get = function(roomObjectName) {
 
         // Construct usedHarvestPositions
 
-        const usedHarvestPositions: Set<number> = new Set()
+        const usedHarvestPositions: Set<number> = new Set(),
+
+        // If the room is a commune, use sourceHarvesters. Otherwise use remoteHarvesters
+
+        harvesterNames = room.memory.type == 'commune' ? room.myCreeps.sourceHarvester : room.myCreeps.remoteHarvester
 
         // Loop through each sourceHarvester's name in the room
 
-        for (const creepName of room.myCreeps.sourceHarvester) {
+        for (const creepName of harvesterNames) {
 
             // Get the creep using its name
 

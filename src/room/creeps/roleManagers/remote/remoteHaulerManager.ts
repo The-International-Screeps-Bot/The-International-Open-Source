@@ -30,6 +30,8 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
         if (!creep.memory.remoteName) continue
 
+        creep.say(creep.memory.remoteName)
+
         // If the creep needs resources
 
         if (creep.needsResources()) {

@@ -689,8 +689,8 @@ Creep.prototype.advancedRepair = function() {
 
 Creep.prototype.findOptimalSourceName = function() {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room
 
     creep.say('FOSN')
 
@@ -709,11 +709,11 @@ Creep.prototype.findOptimalSourceName = function() {
 
     // Otherwise, define source names
 
-    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2'],
 
     // Sort them by their range from the anchor
 
-    const sourceNamesByAnchorRange = sourceNames.sort((a, b) => anchor.getRangeTo(room.get(a).pos) - anchor.getRangeTo(room.get(b).pos))
+    sourceNamesByAnchorRange = sourceNames.sort((a, b) => anchor.getRangeTo(room.get(a).pos) - anchor.getRangeTo(room.get(b).pos))
 
     // Construct a creep threshold
 
@@ -726,6 +726,66 @@ Creep.prototype.findOptimalSourceName = function() {
         // Then loop through the source names and find the first one with open spots
 
         for (const sourceName of sourceNamesByAnchorRange) {
+
+            // If there are still creeps needed to harvest a source under the creepThreshold
+
+            if (Math.min(creepThreshold, room.get(`${sourceName}HarvestPositions`).length) - room.creepsOfSourceAmount[sourceName] > 0) {
+
+                // Assign the sourceName to the creep's memory and Inform true
+
+                creep.memory.sourceName = sourceName
+                return true
+            }
+        }
+
+        // Otherwise increase the creepThreshold
+
+        creepThreshold++
+    }
+
+    // No source was found, inform false
+
+    return false
+}
+
+Creep.prototype.findOptimalRemoteSourceName = function() {
+
+    const creep = this,
+    room = creep.room
+
+    creep.say('FORSN')
+
+    // If the creep already has a sourceName, inform true
+
+    if (creep.memory.sourceName) return true
+
+    // Query usedHarvestPositions to get creepsOfSourceAmount
+
+    room.get('usedHarvestPositions')
+
+    // Otherwise, define source names
+
+    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2'],
+
+    // Sort them by their range from the anchor
+
+    sourceNamesByAnchorRange = sourceNames.sort((a, b) => creep.pos.getRangeTo(room.get(a)?.pos) - creep.pos.getRangeTo(room.get(b)?.pos))
+
+    // Construct a creep threshold
+
+    let creepThreshold = 1
+
+    // So long as the creepThreshold is less than 4
+
+    while (creepThreshold < 4) {
+
+        // Then loop through the source names and find the first one with open spots
+
+        for (const sourceName of sourceNamesByAnchorRange) {
+
+            // Iterate if there is no source for the sourceName
+
+            if (!room.get(sourceName)) continue
 
             // If there are still creeps needed to harvest a source under the creepThreshold
 
@@ -763,34 +823,27 @@ Creep.prototype.findHarvestPosition = function() {
 
     const sourceName = creep.memory.sourceName,
 
-    // Get the closestHarvestPos for the creep's source
-
-    closestHarvestPos: Pos = room.get(`${sourceName}ClosestHarvestPos`),
-
-    // Convert the closestHarvestPos into a packed pos
-
-    packedClosestHarvestPos = closestHarvestPos.x * constants.roomDimensions + closestHarvestPos.y,
-
     // Get usedHarvestPositions
 
-    usedHarvestPositions: Set<number> = room.get('usedHarvestPositions')
-
-    // If the packedClosestHarvestPos isn't used
-
-    if (!usedHarvestPositions.has(packedClosestHarvestPos)) {
-
-        // Set it as the packedClosestHarvestPos, record in usedHarvestPositions, and inform true
-
-        creep.memory.packedHarvestPos = packedClosestHarvestPos
-        usedHarvestPositions.add(packedClosestHarvestPos)
-        return true
-    }
+    usedHarvestPositions: Set<number> = room.get('usedHarvestPositions'),
 
     // Otherwise get the harvest positions for the source
 
-    const harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`)
+    harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`),
 
-    // Loop through each harvest position
+    openHarvestPositions = harvestPositions.filter(pos => !usedHarvestPositions.has(pack(pos)))
+    if (!openHarvestPositions.length) return false
+
+    const closestHarvestPos = openHarvestPositions.sort((a, b) => getRangeBetween(creep.pos.x, creep.pos.y, a.x, a.y) - getRangeBetween(creep.pos.x, creep.pos.y, b.x, b.y))[0],
+
+    packedPos = pack(closestHarvestPos)
+
+    creep.memory.packedHarvestPos = packedPos
+    usedHarvestPositions.add(packedPos)
+
+    return true
+
+    /* // Loop through each harvest position
 
     for (const harvestPos of harvestPositions) {
 
@@ -811,7 +864,7 @@ Creep.prototype.findHarvestPosition = function() {
 
     // No harvestPos was found, inform false
 
-    return false
+    return false */
 }
 
 Creep.prototype.hasPartsOfTypes = function(partTypes) {

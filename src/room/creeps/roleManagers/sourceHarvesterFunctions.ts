@@ -5,12 +5,12 @@ import { SourceHarvester } from "../creepClasses"
 
 SourceHarvester.prototype.travelToSource = function() {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room,
 
     // Define the creep's designated source
 
-    const sourceName = creep.memory.sourceName
+    sourceName = creep.memory.sourceName
 
     // Try to find a harvestPosition, inform false if it failed
 

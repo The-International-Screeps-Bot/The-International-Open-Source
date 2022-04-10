@@ -65,6 +65,12 @@ export class MineralHarvester extends Creep {
 creepClasses.mineralHarvester = MineralHarvester
 
 export class RemoteHarvester extends Creep {
+
+    /**
+     *
+     */
+     travelToSource?(): boolean
+
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
@@ -74,6 +80,7 @@ export class RemoteHarvester extends Creep {
 creepClasses.remoteHarvester = RemoteHarvester
 
 export class RemoteHauler extends Creep {
+
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
