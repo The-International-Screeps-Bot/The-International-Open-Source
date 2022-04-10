@@ -225,8 +225,9 @@ declare global {
         defaultParts: BodyPartConstant[]
         extraParts: BodyPartConstant[]
         partsMultiplier: number
-        minCreeps: number | undefined
-        maxCreeps: number
+        minCreeps?: number | undefined
+        maxCreeps?: number | undefined
+        maxCostPerCreep?: number | undefined
         minCost: number
         priority: number
         memoryAdditions: any
@@ -519,7 +520,7 @@ declare global {
         groupRampartPositions(rampartPositions: Pos[]): RoomPosition[][]
 
         /**
-         * 
+         *
          */
         findRoomPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
 

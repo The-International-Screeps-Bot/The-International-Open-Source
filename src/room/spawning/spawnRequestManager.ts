@@ -70,13 +70,29 @@ export function spawnRequester(room: Room) {
         constructSpawnRequestsByGroup(opts)
     }
 
+    function decideMaxCostPerCreep(maxCostPerCreep: number = 20000) {
+
+        // If there are no sourceHarvesters or haulers
+
+        if (room.creepsFromRoom.sourceHarvester.length == 0 || room.creepsFromRoom.hauler.length == 0) {
+
+            // Inform the smaller of the following
+
+            return Math.min(maxCostPerCreep, spawnEnergyAvailable)
+        }
+
+        // Otherwise the smaller of the following
+
+        return Math.min(maxCostPerCreep, spawnEnergyCapacity)
+    }
+
     // Use preset creep amounts to construct spawn requests
 
     function constructSpawnRequestsIndividually(opts: SpawnRequestOpts) {
 
-        // If there are no sourceHarvesters or haulers, set the maxCostPerCreep to the spawnEnergyAvailable, otherwise set it to the lowest allowed cost
+        // Get the maxCostPerCreep
 
-        const maxCostPerCreep = (room.creepsFromRoom.sourceHarvester.length == 0 || room.creepsFromRoom.hauler.length == 0) ? spawnEnergyAvailable : spawnEnergyCapacity
+        const maxCostPerCreep = decideMaxCostPerCreep(opts.maxCostPerCreep)
 
         // So long as minCreeps is more than the current number of creeps
 
@@ -217,9 +233,9 @@ export function spawnRequester(room: Room) {
 
     function constructSpawnRequestsByGroup(opts: SpawnRequestOpts) {
 
-        // If there are no sourceHarvesters or haulers, set the maxCostPerCreep to the spawnEnergyAvailable, otherwise set it to the lowest allowed cost
+        // Get the maxCostPerCreep
 
-        const maxCostPerCreep = (room.creepsFromRoom.sourceHarvester.length == 0 || room.creepsFromRoom.hauler.length == 0) ? spawnEnergyAvailable : spawnEnergyCapacity
+        const maxCostPerCreep = decideMaxCostPerCreep(opts.maxCostPerCreep)
 
         // Find the totalExtraParts using the partsMultiplier
 
@@ -694,6 +710,7 @@ export function spawnRequester(room: Room) {
                 partsMultiplier,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
+                maxCostPerCreep: 150 * 6,
                 minCost: 200,
                 priority: 4 + remoteEconIndex,
                 memoryAdditions: {
