@@ -18,7 +18,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                 const roomMemory = Memory.rooms[roomName]
 
-                if (roomMemory.needs[remoteNeedsIndex.remoteHauler] > 0) continue
+                if (roomMemory.needs[remoteNeedsIndex.remoteHauler] <= 0) continue
 
                 creep.memory.remoteName = roomName
                 roomMemory.needs[remoteNeedsIndex.remoteHauler] -= creep.partsOfType(CARRY)
