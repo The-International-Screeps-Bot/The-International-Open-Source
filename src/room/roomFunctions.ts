@@ -2665,6 +2665,39 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
     nextGeneration: Pos[] = []
 
+    function planPos(x: number, y: number) {
+
+        // Get the planned value for this pos
+
+        const plannedValue = structurePlans.get(x, y)
+
+        // If there are structures planned for this pos
+
+        if (plannedValue == 0) return
+
+        // Otherwise so long as the pos isn't a wall, try to build a structure
+
+        const structureType = constants.numbersByStructureTypes[plannedValue]
+
+        // If the structureType is empty, iterate
+
+        if (structureType == 'empty') return
+
+        // Display visuals if enabled
+
+        /* if (Memory.roomVisuals) room.visual.structure(x, y, structureType, {
+            opacity: 0.5
+        }) */
+
+        // If the structureType is a road and RCL 3 extensions aren't built, iterate
+
+        if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) return
+
+        // Create a road site at this pos
+
+        room.createConstructionSite(x, y, structureType)
+    }
+
     // So long as there are positions in this gen
 
     while (thisGeneration.length) {
@@ -2683,40 +2716,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
             // Plan structures for this pos
 
-            planPos()
-
-            function planPos() {
-
-                // Get the planned value for this pos
-
-                const plannedValue = structurePlans.get(pos.x, pos.y)
-
-                // If there are structures planned for this pos
-
-                if (plannedValue == 0) return
-
-                // Otherwise so long as the pos isn't a wall, try to build a structure
-
-                const structureType = constants.numbersByStructureTypes[plannedValue]
-
-                // If the structureType is empty, iterate
-
-                if (structureType == 'empty') return
-
-                // Display visuals if enabled
-
-                if (Memory.roomVisuals) room.visual.structure(pos.x, pos.y, structureType, {
-                    opacity: 0.5
-                })
-
-                // If the structureType is a road and RCL 3 extensions aren't built, iterate
-
-                if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) return
-
-                // Create a road site at this pos
-
-                room.createConstructionSite(pos.x, pos.y, structureType)
-            }
+            planPos(pos.x, pos.y)
 
             // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 

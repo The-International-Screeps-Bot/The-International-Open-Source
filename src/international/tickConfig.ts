@@ -103,12 +103,19 @@ export function tickConfig() {
 
         // Loop through the name of each of the commune's remotes
 
-        for (const roomName of room.memory.remotes) {
+        for (let index = 0; index < room.memory.remotes.length; index++) {
 
-            // Get the room's memory using its name, stopping if it's undefined
+            // Get the name of the remote using the index
 
-            const roomMemory = Memory.rooms[roomName]
-            if (!roomMemory) return
+            const roomName = room.memory.remotes[index],
+
+            // Get the room's memory using its name
+
+            roomMemory = Memory.rooms[roomName]
+
+            // If the room isn't a remote, remove it from the remotes array
+
+            if (roomMemory.type != 'remote') room.memory.remotes.splice(index)
 
             // If needs don't yet exist
 
