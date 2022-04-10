@@ -476,9 +476,10 @@ Creep.prototype.findRampartRepairTarget = function(workPartCount) {
 
     if (repairTarget && repairTarget.hits < creep.memory.quota + workPartCount * 1000) return repairTarget
 
-    // Get ramparts in the room
+    // Get ramparts in the room, informing false is there are none
 
     const ramparts: StructureRampart[] = room.get('rampart')
+    if (!ramparts.length) return false
 
     // Assign the quota to the value of the creep's quota, or its workPartCount times 1000, increasing it each iteration based on the creep's workPartCount
 

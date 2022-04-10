@@ -7,6 +7,7 @@ export function rampartPlanner(room: Room) {
 
     /**
      * Posted 10 may 2018 by @saruss
+
      * Formatted, added readability, and modified for typescript by Carson Burke
      *
      * Code for calculating the minCut in a room, written by Saruss
@@ -15,22 +16,26 @@ export function rampartPlanner(room: Room) {
      * (15Aug2019) Updated Game.map.getTerrainAt to Game.map.getRoomTerrain method -Shibdib
      */
 
-    const UNWALKABLE = -1;
-    const NORMAL = 0;
-    const PROTECTED = 1;
-    const TO_EXIT = 2;
-    const EXIT = 3;
+    const bounds = { x1: 0, x2: constants.roomDimensions- 1, y1: 0, y2: constants.roomDimensions - 1 },
+
+    UNWALKABLE = -1,
+    NORMAL = 0,
+    PROTECTED = 1,
+    TO_EXIT = 2,
+    EXIT = 3
 
     /**
      * An Array with Terrain information: -1 not usable, 2 Sink (Leads to Exit)
      */
-    function room_2d_array(roomname: string, bounds = { x1: 0, y1: 0, x2: 49, y2: 49 }) {
-        let room_2d = Array(50).fill(0).map(x => Array(50).fill(UNWALKABLE)); // Array for room tiles
-        let i = bounds.x1;
-        const imax = bounds.x2;
-        let j = bounds.y1;
-        const jmax = bounds.y2;
-        const terrain = Game.map.getRoomTerrain(roomname);
+    function generadeRoomMatrix(roomName: string) {
+
+        let room_2d = Array(50).fill(0).map(x => Array(50).fill(UNWALKABLE)) // Array for room tiles
+        let i = bounds.x1
+        const imax = bounds.x2
+        let j = bounds.y1
+        const jmax = bounds.y2
+        const terrain = Game.map.getRoomTerrain(roomName)
+
         for (; i <= imax; i++) {
             j = bounds.y1;
             for (; j <= jmax; j++) {
@@ -44,28 +49,6 @@ export function rampartPlanner(room: Room) {
                 }
             }
         }
-
-        /* OLD CODE
-        let terrain_array=room.lookForAtArea(LOOK_TERRAIN,0,0,49,49,true);
-        if (terrain_array.length == 0) {
-            console.log('get_room_array in room_layout, look-at-for-Area Fehler');
-        }
-        let terrain='';
-        let x_pos=0;
-        let y_pos=0;
-        let i=0;const imax=terrain_array.length;
-        for (;i<imax;i++) { // Filling array with terrain information
-            terrain=terrain_array[i];
-            x_pos=terrain.x;
-            y_pos=terrain.y;
-            if (terrain.terrain==='wall') {
-                room_2d[x_pos][y_pos]=-1; // mark unwalkable
-            } else {
-                if (x_pos===0 || y_pos===0 ||x_pos===49 || y_pos===49)
-                    room_2d[x_pos][y_pos]=3; // Exit Tiles mark
-            }
-        }
-        ENDE OLD CODE */
 
         // Marks tiles Near Exits for sink- where you cannot build wall/rampart
         let y = 1;
@@ -128,7 +111,9 @@ export function rampartPlanner(room: Room) {
         }
     }
 
-    Graph.prototype.New_edge = function(u, v, c) { // Adds new edge from u to v
+    // Adds new edge from u to v
+
+    Graph.prototype.New_edge = function(u, v, c) {
         this.edges[u].push({ v: v, r: this.edges[v].length, c: c, f: 0 }); // Normal forward Edge
         this.edges[v].push({ v: u, r: this.edges[u].length - 1, c: 0, f: 0 }); // reverse Edge for Residal Graph
     }
@@ -220,77 +205,86 @@ export function rampartPlanner(room: Room) {
         return min_cut;
     }
 
-    Graph.prototype.Calcmincut = function(s, t) { // calculates min-cut graph (Dinic Algorithm)
-        if (s == t)
-            return -1;
-        let returnvalue = 0;
-        let count = [];
-        let flow = 0;
+    // Calculates a mincut graph (Dinic Algorithm)
+
+    Graph.prototype.Calcmincut = function(s, t) {
+
+        if (s == t) return -1
+
+        let returnValue = 0
+
         while (this.Bfs(s, t) === true) {
-            count = Array(this.v + 1).fill(0);
-            flow = 0;
+
+            const count = Array(this.v + 1).fill(0)
+            let flow = 0
+
             do {
-                flow = this.Dfsflow(s, Number.MAX_VALUE, t, count);
-                if (flow > 0)
-                    returnvalue += flow;
+
+                flow = this.Dfsflow(s, Number.MAX_VALUE, t, count)
+                if (flow > 0) returnValue += flow
+
             } while (flow)
         }
-        return returnvalue;
+
+        return returnValue
     }
 
     // Function to create Source, Sink, Tiles arrays: takes a rectangle-Array as input for Tiles that are to Protect
-    // rects have top-left/bot_right Coordinates {x1,y1,x2,y2}
 
-    function create_graph(roomname: string, rect: any, bounds: Rect) {
-        let room_array = room_2d_array(roomname, bounds); // An Array with Terrain information: -1 not usable, 2 Sink (Leads to Exit)
-        // For all Rectangles, set edges as source (to protect area) and area as unused
-        let r = null;
-        let j = 0;
-        const jmax = rect.length;
-        // Check bounds
-        if (bounds.x1 >= bounds.x2 || bounds.y1 >= bounds.y2 ||
-            bounds.x1 < 0 || bounds.y1 < 0 || bounds.x2 > 49 || bounds.y2 > 49)
-            return console.log('ERROR: Invalid bounds', JSON.stringify(bounds));
-        for (; j < jmax; j++) {
-            r = rect[j];
+    function createGraph(roomName: string, rects: Rect[]) {
 
-            let x = r.x1;
-            const maxx = r.x2 + 1;
-            let y = r.y1;
-            const maxy = r.y2 + 1;
-            for (; x < maxx; x++) {
-                y = r.y1;
-                for (; y < maxy; y++) {
-                    if (x === r.x1 || x === r.x2 || y === r.y1 || y === r.y2) {
-                        if (room_array[x][y] === NORMAL)
-                            room_array[x][y] = PROTECTED;
-                    } else
-                        room_array[x][y] = UNWALKABLE;
-                }
-            }
+        // An Array with Terrain information: -1 not usable, 2 Sink (Leads to Exit)
 
-        }
-        // ********************** Visualisierung
-        if (true) {
+        const positionValues = generadeRoomMatrix(roomName)
 
-            let x = 0
-            let y = 0
+        // Loop through each rect
 
-            for (; x < constants.roomDimensions; x++) {
-                y = 0;
-                for (; y < constants.roomDimensions; y++) {
+        for (const rect of rects) {
 
-                    if (room_array[x][y] === NORMAL) {
+            // Loop through each pos inside the rect
 
-                        room.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#e8e863', opacity: 0.3 })
+            for (let x = rect.x1; x <= rect.x2; x++) {
+                for (let y = rect.y1; y <= rect.y2; y++) {
+
+                    // If the pos is NORMAL and on the edge of the rect
+
+                    if (x === rect.x1 || x === rect.x2 || y === rect.y1 || y === rect.y2) {
+
+                        // Set the pos to protected, and iterate
+
+                        if (positionValues[x][y] === NORMAL) positionValues[x][y] = PROTECTED
                         continue
                     }
+
+                    // Otherwise set the pos as unwalkable
+
+                    positionValues[x][y] = UNWALKABLE
+                }
+            }
+        }
+
+        // Visualize position values
+
+        for (let x = 0; x < constants.roomDimensions; x++) {
+            for (let y = 0; y < constants.roomDimensions; y++) {
+
+                if (positionValues[x][y] === NORMAL) {
+
+                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#e8e863', opacity: 0.3 })
+                    continue
+                }
+
+                if (positionValues[x][y] === PROTECTED) {
+
+                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#61975E', opacity: 0.3 })
+                    continue
                 }
             }
         }
 
         // initialise graph
         // possible 2*50*50 +2 (st) Vertices (Walls etc set to unused later)
+
         let g = new Graph(2 * 50 * 50 + 2);
         let infini = Number.MAX_VALUE;
         let surr = [
@@ -324,24 +318,24 @@ export function rampartPlanner(room: Room) {
             for (; y < max; y++) {
                 top = y * 50 + x;
                 bot = top + 2500;
-                if (room_array[x][y] === NORMAL) { // normal Tile
+                if (positionValues[x][y] === NORMAL) { // normal Tile
                     g.New_edge(top, bot, 1);
                     for (let i = 0; i < 8; i++) {
                         dx = x + surr[i][0];
                         dy = y + surr[i][1];
-                        if (room_array[dx][dy] === NORMAL || room_array[dx][dy] === TO_EXIT)
+                        if (positionValues[dx][dy] === NORMAL || positionValues[dx][dy] === TO_EXIT)
                             g.New_edge(bot, dy * 50 + dx, infini);
                     }
-                } else if (room_array[x][y] === PROTECTED) { // protected Tile
+                } else if (positionValues[x][y] === PROTECTED) { // protected Tile
                     g.New_edge(source, top, infini);
                     g.New_edge(top, bot, 1);
                     for (let i = 0; i < 8; i++) {
                         dx = x + surr[i][0];
                         dy = y + surr[i][1];
-                        if (room_array[dx][dy] === NORMAL || room_array[dx][dy] === TO_EXIT)
+                        if (positionValues[dx][dy] === NORMAL || positionValues[dx][dy] === TO_EXIT)
                             g.New_edge(bot, dy * 50 + dx, infini);
                     }
-                } else if (room_array[x][y] === TO_EXIT) { // near Exit
+                } else if (positionValues[x][y] === TO_EXIT) { // near Exit
                     g.New_edge(top, sink, infini);
                 }
             }
@@ -353,14 +347,14 @@ export function rampartPlanner(room: Room) {
 
     // Removes unneccary cut-tiles if bounds are set to include some 	dead ends
 
-    function delete_tiles_to_dead_ends(roomname: string, cut_tiles_array: Pos[]) {
+    function delete_tiles_to_dead_ends(roomName: string, cut_tiles_array: Pos[]) {
 
         // Get Terrain and set all cut-tiles as unwalkable
 
-        let room_array = room_2d_array(roomname);
+        let positionValues = generadeRoomMatrix(roomName);
 
         for (let i = cut_tiles_array.length - 1; i >= 0; i--) {
-            room_array[cut_tiles_array[i].x][cut_tiles_array[i].y] = UNWALKABLE;
+            positionValues[cut_tiles_array[i].x][cut_tiles_array[i].y] = UNWALKABLE;
         }
 
         // Floodfill from exits: save exit tiles in array and do a bfs-like search
@@ -371,15 +365,15 @@ export function rampartPlanner(room: Room) {
 
         for (; y < max; y++) {
 
-            if (room_array[1][y] === TO_EXIT) unvisited_pos.push(50 * y + 1)
-            if (room_array[48][y] === TO_EXIT) unvisited_pos.push(50 * y + 48)
+            if (positionValues[1][y] === TO_EXIT) unvisited_pos.push(50 * y + 1)
+            if (positionValues[48][y] === TO_EXIT) unvisited_pos.push(50 * y + 48)
         }
 
         let x = 0;
 
         for (; x < max; x++) {
-            if (room_array[x][1] === TO_EXIT) unvisited_pos.push(50 + x)
-            if (room_array[x][48] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
+            if (positionValues[x][1] === TO_EXIT) unvisited_pos.push(50 + x)
+            if (positionValues[x][48] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
         }
 
         // Iterate over all unvisited TO_EXIT- Tiles and mark neigbours as TO_EXIT tiles, if walkable (NORMAL), and add to unvisited
@@ -405,9 +399,9 @@ export function rampartPlanner(room: Room) {
             for (let i = 0; i < 8; i++) {
                 dx = x + surr[i][0];
                 dy = y + surr[i][1];
-                if (room_array[dx][dy] === NORMAL) {
+                if (positionValues[dx][dy] === NORMAL) {
                     unvisited_pos.push(50 * dy + dx);
-                    room_array[dx][dy] = TO_EXIT;
+                    positionValues[dx][dy] = TO_EXIT;
                 }
             }
         }
@@ -422,7 +416,7 @@ export function rampartPlanner(room: Room) {
             for (let i = 0; i < 8; i++) {
                 dx = x + surr[i][0];
                 dy = y + surr[i][1];
-                if (room_array[dx][dy] === TO_EXIT) {
+                if (positionValues[dx][dy] === TO_EXIT) {
                     leads_to_exit = true;
                 }
             }
@@ -435,26 +429,27 @@ export function rampartPlanner(room: Room) {
 
     // Function for user: calculate min cut tiles from room, rect[]
 
-    function GetCutTiles(roomname: string, rect: any, bounds: Rect = { x1: 0, x2: constants.roomDimensions- 1, y1: 0, y2: constants.roomDimensions - 1 }, verbose = false) {
+    function GetCutTiles(roomName: string, rects: Rect[], verbose = false) {
 
-        let graph = create_graph(roomname, rect, bounds);
-
+        const graph = createGraph(roomName, rects)
         if (!graph) return []
 
-        let source = 2 * 50 * 50; // Position Source / Sink in Room-Graph
+        // Position Source / Sink in Room-Graph
+        let source = 2 * 50 * 50
 
-        let sink = 2 * 50 * 50 + 1;
+        let sink = 2 * 50 * 50 + 1
 
-        let count = graph.Calcmincut(source, sink);
-
-        if (verbose) console.log('Number of Tiles in Cut:', count);
+        let count = graph.Calcmincut(source, sink)
+        if (verbose) console.log('Number of Tiles in Cut:', count)
 
         let positions: Pos[] = []
 
         if (count > 0) {
 
-            let cut_edges = graph.Bfsthecut(source);
+            let cut_edges = graph.Bfsthecut(source)
+
             // Get Positions from Edge
+
             let u, x, y;
             let i = 0;
             const imax = cut_edges.length;
@@ -472,17 +467,10 @@ export function rampartPlanner(room: Room) {
         // if bounds are given,
         // try to dectect islands of walkable tiles, which are not conntected to the exits, and delete them from the cut-tiles
 
-        let whole_room = (bounds.x1 == 0 && bounds.y1 == 0 && bounds.x2 == 49 && bounds.y2 == 49);
-
-        if (positions.length > 0 && !whole_room) delete_tiles_to_dead_ends(roomname, positions);
+        if (positions.length > 0) delete_tiles_to_dead_ends(roomName, positions);
 
         return positions
     }
-
-    // Operate the mincut algorithm
-    // Example function: demonstrates how to get a min cut with 2 rectangles, which define a "to protect" area
-
-    let cpu = Game.cpu.getUsed()
 
     // Rectangle Array, the Rectangles will be protected by the returned tiles
 
@@ -583,7 +571,7 @@ export function rampartPlanner(room: Room) {
     roadCM: CostMatrix = room.get('roadCM'),
     structurePlans: CostMatrix = room.get('structurePlans'),
     rampartPlans: CostMatrix = room.get('rampartPlans')
-    customLog('RP', rampartPositions)
+
     // Plan the positions
 
     for (const pos of rampartPositions) {
