@@ -7,7 +7,7 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
     for (const creepName of creepsOfRole) {
 
         const creep: RemoteHarvester = Game.creeps[creepName]
-
+        
         //
 
         if (!creep.memory.remoteName) {

@@ -1360,9 +1360,10 @@ Creep.prototype.fulfillTask = function() {
 
     creep.say('FT')
 
-    // Get the creep's task
+    // Get the creep's task, informing false if it's undefined (it's in another room)
 
     const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
+    if (!task) return false
 
     // If visuals are enabled, show the task targeting
 
