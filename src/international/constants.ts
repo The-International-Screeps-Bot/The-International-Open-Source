@@ -347,13 +347,12 @@ constants.stamps = {
             road: [{ x: 1, y: 0 },{ x: 2, y: 0 },{ x: 3, y: 0 },{ x: 0, y: 3 },{ x: 0, y: 2 },{ x: 0, y: 1 },{ x: 1, y: 4 },{ x: 2, y: 4 },{ x: 4, y: 2 },{ x: 4, y: 1 },{ x: 3, y: 3 }],
             spawn: [{ x: 2, y: 3 }],
             link: [{ x: 1, y: 1 }],
-            factory: [{ x: 2, y: 1 }],
-            nuker: [{ x: 1, y: 2 }],
+            /* factory: [{ x: 2, y: 1 }],
+            nuker: [{ x: 1, y: 2 }], */
             terminal: [{ x: 1, y: 3 }],
             storage: [{ x: 3, y: 1 }],
-            powerSpawn: [{ x: 3, y: 2 }],
-            empty: [{ x: 2, y: 2,  }]
-
+            /* powerSpawn: [{ x: 3, y: 2 }], */
+            empty: [{ x: 2, y: 2,  }/*  */, { x: 2, y: 1 }, { x: 1, y: 2 }, { x: 3, y: 2 }/*  */]
         },
     },
     extensions: {
@@ -371,7 +370,8 @@ constants.stamps = {
         size: 5,
         structures: {
             road: [{ x: 3, y: 3 }, { x: 2, y: 2 }, { x: 1, y: 1 }, { x: 0, y: 0 }],
-            lab: [{ x: 0, y: 1 }, { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 1 }, { x: 3, y: 2 }]
+            empty: [{ x: 0, y: 1 }, { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 1 }, { x: 3, y: 2 }]
+            /* lab: [{ x: 0, y: 1 }, { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 1 }, { x: 3, y: 2 }] */
         },
     },
     tower: {
@@ -395,7 +395,8 @@ constants.stamps = {
         protectionOffset: 0,
         size: 1,
         structures: {
-            observer: [{ x: 0, y: 0 }]
+            empty: [{ x: 0, y: 0 }]
+            /* observer: [{ x: 0, y: 0 }] */
         }
     }
 }

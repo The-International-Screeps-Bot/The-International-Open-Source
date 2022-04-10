@@ -564,13 +564,35 @@ export function rampartPlanner(room: Room) {
     // Get Min cut
     // Positions is an array where to build walls/ramparts
 
-    const rampartPositions = GetCutTiles(room.name, protectionRects),
+    const rampartPositions = (GetCutTiles(room.name, protectionRects)),
 
     // Get base planning data
 
     roadCM: CostMatrix = room.get('roadCM'),
     structurePlans: CostMatrix = room.get('structurePlans'),
-    rampartPlans: CostMatrix = room.get('rampartPlans')
+    rampartPlans: CostMatrix = room.get('rampartPlans'),
+
+    // Get the hubAnchor
+
+    hubAnchor: RoomPosition = stampAnchors.hub[0]
+
+    // Loop through each tower anchor and plan for a rampart at it
+
+    for (const stampAnchor of stampAnchors.tower) rampartPlans.set(stampAnchor.x, stampAnchor.y, 1)
+
+    // Protect fastFiller spawns
+
+    rampartPlans.set(anchor.x, anchor.y - 2, 1)
+
+    rampartPlans.set(anchor.x, anchor.y + 2, 1)
+
+    // Protect useful hub structures
+
+    rampartPlans.set(hubAnchor.x, hubAnchor.y + 1, 1)
+
+    rampartPlans.set(hubAnchor.x + 1, hubAnchor.y - 1, 1)
+
+    rampartPlans.set(hubAnchor.x - 1, hubAnchor.y + 1, 1)
 
     // Plan the positions
 
@@ -589,11 +611,7 @@ export function rampartPlanner(room: Room) {
 
     // Group rampart positions
 
-    const groupedRampartPositions = room.groupRampartPositions(rampartPositions),
-
-    // Get the hubAnchor
-
-    hubAnchor: RoomPosition = stampAnchors.hub[0]
+    const groupedRampartPositions = room.groupRampartPositions(rampartPositions)
 
     // Loop through each group
 

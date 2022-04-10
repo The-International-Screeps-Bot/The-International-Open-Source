@@ -25,9 +25,9 @@ export function constructionManager(room: Room) {
         if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
     }
 
-    // Only run the planner every 20 ticks (temporary fix)
+    // Only run the planner every x ticks (temporary fix)
 
-    if (Game.time % 20 != 0) return
+    if (Game.time % 50 != 0) return
 
     manageBasePlanning()
 
@@ -58,6 +58,10 @@ export function constructionManager(room: Room) {
         // Stop if there is no storage and no terminal
 
         if (!room.storage && !room.terminal) return
+
+        // If there is not enough energy to start builing ramparts, stop
+
+        if (room.findStoredResourceAmount(RESOURCE_ENERGY) < 40000) return
 
         // If ramparts are not yet planned
 
