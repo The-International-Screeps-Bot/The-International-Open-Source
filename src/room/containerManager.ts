@@ -309,7 +309,7 @@ export function containerManager(room: Room) {
 
                 // Find the container's tasks of type tansfer
 
-                const containersWithdrawTasks = room.findTasksOfTypes(global[container.id].createdTaskIDs, new Set(['withdraw'])) as RoomWithdrawTask[]
+                const containersOfferTasks = room.findTasksOfTypes(global[container.id].createdTaskIDs, new Set(['offer'])) as RoomWithdrawTask[]
 
                 // Track the amount of energy the resource has offered in tasks
 
@@ -317,7 +317,7 @@ export function containerManager(room: Room) {
 
                 // Loop through each pickup task
 
-                for (const task of containersWithdrawTasks) {
+                for (const task of containersOfferTasks) {
 
                     // Otherwise find how many resources the task has requested to pick up
 
