@@ -465,6 +465,8 @@ declare global {
 
         towersAttackCreeps(): void
 
+        towersRepairRamparts(): void
+
         /**
          * Finds open spaces in a room and records them in a cost matrix
          */

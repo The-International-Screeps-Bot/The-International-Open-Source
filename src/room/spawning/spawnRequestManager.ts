@@ -606,28 +606,39 @@ export function spawnRequester(room: Room) {
 
         // Get roads
 
-        const roads: StructureRoad[] = room.get('road')
+        const roads: (StructureRoad | StructureContainer)[] = room.get('road'),
 
         // Get containers
 
-        const containers: StructureContainer[] = room.get('container')
+        containers: StructureContainer[] = room.get('container'),
 
         // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
-        const repairTargets = [...roads, ...containers].filter(structure => structure.hitsMax * 0.2 >= structure.hits)
-        if (!repairTargets.length) return false
+        repairTargets = roads.concat(containers).filter(structure => structure.hitsMax * 0.2 >= structure.hits),
+
+        // Get ramparts below their max hits
+
+        ramparts = (room.get('rampart') as StructureRampart[]).filter(rampart => rampart.hits < rampart.hitsMax)
+
+        // If there are no ramparts or repair targets
+
+        if (!ramparts.length && !repairTargets.length) return false
 
         // Construct the partsMultiplier
 
         let partsMultiplier = 2
 
-        // For each road, add 0.01 multiplier
+        // For each road, add a multiplier
 
         partsMultiplier += roads.length * 0.01
 
-        // For each container, add 0.5 multiplier
+        // For each container, add a multiplier
 
         partsMultiplier += repairTargets.length * 0.5
+
+        // For each rampart, add a multiplier
+
+        partsMultiplier += ramparts.length * 0.1
 
         // For every 30,000 energy in storage, add 1 multiplier
 

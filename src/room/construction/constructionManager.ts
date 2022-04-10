@@ -25,6 +25,10 @@ export function constructionManager(room: Room) {
         if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
     }
 
+    // Only run the planner every 20 ticks (temporary fix)
+
+    if (Game.time % 20 != 0) return
+
     manageBasePlanning()
 
     function manageBasePlanning() {
@@ -76,6 +80,8 @@ export function constructionManager(room: Room) {
                 if (rampartPlans.get(x, y) != 1) continue
 
                 // Otherwise
+
+                room.createConstructionSite(x, y, STRUCTURE_RAMPART)
 
                 // Display visuals if enabled
 

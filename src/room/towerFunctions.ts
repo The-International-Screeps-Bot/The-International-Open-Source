@@ -85,13 +85,9 @@ Room.prototype.towersHealCreeps = function() {
 
         if (tower.inactionable) continue
 
-        // Otherwise, get the first target
-
-        const creep = healTargets[0]
-
         // Try to heal the creep
 
-        const healResult = tower.heal(creep)
+        const healResult = tower.heal(healTargets[0])
 
         // If the heal failed, iterate
 
@@ -111,14 +107,13 @@ Room.prototype.towersHealCreeps = function() {
     }
 }
 
-
 Room.prototype.towersAttackCreeps = function() {
 
-    const room = this
+    const room = this,
 
     // Get the room's towers
 
-    const towers: StructureTower[] = room.get('tower')
+    towers: StructureTower[] = room.get('tower')
 
     // Stop if there are no towers
 
@@ -136,13 +131,60 @@ Room.prototype.towersAttackCreeps = function() {
 
         if (tower.inactionable) continue
 
-        // Otherwise, get the first target
-
-        const creep = attackTargets[0]
-
         // Try to attack the creep
 
-        const healResult = tower.attack(creep)
+        const attackResult = tower.attack(attackTargets[0])
+
+        // If the attack failed, iterate
+
+        if (attackResult != OK) continue
+
+        // Otherwise record that the tower is no longer inactionable
+
+        tower.inactionable = true
+
+        /* // Remove healTarget if it is fully healed
+
+        if (creep.hitsMax - creep.hits == 0) delete healTargets[0] */
+
+        // And iterate
+
+        continue
+    }
+}
+
+Room.prototype.towersRepairRamparts = function() {
+
+    const room = this,
+
+    // Get the room's towers
+
+    towers: StructureTower[] = room.get('tower')
+
+    // Stop if there are no towers
+
+    if (!towers.length) return
+
+    // Find ramparts at 300 hits or less
+
+    const ramparts = (room.get('rampart') as StructureRampart[]).filter(rampart => rampart.hits <= 300)
+
+    // Loop through the room's towers
+
+    for (const tower of towers) {
+
+        // Iterate if the tower is inactionable
+
+        if (tower.inactionable) continue
+
+        // Try to get the last element of ramparts, iterating if it's undefined
+
+        const target = ramparts[ramparts.length - 1]
+        if (!target) continue
+
+        // Try to repair the target
+
+        const healResult = tower.repair(target)
 
         // If the attack failed, iterate
 
@@ -152,9 +194,9 @@ Room.prototype.towersAttackCreeps = function() {
 
         tower.inactionable = true
 
-        /* // Remove healTarget if it is fully healed
+        // And remove the rampart from ramparts
 
-        if (creep.hitsMax - creep.hits == 0) delete healTargets[0] */
+        ramparts.pop()
 
         // And iterate
 

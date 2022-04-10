@@ -10,4 +10,6 @@ export function towerManager(room: Room) {
     room.towersAttackCreeps()
 
     room.towersHealCreeps()
+
+    room.towersRepairRamparts()
 }
