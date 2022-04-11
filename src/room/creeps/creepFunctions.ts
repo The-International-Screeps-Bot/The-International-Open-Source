@@ -636,7 +636,7 @@ Creep.prototype.advancedRepair = function() {
         // Add control points to total controlPoints counter and say the success
 
         Memory.energySpentOnRepairing += energySpentOnRepairs
-        creep.say('🔧' + energySpentOnRepairs * REPAIR_POWER)
+        creep.say(repairTarget.structureType == STRUCTURE_RAMPART ? '🧱' : '🔧' + energySpentOnRepairs * REPAIR_POWER)
 
         // Find the hits left on the repairTarget
 
@@ -1237,7 +1237,7 @@ Creep.prototype.recurseMoveRequest = function(packedPos) {
     // If there is no creep at the pos
 
     if (!creepNameAtPos) {
-        room.visual.circle(creep.pos)
+        /* room.visual.circle(creep.pos) */
         // If there are no creeps at the pos, operate the moveRequest
 
         creep.runMoveRequest(packedPos)
@@ -1253,7 +1253,7 @@ Creep.prototype.recurseMoveRequest = function(packedPos) {
             // Get the creep using the creepName
 
             const queuedCreep = Game.creeps[creep.queue[index]]
-            room.visual.circle(queuedCreep.pos, { fill: constants.colors.red, strokeWidth: 2, })
+            /* room.visual.circle(queuedCreep.pos, { fill: constants.colors.red, strokeWidth: 2, }) */
             // Have the creep run its moveRequest
             queuedCreep.say('QUEUE')
             queuedCreep.runMoveRequest(queuedCreep.moveRequest)

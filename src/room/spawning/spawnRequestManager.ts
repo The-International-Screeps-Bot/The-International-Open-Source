@@ -518,7 +518,7 @@ export function spawnRequester(room: Room) {
 
         // For every 8 estimated income, add 1 multiplier
 
-        partsMultiplier += Math.floor(room.estimateIncome() / 8)
+        partsMultiplier += Math.floor(room.estimateIncome() / 4)
 
         // If there are construction sites of my ownership in the room, set multiplier to 1
 
@@ -568,6 +568,12 @@ export function spawnRequester(room: Room) {
 
         if (room.find(FIND_MY_CONSTRUCTION_SITES).length == 0) return false
 
+        let partsMultiplier = 1
+
+        // For every 8 estimated income, add 1 multiplier
+
+        partsMultiplier += Math.floor(room.estimateIncome() / 4)
+
         // If all RCL 3 extensions are build
 
         if (spawnEnergyCapacity >= 800) {
@@ -575,7 +581,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [],
                 extraParts: [WORK, CARRY, MOVE],
-                partsMultiplier: 6,
+                partsMultiplier,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 200,
@@ -589,7 +595,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier: 6,
+            partsMultiplier,
             minCreeps: undefined,
             maxCreeps: Infinity,
             minCost: 250,
@@ -690,7 +696,7 @@ export function spawnRequester(room: Room) {
             const remoteName = remoteNamesByEfficacy[index]
 
             const remoteEconNeed = Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteHarvester], 0) + Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteHauler], 0)
-            if (remoteEconNeed > 0) return remoteEconNeed
+            if (remoteEconNeed > 0) return index
         }
 
         return false
