@@ -1427,12 +1427,12 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         // Find harvestPositions for sourceNames, iterating if there are none
 
-                        const harvestPositions = room.get(`${sourceName}HarvestPositions`)
+                        const harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`)
                         if (!harvestPositions?.length) continue
 
                         // Loop through each position of harvestPositions, have creeps prefer to avoid
 
-                        for (const pos of harvestPositions) cm.set(pos.x, pos.y, 5)
+                        for (const pos of harvestPositions) cm.set(pos.x, pos.y, 10)
                     }
 
                     // Get the anchor
@@ -1458,7 +1458,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                             // Otherwise have the creep prefer to avoid the pos
 
-                            cm.set(pos.x, pos.y, 5)
+                            cm.set(pos.x, pos.y, 10)
                         }
                     }
                 }
@@ -2829,7 +2829,7 @@ Room.prototype.estimateIncome = function() {
 
         // Add the number of work parts owned by the creep at a max of 5, times harvest power
 
-        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER
+        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER * 0.9
     }
 
     // Loop through each creepName with a role of remoteHarvester from this room
@@ -2842,7 +2842,7 @@ Room.prototype.estimateIncome = function() {
 
         // Add the number of work parts owned by the creep at a max of 5, times harvest power
 
-        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER * 0.8
+        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER * 0.7
     }
 
     // Inform income

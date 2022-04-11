@@ -91,7 +91,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
+                goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 20 },
                 avoidEnemyRanges: true,
                 weightGamebjects: {
                     1: room.get('road')
@@ -154,9 +154,11 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
             continue
         }
 
+        creep.say(creep.memory.communeName)
+
         creep.createMoveRequest({
             origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 25 },
+            goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 20 },
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')

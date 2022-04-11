@@ -646,6 +646,16 @@ declare global {
         moveRequest: number
 
         /**
+         * 
+         */
+        hasMoved: boolean
+
+        /**
+         * A list of creep names to have their moveRequest met if traffic conditions are correct
+         */
+        queue: string[]
+
+        /**
          * Whether the creep is actively pulling another creep or not
          */
         pulling: boolean
@@ -659,11 +669,6 @@ declare global {
          * The creep's opts when trying to make a moveRequest intra tick
          */
         pathOpts: PathOpts
-
-        /**
-         * A list of creep names to have their moveRequest met if traffic conditions are correct
-         */
-        queue: string[]
 
         // Functions
 
