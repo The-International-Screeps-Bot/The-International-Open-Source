@@ -52,28 +52,7 @@ export function remoteHarvesterManager(room: Room, creepsOfRole: string[]) {
 
             if (creep.advancedHarvestSource(room.get(sourceName))) continue
 
-            /* const sources = room.find(FIND_SOURCES_ACTIVE)
-            if (!sources.length) continue
-
-            const closestSource = creep.pos.findClosestByRange(sources)
-
-            if (creep.pos.getRangeTo(closestSource.pos) > 1) {
-
-                creep.say('⏩')
-
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goal: { pos: closestSource.pos, range: 1 },
-                    avoidEnemyRanges: true,
-                    weightGamebjects: {
-                        1: room.get('road')
-                    }
-                })
-
-                continue
-            }
-
-            creep.advancedHarvestSource(closestSource) */
+            
             continue
         }
 
