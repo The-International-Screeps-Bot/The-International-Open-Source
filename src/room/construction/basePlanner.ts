@@ -165,7 +165,7 @@ export function basePlanner(room: Room) {
 
     // Otherwise store the fastFillerAnchor as anchor in the room's memory
 
-    room.memory.anchor = stampAnchors.fastFiller[0]
+    if (!room.memory.anchor) room.memory.anchor = stampAnchors.fastFiller[0]
 
     // Get the centerUpgradePos, informing false if it's undefined
 

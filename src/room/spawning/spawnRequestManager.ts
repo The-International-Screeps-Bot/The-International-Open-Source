@@ -708,7 +708,7 @@ export function spawnRequester(room: Room) {
 
     // If there is a remote with economic needs
 
-    if (remoteEconIndex) {
+    if (remoteEconIndex !== false) {
 
         // Construct requests for remoteHarvesters
 
@@ -720,7 +720,7 @@ export function spawnRequester(room: Room) {
 
                 partsMultiplier += Math.max(Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester], 0)
             }
-
+            
             return {
                 defaultParts: [],
                 extraParts: [WORK, MOVE],

@@ -14,7 +14,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
         // If creep has a task
 
-        if (global[creep.id] && global[creep.id].respondingTaskID) {
+        if (global[creep.id]?.respondingTaskID) {
 
             // Try to filfill task
 

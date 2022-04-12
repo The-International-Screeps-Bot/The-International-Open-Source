@@ -286,7 +286,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
         // If creep has a task
 
-        if (global[creep.id] && global[creep.id].respondingTaskID) {
+        if (global[creep.id]?.respondingTaskID) {
 
             // Try to filfill task
 
@@ -379,7 +379,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
         // If creep has a task
 
-        if (global[creep.id] && global[creep.id].respondingTaskID) {
+        if (global[creep.id]?.respondingTaskID) {
 
             // Try to filfill task
 
@@ -552,7 +552,7 @@ Creep.prototype.advancedRepair = function() {
 
         // If creep has a task
 
-        if (global[creep.id] && global[creep.id].respondingTaskID) {
+        if (global[creep.id]?.respondingTaskID) {
 
             // Try to filfill task, informing false if it wasn't fulfilled
 
@@ -1429,10 +1429,9 @@ Creep.prototype.fulfillTask = function() {
 
     creep.say('FT')
 
-    // Get the creep's task, informing false if it's undefined (it's in another room)
+    // Get the creep's task
 
     const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
-    if (!task) return false
 
     // If visuals are enabled, show the task targeting
 

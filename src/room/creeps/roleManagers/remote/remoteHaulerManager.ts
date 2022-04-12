@@ -8,31 +8,29 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
         const creep: RemoteHauler = Game.creeps[creepName]
 
-        //
-
-        if (!creep.memory.remoteName) {
-
-            const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
-
-            for (const roomName of remoteNamesByEfficacy) {
-
-                const roomMemory = Memory.rooms[roomName]
-
-                if (roomMemory.needs[remoteNeedsIndex.remoteHauler] <= 0) continue
-
-                creep.memory.remoteName = roomName
-                roomMemory.needs[remoteNeedsIndex.remoteHauler] -= creep.partsOfType(CARRY)
-                break
-            }
-        }
-
-        //
-
-        if (!creep.memory.remoteName) continue
-
         // If the creep needs resources
 
         if (creep.needsResources()) {
+
+            if (!creep.memory.remoteName) {
+
+                const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
+
+                for (const roomName of remoteNamesByEfficacy) {
+
+                    const roomMemory = Memory.rooms[roomName]
+
+                    if (roomMemory.needs[remoteNeedsIndex.remoteHauler] <= 0) continue
+
+                    creep.memory.remoteName = roomName
+                    roomMemory.needs[remoteNeedsIndex.remoteHauler] -= creep.partsOfType(CARRY)
+                    break
+                }
+            }
+
+            //
+
+            if (!creep.memory.remoteName) continue
 
             creep.say(creep.memory.remoteName)
 
@@ -42,7 +40,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                 // If creep has a task
 
-                if (global[creep.id] && global[creep.id].respondingTaskID) {
+                if (global[creep.id]?.respondingTaskID) {
 
                     // Try to filfill task
 
@@ -91,7 +89,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 20 },
+                goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
                 avoidEnemyRanges: true,
                 weightGamebjects: {
                     1: room.get('road')
@@ -105,9 +103,13 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
         if (room.name == creep.memory.communeName) {
 
+            // If the creep has a remoteName, delete it
+
+            if (creep.memory.remoteName) delete creep.memory.remoteName
+
             // If creep has a task
 
-            if (global[creep.id] && global[creep.id].respondingTaskID) {
+            if (global[creep.id]?.respondingTaskID) {
 
                 // Try to filfill task
 
@@ -158,7 +160,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
         creep.createMoveRequest({
             origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 20 },
+            goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 25 },
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')

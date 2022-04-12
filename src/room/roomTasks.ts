@@ -11,7 +11,7 @@ export interface RoomTask {
      */
     creatorID: Id<any>
     roomName: string
-    responderID: Id<any>
+    responderID: Id<Creep>
     ID: number
 
     /**
@@ -116,9 +116,17 @@ RoomTask.prototype.shouldStayActive = function() {
 
     if (task.responderID) {
 
+        // Get the responder
+
+        const responder = findObjectWithID(task.responderID)
+
         // If the responder doesn't exist, inform false
 
-        if (!findObjectWithID(task.responderID)) return false
+        if (!responder) return false
+
+        // If the responder is not in this room, inform false
+
+        if (responder.room.name != task.roomName) return false
     }
 
     // If the creator no longer exits, infom false
