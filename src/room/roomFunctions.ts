@@ -2829,7 +2829,7 @@ Room.prototype.estimateIncome = function() {
 
         // Add the number of work parts owned by the creep at a max of 5, times harvest power
 
-        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER * 0.9
+        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER
     }
 
     // Loop through each creepName with a role of remoteHarvester from this room
@@ -2842,7 +2842,7 @@ Room.prototype.estimateIncome = function() {
 
         // Add the number of work parts owned by the creep at a max of 5, times harvest power
 
-        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER * 0.7
+        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER
     }
 
     // Inform income

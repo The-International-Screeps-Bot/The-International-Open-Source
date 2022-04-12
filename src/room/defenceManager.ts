@@ -7,13 +7,41 @@ import { findObjectWithID } from "international/generalFunctions"
  */
 export function defenceManager(room: Room) {
 
-    // Get enemy creeps in the room
+    // Get enemyAttackers in the room
 
-    const enemyCreeps = room.get('enemyCreeps')
+    const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+        filter: creep => !constants.allyList.has(creep.owner.username) && creep.hasPartsOfTypes([WORK || ATTACK || RANGED_ATTACK])
+    })
 
-    // If there are no enemy creeps, stop
+    manageRampartPublicity()
 
-    if (!enemyCreeps.length) return
+    function manageRampartPublicity() {
+
+        if (!enemyAttackers.length) {
+
+            // Get the room's ramparts and loop through them
+
+            const ramparts: StructureRampart[] = room.get('rampart')
+            for (const rampart of ramparts) {
+
+                // If the rampart isn't public, make it so
+
+                if (!rampart.isPublic) rampart.setPublic(true)
+            }
+
+            return
+        }
+
+        // Get the room's ramparts and loop through them
+
+        const ramparts: StructureRampart[] = room.get('rampart')
+        for (const rampart of ramparts) {
+
+            // If the rampart is public, make it private
+
+            if (rampart.isPublic) rampart.setPublic(false)
+        }
+    }
 
     advancedActivateSafeMode()
 
@@ -31,37 +59,11 @@ export function defenceManager(room: Room) {
 
         if (room.controller.upgradeBlocked > 0) return
 
+        // If there are no enemyAttackers in the room, stop
+
+        if (!enemyAttackers.length) return
+
         // Otherwise if safeMode can be activated
-
-        // Check if there are enemy attackers in the room, stopping if there are none
-
-        const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-            filter: creep => !constants.allyList.has(creep.owner.username) && creep.hasPartsOfTypes([WORK || ATTACK || RANGED_ATTACK])
-        })
-        if (!enemyAttackers.length) {
-
-            // Get the room's ramparts and loop through them
-
-            const ramparts: StructureRampart[] = room.get('rampart')
-            for (const rampart of ramparts) {
-
-                // Check if the rampart is public. If not, make it so
-
-                if (rampart.isPublic) rampart.setPublic(true)
-            }
-            
-            return
-        }
-
-        // Get the room's ramparts and loop through them
-
-        const ramparts: StructureRampart[] = room.get('rampart')
-        for (const rampart of ramparts) {
-
-            // Check if the rampart is public. If so, make it private
-
-            if (rampart.isPublic) rampart.setPublic(false)
-        }
 
         // Get the previous tick's events
 

@@ -518,7 +518,7 @@ export function spawnRequester(room: Room) {
 
         // For every 8 estimated income, add 1 multiplier
 
-        partsMultiplier += Math.floor(room.estimateIncome() / 4)
+        partsMultiplier += Math.floor(room.estimateIncome() / 6)
 
         // If there are construction sites of my ownership in the room, set multiplier to 1
 
@@ -572,7 +572,7 @@ export function spawnRequester(room: Room) {
 
         // For every 8 estimated income, add 1 multiplier
 
-        partsMultiplier += Math.floor(room.estimateIncome() / 4)
+        partsMultiplier += Math.floor(room.estimateIncome() / 6)
 
         // If all RCL 3 extensions are build
 
@@ -720,7 +720,7 @@ export function spawnRequester(room: Room) {
 
                 partsMultiplier += Math.max(Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHarvester], 0)
             }
-            
+
             return {
                 defaultParts: [],
                 extraParts: [WORK, MOVE],
