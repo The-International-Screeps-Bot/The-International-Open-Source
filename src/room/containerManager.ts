@@ -347,7 +347,7 @@ export function containerManager(room: Room) {
 
                 // Update the task's priority to match new amountToOffer
 
-                taskWithoutResponder.priority = 1 + amountToOffer / 500
+                taskWithoutResponder.priority = 1
 
                 // And iterate
 
@@ -360,7 +360,7 @@ export function containerManager(room: Room) {
 
                 // Create a new transfer task for the container
 
-                new RoomOfferTask(room.name, RESOURCE_ENERGY, amountToOffer, container.id, 1 + amountToOffer / 500)
+                new RoomOfferTask(room.name, RESOURCE_ENERGY, amountToOffer, container.id, 1)
             }
         }
     }

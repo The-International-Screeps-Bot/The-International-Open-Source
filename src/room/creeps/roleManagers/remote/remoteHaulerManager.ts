@@ -107,6 +107,16 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
             if (creep.memory.remoteName) delete creep.memory.remoteName
 
+            // If there is a storage
+
+            if (room.storage) {
+
+                // Advanced transfer to it and stop
+
+                creep.advancedTransfer(room.storage)
+                return
+            }
+
             // If creep has a task
 
             if (global[creep.id]?.respondingTaskID) {
