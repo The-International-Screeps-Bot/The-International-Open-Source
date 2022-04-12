@@ -59,9 +59,10 @@ export function defenceManager(room: Room) {
 
         if (room.controller.upgradeBlocked > 0) return
 
-        // If there are no enemyAttackers in the room, stop
+        // Filter attackers that are not invaders. If there are none, stop
 
-        if (!enemyAttackers.length) return
+        const nonInvaderAttackers = enemyAttackers.filter(enemyAttacker => enemyAttacker.owner.username !== 'Invader')
+        if (!nonInvaderAttackers.length) return
 
         // Otherwise if safeMode can be activated
 
