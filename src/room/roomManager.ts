@@ -40,11 +40,11 @@ export function roomManager() {
 
         const room = Game.rooms[roomName]
 
+        taskManager(room)
+
         // If there is a specific manager for this room's type, run it
 
         if (specificRoomManagers[room.memory.type]) specificRoomManagers[room.memory.type](room)
-
-        taskManager(room)
 
         droppedResourceManager(room)
 
