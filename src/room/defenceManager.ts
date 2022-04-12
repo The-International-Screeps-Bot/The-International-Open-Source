@@ -38,7 +38,30 @@ export function defenceManager(room: Room) {
         const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
             filter: creep => !constants.allyList.has(creep.owner.username) && creep.hasPartsOfTypes([WORK || ATTACK || RANGED_ATTACK])
         })
-        if (!enemyAttackers.length) return
+        if (!enemyAttackers.length) {
+
+            // Get the room's ramparts and loop through them
+
+            const ramparts: StructureRampart[] = room.get('rampart')
+            for (const rampart of ramparts) {
+
+                // Check if the rampart is public. If not, make it so
+
+                if (rampart.isPublic) rampart.setPublic(true)
+            }
+            
+            return
+        }
+
+        // Get the room's ramparts and loop through them
+
+        const ramparts: StructureRampart[] = room.get('rampart')
+        for (const rampart of ramparts) {
+
+            // Check if the rampart is public. If so, make it private
+
+            if (rampart.isPublic) rampart.setPublic(false)
+        }
 
         // Get the previous tick's events
 

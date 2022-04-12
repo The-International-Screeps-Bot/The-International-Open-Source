@@ -1433,6 +1433,16 @@ Creep.prototype.fulfillTask = function() {
 
     const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
 
+    // If the task is undefined
+
+    if (!task) {
+
+        // Remove it as the creep's task and inform false
+
+        delete global[creep.id].respondingTaskID
+        return false
+    }
+
     // If visuals are enabled, show the task targeting
 
     if (Memory.roomVisuals) room.visual.line(creep.pos, new RoomPosition(task.pos / 50, Math.floor(task.pos % 50), room.name), { color: constants.colors.lightBlue, width: 0.15 })
