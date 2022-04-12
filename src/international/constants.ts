@@ -90,10 +90,13 @@ constants.mmoShardNames = new Set([
 ])
 
 constants.allyList = new Set([
-    'Q13214',
-    'Orlet',
-    'slowmotionghost',
-    'Arnice123'
+    "asdpof",
+    "MarvinTMB",
+    "Mitsuyoshi",
+    "Modus",
+    "Silten",
+    "Sneaky_Polar_Bear",
+    "Yoner",
 ])
 
 constants.tradeBlacklist = new Set([

@@ -61,6 +61,7 @@ export function basePlanner(room: Room) {
 
     interface PlanStampOpts {
         stampType: StampTypes
+        count: number
         anchorOrient: Pos
         initialWeight?: number
         adjacentToRoads?: boolean
@@ -69,7 +70,7 @@ export function basePlanner(room: Room) {
     /**
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
      */
-    function planStamp(opts: PlanStampOpts): false | RoomPosition {
+    function planStamp(opts: PlanStampOpts): void {
 
         // Define the stamp using the stampType
 
@@ -92,7 +93,7 @@ export function basePlanner(room: Room) {
 
         // Inform false if no anchor was generated
 
-        if (!anchor) return false
+        if (!anchor) return
 
         // Otherwise
         // If the stampType isn't in stampAnchors, construct it
@@ -141,19 +142,20 @@ export function basePlanner(room: Room) {
             }
         }
 
-        return anchor
+        return
     }
 
     // Try to plan the stamp
 
-    const fastFillerAnchor = planStamp({
+    planStamp({
         stampType: 'fastFiller',
+        count: 1,
         anchorOrient: avgControllerSourcePos,
     })
 
     // If the stamp failed to be planned
 
-    if (!fastFillerAnchor) {
+    if (!stampAnchors.fastFiller.length) {
 
         // Record that the room is not claimable and stop
 
@@ -163,7 +165,7 @@ export function basePlanner(room: Room) {
 
     // Otherwise store the fastFillerAnchor as anchor in the room's memory
 
-    room.memory.anchor = fastFillerAnchor
+    room.memory.anchor = stampAnchors.fastFiller[0]
 
     // Get the centerUpgradePos, informing false if it's undefined
 
@@ -186,44 +188,38 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    const hubAnchor = planStamp({
+    planStamp({
         stampType: 'hub',
-        anchorOrient: fastFillerAnchor,
+        count: 1,
+        anchorOrient: stampAnchors.fastFiller[0],
     })
-
-    // Inform false if the stamp failed to be planned
-
-    if (!hubAnchor) return false
 
     // Get the closest upgrade pos and mark it as fair use in roadCM
 
-    const closestUpgradePos = hubAnchor.findClosestByRange(upgradePositions)
+    const closestUpgradePos = stampAnchors.hub[0].findClosestByRange(upgradePositions)
     roadCM.set(closestUpgradePos.x, closestUpgradePos.y, 5)
 
     // Construct path
 
     let path: RoomPosition[] = []
 
+    // Try to plan the stamp
+
+    planStamp({
+        stampType: 'extensions',
+        count: 6,
+        anchorOrient: stampAnchors.hub[0],
+    })
+
     // Plan the stamp x times
 
-    for (let i = 0; i < 6; i++) {
-
-        // Try to plan the stamp
-
-        const extensionsAnchor = planStamp({
-            stampType: 'extensions',
-            anchorOrient: hubAnchor,
-        })
-
-        // Inform false if the stamp failed to be planned
-
-        if (!extensionsAnchor) return false
+    for (const extensionsAnchor of stampAnchors.extensions) {
 
         // Path from the extensionsAnchor to the hubAnchor
 
         path = room.advancedFindPath({
             origin: extensionsAnchor,
-            goal: { pos: hubAnchor, range: 2 },
+            goal: { pos: stampAnchors.hub[0], range: 2 },
             weightCostMatrixes: [roadCM]
         })
 
@@ -245,20 +241,17 @@ export function basePlanner(room: Room) {
 
     const labsAnchor = planStamp({
         stampType: 'labs',
-        anchorOrient: hubAnchor,
+        count: 1,
+        anchorOrient: stampAnchors.hub[0],
     })
-
-    // Inform false if the stamp failed to be planned
-
-    if (!labsAnchor) return false
 
     // Plan roads
 
     // Path from the fastFillerAnchor to the hubAnchor
 
     path = room.advancedFindPath({
-        origin: hubAnchor,
-        goal: { pos: fastFillerAnchor, range: 3 },
+        origin: stampAnchors.hub[0],
+        goal: { pos: stampAnchors.fastFiller[0], range: 3 },
         weightCostMatrixes: [roadCM]
     })
 
@@ -283,7 +276,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: centerUpgadePos,
-        goal: { pos: hubAnchor, range: 2 },
+        goal: { pos: stampAnchors.hub[0], range: 2 },
         weightCostMatrixes: [roadCM]
     })
 
@@ -337,7 +330,7 @@ export function basePlanner(room: Room) {
 
         path = room.advancedFindPath({
             origin: closestHarvestPos,
-            goal: { pos: fastFillerAnchor, range: 4 },
+            goal: { pos: stampAnchors.fastFiller[0], range: 4 },
             weightCostMatrixes: [roadCM]
         })
 
@@ -383,8 +376,8 @@ export function basePlanner(room: Room) {
     // Path from the hubAnchor to the labsAnchor
 
     path = room.advancedFindPath({
-        origin: labsAnchor,
-        goal: { pos: hubAnchor, range: 2 },
+        origin: stampAnchors.labs[0],
+        goal: { pos: stampAnchors.hub[0], range: 2 },
         weightCostMatrixes: [roadCM]
     })
 
@@ -413,7 +406,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: mineralHarvestPos,
-        goal: { pos: hubAnchor, range: 2 },
+        goal: { pos: stampAnchors.hub[0], range: 2 },
         weightCostMatrixes: [roadCM]
     })
 
@@ -525,50 +518,31 @@ export function basePlanner(room: Room) {
         }
     }
 
-    // Loop 6 times
+    // Try to plan the stamp
 
-    for (let i = 0; i < 6; i++) {
-
-        // Try to plan the stamp
-
-        const towerAnchor = planStamp({
-            stampType: 'tower',
-            anchorOrient: hubAnchor,
-            adjacentToRoads: true,
-        })
-
-        // Inform false if the stamp failed to be planned
-
-        if (!towerAnchor) return false
-    }
-
-    // Loop 10 times
-
-    for (extraExtensionsAmount; extraExtensionsAmount > 0; extraExtensionsAmount--) {
-
-        // Try to plan the stamp
-
-        const extensionAnchor = planStamp({
-            stampType: 'extension',
-            anchorOrient: hubAnchor,
-            adjacentToRoads: true,
-        })
-
-        // Inform false if the stamp failed to be planned
-
-        if (!extensionAnchor) return false
-    }
+    planStamp({
+        stampType: 'tower',
+        count: 6,
+        anchorOrient: stampAnchors.hub[0],
+        adjacentToRoads: true,
+    })
 
     // Try to plan the stamp
 
-    const observerAnchor = planStamp({
-        stampType: 'observer',
-        anchorOrient: hubAnchor,
+    planStamp({
+        stampType: 'extension',
+        count: extraExtensionsAmount,
+        anchorOrient: stampAnchors.hub[0],
+        adjacentToRoads: true,
     })
 
-    // Inform false if the stamp failed to be planned
+    // Try to plan the stamp
 
-    if (!observerAnchor) return false
+    planStamp({
+        stampType: 'observer',
+        count: 1,
+        anchorOrient: stampAnchors.hub[0],
+    })
 
     // Record planning results in the room's global and inform true
 
