@@ -585,7 +585,7 @@ export function spawnRequester(room: Room) {
 
         // Construct the partsMultiplier
 
-        let partsMultiplier = 2
+        let partsMultiplier = 1
 
         // For each road, add a multiplier
 
@@ -597,7 +597,7 @@ export function spawnRequester(room: Room) {
 
         // For each rampart, add a multiplier
 
-        partsMultiplier += ramparts.length * 0.1
+        partsMultiplier += ramparts.length * 0.05
 
         // For every 30,000 energy in storage, add 1 multiplier
 
