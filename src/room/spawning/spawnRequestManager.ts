@@ -504,61 +504,9 @@ export function spawnRequester(room: Room) {
         }
     })())
 
-    // Construct requests for upgraders
+    // Get the estimates income
 
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        // Construct the partsMultiplier
-
-        let partsMultiplier = 1
-
-        // For every 30,000 energy in storage, add 1 multiplier
-
-        if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 30000
-
-        // For every 8 estimated income, add 1 multiplier
-
-        partsMultiplier += Math.floor(room.estimateIncome() / 6)
-
-        // If there are construction sites of my ownership in the room, set multiplier to 1
-
-        if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 1
-
-        // If the controllerContainer or controllerLink exists
-
-        if (room.get('controllerContainer') || room.get('controllerLink')) {
-
-            // If the controller is level 8, max out partsMultiplier at 4
-
-            if (room.controller.level == 8) partsMultiplier = Math.min(4, partsMultiplier)
-
-            return {
-                defaultParts: [CARRY],
-                extraParts: [WORK, MOVE, WORK, WORK, WORK],
-                partsMultiplier,
-                minCreeps: undefined,
-                maxCreeps: 8,
-                minCost: 200,
-                priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
-                memoryAdditions: {
-                    role: 'controllerUpgrader',
-                }
-            }
-        }
-
-        return {
-            defaultParts: [],
-            extraParts: [WORK, MOVE, CARRY, MOVE],
-            partsMultiplier,
-            minCreeps: undefined,
-            maxCreeps: 8,
-            minCost: 250,
-            priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
-            memoryAdditions: {
-                role: 'controllerUpgrader',
-            }
-        }
-    })())
+    let estimatedIncome = room.estimateIncome()
 
     // Construct requests for builders
 
@@ -570,9 +518,14 @@ export function spawnRequester(room: Room) {
 
         let partsMultiplier = 1
 
-        // For every 8 estimated income, add 1 multiplier
+        // Construct an income share
 
-        partsMultiplier += Math.floor(room.estimateIncome() / 6)
+        const incomeShare = estimatedIncome * 0.5
+
+        // Use the incomeShare to adjust estimatedIncome and partsMultiplier
+
+        estimatedIncome -= incomeShare
+        partsMultiplier += incomeShare
 
         // If all RCL 3 extensions are build
 
@@ -678,6 +631,67 @@ export function spawnRequester(room: Room) {
             priority: 3.5 + room.creepsFromRoom.maintainer.length,
             memoryAdditions: {
                 role: 'maintainer',
+            }
+        }
+    })())
+
+    // Construct requests for upgraders
+
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+        // Construct the partsMultiplier
+
+        let partsMultiplier = 1
+
+        // Construct an income share
+
+        const incomeShare = estimatedIncome * 0.5
+
+        // Use the incomeShare to adjust estimatedIncome and partsMultiplier
+
+        estimatedIncome -= incomeShare
+        partsMultiplier += incomeShare
+
+        // For every 30,000 energy in storage, add 1 multiplier
+
+        if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 30000
+
+        // If there are construction sites of my ownership in the room, set multiplier to 1
+
+        if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 1
+
+        // If the controllerContainer or controllerLink exists
+
+        if (room.get('controllerContainer') || room.get('controllerLink')) {
+
+            // If the controller is level 8, max out partsMultiplier at 4
+
+            if (room.controller.level == 8) partsMultiplier = Math.min(4, partsMultiplier)
+
+            return {
+                defaultParts: [CARRY],
+                extraParts: [WORK, MOVE, WORK, WORK, WORK],
+                partsMultiplier: Math.max(partsMultiplier / 4, 1),
+                minCreeps: undefined,
+                maxCreeps: 8,
+                minCost: 200,
+                priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                memoryAdditions: {
+                    role: 'controllerUpgrader',
+                }
+            }
+        }
+
+        return {
+            defaultParts: [],
+            extraParts: [WORK, MOVE, CARRY, MOVE],
+            partsMultiplier,
+            minCreeps: undefined,
+            maxCreeps: 8,
+            minCost: 250,
+            priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+            memoryAdditions: {
+                role: 'controllerUpgrader',
             }
         }
     })())
