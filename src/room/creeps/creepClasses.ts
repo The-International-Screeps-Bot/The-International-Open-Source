@@ -104,6 +104,21 @@ export class Scout extends Creep {
 }
 creepClasses.scout = Scout
 
+export class Claimer extends Creep {
+
+    /**
+     * Claims a room specified in the creep's memory
+     */
+    claimRoom?(): void
+
+    constructor(creepID: Id<Creep>) {
+
+        super(creepID)
+
+    }
+}
+creepClasses.claimer = Claimer
+
 export class Antifa extends Creep {
     constructor(creepID: Id<Creep>) {
 

@@ -89,6 +89,7 @@ declare global {
     'remoteDefender' |
     'remoteMaintainer' | */
     'scout' |
+    'claimer' |
     'antifa'
 
     type RoomObjectName =
@@ -341,6 +342,8 @@ declare global {
         energySpentOnRepairing: number
 
         energySpentOnBarricades: number
+
+        claimTarget: string
     }
 
     interface RawMemory {
@@ -856,6 +859,11 @@ declare global {
          * The name of the room the creep is remoting for
          */
         remoteName: string
+
+        /**
+         * The name of the room the creep is trying to claim
+         */
+        claimTarget: string
     }
 
     // PowerCreeps

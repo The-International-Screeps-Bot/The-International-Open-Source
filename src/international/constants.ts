@@ -189,6 +189,7 @@ constants.creepRoles = [
     'remoteDefender',
     'remoteMaintainer', */
     'scout',
+    'claimer',
     'antifa',
 ]
 

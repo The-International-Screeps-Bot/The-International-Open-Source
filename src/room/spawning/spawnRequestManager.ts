@@ -794,6 +794,27 @@ export function spawnRequester(room: Room) {
         }
     })())
 
+        // Construct requests for scouts
+
+        constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+            // If there is no claimTarget, inform false
+
+            if (!Memory.claimTarget) return false
+
+            return {
+                defaultParts: [MOVE, MOVE, CLAIM, MOVE],
+                extraParts: [],
+                partsMultiplier: 1,
+                minCreeps: 1,
+                minCost: 750,
+                priority: 3,
+                memoryAdditions: {
+                    role: 'claimer',
+                }
+            }
+        })())
+
     // Inform spawnRequests
 
     return spawnRequests

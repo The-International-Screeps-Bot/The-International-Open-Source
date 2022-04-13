@@ -12,6 +12,7 @@ import { customLog } from 'international/generalFunctions'
 import { haulerManager } from './roleManagers/commune/haulerManager'
 import { remoteHarvesterManager } from './roleManagers/remote/remoteHarvesterManager'
 import { remoteHaulerManager } from './roleManagers/remote/remoteHaulerManager'
+import { claimerManager } from './roleManagers/claimerManager'
 
 export function roleManager(room: Room) {
 
@@ -31,6 +32,7 @@ export function roleManager(room: Room) {
         remoteHarvester: remoteHarvesterManager,
         remoteHauler: remoteHaulerManager,
         scout: scoutManager,
+        claimer: claimerManager,
         antifa: antifaManager,
     }
 
