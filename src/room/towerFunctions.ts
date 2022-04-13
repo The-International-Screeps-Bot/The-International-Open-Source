@@ -75,7 +75,7 @@ Room.prototype.towersHealCreeps = function() {
 
     // Construct heal targets from my and allied damaged creeps in the room
 
-    const healTargets: Creep[] = room.find(FIND_MY_CREEPS).concat(room.get('allyCreeps')).filter(creep => creep.hits < creep.hitsMax)
+    const healTargets: Creep[] = room.find(FIND_MY_CREEPS).concat(room.get('allyCreeps')).filter(creep => creep.hits < creep.hitsMax && !creep.isOnExit())
 
     // Loop through the room's towers
 
@@ -121,7 +121,7 @@ Room.prototype.towersAttackCreeps = function() {
 
     // Construct attack targets from my and allied damaged creeps in the room
 
-    const attackTargets: Creep[] = room.get('enemyCreeps')
+    const attackTargets = (room.get('enemyCreeps') as Creep[]).filter(creep => !creep.isOnExit())
 
     // Loop through the room's towers
 
