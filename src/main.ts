@@ -646,14 +646,9 @@ declare global {
         moveRequest: number
 
         /**
-         * 
+         *
          */
         hasMoved: boolean
-
-        /**
-         * A list of creep names to have their moveRequest met if traffic conditions are correct
-         */
-        queue: string[]
 
         /**
          * Whether the creep is actively pulling another creep or not
@@ -752,7 +747,7 @@ declare global {
         /**
          *
          */
-        recurseMoveRequest(pos: number): void
+        recurseMoveRequest(pos: number, queue?: string[]): void
 
         /**
          *

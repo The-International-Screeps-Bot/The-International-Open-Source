@@ -72,73 +72,82 @@ export function basePlanner(room: Room) {
      */
     function planStamp(opts: PlanStampOpts): void {
 
-        // Define the stamp using the stampType
+        // So long as the count is more than 0
 
-        const stamp = constants.stamps[opts.stampType]
+        while (opts.count > 0) {
 
-        // Run distance transform with the baseCM
+            // Decrease the count
 
-        const distanceCM = room.specialDT(baseCM)
+            opts.count--
 
-        // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
+            // Define the stamp using the stampType
 
-        const anchor = room.findClosestPosOfValue({
-            CM: distanceCM,
-            startPos: opts.anchorOrient,
-            requiredValue: stamp.size,
-            initialWeight: opts.initialWeight || 0,
-            adjacentToRoads: opts.adjacentToRoads,
-            roadCM: opts.adjacentToRoads ? roadCM : undefined
-        })
+            const stamp = constants.stamps[opts.stampType]
 
-        // Inform false if no anchor was generated
+            // Run distance transform with the baseCM
 
-        if (!anchor) return
+            const distanceCM = room.specialDT(baseCM)
 
-        // Otherwise
-        // If the stampType isn't in stampAnchors, construct it
+            // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 
-        if (!stampAnchors[opts.stampType]) stampAnchors[opts.stampType] = []
+            const anchor = room.findClosestPosOfValue({
+                CM: distanceCM,
+                startPos: opts.anchorOrient,
+                requiredValue: stamp.size,
+                initialWeight: opts.initialWeight || 0,
+                adjacentToRoads: opts.adjacentToRoads,
+                roadCM: opts.adjacentToRoads ? roadCM : undefined
+            })
 
-        // Add the anchor to stampAnchors based on its type
+            // Inform false if no anchor was generated
 
-        stampAnchors[opts.stampType].push(anchor)
+            if (!anchor) return
 
-        // Loop through structure types in fastFiller structures
+            // Otherwise
+            // If the stampType isn't in stampAnchors, construct it
 
-        for (const structureType in stamp.structures) {
+            if (!stampAnchors[opts.stampType]) stampAnchors[opts.stampType] = []
 
-            // Get the positions for this structre type
+            // Add the anchor to stampAnchors based on its type
 
-            const positions = stamp.structures[structureType]
+            stampAnchors[opts.stampType].push(anchor)
 
-            // Loop through positions
+            // Loop through structure types in fastFiller structures
 
-            for (const pos of positions) {
+            for (const structureType in stamp.structures) {
 
-                // Re-assign the pos's x and y to align with the offset
+                // Get the positions for this structre type
 
-                const x = pos.x + anchor.x - stamp.offset,
-                y = pos.y + anchor.y - stamp.offset
+                const positions = stamp.structures[structureType]
 
-                // Plan for the structureType at this position
+                // Loop through positions
 
-                structurePlans.set(x, y, constants.structureTypesByNumber[structureType])
+                for (const pos of positions) {
 
-                // If the structureType is a road
+                    // Re-assign the pos's x and y to align with the offset
 
-                if (structureType == STRUCTURE_ROAD) {
+                    const x = pos.x + anchor.x - stamp.offset,
+                    y = pos.y + anchor.y - stamp.offset
 
-                    // Record the position in roadCM and iterate
+                    // Plan for the structureType at this position
 
-                    roadCM.set(x, y, 1)
-                    continue
+                    structurePlans.set(x, y, constants.structureTypesByNumber[structureType])
+
+                    // If the structureType is a road
+
+                    if (structureType == STRUCTURE_ROAD) {
+
+                        // Record the position in roadCM and iterate
+
+                        roadCM.set(x, y, 1)
+                        continue
+                    }
+
+                    // Otherwise record the position as avoid in baseCM and roadCM and iterate
+
+                    baseCM.set(x, y, 255)
+                    roadCM.set(x, y, 255)
                 }
-
-                // Otherwise record the position as avoid in baseCM and roadCM and iterate
-
-                baseCM.set(x, y, 255)
-                roadCM.set(x, y, 255)
             }
         }
 

@@ -1225,7 +1225,7 @@ Creep.prototype.runMoveRequest = function(packedPos) {
     return creep.move(creep.pos.getDirectionTo(unPackAsRoomPos(packedPos, room.name))) == OK
 }
 
-Creep.prototype.recurseMoveRequest = function(packedPos) {
+Creep.prototype.recurseMoveRequest = function(packedPos, queue = []) {
 
     const creep = this,
     room = creep.room,
@@ -1237,23 +1237,19 @@ Creep.prototype.recurseMoveRequest = function(packedPos) {
     // If there is no creep at the pos
 
     if (!creepNameAtPos) {
-        /* room.visual.circle(creep.pos) */
+
         // If there are no creeps at the pos, operate the moveRequest
 
         creep.runMoveRequest(packedPos)
 
-        // Stop if the creep has no queue
-
-        if (!creep.queue) return
-
         // Otherwise, loop through each index of the queue
 
-        for (let index = creep.queue.length - 1; index > 0; index--) {
+        for (let index = queue.length - 1; index > 0; index--) {
 
             // Get the creep using the creepName
 
-            const queuedCreep = Game.creeps[creep.queue[index]]
-            /* room.visual.circle(queuedCreep.pos, { fill: constants.colors.red, strokeWidth: 2, }) */
+            const queuedCreep = Game.creeps[queue[index]]
+
             // Have the creep run its moveRequest
             queuedCreep.say('QUEUE')
             queuedCreep.runMoveRequest(queuedCreep.moveRequest)
@@ -1294,48 +1290,37 @@ Creep.prototype.recurseMoveRequest = function(packedPos) {
 
         // If the creep's moveRequests aren't aligned
 
-        // If the creep has a traffic queue
-
-        if (creepAtPos.queue) {
-
 /*
-            // Filter creepNames in the creep's traffic queue
+        // Filter creepNames in the creep's traffic queue
 
-            const creepMatchingRequest = findCreepInQueueMatchingRequest(creep.queue, creepAtPos.moveRequest)
+        const creepMatchingRequest = findCreepInQueueMatchingRequest(queue, creepAtPos.moveRequest)
 
-            // If there is a creep in the queue matching the creepAtPos's moveRequest
+        // If there is a creep in the queue matching the creepAtPos's moveRequest
 
-            if (creepMatchingRequest) {
+        if (creepMatchingRequest) {
 
-                // Loop through each index of the queue
+            // Loop through each index of the queue
 
-                for (let index = creep.queue.length - 1; index > 0; index--) {
+            for (let index = queue.length - 1; index > 0; index--) {
 
-                    // Get the creep using the creepName
+                // Get the creep using the creepName
 
-                    const queuedCreep = Game.creeps[creep.queue[index]]
+                const queuedCreep = Game.creeps[queue[index]]
 
-                    // Have the creep run its moveRequest
-                    queuedCreep.say('QUEUE')
-                    queuedCreep.runMoveRequest(queuedCreep.moveRequest)
-                }
+                // Have the creep run its moveRequest
+                queuedCreep.say('QUEUE')
+                queuedCreep.runMoveRequest(queuedCreep.moveRequest)
+            }
 
-                // Have the creepAtPos move to the creepAtPos and inform true
+            // Have the creepAtPos move to the creepAtPos and inform true
 
-                creepAtPos.runMoveRequest(creepAtPos.moveRequest)
-                return
-            } */
-
-            // Otherwise add the creep to the traffic queue and stop
-
-            creepAtPos.queue.push(creep.name)
-            creepAtPos.recurseMoveRequest(creepAtPos.moveRequest)
+            creepAtPos.runMoveRequest(creepAtPos.moveRequest)
             return
-        }
+        } */
 
-        // Otherwise create a traffic queue and stop
+        // Otherwise add the creep to the traffic queue and stop
 
-        creepAtPos.queue = [creep.name]
+        queue.push(creep.name)
         creepAtPos.recurseMoveRequest(creepAtPos.moveRequest)
         return
 
