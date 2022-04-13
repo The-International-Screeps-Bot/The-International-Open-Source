@@ -61,7 +61,7 @@ export function constructionManager(room: Room) {
 
         // If there is not enough energy to start builing ramparts, stop
 
-        if (room.findStoredResourceAmount(RESOURCE_ENERGY) < 40000) return
+        if (room.findStoredResourceAmount(RESOURCE_ENERGY) < 30000) return
 
         // If ramparts are not yet planned
 

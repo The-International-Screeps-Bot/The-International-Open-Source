@@ -129,13 +129,15 @@ export function tickConfig() {
                 roomMemory.needs = []
             }
 
+            //
 
+            const isReserved = roomMemory.needs[remoteNeedsIndex.remoteReserver] == 0
 
             // Initialize aspects of needs
 
             roomMemory.needs[remoteNeedsIndex.remoteReserver] = 1
 
-            roomMemory.needs[remoteNeedsIndex.remoteHarvester] = roomMemory.needs[remoteNeedsIndex.remoteReserver] == 0 ? 6 : 3 * roomMemory.sourceEfficacies.length
+            roomMemory.needs[remoteNeedsIndex.remoteHarvester] = isReserved ? 6 : 3 * roomMemory.sourceEfficacies.length
 
             roomMemory.needs[remoteNeedsIndex.remoteHauler] = 0
 
@@ -143,9 +145,13 @@ export function tickConfig() {
 
             for (const efficacy of roomMemory.sourceEfficacies) {
 
+                // Get the income based on the reservation of the room and remoteHarvester need
+
+                const income = Math.max((roomMemory.needs[remoteNeedsIndex.remoteHarvester] + (isReserved ? 4 : 2)) / roomMemory.sourceEfficacies.length, 0) - roomMemory.needs[remoteNeedsIndex.remoteReserver] == 0 ? 10 : 5
+
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-                roomMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(efficacy, roomMemory.needs[remoteNeedsIndex.remoteReserver] == 0 ? 10 : 5)
+                roomMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(efficacy, income)
             }
         }
 
