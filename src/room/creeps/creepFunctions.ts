@@ -523,7 +523,7 @@ Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs = new Set
 
         // Otherwise if the structure is somewhat low on hits, inform true
 
-        return structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER
+        return structure.hitsMax - structure.hits >= structure.hits * 0.2
     })
 
     creep.say('FRT')
