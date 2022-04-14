@@ -2878,3 +2878,39 @@ Room.prototype.findRoomPositionsInsideRect = function(x1, y1, x2, y2) {
 
     return positions
 }
+
+Room.prototype.getPartsOfRoleAmount = function(role, type) {
+
+    const room = this
+
+    // Intilaize the partsAmount
+
+    let partsAmount = 0
+
+    // Loop through every creepName in the creepsFromRoom of the specified role
+
+    for (const creepName of room.creepsFromRoom[role]) {
+
+        // Get the creep using creepName
+
+        const creep = Game.creeps[creepName]
+
+        // If there is no specified type
+
+        if (!type) {
+
+            // Increase partsAmount by the creep's body size, and iterate
+
+            partsAmount += creep.body.length
+            continue
+        }
+
+        // Otherwise increase partsAmount by the creep's parts count of the specified type
+
+        partsAmount += creep.body.filter(part => part.type == type).length
+    }
+
+    // Inform partsAmount
+
+    return partsAmount
+}

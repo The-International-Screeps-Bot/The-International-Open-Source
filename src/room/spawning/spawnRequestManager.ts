@@ -468,9 +468,9 @@ export function spawnRequester(room: Room) {
 
         if (!room.get('source2Link')) requiredCarryParts += findCarryPartsRequired(room.get('source2PathLength') * 2, 10)
 
-        // If there is no controllerLink, increase requiredCarryParts using the hub-structure path length
+        // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
-        if (!room.get('controllerLink')) requiredCarryParts += findCarryPartsRequired(room.get('upgradePathLength') * 2, 10)
+        if (room.get('controllerContainer')) requiredCarryParts += findCarryPartsRequired(room.get('upgradePathLength') * 2, room.getPartsOfRoleAmount('controllerUpgrader', WORK))
 
         // If all RCL 3 extensions are build
 
@@ -597,7 +597,7 @@ export function spawnRequester(room: Room) {
 
         // For each rampart, add a multiplier
 
-        partsMultiplier += ramparts.length * 0.05
+        partsMultiplier += ramparts.length * 0.06
 
         // For every 30,000 energy in storage, add 1 multiplier
 

@@ -563,6 +563,8 @@ declare global {
          * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
          */
         estimateIncome(): number
+
+        getPartsOfRoleAmount(role: CreepRoles, type?: BodyPartConstant): number
     }
 
     interface RoomMemory {
