@@ -1245,7 +1245,7 @@ Creep.prototype.runMoveRequest = function(packedPos) {
 
     // Record the creep at its new position
 
-    /* room.creepPositions[packedPos] = creep.name */
+    room.creepPositions[packedPos] = creep.name
 
     // Record that the creep has moved this tick
 
