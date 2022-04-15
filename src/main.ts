@@ -711,12 +711,12 @@ declare global {
         /**
          *
          */
-        findRepairTarget(workPartCount: number, excluded?: Set<Id<StructureRoad | StructureContainer>>): Structure | false
+        findRepairTarget(excluded?: Set<Id<StructureRoad | StructureContainer>>): Structure | false
 
         /**
          *
          */
-        advancedRepair(): boolean
+        advancedMaintain(): boolean
 
         findOptimalSourceName(): boolean
 
@@ -847,10 +847,7 @@ declare global {
          */
         getPulled: boolean
 
-        /**
-         *
-         */
-        creatorID: Id<Structure>
+        repairTarget: Id<Structure>
 
         /**
          * The name of the room the scout is trying to scout
@@ -881,6 +878,10 @@ declare global {
     }
 
     // Structures
+
+    interface Structure {
+        realHits: number
+    }
 
     interface StructureSpawn {
         [key: string]: any

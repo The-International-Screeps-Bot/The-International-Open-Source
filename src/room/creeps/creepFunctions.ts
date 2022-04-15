@@ -470,11 +470,13 @@ Creep.prototype.findRampartRepairTarget = function(workPartCount) {
 
     // Get the repairTarget using the ID in the creep's memory
 
-    repairTarget: Structure | false = findObjectWithID(creep.memory.repairTarget)
+    repairTarget: Structure | false = findObjectWithID(creep.memory.repairTarget),
+
+    rampartRepairExpectation = workPartCount * REPAIR_POWER * 25
 
     // If the repairTarget exists and it's under the quota, it
 
-    if (repairTarget && repairTarget.hits < creep.memory.quota + workPartCount * 1000) return repairTarget
+    if (repairTarget && repairTarget.hits < creep.memory.quota + rampartRepairExpectation) return repairTarget
 
     // Get ramparts in the room, informing false is there are none
 
@@ -483,7 +485,7 @@ Creep.prototype.findRampartRepairTarget = function(workPartCount) {
 
     // Assign the quota to the value of the creep's quota, or its workPartCount times 1000, increasing it each iteration based on the creep's workPartCount
 
-    for (let quota = creep.memory.quota || workPartCount * 1000; quota < ramparts[0].hitsMax; quota += workPartCount * 1000) {
+    for (let quota = creep.memory.quota || rampartRepairExpectation; quota < ramparts[0].hitsMax; quota += rampartRepairExpectation) {
 
         // Filter ramparts thats hits are below the quota, iterating if there are none
 
@@ -504,7 +506,7 @@ Creep.prototype.findRampartRepairTarget = function(workPartCount) {
     return false
 }
 
-Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs = new Set()) {
+Creep.prototype.findRepairTarget = function(excludedIDs = new Set()) {
 
     const creep = this,
     room = creep.room,
@@ -523,7 +525,7 @@ Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs = new Set
 
         // Otherwise if the structure is somewhat low on hits, inform true
 
-        return structure.hitsMax - structure.hits >= structure.hits * 0.2
+        return structure.hitsMax * 0.2 >= structure.hits
     })
 
     creep.say('FRT')
@@ -537,12 +539,12 @@ Creep.prototype.findRepairTarget = function(workPartCount, excludedIDs = new Set
     return creep.pos.findClosestByRange(viableRepairTargets)
 }
 
-Creep.prototype.advancedRepair = function() {
+Creep.prototype.advancedMaintain = function() {
 
     const creep = this,
     room = creep.room
 
-    creep.say('AR')
+    creep.say('AM')
 
     // If the creep needs resources
 
@@ -588,7 +590,7 @@ Creep.prototype.advancedRepair = function() {
 
     // Find a repair target based on the creeps work parts. If none are found, inform false
 
-    const repairTarget: Structure | false = creep.findRepairTarget(workPartCount) || creep.findRampartRepairTarget(workPartCount)
+    const repairTarget: Structure | false = findObjectWithID(creep.memory.repairTarget) || creep.findRepairTarget() || creep.findRampartRepairTarget(workPartCount)
     if (!repairTarget) return false
 
     // Add the repair target to memory
@@ -625,66 +627,69 @@ Creep.prototype.advancedRepair = function() {
 
     const repairResult = creep.repair(repairTarget)
 
-    // If the repair worked
+    // If the repair failed, inform false
 
-    if (repairResult == OK) {
+    if (repairResult != OK) return false
 
-        // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
+    // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
 
-        const energySpentOnRepairs = Math.min(workPartCount, (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER)
+    const energySpentOnRepairs = Math.min(workPartCount, (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER)
 
-        // Add control points to total controlPoints counter and say the success
+    // Add control points to total controlPoints counter and say the success
 
-        Memory.energySpentOnRepairing += energySpentOnRepairs
-        creep.say(repairTarget.structureType == STRUCTURE_RAMPART ? '🧱' : '🔧' + energySpentOnRepairs * REPAIR_POWER)
+    Memory.energySpentOnRepairing += energySpentOnRepairs
+    creep.say(repairTarget.structureType == STRUCTURE_RAMPART ? '🧱' : '🔧' + energySpentOnRepairs * REPAIR_POWER)
 
-        // Find the hits left on the repairTarget
+    // Implement the results of the repair pre-emptively
 
-        const newRepairTargetHits = repairTarget.hits + workPartCount * REPAIR_POWER
+    repairTarget.realHits = repairTarget.hits + workPartCount * REPAIR_POWER
 
-        // If the repair target won't be viable to repair next tick, inform true
+    // If the structure is a rampart
 
-        if (repairTarget.hitsMax - newRepairTargetHits >= workPartCount * REPAIR_POWER) return true
+    if (repairTarget.structureType == STRUCTURE_RAMPART) {
 
-        // Otherwise
+        // If the repairTarget will be below or equal to expectations next tick, inform true
 
-        // Delete the target from memory
-
-        delete creep.memory.repairTarget
-
-        // Find repair targets that don't include the current target, informing true if none were found
-
-        const newRepairTargets = room.findRepairTargets(workPartCount, new Set([repairTarget.id]))
-        if (!newRepairTargets.length) return true
-
-        // Otherwise search for the closest newRepairTarget
-
-        const newRepairTarget = creep.pos.findClosestByRange(newRepairTargets)
-
-        // Otherwise, if the new repair target is out of repair range
-
-        if (creep.pos.getRangeTo(newRepairTarget.pos) > 3) {
-
-            // Make a move request to it
-
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goal: { pos: newRepairTarget.pos, range: 3 },
-                avoidEnemyRanges: true,
-                weightGamebjects: {
-                    1: room.get('road')
-                }
-            })
-
-            // Inform true
-
-            return true
-        }
+        if (repairTarget.realHits <= creep.memory.quota + workPartCount * REPAIR_POWER * 25) return true
     }
 
-    // Inform failure
+    // Otherwise if it isn't a rampart and it will be viable to repair next tick, inform true
 
-    return false
+    else if (repairTarget.hitsMax - repairTarget.realHits >= workPartCount * REPAIR_POWER) return true
+
+    // Otherwise
+
+    // Delete the target from memory
+
+    delete creep.memory.repairTarget
+
+    // Find repair targets that don't include the current target, informing true if none were found
+
+    const newRepairTargets = room.findRepairTargets(workPartCount, new Set([repairTarget.id]))
+    if (!newRepairTargets.length) return true
+
+    // Otherwise search for the closest newRepairTarget
+
+    const newRepairTarget = creep.pos.findClosestByRange(newRepairTargets)
+
+    // Otherwise, if the new repair target is in repair range, inform true
+
+    if (creep.pos.getRangeTo(newRepairTarget.pos) > 3) return true
+
+    // Make a move request to it
+
+    creep.createMoveRequest({
+        origin: creep.pos,
+        goal: { pos: newRepairTarget.pos, range: 3 },
+        avoidEnemyRanges: true,
+        weightGamebjects: {
+            1: room.get('road')
+        }
+    })
+
+    // Inform true
+
+    return true
 }
 
 Creep.prototype.findOptimalSourceName = function() {

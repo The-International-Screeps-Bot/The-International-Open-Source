@@ -12,6 +12,6 @@ export function maintainerManager(room: Room, creepsOfRole: string[]) {
 
         //
 
-        creep.advancedRepair()
+        creep.advancedMaintain()
     }
 }
