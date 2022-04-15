@@ -1256,7 +1256,7 @@ Creep.prototype.recurseMoveRequest = function(packedPos, queue = []) {
             const queuedCreep = Game.creeps[queue[index]]
 
             // Have the creep run its moveRequest
-            queuedCreep.say('QUEUE')
+            queuedCreep.say('QUEUE1')
             queuedCreep.runMoveRequest(queuedCreep.moveRequest)
         }
 
@@ -1323,10 +1323,34 @@ Creep.prototype.recurseMoveRequest = function(packedPos, queue = []) {
             return
         } */
 
+        if (queue.includes(creepAtPos.name)) {
+
+            // If there are no creeps at the pos, operate the moveRequest
+
+            creep.runMoveRequest(packedPos)
+
+            // Otherwise, loop through each index of the queue
+
+            for (let index = queue.length - 1; index > 0; index--) {
+
+                // Get the creep using the creepName
+
+                const queuedCreep = Game.creeps[queue[index]]
+
+                // Have the creep run its moveRequest
+                queuedCreep.say('QUEUE2')
+                queuedCreep.runMoveRequest(queuedCreep.moveRequest)
+            }
+
+            // And stop
+
+            return
+        }
+
         // Otherwise add the creep to the traffic queue and stop
 
         queue.push(creep.name)
-        creepAtPos.recurseMoveRequest(creepAtPos.moveRequest)
+        creepAtPos.recurseMoveRequest(creepAtPos.moveRequest, queue)
         return
 
         /* creepAtPos.recurseMoveRequest(JSON.stringify(creepAtPos.memory.path[0]))
