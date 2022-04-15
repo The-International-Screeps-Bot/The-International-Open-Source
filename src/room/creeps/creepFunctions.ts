@@ -828,20 +828,46 @@ Creep.prototype.findHarvestPosition = function() {
 
     const sourceName = creep.memory.sourceName,
 
+    // Define an anchor
+
+    anchor: RoomPosition = room.get('anchor') || creep.pos,
+
     // Get usedHarvestPositions
 
-    usedHarvestPositions: Set<number> = room.get('usedHarvestPositions'),
+    usedHarvestPositions: Set<number> = room.get('usedHarvestPositions')
+
+    let closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`),
+    packedPos = pack(closestHarvestPos)
+
+    // If the closestHarvestPos exists and isn't being used
+
+    if (closestHarvestPos) {
+
+        packedPos = pack(closestHarvestPos)
+
+        // If the position is unused
+
+        if (!usedHarvestPositions.has(packedPos)) {
+
+            // Assign it as the creep's harvest pos and inform true
+
+            creep.memory.packedHarvestPos = packedPos
+            usedHarvestPositions.add(packedPos)
+
+            return true
+        }
+    }
 
     // Otherwise get the harvest positions for the source
 
-    harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`),
+    const harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`),
 
     openHarvestPositions = harvestPositions.filter(pos => !usedHarvestPositions.has(pack(pos)))
     if (!openHarvestPositions.length) return false
 
-    const closestHarvestPos = openHarvestPositions.sort((a, b) => getRangeBetween(creep.pos.x, creep.pos.y, a.x, a.y) - getRangeBetween(creep.pos.x, creep.pos.y, b.x, b.y))[0],
+    const creepsClosestHarvestPos = openHarvestPositions.sort((a, b) => getRangeBetween(anchor.x, anchor.y, a.x, a.y) - getRangeBetween(anchor.x, anchor.y, b.x, b.y))[0]
 
-    packedPos = pack(closestHarvestPos)
+    packedPos = pack(creepsClosestHarvestPos)
 
     creep.memory.packedHarvestPos = packedPos
     usedHarvestPositions.add(packedPos)

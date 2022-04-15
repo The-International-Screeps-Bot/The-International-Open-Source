@@ -515,10 +515,10 @@ export function rampartPlanner(room: Room) {
     // Protect it
 
     protectionRects.push({
-        x1: source1ClosestHarvestPos.x,
-        x2: source1ClosestHarvestPos.x,
-        y1: source1ClosestHarvestPos.y,
-        y2: source1ClosestHarvestPos.y
+        x1: Math.max(Math.min(source1ClosestHarvestPos.x - 2, constants.roomDimensions - 2), 2),
+        y1: Math.max(Math.min(source1ClosestHarvestPos.y - 2, constants.roomDimensions - 2), 2),
+        x2: Math.max(Math.min(source1ClosestHarvestPos.x + 2, constants.roomDimensions - 2), 2),
+        y2: Math.max(Math.min(source1ClosestHarvestPos.y + 2, constants.roomDimensions - 2), 2)
     })
 
     // Get the source2ClosestHarvestPos
@@ -528,10 +528,10 @@ export function rampartPlanner(room: Room) {
     // Protect it
 
     protectionRects.push({
-        x1: source2ClosestHarvestPos.x,
-        x2: source2ClosestHarvestPos.x,
-        y1: source2ClosestHarvestPos.y,
-        y2: source2ClosestHarvestPos.y
+        x1: Math.max(Math.min(source2ClosestHarvestPos.x - 2, constants.roomDimensions - 2), 2),
+        y1: Math.max(Math.min(source2ClosestHarvestPos.y - 2, constants.roomDimensions - 2), 2),
+        x2: Math.max(Math.min(source2ClosestHarvestPos.x + 2, constants.roomDimensions - 2), 2),
+        y2: Math.max(Math.min(source2ClosestHarvestPos.y + 2, constants.roomDimensions - 2), 2)
     })
 
     // Get the room's stampAnchors
