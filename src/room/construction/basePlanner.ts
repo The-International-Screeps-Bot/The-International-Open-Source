@@ -1,5 +1,5 @@
 import { constants } from "international/constants"
-import { findAvgBetweenPosotions, findPositionsInsideRect } from "international/generalFunctions"
+import { findAvgBetweenPosotions, findPositionsInsideRect, getRangeBetween } from "international/generalFunctions"
 import 'other/RoomVisual'
 
 /**
@@ -176,6 +176,10 @@ export function basePlanner(room: Room) {
 
     room.memory.anchor = stampAnchors.fastFiller[0]
 
+    // Get the anchor
+
+    const anchor = room.get('anchor')
+
     // Get the centerUpgradePos, informing false if it's undefined
 
     const centerUpgadePos: RoomPosition = room.get('centerUpgradePos')
@@ -200,7 +204,7 @@ export function basePlanner(room: Room) {
     planStamp({
         stampType: 'hub',
         count: 1,
-        anchorOrient: stampAnchors.fastFiller[0],
+        anchorOrient: anchor,
     })
 
     // Get the closest upgrade pos and mark it as fair use in roadCM
@@ -260,7 +264,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: stampAnchors.hub[0],
-        goal: { pos: stampAnchors.fastFiller[0], range: 3 },
+        goal: { pos: anchor, range: 3 },
         weightCostMatrixes: [roadCM]
     })
 
@@ -316,7 +320,7 @@ export function basePlanner(room: Room) {
 
         // get the closestHarvestPos using the sourceName
 
-        const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPos`)
+        const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`)
 
         // Record the pos in roadCM
 
@@ -329,7 +333,7 @@ export function basePlanner(room: Room) {
 
         // get the closestHarvestPos using the sourceName
 
-        const closestHarvestPos = room.get(`${sourceName}ClosestHarvestPos`)
+        const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`)
 
         // Plan for a road at the pos
 
@@ -339,7 +343,7 @@ export function basePlanner(room: Room) {
 
         path = room.advancedFindPath({
             origin: closestHarvestPos,
-            goal: { pos: stampAnchors.fastFiller[0], range: 4 },
+            goal: { pos: anchor, range: 4 },
             weightCostMatrixes: [roadCM]
         })
 
@@ -466,6 +470,10 @@ export function basePlanner(room: Room) {
 
     let extraExtensionsAmount = 14
 
+    // Get the room's terrain data
+
+    const terrain = room.getTerrain()
+
     // loop through sourceNames
 
     for (const sourceName of sourceNames) {
@@ -480,25 +488,40 @@ export function basePlanner(room: Room) {
 
         // Find positions adjacent to source
 
-        adjacentPositions = findPositionsInsideRect(closestHarvestPos.x - 1, closestHarvestPos.y - 1, closestHarvestPos.x + 1, closestHarvestPos.y + 1)
+        adjacentPositions = findPositionsInsideRect(closestHarvestPos.x - 1, closestHarvestPos.y - 1, closestHarvestPos.x + 1, closestHarvestPos.y + 1),
+
+        // Sort adjacentPositions by range from the anchor
+
+        adjacentPositionsByAnchorRange = adjacentPositions.sort(function(a, b) {
+
+            return getRangeBetween(a.x, a.y, anchor.x, anchor.y) - getRangeBetween(b.x, b.y, anchor.x, anchor.y)
+        })
 
         // Loop through each pos
 
-        for (const pos of adjacentPositions) {
+        for (const pos of adjacentPositionsByAnchorRange) {
 
             // Iterate if plan for pos is in use
 
-            if (baseCM.get(pos.x, pos.y) == 255) continue
+            if (roadCM.get(pos.x, pos.y) != 0) continue
+
+            // Iterate if the pos is a wall
+
+            if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
 
             // Otherwise
+
+            // Assign 255 to this pos in baseCM
+
+            baseCM.set(pos.x, pos.y, 255)
+
+            // Assign 255 to this pos in roadCM
+
+            roadCM.set(pos.x, pos.y, 255)
 
             // If there is no planned link for this source, plan one
 
             if (!sourceHasLink) {
-
-                // Assign 255 to this pos in baseCM
-
-                baseCM.set(pos.x, pos.y, 255)
 
                 // Plan for a link at this position
 
@@ -511,10 +534,6 @@ export function basePlanner(room: Room) {
             }
 
             // Otherwise if there is a link planned for this source
-
-            // Assign 255 to this pos in baseCM
-
-            baseCM.set(pos.x, pos.y, 255)
 
             // Plan for an extension at this position
 

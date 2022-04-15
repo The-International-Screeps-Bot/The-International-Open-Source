@@ -310,6 +310,7 @@ constants.structureTypesByNumber = {
 }
 
 constants.numbersByStructureTypes = {
+    0: 'empty',
     1: STRUCTURE_SPAWN,
     2: STRUCTURE_EXTENSION,
     3: STRUCTURE_CONTAINER,
@@ -326,7 +327,6 @@ constants.numbersByStructureTypes = {
     14: STRUCTURE_POWER_SPAWN,
     15: STRUCTURE_NUKER,
     16: STRUCTURE_OBSERVER,
-    17: 'empty',
 }
 
 constants.stamps = {

@@ -55,7 +55,7 @@ export function tickConfig() {
         const room = Game.rooms[roomName]
 
         const controller = room.controller
-
+        
         // Add roomName to global if it isn't already there
 
         if (!global[room.name]) global[room.name] = {}

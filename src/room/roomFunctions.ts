@@ -507,10 +507,6 @@ Room.prototype.get = function(roomObjectName) {
 
     function findCenterUpgradePos() {
 
-        // Stop if there is no controller
-
-        if (!room.controller) return false
-
         // Get the anchor, informing false if it's undefined
 
         const anchor = room.roomObjects.anchor.getValue()
@@ -2638,10 +2634,6 @@ Room.prototype.advancedConstructStructurePlans = function() {
     // Get structurePlans
 
     structurePlans: CostMatrix = room.get('structurePlans'),
-
-    // Get the terrain cost matrix
-
-    terrain = room.getTerrain(),
 
     // Construct a cost matrix for visited tiles and add seeds to it
 

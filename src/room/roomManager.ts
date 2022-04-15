@@ -39,7 +39,7 @@ export function roomManager() {
         // Get the room using the roomName
 
         const room = Game.rooms[roomName]
-
+        
         taskManager(room)
 
         // If there is a specific manager for this room's type, run it
