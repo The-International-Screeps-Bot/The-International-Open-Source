@@ -290,6 +290,7 @@ constants.structureTypesByBuildPriority = [
 ]
 
 constants.structureTypesByNumber = {
+    empty: 0,
     spawn: 1,
     extension: 2,
     container: 3,
@@ -306,7 +307,6 @@ constants.structureTypesByNumber = {
     powerSpawn: 14,
     nuker: 15,
     observer: 16,
-    empty: 17,
 }
 
 constants.numbersByStructureTypes = {

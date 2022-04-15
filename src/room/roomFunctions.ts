@@ -2666,24 +2666,15 @@ Room.prototype.advancedConstructStructurePlans = function() {
     // Construct values for the flood
 
     let thisGeneration: Pos[] = [adjustedAnchor],
-
     nextGeneration: Pos[] = []
 
     function planPos(x: number, y: number) {
 
-        // Get the planned value for this pos
+        // Get the planned structureType for the x and y, try to build a structure
 
-        const plannedValue = structurePlans.get(x, y)
+        const structureType = constants.numbersByStructureTypes[structurePlans.get(x, y)]
 
-        // If there are structures planned for this pos
-
-        if (plannedValue == 0) return
-
-        // Otherwise so long as the pos isn't a wall, try to build a structure
-
-        const structureType = constants.numbersByStructureTypes[plannedValue]
-
-        // If the structureType is empty, iterate
+        // If the structureType is empty, stop
 
         if (structureType == 'empty') return
 
@@ -2693,7 +2684,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
             opacity: 0.5
         })
 
-        // If the structureType is a road and RCL 3 extensions aren't built, iterate
+        // If the structureType is a road and RCL 3 extensions aren't built, stop
 
         if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) return
 
@@ -2714,43 +2705,17 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
         for (const pos of thisGeneration) {
 
-            // Iterate if the terrain is a wall
-
-            if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
-
             // Plan structures for this pos
 
             planPos(pos.x, pos.y)
 
             // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-            const adjacentPositions = [
-                {
-                    x: pos.x - 1,
-                    y: pos.y
-                },
-                {
-                    x: pos.x + 1,
-                    y: pos.y
-                },
-                {
-                    x: pos.x,
-                    y: pos.y - 1
-                },
-                {
-                    x: pos.x,
-                    y: pos.y + 1
-                },
-            ]
+            const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
 
             // Loop through adjacent positions
 
             for (const adjacentPos of adjacentPositions) {
-
-                // Iterate if the pos doesn't map onto a room
-
-                if (adjacentPos.x < 0 || adjacentPos.x >= constants.roomDimensions ||
-                    adjacentPos.y < 0 || adjacentPos.y >= constants.roomDimensions) continue
 
                 // Iterate if the adjacent pos has been visited or isn't a tile
 
