@@ -27,10 +27,6 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         sourceContainer: StructureContainer = room.get(`${sourceName}Container`)
 
-        // Try to create a withdraw task
-
-        creep.createWithdrawTask(sourceContainer)
-
         // Try to harvest the designated source
 
         creep.advancedHarvestSource(room.get(sourceName))

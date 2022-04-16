@@ -8,7 +8,6 @@ export class SourceHarvester extends Creep {
 
     travelToSource?(): boolean
     transferToSourceLink?(): void
-    createWithdrawTask?(sourceContainer: StructureContainer): void
     repairSourceContainer?(sourceContainer: StructureContainer): void
 
     constructor(creepID: Id<Creep>) {
