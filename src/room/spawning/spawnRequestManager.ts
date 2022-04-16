@@ -537,27 +537,32 @@ export function spawnRequester(room: Room) {
         }
     })())
 
+    // Get enemyAttackers in the room
+
+    const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+        filter: creep => !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
+    })
+
+    // Get the attackValue of the attackers
+
+    let attackValue = 0
+
+    // Loop through each enemyAttacker
+
+    for (const enemyAttacker of enemyAttackers) {
+
+        // Increase attackValue by the creep's heal power
+
+        attackValue += enemyAttacker.findHealPower() / HEAL_POWER + enemyAttacker.partsOfType(WORK) + enemyAttacker.partsOfType(ATTACK) + enemyAttacker.partsOfType(RANGED_ATTACK)
+    }
+
     // Construct requests for meleeDefenders
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-        // Get enemyAttackers in the room, informing false if there are none
+        // Inform false if there are no enemyAttackers
 
-        const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-            filter: creep => !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
-        })
         if(!enemyAttackers.length) return false
-
-        let attackValue = 0
-
-        // Loop through each enemyAttacker
-
-        for (const enemyAttacker of enemyAttackers) {
-
-            // Increase attackValue by the creep's heal power
-
-            attackValue += enemyAttacker.findHealPower() / HEAL_POWER + enemyAttacker.partsOfType(WORK) + enemyAttacker.partsOfType(ATTACK) + enemyAttacker.partsOfType(RANGED_ATTACK)
-        }
 
         return {
             defaultParts: [],
@@ -667,6 +672,10 @@ export function spawnRequester(room: Room) {
         // For each rampart, add a multiplier
 
         partsMultiplier += ramparts.length * 0.06
+
+        // For every attackValue, add a multiplier
+
+        partsMultiplier += attackValue * 0.5
 
         // For every 30,000 energy in storage, add 1 multiplier
 

@@ -43,13 +43,9 @@ MeleeDefender.prototype.advancedDefend = function() {
 
         for (const creepAlt of creepsAtPos) {
 
-            // If the creepAlt is the creep, inform true
+            // If the creepAlt isn't the creep, inform false
 
-            if (creepAlt.id == creep.id) return true
-
-            // Otherwise inform false
-
-            return false
+            if (creepAlt.id != creep.id) return false
         }
 
         // Otherwise inform true
@@ -66,9 +62,13 @@ MeleeDefender.prototype.advancedDefend = function() {
 
     const closestRampart = ememyAttacker.pos.findClosestByRange(ramparts)
 
+    // Visualize the targeting, if roomVisuals are enabled
+
+    if (Memory.roomVisuals) room.visual.line(creep.pos, closestRampart.pos, { color: constants.colors.lightBlue })
+    
     // If the creep is range 0 to the closestRampart, inform false
 
-    if (creep.pos.getRangeTo(closestRampart) == 0) return false
+    if (creep.pos.getRangeTo(closestRampart.pos) == 0) return false
 
     // Otherwise move to the rampart preffering ramparts and inform true
 
@@ -79,7 +79,7 @@ MeleeDefender.prototype.advancedDefend = function() {
         swampCost: 80,
         weightGamebjects: {
             2: room.get('road'),
-            1: ramparts,
+            1: room.get('rampart'),
         }
     })
 
