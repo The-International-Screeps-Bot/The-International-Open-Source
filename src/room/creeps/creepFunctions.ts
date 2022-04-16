@@ -118,16 +118,15 @@ Creep.prototype.advancedPickup = function(target) {
 
 Creep.prototype.advancedHarvestSource = function(source) {
 
-    const creep = this,
+    const creep = this
 
     // Harvest the source, informing the result if it didn't succeed
 
-    harvestResult = creep.harvest(source)
-    if (harvestResult != OK) return false
+    if (creep.harvest(source) != OK) return false
 
     // Find amount of energy harvested and record it in data
 
-    const energyHarvested = Math.min(creep.partsOfType(WORK) * 2, source.energy)
+    const energyHarvested = Math.min(creep.partsOfType(WORK) * HARVEST_POWER, source.energy)
     Memory.energyHarvested += energyHarvested
 
     creep.say('⛏️' + energyHarvested)
@@ -708,9 +707,9 @@ Creep.prototype.findOptimalSourceName = function() {
     const anchor = room.get('anchor')
     if (!anchor) return false
 
-    // Query usedHarvestPositions to get creepsOfSourceAmount
+    // Query usedSourceHarvestPositions to get creepsOfSourceAmount
 
-    room.get('usedHarvestPositions')
+    room.get('usedSourceHarvestPositions')
 
     // Otherwise, define source names
 
@@ -764,9 +763,9 @@ Creep.prototype.findOptimalRemoteSourceName = function() {
 
     if (creep.memory.sourceName) return true
 
-    // Query usedHarvestPositions to get creepsOfSourceAmount
+    // Query usedSourceHarvestPositions to get creepsOfSourceAmount
 
-    room.get('usedHarvestPositions')
+    room.get('usedSourceHarvestPositions')
 
     // Otherwise, define source names
 
@@ -813,12 +812,12 @@ Creep.prototype.findOptimalRemoteSourceName = function() {
     return false
 }
 
-Creep.prototype.findHarvestPosition = function() {
+Creep.prototype.findSourceHarvestPosition = function() {
 
     const creep = this,
     room = creep.room
 
-    creep.say('FHP')
+    creep.say('FSHP')
 
     // Stop if the creep already has a packedHarvestPos
 
@@ -832,11 +831,69 @@ Creep.prototype.findHarvestPosition = function() {
 
     anchor: RoomPosition = room.get('anchor') || creep.pos,
 
-    // Get usedHarvestPositions
+    // Get usedSourceHarvestPositions
 
-    usedHarvestPositions: Set<number> = room.get('usedHarvestPositions')
+    usedSourceHarvestPositions: Set<number> = room.get('usedSourceHarvestPositions')
 
     let closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`),
+    packedPos = pack(closestHarvestPos)
+
+    // If the closestHarvestPos exists and isn't being used
+
+    if (closestHarvestPos) {
+
+        packedPos = pack(closestHarvestPos)
+
+        // If the position is unused
+
+        if (!usedSourceHarvestPositions.has(packedPos)) {
+
+            // Assign it as the creep's harvest pos and inform true
+
+            creep.memory.packedHarvestPos = packedPos
+            usedSourceHarvestPositions.add(packedPos)
+
+            return true
+        }
+    }
+
+    // Otherwise get the harvest positions for the source
+
+    const harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`),
+
+    openHarvestPositions = harvestPositions.filter(pos => !usedSourceHarvestPositions.has(pack(pos)))
+    if (!openHarvestPositions.length) return false
+
+    const creepsClosestHarvestPos = openHarvestPositions.sort((a, b) => getRangeBetween(anchor.x, anchor.y, a.x, a.y) - getRangeBetween(anchor.x, anchor.y, b.x, b.y))[0]
+
+    packedPos = pack(creepsClosestHarvestPos)
+
+    creep.memory.packedHarvestPos = packedPos
+    usedSourceHarvestPositions.add(packedPos)
+
+    return true
+}
+
+Creep.prototype.findMineralHarvestPosition = function() {
+
+    const creep = this,
+    room = creep.room
+
+    creep.say('FMHP')
+
+    // Stop if the creep already has a packedHarvestPos
+
+    if (creep.memory.packedHarvestPos) return true
+
+    // Define an anchor
+
+    const anchor: RoomPosition = room.get('anchor') || creep.pos,
+
+    // Get usedMineralHarvestPositions
+
+    usedHarvestPositions: Set<number> = room.get('usedMineralHarvestPositions')
+
+    let closestHarvestPos: RoomPosition = room.get('closestMineralHarvestPos'),
     packedPos = pack(closestHarvestPos)
 
     // If the closestHarvestPos exists and isn't being used
@@ -860,7 +917,7 @@ Creep.prototype.findHarvestPosition = function() {
 
     // Otherwise get the harvest positions for the source
 
-    const harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`),
+    const harvestPositions: Pos[] = room.get('mineralHarvestPositions'),
 
     openHarvestPositions = harvestPositions.filter(pos => !usedHarvestPositions.has(pack(pos)))
     if (!openHarvestPositions.length) return false
@@ -873,29 +930,6 @@ Creep.prototype.findHarvestPosition = function() {
     usedHarvestPositions.add(packedPos)
 
     return true
-
-    /* // Loop through each harvest position
-
-    for (const harvestPos of harvestPositions) {
-
-        // Construct a packedPos from the harvestPos
-
-        const packedPos = harvestPos.x * constants.roomDimensions + harvestPos.y
-
-        // If the harvestPos is used, iterate
-
-        if (usedHarvestPositions.has(packedPos)) continue
-
-        // Otherwise assign the creep the harvestPos, record it in usedHarvestPositions, and inform true
-
-        creep.memory.packedHarvestPos = packedPos
-        usedHarvestPositions.add(packedPos)
-        return true
-    }
-
-    // No harvestPos was found, inform false
-
-    return false */
 }
 
 Creep.prototype.hasPartsOfTypes = function(partTypes) {

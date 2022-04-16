@@ -109,11 +109,12 @@ declare global {
     `${StructureConstant}CSite` |
     'enemyCSites' |
     'allyCSites' |
+    'mineralHarvestPositions' |
+    'closestMineralHarvestPos' |
     'source1HarvestPositions' |
     'source1ClosestHarvestPos' |
     'source2HarvestPositions' |
     'source2ClosestHarvestPos' |
-    'mineralHarvestPos' |
     'centerUpgradePos' |
     'upgradePositions' |
     'source1Container' |
@@ -128,7 +129,8 @@ declare global {
     'controllerLink' |
     'source1Container' |
     'source2Container' |
-    'usedHarvestPositions' |
+    'usedMineralHarvestPositions' |
+    'usedSourceHarvestPositions' |
     'usedUpgradePositions' |
     'source1PathLength' |
     'source2PathLength' |
@@ -722,7 +724,9 @@ declare global {
 
         findOptimalRemoteSourceName(): boolean
 
-        findHarvestPosition(): boolean
+        findSourceHarvestPosition(): boolean
+
+        findMineralHarvestPosition(): boolean
 
         /**
          * Checks if the creep has some parts of specified types

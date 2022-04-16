@@ -56,6 +56,9 @@ export class Maintainer extends Creep {
 creepClasses.maintainer = Maintainer
 
 export class MineralHarvester extends Creep {
+
+    advancedHarvestMineral?(mineral: Mineral): boolean
+
     constructor(creepID: Id<Creep>) {
 
         super(creepID)

@@ -1,4 +1,4 @@
-import { SourceHarvester } from '../creepClasses'
+import { SourceHarvester } from '../../creepClasses'
 import './sourceHarvesterFunctions'
 
 export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {

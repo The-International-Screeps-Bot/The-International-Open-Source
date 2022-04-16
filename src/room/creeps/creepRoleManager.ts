@@ -1,6 +1,6 @@
 import './creepFunctions'
 
-import { sourceHarvesterManager } from './roleManagers/sourceHarvesterManager'
+import { sourceHarvesterManager } from './roleManagers/commune/sourceHarvesterManager'
 import { controllerUpgraderManager } from './roleManagers/commune/controllerUpgraderManager'
 import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvesterManager'
 import { antifaManager } from './roleManagers/antifa/antifaManager'

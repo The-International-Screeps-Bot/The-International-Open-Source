@@ -40,7 +40,7 @@ export function basePlanner(room: Room) {
 
     // Get and record the mineralHarvestPos as avoid
 
-    const mineralHarvestPos: RoomPosition = room.get('mineralHarvestPos')
+    const mineralHarvestPos: RoomPosition = room.get('closestMineralHarvestPos')
     baseCM.set(mineralHarvestPos.x, mineralHarvestPos.y, 255)
 
     // Record the positions around sources as unusable

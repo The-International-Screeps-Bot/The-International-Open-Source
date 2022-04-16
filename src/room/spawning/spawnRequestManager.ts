@@ -388,7 +388,7 @@ export function spawnRequester(room: Room) {
 
     // Construct requests for sourceHarvesters
 
-    constructSpawnRequests((function(): SpawnRequestOpts {
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
 
         if (spawnEnergyCapacity >= 800) {
 
@@ -500,6 +500,39 @@ export function spawnRequester(room: Room) {
             priority: 0.5 + room.creepsFromRoom.hauler.length,
             memoryAdditions: {
                 role: 'hauler',
+            }
+        }
+    })())
+
+    // Construct requests for mineralHarvesters
+
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+        // If there is no extractor, inform false
+
+        if (!room.get('extractor').length) return false
+
+        if (!room.storage || room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < 40000) return false
+
+        // If there is no terminal, inform false
+
+        if (!room.terminal) return false
+
+        // Get the mineral. If it's out of resources, inform false
+
+        const mineral: Mineral = room.get('mineral')
+        if (mineral.mineralAmount == 0) return false
+
+        return {
+            defaultParts: [],
+            extraParts: [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, CARRY, MOVE, WORK],
+            partsMultiplier: room.get('mineralHarvestPositions')?.length * 3,
+            minCreeps: undefined,
+            maxCreeps: Infinity,
+            minCost: 1200,
+            priority: 3 + room.creepsFromRoom.mineralHarvester.length,
+            memoryAdditions: {
+                role: 'mineralHarvester',
             }
         }
     })())

@@ -1,9 +1,54 @@
+import { constants } from "international/constants"
+import { getRangeBetween, unPackAsPos, unPackAsRoomPos } from "international/generalFunctions"
 import { MineralHarvester } from "../../creepClasses"
 
-MineralHarvester.prototype.advancedHarvestMineral = function() {
+MineralHarvester.prototype.advancedHarvestMineral = function(mineral) {
 
-    const creep: MineralHarvester = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room
 
+    // Try to find a harvestPosition, inform false if it failed
 
+    if (!creep.findMineralHarvestPosition()) return false
+
+    creep.say('🚬')
+
+    // Unpack the creep's packedHarvestPos
+
+    const harvestPos = unPackAsRoomPos(creep.memory.packedHarvestPos, room.name)
+
+    // If the creep is not standing on the harvestPos
+
+    if (getRangeBetween(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) > 0) {
+
+        // Make a move request to it
+
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: harvestPos, range: 0 },
+            avoidEnemyRanges: true,
+            weightGamebjects: {
+                1: room.get('road')
+            }
+        })
+
+        // And inform false
+
+        return false
+    }
+
+    // Harvest the mineral, informing the result if it didn't succeed
+
+    if (creep.harvest(mineral) != OK) return false
+
+    // Find amount of minerals harvested and record it in data
+
+    const energyHarvested = Math.min(creep.partsOfType(WORK) * HARVEST_POWER, mineral.mineralAmount)
+    Memory.energyHarvested += energyHarvested
+
+    creep.say('⛏️' + energyHarvested)
+
+    // Inform true
+
+    return true
 }

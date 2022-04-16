@@ -348,7 +348,7 @@ Room.prototype.get = function(roomObjectName) {
      * @param source source of which to find harvestPositions for
      * @returns source's harvestPositions, a list of positions
      */
-     function findSourceHarvestPositions(source: Source): Pos[] {
+     function findHarvestPositions(source: Source): Pos[] {
 
         // Stop and inform empty array if there is no source
 
@@ -388,7 +388,7 @@ Room.prototype.get = function(roomObjectName) {
     * @param harvestPositions array of RoomPositions to filter
     * @returns the closest harvestPosition to the room's anchor
     */
-    function findClosestSourceHarvestPos(harvestPositions: RoomPosition[]): false | RoomPosition {
+    function findClosestHarvestPos(harvestPositions: RoomPosition[]): false | RoomPosition {
 
         // Get the room anchor, stopping if it's undefined
 
@@ -401,6 +401,30 @@ Room.prototype.get = function(roomObjectName) {
     }
 
     new RoomObject({
+        name: 'mineralHarvestPositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() {
+
+            return findHarvestPositions(room.roomObjects.mineral.getValue())
+        }
+    })
+
+    new RoomObject({
+        name: 'closestMineralHarvestPos',
+        valueType: 'pos',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() {
+
+            return findClosestHarvestPos(room.roomObjects.mineralHarvestPositions.getValue())
+        }
+    })
+
+    new RoomObject({
         name: 'source1HarvestPositions',
         valueType: 'object',
         cacheType: 'global',
@@ -408,7 +432,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findSourceHarvestPositions(room.roomObjects.source1.getValue())
+            return findHarvestPositions(room.roomObjects.source1.getValue())
         }
     })
 
@@ -420,7 +444,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findClosestSourceHarvestPos(room.roomObjects.source1HarvestPositions.getValue())
+            return findClosestHarvestPos(room.roomObjects.source1HarvestPositions.getValue())
         }
     })
 
@@ -432,7 +456,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findSourceHarvestPositions(room.roomObjects.source2.getValue())
+            return findHarvestPositions(room.roomObjects.source2.getValue())
         }
     })
 
@@ -444,62 +468,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findClosestSourceHarvestPos(room.roomObjects.source2HarvestPositions.getValue())
-        }
-    })
-
-    function findMineralHarvestPos(): Pos | false {
-
-        // Get the room's mineral
-
-        const mineral: Mineral = room.roomObjects.mineral.getValue(),
-
-        // Construct harvestPositions
-
-        harvestPositions: RoomPosition[] = [],
-
-        // Get terrain in room
-
-        terrain = Game.map.getRoomTerrain(room.name),
-
-        // Find positions adjacent to mineral
-
-        adjacentPositions = findPositionsInsideRect(mineral.pos.x - 1, mineral.pos.y - 1, mineral.pos.x + 1, mineral.pos.y + 1)
-
-        // Loop through postions of adjacentPositions
-
-        for (const pos of adjacentPositions) {
-
-            // Iterate if terrain for pos is a wall
-
-            if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
-
-            // Add pos to harvestPositions
-
-            harvestPositions.push(room.newPos(pos))
-        }
-
-        // Get the anchor, informing false if it's undefined
-
-        const anchor: RoomPosition = room.roomObjects.anchor.getValue()
-        if (!anchor) return false
-
-        // Inform the closest pos of harvestPositions to the anchor
-
-        return anchor.findClosestByRange(harvestPositions)
-    }
-
-    // Mineral harvest pos
-
-    new RoomObject({
-        name: 'mineralHarvestPos',
-        valueType: 'pos',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor: function() {
-
-            return findMineralHarvestPos()
+            return findClosestHarvestPos(room.roomObjects.source2HarvestPositions.getValue())
         }
     })
 
@@ -605,9 +574,44 @@ Room.prototype.get = function(roomObjectName) {
         }
     })
 
-    // usedHarvestPositions
+    // usedMineralHarvestPositions
 
-    function findUsedHarvestPositions() {
+    function findUsedMineralHarvestPositions() {
+
+        // Construct usedHarvestPositions
+
+        const usedHarvestPositions: Set<number> = new Set()
+
+        // Loop through each sourceHarvester's name in the room
+
+        for (const creepName of room.creepsFromRoom.mineralHarvester) {
+
+            // Get the creep using its name
+
+            const creep: SourceHarvester = Game.creeps[creepName]
+
+            // If the creep has a packedHarvestPos, record it in usedHarvestPositions
+
+            if (creep.memory.packedHarvestPos) usedHarvestPositions.add(creep.memory.packedHarvestPos)
+        }
+
+        // Inform usedHarvestPositions
+
+        return usedHarvestPositions
+    }
+
+    new RoomObject({
+        name: 'usedMineralHarvestPositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 1,
+        room,
+        valueConstructor: findUsedMineralHarvestPositions
+    })
+
+    // usedSourceHarvestPositions
+
+    function findUsedSourceHarvestPositions() {
 
         // Construct usedHarvestPositions
 
@@ -645,12 +649,12 @@ Room.prototype.get = function(roomObjectName) {
     }
 
     new RoomObject({
-        name: 'usedHarvestPositions',
+        name: 'usedSourceHarvestPositions',
         valueType: 'object',
         cacheType: 'global',
         cacheAmount: 1,
         room,
-        valueConstructor: findUsedHarvestPositions
+        valueConstructor: findUsedSourceHarvestPositions
     })
 
     // usedUpgradePositions
@@ -802,7 +806,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the mineralHarvestPos, informing false if it's undefined
 
-        const mineralHarvestPos: RoomPosition = room.roomObjects.mineralHarvestPos.getValue()
+        const mineralHarvestPos: RoomPosition = room.roomObjects.closestMineralHarvestPos.getValue()
         if (!mineralHarvestPos) return false
 
         // Look at the mineralHarvestPos for structures
