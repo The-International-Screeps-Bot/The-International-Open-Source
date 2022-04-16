@@ -1715,13 +1715,17 @@ Creep.prototype.advancedSignController = function() {
 
     let signMessage: string
 
+    // If the room is owned by an enemy or an ally, inform false
+
+    if (room.memory.type == 'ally' || room.memory.type == 'enemy') return false
+
     // If the room is a commune
 
     if (room.memory.type == 'commune') {
 
-        // If the room already has a correct sign, inform true
+        // If the room already has a correct sign, inform false
 
-        if (room.controller.sign && constants.communeSigns.includes(room.controller.sign.text)) return true
+        if (room.controller.sign && constants.communeSigns.includes(room.controller.sign.text)) return false
 
         // Otherwise assign the signMessage the commune sign
 
@@ -1732,9 +1736,9 @@ Creep.prototype.advancedSignController = function() {
 
     else {
 
-        // If the room already has a correct sign, inform true
+        // If the room already has a correct sign, inform false
 
-        if (room.controller.sign && constants.nonCommuneSigns.includes(room.controller.sign.text)) return true
+        if (room.controller.sign && constants.nonCommuneSigns.includes(room.controller.sign.text)) return false
 
         // Otherwise get a rounded random value based on the length of nonCommuneSign
 
@@ -1759,7 +1763,7 @@ Creep.prototype.advancedSignController = function() {
             swampCost: 0,
         })
 
-        return false
+        return true
     }
 
     // Otherwise Try to sign the controller, informing the result
