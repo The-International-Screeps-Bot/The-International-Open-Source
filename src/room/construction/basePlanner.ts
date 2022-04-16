@@ -196,7 +196,7 @@ export function basePlanner(room: Room) {
         // Mark as avoid in road and base cost matrixes
 
         baseCM.set(upgradePos.x, upgradePos.y, 255)
-        roadCM.set(upgradePos.x, upgradePos.y, 255)
+        roadCM.set(upgradePos.x, upgradePos.y, 20)
     }
 
     // Try to plan the stamp
