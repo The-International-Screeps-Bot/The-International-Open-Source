@@ -590,6 +590,10 @@ Room.prototype.get = function(roomObjectName) {
 
             const creep: SourceHarvester = Game.creeps[creepName]
 
+            // If the creep is dying, iterate
+
+            if (creep.isDying()) continue
+
             // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 
             if (creep.memory.packedHarvestPos) usedHarvestPositions.add(creep.memory.packedHarvestPos)
@@ -627,7 +631,11 @@ Room.prototype.get = function(roomObjectName) {
 
             // Get the creep using its name
 
-            const creep: SourceHarvester = Game.creeps[creepName]
+            const creep = Game.creeps[creepName]
+
+            // If the creep is dying, iterate
+
+            if (creep.isDying()) continue
 
             // Get the creep's sourceName, if there is none iterate
 
@@ -703,7 +711,11 @@ Room.prototype.get = function(roomObjectName) {
 
             // Get the creep using its name
 
-            const creep: ControllerUpgrader = Game.creeps[creepName]
+            const creep = Game.creeps[creepName]
+
+            // If the creep is dying, iterate
+
+            if (creep.isDying()) continue
 
             // If the creep has a packedUpgradePos, record it in usedUpgradePositions
 
