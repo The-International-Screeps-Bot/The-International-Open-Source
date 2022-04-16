@@ -1,4 +1,4 @@
-import { Claimer } from '../creepClasses'
+import { Claimer } from '../../creepClasses'
 import './claimerFunctions'
 
 export function claimerManager(room: Room, creepsOfRole: string[]) {

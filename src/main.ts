@@ -82,6 +82,7 @@ declare global {
     'builder' |
     'maintainer' |
     'mineralHarvester' |
+    'hubHauler' |
     'meleeDefender' |
     'remoteHarvester' |
     'remoteHauler' |
@@ -887,6 +888,16 @@ declare global {
          * The name of the room the creep is trying to claim
          */
         claimTarget: string
+
+        /**
+         * The type of task the creep has been assigned
+         */
+        task: RoomTaskTypes
+
+        /**
+         * The target ID of the task
+         */
+        taskTarget: Id<any>
     }
 
     // PowerCreeps

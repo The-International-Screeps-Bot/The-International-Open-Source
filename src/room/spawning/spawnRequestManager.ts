@@ -537,6 +537,27 @@ export function spawnRequester(room: Room) {
         }
     })())
 
+    // Construct requests for hubHaulers
+
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+        // If there is no terminal or storage, inform false
+
+        if (!room.storage || !room.terminal) return false
+
+        return {
+            defaultParts: [MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY],
+            extraParts: [],
+            partsMultiplier: 1,
+            minCreeps: 1,
+            minCost: 750,
+            priority: 3,
+            memoryAdditions: {
+                role: 'hubHauler',
+            }
+        }
+    })())
+
     // Get enemyAttackers in the room
 
     const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
@@ -872,26 +893,26 @@ export function spawnRequester(room: Room) {
         }
     })())
 
-        // Construct requests for scouts
+    // Construct requests for claimers
 
-        constructSpawnRequests((function(): SpawnRequestOpts | false {
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-            // If there is no claimTarget, inform false
+        // If there is no claimTarget, inform false
 
-            if (!Memory.claimTarget) return false
+        if (!Memory.claimTarget) return false
 
-            return {
-                defaultParts: [MOVE, MOVE, CLAIM, MOVE],
-                extraParts: [],
-                partsMultiplier: 1,
-                minCreeps: 1,
-                minCost: 750,
-                priority: 3,
-                memoryAdditions: {
-                    role: 'claimer',
-                }
+        return {
+            defaultParts: [MOVE, MOVE, CLAIM, MOVE],
+            extraParts: [],
+            partsMultiplier: 1,
+            minCreeps: 1,
+            minCost: 750,
+            priority: 3,
+            memoryAdditions: {
+                role: 'claimer',
             }
-        })())
+        }
+    })())
 
     // Inform spawnRequests
 

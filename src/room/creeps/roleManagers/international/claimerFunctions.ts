@@ -1,4 +1,4 @@
-import { Claimer } from "../creepClasses"
+import { Claimer } from "../../creepClasses"
 
 Claimer.prototype.claimRoom = function() {
 

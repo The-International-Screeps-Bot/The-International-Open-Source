@@ -6,14 +6,15 @@ import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvester
 import { antifaManager } from './roleManagers/antifa/antifaManager'
 import { maintainerManager } from './roleManagers/commune/maintainerManager'
 import { builderManager } from './roleManagers/commune/builderManager'
-import { scoutManager } from './roleManagers/scoutManager'
+import { scoutManager } from './roleManagers/international/scoutManager'
 import { constants } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import { haulerManager } from './roleManagers/commune/haulerManager'
 import { remoteHarvesterManager } from './roleManagers/remote/remoteHarvesterManager'
 import { remoteHaulerManager } from './roleManagers/remote/remoteHaulerManager'
-import { claimerManager } from './roleManagers/claimerManager'
+import { claimerManager } from './roleManagers/international/claimerManager'
 import { meleeDefenderManager } from './roleManagers/commune/meleeDefenderManager'
+import { hubHaulerManager } from './roleManagers/commune/hubHaulerManager'
 
 export function roleManager(room: Room) {
 
@@ -30,6 +31,7 @@ export function roleManager(room: Room) {
         builder: builderManager,
         maintainer: maintainerManager,
         mineralHarvester: mineralHarvesterManager,
+        hubHauler: hubHaulerManager,
         meleeDefender: meleeDefenderManager,
         remoteHarvester: remoteHarvesterManager,
         remoteHauler: remoteHaulerManager,

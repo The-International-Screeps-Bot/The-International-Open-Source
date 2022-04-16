@@ -66,6 +66,20 @@ export class MineralHarvester extends Creep {
 }
 creepClasses.mineralHarvester = MineralHarvester
 
+export class HubHauler extends Creep {
+
+    travelToHub?(): boolean
+
+    balanceStoringStructures?(): boolean
+
+    constructor(creepID: Id<Creep>) {
+
+        super(creepID)
+
+    }
+}
+creepClasses.hubHauler = HubHauler
+
 export class MeleeDefender extends Creep {
 
     advancedDefend?(): boolean

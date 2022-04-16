@@ -1,4 +1,4 @@
-import { Scout } from "../creepClasses"
+import { Scout } from "../../creepClasses"
 
 Scout.prototype.findScoutTarget = function() {
 

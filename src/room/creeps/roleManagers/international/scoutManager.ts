@@ -1,4 +1,4 @@
-import { Scout } from '../creepClasses'
+import { Scout } from '../../creepClasses'
 import './scoutFunctions'
 
 export function scoutManager(room: Room, creepsOfRole: string[]) {
