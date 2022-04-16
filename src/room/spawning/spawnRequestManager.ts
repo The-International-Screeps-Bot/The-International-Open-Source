@@ -525,11 +525,11 @@ export function spawnRequester(room: Room) {
 
         return {
             defaultParts: [],
-            extraParts: [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, CARRY, MOVE, WORK],
-            partsMultiplier: room.get('mineralHarvestPositions')?.length * 3,
+            extraParts: [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, MOVE, CARRY, CARRY, MOVE, WORK],
+            partsMultiplier: room.get('mineralHarvestPositions')?.length * 4,
             minCreeps: undefined,
             maxCreeps: room.get('mineralHarvestPositions')?.length,
-            minCost: 1200,
+            minCost: 900,
             priority: 3 + room.creepsFromRoom.mineralHarvester.length,
             memoryAdditions: {
                 role: 'mineralHarvester',
