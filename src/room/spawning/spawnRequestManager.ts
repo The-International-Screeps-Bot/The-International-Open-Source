@@ -607,11 +607,11 @@ export function spawnRequester(room: Room) {
 
             return {
                 defaultParts: [],
-                extraParts: [WORK, CARRY, MOVE],
+                extraParts: [WORK, WORK, MOVE, CARRY, CARRY, MOVE, CARRY, CARRY, MOVE, CARRY, MOVE, WORK],
                 partsMultiplier,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
-                minCost: 200,
+                minCost: 750,
                 priority: 3.5 + room.creepsFromRoom.builder.length,
                 memoryAdditions: {
                     role: 'builder',
