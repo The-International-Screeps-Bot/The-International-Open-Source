@@ -1,4 +1,4 @@
-import { constants } from "international/constants"
+import { boostMultipliers, constants } from "international/constants"
 import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
 import { repeat } from "lodash"
 import { RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
@@ -936,14 +936,9 @@ Creep.prototype.hasPartsOfTypes = function(partTypes) {
 
     const creep = this
 
-    // Loop through each specified partType
+    // If the doesn't have any parts of the specified types, inform false
 
-    for (const partType of partTypes) {
-
-        // If the doesn't have any parts of the specified type, inform false
-
-        if (!creep.body.some(part => part.type == partType)) return false
-    }
+    if (!creep.body.some(part => partTypes.includes(part.type))) return false
 
     // If the creep has all the parts, inform true
 
@@ -1785,4 +1780,30 @@ Creep.prototype.isOnExit = function() {
 
     if (x <= 0 || x >= 49 || y <= 0 || y >= 49) return true
     return false
+}
+
+Creep.prototype.findHealPower = function() {
+
+    const creep = this
+
+    // Initialize the healValue
+
+    let healValue = 0
+
+    // Loop through the creep's body
+
+    for (const part of creep.body) {
+
+        // If the part isn't heal, iterate
+
+        if (part.type != HEAL) continue
+
+        // Otherwise increase healValue by heal power * the part's boost
+
+        healValue += HEAL_POWER * boostMultipliers.HEAL[part.boost]
+    }
+
+    // Inform healValue
+
+    return healValue
 }

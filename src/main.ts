@@ -82,6 +82,7 @@ declare global {
     'builder' |
     'maintainer' |
     'mineralHarvester' |
+    'meleeDefender' |
     'remoteHarvester' |
     'remoteHauler' |
     /*'remoteReserver' |
@@ -804,6 +805,8 @@ declare global {
         advancedSignController(): boolean
 
         isOnExit(): boolean
+
+        findHealPower(): number
     }
 
     interface CreepMemory {

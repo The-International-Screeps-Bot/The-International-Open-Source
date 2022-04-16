@@ -1,4 +1,4 @@
-import { constants } from "international/constants"
+import { allyList, constants } from "international/constants"
 import { findObjectWithID } from "international/generalFunctions"
 
 /**
@@ -67,7 +67,7 @@ export function roomVisualsManager(room: Room) {
                     return constants.colors.lightBlue
                 }
 
-                if (constants.allyList.has(room.controller.reservation.username)) {
+                if (allyList.has(room.controller.reservation.username)) {
 
                     return constants.colors.green
                 }

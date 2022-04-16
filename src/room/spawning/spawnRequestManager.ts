@@ -1,4 +1,4 @@
-import { remoteNeedsIndex } from "international/constants"
+import { allyList, constants, remoteNeedsIndex } from "international/constants"
 import { customLog, findCarryPartsRequired } from "international/generalFunctions"
 
 
@@ -530,9 +530,45 @@ export function spawnRequester(room: Room) {
             minCreeps: undefined,
             maxCreeps: room.get('mineralHarvestPositions')?.length,
             minCost: 900,
-            priority: 3 + room.creepsFromRoom.mineralHarvester.length,
+            priority: 6 + room.creepsFromRoom.mineralHarvester.length,
             memoryAdditions: {
                 role: 'mineralHarvester',
+            }
+        }
+    })())
+
+    // Construct requests for meleeDefenders
+
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+        // Get enemyAttackers in the room, informing false if there are none
+
+        const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+            filter: creep => !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
+        })
+        if(!enemyAttackers.length) return false
+
+        let attackValue = 0
+
+        // Loop through each enemyAttacker
+
+        for (const enemyAttacker of enemyAttackers) {
+
+            // Increase attackValue by the creep's heal power
+
+            attackValue += enemyAttacker.findHealPower() / HEAL_POWER + enemyAttacker.partsOfType(WORK) + enemyAttacker.partsOfType(ATTACK) + enemyAttacker.partsOfType(RANGED_ATTACK)
+        }
+
+        return {
+            defaultParts: [],
+            extraParts: [ATTACK, ATTACK, MOVE],
+            partsMultiplier: attackValue,
+            minCreeps: undefined,
+            maxCreeps: Math.max(enemyAttackers.length, 5),
+            minCost: 210,
+            priority: 2 + room.creepsFromRoom.meleeDefender.length,
+            memoryAdditions: {
+                role: 'meleeDefender',
             }
         }
     })())

@@ -1,5 +1,5 @@
-import { constants } from "international/constants"
-import { findObjectWithID } from "international/generalFunctions"
+import { allyList } from "international/constants"
+import { customLog, findObjectWithID } from "international/generalFunctions"
 
 
 /**
@@ -10,9 +10,9 @@ export function defenceManager(room: Room) {
     // Get enemyAttackers in the room
 
     const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-        filter: creep => !constants.allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([WORK || ATTACK || RANGED_ATTACK])
+        filter: creep => !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
     })
-
+    customLog('ATTACKERS', enemyAttackers)
     manageRampartPublicity()
 
     function manageRampartPublicity() {
@@ -49,7 +49,7 @@ export function defenceManager(room: Room) {
         }
     }
 
-    advancedActivateSafeMode()
+    /* advancedActivateSafeMode() */
 
     function advancedActivateSafeMode() {
 

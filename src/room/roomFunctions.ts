@@ -1,4 +1,4 @@
-import { constants } from 'international/constants'
+import { allyList, constants } from 'international/constants'
 import { advancedFindDistance, arePositionsEqual, customLog, findPositionsInsideRect, unPackAsRoomPos } from 'international/generalFunctions'
 import { ControllerUpgrader, SourceHarvester } from './creeps/creepClasses'
 import { RoomObject } from './roomObject'
@@ -320,7 +320,7 @@ Room.prototype.get = function(roomObjectName) {
             // Inform constuction sites that aren't owned by a member of the allyList
 
             return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => !constants.allyList.has(cSite.owner.username)
+                filter: cSite => !allyList.has(cSite.owner.username)
             })
         }
     })
@@ -336,7 +336,7 @@ Room.prototype.get = function(roomObjectName) {
             // Inform constuction sites that aren't owned by a member of the allyList
 
             return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => constants.allyList.has(cSite.owner.username)
+                filter: cSite => allyList.has(cSite.owner.username)
             })
         }
     })
@@ -1000,7 +1000,7 @@ Room.prototype.get = function(roomObjectName) {
         valueConstructor: function() {
 
             return room.find(FIND_HOSTILE_CREEPS, {
-                filter: creep => !constants.allyList.has(creep.owner.username)
+                filter: creep => !allyList.has(creep.owner.username)
             })
         }
     })
@@ -1014,7 +1014,7 @@ Room.prototype.get = function(roomObjectName) {
         valueConstructor: function() {
 
             return room.find(FIND_HOSTILE_CREEPS, {
-                filter: creep => constants.allyList.has(creep.owner.username)
+                filter: creep => allyList.has(creep.owner.username)
             })
         }
     })
@@ -1332,7 +1332,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     // Stop if avoidEnemyRanges isn't specified
 
-                    if (opts.avoidEnemyRanges) return
+                    if (!opts.avoidEnemyRanges) return
 
                     // Stop if the is a controller, it's mine, and it's in safemode
 
@@ -1378,7 +1378,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         // Otherwise if the rampart is owned by an ally, iterate
 
-                        if (constants.allyList.has(rampart.owner.username)) continue
+                        if (allyList.has(rampart.owner.username)) continue
 
                         // Otherwise set the rampart's pos as impassible
 
@@ -1547,7 +1547,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // If the controller is owned by an ally
 
-            if (constants.allyList.has(controller.owner.username)) {
+            if (allyList.has(controller.owner.username)) {
 
                 // Set the type to ally and stop
 
@@ -1595,7 +1595,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // If the controller is not reserved by an ally
 
-            if (!constants.allyList.has(controller.reservation.username)) {
+            if (!allyList.has(controller.reservation.username)) {
 
                 // If the reserver is an Invader, inform false
 
@@ -1639,7 +1639,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                     // If the creep is owned by an ally
 
-                    if (constants.allyList.has(creep.owner.username)) {
+                    if (allyList.has(creep.owner.username)) {
 
                         // Set type to allyRemote and stop
 

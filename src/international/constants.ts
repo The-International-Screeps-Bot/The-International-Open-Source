@@ -11,11 +11,6 @@ interface Constants {
     mmoShardNames: Set<string>
 
     /**
-     * An array of usernames of players to treat as allies
-     */
-    allyList: Set<string>
-
-    /**
      * An array of usernames of players to avoid trading with
      */
     tradeBlacklist: Set<string>
@@ -89,13 +84,13 @@ constants.mmoShardNames = new Set([
     'shard3'
 ])
 
-constants.allyList = new Set([
+export const allyList = new Set([
     "asdpof",
     "MarvinTMB",
     "Mitsuyoshi",
     "Modus",
     "Silten",
-    "Sneaky_Polar_Bear",
+    /* "Sneaky_Polar_Bear", */
     "Yoner",
 ])
 
@@ -182,6 +177,7 @@ constants.creepRoles = [
     'builder',
     'maintainer',
     'mineralHarvester',
+    'meleeDefender',
     'remoteHarvester',
     'remoteHauler',
     /*'remoteReserver',
@@ -409,4 +405,12 @@ export const remoteNeedsIndex = {
     remoteHarvester: 0,
     remoteHauler: 1,
     remoteReserver: 2,
+}
+
+export const boostMultipliers = {
+    HEAL: {
+        LO: 2,
+        LHO2: 3,
+        XLHO2: 4,
+    }
 }
