@@ -1039,11 +1039,17 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            // Sort the room's remotes based on the lowest source efficacy
+            // Filter rooms that have some sourceEfficacies recorded
 
-            return room.memory.remotes.sort(function(a, b) {
+            const remotesWithEfficacies = room.memory.remotes.filter(function(roomName) {
+                return Memory.rooms[roomName].sourceEfficacies.length
+            })
+            
+            // Sort the remotes based on the average source efficacy
 
-                return Math.min(...Memory.rooms[a].sourceEfficacies) - Math.min(...Memory.rooms[b].sourceEfficacies)
+            return remotesWithEfficacies.sort(function(a1, b1) {
+
+                return (Memory.rooms[a1].sourceEfficacies.reduce((a2, b2) => a2 + b2) / Memory.rooms[a1].sourceEfficacies.length) - (Memory.rooms[b1].sourceEfficacies.reduce((a2, b2) => a2 + b2) / Memory.rooms[b1].sourceEfficacies.length)
             })
         }
     })
@@ -1685,9 +1691,9 @@ Room.prototype.findType = function(scoutingRoom: Room) {
                 highway: Infinity,
             })
 
-        // If distance from scoutingRoom is less than 3
+        // If distance from scoutingRoom is less than 4
 
-        if (distanceFromScoutingRoom < 3) {
+        if (distanceFromScoutingRoom < 4) {
 
             // Set roomType as remote and assign commune as scoutingRoom's name
 
@@ -1705,24 +1711,21 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             room.memory.sourceEfficacies = []
 
-            // Get base planning data
-
-            const /* roadCM: CostMatrix = room.get('roadCM'),
-            structurePlans: CostMatrix = room.get('structurePlans'),
- */
-
             // Get the hubAnchor, stopping if it's undefined
 
-            hubAnchor: RoomPosition = global[scoutingRoom.name].stampAnchors?.hub[0]
+            const hubAnchor: RoomPosition = global[scoutingRoom.name].stampAnchors?.hub[0]
             if (!hubAnchor) return
+
+            // Get base planning data
+
+            /*
+            const roadCM: CostMatrix = room.get('roadCM'),
+            structurePlans: CostMatrix = room.get('structurePlans'),
+            */
 
             // Get the room's sourceNames
 
             const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
-
-            // Construct the sourceIndex
-
-            let sourceIndex = 0
 
             // loop through sourceNames
 
@@ -1731,7 +1734,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
                 // Get the source using sourceName, iterating if undefined
 
                 const source: Source = room.get(sourceName)
-                if (!source) continue
+                if (!source) break
 
                 // Path from the centerUpgradePos to the closestHarvestPos
 
@@ -1743,7 +1746,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                 // Record the length of the path in the room's memory
 
-                room.memory.sourceEfficacies[sourceIndex] = path.length
+                room.memory.sourceEfficacies.push(path.length)
 
                 /*
                 // Loop through positions of the path
@@ -1758,10 +1761,6 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                     structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
                 } */
-
-                // Increment the sourceIndex
-
-                sourceIndex++
             }
 
             // Stop

@@ -39,7 +39,7 @@ export function storageStructuresManager(room: Room) {
 
             let totalResourcesOffered = 0
 
-            // Loop through each pickup task
+            // Loop through each task
 
             for (const task of structuresWithdrawTasks) {
 

@@ -92,7 +92,7 @@ export function spawnRequester(room: Room) {
 
         // Get the maxCostPerCreep
 
-        const maxCostPerCreep = decideMaxCostPerCreep(opts.maxCostPerCreep)
+        const maxCostPerCreep = Math.max(decideMaxCostPerCreep(opts.maxCostPerCreep), opts.minCost)
 
         // So long as minCreeps is more than the current number of creeps
 
@@ -182,11 +182,11 @@ export function spawnRequester(room: Room) {
 
                         // Get the part using the partIndex
 
-                        const part = opts.extraParts[partIndex]
+                        const part = opts.extraParts[partIndex],
 
                         // Get the cost of the part
 
-                        const partCost = BODYPART_COST[part]
+                        partCost = BODYPART_COST[part]
 
                         // If the cost minus partCost is below minCost, stop the loop
 
@@ -235,11 +235,15 @@ export function spawnRequester(room: Room) {
 
         // Get the maxCostPerCreep
 
-        const maxCostPerCreep = decideMaxCostPerCreep(opts.maxCostPerCreep)
+        const maxCostPerCreep = Math.max(decideMaxCostPerCreep(opts.maxCostPerCreep), opts.minCost)
 
         // Find the totalExtraParts using the partsMultiplier
 
-        let totalExtraParts = opts.extraParts.length * opts.partsMultiplier
+        let totalExtraParts = Math.floor(opts.extraParts.length * opts.partsMultiplier)
+
+        // Construct from totalExtraParts at a max of 50 - number of defaultParts
+
+        const maxPartsPerCreep = Math.min(50 - opts.defaultParts.length, totalExtraParts)
 
         // Loop through creep names of the requested role
 
@@ -249,10 +253,6 @@ export function spawnRequester(room: Room) {
 
             totalExtraParts -= (Game.creeps[creepName].body.length - opts.defaultParts.length)
         }
-
-        // Construct from totalExtraParts at a max of 50
-
-        const maxPartsPerCreep = Math.min(50, totalExtraParts)
 
         // If there aren't enough requested parts to justify spawning a creep, stop
 
@@ -264,7 +264,7 @@ export function spawnRequester(room: Room) {
 
         // So long as there are totalExtraParts left to assign
 
-        while (totalExtraParts > 0 && opts.maxCreeps > 0) {
+        while (totalExtraParts >= opts.extraParts.length && opts.maxCreeps > 0) {
 
             // Construct important imformation for the spawnRequest
 
@@ -278,7 +278,7 @@ export function spawnRequester(room: Room) {
 
             // If there are defaultParts
 
-            if (opts.defaultParts.length > 0) {
+            if (opts.defaultParts.length) {
 
                 // Increment tier
 
@@ -331,23 +331,23 @@ export function spawnRequester(room: Room) {
 
             // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
 
-            if (cost > maxCostPerCreep || remainingAllowedParts < 0 || body.length > 50) {
+            if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
 
                 // Assign partIndex as the length of extraParts
 
                 let partIndex = opts.extraParts.length - 1
 
-                // So long as partIndex is above -1
+                // So long as partIndex is greater or equal to 0
 
-                while (partIndex > -1) {
+                while (partIndex >= 0) {
 
                     // Get the part using the partIndex
 
-                    const part = opts.extraParts[partIndex]
+                    const part = opts.extraParts[partIndex],
 
                     // Get the cost of the part
 
-                    const partCost = BODYPART_COST[part]
+                    partCost = BODYPART_COST[part]
 
                     // If the cost minus partCost is below minCost, stop the loop
 
@@ -846,7 +846,7 @@ export function spawnRequester(room: Room) {
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 200,
-                priority: 4 + remoteEconIndex,
+                priority: 4.1 + remoteEconIndex,
                 memoryAdditions: {
                     role: 'remoteHauler',
                 }

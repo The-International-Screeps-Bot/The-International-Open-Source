@@ -234,7 +234,7 @@ declare global {
         maxCostPerCreep?: number | undefined
         minCost: number
         priority: number
-        memoryAdditions: any
+        memoryAdditions: Partial<CreepMemory>
     }
 
     interface ExtraOpts {

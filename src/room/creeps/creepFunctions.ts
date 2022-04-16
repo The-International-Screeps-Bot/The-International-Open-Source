@@ -1,7 +1,7 @@
 import { boostMultipliers, constants } from "international/constants"
 import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
 import { repeat } from "lodash"
-import { RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
+import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
 
 Creep.prototype.isDying = function() {
 
@@ -637,7 +637,7 @@ Creep.prototype.advancedMaintain = function() {
     // Add control points to total controlPoints counter and say the success
 
     Memory.energySpentOnRepairing += energySpentOnRepairs
-    creep.say(repairTarget.structureType == STRUCTURE_RAMPART ? '🧱' : '🔧' + energySpentOnRepairs * REPAIR_POWER)
+    creep.say((repairTarget.structureType == STRUCTURE_RAMPART ? '🧱' : '🔧') + energySpentOnRepairs * REPAIR_POWER)
 
     // Implement the results of the repair pre-emptively
 
@@ -1181,64 +1181,82 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
 
             case 'pull':
 
-            // Iterate if the creep isn't empty
+                // Iterate if the creep isn't empty
 
-            if (creep.store.getUsedCapacity(task.resourceType) > 0) continue
-            break
+                if (creep.store.getUsedCapacity(task.resourceType) > 0) continue
+                break
 
             // If pickup
 
             case 'pickup':
 
-            // Iterate if the creep isn't looking for resources
+                // Iterate if the creep isn't looking for resources
 
-            if (!creep.needsResources()) continue
+                if (!creep.needsResources()) continue
 
-            // Iterate if the resourceType doesn't match the requested one
+                // Iterate if the resourceType doesn't match the requested one
 
-            if (task.resourceType != resourceType) continue
+                if (task.resourceType != resourceType) continue
 
-            // Otherwise set the task's taskAmount to the creep's free capacity
+                // Otherwise set the task's taskAmount to the creep's free capacity
 
-            (task as RoomPickupTask).taskAmount = creep.store.getFreeCapacity()
+                (task as RoomPickupTask).taskAmount = creep.store.getFreeCapacity()
 
-            break
+                break
+
+            // If offer
+
+            case 'offer':
+
+                // Iterate if the resourceType doesn't match the requested one
+
+                if (task.resourceType != resourceType) continue
+
+                // Iterate if the creep isn't looking for resources
+
+                if (!creep.needsResources()) continue
+
+                // Otherwise adjust the task's resource minimized to the creep's free capacity
+
+                (task as RoomOfferTask).taskAmount = Math.min(creep.store.getFreeCapacity(), (task as RoomOfferTask).taskAmount)
+
+                break
 
             // If withdraw
 
             case 'withdraw':
 
-            // Iterate if the resourceType doesn't match the requested one
+                // Iterate if the resourceType doesn't match the requested one
 
-            if (task.resourceType != resourceType) continue
+                if (task.resourceType != resourceType) continue
 
-            // Iterate if the creep isn't looking for resources
+                // Iterate if the creep isn't looking for resources
 
-            if (!creep.needsResources()) continue
+                if (!creep.needsResources()) continue
 
-            // Otherwise adjust the task's resource minimized to the creep's free capacity
+                // Otherwise adjust the task's resource minimized to the creep's free capacity
 
-            (task as RoomWithdrawTask).taskAmount = Math.min(creep.store.getFreeCapacity(), (task as RoomWithdrawTask).taskAmount)
+                (task as RoomWithdrawTask).taskAmount = Math.min(creep.store.getFreeCapacity(), (task as RoomWithdrawTask).taskAmount)
 
-            break
+                break
 
             // If transfer
 
             case 'transfer':
 
-            // If the creep isn't full of the requested resourceType and amount, iterate
+                // If the creep isn't full of the requested resourceType and amount, iterate
 
-            if (creep.store.getUsedCapacity(task.resourceType) == 0) continue
+                if (creep.store.getUsedCapacity(task.resourceType) == 0) continue
 
-            // Iterate if the resourceType doesn't match the requested one
+                // Iterate if the resourceType doesn't match the requested one
 
-            if (task.resourceType != resourceType) continue
+                if (task.resourceType != resourceType) continue
 
-            // Otherwise adjust the task's resource minimized to the creep's used capacity of the requested resource
+                // Otherwise adjust the task's resource minimized to the creep's used capacity of the requested resource
 
-            (task as RoomTransferTask).taskAmount = Math.min(creep.store.getUsedCapacity(task.resourceType), (task as RoomTransferTask).taskAmount)
+                (task as RoomTransferTask).taskAmount = Math.min(creep.store.getUsedCapacity(task.resourceType), (task as RoomTransferTask).taskAmount)
 
-            break
+                break
         }
 
         // Accept the task and stop the loop
@@ -1299,7 +1317,7 @@ Creep.prototype.recurseMoveRequest = function(packedPos, queue = []) {
     if (!creepNameAtPos) {
 
         // If there are no creeps at the pos, operate the moveRequest
-        
+
         creep.runMoveRequest(packedPos)
 
         // Otherwise, loop through each index of the queue
