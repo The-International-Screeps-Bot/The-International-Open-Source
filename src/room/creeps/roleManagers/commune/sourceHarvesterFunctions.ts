@@ -72,7 +72,7 @@ SourceHarvester.prototype.transferToSourceLink = function() {
 
     // If the creep is not nearly full, stop
 
-    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < creep.partsOfType(WORK) * HARVEST_POWER) return
+    if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > creep.partsOfType(WORK) * HARVEST_POWER) return
 
     // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
