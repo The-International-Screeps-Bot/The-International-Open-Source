@@ -51,9 +51,19 @@ Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENER
 
     const transferResult = creep.transfer(target, resourceType, amount)
 
-    // Inform true if the result is acceptable
+    // If the action can be considered a success
 
-    return transferResult == OK || transferResult == ERR_FULL || transferResult == ERR_NOT_ENOUGH_RESOURCES
+    if (transferResult == OK || transferResult == ERR_FULL || transferResult == ERR_NOT_ENOUGH_RESOURCES) {
+
+        // Record that the creep has done the action and inform true
+
+        creep.hasMovedResources = true
+        return true
+    }
+
+    // Otherwise inform false
+
+    return false
 }
 
 Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENERGY, amount) {
@@ -83,9 +93,19 @@ Creep.prototype.advancedWithdraw = function(target, resourceType = RESOURCE_ENER
 
     const withdrawResult = creep.withdraw(target, resourceType, amount)
 
-    // Inform true if the result is acceptable
+    // If the action can be considered a success
 
-    return withdrawResult == OK || withdrawResult == ERR_FULL
+    if (withdrawResult == OK || withdrawResult == ERR_FULL) {
+
+        // Record that the creep has done the action and inform true
+
+        creep.hasMovedResources = true
+        return true
+    }
+
+    // Otherwise inform false
+
+    return false
 }
 
 Creep.prototype.advancedPickup = function(target) {
@@ -111,9 +131,19 @@ Creep.prototype.advancedPickup = function(target) {
         return false
     }
 
-    // Try to pickup, informing the result
+    // Try to pickup. if the action can be considered a success
 
-    return creep.pickup(target) == OK
+    if (creep.pickup(target) == OK) {
+
+        // Record that the creep has done the action and inform true
+
+        creep.hasMovedResources = true
+        return true
+    }
+
+    // Otherwise inform false
+
+    return false
 }
 
 Creep.prototype.advancedHarvestSource = function(source) {
@@ -123,6 +153,10 @@ Creep.prototype.advancedHarvestSource = function(source) {
     // Harvest the source, informing the result if it didn't succeed
 
     if (creep.harvest(source) != OK) return false
+
+    // Record that the creep has worked
+
+    creep.hasWorked = true
 
     // Find amount of energy harvested and record it in data
 

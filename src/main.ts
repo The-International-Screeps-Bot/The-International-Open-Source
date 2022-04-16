@@ -658,6 +658,16 @@ declare global {
          */
         hasMoved: boolean
 
+        hasMovedResources: boolean
+
+        hasWorked: boolean
+
+        hasAttacked: boolean
+
+        hasRangedAttacked: boolean
+
+        hasHealed: boolean
+
         /**
          * Whether the creep is actively pulling another creep or not
          */

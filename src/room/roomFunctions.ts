@@ -1,5 +1,5 @@
 import { allyList, constants } from 'international/constants'
-import { advancedFindDistance, arePositionsEqual, customLog, findPositionsInsideRect, unPackAsRoomPos } from 'international/generalFunctions'
+import { advancedFindDistance, arePositionsEqual, customLog, findPositionsInsideRect, getRangeBetween, unPackAsRoomPos } from 'international/generalFunctions'
 import { ControllerUpgrader, SourceHarvester } from './creeps/creepClasses'
 import { RoomObject } from './roomObject'
 import { RoomTask } from './roomTasks'
@@ -904,6 +904,45 @@ Room.prototype.get = function(roomObjectName) {
 
     // Links
 
+    function findLink(anchor: RoomPosition | undefined): Id<Structure> | false {
+
+        // If the anchor isn't defined, inform false
+
+        if(!anchor) return false
+
+        // Otherwise get the room's links
+
+        const links: StructureLink[] = room.get('link')
+
+        // Inform a link's id if it's adjacent to the anchor
+
+        return links.find(link => getRangeBetween(anchor.x, anchor.y, link.pos.x, link.pos.y) == 1)?.id
+    }
+
+    new RoomObject({
+        name: 'source1Link',
+        valueType: 'id',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() {
+
+            return findLink(room.roomObjects.source1ClosestHarvestPos.getValue())
+        }
+    })
+
+    new RoomObject({
+        name: 'source2Link',
+        valueType: 'id',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() {
+
+            return findLink(room.roomObjects.source2ClosestHarvestPos.getValue())
+        }
+    })
+
     function findLinkAtPos(pos: RoomPosition): Id<Structure> | false {
 
         // Otherwise search based on an offset from the anchor's x
@@ -923,30 +962,6 @@ Room.prototype.get = function(roomObjectName) {
 
         return false
     }
-
-    new RoomObject({
-        name: 'source1Link',
-        valueType: 'id',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor: function() {
-
-            return findLinkAtPos(room.roomObjects.source1ClosestHarvestPos.getValue())
-        }
-    })
-
-    new RoomObject({
-        name: 'source2Link',
-        valueType: 'id',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor: function() {
-
-            return findLinkAtPos(room.roomObjects.source2ClosestHarvestPos.getValue())
-        }
-    })
 
     new RoomObject({
         name: 'controllerLink',
@@ -1044,7 +1059,7 @@ Room.prototype.get = function(roomObjectName) {
             const remotesWithEfficacies = room.memory.remotes.filter(function(roomName) {
                 return Memory.rooms[roomName].sourceEfficacies.length
             })
-            
+
             // Sort the remotes based on the average source efficacy
 
             return remotesWithEfficacies.sort(function(a1, b1) {

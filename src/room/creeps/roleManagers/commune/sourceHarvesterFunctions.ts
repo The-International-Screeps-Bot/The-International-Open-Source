@@ -67,19 +67,22 @@ SourceHarvester.prototype.travelToSource = function() {
 
 SourceHarvester.prototype.transferToSourceLink = function() {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+    room = creep.room
+
+    // If the creep is not nearly full, stop
+
+    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < creep.partsOfType(WORK) * HARVEST_POWER) return
 
     // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
     const sourceLink = room.get(`${creep.memory.sourceName}Link`)
-    if (!sourceLink) return false
+    if (!sourceLink) return
 
-    // Try to transfer to the sourceLink
+    // Try to transfer to the sourceLink and inform true
 
     creep.advancedTransfer(sourceLink)
-
-    return true
+    return
 }
 
 SourceHarvester.prototype.createWithdrawTask = function(sourceContainer) {
@@ -184,9 +187,13 @@ SourceHarvester.prototype.repairSourceContainer = function(sourceContainer) {
 
     if (sourceContainer.hitsMax - sourceContainer.hits < workPartCount * REPAIR_POWER) return false
 
-    // If the creep doesn't have enough energy, withdraw from the sourceContainer
+    // If the creep doesn't have enough energy and it hasn't yet moved resources, withdraw from the sourceContainer
 
-    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount) creep.withdraw(sourceContainer, RESOURCE_ENERGY)
+    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount && !creep.hasMovedResources) creep.withdraw(sourceContainer, RESOURCE_ENERGY)
+
+    // If the creep has already worked, inform false
+
+    if (creep.hasWorked) return false
 
     // Try to repair the target
 
@@ -195,6 +202,10 @@ SourceHarvester.prototype.repairSourceContainer = function(sourceContainer) {
     // If the repair worked
 
     if (repairResult == OK) {
+
+        // Record that the creep has worked
+
+        creep.hasWorked = true
 
         // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
 
