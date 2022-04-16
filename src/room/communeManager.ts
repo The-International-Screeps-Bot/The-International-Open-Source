@@ -11,14 +11,17 @@ import { defenceManager } from "./defenceManager"
 import { constants } from "international/constants"
 import { storageStructuresManager } from "./storingStructuresManager"
 import { customLog } from "international/generalFunctions"
+import { linkManager } from "./linkManager"
 
 export function communeManager(room: Room) {
 
-    towerManager(room)
-
     constructionManager(room)
 
+    towerManager(room)
+
     marketManager(room)
+
+    linkManager(room)
 
     defenceManager(room)
 
@@ -27,7 +30,7 @@ export function communeManager(room: Room) {
     storageStructuresManager(room)
 
     spawnManager(room)
-    
+    customLog('links', room.get('fastFillerLink') + ', ' + room.get('hubLink'))
 /*
     let cpu = Game.cpu.getUsed()
 

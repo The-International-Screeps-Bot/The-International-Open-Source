@@ -127,6 +127,8 @@ declare global {
     'labContainer' |
     'source1Link' |
     'source2Link' |
+    'fastFillerLink' |
+    'hubLink' |
     'controllerLink' |
     'source1Container' |
     'source2Container' |
@@ -905,8 +907,15 @@ declare global {
         realHits: number
     }
 
+    interface StructureLink {
+
+        /**
+         * Wether the link has moved any resources this tick
+         */
+        hasMovedResources: boolean
+    }
+
     interface StructureSpawn {
-        [key: string]: any
 
         advancedSpawn(spawnRequest: SpawnRequest): ScreepsReturnCode
     }

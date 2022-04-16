@@ -904,7 +904,7 @@ Room.prototype.get = function(roomObjectName) {
 
     // Links
 
-    function findLink(anchor: RoomPosition | undefined): Id<Structure> | false {
+    function findLinkNearby(anchor: RoomPosition | undefined): Id<Structure> | false {
 
         // If the anchor isn't defined, inform false
 
@@ -927,7 +927,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findLink(room.roomObjects.source1ClosestHarvestPos.getValue())
+            return findLinkNearby(room.roomObjects.source1ClosestHarvestPos.getValue())
         }
     })
 
@@ -939,11 +939,15 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findLink(room.roomObjects.source2ClosestHarvestPos.getValue())
+            return findLinkNearby(room.roomObjects.source2ClosestHarvestPos.getValue())
         }
     })
 
-    function findLinkAtPos(pos: RoomPosition): Id<Structure> | false {
+    function findLinkAtPos(pos: RoomPosition | undefined): Id<Structure> | false {
+
+        // If the pos isn't defined, inform false
+
+        if (!pos) return false
 
         // Otherwise search based on an offset from the anchor's x
 
@@ -962,6 +966,30 @@ Room.prototype.get = function(roomObjectName) {
 
         return false
     }
+
+    new RoomObject({
+        name: 'fastFillerLink',
+        valueType: 'id',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() {
+
+            return findLinkAtPos(global[room.name].stampAnchors?.fastFiller[0])
+        }
+    })
+
+    new RoomObject({
+        name: 'hubLink',
+        valueType: 'id',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: function() {
+
+            return findLinkNearby(global[room.name].stampAnchors?.hub[0])
+        }
+    })
 
     new RoomObject({
         name: 'controllerLink',
