@@ -12,7 +12,7 @@ export function defenceManager(room: Room) {
     const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
         filter: creep => !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
     })
-    customLog('ATTACKERS', enemyAttackers)
+
     manageRampartPublicity()
 
     function manageRampartPublicity() {
@@ -23,7 +23,7 @@ export function defenceManager(room: Room) {
 
             // Stop if the tick is not divisible by 10
 
-            if (Game.time % 10 == 0) return
+            if (Game.time % Math.floor(Math.random() * 100) == 0) return
 
             // Get the room's ramparts and loop through them
 
@@ -49,7 +49,7 @@ export function defenceManager(room: Room) {
         }
     }
 
-    /* advancedActivateSafeMode() */
+    advancedActivateSafeMode()
 
     function advancedActivateSafeMode() {
 

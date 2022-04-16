@@ -7,7 +7,7 @@ export function towerManager(room: Room) {
 
     room.towersRequestResources()
 
-    /* room.towersAttackCreeps() */
+    room.towersAttackCreeps()
 
     room.towersHealCreeps()
 

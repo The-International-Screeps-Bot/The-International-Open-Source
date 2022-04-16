@@ -90,7 +90,7 @@ export const allyList = new Set([
     "Mitsuyoshi",
     "Modus",
     "Silten",
-    /* "Sneaky_Polar_Bear", */
+    "Sneaky_Polar_Bear",
     "Yoner",
 ])
 
