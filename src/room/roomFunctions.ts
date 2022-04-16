@@ -1362,7 +1362,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                     const ramparts: StructureRampart[] = room.get('rampart')
                     for (const rampart of ramparts) {
 
-                        // If the rampart is mine or public
+                        // If the rampart is mine
 
                         if (rampart.my) {
 
@@ -1376,9 +1376,9 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                             continue
                         }
 
-                        // Otherwise if the rampart is public, iterate
+                        // Otherwise if the rampart is owned by an ally, iterate
 
-                        if (rampart.isPublic) continue
+                        if (constants.allyList.has(rampart.owner.username)) continue
 
                         // Otherwise set the rampart's pos as impassible
 
