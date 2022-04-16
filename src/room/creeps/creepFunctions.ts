@@ -5,7 +5,7 @@ import { RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "ro
 
 Creep.prototype.isDying = function() {
 
-    const creep: Creep = this
+    const creep = this
 
     // Inform as dying if creep is already recorded as dying
 
@@ -139,17 +139,17 @@ Creep.prototype.advancedHarvestSource = function(source) {
 Creep.prototype.advancedUpgradeController = function() {
 
     const creep = this,
-    room = creep.room
-
-    creep.say('AUC')
+    room = creep.room,
 
     // The the controller
 
-    const controller = room.controller,
+    controller = room.controller,
 
     // Get the controllerContainer
 
     controllerContainer: StructureContainer = room.get('controllerContainer')
+
+    creep.say('AUC')
 
     // If there is a controllerContainer
 

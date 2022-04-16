@@ -31,9 +31,13 @@ export function creepOrganizer() {
 
         const room = creep.room,
 
+        // Get the creep's role
+
+        role = creep.memory.role,
+
         // Find the creep a class based on its role
 
-        creepsClass = creepClasses[creep.memory.role]
+        creepsClass = creepClasses[role]
 
         // Assign creep proper class
 
@@ -41,7 +45,7 @@ export function creepOrganizer() {
 
         // Organize creep in its room by its role
 
-        room.myCreeps[creep.memory.role].push(creepName)
+        room.myCreeps[role].push(creepName)
 
         // Record the creep's presence in the room
 
@@ -59,9 +63,9 @@ export function creepOrganizer() {
 
         if (commune) {
 
-            // Organize creep by its roomFrom and role
+            // If the creep isn't dying, organize by its roomFrom and role
 
-            commune.creepsFromRoom[creep.memory.role].push(creepName)
+            if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
 
             // Record that the creep's existence in its roomFrom
 
@@ -74,24 +78,16 @@ export function creepOrganizer() {
 
             // If the creep is a remoteHarvester, reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
 
-            if (creep.memory.role == 'remoteHarvester') Memory.rooms[creep.memory.remoteName].needs[remoteNeedsIndex.remoteHarvester] -= creep.partsOfType(WORK)
+            if (role == 'remoteHarvester') Memory.rooms[creep.memory.remoteName].needs[remoteNeedsIndex.remoteHarvester] -= creep.partsOfType(WORK)
 
             // Otherwise if the creep is a remoteHauler, reduce its remote's needs by their number of carry parts
 
-            else if (creep.memory.role == 'remoteHauler') Memory.rooms[creep.memory.remoteName].needs[remoteNeedsIndex.remoteHauler] -= creep.partsOfType(CARRY)
+            else if (role == 'remoteHauler') Memory.rooms[creep.memory.remoteName].needs[remoteNeedsIndex.remoteHauler] -= creep.partsOfType(CARRY)
         }
 
         // Increase total creep counter
 
         totalCreepCount += 1
-
-        // See if creep is dying
-
-        creep.isDying()
-
-        // Stop if creep is dying
-
-        if (creep.memory.dying) continue
     }
 
     // Record number of creeps

@@ -676,6 +676,11 @@ declare global {
         // Functions
 
         /**
+         * Wether the creep's respawn time is equal to its remaining ticks to live
+         */
+        isDying(): boolean
+
+        /**
          * Sets a task to be responded by a creep
          */
         acceptTask(task: RoomTask): void

@@ -44,19 +44,19 @@ export function roleManager(room: Room) {
 
         // Get the CPU used at the start
 
-        const roleCPUStart = Game.cpu.getUsed()
+        const roleCPUStart = Game.cpu.getUsed(),
 
         // Get the manager using the role
 
-        const manager = managers[role]
+        manager = managers[role],
 
         // Get the amount of creeps with the role
 
-        const creepsOfRoleAmount = room.myCreeps[role].length
+        creepsOfRoleAmount = room.myCreeps[role].length
 
         // Iterate if there are no creeps of manager's role
 
-        if (creepsOfRoleAmount == 0) continue
+        if (room.myCreeps[role].length == 0) continue
 
         // Run manager
 
