@@ -25,7 +25,7 @@ export function structuresForSpawningManager(room: Room) {
 
         // Assign structuresForSpawning that are not in range of 1 to the closestHarvestPos
 
-        structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, closestHarvestPos.x, closestHarvestPos.y) > 1)
+        structuresForSpawning = structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, closestHarvestPos.x, closestHarvestPos.y) > 1)
     }
 
     // If there is a fastFill container or link
@@ -39,7 +39,7 @@ export function structuresForSpawningManager(room: Room) {
 
         // Assign structuresForSpawning that are not in range of 2 to the the anchor
 
-        structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, anchor.x, anchor.y) > 2)
+        structuresForSpawning = structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, anchor.x, anchor.y) > 2)
     }
 
     // Iterate through structures in structureForSpawning
