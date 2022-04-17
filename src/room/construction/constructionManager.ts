@@ -38,7 +38,7 @@ export function constructionManager(room: Room) {
         const centerUpgradePos: RoomPosition | undefined = room.get('centerUpgradePos')
         if (!centerUpgradePos) return
 
-        if (room.controller.level >= 6) {
+        if (room.controller.level >= 5) {
 
             const controllerContainer: StructureContainer | undefined = room.get('controllerContainer')
             if (controllerContainer) controllerContainer.destroy()

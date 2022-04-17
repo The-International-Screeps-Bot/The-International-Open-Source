@@ -15,6 +15,10 @@ export function hubHaulerManager(room: Room, creepsOfRole: string[]) {
 
         if (creep.balanceStoringStructures()) continue
 
+        // Try filling the hubLink, iterating if there were resources moved
+
+        if (creep.fillHubLink()) continue
+
         creep.say('🚬')
     }
 }

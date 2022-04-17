@@ -72,6 +72,8 @@ export class HubHauler extends Creep {
 
     balanceStoringStructures?(): boolean
 
+    fillHubLink?(): boolean
+
     constructor(creepID: Id<Creep>) {
 
         super(creepID)

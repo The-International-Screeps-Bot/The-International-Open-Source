@@ -1,3 +1,5 @@
+import './linkFunctions'
+
 /**
  * Dictates and operates tasks for links
  */
@@ -9,14 +11,21 @@ export function linkManager(room: Room) {
 
     // Get the sourceLinks
 
-    const sourceLinks: (StructureLink | false)[] = [room.get('source1Link'), room.get('source2Link')],
+    const sourceLinks: (StructureLink | false)[] = [
+        room.get('source1Link'),
+        room.get('source2Link')
+    ],
 
     // Get the reciever links
 
+    fastFillerLink = room.get('fastFillerLink'),
+    hubLink = room.get('hubLink'),
+    controllerLink = room.get('controllerLink'),
+
     recieverLinks: (StructureLink | false)[] = [
-        room.get('fastFillerLink'),
-        room.get('hubLink'),
-        room.get('controllerLink')
+        fastFillerLink,
+        hubLink,
+        controllerLink
     ]
 
     // Loop through each sourceLink
@@ -61,12 +70,5 @@ export function linkManager(room: Room) {
         }
     }
 
-    // If the storage has sufficient energy
-
-    if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= 80000) {
-
-        //
-
-        
-    }
+    room.hubToController(hubLink, controllerLink)
 }

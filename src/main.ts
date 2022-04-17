@@ -499,10 +499,6 @@ declare global {
          */
         findClosestPosOfValue(opts: FindClosestPosOfValueOpts): RoomPosition | false
 
-        advancedSell(resourceType: ResourceConstant, amount: number): boolean
-
-        advancedBuy(resourceType: ResourceConstant, amount: number): boolean
-
         /**
          * Checks if the creator has a task of with specified types
          */
@@ -574,6 +570,16 @@ declare global {
         estimateIncome(): number
 
         getPartsOfRoleAmount(role: CreepRoles, type?: BodyPartConstant): number
+
+        // Market functions
+
+        advancedSell(resourceType: ResourceConstant, amount: number): boolean
+
+        advancedBuy(resourceType: ResourceConstant, amount: number): boolean
+
+        // Link functions
+
+        hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
     }
 
     interface RoomMemory {

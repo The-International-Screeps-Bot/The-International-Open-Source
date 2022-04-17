@@ -27,7 +27,6 @@ HubHauler.prototype.travelToHub = function() {
     return true
 }
 
-
 HubHauler.prototype.balanceStoringStructures = function() {
 
     const creep = this,
@@ -89,6 +88,61 @@ HubHauler.prototype.balanceStoringStructures = function() {
         // Assign the taskTarget as the reciever
 
         creep.memory.taskTarget = terminal.id
+
+        // And inform true
+
+        return true
+    }
+
+    // Inform false
+
+    return false
+}
+
+HubHauler.prototype.fillHubLink = function() {
+
+    const creep = this,
+    room = creep.room,
+
+    // Define the storage and hubLink
+
+    storage = room.storage,
+    hubLink: StructureLink | undefined = room.get('hubLink')
+
+    // If there is no terminal or hubLink, inform false
+
+    if (!storage || !hubLink) return false
+
+    creep.say('FHL')
+
+    // If the creep has a taskTarget
+
+    if (creep.memory.taskTarget) {
+
+        // If the taskTarget isn't the storage or terminal, inform false
+
+        if (creep.memory.taskTarget != storage.id && creep.memory.taskTarget != hubLink.id) return false
+
+        // Otherwise transfer to the taskTarget. If a success, delete the taskTarget
+
+        if (creep.advancedTransfer(findObjectWithID(creep.memory.taskTarget), RESOURCE_ENERGY)) delete creep.memory.taskTarget
+
+        // And inform true
+
+        return true
+    }
+
+    // If the storage is sufficiently full and the hubLink is not full
+
+    if (storage.store.getUsedCapacity(RESOURCE_ENERGY) > 80000 && hubLink.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+
+        // Withdraw from the unbalanced structure
+
+        creep.withdraw(storage, RESOURCE_ENERGY)
+
+        // Assign the taskTarget as the reciever
+
+        creep.memory.taskTarget = hubLink.id
 
         // And inform true
 
