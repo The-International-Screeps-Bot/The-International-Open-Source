@@ -263,21 +263,26 @@ export function rampartPlanner(room: Room) {
             }
         }
 
-        // Visualize position values
+        // If roomVisuals are enabled
 
-        for (let x = 0; x < constants.roomDimensions; x++) {
-            for (let y = 0; y < constants.roomDimensions; y++) {
+        if (Memory.roomVisuals) {
 
-                if (positionValues[x][y] === NORMAL) {
+            // Visualize position values
 
-                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#e8e863', opacity: 0.3 })
-                    continue
-                }
+            for (let x = 0; x < constants.roomDimensions; x++) {
+                for (let y = 0; y < constants.roomDimensions; y++) {
 
-                if (positionValues[x][y] === PROTECTED) {
+                    if (positionValues[x][y] === NORMAL) {
 
-                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#61975E', opacity: 0.3 })
-                    continue
+                        room.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#e8e863', opacity: 0.3 })
+                        continue
+                    }
+
+                    if (positionValues[x][y] === PROTECTED) {
+
+                        room.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#61975E', opacity: 0.3 })
+                        continue
+                    }
                 }
             }
         }

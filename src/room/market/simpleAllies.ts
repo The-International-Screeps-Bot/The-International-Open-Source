@@ -82,8 +82,6 @@ class AllyManager {
 
         const allyManager = this
 
-        allyManager.myRequests = []
-
         allyManager.requestTypes = {
             RESOURCE: 0,
             DEFENSE: 1,
@@ -132,9 +130,10 @@ AllyManager.prototype.tickConfig = function() {
 
     const allyManager = this
 
-    // Reset myRequests
+    // Initialize myRequests and allyRequests
 
     allyManager.myRequests = []
+    allyManager.allyRequests = []
 }
 
 AllyManager.prototype.endTickManager = function() {
