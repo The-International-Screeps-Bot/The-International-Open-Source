@@ -9,7 +9,7 @@ export interface RoomTask {
     /**
      * The name of the room that the task will be recorded in
      */
-    creatorID: Id<any>
+    creatorID: Id<RoomObject>
     roomName: string
     responderID: Id<Creep>
     ID: number

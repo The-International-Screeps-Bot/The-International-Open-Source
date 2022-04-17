@@ -544,9 +544,9 @@ export function spawnRequester(room: Room) {
         // If there is no terminal or storage, inform false
 
         if (!room.storage || !room.terminal) return false
-
+        
         return {
-            defaultParts: [MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY],
+            defaultParts: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE],
             extraParts: [],
             partsMultiplier: 1,
             minCreeps: 1,

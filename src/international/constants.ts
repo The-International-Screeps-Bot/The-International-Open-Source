@@ -415,3 +415,17 @@ export const boostMultipliers = {
         XLHO2: 4,
     }
 }
+
+export const minerals: Partial<ResourceConstant[]> = [
+    RESOURCE_HYDROGEN,
+    RESOURCE_OXYGEN,
+    RESOURCE_UTRIUM,
+    RESOURCE_KEANIUM,
+    RESOURCE_LEMERGIUM,
+    RESOURCE_ZYNTHIUM,
+    RESOURCE_CATALYST
+]
+
+export const boosts = [
+    RESOURCE_CATALYZED_GHODIUM_ACID,
+]

@@ -63,7 +63,7 @@ HubHauler.prototype.balanceStoringStructures = function() {
 
     // If the terminal is unbalanced and the storage has free capacity
 
-    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) * 0.5 > storage.store.getUsedCapacity(RESOURCE_ENERGY) + creep.store.getCapacity() && storage.store.getCapacity() > creep.store.getCapacity()) {
+    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) > storage.store.getUsedCapacity(RESOURCE_ENERGY) * 0.5 + creep.store.getCapacity() && storage.store.getCapacity() > creep.store.getCapacity()) {
 
         // Withdraw from the unbalanced structure
 
