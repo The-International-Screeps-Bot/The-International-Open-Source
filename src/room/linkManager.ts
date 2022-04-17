@@ -13,7 +13,11 @@ export function linkManager(room: Room) {
 
     // Get the reciever links
 
-    recieverLinks: (StructureLink | false)[] = [room.get('fastFillerLink'), room.get('hubLink'), room.get('controllerLink')]
+    recieverLinks: (StructureLink | false)[] = [
+        room.get('fastFillerLink'),
+        room.get('hubLink'),
+        room.get('controllerLink')
+    ]
 
     // Loop through each sourceLink
 
@@ -55,5 +59,14 @@ export function linkManager(room: Room) {
 
             break
         }
+    }
+
+    // If the storage has sufficient energy
+
+    if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= 80000) {
+
+        //
+
+        
     }
 }

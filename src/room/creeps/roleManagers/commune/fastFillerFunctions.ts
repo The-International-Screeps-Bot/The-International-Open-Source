@@ -43,6 +43,10 @@ FastFiller.prototype.fillFastFiller = function() {
 
     creep.say('FFF')
 
+    // If all spawningStructures are filled, inform false
+
+    if (room.energyAvailable == room.energyCapacityAvailable) return false
+
     // If the creep has no energy
 
     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {

@@ -6,6 +6,10 @@ import { RoomTransferTask } from "./roomTasks"
  */
 export function structuresForSpawningManager(room: Room) {
 
+    // If all spawningStructures are filled, stop
+
+    if (room.energyAvailable == room.energyCapacityAvailable) return
+
     // Get exensions and spawns
 
     let structuresForSpawning: (StructureSpawn | StructureExtension)[] = room.get('structuresForSpawning')
