@@ -21,9 +21,9 @@ export function defenceManager(room: Room) {
 
         if (!enemyAttackers.length) {
 
-            // Stop if the tick is not divisible by 10
+            // Stop if the tick is not divisible by a random range
 
-            if (Game.time % Math.floor(Math.random() * 100) == 0) return
+            if (Game.time % Math.floor(Math.random() * 100) != 0) return
 
             // Get the room's ramparts and loop through them
 

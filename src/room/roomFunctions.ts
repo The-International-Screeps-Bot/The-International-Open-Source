@@ -1619,7 +1619,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     // Get the anchor
 
-                    const anchor: RoomPosition = room.get('anchor')
+                    const anchor: RoomPosition | undefined = room.get('anchor')
 
                     // If the anchor is defined
 
@@ -1663,7 +1663,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     // If there are fastFillerPositions
 
-                    if (!fastFillerPositions.length) {
+                    if (fastFillerPositions.length) {
 
                         // Loop through each position of fastFillerPositions, have creeps prefer to avoid
 

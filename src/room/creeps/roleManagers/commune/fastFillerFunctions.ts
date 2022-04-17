@@ -43,9 +43,9 @@ FastFiller.prototype.fillFastFiller = function() {
 
     creep.say('FFF')
 
-    // If the creep needs resources
+    // If the creep has no energy
 
-    if (creep.needsResources()) {
+    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
 
         // Get the sourceLinks
 
@@ -101,7 +101,7 @@ FastFiller.prototype.fillFastFiller = function() {
         if (structure.structureType != STRUCTURE_SPAWN && structure.structureType != STRUCTURE_EXTENSION) continue
 
         // Otherwise, if the structure is full, iterate
-        
+
         if (structure.store.getFreeCapacity(RESOURCE_ENERGY) == 0) continue
 
         // Otherwise, transfer to the structure and inform true
