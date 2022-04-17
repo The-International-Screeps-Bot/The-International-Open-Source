@@ -66,9 +66,9 @@ export function marketManager(room: Room) {
         continue
     }
 
-    // If there is less than x energy in the terminal, request y
+    // If the terminal has less than x energy in the terminal, request y
 
-    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 60000) allyManager.requestResource(room.name, RESOURCE_ENERGY, 80000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY), 0.25)
+    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 50000) allyManager.requestResource(room.name, RESOURCE_ENERGY, 60000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY), 0.4)
 
     // For each mineral
 

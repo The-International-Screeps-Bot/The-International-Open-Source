@@ -106,7 +106,7 @@ export function spawnRequester(room: Room) {
 
             // If there are defaultParts
 
-            if (opts.defaultParts.length > 0) {
+            if (opts.defaultParts.length) {
 
                 // Increment tier
 
@@ -208,13 +208,13 @@ export function spawnRequester(room: Room) {
 
                         partIndex--
                     }
+
+                    // Decrease tier
+
+                    tier--
                 }
             }
-/*
-            // If the body has fewer parts than defaultParts amount + extraParts amount, disable the request
 
-            if (body.length < opts.defaultParts.length + opts.extraParts.length) break
- */
             // Create a spawnRequest using previously constructed information
 
             createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
@@ -370,12 +370,12 @@ export function spawnRequester(room: Room) {
 
                     partIndex--
                 }
-            }
-/*
-            // If the body has fewer parts than defaultParts amount + extraParts amount, disable the request
 
-            if (body.length < opts.defaultParts.length + opts.extraParts.length) break
- */
+                // Decrease tier
+
+                tier--
+            }
+
             // Create a spawnRequest using previously constructed information
 
             createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
@@ -588,9 +588,29 @@ export function spawnRequester(room: Room) {
 
     // Get enemyAttackers in the room
 
-    const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-        filter: creep => !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
-    })
+    let enemyAttackers: Creep[]
+
+    // If there are no towers
+
+    if (!room.get('tower').length) {
+
+        // Consider invaders as significant attackers
+
+        enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+            filter: creep => !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
+        })
+    }
+
+    // Otherwise
+
+    else {
+
+        // Don't consider invaders
+
+        enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+            filter: creep => creep.owner.username != 'Invader' && !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
+        })
+    }
 
     // Get the attackValue of the attackers
 
