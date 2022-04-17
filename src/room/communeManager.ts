@@ -30,7 +30,7 @@ export function communeManager(room: Room) {
     storageStructuresManager(room)
 
     spawnManager(room)
-    customLog('links', room.get('fastFillerLink') + ', ' + room.get('hubLink'))
+
 /*
     let cpu = Game.cpu.getUsed()
 

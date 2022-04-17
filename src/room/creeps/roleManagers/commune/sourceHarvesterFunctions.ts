@@ -14,7 +14,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
     // Try to find a harvestPosition, inform false if it failed
 
-    if (!creep.findSourceHarvestPosition()) return false
+    if (!creep.findSourceHarvestPos()) return false
 
     creep.say('🚬')
 
@@ -51,7 +51,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-    creep.say('⏩ ' + sourceName)
+    creep.say('⏩' + sourceName)
 
     creep.createMoveRequest({
         origin: creep.pos,

@@ -83,6 +83,7 @@ declare global {
     'maintainer' |
     'mineralHarvester' |
     'hubHauler' |
+    'fastFiller' |
     'meleeDefender' |
     'remoteHarvester' |
     'remoteHauler' |
@@ -119,6 +120,7 @@ declare global {
     'source2ClosestHarvestPos' |
     'centerUpgradePos' |
     'upgradePositions' |
+    'fastFillerPositions' |
     'source1Container' |
     'source2Container' |
     'controllerContainer' |
@@ -136,6 +138,7 @@ declare global {
     'usedMineralHarvestPositions' |
     'usedSourceHarvestPositions' |
     'usedUpgradePositions' |
+    'usedFastFillerPositions' |
     'source1PathLength' |
     'source2PathLength' |
     'upgradePathLength' |
@@ -743,9 +746,11 @@ declare global {
 
         findOptimalRemoteSourceName(): boolean
 
-        findSourceHarvestPosition(): boolean
+        findSourceHarvestPos(): boolean
 
-        findMineralHarvestPosition(): boolean
+        findMineralHarvestPos(): boolean
+
+        findFastFillerPos(): boolean
 
         /**
          * Checks if the creep has some parts of specified types
@@ -854,6 +859,11 @@ declare global {
          * The creep's packed upgrade pos
          */
         packedUpgradePos: number
+
+        /**
+         * The creep's packed fastFiller pos
+         */
+        packedFastFillerPos: number
 
         /**
          * The last time a path was cached in memory

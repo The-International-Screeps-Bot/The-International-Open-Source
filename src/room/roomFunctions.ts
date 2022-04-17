@@ -524,6 +524,90 @@ Room.prototype.get = function(roomObjectName) {
         valueConstructor: findUpgradePositions
     })
 
+    function findFastFillerPositions() {
+
+        // Get the anchor, informing an empty array if it's undefined
+
+        const anchor: RoomPosition | undefined = room.get('anchor')
+        if (!anchor) return []
+
+        // Construct fastFillerPositions from the top / bottom and left, right adjacent positions
+
+        const fastFillerPositions = [
+            {
+                x: anchor.x - 1,
+                y: anchor.y - 1
+            },
+            {
+                x: anchor.x + 1,
+                y: anchor.y - 1
+            },
+            {
+                x: anchor.x - 1,
+                y: anchor.y + 1
+            },
+            {
+                x: anchor.x + 1,
+                y: anchor.y + 1
+            },
+        ]
+
+        // Loop through each fastFillerPos
+
+        for (let index = fastFillerPositions.length - 1; index > 0; index--) {
+
+            // Get the pos using the index
+
+            const pos = fastFillerPositions[index],
+
+            // Get adjacent structures
+
+            adjacentStructures = room.lookForAtArea(LOOK_STRUCTURES, pos.y - 1, pos.x - 1, pos.y + 1, pos.x + 1, true),
+
+            // Construct organized adjacent structures
+
+            adjacentStructuresByType: Partial<Record<StructureConstant, number>> = {}
+
+            // For each structure of adjacentStructures
+
+            for (const adjacentPosData of adjacentStructures) {
+
+                // Get the structureType at the adjacentPos
+
+                const structureType = adjacentPosData.structure.structureType
+
+                // If the adjacentStructuresByType doesn't have a number for this structureType, intialize one
+
+                if (!adjacentStructuresByType[structureType]) adjacentStructuresByType[structureType] = 0
+
+                // Increase structure amount for this structureType on the adjacentPos
+
+                adjacentStructuresByType[structureType]++
+            }
+
+            // If there is more than one adjacent extension and container, iterate
+
+            if (adjacentStructuresByType[STRUCTURE_CONTAINER] > 0 && adjacentStructuresByType[STRUCTURE_EXTENSION] > 0) continue
+
+            // Otherwise, remove the pos from fastFillePositions
+
+            fastFillerPositions.splice(index)
+        }
+
+        // Inform fastFillerPositions
+
+        return fastFillerPositions
+    }
+
+    new RoomObject({
+        name: 'fastFillerPositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 100,
+        room,
+        valueConstructor: findFastFillerPositions
+    })
+
     // Source containers
 
     function findSourceContainer(closestHarvestPos: RoomPosition) {
@@ -734,6 +818,43 @@ Room.prototype.get = function(roomObjectName) {
         cacheAmount: 1,
         room,
         valueConstructor: findUsedUpgradePositions
+    })
+
+    function findUsedFastFillerPositions() {
+
+        // Construct usedFastFillerPositions
+
+        const usedFastFillerPositions: Set<number> = new Set()
+
+        // Loop through each sourceHarvester's name in the room
+
+        for (const creepName of room.creepsFromRoom.fastFiller) {
+
+            // Get the creep using its name
+
+            const creep = Game.creeps[creepName]
+
+            // If the creep is dying, iterate
+
+            if (creep.isDying()) continue
+
+            // If the creep has a packedFastFillerPos, record it in usedFastFillerPositions
+
+            if (creep.memory.packedFastFillerPos) usedFastFillerPositions.add(creep.memory.packedFastFillerPos)
+        }
+
+        // Inform usedFastFillerPositions
+
+        return usedFastFillerPositions
+    }
+
+    new RoomObject({
+        name: 'usedFastFillerPositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 1,
+        room,
+        valueConstructor: findUsedFastFillerPositions
     })
 
     // Path lengths

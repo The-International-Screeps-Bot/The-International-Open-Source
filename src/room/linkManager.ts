@@ -5,7 +5,7 @@ export function linkManager(room: Room) {
 
     //
 
-    if (!room.storage || room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < 60000) return
+    if (!room.storage) return
 
     // Get the sourceLinks
 

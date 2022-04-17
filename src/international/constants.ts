@@ -178,6 +178,7 @@ constants.creepRoles = [
     'maintainer',
     'mineralHarvester',
     'hubHauler',
+    'fastFiller',
     'meleeDefender',
     'remoteHarvester',
     'remoteHauler',

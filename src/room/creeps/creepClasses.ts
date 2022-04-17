@@ -80,6 +80,20 @@ export class HubHauler extends Creep {
 }
 creepClasses.hubHauler = HubHauler
 
+export class FastFiller extends Creep {
+
+    travelToFastFiller?(): boolean
+
+    fillFastFiller?(): boolean
+
+    constructor(creepID: Id<Creep>) {
+
+        super(creepID)
+
+    }
+}
+creepClasses.fastFiller = FastFiller
+
 export class MeleeDefender extends Creep {
 
     advancedDefend?(): boolean

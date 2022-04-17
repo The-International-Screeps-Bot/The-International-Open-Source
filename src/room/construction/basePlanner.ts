@@ -318,9 +318,10 @@ export function basePlanner(room: Room) {
 
     for (const sourceName of sourceNames) {
 
-        // get the closestHarvestPos using the sourceName
+        // Get the closestHarvestPos using the sourceName, iterating if undefined
 
-        const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`)
+        const closestHarvestPos: RoomPosition | undefined = room.get(`${sourceName}ClosestHarvestPos`)
+        if (!closestHarvestPos) continue
 
         // Record the pos in roadCM
 
@@ -331,9 +332,10 @@ export function basePlanner(room: Room) {
 
     for (const sourceName of sourceNames) {
 
-        // get the closestHarvestPos using the sourceName
+        // get the closestHarvestPos using the sourceName, iterating if undefined
 
-        const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`)
+        const closestHarvestPos: RoomPosition | undefined = room.get(`${sourceName}ClosestHarvestPos`)
+        if (!closestHarvestPos) continue
 
         // Plan for a road at the pos
 

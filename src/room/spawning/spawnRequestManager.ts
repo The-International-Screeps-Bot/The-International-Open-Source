@@ -558,6 +558,28 @@ export function spawnRequester(room: Room) {
         }
     })())
 
+    // Construct requests for fastFillers
+
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+        // Get the fastFiller positions, if there are none, inform false
+
+        const fastFillerPositions: Pos[] = room.get('fastFillerPositions')
+        if (!fastFillerPositions.length) return false
+        
+        return {
+            defaultParts: [CARRY, CARRY, CARRY, MOVE, CARRY],
+            extraParts: [],
+            partsMultiplier: 1,
+            minCreeps: fastFillerPositions.length,
+            minCost: 250,
+            priority: 2 + room.creepsFromRoom.fastFiller.length,
+            memoryAdditions: {
+                role: 'fastFiller',
+            }
+        }
+    })())
+
     // Get enemyAttackers in the room
 
     const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
@@ -784,6 +806,22 @@ export function spawnRequester(room: Room) {
                 defaultParts: [CARRY],
                 extraParts: [WORK, MOVE, WORK, WORK, WORK],
                 partsMultiplier: Math.max(partsMultiplier / 4, 1),
+                minCreeps: undefined,
+                maxCreeps: 8,
+                minCost: 200,
+                priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                memoryAdditions: {
+                    role: 'controllerUpgrader',
+                }
+            }
+        }
+
+        if (spawnEnergyCapacity >= 800) {
+
+            return {
+                defaultParts: [],
+                extraParts: [WORK, CARRY, MOVE],
+                partsMultiplier,
                 minCreeps: undefined,
                 maxCreeps: 8,
                 minCost: 200,

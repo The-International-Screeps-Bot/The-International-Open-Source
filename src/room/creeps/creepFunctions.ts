@@ -846,7 +846,7 @@ Creep.prototype.findOptimalRemoteSourceName = function() {
     return false
 }
 
-Creep.prototype.findSourceHarvestPosition = function() {
+Creep.prototype.findSourceHarvestPos = function() {
 
     const creep = this,
     room = creep.room
@@ -908,7 +908,7 @@ Creep.prototype.findSourceHarvestPosition = function() {
     return true
 }
 
-Creep.prototype.findMineralHarvestPosition = function() {
+Creep.prototype.findMineralHarvestPos = function() {
 
     const creep = this,
     room = creep.room
@@ -962,6 +962,38 @@ Creep.prototype.findMineralHarvestPosition = function() {
 
     creep.memory.packedHarvestPos = packedPos
     usedHarvestPositions.add(packedPos)
+
+    return true
+}
+
+Creep.prototype.findFastFillerPos = function() {
+
+    const creep = this,
+    room = creep.room
+
+    creep.say('FFP')
+
+    // Stop if the creep already has a packedFastFillerPos
+
+    if (creep.memory.packedFastFillerPos) return true
+
+    // Get usedFastFillerPositions
+
+    const usedFastFillerPositions: Set<number> = room.get('usedFastFillerPositions'),
+
+    // Otherwise get the harvest positions for the source
+
+    fastFillerPositions: Pos[] = room.get('fastFillerPositions'),
+
+    openFastFillerPositions = fastFillerPositions.filter(pos => !usedFastFillerPositions.has(pack(pos)))
+    if (!openFastFillerPositions.length) return false
+
+    const creepsClosestFastFillerPos = openFastFillerPositions.sort((a, b) => getRangeBetween(creep.pos.x, creep.pos.y, a.x, a.y) - getRangeBetween(creep.pos.x, creep.pos.y, b.x, b.y))[0],
+
+    packedPos = pack(creepsClosestFastFillerPos)
+
+    creep.memory.packedFastFillerPos = packedPos
+    usedFastFillerPositions.add(packedPos)
 
     return true
 }

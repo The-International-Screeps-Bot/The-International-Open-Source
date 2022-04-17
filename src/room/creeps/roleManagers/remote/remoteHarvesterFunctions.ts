@@ -13,7 +13,7 @@ RemoteHarvester.prototype.travelToSource = function() {
 
     // Try to find a harvestPosition, inform false if it failed
 
-    if (!creep.findSourceHarvestPosition()) return false
+    if (!creep.findSourceHarvestPos()) return false
 
     creep.say('🚬')
 

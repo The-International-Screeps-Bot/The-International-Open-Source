@@ -1,3 +1,4 @@
+import { getRangeBetween } from "international/generalFunctions"
 import { RoomTransferTask } from "./roomTasks"
 
 /**
@@ -7,7 +8,39 @@ export function structuresForSpawningManager(room: Room) {
 
     // Get exensions and spawns
 
-    const structuresForSpawning: (StructureSpawn | StructureExtension)[] = room.get('structuresForSpawning')
+    let structuresForSpawning: (StructureSpawn | StructureExtension)[] = room.get('structuresForSpawning')
+
+    // Get the room's sourceNames
+
+    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+
+    // loop through sourceNames
+
+    for (const sourceName of sourceNames) {
+
+        // Get the closestHarvestPos using the sourceName, iterating if undefined
+
+        const closestHarvestPos: RoomPosition | undefined = room.get(`${sourceName}ClosestHarvestPos`)
+        if (!closestHarvestPos) continue
+
+        // Assign structuresForSpawning that are not in range of 1 to the closestHarvestPos
+
+        structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, closestHarvestPos.x, closestHarvestPos.y) > 1)
+    }
+
+    // If there is a fastFill container or link
+
+    if (room.get('fastFillerContainerLeft') || room.get('fastFillerContainerRight') || room.get('fastFillerLink')) {
+
+        // Get the anchor, stopping if it's undefined
+
+        const anchor: RoomPosition | undefined = room.get('anchor')
+        if (!anchor) return
+
+        // Assign structuresForSpawning that are not in range of 2 to the the anchor
+
+        structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, anchor.x, anchor.y) > 1)
+    }
 
     // Iterate through structures in structureForSpawning
 
