@@ -256,7 +256,7 @@ export function spawnRequester(room: Room) {
 
         // If there aren't enough requested parts to justify spawning a creep, stop
 
-        if (totalExtraParts < maxPartsPerCreep / 2) return
+        if (totalExtraParts < maxPartsPerCreep * 0.25) return
 
         // Subtract maxCreeps by the existing number of creeps of this role
 
@@ -567,8 +567,14 @@ export function spawnRequester(room: Room) {
         const fastFillerPositions: Pos[] = room.get('fastFillerPositions')
         if (!fastFillerPositions.length) return false
 
+        let defaultParts = [CARRY, MOVE, CARRY]
+
+        // If the controller level is more or equal to 7, increase the defaultParts
+
+        if (room.controller.level >= 7) defaultParts = [CARRY, CARRY, CARRY, MOVE, CARRY]
+
         return {
-            defaultParts: [CARRY, CARRY, CARRY, MOVE, CARRY],
+            defaultParts,
             extraParts: [],
             partsMultiplier: 1,
             minCreeps: fastFillerPositions.length,

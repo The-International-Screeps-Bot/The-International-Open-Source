@@ -43,9 +43,9 @@ FastFiller.prototype.fillFastFiller = function() {
 
     if (room.energyAvailable == room.energyCapacityAvailable) return false
 
-    // If the creep has no energy
+    // If the creep needs resources
 
-    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
+    if (creep.needsResources()) {
 
         // Get the sourceLinks
 
