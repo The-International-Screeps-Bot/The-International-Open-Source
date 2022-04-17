@@ -245,3 +245,22 @@ export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPo
 
     return undefined
 }
+
+export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'source2')[] {
+
+    // Get the room's sourceNames
+
+    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2'],
+
+    // Get the remote's sourceEfficacies
+
+    sourceEfficacies = Memory.rooms[roomName].sourceEfficacies
+
+    // Limit sourceNames to the number of sourceEfficacies
+
+    if (sourceNames.length > sourceEfficacies.length) sourceNames.splice(sourceEfficacies.length - 1)
+
+    // Sort sourceNames by efficacy, informing the result
+
+    return sourceNames.sort((a, b) => Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(a)] - Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(b)])
+}

@@ -115,9 +115,14 @@ creepClasses.meleeDefender = MeleeDefender
 export class RemoteHarvester extends Creep {
 
     /**
+     * Finds a remote to harvest in
+     */
+    findRemote?(): boolean
+
+    /**
      *
      */
-     travelToSource?(): boolean
+    travelToSource?(sourceName: ('source1' | 'source2')): boolean
 
     constructor(creepID: Id<Creep>) {
 
@@ -125,7 +130,8 @@ export class RemoteHarvester extends Creep {
 
     }
 }
-creepClasses.remoteHarvester = RemoteHarvester
+creepClasses.source1RemoteHarvester = RemoteHarvester
+creepClasses.source2RemoteHarvester = RemoteHarvester
 
 export class RemoteHauler extends Creep {
 

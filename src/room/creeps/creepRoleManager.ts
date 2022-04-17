@@ -10,12 +10,13 @@ import { scoutManager } from './roleManagers/international/scoutManager'
 import { constants } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import { haulerManager } from './roleManagers/commune/haulerManager'
-import { remoteHarvesterManager } from './roleManagers/remote/remoteHarvesterManager'
+import { source2RemoteHarvesterManager } from './roleManagers/remote/source2RemoteHarvesterManager'
 import { remoteHaulerManager } from './roleManagers/remote/remoteHaulerManager'
 import { claimerManager } from './roleManagers/international/claimerManager'
 import { meleeDefenderManager } from './roleManagers/commune/meleeDefenderManager'
 import { hubHaulerManager } from './roleManagers/commune/hubHaulerManager'
 import { fastFillerManager } from './roleManagers/commune/fastFillerManager'
+import { source1RemoteHarvesterManager } from './roleManagers/remote/source1RemoteHarvesterManager'
 
 export function roleManager(room: Room) {
 
@@ -35,7 +36,8 @@ export function roleManager(room: Room) {
         hubHauler: hubHaulerManager,
         fastFiller: fastFillerManager,
         meleeDefender: meleeDefenderManager,
-        remoteHarvester: remoteHarvesterManager,
+        source1RemoteHarvester: source1RemoteHarvesterManager,
+        source2RemoteHarvester: source2RemoteHarvesterManager,
         remoteHauler: remoteHaulerManager,
         scout: scoutManager,
         claimer: claimerManager,

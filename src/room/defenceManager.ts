@@ -1,7 +1,6 @@
 import { allyList } from "international/constants"
 import { customLog, findObjectWithID } from "international/generalFunctions"
 
-
 /**
  * Handles defence related situations for a commune
  */
@@ -23,17 +22,24 @@ export function defenceManager(room: Room) {
 
             // Stop if the tick is not divisible by a random range
 
-            if (Game.time % Math.floor(Math.random() * 100) != 0) return
+            if (Game.time % Math.floor(Math.random() * 20) != 0) return
 
             // Get the room's ramparts and loop through them
 
             const ramparts: StructureRampart[] = room.get('rampart')
             for (const rampart of ramparts) {
 
-                // If the rampart isn't public, make it so
+                // If the rampart is public, iterate
 
-                if (!rampart.isPublic) rampart.setPublic(true)
+                if (rampart.isPublic) continue
+
+                // Otherwise set the rampart to public and stop
+
+                rampart.setPublic(true)
+                return
             }
+
+            // Stop
 
             return
         }

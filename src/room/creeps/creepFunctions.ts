@@ -791,67 +791,7 @@ Creep.prototype.findOptimalSourceName = function() {
     return false
 }
 
-Creep.prototype.findOptimalRemoteSourceName = function() {
-
-    const creep = this,
-    room = creep.room
-
-    creep.say('FORSN')
-
-    // If the creep already has a sourceName, inform true
-
-    if (creep.memory.sourceName) return true
-
-    // Query usedSourceHarvestPositions to get creepsOfSourceAmount
-
-    room.get('usedSourceHarvestPositions')
-
-    // Otherwise, define source names
-
-    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2'],
-
-    // Sort them by their range from the anchor
-
-    sourceNamesByAnchorRange = sourceNames.sort((a, b) => creep.pos.getRangeTo(room.get(a)?.pos) - creep.pos.getRangeTo(room.get(b)?.pos))
-
-    // Construct a creep threshold
-
-    let creepThreshold = 1
-
-    // So long as the creepThreshold is less than 4
-
-    while (creepThreshold < 4) {
-
-        // Then loop through the source names and find the first one with open spots
-
-        for (const sourceName of sourceNamesByAnchorRange) {
-
-            // Iterate if there is no source for the sourceName
-
-            if (!room.get(sourceName)) continue
-
-            // If there are still creeps needed to harvest a source under the creepThreshold
-
-            if (Math.min(creepThreshold, room.get(`${sourceName}HarvestPositions`).length) - room.creepsOfSourceAmount[sourceName] > 0) {
-
-                // Assign the sourceName to the creep's memory and Inform true
-
-                creep.memory.sourceName = sourceName
-                return true
-            }
-        }
-
-        // Otherwise increase the creepThreshold
-
-        creepThreshold++
-    }
-
-    // No source was found, inform false
-
-    return false
-}
-
-Creep.prototype.findSourceHarvestPos = function() {
+Creep.prototype.findSourceHarvestPos = function(sourceName) {
 
     const creep = this,
     room = creep.room
@@ -862,13 +802,9 @@ Creep.prototype.findSourceHarvestPos = function() {
 
     if (creep.memory.packedHarvestPos) return true
 
-    // Otherwise define the creep's designated source
-
-    const sourceName = creep.memory.sourceName,
-
     // Define an anchor
 
-    anchor: RoomPosition = room.get('anchor') || creep.pos,
+    const anchor: RoomPosition = room.get('anchor') || creep.pos,
 
     // Get usedSourceHarvestPositions
 
@@ -1906,7 +1842,7 @@ Creep.prototype.advancedRenew = function() {
 
     const creep = this,
     room = creep.room
-    if (!creep.memory.cost) return
+
     // If the creep's age is less than the benefit from renewing, stop
 
     if (CREEP_LIFE_TIME - creep.ticksToLive < Math.ceil(creep.memory.cost / 2.5 / creep.body.length)) return

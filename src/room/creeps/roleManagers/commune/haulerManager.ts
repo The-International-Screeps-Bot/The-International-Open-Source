@@ -12,10 +12,6 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
         const creep: Hauler = Game.creeps[creepName]
 
-        // Try to renew the creep
-
-        creep.advancedRenew()
-
         // If creep has a task
 
         if (global[creep.id]?.respondingTaskID) {

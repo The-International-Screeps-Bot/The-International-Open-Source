@@ -1,5 +1,5 @@
 import { allyManager } from 'room/market/simpleAllies'
-import { constants, remoteNeedsIndex } from './constants'
+import { constants, remoteHarvesterRoles, remoteNeedsIndex } from './constants'
 import { createPackedPosMap, customLog, findCarryPartsRequired } from './generalFunctions'
 
 /**
@@ -130,30 +130,15 @@ export function tickConfig() {
                 roomMemory.needs = []
             }
 
-            //
-
-            const isReserved = roomMemory.needs[remoteNeedsIndex.remoteReserver] == 0
-
             // Initialize aspects of needs
 
             roomMemory.needs[remoteNeedsIndex.remoteReserver] = 1
 
-            roomMemory.needs[remoteNeedsIndex.remoteHarvester] = isReserved ? 6 : 3 * roomMemory.sourceEfficacies.length
+            roomMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 3
+
+            roomMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = roomMemory.source2 ? 3 : 0
 
             roomMemory.needs[remoteNeedsIndex.remoteHauler] = 0
-
-            // Loop through the efficacies of each source efficacy
-
-            for (const efficacy of roomMemory.sourceEfficacies) {
-
-                // Get the income based on the reservation of the room and remoteHarvester need
-
-                const income = Math.max((roomMemory.needs[remoteNeedsIndex.remoteHarvester] + (isReserved ? 4 : 2)) / roomMemory.sourceEfficacies.length, 0) - roomMemory.needs[remoteNeedsIndex.remoteReserver] == 0 ? 10 : 5
-
-                // Find the number of carry parts required for the source, and add it to the remoteHauler need
-
-                roomMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(efficacy, income)
-            }
         }
 
         // Add roomName to commune list
@@ -167,6 +152,21 @@ export function tickConfig() {
         for (const role of constants.creepRoles) room.creepsFromRoom[role] = []
 
         room.creepsFromRoomAmount = 0
+
+        room.creepsFromRoomWithRemote = {}
+
+        // For each remoteName in the room's recorded remotes
+
+        for (const remoteName of room.memory.remotes) {
+
+            // Intialize an array for this room's creepsFromRoomWithRemote
+
+            room.creepsFromRoomWithRemote[remoteName] = {}
+
+            // For each role, construct an array for the role in creepsFromWithRemote
+
+            for (const role of remoteHarvesterRoles) room.creepsFromRoomWithRemote[remoteName][role] = []
+        }
 
         room.storedResources = {}
     }

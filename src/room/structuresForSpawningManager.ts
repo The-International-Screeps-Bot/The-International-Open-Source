@@ -41,9 +41,22 @@ export function structuresForSpawningManager(room: Room) {
         const anchor: RoomPosition | undefined = room.get('anchor')
         if (!anchor) return
 
-        // Assign structuresForSpawning that are not in range of 2 to the the anchor
+        // Assign structuresForSpawning that are not in range of 2 to the anchor
 
         structuresForSpawning = structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, anchor.x, anchor.y) > 2)
+    }
+
+    // Get the hubAnchor
+
+    const hubAnchor = global[room.name].stampAnchors?.hub[0]
+
+    // If the hubAnchor is defined
+
+    if (hubAnchor) {
+
+        // Assign structuresForSpawning that are not in range of 1 to the hubAnchor
+
+        structuresForSpawning = structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, hubAnchor.x, hubAnchor.y) > 1)
     }
 
     // Iterate through structures in structureForSpawning

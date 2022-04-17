@@ -86,7 +86,8 @@ declare global {
     'hubHauler' |
     'fastFiller' |
     'meleeDefender' |
-    'remoteHarvester' |
+    'source1RemoteHarvester' |
+    'source2RemoteHarvester' |
     'remoteHauler' |
     /*'remoteReserver' |
     'remoteScout' |
@@ -236,12 +237,13 @@ declare global {
         defaultParts: BodyPartConstant[]
         extraParts: BodyPartConstant[]
         partsMultiplier: number
-        minCreeps?: number | undefined
-        maxCreeps?: number | undefined
-        maxCostPerCreep?: number | undefined
         minCost: number
         priority: number
         memoryAdditions: Partial<CreepMemory>
+        groupComparator?: string[]
+        minCreeps?: number | undefined
+        maxCreeps?: number | undefined
+        maxCostPerCreep?: number | undefined
     }
 
     interface ExtraOpts {
@@ -391,6 +393,11 @@ declare global {
          * The cumulative amount of creeps with a communeName value of this room's name
          */
         creepsFromRoomAmount: number
+
+        /**
+         * An object with keys of roles and properties of the number of creeps with the role from this room
+         */
+        creepsFromRoomWithRemote: {[key: string]: {[key: string]: string[]}}
 
         /**
          * Tasks that currently have a creep trying to fulfill them
@@ -572,6 +579,8 @@ declare global {
 
         getPartsOfRoleAmount(role: CreepRoles, type?: BodyPartConstant): number
 
+        findSourcesByEfficacy(): ('source1' | 'source2')[]
+
         // Market functions
 
         advancedSell(resourceType: ResourceConstant, amount: number): boolean
@@ -751,9 +760,7 @@ declare global {
 
         findOptimalSourceName(): boolean
 
-        findOptimalRemoteSourceName(): boolean
-
-        findSourceHarvestPos(): boolean
+        findSourceHarvestPos(sourceName: ('source1' | 'source2')): boolean
 
         findMineralHarvestPos(): boolean
 
@@ -849,7 +856,7 @@ declare global {
         /**
          * Generally describes the body parts and tasks the creep is expected to do
          */
-        role: string
+        role: CreepRoles
 
         /**
          * The energy the creep cost to spawn

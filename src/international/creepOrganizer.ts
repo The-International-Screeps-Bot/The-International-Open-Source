@@ -59,30 +59,55 @@ export function creepOrganizer() {
 
         const commune = Game.rooms[creep.memory.communeName]
 
-        // If there is vision in the commune
+        // If there is not vision in the commune, stop
 
-        if (commune) {
+        if (!commune) return
 
-            // If the creep isn't dying, organize by its roomFrom and role
+        // If the creep isn't dying, organize by its roomFrom and role
 
-            if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
+        if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
 
-            // Record that the creep's existence in its roomFrom
+        // Record that the creep's existence in its roomFrom
 
-            commune.creepsFromRoomAmount++
-        }
+        commune.creepsFromRoomAmount++
+
+        // Get the creep's remoteName
+
+        const remoteName = creep.memory.remoteName
 
         // If the creep has a remote
 
-        if (creep.memory.remoteName) {
+        if (remoteName) {
 
-            // If the creep is a remoteHarvester, reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
+            // If the creep is a source1RemoteHarvester
 
-            if (role == 'remoteHarvester') Memory.rooms[creep.memory.remoteName].needs[remoteNeedsIndex.remoteHarvester] -= creep.partsOfType(WORK)
+            if (role == 'source1RemoteHarvester') {
+
+                // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
+
+                Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
+
+                // Add the creep to creepsFromRoomWithRemote relative to its remote
+                
+                commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
+            }
+
+            // If the creep is a source2RemoteHarvester
+
+            else if (role == 'source2RemoteHarvester') {
+
+                // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
+
+                Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
+
+                // Add the creep to creepsFromRoomWithRemote relative to its remote
+
+                commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
+            }
 
             // Otherwise if the creep is a remoteHauler, reduce its remote's needs by their number of carry parts
 
-            else if (role == 'remoteHauler') Memory.rooms[creep.memory.remoteName].needs[remoteNeedsIndex.remoteHauler] -= creep.partsOfType(CARRY)
+            else if (role == 'remoteHauler') Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(CARRY)
         }
 
         // Increase total creep counter

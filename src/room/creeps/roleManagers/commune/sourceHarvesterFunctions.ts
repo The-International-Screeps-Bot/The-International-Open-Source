@@ -1,6 +1,6 @@
 import { constants } from "international/constants"
 import { getRangeBetween } from "international/generalFunctions"
-import { RoomPullTask, RoomWithdrawTask } from "room/roomTasks"
+import { RoomPullTask } from "room/roomTasks"
 import { SourceHarvester } from "../../creepClasses"
 
 SourceHarvester.prototype.travelToSource = function() {
@@ -14,7 +14,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
     // Try to find a harvestPosition, inform false if it failed
 
-    if (!creep.findSourceHarvestPos()) return false
+    if (!creep.findSourceHarvestPos(sourceName)) return false
 
     creep.say('🚬')
 

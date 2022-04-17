@@ -707,7 +707,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // If the room is a commune, use sourceHarvesters. Otherwise use remoteHarvesters
 
-        harvesterNames = room.memory.type == 'commune' ? room.myCreeps.sourceHarvester : room.myCreeps.remoteHarvester
+        harvesterNames = room.memory.type == 'commune' ? room.myCreeps.sourceHarvester : room.myCreeps.source1RemoteHarvester.concat(room.myCreeps.source2RemoteHarvester)
 
         // Loop through each sourceHarvester's name in the room
 
@@ -2994,9 +2994,22 @@ Room.prototype.estimateIncome = function() {
         income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER
     }
 
-    // Loop through each creepName with a role of remoteHarvester from this room
+    // Loop through each creepName with a role of source1RemoteHarvester from this room
 
-    for (const creepName of room.creepsFromRoom.remoteHarvester) {
+    for (const creepName of room.creepsFromRoom.source1RemoteHarvester) {
+
+        // Get the creep using creepName
+
+        const creep = Game.creeps[creepName]
+
+        // Add the number of work parts owned by the creep at a max of 5, times harvest power
+
+        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER
+    }
+
+    // Loop through each creepName with a role of source2RemoteHarvester from this room
+
+    for (const creepName of room.creepsFromRoom.source2RemoteHarvester) {
 
         // Get the creep using creepName
 
@@ -3075,4 +3088,17 @@ Room.prototype.getPartsOfRoleAmount = function(role, type) {
     // Inform partsAmount
 
     return partsAmount
+}
+
+Room.prototype.findSourcesByEfficacy = function() {
+
+    const room = this,
+
+    // Get the room's sourceNames
+
+    sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+
+    // Sort sourceNames based on their efficacy, informing the result
+
+    return sourceNames.sort((a, b) => room.get(`${a}PathLength`) - room.get(`${b}PathLength`))
 }

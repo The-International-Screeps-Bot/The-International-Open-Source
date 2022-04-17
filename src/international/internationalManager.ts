@@ -5,6 +5,7 @@ import { creepOrganizer } from '../international/creepOrganizer'
 import { mapVisualsManager } from './mapVisualsManager'
 import { advancedGeneratePixel } from './generalFunctions'
 import { allyManager } from 'room/market/simpleAllies'
+import { remoteNeedsManager } from './remoteNeedsManager'
 
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
@@ -20,6 +21,8 @@ export function internationalManager() {
     allyManager.getAllyRequests()
 
     creepOrganizer()
+
+    remoteNeedsManager()
 
     advancedGeneratePixel()
 
