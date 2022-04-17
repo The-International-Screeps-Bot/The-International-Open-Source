@@ -17,7 +17,7 @@ HubHauler.prototype.travelToHub = function() {
 
     // Otherwise move to the hub and inform true
 
-    creep.say('⏩ H')
+    creep.say('⏩H')
 
     creep.createMoveRequest({
         origin: creep.pos,

@@ -3,6 +3,10 @@
  */
 export function linkManager(room: Room) {
 
+    //
+
+    if (!room.storage || room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < 60000) return
+
     // Get the sourceLinks
 
     const sourceLinks: (StructureLink | false)[] = [room.get('source1Link'), room.get('source2Link')],

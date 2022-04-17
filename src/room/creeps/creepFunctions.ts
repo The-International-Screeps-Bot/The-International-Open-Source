@@ -179,15 +179,15 @@ Creep.prototype.advancedUpgradeController = function() {
 
     controller = room.controller,
 
-    // Get the controllerContainer
+    // Assign either the controllerLink or controllerContainer as the controllerStructure
 
-    controllerContainer: StructureContainer = room.get('controllerContainer')
+    controllerStructure: (StructureLink | StructureContainer | undefined) = room.get('controllerLink') || room.get('controllerContainer')
 
     creep.say('AUC')
 
     // If there is a controllerContainer
 
-    if (controllerContainer) {
+    if (controllerStructure) {
 
         // if the creep doesn't have an upgrade pos
 
@@ -252,20 +252,20 @@ Creep.prototype.advancedUpgradeController = function() {
 
         // If the creep has less energy than its workPartCount
 
-        if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount) {
+        if (creep.store.getUsedCapacity(RESOURCE_ENERGY) <= workPartCount) {
 
             // Withdraw from the controllerContainer, informing false if the withdraw failed
 
-            if (creep.withdraw(controllerContainer, RESOURCE_ENERGY) != OK) return false
+            if (creep.withdraw(controllerStructure, RESOURCE_ENERGY) != OK) return false
         }
 
-        // If the controller is in need of repair
+        // If the controller is a container and is in need of repair
 
-        if (controllerContainer.hitsMax - controllerContainer.hits >= workPartCount * REPAIR_POWER * room.creepsFromRoom.controllerUpgrader.length) {
+        if (controllerStructure.structureType == STRUCTURE_CONTAINER && controllerStructure.hitsMax - controllerStructure.hits >= workPartCount * REPAIR_POWER * room.creepsFromRoom.controllerUpgrader.length) {
 
             // Try to repair the controllerContainer
 
-            const repairResult = creep.repair(controllerContainer)
+            const repairResult = creep.repair(controllerStructure)
 
             // If the repair worked
 
@@ -273,7 +273,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
                 // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
 
-                const energySpentOnRepairs = Math.min(workPartCount, (controllerContainer.hitsMax - controllerContainer.hits) / REPAIR_POWER)
+                const energySpentOnRepairs = Math.min(workPartCount, (controllerStructure.hitsMax - controllerStructure.hits) / REPAIR_POWER)
 
                 // Add control points to total controlPoints counter and say the success
 

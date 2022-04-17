@@ -283,7 +283,7 @@ export function basePlanner(room: Room) {
 
     // Plan for a container at the pos
 
-    structurePlans.set(centerUpgadePos.x, centerUpgadePos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER])
+    /* structurePlans.set(centerUpgadePos.x, centerUpgadePos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER]) */
 
     // Path from the hubAnchor to the closestUpgradePos
 

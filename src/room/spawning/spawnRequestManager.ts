@@ -544,7 +544,7 @@ export function spawnRequester(room: Room) {
         // If there is no terminal or storage, inform false
 
         if (!room.storage || !room.terminal) return false
-        
+
         return {
             defaultParts: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE],
             extraParts: [],
@@ -765,7 +765,20 @@ export function spawnRequester(room: Room) {
 
             // If the controller is level 8, max out partsMultiplier at 4
 
-            if (room.controller.level == 8) partsMultiplier = Math.min(4, partsMultiplier)
+            if (room.controller.level == 8) {
+
+                return {
+                    defaultParts: [MOVE],
+                    extraParts: [WORK, WORK, WORK, WORK, MOVE, CARRY, WORK],
+                    partsMultiplier: Math.min(Math.max(partsMultiplier / 5, 1), 3),
+                    minCreeps: 1,
+                    minCost: 200,
+                    priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                    memoryAdditions: {
+                        role: 'controllerUpgrader',
+                    }
+                }
+            }
 
             return {
                 defaultParts: [CARRY],

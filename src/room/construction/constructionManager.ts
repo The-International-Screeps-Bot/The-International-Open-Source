@@ -29,6 +29,27 @@ export function constructionManager(room: Room) {
 
     if (Game.time % 50 != 0) return
 
+    manageControllerStructures()
+
+    function manageControllerStructures() {
+
+        //
+
+        const centerUpgradePos: RoomPosition | undefined = room.get('centerUpgradePos')
+        if (!centerUpgradePos) return
+
+        if (room.controller.level >= 6) {
+
+            const controllerContainer: StructureContainer | undefined = room.get('controllerContainer')
+            if (controllerContainer) controllerContainer.destroy()
+
+            room.createConstructionSite(centerUpgradePos, STRUCTURE_LINK)
+            return
+        }
+
+        room.createConstructionSite(centerUpgradePos, STRUCTURE_CONTAINER)
+    }
+
     manageBasePlanning()
 
     function manageBasePlanning() {
