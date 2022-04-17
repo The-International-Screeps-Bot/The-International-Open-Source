@@ -46,11 +46,8 @@ export function remoteNeedsManager() {
 
                 // Get the income based on the reservation of the room and remoteHarvester need
 
-                let income = (isReserved ? 10 : 5) - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2))
+                let income = (isReserved ? 10 : 5) /* - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2)) */
 
-
-                /* income = (isReserved ? 2 : 1) - remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] * HARVEST_POWER - (isReserved ? 2 : 1) */
-                customLog('INCOME', income)
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
                 remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(efficacy, income)

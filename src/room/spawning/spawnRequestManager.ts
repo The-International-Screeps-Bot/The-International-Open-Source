@@ -963,6 +963,10 @@ export function spawnRequester(room: Room) {
                 partsMultiplier += Math.max(Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHauler], 0)
             }
 
+            // If there are no needs for this room, stop
+
+            if (Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteHauler] <= 0) return false
+
             return {
                 defaultParts: [],
                 extraParts: [CARRY, MOVE],
