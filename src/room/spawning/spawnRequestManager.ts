@@ -29,9 +29,13 @@ export function spawnRequester(room: Room) {
 
     function createSpawnRequest(priority: number, body: BodyPartConstant[], tier: number, cost: number, memory: any) {
 
-        // Set the memories communeName to this room's name
+        // Set the memory's communeName to this room's name
 
         memory.communeName = room.name
+
+        // Assign the cost to the creep's memory
+
+        memory.cost = cost
 
         // Add the components to spawnRequests
 

@@ -103,6 +103,10 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
         if (room.name == creep.memory.communeName) {
 
+            // Try to renew the creep
+
+            creep.advancedRenew()
+
             // If the creep has a remoteName, delete it
 
             if (creep.memory.remoteName) delete creep.memory.remoteName

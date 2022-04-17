@@ -1878,7 +1878,7 @@ Creep.prototype.advancedRecycle = function() {
 
     // If the creep is in range of 1
 
-    if (creep.pos.getRangeTo(closestSpawn) == 1) {
+    if (creep.pos.getRangeTo(closestSpawn.pos) == 1) {
 
         // Recycle the creep and stop
 
@@ -1900,4 +1900,41 @@ Creep.prototype.advancedRecycle = function() {
             1: room.get('road')
         }
     })
+}
+
+Creep.prototype.advancedRenew = function() {
+
+    const creep = this,
+    room = creep.room
+    if (!creep.memory.cost) return
+    // If the creep's age is less than the benefit from renewing, stop
+
+    if (CREEP_LIFE_TIME - creep.ticksToLive < Math.ceil(creep.memory.cost / 2.5 / creep.body.length)) return
+
+    // Get the room's spawns, stopping if there are none
+
+    const spawns: StructureSpawn[] = room.get('spawn')
+    if (!spawns.length) return
+
+    // Get spawns in range of 1
+
+    const nearbySpawns = spawns.filter(spawn => creep.pos.getRangeTo(spawn.pos) == 1)
+
+    // Loop through each nearbySpawn
+
+    for (const spawn of nearbySpawns) {
+
+        // If the spawn has already renewed this tick, iterate
+
+        if (spawn.hasRenewed) continue
+
+        // Otherwise, renew the creep and record the spawn as having renewed
+
+        spawn.renewCreep(creep)
+        spawn.hasRenewed = true
+
+        // And stop
+
+        return
+    }
 }

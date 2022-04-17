@@ -839,6 +839,8 @@ declare global {
         findHealPower(): number
 
         advancedRecycle(): void
+
+        advancedRenew(): void
     }
 
     interface CreepMemory {
@@ -848,6 +850,11 @@ declare global {
          * Generally describes the body parts and tasks the creep is expected to do
          */
         role: string
+
+        /**
+         * The energy the creep cost to spawn
+         */
+        cost: number
 
         /**
          * The name of the room the creep is from
@@ -946,6 +953,13 @@ declare global {
     }
 
     interface StructureSpawn {
+
+        /**
+         * Wether the spawn has renewed a creep this tick
+         */
+        hasRenewed: boolean
+
+        // Functions
 
         advancedSpawn(spawnRequest: SpawnRequest): ScreepsReturnCode
     }
