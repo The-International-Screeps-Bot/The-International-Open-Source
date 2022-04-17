@@ -1,3 +1,4 @@
+import { spawn } from "child_process"
 import { boostMultipliers, constants } from "international/constants"
 import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
 import { repeat } from "lodash"
@@ -402,6 +403,10 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
     const creep = this,
     room = creep.room
 
+    // Stop if the cSite is undefined
+
+    if (!cSite) return false
+
     creep.say('ABCS')
 
     // If the creep needs resources
@@ -418,18 +423,18 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
             const fulfillTaskResult = creep.fulfillTask()
 
-            // If the task wasn't fulfilled, inform false
+            // If the task wasn't fulfilled, inform true
 
-            if (!fulfillTaskResult) return false
+            if (!fulfillTaskResult) return true
 
             // Otherwise find the task
 
             const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
 
-            // Delete it and inform false
+            // Delete it and inform true
 
             task.delete()
-            return false
+            return true
         }
 
         // Otherwise try to find a new task
@@ -440,7 +445,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
             'offer'
         ]), RESOURCE_ENERGY)
 
-        return false
+        return true
     }
 
     // Otherwise if the creep doesn't need resources
@@ -464,7 +469,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
         // Inform true
 
-        return false
+        return true
     }
 
     // Otherwise
@@ -491,9 +496,9 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
         return true
     }
 
-    // Inform failure
+    // Inform true
 
-    return false
+    return true
 }
 
 Creep.prototype.findRampartRepairTarget = function(workPartCount) {
@@ -1855,4 +1860,44 @@ Creep.prototype.findHealPower = function() {
     // Inform healValue
 
     return healValue
+}
+
+Creep.prototype.advancedRecycle = function() {
+
+    const creep = this,
+    room = creep.room
+
+    // Get the room's spawns, stopping if there are none
+
+    const spawns: StructureSpawn[] = room.get('spawn')
+    if (!spawns.length) return
+
+    // Otherwise, find the closest spawn to the creep
+
+    const closestSpawn = creep.pos.findClosestByRange(spawns)
+
+    // If the creep is in range of 1
+
+    if (creep.pos.getRangeTo(closestSpawn) == 1) {
+
+        // Recycle the creep and stop
+
+        creep.say('♻️')
+
+        closestSpawn.recycleCreep(creep)
+        return
+    }
+
+    // Otherwise, make a move request to it
+
+    creep.say('⏩♻️')
+
+    creep.createMoveRequest({
+        origin: creep.pos,
+        goal: { pos: closestSpawn.pos, range: 1 },
+        avoidEnemyRanges: true,
+        weightGamebjects: {
+            1: room.get('road')
+        }
+    })
 }

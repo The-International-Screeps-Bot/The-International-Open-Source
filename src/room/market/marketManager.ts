@@ -53,7 +53,7 @@ export function marketManager(room: Room) {
 
             // If the terminal doesn't have enough, iterate
 
-            if (terminal.store.getUsedCapacity(resourceRequest.resourceType) < 100000) continue
+            if (terminal.store.getUsedCapacity(resourceRequest.resourceType) < 120000) continue
 
             // Otherwise send the resource and stop the loop
 
@@ -66,9 +66,9 @@ export function marketManager(room: Room) {
         continue
     }
 
-    // If there is less than 40,000 energy in the terminal, request 60,000
+    // If there is less than x energy in the terminal, request y
 
-    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 40000) allyManager.requestResource(room.name, RESOURCE_ENERGY, 60000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY), 0.15)
+    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 60000) allyManager.requestResource(room.name, RESOURCE_ENERGY, 80000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY), 0.25)
 
     // For each mineral
 

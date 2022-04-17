@@ -731,7 +731,7 @@ declare global {
         /**
          * Attempts multiple methods to build a construction site
          */
-        advancedBuildCSite(cSite: ConstructionSite): boolean
+        advancedBuildCSite(cSite: ConstructionSite | undefined): boolean
 
         /**
          *
@@ -836,6 +836,8 @@ declare global {
         isOnExit(): boolean
 
         findHealPower(): number
+
+        advancedRecycle(): void
     }
 
     interface CreepMemory {

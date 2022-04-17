@@ -720,9 +720,9 @@ export function spawnRequester(room: Room) {
 
         partsMultiplier += attackValue * 0.5
 
-        // For every 30,000 energy in storage, add 1 multiplier
+        // For every x energy in storage, add 1 multiplier
 
-        if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 30000
+        if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000
 
         // If all RCL 3 extensions are build
 
@@ -773,9 +773,9 @@ export function spawnRequester(room: Room) {
         estimatedIncome -= incomeShare
         partsMultiplier += incomeShare
 
-        // For every 30,000 energy in storage, add 1 multiplier
+        // For every x energy in storage, add 1 multiplier
 
-        if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 30000
+        if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000
 
         // If there are construction sites of my ownership in the room, set multiplier to 1
 

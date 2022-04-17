@@ -20,15 +20,11 @@ FastFiller.prototype.travelToFastFiller = function() {
 
     // Otherwise, make a move request to it
 
-    creep.say('⏩M')
+    creep.say('⏩F')
 
     creep.createMoveRequest({
         origin: creep.pos,
-        goal: { pos: fastFillerPos, range: 0 },
-        avoidEnemyRanges: true,
-        weightGamebjects: {
-            1: room.get('road')
-        }
+        goal: { pos: fastFillerPos, range: 0 }
     })
 
     // And inform true
