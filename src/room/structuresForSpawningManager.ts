@@ -39,7 +39,7 @@ export function structuresForSpawningManager(room: Room) {
 
         // Assign structuresForSpawning that are not in range of 2 to the the anchor
 
-        structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, anchor.x, anchor.y) > 1)
+        structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, anchor.x, anchor.y) > 2)
     }
 
     // Iterate through structures in structureForSpawning
