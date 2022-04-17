@@ -31,11 +31,15 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         creep.advancedHarvestSource(room.get(sourceName))
 
-        // Try to transfer to the source link. Iterate if it transfered
+        // Try to transfer to source extensions, iterating if success
 
-        creep.transferToSourceLink()
+        if (creep.transferToSourceExtensions()) continue
 
-        // Try to repair the sourceContainer. Iterate if it repaired
+        // Try to transfer to the source link, iterating if success
+
+        if (creep.transferToSourceLink()) continue
+
+        // Try to repair the sourceContainer
 
         creep.repairSourceContainer(sourceContainer)
     }

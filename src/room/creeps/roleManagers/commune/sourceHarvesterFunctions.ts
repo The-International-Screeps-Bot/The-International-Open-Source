@@ -65,6 +65,54 @@ SourceHarvester.prototype.travelToSource = function() {
     return true
 }
 
+SourceHarvester.prototype.transferToSourceExtensions = function() {
+
+    const creep = this,
+    room = creep.room
+
+    // If all spawningStructures are filled, inform false
+
+    if (room.energyAvailable == room.energyCapacityAvailable) return false
+
+    // If the creep is not nearly full, inform false
+
+    if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > creep.partsOfType(WORK) * HARVEST_POWER) return false
+
+    // Get adjacent structures to the creep
+
+    const adjacentStructures = room.lookForAtArea(LOOK_STRUCTURES, creep.pos.y - 1, creep.pos.x - 1, creep.pos.y + 1, creep.pos.x + 1, true)
+
+    // For each structure of adjacentStructures
+
+    for (const adjacentPosData of adjacentStructures) {
+
+        // Get the structure at the adjacentPos
+
+        const structure = adjacentPosData.structure as AnyStoreStructure
+
+        // If the structure has no store property, iterate
+
+        if (!structure.store) continue
+
+        // If the structureType is an extension, iterate
+
+        if (structure.structureType != STRUCTURE_EXTENSION) continue
+
+        // Otherwise, if the structure is full, iterate
+
+        if (structure.store.getFreeCapacity(RESOURCE_ENERGY) == 0) continue
+
+        // Otherwise, transfer to the structure and inform true
+
+        creep.transfer(structure, RESOURCE_ENERGY)
+        return true
+    }
+
+    // Inform false
+
+    return false
+}
+
 SourceHarvester.prototype.transferToSourceLink = function() {
 
     const creep = this,
@@ -72,17 +120,16 @@ SourceHarvester.prototype.transferToSourceLink = function() {
 
     // If the creep is not nearly full, stop
 
-    if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > creep.partsOfType(WORK) * HARVEST_POWER) return
+    if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > creep.partsOfType(WORK) * HARVEST_POWER) return false
 
     // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
     const sourceLink = room.get(`${creep.memory.sourceName}Link`)
-    if (!sourceLink) return
+    if (!sourceLink) return false
 
     // Try to transfer to the sourceLink and inform true
 
-    creep.advancedTransfer(sourceLink)
-    return
+    return creep.advancedTransfer(sourceLink)
 }
 
 SourceHarvester.prototype.repairSourceContainer = function(sourceContainer) {

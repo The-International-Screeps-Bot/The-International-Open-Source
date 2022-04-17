@@ -7,8 +7,12 @@ const creepClasses: CreepClasses = {}
 export class SourceHarvester extends Creep {
 
     travelToSource?(): boolean
-    transferToSourceLink?(): void
-    repairSourceContainer?(sourceContainer: StructureContainer): void
+
+    transferToSourceExtensions?(): boolean
+
+    transferToSourceLink?(): boolean
+
+    repairSourceContainer?(sourceContainer: StructureContainer): boolean
 
     constructor(creepID: Id<Creep>) {
 

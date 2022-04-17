@@ -23,6 +23,7 @@ import { endTickManager } from 'international/endTickManager'
 import { memHack } from 'other/memHack'
 import { RoomOfferTask, RoomPickupTask, RoomPullTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
 import { RoomObject } from 'room/roomObject'
+import { allyManager } from 'room/market/simpleAllies'
 
 // Type declareations for global
 
