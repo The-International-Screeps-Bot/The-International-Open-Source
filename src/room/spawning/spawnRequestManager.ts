@@ -566,14 +566,14 @@ export function spawnRequester(room: Room) {
 
         const fastFillerPositions: Pos[] = room.get('fastFillerPositions')
         if (!fastFillerPositions.length) return false
-        
+
         return {
             defaultParts: [CARRY, CARRY, CARRY, MOVE, CARRY],
             extraParts: [],
             partsMultiplier: 1,
             minCreeps: fastFillerPositions.length,
             minCost: 250,
-            priority: 2 + room.creepsFromRoom.fastFiller.length,
+            priority: 2,
             memoryAdditions: {
                 role: 'fastFiller',
             }

@@ -1610,7 +1610,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                         // Find harvestPositions for sourceNames, iterating if there are none
 
                         const harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`)
-                        if (!harvestPositions?.length) continue
+                        if (!harvestPositions.length) continue
 
                         // Loop through each position of harvestPositions, have creeps prefer to avoid
 
@@ -1642,6 +1642,32 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                             cm.set(pos.x, pos.y, 10)
                         }
+                    }
+
+                    // Get the hubAnchor
+
+                    const hubAnchor: Pos = global[room.name].stampAnchors?.hub[0]
+
+                    // If the hubAnchor is defined
+
+                    if (hubAnchor) {
+
+                        // Have the creep prefer to avoid the pos
+
+                        cm.set(hubAnchor.x, hubAnchor.y, 10)
+                    }
+
+                    // Get fastFillerPositions
+
+                    const fastFillerPositions: Pos[] = room.get('fastFillerPositions')
+
+                    // If there are fastFillerPositions
+
+                    if (!fastFillerPositions.length) {
+
+                        // Loop through each position of fastFillerPositions, have creeps prefer to avoid
+
+                        for (const pos of fastFillerPositions) cm.set(pos.x, pos.y, 10)
                     }
                 }
 
