@@ -651,7 +651,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [],
                 extraParts: [WORK, WORK, MOVE, CARRY, CARRY, MOVE, CARRY, CARRY, MOVE, CARRY, MOVE, WORK],
-                partsMultiplier,
+                partsMultiplier: partsMultiplier / 3,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 750,
