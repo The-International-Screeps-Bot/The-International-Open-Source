@@ -26,6 +26,8 @@ export function taskManager(room: Room) {
         if (!task.shouldStayActive()) task.delete()
     }
 
+    /*
     customLog('TWOR', JSON.stringify(global[room.name].tasksWithoutResponders))
     customLog('TWR', JSON.stringify(global[room.name].tasksWithResponders))
+    */
 }

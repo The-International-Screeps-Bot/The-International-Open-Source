@@ -107,7 +107,7 @@ export function tickConfig() {
 
         // Loop through the name of each of the commune's remotes
 
-        for (let index = room.memory.remotes.length - 1; index > 0; index--) {
+        for (let index = room.memory.remotes.length - 1; index >= 0; index--) {
 
             // Get the name of the remote using the index
 
@@ -116,7 +116,7 @@ export function tickConfig() {
             // Get the room's memory using its name
 
             roomMemory = Memory.rooms[roomName]
-
+            customLog(roomName, index)
             // If the room isn't a remote, remove it from the remotes array
 
             if (roomMemory.type != 'remote') room.memory.remotes.splice(index)
@@ -129,17 +129,17 @@ export function tickConfig() {
 
             const remote = Game.rooms[roomName]
 
-            // If there is visio in the room, the controller is reserved, it's reserved be me, and there is sufficient reservation left
+            // If there is vision in the room, the controller is reserved, it's reserved be me, and there is sufficient reservation left
 
             if (remote &&
                 remote.controller.reservation &&
                 remote.controller.reservation.username == constants.me &&
                 remote.controller.reservation.ticksToEnd >= roomMemory.sourceEfficacies.reduce((a, b) => a + b)) {
 
-                    // Set the reservation need to 0
+                // Set the reservation need to 0
 
-                    roomMemory.needs[remoteNeedsIndex.remoteReserver] = 0
-                }
+                roomMemory.needs[remoteNeedsIndex.remoteReserver] = 0
+            }
 
             roomMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 3
 

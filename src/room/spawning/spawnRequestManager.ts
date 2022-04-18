@@ -749,7 +749,7 @@ export function spawnRequester(room: Room) {
 
         // For each rampart, add a multiplier
 
-        partsMultiplier += ramparts.length * 0.07
+        partsMultiplier += ramparts.length * 0.06
 
         // For every attackValue, add a multiplier
 
@@ -963,7 +963,7 @@ export function spawnRequester(room: Room) {
                 return {
                     defaultParts: [CARRY],
                     extraParts: [WORK, MOVE],
-                    partsMultiplier: 6,
+                    partsMultiplier: Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester], 0),
                     groupComparator: room.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
                     threshold: 0.1,
                     minCreeps: 1,
@@ -1006,7 +1006,7 @@ export function spawnRequester(room: Room) {
                 return {
                     defaultParts: [CARRY],
                     extraParts: [WORK, MOVE],
-                    partsMultiplier: 6,
+                    partsMultiplier: Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source2RemoteHarvester], 0),
                     groupComparator: room.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
                     threshold: 0.1,
                     minCreeps: 1,

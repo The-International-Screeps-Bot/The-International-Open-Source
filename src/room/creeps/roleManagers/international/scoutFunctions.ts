@@ -55,7 +55,7 @@ Scout.prototype.findScoutTarget = function() {
         return
     }
 
-    // Otherwise ort the scoutedRooms by their lastScout, selecting the oldest one
+    // Otherwise sort the scoutedRooms by their lastScout, selecting the oldest one
 
     const oldestScoutedRoom = scoutedRooms.sort((a, b) => Memory.rooms[a].lastScout - Memory.rooms[b].lastScout)[0]
 

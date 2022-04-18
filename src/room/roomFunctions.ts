@@ -483,7 +483,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the open areas in a range of 3 to the controller
 
-        const distanceCM = room.distanceTransform(true, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
+        const distanceCM = room.distanceTransform(false, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
 
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
@@ -1929,7 +1929,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             for (const sourceName of sourceNames) {
 
-                // Get the source using sourceName, iterating if undefined
+                // Get the source using sourceName, stopping the loop if undefined
 
                 const source: Source = room.get(sourceName)
                 if (!source) break
@@ -2235,8 +2235,6 @@ Room.prototype.distanceTransform = function(enableVisuals, x1 = constants.roomDi
                 fill: 'hsl(' + 200 + distanceValue * 10 + ', 100%, 60%)',
                 opacity: 0.4,
             })
-
-            if (enableVisuals) room.visual.text(distanceValue.toString(), x, y)
         }
     }
 
@@ -2247,9 +2245,9 @@ Room.prototype.specialDT = function(initialCM, enableVisuals) {
 
     const room = this
 
-    // Use a costMatrix to record distances. Use the initialCM if provided, otherwise create one
+    // Use a costMatrix to record distances. Use the initialCM if provided, otherwise clone the terrainCM
 
-    const distanceCM = initialCM || new PathFinder.CostMatrix()
+    const distanceCM = initialCM || room.get('terrainCM').clone()
 
     // Loop through each x and y in the room
 
