@@ -134,7 +134,7 @@ export function tickConfig() {
             if (remote &&
                 remote.controller.reservation &&
                 remote.controller.reservation.username == constants.me &&
-                remote.controller.reservation.ticksToEnd >= roomMemory.sourceEfficacies.reduce((a, b) => a + b)) {
+                remote.controller.reservation.ticksToEnd >= roomMemory.sourceEfficacies.reduce((a, b) => a + b) * 2) {
 
                 // Set the reservation need to 0
 

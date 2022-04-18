@@ -1521,12 +1521,15 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     // Get enemies and loop through them
 
-                    const enemyCreeps: Creep[] = room.get('enemyCreeps')
-                    for (const enemyCreep of enemyCreeps) {
+                    const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+                        filter: creep => !allyList.has(creep.owner.username) && creep.hasPartsOfTypes([ATTACK, RANGED_ATTACK])
+                    })
+
+                    for (const enemyAttacker of enemyAttackers) {
 
                         // Construct rect and get positions inside
 
-                        const positions = findPositionsInsideRect(enemyCreep.pos.x - 2, enemyCreep.pos.y - 2, enemyCreep.pos.x + 2, enemyCreep.pos.y + 2)
+                        const positions = findPositionsInsideRect(enemyAttacker.pos.x - 2, enemyAttacker.pos.y - 2, enemyAttacker.pos.x + 2, enemyAttacker.pos.y + 2)
 
                         // Loop through positions and set them as impassible
 
