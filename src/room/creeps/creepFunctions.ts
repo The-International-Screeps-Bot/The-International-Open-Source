@@ -16,7 +16,7 @@ Creep.prototype.isDying = function() {
 
     if (!creep.ticksToLive) return false
 
-    // Stop if creep body parts * creep spawn time is more than ticks left alive
+    // If the creep's remaining ticks are more than the estimated spawn time, inform false
 
     if (creep.ticksToLive > creep.body.length * CREEP_SPAWN_TIME) return false
 

@@ -866,7 +866,7 @@ Room.prototype.get = function(roomObjectName) {
         cacheType: 'global',
         cacheAmount: Infinity,
         room,
-        valueConstructor: function() { return global[room.name].source1PathLength }
+        valueConstructor: function() { return global[room.name].source1PathLength || 0 }
     })
 
     // source2PathLength
@@ -877,7 +877,7 @@ Room.prototype.get = function(roomObjectName) {
         cacheType: 'global',
         cacheAmount: Infinity,
         room,
-        valueConstructor: function() { return global[room.name].source2PathLength }
+        valueConstructor: function() { return global[room.name].source2PathLength || 0 }
     })
 
     // upgradePathLength

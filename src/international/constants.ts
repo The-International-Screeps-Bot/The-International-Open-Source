@@ -447,4 +447,6 @@ export const spawnByRoomRemoteRoles: ('source1RemoteHarvester' | 'source2RemoteH
     'remoteReserver'
 ]
 
+export const builderSpawningWhenStorageThreshold = 40000
+
 export const upgraderSpawningWhenStorageThreshold = 60000

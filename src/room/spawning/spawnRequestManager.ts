@@ -1,4 +1,4 @@
-import { allyList, constants, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
+import { allyList, builderSpawningWhenStorageThreshold, constants, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
 import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy } from "international/generalFunctions"
 
 
@@ -555,11 +555,11 @@ export function spawnRequester(room: Room) {
             !room.terminal) return false
 
         return {
-            defaultParts: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE],
+            defaultParts: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, CARRY],
             extraParts: [],
             partsMultiplier: 1,
             minCreeps: 1,
-            minCost: 750,
+            minCost: 800,
             priority: 3,
             memoryAdditions: {
                 role: 'hubHauler',
@@ -668,16 +668,34 @@ export function spawnRequester(room: Room) {
 
         if (room.find(FIND_MY_CONSTRUCTION_SITES).length == 0) return false
 
-        let partsMultiplier = 1
+        let partsMultiplier = 0
 
-        // Construct an income share
+        // If there is a storage
 
-        const incomeShare = estimatedIncome * 0.5
+        if (room.storage) {
 
-        // Use the incomeShare to adjust estimatedIncome and partsMultiplier
+            // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-        estimatedIncome -= incomeShare
-        partsMultiplier += incomeShare
+            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= builderSpawningWhenStorageThreshold) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 8000
+
+            // Otherwise, set partsMultiplier to 0
+
+            else partsMultiplier = 0
+        }
+
+        // Otherwise if there is no storage
+
+        else {
+
+            // Construct an income share
+
+            const incomeShare = estimatedIncome * 0.5
+
+            // Use the incomeShare to adjust estimatedIncome and partsMultiplier
+
+            estimatedIncome -= incomeShare
+            partsMultiplier += incomeShare
+        }
 
         // If all RCL 3 extensions are build
 
@@ -799,31 +817,36 @@ export function spawnRequester(room: Room) {
 
         let partsMultiplier = 1
 
-        // Construct an income share
-
-        const incomeShare = estimatedIncome * 0.5
-
-        // Use the incomeShare to adjust estimatedIncome and partsMultiplier
-
-        estimatedIncome -= incomeShare
-        partsMultiplier += incomeShare
-
-        // If there are construction sites of my ownership in the room, set multiplier to 1
-
-        if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
-
         // If there is a storage
 
         if (room.storage) {
 
             // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000
+            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 5000
 
             // Otherwise, set partsMultiplier to 0
 
             else partsMultiplier = 0
         }
+
+        // Otherwise if there is no storage
+
+        else {
+
+            // Construct an income share
+
+            const incomeShare = estimatedIncome * 0.5
+
+            // Use the incomeShare to adjust estimatedIncome and partsMultiplier
+
+            estimatedIncome -= incomeShare
+            partsMultiplier += incomeShare
+        }
+
+        // If there are construction sites of my ownership in the room, set multiplier to 1
+
+        if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
 
         // If the controllerContainer or controllerLink exists
 
@@ -928,7 +951,7 @@ export function spawnRequester(room: Room) {
         const sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
 
         // Construct requests for source1RemoteHarvesters
-        customLog('NEEDS', JSON.stringify(Memory.rooms[remoteName].needs))
+
         constructSpawnRequests((function(): SpawnRequestOpts | false {
 
             // If there are no needs for this room, inform false
@@ -945,6 +968,7 @@ export function spawnRequester(room: Room) {
                     threshold: 0.1,
                     minCreeps: 1,
                     maxCreeps: Infinity,
+                    maxCostPerCreep: 50 + 150 * 6,
                     minCost: 200,
                     priority: 4 + index - (sourcesByEfficacy[0] == 'source1' ? .1 : 0),
                     memoryAdditions: {
