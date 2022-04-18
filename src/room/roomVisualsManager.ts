@@ -103,9 +103,14 @@ export function roomVisualsManager(room: Room) {
 
             if (!spawn.spawning) continue
 
+            // Get the spawning creep, iterating if it's undefined
+
+            const creep = Game.creeps[spawn.spawning.name]
+            if(!creep) continue
+
             // Otherwise display the role of the creep being spawn
 
-            room.visual.text(Game.creeps[spawn.spawning.name].memory.role, spawn.pos, {
+            room.visual.text(creep.memory.role, spawn.pos, {
                 backgroundColor: 'rgb(255, 0, 0, 0)',
                 font: 0.5,
                 opacity: 1,

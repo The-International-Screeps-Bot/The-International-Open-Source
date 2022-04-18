@@ -238,6 +238,7 @@ declare global {
         priority: number
         memoryAdditions: Partial<CreepMemory>
         groupComparator?: string[]
+        threshold?: number
         minCreeps?: number | undefined
         maxCreeps?: number | undefined
         maxCostPerCreep?: number | undefined

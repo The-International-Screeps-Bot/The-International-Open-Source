@@ -260,7 +260,7 @@ export function spawnRequester(room: Room) {
 
         // If there aren't enough requested parts to justify spawning a creep, stop
 
-        if (totalExtraParts < maxPartsPerCreep * 0.25) return
+        if (totalExtraParts < maxPartsPerCreep * (opts.threshold || 0.25)) return
 
         // Subtract maxCreeps by the existing number of creeps of this role
 
@@ -749,7 +749,7 @@ export function spawnRequester(room: Room) {
 
         // For each rampart, add a multiplier
 
-        partsMultiplier += ramparts.length * 0.06
+        partsMultiplier += ramparts.length * 0.07
 
         // For every attackValue, add a multiplier
 
@@ -825,22 +825,25 @@ export function spawnRequester(room: Room) {
             else partsMultiplier = 0
         }
 
-        // If the controller is near to downgrading, set partsMultiplier to 1
-
-        if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 1
-
         // If the controllerContainer or controllerLink exists
 
         if (room.get('controllerContainer') || room.get('controllerLink')) {
+
+            // If the controller is near to downgrading, set partsMultiplier to x
+
+            if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 4
 
             // If the controller is level 8, max out partsMultiplier at 4
 
             if (room.controller.level == 8) {
 
+                partsMultiplier = Math.min(Math.round(partsMultiplier / 5), 3)
+                if (partsMultiplier == 0) return false
+
                 return {
                     defaultParts: [MOVE],
                     extraParts: [WORK, WORK, WORK, WORK, MOVE, CARRY, WORK],
-                    partsMultiplier: Math.min(Math.max(partsMultiplier / 5, 0), 3),
+                    partsMultiplier,
                     minCreeps: 1,
                     minCost: 200,
                     priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
@@ -850,10 +853,13 @@ export function spawnRequester(room: Room) {
                 }
             }
 
+            partsMultiplier = Math.round(partsMultiplier / 4)
+            if (partsMultiplier == 0) return false
+
             return {
                 defaultParts: [CARRY],
                 extraParts: [WORK, MOVE, WORK, WORK, WORK],
-                partsMultiplier: Math.max(partsMultiplier / 4, 0),
+                partsMultiplier,
                 minCreeps: undefined,
                 maxCreeps: 8,
                 minCost: 200,
@@ -863,6 +869,10 @@ export function spawnRequester(room: Room) {
                 }
             }
         }
+
+        // If the controller is near to downgrading, set partsMultiplier to x
+
+        if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 1
 
         if (spawnEnergyCapacity >= 800) {
 
@@ -944,14 +954,37 @@ export function spawnRequester(room: Room) {
 
         constructSpawnRequests((function(): SpawnRequestOpts | false {
 
+            // If there are no needs for this room, inform false
+
+            if (Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
+
+            if (spawnEnergyCapacity >= 950) {
+
+                return {
+                    defaultParts: [CARRY],
+                    extraParts: [WORK, MOVE],
+                    partsMultiplier: 6,
+                    groupComparator: room.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
+                    threshold: 0.1,
+                    minCreeps: 1,
+                    maxCreeps: Infinity,
+                    minCost: 200,
+                    priority: 4 + remoteEconIndex - (sourcesByEfficacy[0] == 'source1' ? .1 : 0),
+                    memoryAdditions: {
+                        role: 'source1RemoteHarvester',
+                    }
+                }
+            }
+
             return {
-                defaultParts: [],
+                defaultParts: [CARRY],
                 extraParts: [WORK, MOVE],
                 partsMultiplier: Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester], 0),
                 groupComparator: room.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
+                threshold: 0.1,
                 minCreeps: undefined,
                 maxCreeps: global[remoteName]?.source1HarvestPositions?.length || Infinity,
-                maxCostPerCreep: 150 * 6,
+                maxCostPerCreep: 50 + 150 * 6,
                 minCost: 200,
                 priority: 4 + remoteEconIndex - (sourcesByEfficacy[0] == 'source1' ? .1 : 0),
                 memoryAdditions: {
@@ -964,11 +997,34 @@ export function spawnRequester(room: Room) {
 
         constructSpawnRequests((function(): SpawnRequestOpts | false {
 
+            // If there are no needs for this room, inform false
+
+            if (Memory.rooms[remoteName].needs[remoteNeedsIndex.source2RemoteHarvester] <= 0) return false
+
+            if (spawnEnergyCapacity >= 950) {
+
+                return {
+                    defaultParts: [CARRY],
+                    extraParts: [WORK, MOVE],
+                    partsMultiplier: 6,
+                    groupComparator: room.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
+                    threshold: 0.1,
+                    minCreeps: 1,
+                    maxCreeps: Infinity,
+                    minCost: 200,
+                    priority: 4 + remoteEconIndex - (sourcesByEfficacy[0] == 'source2' ? .1 : 0),
+                    memoryAdditions: {
+                        role: 'source2RemoteHarvester',
+                    }
+                }
+            }
+
             return {
                 defaultParts: [],
                 extraParts: [WORK, MOVE],
                 partsMultiplier: Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source2RemoteHarvester], 0),
                 groupComparator: room.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
+                threshold: 0.1,
                 minCreeps: undefined,
                 maxCreeps: global[remoteName]?.source2HarvestPositions?.length || Infinity,
                 maxCostPerCreep: 150 * 6,
@@ -998,6 +1054,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [],
                 extraParts: [CARRY, MOVE],
+                threshold: 0.1,
                 partsMultiplier,
                 minCreeps: undefined,
                 maxCreeps: Infinity,

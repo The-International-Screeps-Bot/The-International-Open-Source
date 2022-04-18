@@ -66,7 +66,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Construct a cost matrix based off terrain cost matrix
 
-        const baseCM = room.roomObjects.terrainCM.getValue(),
+        const baseCM = room.roomObjects.terrainCM.getValue().clone(),
 
         // Get the room's exits
 
@@ -483,7 +483,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the open areas in a range of 3 to the controller
 
-        const distanceCM = room.distanceTransform(false, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
+        const distanceCM = room.distanceTransform(true, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
 
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
@@ -508,7 +508,7 @@ Room.prototype.get = function(roomObjectName) {
         // Get the center upgrade pos, stopping if it's undefined
 
         const centerUpgradePos = room.roomObjects.centerUpgradePos.getValue()
-        if (!centerUpgradePos) return false
+        if (!centerUpgradePos) return []
 
         // Draw a rect around the center upgrade pos, informing positions inside
 
@@ -2121,15 +2121,11 @@ Room.prototype.findScore = function() {
 
 Room.prototype.distanceTransform = function(enableVisuals, x1 = constants.roomDimensions, y1 = constants.roomDimensions, x2 = -1, y2 = -1) {
 
-    const room = this
+    const room = this,
 
     // Use a costMatrix to record distances. Use the initialCM if provided, otherwise create one
 
-    const distanceCM = new PathFinder.CostMatrix(),
-
-    // Get the room terrain
-
-    terrain = room.getTerrain()
+    distanceCM = room.get('terrainCM').clone()
 
     // Loop through the xs and ys inside the bounds
 
@@ -2138,7 +2134,7 @@ Room.prototype.distanceTransform = function(enableVisuals, x1 = constants.roomDi
 
             // If the pos is a wall, iterate
 
-            if (terrain.get(x, y) == TERRAIN_MASK_WALL) continue
+            if (distanceCM.get(x, y) == 255) continue
 
             // Otherwise construct a rect and get the positions in a range of 1
 
@@ -2190,7 +2186,7 @@ Room.prototype.distanceTransform = function(enableVisuals, x1 = constants.roomDi
 
             // If the pos is a wall, iterate
 
-            if (terrain.get(x, y) == TERRAIN_MASK_WALL) continue
+            if (distanceCM.get(x, y) == 255) continue
 
             // Otherwise construct a rect and get the positions in a range of 1
 
@@ -2239,6 +2235,8 @@ Room.prototype.distanceTransform = function(enableVisuals, x1 = constants.roomDi
                 fill: 'hsl(' + 200 + distanceValue * 10 + ', 100%, 60%)',
                 opacity: 0.4,
             })
+
+            if (enableVisuals) room.visual.text(distanceValue.toString(), x, y)
         }
     }
 
