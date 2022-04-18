@@ -46,6 +46,11 @@ export class Builder extends Creep {
 creepClasses.builder = Builder
 
 export class Maintainer extends Creep {
+
+    advancedMaintain?(): boolean
+
+    maintainAtFeet?(): boolean
+
     constructor(creepID: Id<Creep>) {
 
         super(creepID)

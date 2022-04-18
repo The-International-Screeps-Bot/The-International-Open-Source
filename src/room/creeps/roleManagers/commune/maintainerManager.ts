@@ -1,4 +1,5 @@
 import { Maintainer } from "../../creepClasses"
+import './maintainerFunctions'
 
 export function maintainerManager(room: Room, creepsOfRole: string[]) {
 
@@ -10,8 +11,12 @@ export function maintainerManager(room: Room, creepsOfRole: string[]) {
 
         const creep: Maintainer = Game.creeps[creepName]
 
-        //
+        // Try to maintain structures, iterating if success
 
-        creep.advancedMaintain()
+        if (creep.advancedMaintain()) continue
+
+        // Otherwise, try to maintain at feet, iterating if success
+
+        if (creep.maintainAtFeet()) continue
     }
 }

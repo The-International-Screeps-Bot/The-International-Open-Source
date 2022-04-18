@@ -744,11 +744,6 @@ declare global {
          */
         findRepairTarget(excluded?: Set<Id<StructureRoad | StructureContainer>>): Structure | false
 
-        /**
-         *
-         */
-        advancedMaintain(): boolean
-
         findOptimalSourceName(): boolean
 
         findSourceHarvestPos(sourceName: ('source1' | 'source2')): boolean
