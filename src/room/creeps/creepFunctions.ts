@@ -1063,7 +1063,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
         // Limit the path's length to the cacheAmount
 
-        path.splice(opts.cacheAmount, path.length - 1)
+        path.splice(opts.cacheAmount)
 
         // Set the lastCache to the current tick
 

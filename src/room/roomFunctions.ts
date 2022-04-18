@@ -591,7 +591,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // Otherwise, remove the pos from fastFillePositions
 
-            fastFillerPositions.splice(index)
+            fastFillerPositions.splice(index, 1)
         }
 
         // Inform fastFillerPositions
@@ -1836,7 +1836,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             if (harvestedSources.length == 0) return false
 
-            // Find creeps that I don't own
+            // Find creeps that I don't own that aren't invaders
 
             const creepsNotMine: Creep[] = room.get('enemyCreeps').concat(room.get('allyCreeps'))
 
@@ -1844,7 +1844,11 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             for (const creep of creepsNotMine) {
 
-                // inform creep if it has work parts
+                // If the creep is an invdader, iterate
+
+                if (creep.owner.username == 'Invader') continue
+
+                // If the creep has work parts
 
                 if (creep.hasPartsOfTypes([WORK])) {
 

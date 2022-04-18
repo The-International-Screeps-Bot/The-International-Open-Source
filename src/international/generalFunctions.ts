@@ -258,7 +258,7 @@ export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'sou
 
     // Limit sourceNames to the number of sourceEfficacies
 
-    if (sourceNames.length > sourceEfficacies.length) sourceNames.splice(sourceEfficacies.length - 1)
+    if (sourceNames.length > sourceEfficacies.length) sourceNames.splice(sourceEfficacies.length - 1, 1)
 
     // Sort sourceNames by efficacy, informing the result
 
