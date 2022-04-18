@@ -587,6 +587,8 @@ declare global {
         // Link functions
 
         hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
+
+        hubToFastFiller(hubLink: StructureLink | undefined, fastFillerLink: StructureLink | undefined): void
     }
 
     interface RoomMemory {

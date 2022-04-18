@@ -108,6 +108,7 @@ constants.roomTypeProperties = {
     notClaimable: true,
 
     commune: true,
+    needs: true,
     sourceEfficacies: true,
 
     owner: true,
@@ -133,6 +134,7 @@ constants.roomTypes = {
         commune: true,
         source1: true,
         source2: true,
+        needs: true,
         sourceEfficacies: true,
         notClaimable: true,
     },

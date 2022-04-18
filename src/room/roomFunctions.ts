@@ -1888,6 +1888,10 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
         if (distanceFromScoutingRoom < 4) {
 
+            // If the room is already known to be a remote, stop
+
+            if (scoutingRoom.memory.remotes.includes(room.name)) return
+
             // Set roomType as remote and assign commune as scoutingRoom's name
 
             room.memory.type = 'remote'
@@ -1898,10 +1902,11 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // Add the room's name to the scoutingRoom's remotes list
 
-            if (!scoutingRoom.memory.remotes.includes(room.name)) scoutingRoom.memory.remotes.push(room.name)
+            scoutingRoom.memory.remotes.push(room.name)
 
-            // Construct sourceEfficacies
+            // Construct needs and sourceEfficacies
 
+            room.memory.needs = []
             room.memory.sourceEfficacies = []
 
             // Get the anchor from the scoutingRoom, stopping if it's undefined

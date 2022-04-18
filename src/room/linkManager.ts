@@ -70,5 +70,7 @@ export function linkManager(room: Room) {
         }
     }
 
+    room.hubToFastFiller(hubLink, fastFillerLink)
+
     room.hubToController(hubLink, controllerLink)
 }

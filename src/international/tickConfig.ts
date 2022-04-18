@@ -121,15 +121,6 @@ export function tickConfig() {
 
             if (roomMemory.type != 'remote') room.memory.remotes.splice(index)
 
-            // If needs don't yet exist
-
-            if (!roomMemory.needs) {
-
-                // Construct needs
-
-                roomMemory.needs = []
-            }
-
             // Initialize aspects of needs
 
             roomMemory.needs[remoteNeedsIndex.remoteReserver] = 1

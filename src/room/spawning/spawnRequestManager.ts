@@ -545,9 +545,14 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-        // If there is no terminal or storage, inform false
+        // If there is no storage, inform false
 
-        if (!room.storage || !room.terminal) return false
+        if (!room.storage) return false
+
+        // Otherwise if there is no hubLink or terminal, inform false
+
+        if (!room.get('hubLink') &&
+            !room.terminal) return false
 
         return {
             defaultParts: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE],
@@ -736,11 +741,11 @@ export function spawnRequester(room: Room) {
 
         // For each road, add a multiplier
 
-        partsMultiplier += roads.length * 0.01
+        partsMultiplier += roads.length * 0.015
 
         // For each container, add a multiplier
 
-        partsMultiplier += repairTargets.length * 0.5
+        partsMultiplier += containers.length * 0.3
 
         // For each rampart, add a multiplier
 
@@ -803,13 +808,26 @@ export function spawnRequester(room: Room) {
         estimatedIncome -= incomeShare
         partsMultiplier += incomeShare
 
-        // For every x energy in storage, add 1 multiplier
-
-        if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000
-
         // If there are construction sites of my ownership in the room, set multiplier to 1
 
-        if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 1
+        if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
+
+        // If there is a storage
+
+        if (room.storage) {
+
+            // If the storage is sufficiently full, provide x amount per y enemy in storage
+
+            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= 95000) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000
+
+            // Otherwise, set partsMultiplier to 0
+
+            else partsMultiplier = 0
+        }
+
+        // If the controller is near to downgrading, set partsMultiplier to 1
+
+        if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 1
 
         // If the controllerContainer or controllerLink exists
 
@@ -822,7 +840,7 @@ export function spawnRequester(room: Room) {
                 return {
                     defaultParts: [MOVE],
                     extraParts: [WORK, WORK, WORK, WORK, MOVE, CARRY, WORK],
-                    partsMultiplier: Math.min(Math.max(partsMultiplier / 5, 1), 3),
+                    partsMultiplier: Math.min(Math.max(partsMultiplier / 5, 0), 3),
                     minCreeps: 1,
                     minCost: 200,
                     priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
@@ -835,7 +853,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [CARRY],
                 extraParts: [WORK, MOVE, WORK, WORK, WORK],
-                partsMultiplier: Math.max(partsMultiplier / 4, 1),
+                partsMultiplier: Math.max(partsMultiplier / 4, 0),
                 minCreeps: undefined,
                 maxCreeps: 8,
                 minCost: 200,
@@ -994,6 +1012,10 @@ export function spawnRequester(room: Room) {
         // Construct requests for remoteReservers
 
         constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+            // If there isn't enough spawnEnergyCapacity to spawn a remoteReserver, inform false
+
+            if (spawnEnergyCapacity < 750) return false
 
             // If there are no needs for this room, inform false
 
