@@ -168,9 +168,22 @@ export function findAvgBetweenPosotions(pos1: Pos, pos2: Pos) {
  */
 export function getRangeBetween(x1: number, y1: number, x2: number, y2: number) {
 
-    // Find the range using pythagorus through the axis differences
+    // Find the range using Chebyshev's formula
 
-    return Math.floor(Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)))
+    return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2))
+}
+
+/**
+ * Gets the range between two position's differences
+ * @param xDif the difference between the two location's x's
+ * @param yDif the difference between the two location's y's
+ * @returns The range between the two position's differences
+ */
+export function getRange(xDif: number, yDif: number) {
+
+    // Find the range using Chebyshev's formula
+
+    return Math.max(Math.abs(xDif), Math.abs(yDif))
 }
 
 export function findCPUColor(CPU: number): string {

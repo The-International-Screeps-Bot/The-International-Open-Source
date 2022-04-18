@@ -508,7 +508,7 @@ Creep.prototype.findRampartRepairTarget = function(workPartCount) {
 
     repairTarget: Structure | false = findObjectWithID(creep.memory.repairTarget),
 
-    rampartRepairExpectation = workPartCount * REPAIR_POWER * 25
+    rampartRepairExpectation = workPartCount * REPAIR_POWER * creep.store.getCapacity() / CARRY_CAPACITY
 
     // If the repairTarget exists and it's under the quota, it
 
