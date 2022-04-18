@@ -957,7 +957,7 @@ export function spawnRequester(room: Room) {
             // If there are no needs for this room, inform false
 
             if (Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
-
+            
             if (spawnEnergyCapacity >= 950) {
 
                 return {

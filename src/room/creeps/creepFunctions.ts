@@ -1,5 +1,5 @@
 import { spawn } from "child_process"
-import { boostMultipliers, constants } from "international/constants"
+import { boostMultipliers, constants, CPUBucketRenewThreshold } from "international/constants"
 import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
 import { repeat } from "lodash"
 import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
@@ -1688,6 +1688,10 @@ Creep.prototype.advancedRenew = function() {
     const creep = this,
     room = creep.room
 
+    // If there is insufficient CPU to renew, inform false
+
+    if (Game.cpu.bucket < CPUBucketRenewThreshold) return false
+
     // If the creep's age is less than the benefit from renewing, inform false
 
     if (CREEP_LIFE_TIME - creep.ticksToLive < Math.ceil(creep.memory.cost / 2.5 / creep.body.length)) return false
@@ -1697,36 +1701,28 @@ Creep.prototype.advancedRenew = function() {
     const spawns: StructureSpawn[] = room.get('spawn')
     if (!spawns.length) return false
 
-    // Get spawns in range of 1
+    // Get a spawn in range of 1, informing false if there are none
 
-    const nearbySpawns = spawns.filter(spawn => creep.pos.getRangeTo(spawn.pos) == 1)
+    const spawn = spawns.find(spawn => creep.pos.getRangeTo(spawn.pos) == 1)
+    if (!spawn) return false
 
-    // Loop through each nearbySpawn
+    // If the spawn has already renewed this tick, inform false
 
-    for (const spawn of nearbySpawns) {
+    if (spawn.hasRenewed) return false
 
-        // If the spawn has already renewed this tick, iterate
+    // If the spawn is spawning, inform false
 
-        if (spawn.hasRenewed) continue
+    if (spawn.spawning) return false
 
-        // If the spawn is spawning, iterate
+    // Otherwise
 
-        if (spawn.spawning) continue
+    // Record the spawn has renewed
 
-        // Otherwise
+    spawn.hasRenewed = true
 
-        // Record the spawn has renewed
+    // And try to renew the creep, informing the result
 
-        spawn.hasRenewed = true
-
-        // And try to renew the creep, informing the result
-
-        return spawn.renewCreep(creep) == OK
-    }
-
-    // Inform false
-
-    return false
+    return spawn.renewCreep(creep) == OK
 }
 
 Creep.prototype.advancedReserveController = function() {

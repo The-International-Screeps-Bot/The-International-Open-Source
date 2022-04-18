@@ -589,11 +589,11 @@ export function rampartPlanner(room: Room) {
 
     rampartPlans.set(anchor.x, anchor.y - 2, 1)
 
-    rampartPlans.set(anchor.x, anchor.y + 2, 1)
+    rampartPlans.set(anchor.x - 2, anchor.y + 1, 1)
+
+    rampartPlans.set(anchor.x + 2, anchor.y + 1, 1)
 
     // Protect useful hub structures
-
-    rampartPlans.set(hubAnchor.x, hubAnchor.y + 1, 1)
 
     rampartPlans.set(hubAnchor.x + 1, hubAnchor.y - 1, 1)
 
