@@ -1,3 +1,5 @@
+import { upgraderSpawningWhenStorageThreshold } from "international/constants"
+
 Room.prototype.hubToController = function(hubLink, controllerLink) {
 
     const room = this
@@ -5,7 +7,7 @@ Room.prototype.hubToController = function(hubLink, controllerLink) {
     // If the controller is close to downgrading and the storage has insufficient energy, stop
 
     if (room.controller.ticksToDowngrade > 10000 &&
-        room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < 80000) return
+        room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < upgraderSpawningWhenStorageThreshold - 20000) return
 
     // If the hubLink or controllerLink aren't defined, stop
 

@@ -1,4 +1,4 @@
-import { allyList, constants, remoteNeedsIndex } from "international/constants"
+import { allyList, constants, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
 import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy } from "international/generalFunctions"
 
 
@@ -818,7 +818,7 @@ export function spawnRequester(room: Room) {
 
             // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= 95000) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000
+            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000
 
             // Otherwise, set partsMultiplier to 0
 
@@ -951,7 +951,7 @@ export function spawnRequester(room: Room) {
         sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
 
         // Construct requests for source1RemoteHarvesters
-
+        customLog('NEEDS', JSON.stringify(Memory.rooms[remoteName].needs))
         constructSpawnRequests((function(): SpawnRequestOpts | false {
 
             // If there are no needs for this room, inform false
