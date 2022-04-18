@@ -1022,7 +1022,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [MOVE],
             extraParts: [],
-            partsMultiplier: 2,
+            partsMultiplier: 1,
             minCreeps: 2,
             maxCreeps: Infinity,
             minCost: 100,

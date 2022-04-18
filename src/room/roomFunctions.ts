@@ -1788,6 +1788,10 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             if (!controller.reservation) return false
 
+            // If I am the reserver, inform false
+
+            if (controller.reservation.username == constants.me) return false
+
             // Get roads
 
             const roads: StructureRoad[] = room.get('road'),
@@ -1900,10 +1904,10 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             room.memory.sourceEfficacies = []
 
-            // Get the hubAnchor, stopping if it's undefined
+            // Get the anchor from the scoutingRoom, stopping if it's undefined
 
-            const hubAnchor: RoomPosition = global[scoutingRoom.name].stampAnchors?.hub[0]
-            if (!hubAnchor) return
+            const anchor: RoomPosition = scoutingRoom.get('anchor')
+            if (!anchor) return
 
             // Get base planning data
 
@@ -1929,7 +1933,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                 const path = room.advancedFindPath({
                     origin: source.pos,
-                    goal: { pos: hubAnchor, range: 2 },
+                    goal: { pos: anchor, range: 2 },
                     /* weightCostMatrixes: [roadCM] */
                 })
 

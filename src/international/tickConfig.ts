@@ -107,7 +107,7 @@ export function tickConfig() {
 
         // Loop through the name of each of the commune's remotes
 
-        for (let index = 0; index < room.memory.remotes.length; index++) {
+        for (let index = room.memory.remotes.length - 1; index > 0; index--) {
 
             // Get the name of the remote using the index
 
