@@ -1,6 +1,6 @@
 import { creepClasses } from "room/creeps/creepClasses"
 import { remoteNeedsIndex, spawnByRoomRemoteRoles } from "./constants"
-import { pack } from "./generalFunctions"
+import { customLog, pack } from "./generalFunctions"
 
 /**
  * Organizes creeps into properties for their communeName, and tracks total creep count
@@ -86,7 +86,7 @@ export function creepOrganizer() {
                 // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
 
                 Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
-
+                
                 // Add the creep to creepsFromRoomWithRemote relative to its remote
 
                 commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)

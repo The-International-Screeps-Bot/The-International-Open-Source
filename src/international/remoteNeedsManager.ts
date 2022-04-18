@@ -32,8 +32,8 @@ export function remoteNeedsManager() {
 
                 // Increase the remoteHarvester need accordingly
 
-                remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] =+ 3
-                remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] =+ remoteMemory.source2 ? 3 : 0
+                remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] += 3
+                remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.source2 ? 3 : 0
             }
 
             // Loop through each index of sourceEfficacies

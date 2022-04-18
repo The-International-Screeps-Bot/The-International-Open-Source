@@ -1504,7 +1504,7 @@ Creep.prototype.fulfillTask = function() {
 
     // If visuals are enabled, show the task targeting
 
-    if (Memory.roomVisuals) room.visual.line(creep.pos, new RoomPosition(task.pos / 50, Math.floor(task.pos % 50), room.name), { color: constants.colors.lightBlue, width: 0.15 })
+    if (Memory.roomVisuals) room.visual.line(creep.pos, unPackAsRoomPos(task.pos, room.name), { color: constants.colors.lightBlue, width: 0.15 })
 
     // Run the creep's function based on the task type and inform its result
 

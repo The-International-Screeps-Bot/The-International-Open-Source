@@ -116,7 +116,7 @@ export function tickConfig() {
             // Get the room's memory using its name
 
             roomMemory = Memory.rooms[roomName]
-            customLog(roomName, index)
+            
             // If the room isn't a remote, remove it from the remotes array
 
             if (roomMemory.type != 'remote') room.memory.remotes.splice(index)

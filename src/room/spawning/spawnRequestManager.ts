@@ -908,47 +908,24 @@ export function spawnRequester(room: Room) {
 
     const remoteNamesByEfficacy: string[] = room.get('remoteNamesByEfficacy')
 
-    /**
-     *
-     */
-    function findRemoteEconIndex() {
+    for (let index = 0; index < remoteNamesByEfficacy.length; index++) {
 
-        for (let index = 0; index < remoteNamesByEfficacy.length; index++) {
+        const remoteName = remoteNamesByEfficacy[index]
 
-            const remoteName = remoteNamesByEfficacy[index]
+        // Add up econ needs for this room
 
-            // Add up econ needs for this room
+        const remoteEconNeed = Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester], 0) +
+        Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source2RemoteHarvester], 0) +
+        Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteHauler], 0) +
+        Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteReserver], 0)
 
-            const remoteEconNeed = Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester], 0) +
-            Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source2RemoteHarvester], 0) +
-            Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteHauler], 0) +
-            Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteReserver], 0)
+        // If there is a need for any econ creep, inform the index
 
-            // If there is a need for any econ creep, inform the index
-
-            if (remoteEconNeed > 0) return index
-        }
-
-        // If no remotes were found to have needs, inform false
-
-        return false
-    }
-
-    // Find the index of the most efficient remote with needs
-
-    const remoteEconIndex = findRemoteEconIndex()
-
-    // If there is a remote with economic needs
-
-    if (remoteEconIndex !== false) {
-
-        // Get the roomName using the remoteEconIndex
-
-        const remoteName = remoteNamesByEfficacy[remoteEconIndex],
+        if (remoteEconNeed <= 0) continue
 
         // Get the sources in order of efficacy
 
-        sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
+        const sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
 
         // Construct requests for source1RemoteHarvesters
         customLog('NEEDS', JSON.stringify(Memory.rooms[remoteName].needs))
@@ -969,7 +946,7 @@ export function spawnRequester(room: Room) {
                     minCreeps: 1,
                     maxCreeps: Infinity,
                     minCost: 200,
-                    priority: 4 + remoteEconIndex - (sourcesByEfficacy[0] == 'source1' ? .1 : 0),
+                    priority: 4 + index - (sourcesByEfficacy[0] == 'source1' ? .1 : 0),
                     memoryAdditions: {
                         role: 'source1RemoteHarvester',
                     }
@@ -986,7 +963,7 @@ export function spawnRequester(room: Room) {
                 maxCreeps: global[remoteName]?.source1HarvestPositions?.length || Infinity,
                 maxCostPerCreep: 50 + 150 * 6,
                 minCost: 200,
-                priority: 4 + remoteEconIndex - (sourcesByEfficacy[0] == 'source1' ? .1 : 0),
+                priority: 4 + index - (sourcesByEfficacy[0] == 'source1' ? .1 : 0),
                 memoryAdditions: {
                     role: 'source1RemoteHarvester',
                 }
@@ -1012,7 +989,7 @@ export function spawnRequester(room: Room) {
                     minCreeps: 1,
                     maxCreeps: Infinity,
                     minCost: 200,
-                    priority: 4 + remoteEconIndex - (sourcesByEfficacy[0] == 'source2' ? .1 : 0),
+                    priority: 4 + index - (sourcesByEfficacy[0] == 'source2' ? .1 : 0),
                     memoryAdditions: {
                         role: 'source2RemoteHarvester',
                     }
@@ -1029,7 +1006,7 @@ export function spawnRequester(room: Room) {
                 maxCreeps: global[remoteName]?.source2HarvestPositions?.length || Infinity,
                 maxCostPerCreep: 150 * 6,
                 minCost: 200,
-                priority: 4 + remoteEconIndex - (sourcesByEfficacy[0] == 'source2' ? .1 : 0),
+                priority: 4 + index - (sourcesByEfficacy[0] == 'source2' ? .1 : 0),
                 memoryAdditions: {
                     role: 'source2RemoteHarvester',
                 }
@@ -1059,7 +1036,7 @@ export function spawnRequester(room: Room) {
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 200,
-                priority: 4.2 + remoteEconIndex,
+                priority: 4.2 + index,
                 memoryAdditions: {
                     role: 'remoteHauler',
                 }
@@ -1086,7 +1063,7 @@ export function spawnRequester(room: Room) {
                 minCreeps: 1,
                 maxCreeps: Infinity,
                 minCost: 750,
-                priority: 4.3 + remoteEconIndex,
+                priority: 4.3 + index,
                 memoryAdditions: {
                     role: 'remoteReserver',
                 }
