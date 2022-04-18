@@ -183,6 +183,7 @@ constants.creepRoles = [
     'source1RemoteHarvester',
     'source2RemoteHarvester',
     'remoteHauler',
+    'remoteReserver',
     /*'remoteReserver',
     'remoteScout',
     'remoteDefender',
@@ -436,4 +437,10 @@ export const boosts = [
 export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester')[] = [
     'source1RemoteHarvester',
     'source2RemoteHarvester'
+]
+
+export const spawnByRoomRemoteRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester' | 'remoteReserver')[] = [
+    'source1RemoteHarvester',
+    'source2RemoteHarvester',
+    'remoteReserver'
 ]

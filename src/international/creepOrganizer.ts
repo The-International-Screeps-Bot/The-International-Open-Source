@@ -1,5 +1,5 @@
 import { creepClasses } from "room/creeps/creepClasses"
-import { remoteNeedsIndex } from "./constants"
+import { remoteNeedsIndex, spawnByRoomRemoteRoles } from "./constants"
 import { pack } from "./generalFunctions"
 
 /**
@@ -77,7 +77,7 @@ export function creepOrganizer() {
 
         // If the creep has a remote
 
-        if (remoteName) {
+        if (remoteName && commune.memory.remotes.includes(remoteName)) {
 
             // If the creep is a source1RemoteHarvester
 
@@ -88,7 +88,7 @@ export function creepOrganizer() {
                 Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
 
                 // Add the creep to creepsFromRoomWithRemote relative to its remote
-                
+
                 commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
             }
 
@@ -108,6 +108,19 @@ export function creepOrganizer() {
             // Otherwise if the creep is a remoteHauler, reduce its remote's needs by their number of carry parts
 
             else if (role == 'remoteHauler') Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(CARRY)
+
+            // Otherwise if the creep is a remoteReserver
+
+            else if (role == 'remoteReserver') {
+
+                // Reduce its remote's needs by 1
+
+                Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= 1
+
+                // Add the creep to creepsFromRoomWithRemote relative to its remote
+
+                commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
+            }
         }
 
         // Increase total creep counter

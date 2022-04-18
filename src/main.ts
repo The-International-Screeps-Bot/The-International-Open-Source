@@ -89,10 +89,7 @@ declare global {
     'source1RemoteHarvester' |
     'source2RemoteHarvester' |
     'remoteHauler' |
-    /*'remoteReserver' |
-    'remoteScout' |
-    'remoteDefender' |
-    'remoteMaintainer' | */
+    'remoteReserver' |
     'scout' |
     'claimer' |
     'antifa'
@@ -847,7 +844,9 @@ declare global {
 
         advancedRecycle(): void
 
-        advancedRenew(): void
+        advancedRenew(): boolean
+
+        advancedReserveController(): boolean
     }
 
     interface CreepMemory {

@@ -1,5 +1,5 @@
 import { allyManager } from 'room/market/simpleAllies'
-import { constants, remoteHarvesterRoles, remoteNeedsIndex } from './constants'
+import { constants, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles } from './constants'
 import { createPackedPosMap, customLog, findCarryPartsRequired } from './generalFunctions'
 
 /**
@@ -134,6 +134,22 @@ export function tickConfig() {
 
             roomMemory.needs[remoteNeedsIndex.remoteReserver] = 1
 
+            // Get the room using the roomName
+
+            const remote = Game.rooms[roomName]
+
+            // If there is visio in the room, the controller is reserved, it's reserved be me, and there is sufficient reservation left
+
+            if (remote &&
+                remote.controller.reservation &&
+                remote.controller.reservation.username == constants.me &&
+                remote.controller.reservation.ticksToEnd >= roomMemory.sourceEfficacies.reduce((a, b) => a + b)) {
+
+                    // Set the reservation need to 0
+
+                    roomMemory.needs[remoteNeedsIndex.remoteReserver] = 0
+                }
+
             roomMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 3
 
             roomMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = roomMemory.source2 ? 3 : 0
@@ -165,7 +181,7 @@ export function tickConfig() {
 
             // For each role, construct an array for the role in creepsFromWithRemote
 
-            for (const role of remoteHarvesterRoles) room.creepsFromRoomWithRemote[remoteName][role] = []
+            for (const role of spawnByRoomRemoteRoles) room.creepsFromRoomWithRemote[remoteName][role] = []
         }
 
         room.storedResources = {}

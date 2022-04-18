@@ -34,7 +34,7 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 
         // Say the scoutTarget
 
-        creep.say(`${creep.memory.scoutTarget}`)
+        creep.say('🔭' + creep.memory.scoutTarget.toString())
 
         // If there is a controller and it isn't in safeMode
 

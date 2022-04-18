@@ -17,6 +17,7 @@ import { meleeDefenderManager } from './roleManagers/commune/meleeDefenderManage
 import { hubHaulerManager } from './roleManagers/commune/hubHaulerManager'
 import { fastFillerManager } from './roleManagers/commune/fastFillerManager'
 import { source1RemoteHarvesterManager } from './roleManagers/remote/source1RemoteHarvesterManager'
+import { remoteReserverManager } from './roleManagers/remote/remoteReserver'
 
 export function roleManager(room: Room) {
 
@@ -39,6 +40,7 @@ export function roleManager(room: Room) {
         source1RemoteHarvester: source1RemoteHarvesterManager,
         source2RemoteHarvester: source2RemoteHarvesterManager,
         remoteHauler: remoteHaulerManager,
+        remoteReserver: remoteReserverManager,
         scout: scoutManager,
         claimer: claimerManager,
         antifa: antifaManager,

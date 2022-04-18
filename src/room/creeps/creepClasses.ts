@@ -1,8 +1,4 @@
-interface CreepClasses {
-    [key: string]: any
-}
-
-const creepClasses: CreepClasses = {}
+const creepClasses: Partial<Record<CreepRoles, any>> = {}
 
 export class SourceHarvester extends Creep {
 
@@ -142,6 +138,16 @@ export class RemoteHauler extends Creep {
     }
 }
 creepClasses.remoteHauler = RemoteHauler
+
+export class Reserver extends Creep {
+
+    constructor(creepID: Id<Creep>) {
+
+        super(creepID)
+
+    }
+}
+creepClasses.remoteReserver = Reserver
 
 export class Scout extends Creep {
 

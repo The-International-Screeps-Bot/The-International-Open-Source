@@ -22,21 +22,29 @@ export function defenceManager(room: Room) {
 
             // Stop if the tick is not divisible by a random range
 
-            if (Game.time % Math.floor(Math.random() * 20) != 0) return
+            if (Game.time % Math.floor(Math.random() * 50) != 0) return
+
+            // Construct increment
+
+            let increment = 0
 
             // Get the room's ramparts and loop through them
 
             const ramparts: StructureRampart[] = room.get('rampart')
             for (const rampart of ramparts) {
 
+                // If increment is more or equal to 10, stop
+
+                if (increment >= 10) return
+
                 // If the rampart is public, iterate
 
                 if (rampart.isPublic) continue
 
-                // Otherwise set the rampart to public and stop
+                // Otherwise set the rampart to public, increase increment
 
                 rampart.setPublic(true)
-                return
+                increment++
             }
 
             // Stop

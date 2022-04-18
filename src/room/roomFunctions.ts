@@ -721,14 +721,13 @@ Room.prototype.get = function(roomObjectName) {
 
             if (creep.isDying()) continue
 
-            // Get the creep's sourceName, if there is none iterate
+            // Get the creep's sourceName
 
             const sourceName = creep.memory.sourceName
-            if (!sourceName) continue
 
-            // Record that the creep has this sourceName in creepsOfSouceAmount
+            // If the creep has a souctName, increase the creepOfSourceAmount for the sourceName
 
-            room.creepsOfSourceAmount[sourceName]++
+            if (sourceName) room.creepsOfSourceAmount[sourceName]++
 
             // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 

@@ -1843,14 +1843,14 @@ Creep.prototype.advancedRenew = function() {
     const creep = this,
     room = creep.room
 
-    // If the creep's age is less than the benefit from renewing, stop
+    // If the creep's age is less than the benefit from renewing, inform false
 
-    if (CREEP_LIFE_TIME - creep.ticksToLive < Math.ceil(creep.memory.cost / 2.5 / creep.body.length)) return
+    if (CREEP_LIFE_TIME - creep.ticksToLive < Math.ceil(creep.memory.cost / 2.5 / creep.body.length)) return false
 
     // Get the room's spawns, stopping if there are none
 
     const spawns: StructureSpawn[] = room.get('spawn')
-    if (!spawns.length) return
+    if (!spawns.length) return false
 
     // Get spawns in range of 1
 
@@ -1864,13 +1864,66 @@ Creep.prototype.advancedRenew = function() {
 
         if (spawn.hasRenewed) continue
 
-        // Otherwise, renew the creep and record the spawn as having renewed
+        // If the spawn is spawning, iterate
 
-        spawn.renewCreep(creep)
+        if (spawn.spawning) continue
+
+        // Otherwise
+
+        // Record the spawn has renewed
+
         spawn.hasRenewed = true
 
-        // And stop
+        // And try to renew the creep, informing the result
 
-        return
+        return spawn.renewCreep(creep) == OK
     }
+
+    // Inform false
+
+    return false
+}
+
+Creep.prototype.advancedReserveController = function() {
+
+    const creep = this,
+    room = creep.room,
+
+    // Get the controller
+
+    controller = room.controller
+
+    // If the creep is in range of 1 of the controller
+
+    if (creep.pos.getRangeTo(controller.pos) == 1) {
+
+        // If the controller is reserved and it isn't reserved by me
+
+        if (controller.reservation && controller.reservation.username != constants.me) {
+
+            // Try to attack it, informing the result
+
+            creep.say('🗡️')
+
+            return creep.attackController(controller) == OK
+        }
+
+        // Try to reserve it, informing the result
+
+        creep.say('🤳')
+
+        return creep.reserveController(controller) == OK
+    }
+
+    // Otherwise, make a move request to it and inform true
+
+    creep.say('⏩🤳')
+
+    creep.createMoveRequest({
+        origin: creep.pos,
+        goal: { pos: controller.pos, range: 1 },
+        avoidEnemyRanges: true
+    })
+
+    return true
 }
