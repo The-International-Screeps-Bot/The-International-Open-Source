@@ -18,6 +18,7 @@ import { hubHaulerManager } from './roleManagers/commune/hubHaulerManager'
 import { fastFillerManager } from './roleManagers/commune/fastFillerManager'
 import { source1RemoteHarvesterManager } from './roleManagers/remote/source1RemoteHarvesterManager'
 import { remoteReserverManager } from './roleManagers/remote/remoteReserver'
+import { remoteDefenderManager } from './roleManagers/remote/remoteDefenderManager'
 
 export function roleManager(room: Room) {
 
@@ -41,6 +42,7 @@ export function roleManager(room: Room) {
         source2RemoteHarvester: source2RemoteHarvesterManager,
         remoteHauler: remoteHaulerManager,
         remoteReserver: remoteReserverManager,
+        remoteDefender: remoteDefenderManager,
         scout: scoutManager,
         claimer: claimerManager,
         antifa: antifaManager,
@@ -62,9 +64,9 @@ export function roleManager(room: Room) {
 
         creepsOfRoleAmount = room.myCreeps[role].length
 
-        // Iterate if there are no creeps of manager's role
+        // If there are no creeps for this manager, iterate
 
-        if (room.myCreeps[role].length == 0) continue
+        if (!room.myCreeps[role].length) continue
 
         // Run manager
 

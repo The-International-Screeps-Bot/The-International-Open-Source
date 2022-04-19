@@ -81,6 +81,7 @@ declare global {
     'source2RemoteHarvester' |
     'remoteHauler' |
     'remoteReserver' |
+    'remoteDefender' |
     'scout' |
     'claimer' |
     'antifa'

@@ -186,10 +186,7 @@ constants.creepRoles = [
     'source2RemoteHarvester',
     'remoteHauler',
     'remoteReserver',
-    /*'remoteReserver',
-    'remoteScout',
     'remoteDefender',
-    'remoteMaintainer', */
     'scout',
     'claimer',
     'antifa',
@@ -407,13 +404,6 @@ constants.stamps = {
     }
 }
 
-export const remoteNeedsIndex = {
-    source1RemoteHarvester: 0,
-    source2RemoteHarvester: 1,
-    remoteHauler: 2,
-    remoteReserver: 3,
-}
-
 export const boostMultipliers = {
     HEAL: {
         LO: 2,
@@ -435,6 +425,14 @@ export const minerals: Partial<ResourceConstant[]> = [
 export const boosts = [
     RESOURCE_CATALYZED_GHODIUM_ACID,
 ]
+
+export const remoteNeedsIndex = {
+    source1RemoteHarvester: 0,
+    source2RemoteHarvester: 1,
+    remoteHauler: 2,
+    remoteReserver: 3,
+    remoteDefender: 4,
+}
 
 export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester')[] = [
     'source1RemoteHarvester',
