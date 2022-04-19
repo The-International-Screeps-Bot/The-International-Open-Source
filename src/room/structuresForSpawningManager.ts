@@ -1,4 +1,4 @@
-import { getRangeBetween } from "international/generalFunctions"
+import { getRange, getRangeBetween } from "international/generalFunctions"
 import { RoomTransferTask } from "./roomTasks"
 
 /**
@@ -29,7 +29,7 @@ export function structuresForSpawningManager(room: Room) {
 
         // Assign structuresForSpawning that are not in range of 1 to the closestHarvestPos
 
-        structuresForSpawning = structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, closestHarvestPos.x, closestHarvestPos.y) > 1)
+        structuresForSpawning = structuresForSpawning.filter(structure => getRange(structure.pos.x - closestHarvestPos.x, structure.pos.y - closestHarvestPos.y) > 1)
     }
 
     // If there is a fastFill container or link
@@ -43,9 +43,9 @@ export function structuresForSpawningManager(room: Room) {
 
         // Assign structuresForSpawning that are not in range of 2 to the anchor
 
-        structuresForSpawning = structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, anchor.x, anchor.y) > 2)
+        structuresForSpawning = structuresForSpawning.filter(structure => getRange(structure.pos.x - anchor.x, structure.pos.y - anchor.y) > 2)
     }
-
+/*
     // Get the hubAnchor
 
     const hubAnchor = global[room.name].stampAnchors?.hub[0]
@@ -58,7 +58,7 @@ export function structuresForSpawningManager(room: Room) {
 
         structuresForSpawning = structuresForSpawning.filter(structure => getRangeBetween(structure.pos.x, structure.pos.y, hubAnchor.x, hubAnchor.y) > 1)
     }
-
+ */
     // Iterate through structures in structureForSpawning
 
     for (const structure of structuresForSpawning) {
