@@ -1,5 +1,5 @@
 import { allyList, builderSpawningWhenStorageThreshold, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
-import { findCarryPartsRequired, findRemoteSourcesByEfficacy } from "international/generalFunctions"
+import { findCarryPartsRequired, findRemoteSourcesByEfficacy, getRange } from "international/generalFunctions"
 
 /**
  * Creates spawn requests for the commune
@@ -843,13 +843,31 @@ export function spawnRequester(room: Room) {
             partsMultiplier += incomeShare
         }
 
+        // Get the controllerLink and baseLink
+
+        const controllerLink: StructureLink | undefined = room.get('controllerLink'),
+        hubLink: StructureLink | undefined = room.get('hubLink')
+
+        // If the controllerLink is defined
+
+        if (controllerLink && hubLink) {
+
+            // Get the range between the controllerLink and hubLink
+
+            const range = getRange(controllerLink.pos.x - hubLink.pos.x, controllerLink.pos.y - hubLink.pos.y)
+
+            // Limit partsMultiplier at the range divided by the controllerLink's capacity
+
+            partsMultiplier = Math.max(partsMultiplier, controllerLink.store.getCapacity(RESOURCE_ENERGY) / range)
+        }
+
         // If there are construction sites of my ownership in the room, set multiplier to 1
 
         if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
 
         // If the controllerContainer or controllerLink exists
 
-        if (room.get('controllerContainer') || room.get('controllerLink')) {
+        if (room.get('controllerContainer') || controllerLink) {
 
             // If the controller is near to downgrading, set partsMultiplier to x
 
