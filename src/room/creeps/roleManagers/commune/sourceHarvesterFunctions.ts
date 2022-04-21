@@ -20,9 +20,9 @@ SourceHarvester.prototype.isDying = function() {
 
     const sourcePathLength = room.get(`${creep.memory.sourceName}PathLength`)
 
-    // If the sourcePathLength + creep's remaining ticks are more than the estimated spawn time, inform false
+    // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
-    if (sourcePathLength + creep.ticksToLive > creep.body.length * CREEP_SPAWN_TIME) return false
+    if (creep.ticksToLive > creep.body.length * CREEP_SPAWN_TIME + sourcePathLength) return false
 
     // Record creep as dying
 
