@@ -1168,11 +1168,11 @@ export function spawnRequester(room: Room) {
         if (!Memory.claimTarget) return false
 
         return {
-            defaultParts: [MOVE, MOVE, CLAIM, MOVE],
+            defaultParts: [MOVE, CLAIM],
             extraParts: [],
             partsMultiplier: 1,
             minCreeps: 1,
-            minCost: 750,
+            minCost: 650,
             priority: 3,
             memoryAdditions: {
                 role: 'claimer',
