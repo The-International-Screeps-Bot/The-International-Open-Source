@@ -11,11 +11,21 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
 
         if (!creep.findRemote()) {
 
-            // If none were found, have the creep make a moveRequest to its commune and iterate
+            // If the room is the creep's commune
+
+            if (room.name == creep.memory.communeName) {
+
+                // Advanced recycle and iterate
+
+                creep.advancedRecycle()
+                continue
+            }
+
+            // Otherwise, have the creep make a moveRequest to its commune and iterate
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 1 }
+                goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 25 }
             })
 
             continue
@@ -34,18 +44,13 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
             // Try to attack enemyAttackers, iterating if there are none or one was attacked
 
             if (creep.advancedAttackAttackers()) continue
-
-            // Otherwise have the creep recycle
-
-            // If the room is the creep's commune
-
-            if (room.name == creep.memory.communeName) {
-
-                // Advanced recycle and iterate
-
-                creep.advancedRecycle()
-                continue
-            }
         }
+
+        // Otherwise, create a moveRequest to its remote
+
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 }
+        })
     }
 }

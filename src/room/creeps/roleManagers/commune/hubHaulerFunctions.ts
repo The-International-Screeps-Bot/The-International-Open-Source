@@ -139,7 +139,7 @@ HubHauler.prototype.fillHubLink = function() {
     // If the controller is near to downgrade, the fastFillerLink is insufficiently full, or the storage is sufficiently full and the hubLink is not full
 
     if (((room.controller.ticksToDowngrade < 10000 ||
-        fastFillerLink && fastFillerLink.store.getUsedCapacity(RESOURCE_ENERGY) < fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) ||
+        fastFillerLink && fastFillerLink.store.getUsedCapacity(RESOURCE_ENERGY) < fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) ||
         storage.store.getUsedCapacity(RESOURCE_ENERGY) > creep.store.getCapacity(RESOURCE_ENERGY)) &&
         hubLink.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
 

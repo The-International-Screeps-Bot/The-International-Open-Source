@@ -49,7 +49,7 @@ RemoteDefender.prototype.advancedHeal = function() {
 
     // If the creep is below max hits
 
-    if (creep.hits < creep.hitsMax) {
+    if (creep.hitsMax > creep.hits) {
 
         // Have it heal itself and stop
 
@@ -65,6 +65,14 @@ RemoteDefender.prototype.advancedHeal = function() {
 
     for (const posData of adjacentCreeps) {
 
+        // If the creep is the posData creep, iterate
+
+        if (creep.id == posData.creep.id) continue
+
+        // If the creep is at full health, iterate
+
+        if(posData.creep.hitsMax == posData.creep.hits) continue
+
         // have the creep heal the adjacentCreep and stop
 
         creep.heal(posData.creep)
@@ -78,6 +86,14 @@ RemoteDefender.prototype.advancedHeal = function() {
     // Loop through each nearbyCreep
 
     for (const posData of nearbyCreeps) {
+
+        // If the creep is the posData creep, iterate
+
+        if (creep.id == posData.creep.id) continue
+
+        // If the creep is at full health, iterate
+
+        if(posData.creep.hitsMax == posData.creep.hits) continue
 
         // have the creep rangedHeal the nearbyCreep and stop
 

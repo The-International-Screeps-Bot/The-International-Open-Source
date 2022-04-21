@@ -858,7 +858,7 @@ export function spawnRequester(room: Room) {
 
             // Limit partsMultiplier at the range divided by the controllerLink's capacity
 
-            partsMultiplier = Math.max(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) - 200) / range)
+            partsMultiplier = Math.min(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) - 200) / range)
         }
 
         // If there are construction sites of my ownership in the room, set multiplier to 1
@@ -1115,7 +1115,10 @@ export function spawnRequester(room: Room) {
 
         constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-            const minCost = 900
+            // Define the minCost and strength
+
+            const minCost = 900,
+            strength = 3 * RANGED_ATTACK_POWER + 1 * HEAL_POWER
 
             // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
 
