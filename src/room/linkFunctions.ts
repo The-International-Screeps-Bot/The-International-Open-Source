@@ -45,7 +45,7 @@ Room.prototype.hubToFastFiller = function(hubLink, fastFillerLink) {
 
     // If the fastFillerLink is more than half full, stop
 
-    if (fastFillerLink.store.getUsedCapacity(RESOURCE_ENERGY) > fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) return
+    if (fastFillerLink.store.getUsedCapacity(RESOURCE_ENERGY) > fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) return
 
     // Otherwise, have the sourceLink transfer to the recieverLink
 

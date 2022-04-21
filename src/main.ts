@@ -962,9 +962,22 @@ declare global {
          */
         hasRenewed: boolean
 
+        /**
+         * Wether the structure has been transfered or withdrawn from
+         */
+        hasHadResourcesMoved: boolean
+
         // Functions
 
         advancedSpawn(spawnRequest: SpawnRequest): ScreepsReturnCode
+    }
+
+    interface StructureExtension {
+
+        /**
+         * Wether the structure has been transfered or withdrawn from
+         */
+        hasHadResourcesMoved: boolean
     }
 
     interface StructureTower {

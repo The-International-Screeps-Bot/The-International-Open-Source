@@ -45,7 +45,7 @@ RemoteDefender.prototype.findRemote = function() {
 RemoteDefender.prototype.advancedHeal = function() {
 
     const creep = this,
-    room = creep
+    room = creep.room
 
     // If the creep is below max hits
 
@@ -63,11 +63,11 @@ RemoteDefender.prototype.advancedHeal = function() {
 
     // Loop through each adjacentCreep
 
-    for (const adjacentCreep of adjacentCreeps) {
+    for (const posData of adjacentCreeps) {
 
         // have the creep heal the adjacentCreep and stop
 
-        creep.heal(adjacentCreep)
+        creep.heal(posData.creep)
         return
     }
 
@@ -77,11 +77,11 @@ RemoteDefender.prototype.advancedHeal = function() {
 
     // Loop through each nearbyCreep
 
-    for (const nearbyCreep of nearbyCreeps) {
+    for (const posData of nearbyCreeps) {
 
         // have the creep rangedHeal the nearbyCreep and stop
 
-        creep.rangedHeal(nearbyCreep)
+        creep.rangedHeal(posData.creep)
         return
     }
 }

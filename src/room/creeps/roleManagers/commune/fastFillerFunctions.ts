@@ -80,7 +80,7 @@ FastFiller.prototype.fillFastFiller = function() {
         return false
     }
 
-    // Otherwise if the creep doesn't need energy, get adjacent structures to the creep
+    // Otherwise if the creep doesn't need energy, get adjacent extensions and spawns to the creep
 
     const adjacentStructures = room.lookForAtArea(LOOK_STRUCTURES, creep.pos.y - 1, creep.pos.x - 1, creep.pos.y + 1, creep.pos.x + 1, true)
 
@@ -90,11 +90,15 @@ FastFiller.prototype.fillFastFiller = function() {
 
         // Get the structure at the adjacentPos
 
-        const structure = adjacentPosData.structure as AnyStoreStructure
+        const structure = adjacentPosData.structure as StructureSpawn | StructureExtension
 
         // If the structure has no store property, iterate
 
         if (!structure.store) continue
+
+        // If the structure has already had resources moved, iterate
+
+        if (structure.hasHadResourcesMoved) continue
 
         // If the structureType is an extension or spawn, iterate
 
@@ -104,11 +108,13 @@ FastFiller.prototype.fillFastFiller = function() {
 
         if (structure.store.getFreeCapacity(RESOURCE_ENERGY) == 0) continue
 
-        // Otherwise, transfer to the structure and inform true
+        // Otherwise, transfer to the structure record the action and inform true
 
         creep.say('T')
 
         creep.transfer(structure, RESOURCE_ENERGY)
+        structure.hasHadResourcesMoved = true
+
         return true
     }
 

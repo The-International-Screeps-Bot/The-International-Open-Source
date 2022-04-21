@@ -38,7 +38,7 @@ export function linkManager(room: Room) {
 
         // If the link is not nearly full, iterate
 
-        if (sourceLink.store.getUsedCapacity(RESOURCE_ENERGY) < 700) continue
+        if (sourceLink.store.getFreeCapacity(RESOURCE_ENERGY) > 100) continue
 
         // Otherwise, loop through each recieverLink
 
@@ -54,7 +54,7 @@ export function linkManager(room: Room) {
 
             // If the link is more than half full, iterate
 
-            if (recieverLink.store.getUsedCapacity(RESOURCE_ENERGY) > recieverLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) continue
+            if (recieverLink.store.getUsedCapacity(RESOURCE_ENERGY) > recieverLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) continue
 
             // Otherwise, have the sourceLink transfer to the recieverLink
 

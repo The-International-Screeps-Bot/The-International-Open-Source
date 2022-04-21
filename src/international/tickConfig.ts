@@ -146,6 +146,8 @@ export function tickConfig() {
             roomMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = roomMemory.source2 ? 3 : 0
 
             roomMemory.needs[remoteNeedsIndex.remoteHauler] = 0
+
+            roomMemory.needs[remoteNeedsIndex.remoteDefender] = 0
         }
 
         // Add roomName to commune list
