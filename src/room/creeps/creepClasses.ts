@@ -161,6 +161,8 @@ export class RemoteDefender extends Creep {
      */
     findRemote?(): boolean
 
+    advancedHeal?(): void
+
     /**
      * Find and attack enemyAttackers
      */

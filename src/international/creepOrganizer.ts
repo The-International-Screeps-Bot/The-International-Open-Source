@@ -86,7 +86,7 @@ export function creepOrganizer() {
                 // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
 
                 Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
-                
+
                 // Add the creep to creepsFromRoomWithRemote relative to its remote
 
                 commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
@@ -120,6 +120,15 @@ export function creepOrganizer() {
                 // Add the creep to creepsFromRoomWithRemote relative to its remote
 
                 commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
+            }
+
+            // Otherwise if the creep is a remoteDefender
+
+            else if (role == 'remoteDefender') {
+
+                // Reduduce the remote's defender need proportionate to the creep's strength
+
+                Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.findStrength()
             }
         }
 

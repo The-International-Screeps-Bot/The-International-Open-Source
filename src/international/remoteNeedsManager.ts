@@ -36,6 +36,16 @@ export function remoteNeedsManager() {
                 remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.source2 ? 3 : 0
             }
 
+            // Get enemyCreeps in the room and loop through them
+
+            const enemyCreeps: Creep[] = room.get('enemyCreeps')
+            for (const enemyCreep of enemyCreeps) {
+
+                // Increase the defenderNeed according to the creep's strength
+
+                remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.findStrength()
+            }
+
             // Loop through each index of sourceEfficacies
 
             for (let index = 0; index < remoteMemory.sourceEfficacies.length; index++) {

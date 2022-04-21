@@ -1,13 +1,12 @@
-import { allyList, builderSpawningWhenStorageThreshold, constants, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
-import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy } from "international/generalFunctions"
-
+import { allyList, builderSpawningWhenStorageThreshold, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
+import { findCarryPartsRequired, findRemoteSourcesByEfficacy } from "international/generalFunctions"
 
 /**
  * Creates spawn requests for the commune
  */
 export function spawnRequester(room: Room) {
 
-    // If there is no spawn que, make one
+    // If there is no spawn queue, make one
 
     if (!global[room.name].spawnQueue) global[room.name].spawnQueue = {}
 
@@ -823,7 +822,7 @@ export function spawnRequester(room: Room) {
 
             // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 5000
+            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold) partsMultiplier += Math.pow(room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000, 2)
 
             // Otherwise, set partsMultiplier to 0
 
@@ -957,7 +956,7 @@ export function spawnRequester(room: Room) {
             // If there are no needs for this room, inform false
 
             if (Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
-            
+
             if (spawnEnergyCapacity >= 950) {
 
                 return {
@@ -1090,6 +1089,35 @@ export function spawnRequester(room: Room) {
                 priority: 4.3 + index,
                 memoryAdditions: {
                     role: 'remoteReserver',
+                }
+            }
+        })())
+
+        // Construct requests for remoteDefenders
+
+        constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+            const minCost = 900
+
+            // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
+
+            if (spawnEnergyCapacity < minCost) return false
+
+            // If there are no needs for this room, inform false
+
+            if (Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteDefender] <= 0) return false
+
+            return {
+                defaultParts: [],
+                extraParts: [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE],
+                partsMultiplier: 3,
+                groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDefender,
+                minCreeps: undefined,
+                maxCreeps: Infinity,
+                minCost: minCost,
+                priority: 4,
+                memoryAdditions: {
+                    role: 'remoteDefender',
                 }
             }
         })())

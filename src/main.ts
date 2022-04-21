@@ -697,6 +697,11 @@ declare global {
          */
         pathOpts: PathOpts
 
+        /**
+         * A numerical measurement of the combat abilites of the creep
+         */
+        strength: number
+
         // Functions
 
         /**
@@ -837,6 +842,8 @@ declare global {
         advancedRenew(): boolean
 
         advancedReserveController(): boolean
+
+        findStrength(): number
     }
 
     interface CreepMemory {
