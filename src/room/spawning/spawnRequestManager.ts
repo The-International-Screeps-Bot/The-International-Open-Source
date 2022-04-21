@@ -1098,7 +1098,7 @@ export function spawnRequester(room: Room) {
 
             return {
                 defaultParts: [],
-                extraParts: [MOVE, MOVE, MOVE, CLAIM],
+                extraParts: [MOVE, CLAIM],
                 partsMultiplier: 3,
                 groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteReserver,
                 minCreeps: 1,
@@ -1131,7 +1131,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [],
                 extraParts: [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE],
-                partsMultiplier: 3,
+                partsMultiplier: Math.min(3 / strength, 1),
                 groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDefender,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
@@ -1171,7 +1171,7 @@ export function spawnRequester(room: Room) {
         if (!Memory.claimTarget) return false
 
         return {
-            defaultParts: [MOVE, CLAIM],
+            defaultParts: [MOVE, MOVE, CLAIM, MOVE],
             extraParts: [],
             partsMultiplier: 1,
             minCreeps: 1,
