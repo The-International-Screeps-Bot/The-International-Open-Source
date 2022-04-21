@@ -7,7 +7,7 @@ Room.prototype.hubToController = function(hubLink, controllerLink) {
     // If the controller is close to downgrading and the storage has insufficient energy, stop
 
     if (room.controller.ticksToDowngrade > 10000 &&
-        room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < upgraderSpawningWhenStorageThreshold - 20000) return
+        room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < upgraderSpawningWhenStorageThreshold - 30000) return
 
     // If the hubLink or controllerLink aren't defined, stop
 
@@ -19,7 +19,7 @@ Room.prototype.hubToController = function(hubLink, controllerLink) {
 
     // If the controllerLink is more than half full, stop
 
-    if (controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) > controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) return
+    if (controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) > controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) return
 
     // Otherwise, have the sourceLink transfer to the recieverLink
 
