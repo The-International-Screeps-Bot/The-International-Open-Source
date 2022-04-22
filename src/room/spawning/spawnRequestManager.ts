@@ -858,24 +858,28 @@ export function spawnRequester(room: Room) {
 
             // Limit partsMultiplier at the range divided by the controllerLink's capacity
 
-            partsMultiplier = Math.min(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) - 200) / range)
+            partsMultiplier = Math.min(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range)
         }
 
         // If there are construction sites of my ownership in the room, set multiplier to 1
 
         if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
 
+        // Intitialize the threshold
+
+        const threshold = 0.15
+
         // If the controllerContainer or controllerLink exists
 
         if (room.get('controllerContainer') || controllerLink) {
 
-            // If the controller is near to downgrading, set partsMultiplier to x
-
-            if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 4
-
             // If the controller is level 8, max out partsMultiplier at 4
 
             if (room.controller.level == 8) {
+
+                // If the controller is near to downgrading, set partsMultiplier to x
+
+                if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 5
 
                 partsMultiplier = Math.min(Math.round(partsMultiplier / 5), 3)
                 if (partsMultiplier == 0) return false
@@ -884,14 +888,45 @@ export function spawnRequester(room: Room) {
                     defaultParts: [MOVE],
                     extraParts: [WORK, WORK, WORK, WORK, MOVE, CARRY, WORK],
                     partsMultiplier,
+                    threshold,
                     minCreeps: 1,
-                    minCost: 200,
+                    minCost: 650,
                     priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
                     memoryAdditions: {
                         role: 'controllerUpgrader',
                     }
                 }
             }
+
+            // Otherwise if the spawnEnergyCapacity is more than 800
+
+            if (spawnEnergyCapacity >= 800) {
+
+            // If the controller is near to downgrading, set partsMultiplier to x
+
+            if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 6
+
+                partsMultiplier = Math.round(partsMultiplier / 6)
+                if (partsMultiplier == 0) return false
+
+                return {
+                    defaultParts: [CARRY],
+                    extraParts: [WORK, WORK, WORK, MOVE, WORK, WORK, WORK],
+                    partsMultiplier,
+                    threshold,
+                    minCreeps: undefined,
+                    maxCreeps: 8,
+                    minCost: 700,
+                    priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                    memoryAdditions: {
+                        role: 'controllerUpgrader',
+                    }
+                }
+            }
+
+            // If the controller is near to downgrading, set partsMultiplier to x
+
+            if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 4
 
             partsMultiplier = Math.round(partsMultiplier / 4)
             if (partsMultiplier == 0) return false
@@ -900,6 +935,7 @@ export function spawnRequester(room: Room) {
                 defaultParts: [CARRY],
                 extraParts: [WORK, MOVE, WORK, WORK, WORK],
                 partsMultiplier,
+                threshold,
                 minCreeps: undefined,
                 maxCreeps: 8,
                 minCost: 200,
@@ -920,6 +956,7 @@ export function spawnRequester(room: Room) {
                 defaultParts: [],
                 extraParts: [WORK, CARRY, MOVE],
                 partsMultiplier,
+                threshold,
                 minCreeps: undefined,
                 maxCreeps: 8,
                 minCost: 200,
@@ -934,6 +971,7 @@ export function spawnRequester(room: Room) {
             defaultParts: [],
             extraParts: [WORK, MOVE, CARRY, MOVE],
             partsMultiplier,
+            threshold,
             minCreeps: undefined,
             maxCreeps: 8,
             minCost: 250,
