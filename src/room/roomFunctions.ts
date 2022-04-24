@@ -1,5 +1,6 @@
 import { allyList, constants } from 'international/constants'
 import { advancedFindDistance, arePositionsEqual, customLog, findPositionsInsideRect, getRangeBetween, unPackAsRoomPos } from 'international/generalFunctions'
+import { basePlanner } from './construction/basePlanner'
 import { ControllerUpgrader, SourceHarvester } from './creeps/creepClasses'
 import { RoomObject } from './roomObject'
 import { RoomTask } from './roomTasks'
@@ -206,7 +207,12 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return [room.roomObjects.source1.getValue(), room.roomObjects.source2.getValue()]
+            const sources = [room.roomObjects.source1.getValue()],
+            source2 = room.roomObjects.source2.getValue()
+
+            if (source2) sources.push(source2)
+
+            return sources
         }
     })
 
@@ -1984,52 +1990,12 @@ Room.prototype.findType = function(scoutingRoom: Room) {
             return
         }
 
-        // Set type to neutral and stop
-
         room.memory.type = 'neutral'
+
+        room.createClaimRequest()
+
         return
     }
-/*
-    // If there is no controller
-
-    // Get keeperLair
-
-    const keeperLairs = room.get('keeperLair')
-
-    // If there are keeperLairs
-
-    if (keeperLairs.length > 0) {
-
-        // Set type to keeper and stop
-
-        room.memory.type = 'keeper'
-        return
-    }
-
-    // If there are sources
-
-    if (room.find(FIND_SOURCES).length > 0) {
-
-        // Set type to keeperCenter and stop
-
-        room.memory.type = 'keeperCenter'
-        return
-    }
-
-    // If there are portals
-
-    if (room.get('portal').length > 0) {
-
-        // Set type to intersection and stop
-
-        room.memory.type = 'intersection'
-        return
-    }
-
-    // Set type to highway and stop
-
-    room.memory.type == 'highway'
-    return */
 }
 
 Room.prototype.cleanMemory = function() {
@@ -3123,4 +3089,21 @@ Room.prototype.findSourcesByEfficacy = function() {
     // Sort sourceNames based on their efficacy, informing the result
 
     return sourceNames.sort((a, b) => room.get(`${a}PathLength`) - room.get(`${b}PathLength`))
+}
+
+Room.prototype.createClaimRequest = function() {
+
+    const room = this
+
+    if (room.get('sources').length != 2) return
+
+    if (room.memory.notClaimable) return
+
+    if (Memory.claimRequests[room.name]) return
+
+    if (!basePlanner(room)) return
+
+    Memory.claimRequests[room.name] = {
+        needs: [1, 20, 0]
+    }
 }

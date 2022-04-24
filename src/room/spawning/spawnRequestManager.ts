@@ -988,11 +988,13 @@ export function spawnRequester(room: Room) {
 
     for (let index = 0; index < remoteNamesByEfficacy.length; index++) {
 
-        const remoteName = remoteNamesByEfficacy[index]
+        const remoteName = remoteNamesByEfficacy[index],
+
+        remoteNeeds = Memory.rooms[remoteName].needs,
 
         // Add up econ needs for this room
 
-        const remoteEconNeed = Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester], 0) +
+        remoteEconNeed = Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester], 0) +
         Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source2RemoteHarvester], 0) +
         Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteHauler], 0) +
         Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteReserver], 0)
@@ -1155,8 +1157,7 @@ export function spawnRequester(room: Room) {
 
             // Define the minCost and strength
 
-            const minCost = 900,
-            strength = 3 * RANGED_ATTACK_POWER + 1 * HEAL_POWER
+            const minCost = 900
 
             // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
 
@@ -1166,10 +1167,14 @@ export function spawnRequester(room: Room) {
 
             if (Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteDefender] <= 0) return false
 
+            const strengthByMargin = Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteDefender],
+
+            requiredStrength = Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthByMargin)
+
             return {
                 defaultParts: [],
                 extraParts: [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE],
-                partsMultiplier: Math.max(3 / strength, 1),
+                partsMultiplier: Math.max(requiredStrength, 1),
                 groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDefender,
                 minCreeps: undefined,
                 maxCreeps: Infinity,

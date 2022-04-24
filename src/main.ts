@@ -51,10 +51,6 @@ declare global {
         brown: string
     }
 
-    type ClaimRequest = {[key: string]: { needs: [] }}
-
-    type AttackRequest = {[key: string]: { needs: [] }}
-
     type StampTypes = 'fastFiller' |
     'hub' |
     'extensions' |
@@ -296,9 +292,9 @@ declare global {
         /**
          *
          */
-        claimRequests: ClaimRequest[]
+        claimRequests: {[key: string]: { needs: number[] }}
 
-        attackRequests: AttackRequest[]
+        attackRequests: {[key: string]: { needs: number[] }}
 
         /**
          * An array of roomNames that have controllers we own
@@ -556,12 +552,12 @@ declare global {
         /**
          *
          */
-         createPullTask(creator: Structure | Creep | Resource): void
+        createPullTask(creator: Structure | Creep | Resource): void
 
         /**
          *
          */
-         createPickupTasks(creator: Structure | Creep | Resource): void
+        createPickupTasks(creator: Structure | Creep | Resource): void
 
         /**
          *
@@ -586,6 +582,8 @@ declare global {
         getPartsOfRoleAmount(role: CreepRoles, type?: BodyPartConstant): number
 
         findSourcesByEfficacy(): ('source1' | 'source2')[]
+
+        createClaimRequest(): void
 
         // Market functions
 

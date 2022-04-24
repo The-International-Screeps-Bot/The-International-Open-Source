@@ -14,17 +14,11 @@ InternationalManager.prototype.config = function() {
 
         // Construct foundation
 
-        Memory.rooms = {}
-        Memory.creeps = {}
-        Memory.powerCreeps = {}
-        Memory.flags = {}
-        Memory.spawns = {}
-
         Memory.ID = 0
         Memory.constructionSites = {}
 
-        Memory.claimRequests = []
-        Memory.attackRequests = []
+        Memory.claimRequests = {}
+        Memory.attackRequests = {}
 
         // Config settings
 

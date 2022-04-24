@@ -130,6 +130,10 @@ RemoteDefender.prototype.advancedAttackAttackers = function() {
 
     if (!enemyAttackers.length) {
 
+        // Heal nearby creeps
+
+        creep.advancedHeal()
+
         const enemyCreeps = (room.get('enemyCreeps') as Creep[]).filter(enemyCreep => !enemyCreep.isOnExit())
         if (!enemyCreeps.length) return false
 
@@ -175,7 +179,7 @@ RemoteDefender.prototype.advancedAttackAttackers = function() {
 
         // Heal nearby creeps
 
-        creep.healNearbyCreeps()
+        creep.advancedHeal()
 
         // Make a moveRequest to it and inform true
 

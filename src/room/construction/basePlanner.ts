@@ -164,7 +164,7 @@ export function basePlanner(room: Room) {
 
     // If the stamp failed to be planned
 
-    if (!stampAnchors.fastFiller.length) {
+    if (!stampAnchors.fastFiller?.length) {
 
         // Record that the room is not claimable and stop
 
@@ -311,7 +311,7 @@ export function basePlanner(room: Room) {
     }
 
     // Get the room's sourceNames
-    
+
     const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
 
     // loop through sourceNames

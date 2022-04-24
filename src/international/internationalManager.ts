@@ -175,7 +175,7 @@ InternationalManager.prototype.run = function() {
 
     delete this._myOrders
     delete this._orders
-    this._myOrdersCount = 0
+    delete this._myOrdersCount
 
     // Run prototypes
 
