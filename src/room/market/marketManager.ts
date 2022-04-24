@@ -97,6 +97,6 @@ export function marketManager(room: Room) {
 
         // Otherwise, try to sell the excess amount
 
-        room.advancedSell(resourceType, terminal.store.getUsedCapacity(resourceType) - targetAmount)
+        room.advancedSell(resourceType, terminal.store.getUsedCapacity(resourceType) - targetAmount / 2)
     }
 }

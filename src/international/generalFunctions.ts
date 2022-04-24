@@ -6,7 +6,7 @@ import { constants } from "./constants"
 export function getAvgPrice(resourceType: MarketResourceConstant, days: number = 2) {
 
     // Get the market history for the specified resourceType
-    
+
     const history = Game.market.getHistory(resourceType)
 
     // Init the totalPrice
@@ -291,4 +291,26 @@ export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'sou
     // Sort sourceNames by efficacy, informing the result
 
     return sourceNames.sort((a, b) => Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(a)] - Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(b)])
+}
+
+/**
+ * Finds the largest possible transaction amount given a budget and starting amount
+ * @param budget The number of energy willing to be invested in the trade
+ * @param amount The number of resources that would like to be traded
+ * @param roomName1
+ * @param roomName2
+ * @returns
+ */
+export function findLargestTransactionAmount(budget: number, amount: number, roomName1: string, roomName2: string) {
+
+    // So long as the the transactions cost is more than the budget
+
+    while (Game.market.calcTransactionCost(amount, roomName1, roomName2) > budget) {
+
+        // Decrease amount exponentially
+
+        amount *= 0.8
+    }
+
+    return amount
 }

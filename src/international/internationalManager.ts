@@ -105,7 +105,7 @@ export class InternationalManager {
 
             this._myOrders[order.roomName][order.type][order.resourceType].push(order)
         }
-        
+
         return this._myOrders
     }
 
@@ -132,7 +132,7 @@ export class InternationalManager {
 
             // Get the order using its ID
 
-            const order = Game.market.orders[orderID]
+            const order = orders[orderID]
 
             // If there is no foundation for this structure, create one
 
@@ -140,7 +140,7 @@ export class InternationalManager {
 
             // If there is no array for this structure, create one
 
-            if (!this._orders[order.type][order.resourceType].length)
+            if (!this._orders[order.type][order.resourceType])
                 this._orders[order.type][order.resourceType] = []
 
             // Add the order to the structure's array

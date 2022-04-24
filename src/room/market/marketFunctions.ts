@@ -1,4 +1,4 @@
-import { getAvgPrice } from "international/generalFunctions"
+import { customLog, findLargestTransactionAmount, getAvgPrice } from "international/generalFunctions"
 import { internationalManager } from "international/internationalManager"
 
 Room.prototype.advancedSell = function(resourceType, amount) {
@@ -21,9 +21,9 @@ Room.prototype.advancedSell = function(resourceType, amount) {
 
     for (const order of internationalManager.getBuyOrders(resourceType)) {
 
-        // Deal with the order and inform true
+        amount = findLargestTransactionAmount(room.terminal.store.getUsedCapacity(RESOURCE_ENERGY), amount, room.name, order.roomName)
 
-        Game.market.deal(order.id, Math.min(amount, order.amount), order.roomName)
+        Game.market.deal(order.id, Math.min(amount, order.remainingAmount), room.name)
         return true
     }
 
