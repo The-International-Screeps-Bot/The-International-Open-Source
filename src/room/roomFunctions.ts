@@ -587,7 +587,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // If there is more than one adjacent extension and container, iterate
 
-            if (adjacentStructuresByType[STRUCTURE_CONTAINER] > 0 && adjacentStructuresByType[STRUCTURE_SPAWN] + adjacentStructuresByType[STRUCTURE_EXTENSION] > 0) continue
+            if (adjacentStructuresByType[STRUCTURE_CONTAINER] > 0 && (adjacentStructuresByType[STRUCTURE_SPAWN] || 0 + adjacentStructuresByType[STRUCTURE_EXTENSION] || 0) > 0) continue
 
             // Otherwise, remove the pos from fastFillePositions
 
@@ -1906,9 +1906,9 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
         if (distanceFromScoutingRoom < 4) {
 
-            // If the room is already known to be a remote, stop
+            // If the room is already known to be an active a remote, stop
 
-            if (scoutingRoom.memory.remotes.includes(room.name)) return
+            if (room.memory.type == 'remote' && Memory.communes.includes(room.memory.commune)) return
 
             // Set roomType as remote and assign commune as scoutingRoom's name
 
