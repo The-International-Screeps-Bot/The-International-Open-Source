@@ -13,7 +13,6 @@ export class SourceHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.sourceHarvester = SourceHarvester
@@ -22,7 +21,6 @@ export class Hauler extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.hauler = Hauler
@@ -31,7 +29,6 @@ export class ControllerUpgrader extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.controllerUpgrader = ControllerUpgrader
@@ -40,7 +37,6 @@ export class Builder extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.builder = Builder
@@ -54,7 +50,6 @@ export class Maintainer extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.maintainer = Maintainer
@@ -66,7 +61,6 @@ export class MineralHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.mineralHarvester = MineralHarvester
@@ -82,7 +76,6 @@ export class HubHauler extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.hubHauler = HubHauler
@@ -96,7 +89,6 @@ export class FastFiller extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.fastFiller = FastFiller
@@ -108,7 +100,6 @@ export class MeleeDefender extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.meleeDefender = MeleeDefender
@@ -128,7 +119,6 @@ export class RemoteHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.source1RemoteHarvester = RemoteHarvester
@@ -139,7 +129,6 @@ export class RemoteHauler extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.remoteHauler = RemoteHauler
@@ -149,7 +138,6 @@ export class Reserver extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.remoteReserver = Reserver
@@ -171,7 +159,6 @@ export class RemoteDefender extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.remoteDefender = RemoteDefender
@@ -186,7 +173,6 @@ export class Scout extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.scout = Scout
@@ -194,23 +180,39 @@ creepClasses.scout = Scout
 export class Claimer extends Creep {
 
     /**
-     * Claims a room specified in the creep's memory
+     * Claims a room specified in the creep's commune claimRequest
      */
     claimRoom?(): void
 
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.claimer = Claimer
+
+export class Vanguard extends Creep {
+    /**
+     *
+     */
+    travelToSource?(sourceName: ('source1' | 'source2')): boolean
+
+    /**
+     * Builds a spawn in the creep's commune claimRequest
+     */
+    buildRoom?(): void
+
+    constructor(creepID: Id<Creep>) {
+
+        super(creepID)
+    }
+}
+creepClasses.vanguard = Vanguard
 
 export class Antifa extends Creep {
     constructor(creepID: Id<Creep>) {
 
         super(creepID)
-
     }
 }
 creepClasses.antifa = Antifa

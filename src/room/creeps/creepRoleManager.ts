@@ -19,6 +19,7 @@ import { fastFillerManager } from './roleManagers/commune/fastFillerManager'
 import { source1RemoteHarvesterManager } from './roleManagers/remote/source1RemoteHarvesterManager'
 import { remoteReserverManager } from './roleManagers/remote/remoteReserver'
 import { remoteDefenderManager } from './roleManagers/remote/remoteDefenderManager'
+import { vanguardManager } from './roleManagers/international/vanguardManager'
 
 export function roleManager(room: Room) {
 
@@ -45,6 +46,7 @@ export function roleManager(room: Room) {
         remoteDefender: remoteDefenderManager,
         scout: scoutManager,
         claimer: claimerManager,
+        vanguard: vanguardManager,
         antifa: antifaManager,
     }
 

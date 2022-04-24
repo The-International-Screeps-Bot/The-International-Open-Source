@@ -91,6 +91,7 @@ declare global {
     'remoteDefender' |
     'scout' |
     'claimer' |
+    'vanguard' |
     'antifa'
 
     type RoomObjectName =

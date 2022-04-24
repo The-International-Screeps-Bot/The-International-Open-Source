@@ -30,7 +30,6 @@ export function source1RemoteHarvesterManager(room: Room, creepsOfRole: string[]
 
             if (creep.advancedHarvestSource(room.get(sourceName))) continue
 
-            
             continue
         }
 

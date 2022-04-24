@@ -189,6 +189,7 @@ constants.creepRoles = [
     'remoteDefender',
     'scout',
     'claimer',
+    'vanguard',
     'antifa',
 ]
 
@@ -437,7 +438,7 @@ export const remoteNeedsIndex = {
 
 export const claimRequestNeedsIndex = {
     claimer: 0,
-    builder: 1,
+    vanguard: 1,
     defender: 2,
 }
 

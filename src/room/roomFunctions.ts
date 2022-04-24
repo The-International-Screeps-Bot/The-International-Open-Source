@@ -713,7 +713,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // If the room is a commune, use sourceHarvesters. Otherwise use remoteHarvesters
 
-        harvesterNames = room.memory.type == 'commune' ? room.myCreeps.sourceHarvester : room.myCreeps.source1RemoteHarvester.concat(room.myCreeps.source2RemoteHarvester)
+        harvesterNames = room.memory.type == 'commune' ? room.myCreeps.sourceHarvester.concat(room.myCreeps.vanguard) : room.myCreeps.source1RemoteHarvester.concat(room.myCreeps.source2RemoteHarvester)
 
         // Loop through each sourceHarvester's name in the room
 

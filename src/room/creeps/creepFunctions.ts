@@ -1,6 +1,6 @@
 import { spawn } from "child_process"
 import { boostMultipliers, constants, CPUBucketRenewThreshold } from "international/constants"
-import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
+import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRange, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
 import { repeat } from "lodash"
 import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
 
@@ -406,47 +406,6 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
     if (!cSite) return false
 
     creep.say('ABCS')
-
-    // If the creep needs resources
-
-    if (creep.needsResources()) {
-
-        creep.say('DR')
-
-        // If creep has a task
-
-        if (global[creep.id]?.respondingTaskID) {
-
-            // Try to filfill task
-
-            const fulfillTaskResult = creep.fulfillTask()
-
-            // If the task wasn't fulfilled, inform true
-
-            if (!fulfillTaskResult) return true
-
-            // Otherwise find the task
-
-            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
-
-            // Delete it and inform true
-
-            task.delete()
-            return true
-        }
-
-        // Otherwise try to find a new task
-
-        creep.findTask(new Set([
-            'pickup',
-            'withdraw',
-            'offer'
-        ]), RESOURCE_ENERGY)
-
-        return true
-    }
-
-    // Otherwise if the creep doesn't need resources
 
     // If the cSite is out of build range
 

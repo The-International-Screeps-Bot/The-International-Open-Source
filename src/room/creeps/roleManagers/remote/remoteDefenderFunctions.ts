@@ -57,9 +57,14 @@ RemoteDefender.prototype.advancedHeal = function() {
         return
     }
 
+    let top = Math.max(Math.min(creep.pos.y - 1, constants.roomDimensions - 2), 2),
+    left = Math.max(Math.min(creep.pos.x - 1, constants.roomDimensions - 2), 2),
+    bottom = Math.max(Math.min(creep.pos.y + 1, constants.roomDimensions - 2), 2),
+    right = Math.max(Math.min(creep.pos.x + 1, constants.roomDimensions - 2), 2)
+
     // Find adjacent creeps
 
-    const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, creep.pos.y - 1, creep.pos.x - 1, creep.pos.y + 1, creep.pos.x + 1, true)
+    const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
 
     // Loop through each adjacentCreep
 
@@ -83,7 +88,7 @@ RemoteDefender.prototype.advancedHeal = function() {
         return
     }
 
-    const top = Math.max(Math.min(creep.pos.y - 3, constants.roomDimensions - 2), 2),
+    top = Math.max(Math.min(creep.pos.y - 3, constants.roomDimensions - 2), 2),
     left = Math.max(Math.min(creep.pos.x - 3, constants.roomDimensions - 2), 2),
     bottom = Math.max(Math.min(creep.pos.y + 3, constants.roomDimensions - 2), 2),
     right = Math.max(Math.min(creep.pos.x + 3, constants.roomDimensions - 2), 2)

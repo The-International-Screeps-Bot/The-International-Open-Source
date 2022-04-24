@@ -1,5 +1,5 @@
 import { constants, remoteNeedsIndex } from "international/constants";
-import { getRangeBetween, unPackAsPos } from "international/generalFunctions";
+import { getRange, getRangeBetween, unPackAsPos } from "international/generalFunctions";
 import { RemoteHarvester } from "room/creeps/creepClasses";
 
 RemoteHarvester.prototype.findRemote = function() {
@@ -59,7 +59,7 @@ RemoteHarvester.prototype.travelToSource = function(sourceName) {
 
     // If the creep is at the creep's packedHarvestPos, inform false
 
-    if (getRangeBetween(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) == 0) return false
+    if (getRange(creep.pos.x - harvestPos.x, creep.pos.y - harvestPos.y) == 0) return false
 
     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 

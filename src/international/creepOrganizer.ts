@@ -75,16 +75,19 @@ InternationalManager.prototype.creepOrganizer = function() {
 
         if (role == 'claimer') {
 
-            // Reduce claimer need by one and stop
+            // Reduce claimer need to 0 and stop
 
-            Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[claimRequestNeedsIndex.claimer] = 0
+            Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[claimRequestNeedsIndex[role]] = 0
             continue
         }
 
-        /* if (role == 'vanguard') {
+        if (role == 'vanguard') {
 
+            // Reduce vanguard need by one and stop
 
-        } */
+            Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[claimRequestNeedsIndex[role]] -= creep.partsOfType(WORK)
+            continue
+        }
 
         // Get the creep's remoteName
 

@@ -1232,7 +1232,25 @@ export function spawnRequester(room: Room) {
 
         // Requests for vanguard
 
-        
+        constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+            // If there is no vanguard need
+
+            if (claimRequestNeeds[claimRequestNeedsIndex.vanguard] <= 0) return false
+
+            return {
+                defaultParts: [],
+                extraParts: [WORK, MOVE, CARRY, MOVE],
+                partsMultiplier: claimRequestNeeds[claimRequestNeedsIndex.vanguard],
+                minCreeps: undefined,
+                maxCreeps: Infinity,
+                minCost: 250,
+                priority: 3.1 + room.creepsFromRoom.vanguard.length,
+                memoryAdditions: {
+                    role: 'vanguard',
+                }
+            }
+        })())
     }
 
     // Inform spawnRequests
