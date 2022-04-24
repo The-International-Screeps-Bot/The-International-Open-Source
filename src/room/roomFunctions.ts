@@ -554,7 +554,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Loop through each fastFillerPos
 
-        for (let index = fastFillerPositions.length - 1; index > 0; index--) {
+        for (let index = fastFillerPositions.length - 1; index >= 0; index--) {
 
             // Get the pos using the index
 
