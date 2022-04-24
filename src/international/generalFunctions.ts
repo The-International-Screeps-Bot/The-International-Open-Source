@@ -3,11 +3,26 @@ import { constants } from "./constants"
 /**
  * Finds the average trading price of a resourceType over a set amount of days
  */
-export function findAvgPrice(resourceType: ResourceConstant, days: number = 14) {
+export function getAvgPrice(resourceType: MarketResourceConstant, days: number = 2) {
 
-    let avgPrice: number = 0
+    // Get the market history for the specified resourceType
+    
+    const history = Game.market.getHistory(resourceType)
 
-    return avgPrice
+    // Init the totalPrice
+
+    let totalPrice = 0
+
+    // Iterate through each index less than days
+
+    for (let index = 0; index < days - 1; index++) {
+
+        totalPrice += history[index].avgPrice
+    }
+
+    // Inform the totalPrice divided by the days
+
+    return totalPrice / days
 }
 
 /**

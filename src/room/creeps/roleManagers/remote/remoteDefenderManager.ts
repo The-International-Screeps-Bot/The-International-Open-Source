@@ -33,17 +33,22 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
 
         creep.say(creep.memory.remoteName)
 
+        // Try to heal nearby creeps
+
+        creep.advancedHeal()
+
+        // Try to attack enemyAttackers, iterating if there are none or one was attacked
+
+        if (creep.advancedAttackAttackers()) continue
+
         // If the creep is its remote
 
         if (room.name == creep.memory.remoteName) {
 
-            // Try to heal nearby creeps
+            // Otherwise, remove the remote from the creep
 
-            creep.advancedHeal()
-
-            // Try to attack enemyAttackers, iterating if there are none or one was attacked
-
-            if (creep.advancedAttackAttackers()) continue
+            delete creep.memory.remoteName
+            continue
         }
 
         // Otherwise, create a moveRequest to its remote

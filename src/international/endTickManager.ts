@@ -1,14 +1,12 @@
 import { constants } from "international/constants"
 import { customLog, findCPUColor } from "international/generalFunctions"
-import { allyManager } from "room/market/simpleAllies"
+import { allyManager } from "international/simpleAllies"
+import { InternationalManager } from "./internationalManager"
 
-/**
- * Handles logging, stat recording, and more at the end of the tick
- */
-export function endTickManager() {
+InternationalManager.prototype.endTickManager = function() {
 
     allyManager.endTickManager()
-    
+
     const CPU = Game.cpu.getUsed(),
 
     // Get the CPU color based on the amount of used CPU

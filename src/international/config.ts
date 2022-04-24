@@ -1,7 +1,6 @@
-/**
- * Configures features like Memory, global and object prototypes required to run the bot
- */
-export function config() {
+import { InternationalManager } from "./internationalManager"
+
+InternationalManager.prototype.config = function() {
 
     // Construct Memory if it isn't constructed yet
 

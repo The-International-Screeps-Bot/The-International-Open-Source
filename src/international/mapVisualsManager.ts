@@ -1,9 +1,7 @@
 import { constants } from "./constants"
+import { InternationalManager } from "./internationalManager"
 
-/**
- * Adds colours and annotations to the map if mapVisuals are enabled
- */
-export function mapVisualsManager() {
+InternationalManager.prototype.mapVisualsManager = function() {
 
     // Stop if mapVisuals are disabled
 

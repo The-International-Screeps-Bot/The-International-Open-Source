@@ -587,7 +587,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // If there is more than one adjacent extension and container, iterate
 
-            if (adjacentStructuresByType[STRUCTURE_CONTAINER] > 0 && adjacentStructuresByType[STRUCTURE_EXTENSION] > 0) continue
+            if (adjacentStructuresByType[STRUCTURE_CONTAINER] > 0 && adjacentStructuresByType[STRUCTURE_SPAWN] + adjacentStructuresByType[STRUCTURE_EXTENSION] > 0) continue
 
             // Otherwise, remove the pos from fastFillePositions
 
@@ -1795,6 +1795,10 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             if (controller.reservation.username == constants.me) return false
 
+            // If the reserver is an Invader, inform false
+
+            if (controller.reservation.username == 'Invader') return false
+
             // Get roads
 
             const roads: StructureRoad[] = room.get('road'),
@@ -1810,10 +1814,6 @@ Room.prototype.findType = function(scoutingRoom: Room) {
             // If the controller is not reserved by an ally
 
             if (!allyList.has(controller.reservation.username)) {
-
-                // If the reserver is an Invader, inform false
-
-                if (controller.reservation.username == 'Invader') return false
 
                 // Set type to enemyRemote and inform true
 
@@ -1834,6 +1834,17 @@ Room.prototype.findType = function(scoutingRoom: Room) {
         if (isUnReservedRemote()) return
 
         function isUnReservedRemote() {
+
+            if (controller.reservation) {
+
+                // If I am the reserver, inform false
+
+                if (controller.reservation.username == constants.me) return false
+
+                // If the reserver is an Invader, inform false
+
+                if (controller.reservation.username == 'Invader') return false
+            }
 
             // If there are no sources harvested
 

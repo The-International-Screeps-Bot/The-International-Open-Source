@@ -432,6 +432,7 @@ export const remoteNeedsIndex = {
     remoteHauler: 2,
     remoteReserver: 3,
     remoteDefender: 4,
+    remoteBuilder: 5,
 }
 
 export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester')[] = [

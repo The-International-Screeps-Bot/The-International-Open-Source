@@ -1,10 +1,8 @@
 import { remoteHarvesterRoles, remoteNeedsIndex } from "./constants"
 import { customLog, findCarryPartsRequired } from "./generalFunctions"
+import { InternationalManager } from "./internationalManager"
 
-/**
- * Construct remote needs using data collected from the creepOrganizer
- */
-export function remoteNeedsManager() {
+InternationalManager.prototype.remoteNeedsManager = function() {
 
     // For each roomName in the memory's communes
 
@@ -36,14 +34,21 @@ export function remoteNeedsManager() {
                 remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.source2 ? 3 : 0
             }
 
-            // Get enemyCreeps in the room and loop through them
+            // Get the remote
 
-            const enemyCreeps: Creep[] = room.get('enemyCreeps')
-            for (const enemyCreep of enemyCreeps) {
+            const remote = Game.rooms[remoteName]
 
-                // Increase the defenderNeed according to the creep's strength
+            if (remote) {
 
-                remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.findStrength()
+                // Get enemyCreeps in the room and loop through them
+                
+                const enemyCreeps: Creep[] = remote.get('enemyCreeps')
+                for (const enemyCreep of enemyCreeps) {
+
+                    // Increase the defenderNeed according to the creep's strength
+
+                    remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.findStrength()
+                }
             }
 
             // Loop through each index of sourceEfficacies

@@ -1,7 +1,7 @@
 import { minerals } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import './marketFunctions'
-import { allyManager } from './simpleAllies'
+import { allyManager } from '../../international/simpleAllies'
 
 export function marketManager(room: Room) {
 
@@ -10,6 +10,25 @@ export function marketManager(room: Room) {
     // Stop if there is no terminal
 
     if (!terminal) return
+
+    // If the terminal has less than x energy in the terminal, request y
+
+    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 50000) allyManager.requestResource(room.name, RESOURCE_ENERGY, 60000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY), 0.75)
+
+    // If the market is disabled, stop
+
+    if (!Game.market.getHistory().length) return
+
+    // For each mineral
+
+    for (const mineral of minerals) {
+
+        const mineralAmount = terminal.store.getUsedCapacity(mineral)
+
+        if (mineralAmount > 5000) continue
+
+        allyManager.requestResource(room.name, mineral, 7000 - mineralAmount, 0.25)
+    }
 
     // If the terminal is on cooldown, stop
 
@@ -25,38 +44,38 @@ export function marketManager(room: Room) {
 
     // Iterate through resourceRequests
 
-    for (const resourceRequest of resourceRequestsByPriority) {
+    for (const request of resourceRequestsByPriority) {
 
         // Iterate if there is no requested amount
 
-        if (!resourceRequest.maxAmount) continue
+        if (!request.maxAmount) continue
 
         // If the request resourceType is a mineral
 
-        if (minerals.includes(resourceRequest.resourceType)) {
+        if (minerals.includes(request.resourceType)) {
 
             // If the terminal doesn't have enough, iterate
 
-            if (terminal.store.getUsedCapacity(resourceRequest.resourceType) < 20000) continue
+            if (terminal.store.getUsedCapacity(request.resourceType) < 20000) continue
 
-            // Otherwise send the resource and stop the loop
+            // Otherwise send the resource and stop
 
-            terminal.send(resourceRequest.resourceType, Math.min(resourceRequest.maxAmount, terminal.store.getUsedCapacity(resourceRequest.resourceType) / 2), resourceRequest.roomName, 'Sending minerals to ally')
-            break
+            terminal.send(request.resourceType, Math.min(request.maxAmount, terminal.store.getUsedCapacity(request.resourceType) / 2), request.roomName, 'Sending ' + request + ' to ally')
+            return
         }
 
         // If the resourceType is energy
 
-        if (resourceRequest.resourceType == RESOURCE_ENERGY) {
+        if (request.resourceType == RESOURCE_ENERGY) {
 
             // If the terminal doesn't have enough, iterate
 
-            if (terminal.store.getUsedCapacity(resourceRequest.resourceType) < 120000) continue
+            if (terminal.store.getUsedCapacity(request.resourceType) < 60000) continue
 
-            // Otherwise send the resource and stop the loop
+            // Otherwise send the resource and stop
 
-            terminal.send(resourceRequest.resourceType, Math.min(resourceRequest.maxAmount, terminal.store.getUsedCapacity(resourceRequest.resourceType) / 2), resourceRequest.roomName, 'Sending energy to ally')
-            break
+            terminal.send(request.resourceType, Math.min(request.maxAmount, terminal.store.getUsedCapacity(request.resourceType) / 2), request.roomName, 'Sending ' + request + ' to ally')
+            return
         }
 
         // Otherwise iterate
@@ -64,18 +83,20 @@ export function marketManager(room: Room) {
         continue
     }
 
-    // If the terminal has less than x energy in the terminal, request y
+    // Construct a targetAmount
 
-    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 50000) allyManager.requestResource(room.name, RESOURCE_ENERGY, 60000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY), 0.75)
+    let targetAmount = 10000
 
-    // For each mineral
+    // Loop through each mineral
 
-    for (const mineral of minerals) {
+    for (const resourceType of minerals) {
 
-        const mineralAmount = terminal.store.getUsedCapacity(mineral)
+        // If there is an acceptable amount of resources, iterate
 
-        if (mineralAmount > 5000) continue
+        if (terminal.store.getUsedCapacity(resourceType) <= targetAmount) continue
 
-        allyManager.requestResource(room.name, mineral, 7000 - mineralAmount, 0.25)
+        // Otherwise, try to sell the excess amount
+
+        room.advancedSell(resourceType, terminal.store.getUsedCapacity(resourceType) - targetAmount)
     }
 }

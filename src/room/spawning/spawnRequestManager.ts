@@ -1169,7 +1169,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [],
                 extraParts: [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE],
-                partsMultiplier: Math.min(3 / strength, 1),
+                partsMultiplier: Math.max(3 / strength, 1),
                 groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDefender,
                 minCreeps: undefined,
                 maxCreeps: Infinity,

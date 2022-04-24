@@ -11,9 +11,9 @@
         "removeComments": true,
         "noImplicitReturns": true,
         "allowSyntheticDefaultImports": true,
-        "allowUnreachableCode": false,
+        "allowUnreachableCode": true,
         "strictNullChecks": false,
-        "esModuleInterop": true,
+        "esModuleInterop": true
     },
     "exclude": [
         "node_modules"

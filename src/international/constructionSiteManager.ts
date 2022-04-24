@@ -1,21 +1,12 @@
-/**
- * Tracks and records constructionSites and thier age, deleting old sites
- */
-export function constructionSiteManager() {
+import { InternationalManager } from "./internationalManager"
+
+InternationalManager.prototype.constructionSiteManager = function () {
 
     // Loop through my sites
 
     for (const cSiteID in Game.constructionSites) {
 
-        // Try to find the site using the recorded ID
-
-        const cSite = Game.constructionSites[cSiteID]
-
-        // Record the site in the room it's in
-
-        cSite.room.constructionSites[cSiteID] = cSite
-
-        // Iterate if the site's ID is stored in Memory's constructionSites
+        // If the site's ID is stored in Memory's constructionSites, iterate
 
         if (Memory.constructionSites[cSiteID]) continue
 

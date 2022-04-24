@@ -5,23 +5,25 @@ import { spawnRequester } from './spawnRequestManager'
 
 export function spawnManager(room: Room) {
 
-    const spawns: StructureSpawn[] = room.get('spawn')
+    // Get spawns in the room
+
+    const spawns: StructureSpawn[] = room.get('spawn'),
 
     // Find spawns that aren't spawning
 
-    const inactiveSpawns = spawns.filter(spawn => !spawn.spawning)
+    inactiveSpawns = spawns.filter(spawn => !spawn.spawning)
 
     // Stop if there are no inactiveSpawns
 
-    if (inactiveSpawns.length == 0) return
+    if (!inactiveSpawns.length) return
 
     // Otherwise get spawnRequests by running the spawnRequester
 
-    const spawnRequests = spawnRequester(room)
+    const spawnRequests = spawnRequester(room),
 
     // Sort spawnRequests by their priority
 
-    const requestsByPriority = Object.keys(spawnRequests).sort((a, b) => parseInt(a) - parseInt(b))
+    requestsByPriority = Object.keys(spawnRequests).sort((a, b) => parseInt(a) - parseInt(b))
 
     // Track the inactive spawn index
 

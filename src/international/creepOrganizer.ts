@@ -1,11 +1,9 @@
 import { creepClasses } from "room/creeps/creepClasses"
 import { remoteNeedsIndex, spawnByRoomRemoteRoles } from "./constants"
 import { customLog, pack } from "./generalFunctions"
+import { InternationalManager } from "./internationalManager"
 
-/**
- * Organizes creeps into properties for their communeName, and tracks total creep count
- */
-export function creepOrganizer() {
+InternationalManager.prototype.creepOrganizer = function() {
 
     // Construct counter for creeps
 

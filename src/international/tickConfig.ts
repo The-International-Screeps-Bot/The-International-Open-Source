@@ -1,11 +1,9 @@
-import { allyManager } from 'room/market/simpleAllies'
+import { allyManager } from 'international/simpleAllies'
 import { constants, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles } from './constants'
 import { createPackedPosMap, customLog, findCarryPartsRequired } from './generalFunctions'
+import { InternationalManager } from './internationalManager'
 
-/**
- * Configures tick important or tick-only pre-roomManager settings required to run the bot
- */
-export function tickConfig() {
+InternationalManager.prototype.tickConfig = function() {
 
     // Memory
 

@@ -1,4 +1,4 @@
-import { allyList, remoteNeedsIndex } from "international/constants"
+import { allyList, constants, remoteNeedsIndex } from "international/constants"
 import { getRange } from "international/generalFunctions"
 import { RemoteDefender } from "room/creeps/creepClasses"
 
@@ -69,6 +69,10 @@ RemoteDefender.prototype.advancedHeal = function() {
 
         if (creep.id == posData.creep.id) continue
 
+        // If the creep is not owned and isn't an ally
+
+        if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
+
         // If the creep is at full health, iterate
 
         if(posData.creep.hitsMax == posData.creep.hits) continue
@@ -79,9 +83,14 @@ RemoteDefender.prototype.advancedHeal = function() {
         return
     }
 
+    const top = Math.max(Math.min(creep.pos.y - 3, constants.roomDimensions - 2), 2),
+    left = Math.max(Math.min(creep.pos.x - 3, constants.roomDimensions - 2), 2),
+    bottom = Math.max(Math.min(creep.pos.y + 3, constants.roomDimensions - 2), 2),
+    right = Math.max(Math.min(creep.pos.x + 3, constants.roomDimensions - 2), 2)
+
     // Find my creeps in range of creep
 
-    const nearbyCreeps = room.lookForAtArea(LOOK_CREEPS, creep.pos.y - 3, creep.pos.x - 3, creep.pos.y + 3, creep.pos.x + 3, true)
+    const nearbyCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
 
     // Loop through each nearbyCreep
 
@@ -90,6 +99,10 @@ RemoteDefender.prototype.advancedHeal = function() {
         // If the creep is the posData creep, iterate
 
         if (creep.id == posData.creep.id) continue
+
+        // If the creep is not owned and isn't an ally
+
+        if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
 
         // If the creep is at full health, iterate
 
@@ -113,9 +126,40 @@ RemoteDefender.prototype.advancedAttackAttackers = function() {
         filter: creep => !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([ATTACK, RANGED_ATTACK])
     })
 
-    // If there are none, inform false
+    // If there are none
 
-    if (!enemyAttackers.length) return false
+    if (!enemyAttackers.length) {
+
+        const enemyCreeps = (room.get('enemyCreeps') as Creep[]).filter(enemyCreep => !enemyCreep.isOnExit())
+        if (!enemyCreeps.length) return false
+
+        const enemyCreep = creep.pos.findClosestByRange(enemyCreeps),
+
+        // Get the range between the creeps
+
+        range = getRange(creep.pos.x - enemyCreep.pos.x, creep.pos.y - enemyCreep.pos.y)
+
+        // If the range is more than 1
+
+        if (range > 1) {
+
+            creep.rangedAttack(enemyCreep)
+
+            // Have the create a moveRequest to the enemyAttacker and inform true
+
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goal: { pos: enemyCreep.pos, range: 1 }
+            })
+
+            return true
+        }
+
+        creep.rangedMassAttack()
+        creep.move(creep.pos.getDirectionTo(enemyCreep.pos))
+
+        return true
+    }
 
     // Otherwise, get the closest enemyAttacker
 
@@ -149,7 +193,11 @@ RemoteDefender.prototype.advancedAttackAttackers = function() {
 
     // If the range is 1, rangedMassAttack
 
-    if (range == 1) creep.rangedMassAttack()
+    if (range == 1) {
+
+        creep.rangedMassAttack()
+        creep.move(creep.pos.getDirectionTo(enemyAttacker.pos))
+    }
 
     // Otherwise, rangedAttack the enemyAttacker
 

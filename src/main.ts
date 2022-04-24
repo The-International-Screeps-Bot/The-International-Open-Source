@@ -4,6 +4,14 @@
 
 import 'international/commands'
 import { internationalManager } from 'international/internationalManager'
+import './international/config'
+import './international/tickConfig'
+import './international/creepOrganizer'
+import './international/remoteNeedsManager'
+import './international/internationalTaskManager'
+import './international/constructionSiteManager'
+import './international/mapVisualsManager'
+import './international/endTickManager'
 
 // Room
 
@@ -11,7 +19,6 @@ import { roomManager } from 'room/roomManager'
 
 // Other
 
-import { endTickManager } from 'international/endTickManager'
 import { memHack } from 'other/memHack'
 import { RoomOfferTask, RoomPickupTask, RoomPullTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
 import { RoomObject } from 'room/roomObject'
@@ -410,8 +417,6 @@ declare global {
         creepPositions: PackedPosMap
 
         moveRequests: PackedPosMap
-
-        constructionSites: {[key: string]: ConstructionSite}
 
         // Functions
 
@@ -1030,9 +1035,10 @@ export const loop = function() {
 
     memHack.modifyMemory()
 
-    internationalManager()
+    internationalManager.run()
 
     roomManager()
 
-    endTickManager()
+    internationalManager.mapVisualsManager()
+    internationalManager.endTickManager()
 }
