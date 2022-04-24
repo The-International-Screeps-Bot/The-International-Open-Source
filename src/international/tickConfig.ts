@@ -176,5 +176,10 @@ InternationalManager.prototype.tickConfig = function() {
         }
 
         room.storedResources = {}
+
+        // If there is an existing claimRequest and it's invalid, delete it from the room memory
+
+        if (room.memory.claimRequest && !Memory.claimRequests[room.memory.claimRequest])
+            delete room.memory.claimRequest
     }
 }

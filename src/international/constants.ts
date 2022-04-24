@@ -405,14 +405,6 @@ constants.stamps = {
     }
 }
 
-export const boostMultipliers = {
-    HEAL: {
-        LO: 2,
-        LHO2: 3,
-        XLHO2: 4,
-    }
-}
-
 export const minerals: Partial<ResourceConstant[]> = [
     RESOURCE_HYDROGEN,
     RESOURCE_OXYGEN,

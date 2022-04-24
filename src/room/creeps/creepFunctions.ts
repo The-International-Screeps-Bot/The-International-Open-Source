@@ -1,5 +1,5 @@
 import { spawn } from "child_process"
-import { boostMultipliers, constants, CPUBucketRenewThreshold } from "international/constants"
+import { constants, CPUBucketRenewThreshold } from "international/constants"
 import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRange, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
 import { repeat } from "lodash"
 import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
@@ -1594,7 +1594,7 @@ Creep.prototype.findHealPower = function() {
 
         // Otherwise increase healValue by heal power * the part's boost
 
-        healValue += HEAL_POWER * boostMultipliers.HEAL[part.boost]
+        healValue += HEAL_POWER * BOOSTS[part.type][part.boost][part.type]
     }
 
     // Inform healValue
@@ -1736,9 +1736,32 @@ Creep.prototype.findStrength = function() {
 
     if (creep.strength) return creep.strength
 
-    // Otherwise, initialize the strength
-
     creep.strength = 1
+
+    for (const part of creep.body) {
+
+        switch (part.type) {
+            case RANGED_ATTACK:
+
+                creep.strength += RANGED_ATTACK_POWER * BOOSTS[part.type][part.boost].rangedAttack
+                break
+            case ATTACK:
+
+                creep.strength += ATTACK_POWER * BOOSTS[part.type][part.boost].attack
+                break
+            case HEAL:
+
+                creep.strength += HEAL_POWER * BOOSTS[part.type][part.boost].heal
+                break
+            case TOUGH:
+
+                creep.strength += 1 + 5 / BOOSTS[part.type][part.boost].damage
+                break
+            default:
+
+                creep.strength++
+        }
+    }
 
     // Calculate the strength
 

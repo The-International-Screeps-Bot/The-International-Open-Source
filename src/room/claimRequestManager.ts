@@ -5,7 +5,7 @@ Room.prototype.claimRequestManager = function() {
 
     // If there is an existing claimRequest and it's valid, check if there is claimer need
 
-    if (this.memory.claimRequest && Memory.claimRequests[this.memory.claimRequest]) {
+    if (this.memory.claimRequest) {
 
         Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguard] = 20
 

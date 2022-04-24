@@ -1,3 +1,4 @@
+import { claimRequestNeedsIndex } from 'international/constants'
 import {  Vanguard } from '../../creepClasses'
 import './vanguardFunctions'
 
@@ -16,6 +17,8 @@ export function vanguardManager(room: Room, creepsOfRole: string[]) {
         // If the creep has no claim target, stop
 
         if (!claimTarget) return
+
+        Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[claimRequestNeedsIndex.vanguard] -= creep.partsOfType(WORK)
 
         creep.say(claimTarget)
 

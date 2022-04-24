@@ -1167,9 +1167,10 @@ export function spawnRequester(room: Room) {
 
             if (Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteDefender] <= 0) return false
 
-            const strengthByMargin = Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteDefender],
+            const strengthByMargin = 3 * RANGED_ATTACK_POWER +
+                1 * HEAL_POWER,
 
-            requiredStrength = Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthByMargin)
+            requiredStrength = Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthByMargin) * 1.5
 
             return {
                 defaultParts: [],
