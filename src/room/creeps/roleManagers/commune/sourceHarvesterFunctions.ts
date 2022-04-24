@@ -18,7 +18,7 @@ SourceHarvester.prototype.isDying = function() {
 
     // Get the creep's path length
 
-    const sourcePathLength = room.get(`${creep.memory.sourceName}PathLength`)
+    const sourcePathLength = creep.memory.sourceName ? room.get(`${creep.memory.sourceName}PathLength`) : 0
 
     // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 

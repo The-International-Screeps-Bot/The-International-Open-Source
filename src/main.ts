@@ -358,8 +358,6 @@ declare global {
         energySpentOnRepairing: number
 
         energySpentOnBarricades: number
-
-        claimTarget: string
     }
 
     interface RawMemory {
@@ -419,10 +417,13 @@ declare global {
         storedResources: {[key: string]: number}
 
         /**
-         * A matrix with keys of positions and values of creep names
+         * A matrix with indexes of packed positions and values of creep names
          */
         creepPositions: PackedPosMap
 
+        /**
+         * A matrix with indexes of packed positions and values of move requests
+         */
         moveRequests: PackedPosMap
 
         // Functions
@@ -585,6 +586,10 @@ declare global {
 
         createClaimRequest(): void
 
+        // Main roomFunctions
+
+        claimRequestManager(): void
+
         // Market functions
 
         advancedSell(resourceType: ResourceConstant, amount: number): boolean
@@ -669,6 +674,11 @@ declare global {
          * The last tick the room was scouted at
          */
         lastScout: number
+
+        /**
+         * The room name of the commune's claim target
+         */
+        claimRequest: string
     }
 
     // Creeps
@@ -926,11 +936,6 @@ declare global {
          * The name of the room the creep is remoting for
          */
         remoteName: string
-
-        /**
-         * The name of the room the creep is trying to claim
-         */
-        claimTarget: string
 
         /**
          * The type of task the creep has been assigned

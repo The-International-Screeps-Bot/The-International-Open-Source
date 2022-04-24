@@ -12,6 +12,7 @@ import { constants } from "international/constants"
 import { storageStructuresManager } from "./storingStructuresManager"
 import { customLog, getRange } from "international/generalFunctions"
 import { linkManager } from "./linkManager"
+import './claimRequestManager'
 
 export function communeManager(room: Room) {
 
@@ -28,6 +29,8 @@ export function communeManager(room: Room) {
     structuresForSpawningManager(room)
 
     storageStructuresManager(room)
+
+    room.claimRequestManager()
 
     spawnManager(room)
 

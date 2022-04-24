@@ -1898,15 +1898,14 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
         // Find distance from scoutingRoom
 
-        const distanceFromScoutingRoom = advancedFindDistance(scoutingRoom.name, room.name,
-            {
-                keeper: Infinity,
-                enemy: Infinity,
-                enemyRemote: Infinity,
-                ally: Infinity,
-                allyRemote: Infinity,
-                highway: Infinity,
-            })
+        const distanceFromScoutingRoom = advancedFindDistance(scoutingRoom.name, room.name, {
+            keeper: Infinity,
+            enemy: Infinity,
+            enemyRemote: Infinity,
+            ally: Infinity,
+            allyRemote: Infinity,
+            highway: Infinity,
+        })
 
         // If distance from scoutingRoom is less than 4
 

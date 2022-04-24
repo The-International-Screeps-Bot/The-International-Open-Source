@@ -1,4 +1,4 @@
-import { allyList, builderSpawningWhenStorageThreshold, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
+import { allyList, builderSpawningWhenStorageThreshold, claimRequestNeedsIndex, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
 import { findCarryPartsRequired, findRemoteSourcesByEfficacy, getRange } from "international/generalFunctions"
 
 /**
@@ -1205,26 +1205,35 @@ export function spawnRequester(room: Room) {
         }
     })())
 
-    // Construct requests for claimers
+    if (room.memory.claimRequest) {
 
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
+        const claimRequestNeeds = Memory.claimRequests[room.memory.claimRequest].needs
 
-        // If there is no claimTarget, inform false
+        // Construct requests for claimers
 
-        if (!Memory.claimTarget) return false
+        constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-        return {
-            defaultParts: [MOVE, MOVE, CLAIM, MOVE],
-            extraParts: [],
-            partsMultiplier: 1,
-            minCreeps: 1,
-            minCost: 650,
-            priority: 3,
-            memoryAdditions: {
-                role: 'claimer',
+            // If there is no claimer need
+
+            if (claimRequestNeeds[claimRequestNeedsIndex.claimer] <= 0) return false
+
+            return {
+                defaultParts: [MOVE, MOVE, CLAIM, MOVE],
+                extraParts: [],
+                partsMultiplier: 1,
+                minCreeps: 1,
+                minCost: 650,
+                priority: 3,
+                memoryAdditions: {
+                    role: 'claimer'
+                }
             }
-        }
-    })())
+        })())
+
+        // Requests for vanguard
+
+        
+    }
 
     // Inform spawnRequests
 

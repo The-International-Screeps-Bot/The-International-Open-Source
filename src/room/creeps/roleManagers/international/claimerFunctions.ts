@@ -1,17 +1,24 @@
+import { claimRequestNeedsIndex } from "international/constants"
 import { Claimer } from "../../creepClasses"
 
 Claimer.prototype.claimRoom = function() {
 
     const creep = this,
-    room = creep.room
+    room = creep.room,
+
+    claimTarget = Memory.rooms[creep.memory.communeName].claimRequest
 
     // If the creep has no claim target, stop
 
-    if (!Memory.claimTarget) return
+    if (!claimTarget) return
+
+    creep.say(claimTarget)
 
     // Otherwise
 
-    if (room.name == Memory.claimTarget) {
+    if (room.name == claimTarget) {
+
+        if (room.controller.my) return
 
         // If the creep is not in range to claim the controller
 
@@ -29,9 +36,9 @@ Claimer.prototype.claimRoom = function() {
             return
         }
 
-        // Otherwise, claim the controller. If the successful, remove the claimTarget
+        // Otherwise, claim the controller. If the successful, remove claimerNeed
 
-        if (creep.claimController(room.controller) == OK) delete Memory.claimTarget
+        if (creep.claimController(room.controller) == OK) Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[claimRequestNeedsIndex.claimer] = 0
 
         // And stop
 
@@ -44,7 +51,7 @@ Claimer.prototype.claimRoom = function() {
 
     creep.createMoveRequest({
         origin: creep.pos,
-        goal: { pos: new RoomPosition(25, 25, Memory.claimTarget), range: 25 },
+        goal: { pos: new RoomPosition(25, 25, claimTarget), range: 25 },
         avoidEnemyRanges: true,
         plainCost: 0,
         swampCost: 0,
