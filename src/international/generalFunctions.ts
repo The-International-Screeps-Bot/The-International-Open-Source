@@ -324,3 +324,10 @@ export function findClosestCommuneName(roomName: string) {
 
     return communesNotThis.sort((a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b))[0]
 }
+
+export function findClosestClaimType(roomName: string) {
+
+    const claimTypes = Memory.communes.concat(Object.keys(Memory.claimRequests)).filter(claimRoomName => roomName != claimRoomName)
+
+    return claimTypes.sort((a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b))[0]
+}
