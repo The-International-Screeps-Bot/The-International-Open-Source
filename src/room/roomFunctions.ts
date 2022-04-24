@@ -1964,7 +1964,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
                     // Plan for a road at this position
 
                     structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
-                } 
+                }
                 */
             }
 
@@ -3140,8 +3140,7 @@ Room.prototype.createClaimRequest = function() {
 
     Memory.claimRequests[room.name] = {
         needs: [1, 20, 0],
-        score,
-        closestCommuneName
+        score
     }
 
     return true

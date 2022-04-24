@@ -293,7 +293,7 @@ declare global {
         /**
          *
          */
-        claimRequests: {[key: string]: { needs: number[], score: number, closestCommuneName: string }}
+        claimRequests: {[key: string]: { needs: number[], score: number }}
 
         attackRequests: {[key: string]: { needs: number[] }}
 

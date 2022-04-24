@@ -39,6 +39,8 @@ Room.prototype.claimRequestManager = function() {
 
     if (Game.gcl.level <= Memory.communes.length) return
 
+    if (this.energyCapacityAvailable < 750) return
+
     delete this.memory.claimRequest
 
     for (const roomName of internationalManager.claimRequestsByScore) {
