@@ -293,7 +293,7 @@ declare global {
         /**
          *
          */
-        claimRequests: {[key: string]: { needs: number[] }}
+        claimRequests: {[key: string]: { needs: number[], score: number, closestCommuneName: string }}
 
         attackRequests: {[key: string]: { needs: number[] }}
 
@@ -585,7 +585,7 @@ declare global {
 
         findSourcesByEfficacy(): ('source1' | 'source2')[]
 
-        createClaimRequest(): void
+        createClaimRequest(): boolean
 
         // Main roomFunctions
 

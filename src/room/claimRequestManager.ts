@@ -1,5 +1,6 @@
 import { claimRequestNeedsIndex } from "international/constants"
 import { advancedFindDistance } from "international/generalFunctions"
+import { internationalManager } from "international/internationalManager"
 
 Room.prototype.claimRequestManager = function() {
 
@@ -40,7 +41,7 @@ Room.prototype.claimRequestManager = function() {
 
     delete this.memory.claimRequest
 
-    for (const roomName in Memory.claimRequests) {
+    for (const roomName of internationalManager.claimRequestsByScore) {
 
         const distance = advancedFindDistance(this.name, roomName, {
             keeper: Infinity,

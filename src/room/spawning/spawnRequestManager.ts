@@ -1223,7 +1223,7 @@ export function spawnRequester(room: Room) {
                 extraParts: [],
                 partsMultiplier: 1,
                 minCreeps: 1,
-                minCost: 650,
+                minCost: 750,
                 priority: 3,
                 memoryAdditions: {
                     role: 'claimer'

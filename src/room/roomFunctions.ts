@@ -1,5 +1,5 @@
 import { allyList, constants } from 'international/constants'
-import { advancedFindDistance, arePositionsEqual, customLog, findPositionsInsideRect, getRangeBetween, unPackAsRoomPos } from 'international/generalFunctions'
+import { advancedFindDistance, arePositionsEqual, customLog, findClosestCommuneName, findPositionsInsideRect, getRange, getRangeBetween, unPackAsRoomPos } from 'international/generalFunctions'
 import { basePlanner } from './construction/basePlanner'
 import { ControllerUpgrader, SourceHarvester } from './creeps/creepClasses'
 import { RoomObject } from './roomObject'
@@ -1907,35 +1907,18 @@ Room.prototype.findType = function(scoutingRoom: Room) {
             highway: Infinity,
         })
 
-        // If distance from scoutingRoom is less than 4
-
         if (distanceFromScoutingRoom < 4) {
 
             // If the room is already known to be an active a remote, stop
 
             if (room.memory.type == 'remote' && Memory.communes.includes(room.memory.commune)) return
 
-            // Set roomType as remote and assign commune as scoutingRoom's name
-
-            room.memory.type = 'remote'
-
-            // Assign the room's commune as the scoutingRoom
-
-            room.memory.commune = scoutingRoom.name
-
-            // Add the room's name to the scoutingRoom's remotes list
-
-            scoutingRoom.memory.remotes.push(room.name)
-
-            // Construct needs and sourceEfficacies
-
-            room.memory.needs = []
-            room.memory.sourceEfficacies = []
-
             // Get the anchor from the scoutingRoom, stopping if it's undefined
 
             const anchor: RoomPosition = scoutingRoom.get('anchor')
             if (!anchor) return
+
+            const newSourceEfficacies = [],
 
             // Get base planning data
 
@@ -1946,7 +1929,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // Get the room's sourceNames
 
-            const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+            sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
 
             // loop through sourceNames
 
@@ -1967,7 +1950,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
                 // Record the length of the path in the room's memory
 
-                room.memory.sourceEfficacies.push(path.length)
+                newSourceEfficacies.push(path.length)
 
                 /*
                 // Loop through positions of the path
@@ -1981,11 +1964,48 @@ Room.prototype.findType = function(scoutingRoom: Room) {
                     // Plan for a road at this position
 
                     structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
-                } */
+                } 
+                */
             }
 
-            // Stop
+            // If the room isn't already a remote
 
+            if (room.memory.type != 'remote' && !room.memory.commune) {
+
+                // Assign the room's commune as the scoutingRoom
+
+                room.memory.commune = scoutingRoom.name
+
+                // Add the room's name to the scoutingRoom's remotes list
+
+                scoutingRoom.memory.remotes.push(room.name)
+
+                // Construct needs and sourceEfficacies
+
+                room.memory.needs = []
+                room.memory.sourceEfficacies = newSourceEfficacies
+                return
+            }
+
+            let currentAvgSourceEfficacy = room.memory.sourceEfficacies.reduce((a2, b2) => a2 + b2) / room.memory.sourceEfficacies.length,
+            newAvgSourceEfficacy = newSourceEfficacies.reduce((a2, b2) => a2 + b2) / newSourceEfficacies.length
+
+            // If the new average source efficacy is below the current, stop
+
+            if (newAvgSourceEfficacy <= currentAvgSourceEfficacy) return
+
+            // Assign the room's commune as the scoutingRoom
+
+            room.memory.commune = scoutingRoom.name
+
+            // Add the room's name to the scoutingRoom's remotes list
+
+            scoutingRoom.memory.remotes.push(room.name)
+
+            // Construct needs and sourceEfficacies
+
+            room.memory.needs = []
+            room.memory.sourceEfficacies = newSourceEfficacies
             return
         }
 
@@ -3094,15 +3114,35 @@ Room.prototype.createClaimRequest = function() {
 
     const room = this
 
-    if (room.get('sources').length != 2) return
+    if (room.get('sources').length != 2) return false
 
-    if (room.memory.notClaimable) return
+    if (room.memory.notClaimable) return false
 
-    if (Memory.claimRequests[room.name]) return
+    if (Memory.claimRequests[room.name]) return false
 
-    if (!basePlanner(room)) return
+    if (!basePlanner(room)) return false
+
+    let score = 0,
+
+    median = 10 / 2,
+    closestCommuneName = findClosestCommuneName(room.name),
+    closestCommuneRange = Game.map.getRoomLinearDistance(closestCommuneName, room.name),
+    preference = getRange(closestCommuneRange, median)
+
+    score += preference
+
+    // Don't prefer communes in range of 1-4, 7-12
+
+    // Prefer communes in range of 5-6
+
+    // Limit 1-12
+
 
     Memory.claimRequests[room.name] = {
-        needs: [1, 20, 0]
+        needs: [1, 20, 0],
+        score,
+        closestCommuneName
     }
+
+    return true
 }

@@ -314,3 +314,13 @@ export function findLargestTransactionAmount(budget: number, amount: number, roo
 
     return amount
 }
+
+/**
+ * Finds the name of the closest commune, exluding the specified roomName
+ */
+export function findClosestCommuneName(roomName: string) {
+
+    const communesNotThis = Memory.communes.filter(communeName => roomName != communeName)
+
+    return communesNotThis.sort((a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b))[0]
+}
