@@ -51,6 +51,10 @@ declare global {
         brown: string
     }
 
+    type ClaimRequest = {[key: string]: { needs: [] }}
+
+    type AttackRequest = {[key: string]: { needs: [] }}
+
     type StampTypes = 'fastFiller' |
     'hub' |
     'extensions' |
@@ -288,6 +292,13 @@ declare global {
          * An object of constrctionsSites with keys of site IDs and properties of the site's age
          */
         constructionSites: {[key: string]: number}
+
+        /**
+         *
+         */
+        claimRequests: ClaimRequest[]
+
+        attackRequests: AttackRequest[]
 
         /**
          * An array of roomNames that have controllers we own

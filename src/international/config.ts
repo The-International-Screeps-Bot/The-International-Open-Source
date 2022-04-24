@@ -23,6 +23,9 @@ InternationalManager.prototype.config = function() {
         Memory.ID = 0
         Memory.constructionSites = {}
 
+        Memory.claimRequests = []
+        Memory.attackRequests = []
+
         // Config settings
 
         Memory.roomVisuals = false
