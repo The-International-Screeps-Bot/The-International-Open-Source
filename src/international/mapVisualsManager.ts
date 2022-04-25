@@ -41,7 +41,7 @@ InternationalManager.prototype.mapVisualsManager = function() {
         if (roomMemory.notClaimable) {
 
             Game.map.visual.circle(new RoomPosition(25, 25, roomName), {
-                stroke: constants.colors.red, strokeWidth: 1
+                stroke: constants.colors.red, strokeWidth: 2, fill: 'transparent'
             })
             continue
         }

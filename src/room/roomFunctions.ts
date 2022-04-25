@@ -1,4 +1,4 @@
-import { allyList, constants } from 'international/constants'
+import { allyList, constants, prefferedCommuneRange } from 'international/constants'
 import { advancedFindDistance, arePositionsEqual, customLog, findClosestClaimType, findClosestCommuneName, findPositionsInsideRect, getRange, getRangeBetween, unPackAsRoomPos } from 'international/generalFunctions'
 import { basePlanner } from './construction/basePlanner'
 import { ControllerUpgrader, SourceHarvester } from './creeps/creepClasses'
@@ -3124,10 +3124,9 @@ Room.prototype.createClaimRequest = function() {
 
     let score = 0,
 
-    median = 10 / 2,
     closestClaimTypeName = findClosestClaimType(room.name),
     closestCommuneRange = Game.map.getRoomLinearDistance(closestClaimTypeName, room.name),
-    preference = getRange(closestCommuneRange, median)
+    preference = Math.abs(prefferedCommuneRange - closestCommuneRange)
 
     score += preference
 

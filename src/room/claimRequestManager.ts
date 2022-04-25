@@ -41,8 +41,6 @@ Room.prototype.claimRequestManager = function() {
 
     if (this.energyCapacityAvailable < 750) return
 
-    delete this.memory.claimRequest
-
     for (const roomName of internationalManager.claimRequestsByScore) {
 
         const distance = advancedFindDistance(this.name, roomName, {
