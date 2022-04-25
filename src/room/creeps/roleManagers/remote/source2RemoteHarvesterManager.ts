@@ -38,6 +38,7 @@ export function source2RemoteHarvesterManager(room: Room, creepsOfRole: string[]
             origin: creep.pos,
             goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
             avoidEnemyRanges: true,
+            cacheAmount: 200,
             weightGamebjects: {
                 1: room.get('road')
             }

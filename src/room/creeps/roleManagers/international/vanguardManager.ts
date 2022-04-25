@@ -36,8 +36,6 @@ export function vanguardManager(room: Room, creepsOfRole: string[]) {
             origin: creep.pos,
             goal: { pos: new RoomPosition(25, 25, claimTarget), range: 25 },
             avoidEnemyRanges: true,
-            plainCost: 0,
-            swampCost: 0,
             cacheAmount: 50,
         })
     }

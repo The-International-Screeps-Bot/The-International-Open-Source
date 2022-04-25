@@ -18,7 +18,7 @@ Vanguard.prototype.travelToSource = function(sourceName) {
     const harvestPos = unPackAsPos(creep.memory.packedHarvestPos)
 
     // If the creep is at the creep's packedHarvestPos, inform false
-    customLog('POS', JSON.stringify(harvestPos))
+
     if (getRange(creep.pos.x - harvestPos.x, creep.pos.y - harvestPos.y) == 0) return false
 
     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
@@ -29,9 +29,7 @@ Vanguard.prototype.travelToSource = function(sourceName) {
         origin: creep.pos,
         goal: { pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name), range: 0 },
         avoidEnemyRanges: true,
-        weightGamebjects: {
-            1: room.get('road')
-        }
+        cacheAmount: 200
     })
 
     return true

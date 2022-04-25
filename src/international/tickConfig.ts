@@ -117,7 +117,11 @@ InternationalManager.prototype.tickConfig = function() {
 
             // If the room isn't a remote, remove it from the remotes array
 
-            if (roomMemory.type != 'remote') room.memory.remotes.splice(index, 1)
+            if (roomMemory.type != 'remote' || roomMemory.commune != room.name) {
+
+                room.memory.remotes.splice(index, 1)
+                continue
+            }
 
             // Initialize aspects of needs
 

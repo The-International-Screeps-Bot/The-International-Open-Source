@@ -727,6 +727,16 @@ declare global {
          */
         strength: number
 
+        /**
+         * If the creep is expected to be full next tick
+         */
+        estimatedFull: boolean
+
+        /**
+         * If the creep is expected to be empty next tick
+         */
+        estimatedEmpty: boolean
+
         // Functions
 
         /**

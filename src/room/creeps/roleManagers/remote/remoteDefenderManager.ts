@@ -25,7 +25,8 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 25 }
+                goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 25 },
+                cacheAmount: 200,
             })
 
             continue
@@ -51,7 +52,8 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
 
         creep.createMoveRequest({
             origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 }
+            goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
+            cacheAmount: 200,
         })
     }
 }

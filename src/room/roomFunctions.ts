@@ -1911,7 +1911,8 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // If the room is already known to be an active a remote, stop
 
-            if (room.memory.type == 'remote' && Memory.communes.includes(room.memory.commune)) return
+            if (room.memory.type == 'remote' &&
+                (scoutingRoom.name == room.memory.commune)) return
 
             // Get the anchor from the scoutingRoom, stopping if it's undefined
 
@@ -1970,7 +1971,7 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             // If the room isn't already a remote
 
-            if (room.memory.type != 'remote' && !room.memory.commune) {
+            if (room.memory.type != 'remote') {
 
                 // Assign the room's commune as the scoutingRoom
 

@@ -18,7 +18,8 @@ Claimer.prototype.claimRoom = function() {
             origin: creep.pos,
             goal: { pos: room.controller.pos, range: 1 },
             avoidEnemyRanges: true,
-            cacheAmount: 50,
+            plainCost: 1,
+            swampCost: 1,
         })
 
         return
