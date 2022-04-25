@@ -1896,103 +1896,95 @@ Room.prototype.findType = function(scoutingRoom: Room) {
             return false
         }
 
-        // Find distance from scoutingRoom
+        if (room.makeRemote(scoutingRoom)) return
 
-        const distanceFromScoutingRoom = advancedFindDistance(scoutingRoom.name, room.name, {
-            keeper: Infinity,
-            enemy: Infinity,
-            enemyRemote: Infinity,
-            ally: Infinity,
-            allyRemote: Infinity,
-            highway: Infinity,
-        })
+        room.memory.type = 'neutral'
 
-        if (distanceFromScoutingRoom < 4) {
+        room.createClaimRequest()
 
-            // If the room is already a remote of the scoutingRoom
+        return
+    }
+}
 
-            if (room.memory.type == 'remote' && scoutingRoom.name == room.memory.commune) return
+Room.prototype.makeRemote = function(scoutingRoom) {
 
-            // Get the anchor from the scoutingRoom, stopping if it's undefined
+    const room = this
 
-            const anchor: RoomPosition = scoutingRoom.get('anchor')
-            if (!anchor) return
+    // Find distance from scoutingRoom
 
-            const newSourceEfficacies = [],
+    const distanceFromScoutingRoom = advancedFindDistance(scoutingRoom.name, room.name, {
+        keeper: Infinity,
+        enemy: Infinity,
+        enemyRemote: Infinity,
+        ally: Infinity,
+        allyRemote: Infinity,
+        highway: Infinity,
+    })
 
-            // Get base planning data
+    if (distanceFromScoutingRoom < 4) {
+
+        // If the room is already a remote of the scoutingRoom
+
+        if (room.memory.type == 'remote' && scoutingRoom.name == room.memory.commune) return true
+
+        // Get the anchor from the scoutingRoom, stopping if it's undefined
+
+        const anchor: RoomPosition = scoutingRoom.get('anchor')
+        if (!anchor) return true
+
+        const newSourceEfficacies = [],
+
+        // Get base planning data
+
+        /*
+        const roadCM: CostMatrix = room.get('roadCM'),
+        structurePlans: CostMatrix = room.get('structurePlans'),
+        */
+
+        // Get the room's sourceNames
+
+        sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+
+        // loop through sourceNames
+
+        for (const sourceName of sourceNames) {
+
+            // Get the source using sourceName, stopping the loop if undefined
+
+            const source: Source = room.get(sourceName)
+            if (!source) break
+
+            const path = room.advancedFindPath({
+                origin: source.pos,
+                goal: { pos: anchor, range: 3 },
+                /* weightCostMatrixes: [roadCM] */
+            })
+
+            // Record the length of the path in the room's memory
+
+            newSourceEfficacies.push(path.length)
 
             /*
-            const roadCM: CostMatrix = room.get('roadCM'),
-            structurePlans: CostMatrix = room.get('structurePlans'),
+            // Loop through positions of the path
+
+            for (const pos of path) {
+
+                // Record the pos in roadCM
+
+                roadCM.set(pos.x, pos.y, 1)
+
+                // Plan for a road at this position
+
+                structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+            }
             */
+        }
 
-            // Get the room's sourceNames
+        // If the room isn't already a remote
 
-            sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+        if (room.memory.type != 'remote') {
 
-            // loop through sourceNames
-
-            for (const sourceName of sourceNames) {
-
-                // Get the source using sourceName, stopping the loop if undefined
-
-                const source: Source = room.get(sourceName)
-                if (!source) break
-
-                // Path from the centerUpgradePos to the closestHarvestPos
-
-                const path = room.advancedFindPath({
-                    origin: source.pos,
-                    goal: { pos: anchor, range: 2 },
-                    /* weightCostMatrixes: [roadCM] */
-                })
-
-                // Record the length of the path in the room's memory
-
-                newSourceEfficacies.push(path.length)
-
-                /*
-                // Loop through positions of the path
-
-                for (const pos of path) {
-
-                    // Record the pos in roadCM
-
-                    roadCM.set(pos.x, pos.y, 1)
-
-                    // Plan for a road at this position
-
-                    structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
-                }
-                */
-            }
-
-            // If the room isn't already a remote
-
-            if (room.memory.type != 'remote') {
-
-                // Assign the room's commune as the scoutingRoom
-
-                room.memory.commune = scoutingRoom.name
-
-                // Add the room's name to the scoutingRoom's remotes list
-
-                scoutingRoom.memory.remotes.push(room.name)
-
-                // Construct needs and sourceEfficacies
-
-                room.memory.needs = []
-                room.memory.sourceEfficacies = newSourceEfficacies
-                return
-            }
-
-            let currentAvgSourceEfficacy = room.memory.sourceEfficacies.reduce((a2, b2) => a2 + b2) / room.memory.sourceEfficacies.length,
-            newAvgSourceEfficacy = newSourceEfficacies.reduce((a2, b2) => a2 + b2) / newSourceEfficacies.length
-
-            // If the new average source efficacy is below the current, stop
-
-            if (newAvgSourceEfficacy <= currentAvgSourceEfficacy) return
+            room.memory.type = 'remote'
 
             // Assign the room's commune as the scoutingRoom
 
@@ -2006,19 +1998,38 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
             room.memory.needs = []
             room.memory.sourceEfficacies = newSourceEfficacies
-            return
+            return true
         }
 
-        // If the room is already known to be an active a remote, stop
+        let currentAvgSourceEfficacy = room.memory.sourceEfficacies.reduce((a2, b2) => a2 + b2) / room.memory.sourceEfficacies.length,
+        newAvgSourceEfficacy = newSourceEfficacies.reduce((a2, b2) => a2 + b2) / newSourceEfficacies.length
 
-        if (room.memory.type == 'remote' && Memory.communes.includes(room.memory.commune)) return
+        // If the new average source efficacy is below the current, stop
 
-        room.memory.type = 'neutral'
+        if (newAvgSourceEfficacy <= currentAvgSourceEfficacy) return true
 
-        room.createClaimRequest()
+        room.memory.type = 'remote'
 
-        return
+        // Assign the room's commune as the scoutingRoom
+
+        room.memory.commune = scoutingRoom.name
+
+        // Add the room's name to the scoutingRoom's remotes list
+
+        scoutingRoom.memory.remotes.push(room.name)
+
+        // Construct needs and sourceEfficacies
+
+        room.memory.needs = []
+        room.memory.sourceEfficacies = newSourceEfficacies
+        return true
     }
+
+    if (room.memory.type != 'remote') return false
+
+    if (!Memory.communes.includes(room.memory.commune)) return false
+
+    return true
 }
 
 Room.prototype.cleanMemory = function() {

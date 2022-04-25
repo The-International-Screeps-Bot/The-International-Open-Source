@@ -475,6 +475,8 @@ declare global {
          */
         findType(scoutingRoom: Room): void
 
+        makeRemote(scoutingRoom: Room): boolean
+
         /**
          * Finds the score of rooms for potential communes
          */

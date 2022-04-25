@@ -53,7 +53,7 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
             avoidEnemyRanges: true,
             plainCost: 0,
             swampCost: 0,
-            cacheAmount: 50,
+            cacheAmount: 200,
             typeWeights: {}
         })
     }
