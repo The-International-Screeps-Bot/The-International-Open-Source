@@ -846,19 +846,38 @@ export function spawnRequester(room: Room) {
         // Get the controllerLink and baseLink
 
         const controllerLink: StructureLink | undefined = room.get('controllerLink'),
-        hubLink: StructureLink | undefined = room.get('hubLink')
+        hubLink: StructureLink | undefined = room.get('hubLink'),
+        sourceLinks: StructureLink[] = [room.get('source1Link'), room.get('source2Link')]
 
         // If the controllerLink is defined
 
-        if (controllerLink && hubLink) {
+        if (controllerLink) {
 
-            // Get the range between the controllerLink and hubLink
+            partsMultiplier = 0
 
-            const range = getRange(controllerLink.pos.x - hubLink.pos.x, controllerLink.pos.y - hubLink.pos.y)
+            if (hubLink) {
 
-            // Limit partsMultiplier at the range divided by the controllerLink's capacity
+                // Get the range between the controllerLink and hubLink
 
-            partsMultiplier = Math.min(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range)
+                const range = getRange(controllerLink.pos.x - hubLink.pos.x, controllerLink.pos.y - hubLink.pos.y)
+
+                // Limit partsMultiplier at the range with a multiplier
+
+                partsMultiplier += Math.min(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range)
+            }
+
+            for (const sourceLink of sourceLinks) {
+
+                if (!sourceLink) continue
+
+                // Get the range between the controllerLink and hubLink
+
+                const range = getRange(controllerLink.pos.x - sourceLink.pos.x, controllerLink.pos.y - sourceLink.pos.y)
+
+                // Limit partsMultiplier at the range with a multiplier
+
+                partsMultiplier += Math.min(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) / range)
+            }
         }
 
         // If there are construction sites of my ownership in the room, set multiplier to 1
@@ -970,7 +989,7 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [],
             extraParts: [MOVE, CARRY, MOVE, WORK],
-            partsMultiplier,
+            partsMultiplier: Math.max(partsMultiplier, 1),
             threshold,
             minCreeps: undefined,
             maxCreeps: 8,

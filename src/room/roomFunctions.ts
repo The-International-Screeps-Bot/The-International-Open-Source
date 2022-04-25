@@ -1909,10 +1909,9 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
         if (distanceFromScoutingRoom < 4) {
 
-            // If the room is already known to be an active a remote, stop
+            // If the room is already a remote of the scoutingRoom
 
-            if (room.memory.type == 'remote' &&
-                (scoutingRoom.name == room.memory.commune)) return
+            if (room.memory.type == 'remote' && scoutingRoom.name == room.memory.commune) return
 
             // Get the anchor from the scoutingRoom, stopping if it's undefined
 
@@ -2009,6 +2008,10 @@ Room.prototype.findType = function(scoutingRoom: Room) {
             room.memory.sourceEfficacies = newSourceEfficacies
             return
         }
+
+        // If the room is already known to be an active a remote, stop
+
+        if (room.memory.type == 'remote' && Memory.communes.includes(room.memory.commune)) return
 
         room.memory.type = 'neutral'
 
