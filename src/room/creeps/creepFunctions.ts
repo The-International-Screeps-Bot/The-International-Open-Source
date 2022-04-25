@@ -223,6 +223,24 @@ Creep.prototype.advancedUpgradeController = function() {
             }
         }
 
+        const upgradeControllerResult = creep.upgradeController(controller)
+
+        // Try to upgrade the controller, and if the result is a success
+
+        if (upgradeControllerResult == OK) {
+
+            creep.say('UC')
+
+            // Calculate the control points added
+
+            const controlPoints = creep.partsOfType(WORK)
+
+            // Add control points to total controlPoints counter and say the success
+
+            Memory.controlPoints += controlPoints
+            creep.say('🔋' + controlPoints)
+        }
+
         // If packedUpgradePos is out of range
 
         if (getRangeBetween(creep.pos.x, creep.pos.y, Math.floor(creep.memory.packedUpgradePos / constants.roomDimensions), Math.floor(creep.memory.packedUpgradePos % constants.roomDimensions)) > 0) {
@@ -242,7 +260,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
             // Inform false
 
-            return false
+            return true
         }
 
         // Otherwise
@@ -259,6 +277,8 @@ Creep.prototype.advancedUpgradeController = function() {
 
             if (creep.withdraw(controllerStructure, RESOURCE_ENERGY) != OK) return false
         }
+
+        if (upgradeControllerResult == OK) return true
 
         // If the controller is a container and is in need of repair
 
@@ -285,26 +305,6 @@ Creep.prototype.advancedUpgradeController = function() {
 
                 return true
             }
-        }
-
-        // Try to upgrade the controller, and if the result is a success
-
-        if (creep.upgradeController(controller) == OK) {
-
-            creep.say('UC')
-
-            // Calculate the control points added
-
-            const controlPoints = creep.partsOfType(WORK)
-
-            // Add control points to total controlPoints counter and say the success
-
-            Memory.controlPoints += controlPoints
-            creep.say('🔋' + controlPoints)
-
-            // Inform true
-
-            return true
         }
 
         // Inform true
