@@ -630,7 +630,7 @@ export function spawnRequester(room: Room) {
 
         // Increase attackValue by the creep's heal power
 
-        attackValue += enemyAttacker.findHealPower() / HEAL_POWER + enemyAttacker.partsOfType(WORK) + enemyAttacker.partsOfType(ATTACK) + enemyAttacker.partsOfType(RANGED_ATTACK)
+        attackValue += enemyAttacker.findStrength()
     }
 
     // Construct requests for meleeDefenders
@@ -676,24 +676,13 @@ export function spawnRequester(room: Room) {
             // If the storage is sufficiently full, provide x amount per y enemy in storage
 
             if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= builderSpawningWhenStorageThreshold) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 8000
-
-            // Otherwise, set partsMultiplier to 0
-
-            else partsMultiplier = 0
         }
 
         // Otherwise if there is no storage
 
         else {
 
-            // Construct an income share
-
-            const incomeShare = estimatedIncome * 0.5
-
-            // Use the incomeShare to adjust estimatedIncome and partsMultiplier
-
-            estimatedIncome -= incomeShare
-            partsMultiplier += incomeShare
+            partsMultiplier += estimatedIncome * 0.8
         }
 
         // If all RCL 3 extensions are build
@@ -833,14 +822,7 @@ export function spawnRequester(room: Room) {
 
         else {
 
-            // Construct an income share
-
-            const incomeShare = estimatedIncome * 0.5
-
-            // Use the incomeShare to adjust estimatedIncome and partsMultiplier
-
-            estimatedIncome -= incomeShare
-            partsMultiplier += incomeShare
+            partsMultiplier += estimatedIncome * 0.9
         }
 
         // Get the controllerLink and baseLink

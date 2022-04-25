@@ -489,7 +489,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the open areas in a range of 3 to the controller
 
-        const distanceCM = room.distanceTransform(false, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
+        const distanceCM = room.distanceTransform(undefined, false, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
 
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
@@ -1135,16 +1135,15 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the room anchor. If not defined, inform an empty array
 
-        const anchor = room.roomObjects.anchor.getValue()
-        if (!anchor) return []
+        const anchor = room.roomObjects.anchor.getValue() || new RoomPosition(25, 25, room.name),
 
         // Get array of spawns and extensions
 
-        const spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = room.roomObjects.spawn.getValue().concat(room.roomObjects.extension.getValue())
+        spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = room.roomObjects.spawn.getValue().concat(room.roomObjects.extension.getValue()),
 
         // Filter energy structures by distance from anchor
 
-        const filteredSpawnStructures = spawnsAndExtensions.sort((a, b) => a.pos.getRangeTo(anchor.x, anchor.y) - b.pos.getRangeTo(anchor.x, anchor.y))
+        filteredSpawnStructures = spawnsAndExtensions.sort((a, b) => a.pos.getRangeTo(anchor.x, anchor.y) - b.pos.getRangeTo(anchor.x, anchor.y))
 
         return filteredSpawnStructures
     }
@@ -2137,13 +2136,13 @@ Room.prototype.findScore = function() {
 
 }
 
-Room.prototype.distanceTransform = function(enableVisuals, x1 = constants.roomDimensions, y1 = constants.roomDimensions, x2 = -1, y2 = -1) {
+Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = constants.roomDimensions, y1 = constants.roomDimensions, x2 = -1, y2 = -1) {
 
     const room = this,
 
     // Use a costMatrix to record distances. Use the initialCM if provided, otherwise create one
 
-    distanceCM = room.get('terrainCM').clone()
+    distanceCM = initialCM || room.get('terrainCM').clone()
 
     // Loop through the xs and ys inside the bounds
 
@@ -2261,11 +2260,11 @@ Room.prototype.distanceTransform = function(enableVisuals, x1 = constants.roomDi
 
 Room.prototype.specialDT = function(initialCM, enableVisuals) {
 
-    const room = this
+    const room = this,
 
     // Use a costMatrix to record distances. Use the initialCM if provided, otherwise clone the terrainCM
 
-    const distanceCM = initialCM || room.get('terrainCM').clone()
+    distanceCM = initialCM || room.get('terrainCM').clone()
 
     // Loop through each x and y in the room
 
@@ -2909,7 +2908,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
         // Create a road site at this pos
 
-        room.createConstructionSite(x, y, structureType)
+        /* room.createConstructionSite(x, y, structureType) */
     }
 
     // So long as there are positions in this gen

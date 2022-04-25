@@ -1,4 +1,4 @@
-import { allyList } from "international/constants"
+import { allyList, allyTrading } from "international/constants"
 
 type PrependNextNum<A extends Array<unknown>> = A['length'] extends infer T ? ((t: T, ...a: A) => void) extends ((...x: infer X) => void) ? X : never : never
 
@@ -80,9 +80,7 @@ class AllyManager {
 
     constructor() {
 
-        const allyManager = this
-
-        allyManager.requestTypes = {
+        this.requestTypes = {
             RESOURCE: 0,
             DEFENSE: 1,
             ATTACK: 2,
@@ -97,7 +95,7 @@ class AllyManager {
 
 AllyManager.prototype.getAllyRequests = function() {
 
-    const allyManager = this
+    if (!allyTrading) return
 
     // Stop if there are no allies
 
@@ -117,7 +115,7 @@ AllyManager.prototype.getAllyRequests = function() {
 
             // Get the allyRequests and record them in the allyManager
 
-            allyManager.allyRequests = JSON.parse(RawMemory.foreignSegment.data)
+            this.allyRequests = JSON.parse(RawMemory.foreignSegment.data)
 
         } catch (err) {}
     }
@@ -128,23 +126,21 @@ AllyManager.prototype.getAllyRequests = function() {
 
 AllyManager.prototype.tickConfig = function() {
 
-    const allyManager = this
-
     // Initialize myRequests and allyRequests
 
-    allyManager.myRequests = []
-    allyManager.allyRequests = []
+    this.myRequests = []
+    this.allyRequests = []
 }
 
 AllyManager.prototype.endTickManager = function() {
 
-    const allyManager = this
+    if (!allyTrading) return
 
     if (Object.keys(RawMemory.segments).length < 10) {
 
         // Assign myRequests to the public segment
 
-        RawMemory.segments[segmentID] = JSON.stringify(allyManager.myRequests)
+        RawMemory.segments[segmentID] = JSON.stringify(this.myRequests)
 
         RawMemory.setPublicSegments([segmentID])
     }
@@ -152,10 +148,8 @@ AllyManager.prototype.endTickManager = function() {
 
 AllyManager.prototype.requestAttack = function(roomName, playerName, priority = 0) {
 
-    const allyManager = this
-
-    allyManager.myRequests.push({
-        requestType: allyManager.requestTypes.ATTACK,
+    this.myRequests.push({
+        requestType: this.requestTypes.ATTACK,
         roomName,
         playerName,
         priority
@@ -164,10 +158,8 @@ AllyManager.prototype.requestAttack = function(roomName, playerName, priority = 
 
 AllyManager.prototype.requestHelp = function(roomName, priority = 0) {
 
-    const allyManager = this
-
-    allyManager.myRequests.push({
-        requestType: allyManager.requestTypes.DEFENSE,
+    this.myRequests.push({
+        requestType: this.requestTypes.DEFENSE,
         roomName,
         priority
     })
@@ -175,10 +167,8 @@ AllyManager.prototype.requestHelp = function(roomName, priority = 0) {
 
 AllyManager.prototype.requestHate = function(playerName, priority = 0) {
 
-    const allyManager = this
-
-    allyManager.myRequests.push({
-        requestType: allyManager.requestTypes.HATE,
+    this.myRequests.push({
+        requestType: this.requestTypes.HATE,
         playerName,
         priority
     })
@@ -186,10 +176,8 @@ AllyManager.prototype.requestHate = function(playerName, priority = 0) {
 
 AllyManager.prototype.requestResource = function(roomName, resourceType, maxAmount, priority = 0) {
 
-    const allyManager = this
-
-    allyManager.myRequests.push({
-        requestType: allyManager.requestTypes.RESOURCE,
+    this.myRequests.push({
+        requestType: this.requestTypes.RESOURCE,
         resourceType,
         maxAmount,
         roomName,

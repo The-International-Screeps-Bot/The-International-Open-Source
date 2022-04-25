@@ -496,7 +496,7 @@ declare global {
         /**
          * Finds open spaces in a room and records them in a cost matrix
          */
-        distanceTransform(enableVisuals?: boolean, x1?: number, y1?: number, x2?: number, y2?: number): CostMatrix
+        distanceTransform(initialCM?: CostMatrix, enableVisuals?: boolean, x1?: number, y1?: number, x2?: number, y2?: number): CostMatrix
 
         /**
          * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix

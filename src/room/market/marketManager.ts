@@ -83,13 +83,27 @@ export function marketManager(room: Room) {
         continue
     }
 
-    // Construct a targetAmount
+    // Energy
 
-    let targetAmount = 10000
+    let targetAmount = 30000,
+    resourceType: ResourceConstant = RESOURCE_ENERGY
+
+    // If there is insufficient energy
+
+    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) < targetAmount) {
+
+        // Try to buy some more
+
+        if (room.advancedBuy(resourceType, terminal.store.getUsedCapacity(resourceType) - targetAmount * 1.2)) return
+    }
+
+    // Minerals
+
+    targetAmount = 10000
 
     // Loop through each mineral
 
-    for (const resourceType of minerals) {
+    for (resourceType of minerals) {
 
         // If there is an acceptable amount of resources, iterate
 
@@ -97,6 +111,6 @@ export function marketManager(room: Room) {
 
         // Otherwise, try to sell the excess amount
 
-        room.advancedSell(resourceType, terminal.store.getUsedCapacity(resourceType) - targetAmount / 2)
+        if (room.advancedSell(resourceType, terminal.store.getUsedCapacity(resourceType) - targetAmount / 2)) return
     }
 }

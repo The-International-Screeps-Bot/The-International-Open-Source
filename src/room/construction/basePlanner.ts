@@ -1,5 +1,5 @@
 import { constants } from "international/constants"
-import { findAvgBetweenPosotions, findPositionsInsideRect, getRangeBetween } from "international/generalFunctions"
+import { findAvgBetweenPosotions, findPositionsInsideRect, getRange, getRangeBetween } from "international/generalFunctions"
 import 'other/RoomVisual'
 
 /**
@@ -65,12 +65,17 @@ export function basePlanner(room: Room) {
         anchorOrient: Pos
         initialWeight?: number
         adjacentToRoads?: boolean
+        normalDT?: boolean
     }
 
     /**
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
      */
     function planStamp(opts: PlanStampOpts): void {
+
+        // Define the stamp using the stampType
+
+        const stamp = constants.stamps[opts.stampType]
 
         // So long as the count is more than 0
 
@@ -80,17 +85,13 @@ export function basePlanner(room: Room) {
 
             opts.count--
 
-            // Define the stamp using the stampType
-
-            const stamp = constants.stamps[opts.stampType]
-
             // Run distance transform with the baseCM
 
-            const distanceCM = room.specialDT(baseCM)
+            const distanceCM = opts.normalDT ? room.distanceTransform(baseCM) : room.specialDT(baseCM),
 
             // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 
-            const anchor = room.findClosestPosOfValue({
+            anchor = room.findClosestPosOfValue({
                 CM: distanceCM,
                 startPos: opts.anchorOrient,
                 requiredValue: stamp.size,
@@ -207,9 +208,11 @@ export function basePlanner(room: Room) {
         anchorOrient: anchor,
     })
 
+    const fastFillerHubAnchor = findAvgBetweenPosotions(stampAnchors.fastFiller[0], stampAnchors.hub[0]),
+
     // Get the closest upgrade pos and mark it as fair use in roadCM
 
-    const closestUpgradePos = stampAnchors.hub[0].findClosestByRange(upgradePositions)
+    closestUpgradePos = stampAnchors.hub[0].findClosestByRange(upgradePositions)
     roadCM.set(closestUpgradePos.x, closestUpgradePos.y, 5)
 
     // Construct path
@@ -221,7 +224,7 @@ export function basePlanner(room: Room) {
     planStamp({
         stampType: 'extensions',
         count: 6,
-        anchorOrient: stampAnchors.hub[0],
+        anchorOrient: fastFillerHubAnchor,
     })
 
     // Plan the stamp x times
@@ -252,10 +255,10 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    const labsAnchor = planStamp({
+    planStamp({
         stampType: 'labs',
         count: 1,
-        anchorOrient: stampAnchors.hub[0],
+        anchorOrient: fastFillerHubAnchor,
     })
 
     // Plan roads
@@ -345,7 +348,7 @@ export function basePlanner(room: Room) {
 
         path = room.advancedFindPath({
             origin: closestHarvestPos,
-            goal: { pos: anchor, range: 4 },
+            goal: { pos: anchor, range: 3 },
             weightCostMatrixes: [roadCM]
         })
 
@@ -496,7 +499,7 @@ export function basePlanner(room: Room) {
 
         adjacentPositionsByAnchorRange = adjacentPositions.sort(function(a, b) {
 
-            return getRangeBetween(a.x, a.y, anchor.x, anchor.y) - getRangeBetween(b.x, b.y, anchor.x, anchor.y)
+            return getRange(a.x - stampAnchors.hub[0].x, a.y - stampAnchors.hub[0].y) - getRange(b.x - stampAnchors.hub[0].x, b.y - stampAnchors.hub[0].y)
         })
 
         // Loop through each pos
@@ -553,7 +556,7 @@ export function basePlanner(room: Room) {
     planStamp({
         stampType: 'tower',
         count: 6,
-        anchorOrient: stampAnchors.hub[0],
+        anchorOrient: fastFillerHubAnchor,
         adjacentToRoads: true,
     })
 
@@ -571,7 +574,7 @@ export function basePlanner(room: Room) {
     planStamp({
         stampType: 'observer',
         count: 1,
-        anchorOrient: stampAnchors.hub[0],
+        anchorOrient: fastFillerHubAnchor,
     })
 
     // Record planning results in the room's global and inform true

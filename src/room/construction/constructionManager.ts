@@ -27,7 +27,7 @@ export function constructionManager(room: Room) {
 
     // Only run the planner every x ticks (temporary fix)
 
-    if (Game.time % 50 != 0) return
+    /* if (Game.time % 50 != 0) return */
 
     manageControllerStructures()
 
