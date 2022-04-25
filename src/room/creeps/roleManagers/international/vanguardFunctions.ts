@@ -57,6 +57,7 @@ Vanguard.prototype.buildRoom = function() {
         // Try to normally harvest. Iterate if creep harvested
 
         if (creep.advancedHarvestSource(room.get(sourceName))) return
+        return
     }
 
     // If there is no construction target ID

@@ -459,4 +459,4 @@ export const CPUBucketCapacity = 10000
 
 export const CPUBucketRenewThreshold = 5000
 
-export const prefferedCommuneRange = 7
+export const prefferedCommuneRange = 6
