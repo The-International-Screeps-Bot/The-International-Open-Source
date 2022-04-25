@@ -1,5 +1,5 @@
 import { claimRequestNeedsIndex } from "international/constants"
-import { findObjectWithID, getRange, unPackAsPos } from "international/generalFunctions"
+import { customLog, findObjectWithID, getRange, unPackAsPos } from "international/generalFunctions"
 import { Vanguard } from "../../creepClasses"
 
 Vanguard.prototype.travelToSource = function(sourceName) {
@@ -18,7 +18,7 @@ Vanguard.prototype.travelToSource = function(sourceName) {
     const harvestPos = unPackAsPos(creep.memory.packedHarvestPos)
 
     // If the creep is at the creep's packedHarvestPos, inform false
-
+    customLog('POS', JSON.stringify(harvestPos))
     if (getRange(creep.pos.x - harvestPos.x, creep.pos.y - harvestPos.y) == 0) return false
 
     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt

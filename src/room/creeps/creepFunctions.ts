@@ -615,7 +615,7 @@ Creep.prototype.findSourceHarvestPos = function(sourceName) {
     usedSourceHarvestPositions: Set<number> = room.get('usedSourceHarvestPositions')
 
     let closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`),
-    packedPos = pack(closestHarvestPos)
+    packedPos
 
     // If the closestHarvestPos exists and isn't being used
 
