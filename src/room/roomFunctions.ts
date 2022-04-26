@@ -3134,7 +3134,7 @@ Room.prototype.createClaimRequest = function() {
 
 Room.prototype.findSwampPlainsRatio = function() {
 
-    const terrainAmounts: number[] = [],
+    const terrainAmounts: number[] = [0, 0, 0],
 
     terrain = this.getTerrain()
 
@@ -3144,6 +3144,6 @@ Room.prototype.findSwampPlainsRatio = function() {
             terrainAmounts[terrain.get(x, y)]++
         }
     }
-
+    
     return terrainAmounts[TERRAIN_MASK_SWAMP] / terrainAmounts[0]
 }
