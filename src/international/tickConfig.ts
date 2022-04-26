@@ -51,13 +51,9 @@ InternationalManager.prototype.tickConfig = function() {
 
     for (const roomName in Game.rooms) {
 
-        const room = Game.rooms[roomName]
+        const room = Game.rooms[roomName],
 
-        const controller = room.controller
-
-        // Add roomName to global if it isn't already there
-
-        if (!global[room.name]) global[room.name] = {}
+        controller = room.controller
 
         // Single tick properties
 
@@ -84,8 +80,8 @@ InternationalManager.prototype.tickConfig = function() {
             source2: 0,
         }
 
-        if (!global[room.name].tasksWithoutResponders) global[room.name].tasksWithoutResponders = {}
-        if (!global[room.name].tasksWithResponders) global[room.name].tasksWithResponders = {}
+        if (!room.global.tasksWithoutResponders) room.global.tasksWithoutResponders = {}
+        if (!room.global.tasksWithResponders) room.global.tasksWithResponders = {}
 
         // Iterate if there isn't a controller
 

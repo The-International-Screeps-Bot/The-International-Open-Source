@@ -8,7 +8,7 @@ HubHauler.prototype.travelToHub = function() {
 
     // Get the hub, informing false if it's undefined
 
-    const hub: RoomPosition | undefined = global[room.name].stampAnchors?.hub[0]
+    const hub: RoomPosition | undefined = room.global.stampAnchors?.hub[0]
     if(!hub) return true
 
     // Otherwise if the creep is on the hub, inform false

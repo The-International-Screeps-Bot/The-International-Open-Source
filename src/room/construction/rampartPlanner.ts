@@ -479,17 +479,11 @@ export function rampartPlanner(room: Room) {
 
     // Rectangle Array, the Rectangles will be protected by the returned tiles
 
-    const protectionRects: Rect[] = []
-
-    //
-
-    // Get the room's anchor
-
-    const anchor: RoomPosition = room.get('anchor')
+    const protectionRects: Rect[] = [],
 
     // Get the controller
 
-    const controller = room.controller
+    controller = room.controller
 
     // Protect it
 
@@ -541,7 +535,7 @@ export function rampartPlanner(room: Room) {
 
     // Get the room's stampAnchors
 
-    const stampAnchors: StampAnchors = global[room.name].stampAnchors
+    const stampAnchors: StampAnchors = room.global.stampAnchors
 
     // Loop through types in stampAnchors
 
@@ -587,11 +581,11 @@ export function rampartPlanner(room: Room) {
 
     // Protect fastFiller spawns
 
-    rampartPlans.set(anchor.x, anchor.y - 2, 1)
+    rampartPlans.set(room.anchor.x, room.anchor.y - 2, 1)
 
-    rampartPlans.set(anchor.x - 2, anchor.y + 1, 1)
+    rampartPlans.set(room.anchor.x - 2, room.anchor.y + 1, 1)
 
-    rampartPlans.set(anchor.x + 2, anchor.y + 1, 1)
+    rampartPlans.set(room.anchor.x + 2, room.anchor.y + 1, 1)
 
     // Protect useful hub structures
 

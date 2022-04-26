@@ -9,18 +9,6 @@ Room.prototype.get = function(roomObjectName) {
 
     const room = this
 
-    // Anchor
-
-    new RoomObject({
-        name: 'anchor',
-        valueType: 'pos',
-        cacheType: 'memory',
-        room,
-        valueConstructor: function() {
-            return room.memory.anchor
-        }
-    })
-
     // Cost matrixes
 
     function generateTerrainCM() {
@@ -398,12 +386,11 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the room anchor, stopping if it's undefined
 
-        const anchor: RoomPosition | false = room.roomObjects.anchor.getValue()
-        if (!anchor) return false
+        if (!room.anchor) return false
 
         // Filter harvestPositions by closest one to anchor
 
-        return anchor.findClosestByRange(harvestPositions)
+        return room.anchor.findClosestByRange(harvestPositions)
     }
 
     new RoomObject({
@@ -484,8 +471,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the anchor, informing false if it's undefined
 
-        const anchor = room.roomObjects.anchor.getValue()
-        if (!anchor) return false
+        if (!room.anchor) return false
 
         // Get the open areas in a range of 3 to the controller
 
@@ -495,7 +481,7 @@ Room.prototype.get = function(roomObjectName) {
 
         return room.findClosestPosOfValue({
             CM: distanceCM,
-            startPos: anchor,
+            startPos: room.anchor,
             requiredValue: 2
         })
     }
@@ -532,29 +518,26 @@ Room.prototype.get = function(roomObjectName) {
 
     function findFastFillerPositions() {
 
-        // Get the anchor, informing an empty array if it's undefined
-
-        const anchor: RoomPosition | undefined = room.get('anchor')
-        if (!anchor) return []
+        if (!room.anchor) return []
 
         // Construct fastFillerPositions from the top / bottom and left, right adjacent positions
 
         const fastFillerPositions = [
             {
-                x: anchor.x - 1,
-                y: anchor.y - 1
+                x: room.anchor.x - 1,
+                y: room.anchor.y - 1
             },
             {
-                x: anchor.x + 1,
-                y: anchor.y - 1
+                x: room.anchor.x + 1,
+                y: room.anchor.y - 1
             },
             {
-                x: anchor.x - 1,
-                y: anchor.y + 1
+                x: room.anchor.x - 1,
+                y: room.anchor.y + 1
             },
             {
-                x: anchor.x + 1,
-                y: anchor.y + 1
+                x: room.anchor.x + 1,
+                y: room.anchor.y + 1
             },
         ]
 
@@ -778,7 +761,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the hubAnchor, informing false if it's not defined
 
-        const hubAnchor: RoomPosition = global[room.name].stampAnchors?.hub[0]
+        const hubAnchor: RoomPosition = room.global.stampAnchors?.hub[0]
         if (!hubAnchor) return false
 
         // Get the upgradePositions, informing false if they're undefined
@@ -872,7 +855,7 @@ Room.prototype.get = function(roomObjectName) {
         cacheType: 'global',
         cacheAmount: Infinity,
         room,
-        valueConstructor: function() { return global[room.name].source1PathLength || 0 }
+        valueConstructor: function() { return room.global.source1PathLength || 0 }
     })
 
     // source2PathLength
@@ -883,11 +866,10 @@ Room.prototype.get = function(roomObjectName) {
         cacheType: 'global',
         cacheAmount: Infinity,
         room,
-        valueConstructor: function() { return global[room.name].source2PathLength || 0 }
+        valueConstructor: function() { return room.global.source2PathLength || 0 }
     })
 
     // upgradePathLength
-
 
     new RoomObject({
         name: 'upgradePathLength',
@@ -895,7 +877,7 @@ Room.prototype.get = function(roomObjectName) {
         cacheType: 'global',
         cacheAmount: Infinity,
         room,
-        valueConstructor: function() { return global[room.name].upgradePathLength }
+        valueConstructor: function() { return room.global.upgradePathLength }
     })
 
 
@@ -980,12 +962,11 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the anchor, stopping if it isn't defined
 
-        const anchor = room.roomObjects.anchor.getValue()
-        if (!anchor) return false
+        if (!room.anchor) return false
 
         // Otherwise search based on an offset from the anchor's x
 
-        const structuresAsPos = room.getPositionAt(anchor.x + offset, anchor.y).lookFor(LOOK_STRUCTURES)
+        const structuresAsPos = room.getPositionAt(room.anchor.x + offset, room.anchor.y).lookFor(LOOK_STRUCTURES)
 
         // Loop through structuresAtPos
 
@@ -1101,7 +1082,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findLinkAtPos(global[room.name].stampAnchors?.fastFiller[0])
+            return findLinkAtPos(room.global.stampAnchors?.fastFiller[0])
         }
     })
 
@@ -1113,7 +1094,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findLinkNearby(global[room.name].stampAnchors?.hub[0])
+            return findLinkNearby(room.global.stampAnchors?.hub[0])
         }
     })
 
@@ -1135,7 +1116,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the room anchor. If not defined, inform an empty array
 
-        const anchor = room.roomObjects.anchor.getValue() || new RoomPosition(25, 25, room.name),
+        const anchor = room.anchor || new RoomPosition(25, 25, room.name),
 
         // Get array of spawns and extensions
 
@@ -1624,18 +1605,14 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                         for (const pos of harvestPositions) cm.set(pos.x, pos.y, 10)
                     }
 
-                    // Get the anchor
-
-                    const anchor: RoomPosition | undefined = room.get('anchor')
-
                     // If the anchor is defined
 
-                    if (anchor) {
+                    if (room.anchor) {
 
                         // Get the upgradePositions, and use the anchor to find the closest upgradePosition to the anchor
 
                         const upgradePositions: RoomPosition[] = room.get('upgradePositions'),
-                        deliverUpgradePos = anchor.findClosestByRange(upgradePositions)
+                        deliverUpgradePos = room.anchor.findClosestByRange(upgradePositions)
 
                         // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
 
@@ -1653,7 +1630,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     // Get the hubAnchor
 
-                    const hubAnchor: Pos = global[room.name].stampAnchors?.hub[0]
+                    const hubAnchor: Pos = room.global.stampAnchors?.hub[0]
 
                     // If the hubAnchor is defined
 
@@ -1928,8 +1905,7 @@ Room.prototype.makeRemote = function(scoutingRoom) {
 
         // Get the anchor from the scoutingRoom, stopping if it's undefined
 
-        const anchor: RoomPosition = scoutingRoom.get('anchor')
-        if (!anchor) return true
+        if (!room.anchor) return true
 
         const newSourceEfficacies = [],
 
@@ -1955,7 +1931,7 @@ Room.prototype.makeRemote = function(scoutingRoom) {
 
             const path = room.advancedFindPath({
                 origin: source.pos,
-                goal: { pos: anchor, range: 3 },
+                goal: { pos: room.anchor, range: 3 },
                 /* weightCostMatrixes: [roadCM] */
             })
 
@@ -2109,7 +2085,7 @@ Room.prototype.findTasksOfTypes = function(createdTaskIDs, types) {
 
         // Set the task from tasks without responders, or if undefined, from tasksWithResponders
 
-        const task: RoomTask = global[room.name].tasksWithoutResponders[taskID] || global[room.name].tasksWithResponders[taskID]
+        const task: RoomTask = room.global.tasksWithoutResponders[taskID] || room.global.tasksWithResponders[taskID]
 
         // If the task isn't defined, iterate
 
@@ -2698,11 +2674,11 @@ Room.prototype.findCSiteTargetID = function(creep) {
 
         // Ptherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
 
-        const anchor: RoomPosition = room.get('anchor') || creep?.pos || new RoomPosition(25, 25, room.name)
+        const anchor: RoomPosition = room.anchor || creep?.pos || new RoomPosition(25, 25, room.name)
 
         // Record the closest site to the anchor in the room's global and inform true
 
-        global[room.name].cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id
+        room.global.cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id
         return true
     }
 
@@ -2863,18 +2839,17 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
     // Construct a cost matrix for visited tiles and add seeds to it
 
-    visitedCM = new PathFinder.CostMatrix(),
+    visitedCM = new PathFinder.CostMatrix()
 
     // Get the room's anchor, stopping if it's undefined
 
-    anchor: RoomPosition = room.get('anchor')
-    if (!anchor) return
+    if (!room.anchor) return
 
     // Move the anchor to the top left of the fastFill
 
     const adjustedAnchor = {
-        x: anchor.x - 1,
-        y: anchor.y - 1
+        x: room.anchor.x - 1,
+        y: room.anchor.y - 1
     }
 
     // Record the anchor as visited
@@ -2908,7 +2883,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
         // Create a road site at this pos
 
-        /* room.createConstructionSite(x, y, structureType) */
+        room.createConstructionSite(x, y, structureType)
     }
 
     // So long as there are positions in this gen

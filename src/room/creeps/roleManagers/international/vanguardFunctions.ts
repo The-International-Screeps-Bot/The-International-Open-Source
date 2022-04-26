@@ -60,7 +60,7 @@ Vanguard.prototype.buildRoom = function() {
 
     // If there is no construction target ID
 
-    if (!global[room.name].cSiteTargetID) {
+    if (!room.global.cSiteTargetID) {
 
         // Try to find a construction target. If none are found, stop
 
@@ -69,7 +69,7 @@ Vanguard.prototype.buildRoom = function() {
 
     // Convert the construction target ID into a game object
 
-    let constructionTarget: ConstructionSite | undefined = findObjectWithID(global[room.name].cSiteTargetID)
+    let constructionTarget: ConstructionSite | undefined = findObjectWithID(room.global.cSiteTargetID)
 
     // If there is no construction target
 
@@ -82,7 +82,7 @@ Vanguard.prototype.buildRoom = function() {
 
     // Convert the construction target ID into a game object, stopping if it's undefined
 
-    constructionTarget = findObjectWithID(global[room.name].cSiteTargetID)
+    constructionTarget = findObjectWithID(room.global.cSiteTargetID)
 
     creep.advancedBuildCSite(constructionTarget)
     return

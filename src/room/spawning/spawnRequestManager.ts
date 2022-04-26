@@ -1,14 +1,10 @@
 import { allyList, builderSpawningWhenStorageThreshold, claimRequestNeedsIndex, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
-import { findCarryPartsRequired, findRemoteSourcesByEfficacy, getRange } from "international/generalFunctions"
+import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy, getRange } from "international/generalFunctions"
 
 /**
  * Creates spawn requests for the commune
  */
 export function spawnRequester(room: Room) {
-
-    // If there is no spawn queue, make one
-
-    if (!global[room.name].spawnQueue) global[room.name].spawnQueue = {}
 
     // Construct a record of spawnRequests
 

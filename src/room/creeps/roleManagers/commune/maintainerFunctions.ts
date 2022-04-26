@@ -26,7 +26,7 @@ Maintainer.prototype.advancedMaintain = function() {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
+            const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
 
             // Delete it and inform false
 

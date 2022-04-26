@@ -52,7 +52,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                     // Otherwise find the task
 
-                    const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
+                    const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
 
                     // Delete it
 
@@ -79,7 +79,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                 // Otherwise find the task
 
-                const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
+                const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
 
                 // Delete it and iterate
 
@@ -138,7 +138,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                 // Otherwise find the task
 
-                const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
+                const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
 
                 // Delete it
 
@@ -165,7 +165,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
+            const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
 
             // Delete it and iterate
 

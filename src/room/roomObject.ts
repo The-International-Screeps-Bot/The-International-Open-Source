@@ -109,7 +109,7 @@ RoomObject.prototype.getCachedValue = function() {
 
         // Query room's global for cachedRoomObject
 
-        const cachedRoomObject: RoomObject | undefined = global[room.name][roomObject.name]
+        const cachedRoomObject: RoomObject | undefined = room.global[roomObject.name]
 
         // If cachedRoomObject doesn't exist, and inform false
 
@@ -121,7 +121,7 @@ RoomObject.prototype.getCachedValue = function() {
 
             // Delete the cachedRoomObject and inform false
 
-            delete global[room.name][roomObject.name]
+            delete room.global[roomObject.name]
             return false
         }
 
@@ -216,7 +216,7 @@ RoomObject.prototype.cache = function() {
 
         // Store the copy in global and stop
 
-        global[room.name][roomObject.name] = roomObjectCopy
+        room.global[roomObject.name] = roomObjectCopy
         return
     }
 }

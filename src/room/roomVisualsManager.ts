@@ -10,13 +10,9 @@ export function roomVisualsManager(room: Room) {
 
     if (!Memory.roomVisuals) return
 
-    // Get the anchor
-
-    const anchor: RoomPosition = room.get('anchor')
-
     // If there is an anchor, show a rectangle around it
 
-    if (anchor) room.visual.rect(anchor.x - 0.5, anchor.y - 0.5, 1, 1, {
+    if (room.anchor) room.visual.rect(room.anchor.x - 0.5, room.anchor.y - 0.5, 1, 1, {
         stroke: constants.colors.lightBlue,
         fill: 'transparent',
     })
@@ -134,11 +130,11 @@ export function roomVisualsManager(room: Room) {
 
         // If there is not a cSiteTargetID, stop
 
-        if (!global[room.name].cSiteTargetID) return
+        if (!room.global.cSiteTargetID) return
 
         // Convert the construction target ID into a game object
 
-        const constructionTarget = findObjectWithID(global[room.name].cSiteTargetID)
+        const constructionTarget = findObjectWithID(room.global.cSiteTargetID)
 
         // If the constructionTarget exists, show visuals for it
 

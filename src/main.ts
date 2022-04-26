@@ -16,6 +16,7 @@ import './international/endTickManager'
 // Room
 
 import { roomManager } from 'room/roomManager'
+import './room/roomGetters'
 
 // Other
 
@@ -100,7 +101,6 @@ declare global {
     'roadCM' |
     'structurePlans' |
     'rampartPlans' |
-    'anchor' |
     'mineral' |
     'source1' |
     'source2' |
@@ -366,7 +366,31 @@ declare global {
 
     }
 
-    // Room
+    interface RoomGlobal {
+        [key: string]: any
+
+        // RoomObjects
+
+        stampAnchors: StampAnchors
+
+        source1PathLength: number
+
+        source2PathLength: number
+
+        upgradePathLength: number
+
+        //
+
+        tasksWithResponders: Record<string | number, RoomTask>
+
+        tasksWithoutResponders: Record<string | number, RoomTask>
+
+        cSiteTargetID: Id<ConstructionSite>
+
+        plannedBase: boolean
+
+        plannedRamparts: boolean
+    }
 
     interface Room {
 
@@ -589,6 +613,14 @@ declare global {
 
         createClaimRequest(): boolean
 
+        // Getters
+
+        _anchor: RoomPosition | undefined
+
+        readonly anchor: RoomPosition | undefined
+
+        readonly global: Partial<RoomGlobal>
+
         // Main roomFunctions
 
         claimRequestManager(): void
@@ -609,7 +641,10 @@ declare global {
     interface RoomMemory {
         [key: string]: any
 
-        anchor: Pos
+        /**
+         * A packed representation of the center of the fastFiller
+         */
+        anchor: number
 
         /**
          * A description of the room's defining properties that can be used to assume other properties

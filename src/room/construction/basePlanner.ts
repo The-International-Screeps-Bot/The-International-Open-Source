@@ -1,5 +1,5 @@
 import { constants } from "international/constants"
-import { findAvgBetweenPosotions, findPositionsInsideRect, getRange, getRangeBetween } from "international/generalFunctions"
+import { customLog, findAvgBetweenPosotions, findPositionsInsideRect, getRange, getRangeBetween, pack } from "international/generalFunctions"
 import 'other/RoomVisual'
 
 /**
@@ -11,8 +11,9 @@ export function basePlanner(room: Room) {
 
     const baseCM: CostMatrix = room.get('baseCM'),
     roadCM: CostMatrix = room.get('roadCM'),
-    structurePlans: CostMatrix = room.get('structurePlans'),
-    stampAnchors: StampAnchors = {}
+    structurePlans: CostMatrix = room.get('structurePlans')
+
+    if (!room.global.stampAnchors) room.global.stampAnchors = {}
 
     function recordAdjacentPositions(x: number, y: number, range: number, weight?: number) {
 
@@ -77,9 +78,13 @@ export function basePlanner(room: Room) {
 
         const stamp = constants.stamps[opts.stampType]
 
+        // If the stampType isn't in stampAnchors, construct it
+
+        if (!room.global.stampAnchors[opts.stampType]) room.global.stampAnchors[opts.stampType] = []
+
         // So long as the count is more than 0
 
-        while (opts.count > 0) {
+        while (opts.count - room.global.stampAnchors[opts.stampType].length > 0) {
 
             // Decrease the count
 
@@ -104,14 +109,9 @@ export function basePlanner(room: Room) {
 
             if (!anchor) return
 
-            // Otherwise
-            // If the stampType isn't in stampAnchors, construct it
-
-            if (!stampAnchors[opts.stampType]) stampAnchors[opts.stampType] = []
-
             // Add the anchor to stampAnchors based on its type
 
-            stampAnchors[opts.stampType].push(anchor)
+            room.global.stampAnchors[opts.stampType].push(anchor)
 
             // Loop through structure types in fastFiller structures
 
@@ -165,7 +165,7 @@ export function basePlanner(room: Room) {
 
     // If the stamp failed to be planned
 
-    if (!stampAnchors.fastFiller?.length) {
+    if (!room.global.stampAnchors.fastFiller?.length) {
 
         // Record that the room is not claimable and stop
 
@@ -175,11 +175,7 @@ export function basePlanner(room: Room) {
 
     // Otherwise store the fastFillerAnchor as anchor in the room's memory
 
-    room.memory.anchor = stampAnchors.fastFiller[0]
-
-    // Get the anchor
-
-    const anchor = room.get('anchor')
+    room.memory.anchor = pack(room.global.stampAnchors.fastFiller[0])
 
     // Get the centerUpgradePos, informing false if it's undefined
 
@@ -205,14 +201,14 @@ export function basePlanner(room: Room) {
     planStamp({
         stampType: 'hub',
         count: 1,
-        anchorOrient: anchor,
+        anchorOrient: room.anchor,
     })
 
-    const fastFillerHubAnchor = findAvgBetweenPosotions(stampAnchors.fastFiller[0], stampAnchors.hub[0]),
+    const fastFillerHubAnchor = findAvgBetweenPosotions(room.global.stampAnchors.fastFiller[0], room.global.stampAnchors.hub[0]),
 
     // Get the closest upgrade pos and mark it as fair use in roadCM
 
-    closestUpgradePos = stampAnchors.hub[0].findClosestByRange(upgradePositions)
+    closestUpgradePos = room.global.stampAnchors.hub[0].findClosestByRange(upgradePositions)
     roadCM.set(closestUpgradePos.x, closestUpgradePos.y, 5)
 
     // Construct path
@@ -229,13 +225,13 @@ export function basePlanner(room: Room) {
 
     // Plan the stamp x times
 
-    for (const extensionsAnchor of stampAnchors.extensions) {
+    for (const extensionsAnchor of room.global.stampAnchors.extensions) {
 
         // Path from the extensionsAnchor to the hubAnchor
 
         path = room.advancedFindPath({
             origin: extensionsAnchor,
-            goal: { pos: stampAnchors.hub[0], range: 2 },
+            goal: { pos: room.global.stampAnchors.hub[0], range: 2 },
             weightCostMatrixes: [roadCM]
         })
 
@@ -266,8 +262,8 @@ export function basePlanner(room: Room) {
     // Path from the fastFillerAnchor to the hubAnchor
 
     path = room.advancedFindPath({
-        origin: stampAnchors.hub[0],
-        goal: { pos: anchor, range: 3 },
+        origin: room.global.stampAnchors.hub[0],
+        goal: { pos: room.anchor, range: 3 },
         weightCostMatrixes: [roadCM]
     })
 
@@ -292,13 +288,13 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: centerUpgadePos,
-        goal: { pos: stampAnchors.hub[0], range: 2 },
+        goal: { pos: room.global.stampAnchors.hub[0], range: 2 },
         weightCostMatrixes: [roadCM]
     })
 
     // Record the path's length in global
 
-    global[room.name].upgradePathLength = path.length
+    room.global.upgradePathLength = path.length
 
     // Loop through positions of the path
 
@@ -348,13 +344,13 @@ export function basePlanner(room: Room) {
 
         path = room.advancedFindPath({
             origin: closestHarvestPos,
-            goal: { pos: anchor, range: 3 },
+            goal: { pos: room.anchor, range: 3 },
             weightCostMatrixes: [roadCM]
         })
 
         // Record the path's length in global
 
-        global[room.name][`${sourceName}PathLength`] = path.length
+        room.global[`${sourceName}PathLength`] = path.length
 
         // Loop through positions of the path
 
@@ -394,8 +390,8 @@ export function basePlanner(room: Room) {
     // Path from the hubAnchor to the labsAnchor
 
     path = room.advancedFindPath({
-        origin: stampAnchors.labs[0],
-        goal: { pos: stampAnchors.hub[0], range: 2 },
+        origin: room.global.stampAnchors.labs[0],
+        goal: { pos: room.global.stampAnchors.hub[0], range: 2 },
         weightCostMatrixes: [roadCM]
     })
 
@@ -424,7 +420,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: mineralHarvestPos,
-        goal: { pos: stampAnchors.hub[0], range: 2 },
+        goal: { pos: room.global.stampAnchors.hub[0], range: 2 },
         weightCostMatrixes: [roadCM]
     })
 
@@ -499,7 +495,7 @@ export function basePlanner(room: Room) {
 
         adjacentPositionsByAnchorRange = adjacentPositions.sort(function(a, b) {
 
-            return getRange(a.x - stampAnchors.hub[0].x, a.y - stampAnchors.hub[0].y) - getRange(b.x - stampAnchors.hub[0].x, b.y - stampAnchors.hub[0].y)
+            return getRange(a.x - room.global.stampAnchors.hub[0].x, a.y - room.global.stampAnchors.hub[0].y) - getRange(b.x - room.global.stampAnchors.hub[0].x, b.y - room.global.stampAnchors.hub[0].y)
         })
 
         // Loop through each pos
@@ -565,7 +561,7 @@ export function basePlanner(room: Room) {
     planStamp({
         stampType: 'extension',
         count: extraExtensionsAmount,
-        anchorOrient: stampAnchors.hub[0],
+        anchorOrient: room.global.stampAnchors.hub[0],
         adjacentToRoads: true,
     })
 
@@ -579,7 +575,6 @@ export function basePlanner(room: Room) {
 
     // Record planning results in the room's global and inform true
 
-    global[room.name].stampAnchors = stampAnchors
-    global[room.name].planned = true
+    room.global.plannedBase = true
     return true
 }

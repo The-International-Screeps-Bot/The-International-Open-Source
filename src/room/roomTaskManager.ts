@@ -6,9 +6,9 @@ export function taskManager(room: Room) {
 
     // Iterate through tasks without responders
 
-    for (const taskID in global[room.name].tasksWithoutResponders) {
+    for (const taskID in room.global.tasksWithoutResponders) {
 
-        const task: RoomTask = global[room.name].tasksWithoutResponders[taskID]
+        const task: RoomTask = room.global.tasksWithoutResponders[taskID]
 
         // If the task should be deleted, delete it
 
@@ -17,9 +17,9 @@ export function taskManager(room: Room) {
 
     // Iterate through tasks with responders
 
-    for (const taskID in global[room.name].tasksWithResponders) {
+    for (const taskID in room.global.tasksWithResponders) {
 
-        const task: RoomTask = global[room.name].tasksWithResponders[taskID]
+        const task: RoomTask = room.global.tasksWithResponders[taskID]
 
         // If the task should be deleted, delete it
 
@@ -27,7 +27,7 @@ export function taskManager(room: Room) {
     }
 
     /*
-    customLog('TWOR', JSON.stringify(global[room.name].tasksWithoutResponders))
-    customLog('TWR', JSON.stringify(global[room.name].tasksWithResponders))
+    customLog('TWOR', JSON.stringify(room.global.tasksWithoutResponders))
+    customLog('TWR', JSON.stringify(room.global.tasksWithResponders))
     */
 }

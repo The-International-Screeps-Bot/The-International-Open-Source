@@ -332,7 +332,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
             // Otherwise find the task
 
-            const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
+            const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
 
             // Delete it and inform false
 
@@ -547,8 +547,7 @@ Creep.prototype.findOptimalSourceName = function() {
 
     // Get the rooms anchor, if it's undefined inform false
 
-    const anchor = room.get('anchor')
-    if (!anchor) return false
+    if (!room.anchor) return false
 
     // Query usedSourceHarvestPositions to get creepsOfSourceAmount
 
@@ -560,7 +559,7 @@ Creep.prototype.findOptimalSourceName = function() {
 
     // Sort them by their range from the anchor
 
-    sourceNamesByAnchorRange = sourceNames.sort((a, b) => anchor.getRangeTo(room.get(a).pos) - anchor.getRangeTo(room.get(b).pos))
+    sourceNamesByAnchorRange = sourceNames.sort((a, b) => room.anchor.getRangeTo(room.get(a).pos) - room.anchor.getRangeTo(room.get(b).pos))
 
     // Construct a creep threshold
 
@@ -608,7 +607,7 @@ Creep.prototype.findSourceHarvestPos = function(sourceName) {
 
     // Define an anchor
 
-    const anchor: RoomPosition = room.get('anchor') || creep.pos,
+    const anchor: RoomPosition = room.anchor || creep.pos,
 
     // Get usedSourceHarvestPositions
 
@@ -666,7 +665,7 @@ Creep.prototype.findMineralHarvestPos = function() {
 
     // Define an anchor
 
-    const anchor: RoomPosition = room.get('anchor') || creep.pos,
+    const anchor: RoomPosition = room.anchor || creep.pos,
 
     // Get usedMineralHarvestPositions
 
@@ -947,11 +946,11 @@ Creep.prototype.acceptTask = function(task) {
 
     // Add the task to tasksWithResponders
 
-    global[room.name].tasksWithResponders[task.ID] = task
+    room.global.tasksWithResponders[task.ID] = task
 
     // Delete the task from tasksWithoutResponders
 
-    delete global[room.name].tasksWithoutResponders[task.ID]
+    delete room.global.tasksWithoutResponders[task.ID]
 }
 
 Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_ENERGY) {
@@ -965,7 +964,7 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
 
     // Get the room's tasks without responders
 
-    const tasks: Record<number, RoomTask> = global[room.name].tasksWithoutResponders,
+    const tasks: Record<number, RoomTask> = room.global.tasksWithoutResponders,
 
     // Convert tasks to an array, then Sort it based on priority and range from the creep
 
@@ -1294,7 +1293,7 @@ Creep.prototype.fulfillTask = function() {
 
     // Get the creep's task
 
-    const task: RoomTask = global[room.name].tasksWithResponders[global[creep.id].respondingTaskID]
+    const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
 
     // If the task is undefined
 

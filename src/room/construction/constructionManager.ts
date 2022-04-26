@@ -14,7 +14,7 @@ export function constructionManager(room: Room) {
 
     // If the room has been planned for this global
 
-    if (global[room.name].planned) {
+    if (room.global.plannedBase && room.global.plannedRamparts) {
 
         // If the construction site count is at its limit, stop
 
@@ -56,7 +56,7 @@ export function constructionManager(room: Room) {
 
         // If there are no base plans yet
 
-        if (!global[room.name].planned) {
+        if (!room.global.plannedBase) {
 
             // Generate and record base plans
 
@@ -86,11 +86,11 @@ export function constructionManager(room: Room) {
 
         // If ramparts are not yet planned
 
-        if (!global[room.name].plannedRamparts) {
+        if (!room.global.plannedRamparts) {
 
             // Run rampart planning and record the state of the plans
 
-            global[room.name].plannedRamparts = rampartPlanner(room)
+            room.global.plannedRamparts = rampartPlanner(room)
         }
 
         const rampartPlans: CostMatrix = room.get('rampartPlans')
