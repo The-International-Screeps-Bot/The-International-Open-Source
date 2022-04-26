@@ -13,7 +13,11 @@ export function basePlanner(room: Room) {
     roadCM: CostMatrix = room.get('roadCM'),
     structurePlans: CostMatrix = room.get('structurePlans')
 
-    if (!room.global.stampAnchors) room.global.stampAnchors = {}
+    if (!room.global.stampAnchors) {
+
+        room.global.stampAnchors = {}
+        for (const type in constants.stamps) room.global.stampAnchors[type as StampTypes] = []
+    }
 
     function recordAdjacentPositions(x: number, y: number, range: number, weight?: number) {
 
@@ -72,15 +76,11 @@ export function basePlanner(room: Room) {
     /**
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
      */
-    function planStamp(opts: PlanStampOpts): void {
+    function planStamp(opts: PlanStampOpts): boolean {
 
         // Define the stamp using the stampType
 
         const stamp = constants.stamps[opts.stampType]
-
-        // If the stampType isn't in stampAnchors, construct it
-
-        if (!room.global.stampAnchors[opts.stampType]) room.global.stampAnchors[opts.stampType] = []
 
         // So long as the count is more than 0
 
@@ -107,7 +107,7 @@ export function basePlanner(room: Room) {
 
             // Inform false if no anchor was generated
 
-            if (!anchor) return
+            if (!anchor) return false
 
             // Add the anchor to stampAnchors based on its type
 
@@ -152,16 +152,16 @@ export function basePlanner(room: Room) {
             }
         }
 
-        return
+        return true
     }
 
     // Try to plan the stamp
 
-    planStamp({
+    if (!planStamp({
         stampType: 'fastFiller',
         count: 1,
         anchorOrient: avgControllerSourcePos,
-    })
+    })) return false
 
     // If the stamp failed to be planned
 
@@ -198,11 +198,11 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    planStamp({
+    if (!planStamp({
         stampType: 'hub',
         count: 1,
         anchorOrient: room.anchor,
-    })
+    })) return false
 
     const fastFillerHubAnchor = findAvgBetweenPosotions(room.global.stampAnchors.fastFiller[0], room.global.stampAnchors.hub[0]),
 
@@ -217,11 +217,11 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    planStamp({
+    if(!planStamp({
         stampType: 'extensions',
         count: 6,
         anchorOrient: fastFillerHubAnchor,
-    })
+    })) return false
 
     // Plan the stamp x times
 
@@ -251,11 +251,11 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    planStamp({
+    if(!planStamp({
         stampType: 'labs',
         count: 1,
         anchorOrient: fastFillerHubAnchor,
-    })
+    })) return false
 
     // Plan roads
 
@@ -549,29 +549,29 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    planStamp({
+    if(!planStamp({
         stampType: 'tower',
         count: 6,
         anchorOrient: fastFillerHubAnchor,
         adjacentToRoads: true,
-    })
+    })) return false
 
     // Try to plan the stamp
 
-    planStamp({
+    if(!planStamp({
         stampType: 'extension',
         count: extraExtensionsAmount,
         anchorOrient: room.global.stampAnchors.hub[0],
         adjacentToRoads: true,
-    })
+    })) return false
 
     // Try to plan the stamp
 
-    planStamp({
+    if(!planStamp({
         stampType: 'observer',
         count: 1,
         anchorOrient: fastFillerHubAnchor,
-    })
+    })) return false
 
     // Record planning results in the room's global and inform true
 

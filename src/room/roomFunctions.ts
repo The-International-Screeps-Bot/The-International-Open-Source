@@ -3109,7 +3109,9 @@ Room.prototype.createClaimRequest = function() {
 
     if (Memory.claimRequests[room.name]) return false
 
-    if (!basePlanner(room)) return false
+    basePlanner(room)
+
+    if (!room.global.plannedBase) return false
 
     let score = 0,
 
