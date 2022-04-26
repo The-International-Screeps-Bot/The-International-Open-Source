@@ -23,6 +23,7 @@ import './room/roomGetters'
 import { memHack } from 'other/memHack'
 import { RoomOfferTask, RoomPickupTask, RoomPullTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
 import { RoomObject } from 'room/roomObject'
+import { ErrorMapper } from 'other/ErrorMapper'
 
 // Type declareations for global
 
@@ -76,7 +77,8 @@ declare global {
 
     type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
 
-    type CreepRoles = 'sourceHarvester' |
+    type CreepRoles = 'source1Harvester' |
+    'source2Harvester' |
     'hauler' |
     'controllerUpgrader' |
     'builder' |
@@ -1095,7 +1097,7 @@ declare global {
 
 // Loop
 
-export const loop = function() {
+export const loop = ErrorMapper.wrapLoop(() => {
 
     memHack.modifyMemory()
 
@@ -1105,4 +1107,4 @@ export const loop = function() {
 
     internationalManager.mapVisualsManager()
     internationalManager.endTickManager()
-}
+})

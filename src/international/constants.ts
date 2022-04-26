@@ -167,7 +167,8 @@ constants.roomTypes = {
 }
 
 constants.creepRoles = [
-    'sourceHarvester',
+    'source1Harvester',
+    'source2Harvester',
     'hauler',
     'controllerUpgrader',
     'builder',

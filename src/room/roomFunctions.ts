@@ -877,7 +877,7 @@ Room.prototype.get = function(roomObjectName) {
         cacheType: 'global',
         cacheAmount: Infinity,
         room,
-        valueConstructor: function() { return room.global.upgradePathLength }
+        valueConstructor: function() { return room.global.upgradePathLength || 0 }
     })
 
 
@@ -3144,6 +3144,6 @@ Room.prototype.findSwampPlainsRatio = function() {
             terrainAmounts[terrain.get(x, y)]++
         }
     }
-    
+
     return terrainAmounts[TERRAIN_MASK_SWAMP] / terrainAmounts[0]
 }

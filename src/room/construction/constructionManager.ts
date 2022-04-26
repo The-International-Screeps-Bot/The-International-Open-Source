@@ -14,7 +14,11 @@ export function constructionManager(room: Room) {
 
     // If the room has been planned for this global
 
-    if (room.global.plannedBase && room.global.plannedRamparts) {
+    if (room.global.plannedBase) {
+
+        // Only run the planner every x ticks (temporary fix)
+
+        if (Game.time % Math.random() * 100 != 0) return
 
         // If the construction site count is at its limit, stop
 
@@ -24,10 +28,6 @@ export function constructionManager(room: Room) {
 
         if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
     }
-
-    // Only run the planner every x ticks (temporary fix)
-
-    /* if (Game.time % 50 != 0) return */
 
     manageControllerStructures()
 
@@ -90,7 +90,7 @@ export function constructionManager(room: Room) {
 
             // Run rampart planning and record the state of the plans
 
-            room.global.plannedRamparts = rampartPlanner(room)
+            rampartPlanner(room)
         }
 
         const rampartPlans: CostMatrix = room.get('rampartPlans')

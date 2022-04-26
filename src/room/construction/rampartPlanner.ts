@@ -674,6 +674,8 @@ export function rampartPlanner(room: Room) {
             rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
             break
         }
+
+        room.global.plannedRamparts = true
     }
 
     // Inform true
