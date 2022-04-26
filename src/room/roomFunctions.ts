@@ -3101,37 +3101,49 @@ Room.prototype.findSourcesByEfficacy = function() {
 
 Room.prototype.createClaimRequest = function() {
 
-    const room = this
+    if (this.get('sources').length != 2) return false
 
-    if (room.get('sources').length != 2) return false
+    if (this.memory.notClaimable) return false
 
-    if (room.memory.notClaimable) return false
+    if (Memory.claimRequests[this.name]) return false
 
-    if (Memory.claimRequests[room.name]) return false
+    basePlanner(this)
 
-    basePlanner(room)
-
-    if (!room.global.plannedBase) return false
+    if (!this.global.plannedBase) return false
 
     let score = 0,
 
-    closestClaimTypeName = findClosestClaimType(room.name),
-    closestCommuneRange = Game.map.getRoomLinearDistance(closestClaimTypeName, room.name),
+    // Prefer communes not too close and not too far from the commune
+
+    closestClaimTypeName = findClosestClaimType(this.name),
+    closestCommuneRange = Game.map.getRoomLinearDistance(closestClaimTypeName, this.name),
     preference = Math.abs(prefferedCommuneRange - closestCommuneRange)
 
     score += preference
 
-    // Don't prefer communes in range of 1-4, 7-12
-
-    // Prefer communes in range of 5-6
-
-    // Limit 1-12
+    score += this.findSwampPlainsRatio() * 12
 
 
-    Memory.claimRequests[room.name] = {
+    Memory.claimRequests[this.name] = {
         needs: [1, 20, 0],
         score
     }
 
     return true
+}
+
+Room.prototype.findSwampPlainsRatio = function() {
+
+    const terrainAmounts: number[] = [],
+
+    terrain = this.getTerrain()
+
+    for (let x = 0; x < constants.roomDimensions; x++) {
+        for (let y = 0; y < constants.roomDimensions; y++) {
+
+            terrainAmounts[terrain.get(x, y)]++
+        }
+    }
+
+    return terrainAmounts[TERRAIN_MASK_SWAMP] / terrainAmounts[0]
 }

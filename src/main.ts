@@ -613,6 +613,8 @@ declare global {
 
         createClaimRequest(): boolean
 
+        findSwampPlainsRatio(): number
+
         // Getters
 
         _anchor: RoomPosition | undefined

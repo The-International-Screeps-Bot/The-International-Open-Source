@@ -678,7 +678,7 @@ export function spawnRequester(room: Room) {
 
         else {
 
-            partsMultiplier += estimatedIncome * 0.8
+            partsMultiplier += estimatedIncome * 0.6
         }
 
         // If all RCL 3 extensions are build
