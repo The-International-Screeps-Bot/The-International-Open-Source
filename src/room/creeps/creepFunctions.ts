@@ -407,9 +407,11 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
     creep.say('ABCS')
 
-    // If the cSite is out of build range
+    const range = getRange(creep.pos.x - cSite.pos.x, creep.pos.y - cSite.pos.y)
 
-    if (creep.pos.getRangeTo(cSite.pos) > 3) {
+    // If the cSite is out of range
+
+    if (range > 1) {
 
         creep.say('➡️CS')
 
@@ -417,16 +419,16 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
         creep.createMoveRequest({
             origin: creep.pos,
-            goal: { pos: cSite.pos, range: 3 },
+            goal: { pos: cSite.pos, range: 1 },
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
             }
         })
 
-        // Inform true
+        // Inform true if out of range
 
-        return true
+        if (range > 3) return true
     }
 
     // Otherwise
