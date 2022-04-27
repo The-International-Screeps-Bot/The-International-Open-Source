@@ -1,4 +1,5 @@
 import { allyList, constants } from "international/constants";
+import { getRange } from "international/generalFunctions";
 import { MeleeDefender } from "room/creeps/creepClasses";
 
 
@@ -12,15 +13,16 @@ MeleeDefender.prototype.advancedDefend = function() {
     const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
         filter: enemyAttacker => !allyList.has(enemyAttacker.owner.username) && !enemyAttacker.isOnExit() && enemyAttacker.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
     })
+
     if(!enemyAttackers.length) return false
 
     // Get the closest enemyAttacker
 
-    const ememyAttacker = creep.pos.findClosestByRange(enemyAttackers)
+    const enemyAttacker = creep.pos.findClosestByRange(enemyAttackers),
 
     // Get the room's ramparts, filtering for thoseinforming false if there are none
 
-    const ramparts = (room.get('rampart') as StructureRampart[]).filter(function(rampart) {
+    ramparts = (room.get('rampart') as StructureRampart[]).filter(function(rampart) {
 
         // Get structures at the rampart's pos
 
@@ -52,20 +54,42 @@ MeleeDefender.prototype.advancedDefend = function() {
 
         return true
     })
-    if (!ramparts.length) return false
+
+    if (!ramparts.length) {
+
+        if (getRange(creep.pos.x - enemyAttacker.pos.x, creep.pos.y - enemyAttacker.pos.y) > 1) {
+
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goal: { pos: enemyAttacker.pos, range: 1 },
+                weightGamebjects: {
+                    1: room.get('road'),
+                }
+            })
+
+            return true
+        }
+
+        creep.attack(enemyAttacker)
+
+        if (enemyAttacker.getActiveBodyparts(MOVE) > 0)
+            creep.move(creep.pos.getDirectionTo(enemyAttacker))
+
+        return true
+    }
 
     // Attack the enemyAttacker
 
-    creep.attack(ememyAttacker)
+    creep.attack(enemyAttacker)
 
     // Find the closest rampart to the enemyAttacker
 
-    const closestRampart = ememyAttacker.pos.findClosestByRange(ramparts)
+    const closestRampart = enemyAttacker.pos.findClosestByRange(ramparts)
 
     // Visualize the targeting, if roomVisuals are enabled
 
     if (Memory.roomVisuals) room.visual.line(creep.pos, closestRampart.pos, { color: constants.colors.lightBlue })
-    
+
     // If the creep is range 0 to the closestRampart, inform false
 
     if (creep.pos.getRangeTo(closestRampart.pos) == 0) return false

@@ -446,6 +446,23 @@ export function spawnRequester(room: Room) {
             }
         }
 
+        if (room.get(`${sourceName}Container`)) {
+
+            return {
+                defaultParts: [MOVE],
+                extraParts: [WORK],
+                partsMultiplier: 6,
+                minCreeps: 1,
+                maxCreeps: Infinity,
+                minCost: 150,
+                priority,
+                memoryAdditions: {
+                    role,
+                    sourceName
+                }
+            }
+        }
+
         return {
             defaultParts: [MOVE, CARRY],
             extraParts: [WORK],
@@ -512,6 +529,23 @@ export function spawnRequester(room: Room) {
                 minCreeps: 1,
                 maxCreeps: Infinity,
                 minCost: 300,
+                priority,
+                memoryAdditions: {
+                    role,
+                    sourceName
+                }
+            }
+        }
+
+        if (room.get(`${sourceName}Container`)) {
+
+            return {
+                defaultParts: [MOVE],
+                extraParts: [WORK],
+                partsMultiplier: 6,
+                minCreeps: 1,
+                maxCreeps: Infinity,
+                minCost: 150,
                 priority,
                 memoryAdditions: {
                     role,
@@ -904,7 +938,7 @@ export function spawnRequester(room: Room) {
 
         else {
 
-            partsMultiplier += estimatedIncome * 1.5
+            partsMultiplier += estimatedIncome * 1.2
         }
 
         // Get the controllerLink and baseLink

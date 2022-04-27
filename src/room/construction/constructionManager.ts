@@ -18,7 +18,7 @@ export function constructionManager(room: Room) {
 
         // Only run the planner every x ticks (temporary fix)
 
-        if (Game.time % Math.random() * 100 != 0) return
+        if (Game.time % Math.floor(Math.random() * 100) != 0) return
 
         // If the construction site count is at its limit, stop
 
