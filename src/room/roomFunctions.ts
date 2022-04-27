@@ -2112,7 +2112,7 @@ Room.prototype.findScore = function() {
 
 }
 
-Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = constants.roomDimensions, y1 = constants.roomDimensions, x2 = -1, y2 = -1) {
+Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = 0, y1 = 0, x2 = constants.roomDimensions, y2 = constants.roomDimensions) {
 
     const room = this,
 
@@ -2122,8 +2122,8 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = const
 
     // Loop through the xs and ys inside the bounds
 
-    for (let x = x1; x <= x2; x++) {
-        for (let y = y1; y <= y2; y++) {
+    for (let x = x1; x < x2; x++) {
+        for (let y = y1; y < y2; y++) {
 
             // If the pos is a wall, iterate
 
@@ -2174,8 +2174,8 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = const
 
     // Loop through the xs and ys inside the bounds
 
-    for (let x = x2; x >= x1; x--) {
-        for (let y = y2; y >= y1; y--) {
+    for (let x = x2; x > x1; x--) {
+        for (let y = y2; y > y1; y--) {
 
             // If the pos is a wall, iterate
 
@@ -2311,8 +2311,8 @@ Room.prototype.specialDT = function(initialCM, enableVisuals) {
         }
     }
 
-    for (let x = constants.roomDimensions -1; x > -1; x--) {
-        for (let y = constants.roomDimensions -1; y > -1; y--) {
+    for (let x = constants.roomDimensions; x > -1; x--) {
+        for (let y = constants.roomDimensions; y > -1; y--) {
 
             // Iterate if pos is to be avoided
 

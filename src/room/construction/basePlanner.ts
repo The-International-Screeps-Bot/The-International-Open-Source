@@ -82,9 +82,11 @@ export function basePlanner(room: Room) {
 
         const stamp = constants.stamps[opts.stampType]
 
+        opts.count -= room.global.stampAnchors[opts.stampType].length
+
         // So long as the count is more than 0
 
-        while (opts.count - room.global.stampAnchors[opts.stampType].length > 0) {
+        while (opts.count > 0) {
 
             // Decrease the count
 
@@ -161,6 +163,7 @@ export function basePlanner(room: Room) {
         stampType: 'fastFiller',
         count: 1,
         anchorOrient: avgControllerSourcePos,
+        normalDT: true,
     })) return false
 
     // If the stamp failed to be planned
@@ -202,6 +205,7 @@ export function basePlanner(room: Room) {
         stampType: 'hub',
         count: 1,
         anchorOrient: room.anchor,
+        normalDT: true,
     })) return false
 
     const fastFillerHubAnchor = findAvgBetweenPosotions(room.global.stampAnchors.fastFiller[0], room.global.stampAnchors.hub[0]),
@@ -219,7 +223,7 @@ export function basePlanner(room: Room) {
 
     if(!planStamp({
         stampType: 'extensions',
-        count: 6,
+        count: 7,
         anchorOrient: fastFillerHubAnchor,
     })) return false
 
@@ -469,7 +473,7 @@ export function basePlanner(room: Room) {
 
     // Construct extraExtensions count
 
-    let extraExtensionsAmount = 14
+    let extraExtensionsAmount = 60 - (5 * 7) - 15
 
     // Get the room's terrain data
 
