@@ -15,7 +15,8 @@ export class SourceHarvester extends Creep {
         super(creepID)
     }
 }
-creepClasses.sourceHarvester = SourceHarvester
+creepClasses.source1Harvester = SourceHarvester
+creepClasses.source2Harvester = SourceHarvester
 
 export class Hauler extends Creep {
     constructor(creepID: Id<Creep>) {

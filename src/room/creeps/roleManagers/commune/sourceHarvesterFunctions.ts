@@ -40,7 +40,7 @@ SourceHarvester.prototype.travelToSource = function() {
     sourceName = creep.memory.sourceName
 
     // Try to find a harvestPosition, inform false if it failed
-
+    
     if (!creep.findSourceHarvestPos(sourceName)) return false
 
     creep.say('🚬')

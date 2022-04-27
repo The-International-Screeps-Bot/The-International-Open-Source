@@ -534,66 +534,6 @@ Creep.prototype.findRepairTarget = function(excludedIDs = new Set()) {
     return creep.pos.findClosestByRange(viableRepairTargets)
 }
 
-Creep.prototype.findOptimalSourceName = function() {
-
-    const creep = this,
-    room = creep.room
-
-    creep.say('FOSN')
-
-    // If the creep already has a sourceName, inform true
-
-    if (creep.memory.sourceName) return true
-
-    // Get the rooms anchor, if it's undefined inform false
-
-    if (!room.anchor) return false
-
-    // Query usedSourceHarvestPositions to get creepsOfSourceAmount
-
-    room.get('usedSourceHarvestPositions')
-
-    // Otherwise, define source names
-
-    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2'],
-
-    // Sort them by their range from the anchor
-
-    sourceNamesByAnchorRange = sourceNames.sort((a, b) => room.anchor.getRangeTo(room.get(a).pos) - room.anchor.getRangeTo(room.get(b).pos))
-
-    // Construct a creep threshold
-
-    let creepThreshold = 1
-
-    // So long as the creepThreshold is less than 4
-
-    while (creepThreshold < 4) {
-
-        // Then loop through the source names and find the first one with open spots
-
-        for (const sourceName of sourceNamesByAnchorRange) {
-
-            // If there are still creeps needed to harvest a source under the creepThreshold
-
-            if (Math.min(creepThreshold, room.get(`${sourceName}HarvestPositions`).length) - room.creepsOfSourceAmount[sourceName] > 0) {
-
-                // Assign the sourceName to the creep's memory and Inform true
-
-                creep.memory.sourceName = sourceName
-                return true
-            }
-        }
-
-        // Otherwise increase the creepThreshold
-
-        creepThreshold++
-    }
-
-    // No source was found, inform false
-
-    return false
-}
-
 Creep.prototype.findSourceHarvestPos = function(sourceName) {
 
     const creep = this,

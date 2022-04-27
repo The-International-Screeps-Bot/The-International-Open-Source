@@ -696,7 +696,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // If the room is a commune, use sourceHarvesters. Otherwise use remoteHarvesters
 
-        harvesterNames = room.memory.type == 'commune' ? room.myCreeps.sourceHarvester.concat(room.myCreeps.vanguard) : room.myCreeps.source1RemoteHarvester.concat(room.myCreeps.source2RemoteHarvester)
+        harvesterNames = room.memory.type == 'commune' ? room.myCreeps.source1Harvester.concat(room.myCreeps.source2Harvester).concat(room.myCreeps.vanguard) : room.myCreeps.source1RemoteHarvester.concat(room.myCreeps.source2RemoteHarvester)
 
         // Loop through each sourceHarvester's name in the room
 
@@ -1905,7 +1905,7 @@ Room.prototype.makeRemote = function(scoutingRoom) {
 
         // Get the anchor from the scoutingRoom, stopping if it's undefined
 
-        if (!room.anchor) return true
+        if (!scoutingRoom.anchor) return true
 
         const newSourceEfficacies = [],
 
@@ -1931,7 +1931,7 @@ Room.prototype.makeRemote = function(scoutingRoom) {
 
             const path = room.advancedFindPath({
                 origin: source.pos,
-                goal: { pos: room.anchor, range: 3 },
+                goal: { pos: scoutingRoom.anchor, range: 3 },
                 /* weightCostMatrixes: [roadCM] */
             })
 
@@ -2971,41 +2971,15 @@ Room.prototype.createWithdrawTasks = function(creator) {
 
 Room.prototype.estimateIncome = function() {
 
-    const room = this
+    const room = this,
+
+    harvesterNames = room.creepsFromRoom.source1Harvester.concat(room.creepsFromRoom.source2Harvester).concat(room.creepsFromRoom.source1RemoteHarvester).concat(room.creepsFromRoom.source2RemoteHarvester)
 
     // Construct income starting at 0
 
     let income = 0
 
-    // Loop through each creepName with a role of sourceHarvester from this room
-
-    for (const creepName of room.creepsFromRoom.sourceHarvester) {
-
-        // Get the creep using creepName
-
-        const creep = Game.creeps[creepName]
-
-        // Add the number of work parts owned by the creep at a max of 5, times harvest power
-
-        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER
-    }
-
-    // Loop through each creepName with a role of source1RemoteHarvester from this room
-
-    for (const creepName of room.creepsFromRoom.source1RemoteHarvester) {
-
-        // Get the creep using creepName
-
-        const creep = Game.creeps[creepName]
-
-        // Add the number of work parts owned by the creep at a max of 5, times harvest power
-
-        income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER
-    }
-
-    // Loop through each creepName with a role of source2RemoteHarvester from this room
-
-    for (const creepName of room.creepsFromRoom.source2RemoteHarvester) {
+    for (const creepName of harvesterNames) {
 
         // Get the creep using creepName
 

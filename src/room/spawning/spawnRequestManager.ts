@@ -73,7 +73,7 @@ export function spawnRequester(room: Room) {
 
         // If there are no sourceHarvesters or haulers
 
-        if (room.creepsFromRoom.sourceHarvester.length == 0 || room.creepsFromRoom.hauler.length == 0) {
+        if ((room.creepsFromRoom.source1Harvester.length + room.creepsFromRoom.source2Harvester.length == 0) || room.creepsFromRoom.hauler.length == 0) {
 
             // Inform the smaller of the following
 
@@ -385,9 +385,15 @@ export function spawnRequester(room: Room) {
         }
     }
 
+    const mostOptimalSource = room.findSourcesByEfficacy()[0]
+
     // Construct requests for sourceHarvesters
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+        const sourceName = 'source1',
+            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length,
+            role = 'source1Harvester'
 
         if (spawnEnergyCapacity >= 800) {
 
@@ -395,12 +401,13 @@ export function spawnRequester(room: Room) {
                 defaultParts: [CARRY],
                 extraParts: [WORK, MOVE, WORK],
                 partsMultiplier: 3,
-                minCreeps: 2,
+                minCreeps: 1,
                 maxCreeps: Infinity,
                 minCost: 200,
-                priority: room.creepsFromRoom.sourceHarvester.length,
+                priority,
                 memoryAdditions: {
-                    role: 'sourceHarvester',
+                    role,
+                    sourceName
                 }
             }
         }
@@ -411,12 +418,13 @@ export function spawnRequester(room: Room) {
                 defaultParts: [],
                 extraParts: [WORK, MOVE, WORK],
                 partsMultiplier: 3,
-                minCreeps: 2,
+                minCreeps: 1,
                 maxCreeps: Infinity,
                 minCost: 200,
-                priority: room.creepsFromRoom.sourceHarvester.length,
+                priority,
                 memoryAdditions: {
-                    role: 'sourceHarvester',
+                    role,
+                    sourceName
                 }
             }
         }
@@ -427,12 +435,13 @@ export function spawnRequester(room: Room) {
                 defaultParts: [MOVE, CARRY],
                 extraParts: [WORK],
                 partsMultiplier: 6,
-                minCreeps: 2,
+                minCreeps: 1,
                 maxCreeps: Infinity,
                 minCost: 300,
-                priority: room.creepsFromRoom.sourceHarvester.length,
+                priority,
                 memoryAdditions: {
-                    role: 'sourceHarvester',
+                    role,
+                    sourceName
                 }
             }
         }
@@ -440,13 +449,88 @@ export function spawnRequester(room: Room) {
         return {
             defaultParts: [MOVE, CARRY],
             extraParts: [WORK],
-            partsMultiplier: 12,
+            partsMultiplier: 6,
             minCreeps: undefined,
-            maxCreeps: Math.min(3, room.get('source1HarvestPositions')?.length) + Math.min(3, room.get('source2HarvestPositions')?.length),
+            maxCreeps: Math.min(3, room.get(`${sourceName}HarvestPositions`).length),
             minCost: 200,
-            priority: room.creepsFromRoom.sourceHarvester.length,
+            priority,
             memoryAdditions: {
-                role: 'sourceHarvester',
+                role,
+                sourceName
+            }
+        }
+    })())
+
+    // Construct requests for sourceHarvesters
+
+    constructSpawnRequests((function(): SpawnRequestOpts | false {
+
+        const sourceName = 'source2',
+            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source2Harvester.length,
+            role = 'source2Harvester'
+
+        if (spawnEnergyCapacity >= 800) {
+
+            return {
+                defaultParts: [CARRY],
+                extraParts: [WORK, MOVE, WORK],
+                partsMultiplier: 3,
+                minCreeps: 1,
+                maxCreeps: Infinity,
+                minCost: 200,
+                priority,
+                memoryAdditions: {
+                    role,
+                    sourceName
+                }
+            }
+        }
+
+        if (spawnEnergyCapacity >= 750) {
+
+            return {
+                defaultParts: [],
+                extraParts: [WORK, MOVE, WORK],
+                partsMultiplier: 3,
+                minCreeps: 1,
+                maxCreeps: Infinity,
+                minCost: 200,
+                priority,
+                memoryAdditions: {
+                    role,
+                    sourceName
+                }
+            }
+        }
+
+        if (spawnEnergyCapacity >= 600) {
+
+            return {
+                defaultParts: [MOVE, CARRY],
+                extraParts: [WORK],
+                partsMultiplier: 6,
+                minCreeps: 1,
+                maxCreeps: Infinity,
+                minCost: 300,
+                priority,
+                memoryAdditions: {
+                    role,
+                    sourceName
+                }
+            }
+        }
+
+        return {
+            defaultParts: [MOVE, CARRY],
+            extraParts: [WORK],
+            partsMultiplier: 6,
+            minCreeps: undefined,
+            maxCreeps: Math.min(3, room.get(`${sourceName}HarvestPositions`).length),
+            minCost: 200,
+            priority,
+            memoryAdditions: {
+                role,
+                sourceName
             }
         }
     })())
@@ -470,7 +554,7 @@ export function spawnRequester(room: Room) {
         // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
         if (room.get('controllerContainer')) requiredCarryParts += findCarryPartsRequired(room.get('upgradePathLength') * 2, room.getPartsOfRoleAmount('controllerUpgrader', WORK))
-        
+
         // If all RCL 3 extensions are build
 
         if (spawnEnergyCapacity >= 800) {
@@ -618,7 +702,7 @@ export function spawnRequester(room: Room) {
 
     // Get the attackValue of the attackers
 
-    let attackValue = 0
+    let attackStrength = 0
 
     // Loop through each enemyAttacker
 
@@ -626,7 +710,7 @@ export function spawnRequester(room: Room) {
 
         // Increase attackValue by the creep's heal power
 
-        attackValue += enemyAttacker.findStrength()
+        attackStrength += enemyAttacker.findStrength()
     }
 
     // Construct requests for meleeDefenders
@@ -637,10 +721,12 @@ export function spawnRequester(room: Room) {
 
         if(!enemyAttackers.length) return false
 
+        if (room.controller.safeMode) return false
+
         return {
             defaultParts: [],
             extraParts: [ATTACK, ATTACK, MOVE],
-            partsMultiplier: attackValue,
+            partsMultiplier: attackStrength,
             minCreeps: undefined,
             maxCreeps: Math.max(enemyAttackers.length, 5),
             minCost: 210,
@@ -755,7 +841,7 @@ export function spawnRequester(room: Room) {
 
         // For every attackValue, add a multiplier
 
-        partsMultiplier += attackValue * 0.5
+        partsMultiplier += attackStrength * 0.5
 
         // For every x energy in storage, add 1 multiplier
 

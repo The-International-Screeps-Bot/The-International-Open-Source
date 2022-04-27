@@ -44,7 +44,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
 
             // If there are no sourceHarvesters in the room, harvest a source
 
-            if (!room.myCreeps.sourceHarvester.length) {
+            if (!(room.myCreeps.source1Harvester.length + room.myCreeps.source2Harvester.length)) {
 
                 const sources = room.find(FIND_SOURCES_ACTIVE)
                 if (!sources.length) continue

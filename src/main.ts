@@ -1097,7 +1097,7 @@ declare global {
 
 // Loop
 
-export const loop = ErrorMapper.wrapLoop(() => {
+export const loop = function() {
 
     memHack.modifyMemory()
 
@@ -1107,4 +1107,4 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
     internationalManager.mapVisualsManager()
     internationalManager.endTickManager()
-})
+}

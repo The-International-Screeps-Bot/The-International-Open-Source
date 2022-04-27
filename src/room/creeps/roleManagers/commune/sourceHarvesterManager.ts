@@ -11,10 +11,6 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
         const creep: SourceHarvester = Game.creeps[creepName]
 
-        // If the creep cannot find a sourceName, iterate
-
-        if (!creep.findOptimalSourceName()) continue
-
         // Try to move to source. If creep moved then iterate
 
         if (creep.travelToSource()) continue

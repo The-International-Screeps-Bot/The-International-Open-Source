@@ -1,6 +1,5 @@
 import './creepFunctions'
 
-import { sourceHarvesterManager } from './roleManagers/commune/sourceHarvesterManager'
 import { controllerUpgraderManager } from './roleManagers/commune/controllerUpgraderManager'
 import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvesterManager'
 import { antifaManager } from './roleManagers/antifa/antifaManager'
@@ -20,6 +19,7 @@ import { source1RemoteHarvesterManager } from './roleManagers/remote/source1Remo
 import { remoteReserverManager } from './roleManagers/remote/remoteReserver'
 import { remoteDefenderManager } from './roleManagers/remote/remoteDefenderManager'
 import { vanguardManager } from './roleManagers/international/vanguardManager'
+import { sourceHarvesterManager } from './roleManagers/commune/sourceHarvesterManager'
 
 export function roleManager(room: Room) {
 
@@ -30,7 +30,8 @@ export function roleManager(room: Room) {
     // Construct managers
 
     const managers: Record<CreepRoles, Function> = {
-        sourceHarvester: sourceHarvesterManager,
+        source1Harvester: sourceHarvesterManager,
+        source2Harvester: sourceHarvesterManager,
         hauler: haulerManager,
         controllerUpgrader: controllerUpgraderManager,
         builder: builderManager,
