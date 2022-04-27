@@ -1592,6 +1592,10 @@ Creep.prototype.advancedRenew = function() {
 
     if (Game.cpu.bucket < CPUBucketRenewThreshold) return false
 
+    //
+
+    if (creep.isDying()) return false
+
     // If the creep's age is less than the benefit from renewing, inform false
 
     if (CREEP_LIFE_TIME - creep.ticksToLive < Math.ceil(creep.memory.cost / 2.5 / creep.body.length)) return false

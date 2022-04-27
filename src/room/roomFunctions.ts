@@ -2678,7 +2678,7 @@ Room.prototype.findCSiteTargetID = function(creep) {
 
         // Record the closest site to the anchor in the room's global and inform true
 
-        room.global.cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id
+        room.memory.cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id
         return true
     }
 

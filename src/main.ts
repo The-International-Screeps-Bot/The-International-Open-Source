@@ -387,8 +387,6 @@ declare global {
 
         tasksWithoutResponders: Record<string | number, RoomTask>
 
-        cSiteTargetID: Id<ConstructionSite>
-
         plannedBase: boolean
 
         plannedRamparts: boolean
@@ -721,6 +719,8 @@ declare global {
          * The room name of the commune's claim target
          */
         claimRequest: string
+
+        cSiteTargetID: Id<ConstructionSite>
     }
 
     // Creeps

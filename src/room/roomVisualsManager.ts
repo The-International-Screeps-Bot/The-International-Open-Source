@@ -130,11 +130,11 @@ export function roomVisualsManager(room: Room) {
 
         // If there is not a cSiteTargetID, stop
 
-        if (!room.global.cSiteTargetID) return
+        if (!room.memory.cSiteTargetID) return
 
         // Convert the construction target ID into a game object
 
-        const constructionTarget = findObjectWithID(room.global.cSiteTargetID)
+        const constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
 
         // If the constructionTarget exists, show visuals for it
 

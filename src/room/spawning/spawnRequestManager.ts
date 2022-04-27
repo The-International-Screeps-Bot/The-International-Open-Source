@@ -764,7 +764,7 @@ export function spawnRequester(room: Room) {
 
         else {
 
-            partsMultiplier += estimatedIncome * 0.6
+            partsMultiplier += estimatedIncome * 0.8
         }
 
         // If all RCL 3 extensions are build
@@ -904,7 +904,7 @@ export function spawnRequester(room: Room) {
 
         else {
 
-            partsMultiplier += estimatedIncome * 0.9
+            partsMultiplier += estimatedIncome * 1.5
         }
 
         // Get the controllerLink and baseLink
