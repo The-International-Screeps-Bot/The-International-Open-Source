@@ -845,42 +845,6 @@ Room.prototype.get = function(roomObjectName) {
         valueConstructor: findUsedFastFillerPositions
     })
 
-    // Path lengths
-
-    // source1PathLength
-
-    new RoomObject({
-        name: 'source1PathLength',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor: function() { return room.global.source1PathLength || 0 }
-    })
-
-    // source2PathLength
-
-    new RoomObject({
-        name: 'source2PathLength',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor: function() { return room.global.source2PathLength || 0 }
-    })
-
-    // upgradePathLength
-
-    new RoomObject({
-        name: 'upgradePathLength',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor: function() { return room.global.upgradePathLength || 0 }
-    })
-
-
     // controllerContainer
 
     function findControllerContainer() {
@@ -3070,7 +3034,7 @@ Room.prototype.findSourcesByEfficacy = function() {
 
     // Sort sourceNames based on their efficacy, informing the result
 
-    return sourceNames.sort((a, b) => room.get(`${a}PathLength`) - room.get(`${b}PathLength`))
+    return sourceNames.sort((a, b) => room.global[a] - room.global[b])
 }
 
 Room.prototype.createClaimRequest = function() {

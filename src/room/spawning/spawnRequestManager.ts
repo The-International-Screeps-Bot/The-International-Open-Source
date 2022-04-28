@@ -73,7 +73,7 @@ export function spawnRequester(room: Room) {
 
         // If there are no sourceHarvesters or haulers
 
-        if ((room.creepsFromRoom.source1Harvester.length + room.creepsFromRoom.source2Harvester.length == 0) || room.creepsFromRoom.hauler.length == 0) {
+        if ((room.myCreeps.source1Harvester.length + room.myCreeps.source2Harvester.length == 0) || room.myCreeps.hauler.length == 0) {
 
             // Inform the smaller of the following
 
@@ -392,7 +392,7 @@ export function spawnRequester(room: Room) {
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
         const sourceName = 'source1',
-            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length,
+            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length + room.creepsFromRoom.source2Harvester.length,
             role = 'source1Harvester'
 
         if (spawnEnergyCapacity >= 800) {
@@ -483,7 +483,7 @@ export function spawnRequester(room: Room) {
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
         const sourceName = 'source2',
-            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source2Harvester.length,
+            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length + room.creepsFromRoom.source2Harvester.length,
             role = 'source2Harvester'
 
         if (spawnEnergyCapacity >= 800) {
@@ -579,16 +579,16 @@ export function spawnRequester(room: Room) {
 
         // If there is no source1Link, increase requiredCarryParts using the source's path length
 
-        if (!room.get('source1Link')) requiredCarryParts += findCarryPartsRequired(room.get('source1PathLength') * 2, 10)
+        if (!room.get('source1Link')) requiredCarryParts += findCarryPartsRequired((room.global.source1PathLength || 0) * 2, 10)
 
         // If there is no source2Link, increase requiredCarryParts using the source's path length
 
-        if (!room.get('source2Link')) requiredCarryParts += findCarryPartsRequired(room.get('source2PathLength') * 2, 10)
+        if (!room.get('source2Link')) requiredCarryParts += findCarryPartsRequired((room.global.source2PathLength || 0) * 2, 10)
 
         // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
-        if (room.get('controllerContainer')) requiredCarryParts += findCarryPartsRequired(room.get('upgradePathLength') * 2, room.getPartsOfRoleAmount('controllerUpgrader', WORK))
-
+        if (room.get('controllerContainer')) requiredCarryParts += findCarryPartsRequired((room.global.upgradePathLength || 0) * 2, room.getPartsOfRoleAmount('controllerUpgrader', WORK))
+        customLog('Path', requiredCarryParts)
         // If all RCL 3 extensions are build
 
         if (spawnEnergyCapacity >= 800) {
@@ -1296,7 +1296,7 @@ export function spawnRequester(room: Room) {
                 groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDefender,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
-                minCost: minCost,
+                minCost: 400,
                 priority: 4,
                 memoryAdditions: {
                     role: 'remoteDefender',

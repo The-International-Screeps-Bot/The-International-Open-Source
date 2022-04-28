@@ -18,7 +18,7 @@ SourceHarvester.prototype.isDying = function() {
 
     // Get the creep's path length
 
-    const sourcePathLength = creep.memory.sourceName ? room.get(`${creep.memory.sourceName}PathLength`) : 0
+    const sourcePathLength = creep.memory.sourceName ? room.global[`${creep.memory.sourceName}PathLength`] : 0
 
     // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
@@ -40,7 +40,7 @@ SourceHarvester.prototype.travelToSource = function() {
     sourceName = creep.memory.sourceName
 
     // Try to find a harvestPosition, inform false if it failed
-    
+
     if (!creep.findSourceHarvestPos(sourceName)) return false
 
     creep.say('🚬')

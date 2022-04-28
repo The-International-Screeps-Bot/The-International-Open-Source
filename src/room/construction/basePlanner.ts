@@ -353,7 +353,7 @@ export function basePlanner(room: Room) {
         })
 
         // Record the path's length in global
-
+        
         room.global[`${sourceName}PathLength`] = path.length
 
         // Loop through positions of the path

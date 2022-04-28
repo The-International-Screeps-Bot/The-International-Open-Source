@@ -140,9 +140,6 @@ declare global {
     'usedSourceHarvestPositions' |
     'usedUpgradePositions' |
     'usedFastFillerPositions' |
-    'source1PathLength' |
-    'source2PathLength' |
-    'upgradePathLength' |
     'structuresForSpawning' |
     'notMyCreeps' |
     'enemyCreeps' |
