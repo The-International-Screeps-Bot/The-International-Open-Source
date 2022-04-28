@@ -13,7 +13,7 @@ export function constructionManager(room: Room) {
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
     // If the room has been planned for this global
-
+    
     if (room.global.plannedBase) {
 
         // Only run the planner every x ticks (temporary fix)

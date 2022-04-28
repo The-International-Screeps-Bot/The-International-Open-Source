@@ -1,3 +1,4 @@
+import { allyList } from "international/constants"
 import { unPackAsRoomPos } from "international/generalFunctions"
 
 Object.defineProperties(Room.prototype, {
@@ -20,4 +21,24 @@ Object.defineProperties(Room.prototype, {
                 undefined
         }
     },
+    enemyCreeps: {
+        get() {
+
+            if (this._enemyCreeps) return this._enemyCreeps
+
+            return this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
+                filter: creep => !allyList.has(creep.owner.username)
+            })
+        }
+    },
+    sourceHarvestPositions: {
+        get() {
+
+            if (this.global.sourceHarvestPositions) return this.global.sourceHarvestPositions
+
+            const sourceHarvestPositions = [new Map()]
+
+            return sourceHarvestPositions
+        }
+    }
 } as PropertyDescriptorMap & ThisType<Room>)

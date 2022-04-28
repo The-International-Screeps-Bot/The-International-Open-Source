@@ -24,8 +24,6 @@ export function defenceManager(room: Room) {
 
             if (Game.time % Math.floor(Math.random() * 50) != 0) return
 
-            // Construct increment
-
             let increment = 0
 
             // Get the room's ramparts and loop through them

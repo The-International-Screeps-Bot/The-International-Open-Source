@@ -588,7 +588,7 @@ export function spawnRequester(room: Room) {
         // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
         if (room.get('controllerContainer')) requiredCarryParts += findCarryPartsRequired((room.global.upgradePathLength || 0) * 2, room.getPartsOfRoleAmount('controllerUpgrader', WORK))
-        customLog('Path', requiredCarryParts)
+        
         // If all RCL 3 extensions are build
 
         if (spawnEnergyCapacity >= 800) {

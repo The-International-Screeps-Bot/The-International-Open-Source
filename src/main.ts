@@ -365,12 +365,16 @@ declare global {
 
     }
 
+    type SourceHarvestPositions = Map<number, boolean>[]
+
     interface RoomGlobal {
         [key: string]: any
 
         // RoomObjects
 
         stampAnchors: StampAnchors
+
+        sourceHarvestPositions: SourceHarvestPositions
 
         source1PathLength: number
 
@@ -614,11 +618,17 @@ declare global {
 
         // Getters
 
+        readonly global: Partial<RoomGlobal>
+
         _anchor: RoomPosition | undefined
 
         readonly anchor: RoomPosition | undefined
 
-        readonly global: Partial<RoomGlobal>
+        readonly sourceHarvestPositions: SourceHarvestPositions
+
+        _enemyCreeps: Creep[]
+
+        readonly enemyCreeps: Creep[]
 
         // Main roomFunctions
 
