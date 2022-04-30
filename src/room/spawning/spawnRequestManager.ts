@@ -1,5 +1,5 @@
 import { allyList, builderSpawningWhenStorageThreshold, claimRequestNeedsIndex, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
-import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy, getRange } from "international/generalFunctions"
+import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy, findStrengthOfParts, getRange } from "international/generalFunctions"
 
 /**
  * Creates spawn requests for the commune
@@ -938,7 +938,7 @@ export function spawnRequester(room: Room) {
 
         else {
 
-            partsMultiplier += estimatedIncome * 1.2
+            partsMultiplier += estimatedIncome * 2
         }
 
         // Get the controllerLink and baseLink
@@ -1111,10 +1111,10 @@ export function spawnRequester(room: Room) {
 
         // Add up econ needs for this room
 
-        remoteEconNeed = Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester], 0) +
-        Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source2RemoteHarvester], 0) +
-        Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteHauler], 0) +
-        Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteReserver], 0)
+        remoteEconNeed = Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0) +
+        Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0) +
+        Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0) +
+        Math.max(remoteNeeds[remoteNeedsIndex.remoteReserver], 0)
 
         // If there is a need for any econ creep, inform the index
 
@@ -1130,14 +1130,14 @@ export function spawnRequester(room: Room) {
 
             // If there are no needs for this room, inform false
 
-            if (Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
+            if (remoteNeeds[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
 
             if (spawnEnergyCapacity >= 950) {
 
                 return {
                     defaultParts: [CARRY],
                     extraParts: [WORK, MOVE],
-                    partsMultiplier: Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester], 0),
+                    partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0),
                     groupComparator: room.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
                     threshold: 0.1,
                     minCreeps: 1,
@@ -1154,7 +1154,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [CARRY],
                 extraParts: [WORK, MOVE],
-                partsMultiplier: Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source1RemoteHarvester], 0),
+                partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0),
                 groupComparator: room.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
                 threshold: 0.1,
                 minCreeps: undefined,
@@ -1174,14 +1174,14 @@ export function spawnRequester(room: Room) {
 
             // If there are no needs for this room, inform false
 
-            if (Memory.rooms[remoteName].needs[remoteNeedsIndex.source2RemoteHarvester] <= 0) return false
+            if (remoteNeeds[remoteNeedsIndex.source2RemoteHarvester] <= 0) return false
 
             if (spawnEnergyCapacity >= 950) {
 
                 return {
                     defaultParts: [CARRY],
                     extraParts: [WORK, MOVE],
-                    partsMultiplier: Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source2RemoteHarvester], 0),
+                    partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0),
                     groupComparator: room.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
                     threshold: 0.1,
                     minCreeps: 1,
@@ -1197,7 +1197,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [],
                 extraParts: [WORK, MOVE],
-                partsMultiplier: Math.max(Memory.rooms[remoteName].needs[remoteNeedsIndex.source2RemoteHarvester], 0),
+                partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0),
                 groupComparator: room.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
                 threshold: 0.1,
                 minCreeps: undefined,
@@ -1224,7 +1224,7 @@ export function spawnRequester(room: Room) {
 
             // If there are no needs for this room, inform false
 
-            if (Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteHauler] <= 0) return false
+            if (remoteNeeds[remoteNeedsIndex.remoteHauler] <= 0) return false
 
             return {
                 defaultParts: [],
@@ -1251,7 +1251,7 @@ export function spawnRequester(room: Room) {
 
             // If there are no needs for this room, inform false
 
-            if (Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteReserver] <= 0) return false
+            if (remoteNeeds[remoteNeedsIndex.remoteReserver] <= 0) return false
 
             return {
                 defaultParts: [],
@@ -1274,29 +1274,38 @@ export function spawnRequester(room: Room) {
 
             // Define the minCost and strength
 
-            const minCost = 900
+            const minCost = 400,
+            extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE],
+            strengthOfParts = findStrengthOfParts(extraParts)
 
             // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
 
             if (spawnEnergyCapacity < minCost) return false
 
-            // If there are no needs for this room, inform false
+            // If there are no related needs
 
-            if (Memory.rooms[remoteName].needs[remoteNeedsIndex.remoteDefender] <= 0) return false
+            if (remoteNeeds[remoteNeedsIndex.remoteDefender] <= 0) return false
 
-            const strengthByMargin = 3 * RANGED_ATTACK_POWER +
-                1 * HEAL_POWER,
+            // If max spawnable strength is less that needed
 
-            requiredStrength = Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthByMargin) * 1.5
-            customLog('Test', requiredStrength)
+            if (strengthOfParts < remoteNeeds[remoteNeedsIndex.remoteDefender]) {
+
+                // Abandon the room for some time
+
+                Memory.rooms[remoteName].abandoned = 20000
+                return false
+            }
+
+            const requiredParts = Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthOfParts) * 1.5
+
             return {
                 defaultParts: [],
-                extraParts: [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE],
-                partsMultiplier: Math.max(requiredStrength, 1),
+                extraParts,
+                partsMultiplier: Math.max(requiredParts, 1),
                 groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDefender,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
-                minCost: 400,
+                minCost,
                 priority: 4,
                 memoryAdditions: {
                     role: 'remoteDefender',

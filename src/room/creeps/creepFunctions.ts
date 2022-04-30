@@ -1687,7 +1687,7 @@ Creep.prototype.findStrength = function() {
 
         switch (part.type) {
             case RANGED_ATTACK:
-            
+
                 creep.strength += RANGED_ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
                 break
             case ATTACK:
@@ -1707,13 +1707,6 @@ Creep.prototype.findStrength = function() {
                 creep.strength++
         }
     }
-
-    // Calculate the strength
-
-    creep.strength += creep.getActiveBodyparts(RANGED_ATTACK) * RANGED_ATTACK_POWER +
-        creep.getActiveBodyparts(HEAL) * HEAL_POWER
-
-    // Inform the creep's strength
 
     return creep.strength
 }

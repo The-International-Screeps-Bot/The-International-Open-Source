@@ -230,7 +230,7 @@ RemoteDefender.prototype.advancedAttackAttackers = function() {
 
         creep.createMoveRequest({
             origin: creep.pos,
-            goal: { pos: enemyAttacker.pos, range: 3 },
+            goal: { pos: enemyAttacker.pos, range: 25 },
             flee: true
         })
 

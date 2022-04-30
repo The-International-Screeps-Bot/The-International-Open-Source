@@ -104,6 +104,7 @@ constants.roomTypeProperties = {
     commune: true,
     needs: true,
     sourceEfficacies: true,
+    abandoned: true,
 
     owner: true,
     level: true,
@@ -130,6 +131,7 @@ constants.roomTypes = {
         source2: true,
         needs: true,
         sourceEfficacies: true,
+        abandoned: true,
         notClaimable: true,
     },
     ally: {

@@ -119,6 +119,18 @@ InternationalManager.prototype.tickConfig = function() {
                 continue
             }
 
+            if (roomMemory.abandoned > 0) {
+
+                roomMemory.abandoned--
+
+                for (const need in roomMemory.needs) {
+
+                    roomMemory.needs[need] = 0
+                }
+
+                continue
+            }
+
             // Initialize aspects of needs
 
             roomMemory.needs[remoteNeedsIndex.remoteReserver] = 1

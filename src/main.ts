@@ -730,7 +730,7 @@ declare global {
         /**
          * The last tick the room was scouted at
          */
-        lastScout: number
+        lastScout: number | undefined
 
         /**
          * The room name of the commune's claim target
@@ -740,6 +740,8 @@ declare global {
         cSiteTargetID: Id<ConstructionSite>
 
         stampAnchors: StampAnchors
+
+        abandoned: number | undefined
     }
 
     // Creeps

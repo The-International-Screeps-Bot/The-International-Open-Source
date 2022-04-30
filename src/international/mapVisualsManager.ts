@@ -41,6 +41,14 @@ InternationalManager.prototype.mapVisualsManager = function() {
                 fontSize: 8,
             })
 
+            if (roomMemory.abandoned) {
+
+                Game.map.visual.text('❌' + roomMemory.abandoned.toString(), new RoomPosition(2, 18, roomName), {
+                    align: 'left',
+                    fontSize: 8,
+                })
+            }
+
             continue
         }
 
@@ -55,7 +63,7 @@ InternationalManager.prototype.mapVisualsManager = function() {
 
     for (const roomName in Memory.claimRequests) {
 
-        Game.map.visual.text('💵' + Memory.claimRequests[roomName].score.toFixed(2), new RoomPosition(2, 18, roomName), {
+        Game.map.visual.text('💵' + Memory.claimRequests[roomName].score.toFixed(2), new RoomPosition(2, 26, roomName), {
             align: 'left',
             fontSize: 8,
         })
