@@ -211,14 +211,32 @@ RemoteDefender.prototype.advancedAttackAttackers = function() {
     // Otherwise, rangedAttack the enemyAttacker
 
     else creep.rangedAttack(enemyAttacker)
-/*
-    // If the creep is out matched
 
-    if (creep.strength < enemyAttacker.power()) {
+    // If the creep is out matched, try to always stay in range 3
 
-        flee()
+    if (creep.findStrength() < enemyAttacker.findStrength()) {
+
+        if (range == 3) return true
+
+        if (range >= 3) {
+
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goal: { pos: enemyAttacker.pos, range: 3 }
+            })
+
+            return true
+        }
+
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: enemyAttacker.pos, range: 3 },
+            flee: true
+        })
+
+        return true
     }
- */
+
     // If the creep has less heal power than the enemyAttacker's attack power
 
     if (creep.findStrength() < enemyAttacker.findStrength()) {
