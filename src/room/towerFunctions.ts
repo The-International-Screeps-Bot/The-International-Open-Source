@@ -119,6 +119,8 @@ Room.prototype.towersAttackCreeps = function() {
 
     if (!towers.length) return
 
+    if (room.controller.safeMode) return
+
     // Construct attack targets from my and allied damaged creeps in the room
 
     const attackTargets = (room.get('enemyCreeps') as Creep[]).filter(creep => !creep.isOnExit())

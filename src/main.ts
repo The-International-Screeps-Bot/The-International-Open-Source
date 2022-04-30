@@ -211,10 +211,6 @@ declare global {
         cacheAmount?: number
     }
 
-    interface Commune extends Room {
-
-    }
-
     type OrderedStructurePlans = BuildObj[]
 
     interface BuildObj {
@@ -364,6 +360,8 @@ declare global {
         [key: string]: any
 
     }
+
+    type SpawningStructures = (StructureSpawn | StructureExtension)[]
 
     type SourceHarvestPositions = Map<number, boolean>[]
 
@@ -629,6 +627,18 @@ declare global {
         _enemyCreeps: Creep[]
 
         readonly enemyCreeps: Creep[]
+
+        _spawningStructures: SpawningStructures
+
+        spawningStructures: SpawningStructures
+
+        _taskNeedingSpawningStructures: SpawningStructures
+
+        taskNeedingSpawningStructures: SpawningStructures
+
+        _spawningStructuresByPriority: SpawningStructures
+
+        spawningStructuresByPriority: SpawningStructures
 
         // Main roomFunctions
 

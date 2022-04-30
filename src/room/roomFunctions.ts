@@ -1921,7 +1921,7 @@ Room.prototype.makeRemote = function(scoutingRoom) {
 
         // If the room isn't already a remote
 
-        if (room.memory.type != 'remote') {
+        if (room.memory.type != 'remote' || !Memory.communes.includes(room.memory.commune)) {
 
             room.memory.type = 'remote'
 

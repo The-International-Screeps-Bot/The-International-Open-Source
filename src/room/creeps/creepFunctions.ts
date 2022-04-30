@@ -1687,7 +1687,7 @@ Creep.prototype.findStrength = function() {
 
         switch (part.type) {
             case RANGED_ATTACK:
-            console.log(JSON.stringify(BOOSTS[part.type]))
+            
                 creep.strength += RANGED_ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
                 break
             case ATTACK:

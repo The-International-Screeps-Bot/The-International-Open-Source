@@ -1,5 +1,5 @@
 import { allyList } from "international/constants"
-import { unPackAsRoomPos } from "international/generalFunctions"
+import { getRange, unPackAsRoomPos } from "international/generalFunctions"
 
 Object.defineProperties(Room.prototype, {
 
@@ -29,6 +29,100 @@ Object.defineProperties(Room.prototype, {
             return this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
                 filter: creep => !allyList.has(creep.owner.username)
             })
+        }
+    },
+    spawningStructures: {
+        get() {
+
+            if (this._spawningStructures) return this._spawningStructures
+
+            return this._spawningStructures = this.get('spawn').concat(this.get('extension'))
+        }
+    },
+    taskNeedingSpawningStructures: {
+        get() {
+
+            if (this._taskNeedingSpawningStructures) return this._taskNeedingSpawningStructures
+
+            this._taskNeedingSpawningStructures = []
+
+            for (const pos of this.global.stampAnchors.extensions) {
+
+                const structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
+
+                for (const structure of structuresAtPos) {
+
+                    if (structure.structureType != STRUCTURE_SPAWN && structure.structureType != STRUCTURE_EXTENSION) continue
+
+                    this._taskNeedingSpawningStructures.push(structure as StructureSpawn | StructureExtension)
+                    break
+                }
+            }
+
+            for (const pos of this.global.stampAnchors.extension) {
+
+                const structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
+
+                for (const structure of structuresAtPos) {
+
+                    if (structure.structureType != STRUCTURE_SPAWN && structure.structureType != STRUCTURE_EXTENSION) continue
+
+                    this._taskNeedingSpawningStructures.push(structure as StructureSpawn | StructureExtension)
+                    break
+                }
+            }
+
+            return this._taskNeedingSpawningStructures
+        }
+    },
+    spawningStructuresByPriority: {
+        get() {
+
+            if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
+
+            this._spawningStructuresByPriority = []
+
+            // Fastfiller
+
+            let adjacentStructures = this.lookForAtArea(LOOK_STRUCTURES, this.anchor.y - 2, this.anchor.x - 2, this.anchor.y + 2, this.anchor.x + 2, true)
+
+            for (const adjacentPosData of adjacentStructures) {
+
+                const structureType = adjacentPosData.structure.structureType
+
+                if (structureType != STRUCTURE_SPAWN && structureType != STRUCTURE_EXTENSION) continue
+
+                this.spawningStructuresByPriority.push(adjacentPosData.structure as StructureSpawn | StructureExtension)
+            }
+
+            const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+
+            for (const sourceName of sourceNames) {
+
+                // Get the closestHarvestPos using the sourceName, iterating if undefined
+
+                const closestHarvestPos: RoomPosition | undefined = this.get(`${sourceName}ClosestHarvestPos`)
+                if (!closestHarvestPos) continue
+
+                // Harvest extensions
+
+                let adjacentStructures = this.lookForAtArea(LOOK_STRUCTURES, closestHarvestPos.y - 1, closestHarvestPos.x - 1, closestHarvestPos.y + 1, closestHarvestPos.x + 1, true)
+
+                for (const adjacentPosData of adjacentStructures) {
+
+                    const structureType = adjacentPosData.structure.structureType
+
+                    if (structureType != STRUCTURE_SPAWN && structureType != STRUCTURE_EXTENSION) continue
+
+                    this.spawningStructuresByPriority.push(adjacentPosData.structure as StructureSpawn | StructureExtension)
+                }
+            }
+
+            // Assign taskNeedingSpawningStructures by lowest range from the anchor
+
+            return this._spawningStructuresByPriority.concat(this.taskNeedingSpawningStructures.sort((a, b) =>
+                getRange(a.pos.x - this.anchor.x, a.pos.y - this.anchor.y) - getRange(b.pos.x - this.anchor.x, b.pos.y - this.anchor.y)
+            ))
         }
     },
     sourceHarvestPositions: {
