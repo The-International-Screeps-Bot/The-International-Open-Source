@@ -1,4 +1,5 @@
 import { constants } from "./constants"
+import { unPackAsRoomPos } from "./generalFunctions"
 import { InternationalManager } from "./internationalManager"
 
 InternationalManager.prototype.mapVisualsManager = function() {
@@ -31,8 +32,13 @@ InternationalManager.prototype.mapVisualsManager = function() {
 
             // Draw a line from the center of the remote to the center of its commune
 
-            Game.map.visual.line(new RoomPosition(25, 25, roomName), new RoomPosition(25, 25, roomMemory.commune), {
+            Game.map.visual.line(new RoomPosition(25, 25, roomName), unPackAsRoomPos(Memory.rooms[roomMemory.commune].anchor || 0, roomMemory.commune), {
                 color: constants.colors.yellow, width: 1.2, opacity: .5, lineStyle: 'dashed'
+            })
+
+            Game.map.visual.text('⛏️' + roomMemory.sourceEfficacies.reduce((sum, el) => sum + el, 0).toString(), new RoomPosition(2, 10, roomName), {
+                align: 'left',
+                fontSize: 8,
             })
 
             continue
@@ -49,8 +55,9 @@ InternationalManager.prototype.mapVisualsManager = function() {
 
     for (const roomName in Memory.claimRequests) {
 
-        Game.map.visual.text(Memory.claimRequests[roomName].score.toString(), new RoomPosition(25, 25, roomName), {
-
+        Game.map.visual.text('💵' + Memory.claimRequests[roomName].score.toFixed(2), new RoomPosition(2, 18, roomName), {
+            align: 'left',
+            fontSize: 8,
         })
     }
 }

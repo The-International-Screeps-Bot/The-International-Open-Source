@@ -181,5 +181,9 @@ InternationalManager.prototype.tickConfig = function() {
 
         if (room.memory.claimRequest && !Memory.claimRequests[room.memory.claimRequest])
             delete room.memory.claimRequest
+
+        if (!room.memory.stampAnchors) room.memory.stampAnchors = {}
+
+        for (const type in constants.stamps) room.memory.stampAnchors[type as StampTypes] = []
     }
 }

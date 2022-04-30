@@ -1,5 +1,5 @@
 import { claimRequestNeedsIndex } from "international/constants"
-import { advancedFindDistance } from "international/generalFunctions"
+import { advancedFindDistance, customLog } from "international/generalFunctions"
 import { internationalManager } from "international/internationalManager"
 
 Room.prototype.claimRequestManager = function() {
@@ -35,7 +35,7 @@ Room.prototype.claimRequestManager = function() {
 
     // Every 50 or so ticks
 
-    if (Game.time % Math.floor(Math.random() * 100) != 0) return
+    /* if (Game.time % Math.floor(Math.random() * 100) != 0) return */
 
     if (Game.gcl.level <= Memory.communes.length) return
 
@@ -49,7 +49,6 @@ Room.prototype.claimRequestManager = function() {
             enemyRemote: Infinity,
             ally: Infinity,
             allyRemote: Infinity,
-            highway: Infinity,
         })
 
         if (distance > 10) continue

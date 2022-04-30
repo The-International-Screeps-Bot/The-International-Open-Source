@@ -728,6 +728,8 @@ declare global {
         claimRequest: string
 
         cSiteTargetID: Id<ConstructionSite>
+
+        stampAnchors: StampAnchors
     }
 
     // Creeps
