@@ -577,7 +577,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // If there is more than one adjacent extension and container, iterate
 
-            if (adjacentStructuresByType[STRUCTURE_CONTAINER] > 0 && (adjacentStructuresByType[STRUCTURE_SPAWN] || 0 + adjacentStructuresByType[STRUCTURE_EXTENSION] || 0) > 0) continue
+            if (adjacentStructuresByType[STRUCTURE_CONTAINER] > 0 && (adjacentStructuresByType[STRUCTURE_SPAWN] > 0 || adjacentStructuresByType[STRUCTURE_EXTENSION] > 1)) continue
 
             // Otherwise, remove the pos from fastFillePositions
 
@@ -593,7 +593,7 @@ Room.prototype.get = function(roomObjectName) {
         name: 'fastFillerPositions',
         valueType: 'object',
         cacheType: 'global',
-        cacheAmount: 100,
+        cacheAmount: 10,
         room,
         valueConstructor: findFastFillerPositions
     })

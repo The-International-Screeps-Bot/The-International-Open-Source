@@ -18,11 +18,23 @@ InternationalManager.prototype.remoteNeedsManager = function() {
 
             // Get the remote's memory using its name
 
-            const remoteMemory = Memory.rooms[remoteName],
+            const remoteMemory = Memory.rooms[remoteName]
+
+            if (remoteMemory.abandoned > 0) {
+
+                remoteMemory.abandoned--
+
+                for (const need in remoteMemory.needs) {
+
+                    remoteMemory.needs[need] = 0
+                }
+
+                continue
+            }
 
             // See if the remote is reserved
 
-            isReserved = remoteMemory.needs[remoteNeedsIndex.remoteReserver] == 0
+            const isReserved = remoteMemory.needs[remoteNeedsIndex.remoteReserver] == 0
 
             // If the remote is reserved
 
@@ -41,7 +53,7 @@ InternationalManager.prototype.remoteNeedsManager = function() {
             if (remote) {
 
                 // Get enemyCreeps in the room and loop through them
-                
+
                 const enemyCreeps: Creep[] = remote.get('enemyCreeps')
                 for (const enemyCreep of enemyCreeps) {
 
