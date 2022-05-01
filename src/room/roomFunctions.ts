@@ -1,7 +1,7 @@
 import { allyList, constants, prefferedCommuneRange } from 'international/constants'
 import { advancedFindDistance, arePositionsEqual, customLog, findClosestClaimType, findClosestCommuneName, findPositionsInsideRect, getRange, getRangeBetween, unPackAsRoomPos } from 'international/generalFunctions'
 import { basePlanner } from './construction/basePlanner'
-import { ControllerUpgrader, SourceHarvester } from './creeps/creepClasses'
+import { ControllerUpgrader, MineralHarvester, SourceHarvester } from './creeps/creepClasses'
 import { RoomObject } from './roomObject'
 import { RoomTask } from './roomTasks'
 
@@ -342,7 +342,7 @@ Room.prototype.get = function(roomObjectName) {
      * @param source source of which to find harvestPositions for
      * @returns source's harvestPositions, a list of positions
      */
-     function findHarvestPositions(source: Source): Pos[] {
+     function findHarvestPositions(source: Source) {
 
         // Stop and inform empty array if there is no source
 
@@ -350,7 +350,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Construct harvestPositions
 
-        const harvestPositions: Pos[] = [],
+        const harvestPositions = [],
 
         // Find terrain in room
 
@@ -503,9 +503,34 @@ Room.prototype.get = function(roomObjectName) {
         const centerUpgradePos = room.roomObjects.centerUpgradePos.getValue()
         if (!centerUpgradePos) return []
 
-        // Draw a rect around the center upgrade pos, informing positions inside
+        // Construct harvestPositions
 
-        return room.findRoomPositionsInsideRect(centerUpgradePos.x - 1, centerUpgradePos.y - 1, centerUpgradePos.x + 1, centerUpgradePos.y + 1)
+        const upgradePositions = [],
+
+        // Find terrain in room
+
+        terrain = Game.map.getRoomTerrain(room.name),
+
+        // Find positions adjacent to source
+
+        adjacentPositions = findPositionsInsideRect(centerUpgradePos.x - 1, centerUpgradePos.y - 1, centerUpgradePos.x + 1, centerUpgradePos.y + 1)
+
+        // Loop through each pos
+
+        for (const pos of adjacentPositions) {
+
+            // Iterate if terrain for pos is a wall
+
+            if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
+
+            // Add pos to harvestPositions
+
+            upgradePositions.push(room.newPos(pos))
+        }
+
+        // Inform harvestPositions
+
+        return upgradePositions
     }
 
     new RoomObject({
@@ -662,7 +687,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // Get the creep using its name
 
-            const creep: SourceHarvester = Game.creeps[creepName]
+            const creep = Game.creeps[creepName]
 
             // If the creep is dying, iterate
 
