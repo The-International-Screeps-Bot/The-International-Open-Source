@@ -12,6 +12,7 @@ InternationalManager.prototype.tickConfig = function() {
     Memory.communes = []
 
     Memory.stats = {
+        communes: Memory.communes.length,
         credits: Game.market.credits,
         energy: 0,
 
@@ -30,17 +31,21 @@ InternationalManager.prototype.tickConfig = function() {
 
         GCLPercent: (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2),
         totalGCL: (Math.pow(Game.gcl.level - 1, 2.4) * 1000000 + Game.gcl.progress).toFixed(2),
+        GCLLevel: Game.gcl.level,
 
         GPLPercent: (Game.gpl.progress / Game.gpl.progressTotal * 100).toFixed(2),
         totalGPL: (Math.pow(Game.gpl.level - 1, 2) * 1000 + Game.gpl.progress).toFixed(2),
+        GPLLevel: Game.gpl.level,
 
         //
 
         energyHarvested: 0,
+        mineralsHarvested: 0,
+
         controlPoints: 0,
 
         energySpentOnCreeps: 0,
-        energySpentOnBuilding: 0,
+        energySpentOnConstruction: 0,
         energySpentOnRepairing: 0,
         energySpentOnBarricades: 0,
     }

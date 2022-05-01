@@ -443,12 +443,12 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
         // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
-        const energySpentBuilding = Math.min(creep.partsOfType(WORK) * BUILD_POWER, (cSite.progressTotal - cSite.progress) * BUILD_POWER)
+        const energySpentOnConstruction = Math.min(creep.partsOfType(WORK) * BUILD_POWER, (cSite.progressTotal - cSite.progress) * BUILD_POWER)
 
         // Add control points to total controlPoints counter and say the success
 
-        Memory.stats.energySpentOnBuilding += energySpentBuilding
-        creep.say('🚧' + energySpentBuilding)
+        Memory.stats.energySpentOnConstruction += Math.min(creep.partsOfType(WORK) * BUILD_POWER, (cSite.progressTotal - cSite.progress) * BUILD_POWER)
+        creep.say('🚧' + energySpentOnConstruction)
 
         // Inform true
 

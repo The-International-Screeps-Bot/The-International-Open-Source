@@ -255,6 +255,8 @@ declare global {
 
     interface Stats {
 
+        communes: number
+
         credits: number
 
         /**
@@ -307,6 +309,8 @@ declare global {
          */
         totalGCL: string
 
+        GCLLevel: number
+
         /**
          * The percent to the next PCL level
          */
@@ -316,6 +320,8 @@ declare global {
           * The total amount of PCL
           */
         totalGPL: string
+
+        GPLLevel: number
 
         /**
          * The total number of creeps the bot owns
@@ -332,11 +338,13 @@ declare global {
          */
         energyHarvested: number
 
+        mineralsHarvested: number
+
         controlPoints: number
 
         energySpentOnCreeps: number
 
-        energySpentOnBuilding: number
+        energySpentOnConstruction: number
 
         energySpentOnRepairing: number
 
