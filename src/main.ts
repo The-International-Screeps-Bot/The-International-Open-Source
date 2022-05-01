@@ -202,6 +202,7 @@ declare global {
         CM: CostMatrix,
         startPos: Pos
         requiredValue: number
+        reduceIterations?: number
         initialWeight?: number
         adjacentToRoads?: boolean
         roadCM?: CostMatrix

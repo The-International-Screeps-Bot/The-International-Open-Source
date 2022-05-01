@@ -181,7 +181,7 @@ export function basePlanner(room: Room) {
     room.memory.anchor = pack(room.global.stampAnchors.fastFiller[0])
 
     // Get the centerUpgradePos, informing false if it's undefined
-
+    
     const centerUpgadePos: RoomPosition = room.get('centerUpgradePos')
     if (!centerUpgadePos) return false
 

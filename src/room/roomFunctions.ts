@@ -482,7 +482,8 @@ Room.prototype.get = function(roomObjectName) {
         return room.findClosestPosOfValue({
             CM: distanceCM,
             startPos: room.anchor,
-            requiredValue: 2
+            requiredValue: 2,
+            reduceIterations: 1,
         })
     }
 
@@ -713,8 +714,6 @@ Room.prototype.get = function(roomObjectName) {
             // Get the creep's sourceName
 
             const sourceName = creep.memory.sourceName
-
-            // If the creep has a souctName, increase the creepOfSourceAmount for the sourceName
 
             if (sourceName) room.creepsOfSourceAmount[sourceName]++
 
@@ -2453,10 +2452,13 @@ Room.prototype.floodFill = function(seeds) {
 
 Room.prototype.findClosestPosOfValue = function(opts) {
 
-    const room = this
+    const room = this,
 
-    //
+    terrain = room.getTerrain()
 
+    /**
+     *
+     */
     function isViableAnchor(pos: Pos): boolean {
 
         // Get the value of the pos
@@ -2507,91 +2509,93 @@ Room.prototype.findClosestPosOfValue = function(opts) {
         return true
     }
 
-    // Construct a cost matrix for visited tiles and add seeds to it
+    while ((opts.reduceIterations || 0) >= 0) {
 
-    const visitedCM = new PathFinder.CostMatrix()
+        // Construct a cost matrix for visited tiles and add seeds to it
 
-    // Record startPos as visited
+        const visitedCM = new PathFinder.CostMatrix()
 
-    visitedCM.set(opts.startPos.x, opts.startPos.y, 1)
+        // Record startPos as visited
 
-    // Construct values for the check
+        visitedCM.set(opts.startPos.x, opts.startPos.y, 1)
 
-    let thisGeneration: Pos[] = [opts.startPos],
-    nextGeneration: Pos[] = [],
-    canUseWalls = true
+        // Construct values for the check
 
-    // Get the room's terrain
+        let thisGeneration: Pos[] = [opts.startPos],
+        nextGeneration: Pos[] = [],
+        canUseWalls = true
 
-    const terrain = room.getTerrain()
+        // So long as there are positions in this gen
 
-    // So long as there are positions in this gen
+        while (thisGeneration.length) {
 
-    while (thisGeneration.length) {
+            // Reset nextGeneration
 
-        // Reset nextGeneration
+            nextGeneration = []
 
-        nextGeneration = []
+            // Iterate through positions of this gen
 
-        // Iterate through positions of this gen
+            for (const pos of thisGeneration) {
 
-        for (const pos of thisGeneration) {
+                // If the pos can be an anchor, inform it
 
-            // If the pos can be an anchor, inform it
+                if (isViableAnchor(pos)) return room.newPos(pos)
 
-            if (isViableAnchor(pos)) return room.newPos(pos)
+                // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-            // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+                const adjacentPositions = [
+                    {
+                        x: pos.x - 1,
+                        y: pos.y
+                    },
+                    {
+                        x: pos.x + 1,
+                        y: pos.y
+                    },
+                    {
+                        x: pos.x,
+                        y: pos.y - 1
+                    },
+                    {
+                        x: pos.x,
+                        y: pos.y + 1
+                    },
+                ]
 
-            const adjacentPositions = [
-                {
-                    x: pos.x - 1,
-                    y: pos.y
-                },
-                {
-                    x: pos.x + 1,
-                    y: pos.y
-                },
-                {
-                    x: pos.x,
-                    y: pos.y - 1
-                },
-                {
-                    x: pos.x,
-                    y: pos.y + 1
-                },
-            ]
+                // Loop through adjacent positions
 
-            // Loop through adjacent positions
+                for (const adjacentPos of adjacentPositions) {
 
-            for (const adjacentPos of adjacentPositions) {
+                    // Iterate if the pos doesn't map onto a room
 
-                // Iterate if the pos doesn't map onto a room
+                    if (adjacentPos.x < 0 || adjacentPos.x >= constants.roomDimensions ||
+                        adjacentPos.y < 0 || adjacentPos.y >= constants.roomDimensions) continue
 
-                if (adjacentPos.x < 0 || adjacentPos.x >= constants.roomDimensions ||
-                    adjacentPos.y < 0 || adjacentPos.y >= constants.roomDimensions) continue
+                    // Iterate if the adjacent pos has been visited or isn't a tile
 
-                // Iterate if the adjacent pos has been visited or isn't a tile
+                    if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
 
-                if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
+                    // Otherwise record that it has been visited
 
-                // Otherwise record that it has been visited
+                    visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
 
-                visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+                    // If canUseWalls is enabled and the terrain isnt' a wall, disable canUseWalls
 
-                // If canUseWalls is enabled and the terrain isnt' a wall, disable canUseWalls
+                    if (canUseWalls && terrain.get(adjacentPos.x, adjacentPos.y) != TERRAIN_MASK_WALL) canUseWalls = false
 
-                if (canUseWalls && terrain.get(adjacentPos.x, adjacentPos.y) != TERRAIN_MASK_WALL) canUseWalls = false
+                    // Add it tofastFillerSide the next gen
 
-                // Add it tofastFillerSide the next gen
-
-                nextGeneration.push(adjacentPos)
+                    nextGeneration.push(adjacentPos)
+                }
             }
+
+            // Set this gen to next gen
+
+            thisGeneration = nextGeneration
         }
 
-        // Set this gen to next gen
-
-        thisGeneration = nextGeneration
+        opts.reduceIterations--
+        opts.requiredValue--
     }
 
     // Inform false if no value was found
