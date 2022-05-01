@@ -20,6 +20,9 @@ Claimer.prototype.claimRoom = function() {
             avoidEnemyRanges: true,
             plainCost: 1,
             swampCost: 1,
+            typeWeights: {
+                keeper: Infinity,
+            }
         })
 
         return
@@ -27,5 +30,5 @@ Claimer.prototype.claimRoom = function() {
 
     // Otherwise, claim the controller. If the successful, remove claimerNeed
 
-    if (creep.claimController(room.controller) == OK) Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[claimRequestNeedsIndex.claimer] = 0
+    creep.claimController(room.controller)
 }

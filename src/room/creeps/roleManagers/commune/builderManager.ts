@@ -38,6 +38,12 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
 
         const creep: Builder = Game.creeps[creepName]
 
+        if (!constructionTarget) {
+
+            creep.advancedRecycle()
+            continue
+        }
+
         // If the creep needs resources
 
         if (creep.needsResources()) {
@@ -107,9 +113,5 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
         // If there is a cSite, try to build it and iterate
 
         if (creep.advancedBuildCSite(constructionTarget)) continue
-
-        // Otherwise, recycle the creep
-
-        creep.advancedRecycle()
     }
 }
