@@ -699,8 +699,6 @@ Room.prototype.get = function(roomObjectName) {
 
         harvesterNames = room.memory.type == 'commune' ? room.myCreeps.source1Harvester.concat(room.myCreeps.source2Harvester).concat(room.myCreeps.vanguard) : room.myCreeps.source1RemoteHarvester.concat(room.myCreeps.source2RemoteHarvester)
 
-        customLog('harv names', harvesterNames)
-
         for (const creepName of harvesterNames) {
 
             // Get the creep using its name
@@ -2615,6 +2613,8 @@ Room.prototype.pathVisual = function(path, color) {
 
     if (!Memory.roomVisuals) return
 
+    // Filter only positions in the path that are in the path's starting room
+
     let currentRoomName = path[0].roomName
 
     for (let index = 0; index < path.length; index++) {
@@ -2627,7 +2627,7 @@ Room.prototype.pathVisual = function(path, color) {
         break
     }
 
-    // Otherwise generate the path visual
+    // Generate the visual
 
     room.visual.poly(path, { stroke: constants.colors[color], strokeWidth: .15, opacity: .3, lineStyle: 'solid' })
 }

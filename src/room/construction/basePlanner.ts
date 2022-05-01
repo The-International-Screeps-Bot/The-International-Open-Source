@@ -114,6 +114,8 @@ export function basePlanner(room: Room) {
             // Add the anchor to stampAnchors based on its type
 
             room.global.stampAnchors[opts.stampType].push(anchor)
+            console.log(opts.stampType, room.memory.stampAnchors[opts.stampType])
+            room.memory.stampAnchors[opts.stampType].push(pack(anchor))
 
             // Loop through structure types in fastFiller structures
 
@@ -181,7 +183,7 @@ export function basePlanner(room: Room) {
     room.memory.anchor = pack(room.global.stampAnchors.fastFiller[0])
 
     // Get the centerUpgradePos, informing false if it's undefined
-    
+
     const centerUpgadePos: RoomPosition = room.get('centerUpgradePos')
     if (!centerUpgadePos) return false
 

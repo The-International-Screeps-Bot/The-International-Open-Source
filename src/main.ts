@@ -771,7 +771,7 @@ declare global {
 
         cSiteTargetID: Id<ConstructionSite>
 
-        stampAnchors: StampAnchors
+        stampAnchors: Partial<Record<StampTypes, number[]>>
 
         abandoned: number | undefined
     }
