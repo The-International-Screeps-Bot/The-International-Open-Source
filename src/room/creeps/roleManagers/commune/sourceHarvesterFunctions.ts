@@ -205,7 +205,7 @@ SourceHarvester.prototype.repairSourceContainer = function(sourceContainer) {
 
         // Add control points to total controlPoints counter and say the success
 
-        Memory.energySpentOnRepairing += energySpentOnRepairs
+        Memory.stats.energySpentOnRepairing += energySpentOnRepairs
         creep.say('🔧' + energySpentOnRepairs * REPAIR_POWER)
 
         // Inform success

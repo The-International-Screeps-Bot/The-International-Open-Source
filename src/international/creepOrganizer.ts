@@ -145,5 +145,5 @@ InternationalManager.prototype.creepOrganizer = function() {
 
     // Record number of creeps
 
-    Memory.creepCount = totalCreepCount
+    Memory.stats.creeps = totalCreepCount
 }

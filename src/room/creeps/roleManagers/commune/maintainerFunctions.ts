@@ -100,7 +100,7 @@ Maintainer.prototype.advancedMaintain = function() {
 
     // Add control points to total controlPoints counter and say the success
 
-    Memory.energySpentOnRepairing += energySpentOnRepairs
+    Memory.stats.energySpentOnRepairing += energySpentOnRepairs
     creep.say((repairTarget.structureType == STRUCTURE_RAMPART ? '🧱' : '🔧') + energySpentOnRepairs * REPAIR_POWER)
 
     // Implement the results of the repair pre-emptively

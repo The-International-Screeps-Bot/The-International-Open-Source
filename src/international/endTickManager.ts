@@ -15,14 +15,14 @@ InternationalManager.prototype.endTickManager = function() {
 
     // Stats recording
 
-    Memory.cpuUsage = Game.cpu.getUsed()
+    Memory.stats.cpuUsage = Game.cpu.getUsed()
 
     // customLog the CPU used
 
     customLog('Total CPU', (CPU).toFixed(2) + ' / ' + Game.cpu.limit + ' CPU Bucket: ' + Game.cpu.bucket, constants.colors.white, CPUColor)
 
     // Fill up the console with empty logs
-    
+
     for (let i = 0; i < 99; i++) console.log()
 
     // Log the accumilated global logs

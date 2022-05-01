@@ -67,6 +67,8 @@ export function spawnManager(room: Room) {
 
         spawn.advancedSpawn(spawnRequest)
 
+        Memory.stats.energySpentOnCreeps += spawnRequest.cost
+
         // Decrease the spawnIndex
 
         spawnIndex--

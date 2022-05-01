@@ -11,34 +11,39 @@ InternationalManager.prototype.tickConfig = function() {
 
     Memory.communes = []
 
-    Memory.energy = 0
+    Memory.stats = {
+        credits: Game.market.credits,
+        energy: 0,
 
-    Memory.boosts = {}
+        boosts: {},
 
-    // CPU
+        // CPU
 
-    Memory.cpuLimit = Game.cpu.limit
-    Memory.cpuBucket = Game.cpu.bucket
+        cpuLimit: Game.cpu.limit,
+        cpuBucket: Game.cpu.bucket,
 
-    // Memory memory
+        // Memory memory
 
-    Memory.memoryUsage = Math.floor(RawMemory.get().length / 1000)
+        memoryUsage: Math.floor(RawMemory.get().length / 1000),
 
-    //
+        //
 
-    Memory.GCLPercent = (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2)
-    Memory.totalGCL = (Math.pow(Game.gcl.level - 1, 2.4) * 1000000 + Game.gcl.progress).toFixed(2)
+        GCLPercent: (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2),
+        totalGCL: (Math.pow(Game.gcl.level - 1, 2.4) * 1000000 + Game.gcl.progress).toFixed(2),
 
-    Memory.GPLPercent = (Game.gpl.progress / Game.gpl.progressTotal * 100).toFixed(2)
-    Memory.totalGPL = (Math.pow(Game.gpl.level - 1, 2) * 1000 + Game.gpl.progress).toFixed(2)
+        GPLPercent: (Game.gpl.progress / Game.gpl.progressTotal * 100).toFixed(2),
+        totalGPL: (Math.pow(Game.gpl.level - 1, 2) * 1000 + Game.gpl.progress).toFixed(2),
 
-    //
+        //
 
-    Memory.energyHarvested = 0
-    Memory.controlPoints = 0
-    Memory.energySpentOnBuilding = 0
-    Memory.energySpentOnRepairing = 0
-    Memory.energySpentOnBarricades = 0
+        energyHarvested: 0,
+        controlPoints: 0,
+
+        energySpentOnCreeps: 0,
+        energySpentOnBuilding: 0,
+        energySpentOnRepairing: 0,
+        energySpentOnBarricades: 0,
+    }
 
     // global
 

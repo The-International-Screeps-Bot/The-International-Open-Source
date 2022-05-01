@@ -699,7 +699,7 @@ Room.prototype.get = function(roomObjectName) {
 
         harvesterNames = room.memory.type == 'commune' ? room.myCreeps.source1Harvester.concat(room.myCreeps.source2Harvester).concat(room.myCreeps.vanguard) : room.myCreeps.source1RemoteHarvester.concat(room.myCreeps.source2RemoteHarvester)
 
-        // Loop through each sourceHarvester's name in the room
+        customLog('harv names', harvesterNames)
 
         for (const creepName of harvesterNames) {
 

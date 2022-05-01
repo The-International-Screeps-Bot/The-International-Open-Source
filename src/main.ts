@@ -253,10 +253,97 @@ declare global {
         extraOpts: ExtraOpts
     }
 
-    // Memory
+    interface Stats {
+
+        credits: number
+
+        /**
+         * The amount of energy in storages and terminals in owned rooms
+         */
+        energy: number
+
+        /**
+         * An object of boosts representing the amount of each boost in storages and terminals in owned rooms
+         */
+        boosts: {[key: string]: MineralBoostConstant}
+
+        /**
+         * The total amount of CPU used
+         */
+        cpuUsage: number
+
+        /**
+         * The amount of CPU generated per tick
+         */
+        cpuLimit: number
+
+        /**
+         * The amount of CPU left in the bucket
+         */
+        cpuBucket: number
+
+        /**
+         * The amount of memory used by the bot
+         */
+        memorUsage: number
+
+        /**
+         * The maximum memory the bot can use
+         */
+        memoryLimit: number
+
+        /**
+         * The amount of memory used by the bot
+         */
+        memoryUsage: number
+
+        /**
+         * The percent to the next GCL level
+         */
+        GCLPercent: string
+
+        /**
+         * The total amount of GCL
+         */
+        totalGCL: string
+
+        /**
+         * The percent to the next PCL level
+         */
+        GPLPercent: string
+
+         /**
+          * The total amount of PCL
+          */
+        totalGPL: string
+
+        /**
+         * The total number of creeps the bot owns
+         */
+        creeps: number
+
+        /**
+         * The total number of powerCreeps the bot owns
+         */
+        powerCreepCount: number
+
+        /**
+         * The total amount of energy harvested by the bot per tick
+         */
+        energyHarvested: number
+
+        controlPoints: number
+
+        energySpentOnCreeps: number
+
+        energySpentOnBuilding: number
+
+        energySpentOnRepairing: number
+
+        energySpentOnBarricades: number
+    }
 
     interface Memory {
-        [key: string]: any
 
         /**
          * Whether Memory is constructed or not
@@ -298,63 +385,7 @@ declare global {
          */
         communes: string[]
 
-        /**
-         * The amount of energy in storages and terminals in owned rooms
-         */
-        energy: number
-
-        /**
-         * An object of boosts representing the amount of each boost in storages and terminals in owned rooms
-         */
-        boosts: {[key: string]: MineralBoostConstant}
-
-        /**
-         * The total amount of CPU used
-         */
-        cpuUsage: number
-
-        /**
-         * The amount of CPU generated per tick
-         */
-        cpuLimit: number
-
-        /**
-         * The amount of CPU left in the bucket
-         */
-        cpuBucket: number
-
-        /**
-         * The amount of memory used by the bot
-         */
-        memorUsage: number
-
-        /**
-         * The maximum memory the bot can use
-         */
-        memoryLimit: number
-
-        /**
-         * The total number of creeps the bot owns
-         */
-        creepCount: number
-
-        /**
-         * The total number of powerCreeps the bot owns
-         */
-        powerCreepCount: number
-
-        /**
-         * The total amount of energy harvested by the bot per tick
-         */
-        energyHarvested: number
-
-        controlPoint: number
-
-        energySpentOnBuilding: number
-
-        energySpentOnRepairing: number
-
-        energySpentOnBarricades: number
+        stats: Partial<Stats>
     }
 
     interface RawMemory {

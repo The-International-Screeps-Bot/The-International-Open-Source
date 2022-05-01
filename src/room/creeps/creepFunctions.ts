@@ -162,7 +162,7 @@ Creep.prototype.advancedHarvestSource = function(source) {
     // Find amount of energy harvested and record it in data
 
     const energyHarvested = Math.min(creep.partsOfType(WORK) * HARVEST_POWER, source.energy)
-    Memory.energyHarvested += energyHarvested
+    Memory.stats.energyHarvested += energyHarvested
 
     creep.say('⛏️' + energyHarvested)
 
@@ -237,7 +237,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
             // Add control points to total controlPoints counter and say the success
 
-            Memory.controlPoints += controlPoints
+            Memory.stats.controlPoints += controlPoints
             creep.say('🔋' + controlPoints)
         }
 
@@ -298,7 +298,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
                 // Add control points to total controlPoints counter and say the success
 
-                Memory.energySpentOnRepairing += energySpentOnRepairs
+                Memory.stats.energySpentOnRepairing += energySpentOnRepairs
                 creep.say('🔧' + energySpentOnRepairs * REPAIR_POWER)
 
                 // And inform true
@@ -383,7 +383,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
         // Add control points to total controlPoints counter and say the success
 
-        Memory.controlPoints += controlPoints
+        Memory.stats.controlPoints += controlPoints
         creep.say('🔋' + controlPoints)
 
         // Inform true
@@ -447,7 +447,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
         // Add control points to total controlPoints counter and say the success
 
-        Memory.energySpentOnBuilding += energySpentBuilding
+        Memory.stats.energySpentOnBuilding += energySpentBuilding
         creep.say('🚧' + energySpentBuilding)
 
         // Inform true
