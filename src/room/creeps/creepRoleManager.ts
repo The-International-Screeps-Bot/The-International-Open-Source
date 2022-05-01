@@ -21,35 +21,35 @@ import { remoteDefenderManager } from './roleManagers/remote/remoteDefenderManag
 import { vanguardManager } from './roleManagers/international/vanguardManager'
 import { sourceHarvesterManager } from './roleManagers/commune/sourceHarvesterManager'
 
+// Construct managers
+
+const managers: Record<CreepRoles, Function> = {
+    source1Harvester: sourceHarvesterManager,
+    source2Harvester: sourceHarvesterManager,
+    hauler: haulerManager,
+    controllerUpgrader: controllerUpgraderManager,
+    builder: builderManager,
+    maintainer: maintainerManager,
+    mineralHarvester: mineralHarvesterManager,
+    hubHauler: hubHaulerManager,
+    fastFiller: fastFillerManager,
+    meleeDefender: meleeDefenderManager,
+    source1RemoteHarvester: source1RemoteHarvesterManager,
+    source2RemoteHarvester: source2RemoteHarvesterManager,
+    remoteHauler: remoteHaulerManager,
+    remoteReserver: remoteReserverManager,
+    remoteDefender: remoteDefenderManager,
+    scout: scoutManager,
+    claimer: claimerManager,
+    vanguard: vanguardManager,
+    antifa: antifaManager,
+}
+
 export function roleManager(room: Room) {
 
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
-
-    // Construct managers
-
-    const managers: Record<CreepRoles, Function> = {
-        source1Harvester: sourceHarvesterManager,
-        source2Harvester: sourceHarvesterManager,
-        hauler: haulerManager,
-        controllerUpgrader: controllerUpgraderManager,
-        builder: builderManager,
-        maintainer: maintainerManager,
-        mineralHarvester: mineralHarvesterManager,
-        hubHauler: hubHaulerManager,
-        fastFiller: fastFillerManager,
-        meleeDefender: meleeDefenderManager,
-        source1RemoteHarvester: source1RemoteHarvesterManager,
-        source2RemoteHarvester: source2RemoteHarvesterManager,
-        remoteHauler: remoteHaulerManager,
-        remoteReserver: remoteReserverManager,
-        remoteDefender: remoteDefenderManager,
-        scout: scoutManager,
-        claimer: claimerManager,
-        vanguard: vanguardManager,
-        antifa: antifaManager,
-    }
 
     // Loop through each role in managers
 

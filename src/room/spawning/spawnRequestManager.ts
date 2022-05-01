@@ -392,7 +392,7 @@ export function spawnRequester(room: Room) {
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
         const sourceName = 'source1',
-            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length + room.creepsFromRoom.source2Harvester.length,
+            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length,
             role = 'source1Harvester'
 
         if (spawnEnergyCapacity >= 800) {
@@ -483,7 +483,7 @@ export function spawnRequester(room: Room) {
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
         const sourceName = 'source2',
-            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length + room.creepsFromRoom.source2Harvester.length,
+            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length,
             role = 'source2Harvester'
 
         if (spawnEnergyCapacity >= 800) {
@@ -573,6 +573,8 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
+        const priority = 0.5 + room.creepsFromRoom.hauler.length * 0.75
+
         // Construct the required carry parts
 
         let requiredCarryParts = 10
@@ -600,7 +602,7 @@ export function spawnRequester(room: Room) {
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 150,
-                priority: 0.5 + room.creepsFromRoom.hauler.length,
+                priority,
                 memoryAdditions: {
                     role: 'hauler',
                 }
@@ -614,7 +616,7 @@ export function spawnRequester(room: Room) {
             minCreeps: undefined,
             maxCreeps: Infinity,
             minCost: 100,
-            priority: 0.5 + room.creepsFromRoom.hauler.length,
+            priority,
             memoryAdditions: {
                 role: 'hauler',
             }
@@ -1032,7 +1034,7 @@ export function spawnRequester(room: Room) {
                     partsMultiplier,
                     threshold,
                     minCreeps: undefined,
-                    maxCreeps: 8,
+                    maxCreeps: room.get('upgradePositions').length,
                     minCost: 700,
                     priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
                     memoryAdditions: {
@@ -1054,7 +1056,7 @@ export function spawnRequester(room: Room) {
                 partsMultiplier,
                 threshold,
                 minCreeps: undefined,
-                maxCreeps: 8,
+                maxCreeps: room.get('upgradePositions').length,
                 minCost: 200,
                 priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
                 memoryAdditions: {
@@ -1075,7 +1077,7 @@ export function spawnRequester(room: Room) {
                 partsMultiplier,
                 threshold,
                 minCreeps: undefined,
-                maxCreeps: 8,
+                maxCreeps: room.get('upgradePositions').length,
                 minCost: 200,
                 priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
                 memoryAdditions: {
@@ -1090,7 +1092,7 @@ export function spawnRequester(room: Room) {
             partsMultiplier: Math.max(partsMultiplier, 1),
             threshold,
             minCreeps: undefined,
-            maxCreeps: 8,
+            maxCreeps: room.get('upgradePositions').length,
             minCost: 250,
             priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
             memoryAdditions: {

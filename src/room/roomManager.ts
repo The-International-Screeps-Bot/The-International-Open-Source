@@ -4,7 +4,6 @@ import './roomFunctions'
 
 import './roomTaskManager'
 
-import { remoteManager } from './remoteManager'
 import { communeManager } from './communeManager'
 
 import { roleManager } from './creeps/creepRoleManager'
@@ -18,7 +17,6 @@ import { droppedResourceManager } from './droppedResourceManager'
 import { taskManager } from './roomTaskManager'
 
 const specificRoomManagers: {[key: string]: Function} = {
-    remote: remoteManager,
     commune: communeManager,
 }
 
@@ -39,7 +37,7 @@ export function roomManager() {
         // Get the room using the roomName
 
         const room = Game.rooms[roomName]
-        
+
         taskManager(room)
 
         // If there is a specific manager for this room's type, run it

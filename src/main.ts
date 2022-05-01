@@ -841,6 +841,8 @@ declare global {
 
         // Functions
 
+        preTickManager(): void
+
         /**
          * Wether the creep's respawn time is equal to its remaining ticks to live
          */
@@ -1058,7 +1060,11 @@ declare global {
         /**
          * The target ID of the task
          */
-        taskTarget: Id<any>
+        taskTargetID: Id<Creep | AnyStoreStructure>
+
+        taskAmount: number
+
+        taskResource: ResourceConstant
     }
 
     // PowerCreeps

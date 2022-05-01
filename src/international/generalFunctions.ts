@@ -28,9 +28,9 @@ export function getAvgPrice(resourceType: MarketResourceConstant, days: number =
 /**
  * Uses a provided ID to find an object associated with it
  */
-export function findObjectWithID(id: Id<any>) {
+export function findObjectWithID<T extends Id<any>>(ID: T): fromId<T> | undefined {
 
-    return Game.getObjectById(id) || undefined
+    return Game.getObjectById(ID) || undefined
 }
 
 /**

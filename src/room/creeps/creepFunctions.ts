@@ -4,6 +4,8 @@ import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObje
 import { repeat } from "lodash"
 import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
 
+Creep.prototype.preTickManager = function() {}
+
 Creep.prototype.isDying = function() {
 
     const creep = this
@@ -1265,7 +1267,7 @@ Creep.prototype.fulfillPullTask = function(task) {
 
     // Get the task info
 
-    const taskTarget: Creep = findObjectWithID(task.creatorID)
+    const taskTarget = findObjectWithID(task.creatorID) as Creep
 
     // If the creep is not close enough to pull the target
 
@@ -1348,7 +1350,7 @@ Creep.prototype.fulfillTransferTask = function(task) {
 
     // Get the transfer target using the task's transfer target IDs
 
-    const transferTarget = findObjectWithID(task.creatorID)
+    const transferTarget = findObjectWithID(task.creatorID) as AnyStoreStructure | Creep | Tombstone
 
     // Inform the result of the adancedTransfer to the transferTarget
 
@@ -1361,7 +1363,7 @@ Creep.prototype.fulfillOfferTask = function(task) {
 
     // Get the withdraw target
 
-    offerTarget = findObjectWithID(task.creatorID)
+    offerTarget = findObjectWithID(task.creatorID) as AnyStoreStructure | Creep | Tombstone
 
     creep.say('OT')
 
@@ -1377,7 +1379,7 @@ Creep.prototype.fulfillWithdrawTask = function(task) {
 
     // Get the withdraw target
 
-    withdrawTarget: AnyStoreStructure | Creep | Tombstone = findObjectWithID(task.creatorID)
+    withdrawTarget = findObjectWithID(task.creatorID) as AnyStoreStructure | Creep | Tombstone
 
     creep.say('WT')
 
@@ -1429,7 +1431,7 @@ Creep.prototype.fulfillPickupTask = function(task) {
 
     // Otherwise get the pickup target
 
-    const pickupTarget = findObjectWithID(task.creatorID)
+    const pickupTarget = findObjectWithID(task.creatorID) as Resource
 
     // Try to pickup from the target, informing the result
 

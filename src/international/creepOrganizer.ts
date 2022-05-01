@@ -73,6 +73,8 @@ InternationalManager.prototype.creepOrganizer = function() {
 
         totalCreepCount += 1
 
+        creep.preTickManager()
+
         // Get the creep's remoteName
 
         const remoteName = creep.memory.remoteName
