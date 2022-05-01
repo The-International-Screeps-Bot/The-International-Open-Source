@@ -2615,6 +2615,18 @@ Room.prototype.pathVisual = function(path, color) {
 
     if (!Memory.roomVisuals) return
 
+    let currentRoomName = path[0].roomName
+
+    for (let index = 0; index < path.length; index++) {
+
+        const pos = path[index]
+
+        if (pos.roomName == currentRoomName) continue
+
+        path.splice(index, path.length - 1)
+        break
+    }
+
     // Otherwise generate the path visual
 
     room.visual.poly(path, { stroke: constants.colors[color], strokeWidth: .15, opacity: .3, lineStyle: 'solid' })
