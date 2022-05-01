@@ -1298,7 +1298,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                 // If the type is in typeWeights, inform the weight for the type
 
-                if (opts.typeWeights && opts.typeWeights[Memory.rooms[roomName].type] == Infinity) return false
+                if (opts.typeWeights && Memory.rooms[roomName] && opts.typeWeights[Memory.rooms[roomName].type] == Infinity) return false
 
                 // Create a costMatrix for the room
 
