@@ -1298,6 +1298,10 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                 const room = Game.rooms[roomName]
 
+                // If the type is in typeWeights, inform the weight for the type
+
+                if (opts.typeWeights && opts.typeWeights[Memory.rooms[roomName].type] == Infinity) return false
+
                 // Create a costMatrix for the room
 
                 const cm = new PathFinder.CostMatrix()
@@ -1306,8 +1310,8 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                 if (!route) {
 
-                    let y = 0
-                    let x = 0
+                    let y = 0,
+                    x = 0
 
                     // Configure y and loop through top exits
 

@@ -1292,7 +1292,7 @@ export function spawnRequester(room: Room) {
 
                 // Abandon the room for some time
 
-                Memory.rooms[remoteName].abandoned = 20000
+                Memory.rooms[remoteName].abandoned = 1500
                 return false
             }
 

@@ -29,7 +29,7 @@ Vanguard.prototype.travelToSource = function(sourceName) {
         origin: creep.pos,
         goal: { pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name), range: 0 },
         avoidEnemyRanges: true,
-        cacheAmount: 200
+        cacheAmount: 50
     })
 
     return true
