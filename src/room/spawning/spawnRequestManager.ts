@@ -1,10 +1,14 @@
-import { allyList, builderSpawningWhenStorageThreshold, claimRequestNeedsIndex, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
+import { allyList, builderSpawningWhenStorageThreshold, claimRequestNeedsIndex, constants, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
 import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy, findStrengthOfParts, getRange } from "international/generalFunctions"
 
 /**
  * Creates spawn requests for the commune
  */
 export function spawnRequester(room: Room) {
+
+    // If CPU logging is enabled, get the CPU used at the start
+
+    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
     // Construct a record of spawnRequests
 
@@ -1381,6 +1385,10 @@ export function spawnRequester(room: Room) {
             }
         })())
     }
+
+    // If CPU logging is enabled, log the CPU used by this manager
+
+    if (Memory.cpuLogging) customLog('Spawn Request Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
 
     // Inform spawnRequests
 

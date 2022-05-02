@@ -3,6 +3,10 @@ import { customLog } from "international/generalFunctions"
 
 export function trafficManager(room: Room) {
 
+    // If CPU logging is enabled, get the CPU used at the start
+
+    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+
     // Loop through each x and y in the room
 
     for (let x = 0; x < constants.roomDimensions; x++) {
@@ -200,4 +204,8 @@ export function trafficManager(room: Room) {
             }
         }
     }
+
+    // If CPU logging is enabled, log the CPU used by this manager
+
+    if (Memory.cpuLogging) customLog('Traffic Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
 }

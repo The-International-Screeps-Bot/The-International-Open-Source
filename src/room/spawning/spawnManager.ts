@@ -1,9 +1,14 @@
 
+import { constants } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import './spawnFunctions'
 import { spawnRequester } from './spawnRequestManager'
 
 export function spawnManager(room: Room) {
+
+    // If CPU logging is enabled, get the CPU used at the start
+
+    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
     // Get spawns in the room
 
@@ -73,4 +78,8 @@ export function spawnManager(room: Room) {
 
         spawnIndex--
     }
+
+    // If CPU logging is enabled, log the CPU used by this manager
+
+    if (Memory.cpuLogging) customLog('Spawn Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
 }

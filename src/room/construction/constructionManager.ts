@@ -12,24 +12,29 @@ export function constructionManager(room: Room) {
 
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    // If the room has been planned for this global
+    runPlanning()
 
-    if (room.global.plannedBase) {
+    function runPlanning() {
 
-        // Only run the planner every x ticks (temporary fix)
+        if (room.global.plannedBase) {
 
-        /* if (Game.time % Math.floor(Math.random() * 100) != 0) return */
+            // Only run the planner every x ticks (temporary fix)
 
-        // If the construction site count is at its limit, stop
+            if (Game.time % Math.floor(Math.random() * 100) != 0) return
 
-        if (global.constructionSitesCount == 100) return
+            // If the construction site count is at its limit, stop
 
-        // If the room is above 1 construction site, stop
+            if (global.constructionSitesCount == 100) return
 
-        if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
+            // If the room is above 1 construction site, stop
+
+            if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
+        }
+
+        manageControllerStructures()
+        manageBasePlanning()
+        manageRampartPlanning()
     }
-
-    manageControllerStructures()
 
     function manageControllerStructures() {
 
@@ -50,8 +55,6 @@ export function constructionManager(room: Room) {
         room.createConstructionSite(centerUpgradePos, STRUCTURE_CONTAINER)
     }
 
-    manageBasePlanning()
-
     function manageBasePlanning() {
 
         // If there are no base plans yet
@@ -71,8 +74,6 @@ export function constructionManager(room: Room) {
 
         room.advancedConstructStructurePlans()
     }
-
-    manageRampartPlanning()
 
     function manageRampartPlanning() {
 

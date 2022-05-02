@@ -32,11 +32,11 @@ export function roomManager() {
 
         // Get the CPU used at the start
 
-        const roomCPUStart = Game.cpu.getUsed()
+        const roomCPUStart = Game.cpu.getUsed(),
 
         // Get the room using the roomName
 
-        const room = Game.rooms[roomName]
+        room = Game.rooms[roomName]
 
         taskManager(room)
 
@@ -63,15 +63,19 @@ export function roomManager() {
         roomVisualsManager(room)
 
         // Testing
-
+/* 
         let cpuUsed = Game.cpu.getUsed()
 
         cpuUsed = Game.cpu.getUsed() - cpuUsed
-        /* customLog('Testing CPU', cpuUsed.toFixed(2)) */
-
+        customLog('Testing CPU', cpuUsed.toFixed(2))
+ */
         // Log room stats
 
-        customLog(room.name, 'Creeps: ' + room.myCreepsAmount + ', CPU: ' + (Game.cpu.getUsed() - roomCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
+        let logMessage = 'Creeps: ' + room.myCreepsAmount
+
+        if (Memory.cpuLogging) logMessage += ', CPU: ' + (Game.cpu.getUsed() - roomCPUStart).toFixed(2)
+
+        customLog(room.name, logMessage, undefined, constants.colors.lightGrey)
     }
 
     // If CPU logging is enabled, log the CPU used by this manager

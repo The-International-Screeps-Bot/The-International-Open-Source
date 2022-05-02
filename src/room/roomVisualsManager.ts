@@ -1,5 +1,5 @@
 import { allyList, constants } from "international/constants"
-import { findObjectWithID } from "international/generalFunctions"
+import { customLog, findObjectWithID } from "international/generalFunctions"
 
 /**
  * Adds annotations to the room if roomVisuals are enabled
@@ -9,6 +9,10 @@ export function roomVisualsManager(room: Room) {
     // Stop if roomVisuals are disabled
 
     if (!Memory.roomVisuals) return
+
+    // If CPU logging is enabled, get the CPU used at the start
+
+    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
     // If there is an anchor, show a rectangle around it
 
@@ -149,4 +153,8 @@ export function roomVisualsManager(room: Room) {
     function observerVisuals() {}
     function sourceVisuals() {}
     function mineralVisuals() {}
+
+    // If CPU logging is enabled, log the CPU used by this manager
+
+    if (Memory.cpuLogging) customLog('Room Visual Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
 }

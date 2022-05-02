@@ -629,12 +629,12 @@ export function rampartPlanner(room: Room) {
 
         // Get the closest pos of the group by range to the anchor
 
-        const cloestPosToAnchor = hubAnchor.findClosestByRange(group)
+        const closestPosToAnchor = hubAnchor.findClosestByRange(group),
 
         // Path from the hubAnchor to the cloestPosToAnchor
 
-        const path = room.advancedFindPath({
-            origin: cloestPosToAnchor,
+        path = room.advancedFindPath({
+            origin: closestPosToAnchor,
             goal: { pos: hubAnchor, range: 2 },
             weightCostMatrixes: [roadCM]
         })
@@ -685,9 +685,9 @@ export function rampartPlanner(room: Room) {
             rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
             break
         }
-
-        room.global.plannedRamparts = true
     }
+
+    room.global.plannedRamparts = true
 
     // Inform true
 

@@ -16,7 +16,7 @@ Object.defineProperties(Room.prototype, {
 
             if (this._anchor) return this._anchor
 
-            return this._anchor = this.memory.stampAnchors ? unPackAsRoomPos(this.memory.stampAnchors.fastFiller[0], this.name) :
+            return this._anchor = this.memory.stampAnchors?.fastFiller.length ? unPackAsRoomPos(this.memory.stampAnchors.fastFiller[0], this.name) :
                 undefined
         }
     },

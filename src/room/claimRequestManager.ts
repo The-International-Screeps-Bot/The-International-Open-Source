@@ -1,8 +1,12 @@
-import { claimRequestNeedsIndex } from "international/constants"
+import { claimRequestNeedsIndex, constants } from "international/constants"
 import { advancedFindDistance, customLog } from "international/generalFunctions"
 import { internationalManager } from "international/internationalManager"
 
 Room.prototype.claimRequestManager = function() {
+
+    // If CPU logging is enabled, get the CPU used at the start
+
+    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
     // If there is an existing claimRequest and it's valid, check if there is claimer need
 
@@ -25,7 +29,7 @@ Room.prototype.claimRequestManager = function() {
 
             delete Memory.claimRequests[this.memory.claimRequest]
             delete this.memory.claimRequest
-            
+
             return
         }
 
@@ -58,4 +62,8 @@ Room.prototype.claimRequestManager = function() {
         this.memory.claimRequest = roomName
         return
     }
+
+    // If CPU logging is enabled, log the CPU used by this manager
+
+    if (Memory.cpuLogging) customLog('Claim Request Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
 }

@@ -1,10 +1,14 @@
-import { allyList } from "international/constants"
+import { allyList, constants } from "international/constants"
 import { customLog, findObjectWithID } from "international/generalFunctions"
 
 /**
  * Handles defence related situations for a commune
  */
 export function defenceManager(room: Room) {
+
+    // If CPU logging is enabled, get the CPU used at the start
+
+    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
     // Get enemyAttackers in the room
 
@@ -110,4 +114,8 @@ export function defenceManager(room: Room) {
             break
         }
     }
+
+    // If CPU logging is enabled, log the CPU used by this manager
+
+    if (Memory.cpuLogging) customLog('Defence Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
 }

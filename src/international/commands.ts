@@ -17,7 +17,7 @@ global.killAllCreeps = function() {
     return 'Killed all creeps'
 }
 
-global.destroyAllCSites = function(types) {
+global.removeAllCSites = function(types: BuildableStructureConstant[]) {
 
     // Loop through cSite IDs in construction sites
 
@@ -34,7 +34,7 @@ global.destroyAllCSites = function(types) {
 
     // Inform the result
 
-    return 'Destroyed all construction sites of types ' + types
+    return 'Destroyed all construction sites of types ' + types || 'all'
 }
 
 global.destroyAllStructures = function(roomName: string, types?: StructureConstant[]) {
@@ -66,5 +66,5 @@ global.destroyAllStructures = function(roomName: string, types?: StructureConsta
 
     // Inform the result
 
-    return 'Destroyed all structures of types ' + types + ' in ' + roomName
+    return 'Destroyed all structures of types ' + types || 'all' + ' in ' + roomName
 }

@@ -2909,7 +2909,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
         x: room.anchor.x - 1,
         y: room.anchor.y - 1
     }
-    let cpu = Game.cpu.getUsed()
+
     for (const stampType in stamps) {
 
         const stamp = stamps[stampType as StampTypes]
@@ -2924,7 +2924,11 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
                 // If there are already sufficient structures + cSites
 
-                if (room.get(structureType as BuildableStructureConstant).length + room.get(`${structureType as BuildableStructureConstant}CSite`) >= CONTROLLER_STRUCTURES[structureType as BuildableStructureConstant][room.controller.level]) continue
+                if (room.get(structureType as BuildableStructureConstant).length + room.get(`${structureType as BuildableStructureConstant}CSite`).length >= CONTROLLER_STRUCTURES[structureType as BuildableStructureConstant][room.controller.level]) continue
+
+                // If the structureType is a road and RCL 3 extensions aren't built, stop
+
+                if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue
 
                 const positions = stamp.structures[structureType]
 
@@ -2941,16 +2945,12 @@ Room.prototype.advancedConstructStructurePlans = function() {
                         opacity: 0.5
                     })
 
-                    // If the structureType is a road and RCL 3 extensions aren't built, stop
-
-                    if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue
-
                     room.createConstructionSite(x, y, structureType as BuildableStructureConstant)
                 }
             }
         }
     }
-    customLog('TESTING CPU USAGE', Game.cpu.getUsed() - cpu)
+  
     // Record the anchor as visited
 
     visitedCM.set(adjustedAnchor.x, adjustedAnchor.y, 1)
