@@ -1,5 +1,5 @@
-import { allyList, constants, prefferedCommuneRange } from 'international/constants'
-import { advancedFindDistance, arePositionsEqual, customLog, findClosestClaimType, findClosestCommuneName, findPositionsInsideRect, getRange, getRangeBetween, unPackAsRoomPos } from 'international/generalFunctions'
+import { allyList, constants, prefferedCommuneRange, stamps } from 'international/constants'
+import { advancedFindDistance, arePositionsEqual, customLog, findClosestClaimType, findClosestCommuneName, findPositionsInsideRect, getRange, getRangeBetween, pack, unPackAsPos, unPackAsRoomPos } from 'international/generalFunctions'
 import { basePlanner } from './construction/basePlanner'
 import { ControllerUpgrader, MineralHarvester, SourceHarvester } from './creeps/creepClasses'
 import { RoomObject } from './roomObject'
@@ -112,17 +112,6 @@ Room.prototype.get = function(roomObjectName) {
 
     new RoomObject({
         name: 'structurePlans',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor: () => { return new PathFinder.CostMatrix() }
-    })
-
-    // rampartPlans
-
-    new RoomObject({
-        name: 'rampartPlans',
         valueType: 'object',
         cacheType: 'global',
         cacheAmount: Infinity,
@@ -783,7 +772,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the hubAnchor, informing false if it's not defined
 
-        const hubAnchor: RoomPosition = room.global.stampAnchors?.hub[0]
+        const hubAnchor = unPackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
         if (!hubAnchor) return false
 
         // Get the upgradePositions, informing false if they're undefined
@@ -1068,7 +1057,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findLinkAtPos(room.global.stampAnchors?.fastFiller[0])
+            return findLinkAtPos(room.anchor)
         }
     })
 
@@ -1080,7 +1069,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findLinkNearby(room.global.stampAnchors?.hub[0])
+            return findLinkNearby(unPackAsRoomPos(room.memory.stampAnchors.hub[0], room.name))
         }
     })
 
@@ -1966,8 +1955,8 @@ Room.prototype.makeRemote = function(scoutingRoom) {
             return true
         }
 
-        let currentAvgSourceEfficacy = room.memory.sourceEfficacies.reduce((a2, b2) => a2 + b2) / room.memory.sourceEfficacies.length,
-        newAvgSourceEfficacy = newSourceEfficacies.reduce((a2, b2) => a2 + b2) / newSourceEfficacies.length
+        let currentAvgSourceEfficacy = room.memory.sourceEfficacies.reduce((sum, el) => sum + el) / room.memory.sourceEfficacies.length,
+        newAvgSourceEfficacy = newSourceEfficacies.reduce((sum, el) => sum + el) / newSourceEfficacies.length
 
         // If the new average source efficacy is below the current, stop
 
@@ -2638,6 +2627,8 @@ Room.prototype.pathVisual = function(path, color) {
 
     if (!Memory.roomVisuals) return
 
+    if (!path.length) return
+
     // Filter only positions in the path that are in the path's starting room
 
     let currentRoomName = path[0].roomName
@@ -2778,21 +2769,17 @@ Creep.prototype.findOptimalSourceName = function() {
     return false
 }
 
-Room.prototype.groupRampartPositions = function(rampartPositions) {
+Room.prototype.groupRampartPositions = function(rampartPositions, rampartPlans) {
 
     const room = this
 
-    // Get base planning data
-
-    const rampartPlans: CostMatrix = room.get('rampartPlans'),
-
     // Construct a costMatrix to store visited positions
 
-    visitedCM = new PathFinder.CostMatrix(),
+    const visitedCM = new PathFinder.CostMatrix(),
 
     // Construct storage of position groups
 
-    groupedPositions: RoomPosition[][] = []
+    groupedPositions = []
 
     // Construct the groupIndex
 
@@ -2812,7 +2799,7 @@ Room.prototype.groupRampartPositions = function(rampartPositions) {
 
         // Construct the group for this index with the pos in it the group
 
-        groupedPositions[groupIndex] = [room.newPos(pos)]
+        groupedPositions[groupIndex] = [new RoomPosition(pos.x, pos.y, room.name)]
 
         // Construct values for floodFilling
 
@@ -2879,7 +2866,9 @@ Room.prototype.groupRampartPositions = function(rampartPositions) {
                     // Add it to the next gen and this group
 
                     nextGeneration.push(adjacentPos)
+
                     groupedPositions[groupIndex].push(new RoomPosition(adjacentPos.x, adjacentPos.y, room.name))
+                    room.memory.stampAnchors.rampart.push(pack({ x: adjacentPos.x, y: adjacentPos.y }))
                 }
             }
 
@@ -2920,7 +2909,48 @@ Room.prototype.advancedConstructStructurePlans = function() {
         x: room.anchor.x - 1,
         y: room.anchor.y - 1
     }
+    let cpu = Game.cpu.getUsed()
+    for (const stampType in stamps) {
 
+        const stamp = stamps[stampType as StampTypes]
+
+        for (const packedStampAnchor of room.memory.stampAnchors[stampType as StampTypes]) {
+
+            const stampAnchor = unPackAsPos(packedStampAnchor)
+
+            for (const structureType in stamp.structures) {
+
+                if (structureType == 'empty') continue
+
+                // If there are already sufficient structures + cSites
+
+                if (room.get(structureType as BuildableStructureConstant).length + room.get(`${structureType as BuildableStructureConstant}CSite`) >= CONTROLLER_STRUCTURES[structureType as BuildableStructureConstant][room.controller.level]) continue
+
+                const positions = stamp.structures[structureType]
+
+                for (const pos of positions) {
+
+                    // Re-assign the pos's x and y to align with the offset
+
+                    const x = pos.x + stampAnchor.x - stamp.offset,
+                    y = pos.y + stampAnchor.y - stamp.offset
+
+                    // Display visuals if enabled
+
+                    if (Memory.roomVisuals) room.visual.structure(x, y, structureType as StructureConstant, {
+                        opacity: 0.5
+                    })
+
+                    // If the structureType is a road and RCL 3 extensions aren't built, stop
+
+                    if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue
+
+                    room.createConstructionSite(x, y, structureType as BuildableStructureConstant)
+                }
+            }
+        }
+    }
+    customLog('TESTING CPU USAGE', Game.cpu.getUsed() - cpu)
     // Record the anchor as visited
 
     visitedCM.set(adjustedAnchor.x, adjustedAnchor.y, 1)
@@ -2949,8 +2979,6 @@ Room.prototype.advancedConstructStructurePlans = function() {
         // If the structureType is a road and RCL 3 extensions aren't built, stop
 
         if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) return
-
-        // Create a road site at this pos
 
         room.createConstructionSite(x, y, structureType)
     }

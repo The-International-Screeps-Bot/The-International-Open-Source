@@ -69,8 +69,6 @@ interface Constants {
 
     numbersByStructureTypes: {[key: string]: BuildableStructureConstant | 'empty'}
 
-    stamps: Stamps
-
     styleForStructureTypes: {[key: string]: CircleStyle}
 }
 
@@ -326,7 +324,7 @@ constants.numbersByStructureTypes = {
     16: STRUCTURE_OBSERVER,
 }
 
-constants.stamps = {
+export const stamps: Record<StampTypes, Partial<Stamp>> = {
     fastFiller: {
         offset: 3,
         protectionOffset: 6,
@@ -398,6 +396,22 @@ constants.stamps = {
         structures: {
             empty: [{ x: 0, y: 0 }]
             /* observer: [{ x: 0, y: 0 }] */
+        }
+    },
+    link: {
+        offset: 0,
+        protectionOffset: 1,
+        size: 1,
+        structures: {
+            link: [{ x: 0, y: 0 }]
+        }
+    },
+    rampart: {
+        offset: 0,
+        protectionOffset: 0,
+        size: 1,
+        structures: {
+            rampart: [{ x: 0, y: 0 }]
         }
     }
 }

@@ -13,12 +13,12 @@ export function constructionManager(room: Room) {
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
     // If the room has been planned for this global
-    
+
     if (room.global.plannedBase) {
 
         // Only run the planner every x ticks (temporary fix)
 
-        if (Game.time % Math.floor(Math.random() * 100) != 0) return
+        /* if (Game.time % Math.floor(Math.random() * 100) != 0) return */
 
         // If the construction site count is at its limit, stop
 
@@ -91,29 +91,6 @@ export function constructionManager(room: Room) {
             // Run rampart planning and record the state of the plans
 
             rampartPlanner(room)
-        }
-
-        const rampartPlans: CostMatrix = room.get('rampartPlans')
-
-        // Iterate through each x and y in the room
-
-        for (let x = 0; x < constants.roomDimensions; x++) {
-            for (let y = 0; y < constants.roomDimensions; y++) {
-
-                // If there are no ramparts planned for this pos, iterate
-
-                if (rampartPlans.get(x, y) != 1) continue
-
-                // Otherwise
-
-                room.createConstructionSite(x, y, STRUCTURE_RAMPART)
-
-                // Display visuals if enabled
-
-                if (Memory.roomVisuals) room.visual.structure(x, y, STRUCTURE_RAMPART, {
-                    opacity: 0.5
-                })
-            }
         }
     }
 

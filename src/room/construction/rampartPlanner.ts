@@ -1,5 +1,5 @@
-import { constants } from "international/constants"
-import { customLog } from "international/generalFunctions";
+import { constants, stamps } from "international/constants"
+import { customLog, pack, unPackAsPos, unPackAsRoomPos } from "international/generalFunctions";
 
 export function rampartPlanner(room: Room) {
 
@@ -535,7 +535,7 @@ export function rampartPlanner(room: Room) {
 
     // Get the room's stampAnchors
 
-    const stampAnchors: StampAnchors = room.global.stampAnchors
+    const stampAnchors = room.memory.stampAnchors
 
     // Loop through types in stampAnchors
 
@@ -543,11 +543,13 @@ export function rampartPlanner(room: Room) {
 
         // Get the protectionOffset using the stampType
 
-        const protectionOffset = constants.stamps[stampType as StampTypes].protectionOffset
+        const protectionOffset = stamps[stampType as StampTypes].protectionOffset
 
         // Loop through stampAnchor of this stampType's stampAnchors
 
-        for (const stampAnchor of stampAnchors[stampType as StampTypes]) {
+        for (const packedStampAnchor of stampAnchors[stampType as StampTypes]) {
+
+            const stampAnchor = unPackAsPos(packedStampAnchor)
 
             // Protect the stamp
 
@@ -563,21 +565,30 @@ export function rampartPlanner(room: Room) {
     // Get Min cut
     // Positions is an array where to build walls/ramparts
 
-    const rampartPositions = (GetCutTiles(room.name, protectionRects)),
+    const rampartPositions = GetCutTiles(room.name, protectionRects),
 
     // Get base planning data
 
     roadCM: CostMatrix = room.get('roadCM'),
     structurePlans: CostMatrix = room.get('structurePlans'),
-    rampartPlans: CostMatrix = room.get('rampartPlans'),
+    rampartPlans = new PathFinder.CostMatrix(),
 
     // Get the hubAnchor
 
-    hubAnchor: RoomPosition = stampAnchors.hub[0]
+    hubAnchor = unPackAsRoomPos(stampAnchors.hub[0], room.name)
 
     // Loop through each tower anchor and plan for a rampart at it
 
-    for (const stampAnchor of stampAnchors.tower) rampartPlans.set(stampAnchor.x, stampAnchor.y, 1)
+    for (const packedStampAnchor of stampAnchors.tower) {
+
+        const stampAnchor = unPackAsPos(packedStampAnchor)
+
+        rampartPlans.set(stampAnchor.x, stampAnchor.y, 1)
+    }
+
+    // Protect useful hub structures
+
+
 
     // Protect fastFiller spawns
 
@@ -610,7 +621,7 @@ export function rampartPlanner(room: Room) {
 
     // Group rampart positions
 
-    const groupedRampartPositions = room.groupRampartPositions(rampartPositions)
+    const groupedRampartPositions = room.groupRampartPositions(rampartPositions, rampartPlans)
 
     // Loop through each group
 

@@ -1,5 +1,5 @@
-import { constants } from "international/constants"
-import { customLog, findAvgBetweenPosotions, findPositionsInsideRect, getRange, getRangeBetween, pack } from "international/generalFunctions"
+import { constants, stamps } from "international/constants"
+import { customLog, findAvgBetweenPosotions, findPositionsInsideRect, getRange, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
 import 'other/RoomVisual'
 
 /**
@@ -12,12 +12,6 @@ export function basePlanner(room: Room) {
     const baseCM: CostMatrix = room.get('baseCM'),
     roadCM: CostMatrix = room.get('roadCM'),
     structurePlans: CostMatrix = room.get('structurePlans')
-
-    if (!room.global.stampAnchors) {
-
-        room.global.stampAnchors = {}
-        for (const type in constants.stamps) room.global.stampAnchors[type as StampTypes] = []
-    }
 
     function recordAdjacentPositions(x: number, y: number, range: number, weight?: number) {
 
@@ -80,9 +74,9 @@ export function basePlanner(room: Room) {
 
         // Define the stamp using the stampType
 
-        const stamp = constants.stamps[opts.stampType]
+        const stamp = stamps[opts.stampType]
 
-        opts.count -= room.global.stampAnchors[opts.stampType].length
+        opts.count -= room.memory.stampAnchors[opts.stampType].length
 
         // So long as the count is more than 0
 
@@ -96,27 +90,24 @@ export function basePlanner(room: Room) {
 
             const distanceCM = opts.normalDT ? room.distanceTransform(baseCM) : room.specialDT(baseCM),
 
-            // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
+                // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 
-            anchor = room.findClosestPosOfValue({
-                CM: distanceCM,
-                startPos: opts.anchorOrient,
-                requiredValue: stamp.size,
-                initialWeight: opts.initialWeight || 0,
-                adjacentToRoads: opts.adjacentToRoads,
-                roadCM: opts.adjacentToRoads ? roadCM : undefined
-            })
+                stampAnchor = room.findClosestPosOfValue({
+                    CM: distanceCM,
+                    startPos: opts.anchorOrient,
+                    requiredValue: stamp.size,
+                    initialWeight: opts.initialWeight || 0,
+                    adjacentToRoads: opts.adjacentToRoads,
+                    roadCM: opts.adjacentToRoads ? roadCM : undefined
+                })
 
             // Inform false if no anchor was generated
 
-            if (!anchor) return false
+            if (!stampAnchor) return false
 
             // Add the anchor to stampAnchors based on its type
 
-            room.global.stampAnchors[opts.stampType].push(anchor)
-            room.memory.stampAnchors[opts.stampType].push(pack(anchor))
-
-            // Loop through structure types in fastFiller structures
+            room.memory.stampAnchors[opts.stampType].push(pack(stampAnchor))
 
             for (const structureType in stamp.structures) {
 
@@ -130,12 +121,8 @@ export function basePlanner(room: Room) {
 
                     // Re-assign the pos's x and y to align with the offset
 
-                    const x = pos.x + anchor.x - stamp.offset,
-                    y = pos.y + anchor.y - stamp.offset
-
-                    // Plan for the structureType at this position
-
-                    structurePlans.set(x, y, constants.structureTypesByNumber[structureType])
+                    const x = pos.x + stampAnchor.x - stamp.offset,
+                    y = pos.y + stampAnchor.y - stamp.offset
 
                     // If the structureType is a road
 
@@ -159,27 +146,24 @@ export function basePlanner(room: Room) {
     }
 
     // Try to plan the stamp
-
+    customLog('TEST1', '')
     if (!planStamp({
         stampType: 'fastFiller',
         count: 1,
         anchorOrient: avgControllerSourcePos,
         normalDT: true,
     })) return false
-
+    customLog('TEST2', '')
     // If the stamp failed to be planned
 
-    if (!room.global.stampAnchors.fastFiller?.length) {
+    if (!room.memory.stampAnchors.fastFiller.length) {
 
         // Record that the room is not claimable and stop
 
         room.memory.notClaimable = true
         return false
     }
-
-    // Otherwise store the fastFillerAnchor as anchor in the room's memory
-
-    room.memory.anchor = pack(room.global.stampAnchors.fastFiller[0])
+    customLog('TEST3', '')
 
     // Get the centerUpgradePos, informing false if it's undefined
 
@@ -209,11 +193,13 @@ export function basePlanner(room: Room) {
         normalDT: true,
     })) return false
 
-    const fastFillerHubAnchor = findAvgBetweenPosotions(room.global.stampAnchors.fastFiller[0], room.global.stampAnchors.hub[0]),
+    const hubAnchor = unPackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
+
+    const fastFillerHubAnchor = findAvgBetweenPosotions(room.anchor, hubAnchor),
 
     // Get the closest upgrade pos and mark it as fair use in roadCM
 
-    closestUpgradePos = room.global.stampAnchors.hub[0].findClosestByRange(upgradePositions)
+    closestUpgradePos = hubAnchor.findClosestByRange(upgradePositions)
     roadCM.set(closestUpgradePos.x, closestUpgradePos.y, 5)
 
     // Construct path
@@ -230,13 +216,13 @@ export function basePlanner(room: Room) {
 
     // Plan the stamp x times
 
-    for (const extensionsAnchor of room.global.stampAnchors.extensions) {
+    for (const extensionsAnchor of room.memory.stampAnchors.extensions) {
 
         // Path from the extensionsAnchor to the hubAnchor
 
         path = room.advancedFindPath({
-            origin: extensionsAnchor,
-            goal: { pos: room.global.stampAnchors.hub[0], range: 2 },
+            origin: unPackAsRoomPos(extensionsAnchor, room.name),
+            goal: { pos: hubAnchor, range: 2 },
             weightCostMatrixes: [roadCM]
         })
 
@@ -267,7 +253,7 @@ export function basePlanner(room: Room) {
     // Path from the fastFillerAnchor to the hubAnchor
 
     path = room.advancedFindPath({
-        origin: room.global.stampAnchors.hub[0],
+        origin: hubAnchor,
         goal: { pos: room.anchor, range: 3 },
         weightCostMatrixes: [roadCM]
     })
@@ -293,7 +279,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: centerUpgadePos,
-        goal: { pos: room.global.stampAnchors.hub[0], range: 2 },
+        goal: { pos: hubAnchor, range: 2 },
         weightCostMatrixes: [roadCM]
     })
 
@@ -395,8 +381,8 @@ export function basePlanner(room: Room) {
     // Path from the hubAnchor to the labsAnchor
 
     path = room.advancedFindPath({
-        origin: room.global.stampAnchors.labs[0],
-        goal: { pos: room.global.stampAnchors.hub[0], range: 2 },
+        origin: unPackAsRoomPos(room.memory.stampAnchors.labs[0], room.name),
+        goal: { pos: hubAnchor, range: 2 },
         weightCostMatrixes: [roadCM]
     })
 
@@ -425,7 +411,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: mineralHarvestPos,
-        goal: { pos: room.global.stampAnchors.hub[0], range: 2 },
+        goal: { pos: hubAnchor, range: 2 },
         weightCostMatrixes: [roadCM]
     })
 
@@ -446,9 +432,9 @@ export function basePlanner(room: Room) {
 
     const mineral: Mineral = room.get('mineral')
 
-    // Plan for a road at the mineral's pos
+        // Plan for a road at the mineral's pos
 
-    structurePlans.set(mineral.pos.x, mineral.pos.y, constants.structureTypesByNumber[STRUCTURE_EXTRACTOR])
+        structurePlans.set(mineral.pos.x, mineral.pos.y, constants.structureTypesByNumber[STRUCTURE_EXTRACTOR])
 
     // Record road plans in the baseCM
 
@@ -492,16 +478,16 @@ export function basePlanner(room: Room) {
 
         const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`),
 
-        // Find positions adjacent to source
+            // Find positions adjacent to source
 
-        adjacentPositions = findPositionsInsideRect(closestHarvestPos.x - 1, closestHarvestPos.y - 1, closestHarvestPos.x + 1, closestHarvestPos.y + 1),
+            adjacentPositions = findPositionsInsideRect(closestHarvestPos.x - 1, closestHarvestPos.y - 1, closestHarvestPos.x + 1, closestHarvestPos.y + 1),
 
-        // Sort adjacentPositions by range from the anchor
+            // Sort adjacentPositions by range from the anchor
 
-        adjacentPositionsByAnchorRange = adjacentPositions.sort(function(a, b) {
+            adjacentPositionsByAnchorRange = adjacentPositions.sort(function(a, b) {
 
-            return getRange(a.x - room.global.stampAnchors.hub[0].x, a.y - room.global.stampAnchors.hub[0].y) - getRange(b.x - room.global.stampAnchors.hub[0].x, b.y - room.global.stampAnchors.hub[0].y)
-        })
+                return getRange(a.x - hubAnchor.x, a.y - hubAnchor.y) - getRange(b.x - hubAnchor.x, b.y - hubAnchor.y)
+            })
 
         // Loop through each pos
 
@@ -529,21 +515,15 @@ export function basePlanner(room: Room) {
 
             if (!sourceHasLink) {
 
-                // Plan for a link at this position
-
-                structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_LINK])
-
-                // Record the link now has a source and iterate
+                room.memory.stampAnchors.link.push(pack(pos))
 
                 sourceHasLink = true
                 continue
             }
 
-            // Otherwise if there is a link planned for this source
+            // Otherwise plan for an extension
 
-            // Plan for an extension at this position
-
-            structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_EXTENSION])
+            room.memory.stampAnchors.extension.push(pack(pos))
 
             // Decrease the extraExtensionsAmount and iterate
 
@@ -566,7 +546,7 @@ export function basePlanner(room: Room) {
     if(!planStamp({
         stampType: 'extension',
         count: extraExtensionsAmount,
-        anchorOrient: room.global.stampAnchors.hub[0],
+        anchorOrient: fastFillerHubAnchor,
         adjacentToRoads: true,
     })) return false
 

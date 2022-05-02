@@ -59,9 +59,9 @@ declare global {
     'labs' |
     'tower' |
     'extension' |
-    'observer'
-
-    type PackedPosMap = any[]
+    'observer' |
+    'link' |
+    'rampart'
 
     interface Stamp {
         offset: number
@@ -73,9 +73,9 @@ declare global {
         structures: {[key: string]: Pos[]}
     }
 
-    type Stamps = Record<StampTypes, Stamp>
-
     type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
+
+    type PackedPosMap = any[]
 
     type CreepRoles = 'source1Harvester' |
     'source2Harvester' |
@@ -102,7 +102,6 @@ declare global {
     'baseCM' |
     'roadCM' |
     'structurePlans' |
-    'rampartPlans' |
     'mineral' |
     'source1' |
     'source2' |
@@ -604,7 +603,7 @@ declare global {
         /**
          * Groups positions with contigiousness, structured similarily to a flood fill
          */
-        groupRampartPositions(rampartPositions: Pos[]): RoomPosition[][]
+        groupRampartPositions(rampartPositions: Pos[], rampartPlans: CostMatrix): RoomPosition[][]
 
         /**
          *

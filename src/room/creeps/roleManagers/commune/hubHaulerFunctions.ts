@@ -1,4 +1,4 @@
-import { findObjectWithID } from "international/generalFunctions";
+import { findObjectWithID, unPackAsRoomPos } from "international/generalFunctions";
 import { HubHauler } from "room/creeps/creepClasses";
 
 HubHauler.prototype.travelToHub = function() {
@@ -8,12 +8,12 @@ HubHauler.prototype.travelToHub = function() {
 
     // Get the hub, informing false if it's undefined
 
-    const hub: RoomPosition | undefined = room.global.stampAnchors?.hub[0]
-    if(!hub) return true
+    const hubAnchor = unPackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
+    if(!hubAnchor) return true
 
     // Otherwise if the creep is on the hub, inform false
 
-    if (creep.pos.getRangeTo(hub) == 0) return false
+    if (creep.pos.getRangeTo(hubAnchor) == 0) return false
 
     // Otherwise move to the hub and inform true
 
@@ -21,7 +21,7 @@ HubHauler.prototype.travelToHub = function() {
 
     creep.createMoveRequest({
         origin: creep.pos,
-        goal: { pos: hub, range: 0 }
+        goal: { pos: hubAnchor, range: 0 }
     })
 
     return true

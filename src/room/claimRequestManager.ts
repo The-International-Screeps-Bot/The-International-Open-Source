@@ -25,6 +25,7 @@ Room.prototype.claimRequestManager = function() {
 
             delete Memory.claimRequests[this.memory.claimRequest]
             delete this.memory.claimRequest
+            
             return
         }
 

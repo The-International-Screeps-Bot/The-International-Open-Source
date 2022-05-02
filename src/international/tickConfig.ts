@@ -1,5 +1,5 @@
 import { allyManager } from 'international/simpleAllies'
-import { constants, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles } from './constants'
+import { constants, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles, stamps } from './constants'
 import { createPackedPosMap, customLog, findCarryPartsRequired } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
@@ -196,7 +196,7 @@ InternationalManager.prototype.tickConfig = function() {
 
             room.memory.stampAnchors = {}
 
-            for (const type in constants.stamps) room.memory.stampAnchors[type as StampTypes] = []
+            for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
         }
     }
 }
