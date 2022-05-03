@@ -430,6 +430,30 @@ declare global {
         plannedRamparts: boolean
     }
 
+    interface OrganizedStructures {
+        spawn: StructureSpawn[]
+        extension: StructureExtension[]
+        road: StructureRoad[]
+        constructedWall: StructureWall[]
+        rampart: StructureRampart[]
+        keeperLair: StructureKeeperLair[]
+        portal: StructurePortal[]
+        controller: StructureController[]
+        link: StructureLink[]
+        storage: StructureStorage[]
+        tower: StructureTower[]
+        observer: StructureObserver[]
+        powerBank: StructurePowerBank[]
+        powerSpawn: StructurePowerSpawn[]
+        extractor: StructureExtractor[]
+        lab: StructureLab[]
+        terminal: StructureTerminal[]
+        container: StructureContainer[]
+        nuker: StructureNuker[]
+        factory: StructureFactory[]
+        invaderCore: StructureInvaderCore[]
+    }
+
     interface Room {
 
         /**
@@ -667,13 +691,13 @@ declare global {
 
         readonly enemyCreeps: Creep[]
 
-        _structures: Partial<Record<StructureConstant, Structure[]>>
+        _structures: Partial<OrganizedStructures>
 
-        readonly structures: Partial<Record<StructureConstant, Structure[]>>
+        readonly structures: OrganizedStructures
 
         _cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
 
-        readonly cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
+        readonly cSites: Record<StructureConstant, ConstructionSite[]>
 
         _spawningStructures: SpawningStructures
 

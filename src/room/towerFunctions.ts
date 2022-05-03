@@ -2,11 +2,9 @@ import { RoomTransferTask } from "./roomTasks"
 
 Room.prototype.towersRequestResources = function() {
 
-    const room = this
+    const room = this,
 
-    // Get the room's towers
-
-    const towers: StructureTower[] = room.get('tower')
+    towers = room.structures.tower
 
     // Get and loop through each tower
 
@@ -63,11 +61,9 @@ Room.prototype.towersRequestResources = function() {
 
 Room.prototype.towersHealCreeps = function() {
 
-    const room = this
+    const room = this,
 
-    // Get the room's towers
-
-    const towers: StructureTower[] = room.get('tower')
+    towers = room.structures.tower
 
     // Stop if there are no towers
 
@@ -111,19 +107,13 @@ Room.prototype.towersAttackCreeps = function() {
 
     const room = this,
 
-    // Get the room's towers
-
-    towers: StructureTower[] = room.get('tower')
-
-    // Stop if there are no towers
-
-    if (!towers.length) return
+    towers = room.structures.tower
 
     if (room.controller.safeMode) return
 
     // Construct attack targets from my and allied damaged creeps in the room
 
-    const attackTargets = (room.get('enemyCreeps') as Creep[]).filter(creep => !creep.isOnExit())
+    const attackTargets = room.enemyCreeps
 
     // Loop through the room's towers
 
@@ -159,13 +149,7 @@ Room.prototype.towersRepairRamparts = function() {
 
     const room = this,
 
-    // Get the room's towers
-
-    towers: StructureTower[] = room.get('tower')
-
-    // Stop if there are no towers
-
-    if (!towers.length) return
+    towers = room.structures.tower
 
     // Find ramparts at 300 hits or less
 

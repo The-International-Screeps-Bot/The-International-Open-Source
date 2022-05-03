@@ -104,9 +104,9 @@ FastFiller.prototype.fillFastFiller = function() {
 
         if (structure.structureType != STRUCTURE_SPAWN && structure.structureType != STRUCTURE_EXTENSION) continue
 
-        // Otherwise, if the structure is full, iterate
+        // , iterate
 
-        if (structure.store.getFreeCapacity(RESOURCE_ENERGY) == 0) continue
+        if (structure.store.getFreeCapacity(RESOURCE_ENERGY) < creep.store.getCapacity() * 0.2) continue
 
         // Otherwise, transfer to the structure record the action and inform true
 

@@ -1293,9 +1293,9 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
     function generatePath() {
 
-        const route = generateRoute()
+        const route = generateRoute(),
 
-        const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
+        pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost || 2,
             swampCost: opts.swampCost || 8,
             maxRooms: route ? 100 : 1,
@@ -1312,7 +1312,8 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                 // If the type is in typeWeights, inform the weight for the type
 
-                if (opts.typeWeights && Memory.rooms[roomName] && opts.typeWeights[Memory.rooms[roomName].type] == Infinity) return false
+                if (opts.typeWeights && Memory.rooms[roomName] && opts.typeWeights[Memory.rooms[roomName].type] == Infinity)
+                    return false
 
                 // Create a costMatrix for the room
 
@@ -1323,47 +1324,31 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                 if (!route) {
 
                     let y = 0,
-                    x = 0
+                        x = 0
 
                     // Configure y and loop through top exits
 
                     y = 0
-                    for (x = 0; x < 50; x++) {
-
-                        // Record the exit to be avoided
-
+                    for (x = 0; x < 50; x++)
                         cm.set(x, y, 255)
-                    }
 
                     // Configure x and loop through left exits
 
                     x = 0
-                    for (y = 0; y < 50; y++) {
-
-                        // Record the exit to be avoided
-
+                    for (y = 0; y < 50; y++)
                         cm.set(x, y, 255)
-                    }
 
                     // Configure y and loop through bottom exits
 
                     y = 49
-                    for (x = 0; x < 50; x++) {
-
-                        // Record the exit to be avoided
-
+                    for (x = 0; x < 50; x++)
                         cm.set(x, y, 255)
-                    }
 
                     // Configure x and loop through right exits
 
                     x = 49
-                    for (y = 0; y < 50; y++) {
-
-                        // Record the exit to be avoided
-
+                    for (y = 0; y < 50; y++)
                         cm.set(x, y, 255)
-                    }
                 }
 
                 weightStructures()
@@ -1376,15 +1361,16 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         // Use the weight to get the gameObjects
 
-                        const gameObjects = opts.weightGamebjects[weight]
+                        const gameObjects = opts.weightGamebjects[weight],
 
                         // Get the numeric value of the weight
 
-                        const weightNumber = parseInt(weight)
+                        weightNumber = parseInt(weight)
 
                         // Loop through each gameObject and set their pos to the weight in the cm
 
-                        for (const gameObj of gameObjects) cm.set(gameObj.pos.x, gameObj.pos.y, weightNumber)
+                        for (const gameObj of gameObjects)
+                            cm.set(gameObj.pos.x, gameObj.pos.y, weightNumber)
                     }
                 }
 
@@ -1398,15 +1384,16 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         // Use the weight to get the gameObjects
 
-                        const gameObjects = opts.weightGamebjects[weight]
+                        const gameObjects = opts.weightGamebjects[weight],
 
                         // Get the numeric value of the weight
 
-                        const weightNumber = parseInt(weight)
+                        weightNumber = parseInt(weight)
 
                         // Loop through each gameObject and set their pos to the weight in the cm
 
-                        for (const gameObj of gameObjects) cm.set(gameObj.pos.x, gameObj.pos.y, weightNumber)
+                        for (const gameObj of gameObjects)
+                            cm.set(gameObj.pos.x, gameObj.pos.y, weightNumber)
                     }
                 }
 
@@ -1420,15 +1407,16 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         // Use the weight to get the positions
 
-                        const positions = opts.weightPositions[weight]
+                        const positions = opts.weightPositions[weight],
 
                         // Get the numeric value of the weight
 
-                        const weightNumber = parseInt(weight)
+                        weightNumber = parseInt(weight)
 
                         // Loop through each gameObject and set their pos to the weight in the cm
 
-                        for (const pos of positions) cm.set(pos.x, pos.y, weightNumber)
+                        for (const pos of positions)
+                            cm.set(pos.x, pos.y, weightNumber)
                     }
                 }
 
@@ -1447,12 +1435,8 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                             // Loop through each costMatrix
 
-                            for (const weightCM of opts.weightCostMatrixes) {
-
-                                // If weightCM is defined, assign the weightCM's value of this pos to the cm's value
-
+                            for (const weightCM of opts.weightCostMatrixes)
                                 if (weightCM) cm.set(x, y, weightCM.get(x, y))
-                            }
                         }
                     }
                 }
@@ -1461,14 +1445,13 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                 if (!room) return cm
 
+                for (const portal of room.structures.portal)
+                    cm.set(portal.pos.x, portal.pos.y, 255)
+
                 // Loop trough each construction site belonging to an ally
 
-                for (const cSite of room.get('allyCSites')) {
-
-                    // Set the site as impassible
-
+                for (const cSite of room.get('allyCSites'))
                     cm.set(cSite.x, cSite.y, 255)
-                }
 
                 // If there is a request to avoid enemy ranges
 
@@ -1508,7 +1491,8 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     // Get and loop through ramparts
 
-                    const ramparts: StructureRampart[] = room.get('rampart')
+                    const ramparts = room.structures.rampart
+
                     for (const rampart of ramparts) {
 
                         // If the rampart is mine
@@ -1538,22 +1522,14 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     for (const structureType of constants.impassibleStructureTypes) {
 
-                        // Get structures of type and loop through them
-
-                        const structuresOfType: Structure<StructureConstant>[] = room.get(structureType)
-
-                        for (const structure of structuresOfType) {
+                        for (const structure of room.structures[structureType]) {
 
                             // Set pos as impassible
 
                             cm.set(structure.pos.x, structure.pos.y, 255)
                         }
 
-                        // Get cSites of type and loop through them
-
-                        const cSitesOfType: ConstructionSite<BuildableStructureConstant>[] = room.get(`${structureType}CSite`)
-
-                        for (const cSite of cSitesOfType) {
+                        for (const cSite of room.cSites[structureType]) {
 
                             // Set pos as impassible
 
@@ -1591,7 +1567,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                         // Get the upgradePositions, and use the anchor to find the closest upgradePosition to the anchor
 
                         const upgradePositions: RoomPosition[] = room.get('upgradePositions'),
-                        deliverUpgradePos = room.anchor.findClosestByRange(upgradePositions)
+                            deliverUpgradePos = room.anchor.findClosestByRange(upgradePositions)
 
                         // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
 
@@ -1609,16 +1585,12 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     // Get the hubAnchor
 
-                    const hubAnchor: Pos = room.global.stampAnchors?.hub[0]
+                    const hubAnchor = room.memory.stampAnchors ? unPackAsRoomPos(room.memory.stampAnchors.hub[0], roomName) : undefined
 
                     // If the hubAnchor is defined
 
-                    if (hubAnchor) {
-
-                        // Have the creep prefer to avoid the pos
-
+                    if (hubAnchor)
                         cm.set(hubAnchor.x, hubAnchor.y, 10)
-                    }
 
                     // Get fastFillerPositions
 
@@ -1645,8 +1617,10 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
         if (pathFinderResult.incomplete) {
 
             customLog('Incomplete Path', JSON.stringify(opts.origin), constants.colors.white, constants.colors.red)
+
             room.pathVisual(pathFinderResult.path, constants.colors.red as keyof Colors)
             room.visual.line(opts.origin, opts.goal.pos, { color: constants.colors.red, width: .15, opacity: .3, lineStyle: 'solid' })
+
             return []
         }
 
