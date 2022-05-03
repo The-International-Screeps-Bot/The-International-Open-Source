@@ -15,7 +15,7 @@ MineralHarvester.prototype.advancedHarvestMineral = function(mineral) {
 
     // Unpack the creep's packedHarvestPos
 
-    const harvestPos = unPackAsRoomPos(creep.memory.packedHarvestPos, room.name)
+    const harvestPos = unPackAsRoomPos(creep.memory.packedPos, room.name)
 
     // If the creep is not standing on the harvestPos
 

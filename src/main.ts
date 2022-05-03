@@ -667,17 +667,25 @@ declare global {
 
         readonly enemyCreeps: Creep[]
 
+        _structures: Partial<Record<StructureConstant, Structure[]>>
+
+        readonly structures: Partial<Record<StructureConstant, Structure[]>>
+
+        _cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
+
+        readonly cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
+
         _spawningStructures: SpawningStructures
 
-        spawningStructures: SpawningStructures
+        readonly spawningStructures: SpawningStructures
 
         _taskNeedingSpawningStructures: SpawningStructures
 
-        taskNeedingSpawningStructures: SpawningStructures
+        readonly taskNeedingSpawningStructures: SpawningStructures
 
         _spawningStructuresByPriority: SpawningStructures
 
-        spawningStructuresByPriority: SpawningStructures
+        readonly spawningStructuresByPriority: SpawningStructures
 
         // Main roomFunctions
 
@@ -1010,19 +1018,9 @@ declare global {
         sourceName: 'source1' | 'source2'
 
         /**
-         * The creep's packed pos to sit on when harvesting
+         * The creep's packedPos for a designated target
          */
-        packedHarvestPos: number
-
-        /**
-         * The creep's packed upgrade pos
-         */
-        packedUpgradePos: number
-
-        /**
-         * The creep's packed fastFiller pos
-         */
-        packedFastFillerPos: number
+        packedPos: number
 
         /**
          * The last time a path was cached in memory

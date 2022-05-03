@@ -473,3 +473,8 @@ export const CPUBucketRenewThreshold = 5000
 export const prefferedCommuneRange = 6
 
 export const allyTrading = false
+
+export const relayRoles: Partial<CreepRoles>[] = [
+    'hauler',
+    'remoteHauler'
+]

@@ -684,7 +684,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 
-            if (creep.memory.packedHarvestPos) usedHarvestPositions.add(creep.memory.packedHarvestPos)
+            if (creep.memory.packedPos) usedHarvestPositions.add(creep.memory.packedPos)
         }
 
         // Inform usedHarvestPositions
@@ -731,7 +731,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 
-            if (creep.memory.packedHarvestPos) usedHarvestPositions.add(creep.memory.packedHarvestPos)
+            if (creep.memory.packedPos) usedHarvestPositions.add(creep.memory.packedPos)
         }
 
         // Inform usedHarvestPositions
@@ -802,7 +802,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // If the creep has a packedUpgradePos, record it in usedUpgradePositions
 
-            if (creep.memory.packedUpgradePos) usedUpgradePositions.add(creep.memory.packedUpgradePos)
+            if (creep.memory.packedPos) usedUpgradePositions.add(creep.memory.packedPos)
         }
 
         // Inform usedUpgradePositions
@@ -839,7 +839,7 @@ Room.prototype.get = function(roomObjectName) {
 
             // If the creep has a packedFastFillerPos, record it in usedFastFillerPositions
 
-            if (creep.memory.packedFastFillerPos) usedFastFillerPositions.add(creep.memory.packedFastFillerPos)
+            if (creep.memory.packedPos) usedFastFillerPositions.add(creep.memory.packedPos)
         }
 
         // Inform usedFastFillerPositions
@@ -2597,7 +2597,7 @@ Room.prototype.findClosestPosOfValue = function(opts) {
 
                     // If canUseWalls is enabled and the terrain isnt' a wall, disable canUseWalls
 
-                    if (canUseWalls && terrain.get(adjacentPos.x, adjacentPos.y) != TERRAIN_MASK_WALL) canUseWalls = false
+                    if (canUseWalls && opts.CM.get(adjacentPos.x, adjacentPos.y) != 255) canUseWalls = false
 
                     // Add it tofastFillerSide the next gen
 
@@ -2950,7 +2950,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
             }
         }
     }
-  
+
     // Record the anchor as visited
 
     visitedCM.set(adjustedAnchor.x, adjustedAnchor.y, 1)

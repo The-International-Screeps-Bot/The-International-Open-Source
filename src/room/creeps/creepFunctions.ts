@@ -194,7 +194,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
         // if the creep doesn't have an upgrade pos
 
-        if (!creep.memory.packedUpgradePos) {
+        if (!creep.memory.packedPos) {
 
             // Get upgrade positions
 
@@ -219,7 +219,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
                 // Otherwise record packedPos in the creep's memory and in usedUpgradePositions
 
-                creep.memory.packedUpgradePos = packedPos
+                creep.memory.packedPos = packedPos
                 usedUpgradePositions.add(packedPos)
                 break
             }
@@ -245,7 +245,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
         // If packedUpgradePos is out of range
 
-        if (getRangeBetween(creep.pos.x, creep.pos.y, Math.floor(creep.memory.packedUpgradePos / constants.roomDimensions), Math.floor(creep.memory.packedUpgradePos % constants.roomDimensions)) > 0) {
+        if (getRangeBetween(creep.pos.x, creep.pos.y, Math.floor(creep.memory.packedPos / constants.roomDimensions), Math.floor(creep.memory.packedPos % constants.roomDimensions)) > 0) {
 
             creep.say('➡️🔋')
 
@@ -253,7 +253,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: new RoomPosition(Math.floor(creep.memory.packedUpgradePos / constants.roomDimensions), Math.floor(creep.memory.packedUpgradePos % constants.roomDimensions), room.name), range: 0 },
+                goal: { pos: new RoomPosition(Math.floor(creep.memory.packedPos / constants.roomDimensions), Math.floor(creep.memory.packedPos % constants.roomDimensions), room.name), range: 0 },
                 avoidEnemyRanges: true,
                 weightGamebjects: {
                     1: room.get('road')
@@ -547,7 +547,7 @@ Creep.prototype.findSourceHarvestPos = function(sourceName) {
 
     // Stop if the creep already has a packedHarvestPos
 
-    if (creep.memory.packedHarvestPos) return true
+    if (creep.memory.packedPos) return true
 
     // Define an anchor
 
@@ -572,7 +572,7 @@ Creep.prototype.findSourceHarvestPos = function(sourceName) {
 
             // Assign it as the creep's harvest pos and inform true
 
-            creep.memory.packedHarvestPos = packedPos
+            creep.memory.packedPos = packedPos
             usedSourceHarvestPositions.add(packedPos)
 
             return true
@@ -590,7 +590,7 @@ Creep.prototype.findSourceHarvestPos = function(sourceName) {
 
     packedPos = pack(creepsClosestHarvestPos)
 
-    creep.memory.packedHarvestPos = packedPos
+    creep.memory.packedPos = packedPos
     usedSourceHarvestPositions.add(packedPos)
 
     return true
@@ -605,7 +605,7 @@ Creep.prototype.findMineralHarvestPos = function() {
 
     // Stop if the creep already has a packedHarvestPos
 
-    if (creep.memory.packedHarvestPos) return true
+    if (creep.memory.packedPos) return true
 
     // Define an anchor
 
@@ -630,7 +630,7 @@ Creep.prototype.findMineralHarvestPos = function() {
 
             // Assign it as the creep's harvest pos and inform true
 
-            creep.memory.packedHarvestPos = packedPos
+            creep.memory.packedPos = packedPos
             usedHarvestPositions.add(packedPos)
 
             return true
@@ -648,7 +648,7 @@ Creep.prototype.findMineralHarvestPos = function() {
 
     packedPos = pack(creepsClosestHarvestPos)
 
-    creep.memory.packedHarvestPos = packedPos
+    creep.memory.packedPos = packedPos
     usedHarvestPositions.add(packedPos)
 
     return true
@@ -663,7 +663,7 @@ Creep.prototype.findFastFillerPos = function() {
 
     // Stop if the creep already has a packedFastFillerPos
 
-    if (creep.memory.packedFastFillerPos) return true
+    if (creep.memory.packedPos) return true
 
     // Get usedFastFillerPositions
 
@@ -680,7 +680,7 @@ Creep.prototype.findFastFillerPos = function() {
 
     packedPos = pack(creepsClosestFastFillerPos)
 
-    creep.memory.packedFastFillerPos = packedPos
+    creep.memory.packedPos = packedPos
     usedFastFillerPositions.add(packedPos)
 
     return true

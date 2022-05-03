@@ -47,7 +47,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
     // Unpack the harvestPos
 
-    const harvestPos = unPackAsPos(creep.memory.packedHarvestPos)
+    const harvestPos = unPackAsPos(creep.memory.packedPos)
 
     // If the creep is at the creep's packedHarvestPos, inform false
 

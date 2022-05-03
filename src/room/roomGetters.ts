@@ -1,4 +1,4 @@
-import { allyList } from "international/constants"
+import { allyList, constants } from "international/constants"
 import { getRange, unPackAsRoomPos } from "international/generalFunctions"
 
 Object.defineProperties(Room.prototype, {
@@ -28,6 +28,50 @@ Object.defineProperties(Room.prototype, {
             return this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
                 filter: creep => !allyList.has(creep.owner.username)
             })
+        }
+    },
+    structures: {
+        get() {
+
+            if (this._structures) return this._structures
+
+            // Construct storage of structures based on structureType
+
+            this._structures = {}
+
+            // Make array keys for each structureType
+
+            for (const structureType of constants.allStructureTypes)
+                this._structures[structureType] = []
+
+            // Group structures by structureType
+
+            for (const structure of this.find(FIND_STRUCTURES))
+                this._structures[structure.structureType].push(structure)
+
+            return this._structures
+        }
+    },
+    cSites: {
+        get() {
+
+            if (this._cSites) return this._cSites
+
+            // Construct storage of structures based on structureType
+
+            this._cSites = {}
+
+            // Make array keys for each structureType
+
+            for (const structureType of constants.allStructureTypes)
+                this._cSites[structureType] = []
+
+            // Group cSites by structureType
+
+            for (const cSite of this.find(FIND_MY_CONSTRUCTION_SITES))
+                this._cSites[cSite.structureType].push(cSite)
+
+            return this._cSites
         }
     },
     spawningStructures: {

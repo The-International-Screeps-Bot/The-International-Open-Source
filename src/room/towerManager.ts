@@ -11,6 +11,8 @@ export function towerManager(room: Room) {
 
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
+    /* if (!room.structures.towers.length) return */
+
     room.towersRequestResources()
 
     room.towersAttackCreeps()

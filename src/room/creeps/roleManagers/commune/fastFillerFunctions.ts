@@ -12,7 +12,7 @@ FastFiller.prototype.travelToFastFiller = function() {
 
     // Unpack the creep's packedFastFillerPos
 
-    const fastFillerPos = unPackAsRoomPos(creep.memory.packedFastFillerPos, room.name)
+    const fastFillerPos = unPackAsRoomPos(creep.memory.packedPos, room.name)
 
     // If the creep is standing on the fastFillerPos, inform false
 
