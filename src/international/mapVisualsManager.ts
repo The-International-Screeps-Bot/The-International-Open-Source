@@ -18,10 +18,14 @@ InternationalManager.prototype.mapVisualsManager = function() {
 
         if (roomMemory.type === 'commune') {
 
+            const room = Game.rooms[roomName]
+            if (!room) continue
+
+
 
             if (roomMemory.claimRequest) {
 
-                Game.map.visual.line(new RoomPosition(25, 25, roomName), new RoomPosition(25, 25, roomMemory.claimRequest), {
+                Game.map.visual.line(room.anchor || new RoomPosition(25, 25, roomName), new RoomPosition(25, 25, roomMemory.claimRequest), {
                     color: constants.colors.lightBlue, width: 1.2, opacity: .5, lineStyle: 'dashed'
                 })
             }
@@ -30,11 +34,16 @@ InternationalManager.prototype.mapVisualsManager = function() {
 
         if (roomMemory.type === 'remote') {
 
-            // Draw a line from the center of the remote to the center of its commune
+            const commune = Game.rooms[roomMemory.commune]
 
-            Game.map.visual.line(new RoomPosition(25, 25, roomName), unPackAsRoomPos(Memory.rooms[roomMemory.commune].anchor || 0, roomMemory.commune), {
-                color: constants.colors.yellow, width: 1.2, opacity: .5, lineStyle: 'dashed'
-            })
+            if (commune) {
+
+                // Draw a line from the center of the remote to the center of its commune
+
+                Game.map.visual.line(new RoomPosition(25, 25, roomName), commune.anchor || new RoomPosition(25, 25, roomMemory.commune), {
+                    color: constants.colors.yellow, width: 1.2, opacity: .5, lineStyle: 'dashed'
+                })
+            }
 
             Game.map.visual.text('⛏️' + roomMemory.sourceEfficacies.reduce((sum, el) => sum + el, 0).toString(), new RoomPosition(2, 10, roomName), {
                 align: 'left',
