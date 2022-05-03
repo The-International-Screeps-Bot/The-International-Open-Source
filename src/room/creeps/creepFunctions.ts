@@ -1600,7 +1600,7 @@ Creep.prototype.advancedRenew = function() {
 
     // If the creep's age is less than the benefit from renewing, inform false
 
-    if (CREEP_LIFE_TIME - creep.ticksToLive < Math.ceil(creep.memory.cost / 2.5 / creep.body.length)) return false
+    if (CREEP_LIFE_TIME - creep.ticksToLive < Math.ceil(creep.findCost() / 2.5 / creep.body.length)) return false
 
     // Get the room's spawns, stopping if there are none
 
@@ -1711,4 +1711,13 @@ Creep.prototype.findStrength = function() {
     }
 
     return creep.strength
+}
+
+Creep.prototype.findCost = function() {
+
+    let cost = 0
+
+    for(const part of this.body) cost += BODYPART_COST[part.type]
+
+    return cost
 }

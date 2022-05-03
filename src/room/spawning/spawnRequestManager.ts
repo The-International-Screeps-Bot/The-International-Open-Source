@@ -32,10 +32,6 @@ export function spawnRequester(room: Room) {
 
         memory.communeName = room.name
 
-        // Assign the cost to the creep's memory
-
-        memory.cost = cost
-
         // Add the components to spawnRequests
 
         spawnRequests[priority] = {

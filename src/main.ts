@@ -982,6 +982,8 @@ declare global {
         advancedReserveController(): boolean
 
         findStrength(): number
+
+        findCost(): number
     }
 
     interface CreepMemory {
