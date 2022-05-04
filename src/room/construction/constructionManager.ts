@@ -20,7 +20,7 @@ export function constructionManager(room: Room) {
 
             // Only run the planner every x ticks (temporary fix)
 
-            /* if (Game.time % Math.floor(Math.random() * 100) != 0) return */
+            if (Game.time % Math.floor(Math.random() * 100) != 0) return
 
             // If the construction site count is at its limit, stop
 
@@ -58,7 +58,7 @@ export function constructionManager(room: Room) {
     function manageBasePlanning() {
 
         // If there are no base plans yet
-        delete room.global.plannedBase
+        
         if (!room.global.plannedBase) {
 
             // Generate and record base plans

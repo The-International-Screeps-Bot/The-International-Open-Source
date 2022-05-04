@@ -2872,13 +2872,13 @@ Room.prototype.advancedConstructStructurePlans = function() {
                 if (structureType == 'empty') continue
 
                 // If there are already sufficient structures + cSites
-/*
+
                 if (room.get(structureType as BuildableStructureConstant).length + room.get(`${structureType as BuildableStructureConstant}CSite`).length >= CONTROLLER_STRUCTURES[structureType as BuildableStructureConstant][room.controller.level]) continue
- */
+
                 // If the structureType is a road and RCL 3 extensions aren't built, stop
-/*
+
                 if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue
- */
+
                 const positions = stamp.structures[structureType]
 
                 for (const pos of positions) {
@@ -2894,7 +2894,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
                         opacity: 0.5
                     })
 
-                    // room.createConstructionSite(x, y, structureType as BuildableStructureConstant)
+                    room.createConstructionSite(x, y, structureType as BuildableStructureConstant)
                 }
             }
         }
@@ -2926,10 +2926,10 @@ Room.prototype.advancedConstructStructurePlans = function() {
         })
 
         // If the structureType is a road and RCL 3 extensions aren't built, stop
-/*
+
         if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) return
- */
-        // room.createConstructionSite(x, y, structureType)
+
+        room.createConstructionSite(x, y, structureType)
     }
 
     // So long as there are positions in this gen
