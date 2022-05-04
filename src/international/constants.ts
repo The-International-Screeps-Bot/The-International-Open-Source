@@ -398,12 +398,20 @@ export const stamps: Record<StampTypes, Partial<Stamp>> = {
             /* observer: [{ x: 0, y: 0 }] */
         }
     },
-    link: {
+    sourceLink: {
         offset: 0,
         protectionOffset: 1,
         size: 1,
         structures: {
             link: [{ x: 0, y: 0 }]
+        }
+    },
+    sourceExtension: {
+        offset: 0,
+        protectionOffset: 1,
+        size: 1,
+        structures: {
+            extension: [{ x: 0, y: 0 }]
         }
     },
     rampart: {
@@ -413,22 +421,30 @@ export const stamps: Record<StampTypes, Partial<Stamp>> = {
         structures: {
             rampart: [{ x: 0, y: 0 }]
         }
-    }
+    },
+    boardingRampart: {
+        offset: 0,
+        protectionOffset: 0,
+        size: 1,
+        structures: {
+            rampart: [{ x: 0, y: 0 }]
+        }
+    },
 }
 
 export const minerals: Partial<ResourceConstant[]> = [
-    RESOURCE_HYDROGEN,
-    RESOURCE_OXYGEN,
-    RESOURCE_UTRIUM,
-    RESOURCE_KEANIUM,
-    RESOURCE_LEMERGIUM,
-    RESOURCE_ZYNTHIUM,
-    RESOURCE_CATALYST
-]
+        RESOURCE_HYDROGEN,
+        RESOURCE_OXYGEN,
+        RESOURCE_UTRIUM,
+        RESOURCE_KEANIUM,
+        RESOURCE_LEMERGIUM,
+        RESOURCE_ZYNTHIUM,
+        RESOURCE_CATALYST
+    ],
 
-export const boosts = [
-    RESOURCE_CATALYZED_GHODIUM_ACID,
-]
+    boosts = [
+        RESOURCE_CATALYZED_GHODIUM_ACID,
+    ]
 
 export const remoteNeedsIndex = {
     source1RemoteHarvester: 0,
@@ -468,13 +484,13 @@ export const upgraderSpawningWhenStorageThreshold = 60000
 
 export const CPUBucketCapacity = 10000
 
-export const CPUBucketRenewThreshold = 5000
+export const CPUBucketRenewThreshold = 5000,
 
-export const prefferedCommuneRange = 6
+    prefferedCommuneRange = 6,
 
-export const allyTrading = false
+    allyTrading = false,
 
-export const relayRoles: Partial<CreepRoles>[] = [
-    'hauler',
-    'remoteHauler'
-]
+    relayRoles: Partial<CreepRoles>[] = [
+        'hauler',
+        'remoteHauler'
+    ]

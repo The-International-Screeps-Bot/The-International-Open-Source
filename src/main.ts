@@ -60,8 +60,10 @@ declare global {
     'tower' |
     'extension' |
     'observer' |
-    'link' |
-    'rampart'
+    'sourceLink' |
+    'sourceExtension' |
+    'rampart' |
+    'boardingRampart'
 
     interface Stamp {
         offset: number
@@ -70,7 +72,7 @@ declare global {
          */
         protectionOffset: number
         size: number
-        structures: {[key: string]: Pos[]}
+        structures: {[structureType: string]: Pos[]}
     }
 
     type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
@@ -627,7 +629,7 @@ declare global {
         /**
          * Groups positions with contigiousness, structured similarily to a flood fill
          */
-        groupRampartPositions(rampartPositions: Pos[], rampartPlans: CostMatrix): RoomPosition[][]
+        groupRampartPositions(rampartPositions: number[], rampartPlans: CostMatrix): RoomPosition[][]
 
         /**
          *

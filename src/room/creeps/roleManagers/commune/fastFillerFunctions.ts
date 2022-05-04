@@ -106,7 +106,7 @@ FastFiller.prototype.fillFastFiller = function() {
 
         // , iterate
 
-        if (structure.store.getFreeCapacity(RESOURCE_ENERGY) < creep.store.getCapacity() * 0.2) continue
+        if (structure.store.getFreeCapacity(RESOURCE_ENERGY) == 0) continue
 
         // Otherwise, transfer to the structure record the action and inform true
 

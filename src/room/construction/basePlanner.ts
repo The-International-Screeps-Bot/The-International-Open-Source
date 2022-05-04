@@ -11,7 +11,9 @@ export function basePlanner(room: Room) {
 
     const baseCM: CostMatrix = room.get('baseCM'),
         roadCM: CostMatrix = room.get('roadCM'),
-        structurePlans: CostMatrix = room.get('structurePlans')
+        structurePlans: CostMatrix = room.get('structurePlans'),
+
+        terrain = room.getTerrain()
 
     if (!room.memory.stampAnchors) {
 
@@ -500,9 +502,13 @@ export function basePlanner(room: Room) {
 
     // Construct extraExtensions count
 
-    let extraExtensionsAmount = 60 - (5 * 7) - 15
+    let extraExtensionsAmount = CONTROLLER_STRUCTURES.extension[8] - stamps.fastFiller.structures.extension.length -
+        stamps.hub.structures.extension.length -
+        room.memory.stampAnchors.extensions.length * stamps.extensions.structures.extension.length -
+        room.memory.stampAnchors.extension.length -
+        room.memory.stampAnchors.sourceExtension.length
 
-    if (room.memory.stampAnchors.link.length + room.memory.stampAnchors.extension.length == 0) {
+    if (room.memory.stampAnchors.sourceLink.length + room.memory.stampAnchors.sourceExtension.length == 0) {
 
         // loop through sourceNames
 
@@ -533,11 +539,11 @@ export function basePlanner(room: Room) {
 
                 // Iterate if plan for pos is in use
 
-                if (roadCM.get(pos.x, pos.y) != 0) continue
+                if (roadCM.get(pos.x, pos.y) > 0) continue
 
                 // Iterate if the pos is a wall
 
-                if (baseCM.get(pos.x, pos.y) == 255) continue
+                if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
 
                 // Otherwise
 
@@ -553,7 +559,7 @@ export function basePlanner(room: Room) {
 
                 if (!sourceHasLink) {
 
-                    room.memory.stampAnchors.link.push(pack(pos))
+                    room.memory.stampAnchors.sourceLink.push(pack(pos))
 
                     sourceHasLink = true
                     continue
@@ -561,7 +567,7 @@ export function basePlanner(room: Room) {
 
                 // Otherwise plan for an extension
 
-                room.memory.stampAnchors.extension.push(pack(pos))
+                room.memory.stampAnchors.sourceExtension.push(pack(pos))
 
                 // Decrease the extraExtensionsAmount and iterate
 

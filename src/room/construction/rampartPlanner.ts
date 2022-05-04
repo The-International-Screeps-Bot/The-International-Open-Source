@@ -5,24 +5,21 @@ export function rampartPlanner(room: Room) {
 
     // require('util.min_cut').test('W5N9');
 
-    /**
-     * Posted 10 may 2018 by @saruss
-
-     * Formatted, added readability, and modified for typescript by Carson Burke
-     *
-     * Code for calculating the minCut in a room, written by Saruss
-     * adapted (for Typescript by Chobobobo , is it somewhere?)
-     * some readability added by Chobobobo @typescript was included here
-     * (15Aug2019) Updated Game.map.getTerrainAt to Game.map.getRoomTerrain method -Shibdib
-     */
+    /*
+    - Posted 10 may 2018 by @saruss
+    - Formatted, optimized, added readability, and modified for typescript by Carson Burke
+    - Code for calculating the minCut in a room, written by Saruss
+    - some readability added by Chobobobo for typescript
+    - Fixed Game.map.getTerrainAt to Game.map.getRoomTerrain method -Shibdib
+    */
 
     const bounds = { x1: 0, x2: constants.roomDimensions- 1, y1: 0, y2: constants.roomDimensions - 1 },
 
-    UNWALKABLE = -1,
-    NORMAL = 0,
-    PROTECTED = 1,
-    TO_EXIT = 2,
-    EXIT = 3
+        UNWALKABLE = -1,
+        NORMAL = 0,
+        PROTECTED = 1,
+        TO_EXIT = 2,
+        EXIT = 3
 
     /**
      * An Array with Terrain information: -1 not usable, 2 Sink (Leads to Exit)
@@ -105,17 +102,22 @@ export function rampartPlanner(room: Room) {
     class Graph {
         constructor(menge_v: number) {
 
-            this.v = menge_v; // Vertex count
-            this.level = Array(menge_v);
-            this.edges = Array(menge_v).fill(0).map(x => []); // Array: for every vertex an edge Array mit {v,r,c,f} vertex_to,res_edge,capacity,flow
+            // Vertex count
+
+            this.v = menge_v
+            this.level = Array(menge_v)
+
+            // Array: for every vertex an edge Array mit {v,r,c,f} vertex_to,res_edge,capacity,flow
+
+            this.edges = Array(menge_v).fill(0).map(x => [])
         }
     }
 
     // Adds new edge from u to v
 
     Graph.prototype.New_edge = function(u, v, c) {
-        this.edges[u].push({ v: v, r: this.edges[v].length, c: c, f: 0 }); // Normal forward Edge
-        this.edges[v].push({ v: u, r: this.edges[u].length - 1, c: 0, f: 0 }); // reverse Edge for Residal Graph
+        this.edges[u].push({ v: v, r: this.edges[v].length, c: c, f: 0 }) // Normal forward Edge
+        this.edges[v].push({ v: u, r: this.edges[u].length - 1, c: 0, f: 0 }) // reverse Edge for Residal Graph
     }
 
     Graph.prototype.Bfs = function(s, t) { // calculates Level Graph and if theres a path from s to t
@@ -440,14 +442,17 @@ export function rampartPlanner(room: Room) {
         if (!graph) return []
 
         // Position Source / Sink in Room-Graph
-        let source = 2 * 50 * 50
 
-        let sink = 2 * 50 * 50 + 1
+        let source = 2 * 50 * 50,
 
-        let count = graph.Calcmincut(source, sink)
+            sink = 2 * 50 * 50 + 1,
+
+            count = graph.Calcmincut(source, sink)
+
         if (verbose) console.log('Number of Tiles in Cut:', count)
 
-        let positions: Pos[] = []
+        const positions: Pos[] = [],
+            packedPositions: number[] = []
 
         if (count > 0) {
 
@@ -455,9 +460,12 @@ export function rampartPlanner(room: Room) {
 
             // Get Positions from Edge
 
-            let u, x, y;
-            let i = 0;
-            const imax = cut_edges.length;
+            let u,
+                x,
+                y,
+                i = 0
+
+            const imax = cut_edges.length
 
             for (; i < imax; i++) {
 
@@ -466,24 +474,25 @@ export function rampartPlanner(room: Room) {
                 y = Math.floor(u / 50);
 
                 positions.push({ x, y })
+                packedPositions.push(pack({ x, y }))
             }
         }
 
         // if bounds are given,
         // try to dectect islands of walkable tiles, which are not conntected to the exits, and delete them from the cut-tiles
 
-        if (positions.length > 0) delete_tiles_to_dead_ends(roomName, positions);
+        if (positions.length > 0) delete_tiles_to_dead_ends(roomName, positions)
 
-        return positions
+        return packedPositions
     }
 
     // Rectangle Array, the Rectangles will be protected by the returned tiles
 
     const protectionRects: Rect[] = [],
 
-    // Get the controller
+        // Get the controller
 
-    controller = room.controller
+        controller = room.controller
 
     // Protect it
 
@@ -562,20 +571,24 @@ export function rampartPlanner(room: Room) {
         }
     }
 
-    // Get Min cut
-    // Positions is an array where to build walls/ramparts
+    const recordRamparts = room.memory.stampAnchors.rampart.length == 0,
 
-    const rampartPositions = GetCutTiles(room.name, protectionRects),
+        // Get Min cut
+        // Positions is an array where to build walls/ramparts
 
-    // Get base planning data
+        rampartPositions = recordRamparts ?
+            GetCutTiles(room.name, protectionRects) :
+            room.memory.stampAnchors.rampart,
 
-    roadCM: CostMatrix = room.get('roadCM'),
-    structurePlans: CostMatrix = room.get('structurePlans'),
-    rampartPlans = new PathFinder.CostMatrix(),
+        // Get base planning data
 
-    // Get the hubAnchor
+        roadCM: CostMatrix = room.get('roadCM'),
+        structurePlans: CostMatrix = room.get('structurePlans'),
+        rampartPlans = new PathFinder.CostMatrix(),
 
-    hubAnchor = unPackAsRoomPos(stampAnchors.hub[0], room.name)
+        // Get the hubAnchor
+
+        hubAnchor = unPackAsRoomPos(stampAnchors.hub[0], room.name)
 
     // Loop through each tower anchor and plan for a rampart at it
 
@@ -585,10 +598,6 @@ export function rampartPlanner(room: Room) {
 
         rampartPlans.set(stampAnchor.x, stampAnchor.y, 1)
     }
-
-    // Protect useful hub structures
-
-
 
     // Protect fastFiller spawns
 
@@ -606,7 +615,9 @@ export function rampartPlanner(room: Room) {
 
     // Plan the positions
 
-    for (const pos of rampartPositions) {
+    for (const packedPos of rampartPositions) {
+
+        const pos = unPackAsPos(packedPos)
 
         // Record the pos in roadCM
 
@@ -619,71 +630,154 @@ export function rampartPlanner(room: Room) {
         rampartPlans.set(pos.x, pos.y, 1)
     }
 
-    // Group rampart positions
+    if (recordRamparts) {
 
-    const groupedRampartPositions = room.groupRampartPositions(rampartPositions, rampartPlans)
+        for (let x = 0; x < constants.roomDimensions; x++) {
+            for (let y = 0; y < constants.roomDimensions; y++) {
 
-    // Loop through each group
-
-    for (const group of groupedRampartPositions) {
-
-        // Get the closest pos of the group by range to the anchor
-
-        const closestPosToAnchor = hubAnchor.findClosestByRange(group),
-
-        // Path from the hubAnchor to the cloestPosToAnchor
-
-        path = room.advancedFindPath({
-            origin: closestPosToAnchor,
-            goal: { pos: hubAnchor, range: 2 },
-            weightCostMatrixes: [roadCM]
-        })
-
-        // Loop through positions of the path
-
-        for (const pos of path) {
-
-            // Record the pos in roadCM
-
-            roadCM.set(pos.x, pos.y, 1)
-
-            // And add the position to the structurePlans
-
-            structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+                if (rampartPlans.get(x, y) == 1)
+                    room.memory.stampAnchors.rampart.push(pack({ x: x, y: y }))
+            }
         }
+    }
 
-        // Construct the onboardingIndex
+    const needsBoardingRamparts = room.memory.stampAnchors.boardingRampart.length == 0
 
-        let onboardingIndex = 0
+    if (room.memory.stampAnchors.boardingRampart.length) {
 
-        // So long as there is a pos in path with an index of onboardingIndex
+        for (const packedPos of room.memory.stampAnchors.boardingRampart) {
 
-        while (path[onboardingIndex]) {
+            const pos = unPackAsRoomPos(packedPos, room.name)
 
-            // Get the pos in path with an index of onboardingIndex
+            // Path from the hubAnchor to the cloestPosToAnchor
 
-            let onboardingPos = path[onboardingIndex]
+            const path = room.advancedFindPath({
+                origin: pos,
+                goal: { pos: hubAnchor, range: 2 },
+                weightCostMatrixes: [roadCM]
+            })
 
-            // If there are already rampart plans at this pos
+            // Loop through positions of the path
 
-           if (rampartPlans.get(onboardingPos.x, onboardingPos.y) == 1) {
+            for (const pos of path) {
 
-                // Increase the onboardingIndex and iterate
+                // Record the pos in roadCM
 
-                onboardingIndex++
-                continue
-           }
+                roadCM.set(pos.x, pos.y, 1)
 
-            // Record the pos in roadCM
+                // And add the position to the structurePlans
 
-            roadCM.set(onboardingPos.x, onboardingPos.y, 1)
+                structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+            }
 
-            // Plan for a road and rampart at pos and stop
+            // Construct the onboardingIndex
 
-            structurePlans.set(onboardingPos.x, onboardingPos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+            let onboardingIndex = 0
 
-            rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
-            break
+            // So long as there is a pos in path with an index of onboardingIndex
+
+            while (path[onboardingIndex]) {
+
+                // Get the pos in path with an index of onboardingIndex
+
+                let onboardingPos = path[onboardingIndex]
+
+                // If there are already rampart plans at this pos
+
+                if (rampartPlans.get(onboardingPos.x, onboardingPos.y) == 1) {
+
+                        // Increase the onboardingIndex and iterate
+
+                        onboardingIndex++
+                        continue
+                }
+
+                // Record the pos in roadCM
+
+                roadCM.set(onboardingPos.x, onboardingPos.y, 1)
+
+                // Plan for a road and rampart at pos and stop
+
+                structurePlans.set(onboardingPos.x, onboardingPos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+
+                rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
+
+                break
+            }
+        }
+    }
+
+    else {
+
+        // Group rampart positions
+
+        const groupedRampartPositions = room.groupRampartPositions(rampartPositions, rampartPlans)
+
+        // Loop through each group
+
+        for (const group of groupedRampartPositions) {
+
+            // Get the closest pos of the group by range to the anchor
+
+            const closestPosToAnchor = hubAnchor.findClosestByRange(group),
+
+            // Path from the hubAnchor to the cloestPosToAnchor
+
+            path = room.advancedFindPath({
+                origin: closestPosToAnchor,
+                goal: { pos: hubAnchor, range: 2 },
+                weightCostMatrixes: [roadCM]
+            })
+
+            // Loop through positions of the path
+
+            for (const pos of path) {
+
+                // Record the pos in roadCM
+
+                roadCM.set(pos.x, pos.y, 1)
+
+                // And add the position to the structurePlans
+
+                structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+            }
+
+            // Construct the onboardingIndex
+
+            let onboardingIndex = 0
+
+            // So long as there is a pos in path with an index of onboardingIndex
+
+            while (path[onboardingIndex]) {
+
+                // Get the pos in path with an index of onboardingIndex
+
+                let onboardingPos = path[onboardingIndex]
+
+                // If there are already rampart plans at this pos
+
+                if (rampartPlans.get(onboardingPos.x, onboardingPos.y) == 1) {
+
+                        // Increase the onboardingIndex and iterate
+
+                        onboardingIndex++
+                        continue
+                }
+
+                // Record the pos in roadCM
+
+                roadCM.set(onboardingPos.x, onboardingPos.y, 1)
+
+                // Plan for a road and rampart at pos and stop
+
+                structurePlans.set(onboardingPos.x, onboardingPos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+
+                rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
+
+                if (needsBoardingRamparts) room.memory.stampAnchors.boardingRampart.push(pack({ x: onboardingPos.x, y: onboardingPos.y }))
+
+                break
+            }
         }
     }
 

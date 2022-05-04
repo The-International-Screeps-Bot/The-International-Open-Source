@@ -2058,13 +2058,6 @@ Room.prototype.findTasksOfTypes = function(createdTaskIDs, types) {
     return tasksOfTypes
 }
 
-Room.prototype.findScore = function() {
-
-    const room = this
-
-
-}
-
 Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = 0, y1 = 0, x2 = constants.roomDimensions, y2 = constants.roomDimensions) {
 
     const room = this,
@@ -2349,21 +2342,21 @@ Room.prototype.floodFill = function(seeds) {
 
     const floodCM = new PathFinder.CostMatrix(),
 
-    // Get the terrain cost matrix
+        // Get the terrain cost matrix
 
-    terrain = room.getTerrain(),
+        terrain = room.getTerrain(),
 
-    // Construct a cost matrix for visited tiles and add seeds to it
+        // Construct a cost matrix for visited tiles and add seeds to it
 
-    visitedCM = new PathFinder.CostMatrix()
+        visitedCM = new PathFinder.CostMatrix()
 
     // Construct values for the flood
 
     let depth = 0,
 
-    thisGeneration: Pos[] = seeds,
+        thisGeneration: Pos[] = seeds,
 
-    nextGeneration: Pos[] = []
+        nextGeneration: Pos[] = []
 
     // Loop through positions of seeds
 
@@ -2442,9 +2435,7 @@ Room.prototype.floodFill = function(seeds) {
 
 Room.prototype.findClosestPosOfValue = function(opts) {
 
-    const room = this,
-
-    terrain = room.getTerrain()
+    const room = this
 
     /**
      *
@@ -2745,15 +2736,15 @@ Creep.prototype.findOptimalSourceName = function() {
 
 Room.prototype.groupRampartPositions = function(rampartPositions, rampartPlans) {
 
-    const room = this
+    const room = this,
 
-    // Construct a costMatrix to store visited positions
+        // Construct a costMatrix to store visited positions
 
-    const visitedCM = new PathFinder.CostMatrix(),
+        visitedCM = new PathFinder.CostMatrix(),
 
-    // Construct storage of position groups
+        // Construct storage of position groups
 
-    groupedPositions = []
+        groupedPositions = []
 
     // Construct the groupIndex
 
@@ -2761,7 +2752,9 @@ Room.prototype.groupRampartPositions = function(rampartPositions, rampartPlans) 
 
     // Loop through each pos of positions
 
-    for (const pos of rampartPositions) {
+    for (const packedPos of rampartPositions) {
+
+        const pos = unPackAsPos(packedPos)
 
         // If the pos has already been visited, iterate
 
@@ -2777,9 +2770,9 @@ Room.prototype.groupRampartPositions = function(rampartPositions, rampartPlans) 
 
         // Construct values for floodFilling
 
-        let thisGeneration: Pos[] = [pos],
+        let thisGeneration = [pos],
 
-        nextGeneration: Pos[] = []
+            nextGeneration: Pos[] = []
 
         // So long as there are positions in this gen
 
@@ -2795,24 +2788,7 @@ Room.prototype.groupRampartPositions = function(rampartPositions, rampartPlans) 
 
                 // Construct a rect and get the positions in a range of 1 (not diagonals)
 
-                const adjacentPositions = [
-                    {
-                        x: pos.x - 1,
-                        y: pos.y
-                    },
-                    {
-                        x: pos.x + 1,
-                        y: pos.y
-                    },
-                    {
-                        x: pos.x,
-                        y: pos.y - 1
-                    },
-                    {
-                        x: pos.x,
-                        y: pos.y + 1
-                    },
-                ]
+                const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
 
                 // Loop through adjacent positions
 
@@ -2842,7 +2818,6 @@ Room.prototype.groupRampartPositions = function(rampartPositions, rampartPlans) 
                     nextGeneration.push(adjacentPos)
 
                     groupedPositions[groupIndex].push(new RoomPosition(adjacentPos.x, adjacentPos.y, room.name))
-                    room.memory.stampAnchors.rampart.push(pack({ x: adjacentPos.x, y: adjacentPos.y }))
                 }
             }
 
@@ -2865,13 +2840,13 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
     const room = this,
 
-    // Get structurePlans
+        // Get structurePlans
 
-    structurePlans: CostMatrix = room.get('structurePlans'),
+        structurePlans: CostMatrix = room.get('structurePlans'),
 
-    // Construct a cost matrix for visited tiles and add seeds to it
+        // Construct a cost matrix for visited tiles and add seeds to it
 
-    visitedCM = new PathFinder.CostMatrix()
+        visitedCM = new PathFinder.CostMatrix()
 
     // Get the room's anchor, stopping if it's undefined
 
@@ -2897,13 +2872,13 @@ Room.prototype.advancedConstructStructurePlans = function() {
                 if (structureType == 'empty') continue
 
                 // If there are already sufficient structures + cSites
-
+/*
                 if (room.get(structureType as BuildableStructureConstant).length + room.get(`${structureType as BuildableStructureConstant}CSite`).length >= CONTROLLER_STRUCTURES[structureType as BuildableStructureConstant][room.controller.level]) continue
-
+ */
                 // If the structureType is a road and RCL 3 extensions aren't built, stop
-
+/*
                 if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue
-
+ */
                 const positions = stamp.structures[structureType]
 
                 for (const pos of positions) {
@@ -2919,7 +2894,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
                         opacity: 0.5
                     })
 
-                    room.createConstructionSite(x, y, structureType as BuildableStructureConstant)
+                    // room.createConstructionSite(x, y, structureType as BuildableStructureConstant)
                 }
             }
         }
@@ -2931,7 +2906,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
     // Construct values for the flood
 
-    let thisGeneration: Pos[] = [adjustedAnchor],
+    let thisGeneration = [adjustedAnchor],
     nextGeneration: Pos[] = []
 
     function planPos(x: number, y: number) {
@@ -2951,10 +2926,10 @@ Room.prototype.advancedConstructStructurePlans = function() {
         })
 
         // If the structureType is a road and RCL 3 extensions aren't built, stop
-
+/*
         if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) return
-
-        room.createConstructionSite(x, y, structureType)
+ */
+        // room.createConstructionSite(x, y, structureType)
     }
 
     // So long as there are positions in this gen
