@@ -3,6 +3,8 @@ import { customLog } from "international/generalFunctions"
 
 export function trafficManager(room: Room) {
 
+    if (!room.myCreepsAmount) return
+
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
@@ -14,15 +16,11 @@ export function trafficManager(room: Room) {
 
             // Construct a packedPos from the coordinates
 
-            const packedPos = x * constants.roomDimensions + y,
-
-            // Get creeps making move requests to this pos
-
-            creepNames = room.moveRequests[packedPos]
+            const packedPos = x * constants.roomDimensions + y
 
             // Loop through those creeps
 
-            for (const creepName of creepNames) {
+            for (const creepName of room.moveRequests[packedPos]) {
 
                 // Get the creep with the name of creepName
 

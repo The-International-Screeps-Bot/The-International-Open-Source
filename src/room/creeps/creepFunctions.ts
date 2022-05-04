@@ -1060,11 +1060,11 @@ Creep.prototype.runMoveRequest = function(packedPos) {
 Creep.prototype.recurseMoveRequest = function(packedPos, queue = []) {
 
     const creep = this,
-    room = creep.room,
+        room = creep.room,
 
-    // Try to find the name of the creep at pos
+        // Try to find the name of the creep at pos
 
-    creepNameAtPos = room.creepPositions[packedPos]
+        creepNameAtPos = room.creepPositions[packedPos]
 
     // If there is no creep at the pos
 
@@ -1175,8 +1175,8 @@ Creep.prototype.recurseMoveRequest = function(packedPos, queue = []) {
 
 Creep.prototype.getPushed = function() {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+        room = creep.room
 
     // Create a moveRequest to flee the current position
 

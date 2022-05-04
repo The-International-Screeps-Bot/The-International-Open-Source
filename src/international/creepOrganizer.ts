@@ -25,21 +25,31 @@ InternationalManager.prototype.creepOrganizer = function() {
             continue
         }
 
+        // Increase total creep counter
+
+        totalCreepCount += 1
+
         // Get the creep's current room and the room it's from
 
         const room = creep.room,
 
-        // Get the creep's role
+            // Get the creep's role
 
-        role = creep.memory.role,
+            role = creep.memory.role
 
-        // Find the creep a class based on its role
+        if (!role) {
 
-        creepsClass = creepClasses[role]
+            creep.suicide()
+            continue
+        }
 
         // Assign creep proper class
 
-        Game.creeps[creepName] = new creepsClass(creep.id)
+        Game.creeps[creepName] = new creepClasses[role](creep.id)
+
+        // Increase total creep counter
+
+        totalCreepCount += 1
 
         // Organize creep in its room by its role
 
@@ -68,10 +78,6 @@ InternationalManager.prototype.creepOrganizer = function() {
         // Record that the creep's existence in its roomFrom
 
         commune.creepsFromRoomAmount++
-
-        // Increase total creep counter
-
-        totalCreepCount += 1
 
         creep.preTickManager()
 

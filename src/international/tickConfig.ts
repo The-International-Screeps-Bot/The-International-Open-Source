@@ -63,7 +63,7 @@ InternationalManager.prototype.tickConfig = function() {
 
         const room = Game.rooms[roomName],
 
-        controller = room.controller
+            controller = room.controller
 
         // Single tick properties
 
