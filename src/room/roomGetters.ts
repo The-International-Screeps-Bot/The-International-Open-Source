@@ -1,5 +1,5 @@
 import { allyList, constants } from "international/constants"
-import { getRange, unPackAsRoomPos } from "international/generalFunctions"
+import { findObjectWithID, getRange, unPackAsRoomPos } from "international/generalFunctions"
 
 Object.defineProperties(Room.prototype, {
 
@@ -72,6 +72,30 @@ Object.defineProperties(Room.prototype, {
                 this._cSites[cSite.structureType].push(cSite)
 
             return this._cSites
+        }
+    },
+    cSiteTarget: {
+        get() {
+
+            if (this.memory.cSiteTargetID) {
+
+                const cSiteTarget = findObjectWithID(this.memory.cSiteTargetID)
+                if (cSiteTarget) return cSiteTarget
+            }
+
+            // Loop through structuretypes of the build priority
+
+            for (const structureType of constants.structureTypesByBuildPriority) {
+
+                const cSitesOfType = this.cSites[structureType]
+                if (!cSitesOfType.length) continue
+
+                const anchor = this.anchor || new RoomPosition(25, 25, this.name)
+
+                return this.memory.cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id
+            }
+
+            return undefined
         }
     },
     spawningStructures: {

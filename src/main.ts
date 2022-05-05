@@ -701,6 +701,8 @@ declare global {
 
         readonly cSites: Record<StructureConstant, ConstructionSite[]>
 
+        readonly cSiteTarget: Id<ConstructionSite> | undefined
+
         _spawningStructures: SpawningStructures
 
         readonly spawningStructures: SpawningStructures

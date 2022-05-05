@@ -531,7 +531,7 @@ Creep.prototype.findRepairTarget = function(excludedIDs = new Set()) {
 
     // If there are no viableRepairTargets, inform false
 
-    if (!viableRepairTargets) return false
+    if (!viableRepairTargets.length) return false
 
     // Inform the closest viableRepairTarget to the creep's memory
 
@@ -553,9 +553,9 @@ Creep.prototype.findSourceHarvestPos = function(sourceName) {
 
     const anchor: RoomPosition = room.anchor || creep.pos,
 
-    // Get usedSourceHarvestPositions
+        // Get usedSourceHarvestPositions
 
-    usedSourceHarvestPositions: Set<number> = room.get('usedSourceHarvestPositions')
+        usedSourceHarvestPositions: Set<number> = room.get('usedSourceHarvestPositions')
 
     let closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`),
     packedPos
@@ -583,7 +583,7 @@ Creep.prototype.findSourceHarvestPos = function(sourceName) {
 
     const harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`),
 
-    openHarvestPositions = harvestPositions.filter(pos => !usedSourceHarvestPositions.has(pack(pos)))
+        openHarvestPositions = harvestPositions.filter(pos => !usedSourceHarvestPositions.has(pack(pos)))
     if (!openHarvestPositions.length) return false
 
     const creepsClosestHarvestPos = openHarvestPositions.sort((a, b) => getRangeBetween(anchor.x, anchor.y, a.x, a.y) - getRangeBetween(anchor.x, anchor.y, b.x, b.y))[0]

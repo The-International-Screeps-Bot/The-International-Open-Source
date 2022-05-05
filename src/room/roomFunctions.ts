@@ -1519,7 +1519,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                     }
 
                     // Loop through structureTypes of impassibleStructureTypes
-
+                    
                     for (const structureType of constants.impassibleStructureTypes) {
 
                         for (const structure of room.structures[structureType]) {
