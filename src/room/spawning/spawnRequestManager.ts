@@ -962,7 +962,7 @@ export function spawnRequester(room: Room) {
 
                 // Limit partsMultiplier at the range with a multiplier
 
-                partsMultiplier += Math.min(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range)
+                partsMultiplier += Math.max(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range)
             }
 
             for (const sourceLink of sourceLinks) {
@@ -975,7 +975,7 @@ export function spawnRequester(room: Room) {
 
                 // Limit partsMultiplier at the range with a multiplier
 
-                partsMultiplier += Math.min(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) / range)
+                partsMultiplier += Math.max(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) / range)
             }
         }
 
