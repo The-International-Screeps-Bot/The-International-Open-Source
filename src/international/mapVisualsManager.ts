@@ -21,7 +21,10 @@ InternationalManager.prototype.mapVisualsManager = function() {
             const room = Game.rooms[roomName]
             if (!room) continue
 
-
+            Game.map.visual.text('⚡' + room.findStoredResourceAmount(RESOURCE_ENERGY), new RoomPosition(2, 10, roomName), {
+                align: 'left',
+                fontSize: 8,
+            })
 
             if (roomMemory.claimRequest) {
 

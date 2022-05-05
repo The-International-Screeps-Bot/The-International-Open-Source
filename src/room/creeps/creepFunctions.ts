@@ -465,13 +465,13 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 Creep.prototype.findRampartRepairTarget = function(workPartCount) {
 
     const creep = this,
-    room = creep.room,
+        room = creep.room,
 
-    // Get the repairTarget using the ID in the creep's memory
+        // Get the repairTarget using the ID in the creep's memory
 
-    repairTarget: Structure | false = findObjectWithID(creep.memory.repairTarget),
+        repairTarget: Structure | false = findObjectWithID(creep.memory.repairTarget),
 
-    rampartRepairExpectation = workPartCount * REPAIR_POWER * creep.store.getCapacity() / CARRY_CAPACITY
+        rampartRepairExpectation = workPartCount * REPAIR_POWER * creep.store.getCapacity() / CARRY_CAPACITY
 
     // If the repairTarget exists and it's under the quota, it
 
@@ -479,7 +479,7 @@ Creep.prototype.findRampartRepairTarget = function(workPartCount) {
 
     // Get ramparts in the room, informing false is there are none
 
-    const ramparts: StructureRampart[] = room.get('rampart')
+    const ramparts = room.structures.rampart
     if (!ramparts.length) return false
 
     // Assign the quota to the value of the creep's quota, or its workPartCount times 1000, increasing it each iteration based on the creep's workPartCount
@@ -508,24 +508,24 @@ Creep.prototype.findRampartRepairTarget = function(workPartCount) {
 Creep.prototype.findRepairTarget = function(excludedIDs = new Set()) {
 
     const creep = this,
-    room = creep.room,
+        room = creep.room,
 
-    // Get roads and containers in the room
+        // Get roads and containers in the room
 
-    possibleRepairTargets: (StructureRoad | StructureContainer)[] = room.get('road').concat(room.get('container')),
+        possibleRepairTargets: (StructureRoad | StructureContainer)[] = room.get('road').concat(room.get('container')),
 
-    // Filter viableRepairTargets that are low enough on hits
+        // Filter viableRepairTargets that are low enough on hits
 
-    viableRepairTargets = possibleRepairTargets.filter(function(structure) {
+        viableRepairTargets = possibleRepairTargets.filter(function(structure) {
 
-        // If the structure's ID is to be excluded, inform false
+            // If the structure's ID is to be excluded, inform false
 
-        if (excludedIDs.has(structure.id)) return false
+            if (excludedIDs.has(structure.id)) return false
 
-        // Otherwise if the structure is somewhat low on hits, inform true
+            // Otherwise if the structure is somewhat low on hits, inform true
 
-        return structure.hitsMax * 0.2 >= structure.hits
-    })
+            return structure.hitsMax * 0.2 >= structure.hits
+        })
 
     creep.say('FRT')
 
@@ -541,7 +541,7 @@ Creep.prototype.findRepairTarget = function(excludedIDs = new Set()) {
 Creep.prototype.findSourceHarvestPos = function(sourceName) {
 
     const creep = this,
-    room = creep.room
+        room = creep.room
 
     creep.say('FSHP')
 

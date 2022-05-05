@@ -12,7 +12,6 @@ InternationalManager.prototype.tickConfig = function() {
     Memory.communes = []
 
     Memory.stats = {
-        communes: Memory.communes.length,
         credits: Game.market.credits,
         energy: 0,
 
@@ -185,7 +184,7 @@ InternationalManager.prototype.tickConfig = function() {
             for (const role of spawnByRoomRemoteRoles) room.creepsFromRoomWithRemote[remoteName][role] = []
         }
 
-        room.storedResources = {}
+        Memory.stats.energy += room.findStoredResourceAmount(RESOURCE_ENERGY)
 
         // If there is an existing claimRequest and it's invalid, delete it from the room memory
 

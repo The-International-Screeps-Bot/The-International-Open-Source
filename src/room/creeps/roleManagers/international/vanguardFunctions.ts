@@ -7,6 +7,8 @@ Vanguard.prototype.travelToSource = function(sourceName) {
     const creep = this,
     room = creep.room
 
+    creep.say('FHP')
+
     // Try to find a harvestPosition, inform false if it failed
 
     if (!creep.findSourceHarvestPos(sourceName)) return false

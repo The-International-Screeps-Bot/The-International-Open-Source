@@ -15,6 +15,8 @@ InternationalManager.prototype.endTickManager = function() {
 
     // Stats recording
 
+    Memory.stats.communes = Memory.communes.length
+
     Memory.stats.cpuUsage = Game.cpu.getUsed()
 
     // customLog the CPU used

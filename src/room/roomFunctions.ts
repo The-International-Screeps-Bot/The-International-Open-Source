@@ -782,7 +782,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the closest pos of the upgradePositions by range to the anchor
 
-        const closestUpgradePos = hubAnchor.findClosestByRange(upgradePositions)
+        const closestUpgradePos = hubAnchor.findClosestByPath(upgradePositions)
 
         // Assign closestUpgradePos in usedUpgradePositions
 

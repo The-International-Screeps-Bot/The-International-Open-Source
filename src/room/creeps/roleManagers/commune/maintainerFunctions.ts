@@ -49,11 +49,11 @@ Maintainer.prototype.advancedMaintain = function() {
 
     // Get the creep's work part count
 
-    const workPartCount = creep.partsOfType(WORK)
+    const workPartCount = creep.partsOfType(WORK),
 
-    // Find a repair target based on the creeps work parts. If none are found, inform false
+        // Find a repair target based on the creeps work parts. If none are found, inform false
 
-    const repairTarget: Structure | false = findObjectWithID(creep.memory.repairTarget) || creep.findRepairTarget() || creep.findRampartRepairTarget(workPartCount)
+        repairTarget: Structure | false = findObjectWithID(creep.memory.repairTarget) || creep.findRepairTarget() || creep.findRampartRepairTarget(workPartCount)
     if (!repairTarget) return false
 
     // Add the repair target to memory
@@ -62,7 +62,7 @@ Maintainer.prototype.advancedMaintain = function() {
 
     // If roomVisuals are enabled
 
-    if (Memory.roomVisuals) room.visual.text('🔧', repairTarget.pos)
+    if (Memory.roomVisuals) room.visual.text(repairTarget.structureType == STRUCTURE_RAMPART ? '🧱' : '🔧', repairTarget.pos)
 
     // If the repairTarget is out of repair range
 
@@ -98,10 +98,17 @@ Maintainer.prototype.advancedMaintain = function() {
 
     const energySpentOnRepairs = Math.min(workPartCount, (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER)
 
-    // Add control points to total controlPoints counter and say the success
+    if (repairTarget.structureType == STRUCTURE_RAMPART) {
 
-    Memory.stats.energySpentOnRepairing += energySpentOnRepairs
-    creep.say((repairTarget.structureType == STRUCTURE_RAMPART ? '🧱' : '🔧') + energySpentOnRepairs * REPAIR_POWER)
+        Memory.stats.energySpentOnBarricades += energySpentOnRepairs
+        creep.say('🧱' + energySpentOnRepairs * REPAIR_POWER)
+    }
+
+    else {
+
+        Memory.stats.energySpentOnRepairing += energySpentOnRepairs
+        creep.say('🔧' + energySpentOnRepairs * REPAIR_POWER)
+    }
 
     // Implement the results of the repair pre-emptively
 

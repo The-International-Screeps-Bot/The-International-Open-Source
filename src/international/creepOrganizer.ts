@@ -7,7 +7,7 @@ InternationalManager.prototype.creepOrganizer = function() {
 
     // Construct counter for creeps
 
-    let totalCreepCount: number = 0
+    let totalCreepCount = 0
 
     // Loop through all of my creeps
 
@@ -37,12 +37,6 @@ InternationalManager.prototype.creepOrganizer = function() {
 
             role = creep.memory.role
 
-        if (!role) {
-
-            creep.suicide()
-            continue
-        }
-
         // Assign creep proper class
 
         Game.creeps[creepName] = new creepClasses[role](creep.id)
@@ -61,11 +55,13 @@ InternationalManager.prototype.creepOrganizer = function() {
 
         // Add the creep's name to the position in its room
 
-        room.creepPositions[pack(creep.pos)] = creep.name
+        if (!creep.spawning) room.creepPositions[pack(creep.pos)] = creep.name
 
         // Get the commune the creep is from
 
         const commune = Game.rooms[creep.memory.communeName]
+
+        creep.preTickManager()
 
         // If there is not vision in the commune, stop
 
@@ -78,8 +74,6 @@ InternationalManager.prototype.creepOrganizer = function() {
         // Record that the creep's existence in its roomFrom
 
         commune.creepsFromRoomAmount++
-
-        creep.preTickManager()
 
         // Get the creep's remoteName
 

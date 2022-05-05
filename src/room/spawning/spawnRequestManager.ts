@@ -1276,8 +1276,9 @@ export function spawnRequester(room: Room) {
             // Define the minCost and strength
 
             const minCost = 400,
-            extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE],
-            strengthOfParts = findStrengthOfParts(extraParts)
+                cost = 900,
+                extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE],
+                strengthOfParts = findStrengthOfParts(extraParts) * (spawnEnergyCapacity / cost)
 
             // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
 
@@ -1297,7 +1298,7 @@ export function spawnRequester(room: Room) {
                 return false
             }
 
-            const requiredParts = Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthOfParts) * 1.5
+            const requiredParts = Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthOfParts) * 1.2
 
             return {
                 defaultParts: [],
