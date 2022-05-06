@@ -591,7 +591,7 @@ export function basePlanner(room: Room) {
     if(!planStamp({
         stampType: 'extension',
         count: extraExtensionsAmount,
-        anchorOrient: fastFillerHubAnchor,
+        anchorOrient: hubAnchor,
         adjacentToRoads: true,
     })) return false
 

@@ -1519,7 +1519,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                     }
 
                     // Loop through structureTypes of impassibleStructureTypes
-                    
+
                     for (const structureType of constants.impassibleStructureTypes) {
 
                         for (const structure of room.structures[structureType]) {
@@ -2852,13 +2852,6 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
     if (!room.anchor) return
 
-    // Move the anchor to the top left of the fastFill
-
-    const adjustedAnchor = {
-        x: room.anchor.x - 1,
-        y: room.anchor.y - 1
-    }
-
     for (const stampType in stamps) {
 
         const stamp = stamps[stampType as StampTypes]
@@ -2886,7 +2879,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
                     // Re-assign the pos's x and y to align with the offset
 
                     const x = pos.x + stampAnchor.x - stamp.offset,
-                    y = pos.y + stampAnchor.y - stamp.offset
+                        y = pos.y + stampAnchor.y - stamp.offset
 
                     // Display visuals if enabled
 
@@ -2900,79 +2893,80 @@ Room.prototype.advancedConstructStructurePlans = function() {
         }
     }
 
-    // Record the anchor as visited
+    // If RCL 3 extensions are built
 
-    visitedCM.set(adjustedAnchor.x, adjustedAnchor.y, 1)
+    if (room.energyCapacityAvailable >= 800) {
 
-    // Construct values for the flood
+        // Record the anchor as visited
 
-    let thisGeneration = [adjustedAnchor],
-    nextGeneration: Pos[] = []
+        visitedCM.set(this.anchor.x, this.anchor.y, 1)
 
-    function planPos(x: number, y: number) {
+        // Construct values for the flood
 
-        // Get the planned structureType for the x and y, try to build a structure
+        let thisGeneration: Pos[] = [this.anchor],
+        nextGeneration: Pos[] = []
 
-        const structureType = constants.numbersByStructureTypes[structurePlans.get(x, y)]
+        function planPos(x: number, y: number) {
 
-        // If the structureType is empty, stop
+            // Get the planned structureType for the x and y, try to build a structure
 
-        if (structureType == 'empty') return
+            const structureType = constants.numbersByStructureTypes[structurePlans.get(x, y)]
 
-        // Display visuals if enabled
+            // If the structureType is empty, stop
 
-        if (Memory.roomVisuals) room.visual.structure(x, y, structureType, {
-            opacity: 0.5
-        })
+            if (structureType == 'empty') return
 
-        // If the structureType is a road and RCL 3 extensions aren't built, stop
+            // Display visuals if enabled
 
-        if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) return
+            if (Memory.roomVisuals) room.visual.structure(x, y, structureType, {
+                opacity: 0.5
+            })
 
-        room.createConstructionSite(x, y, structureType)
-    }
-
-    // So long as there are positions in this gen
-
-    while (thisGeneration.length) {
-
-        // Reset next gen
-
-        nextGeneration = []
-
-        // Iterate through positions of this gen
-
-        for (const pos of thisGeneration) {
-
-            // Plan structures for this pos
-
-            planPos(pos.x, pos.y)
-
-            // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
-
-            const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
-
-            // Loop through adjacent positions
-
-            for (const adjacentPos of adjacentPositions) {
-
-                // Iterate if the adjacent pos has been visited or isn't a tile
-
-                if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
-
-                // Otherwise record that it has been visited
-
-                visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
-
-                // Add it to the next gen
-
-                nextGeneration.push(adjacentPos)
-            }
+            room.createConstructionSite(x, y, structureType)
         }
 
-        // Set this gen to next gen
+        // So long as there are positions in this gen
 
-        thisGeneration = nextGeneration
+        while (thisGeneration.length) {
+
+            // Reset next gen
+
+            nextGeneration = []
+
+            // Iterate through positions of this gen
+
+            for (const pos of thisGeneration) {
+
+                // Plan structures for this pos
+
+                planPos(pos.x, pos.y)
+
+                // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+
+                const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
+
+                // Loop through adjacent positions
+
+                for (const adjacentPos of adjacentPositions) {
+
+                    // Iterate if the adjacent pos has been visited or isn't a tile
+
+                    if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
+
+                    // Otherwise record that it has been visited
+
+                    visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+
+                    // Add it to the next gen
+
+                    nextGeneration.push(adjacentPos)
+                }
+            }
+
+            // Set this gen to next gen
+
+            thisGeneration = nextGeneration
+        }
     }
 
     // If visuals are enabled, visually connect roads
