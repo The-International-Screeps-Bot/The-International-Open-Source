@@ -922,35 +922,16 @@ export function spawnRequester(room: Room) {
 
         let partsMultiplier = 1
 
-        // If there is a storage
-
-        if (room.storage) {
-
-            // If the storage is sufficiently full, provide x amount per y enemy in storage
-
-            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold) partsMultiplier += Math.pow(room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000, 2)
-
-            // Otherwise, set partsMultiplier to 0
-
-            else partsMultiplier = 0
-        }
-
-        // Otherwise if there is no storage
-
-        else {
-
-            partsMultiplier += estimatedIncome * 2
-        }
-
         // Get the controllerLink and baseLink
 
-        const controllerLink: StructureLink | undefined = room.get('controllerLink'),
-        hubLink: StructureLink | undefined = room.get('hubLink'),
-        sourceLinks: StructureLink[] = [room.get('source1Link'), room.get('source2Link')]
+        const controllerLink: StructureLink | undefined = room.get('controllerLink')
 
         // If the controllerLink is defined
 
         if (controllerLink) {
+
+            const hubLink: StructureLink | undefined = room.get('hubLink'),
+                sourceLinks: StructureLink[] = [room.get('source1Link'), room.get('source2Link')]
 
             partsMultiplier = 0
 
@@ -977,6 +958,26 @@ export function spawnRequester(room: Room) {
 
                 partsMultiplier += Math.max(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) / range)
             }
+        }
+
+        // If there is a storage
+
+        if (room.storage) {
+
+            // If the storage is sufficiently full, provide x amount per y enemy in storage
+
+            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold) partsMultiplier = Math.pow(room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000, 2)
+
+            // Otherwise, set partsMultiplier to 0
+
+            else partsMultiplier = 0
+        }
+
+        // Otherwise if there is no storage
+
+        else {
+
+            partsMultiplier += estimatedIncome * 2
         }
 
         // If there are construction sites of my ownership in the room, set multiplier to 1
