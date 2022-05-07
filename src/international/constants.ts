@@ -83,7 +83,8 @@ constants.mmoShardNames = new Set([
 ])
 
 export const allyList = new Set([
-    'Q13214'
+    'Q13214',
+    'HerrKai'
 ])
 
 constants.tradeBlacklist = new Set([
