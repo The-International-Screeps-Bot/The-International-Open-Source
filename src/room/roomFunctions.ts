@@ -2062,9 +2062,9 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = 0, y1
 
     const room = this,
 
-    // Use a costMatrix to record distances. Use the initialCM if provided, otherwise create one
+        // Use a costMatrix to record distances. Use the initialCM if provided, otherwise create one
 
-    distanceCM = initialCM || room.get('terrainCM').clone()
+        distanceCM = initialCM || (room.get('terrainCM').clone() as CostMatrix)
 
     // Loop through the xs and ys inside the bounds
 
@@ -2075,44 +2075,21 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = 0, y1
 
             if (distanceCM.get(x, y) == 255) continue
 
-            // Otherwise construct a rect and get the positions in a range of 1
+            let distanceValue = 1
 
-            const adjacentPositions = findPositionsInsideRect(x - 1, y - 1, x + 1, y + 1)
+            const adjacentPositions = [
+                distanceCM.get(x - 1, y - 1),
+                distanceCM.get(x - 1, y),
+                distanceCM.get(x, y - 1),
+                distanceCM.get(x + 1, y - 1),
+                distanceCM.get(x - 1, y + 1)
+            ]
 
-            // Construct the distance value as the avoid value
+            if (adjacentPositions.filter(value => value == 255).length) {}
 
-            let distanceValue = 255
-
-            // Iterate through positions
-
-            for (const adjacentPos of adjacentPositions) {
-
-                // Get the value of the pos in distanceCM
-
-                const value = distanceCM.get(adjacentPos.x, adjacentPos.y)
-
-                // Iterate if the value has yet to be configured
-
-                if (value == 0) continue
-
-                // If the value is to be avoided, stop the loop
-
-                if (value == 255) {
-
-                    distanceValue = 1
-                    break
-                }
-
-                // Otherwise check if the depth is less than the distance value. If so make it the new distance value plus one
-
-                if (value < distanceValue) distanceValue = 1 + value
-            }
-
-            // If the distance value is that of avoid, set it to 1
+            else distanceValue = Math.min(...adjacentPositions.filter(value => value > 0)) + 1
 
             if (distanceValue == 255) distanceValue = 1
-
-            // Record the distanceValue in the distance cost matrix
 
             distanceCM.set(x, y, distanceValue)
         }
@@ -2123,48 +2100,26 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = 0, y1
     for (let x = x2; x > x1; x--) {
         for (let y = y2; y > y1; y--) {
 
+            let distanceValue = distanceCM.get(x, y)
+
             // If the pos is a wall, iterate
 
-            if (distanceCM.get(x, y) == 255) continue
+            if (distanceValue == 255) continue
 
-            // Otherwise construct a rect and get the positions in a range of 1
+            const adjacentPositions = [
+                distanceCM.get(x + 1, y + 1),
+                distanceCM.get(x + 1, y),
+                distanceCM.get(x, y + 1),
+                distanceCM.get(x + 1, y - 1),
+                distanceCM.get(x - 1, y + 1)
+            ]
 
-            const adjacentPositions = findPositionsInsideRect(x - 1, y - 1, x + 1, y + 1)
+            if (adjacentPositions.filter(value => value == 255).length)
+                distanceValue = 1
 
-            // Construct the distance value as the avoid value
-
-            let distanceValue = 255
-
-            // Iterate through positions
-
-            for (const adjacentPos of adjacentPositions) {
-
-                // Get the value of the pos in distanceCM
-
-                const value = distanceCM.get(adjacentPos.x, adjacentPos.y)
-
-                // Iterate if the value has yet to be configured
-
-                if (value == 0) continue
-
-                // If the value is to be avoided, stop the loop
-
-                if (value == 255) {
-
-                    distanceValue = 1
-                    break
-                }
-
-                // Otherwise check if the depth is less than the distance value. If so make it the new distance value plus one
-
-                if (value < distanceValue) distanceValue = 1 + value
-            }
-
-            // If the distance value is that of avoid, set it to 1
+            else distanceValue = Math.min(distanceValue, Math.min(...adjacentPositions.filter(value => value > 0)) + 1)
 
             if (distanceValue == 255) distanceValue = 1
-
-            // Record the distanceValue in the distance cost matrix
 
             distanceCM.set(x, y, distanceValue)
 
@@ -2184,74 +2139,29 @@ Room.prototype.specialDT = function(initialCM, enableVisuals) {
 
     const room = this,
 
-    // Use a costMatrix to record distances. Use the initialCM if provided, otherwise clone the terrainCM
+        // Use a costMatrix to record distances. Use the initialCM if provided, otherwise clone the terrainCM
 
-    distanceCM = initialCM || room.get('terrainCM').clone()
+        distanceCM = initialCM || room.get('terrainCM').clone()
 
     // Loop through each x and y in the room
 
     for (let x = 0; x < constants.roomDimensions; x++) {
         for (let y = 0; y < constants.roomDimensions; y++) {
 
-            // Iterate if pos is to be avoided
+            // If the pos is a wall, iterate
 
             if (distanceCM.get(x, y) == 255) continue
 
-            // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+            let distanceValue = 1
 
-            const adjacentPositions = [
-                {
-                    x: x - 1,
-                    y: y
-                },
-                {
-                    x: x + 1,
-                    y: y
-                },
-                {
-                    x: x,
-                    y: y - 1
-                },
-                {
-                    x: x,
-                    y: y + 1
-                },
-            ]
+            const left = distanceCM.get(x - 1, y),
+                top = distanceCM.get(x, y - 1)
 
-            // Construct the distance value as the avoid value
+            if (left == 255 || top == 255) {}
 
-            let distanceValue = 255
-
-            // Iterate through positions
-
-            for (const adjacentPos of adjacentPositions) {
-
-                // Get the value of the pos in distanceCM
-
-                const value = distanceCM.get(adjacentPos.x, adjacentPos.y)
-
-                // Iterate if the value has yet to be configured
-
-                if (value == 0) continue
-
-                // If the value is to be avoided, stop the loop
-
-                if (value == 255) {
-
-                    distanceValue = 1
-                    break
-                }
-
-                // Otherwise check if the depth is less than the distance value. If so make it the new distance value plus one
-
-                if (value < distanceValue) distanceValue = 1 + value
-            }
-
-            // If the distance value is that of avoid, set it to 1
+            else distanceValue = Math.min(left, top) + 1
 
             if (distanceValue == 255) distanceValue = 1
-
-            // Record the distanceValue in the distance cost matrix
 
             distanceCM.set(x, y, distanceValue)
         }
@@ -2260,65 +2170,23 @@ Room.prototype.specialDT = function(initialCM, enableVisuals) {
     for (let x = constants.roomDimensions; x > -1; x--) {
         for (let y = constants.roomDimensions; y > -1; y--) {
 
-            // Iterate if pos is to be avoided
+            let distanceValue = distanceCM.get(x, y)
 
-            if (distanceCM.get(x, y) == 255) continue
+            // If the pos is a wall, iterate
 
-            // Otherwise construct a rect and get the positions in a range of 1
+            if (distanceValue == 255) continue
 
-            const adjacentPositions = [
-                {
-                    x: x - 1,
-                    y: y
-                },
-                {
-                    x: x + 1,
-                    y: y
-                },
-                {
-                    x: x,
-                    y: y - 1
-                },
-                {
-                    x: x,
-                    y: y + 1
-                },
-            ]
+            const right = distanceCM.get(x + 1, y),
+                bottom = distanceCM.get(x, y + 1)
 
-            // Construct the distance value as the avoid value
+            if (right == 255 || bottom == 255) {
 
-            let distanceValue = 255
-
-            // Iterate through positions
-
-            for (const adjacentPos of adjacentPositions) {
-
-                // Get the value of the pos in distanceCM
-
-                const value = distanceCM.get(adjacentPos.x, adjacentPos.y)
-
-                // Iterate if the value has yet to be configured
-
-                if (value == 0) continue
-
-                // If the value is to be avoided, stop the loop
-
-                if (value == 255) {
-
-                    distanceValue = 1
-                    break
-                }
-
-                // Otherwise check if the depth is less than the distance value. If so make it the new distance value plus one
-
-                if (value < distanceValue) distanceValue = 1 + value
+                distanceValue = 1
             }
 
-            // If the distance value is that of avoid, set it to 1
+            else distanceValue = Math.min(distanceValue, Math.min(right, bottom) + 1)
 
             if (distanceValue == 255) distanceValue = 1
-
-            // Record the distanceValue in the distance cost matrix
 
             distanceCM.set(x, y, distanceValue)
 

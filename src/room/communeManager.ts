@@ -33,12 +33,11 @@ export function communeManager(room: Room) {
     room.claimRequestManager()
 
     spawnManager(room)
-
 /*
     let cpu = Game.cpu.getUsed()
 
-
+    room.distanceTransform(undefined)
 
     customLog('CPU USED FOR TEST', Game.cpu.getUsed() - cpu)
-     */
+ */
 }
