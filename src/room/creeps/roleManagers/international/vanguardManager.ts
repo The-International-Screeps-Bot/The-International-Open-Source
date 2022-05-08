@@ -38,7 +38,9 @@ export function vanguardManager(room: Room, creepsOfRole: string[]) {
             avoidEnemyRanges: true,
             cacheAmount: 200,
             typeWeights: {
-                keeper: Infinity,
+                enemy: Infinity,
+                ally: Infinity,
+                keeper: Infinity
             }
         })
     }

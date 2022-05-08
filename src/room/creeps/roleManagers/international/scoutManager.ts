@@ -51,10 +51,9 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
             origin: creep.pos,
             goal: { pos: new RoomPosition(25, 25, creep.memory.scoutTarget), range: 25 },
             avoidEnemyRanges: true,
-            plainCost: 0,
-            swampCost: 0,
-            cacheAmount: 200,
-            typeWeights: {}
+            plainCost: 1,
+            swampCost: 1,
+            cacheAmount: 200
         })
     }
 }

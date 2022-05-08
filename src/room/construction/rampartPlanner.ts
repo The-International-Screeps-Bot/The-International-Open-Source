@@ -603,7 +603,7 @@ export function rampartPlanner(room: Room) {
 
     rampartPlans.set(room.anchor.x - 2, room.anchor.y - 1, 1)
 
-    rampartPlans.set(room.anchor.x + 5, room.anchor.y - 2, 1)
+    rampartPlans.set(room.anchor.x + 2, room.anchor.y - 1, 1)
 
     rampartPlans.set(room.anchor.x, room.anchor.y + 2, 1)
 

@@ -84,10 +84,11 @@ constants.mmoShardNames = new Set([
 
 export const allyList = new Set([
     'Q13214',
-    'HerrKai'
+    'HerrKai',
+    'clarkok'
 ])
 
-export const autoClaim = true
+export const autoClaim = false
 
 constants.tradeBlacklist = new Set([
 

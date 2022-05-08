@@ -37,6 +37,8 @@ InternationalManager.prototype.creepOrganizer = function() {
 
             role = creep.memory.role
 
+        if (!role) continue
+
         // Assign creep proper class
 
         Game.creeps[creepName] = new creepClasses[role](creep.id)

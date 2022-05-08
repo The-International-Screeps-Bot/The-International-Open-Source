@@ -250,7 +250,7 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    if(!planStamp({
+     if (!planStamp({
         stampType: 'extensions',
         count: 7,
         anchorOrient: fastFillerHubAnchor,
@@ -284,7 +284,7 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    if(!planStamp({
+     if (!planStamp({
         stampType: 'labs',
         count: 1,
         anchorOrient: fastFillerHubAnchor,
@@ -579,7 +579,7 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    if(!planStamp({
+     if (!planStamp({
         stampType: 'tower',
         count: 6,
         anchorOrient: fastFillerHubAnchor,
@@ -588,7 +588,7 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    if(!planStamp({
+     if (!planStamp({
         stampType: 'extension',
         count: extraExtensionsAmount,
         anchorOrient: hubAnchor,
@@ -597,7 +597,7 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    if(!planStamp({
+     if (!planStamp({
         stampType: 'observer',
         count: 1,
         anchorOrient: fastFillerHubAnchor,
