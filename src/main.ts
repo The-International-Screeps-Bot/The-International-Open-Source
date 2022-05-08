@@ -589,7 +589,7 @@ declare global {
         /**
          * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix
          */
-        specialDT(initialCM?: CostMatrix, enableVisuals?: boolean): CostMatrix
+        specialDT(initialCM?: CostMatrix, enableVisuals?: boolean, x1?: number, y1?: number, x2?: number, y2?: number): CostMatrix
 
         /**
          * Gets ranges from for each position from a certain point

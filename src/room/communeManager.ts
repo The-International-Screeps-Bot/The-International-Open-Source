@@ -36,7 +36,7 @@ export function communeManager(room: Room) {
 /*
     let cpu = Game.cpu.getUsed()
 
-    room.distanceTransform(undefined)
+    room.specialDT(undefined)
 
     customLog('CPU USED FOR TEST', Game.cpu.getUsed() - cpu)
  */

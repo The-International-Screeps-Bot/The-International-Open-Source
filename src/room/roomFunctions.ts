@@ -2062,140 +2062,136 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = 0, y1
 
     const room = this,
 
-        // Use a costMatrix to record distances. Use the initialCM if provided, otherwise create one
+        // Use a costMatrix to record distances
 
-        distanceCM = initialCM || (room.get('terrainCM').clone() as CostMatrix)
+        distanceCM = new PathFinder.CostMatrix()
+
+    if (!initialCM) initialCM = room.get('terrainCM')
+
+    for (let x = x1; x < x2; x++) {
+        for (let y = y1; y < y2; y++) {
+
+            distanceCM.set(x, y, initialCM.get(x, y) == 255 ? 0 : 255)
+        }
+    }
+
+    let top: number,
+        left: number,
+        topLeft: number,
+        topRight: number,
+        bottomLeft: number
 
     // Loop through the xs and ys inside the bounds
 
     for (let x = x1; x < x2; x++) {
         for (let y = y1; y < y2; y++) {
 
-            // If the pos is a wall, iterate
+            top = distanceCM.get(x, y - 1)
+            left = distanceCM.get(x - 1, y)
+            topLeft = distanceCM.get(x - 1, y - 1)
+            topRight = distanceCM.get(x + 1, y - 1)
+            bottomLeft = distanceCM.get(x - 1, y + 1)
 
-            if (distanceCM.get(x, y) == 255) continue
-
-            let distanceValue = 1
-
-            const adjacentPositions = [
-                distanceCM.get(x - 1, y - 1),
-                distanceCM.get(x - 1, y),
-                distanceCM.get(x, y - 1),
-                distanceCM.get(x + 1, y - 1),
-                distanceCM.get(x - 1, y + 1)
-            ]
-
-            if (adjacentPositions.filter(value => value == 255).length) {}
-
-            else distanceValue = Math.min(...adjacentPositions.filter(value => value > 0)) + 1
-
-            if (distanceValue == 255) distanceValue = 1
-
-            distanceCM.set(x, y, distanceValue)
+            distanceCM.set(x, y, Math.min(Math.min(top, left, topLeft, topRight, bottomLeft) + 1, distanceCM.get(x, y)))
         }
     }
+
+    let bottom: number,
+        right: number,
+        bottomRight: number
 
     // Loop through the xs and ys inside the bounds
 
     for (let x = x2; x > x1; x--) {
         for (let y = y2; y > y1; y--) {
 
-            let distanceValue = distanceCM.get(x, y)
+            bottom = distanceCM.get(x, y + 1)
+            right = distanceCM.get(x + 1, y)
+            bottomRight = distanceCM.get(x + 1, y + 1)
+            topRight = distanceCM.get(x + 1, y - 1)
+            bottomLeft = distanceCM.get(x - 1, y + 1)
 
-            // If the pos is a wall, iterate
+            distanceCM.set(x, y, Math.min(Math.min(bottom, right, bottomRight, topRight, bottomLeft) + 1, distanceCM.get(x, y)))
+        }
+    }
 
-            if (distanceValue == 255) continue
+    if (enableVisuals && Memory.roomVisuals) {
 
-            const adjacentPositions = [
-                distanceCM.get(x + 1, y + 1),
-                distanceCM.get(x + 1, y),
-                distanceCM.get(x, y + 1),
-                distanceCM.get(x + 1, y - 1),
-                distanceCM.get(x - 1, y + 1)
-            ]
+        // Loop through the xs and ys inside the bounds
 
-            if (adjacentPositions.filter(value => value == 255).length)
-                distanceValue = 1
+        for (let x = x1; x < x2; x++) {
+            for (let y = y1; y < y2; y++) {
 
-            else distanceValue = Math.min(distanceValue, Math.min(...adjacentPositions.filter(value => value > 0)) + 1)
-
-            if (distanceValue == 255) distanceValue = 1
-
-            distanceCM.set(x, y, distanceValue)
-
-            // If roomVisuals are enabled, show the terrain's distanceValue
-
-            if (enableVisuals && Memory.roomVisuals) room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                fill: 'hsl(' + 200 + distanceValue * 10 + ', 100%, 60%)',
-                opacity: 0.4,
-            })
+                room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+                    fill: 'hsl(' + 200 + distanceCM.get(x, y) * 10 + ', 100%, 60%)',
+                    opacity: 0.4,
+                })
+            }
         }
     }
 
     return distanceCM
 }
 
-Room.prototype.specialDT = function(initialCM, enableVisuals) {
+Room.prototype.specialDT = function(initialCM, enableVisuals, x1 = 0, y1 = 0, x2 = constants.roomDimensions, y2 = constants.roomDimensions) {
 
     const room = this,
 
-        // Use a costMatrix to record distances. Use the initialCM if provided, otherwise clone the terrainCM
+        // Use a costMatrix to record distances
 
-        distanceCM = initialCM || room.get('terrainCM').clone()
+        distanceCM = new PathFinder.CostMatrix()
 
-    // Loop through each x and y in the room
+    if (!initialCM) initialCM = room.get('terrainCM')
 
-    for (let x = 0; x < constants.roomDimensions; x++) {
-        for (let y = 0; y < constants.roomDimensions; y++) {
+    for (let x = x1; x < x2; x++) {
+        for (let y = y1; y < y2; y++) {
 
-            // If the pos is a wall, iterate
-
-            if (distanceCM.get(x, y) == 255) continue
-
-            let distanceValue = 1
-
-            const left = distanceCM.get(x - 1, y),
-                top = distanceCM.get(x, y - 1)
-
-            if (left == 255 || top == 255) {}
-
-            else distanceValue = Math.min(left, top) + 1
-
-            if (distanceValue == 255) distanceValue = 1
-
-            distanceCM.set(x, y, distanceValue)
+            distanceCM.set(x, y, initialCM.get(x, y) == 255 ? 0 : 255)
         }
     }
 
-    for (let x = constants.roomDimensions; x > -1; x--) {
-        for (let y = constants.roomDimensions; y > -1; y--) {
+    let top: number,
+        left: number
 
-            let distanceValue = distanceCM.get(x, y)
+    // Loop through the xs and ys inside the bounds
 
-            // If the pos is a wall, iterate
+    for (let x = x1; x < x2; x++) {
+        for (let y = y1; y < y2; y++) {
 
-            if (distanceValue == 255) continue
+            top = distanceCM.get(x, y - 1)
+            left = distanceCM.get(x - 1, y)
 
-            const right = distanceCM.get(x + 1, y),
-                bottom = distanceCM.get(x, y + 1)
+            distanceCM.set(x, y, Math.min(Math.min(top, left) + 1, distanceCM.get(x, y)))
+        }
+    }
 
-            if (right == 255 || bottom == 255) {
+    let bottom: number,
+        right: number
 
-                distanceValue = 1
+    // Loop through the xs and ys inside the bounds
+
+    for (let x = x2; x > x1; x--) {
+        for (let y = y2; y > y1; y--) {
+
+            bottom = distanceCM.get(x, y + 1)
+            right = distanceCM.get(x + 1, y)
+
+            distanceCM.set(x, y, Math.min(Math.min(bottom, right) + 1, distanceCM.get(x, y)))
+        }
+    }
+
+    if (enableVisuals && Memory.roomVisuals) {
+
+        // Loop through the xs and ys inside the bounds
+
+        for (let x = x1; x < x2; x++) {
+            for (let y = y1; y < y2; y++) {
+
+                room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+                    fill: 'hsl(' + 200 + distanceCM.get(x, y) * 10 + ', 100%, 60%)',
+                    opacity: 0.4,
+                })
             }
-
-            else distanceValue = Math.min(distanceValue, Math.min(right, bottom) + 1)
-
-            if (distanceValue == 255) distanceValue = 1
-
-            distanceCM.set(x, y, distanceValue)
-
-            // If roomVisuals are enabled, show the terrain's distanceValue
-
-            if (enableVisuals && Memory.roomVisuals) room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                fill: 'hsl(' + 200 + distanceValue * 10 + ', 100%, 60%)',
-                opacity: 0.4,
-            })
         }
     }
 
