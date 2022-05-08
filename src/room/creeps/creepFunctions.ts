@@ -586,9 +586,9 @@ Creep.prototype.findSourceHarvestPos = function(sourceName) {
         openHarvestPositions = harvestPositions.filter(pos => !usedSourceHarvestPositions.has(pack(pos)))
     if (!openHarvestPositions.length) return false
 
-    const creepsClosestHarvestPos = openHarvestPositions.sort((a, b) => getRangeBetween(anchor.x, anchor.y, a.x, a.y) - getRangeBetween(anchor.x, anchor.y, b.x, b.y))[0]
+    openHarvestPositions.sort((a, b) => getRangeBetween(anchor.x, anchor.y, a.x, a.y) - getRangeBetween(anchor.x, anchor.y, b.x, b.y))
 
-    packedPos = pack(creepsClosestHarvestPos)
+    packedPos = pack(openHarvestPositions[0])
 
     creep.memory.packedPos = packedPos
     usedSourceHarvestPositions.add(packedPos)
@@ -644,9 +644,9 @@ Creep.prototype.findMineralHarvestPos = function() {
     openHarvestPositions = harvestPositions.filter(pos => !usedHarvestPositions.has(pack(pos)))
     if (!openHarvestPositions.length) return false
 
-    const creepsClosestHarvestPos = openHarvestPositions.sort((a, b) => getRangeBetween(anchor.x, anchor.y, a.x, a.y) - getRangeBetween(anchor.x, anchor.y, b.x, b.y))[0]
+    openHarvestPositions.sort((a, b) => getRangeBetween(anchor.x, anchor.y, a.x, a.y) - getRangeBetween(anchor.x, anchor.y, b.x, b.y))
 
-    packedPos = pack(creepsClosestHarvestPos)
+    packedPos = pack(openHarvestPositions[0])
 
     creep.memory.packedPos = packedPos
     usedHarvestPositions.add(packedPos)
@@ -676,9 +676,9 @@ Creep.prototype.findFastFillerPos = function() {
     openFastFillerPositions = fastFillerPositions.filter(pos => !usedFastFillerPositions.has(pack(pos)))
     if (!openFastFillerPositions.length) return false
 
-    const creepsClosestFastFillerPos = openFastFillerPositions.sort((a, b) => getRangeBetween(creep.pos.x, creep.pos.y, a.x, a.y) - getRangeBetween(creep.pos.x, creep.pos.y, b.x, b.y))[0],
+    openFastFillerPositions.sort((a, b) => getRangeBetween(creep.pos.x, creep.pos.y, a.x, a.y) - getRangeBetween(creep.pos.x, creep.pos.y, b.x, b.y))
 
-    packedPos = pack(creepsClosestFastFillerPos)
+    const packedPos = pack(openFastFillerPositions[0])
 
     creep.memory.packedPos = packedPos
     usedFastFillerPositions.add(packedPos)

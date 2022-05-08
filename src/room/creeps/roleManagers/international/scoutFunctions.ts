@@ -47,19 +47,19 @@ Scout.prototype.findScoutTarget = function() {
 
         // Sort unscoutedRooms by their distance from the creep's room, selecting the closest
 
-        const preferedUnscoutedRoom = unscoutedRooms.sort((a, b) => Game.map.getRoomLinearDistance(creep.memory.communeName, a) - Game.map.getRoomLinearDistance(creep.memory.communeName, b))[0]
+        unscoutedRooms.sort((a, b) => Game.map.getRoomLinearDistance(creep.memory.communeName, a) - Game.map.getRoomLinearDistance(creep.memory.communeName, b))
 
         // Record the preferedUnscoutedRoom in the creep's memory and stop
 
-        creep.memory.scoutTarget = preferedUnscoutedRoom
+        creep.memory.scoutTarget = unscoutedRooms[0]
         return
     }
 
     // Otherwise sort the scoutedRooms by their lastScout, selecting the oldest one
 
-    const oldestScoutedRoom = scoutedRooms.sort((a, b) => Memory.rooms[a].lastScout - Memory.rooms[b].lastScout)[0]
+    scoutedRooms.sort((a, b) => Memory.rooms[a].lastScout - Memory.rooms[b].lastScout)
 
     // Record the oldestScoutedRoom in the creep's memory
 
-    creep.memory.scoutTarget = oldestScoutedRoom
+    creep.memory.scoutTarget = scoutedRooms[0]
 }

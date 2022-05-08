@@ -464,7 +464,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the open areas in a range of 3 to the controller
 
-        const distanceCM = room.distanceTransform(undefined, false, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
+        const distanceCM = room.distanceTransform(undefined, true, room.controller.pos.x - 3, room.controller.pos.y - 3, room.controller.pos.x + 3, room.controller.pos.y + 3)
 
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
@@ -492,17 +492,19 @@ Room.prototype.get = function(roomObjectName) {
         const centerUpgradePos = room.roomObjects.centerUpgradePos.getValue()
         if (!centerUpgradePos) return []
 
+        if (!room.anchor) return []
+
         // Construct harvestPositions
 
         const upgradePositions = [],
 
-        // Find terrain in room
+            // Find terrain in room
 
-        terrain = Game.map.getRoomTerrain(room.name),
+            terrain = Game.map.getRoomTerrain(room.name),
 
-        // Find positions adjacent to source
+            // Find positions adjacent to source
 
-        adjacentPositions = findPositionsInsideRect(centerUpgradePos.x - 1, centerUpgradePos.y - 1, centerUpgradePos.x + 1, centerUpgradePos.y + 1)
+            adjacentPositions = findPositionsInsideRect(centerUpgradePos.x - 1, centerUpgradePos.y - 1, centerUpgradePos.x + 1, centerUpgradePos.y + 1)
 
         // Loop through each pos
 
@@ -516,6 +518,11 @@ Room.prototype.get = function(roomObjectName) {
 
             upgradePositions.push(room.newPos(pos))
         }
+
+        upgradePositions.sort(function(a, b) {
+
+            return getRange(a.x - room.anchor.x, a.y - room.anchor.y) - getRange(b.x - room.anchor.x, b.y - room.anchor.y)
+        })
 
         // Inform harvestPositions
 
@@ -2068,8 +2075,8 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = 0, y1
 
     if (!initialCM) initialCM = room.get('terrainCM')
 
-    for (let x = x1; x < x2; x++) {
-        for (let y = y1; y < y2; y++) {
+    for (let x = x1; x <= x2; x++) {
+        for (let y = y1; y <= y2; y++) {
 
             distanceCM.set(x, y, initialCM.get(x, y) == 255 ? 0 : 255)
         }
@@ -2083,8 +2090,8 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = 0, y1
 
     // Loop through the xs and ys inside the bounds
 
-    for (let x = x1; x < x2; x++) {
-        for (let y = y1; y < y2; y++) {
+    for (let x = x1; x <= x2; x++) {
+        for (let y = y1; y <= y2; y++) {
 
             top = distanceCM.get(x, y - 1)
             left = distanceCM.get(x - 1, y)
@@ -2102,8 +2109,8 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = 0, y1
 
     // Loop through the xs and ys inside the bounds
 
-    for (let x = x2; x > x1; x--) {
-        for (let y = y2; y > y1; y--) {
+    for (let x = x2; x >= x1; x--) {
+        for (let y = y2; y >= y1; y--) {
 
             bottom = distanceCM.get(x, y + 1)
             right = distanceCM.get(x + 1, y)
@@ -2119,8 +2126,8 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = 0, y1
 
         // Loop through the xs and ys inside the bounds
 
-        for (let x = x1; x < x2; x++) {
-            for (let y = y1; y < y2; y++) {
+        for (let x = x1; x <= x2; x++) {
+            for (let y = y1; y <= y2; y++) {
 
                 room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                     fill: 'hsl(' + 200 + distanceCM.get(x, y) * 10 + ', 100%, 60%)',
@@ -2143,8 +2150,8 @@ Room.prototype.specialDT = function(initialCM, enableVisuals, x1 = 0, y1 = 0, x2
 
     if (!initialCM) initialCM = room.get('terrainCM')
 
-    for (let x = x1; x < x2; x++) {
-        for (let y = y1; y < y2; y++) {
+    for (let x = x1; x <= x2; x++) {
+        for (let y = y1; y <= y2; y++) {
 
             distanceCM.set(x, y, initialCM.get(x, y) == 255 ? 0 : 255)
         }
@@ -2155,8 +2162,8 @@ Room.prototype.specialDT = function(initialCM, enableVisuals, x1 = 0, y1 = 0, x2
 
     // Loop through the xs and ys inside the bounds
 
-    for (let x = x1; x < x2; x++) {
-        for (let y = y1; y < y2; y++) {
+    for (let x = x1; x <= x2; x++) {
+        for (let y = y1; y <= y2; y++) {
 
             top = distanceCM.get(x, y - 1)
             left = distanceCM.get(x - 1, y)
@@ -2170,8 +2177,8 @@ Room.prototype.specialDT = function(initialCM, enableVisuals, x1 = 0, y1 = 0, x2
 
     // Loop through the xs and ys inside the bounds
 
-    for (let x = x2; x > x1; x--) {
-        for (let y = y2; y > y1; y--) {
+    for (let x = x2; x >= x1; x--) {
+        for (let y = y2; y >= y1; y--) {
 
             bottom = distanceCM.get(x, y + 1)
             right = distanceCM.get(x + 1, y)
@@ -2184,8 +2191,8 @@ Room.prototype.specialDT = function(initialCM, enableVisuals, x1 = 0, y1 = 0, x2
 
         // Loop through the xs and ys inside the bounds
 
-        for (let x = x1; x < x2; x++) {
-            for (let y = y1; y < y2; y++) {
+        for (let x = x1; x <= x2; x++) {
+            for (let y = y1; y <= y2; y++) {
 
                 room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                     fill: 'hsl(' + 200 + distanceCM.get(x, y) * 10 + ', 100%, 60%)',
@@ -2559,11 +2566,11 @@ Creep.prototype.findOptimalSourceName = function() {
 
     // Otherwise, define source names
 
-    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2'],
+    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
 
     // Sort them by their range from the anchor
 
-    sourceNamesByAnchorRange = sourceNames.sort((a, b) => room.anchor.getRangeTo(room.get(a).pos) - room.anchor.getRangeTo(room.get(b).pos))
+    sourceNames.sort((a, b) => room.anchor.getRangeTo(room.get(a).pos) - room.anchor.getRangeTo(room.get(b).pos))
 
     // Construct a creep threshold
 
@@ -2575,7 +2582,7 @@ Creep.prototype.findOptimalSourceName = function() {
 
         // Then loop through the source names and find the first one with open spots
 
-        for (const sourceName of sourceNamesByAnchorRange) {
+        for (const sourceName of sourceNames) {
 
             // If there are still creeps needed to harvest a source under the creepThreshold
 

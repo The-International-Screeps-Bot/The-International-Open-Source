@@ -198,7 +198,7 @@ export function basePlanner(room: Room) {
     })) return false
 
     // If the stamp failed to be planned
-
+    
     if (!room.memory.stampAnchors.fastFiller.length) {
 
         // Record that the room is not claimable and stop
@@ -227,22 +227,22 @@ export function basePlanner(room: Room) {
     }
 
     // Try to plan the stamp
-
+    console.log('1')
     if (!planStamp({
         stampType: 'hub',
         count: 1,
         anchorOrient: room.anchor,
         normalDT: true,
     })) return false
+    console.log(room.memory.stampAnchors.hub)
+    const hubAnchor = unPackAsRoomPos(room.memory.stampAnchors.hub[0], room.name),
 
-    const hubAnchor = unPackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
+        fastFillerHubAnchor = findAvgBetweenPosotions(room.anchor, hubAnchor),
 
-    const fastFillerHubAnchor = findAvgBetweenPosotions(room.anchor, hubAnchor),
+        // Get the closest upgrade pos and mark it as fair use in roadCM
 
-    // Get the closest upgrade pos and mark it as fair use in roadCM
-
-    closestUpgradePos = hubAnchor.findClosestByRange(upgradePositions)
-    roadCM.set(closestUpgradePos.x, closestUpgradePos.y, 5)
+        closestUpgradePos = upgradePositions[0]
+        roadCM.set(closestUpgradePos.x, closestUpgradePos.y, 5)
 
     // Construct path
 
@@ -524,18 +524,18 @@ export function basePlanner(room: Room) {
 
                 // Find positions adjacent to source
 
-                adjacentPositions = findPositionsInsideRect(closestHarvestPos.x - 1, closestHarvestPos.y - 1, closestHarvestPos.x + 1, closestHarvestPos.y + 1),
+                adjacentPositions = findPositionsInsideRect(closestHarvestPos.x - 1, closestHarvestPos.y - 1, closestHarvestPos.x + 1, closestHarvestPos.y + 1)
 
                 // Sort adjacentPositions by range from the anchor
 
-                adjacentPositionsByAnchorRange = adjacentPositions.sort(function(a, b) {
+                adjacentPositions.sort(function(a, b) {
 
                     return getRange(a.x - hubAnchor.x, a.y - hubAnchor.y) - getRange(b.x - hubAnchor.x, b.y - hubAnchor.y)
                 })
 
             // Loop through each pos
 
-            for (const pos of adjacentPositionsByAnchorRange) {
+            for (const pos of adjacentPositions) {
 
                 // Iterate if plan for pos is in use
 

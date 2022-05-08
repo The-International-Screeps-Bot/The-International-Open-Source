@@ -36,15 +36,15 @@ export function marketManager(room: Room) {
 
     // Filter out allyRequests that are requesting resources
 
-    const resourceRequests = allyManager.allyRequests.filter(request => request.requestType == allyManager.requestTypes.RESOURCE),
+    const resourceRequests = allyManager.allyRequests.filter(request => request.requestType == allyManager.requestTypes.RESOURCE)
 
     // Filter resourceRequests by priority, highest to lowest
 
-    resourceRequestsByPriority = resourceRequests.sort((a, b) => a.priority - b.priority).reverse()
+    resourceRequests.sort((a, b) => a.priority - b.priority).reverse()
 
     // Iterate through resourceRequests
 
-    for (const request of resourceRequestsByPriority) {
+    for (const request of resourceRequests) {
 
         // Iterate if there is no requested amount
 

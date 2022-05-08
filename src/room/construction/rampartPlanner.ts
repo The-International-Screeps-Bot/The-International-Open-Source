@@ -3,6 +3,8 @@ import { customLog, pack, unPackAsPos, unPackAsRoomPos } from "international/gen
 
 export function rampartPlanner(room: Room) {
 
+    if (!room.global.plannedBase) return false
+
     // require('util.min_cut').test('W5N9');
 
     /*
@@ -588,7 +590,7 @@ export function rampartPlanner(room: Room) {
 
         // Get the hubAnchor
 
-        hubAnchor = unPackAsRoomPos(stampAnchors.hub[0], room.name)
+        hubAnchor = unPackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
 
     // Loop through each tower anchor and plan for a rampart at it
 

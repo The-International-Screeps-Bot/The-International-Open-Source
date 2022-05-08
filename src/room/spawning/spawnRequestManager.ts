@@ -1109,14 +1109,14 @@ export function spawnRequester(room: Room) {
 
         const remoteName = remoteNamesByEfficacy[index],
 
-        remoteNeeds = Memory.rooms[remoteName].needs,
+            remoteNeeds = Memory.rooms[remoteName].needs,
 
-        // Add up econ needs for this room
+            // Add up econ needs for this room
 
-        remoteEconNeed = Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0) +
-        Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0) +
-        Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0) +
-        Math.max(remoteNeeds[remoteNeedsIndex.remoteReserver], 0)
+            remoteEconNeed = Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0) +
+            Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0) +
+            Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0) +
+            Math.max(remoteNeeds[remoteNeedsIndex.remoteReserver], 0)
 
         // If there is a need for any econ creep, inform the index
 
