@@ -12,9 +12,7 @@ export function defenceManager(room: Room) {
 
     // Get enemyAttackers in the room
 
-    const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-        filter: creep => !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([ATTACK, RANGED_ATTACK])
-    })
+    const enemyAttackers = room.enemyCreeps.filter(creep => !creep.isOnExit() && creep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK]))
 
     manageRampartPublicity()
 
