@@ -1,6 +1,6 @@
 import { constants } from "./constants"
 
-global.killAllCreeps = function() {
+global.killAllCreeps = function(roles?: CreepRoles[]) {
 
     // Loop through each creepName
 
@@ -9,15 +9,16 @@ global.killAllCreeps = function() {
         // Construct and suicide the creep
 
         const creep = Game.creeps[creepName]
-        creep.suicide()
+
+        if (!roles || roles.includes(creep.memory.role)) creep.suicide()
     }
 
     // Inform the result
 
-    return 'Killed all creeps'
+    return 'Killed all creeps of role ' + roles || 'all'
 }
 
-global.removeAllCSites = function(types: BuildableStructureConstant[]) {
+global.removeAllCSites = function(types?: BuildableStructureConstant[]) {
 
     // Loop through cSite IDs in construction sites
 
@@ -57,7 +58,7 @@ global.destroyAllStructures = function(roomName: string, types?: StructureConsta
 
         // Get the structures of the type
 
-        const structures: Structure[] = room.get(structureType)
+        const structures = room.structures[structureType]
 
         // Loop through the structures
 
@@ -67,4 +68,20 @@ global.destroyAllStructures = function(roomName: string, types?: StructureConsta
     // Inform the result
 
     return 'Destroyed all structures of types ' + types || 'all' + ' in ' + roomName
+}
+
+/**
+ *
+ * @param commune The commune to respond to the claimRequest
+ * @param claimRequest The roomName of the claimRequest to respond to
+ */
+global.claim = function(communeName: string, claimRequest: string) {
+
+    const roomMemory = Memory.rooms[communeName]
+    if (!roomMemory) return 'No memory for ' + communeName
+
+    if (!Memory.claimRequests[claimRequest]) return 'There is no claimRequest for ' + claimRequest
+
+    roomMemory.claimRequest = claimRequest
+    return communeName + ' is responding to claimRequest for ' + claimRequest
 }

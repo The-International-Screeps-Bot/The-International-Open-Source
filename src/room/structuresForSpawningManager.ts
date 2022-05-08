@@ -34,7 +34,7 @@ export function structuresForSpawningManager(room: Room) {
 
     // If there is a fastFill container or link
 
-    if (room.myCreeps.fastFiller.length > 0 && ((room.get('fastFillerContainerLeft') && room.get('fastFillerContainerRight')) || room.get('fastFillerLink'))) {
+    if (room.myCreeps.fastFiller.length > 0 && ((room.get('fastFillerContainerLeft') && room.get('fastFillerContainerRight')))) {
 
         // Assign structuresForSpawning that are not in range of 2 to the anchor
 

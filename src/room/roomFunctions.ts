@@ -2732,6 +2732,8 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
                 if (room.get(structureType as BuildableStructureConstant).length + room.get(`${structureType as BuildableStructureConstant}CSite`).length >= CONTROLLER_STRUCTURES[structureType as BuildableStructureConstant][room.controller.level]) continue
 
+                if (structureType == STRUCTURE_RAMPART && (!room.storage || room.controller.level < 4)) continue
+
                 // If the structureType is a road and RCL 3 extensions aren't built, stop
 
                 if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue

@@ -235,7 +235,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
             // Calculate the control points added
 
-            const controlPoints = creep.partsOfType(WORK)
+            const controlPoints = Math.min(creep.store.getUsedCapacity(RESOURCE_ENERGY), creep.partsOfType(WORK))
 
             // Add control points to total controlPoints counter and say the success
 

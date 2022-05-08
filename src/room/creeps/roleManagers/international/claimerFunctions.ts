@@ -1,4 +1,4 @@
-import { claimRequestNeedsIndex } from "international/constants"
+import { claimRequestNeedsIndex, constants } from "international/constants"
 import { Claimer } from "../../creepClasses"
 
 Claimer.prototype.claimRoom = function() {
@@ -25,6 +25,16 @@ Claimer.prototype.claimRoom = function() {
             }
         })
 
+        return
+    }
+
+    // If the owner or reserver isn't me
+
+    if (room.controller.owner ||
+        (room.controller.reservation &&
+        room.controller.reservation.username != constants.me)) {
+
+        creep.attackController(room.controller)
         return
     }
 

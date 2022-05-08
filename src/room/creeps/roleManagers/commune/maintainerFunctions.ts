@@ -5,7 +5,7 @@ import { RoomTask } from "room/roomTasks"
 Maintainer.prototype.advancedMaintain = function() {
 
     const creep = this,
-    room = creep.room
+        room = creep.room
 
     creep.say('⏩🔧')
 
