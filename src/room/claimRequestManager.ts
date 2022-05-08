@@ -1,4 +1,4 @@
-import { claimRequestNeedsIndex, constants } from "international/constants"
+import { autoClaim, claimRequestNeedsIndex, constants } from "international/constants"
 import { advancedFindDistance, customLog } from "international/generalFunctions"
 import { internationalManager } from "international/internationalManager"
 
@@ -43,7 +43,15 @@ Room.prototype.claimRequestManager = function() {
 
     /* if (Game.time % Math.floor(Math.random() * 100) != 0) return */
 
+    // If autoClaim is disabled
+
+    if (!autoClaim) return
+
+    // If there are enough communes for the GCL
+
     if (Game.gcl.level <= Memory.communes.length) return
+
+    // If a claimer can't be spawned
 
     if (this.energyCapacityAvailable < 750) return
 
