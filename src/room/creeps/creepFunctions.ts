@@ -238,9 +238,9 @@ Creep.prototype.advancedUpgradeController = function() {
 
             creep.say('UC')
 
-            creep.store[RESOURCE_ENERGY] -= workPartCount
+            creep.store.energy -= workPartCount
 
-            controlPoints = Math.min(creep.store.getUsedCapacity(RESOURCE_ENERGY), creep.partsOfType(WORK))
+            controlPoints = Math.min(creep.store.energy, creep.partsOfType(WORK))
         }
 
         // If packedUpgradePos is out of range
@@ -274,17 +274,17 @@ Creep.prototype.advancedUpgradeController = function() {
 
         // If the creep has less energy than its workPartCount
 
-        if (creep.store.getUsedCapacity(RESOURCE_ENERGY) <= workPartCount) {
+        if (creep.store.energy <= workPartCount) {
 
             // Withdraw from the controllerContainer, informing false if the withdraw failed
 
             if (creep.withdraw(controllerStructure, RESOURCE_ENERGY) != OK) return false
 
-            creep.store[RESOURCE_ENERGY] = creep.store.getCapacity(RESOURCE_ENERGY)
+            creep.store.energy = creep.store.getCapacity(RESOURCE_ENERGY)
 
             // Calculate the control points added
 
-            controlPoints = Math.min(creep.store.getUsedCapacity(RESOURCE_ENERGY), creep.partsOfType(WORK))
+            controlPoints = Math.min(creep.store.energy, creep.partsOfType(WORK))
         }
 
         if (upgradeControllerResult == OK) {

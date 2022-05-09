@@ -763,9 +763,9 @@ Room.prototype.get = function(roomObjectName) {
 
         const usedUpgradePositions: Set<number> = new Set(),
 
-        // Get the controllerContainer
+            // Get the controllerContainer
 
-        controllerContainer: StructureContainer = room.roomObjects.controllerContainer.getValue()
+            controllerContainer: StructureContainer = room.roomObjects.controllerContainer.getValue()
 
         // If there is no controllerContainer
 
@@ -774,7 +774,7 @@ Room.prototype.get = function(roomObjectName) {
             // Get the centerUpgradePos and set it as avoid in usedUpgradePositions
 
             const centerUpgadePos = room.roomObjects.centerUpgradePos.getValue()
-            usedUpgradePositions.add(centerUpgadePos.x * constants.roomDimensions + centerUpgadePos.y)
+            usedUpgradePositions.add(pack(centerUpgadePos))
         }
 
         // Get the hubAnchor, informing false if it's not defined
@@ -789,11 +789,11 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the closest pos of the upgradePositions by range to the anchor
 
-        const closestUpgradePos = hubAnchor.findClosestByPath(upgradePositions)
+        const closestUpgradePos = hubAnchor.findClosestByRange(upgradePositions)
 
         // Assign closestUpgradePos in usedUpgradePositions
 
-        usedUpgradePositions.add(closestUpgradePos.x * constants.roomDimensions + closestUpgradePos.y)
+        usedUpgradePositions.add(pack(closestUpgradePos))
 
         // Loop through each controllerUpgrader's name in the room
 

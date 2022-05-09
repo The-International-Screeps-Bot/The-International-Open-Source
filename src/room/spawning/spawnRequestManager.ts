@@ -994,7 +994,7 @@ export function spawnRequester(room: Room) {
         if (room.get('controllerContainer') || controllerLink) {
 
             // If the controller is level 8
-/*
+
             if (room.controller.level == 8) {
 
                 // If the controller is near to downgrading
@@ -1017,7 +1017,7 @@ export function spawnRequester(room: Room) {
                     }
                 }
             }
- */
+
             // Otherwise if the spawnEnergyCapacity is more than 800
 
             if (spawnEnergyCapacity >= 800) {

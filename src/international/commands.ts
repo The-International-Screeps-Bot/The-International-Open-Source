@@ -15,7 +15,7 @@ global.killAllCreeps = function(roles?: CreepRoles[]) {
 
     // Inform the result
 
-    return 'Killed all creeps of role ' + roles || 'all'
+    return 'Killed all creeps of role ' + (roles || 'all')
 }
 
 global.removeAllCSites = function(types?: BuildableStructureConstant[]) {
@@ -35,7 +35,7 @@ global.removeAllCSites = function(types?: BuildableStructureConstant[]) {
 
     // Inform the result
 
-    return 'Destroyed all construction sites of types ' + types || 'all'
+    return 'Destroyed all construction sites of types ' + (types || 'all')
 }
 
 global.destroyAllStructures = function(roomName: string, types?: StructureConstant[]) {
@@ -67,7 +67,7 @@ global.destroyAllStructures = function(roomName: string, types?: StructureConsta
 
     // Inform the result
 
-    return 'Destroyed all structures of types ' + types || 'all' + ' in ' + roomName
+    return 'Destroyed all structures of types ' + (types || 'all') + ' in ' + roomName
 }
 
 /**
