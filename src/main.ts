@@ -515,6 +515,11 @@ declare global {
          */
         moveRequests: PackedPosMap
 
+        /**
+         * A set of roomNames representing the targets of scouts from this commune
+         */
+        scoutTargets: Set<string>
+
         // Functions
 
         /**

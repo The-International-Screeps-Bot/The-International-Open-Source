@@ -371,11 +371,11 @@ Room.prototype.get = function(roomObjectName) {
     * @param harvestPositions array of RoomPositions to filter
     * @returns the closest harvestPosition to the room's anchor
     */
-    function findClosestHarvestPos(harvestPositions: RoomPosition[]): false | RoomPosition {
+    function findClosestHarvestPos(harvestPositions: RoomPosition[]): void | RoomPosition {
 
         // Get the room anchor, stopping if it's undefined
 
-        if (!room.anchor) return false
+        if (!room.anchor) return
 
         // Filter harvestPositions by closest one to anchor
 
@@ -464,7 +464,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the open areas in a range of 3 to the controller
 
-        const distanceCM = room.distanceTransform(undefined, true, room.controller.pos.x - 3, room.controller.pos.y - 3, room.controller.pos.x + 3, room.controller.pos.y + 3)
+        const distanceCM = room.distanceTransform(undefined, true, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
 
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
@@ -2033,11 +2033,11 @@ Room.prototype.findStoredResourceAmount = function(resourceType) {
 
 Room.prototype.findTasksOfTypes = function(createdTaskIDs, types) {
 
-    const room = this
+    const room = this,
 
-    // Initialize tasks of types
+        // Initialize tasks of types
 
-    const tasksOfTypes = []
+        tasksOfTypes = []
 
     // Iterate through IDs of createdTasks
 
@@ -2075,8 +2075,8 @@ Room.prototype.distanceTransform = function(initialCM, enableVisuals, x1 = 0, y1
 
     if (!initialCM) initialCM = room.get('terrainCM')
 
-    for (let x = x1; x <= x2; x++) {
-        for (let y = y1; y <= y2; y++) {
+    for (let x = Math.max(x1 - 1, 0); x <= Math.min(x2 + 1, constants.roomDimensions); x++) {
+        for (let y = Math.max(y1 - 1, 0); y <= Math.min(y2 + 1, constants.roomDimensions); y++) {
 
             distanceCM.set(x, y, initialCM.get(x, y) == 255 ? 0 : 255)
         }

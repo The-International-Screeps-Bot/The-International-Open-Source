@@ -9,7 +9,11 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 
         // Get the creep using its name
 
-        const creep: Scout = Game.creeps[creepName]
+        const creep: Scout = Game.creeps[creepName],
+
+            commune = Game.rooms[creep.memory.communeName]
+
+        if (!commune) continue
 
         // If the creep is in the scoutTarget
 
@@ -17,7 +21,7 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 
             // Get information about the room
 
-            room.findType(Game.rooms[creep.memory.communeName])
+            room.findType(commune)
 
             // Clean the room's memory
 

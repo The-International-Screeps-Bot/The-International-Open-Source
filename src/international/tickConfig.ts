@@ -197,5 +197,7 @@ InternationalManager.prototype.tickConfig = function() {
 
             for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
         }
+
+        room.scoutTargets = new Set()
     }
 }

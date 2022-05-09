@@ -1440,8 +1440,8 @@ Creep.prototype.fulfillPickupTask = function(task) {
 
 Creep.prototype.advancedSignController = function() {
 
-    const creep = this
-    const room = creep.room
+    const creep = this,
+        room = creep.room
 
     // Construct the signMessage
 
@@ -1500,8 +1500,7 @@ Creep.prototype.advancedSignController = function() {
 
     // Otherwise Try to sign the controller, informing the result
 
-    const signResult = creep.signController(room.controller, signMessage)
-    return signResult == OK
+    return creep.signController(room.controller, signMessage) == OK
 }
 
 Creep.prototype.isOnExit = function() {

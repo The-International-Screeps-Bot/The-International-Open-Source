@@ -105,15 +105,15 @@ Room.prototype.towersHealCreeps = function() {
 
 Room.prototype.towersAttackCreeps = function() {
 
-    const room = this,
+    const room = this
 
-        towers = room.structures.tower
-/*
     if (room.controller.safeMode) return
- */
-    // Construct attack targets from my and allied damaged creeps in the room
 
-    const attackTargets = room.enemyCreeps.filter(creep => !creep.isOnExit())
+    const towers = room.structures.tower,
+
+        // Construct attack targets from my and allied damaged creeps in the room
+
+        attackTargets = room.enemyCreeps.filter(creep => !creep.isOnExit())
 
     // Loop through the room's towers
 

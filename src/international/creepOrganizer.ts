@@ -3,6 +3,8 @@ import { claimRequestNeedsIndex, remoteNeedsIndex, spawnByRoomRemoteRoles } from
 import { customLog, pack } from "./generalFunctions"
 import { InternationalManager } from "./internationalManager"
 
+import '../room/creeps/preTickManagers/international/scoutPreTickManager'
+
 InternationalManager.prototype.creepOrganizer = function() {
 
     // Construct counter for creeps
@@ -13,7 +15,7 @@ InternationalManager.prototype.creepOrganizer = function() {
 
     for (const creepName in Memory.creeps) {
 
-        const creep = Game.creeps[creepName]
+        let creep = Game.creeps[creepName]
 
         // If creep doesn't exist
 
@@ -41,7 +43,7 @@ InternationalManager.prototype.creepOrganizer = function() {
 
         // Assign creep proper class
 
-        Game.creeps[creepName] = new creepClasses[role](creep.id)
+        creep = Game.creeps[creepName] = new creepClasses[role](creep.id)
 
         // Increase total creep counter
 
@@ -62,7 +64,7 @@ InternationalManager.prototype.creepOrganizer = function() {
         // Get the commune the creep is from
 
         const commune = Game.rooms[creep.memory.communeName]
-
+        customLog('THING ' + role, creep.preTickManager)
         creep.preTickManager()
 
         // If there is not vision in the commune, stop
