@@ -308,24 +308,24 @@ declare global {
         /**
          * The percent to the next GCL level
          */
-        GCLPercent: string
+        GCLPercent: number
 
         /**
          * The total amount of GCL
          */
-        totalGCL: string
+        totalGCL: number
 
         GCLLevel: number
 
         /**
          * The percent to the next PCL level
          */
-        GPLPercent: string
+        GPLPercent: number
 
          /**
           * The total amount of PCL
           */
-        totalGPL: string
+        totalGPL: number
 
         GPLLevel: number
 

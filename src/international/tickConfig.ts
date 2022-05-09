@@ -28,12 +28,12 @@ InternationalManager.prototype.tickConfig = function() {
 
         //
 
-        GCLPercent: (Game.gcl.progress / Game.gcl.progressTotal * 100).toFixed(2),
-        totalGCL: (Math.pow(Game.gcl.level - 1, 2.4) * 1000000 + Game.gcl.progress).toFixed(2),
+        GCLPercent: Game.gcl.progress / Game.gcl.progressTotal * 100,
+        totalGCL: Math.pow(Game.gcl.level - 1, 2.4) * 1000000 + Game.gcl.progress,
         GCLLevel: Game.gcl.level,
 
-        GPLPercent: (Game.gpl.progress / Game.gpl.progressTotal * 100).toFixed(2),
-        totalGPL: (Math.pow(Game.gpl.level - 1, 2) * 1000 + Game.gpl.progress).toFixed(2),
+        GPLPercent: Game.gpl.progress / Game.gpl.progressTotal * 100,
+        totalGPL: Math.pow(Game.gpl.level - 1, 2) * 1000 + Game.gpl.progress,
         GPLLevel: Game.gpl.level,
 
         //
