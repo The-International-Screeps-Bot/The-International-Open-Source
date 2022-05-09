@@ -1,23 +1,23 @@
-/*
-Ripped from https://github.com/AlinaNova21/ZeSwarm/
-only slightly modified and adjusted for Typescript
-Usage:
-At top of main: import memHack from 'memHack
-At top of loop() in main: MemHack.modifyMemory()
-*/
+/**
+ * Ripped from https://github.com/AlinaNova21/ZeSwarm/
+ * only slightly modified and adjusted for Typescript
+ * Modified by Carson Burke
+ *
+ * Usage:
+ * At top of main: import memHack
+ * At top of loop() in main, memHack.modifyMemory()
+ */
+class MemHack {
 
-interface MemHack {
-    memory: any,
-    parseTime: number,
-    init: Function,
-    modifyMemory: Function
-}
+    memory: Memory | undefined
 
-const memHack: MemHack = {
+    parseTime: number
 
-    memory: null,
-    parseTime: -1,
+    constructor() {
 
+        this.memory = undefined
+        this.parseTime = -1
+    }
     init() {
 
         let cpu = Game.cpu.getUsed()
@@ -27,8 +27,7 @@ const memHack: MemHack = {
         Game.cpu.getUsed() - cpu
 
         this.memory = RawMemory._parsed
-    },
-
+    }
     modifyMemory() {
 
         delete global.Memory
@@ -39,6 +38,6 @@ const memHack: MemHack = {
     }
 }
 
-memHack.init()
+export const memHack = new MemHack()
 
-export { memHack }
+memHack.init()

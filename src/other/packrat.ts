@@ -2,7 +2,10 @@
  * screeps-packrat
  * ---------------
  * Lightning-fast and memory-efficient serialization of Screeps IDs, Coords, and RoomPositions
- * Code written by Muon as part of Overmind Screeps AI. Feel free to adapt as desired.
+ * Code written by Muon as part of Overmind Screeps AI
+ * Modified by Carson Burke
+ *
+ * Feel free to adapt as desired
  * Package repository: https://github.com/bencbartlett/screeps-packrat
  *
  * To use: import desired functions from module
