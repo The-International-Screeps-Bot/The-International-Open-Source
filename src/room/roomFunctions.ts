@@ -1,5 +1,5 @@
 import { allyList, constants, prefferedCommuneRange, stamps } from 'international/constants'
-import { advancedFindDistance, arePositionsEqual, customLog, findClosestClaimType, findClosestCommuneName, findPositionsInsideRect, getRange, getRangeBetween, pack, unPackAsPos, unPackAsRoomPos } from 'international/generalFunctions'
+import { advancedFindDistance, arePositionsEqual, customLog, findClosestClaimType, findClosestCommuneName, findPositionsInsideRect, getRange, getRangeBetween, pack, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 import { basePlanner } from './construction/basePlanner'
 import { ControllerUpgrader, MineralHarvester, SourceHarvester } from './creeps/creepClasses'
 import { RoomObject } from './roomObject'
@@ -779,7 +779,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the hubAnchor, informing false if it's not defined
 
-        const hubAnchor = unPackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
+        const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
         if (!hubAnchor) return false
 
         // Get the upgradePositions, informing false if they're undefined
@@ -1076,7 +1076,7 @@ Room.prototype.get = function(roomObjectName) {
         room,
         valueConstructor: function() {
 
-            return findLinkNearby(unPackAsRoomPos(room.memory.stampAnchors.hub[0], room.name))
+            return findLinkNearby(unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name))
         }
     })
 
@@ -1592,7 +1592,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     // Get the hubAnchor
 
-                    const hubAnchor = room.memory.stampAnchors ? unPackAsRoomPos(room.memory.stampAnchors.hub[0], roomName) : undefined
+                    const hubAnchor = room.memory.stampAnchors ? unpackAsRoomPos(room.memory.stampAnchors.hub[0], roomName) : undefined
 
                     // If the hubAnchor is defined
 
@@ -2625,7 +2625,7 @@ Room.prototype.groupRampartPositions = function(rampartPositions, rampartPlans) 
 
     for (const packedPos of rampartPositions) {
 
-        const pos = unPackAsPos(packedPos)
+        const pos = unpackAsPos(packedPos)
 
         // If the pos has already been visited, iterate
 
@@ -2729,7 +2729,7 @@ Room.prototype.advancedConstructStructurePlans = function() {
 
         for (const packedStampAnchor of room.memory.stampAnchors[stampType as StampTypes]) {
 
-            const stampAnchor = unPackAsPos(packedStampAnchor)
+            const stampAnchor = unpackAsPos(packedStampAnchor)
 
             for (const structureType in stamp.structures) {
 

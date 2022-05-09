@@ -1,12 +1,12 @@
 import { constants } from "international/constants"
-import { customLog, getRangeBetween, unPackAsPos } from "international/generalFunctions"
+import { customLog, getRangeBetween, unpackAsPos } from "international/generalFunctions"
 import { RoomPullTask } from "room/roomTasks"
 import { SourceHarvester } from "../../creepClasses"
 
 SourceHarvester.prototype.isDying = function() {
 
     // Inform as dying if creep is already recorded as dying
-    
+
     if (this.memory.dying) return true
 
     // Stop if creep is spawning
@@ -40,7 +40,7 @@ SourceHarvester.prototype.travelToSource = function() {
 
     // Unpack the harvestPos
 
-    const harvestPos = unPackAsPos(creep.memory.packedPos)
+    const harvestPos = unpackAsPos(creep.memory.packedPos)
 
     // If the creep is at the creep's packedHarvestPos, inform false
 

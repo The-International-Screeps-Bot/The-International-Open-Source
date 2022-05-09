@@ -1,5 +1,5 @@
 import { constants, stamps } from "international/constants"
-import { customLog, findAvgBetweenPosotions, findPositionsInsideRect, getRange, getRangeBetween, pack, unPackAsPos, unPackAsRoomPos } from "international/generalFunctions"
+import { customLog, findAvgBetweenPosotions, findPositionsInsideRect, getRange, getRangeBetween, pack, unpackAsPos, unpackAsRoomPos } from "international/generalFunctions"
 import 'other/RoomVisual'
 
 /**
@@ -97,7 +97,7 @@ export function basePlanner(room: Room) {
 
                 for (const packedStampAnchor of room.memory.stampAnchors[opts.stampType]) {
 
-                    const stampAnchor = unPackAsPos(packedStampAnchor)
+                    const stampAnchor = unpackAsPos(packedStampAnchor)
 
                     for (const structureType in stamp.structures) {
 
@@ -198,7 +198,7 @@ export function basePlanner(room: Room) {
     })) return false
 
     // If the stamp failed to be planned
-    
+
     if (!room.memory.stampAnchors.fastFiller.length) {
 
         // Record that the room is not claimable and stop
@@ -227,15 +227,15 @@ export function basePlanner(room: Room) {
     }
 
     // Try to plan the stamp
-    console.log('1')
+
     if (!planStamp({
         stampType: 'hub',
         count: 1,
         anchorOrient: room.anchor,
         normalDT: true,
     })) return false
-    console.log(room.memory.stampAnchors.hub)
-    const hubAnchor = unPackAsRoomPos(room.memory.stampAnchors.hub[0], room.name),
+
+    const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name),
 
         fastFillerHubAnchor = findAvgBetweenPosotions(room.anchor, hubAnchor),
 
@@ -263,7 +263,7 @@ export function basePlanner(room: Room) {
         // Path from the extensionsAnchor to the hubAnchor
 
         path = room.advancedFindPath({
-            origin: unPackAsRoomPos(extensionsAnchor, room.name),
+            origin: unpackAsRoomPos(extensionsAnchor, room.name),
             goal: { pos: hubAnchor, range: 2 },
             weightCostMatrixes: [roadCM]
         })
@@ -423,7 +423,7 @@ export function basePlanner(room: Room) {
     // Path from the hubAnchor to the labsAnchor
 
     path = room.advancedFindPath({
-        origin: unPackAsRoomPos(room.memory.stampAnchors.labs[0], room.name),
+        origin: unpackAsRoomPos(room.memory.stampAnchors.labs[0], room.name),
         goal: { pos: hubAnchor, range: 2 },
         weightCostMatrixes: [roadCM]
     })

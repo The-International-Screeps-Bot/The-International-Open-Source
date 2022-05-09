@@ -34,7 +34,7 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 
         // If there is no scoutTarget, find one
 
-        if (!creep.memory.scoutTarget) creep.findScoutTarget()
+        if (!creep.findScoutTarget()) return
 
         // Say the scoutTarget
 

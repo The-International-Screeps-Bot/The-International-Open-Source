@@ -1,5 +1,5 @@
 import { constants } from "international/constants"
-import { getRangeBetween, unPackAsPos, unPackAsRoomPos } from "international/generalFunctions"
+import { getRangeBetween, unpackAsPos, unpackAsRoomPos } from "international/generalFunctions"
 import { MineralHarvester } from "../../creepClasses"
 
 MineralHarvester.prototype.advancedHarvestMineral = function(mineral) {
@@ -15,7 +15,7 @@ MineralHarvester.prototype.advancedHarvestMineral = function(mineral) {
 
     // Unpack the creep's packedHarvestPos
 
-    const harvestPos = unPackAsRoomPos(creep.memory.packedPos, room.name)
+    const harvestPos = unpackAsRoomPos(creep.memory.packedPos, room.name)
 
     // If the creep is not standing on the harvestPos
 

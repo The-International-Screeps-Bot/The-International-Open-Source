@@ -1,5 +1,5 @@
 import { constants, remoteNeedsIndex } from "international/constants";
-import { getRange, getRangeBetween, unPackAsPos } from "international/generalFunctions";
+import { getRange, getRangeBetween, unpackAsPos } from "international/generalFunctions";
 import { RemoteHarvester } from "room/creeps/creepClasses";
 
 RemoteHarvester.prototype.findRemote = function() {
@@ -55,7 +55,7 @@ RemoteHarvester.prototype.travelToSource = function(sourceName) {
 
     // Unpack the harvestPos
 
-    const harvestPos = unPackAsPos(creep.memory.packedPos)
+    const harvestPos = unpackAsPos(creep.memory.packedPos)
 
     // If the creep is at the creep's packedHarvestPos, inform false
 

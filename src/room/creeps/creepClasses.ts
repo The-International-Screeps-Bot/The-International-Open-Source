@@ -169,7 +169,7 @@ export class Scout extends Creep {
     /**
      * Finds a room name for the scout to target
      */
-    findScoutTarget?(): void
+    findScoutTarget?(): boolean
 
     constructor(creepID: Id<Creep>) {
 

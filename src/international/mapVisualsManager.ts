@@ -1,5 +1,5 @@
 import { constants } from "./constants"
-import { unPackAsRoomPos } from "./generalFunctions"
+import { unpackAsRoomPos } from "./generalFunctions"
 import { InternationalManager } from "./internationalManager"
 
 InternationalManager.prototype.mapVisualsManager = function() {

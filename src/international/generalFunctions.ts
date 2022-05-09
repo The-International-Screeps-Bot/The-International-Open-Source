@@ -232,7 +232,7 @@ export function createPackedPosMap(innerArray?: boolean) {
     return packedPosMap
 }
 
-export function unPackAsPos(packedPos: number) {
+export function unpackAsPos(packedPos: number) {
 
     // Inform an unpacked pos
 
@@ -242,7 +242,7 @@ export function unPackAsPos(packedPos: number) {
     }
 }
 
-export function unPackAsRoomPos(packedPos: number, roomName: string) {
+export function unpackAsRoomPos(packedPos: number, roomName: string) {
 
     // Inform an unpacked RoomPosition
 
@@ -291,7 +291,7 @@ export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'sou
     // Sort sourceNames by efficacy, informing the result
 
     return sourceNames.sort(function(a, b)  {
-        
+
         return Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(a)] - Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(b)]
     })
 }

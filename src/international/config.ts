@@ -30,4 +30,12 @@ InternationalManager.prototype.config = function() {
 
         Memory.stats.memoryLimit = 2097
     }
+
+    if (!global.constructed) {
+
+        global.constructed = true
+
+        global.packedRoomNames = {}
+        global.unpackedRoomNames = {}
+    }
 }

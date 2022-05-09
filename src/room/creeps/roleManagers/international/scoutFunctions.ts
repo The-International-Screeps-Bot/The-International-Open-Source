@@ -2,9 +2,9 @@ import { Scout } from "../../creepClasses"
 
 Scout.prototype.findScoutTarget = function() {
 
-    const creep = this,
-        room = creep.room,
-        commune = Game.rooms[creep.memory.communeName],
+    if(this.memory.scoutTarget) return true
+
+    const commune = Game.rooms[this.memory.communeName],
 
         // Construct storage of exit information
 
@@ -13,7 +13,7 @@ Scout.prototype.findScoutTarget = function() {
 
         // Get information about the room's exits
 
-        exits = Game.map.describeExits(room.name)
+        exits = Game.map.describeExits(this.room.name)
 
     // Loop through each exit type
 
@@ -25,7 +25,7 @@ Scout.prototype.findScoutTarget = function() {
 
         // Iterate if the room statuses aren't the same
 
-        if (Game.map.getRoomStatus(roomName).status != Game.map.getRoomStatus(room.name).status) continue
+        if (Game.map.getRoomStatus(roomName).status != Game.map.getRoomStatus(this.room.name).status) continue
 
         // If a scout already has this room as a target
 
@@ -47,11 +47,13 @@ Scout.prototype.findScoutTarget = function() {
     }
 
     const scoutTarget = unscoutedRooms.length ?
-        unscoutedRooms.sort((a, b) => Game.map.getRoomLinearDistance(creep.memory.communeName, a) - Game.map.getRoomLinearDistance(creep.memory.communeName, b))[0] :
+        unscoutedRooms.sort((a, b) => Game.map.getRoomLinearDistance(this.memory.communeName, a) - Game.map.getRoomLinearDistance(this.memory.communeName, b))[0] :
         scoutedRooms.sort((a, b) => Memory.rooms[a].lastScout - Memory.rooms[b].lastScout)[0]
 
-    if (!scoutTarget) return
+    if (!scoutTarget) return false
 
-    creep.memory.scoutTarget = scoutTarget
+    this.memory.scoutTarget = scoutTarget
     commune.scoutTargets.add(scoutTarget)
+
+    return true
 }

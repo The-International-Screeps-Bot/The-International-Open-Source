@@ -1,5 +1,5 @@
 import { allyList, constants } from "international/constants"
-import { findObjectWithID, getRange, unPackAsRoomPos } from "international/generalFunctions"
+import { findObjectWithID, getRange, unpackAsRoomPos } from "international/generalFunctions"
 
 Object.defineProperties(Room.prototype, {
 
@@ -16,7 +16,7 @@ Object.defineProperties(Room.prototype, {
 
             if (this._anchor) return this._anchor
 
-            return this._anchor = this.memory.stampAnchors && this.memory.stampAnchors.fastFiller.length ? unPackAsRoomPos(this.memory.stampAnchors.fastFiller[0], this.name) :
+            return this._anchor = this.memory.stampAnchors && this.memory.stampAnchors.fastFiller.length ? unpackAsRoomPos(this.memory.stampAnchors.fastFiller[0], this.name) :
                 undefined
         }
     },

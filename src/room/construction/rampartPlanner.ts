@@ -1,5 +1,5 @@
 import { constants, stamps } from "international/constants"
-import { customLog, pack, unPackAsPos, unPackAsRoomPos } from "international/generalFunctions";
+import { customLog, pack, unpackAsPos, unpackAsRoomPos } from "international/generalFunctions";
 
 export function rampartPlanner(room: Room) {
 
@@ -560,7 +560,7 @@ export function rampartPlanner(room: Room) {
 
         for (const packedStampAnchor of stampAnchors[stampType as StampTypes]) {
 
-            const stampAnchor = unPackAsPos(packedStampAnchor)
+            const stampAnchor = unpackAsPos(packedStampAnchor)
 
             // Protect the stamp
 
@@ -590,13 +590,13 @@ export function rampartPlanner(room: Room) {
 
         // Get the hubAnchor
 
-        hubAnchor = unPackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
+        hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
 
     // Loop through each tower anchor and plan for a rampart at it
 
     for (const packedStampAnchor of stampAnchors.tower) {
 
-        const stampAnchor = unPackAsPos(packedStampAnchor)
+        const stampAnchor = unpackAsPos(packedStampAnchor)
 
         rampartPlans.set(stampAnchor.x, stampAnchor.y, 1)
     }
@@ -619,7 +619,7 @@ export function rampartPlanner(room: Room) {
 
     for (const packedPos of rampartPositions) {
 
-        const pos = unPackAsPos(packedPos)
+        const pos = unpackAsPos(packedPos)
 
         // Record the pos in roadCM
 
@@ -649,7 +649,7 @@ export function rampartPlanner(room: Room) {
 
         for (const packedPos of room.memory.stampAnchors.boardingRampart) {
 
-            const pos = unPackAsRoomPos(packedPos, room.name)
+            const pos = unpackAsRoomPos(packedPos, room.name)
 
             // Path from the hubAnchor to the cloestPosToAnchor
 

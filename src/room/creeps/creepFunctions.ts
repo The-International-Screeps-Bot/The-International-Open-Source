@@ -1,6 +1,6 @@
 import { spawn } from "child_process"
 import { constants, CPUBucketRenewThreshold } from "international/constants"
-import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRange, getRangeBetween, pack, unPackAsRoomPos } from "international/generalFunctions"
+import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRange, getRangeBetween, pack, unpackAsRoomPos } from "international/generalFunctions"
 import { repeat } from "lodash"
 import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
 
@@ -277,14 +277,13 @@ Creep.prototype.advancedUpgradeController = function() {
 
             // Withdraw from the controllerContainer, informing false if the withdraw failed
 
-            if (creep.withdraw(controllerStructure, RESOURCE_ENERGY) != OK) {
+            if (creep.withdraw(controllerStructure, RESOURCE_ENERGY) != OK) return false
 
-                creep.store[RESOURCE_ENERGY] = creep.store.getCapacity(RESOURCE_ENERGY)
+            creep.store[RESOURCE_ENERGY] = creep.store.getCapacity(RESOURCE_ENERGY)
 
-                // Calculate the control points added
+            // Calculate the control points added
 
-                controlPoints = Math.min(creep.store.getUsedCapacity(RESOURCE_ENERGY), creep.partsOfType(WORK))
-            }
+            controlPoints = Math.min(creep.store.getUsedCapacity(RESOURCE_ENERGY), creep.partsOfType(WORK))
         }
 
         if (upgradeControllerResult == OK) {
@@ -1069,7 +1068,7 @@ Creep.prototype.runMoveRequest = function(packedPos) {
 
     // Move the creep to the position and inform the result
 
-    return creep.move(creep.pos.getDirectionTo(unPackAsRoomPos(packedPos, room.name))) == OK
+    return creep.move(creep.pos.getDirectionTo(unpackAsRoomPos(packedPos, room.name))) == OK
 }
 
 Creep.prototype.recurseMoveRequest = function(packedPos, queue = []) {
@@ -1266,7 +1265,7 @@ Creep.prototype.fulfillTask = function() {
 
     // If visuals are enabled, show the task targeting
 
-    if (Memory.roomVisuals) room.visual.line(creep.pos, unPackAsRoomPos(task.pos, room.name), { color: constants.colors.lightBlue, width: 0.15 })
+    if (Memory.roomVisuals) room.visual.line(creep.pos, unpackAsRoomPos(task.pos, room.name), { color: constants.colors.lightBlue, width: 0.15 })
 
     // Run the creep's function based on the task type and inform its result
 

@@ -1,4 +1,4 @@
-import { customLog, getRangeBetween, unPackAsRoomPos } from "international/generalFunctions";
+import { customLog, getRangeBetween, unpackAsRoomPos } from "international/generalFunctions";
 import { FastFiller } from "room/creeps/creepClasses";
 
 FastFiller.prototype.travelToFastFiller = function() {
@@ -12,7 +12,7 @@ FastFiller.prototype.travelToFastFiller = function() {
 
     // Unpack the creep's packedFastFillerPos
 
-    const fastFillerPos = unPackAsRoomPos(creep.memory.packedPos, room.name)
+    const fastFillerPos = unpackAsRoomPos(creep.memory.packedPos, room.name)
 
     // If the creep is standing on the fastFillerPos, inform false
 

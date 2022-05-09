@@ -34,6 +34,11 @@ declare global {
         y: number
     }
 
+    export interface Coord {
+        x: number;
+        y: number;
+    }
+
     interface Rect {
         x1: number
         y1: number
@@ -1178,6 +1183,10 @@ declare global {
             tasksWithoutResponders: {[key: string]: RoomTask}
 
             tasksWithResponders: {[key: string]: RoomTask}
+
+            packedRoomNames: { [roomManager: string]: string }
+
+            unpackedRoomNames: { [key: string]: string }
 
             // Command functions
 

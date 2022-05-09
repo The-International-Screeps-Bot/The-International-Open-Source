@@ -1,5 +1,5 @@
 import { claimRequestNeedsIndex } from "international/constants"
-import { customLog, findObjectWithID, getRange, unPackAsPos } from "international/generalFunctions"
+import { customLog, findObjectWithID, getRange, unpackAsPos } from "international/generalFunctions"
 import { Vanguard } from "../../creepClasses"
 
 Vanguard.prototype.travelToSource = function(sourceName) {
@@ -17,7 +17,7 @@ Vanguard.prototype.travelToSource = function(sourceName) {
 
     // Unpack the harvestPos
 
-    const harvestPos = unPackAsPos(creep.memory.packedPos)
+    const harvestPos = unpackAsPos(creep.memory.packedPos)
 
     // If the creep is at the creep's packedHarvestPos, inform false
 
