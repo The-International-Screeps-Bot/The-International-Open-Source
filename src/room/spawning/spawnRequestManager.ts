@@ -918,9 +918,8 @@ export function spawnRequester(room: Room) {
 
     constructSpawnRequests((function(): SpawnRequestOpts | false {
 
-        // Construct the partsMultiplier
-
-        let partsMultiplier = 1
+        let partsMultiplier = 1,
+            maxCreeps = room.get('upgradePositions').length
 
         // Get the controllerLink and baseLink
 
@@ -929,6 +928,8 @@ export function spawnRequester(room: Room) {
         // If the controllerLink is defined
 
         if (controllerLink) {
+
+            maxCreeps--
 
             const hubLink: StructureLink | undefined = room.get('hubLink'),
                 sourceLinks: StructureLink[] = [room.get('source1Link'), room.get('source2Link')]
@@ -992,11 +993,11 @@ export function spawnRequester(room: Room) {
 
         if (room.get('controllerContainer') || controllerLink) {
 
-            // If the controller is level 8, max out partsMultiplier at 4
-
+            // If the controller is level 8
+/*
             if (room.controller.level == 8) {
 
-                // If the controller is near to downgrading, set partsMultiplier to x
+                // If the controller is near to downgrading
 
                 if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 5
 
@@ -1016,14 +1017,14 @@ export function spawnRequester(room: Room) {
                     }
                 }
             }
-
+ */
             // Otherwise if the spawnEnergyCapacity is more than 800
 
             if (spawnEnergyCapacity >= 800) {
 
-            // If the controller is near to downgrading, set partsMultiplier to x
+                // If the controller is near to downgrading, set partsMultiplier to x
 
-            if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 6
+                if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 6
 
                 partsMultiplier = Math.round(partsMultiplier / 6)
                 if (partsMultiplier == 0) return false
@@ -1034,7 +1035,7 @@ export function spawnRequester(room: Room) {
                     partsMultiplier,
                     threshold,
                     minCreeps: undefined,
-                    maxCreeps: room.get('upgradePositions').length,
+                    maxCreeps,
                     minCost: 700,
                     priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
                     memoryAdditions: {
@@ -1056,7 +1057,7 @@ export function spawnRequester(room: Room) {
                 partsMultiplier,
                 threshold,
                 minCreeps: undefined,
-                maxCreeps: room.get('upgradePositions').length,
+                maxCreeps,
                 minCost: 200,
                 priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
                 memoryAdditions: {
@@ -1076,8 +1077,6 @@ export function spawnRequester(room: Room) {
                 extraParts: [CARRY, MOVE, WORK],
                 partsMultiplier,
                 threshold,
-                minCreeps: undefined,
-                maxCreeps: room.get('upgradePositions').length,
                 minCost: 200,
                 priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
                 memoryAdditions: {
@@ -1091,8 +1090,6 @@ export function spawnRequester(room: Room) {
             extraParts: [MOVE, CARRY, MOVE, WORK],
             partsMultiplier: Math.max(partsMultiplier, 1),
             threshold,
-            minCreeps: undefined,
-            maxCreeps: room.get('upgradePositions').length,
             minCost: 250,
             priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
             memoryAdditions: {

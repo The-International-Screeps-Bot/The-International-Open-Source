@@ -33,6 +33,7 @@ export function communeManager(room: Room) {
     room.claimRequestManager()
 
     spawnManager(room)
+    
 /*
     let cpu = Game.cpu.getUsed()
 

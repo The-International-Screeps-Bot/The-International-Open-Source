@@ -2,7 +2,7 @@ import { spawn } from "child_process"
 import { constants, CPUBucketRenewThreshold } from "international/constants"
 import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRange, getRangeBetween, pack, unpackAsRoomPos } from "international/generalFunctions"
 import { repeat } from "lodash"
-import { packPosList, unpackPosList } from "other/packrat"
+import { packCoord, packPosList, unpackPosList } from "other/packrat"
 import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
 
 Creep.prototype.preTickManager = function() {}
@@ -212,7 +212,7 @@ Creep.prototype.advancedUpgradeController = function() {
 
                 // Construct the packedPos using pos
 
-                const packedPos = pos.x * 50 + pos.y
+                const packedPos = pack(pos)
 
                 // Iterate if the pos is used
 
