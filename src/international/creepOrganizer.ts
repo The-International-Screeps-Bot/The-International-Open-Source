@@ -64,7 +64,7 @@ InternationalManager.prototype.creepOrganizer = function() {
         // Get the commune the creep is from
 
         const commune = Game.rooms[creep.memory.communeName]
-        customLog('THING ' + role, creep.preTickManager)
+        
         creep.preTickManager()
 
         // If there is not vision in the commune, stop

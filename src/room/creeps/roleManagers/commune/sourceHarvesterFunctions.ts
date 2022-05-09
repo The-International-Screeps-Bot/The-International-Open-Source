@@ -1,32 +1,25 @@
 import { constants } from "international/constants"
-import { getRangeBetween, unPackAsPos } from "international/generalFunctions"
+import { customLog, getRangeBetween, unPackAsPos } from "international/generalFunctions"
 import { RoomPullTask } from "room/roomTasks"
 import { SourceHarvester } from "../../creepClasses"
 
 SourceHarvester.prototype.isDying = function() {
 
-    const creep = this,
-    room = creep.room
-
     // Inform as dying if creep is already recorded as dying
-
-    if (creep.memory.dying) return true
+    
+    if (this.memory.dying) return true
 
     // Stop if creep is spawning
 
-    if (!creep.ticksToLive) return false
-
-    // Get the creep's path length
-
-    const sourcePathLength = creep.memory.sourceName ? room.global[`${creep.memory.sourceName}PathLength`] : 0
+    if (!this.ticksToLive) return false
 
     // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
-    if (creep.ticksToLive > creep.body.length * CREEP_SPAWN_TIME + sourcePathLength) return false
+    if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.global[`${this.memory.sourceName}PathLength`] || 0)) return false
 
     // Record creep as dying
 
-    creep.memory.dying = true
+    this.memory.dying = true
     return true
 }
 
