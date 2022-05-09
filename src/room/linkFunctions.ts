@@ -1,39 +1,46 @@
 import { upgraderSpawningWhenStorageThreshold } from "international/constants"
 
-Room.prototype.hubToController = function(hubLink, controllerLink) {
+Room.prototype.sourcesToReceivers = function(sourceLinks, receiverLinks) {
 
-    const room = this
+    // Loop through each sourceLink
 
-    // If the controller is close to downgrading and the storage has insufficient energy, stop
+    for (const sourceLink of sourceLinks) {
 
-    if (room.controller.ticksToDowngrade > 10000 &&
-        room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < upgraderSpawningWhenStorageThreshold - 30000) return
+        // If the sourceLink is undefined, iterate
 
-    // If the hubLink or controllerLink aren't defined, stop
+        if (!sourceLink) continue
 
-    if (!hubLink || !controllerLink) return
+        // If the link is not nearly full, iterate
 
-    // If the hubLink is not sufficiently full, stop
+        if (sourceLink.store.getCapacity(RESOURCE_ENERGY) - sourceLink.store.energy > 100) continue
 
-    if (hubLink.store.getFreeCapacity(RESOURCE_ENERGY) > 100) return
+        // Otherwise, loop through each receiverLink
 
-    // If the controllerLink is more than half full, stop
+        for (const receiverLink of receiverLinks) {
 
-    if (controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) > controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) return
+            // If the sourceLink is undefined, iterate
 
-    // Otherwise, have the sourceLink transfer to the recieverLink
+            if (!receiverLink) continue
 
-    hubLink.transferEnergy(controllerLink)
+            // If the link is more than half full, iterate
 
-    // Record the links have moved resources
+            if (receiverLink.store.energy > receiverLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) continue
 
-    hubLink.hasMovedResources = true
-    controllerLink.hasMovedResources = true
+            // Otherwise, have the sourceLink transfer to the receiverLink
+
+            sourceLink.transferEnergy(receiverLink)
+
+            receiverLink.store.energy += sourceLink.store.energy
+            sourceLink.store.energy -= receiverLink.store.getCapacity(RESOURCE_ENERGY) - receiverLink.store.energy
+
+            // And stop the loop
+
+            break
+        }
+    }
 }
 
 Room.prototype.hubToFastFiller = function(hubLink, fastFillerLink) {
-
-    const room = this
 
     // If the hubLink or fastFillerLink aren't defined, stop
 
@@ -41,18 +48,43 @@ Room.prototype.hubToFastFiller = function(hubLink, fastFillerLink) {
 
     // If the hubLink is not sufficiently full, stop
 
-    if (hubLink.store.getFreeCapacity(RESOURCE_ENERGY) > 100) return
+    if (hubLink.store.getCapacity(RESOURCE_ENERGY) - hubLink.store.energy > 100) return
 
     // If the fastFillerLink is more than half full, stop
 
-    if (fastFillerLink.store.getUsedCapacity(RESOURCE_ENERGY) > fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) return
+    if (fastFillerLink.store.energy > fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) return
 
     // Otherwise, have the sourceLink transfer to the recieverLink
 
     hubLink.transferEnergy(fastFillerLink)
 
-    // Record the links have moved resources
+    fastFillerLink.store.energy += hubLink.store.energy
+    hubLink.store.energy -= fastFillerLink.store.getCapacity(RESOURCE_ENERGY) - fastFillerLink.store.energy
+}
 
-    hubLink.hasMovedResources = true
-    fastFillerLink.hasMovedResources = true
+Room.prototype.hubToController = function(hubLink, controllerLink) {
+
+    // If the controller is close to downgrading and the storage has insufficient energy, stop
+
+    if (this.controller.ticksToDowngrade > 10000 &&
+        this.storage.store.energy < upgraderSpawningWhenStorageThreshold - 30000) return
+
+    // If the hubLink or controllerLink aren't defined, stop
+
+    if (!hubLink || !controllerLink) return
+
+    // If the hubLink is not sufficiently full, stop
+
+    if (hubLink.store.getCapacity(RESOURCE_ENERGY) - hubLink.store.energy > 100) return
+
+    // If the controllerLink is more than half full, stop
+
+    if (controllerLink.store.energy > controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) return
+
+    // Otherwise, have the sourceLink transfer to the recieverLink
+
+    hubLink.transferEnergy(controllerLink)
+
+    controllerLink.store.energy += hubLink.store.energy
+    hubLink.store.energy -= controllerLink.store.getCapacity(RESOURCE_ENERGY) - controllerLink.store.energy
 }

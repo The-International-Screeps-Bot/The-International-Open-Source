@@ -737,9 +737,11 @@ declare global {
 
         // Link functions
 
-        hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
+        sourcesToReceivers(sourceLinks: (StructureLink | false)[], receiverLinks: (StructureLink | false)[]): void
 
         hubToFastFiller(hubLink: StructureLink | undefined, fastFillerLink: StructureLink | undefined): void
+
+        hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
     }
 
     interface RoomMemory {
@@ -1120,14 +1122,6 @@ declare global {
 
     interface Structure {
         realHits: number
-    }
-
-    interface StructureLink {
-
-        /**
-         * Wether the link has moved any resources this tick
-         */
-        hasMovedResources: boolean
     }
 
     interface StructureSpawn {
