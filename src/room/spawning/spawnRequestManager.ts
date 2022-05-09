@@ -1279,7 +1279,7 @@ export function spawnRequester(room: Room) {
             const minCost = 400,
                 cost = 900,
                 extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE],
-                strengthOfParts = findStrengthOfParts(extraParts) * (spawnEnergyCapacity / cost)
+                strengthOfParts = findStrengthOfParts(extraParts)
 
             // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
 
@@ -1291,11 +1291,11 @@ export function spawnRequester(room: Room) {
 
             // If max spawnable strength is less that needed
 
-            if (strengthOfParts < remoteNeeds[remoteNeedsIndex.remoteDefender]) {
+            if (strengthOfParts * (spawnEnergyCapacity / cost) < remoteNeeds[remoteNeedsIndex.remoteDefender]) {
 
                 // Abandon the room for some time
 
-                Memory.rooms[remoteName].abandoned = 1500
+                Memory.rooms[remoteName].abandoned = 1000
                 return false
             }
 

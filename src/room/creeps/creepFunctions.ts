@@ -762,7 +762,7 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 Creep.prototype.createMoveRequest = function(opts) {
 
     const creep = this,
-    room = creep.room
+        room = creep.room
 
     // If creep can't move, inform false
 

@@ -45,7 +45,7 @@ RemoteDefender.prototype.findRemote = function() {
 RemoteDefender.prototype.advancedHeal = function() {
 
     const creep = this,
-    room = creep.room
+        room = creep.room
 
     // If the creep is below max hits
 
@@ -54,13 +54,13 @@ RemoteDefender.prototype.advancedHeal = function() {
         // Have it heal itself and stop
 
         creep.heal(creep)
-        return
+        return false
     }
 
     let top = Math.max(Math.min(creep.pos.y - 1, constants.roomDimensions - 2), 2),
-    left = Math.max(Math.min(creep.pos.x - 1, constants.roomDimensions - 2), 2),
-    bottom = Math.max(Math.min(creep.pos.y + 1, constants.roomDimensions - 2), 2),
-    right = Math.max(Math.min(creep.pos.x + 1, constants.roomDimensions - 2), 2)
+        left = Math.max(Math.min(creep.pos.x - 1, constants.roomDimensions - 2), 2),
+        bottom = Math.max(Math.min(creep.pos.y + 1, constants.roomDimensions - 2), 2),
+        right = Math.max(Math.min(creep.pos.x + 1, constants.roomDimensions - 2), 2)
 
     // Find adjacent creeps
 
@@ -80,12 +80,12 @@ RemoteDefender.prototype.advancedHeal = function() {
 
         // If the creep is at full health, iterate
 
-        if(posData.creep.hitsMax == posData.creep.hits) continue
+        if (posData.creep.hitsMax == posData.creep.hits) continue
 
         // have the creep heal the adjacentCreep and stop
 
         creep.heal(posData.creep)
-        return
+        return false
     }
 
     top = Math.max(Math.min(creep.pos.y - 3, constants.roomDimensions - 2), 2),
@@ -111,25 +111,25 @@ RemoteDefender.prototype.advancedHeal = function() {
 
         // If the creep is at full health, iterate
 
-        if(posData.creep.hitsMax == posData.creep.hits) continue
+        if (posData.creep.hitsMax == posData.creep.hits) continue
 
         // have the creep rangedHeal the nearbyCreep and stop
 
         creep.rangedHeal(posData.creep)
-        return
+        return true
     }
+
+    return false
 }
 
 RemoteDefender.prototype.advancedAttackAttackers = function() {
 
     const creep = this,
-    room = creep.room,
+        room = creep.room,
 
-    // Get enemyAttackers in the room
+        // Get enemyAttackers in the room
 
-    enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-        filter: creep => !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([ATTACK, RANGED_ATTACK])
-    })
+        enemyAttackers = room.enemyCreeps.filter(enemyCreep => !enemyCreep.isOnExit() && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK]))
 
     // If there are none
 
@@ -137,9 +137,9 @@ RemoteDefender.prototype.advancedAttackAttackers = function() {
 
         // Heal nearby creeps
 
-        creep.advancedHeal()
+        if (creep.advancedHeal()) return true
 
-        const enemyCreeps = (room.get('enemyCreeps') as Creep[]).filter(enemyCreep => !enemyCreep.isOnExit())
+        const enemyCreeps = room.enemyCreeps.filter(enemyCreep => !enemyCreep.isOnExit())
         if (!enemyCreeps.length) return false
 
         const enemyCreep = creep.pos.findClosestByRange(enemyCreeps),
