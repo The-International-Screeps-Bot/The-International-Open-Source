@@ -1258,7 +1258,7 @@ export function spawnRequester(room: Room) {
             return {
                 defaultParts: [],
                 extraParts: [MOVE, CLAIM],
-                partsMultiplier: 5,
+                partsMultiplier: 4,
                 groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteReserver,
                 minCreeps: 1,
                 maxCreeps: Infinity,

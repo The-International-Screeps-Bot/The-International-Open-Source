@@ -176,15 +176,15 @@ Creep.prototype.advancedHarvestSource = function(source) {
 Creep.prototype.advancedUpgradeController = function() {
 
     const creep = this,
-    room = creep.room,
+        room = creep.room,
 
-    // The the controller
+        // The the controller
 
-    controller = room.controller,
+        controller = room.controller,
 
-    // Assign either the controllerLink or controllerContainer as the controllerStructure
+        // Assign either the controllerLink or controllerContainer as the controllerStructure
 
-    controllerStructure: (StructureLink | StructureContainer | undefined) = room.get('controllerLink') || room.get('controllerContainer')
+        controllerStructure: (StructureLink | StructureContainer | undefined) = room.get('controllerLink') || room.get('controllerContainer')
 
     creep.say('AUC')
 
@@ -200,9 +200,9 @@ Creep.prototype.advancedUpgradeController = function() {
 
             const upgradePositions: RoomPosition[] = room.get('upgradePositions'),
 
-            // Get usedUpgradePositions, informing false if they're undefined
+                // Get usedUpgradePositions, informing false if they're undefined
 
-            usedUpgradePositions: Set<number> = room.get('usedUpgradePositions')
+                usedUpgradePositions: Set<number> = room.get('usedUpgradePositions')
             if (!usedUpgradePositions) return false
 
             // Loop through each upgradePositions
@@ -225,7 +225,11 @@ Creep.prototype.advancedUpgradeController = function() {
             }
         }
 
-        const upgradeControllerResult = creep.upgradeController(controller)
+        const upgradeControllerResult = creep.upgradeController(controller),
+
+            workPartCount = creep.partsOfType(WORK)
+
+            let controlPoints = 0
 
         // Try to upgrade the controller, and if the result is a success
 
@@ -233,14 +237,9 @@ Creep.prototype.advancedUpgradeController = function() {
 
             creep.say('UC')
 
-            // Calculate the control points added
+            creep.store[RESOURCE_ENERGY] -= workPartCount
 
-            const controlPoints = Math.min(creep.store.getUsedCapacity(RESOURCE_ENERGY), creep.partsOfType(WORK))
-
-            // Add control points to total controlPoints counter and say the success
-
-            Memory.stats.controlPoints += controlPoints
-            creep.say('🔋' + controlPoints)
+            controlPoints = Math.min(creep.store.getUsedCapacity(RESOURCE_ENERGY), creep.partsOfType(WORK))
         }
 
         // If packedUpgradePos is out of range
@@ -260,6 +259,11 @@ Creep.prototype.advancedUpgradeController = function() {
                 }
             })
 
+            // Add control points to total controlPoints counter
+
+            Memory.stats.controlPoints += controlPoints
+            creep.say('🔋' + controlPoints)
+
             // Inform false
 
             return true
@@ -267,20 +271,31 @@ Creep.prototype.advancedUpgradeController = function() {
 
         // Otherwise
 
-        // Get the number of work parts for the creep
-
-        const workPartCount = creep.partsOfType(WORK)
-
         // If the creep has less energy than its workPartCount
 
         if (creep.store.getUsedCapacity(RESOURCE_ENERGY) <= workPartCount) {
 
             // Withdraw from the controllerContainer, informing false if the withdraw failed
 
-            if (creep.withdraw(controllerStructure, RESOURCE_ENERGY) != OK) return false
+            if (creep.withdraw(controllerStructure, RESOURCE_ENERGY) != OK) {
+
+                creep.store[RESOURCE_ENERGY] = creep.store.getCapacity(RESOURCE_ENERGY)
+
+                // Calculate the control points added
+
+                controlPoints = Math.min(creep.store.getUsedCapacity(RESOURCE_ENERGY), creep.partsOfType(WORK))
+            }
         }
 
-        if (upgradeControllerResult == OK) return true
+        if (upgradeControllerResult == OK) {
+
+            // Add control points to total controlPoints counter
+
+            Memory.stats.controlPoints += controlPoints
+            creep.say('🔋' + controlPoints)
+
+            return true
+        }
 
         // If the controller is a container and is in need of repair
 
