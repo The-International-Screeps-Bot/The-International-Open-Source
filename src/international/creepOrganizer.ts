@@ -43,10 +43,6 @@ InternationalManager.prototype.creepOrganizer = function() {
 
         creep = Game.creeps[creepName] = new creepClasses[role](creep.id)
 
-        // Increase total creep counter
-
-        totalCreepCount += 1
-
         // Organize creep in its room by its role
 
         room.myCreeps[role].push(creepName)
