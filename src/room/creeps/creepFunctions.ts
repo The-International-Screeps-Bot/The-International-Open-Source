@@ -2,6 +2,7 @@ import { spawn } from "child_process"
 import { constants, CPUBucketRenewThreshold } from "international/constants"
 import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRange, getRangeBetween, pack, unpackAsRoomPos } from "international/generalFunctions"
 import { repeat } from "lodash"
+import { packPosList, unpackPosList } from "other/packrat"
 import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
 
 Creep.prototype.preTickManager = function() {}
@@ -722,17 +723,17 @@ Creep.prototype.partsOfType = function(type) {
     return creep.body.filter(part => part.type == type).length
 }
 
-Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
+Creep.prototype.needsNewPath = function(goalPos, cacheAmount, path) {
 
     const creep = this
 
     // Inform true if there is no path
 
-    if (!creep.memory.path) return true
+    if (!path) return true
 
     // Inform true if the path is at its end
 
-    if (creep.memory.path.length == 0) return true
+    if (path.length == 0) return true
 
     // Inform true if there is no lastCache value in the creep's memory
 
@@ -744,7 +745,7 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
     // Inform true if the path isn't in the same room as the creep
 
-    if (creep.memory.path[0].roomName != creep.room.name) return true
+    if (path[0].roomName != creep.room.name) return true
 
     // Inform true if the creep's previous target isn't its current
 
@@ -752,7 +753,7 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount) {
 
     // If next pos in the path is not in range, inform true
 
-    if (creep.pos.getRangeTo(creep.memory.path[0]) > 1) return true
+    if (creep.pos.getRangeTo(path[0]) > 1) return true
 
     // Otherwise inform false
 
@@ -780,27 +781,27 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     if (!opts.cacheAmount) opts.cacheAmount = 50
 
+    let path: RoomPosition[]
+
     // If there is a path in the creep's memory
 
     if (creep.memory.path) {
 
+        path = unpackPosList(creep.memory.path)
+
         // So long as the creep isn't standing on the first position in the path
 
-        while (creep.memory.path[0] && arePositionsEqual(creep.pos, creep.memory.path[0])) {
+        while (path[0] && arePositionsEqual(creep.pos, path[0])) {
 
             // Remove the first pos of the path
 
-            creep.memory.path.shift()
+            path.shift()
         }
     }
 
     // See if the creep needs a new path
 
-    const needsNewPathResult = creep.needsNewPath(opts.goal.pos, opts.cacheAmount)
-
-    // Set path to the path in the creep's memory
-
-    let path = creep.memory.path
+    const needsNewPathResult = creep.needsNewPath(opts.goal.pos, opts.cacheAmount, path)
 
     // If the creep need a new path, make one
 
@@ -874,7 +875,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     // Set the path in the creep's memory
 
-    creep.memory.path = path
+    creep.memory.path = packPosList(path)
 
     // Inform success
 
@@ -1188,7 +1189,7 @@ Creep.prototype.recurseMoveRequest = function(packedPos, queue = []) {
 }
 
 Creep.prototype.getPushed = function() {
-
+    /*
     const creep = this,
         room = creep.room
 
@@ -1211,6 +1212,7 @@ Creep.prototype.getPushed = function() {
     // Otherwise enforce the moveRequest
 
     creep.runMoveRequest(pack(creep.memory.path[0]))
+    */
 }
 
 Creep.prototype.needsResources = function() {

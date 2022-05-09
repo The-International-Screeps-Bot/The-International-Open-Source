@@ -955,7 +955,7 @@ declare global {
         /**
          *
          */
-        needsNewPath(goalPos: RoomPosition, cacheAmount: number): boolean
+        needsNewPath(goalPos: RoomPosition, cacheAmount: number, path: RoomPosition[] | undefined): boolean
 
         /**
          *
@@ -1068,7 +1068,7 @@ declare global {
         /**
          * An array of positions desciring where the creep neeeds to move to get to its goal
          */
-        path: RoomPosition[]
+        path: string
 
         goalPos: RoomPosition
 

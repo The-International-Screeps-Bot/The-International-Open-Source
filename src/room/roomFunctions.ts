@@ -464,7 +464,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Get the open areas in a range of 3 to the controller
 
-        const distanceCM = room.distanceTransform(undefined, true, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
+        const distanceCM = room.distanceTransform(undefined, false, room.controller.pos.x - 2, room.controller.pos.y - 2, room.controller.pos.x + 2, room.controller.pos.y + 2)
 
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
