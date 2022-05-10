@@ -702,7 +702,7 @@ export function spawnRequester(room: Room) {
             partsMultiplier: 1,
             minCreeps: fastFillerPositions.length,
             minCost: 250,
-            priority: 0.75 + (room.myCreeps.fastFiller.length * 0.15),
+            priority: 0.75,
             memoryAdditions: {
                 role: 'fastFiller',
             }

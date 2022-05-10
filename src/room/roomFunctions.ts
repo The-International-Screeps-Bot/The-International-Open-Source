@@ -1592,7 +1592,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                     // Get the hubAnchor
 
-                    const hubAnchor = room.memory.stampAnchors ? unpackAsRoomPos(room.memory.stampAnchors.hub[0], roomName) : undefined
+                    const hubAnchor = (room.memory.stampAnchors && room.memory.stampAnchors.hub[0]) ? unpackAsRoomPos(room.memory.stampAnchors.hub[0], roomName) : undefined
 
                     // If the hubAnchor is defined
 
