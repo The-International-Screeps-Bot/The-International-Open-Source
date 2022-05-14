@@ -85,7 +85,7 @@ export function marketManager(room: Room) {
 
     // Energy
 
-    let targetAmount = 40000,
+    let targetAmount = 30000,
     resourceType: ResourceConstant = RESOURCE_ENERGY
 
     // If there is insufficient energy

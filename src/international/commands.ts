@@ -75,7 +75,7 @@ global.destroyAllStructures = function(roomName: string, types?: StructureConsta
  * @param commune The commune to respond to the claimRequest
  * @param claimRequest The roomName of the claimRequest to respond to
  */
-global.claim = function(communeName: string, claimRequest: string) {
+global.claim = function(claimRequest: string, communeName: string) {
 
     const roomMemory = Memory.rooms[communeName]
     if (!roomMemory) return 'No memory for ' + communeName
