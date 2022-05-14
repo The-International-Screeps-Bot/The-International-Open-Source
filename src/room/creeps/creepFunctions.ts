@@ -429,7 +429,7 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
     // If the cSite is out of range
 
-    if (range > 1) {
+    if (range > 3) {
 
         creep.say('➡️CS')
 
@@ -437,16 +437,14 @@ Creep.prototype.advancedBuildCSite = function(cSite) {
 
         creep.createMoveRequest({
             origin: creep.pos,
-            goal: { pos: cSite.pos, range: 1 },
+            goal: { pos: cSite.pos, range: 3 },
             avoidEnemyRanges: true,
             weightGamebjects: {
                 1: room.get('road')
             }
         })
 
-        // Inform true if out of range
-
-        if (range > 3) return true
+        return true
     }
 
     // Otherwise
@@ -871,7 +869,6 @@ Creep.prototype.createMoveRequest = function(opts) {
     // Assign the goal's pos to the creep's goalPos
 
     creep.memory.goalPos = packPos(opts.goal.pos)
-    creep.memory.range = opts.goal.range
 
     // Make moveRequest true to inform a moveRequest has been made
 
@@ -889,7 +886,7 @@ Creep.prototype.createMoveRequest = function(opts) {
 Creep.prototype.acceptTask = function(task) {
 
     const creep = this,
-    room = creep.room
+        room = creep.room
 
     // if there is no global for the creep, make one
 
@@ -1047,7 +1044,7 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
 
 Creep.prototype.shove = function(shoverPos) {
 
-    let goalPos,
+    let goalPos: RoomPosition | undefined,
         flee = false
 
     if (this.memory.goalPos) {
@@ -1060,19 +1057,22 @@ Creep.prototype.shove = function(shoverPos) {
         goalPos = this.pos
         flee = true
     }
-
+    /* this.say(goalPos.x + ',' + goalPos.y + ',' + flee) */
     this.createMoveRequest({
         origin: this.pos,
         goal: { pos: goalPos, range: 1 },
-        weightPositions: { 255: [this.pos, shoverPos] },
+        /* weightPositions: { 255: [this.pos, shoverPos] }, */
+        weightGamebjects: { 255: this.room.find(FIND_MY_CREEPS) },
         flee,
+        cacheAmount: 1,
     })
 
-    this.say('failed s')
+    /* this.say('failed s') */
 
     if (!this.moveRequest) return false
 
-    this.say('SHOVE')
+    /* this.say('SHOVE') */
+    this.room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), { color: constants.colors.yellow })
 
     this.recurseMoveRequest(this.moveRequest)
     return true
@@ -1646,11 +1646,13 @@ Creep.prototype.advancedRecycle = function() {
 Creep.prototype.advancedRenew = function() {
 
     const creep = this,
-    room = creep.room
+        room = creep.room
 
     // If there is insufficient CPU to renew, inform false
 
     if (Game.cpu.bucket < CPUBucketRenewThreshold) return false
+
+    if (!room.myCreeps.fastFiller.length) return false
 
     //
 

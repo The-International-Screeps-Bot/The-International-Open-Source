@@ -1389,9 +1389,9 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         const gameObjects = opts.weightGamebjects[weight],
 
-                        // Get the numeric value of the weight
+                            // Get the numeric value of the weight
 
-                        weightNumber = parseInt(weight)
+                            weightNumber = parseInt(weight)
 
                         // Loop through each gameObject and set their pos to the weight in the cm
 

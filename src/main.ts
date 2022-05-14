@@ -1076,8 +1076,6 @@ declare global {
 
         goalPos: string
 
-        goalRange: number
-
         /**
          * Whether the creep is intended to move on its own or not
          */
