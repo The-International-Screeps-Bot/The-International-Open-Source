@@ -1063,7 +1063,7 @@ Creep.prototype.shove = function(shoverPos) {
         goal: { pos: goalPos, range: 1 },
         weightGamebjects: { 255: this.room.find(FIND_MY_CREEPS) },
         flee,
-        cacheAmount: 1,
+        cacheAmount: 0,
     })
 
     if (!this.moveRequest) return false

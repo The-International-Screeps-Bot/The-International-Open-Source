@@ -5,6 +5,7 @@ import { RemoteDefender } from "room/creeps/creepClasses"
 RemoteDefender.prototype.findRemote = function() {
 
     const creep = this
+
     // If the creep already has a remote, inform true
 
     if (creep.memory.remoteName) return true
@@ -46,6 +47,8 @@ RemoteDefender.prototype.advancedHeal = function() {
 
     const creep = this,
         room = creep.room
+
+    creep.say('AH')
 
     // If the creep is below max hits
 
@@ -129,7 +132,7 @@ RemoteDefender.prototype.advancedAttackAttackers = function() {
 
         // Get enemyAttackers in the room
 
-        enemyAttackers = room.enemyCreeps.filter(enemyCreep => !enemyCreep.isOnExit() && enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK]))
+        enemyAttackers = room.enemyCreeps.filter(enemyCreep => /* !enemyCreep.isOnExit() && */ enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK]))
 
     // If there are none
 
@@ -139,8 +142,10 @@ RemoteDefender.prototype.advancedAttackAttackers = function() {
 
         if (creep.advancedHeal()) return true
 
-        const enemyCreeps = room.enemyCreeps.filter(enemyCreep => !enemyCreep.isOnExit())
+        const enemyCreeps = room.enemyCreeps
         if (!enemyCreeps.length) return false
+
+        creep.say('EC')
 
         const enemyCreep = creep.pos.findClosestByRange(enemyCreeps),
 
@@ -165,7 +170,7 @@ RemoteDefender.prototype.advancedAttackAttackers = function() {
         }
 
         creep.rangedMassAttack()
-        creep.move(creep.pos.getDirectionTo(enemyCreep.pos))
+        if (enemyCreep.owner.username != 'Invader') creep.move(creep.pos.getDirectionTo(enemyCreep.pos))
 
         return true
     }
@@ -195,6 +200,8 @@ RemoteDefender.prototype.advancedAttackAttackers = function() {
 
         return true
     }
+
+    creep.say("AEA")
 
     // Otherwise, have the creep pre-heal itself
 
