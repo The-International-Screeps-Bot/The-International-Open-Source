@@ -38,7 +38,7 @@ export function findObjectWithID<T extends Id<any>>(ID: T): fromId<T> | undefine
  */
 export function findPositionsInsideRect(x1: number, y1: number, x2: number, y2: number) {
 
-    const positions: Pos[] = []
+    const positions: Coord[] = []
 
     for (let x = x1; x <= x2; x++) {
         for (let y = y1; y <= y2; y++) {

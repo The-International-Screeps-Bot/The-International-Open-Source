@@ -721,7 +721,7 @@ export function rampartPlanner(room: Room) {
 
             // Get the closest pos of the group by range to the anchor
 
-            const closestPosToAnchor = hubAnchor.findClosestByRange(group),
+            const closestPosToAnchor = hubAnchor.findClosestByPath(group, { ignoreCreeps: true }),
 
             // Path from the hubAnchor to the cloestPosToAnchor
 

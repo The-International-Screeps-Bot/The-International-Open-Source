@@ -379,7 +379,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Filter harvestPositions by closest one to anchor
 
-        return room.anchor.findClosestByRange(harvestPositions)
+        return room.anchor.findClosestByPath(harvestPositions, { ignoreCreeps: true })
     }
 
     new RoomObject({
@@ -787,13 +787,9 @@ Room.prototype.get = function(roomObjectName) {
         const upgradePositions: RoomPosition[] = room.roomObjects.upgradePositions.getValue()
         if (!upgradePositions.length) return false
 
-        // Get the closest pos of the upgradePositions by range to the anchor
-
-        const closestUpgradePos = hubAnchor.findClosestByRange(upgradePositions)
-
         // Assign closestUpgradePos in usedUpgradePositions
 
-        usedUpgradePositions.add(pack(closestUpgradePos))
+        usedUpgradePositions.add(pack(hubAnchor.findClosestByPath(upgradePositions, { ignoreCreeps: true })))
 
         // Loop through each controllerUpgrader's name in the room
 
@@ -948,7 +944,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Otherwise search based on an offset from the anchor's x
 
-        const structuresAsPos = room.getPositionAt(room.anchor.x + offset, room.anchor.y).lookFor(LOOK_STRUCTURES)
+        const structuresAsPos = room.lookForAt(LOOK_STRUCTURES, room.anchor.x + offset, room.anchor.y)
 
         // Loop through structuresAtPos
 
@@ -1040,7 +1036,7 @@ Room.prototype.get = function(roomObjectName) {
 
         // Otherwise search based on an offset from the anchor's x
 
-        const structuresAsPos = room.getPositionAt(pos.x, pos.y).lookFor(LOOK_STRUCTURES)
+        const structuresAsPos = pos.lookFor(LOOK_STRUCTURES)
 
         // Loop through structuresAtPos
 
@@ -1574,7 +1570,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
                         // Get the upgradePositions, and use the anchor to find the closest upgradePosition to the anchor
 
                         const upgradePositions: RoomPosition[] = room.get('upgradePositions'),
-                            deliverUpgradePos = room.anchor.findClosestByRange(upgradePositions)
+                            deliverUpgradePos = room.anchor.findClosestByPath(upgradePositions, { ignoreCreeps: true })
 
                         // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
 
@@ -1644,7 +1640,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 Room.prototype.findType = function(scoutingRoom: Room) {
 
     const room = this,
-    controller = room.controller
+        controller = room.controller
 
     // Record that the room was scouted this tick
 
@@ -1654,10 +1650,10 @@ Room.prototype.findType = function(scoutingRoom: Room) {
 
 	const [EWstring, NSstring] = room.name.match(/\d+/g),
 
-    // Convert he numbers from strings into actual numbers
+        // Convert he numbers from strings into actual numbers
 
-    EW = parseInt(EWstring),
-    NS = parseInt(NSstring)
+        EW = parseInt(EWstring),
+        NS = parseInt(NSstring)
 
     // Use the numbers to deduce some room types - quickly!
 

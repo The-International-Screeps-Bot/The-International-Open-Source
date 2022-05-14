@@ -88,7 +88,7 @@ export const allyList = new Set([
     'clarkok'
 ]),
 
-    autoClaim = true
+    autoClaim = false
 
 constants.tradeBlacklist = new Set([
 

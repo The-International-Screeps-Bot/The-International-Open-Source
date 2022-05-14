@@ -55,7 +55,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
                 const sources = room.find(FIND_SOURCES_ACTIVE)
                 if (!sources.length) continue
 
-                const source = creep.pos.findClosestByRange(sources)
+                const source = creep.pos.findClosestByPath(sources, { ignoreCreeps: true })
 
                 if (getRange(creep.pos.x - source.pos.x, creep.pos.y - source.pos.y) > 1) {
 
