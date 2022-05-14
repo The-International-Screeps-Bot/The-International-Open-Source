@@ -1243,7 +1243,7 @@ type Route = RoutePart[]
  */
 Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
-    const room: Room = this
+    const room = this
 
     // Construct route
 

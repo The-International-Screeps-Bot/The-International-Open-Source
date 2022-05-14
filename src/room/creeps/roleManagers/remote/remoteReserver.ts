@@ -47,6 +47,7 @@ export function remoteReserverManager(room: Room, creepsOfRole: string[]) {
             goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
             avoidEnemyRanges: true,
             cacheAmount: 200,
+            plainCost: 1,
         })
 
         continue

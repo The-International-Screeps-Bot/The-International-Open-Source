@@ -1,9 +1,10 @@
 import { spawn } from "child_process"
 import { constants, CPUBucketRenewThreshold } from "international/constants"
-import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRange, getRangeBetween, pack, unpackAsRoomPos } from "international/generalFunctions"
+import { arePositionsEqual, customLog, findCreepInQueueMatchingRequest, findObjectWithID, getRange, getRangeBetween, pack, unpackAsPos, unpackAsRoomPos } from "international/generalFunctions"
 import { repeat } from "lodash"
-import { packCoord, packPosList, unpackPosList } from "other/packrat"
+import { packCoord, packPos, packPosList, unpackPos, unpackPosList } from "other/packrat"
 import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from "room/roomTasks"
+import { creepClasses } from "./creepClasses"
 
 Creep.prototype.preTickManager = function() {}
 
@@ -747,9 +748,11 @@ Creep.prototype.needsNewPath = function(goalPos, cacheAmount, path) {
 
     if (path[0].roomName != creep.room.name) return true
 
+    if (!creep.memory.goalPos) return true
+
     // Inform true if the creep's previous target isn't its current
 
-    if (!arePositionsEqual(creep.memory.goalPos, goalPos)) return true
+    if (!arePositionsEqual(unpackPos(creep.memory.goalPos), goalPos)) return true
 
     // If next pos in the path is not in range, inform true
 
@@ -867,7 +870,8 @@ Creep.prototype.createMoveRequest = function(opts) {
 
     // Assign the goal's pos to the creep's goalPos
 
-    creep.memory.goalPos = opts.goal.pos
+    creep.memory.goalPos = packPos(opts.goal.pos)
+    creep.memory.range = opts.goal.range
 
     // Make moveRequest true to inform a moveRequest has been made
 
@@ -1041,10 +1045,43 @@ Creep.prototype.findTask = function(allowedTaskTypes, resourceType = RESOURCE_EN
     return false
 }
 
+Creep.prototype.shove = function(shoverPos) {
+
+    let goalPos,
+        flee = false
+
+    if (this.memory.goalPos) {
+
+        goalPos = unpackPos(this.memory.goalPos)
+    }
+
+    if (!goalPos || getRange(goalPos.x - this.pos.x, goalPos.y - this.pos.y) == 0) {
+
+        goalPos = this.pos
+        flee = true
+    }
+
+    this.createMoveRequest({
+        origin: this.pos,
+        goal: { pos: goalPos, range: 1 },
+        weightPositions: { 255: [this.pos, shoverPos] },
+        flee,
+    })
+
+    this.say('failed s')
+
+    if (!this.moveRequest) return false
+
+    this.say('SHOVE')
+
+    this.recurseMoveRequest(this.moveRequest)
+    return true
+}
+
 Creep.prototype.runMoveRequest = function(packedPos) {
 
     const creep = this,
-    room = creep.room
+        room = creep.room
 
     // If requests are not allowed for this pos, inform false
 
@@ -1177,6 +1214,12 @@ Creep.prototype.recurseMoveRequest = function(packedPos, queue = []) {
     if (creepAtPos.fatigue > 0) return
 
     // Otherwise the creepAtPos has no moveRequest and isn't fatigued
+
+    if (creepAtPos.shove(creep.pos)) {
+
+        creep.runMoveRequest(packedPos)
+        return
+    }
 
     // Have the creep move to its moveRequest
 
@@ -1507,8 +1550,8 @@ Creep.prototype.advancedSignController = function() {
             origin: creep.pos,
             goal: { pos: room.controller.pos, range: 1 },
             avoidEnemyRanges: true,
-            plainCost: 0,
-            swampCost: 0,
+            plainCost: 1,
+            swampCost: 1,
         })
 
         return true
@@ -1649,11 +1692,11 @@ Creep.prototype.advancedRenew = function() {
 Creep.prototype.advancedReserveController = function() {
 
     const creep = this,
-    room = creep.room,
+        room = creep.room,
 
-    // Get the controller
+        // Get the controller
 
-    controller = room.controller
+        controller = room.controller
 
     // If the creep is in range of 1 of the controller
 
@@ -1684,7 +1727,8 @@ Creep.prototype.advancedReserveController = function() {
     creep.createMoveRequest({
         origin: creep.pos,
         goal: { pos: controller.pos, range: 1 },
-        avoidEnemyRanges: true
+        avoidEnemyRanges: true,
+        plainCost: 1,
     })
 
     return true

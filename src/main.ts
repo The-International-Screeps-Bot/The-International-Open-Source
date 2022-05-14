@@ -964,6 +964,8 @@ declare global {
          */
         createMoveRequest(opts: MoveRequestOpts): boolean
 
+        shove(shoverPos: RoomPosition): boolean
+
         /**
          * Try to enforce a moveRequest and inform the result
          */
@@ -1072,7 +1074,9 @@ declare global {
          */
         path: string
 
-        goalPos: RoomPosition
+        goalPos: string
+
+        goalRange: number
 
         /**
          * Whether the creep is intended to move on its own or not
