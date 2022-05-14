@@ -48,8 +48,10 @@ export function basePlanner(room: Room) {
 
     // Get and record the mineralHarvestPos as avoid
 
-    const mineralHarvestPos: RoomPosition = room.get('closestMineralHarvestPos')
-    baseCM.set(mineralHarvestPos.x, mineralHarvestPos.y, 255)
+    for (const pos of room.get('mineralHarvestPositions') as RoomPosition[]) {
+
+        baseCM.set(pos.x, pos.y, 255)
+    }
 
     // Record the positions around sources as unusable
 
@@ -440,6 +442,8 @@ export function basePlanner(room: Room) {
 
         structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
     }
+
+    const mineralHarvestPos: RoomPosition = room.get('closestMineralHarvestPos')
 
     // Record the pos in roadCM
 

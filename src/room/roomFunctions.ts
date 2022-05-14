@@ -331,7 +331,7 @@ Room.prototype.get = function(roomObjectName) {
      * @param source source of which to find harvestPositions for
      * @returns source's harvestPositions, a list of positions
      */
-     function findHarvestPositions(source: Source) {
+     function findHarvestPositions(source: Source | Mineral) {
 
         // Stop and inform empty array if there is no source
 
@@ -341,13 +341,13 @@ Room.prototype.get = function(roomObjectName) {
 
         const harvestPositions = [],
 
-        // Find terrain in room
+            // Find terrain in room
 
-        terrain = Game.map.getRoomTerrain(room.name),
+            terrain = Game.map.getRoomTerrain(room.name),
 
-        // Find positions adjacent to source
+            // Find positions adjacent to source
 
-        adjacentPositions = findPositionsInsideRect(source.pos.x - 1, source.pos.y - 1, source.pos.x + 1, source.pos.y + 1)
+            adjacentPositions = findPositionsInsideRect(source.pos.x - 1, source.pos.y - 1, source.pos.x + 1, source.pos.y + 1)
 
         // Loop through each pos
 
