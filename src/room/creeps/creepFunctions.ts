@@ -33,7 +33,7 @@ Creep.prototype.isDying = function() {
 Creep.prototype.advancedTransfer = function(target, resourceType = RESOURCE_ENERGY, amount) {
 
     const creep = this,
-    room = creep.room
+        room = creep.room
 
     // If creep isn't in transfer range
 
