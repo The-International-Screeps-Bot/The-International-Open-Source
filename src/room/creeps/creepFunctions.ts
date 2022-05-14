@@ -1057,23 +1057,20 @@ Creep.prototype.shove = function(shoverPos) {
         goalPos = this.pos
         flee = true
     }
-    /* this.say(goalPos.x + ',' + goalPos.y + ',' + flee) */
+
     this.createMoveRequest({
         origin: this.pos,
         goal: { pos: goalPos, range: 1 },
-        /* weightPositions: { 255: [this.pos, shoverPos] }, */
         weightGamebjects: { 255: this.room.find(FIND_MY_CREEPS) },
         flee,
         cacheAmount: 1,
     })
 
-    /* this.say('failed s') */
-
     if (!this.moveRequest) return false
 
-    /* this.say('SHOVE') */
+    /*
     this.room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), { color: constants.colors.yellow })
-
+    */
     this.recurseMoveRequest(this.moveRequest)
     return true
 }
@@ -1606,41 +1603,66 @@ Creep.prototype.findHealPower = function() {
 Creep.prototype.advancedRecycle = function() {
 
     const creep = this,
-    room = creep.room
+        room = creep.room
 
-    // Get the room's spawns, stopping if there are none
+    if (!room.structures.spawn.length) return
 
-    const spawns: StructureSpawn[] = room.get('spawn')
-    if (!spawns.length) return
+    creep.say('♻️')
 
     // Otherwise, find the closest spawn to the creep
 
-    const closestSpawn = creep.pos.findClosestByRange(spawns)
+    const closestSpawn = creep.pos.findClosestByRange(room.structures.spawn),
 
-    // If the creep is in range of 1
+        fastFillerContainers = ([
+            room.get('fastFillerContainerLeft'),
+            room.get('fastFillerContainerRight')
+        ] as (StructureContainer | undefined)[]).filter(function(container) {
 
-    if (creep.pos.getRangeTo(closestSpawn.pos) == 1) {
+            return container &&
+                getRange(container.pos.x - closestSpawn.pos.x, container.pos.y - closestSpawn.pos.y)
+        })
 
-        // Recycle the creep and stop
+    if (fastFillerContainers.length) {
 
-        creep.say('♻️')
+        const closestContainer = closestSpawn.pos.findClosestByRange(fastFillerContainers)
 
-        closestSpawn.recycleCreep(creep)
-        return
+        // If the creep is in range of 1
+
+        if (getRange(creep.pos.x - closestContainer.pos.x, creep.pos.y - closestContainer.pos.y) > 0) {
+
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goal: { pos: closestContainer.pos, range: 0 },
+                avoidEnemyRanges: true,
+                weightGamebjects: {
+                    1: room.get('road')
+                }
+            })
+
+            return
+        }
     }
 
-    // Otherwise, make a move request to it
+    else {
 
-    creep.say('⏩♻️')
+        // If the creep is in range of 1
 
-    creep.createMoveRequest({
-        origin: creep.pos,
-        goal: { pos: closestSpawn.pos, range: 1 },
-        avoidEnemyRanges: true,
-        weightGamebjects: {
-            1: room.get('road')
+        if (creep.pos.getRangeTo(closestSpawn.pos) > 1) {
+
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goal: { pos: closestSpawn.pos, range: 1 },
+                avoidEnemyRanges: true,
+                weightGamebjects: {
+                    1: room.get('road')
+                }
+            })
+
+            return
         }
-    })
+    }
+
+    closestSpawn.recycleCreep(creep)
 }
 
 Creep.prototype.advancedRenew = function() {

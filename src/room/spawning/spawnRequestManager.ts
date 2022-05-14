@@ -797,14 +797,13 @@ export function spawnRequester(room: Room) {
 
         // Otherwise if there is no storage
 
-        else {
-
-            partsMultiplier += estimatedIncome * 0.8
-        }
+        else partsMultiplier += estimatedIncome
 
         // If all RCL 3 extensions are build
 
         if (spawnEnergyCapacity >= 800) {
+
+            partsMultiplier /= 3
 
             return {
                 defaultParts: [],
