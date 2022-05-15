@@ -1536,7 +1536,7 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
                         // Otherwise if the rampart is owned by an ally, iterate
 
-                        if (allyList.has(rampart.owner.username)) continue
+                        if (rampart.isPublic) continue
 
                         // Otherwise set the rampart's pos as impassible
 
@@ -1641,9 +1641,9 @@ Room.prototype.advancedFindPath = function(opts: PathOpts): RoomPosition[] {
 
         if (pathFinderResult.incomplete) {
 
-            customLog('Incomplete Path', JSON.stringify(opts.origin), constants.colors.white, constants.colors.red)
+            customLog('Incomplete Path', pathFinderResult.path + ', ' + JSON.stringify(opts.goal.pos), constants.colors.white, constants.colors.red)
 
-            room.pathVisual(pathFinderResult.path, constants.colors.red as keyof Colors)
+            room.pathVisual(pathFinderResult.path, 'red')
             room.visual.line(opts.origin, opts.goal.pos, { color: constants.colors.red, width: .15, opacity: .3, lineStyle: 'solid' })
 
             return []

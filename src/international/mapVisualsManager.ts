@@ -16,6 +16,11 @@ InternationalManager.prototype.mapVisualsManager = function() {
 
         const roomMemory = Memory.rooms[roomName]
 
+        Game.map.visual.text(roomMemory.type, new RoomPosition(constants.roomDimensions - 2, 10, roomName), {
+            align: 'right',
+            fontSize: 5,
+        })
+
         if (roomMemory.type === 'commune') {
 
             const room = Game.rooms[roomName]

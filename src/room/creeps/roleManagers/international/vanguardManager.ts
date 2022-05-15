@@ -40,7 +40,10 @@ export function vanguardManager(room: Room, creepsOfRole: string[]) {
             typeWeights: {
                 enemy: Infinity,
                 ally: Infinity,
-                keeper: Infinity
+                keeper: Infinity,
+                commune: 1,
+                neutral: 1,
+                highway: 1,
             }
         })
     }

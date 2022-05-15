@@ -1545,6 +1545,8 @@ Creep.prototype.advancedSignController = function() {
             swampCost: 1,
         })
 
+        if (!creep.moveRequest) return false
+
         return true
     }
 
