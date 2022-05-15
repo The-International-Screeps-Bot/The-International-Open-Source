@@ -876,6 +876,8 @@ declare global {
          */
         strength: number
 
+        healStrength: number
+
         /**
          * If the creep is expected to be full next tick
          */
@@ -1032,6 +1034,8 @@ declare global {
         advancedReserveController(): boolean
 
         findStrength(): number
+
+        findHealStrength(): number
 
         findCost(): number
     }

@@ -1792,6 +1792,22 @@ Creep.prototype.findStrength = function() {
     return creep.strength
 }
 
+Creep.prototype.findHealStrength = function() {
+
+    if (this.healStrength) return this.healStrength
+
+    this.healStrength = 0
+
+    for (const part of this.body) {
+
+        if (part.type != HEAL) continue
+
+        this.healStrength += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
+    }
+
+    return this.healStrength
+}
+
 Creep.prototype.findCost = function() {
 
     let cost = 0

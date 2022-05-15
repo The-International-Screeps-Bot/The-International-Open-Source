@@ -38,9 +38,11 @@ export function marketManager(room: Room) {
 
     const resourceRequests = allyManager.allyRequests.filter(request => request.requestType == allyManager.requestTypes.RESOURCE)
 
-    // Filter resourceRequests by priority, highest to lowest
+        // Filter resourceRequests by priority, highest to lowest
 
-    resourceRequests.sort((a, b) => a.priority - b.priority).reverse()
+        resourceRequests.sort((a, b) => a.priority - b.priority).reverse()
+
+    let amount = 0
 
     // Iterate through resourceRequests
 
@@ -50,6 +52,8 @@ export function marketManager(room: Room) {
 
         if (!request.maxAmount) continue
 
+        amount = 0
+
         // If the request resourceType is a mineral
 
         if (minerals.includes(request.resourceType)) {
@@ -58,9 +62,11 @@ export function marketManager(room: Room) {
 
             if (terminal.store.getUsedCapacity(request.resourceType) < 20000) continue
 
+            amount = Math.min(request.maxAmount, terminal.store.getUsedCapacity(request.resourceType) / 2)
+
             // Otherwise send the resource and stop
 
-            terminal.send(request.resourceType, Math.min(request.maxAmount, terminal.store.getUsedCapacity(request.resourceType) / 2), request.roomName, 'Sending ' + request + ' to ally')
+            terminal.send(request.resourceType, amount, request.roomName, 'Sending ' + request + ' to ally')
             return
         }
 
@@ -72,9 +78,11 @@ export function marketManager(room: Room) {
 
             if (terminal.store.getUsedCapacity(request.resourceType) < 60000) continue
 
+            amount = Math.min(request.maxAmount, terminal.store.getUsedCapacity(request.resourceType) / 2)
+
             // Otherwise send the resource and stop
 
-            terminal.send(request.resourceType, Math.min(request.maxAmount, terminal.store.getUsedCapacity(request.resourceType) / 2), request.roomName, 'Sending ' + request + ' to ally')
+            terminal.send(request.resourceType, amount, request.roomName, 'Sending ' + request + ' to ally')
             return
         }
 
@@ -86,7 +94,7 @@ export function marketManager(room: Room) {
     // Energy
 
     let targetAmount = 30000,
-    resourceType: ResourceConstant = RESOURCE_ENERGY
+        resourceType: ResourceConstant = RESOURCE_ENERGY
 
     // If there is insufficient energy
 
