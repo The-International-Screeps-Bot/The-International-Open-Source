@@ -1798,12 +1798,21 @@ Creep.prototype.findHealStrength = function() {
 
     this.healStrength = 0
 
+    let toughBoost = 0
+
     for (const part of this.body) {
 
-        if (part.type != HEAL) continue
+        if (part.type == TOUGH) {
 
-        this.healStrength += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
+            toughBoost = Math.max(part.boost ? BOOSTS[part.type][part.boost].damage : 0, toughBoost)
+            continue
+        }
+
+        if (part.type == HEAL)
+            this.healStrength += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
     }
+
+    this.healStrength += this.healStrength * toughBoost
 
     return this.healStrength
 }
