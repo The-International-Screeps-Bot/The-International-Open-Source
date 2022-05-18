@@ -18,7 +18,8 @@
           "watch-mmo": "rollup -cw --environment DEST:mmo",
           "watch-pserver": "rollup -cw --environment DEST:pserver",
           "watch-season": "rollup -cw --environment DEST:season",
-          "watch-sim": "rollup -cw --environment DEST:sim"
+          "watch-sim": "rollup -cw --environment DEST:sim",
+          "test-server": "npm run build && node server/index.js 300"
      },
      "repository": {
           "type": "git",
@@ -67,9 +68,16 @@
           "sinon-chai": "^3.2.0",
           "ts-node": "^10.2.0",
           "tsconfig-paths": "^3.10.1",
-          "typescript": "^4.3.5"
+          "typescript": "^4.3.5",
+          "q": "^1.5.1",
+          "dotenv": "^10.0.0",
+          "screeps": "4.2.3",
+          "screeps-api": "1.13.0",
+          "screepsmod-admin-utils": "1.24.0",
+          "screepsmod-auth": "2.6.2"
      },
      "dependencies": {
+          "ncp": "^2.0.0",
           "source-map": "~0.6.1"
      }
 }
