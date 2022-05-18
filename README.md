@@ -37,13 +37,13 @@ First you'll want to download the repository. It's the big green button that say
 
 Next, if you don't have it already, install Node Package Manager so we can install other things:
 
-```
+```powershell
 npm install
 ```
 
 Then, when in the project folder, you'll want to install the devDependencies like so:
 
-```
+```powershell
 npm install --only=dev
 ```
 
