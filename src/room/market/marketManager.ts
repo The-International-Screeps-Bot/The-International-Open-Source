@@ -107,7 +107,7 @@ export function marketManager(room: Room) {
 
     // Minerals
 
-    targetAmount = 10000
+    targetAmount = 8000
 
     // Loop through each mineral
 
@@ -119,6 +119,6 @@ export function marketManager(room: Room) {
 
         // Otherwise, try to sell the excess amount
 
-        if (room.advancedSell(resourceType, terminal.store.getUsedCapacity(resourceType) - targetAmount / 2)) return
+        if (room.advancedSell(resourceType, terminal.store.getUsedCapacity(resourceType) - targetAmount * 0.75)) return
     }
 }
