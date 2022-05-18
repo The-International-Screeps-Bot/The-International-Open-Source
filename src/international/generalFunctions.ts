@@ -306,6 +306,8 @@ export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'sou
  */
 export function findLargestTransactionAmount(budget: number, amount: number, roomName1: string, roomName2: string) {
 
+    budget = Math.max(budget, 1)
+
     // So long as the the transactions cost is more than the budget
 
     while (Game.market.calcTransactionCost(amount, roomName1, roomName2) > budget) {
