@@ -16,7 +16,7 @@ InternationalManager.prototype.mapVisualsManager = function() {
 
         const roomMemory = Memory.rooms[roomName]
 
-        Game.map.visual.text(roomMemory.type, new RoomPosition(constants.roomDimensions - 2, 10, roomName), {
+        Game.map.visual.text(roomMemory.type, new RoomPosition(constants.roomDimensions - 2, 40, roomName), {
             align: 'right',
             fontSize: 5,
         })
@@ -26,7 +26,7 @@ InternationalManager.prototype.mapVisualsManager = function() {
             const room = Game.rooms[roomName]
             if (!room) continue
 
-            Game.map.visual.text('⚡' + room.findStoredResourceAmount(RESOURCE_ENERGY), new RoomPosition(2, 10, roomName), {
+            Game.map.visual.text('⚡' + room.findStoredResourceAmount(RESOURCE_ENERGY), new RoomPosition(2, 2, roomName), {
                 align: 'left',
                 fontSize: 8,
             })
