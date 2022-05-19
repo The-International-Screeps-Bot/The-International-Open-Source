@@ -26,7 +26,7 @@ InternationalManager.prototype.mapVisualsManager = function() {
             const room = Game.rooms[roomName]
             if (!room) continue
 
-            Game.map.visual.text('⚡' + room.findStoredResourceAmount(RESOURCE_ENERGY), new RoomPosition(2, 2, roomName), {
+            Game.map.visual.text('⚡' + room.findStoredResourceAmount(RESOURCE_ENERGY), new RoomPosition(2, 8, roomName), {
                 align: 'left',
                 fontSize: 8,
             })
@@ -53,14 +53,14 @@ InternationalManager.prototype.mapVisualsManager = function() {
                 })
             }
 
-            Game.map.visual.text('⛏️' + roomMemory.sourceEfficacies.reduce((sum, el) => sum + el, 0).toString(), new RoomPosition(2, 10, roomName), {
+            Game.map.visual.text('⛏️' + roomMemory.sourceEfficacies.reduce((sum, el) => sum + el, 0).toString(), new RoomPosition(2, 8, roomName), {
                 align: 'left',
                 fontSize: 8,
             })
 
             if (roomMemory.abandoned) {
 
-                Game.map.visual.text('❌' + roomMemory.abandoned.toString(), new RoomPosition(2, 18, roomName), {
+                Game.map.visual.text('❌' + roomMemory.abandoned.toString(), new RoomPosition(2, 16, roomName), {
                     align: 'left',
                     fontSize: 8,
                 })
@@ -80,7 +80,7 @@ InternationalManager.prototype.mapVisualsManager = function() {
 
     for (const roomName in Memory.claimRequests) {
 
-        Game.map.visual.text('💵' + Memory.claimRequests[roomName].score.toFixed(2), new RoomPosition(2, 26, roomName), {
+        Game.map.visual.text('💵' + Memory.claimRequests[roomName].score.toFixed(2), new RoomPosition(2, 24, roomName), {
             align: 'left',
             fontSize: 8,
         })
