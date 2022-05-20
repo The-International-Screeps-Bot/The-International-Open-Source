@@ -1,13 +1,12 @@
 {
-     "name": "screeps-typescript-starter",
+     "name": "the-international-screeps-bot",
      "version": "3.0.0",
      "description": "",
-     "main": "index.js",
-     "//": "If you add or change the names of destinations in screeps.json, make sure you update these scripts to reflect the changes",
+     "main": "src/main.ts",
      "scripts": {
           "build": "rollup -c",
-          "lint": "eslint **/*",
-          "lint-fix": "eslint **/* --fix",
+          "lint": "eslint '**/*'",
+          "lint-fix": "eslint '**/*' --fix",
           "push-mmo": "rollup -c --environment DEST:mmo",
           "push-pserver": "rollup -c --environment DEST:pserver",
           "push-season": "rollup -c --environment DEST:season",
@@ -19,21 +18,18 @@
           "watch-pserver": "rollup -cw --environment DEST:pserver",
           "watch-season": "rollup -cw --environment DEST:season",
           "watch-sim": "rollup -cw --environment DEST:sim",
-          "test-server": "npm run build && node server/index.js 300"
+          "test-server": "npm run build && node server/index.js 150"
      },
      "repository": {
           "type": "git",
-          "url": "git+https://github.com/screepers/screeps-typescript-starter.git"
+          "url": "git+https://github.com/CarsonBurke/The-International-Screeps-Bot.git"
      },
      "author": "",
      "license": "Unlicense",
      "bugs": {
-          "url": "https://github.com/screepers/screeps-typescript-starter/issues"
+          "url": "https://github.com/CarsonBurke/The-International-Screeps-Bot/issues"
      },
-     "homepage": "https://github.com/screepers/screeps-typescript-starter#readme",
-     "engines": {
-          "node": "10.x || 12.x"
-     },
+     "homepage": "https://github.com/CarsonBurke/The-International-Screeps-Bot#readme",
      "devDependencies": {
           "@rollup/plugin-commonjs": "^20.0.0",
           "@rollup/plugin-node-resolve": "^13.0.4",

@@ -116,9 +116,9 @@ async function initServer() {
   const configFilename = path.resolve(dir, ".screepsrc");
   let config = fs.readFileSync(configFilename, { encoding: "utf8" });
   config = config
-    .replace("{{STEAM_KEY}}", process.env.STEAM_API_KEY);
-    // .replace("runner_threads = 2", "runner_threads = 4")
-    // .replace("processors_cnt = 2", "processors_cnt = 4");
+    .replace("{{STEAM_KEY}}", process.env.STEAM_API_KEY)
+    .replace("runner_threads = 2", "runner_threads = 4")
+    .replace("processors_cnt = 2", "processors_cnt = 4");
 
   fs.writeFileSync(configFilename, config);
   fs.chmodSync(path.resolve(dir, "node_modules/.hooks/install"), "755");
