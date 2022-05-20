@@ -1,21 +1,22 @@
 # This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CD
+name: Continues Delivery
 
 on:
      push:
+          branches: [Typescript-(Main), development]
      pull_request:
 
 jobs:
-     build:
+     testUsingServer:
           runs-on: ubuntu-latest
           steps:
-               - uses: actions/checkout@v2
-               - name: Bot performance test
-                 uses: actions/setup-node@v2
+               - uses: actions/checkout@v3
+               - name: Use Node.js 12.x
+                 uses: actions/setup-node@v3
                  with:
-                      node-version: 12.22.4
+                      node-version: 12.x
                       cache: 'npm'
                - run: npm ci
                - run: npm run test-server
