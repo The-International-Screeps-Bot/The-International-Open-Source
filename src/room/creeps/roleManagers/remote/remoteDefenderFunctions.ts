@@ -70,7 +70,7 @@ RemoteDefender.prototype.advancedHeal = function () {
      for (const posData of adjacentCreeps) {
           // If the creep is the posData creep, iterate
 
-          if (creep.id == posData.creep.id) continue
+          if (creep.id === posData.creep.id) continue
 
           // If the creep is not owned and isn't an ally
 
@@ -78,7 +78,7 @@ RemoteDefender.prototype.advancedHeal = function () {
 
           // If the creep is at full health, iterate
 
-          if (posData.creep.hitsMax == posData.creep.hits) continue
+          if (posData.creep.hitsMax === posData.creep.hits) continue
 
           // have the creep heal the adjacentCreep and stop
 
@@ -86,7 +86,7 @@ RemoteDefender.prototype.advancedHeal = function () {
           return false
      }
 
-     (top = Math.max(Math.min(creep.pos.y - 3, constants.roomDimensions - 2), 2)),
+     ;(top = Math.max(Math.min(creep.pos.y - 3, constants.roomDimensions - 2), 2)),
           (left = Math.max(Math.min(creep.pos.x - 3, constants.roomDimensions - 2), 2)),
           (bottom = Math.max(Math.min(creep.pos.y + 3, constants.roomDimensions - 2), 2)),
           (right = Math.max(Math.min(creep.pos.x + 3, constants.roomDimensions - 2), 2))
@@ -100,7 +100,7 @@ RemoteDefender.prototype.advancedHeal = function () {
      for (const posData of nearbyCreeps) {
           // If the creep is the posData creep, iterate
 
-          if (creep.id == posData.creep.id) continue
+          if (creep.id === posData.creep.id) continue
 
           // If the creep is not owned and isn't an ally
 
@@ -108,7 +108,7 @@ RemoteDefender.prototype.advancedHeal = function () {
 
           // If the creep is at full health, iterate
 
-          if (posData.creep.hitsMax == posData.creep.hits) continue
+          if (posData.creep.hitsMax === posData.creep.hits) continue
 
           // have the creep rangedHeal the nearbyCreep and stop
 
@@ -162,7 +162,7 @@ RemoteDefender.prototype.advancedAttackAttackers = function () {
           }
 
           creep.rangedMassAttack()
-          if (enemyCreep.owner.username != 'Invader') creep.move(creep.pos.getDirectionTo(enemyCreep.pos))
+          if (enemyCreep.owner.username !== 'Invader') creep.move(creep.pos.getDirectionTo(enemyCreep.pos))
 
           return true
      }
@@ -200,7 +200,7 @@ RemoteDefender.prototype.advancedAttackAttackers = function () {
 
      // If the range is 1, rangedMassAttack
 
-     if (range == 1) {
+     if (range === 1) {
           creep.rangedMassAttack()
           creep.move(creep.pos.getDirectionTo(enemyAttacker.pos))
      }
@@ -211,7 +211,7 @@ RemoteDefender.prototype.advancedAttackAttackers = function () {
      // If the creep is out matched, try to always stay in range 3
 
      if (creep.findStrength() < enemyAttacker.findStrength()) {
-          if (range == 3) return true
+          if (range === 3) return true
 
           if (range >= 3) {
                creep.createMoveRequest({

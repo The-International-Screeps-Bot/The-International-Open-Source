@@ -23,7 +23,7 @@ export function defenceManager(room: Room) {
           if (!enemyAttackers.length) {
                // Stop if the tick is not divisible by a random range
 
-               if (Game.time % Math.floor(Math.random() * 50) != 0) return
+               if (Game.time % Math.floor(Math.random() * 50) !== 0) return
 
                let increment = 0
 
@@ -42,7 +42,7 @@ export function defenceManager(room: Room) {
                     // Otherwise set the rampart to public, increase increment
 
                     rampart.setPublic(true)
-                    increment++
+                    increment += 1
                }
 
                // Stop
@@ -69,7 +69,7 @@ export function defenceManager(room: Room) {
 
           // Otherwise if there are no safeModes left, stop
 
-          if (room.controller.safeModeAvailable == 0) return
+          if (room.controller.safeModeAvailable === 0) return
 
           // Otherwise if the controller is upgradeBlocked, stop
 
@@ -91,7 +91,7 @@ export function defenceManager(room: Room) {
           for (const eventItem of eventLog) {
                // If the event wasn't an attack, iterate
 
-               if (eventItem.event != EVENT_ATTACK) continue
+               if (eventItem.event !== EVENT_ATTACK) continue
 
                // Otherwise get the target of the attack
 

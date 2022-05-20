@@ -20,7 +20,7 @@ Vanguard.prototype.travelToSource = function (sourceName) {
 
      // If the creep is at the creep's packedHarvestPos, inform false
 
-     if (getRange(creep.pos.x - harvestPos.x, creep.pos.y - harvestPos.y) == 0) return false
+     if (getRange(creep.pos.x - harvestPos.x, creep.pos.y - harvestPos.y) === 0) return false
 
      // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 

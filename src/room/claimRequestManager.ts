@@ -14,7 +14,7 @@ Room.prototype.claimRequestManager = function () {
 
           const claimTarget = Game.rooms[this.memory.claimRequest]
           if (!claimTarget) {
-               Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer]++
+               Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer] += 1
                return
           }
 
@@ -31,13 +31,13 @@ Room.prototype.claimRequestManager = function () {
 
           if (claimTarget.controller.my) return
 
-          Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer]++
+          Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer] += 1
           return
      }
 
      // Every 50 or so ticks
 
-     /* if (Game.time % Math.floor(Math.random() * 100) != 0) return */
+     /* if (Game.time % Math.floor(Math.random() * 100) !==0) return */
 
      // If autoClaim is disabled
 

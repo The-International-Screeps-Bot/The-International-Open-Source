@@ -130,7 +130,7 @@ export function storageStructuresManager(room: Room) {
           // Assign amountToRequest as the energy left not assigned to tasks, iterating if 0
 
           const amountToRequest = storage.store.getFreeCapacity(RESOURCE_ENERGY) - totalResourcesRequested
-          if (amountToRequest == 0) return
+          if (amountToRequest === 0) return
 
           // If there is a taskWithoutResponder
 

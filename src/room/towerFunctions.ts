@@ -84,7 +84,7 @@ Room.prototype.towersHealCreeps = function () {
 
           // If the heal failed, iterate
 
-          if (healResult != OK) continue
+          if (healResult !== OK) continue
 
           // Otherwise record that the tower is no longer inactionable
 
@@ -92,7 +92,7 @@ Room.prototype.towersHealCreeps = function () {
 
           /* // Remove healTarget if it is fully healed
 
-        if (creep.hitsMax - creep.hits == 0) delete healTargets[0] */
+        if (creep.hitsMax - creep.hits === 0) delete healTargets[0] */
 
           // And iterate
 
@@ -124,7 +124,7 @@ Room.prototype.towersAttackCreeps = function () {
 
           // If the attack failed, iterate
 
-          if (attackResult != OK) continue
+          if (attackResult !== OK) continue
 
           // Otherwise record that the tower is no longer inactionable
 
@@ -132,7 +132,7 @@ Room.prototype.towersAttackCreeps = function () {
 
           /* // Remove healTarget if it is fully healed
 
-        if (creep.hitsMax - creep.hits == 0) delete healTargets[0] */
+        if (creep.hitsMax - creep.hits === 0) delete healTargets[0] */
 
           // And iterate
 
@@ -167,7 +167,7 @@ Room.prototype.towersRepairRamparts = function () {
 
           // If the attack failed, iterate
 
-          if (healResult != OK) continue
+          if (healResult !== OK) continue
 
           // Otherwise record that the tower is no longer inactionable
 

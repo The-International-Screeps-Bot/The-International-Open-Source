@@ -10,8 +10,8 @@ export function trafficManager(room: Room) {
 
      // Loop through each x and y in the room
 
-     for (let x = 0; x < constants.roomDimensions; x++) {
-          for (let y = 0; y < constants.roomDimensions; y++) {
+     for (let x = 0; x < constants.roomDimensions; x += 1) {
+          for (let y = 0; y < constants.roomDimensions; y += 1) {
                // Construct a packedPos from the coordinates
 
                const packedPos = x * constants.roomDimensions + y
@@ -108,7 +108,7 @@ export function trafficManager(room: Room) {
 
                         // If the creepAtPos failed to generate a new path, push the it
 
-                        if (creepAtPos.memory.path.length == 0) creepAtPos.getPushed()
+                        if (creepAtPos.memory.path.length === 0) creepAtPos.getPushed()
 
                         // OOtherwise operate creepAtPos's moveRequest
 
@@ -174,7 +174,7 @@ export function trafficManager(room: Room) {
 
                         // If the creepAtPos failed to generate a new path, push the creep
 
-                        if (creepAtPos.memory.path.length == 0) creepAtPos.getPushed()
+                        if (creepAtPos.memory.path.length === 0) creepAtPos.getPushed()
 
                         // Otherwise operate creepAtPos's moveRequest
 

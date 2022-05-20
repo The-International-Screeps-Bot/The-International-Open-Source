@@ -59,7 +59,7 @@ Maintainer.prototype.advancedMaintain = function () {
      // If roomVisuals are enabled
 
      if (Memory.roomVisuals)
-          room.visual.text(repairTarget.structureType == STRUCTURE_RAMPART ? '🧱' : '🔧', repairTarget.pos)
+          room.visual.text(repairTarget.structureType === STRUCTURE_RAMPART ? '🧱' : '🔧', repairTarget.pos)
 
      // If the repairTarget is out of repair range
 
@@ -88,13 +88,13 @@ Maintainer.prototype.advancedMaintain = function () {
 
      // If the repair failed, inform false
 
-     if (repairResult != OK) return false
+     if (repairResult !== OK) return false
 
      // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
 
      const energySpentOnRepairs = Math.min(workPartCount, (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER)
 
-     if (repairTarget.structureType == STRUCTURE_RAMPART) {
+     if (repairTarget.structureType === STRUCTURE_RAMPART) {
           Memory.stats.energySpentOnBarricades += energySpentOnRepairs
           creep.say(`🧱${energySpentOnRepairs * REPAIR_POWER}`)
      } else {
@@ -108,7 +108,7 @@ Maintainer.prototype.advancedMaintain = function () {
 
      // If the structure is a rampart
 
-     if (repairTarget.structureType == STRUCTURE_RAMPART) {
+     if (repairTarget.structureType === STRUCTURE_RAMPART) {
           // If the repairTarget will be below or equal to expectations next tick, inform true
 
           if (repairTarget.realHits <= creep.memory.quota + workPartCount * REPAIR_POWER * 25) return true
@@ -157,7 +157,7 @@ Maintainer.prototype.maintainAtFeet = function () {
 
      // If the creep has no energy, inform false
 
-     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) == 0) return false
+     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return false
 
      // Otherwise, look at the creep's pos for structures
 
@@ -168,7 +168,7 @@ Maintainer.prototype.maintainAtFeet = function () {
      for (const structure of structuresAsPos) {
           // If the structure is not a road, iterate
 
-          if (structure.structureType != STRUCTURE_ROAD) continue
+          if (structure.structureType !== STRUCTURE_ROAD) continue
 
           // Get the creep's work parts
 
@@ -180,7 +180,7 @@ Maintainer.prototype.maintainAtFeet = function () {
 
           // Otherwise, try to repair the structure, informing false if failure
 
-          if (creep.repair(structure) != OK) return false
+          if (creep.repair(structure) !== OK) return false
 
           // Otherwise
 

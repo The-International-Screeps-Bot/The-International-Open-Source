@@ -15,7 +15,7 @@ FastFiller.prototype.travelToFastFiller = function () {
 
      // If the creep is standing on the fastFillerPos, inform false
 
-     if (getRangeBetween(creep.pos.x, creep.pos.y, fastFillerPos.x, fastFillerPos.y) == 0) return false
+     if (getRangeBetween(creep.pos.x, creep.pos.y, fastFillerPos.x, fastFillerPos.y) === 0) return false
 
      // Otherwise, make a move request to it
 
@@ -39,7 +39,7 @@ FastFiller.prototype.fillFastFiller = function () {
 
      // If all spawningStructures are filled, inform false
 
-     if (room.energyAvailable == room.energyCapacityAvailable) return false
+     if (room.energyAvailable === room.energyCapacityAvailable) return false
 
      // If the creep needs resources
 
@@ -61,7 +61,7 @@ FastFiller.prototype.fillFastFiller = function () {
 
                // Otherwise, if the structure is not in range 1 to the creep
 
-               if (getRangeBetween(creep.pos.x, creep.pos.y, structure.pos.x, structure.pos.y) != 1) continue
+               if (getRangeBetween(creep.pos.x, creep.pos.y, structure.pos.x, structure.pos.y) !== 1) continue
 
                // Otherwise, if there is insufficient energy in the structure, iterate
 
@@ -108,11 +108,11 @@ FastFiller.prototype.fillFastFiller = function () {
 
           // If the structureType is an extension or spawn, iterate
 
-          if (structure.structureType != STRUCTURE_SPAWN && structure.structureType != STRUCTURE_EXTENSION) continue
+          if (structure.structureType !== STRUCTURE_SPAWN && structure.structureType !== STRUCTURE_EXTENSION) continue
 
           // , iterate
 
-          if (structure.store.getFreeCapacity(RESOURCE_ENERGY) == 0) continue
+          if (structure.store.getFreeCapacity(RESOURCE_ENERGY) === 0) continue
 
           // Otherwise, transfer to the structure record the action and inform true
 

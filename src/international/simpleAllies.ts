@@ -114,7 +114,7 @@ AllyManager.prototype.getAllyRequests = function () {
 
      //
 
-     if (RawMemory.foreignSegment && RawMemory.foreignSegment.username == currentAllyName) {
+     if (RawMemory.foreignSegment && RawMemory.foreignSegment.username === currentAllyName) {
           try {
                // Get the allyRequests and record them in the allyManager
 

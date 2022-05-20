@@ -55,7 +55,7 @@ RoomObject.prototype.formatValue = function () {
 
      // If roomObject's valueType is an ID
 
-     if (roomObject.valueType == 'id') {
+     if (roomObject.valueType === 'id') {
           // Assign its value to the object with the ID and stop
 
           roomObject.value = findObjectWithID(roomObject.value)
@@ -64,7 +64,7 @@ RoomObject.prototype.formatValue = function () {
 
      // If roomObject's type is pos
 
-     if (roomObject.valueType == 'pos') {
+     if (roomObject.valueType === 'pos') {
           // Stop if the roomObject's value isn't defined
 
           if (!roomObject.value) return
@@ -79,7 +79,7 @@ RoomObject.prototype.getCachedValue = function () {
      const roomObject = this
      const { room } = roomObject
 
-     if (roomObject.cacheType == 'memory') {
+     if (roomObject.cacheType === 'memory') {
           // Query room memory for cachedRoomObject
 
           const cachedValue: any = room.memory[roomObject.name]
@@ -94,7 +94,7 @@ RoomObject.prototype.getCachedValue = function () {
           return true
      }
 
-     if (roomObject.cacheType == 'global') {
+     if (roomObject.cacheType === 'global') {
           // Query room's global for cachedRoomObject
 
           const cachedRoomObject: RoomObject | undefined = room.global[roomObject.name]
@@ -165,7 +165,7 @@ RoomObject.prototype.cache = function () {
 
      // If cacheMethod is memory
 
-     if (roomObject.cacheType == 'memory') {
+     if (roomObject.cacheType === 'memory') {
           // Store value in room's memory and stop
 
           room.memory[roomObject.name] = roomObject.value
@@ -174,7 +174,7 @@ RoomObject.prototype.cache = function () {
 
      // If cacheMethod is global
 
-     if (roomObject.cacheType == 'global') {
+     if (roomObject.cacheType === 'global') {
           // Create a copy of the roomObject
 
           const roomObjectCopy = new RoomObject({

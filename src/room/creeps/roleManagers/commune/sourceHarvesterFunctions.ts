@@ -46,7 +46,7 @@ SourceHarvester.prototype.travelToSource = function () {
 
      // If the creep is at the creep's packedHarvestPos, inform false
 
-     if (getRangeBetween(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) == 0) return false
+     if (getRangeBetween(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) === 0) return false
 
      // If the creep's movement type is pull
 
@@ -67,7 +67,7 @@ SourceHarvester.prototype.travelToSource = function () {
 
           // If there are no pull tasks for the creep, make one for the creep's harvestPos
 
-          if (creepsPullTasks.length == 0)
+          if (creepsPullTasks.length === 0)
                new RoomPullTask(room.name, creep.id, new RoomPosition(harvestPos.x, harvestPos.y, room.name), 1)
 
           // Inform false
@@ -97,7 +97,7 @@ SourceHarvester.prototype.transferToSourceExtensions = function () {
 
      // If all spawningStructures are filled, inform false
 
-     if (room.energyAvailable == room.energyCapacityAvailable) return false
+     if (room.energyAvailable === room.energyCapacityAvailable) return false
 
      // If the creep is not nearly full, inform false
 
@@ -127,11 +127,11 @@ SourceHarvester.prototype.transferToSourceExtensions = function () {
 
           // If the structureType is an extension, iterate
 
-          if (structure.structureType != STRUCTURE_EXTENSION) continue
+          if (structure.structureType !== STRUCTURE_EXTENSION) continue
 
           // Otherwise, if the structure is full, iterate
 
-          if (structure.store.getFreeCapacity(RESOURCE_ENERGY) == 0) continue
+          if (structure.store.getFreeCapacity(RESOURCE_ENERGY) === 0) continue
 
           // Otherwise, transfer to the structure and inform true
 
@@ -192,7 +192,7 @@ SourceHarvester.prototype.repairSourceContainer = function (sourceContainer) {
 
      // If the repair worked
 
-     if (repairResult == OK) {
+     if (repairResult === OK) {
           // Record that the creep has worked
 
           creep.hasWorked = true

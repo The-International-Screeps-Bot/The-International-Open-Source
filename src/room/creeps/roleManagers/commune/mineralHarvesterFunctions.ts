@@ -39,7 +39,7 @@ MineralHarvester.prototype.advancedHarvestMineral = function (mineral) {
 
      // Harvest the mineral, informing the result if it didn't succeed
 
-     if (creep.harvest(mineral) != OK) return false
+     if (creep.harvest(mineral) !== OK) return false
 
      // Find amount of minerals harvested and record it in data
 

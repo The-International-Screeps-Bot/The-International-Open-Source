@@ -106,8 +106,8 @@ Object.defineProperties(Room.prototype, {
 
                     for (const structure of structuresAtPos) {
                          if (
-                              structure.structureType != STRUCTURE_SPAWN &&
-                              structure.structureType != STRUCTURE_EXTENSION
+                              structure.structureType !== STRUCTURE_SPAWN &&
+                              structure.structureType !== STRUCTURE_EXTENSION
                          )
                               continue
 
@@ -121,8 +121,8 @@ Object.defineProperties(Room.prototype, {
 
                     for (const structure of structuresAtPos) {
                          if (
-                              structure.structureType != STRUCTURE_SPAWN &&
-                              structure.structureType != STRUCTURE_EXTENSION
+                              structure.structureType !== STRUCTURE_SPAWN &&
+                              structure.structureType !== STRUCTURE_EXTENSION
                          )
                               continue
 
@@ -154,7 +154,7 @@ Object.defineProperties(Room.prototype, {
                for (const adjacentPosData of adjacentStructures) {
                     const { structureType } = adjacentPosData.structure
 
-                    if (structureType != STRUCTURE_SPAWN && structureType != STRUCTURE_EXTENSION) continue
+                    if (structureType !== STRUCTURE_SPAWN && structureType !== STRUCTURE_EXTENSION) continue
 
                     this.spawningStructuresByPriority.push(
                          adjacentPosData.structure as StructureSpawn | StructureExtension,
@@ -183,7 +183,7 @@ Object.defineProperties(Room.prototype, {
                     for (const adjacentPosData of adjacentStructures) {
                          const { structureType } = adjacentPosData.structure
 
-                         if (structureType != STRUCTURE_SPAWN && structureType != STRUCTURE_EXTENSION) continue
+                         if (structureType !== STRUCTURE_SPAWN && structureType !== STRUCTURE_EXTENSION) continue
 
                          this.spawningStructuresByPriority.push(
                               adjacentPosData.structure as StructureSpawn | StructureExtension,

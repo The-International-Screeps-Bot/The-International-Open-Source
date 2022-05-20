@@ -29,7 +29,7 @@ InternationalManager.prototype.endTickManager = function () {
 
      // Fill up the console with empty logs
 
-     for (let i = 0; i < 99; i++) console.log()
+     for (let i = 0; i < 99; i += 1) console.log()
 
      // Log the accumilated global logs
 

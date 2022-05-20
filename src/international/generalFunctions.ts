@@ -14,7 +14,7 @@ export function getAvgPrice(resourceType: MarketResourceConstant, days = 2) {
 
      // Iterate through each index less than days
 
-     for (let index = 0; index < days - 1; index++) {
+     for (let index = 0; index < days - 1; index += 1) {
           totalPrice += history[index].avgPrice
      }
 
@@ -36,8 +36,8 @@ export function findObjectWithID<T extends Id<any>>(ID: T): fromId<T> | undefine
 export function findPositionsInsideRect(x1: number, y1: number, x2: number, y2: number) {
      const positions: Coord[] = []
 
-     for (let x = x1; x <= x2; x++) {
-          for (let y = y1; y <= y2; y++) {
+     for (let x = x1; x <= x2; x += 1) {
+          for (let y = y1; y <= y2; y += 1) {
                // Iterate if the pos doesn't map onto a room
 
                if (x < 0 || x >= constants.roomDimensions || y < 0 || y >= constants.roomDimensions) continue
@@ -55,7 +55,7 @@ export function findPositionsInsideRect(x1: number, y1: number, x2: number, y2: 
  * Checks if two positions are equal
  */
 export function arePositionsEqual(pos1: Pos, pos2: Pos) {
-     return pos1?.x == pos2?.x && pos1?.y == pos2?.y
+     return pos1?.x === pos2?.x && pos1?.y === pos2?.y
 }
 
 /**
@@ -90,7 +90,7 @@ export function advancedGeneratePixel() {
 
      // Stop if the cpu bucket isn't full
 
-     if (Game.cpu.bucket != 10000) return false
+     if (Game.cpu.bucket !== 10000) return false
 
      // Try to generate a pixel
 
@@ -102,7 +102,7 @@ export function advancedGeneratePixel() {
  * @returns an incremented ID
  */
 export function newID() {
-     return Memory.ID++
+     return (Memory.ID += 1)
 }
 
 /**
@@ -119,7 +119,7 @@ export function advancedFindDistance(
           routeCallback(roomName) {
                // If the goal is in the room, inform 1
 
-               if (roomName == goalRoomName) return 1
+               if (roomName === goalRoomName) return 1
 
                // Get the room's memory
 
@@ -141,7 +141,7 @@ export function advancedFindDistance(
 
      // If findRouteResult didn't work, inform a path length of Infinity
 
-     if (findRouteResult == ERR_NO_PATH) return Infinity
+     if (findRouteResult === ERR_NO_PATH) return Infinity
 
      // inform the path's length
 
@@ -209,8 +209,8 @@ export function createPackedPosMap(innerArray?: boolean) {
 
      // Loop through each x and y in the room
 
-     for (let x = 0; x < constants.roomDimensions; x++) {
-          for (let y = 0; y < constants.roomDimensions; y++) {
+     for (let x = 0; x < constants.roomDimensions; x += 1) {
+          for (let y = 0; y < constants.roomDimensions; y += 1) {
                // Add an element for this pos
 
                packedPosMap.push(innerArray ? [] : undefined)
@@ -257,7 +257,7 @@ export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPo
 
           // If the queuedCreep's pos is equal to the moveRequest, inform the creep
 
-          if (pack(queuedCreep.pos) == requestPackedPos) return queuedCreep
+          if (pack(queuedCreep.pos) === requestPackedPos) return queuedCreep
      }
 
      return undefined
@@ -312,7 +312,7 @@ export function findLargestTransactionAmount(budget: number, amount: number, roo
  * Finds the name of the closest commune, exluding the specified roomName
  */
 export function findClosestCommuneName(roomName: string) {
-     const communesNotThis = Memory.communes.filter(communeName => roomName != communeName)
+     const communesNotThis = Memory.communes.filter(communeName => roomName !== communeName)
 
      return communesNotThis.sort(
           (a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
@@ -322,7 +322,7 @@ export function findClosestCommuneName(roomName: string) {
 export function findClosestClaimType(roomName: string) {
      const claimTypes = Memory.communes
           .concat(Object.keys(Memory.claimRequests))
-          .filter(claimRoomName => roomName != claimRoomName)
+          .filter(claimRoomName => roomName !== claimRoomName)
 
      return claimTypes.sort(
           (a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
@@ -344,7 +344,7 @@ export function findStrengthOfParts(body: BodyPartConstant[]) {
                     strength += HEAL_POWER
                     break
                default:
-                    strength++
+                    strength += 1
           }
      }
 

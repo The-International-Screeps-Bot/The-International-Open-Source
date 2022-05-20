@@ -9,7 +9,7 @@ export function mineralHarvesterManager(room: Room, creepsOfRole: string[]) {
 
           const mineral: Mineral = room.get('mineral')
 
-          if (mineral.mineralAmount == 0) {
+          if (mineral.mineralAmount === 0) {
                creep.advancedRecycle()
                continue
           }

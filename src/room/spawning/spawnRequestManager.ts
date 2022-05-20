@@ -82,8 +82,8 @@ export function spawnRequester(room: Room) {
           // If there are no sourceHarvesters or haulers
 
           if (
-               room.myCreeps.source1Harvester.length + room.myCreeps.source2Harvester.length == 0 ||
-               room.myCreeps.hauler.length == 0
+               room.myCreeps.source1Harvester.length + room.myCreeps.source2Harvester.length === 0 ||
+               room.myCreeps.hauler.length === 0
           ) {
                // Inform the smaller of the following
 
@@ -121,7 +121,7 @@ export function spawnRequester(room: Room) {
                if (opts.defaultParts.length) {
                     // Increment tier
 
-                    tier++
+                    tier += 1
 
                     // Loop through defaultParts
 
@@ -170,12 +170,12 @@ export function spawnRequester(room: Room) {
 
                               // Reduce remainingAllowedParts
 
-                              remainingAllowedParts--
+                              remainingAllowedParts -= 1
                          }
 
                          // Increase tier
 
-                         tier++
+                         tier += 1
                     }
 
                     // Assign partIndex as the length of extraParts
@@ -210,16 +210,16 @@ export function spawnRequester(room: Room) {
 
                               // Increase remainingAllowedParts
 
-                              remainingAllowedParts++
+                              remainingAllowedParts += 1
 
                               // Decrease the partIndex
 
-                              partIndex--
+                              partIndex -= 1
                          }
 
                          // Decrease tier
 
-                         tier--
+                         tier -= 1
                     }
                }
 
@@ -229,7 +229,7 @@ export function spawnRequester(room: Room) {
 
                // Reduce the number of minCreeps
 
-               opts.minCreeps--
+               opts.minCreeps -= 1
           }
 
           // If minCreeps is equal to 0, stop
@@ -286,7 +286,7 @@ export function spawnRequester(room: Room) {
                if (opts.defaultParts.length) {
                     // Increment tier
 
-                    tier++
+                    tier += 1
 
                     // Loop through defaultParts
 
@@ -321,13 +321,13 @@ export function spawnRequester(room: Room) {
 
                          // Reduce remainingAllowedParts and totalExtraParts
 
-                         remainingAllowedParts--
-                         totalExtraParts--
+                         remainingAllowedParts -= 1
+                         totalExtraParts -= 1
                     }
 
                     // Increase tier
 
-                    tier++
+                    tier += 1
                }
 
                // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
@@ -362,17 +362,17 @@ export function spawnRequester(room: Room) {
 
                          // Increase remainingAllowedParts and totalExtraParts
 
-                         remainingAllowedParts++
-                         totalExtraParts++
+                         remainingAllowedParts += 1
+                         totalExtraParts += 1
 
                          // Decrease the partIndex
 
-                         partIndex--
+                         partIndex -= 1
                     }
 
                     // Decrease tier
 
-                    tier--
+                    tier -= 1
                }
 
                // Create a spawnRequest using previously constructed information
@@ -381,7 +381,7 @@ export function spawnRequester(room: Room) {
 
                // Decrease maxCreeps counter
 
-               opts.maxCreeps--
+               opts.maxCreeps -= 1
           }
      }
 
@@ -392,7 +392,7 @@ export function spawnRequester(room: Room) {
      constructSpawnRequests(
           (function (): SpawnRequestOpts | false {
                const sourceName = 'source1'
-               const priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length
+               const priority = (mostOptimalSource === sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length
                const role = 'source1Harvester'
 
                if (spawnEnergyCapacity >= 800) {
@@ -480,7 +480,7 @@ export function spawnRequester(room: Room) {
      constructSpawnRequests(
           (function (): SpawnRequestOpts | false {
                const sourceName = 'source2'
-               const priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length
+               const priority = (mostOptimalSource === sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length
                const role = 'source2Harvester'
 
                if (spawnEnergyCapacity >= 800) {
@@ -640,7 +640,7 @@ export function spawnRequester(room: Room) {
                // Get the mineral. If it's out of resources, inform false
 
                const mineral: Mineral = room.get('mineral')
-               if (mineral.mineralAmount == 0) return false
+               if (mineral.mineralAmount === 0) return false
 
                return {
                     defaultParts: [],
@@ -734,7 +734,7 @@ export function spawnRequester(room: Room) {
 
           enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
                filter: creep =>
-                    creep.owner.username != 'Invader' &&
+                    creep.owner.username !== 'Invader' &&
                     !allyList.has(creep.owner.username) &&
                     !creep.isOnExit() &&
                     creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK]),
@@ -788,7 +788,7 @@ export function spawnRequester(room: Room) {
           (function (): SpawnRequestOpts | false {
                // Stop if there are no construction sites
 
-               if (room.find(FIND_MY_CONSTRUCTION_SITES).length == 0) return false
+               if (room.find(FIND_MY_CONSTRUCTION_SITES).length === 0) return false
 
                let partsMultiplier = 0
 
@@ -933,7 +933,7 @@ export function spawnRequester(room: Room) {
                // If the controllerLink is defined
 
                if (controllerLink) {
-                    maxCreeps--
+                    maxCreeps -= 1
 
                     const hubLink: StructureLink | undefined = room.get('hubLink')
                     const sourceLinks: StructureLink[] = [room.get('source1Link'), room.get('source2Link')]
@@ -1004,13 +1004,13 @@ export function spawnRequester(room: Room) {
                if (room.get('controllerContainer') || controllerLink) {
                     // If the controller is level 8
 
-                    if (room.controller.level == 8) {
+                    if (room.controller.level === 8) {
                          // If the controller is near to downgrading
 
                          if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 5
 
                          partsMultiplier = Math.min(Math.round(partsMultiplier / 5), 3)
-                         if (partsMultiplier == 0) return false
+                         if (partsMultiplier === 0) return false
 
                          return {
                               defaultParts: [MOVE],
@@ -1034,7 +1034,7 @@ export function spawnRequester(room: Room) {
                          if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 6
 
                          partsMultiplier = Math.round(partsMultiplier / 6)
-                         if (partsMultiplier == 0) return false
+                         if (partsMultiplier === 0) return false
 
                          return {
                               defaultParts: [CARRY],
@@ -1056,7 +1056,7 @@ export function spawnRequester(room: Room) {
                     if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 4
 
                     partsMultiplier = Math.round(partsMultiplier / 4)
-                    if (partsMultiplier == 0) return false
+                    if (partsMultiplier === 0) return false
 
                     return {
                          defaultParts: [CARRY],
@@ -1109,7 +1109,7 @@ export function spawnRequester(room: Room) {
 
      const remoteNamesByEfficacy: string[] = room.get('remoteNamesByEfficacy')
 
-     for (let index = 0; index < remoteNamesByEfficacy.length; index++) {
+     for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
           const remoteName = remoteNamesByEfficacy[index]
           const remoteNeeds = Memory.rooms[remoteName].needs
           // Add up econ needs for this room
@@ -1147,7 +1147,7 @@ export function spawnRequester(room: Room) {
                               maxCreeps: Infinity,
                               maxCostPerCreep: 50 + 150 * 6,
                               minCost: 200,
-                              priority: 4 + index - (sourcesByEfficacy[0] == 'source1' ? 0.1 : 0),
+                              priority: 4 + index - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                               memoryAdditions: {
                                    role: 'source1RemoteHarvester',
                               },
@@ -1164,7 +1164,7 @@ export function spawnRequester(room: Room) {
                          maxCreeps: global[remoteName]?.source1HarvestPositions?.length || Infinity,
                          maxCostPerCreep: 50 + 150 * 6,
                          minCost: 200,
-                         priority: 4 + index - (sourcesByEfficacy[0] == 'source1' ? 0.1 : 0),
+                         priority: 4 + index - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                          memoryAdditions: {
                               role: 'source1RemoteHarvester',
                          },
@@ -1190,7 +1190,7 @@ export function spawnRequester(room: Room) {
                               minCreeps: 1,
                               maxCreeps: Infinity,
                               minCost: 200,
-                              priority: 4 + index - (sourcesByEfficacy[0] == 'source2' ? 0.1 : 0),
+                              priority: 4 + index - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                               memoryAdditions: {
                                    role: 'source2RemoteHarvester',
                               },
@@ -1207,7 +1207,7 @@ export function spawnRequester(room: Room) {
                          maxCreeps: global[remoteName]?.source2HarvestPositions?.length || Infinity,
                          maxCostPerCreep: 150 * 6,
                          minCost: 200,
-                         priority: 4 + index - (sourcesByEfficacy[0] == 'source2' ? 0.1 : 0),
+                         priority: 4 + index - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                          memoryAdditions: {
                               role: 'source2RemoteHarvester',
                          },

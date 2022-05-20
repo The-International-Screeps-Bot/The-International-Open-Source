@@ -45,7 +45,7 @@ MeleeDefender.prototype.advancedDefend = function () {
           for (const creepAlt of creepsAtPos) {
                // If the creepAlt isn't the creep, inform false
 
-               if (creepAlt.id != creep.id) return false
+               if (creepAlt.id !== creep.id) return false
           }
 
           // Otherwise inform true
@@ -87,7 +87,7 @@ MeleeDefender.prototype.advancedDefend = function () {
 
      // If the creep is range 0 to the closestRampart, inform false
 
-     if (creep.pos.getRangeTo(closestRampart.pos) == 0) return false
+     if (creep.pos.getRangeTo(closestRampart.pos) === 0) return false
 
      // Otherwise move to the rampart preffering ramparts and inform true
 

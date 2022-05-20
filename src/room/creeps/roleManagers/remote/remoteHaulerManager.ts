@@ -32,7 +32,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                // If the creep is in the remote
 
-               if (room.name == creep.memory.remoteName) {
+               if (room.name === creep.memory.remoteName) {
                     // If creep has a task
 
                     if (global[creep.id]?.respondingTaskID) {
@@ -94,7 +94,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
           // Otherwise
 
-          if (room.name == creep.memory.communeName) {
+          if (room.name === creep.memory.communeName) {
                // Try to renew the creep
 
                creep.advancedRenew()

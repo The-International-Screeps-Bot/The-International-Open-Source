@@ -14,7 +14,7 @@ export function source1RemoteHarvesterManager(room: Room, creepsOfRole: string[]
 
           // If the creep needs resources
 
-          if (room.name == creep.memory.remoteName) {
+          if (room.name === creep.memory.remoteName) {
                // Define the creep's sourceName
 
                const sourceName = 'source1'

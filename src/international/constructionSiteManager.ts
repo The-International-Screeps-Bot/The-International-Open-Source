@@ -47,6 +47,6 @@ InternationalManager.prototype.constructionSiteManager = function () {
 
           // Otherwise increase the constructionSite's age
 
-          Memory.constructionSites[cSiteID]++
+          Memory.constructionSites[cSiteID] += 1
      }
 }

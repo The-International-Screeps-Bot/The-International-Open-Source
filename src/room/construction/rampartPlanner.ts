@@ -35,9 +35,9 @@ export function rampartPlanner(room: Room) {
           const jmax = bounds.y2
           const terrain = Game.map.getRoomTerrain(roomName)
 
-          for (; i <= imax; i++) {
+          for (; i <= imax; i += 1) {
                j = bounds.y1
-               for (; j <= jmax; j++) {
+               for (; j <= jmax; j += 1) {
                     if (terrain.get(i, j) !== TERRAIN_MASK_WALL) {
                          room_2d[i][j] = NORMAL // mark unwalkable
                          if (i === bounds.x1 || j === bounds.y1 || i === bounds.x2 || j === bounds.y2)
@@ -50,7 +50,7 @@ export function rampartPlanner(room: Room) {
           // Marks tiles Near Exits for sink- where you cannot build wall/rampart
           let y = 1
           const max = 49
-          for (; y < max; y++) {
+          for (; y < max; y += 1) {
                if (room_2d[0][y - 1] === EXIT) room_2d[1][y] = TO_EXIT
                if (room_2d[0][y] === EXIT) room_2d[1][y] = TO_EXIT
                if (room_2d[0][y + 1] === EXIT) room_2d[1][y] = TO_EXIT
@@ -59,7 +59,7 @@ export function rampartPlanner(room: Room) {
                if (room_2d[49][y + 1] === EXIT) room_2d[48][y] = TO_EXIT
           }
           let x = 1
-          for (; x < max; x++) {
+          for (; x < max; x += 1) {
                if (room_2d[x - 1][0] === EXIT) room_2d[x][1] = TO_EXIT
                if (room_2d[x][0] === EXIT) room_2d[x][1] = TO_EXIT
                if (room_2d[x + 1][0] === EXIT) room_2d[x][1] = TO_EXIT
@@ -69,14 +69,14 @@ export function rampartPlanner(room: Room) {
           }
           // mark Border Tiles as not usable
           y = 1
-          for (; y < max; y++) {
-               room_2d[0][y] == UNWALKABLE
-               room_2d[49][y] == UNWALKABLE
+          for (; y < max; y += 1) {
+               room_2d[0][y] === UNWALKABLE
+               room_2d[49][y] === UNWALKABLE
           }
           x = 1
-          for (; x < max; x++) {
-               room_2d[x][0] == UNWALKABLE
-               room_2d[x][49] == UNWALKABLE
+          for (; x < max; x += 1) {
+               room_2d[x][0] === UNWALKABLE
+               room_2d[x][49] === UNWALKABLE
           }
           return room_2d
      }
@@ -134,7 +134,7 @@ export function rampartPlanner(room: Room) {
                u = q.splice(0, 1)[0]
                let i = 0
                const imax = this.edges[u].length
-               for (; i < imax; i++) {
+               for (; i < imax; i += 1) {
                     edge = this.edges[u][i]
                     if (this.level[edge.v] < 0 && edge.f < edge.c) {
                          this.level[edge.v] = this.level[u] + 1
@@ -168,7 +168,7 @@ export function rampartPlanner(room: Room) {
                          return flow_to_t
                     }
                }
-               c[u]++
+               c[u] += 1
           }
           return 0
      }
@@ -187,7 +187,7 @@ export function rampartPlanner(room: Room) {
                u = q.splice(0, 1)[0]
                let i = 0
                const imax = this.edges[u].length
-               for (; i < imax; i++) {
+               for (; i < imax; i += 1) {
                     edge = this.edges[u][i]
                     if (edge.f < edge.c) {
                          if (this.level[edge.v] < 1) {
@@ -205,7 +205,7 @@ export function rampartPlanner(room: Room) {
           const min_cut = []
           let i = 0
           const imax = e_in_cut.length
-          for (; i < imax; i++) {
+          for (; i < imax; i += 1) {
                if (this.level[e_in_cut[i].v] === -1)
                     // Only edges which are blocking and lead to from s unreachable vertices are in the min cut
                     min_cut.push(e_in_cut[i].u)
@@ -216,7 +216,7 @@ export function rampartPlanner(room: Room) {
      // Calculates a mincut graph (Dinic Algorithm)
 
      Graph.prototype.Calcmincut = function (s, t) {
-          if (s == t) return -1
+          if (s === t) return -1
 
           let returnValue = 0
 
@@ -245,8 +245,8 @@ export function rampartPlanner(room: Room) {
           for (const rect of rects) {
                // Loop through each pos inside the rect
 
-               for (let x = rect.x1; x <= rect.x2; x++) {
-                    for (let y = rect.y1; y <= rect.y2; y++) {
+               for (let x = rect.x1; x <= rect.x2; x += 1) {
+                    for (let y = rect.y1; y <= rect.y2; y += 1) {
                          // If the pos is NORMAL and on the edge of the rect
 
                          if (x === rect.x1 || x === rect.x2 || y === rect.y1 || y === rect.y2) {
@@ -268,8 +268,8 @@ export function rampartPlanner(room: Room) {
           if (Memory.roomVisuals) {
                // Visualize position values
 
-               for (let x = 0; x < constants.roomDimensions; x++) {
-                    for (let y = 0; y < constants.roomDimensions; y++) {
+               for (let x = 0; x < constants.roomDimensions; x += 1) {
+                    for (let y = 0; y < constants.roomDimensions; y += 1) {
                          if (positionValues[x][y] === NORMAL) {
                               room.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill: '#e8e863', opacity: 0.3 })
                               continue
@@ -314,15 +314,15 @@ export function rampartPlanner(room: Room) {
           let x = 1
           let y = 1
           const max = 49
-          for (; x < max; x++) {
+          for (; x < max; x += 1) {
                y = 1
-               for (; y < max; y++) {
+               for (; y < max; y += 1) {
                     top = y * 50 + x
                     bot = top + 2500
                     if (positionValues[x][y] === NORMAL) {
                          // normal Tile
                          g.New_edge(top, bot, 1)
-                         for (let i = 0; i < 8; i++) {
+                         for (let i = 0; i < 8; i += 1) {
                               dx = x + surr[i][0]
                               dy = y + surr[i][1]
                               if (positionValues[dx][dy] === NORMAL || positionValues[dx][dy] === TO_EXIT)
@@ -332,7 +332,7 @@ export function rampartPlanner(room: Room) {
                          // protected Tile
                          g.New_edge(source, top, infini)
                          g.New_edge(top, bot, 1)
-                         for (let i = 0; i < 8; i++) {
+                         for (let i = 0; i < 8; i += 1) {
                               dx = x + surr[i][0]
                               dy = y + surr[i][1]
                               if (positionValues[dx][dy] === NORMAL || positionValues[dx][dy] === TO_EXIT)
@@ -356,7 +356,7 @@ export function rampartPlanner(room: Room) {
 
           const positionValues = generadeRoomMatrix(roomName)
 
-          for (let i = cut_tiles_array.length - 1; i >= 0; i--) {
+          for (let i = cut_tiles_array.length - 1; i >= 0; i -= 1) {
                positionValues[cut_tiles_array[i].x][cut_tiles_array[i].y] = UNWALKABLE
           }
 
@@ -366,14 +366,14 @@ export function rampartPlanner(room: Room) {
           let y = 0
           const max = 49
 
-          for (; y < max; y++) {
+          for (; y < max; y += 1) {
                if (positionValues[1][y] === TO_EXIT) unvisited_pos.push(50 * y + 1)
                if (positionValues[48][y] === TO_EXIT) unvisited_pos.push(50 * y + 48)
           }
 
           let x = 0
 
-          for (; x < max; x++) {
+          for (; x < max; x += 1) {
                if (positionValues[x][1] === TO_EXIT) unvisited_pos.push(50 + x)
                if (positionValues[x][48] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
           }
@@ -399,7 +399,7 @@ export function rampartPlanner(room: Room) {
                x = index % 50
                y = Math.floor(index / 50)
 
-               for (let i = 0; i < 8; i++) {
+               for (let i = 0; i < 8; i += 1) {
                     dx = x + surr[i][0]
                     dy = y + surr[i][1]
                     if (positionValues[dx][dy] === NORMAL) {
@@ -410,12 +410,12 @@ export function rampartPlanner(room: Room) {
           }
           // Remove min-Cut-Tile if there is no TO-EXIT  surrounding it
           let leads_to_exit = false
-          for (let i = cut_tiles_array.length - 1; i >= 0; i--) {
+          for (let i = cut_tiles_array.length - 1; i >= 0; i -= 1) {
                leads_to_exit = false
                x = cut_tiles_array[i].x
                y = cut_tiles_array[i].y
 
-               for (let i = 0; i < 8; i++) {
+               for (let i = 0; i < 8; i += 1) {
                     dx = x + surr[i][0]
                     dy = y + surr[i][1]
                     if (positionValues[dx][dy] === TO_EXIT) {
@@ -460,7 +460,7 @@ export function rampartPlanner(room: Room) {
 
                const imax = cut_edges.length
 
-               for (; i < imax; i++) {
+               for (; i < imax; i += 1) {
                     u = cut_edges[i] // x= v % 50  y=v/50 (math.floor?)
                     x = u % 50
                     y = Math.floor(u / 50)
@@ -561,7 +561,7 @@ export function rampartPlanner(room: Room) {
           }
      }
 
-     const recordRamparts = room.memory.stampAnchors.rampart.length == 0
+     const recordRamparts = room.memory.stampAnchors.rampart.length === 0
 
      // Get Min cut
      // Positions is an array where to build walls/ramparts
@@ -619,14 +619,14 @@ export function rampartPlanner(room: Room) {
      }
 
      if (recordRamparts) {
-          for (let x = 0; x < constants.roomDimensions; x++) {
-               for (let y = 0; y < constants.roomDimensions; y++) {
-                    if (rampartPlans.get(x, y) == 1) room.memory.stampAnchors.rampart.push(pack({ x, y }))
+          for (let x = 0; x < constants.roomDimensions; x += 1) {
+               for (let y = 0; y < constants.roomDimensions; y += 1) {
+                    if (rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(pack({ x, y }))
                }
           }
      }
 
-     const needsBoardingRamparts = room.memory.stampAnchors.boardingRampart.length == 0
+     const needsBoardingRamparts = room.memory.stampAnchors.boardingRampart.length === 0
 
      if (room.memory.stampAnchors.boardingRampart.length) {
           for (const packedPos of room.memory.stampAnchors.boardingRampart) {
@@ -665,10 +665,10 @@ export function rampartPlanner(room: Room) {
 
                     // If there are already rampart plans at this pos
 
-                    if (rampartPlans.get(onboardingPos.x, onboardingPos.y) == 1) {
+                    if (rampartPlans.get(onboardingPos.x, onboardingPos.y) === 1) {
                          // Increase the onboardingIndex and iterate
 
-                         onboardingIndex++
+                         onboardingIndex += 1
                          continue
                     }
 
@@ -734,10 +734,10 @@ export function rampartPlanner(room: Room) {
 
                     // If there are already rampart plans at this pos
 
-                    if (rampartPlans.get(onboardingPos.x, onboardingPos.y) == 1) {
+                    if (rampartPlans.get(onboardingPos.x, onboardingPos.y) === 1) {
                          // Increase the onboardingIndex and iterate
 
-                         onboardingIndex++
+                         onboardingIndex += 1
                          continue
                     }
 

@@ -10,7 +10,7 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
           if (!creep.findRemote()) {
                // If the room is the creep's commune
 
-               if (room.name == creep.memory.communeName) {
+               if (room.name === creep.memory.communeName) {
                     // Advanced recycle and iterate
 
                     creep.advancedRecycle()
@@ -36,7 +36,7 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
 
           // If the creep is its remote
 
-          if (room.name == creep.memory.remoteName) {
+          if (room.name === creep.memory.remoteName) {
                // Otherwise, remove the remote from the creep
 
                delete creep.memory.remoteName

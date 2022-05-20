@@ -29,14 +29,14 @@ outer: do {
           for (const o of igen_open) {
                igen[o] = gen
           }
-          gen++
+          gen += 1
           igen_open = _(igen_open).map(getNeighbors).flatten().intersection(igen_field).run()
           igen_field = _.difference(igen_field, igen_open)
      } // End Inverse Generationalize
      for (const o of igen_open) {
           igen[o] = gen
      }
-     gen++
+     gen += 1
      const deadend = new Set()
      for (const source of gen0) {
           // "Source" is the mincut term for the exits of the room.
@@ -57,10 +57,10 @@ outer: do {
                } // Hit leaf node in DFS.
                if (sinks.includes(child)) {
                     // Found a "sink".  Log a maxflow path.
-                    if (path.length == 1) {
+                    if (path.length === 1) {
                          break
                     }
-                    for (let i = 1; i < path.length; i++) {
+                    for (let i = 1; i < path.length; i += 1) {
                          parents[path[i]] = path[i - 1]
                     }
                     dirty = true

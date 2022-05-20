@@ -29,7 +29,7 @@ export function remoteReserverManager(room: Room, creepsOfRole: string[]) {
 
           // If the creep is in the remote
 
-          if (room.name == creep.memory.remoteName) {
+          if (room.name === creep.memory.remoteName) {
                // Try to reserve the controller
 
                creep.advancedReserveController()

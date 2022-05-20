@@ -46,7 +46,7 @@ export function spawnManager(room: Room) {
 
           // If creep can't be spawned
 
-          if (testSpawnResult != OK) {
+          if (testSpawnResult !== OK) {
                // Log the error and stop the loop
 
                customLog(
@@ -72,7 +72,7 @@ export function spawnManager(room: Room) {
 
           // Decrease the spawnIndex
 
-          spawnIndex--
+          spawnIndex -= 1
      }
 
      // If CPU logging is enabled, log the CPU used by this manager

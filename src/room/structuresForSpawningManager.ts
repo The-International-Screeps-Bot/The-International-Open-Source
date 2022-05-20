@@ -7,7 +7,7 @@ import { RoomTransferTask } from './roomTasks'
 export function structuresForSpawningManager(room: Room) {
      // If all spawningStructures are filled, stop
 
-     if (room.energyAvailable == room.energyCapacityAvailable) return
+     if (room.energyAvailable === room.energyCapacityAvailable) return
 
      // Get exensions and spawns
 
@@ -107,7 +107,7 @@ export function structuresForSpawningManager(room: Room) {
           // Assign amountToRequest as the energy left not assigned to tasks, iterating if 0
 
           const amountToRequest = structure.store.getFreeCapacity(RESOURCE_ENERGY) - totalResourcesRequested
-          if (amountToRequest == 0) continue
+          if (amountToRequest === 0) continue
 
           // If there is a taskWithoutResponder
 

@@ -41,7 +41,7 @@ export function marketManager(room: Room) {
      // Filter out allyRequests that are requesting resources
 
      const resourceRequests = allyManager.allyRequests.filter(
-          request => request.requestType == allyManager.requestTypes.RESOURCE,
+          request => request.requestType === allyManager.requestTypes.RESOURCE,
      )
 
      // Filter resourceRequests by priority, highest to lowest
@@ -76,7 +76,7 @@ export function marketManager(room: Room) {
 
           // If the resourceType is energy
 
-          if (request.resourceType == RESOURCE_ENERGY) {
+          if (request.resourceType === RESOURCE_ENERGY) {
                // If the terminal doesn't have enough, iterate
 
                if (terminal.store.getUsedCapacity(request.resourceType) < 60000) continue

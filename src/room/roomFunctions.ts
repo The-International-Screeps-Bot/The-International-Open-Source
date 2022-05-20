@@ -31,15 +31,15 @@ Room.prototype.get = function (roomObjectName) {
 
           // Loop through each x and y in the room
 
-          for (let x = 0; x < constants.roomDimensions; x++) {
-               for (let y = 0; y < constants.roomDimensions; y++) {
+          for (let x = 0; x < constants.roomDimensions; x += 1) {
+               for (let y = 0; y < constants.roomDimensions; y += 1) {
                     // Try to find the terrainValue
 
                     const terrainValue = terrain.get(x, y)
 
                     // If terrain is a wall
 
-                    if (terrainValue == TERRAIN_MASK_WALL) {
+                    if (terrainValue === TERRAIN_MASK_WALL) {
                          // Set this positions as 1 in the terrainCM
 
                          terrainCM.set(x, y, 255)
@@ -357,7 +357,7 @@ Room.prototype.get = function (roomObjectName) {
           for (const pos of adjacentPositions) {
                // Iterate if terrain for pos is a wall
 
-               if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
+               if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
                // Add pos to harvestPositions
 
@@ -516,7 +516,7 @@ Room.prototype.get = function (roomObjectName) {
           for (const pos of adjacentPositions) {
                // Iterate if terrain for pos is a wall
 
-               if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
+               if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
                // Add pos to harvestPositions
 
@@ -570,7 +570,7 @@ Room.prototype.get = function (roomObjectName) {
 
           // Loop through each fastFillerPos
 
-          for (let index = fastFillerPositions.length - 1; index >= 0; index--) {
+          for (let index = fastFillerPositions.length - 1; index >= 0; index -= 1) {
                // Get the pos using the index
 
                const pos = fastFillerPositions[index]
@@ -603,7 +603,7 @@ Room.prototype.get = function (roomObjectName) {
 
                     // Increase structure amount for this structureType on the adjacentPos
 
-                    adjacentStructuresByType[structureType]++
+                    adjacentStructuresByType[structureType] += 1
                }
 
                // If there is more than one adjacent extension and container, iterate
@@ -649,7 +649,7 @@ Room.prototype.get = function (roomObjectName) {
           for (const structure of structuresAsPos) {
                // If the structureType is container, inform the container's ID
 
-               if (structure.structureType == STRUCTURE_CONTAINER) return structure.id
+               if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
           }
 
           // Otherwise inform false
@@ -726,7 +726,7 @@ Room.prototype.get = function (roomObjectName) {
           // If the room is a commune, use sourceHarvesters. Otherwise use remoteHarvesters
 
           const harvesterNames =
-               room.memory.type == 'commune'
+               room.memory.type === 'commune'
                     ? room.myCreeps.source1Harvester
                            .concat(room.myCreeps.source2Harvester)
                            .concat(room.myCreeps.vanguard)
@@ -745,7 +745,7 @@ Room.prototype.get = function (roomObjectName) {
 
                const { sourceName } = creep.memory
 
-               if (sourceName) room.creepsOfSourceAmount[sourceName]++
+               if (sourceName) room.creepsOfSourceAmount[sourceName] += 1
 
                // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 
@@ -885,7 +885,7 @@ Room.prototype.get = function (roomObjectName) {
           for (const structure of structuresAsPos) {
                // If the structureType is container, inform the container's ID
 
-               if (structure.structureType == STRUCTURE_CONTAINER) return structure.id
+               if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
           }
 
           // Otherwise inform false
@@ -919,7 +919,7 @@ Room.prototype.get = function (roomObjectName) {
           for (const structure of structuresAsPos) {
                // If the structureType is container, inform the container's ID
 
-               if (structure.structureType == STRUCTURE_CONTAINER) return structure.id
+               if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
           }
 
           // Otherwise inform false
@@ -952,7 +952,7 @@ Room.prototype.get = function (roomObjectName) {
           for (const structure of structuresAsPos) {
                // If the structureType is container, inform the container's ID
 
-               if (structure.structureType == STRUCTURE_CONTAINER) return structure.id
+               if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
           }
 
           // Otherwise inform false
@@ -1004,7 +1004,7 @@ Room.prototype.get = function (roomObjectName) {
 
           // Inform a link's id if it's adjacent to the anchor
 
-          return links.find(link => getRangeBetween(anchor.x, anchor.y, link.pos.x, link.pos.y) == 1)?.id
+          return links.find(link => getRangeBetween(anchor.x, anchor.y, link.pos.x, link.pos.y) === 1)?.id
      }
 
      new RoomObject({
@@ -1043,7 +1043,7 @@ Room.prototype.get = function (roomObjectName) {
           for (const structure of structuresAsPos) {
                // If the structureType is link, inform the structures's ID
 
-               if (structure.structureType == STRUCTURE_LINK) return structure.id
+               if (structure.structureType === STRUCTURE_LINK) return structure.id
           }
 
           // Otherwise inform false
@@ -1246,7 +1246,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
      function generateRoute(): Route | undefined {
           // If the goal is in the same room as the origin, inform that no route is needed
 
-          if (opts.origin.roomName == opts.goal.pos.roomName) return undefined
+          if (opts.origin.roomName === opts.goal.pos.roomName) return undefined
 
           // Construct route by searching through rooms
 
@@ -1256,7 +1256,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                routeCallback(roomName: string) {
                     // If the goal is in the room, inform 1
 
-                    if (roomName == opts.goal.pos.roomName) return 1
+                    if (roomName === opts.goal.pos.roomName) return 1
 
                     // Get the room's memory
 
@@ -1278,7 +1278,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
           // If route doesn't work inform undefined
 
-          if (route == ERR_NO_PATH) return undefined
+          if (route === ERR_NO_PATH) return undefined
 
           // Otherwise inform the route
 
@@ -1309,7 +1309,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     if (
                          opts.typeWeights &&
                          Memory.rooms[roomName] &&
-                         opts.typeWeights[Memory.rooms[roomName].type] == Infinity
+                         opts.typeWeights[Memory.rooms[roomName].type] === Infinity
                     )
                          return false
 
@@ -1326,22 +1326,22 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                          // Configure y and loop through top exits
 
                          y = 0
-                         for (x = 0; x < 50; x++) cm.set(x, y, 255)
+                         for (x = 0; x < 50; x += 1) cm.set(x, y, 255)
 
                          // Configure x and loop through left exits
 
                          x = 0
-                         for (y = 0; y < 50; y++) cm.set(x, y, 255)
+                         for (y = 0; y < 50; y += 1) cm.set(x, y, 255)
 
                          // Configure y and loop through bottom exits
 
                          y = 49
-                         for (x = 0; x < 50; x++) cm.set(x, y, 255)
+                         for (x = 0; x < 50; x += 1) cm.set(x, y, 255)
 
                          // Configure x and loop through right exits
 
                          x = 49
-                         for (y = 0; y < 50; y++) cm.set(x, y, 255)
+                         for (y = 0; y < 50; y += 1) cm.set(x, y, 255)
                     }
 
                     weightStructures()
@@ -1413,8 +1413,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                          // Otherwise iterate through each x and y in the room
 
-                         for (let x = 0; x < constants.roomDimensions; x++) {
-                              for (let y = 0; y < constants.roomDimensions; y++) {
+                         for (let x = 0; x < constants.roomDimensions; x += 1) {
+                              for (let y = 0; y < constants.roomDimensions; y += 1) {
                                    // Loop through each costMatrix
 
                                    for (const weightCM of opts.weightCostMatrixes)
@@ -1661,17 +1661,17 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
      // Use the numbers to deduce some room types - quickly!
 
-     if (EW % 10 == 0 && NS % 10 == 0) {
+     if (EW % 10 === 0 && NS % 10 === 0) {
           room.memory.type = 'intersection'
           return
      }
 
-     if (EW % 10 == 0 || NS % 10 == 0) {
+     if (EW % 10 === 0 || NS % 10 === 0) {
           room.memory.type = 'highway'
           return
      }
 
-     if (EW % 5 == 0 && NS % 5 == 0) {
+     if (EW % 5 === 0 && NS % 5 === 0) {
           room.memory.type = 'keeperCenter'
           return
      }
@@ -1709,7 +1709,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
                room.memory.owner = controller.owner.username
                room.memory.level = controller.level
                room.memory.powerEnabled = controller.isPowerEnabled
-               room.memory.terminal = room.terminal != undefined
+               room.memory.terminal = room.terminal !== undefined
                room.memory.storedEnergy = room.findStoredResourceAmount(RESOURCE_ENERGY)
                return
           }
@@ -1727,11 +1727,11 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
                // If I am the reserver, inform false
 
-               if (controller.reservation.username == constants.me) return false
+               if (controller.reservation.username === constants.me) return false
 
                // If the reserver is an Invader, inform false
 
-               if (controller.reservation.username == 'Invader') return false
+               if (controller.reservation.username === 'Invader') return false
 
                // Get roads
 
@@ -1743,7 +1743,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
                // If there are roads or containers or sources harvested, inform false
 
-               if (roads.length == 0 && containers.length == 0 && !harvestedSources) return false
+               if (roads.length === 0 && containers.length === 0 && !harvestedSources) return false
 
                // If the controller is not reserved by an ally
 
@@ -1770,16 +1770,16 @@ Room.prototype.findType = function (scoutingRoom: Room) {
                if (controller.reservation) {
                     // If I am the reserver, inform false
 
-                    if (controller.reservation.username == constants.me) return false
+                    if (controller.reservation.username === constants.me) return false
 
                     // If the reserver is an Invader, inform false
 
-                    if (controller.reservation.username == 'Invader') return false
+                    if (controller.reservation.username === 'Invader') return false
                }
 
                // If there are no sources harvested
 
-               if (harvestedSources.length == 0) return false
+               if (harvestedSources.length === 0) return false
 
                // Find creeps that I don't own that aren't invaders
 
@@ -1790,7 +1790,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
                for (const creep of creepsNotMine) {
                     // If the creep is an invdader, iterate
 
-                    if (creep.owner.username == 'Invader') continue
+                    if (creep.owner.username === 'Invader') continue
 
                     // If the creep has work parts
 
@@ -1843,7 +1843,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
      if (distanceFromScoutingRoom < 4) {
           // If the room is already a remote of the scoutingRoom
 
-          if (room.memory.type == 'remote' && scoutingRoom.name == room.memory.commune) return true
+          if (room.memory.type === 'remote' && scoutingRoom.name === room.memory.commune) return true
 
           // Get the anchor from the scoutingRoom, stopping if it's undefined
 
@@ -1898,7 +1898,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
           // If the room isn't already a remote
 
-          if (room.memory.type != 'remote' || !Memory.communes.includes(room.memory.commune)) {
+          if (room.memory.type !== 'remote' || !Memory.communes.includes(room.memory.commune)) {
                room.memory.type = 'remote'
 
                // Assign the room's commune as the scoutingRoom
@@ -1941,7 +1941,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
           return true
      }
 
-     if (room.memory.type != 'remote') return false
+     if (room.memory.type !== 'remote') return false
 
      if (!Memory.communes.includes(room.memory.commune)) return false
 
@@ -2054,9 +2054,9 @@ Room.prototype.distanceTransform = function (
 
      if (!initialCM) initialCM = room.get('terrainCM')
 
-     for (let x = Math.max(x1 - 1, 0); x <= Math.min(x2 + 1, constants.roomDimensions); x++) {
-          for (let y = Math.max(y1 - 1, 0); y <= Math.min(y2 + 1, constants.roomDimensions); y++) {
-               distanceCM.set(x, y, initialCM.get(x, y) == 255 ? 0 : 255)
+     for (let x = Math.max(x1 - 1, 0); x <= Math.min(x2 + 1, constants.roomDimensions); x += 1) {
+          for (let y = Math.max(y1 - 1, 0); y <= Math.min(y2 + 1, constants.roomDimensions); y += 1) {
+               distanceCM.set(x, y, initialCM.get(x, y) === 255 ? 0 : 255)
           }
      }
 
@@ -2068,8 +2068,8 @@ Room.prototype.distanceTransform = function (
 
      // Loop through the xs and ys inside the bounds
 
-     for (let x = x1; x <= x2; x++) {
-          for (let y = y1; y <= y2; y++) {
+     for (let x = x1; x <= x2; x += 1) {
+          for (let y = y1; y <= y2; y += 1) {
                top = distanceCM.get(x, y - 1)
                left = distanceCM.get(x - 1, y)
                topLeft = distanceCM.get(x - 1, y - 1)
@@ -2090,8 +2090,8 @@ Room.prototype.distanceTransform = function (
 
      // Loop through the xs and ys inside the bounds
 
-     for (let x = x2; x >= x1; x--) {
-          for (let y = y2; y >= y1; y--) {
+     for (let x = x2; x >= x1; x -= 1) {
+          for (let y = y2; y >= y1; y -= 1) {
                bottom = distanceCM.get(x, y + 1)
                right = distanceCM.get(x + 1, y)
                bottomRight = distanceCM.get(x + 1, y + 1)
@@ -2109,8 +2109,8 @@ Room.prototype.distanceTransform = function (
      if (enableVisuals && Memory.roomVisuals) {
           // Loop through the xs and ys inside the bounds
 
-          for (let x = x1; x <= x2; x++) {
-               for (let y = y1; y <= y2; y++) {
+          for (let x = x1; x <= x2; x += 1) {
+               for (let y = y1; y <= y2; y += 1) {
                     room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                          fill: `hsl(${200}${distanceCM.get(x, y) * 10}, 100%, 60%)`,
                          opacity: 0.4,
@@ -2138,9 +2138,9 @@ Room.prototype.specialDT = function (
 
      if (!initialCM) initialCM = room.get('terrainCM')
 
-     for (let x = x1; x <= x2; x++) {
-          for (let y = y1; y <= y2; y++) {
-               distanceCM.set(x, y, initialCM.get(x, y) == 255 ? 0 : 255)
+     for (let x = x1; x <= x2; x += 1) {
+          for (let y = y1; y <= y2; y += 1) {
+               distanceCM.set(x, y, initialCM.get(x, y) === 255 ? 0 : 255)
           }
      }
 
@@ -2149,8 +2149,8 @@ Room.prototype.specialDT = function (
 
      // Loop through the xs and ys inside the bounds
 
-     for (let x = x1; x <= x2; x++) {
-          for (let y = y1; y <= y2; y++) {
+     for (let x = x1; x <= x2; x += 1) {
+          for (let y = y1; y <= y2; y += 1) {
                top = distanceCM.get(x, y - 1)
                left = distanceCM.get(x - 1, y)
 
@@ -2163,8 +2163,8 @@ Room.prototype.specialDT = function (
 
      // Loop through the xs and ys inside the bounds
 
-     for (let x = x2; x >= x1; x--) {
-          for (let y = y2; y >= y1; y--) {
+     for (let x = x2; x >= x1; x -= 1) {
+          for (let y = y2; y >= y1; y -= 1) {
                bottom = distanceCM.get(x, y + 1)
                right = distanceCM.get(x + 1, y)
 
@@ -2175,8 +2175,8 @@ Room.prototype.specialDT = function (
      if (enableVisuals && Memory.roomVisuals) {
           // Loop through the xs and ys inside the bounds
 
-          for (let x = x1; x <= x2; x++) {
-               for (let y = y1; y <= y2; y++) {
+          for (let x = x1; x <= x2; x += 1) {
+               for (let y = y1; y <= y2; y += 1) {
                     room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                          fill: `hsl(${200}${distanceCM.get(x, y) * 10}, 100%, 60%)`,
                          opacity: 0.4,
@@ -2227,10 +2227,10 @@ Room.prototype.floodFill = function (seeds) {
           for (const pos of thisGeneration) {
                // If the depth isn't 0
 
-               if (depth != 0) {
+               if (depth !== 0) {
                     // Iterate if the terrain is a wall
 
-                    if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
+                    if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
                     // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
 
@@ -2254,7 +2254,7 @@ Room.prototype.floodFill = function (seeds) {
                for (const adjacentPos of adjacentPositions) {
                     // Iterate if the adjacent pos has been visited or isn't a tile
 
-                    if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
+                    if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
 
                     // Otherwise record that it has been visited
 
@@ -2272,7 +2272,7 @@ Room.prototype.floodFill = function (seeds) {
 
           // Increment depth
 
-          depth++
+          depth += 1
      }
 
      return floodCM
@@ -2291,7 +2291,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
           // If the value is to avoid, inform false
 
-          if (posValue == 255) return false
+          if (posValue === 255) return false
 
           // If the posValue is less than the requiredValue, inform false
 
@@ -2313,7 +2313,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                for (const adjacentPos of adjacentPositions) {
                     // If the adjacentPos isn't a roadPosition, iterate
 
-                    if (opts.roadCM.get(adjacentPos.x, adjacentPos.y) != 1) continue
+                    if (opts.roadCM.get(adjacentPos.x, adjacentPos.y) !== 1) continue
 
                     // Otherwise set nearbyRoad to true and stop the loop
 
@@ -2396,7 +2396,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                          // Iterate if the adjacent pos has been visited or isn't a tile
 
-                         if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
+                         if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
 
                          // Otherwise record that it has been visited
 
@@ -2404,7 +2404,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                          // If canUseWalls is enabled and the terrain isnt' a wall, disable canUseWalls
 
-                         if (canUseWalls && opts.CM.get(adjacentPos.x, adjacentPos.y) != 255) canUseWalls = false
+                         if (canUseWalls && opts.CM.get(adjacentPos.x, adjacentPos.y) !== 255) canUseWalls = false
 
                          // Add it tofastFillerSide the next gen
 
@@ -2417,8 +2417,8 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                thisGeneration = nextGeneration
           }
 
-          opts.reduceIterations--
-          opts.requiredValue--
+          opts.reduceIterations -= 1
+          opts.requiredValue -= 1
      }
 
      // Inform false if no value was found
@@ -2439,10 +2439,10 @@ Room.prototype.pathVisual = function (path, color) {
 
      const currentRoomName = path[0].roomName
 
-     for (let index = 0; index < path.length; index++) {
+     for (let index = 0; index < path.length; index += 1) {
           const pos = path[index]
 
-          if (pos.roomName == currentRoomName) continue
+          if (pos.roomName === currentRoomName) continue
 
           path.splice(index, path.length - 1)
           break
@@ -2564,7 +2564,7 @@ Creep.prototype.findOptimalSourceName = function () {
 
           // Otherwise increase the creepThreshold
 
-          creepThreshold++
+          creepThreshold += 1
      }
 
      // No source was found, inform false
@@ -2594,7 +2594,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions, rampartPlans)
 
           // If the pos has already been visited, iterate
 
-          if (visitedCM.get(pos.x, pos.y) == 1) continue
+          if (visitedCM.get(pos.x, pos.y) === 1) continue
 
           // Record that this pos has been visited
 
@@ -2639,7 +2639,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions, rampartPlans)
 
                          // Iterate if the adjacent pos has been visited or isn't a tile
 
-                         if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
+                         if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
 
                          // Otherwise record that it has been visited
 
@@ -2647,7 +2647,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions, rampartPlans)
 
                          // If a rampart is not planned for this position, iterate
 
-                         if (rampartPlans.get(adjacentPos.x, adjacentPos.y) != 1) continue
+                         if (rampartPlans.get(adjacentPos.x, adjacentPos.y) !== 1) continue
 
                          // Add it to the next gen and this group
 
@@ -2664,7 +2664,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions, rampartPlans)
 
           // Increase the groupIndex
 
-          groupIndex++
+          groupIndex += 1
      }
 
      // Inform groupedPositions
@@ -2694,7 +2694,7 @@ Room.prototype.advancedConstructStructurePlans = function () {
                const stampAnchor = unpackAsPos(packedStampAnchor)
 
                for (const structureType in stamp.structures) {
-                    if (structureType == 'empty') continue
+                    if (structureType === 'empty') continue
 
                     // If there are already sufficient structures + cSites
 
@@ -2705,11 +2705,11 @@ Room.prototype.advancedConstructStructurePlans = function () {
                     )
                          continue
 
-                    if (structureType == STRUCTURE_RAMPART && (!room.storage || room.controller.level < 4)) continue
+                    if (structureType === STRUCTURE_RAMPART && (!room.storage || room.controller.level < 4)) continue
 
                     // If the structureType is a road and RCL 3 extensions aren't built, stop
 
-                    if (structureType == STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue
+                    if (structureType === STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue
 
                     const positions = stamp.structures[structureType]
 
@@ -2751,7 +2751,7 @@ Room.prototype.advancedConstructStructurePlans = function () {
 
                // If the structureType is empty, stop
 
-               if (structureType == 'empty') return
+               if (structureType === 'empty') return
 
                // Display visuals if enabled
 
@@ -2786,7 +2786,7 @@ Room.prototype.advancedConstructStructurePlans = function () {
                     for (const adjacentPos of adjacentPositions) {
                          // Iterate if the adjacent pos has been visited or isn't a tile
 
-                         if (visitedCM.get(adjacentPos.x, adjacentPos.y) == 1) continue
+                         if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
 
                          // Otherwise record that it has been visited
 
@@ -2865,8 +2865,8 @@ Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
 
      // Loop through coordinates inside the rect
 
-     for (let x = x1; x <= x2; x++) {
-          for (let y = y1; y <= y2; y++) {
+     for (let x = x1; x <= x2; x += 1) {
+          for (let y = y1; y <= y2; y += 1) {
                // Iterate if the pos doesn't map onto a room
 
                if (x < 0 || x >= constants.roomDimensions || y < 0 || y >= constants.roomDimensions) continue
@@ -2907,7 +2907,7 @@ Room.prototype.getPartsOfRoleAmount = function (role, type) {
 
           // Otherwise increase partsAmount by the creep's parts count of the specified type
 
-          partsAmount += creep.body.filter(part => part.type == type).length
+          partsAmount += creep.body.filter(part => part.type === type).length
      }
 
      // Inform partsAmount
@@ -2928,7 +2928,7 @@ Room.prototype.findSourcesByEfficacy = function () {
 }
 
 Room.prototype.createClaimRequest = function () {
-     if (this.get('sources').length != 2) return false
+     if (this.get('sources').length !== 2) return false
 
      if (this.memory.notClaimable) return false
 
@@ -2963,9 +2963,9 @@ Room.prototype.findSwampPlainsRatio = function () {
 
      const terrain = this.getTerrain()
 
-     for (let x = 0; x < constants.roomDimensions; x++) {
-          for (let y = 0; y < constants.roomDimensions; y++) {
-               terrainAmounts[terrain.get(x, y)]++
+     for (let x = 0; x < constants.roomDimensions; x += 1) {
+          for (let y = 0; y < constants.roomDimensions; y += 1) {
+               terrainAmounts[terrain.get(x, y)] += 1
           }
      }
 

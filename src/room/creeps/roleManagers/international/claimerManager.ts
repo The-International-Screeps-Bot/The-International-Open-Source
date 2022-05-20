@@ -22,7 +22,7 @@ export function claimerManager(room: Room, creepsOfRole: string[]) {
                claimRequestNeedsIndex.claimer
           ] = 0
 
-          if (room.name == claimTarget) {
+          if (room.name === claimTarget) {
                creep.claimRoom()
                continue
           }

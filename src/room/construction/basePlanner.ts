@@ -93,7 +93,7 @@ export function basePlanner(room: Room) {
           // So long as the count is more than 0
 
           while (opts.count > 0) {
-               opts.count--
+               opts.count -= 1
 
                // If an anchor already exists with this index
 
@@ -112,7 +112,7 @@ export function basePlanner(room: Room) {
 
                                    // If the structureType is a road
 
-                                   if (structureType == STRUCTURE_ROAD) {
+                                   if (structureType === STRUCTURE_ROAD) {
                                         // Record the position in roadCM and iterate
 
                                         roadCM.set(x, y, 1)
@@ -166,7 +166,7 @@ export function basePlanner(room: Room) {
 
                          // If the structureType is a road
 
-                         if (structureType == STRUCTURE_ROAD) {
+                         if (structureType === STRUCTURE_ROAD) {
                               // Record the position in roadCM and iterate
 
                               roadCM.set(x, y, 1)
@@ -483,12 +483,12 @@ export function basePlanner(room: Room) {
 
      // Iterate through each x and y in the room
 
-     for (let x = 0; x < constants.roomDimensions; x++) {
-          for (let y = 0; y < constants.roomDimensions; y++) {
+     for (let x = 0; x < constants.roomDimensions; x += 1) {
+          for (let y = 0; y < constants.roomDimensions; y += 1) {
                // Get the value of this pos in roadCM, iterate if the value is 0, iterate
 
                const roadValue = roadCM.get(x, y)
-               if (roadValue == 0) continue
+               if (roadValue === 0) continue
 
                // Otherwise assign 255 to this pos in baseCM
 
@@ -510,7 +510,7 @@ export function basePlanner(room: Room) {
           room.memory.stampAnchors.extension.length -
           room.memory.stampAnchors.sourceExtension.length
 
-     if (room.memory.stampAnchors.sourceLink.length + room.memory.stampAnchors.sourceExtension.length == 0) {
+     if (room.memory.stampAnchors.sourceLink.length + room.memory.stampAnchors.sourceExtension.length === 0) {
           // loop through sourceNames
 
           for (const sourceName of sourceNames) {
@@ -548,7 +548,7 @@ export function basePlanner(room: Room) {
 
                     // Iterate if the pos is a wall
 
-                    if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
+                    if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
                     // Otherwise
 
@@ -575,7 +575,7 @@ export function basePlanner(room: Room) {
 
                     // Decrease the extraExtensionsAmount and iterate
 
-                    extraExtensionsAmount--
+                    extraExtensionsAmount -= 1
                     continue
                }
           }

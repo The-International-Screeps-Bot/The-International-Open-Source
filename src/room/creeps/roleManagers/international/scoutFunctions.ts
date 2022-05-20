@@ -23,7 +23,7 @@ Scout.prototype.findScoutTarget = function () {
 
           // Iterate if the room statuses aren't the same
 
-          if (Game.map.getRoomStatus(roomName).status != Game.map.getRoomStatus(this.room.name).status) continue
+          if (Game.map.getRoomStatus(roomName).status !== Game.map.getRoomStatus(this.room.name).status) continue
 
           // If a scout already has this room as a target
 

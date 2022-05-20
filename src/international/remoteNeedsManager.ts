@@ -18,7 +18,7 @@ InternationalManager.prototype.remoteNeedsManager = function () {
                const remoteMemory = Memory.rooms[remoteName]
 
                if (remoteMemory.abandoned > 0) {
-                    remoteMemory.abandoned--
+                    remoteMemory.abandoned -= 1
 
                     for (const need in remoteMemory.needs) {
                          remoteMemory.needs[need] = 0
@@ -29,7 +29,7 @@ InternationalManager.prototype.remoteNeedsManager = function () {
 
                // See if the remote is reserved
 
-               const isReserved = remoteMemory.needs[remoteNeedsIndex.remoteReserver] == 0
+               const isReserved = remoteMemory.needs[remoteNeedsIndex.remoteReserver] === 0
 
                // If the remote is reserved
 
@@ -57,7 +57,7 @@ InternationalManager.prototype.remoteNeedsManager = function () {
 
                // Loop through each index of sourceEfficacies
 
-               for (let index = 0; index < remoteMemory.sourceEfficacies.length; index++) {
+               for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
                     // Get the efficacy using the index
 
                     const efficacy = remoteMemory.sourceEfficacies[index]

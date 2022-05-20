@@ -108,7 +108,7 @@ InternationalManager.prototype.tickConfig = function () {
 
           // Loop through the name of each of the commune's remotes
 
-          for (let index = room.memory.remotes.length - 1; index >= 0; index--) {
+          for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
                // Get the name of the remote using the index
 
                const roomName = room.memory.remotes[index]
@@ -119,7 +119,7 @@ InternationalManager.prototype.tickConfig = function () {
 
                // If the room isn't a remote, remove it from the remotes array
 
-               if (roomMemory.type != 'remote' || roomMemory.commune != room.name) {
+               if (roomMemory.type !== 'remote' || roomMemory.commune !== room.name) {
                     room.memory.remotes.splice(index, 1)
                     continue
                }
@@ -137,7 +137,7 @@ InternationalManager.prototype.tickConfig = function () {
                if (
                     remote &&
                     remote.controller.reservation &&
-                    remote.controller.reservation.username == constants.me &&
+                    remote.controller.reservation.username === constants.me &&
                     remote.controller.reservation.ticksToEnd >= roomMemory.sourceEfficacies.reduce((a, b) => a + b) * 2
                ) {
                     // Set the reservation need to 0

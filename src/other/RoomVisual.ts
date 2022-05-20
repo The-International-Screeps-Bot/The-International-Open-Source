@@ -52,7 +52,7 @@ function calculateFactoryLevelGapsPoly() {
      const c2 = Math.cos(angle)
      const s2 = Math.sin(angle)
 
-     for (let i = 0; i < 5; ++i) {
+     for (let i = 0; i < 5; i += 1) {
           result.push([0.0, 0.0])
           result.push([x, y])
           result.push([x * c1 - y * s1, x * s1 + y * c1])
@@ -501,10 +501,10 @@ RoomVisual.prototype.connectRoads = function (opts = {}) {
      const color = opts.color || colors.road || 'white'
      if (!this.roads) return this
      this.roads.forEach(r => {
-          for (let i = 1; i <= 4; i++) {
+          for (let i = 1; i <= 4; i += 1) {
                const d = dirs[i]
                const c = [r[0] + d[0], r[1] + d[1]]
-               const rd = _.some(this.roads, r => r[0] == c[0] && r[1] == c[1])
+               const rd = _.some(this.roads, r => r[0] === c[0] && r[1] === c[1])
                if (rd) {
                     this.line(r[0], r[1], c[0], c[1], {
                          color,

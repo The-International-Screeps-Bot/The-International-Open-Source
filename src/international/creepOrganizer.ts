@@ -47,7 +47,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
           // Record the creep's presence in the room
 
-          room.myCreepsAmount++
+          room.myCreepsAmount += 1
 
           // Add the creep's name to the position in its room
 
@@ -69,7 +69,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
           // Record that the creep's existence in its roomFrom
 
-          commune.creepsFromRoomAmount++
+          commune.creepsFromRoomAmount += 1
 
           // Get the creep's remoteName
 
@@ -80,7 +80,7 @@ InternationalManager.prototype.creepOrganizer = function () {
           if (remoteName && commune.memory.remotes.includes(remoteName)) {
                // If the creep is a source1RemoteHarvester
 
-               if (role == 'source1RemoteHarvester') {
+               if (role === 'source1RemoteHarvester') {
                     // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
 
                     Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
@@ -93,7 +93,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
                // If the creep is a source2RemoteHarvester
 
-               if (role == 'source2RemoteHarvester') {
+               if (role === 'source2RemoteHarvester') {
                     // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
 
                     Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
@@ -106,14 +106,14 @@ InternationalManager.prototype.creepOrganizer = function () {
 
                // Otherwise if the creep is a remoteHauler, reduce its remote's needs by their number of carry parts
 
-               if (role == 'remoteHauler') {
+               if (role === 'remoteHauler') {
                     Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(CARRY)
                     continue
                }
 
                // Otherwise if the creep is a remoteReserver
 
-               if (role == 'remoteReserver') {
+               if (role === 'remoteReserver') {
                     // Reduce its remote's needs by 1
 
                     Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= 1
@@ -126,7 +126,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
                // Otherwise if the creep is a remoteDefender
 
-               if (role == 'remoteDefender') {
+               if (role === 'remoteDefender') {
                     // Reduduce the remote's defender need proportionate to the creep's strength
 
                     Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.findStrength()

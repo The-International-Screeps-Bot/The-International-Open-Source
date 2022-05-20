@@ -17,11 +17,11 @@ export function constructionManager(room: Room) {
           if (room.global.plannedBase) {
                // Only run the planner every x ticks (temporary fix)
 
-               if (Game.time % Math.floor(Math.random() * 100) != 0) return
+               if (Game.time % Math.floor(Math.random() * 100) !== 0) return
 
                // If the construction site count is at its limit, stop
 
-               if (global.constructionSitesCount == 100) return
+               if (global.constructionSitesCount === 100) return
 
                // If the room is above 1 construction site, stop
 

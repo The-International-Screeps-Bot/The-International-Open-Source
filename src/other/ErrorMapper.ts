@@ -5,7 +5,7 @@ export class ErrorMapper {
      private static _consumer?: SourceMapConsumer
 
      public static get consumer(): SourceMapConsumer {
-          if (this._consumer == null) {
+          if (this._consumer === null) {
                this._consumer = new SourceMapConsumer(require('main.js.map'))
           }
 
@@ -42,7 +42,7 @@ export class ErrorMapper {
                          line: parseInt(match[3], 10),
                     })
 
-                    if (pos.line != null) {
+                    if (pos.line !== null) {
                          if (pos.name) {
                               outStack += `\n    at ${pos.name} (${pos.source}:${pos.line}:${pos.column})`
                          } else if (match[1]) {

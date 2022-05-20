@@ -12,7 +12,7 @@ HubHauler.prototype.travelToHub = function () {
 
      // Otherwise if the creep is on the hub, inform false
 
-     if (creep.pos.getRangeTo(hubAnchor) == 0) return false
+     if (creep.pos.getRangeTo(hubAnchor) === 0) return false
 
      // Otherwise move to the hub and inform true
 
@@ -46,7 +46,7 @@ HubHauler.prototype.balanceStoringStructures = function () {
      if (creep.memory.taskTarget) {
           // If the taskTarget isn't the storage or terminal, inform false
 
-          if (creep.memory.taskTarget != storage.id && creep.memory.taskTarget != terminal.id) return false
+          if (creep.memory.taskTarget !== storage.id && creep.memory.taskTarget !== terminal.id) return false
 
           // Otherwise transfer to the taskTarget. If a success, delete the taskTarget
 
@@ -123,7 +123,7 @@ HubHauler.prototype.fillHubLink = function () {
      if (creep.memory.taskTarget) {
           // If the taskTarget isn't the storage or terminal, inform false
 
-          if (creep.memory.taskTarget != storage.id && creep.memory.taskTarget != hubLink.id) return false
+          if (creep.memory.taskTarget !== storage.id && creep.memory.taskTarget !== hubLink.id) return false
 
           // Otherwise transfer to the taskTarget. If a success, delete the taskTarget
 

@@ -121,7 +121,7 @@ RoomTask.prototype.shouldStayActive = function () {
 
           // If the responder is not in this room, inform false
 
-          if (responder.room.name != task.roomName) return false
+          if (responder.room.name !== task.roomName) return false
      }
 
      // If the creator no longer exits, infom false

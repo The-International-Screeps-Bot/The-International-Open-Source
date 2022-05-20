@@ -1,3 +1,4 @@
+// eslint-disable
 /**
  * screeps-packrat
  * ---------------
@@ -226,13 +227,13 @@ function packRoomName(roomName: string) {
           const y = Number(match[4])
 
           let quadrant
-          if (xDir == 'W') {
-               if (yDir == 'N') {
+          if (xDir === 'W') {
+               if (yDir === 'N') {
                     quadrant = 0
                } else {
                     quadrant = 1
                }
-          } else if (yDir == 'N') {
+          } else if (yDir === 'N') {
                quadrant = 2
           } else {
                quadrant = 3
