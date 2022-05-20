@@ -46,5 +46,5 @@ jobs:
                node-version: 12.x
                cache: 'npm'
           - run: npm ci
-          - run: npm run lint --if-present
+          - run: npm run eslint '**/*'
             continue-on-error: true

@@ -5,8 +5,8 @@
      "main": "src/main.ts",
      "scripts": {
           "build": "rollup -c",
-          "lint": "eslint '**/*'",
-          "lint-fix": "eslint '**/*' --fix",
+          "lint": "eslint **/*",
+          "lint-fix": "eslint **/* --fix",
           "push-mmo": "rollup -c --environment DEST:mmo",
           "push-pserver": "rollup -c --environment DEST:pserver",
           "push-season": "rollup -c --environment DEST:season",
