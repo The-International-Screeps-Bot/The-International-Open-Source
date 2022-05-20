@@ -19,7 +19,7 @@ If you have specific questions or want to discuss the bot, DM me on discord: `Ca
 
 ![Room with bot](images/room.png)
 ![Map view with visuals](images/visuals.png)
-![Information panel](images/infopanel.png)
+![Information panel](images/grafana.png)
 
 ## Progress and Design
 

@@ -80,7 +80,18 @@ global.claim = function(claimRequest: string, communeName: string) {
     const roomMemory = Memory.rooms[communeName]
     if (!roomMemory) return 'No memory for ' + communeName
 
-    if (!Memory.claimRequests[claimRequest]) return 'There is no claimRequest for ' + claimRequest
+    let log = ``
+
+    if (!Memory.claimRequests[claimRequest]) {
+
+        Memory.claimRequests[claimRequest] = {
+            needs: [1, 20, 0],
+            score: 0
+        }
+
+        log += `Created a claimRequest for ` + claimRequest + `
+        `
+    }
 
     roomMemory.claimRequest = claimRequest
     return communeName + ' is responding to claimRequest for ' + claimRequest
