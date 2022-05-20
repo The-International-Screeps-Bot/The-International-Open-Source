@@ -1,6 +1,3 @@
 import 'powerCreepFunctions'
 
-export function powerCreepManager(room: Room) {
-
-
-}
+export function powerCreepManager(room: Room) {}

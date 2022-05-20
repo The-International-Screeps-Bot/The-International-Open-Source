@@ -2,41 +2,38 @@ import { SourceHarvester } from '../../creepClasses'
 import './sourceHarvesterFunctions'
 
 export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
+     // Loop through the names of the creeps of the role
 
-    // Loop through the names of the creeps of the role
+     for (const creepName of creepsOfRole) {
+          // Get the creep using its name
 
-    for (const creepName of creepsOfRole) {
+          const creep: SourceHarvester = Game.creeps[creepName]
 
-        // Get the creep using its name
+          // Try to move to source. If creep moved then iterate
 
-        const creep: SourceHarvester = Game.creeps[creepName]
+          if (creep.travelToSource()) continue
 
-        // Try to move to source. If creep moved then iterate
+          // Get the creeps sourceName
 
-        if (creep.travelToSource()) continue
+          const { sourceName } = creep.memory
+          // Get the sourceContainer for the creep's source
 
-        // Get the creeps sourceName
+          const sourceContainer: StructureContainer = room.get(`${sourceName}Container`)
 
-        const sourceName = creep.memory.sourceName,
+          // Try to harvest the designated source
 
-        // Get the sourceContainer for the creep's source
+          creep.advancedHarvestSource(room.get(sourceName))
 
-        sourceContainer: StructureContainer = room.get(`${sourceName}Container`)
+          // Try to transfer to source extensions, iterating if success
 
-        // Try to harvest the designated source
+          if (creep.transferToSourceExtensions()) continue
 
-        creep.advancedHarvestSource(room.get(sourceName))
+          // Try to transfer to the source link, iterating if success
 
-        // Try to transfer to source extensions, iterating if success
+          if (creep.transferToSourceLink()) continue
 
-        if (creep.transferToSourceExtensions()) continue
+          // Try to repair the sourceContainer
 
-        // Try to transfer to the source link, iterating if success
-
-        if (creep.transferToSourceLink()) continue
-
-        // Try to repair the sourceContainer
-
-        creep.repairSourceContainer(sourceContainer)
-    }
+          creep.repairSourceContainer(sourceContainer)
+     }
 }

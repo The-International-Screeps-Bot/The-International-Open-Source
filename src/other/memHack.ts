@@ -8,34 +8,32 @@
  * At top of loop() in main, memHack.modifyMemory()
  */
 class MemHack {
+     memory: Memory | undefined
 
-    memory: Memory | undefined
+     parseTime: number
 
-    parseTime: number
+     constructor() {
+          this.memory = undefined
+          this.parseTime = -1
+     }
 
-    constructor() {
+     init() {
+          const cpu = Game.cpu.getUsed()
 
-        this.memory = undefined
-        this.parseTime = -1
-    }
-    init() {
+          this.memory = Memory
 
-        let cpu = Game.cpu.getUsed()
+          Game.cpu.getUsed() - cpu
 
-        this.memory = Memory
+          this.memory = RawMemory._parsed
+     }
 
-        Game.cpu.getUsed() - cpu
+     modifyMemory() {
+          delete global.Memory
 
-        this.memory = RawMemory._parsed
-    }
-    modifyMemory() {
+          global.Memory = this.memory
 
-        delete global.Memory
-
-        global.Memory = this.memory
-
-        RawMemory._parsed = this.memory
-    }
+          RawMemory._parsed = this.memory
+     }
 }
 
 export const memHack = new MemHack()

@@ -1,77 +1,78 @@
-import { autoClaim, claimRequestNeedsIndex, constants } from "international/constants"
-import { advancedFindDistance, customLog } from "international/generalFunctions"
-import { internationalManager } from "international/internationalManager"
+import { autoClaim, claimRequestNeedsIndex, constants } from 'international/constants'
+import { advancedFindDistance, customLog } from 'international/generalFunctions'
+import { internationalManager } from 'international/internationalManager'
 
-Room.prototype.claimRequestManager = function() {
+Room.prototype.claimRequestManager = function () {
+     // If CPU logging is enabled, get the CPU used at the start
 
-    // If CPU logging is enabled, get the CPU used at the start
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+     // If there is an existing claimRequest and it's valid, check if there is claimer need
 
-    // If there is an existing claimRequest and it's valid, check if there is claimer need
+     if (this.memory.claimRequest) {
+          Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguard] = 20
 
-    if (this.memory.claimRequest) {
+          const claimTarget = Game.rooms[this.memory.claimRequest]
+          if (!claimTarget) {
+               Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer]++
+               return
+          }
 
-        Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguard] = 20
+          const spawns: StructureSpawn[] = claimTarget.get('spawn')
 
-        const claimTarget = Game.rooms[this.memory.claimRequest]
-        if (!claimTarget) {
+          // If there are no spawns, delete the claimRequest
 
-            Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer]++
-            return
-        }
+          if (spawns.length) {
+               delete Memory.claimRequests[this.memory.claimRequest]
+               delete this.memory.claimRequest
 
-        const spawns: StructureSpawn[] = claimTarget.get('spawn')
+               return
+          }
 
-        // If there are no spawns, delete the claimRequest
+          if (claimTarget.controller.my) return
 
-        if (spawns.length) {
+          Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer]++
+          return
+     }
 
-            delete Memory.claimRequests[this.memory.claimRequest]
-            delete this.memory.claimRequest
+     // Every 50 or so ticks
 
-            return
-        }
+     /* if (Game.time % Math.floor(Math.random() * 100) != 0) return */
 
-        if (claimTarget.controller.my) return
+     // If autoClaim is disabled
 
-        Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer]++
-        return
-    }
+     if (!autoClaim) return
 
-    // Every 50 or so ticks
+     // If there are enough communes for the GCL
 
-    /* if (Game.time % Math.floor(Math.random() * 100) != 0) return */
+     if (Game.gcl.level <= Memory.communes.length) return
 
-    // If autoClaim is disabled
+     // If a claimer can't be spawned
 
-    if (!autoClaim) return
+     if (this.energyCapacityAvailable < 750) return
 
-    // If there are enough communes for the GCL
+     for (const roomName of internationalManager.findClaimRequestsByScore()) {
+          const distance = advancedFindDistance(this.name, roomName, {
+               keeper: Infinity,
+               enemy: Infinity,
+               enemyRemote: Infinity,
+               ally: Infinity,
+               allyRemote: Infinity,
+          })
 
-    if (Game.gcl.level <= Memory.communes.length) return
+          if (distance > 10) continue
 
-    // If a claimer can't be spawned
+          this.memory.claimRequest = roomName
+          return
+     }
 
-    if (this.energyCapacityAvailable < 750) return
+     // If CPU logging is enabled, log the CPU used by this manager
 
-    for (const roomName of internationalManager.findClaimRequestsByScore()) {
-
-        const distance = advancedFindDistance(this.name, roomName, {
-            keeper: Infinity,
-            enemy: Infinity,
-            enemyRemote: Infinity,
-            ally: Infinity,
-            allyRemote: Infinity,
-        })
-
-        if (distance > 10) continue
-
-        this.memory.claimRequest = roomName
-        return
-    }
-
-    // If CPU logging is enabled, log the CPU used by this manager
-
-    if (Memory.cpuLogging) customLog('Claim Request Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
+     if (Memory.cpuLogging)
+          customLog(
+               'Claim Request Manager',
+               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+               undefined,
+               constants.colors.lightGrey,
+          )
 }

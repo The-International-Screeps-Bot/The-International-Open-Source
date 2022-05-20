@@ -1,44 +1,42 @@
-import { claimRequestNeedsIndex, constants } from "international/constants"
-import { Claimer } from "../../creepClasses"
+import { claimRequestNeedsIndex, constants } from 'international/constants'
+import { Claimer } from '../../creepClasses'
 
-Claimer.prototype.claimRoom = function() {
+Claimer.prototype.claimRoom = function () {
+     const creep = this
+     const { room } = creep
 
-    const creep = this,
-    room = creep.room
+     if (room.controller.my) return
 
-    if (room.controller.my) return
+     // If the creep is not in range to claim the controller
 
-    // If the creep is not in range to claim the controller
+     if (creep.pos.getRangeTo(room.controller) > 1) {
+          // Move to the controller and stop
 
-    if (creep.pos.getRangeTo(room.controller) > 1) {
+          creep.createMoveRequest({
+               origin: creep.pos,
+               goal: { pos: room.controller.pos, range: 1 },
+               avoidEnemyRanges: true,
+               plainCost: 1,
+               swampCost: 1,
+               typeWeights: {
+                    keeper: Infinity,
+               },
+          })
 
-        // Move to the controller and stop
+          return
+     }
 
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: room.controller.pos, range: 1 },
-            avoidEnemyRanges: true,
-            plainCost: 1,
-            swampCost: 1,
-            typeWeights: {
-                keeper: Infinity,
-            }
-        })
+     // If the owner or reserver isn't me
 
-        return
-    }
+     if (
+          room.controller.owner ||
+          (room.controller.reservation && room.controller.reservation.username != constants.me)
+     ) {
+          creep.attackController(room.controller)
+          return
+     }
 
-    // If the owner or reserver isn't me
+     // Otherwise, claim the controller. If the successful, remove claimerNeed
 
-    if (room.controller.owner ||
-        (room.controller.reservation &&
-        room.controller.reservation.username != constants.me)) {
-
-        creep.attackController(room.controller)
-        return
-    }
-
-    // Otherwise, claim the controller. If the successful, remove claimerNeed
-
-    creep.claimController(room.controller)
+     creep.claimController(room.controller)
 }

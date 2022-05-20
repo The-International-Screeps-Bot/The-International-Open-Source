@@ -1,162 +1,168 @@
-import { findObjectWithID, unpackAsRoomPos } from "international/generalFunctions";
-import { HubHauler } from "room/creeps/creepClasses";
+import { findObjectWithID, unpackAsRoomPos } from 'international/generalFunctions'
+import { HubHauler } from 'room/creeps/creepClasses'
 
-HubHauler.prototype.travelToHub = function() {
+HubHauler.prototype.travelToHub = function () {
+     const creep = this
+     const { room } = creep
 
-    const creep = this,
-    room = creep.room
+     // Get the hub, informing false if it's undefined
 
-    // Get the hub, informing false if it's undefined
+     const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
+     if (!hubAnchor) return true
 
-    const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
-    if(!hubAnchor) return true
+     // Otherwise if the creep is on the hub, inform false
 
-    // Otherwise if the creep is on the hub, inform false
+     if (creep.pos.getRangeTo(hubAnchor) == 0) return false
 
-    if (creep.pos.getRangeTo(hubAnchor) == 0) return false
+     // Otherwise move to the hub and inform true
 
-    // Otherwise move to the hub and inform true
+     creep.say('⏩H')
 
-    creep.say('⏩H')
+     creep.createMoveRequest({
+          origin: creep.pos,
+          goal: { pos: hubAnchor, range: 0 },
+     })
 
-    creep.createMoveRequest({
-        origin: creep.pos,
-        goal: { pos: hubAnchor, range: 0 }
-    })
-
-    return true
+     return true
 }
 
-HubHauler.prototype.balanceStoringStructures = function() {
+HubHauler.prototype.balanceStoringStructures = function () {
+     const creep = this
+     const { room } = creep
 
-    const creep = this,
-    room = creep.room,
+     // Define the storage and termina
 
-    // Define the storage and termina
+     const { storage } = room
+     const { terminal } = room
 
-    storage = room.storage,
-    terminal = room.terminal
+     // If there is no terminal or storage, inform false
 
-    // If there is no terminal or storage, inform false
+     if (!storage || !terminal) return false
 
-    if (!storage || !terminal) return false
+     creep.say('BSS')
 
-    creep.say('BSS')
+     // If the creep has a taskTarget
 
-    // If the creep has a taskTarget
+     if (creep.memory.taskTarget) {
+          // If the taskTarget isn't the storage or terminal, inform false
 
-    if (creep.memory.taskTarget) {
+          if (creep.memory.taskTarget != storage.id && creep.memory.taskTarget != terminal.id) return false
 
-        // If the taskTarget isn't the storage or terminal, inform false
+          // Otherwise transfer to the taskTarget. If a success, delete the taskTarget
 
-        if (creep.memory.taskTarget != storage.id && creep.memory.taskTarget != terminal.id) return false
+          if (creep.advancedTransfer(findObjectWithID(creep.memory.taskTarget), RESOURCE_ENERGY))
+               delete creep.memory.taskTarget
 
-        // Otherwise transfer to the taskTarget. If a success, delete the taskTarget
+          // And inform true
 
-        if (creep.advancedTransfer(findObjectWithID(creep.memory.taskTarget), RESOURCE_ENERGY)) delete creep.memory.taskTarget
+          return true
+     }
 
-        // And inform true
+     // If the terminal is unbalanced and the storage has free capacity
 
-        return true
-    }
+     if (
+          terminal.store.getUsedCapacity(RESOURCE_ENERGY) >
+               storage.store.getUsedCapacity(RESOURCE_ENERGY) * 0.3 + creep.store.getCapacity() &&
+          storage.store.getFreeCapacity() > creep.store.getCapacity()
+     ) {
+          // Withdraw from the unbalanced structure
 
-    // If the terminal is unbalanced and the storage has free capacity
+          creep.withdraw(terminal, RESOURCE_ENERGY)
 
-    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) > storage.store.getUsedCapacity(RESOURCE_ENERGY) * 0.3 + creep.store.getCapacity() && storage.store.getFreeCapacity() > creep.store.getCapacity()) {
+          // Assign the taskTarget as the reciever
 
-        // Withdraw from the unbalanced structure
+          creep.memory.taskTarget = storage.id
 
-        creep.withdraw(terminal, RESOURCE_ENERGY)
+          // And inform true
 
-        // Assign the taskTarget as the reciever
+          return true
+     }
 
-        creep.memory.taskTarget = storage.id
+     // If the storage is unbalanced and the terminal has free capacity
 
-        // And inform true
+     if (
+          storage.store.getUsedCapacity(RESOURCE_ENERGY) * 0.3 >
+               terminal.store.getUsedCapacity(RESOURCE_ENERGY) + creep.store.getCapacity() &&
+          terminal.store.getFreeCapacity() > creep.store.getCapacity()
+     ) {
+          // Withdraw from the unbalanced structure
 
-        return true
-    }
+          creep.withdraw(storage, RESOURCE_ENERGY)
 
-    // If the storage is unbalanced and the terminal has free capacity
+          // Assign the taskTarget as the reciever
 
-    if (storage.store.getUsedCapacity(RESOURCE_ENERGY) * 0.3 > terminal.store.getUsedCapacity(RESOURCE_ENERGY) + creep.store.getCapacity() && terminal.store.getFreeCapacity() > creep.store.getCapacity()) {
+          creep.memory.taskTarget = terminal.id
 
-        // Withdraw from the unbalanced structure
+          // And inform true
 
-        creep.withdraw(storage, RESOURCE_ENERGY)
+          return true
+     }
 
-        // Assign the taskTarget as the reciever
+     // Inform false
 
-        creep.memory.taskTarget = terminal.id
-
-        // And inform true
-
-        return true
-    }
-
-    // Inform false
-
-    return false
+     return false
 }
 
-HubHauler.prototype.fillHubLink = function() {
+HubHauler.prototype.fillHubLink = function () {
+     const creep = this
+     const { room } = creep
 
-    const creep = this,
-    room = creep.room,
+     // Define the storage and hubLink
 
-    // Define the storage and hubLink
+     const { storage } = room
+     const hubLink: StructureLink | undefined = room.get('hubLink')
 
-    storage = room.storage,
-    hubLink: StructureLink | undefined = room.get('hubLink')
+     // If there is no terminal or hubLink, inform false
 
-    // If there is no terminal or hubLink, inform false
+     if (!storage || !hubLink) return false
 
-    if (!storage || !hubLink) return false
+     creep.say('FHL')
 
-    creep.say('FHL')
+     // If the creep has a taskTarget
 
-    // If the creep has a taskTarget
+     if (creep.memory.taskTarget) {
+          // If the taskTarget isn't the storage or terminal, inform false
 
-    if (creep.memory.taskTarget) {
+          if (creep.memory.taskTarget != storage.id && creep.memory.taskTarget != hubLink.id) return false
 
-        // If the taskTarget isn't the storage or terminal, inform false
+          // Otherwise transfer to the taskTarget. If a success, delete the taskTarget
 
-        if (creep.memory.taskTarget != storage.id && creep.memory.taskTarget != hubLink.id) return false
+          if (creep.advancedTransfer(findObjectWithID(creep.memory.taskTarget), RESOURCE_ENERGY))
+               delete creep.memory.taskTarget
 
-        // Otherwise transfer to the taskTarget. If a success, delete the taskTarget
+          // And inform true
 
-        if (creep.advancedTransfer(findObjectWithID(creep.memory.taskTarget), RESOURCE_ENERGY)) delete creep.memory.taskTarget
+          return true
+     }
 
-        // And inform true
+     // Get the fastFillerLink
 
-        return true
-    }
+     const fastFillerLink: StructureLink | undefined = room.get('fastFillerLink')
 
-    // Get the fastFillerLink
+     // If the controller is near to downgrade, the fastFillerLink is insufficiently full, or the storage is sufficiently full and the hubLink is not full
 
-    const fastFillerLink: StructureLink | undefined = room.get('fastFillerLink')
+     if (
+          (room.controller.ticksToDowngrade < 10000 ||
+               (fastFillerLink &&
+                    fastFillerLink.store.getUsedCapacity(RESOURCE_ENERGY) <
+                         fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) ||
+               storage.store.getUsedCapacity(RESOURCE_ENERGY) > creep.store.getCapacity(RESOURCE_ENERGY)) &&
+          hubLink.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+     ) {
+          // Withdraw from the unbalanced structure
 
-    // If the controller is near to downgrade, the fastFillerLink is insufficiently full, or the storage is sufficiently full and the hubLink is not full
+          creep.withdraw(storage, RESOURCE_ENERGY)
 
-    if (((room.controller.ticksToDowngrade < 10000 ||
-        fastFillerLink && fastFillerLink.store.getUsedCapacity(RESOURCE_ENERGY) < fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) ||
-        storage.store.getUsedCapacity(RESOURCE_ENERGY) > creep.store.getCapacity(RESOURCE_ENERGY)) &&
-        hubLink.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+          // Assign the taskTarget as the reciever
 
-        // Withdraw from the unbalanced structure
+          creep.memory.taskTarget = hubLink.id
 
-        creep.withdraw(storage, RESOURCE_ENERGY)
+          // And inform true
 
-        // Assign the taskTarget as the reciever
+          return true
+     }
 
-        creep.memory.taskTarget = hubLink.id
+     // Inform false
 
-        // And inform true
-
-        return true
-    }
-
-    // Inform false
-
-    return false
+     return false
 }

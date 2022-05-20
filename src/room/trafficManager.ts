@@ -1,36 +1,33 @@
-import { constants } from "international/constants"
-import { customLog } from "international/generalFunctions"
+import { constants } from 'international/constants'
+import { customLog } from 'international/generalFunctions'
 
 export function trafficManager(room: Room) {
+     if (!room.myCreepsAmount) return
 
-    if (!room.myCreepsAmount) return
+     // If CPU logging is enabled, get the CPU used at the start
 
-    // If CPU logging is enabled, get the CPU used at the start
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+     // Loop through each x and y in the room
 
-    // Loop through each x and y in the room
+     for (let x = 0; x < constants.roomDimensions; x++) {
+          for (let y = 0; y < constants.roomDimensions; y++) {
+               // Construct a packedPos from the coordinates
 
-    for (let x = 0; x < constants.roomDimensions; x++) {
-        for (let y = 0; y < constants.roomDimensions; y++) {
+               const packedPos = x * constants.roomDimensions + y
 
-            // Construct a packedPos from the coordinates
+               // Loop through those creeps
 
-            const packedPos = x * constants.roomDimensions + y
+               for (const creepName of room.moveRequests[packedPos]) {
+                    // Get the creep with the name of creepName
 
-            // Loop through those creeps
+                    const creep = Game.creeps[creepName]
 
-            for (const creepName of room.moveRequests[packedPos]) {
+                    // Handle traffic for this position
 
-                // Get the creep with the name of creepName
+                    creep.recurseMoveRequest(packedPos)
 
-                const creep = Game.creeps[creepName]
-
-                // Handle traffic for this position
-
-                creep.recurseMoveRequest(packedPos)
-
-                /* // Find the pos stringPos represents
+                    /* // Find the pos stringPos represents
 
                 const pos: Pos = JSON.parse(stringPos)
 
@@ -54,9 +51,9 @@ export function trafficManager(room: Room) {
 
                 const creepAtPos = Game.creeps[creepNameAtPos] */
 
-                // If there is a creep that moves through pull is in the way and it isn't actively getting pulled
+                    // If there is a creep that moves through pull is in the way and it isn't actively getting pulled
 
-                /* if (creepAtPos.memory.getPulled && !creepAtPos.gettingPulled) {
+                    /* if (creepAtPos.memory.getPulled && !creepAtPos.gettingPulled) {
 
                     // Remove information about previous move requests from the creep
 
@@ -128,7 +125,7 @@ export function trafficManager(room: Room) {
                     break
                 } */
 
-                /* // If the creepAtPos has a moveRequest
+                    /* // If the creepAtPos has a moveRequest
 
                 if (creepAtPos.moveRequest) {
 
@@ -149,7 +146,7 @@ export function trafficManager(room: Room) {
 
                 if(creepAtPos.fatigue > 0) break */
 
-                /* // If the last pos in the creep's path has creepAtPos
+                    /* // If the last pos in the creep's path has creepAtPos
 
                 if (arePositionsEqual(creep.memory.path[creep.memory.path.length - 1], pos)) {
 
@@ -194,16 +191,22 @@ export function trafficManager(room: Room) {
                     break
                 } */
 
-                /* creep.tradePositions(creepAtPos)
+                    /* creep.tradePositions(creepAtPos)
 
                 // And stop the loop
 
                 break */
-            }
-        }
-    }
+               }
+          }
+     }
 
-    // If CPU logging is enabled, log the CPU used by this manager
+     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.cpuLogging) customLog('Traffic Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
+     if (Memory.cpuLogging)
+          customLog(
+               'Traffic Manager',
+               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+               undefined,
+               constants.colors.lightGrey,
+          )
 }

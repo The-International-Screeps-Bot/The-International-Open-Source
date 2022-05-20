@@ -1,8 +1,5 @@
-import { Duo } from "./squads";
+import { Duo } from './squads'
 
-Duo.prototype.do = function() {
-
-    const duo = this
-
-    
+Duo.prototype.do = function () {
+     const duo = this
 }

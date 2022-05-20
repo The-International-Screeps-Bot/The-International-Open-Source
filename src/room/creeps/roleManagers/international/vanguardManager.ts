@@ -1,50 +1,49 @@
 import { claimRequestNeedsIndex } from 'international/constants'
-import {  Vanguard } from '../../creepClasses'
+import { Vanguard } from '../../creepClasses'
 import './vanguardFunctions'
 
 export function vanguardManager(room: Room, creepsOfRole: string[]) {
+     // Loop through the names of the creeps of the role
 
-    // Loop through the names of the creeps of the role
+     for (const creepName of creepsOfRole) {
+          // Get the creep using its name
 
-    for (const creepName of creepsOfRole) {
+          const creep: Vanguard = Game.creeps[creepName]
 
-        // Get the creep using its name
+          const claimTarget = Memory.rooms[creep.memory.communeName].claimRequest
 
-        const creep: Vanguard = Game.creeps[creepName],
+          // If the creep has no claim target, stop
 
-        claimTarget = Memory.rooms[creep.memory.communeName].claimRequest
+          if (!claimTarget) return
 
-        // If the creep has no claim target, stop
+          Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[
+               claimRequestNeedsIndex.vanguard
+          ] -= creep.partsOfType(WORK)
 
-        if (!claimTarget) return
+          creep.say(claimTarget)
 
-        Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[claimRequestNeedsIndex.vanguard] -= creep.partsOfType(WORK)
+          if (room.name == claimTarget) {
+               creep.buildRoom()
+               continue
+          }
 
-        creep.say(claimTarget)
+          // Otherwise if the creep is not in the claimTarget
 
-        if (room.name == claimTarget) {
+          // Move to it
 
-            creep.buildRoom()
-            continue
-        }
-
-        // Otherwise if the creep is not in the claimTarget
-
-        // Move to it
-
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, claimTarget), range: 25 },
-            avoidEnemyRanges: true,
-            cacheAmount: 200,
-            typeWeights: {
-                enemy: Infinity,
-                ally: Infinity,
-                keeper: Infinity,
-                commune: 1,
-                neutral: 1,
-                highway: 1,
-            }
-        })
-    }
+          creep.createMoveRequest({
+               origin: creep.pos,
+               goal: { pos: new RoomPosition(25, 25, claimTarget), range: 25 },
+               avoidEnemyRanges: true,
+               cacheAmount: 200,
+               typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    commune: 1,
+                    neutral: 1,
+                    highway: 1,
+               },
+          })
+     }
 }

@@ -1,205 +1,214 @@
-import { allyList, constants } from "international/constants"
-import { findObjectWithID, getRange, unpackAsRoomPos } from "international/generalFunctions"
+import { allyList, constants } from 'international/constants'
+import { findObjectWithID, getRange, unpackAsRoomPos } from 'international/generalFunctions'
 
 Object.defineProperties(Room.prototype, {
+     global: {
+          get() {
+               if (global[this.name]) return global[this.name]
 
-    global: {
-        get() {
+               return (global[this.name] = {})
+          },
+     },
+     anchor: {
+          get() {
+               if (this._anchor) return this._anchor
 
-            if (global[this.name]) return global[this.name]
+               return (this._anchor =
+                    this.memory.stampAnchors && this.memory.stampAnchors.fastFiller.length
+                         ? unpackAsRoomPos(this.memory.stampAnchors.fastFiller[0], this.name)
+                         : undefined)
+          },
+     },
+     enemyCreeps: {
+          get() {
+               if (this._enemyCreeps) return this._enemyCreeps
 
-            return global[this.name] = {}
-        }
-    },
-    anchor: {
-        get() {
+               return (this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
+                    filter: creep => !allyList.has(creep.owner.username),
+               }))
+          },
+     },
+     structures: {
+          get() {
+               if (this._structures) return this._structures
 
-            if (this._anchor) return this._anchor
+               // Construct storage of structures based on structureType
 
-            return this._anchor = this.memory.stampAnchors && this.memory.stampAnchors.fastFiller.length ? unpackAsRoomPos(this.memory.stampAnchors.fastFiller[0], this.name) :
-                undefined
-        }
-    },
-    enemyCreeps: {
-        get() {
+               this._structures = {}
 
-            if (this._enemyCreeps) return this._enemyCreeps
+               // Make array keys for each structureType
 
-            return this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
-                filter: creep => !allyList.has(creep.owner.username)
-            })
-        }
-    },
-    structures: {
-        get() {
+               for (const structureType of constants.allStructureTypes) this._structures[structureType] = []
 
-            if (this._structures) return this._structures
+               // Group structures by structureType
 
-            // Construct storage of structures based on structureType
+               for (const structure of this.find(FIND_STRUCTURES))
+                    this._structures[structure.structureType].push(structure as any)
 
-            this._structures = {}
+               return this._structures
+          },
+     },
+     cSites: {
+          get() {
+               if (this._cSites) return this._cSites
 
-            // Make array keys for each structureType
+               // Construct storage of structures based on structureType
 
-            for (const structureType of constants.allStructureTypes)
-                this._structures[structureType] = []
+               this._cSites = {}
 
-            // Group structures by structureType
+               // Make array keys for each structureType
 
-            for (const structure of this.find(FIND_STRUCTURES))
-                this._structures[structure.structureType].push(structure as any)
+               for (const structureType of constants.allStructureTypes) this._cSites[structureType] = []
 
-            return this._structures
-        }
-    },
-    cSites: {
-        get() {
+               // Group cSites by structureType
 
-            if (this._cSites) return this._cSites
+               for (const cSite of this.find(FIND_MY_CONSTRUCTION_SITES)) this._cSites[cSite.structureType].push(cSite)
 
-            // Construct storage of structures based on structureType
+               return this._cSites
+          },
+     },
+     cSiteTarget: {
+          get() {
+               if (this.memory.cSiteTargetID) {
+                    const cSiteTarget = findObjectWithID(this.memory.cSiteTargetID)
+                    if (cSiteTarget) return cSiteTarget
+               }
 
-            this._cSites = {}
+               // Loop through structuretypes of the build priority
 
-            // Make array keys for each structureType
+               for (const structureType of constants.structureTypesByBuildPriority) {
+                    const cSitesOfType = this.cSites[structureType]
+                    if (!cSitesOfType.length) continue
 
-            for (const structureType of constants.allStructureTypes)
-                this._cSites[structureType] = []
+                    const anchor = this.anchor || new RoomPosition(25, 25, this.name)
 
-            // Group cSites by structureType
+                    return (this.memory.cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id)
+               }
 
-            for (const cSite of this.find(FIND_MY_CONSTRUCTION_SITES))
-                this._cSites[cSite.structureType].push(cSite)
+               return undefined
+          },
+     },
+     spawningStructures: {
+          get() {
+               if (this._spawningStructures) return this._spawningStructures
 
-            return this._cSites
-        }
-    },
-    cSiteTarget: {
-        get() {
+               return (this._spawningStructures = this.get('spawn').concat(this.get('extension')))
+          },
+     },
+     taskNeedingSpawningStructures: {
+          get() {
+               if (this._taskNeedingSpawningStructures) return this._taskNeedingSpawningStructures
 
-            if (this.memory.cSiteTargetID) {
+               this._taskNeedingSpawningStructures = []
 
-                const cSiteTarget = findObjectWithID(this.memory.cSiteTargetID)
-                if (cSiteTarget) return cSiteTarget
-            }
+               for (const pos of this.global.stampAnchors.extensions) {
+                    const structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
 
-            // Loop through structuretypes of the build priority
+                    for (const structure of structuresAtPos) {
+                         if (
+                              structure.structureType != STRUCTURE_SPAWN &&
+                              structure.structureType != STRUCTURE_EXTENSION
+                         )
+                              continue
 
-            for (const structureType of constants.structureTypesByBuildPriority) {
+                         this._taskNeedingSpawningStructures.push(structure as StructureSpawn | StructureExtension)
+                         break
+                    }
+               }
 
-                const cSitesOfType = this.cSites[structureType]
-                if (!cSitesOfType.length) continue
+               for (const pos of this.global.stampAnchors.extension) {
+                    const structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
 
-                const anchor = this.anchor || new RoomPosition(25, 25, this.name)
+                    for (const structure of structuresAtPos) {
+                         if (
+                              structure.structureType != STRUCTURE_SPAWN &&
+                              structure.structureType != STRUCTURE_EXTENSION
+                         )
+                              continue
 
-                return this.memory.cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id
-            }
+                         this._taskNeedingSpawningStructures.push(structure as StructureSpawn | StructureExtension)
+                         break
+                    }
+               }
 
-            return undefined
-        }
-    },
-    spawningStructures: {
-        get() {
+               return this._taskNeedingSpawningStructures
+          },
+     },
+     spawningStructuresByPriority: {
+          get() {
+               if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
 
-            if (this._spawningStructures) return this._spawningStructures
+               this._spawningStructuresByPriority = []
 
-            return this._spawningStructures = this.get('spawn').concat(this.get('extension'))
-        }
-    },
-    taskNeedingSpawningStructures: {
-        get() {
+               // Fastfiller
 
-            if (this._taskNeedingSpawningStructures) return this._taskNeedingSpawningStructures
+               const adjacentStructures = this.lookForAtArea(
+                    LOOK_STRUCTURES,
+                    this.anchor.y - 2,
+                    this.anchor.x - 2,
+                    this.anchor.y + 2,
+                    this.anchor.x + 2,
+                    true,
+               )
 
-            this._taskNeedingSpawningStructures = []
-
-            for (const pos of this.global.stampAnchors.extensions) {
-
-                const structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
-
-                for (const structure of structuresAtPos) {
-
-                    if (structure.structureType != STRUCTURE_SPAWN && structure.structureType != STRUCTURE_EXTENSION) continue
-
-                    this._taskNeedingSpawningStructures.push(structure as StructureSpawn | StructureExtension)
-                    break
-                }
-            }
-
-            for (const pos of this.global.stampAnchors.extension) {
-
-                const structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
-
-                for (const structure of structuresAtPos) {
-
-                    if (structure.structureType != STRUCTURE_SPAWN && structure.structureType != STRUCTURE_EXTENSION) continue
-
-                    this._taskNeedingSpawningStructures.push(structure as StructureSpawn | StructureExtension)
-                    break
-                }
-            }
-
-            return this._taskNeedingSpawningStructures
-        }
-    },
-    spawningStructuresByPriority: {
-        get() {
-
-            if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
-
-            this._spawningStructuresByPriority = []
-
-            // Fastfiller
-
-            let adjacentStructures = this.lookForAtArea(LOOK_STRUCTURES, this.anchor.y - 2, this.anchor.x - 2, this.anchor.y + 2, this.anchor.x + 2, true)
-
-            for (const adjacentPosData of adjacentStructures) {
-
-                const structureType = adjacentPosData.structure.structureType
-
-                if (structureType != STRUCTURE_SPAWN && structureType != STRUCTURE_EXTENSION) continue
-
-                this.spawningStructuresByPriority.push(adjacentPosData.structure as StructureSpawn | StructureExtension)
-            }
-
-            const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
-
-            for (const sourceName of sourceNames) {
-
-                // Get the closestHarvestPos using the sourceName, iterating if undefined
-
-                const closestHarvestPos: RoomPosition | undefined = this.get(`${sourceName}ClosestHarvestPos`)
-                if (!closestHarvestPos) continue
-
-                // Harvest extensions
-
-                let adjacentStructures = this.lookForAtArea(LOOK_STRUCTURES, closestHarvestPos.y - 1, closestHarvestPos.x - 1, closestHarvestPos.y + 1, closestHarvestPos.x + 1, true)
-
-                for (const adjacentPosData of adjacentStructures) {
-
-                    const structureType = adjacentPosData.structure.structureType
+               for (const adjacentPosData of adjacentStructures) {
+                    const { structureType } = adjacentPosData.structure
 
                     if (structureType != STRUCTURE_SPAWN && structureType != STRUCTURE_EXTENSION) continue
 
-                    this.spawningStructuresByPriority.push(adjacentPosData.structure as StructureSpawn | StructureExtension)
-                }
-            }
+                    this.spawningStructuresByPriority.push(
+                         adjacentPosData.structure as StructureSpawn | StructureExtension,
+                    )
+               }
 
-            // Assign taskNeedingSpawningStructures by lowest range from the anchor
+               const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
 
-            return this._spawningStructuresByPriority.concat(this.taskNeedingSpawningStructures.sort((a, b) =>
-                getRange(a.pos.x - this.anchor.x, a.pos.y - this.anchor.y) - getRange(b.pos.x - this.anchor.x, b.pos.y - this.anchor.y)
-            ))
-        }
-    },
-    sourceHarvestPositions: {
-        get() {
+               for (const sourceName of sourceNames) {
+                    // Get the closestHarvestPos using the sourceName, iterating if undefined
 
-            if (this.global.sourceHarvestPositions) return this.global.sourceHarvestPositions
+                    const closestHarvestPos: RoomPosition | undefined = this.get(`${sourceName}ClosestHarvestPos`)
+                    if (!closestHarvestPos) continue
 
-            const sourceHarvestPositions = [new Map()]
+                    // Harvest extensions
 
-            return sourceHarvestPositions
-        }
-    }
+                    const adjacentStructures = this.lookForAtArea(
+                         LOOK_STRUCTURES,
+                         closestHarvestPos.y - 1,
+                         closestHarvestPos.x - 1,
+                         closestHarvestPos.y + 1,
+                         closestHarvestPos.x + 1,
+                         true,
+                    )
+
+                    for (const adjacentPosData of adjacentStructures) {
+                         const { structureType } = adjacentPosData.structure
+
+                         if (structureType != STRUCTURE_SPAWN && structureType != STRUCTURE_EXTENSION) continue
+
+                         this.spawningStructuresByPriority.push(
+                              adjacentPosData.structure as StructureSpawn | StructureExtension,
+                         )
+                    }
+               }
+
+               // Assign taskNeedingSpawningStructures by lowest range from the anchor
+
+               return this._spawningStructuresByPriority.concat(
+                    this.taskNeedingSpawningStructures.sort(
+                         (a, b) =>
+                              getRange(a.pos.x - this.anchor.x, a.pos.y - this.anchor.y) -
+                              getRange(b.pos.x - this.anchor.x, b.pos.y - this.anchor.y),
+                    ),
+               )
+          },
+     },
+     sourceHarvestPositions: {
+          get() {
+               if (this.global.sourceHarvestPositions) return this.global.sourceHarvestPositions
+
+               const sourceHarvestPositions = [new Map()]
+
+               return sourceHarvestPositions
+          },
+     },
 } as PropertyDescriptorMap & ThisType<Room>)

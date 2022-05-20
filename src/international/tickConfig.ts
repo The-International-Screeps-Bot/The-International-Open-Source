@@ -3,201 +3,196 @@ import { constants, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRol
 import { createPackedPosMap, customLog, findCarryPartsRequired } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
-InternationalManager.prototype.tickConfig = function() {
+InternationalManager.prototype.tickConfig = function () {
+     // Memory
 
-    // Memory
+     // General
 
-    // General
+     Memory.communes = []
 
-    Memory.communes = []
+     Memory.stats = {
+          credits: Game.market.credits,
+          energy: 0,
 
-    Memory.stats = {
-        credits: Game.market.credits,
-        energy: 0,
+          boosts: {},
 
-        boosts: {},
+          // CPU
 
-        // CPU
+          cpuLimit: Game.cpu.limit,
+          cpuBucket: Game.cpu.bucket,
 
-        cpuLimit: Game.cpu.limit,
-        cpuBucket: Game.cpu.bucket,
+          // Memory memory
 
-        // Memory memory
+          memoryUsage: Math.floor(RawMemory.get().length / 1000),
 
-        memoryUsage: Math.floor(RawMemory.get().length / 1000),
+          //
 
-        //
+          GCLPercent: (Game.gcl.progress / Game.gcl.progressTotal) * 100,
+          totalGCL: Math.pow(Game.gcl.level - 1, 2.4) * 1000000 + Game.gcl.progress,
+          GCLLevel: Game.gcl.level,
 
-        GCLPercent: Game.gcl.progress / Game.gcl.progressTotal * 100,
-        totalGCL: Math.pow(Game.gcl.level - 1, 2.4) * 1000000 + Game.gcl.progress,
-        GCLLevel: Game.gcl.level,
+          GPLPercent: (Game.gpl.progress / Game.gpl.progressTotal) * 100,
+          totalGPL: Math.pow(Game.gpl.level - 1, 2) * 1000 + Game.gpl.progress,
+          GPLLevel: Game.gpl.level,
 
-        GPLPercent: Game.gpl.progress / Game.gpl.progressTotal * 100,
-        totalGPL: Math.pow(Game.gpl.level - 1, 2) * 1000 + Game.gpl.progress,
-        GPLLevel: Game.gpl.level,
+          //
 
-        //
+          energyHarvested: 0,
+          mineralsHarvested: 0,
 
-        energyHarvested: 0,
-        mineralsHarvested: 0,
+          controlPoints: 0,
 
-        controlPoints: 0,
+          energySpentOnCreeps: 0,
+          energySpentOnConstruction: 0,
+          energySpentOnRepairing: 0,
+          energySpentOnBarricades: 0,
+     }
 
-        energySpentOnCreeps: 0,
-        energySpentOnConstruction: 0,
-        energySpentOnRepairing: 0,
-        energySpentOnBarricades: 0,
-    }
+     // global
 
-    // global
+     global.constructionSitesCount = Object.keys(Game.constructionSites).length
+     global.logs = ``
 
-    global.constructionSitesCount = Object.keys(Game.constructionSites).length
-    global.logs = ``
+     // Other
 
-    // Other
+     // Configure rooms
 
-    // Configure rooms
+     for (const roomName in Game.rooms) {
+          const room = Game.rooms[roomName]
 
-    for (const roomName in Game.rooms) {
+          const { controller } = room
 
-        const room = Game.rooms[roomName],
+          // Single tick properties
 
-            controller = room.controller
+          room.myCreeps = {}
 
-        // Single tick properties
+          // For each role, construct an array for myCreeps
 
-        room.myCreeps = {}
+          for (const role of constants.creepRoles) room.myCreeps[role] = []
 
-        // For each role, construct an array for myCreeps
+          room.myCreepsAmount = 0
 
-        for (const role of constants.creepRoles) room.myCreeps[role] = []
+          // Assign a position map
 
-        room.myCreepsAmount = 0
+          room.creepPositions = createPackedPosMap()
 
-        // Assign a position map
+          // Assign a 2d position map
 
-        room.creepPositions = createPackedPosMap()
+          room.moveRequests = createPackedPosMap(true)
 
-        // Assign a 2d position map
+          room.roomObjects = {}
 
-        room.moveRequests = createPackedPosMap(true)
+          room.creepsOfSourceAmount = {
+               source1: 0,
+               source2: 0,
+          }
 
-        room.roomObjects = {}
+          if (!room.global.tasksWithoutResponders) room.global.tasksWithoutResponders = {}
+          if (!room.global.tasksWithResponders) room.global.tasksWithResponders = {}
 
-        room.creepsOfSourceAmount = {
-            source1: 0,
-            source2: 0,
-        }
+          // Iterate if there isn't a controller
 
-        if (!room.global.tasksWithoutResponders) room.global.tasksWithoutResponders = {}
-        if (!room.global.tasksWithResponders) room.global.tasksWithResponders = {}
+          if (!controller) continue
 
-        // Iterate if there isn't a controller
+          // Iterate if the controller is not mine
 
-        if (!controller) continue
+          if (!controller.my) continue
 
-        // Iterate if the controller is not mine
+          // Set type to commune
 
-        if (!controller.my) continue
+          room.memory.type = 'commune'
 
-        // Set type to commune
+          //
 
-        room.memory.type = 'commune'
+          if (!room.memory.remotes) room.memory.remotes = []
 
-        //
+          // Loop through the name of each of the commune's remotes
 
-        if (!room.memory.remotes) room.memory.remotes = []
+          for (let index = room.memory.remotes.length - 1; index >= 0; index--) {
+               // Get the name of the remote using the index
 
-        // Loop through the name of each of the commune's remotes
+               const roomName = room.memory.remotes[index]
 
-        for (let index = room.memory.remotes.length - 1; index >= 0; index--) {
+               // Get the room's memory using its name
 
-            // Get the name of the remote using the index
+               const roomMemory = Memory.rooms[roomName]
 
-            const roomName = room.memory.remotes[index],
+               // If the room isn't a remote, remove it from the remotes array
 
-            // Get the room's memory using its name
+               if (roomMemory.type != 'remote' || roomMemory.commune != room.name) {
+                    room.memory.remotes.splice(index, 1)
+                    continue
+               }
 
-            roomMemory = Memory.rooms[roomName]
+               // Initialize aspects of needs
 
-            // If the room isn't a remote, remove it from the remotes array
+               roomMemory.needs[remoteNeedsIndex.remoteReserver] = 1
 
-            if (roomMemory.type != 'remote' || roomMemory.commune != room.name) {
+               // Get the room using the roomName
 
-                room.memory.remotes.splice(index, 1)
-                continue
-            }
+               const remote = Game.rooms[roomName]
 
-            // Initialize aspects of needs
+               // If there is vision in the room, the controller is reserved, it's reserved be me, and there is sufficient reservation left
 
-            roomMemory.needs[remoteNeedsIndex.remoteReserver] = 1
+               if (
+                    remote &&
+                    remote.controller.reservation &&
+                    remote.controller.reservation.username == constants.me &&
+                    remote.controller.reservation.ticksToEnd >= roomMemory.sourceEfficacies.reduce((a, b) => a + b) * 2
+               ) {
+                    // Set the reservation need to 0
 
-            // Get the room using the roomName
+                    roomMemory.needs[remoteNeedsIndex.remoteReserver] = 0
+               }
 
-            const remote = Game.rooms[roomName]
+               roomMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 3
 
-            // If there is vision in the room, the controller is reserved, it's reserved be me, and there is sufficient reservation left
+               roomMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = roomMemory.source2 ? 3 : 0
 
-            if (remote &&
-                remote.controller.reservation &&
-                remote.controller.reservation.username == constants.me &&
-                remote.controller.reservation.ticksToEnd >= roomMemory.sourceEfficacies.reduce((a, b) => a + b) * 2) {
+               roomMemory.needs[remoteNeedsIndex.remoteHauler] = 0
 
-                // Set the reservation need to 0
+               roomMemory.needs[remoteNeedsIndex.remoteDefender] = 0
+          }
 
-                roomMemory.needs[remoteNeedsIndex.remoteReserver] = 0
-            }
+          // Add roomName to commune list
 
-            roomMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 3
+          Memory.communes.push(roomName)
 
-            roomMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = roomMemory.source2 ? 3 : 0
+          room.creepsFromRoom = {}
 
-            roomMemory.needs[remoteNeedsIndex.remoteHauler] = 0
+          // For each role, construct an array for creepsFromRoom
 
-            roomMemory.needs[remoteNeedsIndex.remoteDefender] = 0
-        }
+          for (const role of constants.creepRoles) room.creepsFromRoom[role] = []
 
-        // Add roomName to commune list
+          room.creepsFromRoomAmount = 0
 
-        Memory.communes.push(roomName)
+          room.creepsFromRoomWithRemote = {}
 
-        room.creepsFromRoom = {}
+          // For each remoteName in the room's recorded remotes
 
-        // For each role, construct an array for creepsFromRoom
+          for (const remoteName of room.memory.remotes) {
+               // Intialize an array for this room's creepsFromRoomWithRemote
 
-        for (const role of constants.creepRoles) room.creepsFromRoom[role] = []
+               room.creepsFromRoomWithRemote[remoteName] = {}
 
-        room.creepsFromRoomAmount = 0
+               // For each role, construct an array for the role in creepsFromWithRemote
 
-        room.creepsFromRoomWithRemote = {}
+               for (const role of spawnByRoomRemoteRoles) room.creepsFromRoomWithRemote[remoteName][role] = []
+          }
 
-        // For each remoteName in the room's recorded remotes
+          Memory.stats.energy += room.findStoredResourceAmount(RESOURCE_ENERGY)
 
-        for (const remoteName of room.memory.remotes) {
+          // If there is an existing claimRequest and it's invalid, delete it from the room memory
 
-            // Intialize an array for this room's creepsFromRoomWithRemote
+          if (room.memory.claimRequest && !Memory.claimRequests[room.memory.claimRequest])
+               delete room.memory.claimRequest
 
-            room.creepsFromRoomWithRemote[remoteName] = {}
+          if (!room.memory.stampAnchors) {
+               room.memory.stampAnchors = {}
 
-            // For each role, construct an array for the role in creepsFromWithRemote
+               for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
+          }
 
-            for (const role of spawnByRoomRemoteRoles) room.creepsFromRoomWithRemote[remoteName][role] = []
-        }
-
-        Memory.stats.energy += room.findStoredResourceAmount(RESOURCE_ENERGY)
-
-        // If there is an existing claimRequest and it's invalid, delete it from the room memory
-
-        if (room.memory.claimRequest && !Memory.claimRequests[room.memory.claimRequest])
-            delete room.memory.claimRequest
-
-        if (!room.memory.stampAnchors) {
-
-            room.memory.stampAnchors = {}
-
-            for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
-        }
-
-        room.scoutTargets = new Set()
-    }
+          room.scoutTargets = new Set()
+     }
 }

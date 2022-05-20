@@ -1,111 +1,106 @@
-import { allyList, constants } from "international/constants";
-import { getRange } from "international/generalFunctions";
-import { MeleeDefender } from "room/creeps/creepClasses";
+import { allyList, constants } from 'international/constants'
+import { getRange } from 'international/generalFunctions'
+import { MeleeDefender } from 'room/creeps/creepClasses'
 
+MeleeDefender.prototype.advancedDefend = function () {
+     const creep = this
+     const { room } = creep
 
-MeleeDefender.prototype.advancedDefend = function() {
+     // Get enemyAttackers in the room, informing false if there are none
 
-    const creep = this,
-    room = creep.room
+     const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+          filter: enemyAttacker =>
+               !allyList.has(enemyAttacker.owner.username) &&
+               !enemyAttacker.isOnExit() &&
+               enemyAttacker.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK]),
+     })
 
-    // Get enemyAttackers in the room, informing false if there are none
+     if (!enemyAttackers.length) return false
 
-    const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-        filter: enemyAttacker => !allyList.has(enemyAttacker.owner.username) && !enemyAttacker.isOnExit() && enemyAttacker.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
-    })
+     // Get the closest enemyAttacker
 
-    if(!enemyAttackers.length) return false
+     const enemyAttacker = creep.pos.findClosestByRange(enemyAttackers)
 
-    // Get the closest enemyAttacker
+     // Get the room's ramparts, filtering for thoseinforming false if there are none
 
-    const enemyAttacker = creep.pos.findClosestByRange(enemyAttackers),
+     const ramparts = (room.get('rampart') as StructureRampart[]).filter(function (rampart) {
+          // Get structures at the rampart's pos
 
-    // Get the room's ramparts, filtering for thoseinforming false if there are none
+          const structuresAtPos = room.lookForAt(LOOK_STRUCTURES, rampart.pos)
 
-    ramparts = (room.get('rampart') as StructureRampart[]).filter(function(rampart) {
+          // Loop through each structure
 
-        // Get structures at the rampart's pos
+          for (const structure of structuresAtPos) {
+               // If the structure is impassible, inform false
 
-        const structuresAtPos = room.lookForAt(LOOK_STRUCTURES, rampart.pos)
+               if (constants.impassibleStructureTypes.includes(structure.structureType)) return false
+          }
 
-        // Loop through each structure
+          // Get creeps at the rampart's pos
 
-        for (const structure of structuresAtPos) {
+          const creepsAtPos = room.lookForAt(LOOK_CREEPS, rampart.pos)
 
-            // If the structure is impassible, inform false
+          // Loop through each creep
 
-            if (constants.impassibleStructureTypes.includes(structure.structureType)) return false
-        }
+          for (const creepAlt of creepsAtPos) {
+               // If the creepAlt isn't the creep, inform false
 
-        // Get creeps at the rampart's pos
+               if (creepAlt.id != creep.id) return false
+          }
 
-        const creepsAtPos = room.lookForAt(LOOK_CREEPS, rampart.pos)
+          // Otherwise inform true
 
-        // Loop through each creep
+          return true
+     })
 
-        for (const creepAlt of creepsAtPos) {
+     if (!ramparts.length) {
+          if (getRange(creep.pos.x - enemyAttacker.pos.x, creep.pos.y - enemyAttacker.pos.y) > 1) {
+               creep.createMoveRequest({
+                    origin: creep.pos,
+                    goal: { pos: enemyAttacker.pos, range: 1 },
+                    weightGamebjects: {
+                         1: room.get('road'),
+                    },
+               })
 
-            // If the creepAlt isn't the creep, inform false
+               return true
+          }
 
-            if (creepAlt.id != creep.id) return false
-        }
+          creep.attack(enemyAttacker)
 
-        // Otherwise inform true
+          if (enemyAttacker.getActiveBodyparts(MOVE) > 0) creep.move(creep.pos.getDirectionTo(enemyAttacker))
 
-        return true
-    })
+          return true
+     }
 
-    if (!ramparts.length) {
+     // Attack the enemyAttacker
 
-        if (getRange(creep.pos.x - enemyAttacker.pos.x, creep.pos.y - enemyAttacker.pos.y) > 1) {
+     creep.attack(enemyAttacker)
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goal: { pos: enemyAttacker.pos, range: 1 },
-                weightGamebjects: {
-                    1: room.get('road'),
-                }
-            })
+     // Find the closest rampart to the enemyAttacker
 
-            return true
-        }
+     const closestRampart = enemyAttacker.pos.findClosestByRange(ramparts)
 
-        creep.attack(enemyAttacker)
+     // Visualize the targeting, if roomVisuals are enabled
 
-        if (enemyAttacker.getActiveBodyparts(MOVE) > 0)
-            creep.move(creep.pos.getDirectionTo(enemyAttacker))
+     if (Memory.roomVisuals) room.visual.line(creep.pos, closestRampart.pos, { color: constants.colors.lightBlue })
 
-        return true
-    }
+     // If the creep is range 0 to the closestRampart, inform false
 
-    // Attack the enemyAttacker
+     if (creep.pos.getRangeTo(closestRampart.pos) == 0) return false
 
-    creep.attack(enemyAttacker)
+     // Otherwise move to the rampart preffering ramparts and inform true
 
-    // Find the closest rampart to the enemyAttacker
+     creep.createMoveRequest({
+          origin: creep.pos,
+          goal: { pos: closestRampart.pos, range: 0 },
+          plainCost: 30,
+          swampCost: 80,
+          weightGamebjects: {
+               2: room.get('road'),
+               1: room.get('rampart'),
+          },
+     })
 
-    const closestRampart = enemyAttacker.pos.findClosestByRange(ramparts)
-
-    // Visualize the targeting, if roomVisuals are enabled
-
-    if (Memory.roomVisuals) room.visual.line(creep.pos, closestRampart.pos, { color: constants.colors.lightBlue })
-
-    // If the creep is range 0 to the closestRampart, inform false
-
-    if (creep.pos.getRangeTo(closestRampart.pos) == 0) return false
-
-    // Otherwise move to the rampart preffering ramparts and inform true
-
-    creep.createMoveRequest({
-        origin: creep.pos,
-        goal: { pos: closestRampart.pos, range: 0 },
-        plainCost: 30,
-        swampCost: 80,
-        weightGamebjects: {
-            2: room.get('road'),
-            1: room.get('rampart'),
-        }
-    })
-
-    return true
+     return true
 }

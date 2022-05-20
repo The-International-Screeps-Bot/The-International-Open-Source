@@ -4,33 +4,25 @@ import './linkFunctions'
  * Dictates and operates tasks for links
  */
 export function linkManager(room: Room) {
+     //
 
-    //
+     if (!room.storage) return
 
-    if (!room.storage) return
+     // Get the receiver links
 
-    // Get the receiver links
+     const fastFillerLink = room.get('fastFillerLink')
+     const hubLink = room.get('hubLink')
+     const controllerLink = room.get('controllerLink')
 
-    const fastFillerLink = room.get('fastFillerLink'),
-        hubLink = room.get('hubLink'),
-        controllerLink = room.get('controllerLink'),
+     // Get the sourceLinks
 
-        // Get the sourceLinks
+     const sourceLinks: (StructureLink | false)[] = [room.get('source1Link'), room.get('source2Link')]
 
-        sourceLinks: (StructureLink | false)[] = [
-            room.get('source1Link'),
-            room.get('source2Link')
-        ],
+     const receiverLinks: (StructureLink | false)[] = [fastFillerLink, hubLink, controllerLink]
 
-        receiverLinks: (StructureLink | false)[] = [
-            fastFillerLink,
-            hubLink,
-            controllerLink
-        ]
+     room.sourcesToReceivers(sourceLinks, receiverLinks)
 
-    room.sourcesToReceivers(sourceLinks, receiverLinks)
+     room.hubToFastFiller(hubLink, fastFillerLink)
 
-    room.hubToFastFiller(hubLink, fastFillerLink)
-
-    room.hubToController(hubLink, controllerLink)
+     room.hubToController(hubLink, controllerLink)
 }

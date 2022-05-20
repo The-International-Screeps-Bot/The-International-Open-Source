@@ -1,119 +1,120 @@
-import { allyList, constants } from "international/constants"
-import { customLog, findObjectWithID } from "international/generalFunctions"
+import { allyList, constants } from 'international/constants'
+import { customLog, findObjectWithID } from 'international/generalFunctions'
 
 /**
  * Handles defence related situations for a commune
  */
 export function defenceManager(room: Room) {
+     // If CPU logging is enabled, get the CPU used at the start
 
-    // If CPU logging is enabled, get the CPU used at the start
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+     // Get enemyAttackers in the room
 
-    // Get enemyAttackers in the room
+     const enemyAttackers = room.enemyCreeps.filter(
+          creep => !creep.isOnExit() && creep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK]),
+     )
 
-    const enemyAttackers = room.enemyCreeps.filter(creep => !creep.isOnExit() && creep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK]))
+     manageRampartPublicity()
 
-    manageRampartPublicity()
+     function manageRampartPublicity() {
+          // If there are no enemyAttackers
 
-    function manageRampartPublicity() {
+          if (!enemyAttackers.length) {
+               // Stop if the tick is not divisible by a random range
 
-        // If there are no enemyAttackers
+               if (Game.time % Math.floor(Math.random() * 50) != 0) return
 
-        if (!enemyAttackers.length) {
+               let increment = 0
 
-            // Stop if the tick is not divisible by a random range
+               // Get the room's ramparts and loop through them
 
-            if (Game.time % Math.floor(Math.random() * 50) != 0) return
+               const ramparts: StructureRampart[] = room.get('rampart')
+               for (const rampart of ramparts) {
+                    // If increment is more or equal to 10, stop
 
-            let increment = 0
+                    if (increment >= 10) return
 
-            // Get the room's ramparts and loop through them
+                    // If the rampart is public, iterate
 
-            const ramparts: StructureRampart[] = room.get('rampart')
-            for (const rampart of ramparts) {
+                    if (rampart.isPublic) continue
 
-                // If increment is more or equal to 10, stop
+                    // Otherwise set the rampart to public, increase increment
 
-                if (increment >= 10) return
+                    rampart.setPublic(true)
+                    increment++
+               }
 
-                // If the rampart is public, iterate
+               // Stop
 
-                if (rampart.isPublic) continue
+               return
+          }
 
-                // Otherwise set the rampart to public, increase increment
+          // Get the room's ramparts and loop through them
 
-                rampart.setPublic(true)
-                increment++
-            }
+          const ramparts: StructureRampart[] = room.get('rampart')
+          for (const rampart of ramparts) {
+               // If the rampart is public, make it private
 
-            // Stop
+               if (rampart.isPublic) rampart.setPublic(false)
+          }
+     }
 
-            return
-        }
+     advancedActivateSafeMode()
 
-        // Get the room's ramparts and loop through them
+     function advancedActivateSafeMode() {
+          // If safeMode is on cooldown, stop
 
-        const ramparts: StructureRampart[] = room.get('rampart')
-        for (const rampart of ramparts) {
+          if (room.controller.safeModeCooldown) return
 
-            // If the rampart is public, make it private
+          // Otherwise if there are no safeModes left, stop
 
-            if (rampart.isPublic) rampart.setPublic(false)
-        }
-    }
+          if (room.controller.safeModeAvailable == 0) return
 
-    advancedActivateSafeMode()
+          // Otherwise if the controller is upgradeBlocked, stop
 
-    function advancedActivateSafeMode() {
+          if (room.controller.upgradeBlocked > 0) return
 
-        // If safeMode is on cooldown, stop
+          // Filter attackers that are not invaders. If there are none, stop
 
-        if (room.controller.safeModeCooldown) return
+          const nonInvaderAttackers = enemyAttackers.filter(enemyAttacker => enemyAttacker.owner.username !== 'Invader')
+          if (!nonInvaderAttackers.length) return
 
-        // Otherwise if there are no safeModes left, stop
+          // Otherwise if safeMode can be activated
 
-        if (room.controller.safeModeAvailable == 0) return
+          // Get the previous tick's events
 
-        // Otherwise if the controller is upgradeBlocked, stop
+          const eventLog = room.getEventLog()
 
-        if (room.controller.upgradeBlocked > 0) return
+          // Loop through each eventItem
 
-        // Filter attackers that are not invaders. If there are none, stop
+          for (const eventItem of eventLog) {
+               // If the event wasn't an attack, iterate
 
-        const nonInvaderAttackers = enemyAttackers.filter(enemyAttacker => enemyAttacker.owner.username !== 'Invader')
-        if (!nonInvaderAttackers.length) return
+               if (eventItem.event != EVENT_ATTACK) continue
 
-        // Otherwise if safeMode can be activated
+               // Otherwise get the target of the attack
 
-        // Get the previous tick's events
+               const attackTarget: Structure | Creep = findObjectWithID(eventItem.data.targetId as Id<any>)
 
-        const eventLog = room.getEventLog()
+               // If the attackTarget doesn't have a structureType, iterate
 
-        // Loop through each eventItem
+               if (!attackTarget.structureType) continue
 
-        for (const eventItem of eventLog) {
+               // Otherwise activate safeMode and stop the loop
 
-            // If the event wasn't an attack, iterate
+               room.controller.activateSafeMode()
+               break
+          }
+     }
 
-            if (eventItem.event != EVENT_ATTACK) continue
+     // If CPU logging is enabled, log the CPU used by this manager
 
-            // Otherwise get the target of the attack
-
-            const attackTarget: Structure | Creep = findObjectWithID(eventItem.data.targetId as Id<any>)
-
-            // If the attackTarget doesn't have a structureType, iterate
-
-            if (!attackTarget.structureType) continue
-
-            // Otherwise activate safeMode and stop the loop
-
-            room.controller.activateSafeMode()
-            break
-        }
-    }
-
-    // If CPU logging is enabled, log the CPU used by this manager
-
-    if (Memory.cpuLogging) customLog('Defence Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
+     if (Memory.cpuLogging)
+          customLog(
+               'Defence Manager',
+               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+               undefined,
+               constants.colors.lightGrey,
+          )
 }

@@ -2,62 +2,58 @@ import { Scout } from '../../creepClasses'
 import './scoutFunctions'
 
 export function scoutManager(room: Room, creepsOfRole: string[]) {
+     // Loop through the names of the creeps of the role
 
-    // Loop through the names of the creeps of the role
+     for (const creepName of creepsOfRole) {
+          // Get the creep using its name
 
-    for (const creepName of creepsOfRole) {
+          const creep: Scout = Game.creeps[creepName]
 
-        // Get the creep using its name
+          const commune = Game.rooms[creep.memory.communeName]
 
-        const creep: Scout = Game.creeps[creepName],
+          if (!commune) continue
 
-            commune = Game.rooms[creep.memory.communeName]
+          // If the creep is in the scoutTarget
 
-        if (!commune) continue
+          if (creep.memory.scoutTarget == room.name) {
+               // Get information about the room
 
-        // If the creep is in the scoutTarget
+               room.findType(commune)
 
-        if (creep.memory.scoutTarget == room.name) {
+               // Clean the room's memory
 
-            // Get information about the room
+               room.cleanMemory()
 
-            room.findType(commune)
+               // And delete the creep's scoutTarget
 
-            // Clean the room's memory
+               delete creep.memory.scoutTarget
+          }
 
-            room.cleanMemory()
+          // If there is no scoutTarget, find one
 
-            // And delete the creep's scoutTarget
+          if (!creep.findScoutTarget()) return
 
-            delete creep.memory.scoutTarget
-        }
+          // Say the scoutTarget
 
-        // If there is no scoutTarget, find one
+          creep.say(`🔭${creep.memory.scoutTarget.toString()}`)
 
-        if (!creep.findScoutTarget()) return
+          // If there is a controller and it isn't in safeMode
 
-        // Say the scoutTarget
+          if (room.controller && !room.controller.safeMode) {
+               // Try to sign the controller, iterating if there is success
 
-        creep.say('🔭' + creep.memory.scoutTarget.toString())
+               if (creep.advancedSignController()) continue
+          }
 
-        // If there is a controller and it isn't in safeMode
+          // Try to go to the scoutTarget
 
-        if (room.controller && !room.controller.safeMode) {
-
-            // Try to sign the controller, iterating if there is success
-
-            if (creep.advancedSignController()) continue
-        }
-
-        // Try to go to the scoutTarget
-
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, creep.memory.scoutTarget), range: 25 },
-            avoidEnemyRanges: true,
-            plainCost: 1,
-            swampCost: 1,
-            cacheAmount: 200
-        })
-    }
+          creep.createMoveRequest({
+               origin: creep.pos,
+               goal: { pos: new RoomPosition(25, 25, creep.memory.scoutTarget), range: 25 },
+               avoidEnemyRanges: true,
+               plainCost: 1,
+               swampCost: 1,
+               cacheAmount: 200,
+          })
+     }
 }

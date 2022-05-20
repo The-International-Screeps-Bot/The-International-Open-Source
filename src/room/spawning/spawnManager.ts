@@ -1,82 +1,87 @@
-
 import { constants } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import './spawnFunctions'
 import { spawnRequester } from './spawnRequestManager'
 
 export function spawnManager(room: Room) {
+     // If CPU logging is enabled, get the CPU used at the start
 
-    // If CPU logging is enabled, get the CPU used at the start
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+     // Find spawns that aren't spawning
 
-    // Find spawns that aren't spawning
+     const inactiveSpawns = room.structures.spawn.filter(spawn => !spawn.spawning)
+     if (!inactiveSpawns.length) return
 
-    const inactiveSpawns = room.structures.spawn.filter(spawn => !spawn.spawning)
-    if (!inactiveSpawns.length) return
+     // Otherwise get spawnRequests by running the spawnRequester
 
-    // Otherwise get spawnRequests by running the spawnRequester
+     const spawnRequests = spawnRequester(room)
 
-    const spawnRequests = spawnRequester(room),
+     // Sort spawnRequests by their priority
 
-        // Sort spawnRequests by their priority
+     const requestsByPriority = Object.keys(spawnRequests).sort((a, b) => parseInt(a) - parseInt(b))
 
-        requestsByPriority = Object.keys(spawnRequests).sort((a, b) => parseInt(a) - parseInt(b))
+     // Track the inactive spawn index
 
-    // Track the inactive spawn index
+     let spawnIndex = inactiveSpawns.length - 1
 
-    let spawnIndex = inactiveSpawns.length - 1
+     // Loop through priorities inside requestsByPriority
 
-    // Loop through priorities inside requestsByPriority
+     for (const priority of requestsByPriority) {
+          // Stop if the spawnIndex is negative
 
-    for (const priority of requestsByPriority) {
+          if (spawnIndex < 0) break
 
-        // Stop if the spawnIndex is negative
+          // Try to find inactive spawn, if can't, stop the loop
 
-        if (spawnIndex < 0) break
+          const spawn = inactiveSpawns[spawnIndex]
 
-        // Try to find inactive spawn, if can't, stop the loop
+          // Otherwise get the spawnRequest using its priority
 
-        const spawn = inactiveSpawns[spawnIndex],
+          const spawnRequest = spawnRequests[priority]
 
-            // Otherwise get the spawnRequest using its priority
+          // See if creep can be spawned
 
-            spawnRequest = spawnRequests[priority],
+          const testSpawnResult = spawn.advancedSpawn(spawnRequest)
 
-            // See if creep can be spawned
+          // If creep can't be spawned
 
-            testSpawnResult = spawn.advancedSpawn(spawnRequest)
+          if (testSpawnResult != OK) {
+               // Log the error and stop the loop
 
-        // If creep can't be spawned
+               customLog(
+                    'Failed to spawn',
+                    `${testSpawnResult}, ${spawnRequest.extraOpts.memory.role}, ${spawnRequest.cost}, ${spawnRequest.body}`,
+               )
+               break
+          }
 
-        if (testSpawnResult != OK) {
+          // Disable dry run
 
-            // Log the error and stop the loop
+          spawnRequest.extraOpts.dryRun = false
 
-            customLog('Failed to spawn', testSpawnResult + ', ' + spawnRequest.extraOpts.memory.role + ', ' + spawnRequest.cost + ', ' + spawnRequest.body)
-            break
-        }
+          // Spawn the creep
 
-        // Disable dry run
+          spawn.advancedSpawn(spawnRequest)
 
-        spawnRequest.extraOpts.dryRun = false
+          // Record in stats the costs
 
-        // Spawn the creep
+          room.energyAvailable -= spawnRequest.cost
 
-        spawn.advancedSpawn(spawnRequest)
+          Memory.stats.energySpentOnCreeps += spawnRequest.cost
 
-        // Record in stats the costs
+          // Decrease the spawnIndex
 
-        room.energyAvailable -= spawnRequest.cost
+          spawnIndex--
+     }
 
-        Memory.stats.energySpentOnCreeps += spawnRequest.cost
+     // If CPU logging is enabled, log the CPU used by this manager
 
-        // Decrease the spawnIndex
-
-        spawnIndex--
-    }
-
-    // If CPU logging is enabled, log the CPU used by this manager
-
-    if (Memory.cpuLogging) customLog('Spawn Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
+     if (Memory.cpuLogging)
+          customLog(
+               'Spawn Manager',
+               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+               undefined,
+               constants.colors.lightGrey,
+          )
 }

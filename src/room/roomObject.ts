@@ -1,222 +1,203 @@
 // Define roomObject types
 
-import { constants } from "international/constants"
-import { findObjectWithID } from "international/generalFunctions"
+import { constants } from 'international/constants'
+import { findObjectWithID } from 'international/generalFunctions'
 
-export type RoomObjectValueTypes = 'pos' |
-'id' |
-'object'
+export type RoomObjectValueTypes = 'pos' | 'id' | 'object'
 
-export type RoomObjectCacheTypes = 'global' |
-'memory' | 'property'
+export type RoomObjectCacheTypes = 'global' | 'memory' | 'property'
 
 export interface RoomObjectOpts {
-    [key: string]: any
-    name: RoomObjectName,
-    valueType: RoomObjectValueTypes,
-    cacheType: RoomObjectCacheTypes,
-    cacheAmount?: number
-    room: Room
+     [key: string]: any
+     name: RoomObjectName
+     valueType: RoomObjectValueTypes
+     cacheType: RoomObjectCacheTypes
+     cacheAmount?: number
+     room: Room
 
-    //
+     //
 
-    valueConstructor(): any
+     valueConstructor(): any
 }
 
 export interface RoomObject extends RoomObjectOpts {
+     lastCache?: number
+     value: any
 
-    lastCache?: number
-    value: any
+     // Functions
 
-    // Functions
+     formatValue(): void
 
-    formatValue(): void
+     getCachedValue(): boolean
 
-    getCachedValue(): boolean
+     getValue(): any
 
-    getValue(): any
-
-    cache(): void
+     cache(): void
 }
 
 export class RoomObject {
-    constructor(opts: RoomObjectOpts) {
+     constructor(opts: RoomObjectOpts) {
+          const roomObject = this
 
-        const roomObject = this
+          // Assign opts as properties
 
-        // Assign opts as properties
+          for (const propertyName in opts) roomObject[propertyName] = opts[propertyName]
 
-        for (const propertyName in opts) roomObject[propertyName] = opts[propertyName]
+          // Record the roomObject in the room's roomObjects
 
-        // Record the roomObject in the room's roomObjects
-
-        roomObject.room.roomObjects[roomObject.name] = roomObject
-    }
+          roomObject.room.roomObjects[roomObject.name] = roomObject
+     }
 }
 
-RoomObject.prototype.formatValue = function() {
+RoomObject.prototype.formatValue = function () {
+     const roomObject = this
+     const { room } = roomObject
 
-    const roomObject = this,
-    room = roomObject.room
+     // If roomObject's valueType is an ID
 
-    // If roomObject's valueType is an ID
+     if (roomObject.valueType == 'id') {
+          // Assign its value to the object with the ID and stop
 
-    if (roomObject.valueType == 'id') {
+          roomObject.value = findObjectWithID(roomObject.value)
+          return
+     }
 
-        // Assign its value to the object with the ID and stop
+     // If roomObject's type is pos
 
-        roomObject.value = findObjectWithID(roomObject.value)
-        return
-    }
+     if (roomObject.valueType == 'pos') {
+          // Stop if the roomObject's value isn't defined
 
-    // If roomObject's type is pos
+          if (!roomObject.value) return
 
-    if (roomObject.valueType == 'pos') {
+          // Otherwise assign its value as a new RoomPosition and stop
 
-        // Stop if the roomObject's value isn't defined
-
-        if (!roomObject.value) return
-
-        // Otherwise assign its value as a new RoomPosition and stop
-
-        roomObject.value = room.newPos(roomObject.value)
-        return
-    }
+          roomObject.value = room.newPos(roomObject.value)
+     }
 }
 
-RoomObject.prototype.getCachedValue = function() {
+RoomObject.prototype.getCachedValue = function () {
+     const roomObject = this
+     const { room } = roomObject
 
-    const roomObject = this,
-    room = roomObject.room
+     if (roomObject.cacheType == 'memory') {
+          // Query room memory for cachedRoomObject
 
-    if (roomObject.cacheType == 'memory') {
+          const cachedValue: any = room.memory[roomObject.name]
 
-        // Query room memory for cachedRoomObject
+          // If cachedRoomObject doesn't exist, and inform false
 
-        const cachedValue: any = room.memory[roomObject.name]
+          if (!cachedValue) return false
 
-        // If cachedRoomObject doesn't exist, and inform false
+          // Otherwise assign the cachedValue to the roomObject and inform true
 
-        if (!cachedValue) return false
+          roomObject.value = cachedValue
+          return true
+     }
 
-        // Otherwise assign the cachedValue to the roomObject and inform true
+     if (roomObject.cacheType == 'global') {
+          // Query room's global for cachedRoomObject
 
-        roomObject.value = cachedValue
-        return true
-    }
+          const cachedRoomObject: RoomObject | undefined = room.global[roomObject.name]
 
-    if (roomObject.cacheType == 'global') {
+          // If cachedRoomObject doesn't exist, and inform false
 
-        // Query room's global for cachedRoomObject
+          if (!cachedRoomObject) return false
 
-        const cachedRoomObject: RoomObject | undefined = room.global[roomObject.name]
+          // If cachedRoomObject is past renewal date, and inform false
 
-        // If cachedRoomObject doesn't exist, and inform false
+          if (cachedRoomObject.lastCache + roomObject.cacheAmount <= Game.time) {
+               // Delete the cachedRoomObject and inform false
 
-        if (!cachedRoomObject) return false
+               delete room.global[roomObject.name]
+               return false
+          }
 
-        // If cachedRoomObject is past renewal date, and inform false
+          // Otherwise assign the cachedRoomObject's value to the roomObject and inform true
 
-        if (cachedRoomObject.lastCache + roomObject.cacheAmount <= Game.time) {
+          roomObject.value = cachedRoomObject.value
+          return true
+     }
 
-            // Delete the cachedRoomObject and inform false
+     // Inform false
 
-            delete room.global[roomObject.name]
-            return false
-        }
-
-        // Otherwise assign the cachedRoomObject's value to the roomObject and inform true
-
-        roomObject.value = cachedRoomObject.value
-        return true
-    }
-
-    // Inform false
-
-    return false
+     return false
 }
 
-RoomObject.prototype.getValue = function() {
+RoomObject.prototype.getValue = function () {
+     const roomObject = this
 
-    const roomObject = this
+     // If the roomObject's value can be acquired from its cache
 
-    // If the roomObject's value can be acquired from its cache
+     if (roomObject.getCachedValue()) {
+          // Format the value
 
-    if (roomObject.getCachedValue()) {
+          roomObject.formatValue()
 
-        // Format the value
+          // If the value is defined, inform it
 
-        roomObject.formatValue()
+          if (roomObject.value) return roomObject.value
+     }
 
-        // If the value is defined, inform it
+     // Otherwise run the value constructor and set it as the roomObject's value
 
-        if (roomObject.value) return roomObject.value
-    }
+     roomObject.value = roomObject.valueConstructor()
 
-    // Otherwise run the value constructor and set it as the roomObject's value
+     // Cache the value
 
-    roomObject.value = roomObject.valueConstructor()
+     roomObject.cache()
 
-    // Cache the value
+     // Then format it
 
-    roomObject.cache()
+     roomObject.formatValue()
 
-    // Then format it
+     // Then inform it
 
-    roomObject.formatValue()
-
-    // Then inform it
-
-    return roomObject.value
+     return roomObject.value
 }
 
-RoomObject.prototype.cache = function() {
+RoomObject.prototype.cache = function () {
+     const roomObject = this
+     const { room } = roomObject
 
-    const roomObject = this,
-    room = roomObject.room
+     // Add roomObject to roomObjects
 
-    // Add roomObject to roomObjects
+     room.roomObjects[roomObject.name] = roomObject
 
-    room.roomObjects[roomObject.name] = roomObject
+     // If cacheMethod is memory
 
-    // If cacheMethod is memory
+     if (roomObject.cacheType == 'memory') {
+          // Store value in room's memory and stop
 
-    if (roomObject.cacheType == 'memory') {
+          room.memory[roomObject.name] = roomObject.value
+          return
+     }
 
-        // Store value in room's memory and stop
+     // If cacheMethod is global
 
-        room.memory[roomObject.name] = roomObject.value
-        return
-    }
+     if (roomObject.cacheType == 'global') {
+          // Create a copy of the roomObject
 
-    // If cacheMethod is global
+          const roomObjectCopy = new RoomObject({
+               name: roomObject.name,
+               valueType: roomObject.valueType,
+               cacheType: roomObject.cacheType,
+               cacheAmount: roomObject.cacheAmount,
+               room,
+               valueConstructor: undefined,
+          })
 
-    if (roomObject.cacheType == 'global') {
+          // Assign special properties to the copy
 
-        // Create a copy of the roomObject
+          // Such as the current tick as the lastCache
 
-        const roomObjectCopy = new RoomObject({
-            name: roomObject.name,
-            valueType: roomObject.valueType,
-            cacheType: roomObject.cacheType,
-            cacheAmount: roomObject.cacheAmount,
-            room,
-            valueConstructor: undefined
-        })
+          roomObjectCopy.lastCache = Game.time
 
-        // Assign special properties to the copy
+          // And the roomObject's value
 
-        // Such as the current tick as the lastCache
+          roomObjectCopy.value = roomObject.value
 
-        roomObjectCopy.lastCache = Game.time
+          // Store the copy in global and stop
 
-        // And the roomObject's value
-
-        roomObjectCopy.value = roomObject.value
-
-        // Store the copy in global and stop
-
-        room.global[roomObject.name] = roomObjectCopy
-        return
-    }
+          room.global[roomObject.name] = roomObjectCopy
+     }
 }

@@ -1,284 +1,268 @@
-import { allyList, constants, remoteNeedsIndex } from "international/constants"
-import { getRange } from "international/generalFunctions"
-import { RemoteDefender } from "room/creeps/creepClasses"
+import { allyList, constants, remoteNeedsIndex } from 'international/constants'
+import { getRange } from 'international/generalFunctions'
+import { RemoteDefender } from 'room/creeps/creepClasses'
 
-RemoteDefender.prototype.findRemote = function() {
+RemoteDefender.prototype.findRemote = function () {
+     const creep = this
 
-    const creep = this
+     // If the creep already has a remote, inform true
 
-    // If the creep already has a remote, inform true
+     if (creep.memory.remoteName) return true
 
-    if (creep.memory.remoteName) return true
+     // Otherwise, get the creep's role
 
-    // Otherwise, get the creep's role
+     const role = creep.memory.role as 'remoteDefender'
 
-    const role = creep.memory.role as 'remoteDefender',
+     // Get remotes by their efficacy
 
-    // Get remotes by their efficacy
+     const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
 
-    remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
+     // Loop through each remote name
 
-    // Loop through each remote name
+     for (const roomName of remoteNamesByEfficacy) {
+          // Get the remote's memory using its name
 
-    for (const roomName of remoteNamesByEfficacy) {
+          const roomMemory = Memory.rooms[roomName]
 
-        // Get the remote's memory using its name
+          // If the needs of this remote are met, iterate
 
-        const roomMemory = Memory.rooms[roomName]
+          if (roomMemory.needs[remoteNeedsIndex[role]] <= 0) continue
 
-        // If the needs of this remote are met, iterate
+          // Otherwise assign the remote to the creep and inform true
 
-        if (roomMemory.needs[remoteNeedsIndex[role]] <= 0) continue
+          creep.memory.remoteName = roomName
+          roomMemory.needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
 
-        // Otherwise assign the remote to the creep and inform true
+          return true
+     }
 
-        creep.memory.remoteName = roomName
-        roomMemory.needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
+     // Inform false
 
-        return true
-    }
-
-    // Inform false
-
-    return false
+     return false
 }
 
-RemoteDefender.prototype.advancedHeal = function() {
+RemoteDefender.prototype.advancedHeal = function () {
+     const creep = this
+     const { room } = creep
 
-    const creep = this,
-        room = creep.room
+     creep.say('AH')
 
-    creep.say('AH')
+     // If the creep is below max hits
 
-    // If the creep is below max hits
+     if (creep.hitsMax > creep.hits) {
+          // Have it heal itself and stop
 
-    if (creep.hitsMax > creep.hits) {
+          creep.heal(creep)
+          return false
+     }
 
-        // Have it heal itself and stop
+     let top = Math.max(Math.min(creep.pos.y - 1, constants.roomDimensions - 2), 2)
+     let left = Math.max(Math.min(creep.pos.x - 1, constants.roomDimensions - 2), 2)
+     let bottom = Math.max(Math.min(creep.pos.y + 1, constants.roomDimensions - 2), 2)
+     let right = Math.max(Math.min(creep.pos.x + 1, constants.roomDimensions - 2), 2)
 
-        creep.heal(creep)
-        return false
-    }
+     // Find adjacent creeps
 
-    let top = Math.max(Math.min(creep.pos.y - 1, constants.roomDimensions - 2), 2),
-        left = Math.max(Math.min(creep.pos.x - 1, constants.roomDimensions - 2), 2),
-        bottom = Math.max(Math.min(creep.pos.y + 1, constants.roomDimensions - 2), 2),
-        right = Math.max(Math.min(creep.pos.x + 1, constants.roomDimensions - 2), 2)
+     const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
 
-    // Find adjacent creeps
+     // Loop through each adjacentCreep
 
-    const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+     for (const posData of adjacentCreeps) {
+          // If the creep is the posData creep, iterate
 
-    // Loop through each adjacentCreep
+          if (creep.id == posData.creep.id) continue
 
-    for (const posData of adjacentCreeps) {
+          // If the creep is not owned and isn't an ally
 
-        // If the creep is the posData creep, iterate
+          if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
 
-        if (creep.id == posData.creep.id) continue
+          // If the creep is at full health, iterate
 
-        // If the creep is not owned and isn't an ally
+          if (posData.creep.hitsMax == posData.creep.hits) continue
 
-        if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
+          // have the creep heal the adjacentCreep and stop
 
-        // If the creep is at full health, iterate
+          creep.heal(posData.creep)
+          return false
+     }
 
-        if (posData.creep.hitsMax == posData.creep.hits) continue
+     (top = Math.max(Math.min(creep.pos.y - 3, constants.roomDimensions - 2), 2)),
+          (left = Math.max(Math.min(creep.pos.x - 3, constants.roomDimensions - 2), 2)),
+          (bottom = Math.max(Math.min(creep.pos.y + 3, constants.roomDimensions - 2), 2)),
+          (right = Math.max(Math.min(creep.pos.x + 3, constants.roomDimensions - 2), 2))
 
-        // have the creep heal the adjacentCreep and stop
+     // Find my creeps in range of creep
 
-        creep.heal(posData.creep)
-        return false
-    }
+     const nearbyCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
 
-    top = Math.max(Math.min(creep.pos.y - 3, constants.roomDimensions - 2), 2),
-    left = Math.max(Math.min(creep.pos.x - 3, constants.roomDimensions - 2), 2),
-    bottom = Math.max(Math.min(creep.pos.y + 3, constants.roomDimensions - 2), 2),
-    right = Math.max(Math.min(creep.pos.x + 3, constants.roomDimensions - 2), 2)
+     // Loop through each nearbyCreep
 
-    // Find my creeps in range of creep
+     for (const posData of nearbyCreeps) {
+          // If the creep is the posData creep, iterate
 
-    const nearbyCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+          if (creep.id == posData.creep.id) continue
 
-    // Loop through each nearbyCreep
+          // If the creep is not owned and isn't an ally
 
-    for (const posData of nearbyCreeps) {
+          if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
 
-        // If the creep is the posData creep, iterate
+          // If the creep is at full health, iterate
 
-        if (creep.id == posData.creep.id) continue
+          if (posData.creep.hitsMax == posData.creep.hits) continue
 
-        // If the creep is not owned and isn't an ally
+          // have the creep rangedHeal the nearbyCreep and stop
 
-        if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
+          creep.rangedHeal(posData.creep)
+          return true
+     }
 
-        // If the creep is at full health, iterate
-
-        if (posData.creep.hitsMax == posData.creep.hits) continue
-
-        // have the creep rangedHeal the nearbyCreep and stop
-
-        creep.rangedHeal(posData.creep)
-        return true
-    }
-
-    return false
+     return false
 }
 
-RemoteDefender.prototype.advancedAttackAttackers = function() {
+RemoteDefender.prototype.advancedAttackAttackers = function () {
+     const creep = this
+     const { room } = creep
 
-    const creep = this,
-        room = creep.room,
+     // Get enemyAttackers in the room
 
-        // Get enemyAttackers in the room
+     const enemyAttackers = room.enemyCreeps.filter(enemyCreep =>
+          /* !enemyCreep.isOnExit() && */ enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK]),
+     )
 
-        enemyAttackers = room.enemyCreeps.filter(enemyCreep => /* !enemyCreep.isOnExit() && */ enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK]))
+     // If there are none
 
-    // If there are none
+     if (!enemyAttackers.length) {
+          // Heal nearby creeps
 
-    if (!enemyAttackers.length) {
+          if (creep.advancedHeal()) return true
 
-        // Heal nearby creeps
+          const { enemyCreeps } = room
+          if (!enemyCreeps.length) return false
 
-        if (creep.advancedHeal()) return true
+          creep.say('EC')
 
-        const enemyCreeps = room.enemyCreeps
-        if (!enemyCreeps.length) return false
+          const enemyCreep = creep.pos.findClosestByRange(enemyCreeps)
+          // Get the range between the creeps
 
-        creep.say('EC')
+          const range = getRange(creep.pos.x - enemyCreep.pos.x, creep.pos.y - enemyCreep.pos.y)
 
-        const enemyCreep = creep.pos.findClosestByRange(enemyCreeps),
+          // If the range is more than 1
 
-        // Get the range between the creeps
+          if (range > 1) {
+               creep.rangedAttack(enemyCreep)
 
-        range = getRange(creep.pos.x - enemyCreep.pos.x, creep.pos.y - enemyCreep.pos.y)
+               // Have the create a moveRequest to the enemyAttacker and inform true
 
-        // If the range is more than 1
+               creep.createMoveRequest({
+                    origin: creep.pos,
+                    goal: { pos: enemyCreep.pos, range: 1 },
+               })
 
-        if (range > 1) {
+               return true
+          }
 
-            creep.rangedAttack(enemyCreep)
+          creep.rangedMassAttack()
+          if (enemyCreep.owner.username != 'Invader') creep.move(creep.pos.getDirectionTo(enemyCreep.pos))
 
-            // Have the create a moveRequest to the enemyAttacker and inform true
+          return true
+     }
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goal: { pos: enemyCreep.pos, range: 1 }
-            })
+     // Otherwise, get the closest enemyAttacker
 
-            return true
-        }
+     const enemyAttacker = creep.pos.findClosestByRange(enemyAttackers)
 
-        creep.rangedMassAttack()
-        if (enemyCreep.owner.username != 'Invader') creep.move(creep.pos.getDirectionTo(enemyCreep.pos))
+     // Get the range between the creeps
 
-        return true
-    }
+     const range = getRange(creep.pos.x - enemyAttacker.pos.x, creep.pos.y - enemyAttacker.pos.y)
 
-    // Otherwise, get the closest enemyAttacker
+     // If it's more than range 3
 
-    const enemyAttacker = creep.pos.findClosestByRange(enemyAttackers),
+     if (range > 3) {
+          // Heal nearby creeps
 
-    // Get the range between the creeps
+          creep.advancedHeal()
 
-    range = getRange(creep.pos.x - enemyAttacker.pos.x, creep.pos.y - enemyAttacker.pos.y)
+          // Make a moveRequest to it and inform true
 
-    // If it's more than range 3
+          creep.createMoveRequest({
+               origin: creep.pos,
+               goal: { pos: enemyAttacker.pos, range: 1 },
+          })
 
-    if (range > 3) {
+          return true
+     }
 
-        // Heal nearby creeps
+     creep.say('AEA')
 
-        creep.advancedHeal()
+     // Otherwise, have the creep pre-heal itself
 
-        // Make a moveRequest to it and inform true
+     creep.heal(creep)
 
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: enemyAttacker.pos, range: 1 }
-        })
+     // If the range is 1, rangedMassAttack
 
-        return true
-    }
+     if (range == 1) {
+          creep.rangedMassAttack()
+          creep.move(creep.pos.getDirectionTo(enemyAttacker.pos))
+     }
 
-    creep.say("AEA")
+     // Otherwise, rangedAttack the enemyAttacker
+     else creep.rangedAttack(enemyAttacker)
 
-    // Otherwise, have the creep pre-heal itself
+     // If the creep is out matched, try to always stay in range 3
 
-    creep.heal(creep)
+     if (creep.findStrength() < enemyAttacker.findStrength()) {
+          if (range == 3) return true
 
-    // If the range is 1, rangedMassAttack
+          if (range >= 3) {
+               creep.createMoveRequest({
+                    origin: creep.pos,
+                    goal: { pos: enemyAttacker.pos, range: 3 },
+               })
 
-    if (range == 1) {
+               return true
+          }
 
-        creep.rangedMassAttack()
-        creep.move(creep.pos.getDirectionTo(enemyAttacker.pos))
-    }
+          creep.createMoveRequest({
+               origin: creep.pos,
+               goal: { pos: enemyAttacker.pos, range: 25 },
+               flee: true,
+          })
 
-    // Otherwise, rangedAttack the enemyAttacker
+          return true
+     }
 
-    else creep.rangedAttack(enemyAttacker)
+     // If the creep has less heal power than the enemyAttacker's attack power
 
-    // If the creep is out matched, try to always stay in range 3
+     if (creep.findStrength() < enemyAttacker.findStrength()) {
+          // If the range is less or equal to 2
 
-    if (creep.findStrength() < enemyAttacker.findStrength()) {
+          if (range <= 2) {
+               // Have the creep flee and inform true
 
-        if (range == 3) return true
+               creep.createMoveRequest({
+                    origin: creep.pos,
+                    goal: { pos: enemyAttacker.pos, range: 1 },
+                    flee: true,
+               })
 
-        if (range >= 3) {
+               return true
+          }
+     }
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goal: { pos: enemyAttacker.pos, range: 3 }
-            })
+     // If the range is more than 1
 
-            return true
-        }
+     if (range > 1) {
+          // Have the create a moveRequest to the enemyAttacker and inform true
 
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: enemyAttacker.pos, range: 25 },
-            flee: true
-        })
+          creep.createMoveRequest({
+               origin: creep.pos,
+               goal: { pos: enemyAttacker.pos, range: 1 },
+          })
 
-        return true
-    }
+          return true
+     }
 
-    // If the creep has less heal power than the enemyAttacker's attack power
+     // Otherwise inform true
 
-    if (creep.findStrength() < enemyAttacker.findStrength()) {
-
-        // If the range is less or equal to 2
-
-        if (range <= 2) {
-
-            // Have the creep flee and inform true
-
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goal: { pos: enemyAttacker.pos, range: 1 },
-                flee: true
-            })
-
-            return true
-        }
-    }
-
-    // If the range is more than 1
-
-    if (range > 1) {
-
-        // Have the create a moveRequest to the enemyAttacker and inform true
-
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: enemyAttacker.pos, range: 1 }
-        })
-
-        return true
-    }
-
-    // Otherwise inform true
-
-    return true
+     return true
 }

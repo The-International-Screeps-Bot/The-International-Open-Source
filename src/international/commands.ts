@@ -1,73 +1,67 @@
-import { constants } from "./constants"
+import { constants } from './constants'
 
-global.killAllCreeps = function(roles?: CreepRoles[]) {
+global.killAllCreeps = function (roles?: CreepRoles[]) {
+     // Loop through each creepName
 
-    // Loop through each creepName
+     for (const creepName in Game.creeps) {
+          // Construct and suicide the creep
 
-    for (const creepName in Game.creeps) {
+          const creep = Game.creeps[creepName]
 
-        // Construct and suicide the creep
+          if (!roles || roles.includes(creep.memory.role)) creep.suicide()
+     }
 
-        const creep = Game.creeps[creepName]
+     // Inform the result
 
-        if (!roles || roles.includes(creep.memory.role)) creep.suicide()
-    }
-
-    // Inform the result
-
-    return 'Killed all creeps of role ' + (roles || 'all')
+     return `Killed all creeps of role ${roles || 'all'}`
 }
 
-global.removeAllCSites = function(types?: BuildableStructureConstant[]) {
+global.removeAllCSites = function (types?: BuildableStructureConstant[]) {
+     // Loop through cSite IDs in construction sites
 
-    // Loop through cSite IDs in construction sites
+     for (const ID in Game.constructionSites) {
+          // Get the site using its ID
 
-    for (const ID in Game.constructionSites) {
+          const cSite = Game.constructionSites[ID]
 
-        // Get the site using its ID
+          // If the cSite type matches the specified types, delete the cSite
 
-        const cSite = Game.constructionSites[ID]
+          if (!types || types.includes(cSite.structureType)) cSite.remove()
+     }
 
-        // If the cSite type matches the specified types, delete the cSite
+     // Inform the result
 
-        if (!types || types.includes(cSite.structureType)) cSite.remove()
-    }
-
-    // Inform the result
-
-    return 'Destroyed all construction sites of types ' + (types || 'all')
+     return `Destroyed all construction sites of types ${types || 'all'}`
 }
 
-global.destroyAllStructures = function(roomName: string, types?: StructureConstant[]) {
+global.destroyAllStructures = function (roomName: string, types?: StructureConstant[]) {
+     // Get the room with the roomName
 
-    // Get the room with the roomName
+     const room = Game.rooms[roomName]
 
-    const room = Game.rooms[roomName]
+     // Stop if the room isn't defined
 
-    // Stop if the room isn't defined
+     if (!room) return `You have no vision in ${roomName}`
 
-    if (!room) return 'You have no vision in ' + roomName
+     // Otherwise loop through each structureType
 
-    // Otherwise loop through each structureType
+     for (const structureType of constants.allStructureTypes) {
+          // If types is constructed and the part isn't in types, iterate
 
-    for (const structureType of constants.allStructureTypes) {
+          if (types && !types.includes(structureType)) continue
 
-        // If types is constructed and the part isn't in types, iterate
+          // Get the structures of the type
 
-        if (types && !types.includes(structureType)) continue
+          const structures = room.structures[structureType]
 
-        // Get the structures of the type
+          // Loop through the structures
 
-        const structures = room.structures[structureType]
+          for (const structure of structures) structure.destroy()
+     }
 
-        // Loop through the structures
+     // Inform the result
 
-        for (const structure of structures) structure.destroy()
-    }
-
-    // Inform the result
-
-    return 'Destroyed all structures of types ' + (types || 'all') + ' in ' + roomName
+     return `Destroyed all structures of types ${types || 'all'} in ${roomName}`
 }
 
 /**
@@ -75,24 +69,22 @@ global.destroyAllStructures = function(roomName: string, types?: StructureConsta
  * @param commune The commune to respond to the claimRequest
  * @param claimRequest The roomName of the claimRequest to respond to
  */
-global.claim = function(claimRequest: string, communeName: string) {
+global.claim = function (claimRequest: string, communeName: string) {
+     const roomMemory = Memory.rooms[communeName]
+     if (!roomMemory) return `No memory for ${communeName}`
 
-    const roomMemory = Memory.rooms[communeName]
-    if (!roomMemory) return 'No memory for ' + communeName
+     let log = ``
 
-    let log = ``
+     if (!Memory.claimRequests[claimRequest]) {
+          Memory.claimRequests[claimRequest] = {
+               needs: [1, 20, 0],
+               score: 0,
+          }
 
-    if (!Memory.claimRequests[claimRequest]) {
-
-        Memory.claimRequests[claimRequest] = {
-            needs: [1, 20, 0],
-            score: 0
-        }
-
-        log += `Created a claimRequest for ` + claimRequest + `
+          log += `Created a claimRequest for ${claimRequest}
         `
-    }
+     }
 
-    roomMemory.claimRequest = claimRequest
-    return communeName + ' is responding to claimRequest for ' + claimRequest
+     roomMemory.claimRequest = claimRequest
+     return `${communeName} is responding to claimRequest for ${claimRequest}`
 }

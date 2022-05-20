@@ -1,1389 +1,1405 @@
-import { allyList, builderSpawningWhenStorageThreshold, claimRequestNeedsIndex, constants, remoteNeedsIndex, upgraderSpawningWhenStorageThreshold } from "international/constants"
-import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy, findStrengthOfParts, getRange } from "international/generalFunctions"
+import {
+     allyList,
+     builderSpawningWhenStorageThreshold,
+     claimRequestNeedsIndex,
+     constants,
+     remoteNeedsIndex,
+     upgraderSpawningWhenStorageThreshold,
+} from 'international/constants'
+import {
+     customLog,
+     findCarryPartsRequired,
+     findRemoteSourcesByEfficacy,
+     findStrengthOfParts,
+     getRange,
+} from 'international/generalFunctions'
 
 /**
  * Creates spawn requests for the commune
  */
 export function spawnRequester(room: Room) {
+     // If CPU logging is enabled, get the CPU used at the start
 
-    // If CPU logging is enabled, get the CPU used at the start
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+     // Construct a record of spawnRequests
 
-    // Construct a record of spawnRequests
+     const spawnRequests: { [key: string]: SpawnRequest } = {}
 
-    const spawnRequests: {[key: string]: SpawnRequest} = {},
+     // Structure info about the room's spawn energy
 
-    // Structure info about the room's spawn energy
+     const spawnEnergyAvailable = room.energyAvailable
+     const spawnEnergyCapacity = room.energyCapacityAvailable
 
-    spawnEnergyAvailable = room.energyAvailable,
-    spawnEnergyCapacity = room.energyCapacityAvailable,
+     // Get the energyStructures
 
-    // Get the energyStructures
+     const energyStructures = room.get('structuresForSpawning')
+     const dryRun = true
 
-    energyStructures = room.get('structuresForSpawning'),
-    dryRun = true
+     // Create a spawn request given some values
 
-    // Create a spawn request given some values
+     function createSpawnRequest(priority: number, body: BodyPartConstant[], tier: number, cost: number, memory: any) {
+          // Set the memory's communeName to this room's name
 
-    function createSpawnRequest(priority: number, body: BodyPartConstant[], tier: number, cost: number, memory: any) {
+          memory.communeName = room.name
 
-        // Set the memory's communeName to this room's name
+          // Add the components to spawnRequests
 
-        memory.communeName = room.name
+          spawnRequests[priority] = {
+               body,
+               tier,
+               cost,
+               extraOpts: {
+                    memory,
+                    energyStructures,
+                    dryRun,
+               },
+          }
+     }
 
-        // Add the components to spawnRequests
+     // Create spawn requests using opts
 
-        spawnRequests[priority] = {
-            body,
-            tier,
-            cost,
-            extraOpts: {
-                memory,
-                energyStructures,
-                dryRun
-            },
-        }
-    }
+     function constructSpawnRequests(opts: SpawnRequestOpts | false) {
+          // If the opts aren't defined, stop
 
-    // Create spawn requests using opts
+          if (!opts) return
 
-    function constructSpawnRequests(opts: SpawnRequestOpts | false) {
+          // If minCreeps is defined
 
-        // If the opts aren't defined, stop
+          if (opts.minCreeps) {
+               // Construct spawn requests individually, and stop
 
-        if (!opts) return
+               constructSpawnRequestsIndividually(opts)
+               return
+          }
 
-        // If minCreeps is defined
+          // Construct spawn requests by group
 
-        if (opts.minCreeps) {
+          constructSpawnRequestsByGroup(opts)
+     }
 
-            // Construct spawn requests individually, and stop
+     function decideMaxCostPerCreep(maxCostPerCreep: number = spawnEnergyCapacity) {
+          // If there are no sourceHarvesters or haulers
 
-            constructSpawnRequestsIndividually(opts)
-            return
-        }
+          if (
+               room.myCreeps.source1Harvester.length + room.myCreeps.source2Harvester.length == 0 ||
+               room.myCreeps.hauler.length == 0
+          ) {
+               // Inform the smaller of the following
 
-        // Construct spawn requests by group
+               return Math.min(maxCostPerCreep, spawnEnergyAvailable)
+          }
 
-        constructSpawnRequestsByGroup(opts)
-    }
+          // Otherwise the smaller of the following
 
-    function decideMaxCostPerCreep(maxCostPerCreep: number = spawnEnergyCapacity) {
+          return Math.min(maxCostPerCreep, spawnEnergyCapacity)
+     }
 
-        // If there are no sourceHarvesters or haulers
+     // Use preset creep amounts to construct spawn requests
 
-        if ((room.myCreeps.source1Harvester.length + room.myCreeps.source2Harvester.length == 0) || room.myCreeps.hauler.length == 0) {
+     function constructSpawnRequestsIndividually(opts: SpawnRequestOpts) {
+          // Get the maxCostPerCreep
 
-            // Inform the smaller of the following
+          const maxCostPerCreep = Math.max(decideMaxCostPerCreep(opts.maxCostPerCreep), opts.minCost)
 
-            return Math.min(maxCostPerCreep, spawnEnergyAvailable)
-        }
+          // So long as minCreeps is more than the current number of creeps
 
-        // Otherwise the smaller of the following
+          while (
+               opts.minCreeps >
+               (opts.groupComparator
+                    ? opts.groupComparator.length
+                    : room.creepsFromRoom[opts.memoryAdditions.role].length)
+          ) {
+               // Construct important imformation for the spawnRequest
 
-        return Math.min(maxCostPerCreep, spawnEnergyCapacity)
-    }
+               const body: BodyPartConstant[] = []
+               let tier = 0
+               let cost = 0
 
-    // Use preset creep amounts to construct spawn requests
+               // If there are defaultParts
 
-    function constructSpawnRequestsIndividually(opts: SpawnRequestOpts) {
+               if (opts.defaultParts.length) {
+                    // Increment tier
 
-        // Get the maxCostPerCreep
+                    tier++
 
-        const maxCostPerCreep = Math.max(decideMaxCostPerCreep(opts.maxCostPerCreep), opts.minCost)
+                    // Loop through defaultParts
 
-        // So long as minCreeps is more than the current number of creeps
+                    for (const part of opts.defaultParts) {
+                         // Get the cost of the part
 
-        while (opts.minCreeps > (opts.groupComparator ? opts.groupComparator.length : room.creepsFromRoom[opts.memoryAdditions.role].length)) {
+                         const partCost = BODYPART_COST[part]
 
-            // Construct important imformation for the spawnRequest
+                         // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, stop the loop
 
-            let body: BodyPartConstant[] = [],
-            tier = 0,
-            cost = 0
+                         if (cost + partCost > maxCostPerCreep) break
 
-            // If there are defaultParts
+                         // Otherwise add the part the the body
 
-            if (opts.defaultParts.length) {
+                         body.push(part)
 
-                // Increment tier
+                         // And add the partCost to the cost
 
-                tier++
+                         cost += partCost
+                    }
+               }
 
-                // Loop through defaultParts
+               // If there are extraParts
 
-                for (const part of opts.defaultParts) {
+               if (opts.extraParts.length) {
+                    // Use the partsMultiplier to decide how many extraParts are needed on top of the defaultParts, at a max of 50
 
-                    // Get the cost of the part
+                    let remainingAllowedParts = Math.min(
+                         50 - opts.defaultParts.length,
+                         opts.extraParts.length * opts.partsMultiplier,
+                    )
 
-                    const partCost = BODYPART_COST[part]
+                    // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
 
-                    // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, stop the loop
+                    while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
+                         // Loop through each part in extraParts
 
-                    if (cost + partCost > maxCostPerCreep) break
+                         for (const part of opts.extraParts) {
+                              // And add the part's cost to the cost
 
-                    // Otherwise add the part the the body
+                              cost += BODYPART_COST[part]
 
-                    body.push(part)
+                              // Otherwise add the part the the body
 
-                    // And add the partCost to the cost
+                              body.push(part)
 
-                    cost += partCost
-                }
-            }
+                              // Reduce remainingAllowedParts
 
-            // If there are extraParts
+                              remainingAllowedParts--
+                         }
 
-            if (opts.extraParts.length) {
+                         // Increase tier
 
-                // Use the partsMultiplier to decide how many extraParts are needed on top of the defaultParts, at a max of 50
+                         tier++
+                    }
 
-                let remainingAllowedParts = Math.min(50 - opts.defaultParts.length, opts.extraParts.length * opts.partsMultiplier)
+                    // Assign partIndex as the length of extraParts
 
-                // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
+                    let partIndex = opts.extraParts.length
 
-                while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
+                    // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
 
+                    if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
+                         // So long as partIndex is above 0
+
+                         while (partIndex > 0) {
+                              // Get the part using the partIndex
+
+                              const part = opts.extraParts[partIndex]
+
+                              // Get the cost of the part
+
+                              const partCost = BODYPART_COST[part]
+
+                              // If the cost minus partCost is below minCost, stop the loop
+
+                              if (cost - partCost < opts.minCost) break
+
+                              // And remove the part's cost to the cost
+
+                              cost -= partCost
+
+                              // Remove the last part in the body
+
+                              body.pop()
+
+                              // Increase remainingAllowedParts
+
+                              remainingAllowedParts++
+
+                              // Decrease the partIndex
+
+                              partIndex--
+                         }
+
+                         // Decrease tier
+
+                         tier--
+                    }
+               }
+
+               // Create a spawnRequest using previously constructed information
+
+               createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
+
+               // Reduce the number of minCreeps
+
+               opts.minCreeps--
+          }
+
+          // If minCreeps is equal to 0, stop
+     }
+
+     // Construct spawn requests while deciding on creep amounts
+
+     function constructSpawnRequestsByGroup(opts: SpawnRequestOpts) {
+          // Get the maxCostPerCreep
+
+          const maxCostPerCreep = Math.max(decideMaxCostPerCreep(opts.maxCostPerCreep), opts.minCost)
+
+          // Find the totalExtraParts using the partsMultiplier
+
+          let totalExtraParts = Math.floor(opts.extraParts.length * opts.partsMultiplier)
+
+          // Construct from totalExtraParts at a max of 50 - number of defaultParts
+
+          const maxPartsPerCreep = Math.min(50 - opts.defaultParts.length, totalExtraParts)
+
+          // Loop through creep names of the requested role
+
+          for (const creepName of opts.groupComparator || room.creepsFromRoom[opts.memoryAdditions.role]) {
+               // Take away the amount of parts the creep with the name has from totalExtraParts
+
+               totalExtraParts -= Game.creeps[creepName].body.length - opts.defaultParts.length
+          }
+
+          // If there aren't enough requested parts to justify spawning a creep, stop
+
+          if (totalExtraParts < maxPartsPerCreep * (opts.threshold || 0.25)) return
+
+          // Subtract maxCreeps by the existing number of creeps of this role
+
+          opts.maxCreeps -= opts.groupComparator
+               ? opts.groupComparator.length
+               : room.creepsFromRoom[opts.memoryAdditions.role].length
+
+          // So long as there are totalExtraParts left to assign
+
+          while (totalExtraParts >= opts.extraParts.length && opts.maxCreeps > 0) {
+               // Construct important imformation for the spawnRequest
+
+               const body: BodyPartConstant[] = []
+               let tier = 0
+               let cost = 0
+
+               // Construct from totalExtraParts at a max of 50, at equal to extraOpts's length
+
+               let remainingAllowedParts = maxPartsPerCreep
+
+               // If there are defaultParts
+
+               if (opts.defaultParts.length) {
+                    // Increment tier
+
+                    tier++
+
+                    // Loop through defaultParts
+
+                    for (const part of opts.defaultParts) {
+                         // Get the cost of the part
+
+                         const partCost = BODYPART_COST[part]
+
+                         // And add the partCost to the cost
+
+                         cost += partCost
+
+                         // Add the part the the body
+
+                         body.push(part)
+                    }
+               }
+
+               // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
+
+               while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
                     // Loop through each part in extraParts
 
                     for (const part of opts.extraParts) {
+                         // And add the part's cost to the cost
 
-                        // And add the part's cost to the cost
+                         cost += BODYPART_COST[part]
 
-                        cost += BODYPART_COST[part]
+                         // Add the part the the body
 
-                        // Otherwise add the part the the body
+                         body.push(part)
 
-                        body.push(part)
+                         // Reduce remainingAllowedParts and totalExtraParts
 
-                        // Reduce remainingAllowedParts
-
-                        remainingAllowedParts--
+                         remainingAllowedParts--
+                         totalExtraParts--
                     }
 
                     // Increase tier
 
                     tier++
-                }
+               }
 
-                // Assign partIndex as the length of extraParts
+               // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
 
-                let partIndex = opts.extraParts.length
+               if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
+                    // Assign partIndex as the length of extraParts
 
-                // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
+                    let partIndex = opts.extraParts.length - 1
 
-                if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
+                    // So long as partIndex is greater or equal to 0
 
-                    // So long as partIndex is above 0
+                    while (partIndex >= 0) {
+                         // Get the part using the partIndex
 
-                    while (partIndex > 0) {
+                         const part = opts.extraParts[partIndex]
 
-                        // Get the part using the partIndex
+                         // Get the cost of the part
 
-                        const part = opts.extraParts[partIndex],
+                         const partCost = BODYPART_COST[part]
 
-                        // Get the cost of the part
+                         // If the cost minus partCost is below minCost, stop the loop
 
-                        partCost = BODYPART_COST[part]
+                         if (cost - partCost < opts.minCost) break
 
-                        // If the cost minus partCost is below minCost, stop the loop
+                         // And remove the part's cost to the cost
 
-                        if (cost - partCost < opts.minCost) break
+                         cost -= partCost
 
-                        // And remove the part's cost to the cost
+                         // Remove the last part in the body
 
-                        cost -= partCost
+                         body.pop()
 
-                        // Remove the last part in the body
+                         // Increase remainingAllowedParts and totalExtraParts
 
-                        body.pop()
+                         remainingAllowedParts++
+                         totalExtraParts++
 
-                        // Increase remainingAllowedParts
+                         // Decrease the partIndex
 
-                        remainingAllowedParts++
-
-                        // Decrease the partIndex
-
-                        partIndex--
+                         partIndex--
                     }
 
                     // Decrease tier
 
                     tier--
-                }
-            }
-
-            // Create a spawnRequest using previously constructed information
-
-            createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
-
-            // Reduce the number of minCreeps
-
-            opts.minCreeps--
-        }
-
-        // If minCreeps is equal to 0, stop
-
-        return
-    }
-
-    // Construct spawn requests while deciding on creep amounts
-
-    function constructSpawnRequestsByGroup(opts: SpawnRequestOpts) {
-
-        // Get the maxCostPerCreep
-
-        const maxCostPerCreep = Math.max(decideMaxCostPerCreep(opts.maxCostPerCreep), opts.minCost)
-
-        // Find the totalExtraParts using the partsMultiplier
-
-        let totalExtraParts = Math.floor(opts.extraParts.length * opts.partsMultiplier)
-
-        // Construct from totalExtraParts at a max of 50 - number of defaultParts
-
-        const maxPartsPerCreep = Math.min(50 - opts.defaultParts.length, totalExtraParts)
-
-        // Loop through creep names of the requested role
-
-        for (const creepName of opts.groupComparator || room.creepsFromRoom[opts.memoryAdditions.role]) {
-
-            // Take away the amount of parts the creep with the name has from totalExtraParts
-
-            totalExtraParts -= (Game.creeps[creepName].body.length - opts.defaultParts.length)
-        }
-
-        // If there aren't enough requested parts to justify spawning a creep, stop
-
-        if (totalExtraParts < maxPartsPerCreep * (opts.threshold || 0.25)) return
-
-        // Subtract maxCreeps by the existing number of creeps of this role
-
-        opts.maxCreeps -= opts.groupComparator ? opts.groupComparator.length : room.creepsFromRoom[opts.memoryAdditions.role].length
-
-        // So long as there are totalExtraParts left to assign
-
-        while (totalExtraParts >= opts.extraParts.length && opts.maxCreeps > 0) {
-
-            // Construct important imformation for the spawnRequest
-
-            let body: BodyPartConstant[] = [],
-            tier = 0,
-            cost = 0,
-
-            // Construct from totalExtraParts at a max of 50, at equal to extraOpts's length
-
-            remainingAllowedParts = maxPartsPerCreep
-
-            // If there are defaultParts
-
-            if (opts.defaultParts.length) {
-
-                // Increment tier
-
-                tier++
-
-                // Loop through defaultParts
-
-                for (const part of opts.defaultParts) {
-
-                    // Get the cost of the part
-
-                    const partCost = BODYPART_COST[part]
-
-                    // And add the partCost to the cost
-
-                    cost += partCost
-
-                    // Add the part the the body
-
-                    body.push(part)
-                }
-            }
-
-            // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
-
-            while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
-
-                // Loop through each part in extraParts
-
-                for (const part of opts.extraParts) {
-
-                    // And add the part's cost to the cost
-
-                    cost += BODYPART_COST[part]
-
-                    // Add the part the the body
-
-                    body.push(part)
-
-                    // Reduce remainingAllowedParts and totalExtraParts
-
-                    remainingAllowedParts--
-                    totalExtraParts--
-                }
-
-                // Increase tier
-
-                tier++
-            }
-
-            // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
-
-            if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
-
-                // Assign partIndex as the length of extraParts
-
-                let partIndex = opts.extraParts.length - 1
-
-                // So long as partIndex is greater or equal to 0
-
-                while (partIndex >= 0) {
-
-                    // Get the part using the partIndex
-
-                    const part = opts.extraParts[partIndex],
-
-                    // Get the cost of the part
-
-                    partCost = BODYPART_COST[part]
-
-                    // If the cost minus partCost is below minCost, stop the loop
-
-                    if (cost - partCost < opts.minCost) break
-
-                    // And remove the part's cost to the cost
-
-                    cost -= partCost
-
-                    // Remove the last part in the body
-
-                    body.pop()
-
-                    // Increase remainingAllowedParts and totalExtraParts
-
-                    remainingAllowedParts++
-                    totalExtraParts++
-
-                    // Decrease the partIndex
-
-                    partIndex--
-                }
-
-                // Decrease tier
-
-                tier--
-            }
-
-            // Create a spawnRequest using previously constructed information
-
-            createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
-
-            // Decrease maxCreeps counter
-
-            opts.maxCreeps--
-        }
-    }
-
-    const mostOptimalSource = room.findSourcesByEfficacy()[0]
-
-    // Construct requests for sourceHarvesters
-
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        const sourceName = 'source1',
-            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length,
-            role = 'source1Harvester'
-
-        if (spawnEnergyCapacity >= 800) {
-
-            return {
-                defaultParts: [CARRY],
-                extraParts: [WORK, MOVE, WORK],
-                partsMultiplier: 3,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 200,
-                priority,
-                memoryAdditions: {
-                    role,
-                    sourceName
-                }
-            }
-        }
-
-        if (spawnEnergyCapacity >= 750) {
-
-            return {
-                defaultParts: [],
-                extraParts: [WORK, MOVE, WORK],
-                partsMultiplier: 3,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 200,
-                priority,
-                memoryAdditions: {
-                    role,
-                    sourceName
-                }
-            }
-        }
-
-        if (spawnEnergyCapacity >= 600) {
-
-            return {
-                defaultParts: [MOVE, CARRY],
-                extraParts: [WORK],
-                partsMultiplier: 6,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 300,
-                priority,
-                memoryAdditions: {
-                    role,
-                    sourceName
-                }
-            }
-        }
-
-        if (room.get(`${sourceName}Container`)) {
-
-            return {
-                defaultParts: [MOVE],
-                extraParts: [WORK],
-                partsMultiplier: 6,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 150,
-                priority,
-                memoryAdditions: {
-                    role,
-                    sourceName
-                }
-            }
-        }
-
-        return {
-            defaultParts: [MOVE, CARRY],
-            extraParts: [WORK],
-            partsMultiplier: 6,
-            minCreeps: undefined,
-            maxCreeps: Math.min(3, room.get(`${sourceName}HarvestPositions`).length),
-            minCost: 200,
-            priority,
-            memoryAdditions: {
-                role,
-                sourceName
-            }
-        }
-    })())
-
-    // Construct requests for sourceHarvesters
-
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        const sourceName = 'source2',
-            priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length,
-            role = 'source2Harvester'
-
-        if (spawnEnergyCapacity >= 800) {
-
-            return {
-                defaultParts: [CARRY],
-                extraParts: [WORK, MOVE, WORK],
-                partsMultiplier: 3,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 200,
-                priority,
-                memoryAdditions: {
-                    role,
-                    sourceName
-                }
-            }
-        }
-
-        if (spawnEnergyCapacity >= 750) {
-
-            return {
-                defaultParts: [],
-                extraParts: [WORK, MOVE, WORK],
-                partsMultiplier: 3,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 200,
-                priority,
-                memoryAdditions: {
-                    role,
-                    sourceName
-                }
-            }
-        }
-
-        if (spawnEnergyCapacity >= 600) {
-
-            return {
-                defaultParts: [MOVE, CARRY],
-                extraParts: [WORK],
-                partsMultiplier: 6,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 300,
-                priority,
-                memoryAdditions: {
-                    role,
-                    sourceName
-                }
-            }
-        }
-
-        if (room.get(`${sourceName}Container`)) {
-
-            return {
-                defaultParts: [MOVE],
-                extraParts: [WORK],
-                partsMultiplier: 6,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 150,
-                priority,
-                memoryAdditions: {
-                    role,
-                    sourceName
-                }
-            }
-        }
-
-        return {
-            defaultParts: [MOVE, CARRY],
-            extraParts: [WORK],
-            partsMultiplier: 6,
-            minCreeps: undefined,
-            maxCreeps: Math.min(3, room.get(`${sourceName}HarvestPositions`).length),
-            minCost: 200,
-            priority,
-            memoryAdditions: {
-                role,
-                sourceName
-            }
-        }
-    })())
-
-    // Construct requests for haulers
-
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        const priority = 0.5 + room.creepsFromRoom.hauler.length * 0.75
-
-        // Construct the required carry parts
-
-        let requiredCarryParts = 10
-
-        // If there is no source1Link, increase requiredCarryParts using the source's path length
-
-        if (!room.get('source1Link')) requiredCarryParts += findCarryPartsRequired((room.global.source1PathLength || 0) * 2, 10)
-
-        // If there is no source2Link, increase requiredCarryParts using the source's path length
-
-        if (!room.get('source2Link')) requiredCarryParts += findCarryPartsRequired((room.global.source2PathLength || 0) * 2, 10)
-
-        // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
-
-        if (room.get('controllerContainer') && !room.get('controllerLink')) requiredCarryParts += findCarryPartsRequired((room.global.upgradePathLength || 0) * 2, room.getPartsOfRoleAmount('controllerUpgrader', WORK))
-
-        // If all RCL 3 extensions are build
-
-        if (spawnEnergyCapacity >= 800) {
-
-            return {
-                defaultParts: [],
-                extraParts: [CARRY, CARRY, MOVE],
-                partsMultiplier: requiredCarryParts / 2,
-                minCreeps: undefined,
-                maxCreeps: Infinity,
-                minCost: 150,
-                priority,
-                memoryAdditions: {
-                    role: 'hauler',
-                }
-            }
-        }
-
-        return {
-            defaultParts: [],
-            extraParts: [CARRY, MOVE],
-            partsMultiplier: requiredCarryParts,
-            minCreeps: undefined,
-            maxCreeps: Infinity,
-            minCost: 100,
-            priority,
-            memoryAdditions: {
-                role: 'hauler',
-            }
-        }
-    })())
-
-    // Construct requests for mineralHarvesters
-
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        // If there is no extractor, inform false
-
-        if (!room.get('extractor').length) return false
-
-        if (!room.storage || room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < 40000) return false
-
-        // If there is no terminal, inform false
-
-        if (!room.terminal) return false
-
-        // Get the mineral. If it's out of resources, inform false
-
-        const mineral: Mineral = room.get('mineral')
-        if (mineral.mineralAmount == 0) return false
-
-        return {
-            defaultParts: [],
-            extraParts: [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, MOVE, CARRY, CARRY, MOVE, WORK],
-            partsMultiplier: room.get('mineralHarvestPositions')?.length * 4,
-            minCreeps: 1,
-            minCost: 900,
-            priority: 6 + (room.creepsFromRoom.mineralHarvester.length * 3),
-            memoryAdditions: {
-                role: 'mineralHarvester',
-            }
-        }
-    })())
-
-    // Construct requests for hubHaulers
-
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        // If there is no storage, inform false
-
-        if (!room.storage) return false
-
-        // Otherwise if there is no hubLink or terminal, inform false
-
-        if (!room.get('hubLink') &&
-            !room.terminal) return false
-
-        return {
-            defaultParts: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, CARRY],
-            extraParts: [],
-            partsMultiplier: 1,
-            minCreeps: 1,
-            minCost: 800,
-            priority: 3,
-            memoryAdditions: {
-                role: 'hubHauler',
-            }
-        }
-    })())
-
-    // Construct requests for fastFillers
-
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        // Get the fastFiller positions, if there are none, inform false
-
-        const fastFillerPositions: Pos[] = room.get('fastFillerPositions')
-        if (!fastFillerPositions.length) return false
-
-        let defaultParts = [CARRY, MOVE, CARRY]
-
-        // If the controller level is more or equal to 7, increase the defaultParts
-
-        if (room.controller.level >= 7) defaultParts = [CARRY, CARRY, CARRY, MOVE, CARRY]
-
-        return {
-            defaultParts,
-            extraParts: [],
-            partsMultiplier: 1,
-            minCreeps: fastFillerPositions.length,
-            minCost: 250,
-            priority: 0.75,
-            memoryAdditions: {
-                role: 'fastFiller',
-            }
-        }
-    })())
-
-    // Get enemyAttackers in the room
-
-    let enemyAttackers: Creep[]
-
-    // If there are no towers
-
-    if (!room.get('tower').length) {
-
-        // Consider invaders as significant attackers
-
-        enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-            filter: creep => !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
-        })
-    }
-
-    // Otherwise
-
-    else {
-
-        // Don't consider invaders
-
-        enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-            filter: creep => creep.owner.username != 'Invader' && !allyList.has(creep.owner.username) && !creep.isOnExit() && creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK])
-        })
-    }
-
-    // Get the attackValue of the attackers
-
-    let attackStrength = 0
-
-    // Loop through each enemyAttacker
-
-    for (const enemyAttacker of enemyAttackers) {
-
-        // Increase attackValue by the creep's heal power
-
-        attackStrength += enemyAttacker.findStrength()
-    }
-
-    // Construct requests for meleeDefenders
-
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        // Inform false if there are no enemyAttackers
-
-        if(!enemyAttackers.length) return false
-
-        if (room.controller.safeMode) return false
-
-        return {
-            defaultParts: [],
-            extraParts: [ATTACK, ATTACK, MOVE],
-            partsMultiplier: attackStrength,
-            minCreeps: undefined,
-            maxCreeps: Math.max(enemyAttackers.length, 5),
-            minCost: 210,
-            priority: 2 + room.creepsFromRoom.meleeDefender.length,
-            memoryAdditions: {
-                role: 'meleeDefender',
-            }
-        }
-    })())
-
-    // Get the estimates income
-
-    let estimatedIncome = room.estimateIncome()
-
-    // Construct requests for builders
-
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        // Stop if there are no construction sites
-
-        if (room.find(FIND_MY_CONSTRUCTION_SITES).length == 0) return false
-
-        let partsMultiplier = 0
-
-        // If there is a storage
-
-        if (room.storage) {
-
-            // If the storage is sufficiently full, provide x amount per y enemy in storage
-
-            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= builderSpawningWhenStorageThreshold) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 8000
-        }
-
-        // Otherwise if there is no storage
-
-        else partsMultiplier += estimatedIncome
-
-        // If all RCL 3 extensions are build
-
-        if (spawnEnergyCapacity >= 800) {
-
-            partsMultiplier /= 3
-
-            return {
-                defaultParts: [],
-                extraParts: [WORK, WORK, MOVE, CARRY, CARRY, MOVE, CARRY, CARRY, MOVE, CARRY, MOVE, WORK],
-                partsMultiplier: partsMultiplier / 3,
-                minCreeps: undefined,
-                maxCreeps: Infinity,
-                minCost: 750,
-                priority: 3.5 + room.creepsFromRoom.builder.length,
-                memoryAdditions: {
-                    role: 'builder',
-                }
-            }
-        }
-
-        return {
-            defaultParts: [],
-            extraParts: [MOVE, CARRY, MOVE, WORK],
-            partsMultiplier,
-            minCreeps: undefined,
-            maxCreeps: Infinity,
-            minCost: 250,
-            priority: 3.5 + room.creepsFromRoom.builder.length,
-            memoryAdditions: {
-                role: 'builder',
-            }
-        }
-    })())
-
-    // Construct requests for mainainers
-
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        // Get roads
-
-        const roads: (StructureRoad | StructureContainer)[] = room.get('road'),
-
-        // Get containers
-
-        containers: StructureContainer[] = room.get('container'),
-
-        // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
-
-        repairTargets = roads.concat(containers).filter(structure => structure.hitsMax * 0.2 >= structure.hits),
-
-        // Get ramparts below their max hits
-
-        ramparts = (room.get('rampart') as StructureRampart[]).filter(rampart => rampart.hits < rampart.hitsMax)
-
-        // If there are no ramparts or repair targets
-
-        if (!ramparts.length && !repairTargets.length) return false
-
-        // Construct the partsMultiplier
-
-        let partsMultiplier = 1
-
-        // For each road, add a multiplier
-
-        partsMultiplier += roads.length * 0.015
-
-        // For each container, add a multiplier
-
-        partsMultiplier += containers.length * 0.3
-
-        // For each rampart, add a multiplier
-
-        partsMultiplier += ramparts.length * 0.06
-
-        // For every attackValue, add a multiplier
-
-        partsMultiplier += attackStrength * 0.5
-
-        // For every x energy in storage, add 1 multiplier
-
-        if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000
-
-        // If all RCL 3 extensions are build
-
-        if (spawnEnergyCapacity >= 800) {
-
-            return {
-                defaultParts: [],
-                extraParts: [CARRY, MOVE, WORK],
-                partsMultiplier,
-                minCreeps: undefined,
-                maxCreeps: Infinity,
-                minCost: 200,
-                priority: 3.5 + room.creepsFromRoom.maintainer.length,
-                memoryAdditions: {
-                    role: 'maintainer',
-                }
-            }
-        }
-
-        return {
-            defaultParts: [],
-            extraParts: [MOVE, CARRY, MOVE, WORK],
-            partsMultiplier,
-            minCreeps: undefined,
-            maxCreeps: Infinity,
-            minCost: 250,
-            priority: 3.5 + room.creepsFromRoom.maintainer.length,
-            memoryAdditions: {
-                role: 'maintainer',
-            }
-        }
-    })())
-
-    // Construct requests for upgraders
-
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        let partsMultiplier = 1,
-            maxCreeps = room.get('upgradePositions').length
-
-        // Get the controllerLink and baseLink
-
-        const controllerLink: StructureLink | undefined = room.get('controllerLink')
-
-        // If the controllerLink is defined
-
-        if (controllerLink) {
-
-            maxCreeps--
-
-            const hubLink: StructureLink | undefined = room.get('hubLink'),
-                sourceLinks: StructureLink[] = [room.get('source1Link'), room.get('source2Link')]
-
-            partsMultiplier = 0
-
-            if (hubLink) {
-
-                // Get the range between the controllerLink and hubLink
-
-                const range = getRange(controllerLink.pos.x - hubLink.pos.x, controllerLink.pos.y - hubLink.pos.y)
-
-                // Limit partsMultiplier at the range with a multiplier
-
-                partsMultiplier += Math.max(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range)
-            }
-
-            for (const sourceLink of sourceLinks) {
-
-                if (!sourceLink) continue
-
-                // Get the range between the controllerLink and hubLink
-
-                const range = getRange(controllerLink.pos.x - sourceLink.pos.x, controllerLink.pos.y - sourceLink.pos.y)
-
-                // Limit partsMultiplier at the range with a multiplier
-
-                partsMultiplier += Math.max(partsMultiplier, (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) / range)
-            }
-        }
-
-        // If there is a storage
-
-        if (room.storage) {
-
-            // If the storage is sufficiently full, provide x amount per y enemy in storage
-
-            if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold) partsMultiplier = Math.pow(room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000, 2)
-
-            // Otherwise, set partsMultiplier to 0
-
-            else partsMultiplier = 0
-        }
-
-        // Otherwise if there is no storage
-
-        else {
-
-            partsMultiplier += estimatedIncome * 2
-        }
-
-        // If there are construction sites of my ownership in the room, set multiplier to 1
-
-        if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
-
-        // Intitialize the threshold
-
-        const threshold = 0.15
-
-        // If the controllerContainer or controllerLink exists
-
-        if (room.get('controllerContainer') || controllerLink) {
-
-            // If the controller is level 8
-
-            if (room.controller.level == 8) {
-
-                // If the controller is near to downgrading
-
-                if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 5
-
-                partsMultiplier = Math.min(Math.round(partsMultiplier / 5), 3)
-                if (partsMultiplier == 0) return false
-
-                return {
-                    defaultParts: [MOVE],
-                    extraParts: [WORK, WORK, WORK, WORK, MOVE, CARRY, WORK],
-                    partsMultiplier,
-                    threshold,
-                    minCreeps: 1,
-                    minCost: 650,
-                    priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
-                    memoryAdditions: {
-                        role: 'controllerUpgrader',
+               }
+
+               // Create a spawnRequest using previously constructed information
+
+               createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
+
+               // Decrease maxCreeps counter
+
+               opts.maxCreeps--
+          }
+     }
+
+     const mostOptimalSource = room.findSourcesByEfficacy()[0]
+
+     // Construct requests for sourceHarvesters
+
+     constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               const sourceName = 'source1'
+               const priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length
+               const role = 'source1Harvester'
+
+               if (spawnEnergyCapacity >= 800) {
+                    return {
+                         defaultParts: [CARRY],
+                         extraParts: [WORK, MOVE, WORK],
+                         partsMultiplier: 3,
+                         minCreeps: 1,
+                         maxCreeps: Infinity,
+                         minCost: 200,
+                         priority,
+                         memoryAdditions: {
+                              role,
+                              sourceName,
+                         },
                     }
-                }
-            }
+               }
 
-            // Otherwise if the spawnEnergyCapacity is more than 800
+               if (spawnEnergyCapacity >= 750) {
+                    return {
+                         defaultParts: [],
+                         extraParts: [WORK, MOVE, WORK],
+                         partsMultiplier: 3,
+                         minCreeps: 1,
+                         maxCreeps: Infinity,
+                         minCost: 200,
+                         priority,
+                         memoryAdditions: {
+                              role,
+                              sourceName,
+                         },
+                    }
+               }
 
-            if (spawnEnergyCapacity >= 800) {
+               if (spawnEnergyCapacity >= 600) {
+                    return {
+                         defaultParts: [MOVE, CARRY],
+                         extraParts: [WORK],
+                         partsMultiplier: 6,
+                         minCreeps: 1,
+                         maxCreeps: Infinity,
+                         minCost: 300,
+                         priority,
+                         memoryAdditions: {
+                              role,
+                              sourceName,
+                         },
+                    }
+               }
 
-                // If the controller is near to downgrading, set partsMultiplier to x
+               if (room.get(`${sourceName}Container`)) {
+                    return {
+                         defaultParts: [MOVE],
+                         extraParts: [WORK],
+                         partsMultiplier: 6,
+                         minCreeps: 1,
+                         maxCreeps: Infinity,
+                         minCost: 150,
+                         priority,
+                         memoryAdditions: {
+                              role,
+                              sourceName,
+                         },
+                    }
+               }
 
-                if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 6
-
-                partsMultiplier = Math.round(partsMultiplier / 6)
-                if (partsMultiplier == 0) return false
-
-                return {
-                    defaultParts: [CARRY],
-                    extraParts: [WORK, WORK, WORK, MOVE, WORK, WORK, WORK],
-                    partsMultiplier,
-                    threshold,
+               return {
+                    defaultParts: [MOVE, CARRY],
+                    extraParts: [WORK],
+                    partsMultiplier: 6,
                     minCreeps: undefined,
-                    maxCreeps,
-                    minCost: 700,
+                    maxCreeps: Math.min(3, room.get(`${sourceName}HarvestPositions`).length),
+                    minCost: 200,
+                    priority,
+                    memoryAdditions: {
+                         role,
+                         sourceName,
+                    },
+               }
+          })(),
+     )
+
+     // Construct requests for sourceHarvesters
+
+     constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               const sourceName = 'source2'
+               const priority = (mostOptimalSource == sourceName ? 0 : 1) + room.creepsFromRoom.source1Harvester.length
+               const role = 'source2Harvester'
+
+               if (spawnEnergyCapacity >= 800) {
+                    return {
+                         defaultParts: [CARRY],
+                         extraParts: [WORK, MOVE, WORK],
+                         partsMultiplier: 3,
+                         minCreeps: 1,
+                         maxCreeps: Infinity,
+                         minCost: 200,
+                         priority,
+                         memoryAdditions: {
+                              role,
+                              sourceName,
+                         },
+                    }
+               }
+
+               if (spawnEnergyCapacity >= 750) {
+                    return {
+                         defaultParts: [],
+                         extraParts: [WORK, MOVE, WORK],
+                         partsMultiplier: 3,
+                         minCreeps: 1,
+                         maxCreeps: Infinity,
+                         minCost: 200,
+                         priority,
+                         memoryAdditions: {
+                              role,
+                              sourceName,
+                         },
+                    }
+               }
+
+               if (spawnEnergyCapacity >= 600) {
+                    return {
+                         defaultParts: [MOVE, CARRY],
+                         extraParts: [WORK],
+                         partsMultiplier: 6,
+                         minCreeps: 1,
+                         maxCreeps: Infinity,
+                         minCost: 300,
+                         priority,
+                         memoryAdditions: {
+                              role,
+                              sourceName,
+                         },
+                    }
+               }
+
+               if (room.get(`${sourceName}Container`)) {
+                    return {
+                         defaultParts: [MOVE],
+                         extraParts: [WORK],
+                         partsMultiplier: 6,
+                         minCreeps: 1,
+                         maxCreeps: Infinity,
+                         minCost: 150,
+                         priority,
+                         memoryAdditions: {
+                              role,
+                              sourceName,
+                         },
+                    }
+               }
+
+               return {
+                    defaultParts: [MOVE, CARRY],
+                    extraParts: [WORK],
+                    partsMultiplier: 6,
+                    minCreeps: undefined,
+                    maxCreeps: Math.min(3, room.get(`${sourceName}HarvestPositions`).length),
+                    minCost: 200,
+                    priority,
+                    memoryAdditions: {
+                         role,
+                         sourceName,
+                    },
+               }
+          })(),
+     )
+
+     // Construct requests for haulers
+
+     constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               const priority = 0.5 + room.creepsFromRoom.hauler.length * 0.75
+
+               // Construct the required carry parts
+
+               let requiredCarryParts = 10
+
+               // If there is no source1Link, increase requiredCarryParts using the source's path length
+
+               if (!room.get('source1Link'))
+                    requiredCarryParts += findCarryPartsRequired((room.global.source1PathLength || 0) * 2, 10)
+
+               // If there is no source2Link, increase requiredCarryParts using the source's path length
+
+               if (!room.get('source2Link'))
+                    requiredCarryParts += findCarryPartsRequired((room.global.source2PathLength || 0) * 2, 10)
+
+               // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
+
+               if (room.get('controllerContainer') && !room.get('controllerLink'))
+                    requiredCarryParts += findCarryPartsRequired(
+                         (room.global.upgradePathLength || 0) * 2,
+                         room.getPartsOfRoleAmount('controllerUpgrader', WORK),
+                    )
+
+               // If all RCL 3 extensions are build
+
+               if (spawnEnergyCapacity >= 800) {
+                    return {
+                         defaultParts: [],
+                         extraParts: [CARRY, CARRY, MOVE],
+                         partsMultiplier: requiredCarryParts / 2,
+                         minCreeps: undefined,
+                         maxCreeps: Infinity,
+                         minCost: 150,
+                         priority,
+                         memoryAdditions: {
+                              role: 'hauler',
+                         },
+                    }
+               }
+
+               return {
+                    defaultParts: [],
+                    extraParts: [CARRY, MOVE],
+                    partsMultiplier: requiredCarryParts,
+                    minCreeps: undefined,
+                    maxCreeps: Infinity,
+                    minCost: 100,
+                    priority,
+                    memoryAdditions: {
+                         role: 'hauler',
+                    },
+               }
+          })(),
+     )
+
+     // Construct requests for mineralHarvesters
+
+     constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               // If there is no extractor, inform false
+
+               if (!room.get('extractor').length) return false
+
+               if (!room.storage || room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < 40000) return false
+
+               // If there is no terminal, inform false
+
+               if (!room.terminal) return false
+
+               // Get the mineral. If it's out of resources, inform false
+
+               const mineral: Mineral = room.get('mineral')
+               if (mineral.mineralAmount == 0) return false
+
+               return {
+                    defaultParts: [],
+                    extraParts: [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, MOVE, CARRY, CARRY, MOVE, WORK],
+                    partsMultiplier: room.get('mineralHarvestPositions')?.length * 4,
+                    minCreeps: 1,
+                    minCost: 900,
+                    priority: 6 + room.creepsFromRoom.mineralHarvester.length * 3,
+                    memoryAdditions: {
+                         role: 'mineralHarvester',
+                    },
+               }
+          })(),
+     )
+
+     // Construct requests for hubHaulers
+
+     constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               // If there is no storage, inform false
+
+               if (!room.storage) return false
+
+               // Otherwise if there is no hubLink or terminal, inform false
+
+               if (!room.get('hubLink') && !room.terminal) return false
+
+               return {
+                    defaultParts: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, CARRY],
+                    extraParts: [],
+                    partsMultiplier: 1,
+                    minCreeps: 1,
+                    minCost: 800,
+                    priority: 3,
+                    memoryAdditions: {
+                         role: 'hubHauler',
+                    },
+               }
+          })(),
+     )
+
+     // Construct requests for fastFillers
+
+     constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               // Get the fastFiller positions, if there are none, inform false
+
+               const fastFillerPositions: Pos[] = room.get('fastFillerPositions')
+               if (!fastFillerPositions.length) return false
+
+               let defaultParts = [CARRY, MOVE, CARRY]
+
+               // If the controller level is more or equal to 7, increase the defaultParts
+
+               if (room.controller.level >= 7) defaultParts = [CARRY, CARRY, CARRY, MOVE, CARRY]
+
+               return {
+                    defaultParts,
+                    extraParts: [],
+                    partsMultiplier: 1,
+                    minCreeps: fastFillerPositions.length,
+                    minCost: 250,
+                    priority: 0.75,
+                    memoryAdditions: {
+                         role: 'fastFiller',
+                    },
+               }
+          })(),
+     )
+
+     // Get enemyAttackers in the room
+
+     let enemyAttackers: Creep[]
+
+     // If there are no towers
+
+     if (!room.get('tower').length) {
+          // Consider invaders as significant attackers
+
+          enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+               filter: creep =>
+                    !allyList.has(creep.owner.username) &&
+                    !creep.isOnExit() &&
+                    creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK]),
+          })
+     }
+
+     // Otherwise
+     else {
+          // Don't consider invaders
+
+          enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
+               filter: creep =>
+                    creep.owner.username != 'Invader' &&
+                    !allyList.has(creep.owner.username) &&
+                    !creep.isOnExit() &&
+                    creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK]),
+          })
+     }
+
+     // Get the attackValue of the attackers
+
+     let attackStrength = 0
+
+     // Loop through each enemyAttacker
+
+     for (const enemyAttacker of enemyAttackers) {
+          // Increase attackValue by the creep's heal power
+
+          attackStrength += enemyAttacker.findStrength()
+     }
+
+     // Construct requests for meleeDefenders
+
+     constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               // Inform false if there are no enemyAttackers
+
+               if (!enemyAttackers.length) return false
+
+               if (room.controller.safeMode) return false
+
+               return {
+                    defaultParts: [],
+                    extraParts: [ATTACK, ATTACK, MOVE],
+                    partsMultiplier: attackStrength,
+                    minCreeps: undefined,
+                    maxCreeps: Math.max(enemyAttackers.length, 5),
+                    minCost: 210,
+                    priority: 2 + room.creepsFromRoom.meleeDefender.length,
+                    memoryAdditions: {
+                         role: 'meleeDefender',
+                    },
+               }
+          })(),
+     )
+
+     // Get the estimates income
+
+     const estimatedIncome = room.estimateIncome()
+
+     // Construct requests for builders
+
+     constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               // Stop if there are no construction sites
+
+               if (room.find(FIND_MY_CONSTRUCTION_SITES).length == 0) return false
+
+               let partsMultiplier = 0
+
+               // If there is a storage
+
+               if (room.storage) {
+                    // If the storage is sufficiently full, provide x amount per y enemy in storage
+
+                    if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= builderSpawningWhenStorageThreshold)
+                         partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 8000
+               }
+
+               // Otherwise if there is no storage
+               else partsMultiplier += estimatedIncome
+
+               // If all RCL 3 extensions are build
+
+               if (spawnEnergyCapacity >= 800) {
+                    partsMultiplier /= 3
+
+                    return {
+                         defaultParts: [],
+                         extraParts: [WORK, WORK, MOVE, CARRY, CARRY, MOVE, CARRY, CARRY, MOVE, CARRY, MOVE, WORK],
+                         partsMultiplier: partsMultiplier / 3,
+                         minCreeps: undefined,
+                         maxCreeps: Infinity,
+                         minCost: 750,
+                         priority: 3.5 + room.creepsFromRoom.builder.length,
+                         memoryAdditions: {
+                              role: 'builder',
+                         },
+                    }
+               }
+
+               return {
+                    defaultParts: [],
+                    extraParts: [MOVE, CARRY, MOVE, WORK],
+                    partsMultiplier,
+                    minCreeps: undefined,
+                    maxCreeps: Infinity,
+                    minCost: 250,
+                    priority: 3.5 + room.creepsFromRoom.builder.length,
+                    memoryAdditions: {
+                         role: 'builder',
+                    },
+               }
+          })(),
+     )
+
+     // Construct requests for mainainers
+
+     constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               // Get roads
+
+               const roads: (StructureRoad | StructureContainer)[] = room.get('road')
+               // Get containers
+
+               const containers: StructureContainer[] = room.get('container')
+               // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
+
+               const repairTargets = roads
+                    .concat(containers)
+                    .filter(structure => structure.hitsMax * 0.2 >= structure.hits)
+               // Get ramparts below their max hits
+
+               const ramparts = (room.get('rampart') as StructureRampart[]).filter(
+                    rampart => rampart.hits < rampart.hitsMax,
+               )
+
+               // If there are no ramparts or repair targets
+
+               if (!ramparts.length && !repairTargets.length) return false
+
+               // Construct the partsMultiplier
+
+               let partsMultiplier = 1
+
+               // For each road, add a multiplier
+
+               partsMultiplier += roads.length * 0.015
+
+               // For each container, add a multiplier
+
+               partsMultiplier += containers.length * 0.3
+
+               // For each rampart, add a multiplier
+
+               partsMultiplier += ramparts.length * 0.06
+
+               // For every attackValue, add a multiplier
+
+               partsMultiplier += attackStrength * 0.5
+
+               // For every x energy in storage, add 1 multiplier
+
+               if (room.storage) partsMultiplier += room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000
+
+               // If all RCL 3 extensions are build
+
+               if (spawnEnergyCapacity >= 800) {
+                    return {
+                         defaultParts: [],
+                         extraParts: [CARRY, MOVE, WORK],
+                         partsMultiplier,
+                         minCreeps: undefined,
+                         maxCreeps: Infinity,
+                         minCost: 200,
+                         priority: 3.5 + room.creepsFromRoom.maintainer.length,
+                         memoryAdditions: {
+                              role: 'maintainer',
+                         },
+                    }
+               }
+
+               return {
+                    defaultParts: [],
+                    extraParts: [MOVE, CARRY, MOVE, WORK],
+                    partsMultiplier,
+                    minCreeps: undefined,
+                    maxCreeps: Infinity,
+                    minCost: 250,
+                    priority: 3.5 + room.creepsFromRoom.maintainer.length,
+                    memoryAdditions: {
+                         role: 'maintainer',
+                    },
+               }
+          })(),
+     )
+
+     // Construct requests for upgraders
+
+     constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               let partsMultiplier = 1
+               let maxCreeps = room.get('upgradePositions').length
+
+               // Get the controllerLink and baseLink
+
+               const controllerLink: StructureLink | undefined = room.get('controllerLink')
+
+               // If the controllerLink is defined
+
+               if (controllerLink) {
+                    maxCreeps--
+
+                    const hubLink: StructureLink | undefined = room.get('hubLink')
+                    const sourceLinks: StructureLink[] = [room.get('source1Link'), room.get('source2Link')]
+
+                    partsMultiplier = 0
+
+                    if (hubLink) {
+                         // Get the range between the controllerLink and hubLink
+
+                         const range = getRange(
+                              controllerLink.pos.x - hubLink.pos.x,
+                              controllerLink.pos.y - hubLink.pos.y,
+                         )
+
+                         // Limit partsMultiplier at the range with a multiplier
+
+                         partsMultiplier += Math.max(
+                              partsMultiplier,
+                              (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range,
+                         )
+                    }
+
+                    for (const sourceLink of sourceLinks) {
+                         if (!sourceLink) continue
+
+                         // Get the range between the controllerLink and hubLink
+
+                         const range = getRange(
+                              controllerLink.pos.x - sourceLink.pos.x,
+                              controllerLink.pos.y - sourceLink.pos.y,
+                         )
+
+                         // Limit partsMultiplier at the range with a multiplier
+
+                         partsMultiplier += Math.max(
+                              partsMultiplier,
+                              (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) / range,
+                         )
+                    }
+               }
+
+               // If there is a storage
+
+               if (room.storage) {
+                    // If the storage is sufficiently full, provide x amount per y enemy in storage
+
+                    if (room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold)
+                         partsMultiplier = Math.pow(room.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000, 2)
+                    // Otherwise, set partsMultiplier to 0
+                    else partsMultiplier = 0
+               }
+
+               // Otherwise if there is no storage
+               else {
+                    partsMultiplier += estimatedIncome * 2
+               }
+
+               // If there are construction sites of my ownership in the room, set multiplier to 1
+
+               if (room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
+
+               // Intitialize the threshold
+
+               const threshold = 0.15
+
+               // If the controllerContainer or controllerLink exists
+
+               if (room.get('controllerContainer') || controllerLink) {
+                    // If the controller is level 8
+
+                    if (room.controller.level == 8) {
+                         // If the controller is near to downgrading
+
+                         if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 5
+
+                         partsMultiplier = Math.min(Math.round(partsMultiplier / 5), 3)
+                         if (partsMultiplier == 0) return false
+
+                         return {
+                              defaultParts: [MOVE],
+                              extraParts: [WORK, WORK, WORK, WORK, MOVE, CARRY, WORK],
+                              partsMultiplier,
+                              threshold,
+                              minCreeps: 1,
+                              minCost: 650,
+                              priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                              memoryAdditions: {
+                                   role: 'controllerUpgrader',
+                              },
+                         }
+                    }
+
+                    // Otherwise if the spawnEnergyCapacity is more than 800
+
+                    if (spawnEnergyCapacity >= 800) {
+                         // If the controller is near to downgrading, set partsMultiplier to x
+
+                         if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 6
+
+                         partsMultiplier = Math.round(partsMultiplier / 6)
+                         if (partsMultiplier == 0) return false
+
+                         return {
+                              defaultParts: [CARRY],
+                              extraParts: [WORK, WORK, WORK, MOVE, WORK, WORK, WORK],
+                              partsMultiplier,
+                              threshold,
+                              minCreeps: undefined,
+                              maxCreeps,
+                              minCost: 700,
+                              priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                              memoryAdditions: {
+                                   role: 'controllerUpgrader',
+                              },
+                         }
+                    }
+
+                    // If the controller is near to downgrading, set partsMultiplier to x
+
+                    if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 4
+
+                    partsMultiplier = Math.round(partsMultiplier / 4)
+                    if (partsMultiplier == 0) return false
+
+                    return {
+                         defaultParts: [CARRY],
+                         extraParts: [WORK, MOVE, WORK, WORK, WORK],
+                         partsMultiplier,
+                         threshold,
+                         minCreeps: undefined,
+                         maxCreeps,
+                         minCost: 200,
+                         priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                         memoryAdditions: {
+                              role: 'controllerUpgrader',
+                         },
+                    }
+               }
+
+               // If the controller is near to downgrading, set partsMultiplier to x
+
+               if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 1
+
+               if (spawnEnergyCapacity >= 800) {
+                    return {
+                         defaultParts: [],
+                         extraParts: [CARRY, MOVE, WORK],
+                         partsMultiplier,
+                         threshold,
+                         minCost: 200,
+                         priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                         memoryAdditions: {
+                              role: 'controllerUpgrader',
+                         },
+                    }
+               }
+
+               return {
+                    defaultParts: [],
+                    extraParts: [MOVE, CARRY, MOVE, WORK],
+                    partsMultiplier: Math.max(partsMultiplier, 1),
+                    threshold,
+                    minCost: 250,
                     priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
                     memoryAdditions: {
-                        role: 'controllerUpgrader',
+                         role: 'controllerUpgrader',
+                    },
+               }
+          })(),
+     )
+
+     // Get remotes by order of efficacy
+
+     const remoteNamesByEfficacy: string[] = room.get('remoteNamesByEfficacy')
+
+     for (let index = 0; index < remoteNamesByEfficacy.length; index++) {
+          const remoteName = remoteNamesByEfficacy[index]
+          const remoteNeeds = Memory.rooms[remoteName].needs
+          // Add up econ needs for this room
+
+          const remoteEconNeed =
+               Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0) +
+               Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0) +
+               Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0) +
+               Math.max(remoteNeeds[remoteNeedsIndex.remoteReserver], 0)
+
+          // If there is a need for any econ creep, inform the index
+
+          if (remoteEconNeed <= 0) continue
+
+          // Get the sources in order of efficacy
+
+          const sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
+
+          // Construct requests for source1RemoteHarvesters
+
+          constructSpawnRequests(
+               (function (): SpawnRequestOpts | false {
+                    // If there are no needs for this room, inform false
+
+                    if (remoteNeeds[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
+
+                    if (spawnEnergyCapacity >= 950) {
+                         return {
+                              defaultParts: [CARRY],
+                              extraParts: [WORK, MOVE],
+                              partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0),
+                              groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source1RemoteHarvester,
+                              threshold: 0.1,
+                              minCreeps: 1,
+                              maxCreeps: Infinity,
+                              maxCostPerCreep: 50 + 150 * 6,
+                              minCost: 200,
+                              priority: 4 + index - (sourcesByEfficacy[0] == 'source1' ? 0.1 : 0),
+                              memoryAdditions: {
+                                   role: 'source1RemoteHarvester',
+                              },
+                         }
                     }
-                }
-            }
 
-            // If the controller is near to downgrading, set partsMultiplier to x
+                    return {
+                         defaultParts: [CARRY],
+                         extraParts: [WORK, MOVE],
+                         partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0),
+                         groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source1RemoteHarvester,
+                         threshold: 0.1,
+                         minCreeps: undefined,
+                         maxCreeps: global[remoteName]?.source1HarvestPositions?.length || Infinity,
+                         maxCostPerCreep: 50 + 150 * 6,
+                         minCost: 200,
+                         priority: 4 + index - (sourcesByEfficacy[0] == 'source1' ? 0.1 : 0),
+                         memoryAdditions: {
+                              role: 'source1RemoteHarvester',
+                         },
+                    }
+               })(),
+          )
 
-            if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 4
+          // Construct requests for source2RemoteHarvesters
 
-            partsMultiplier = Math.round(partsMultiplier / 4)
-            if (partsMultiplier == 0) return false
+          constructSpawnRequests(
+               (function (): SpawnRequestOpts | false {
+                    // If there are no needs for this room, inform false
 
-            return {
-                defaultParts: [CARRY],
-                extraParts: [WORK, MOVE, WORK, WORK, WORK],
-                partsMultiplier,
-                threshold,
-                minCreeps: undefined,
-                maxCreeps,
-                minCost: 200,
-                priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
-                memoryAdditions: {
-                    role: 'controllerUpgrader',
-                }
-            }
-        }
+                    if (remoteNeeds[remoteNeedsIndex.source2RemoteHarvester] <= 0) return false
 
-        // If the controller is near to downgrading, set partsMultiplier to x
+                    if (spawnEnergyCapacity >= 950) {
+                         return {
+                              defaultParts: [CARRY],
+                              extraParts: [WORK, MOVE],
+                              partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0),
+                              groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source2RemoteHarvester,
+                              threshold: 0.1,
+                              minCreeps: 1,
+                              maxCreeps: Infinity,
+                              minCost: 200,
+                              priority: 4 + index - (sourcesByEfficacy[0] == 'source2' ? 0.1 : 0),
+                              memoryAdditions: {
+                                   role: 'source2RemoteHarvester',
+                              },
+                         }
+                    }
 
-        if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 1
+                    return {
+                         defaultParts: [],
+                         extraParts: [WORK, MOVE],
+                         partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0),
+                         groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source2RemoteHarvester,
+                         threshold: 0.1,
+                         minCreeps: undefined,
+                         maxCreeps: global[remoteName]?.source2HarvestPositions?.length || Infinity,
+                         maxCostPerCreep: 150 * 6,
+                         minCost: 200,
+                         priority: 4 + index - (sourcesByEfficacy[0] == 'source2' ? 0.1 : 0),
+                         memoryAdditions: {
+                              role: 'source2RemoteHarvester',
+                         },
+                    }
+               })(),
+          )
 
-        if (spawnEnergyCapacity >= 800) {
+          // Construct requests for remoteHaulers
 
-            return {
-                defaultParts: [],
-                extraParts: [CARRY, MOVE, WORK],
-                partsMultiplier,
-                threshold,
-                minCost: 200,
-                priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
-                memoryAdditions: {
-                    role: 'controllerUpgrader',
-                }
-            }
-        }
+          constructSpawnRequests(
+               (function (): SpawnRequestOpts | false {
+                    let partsMultiplier = 0
 
-        return {
-            defaultParts: [],
-            extraParts: [MOVE, CARRY, MOVE, WORK],
-            partsMultiplier: Math.max(partsMultiplier, 1),
-            threshold,
-            minCost: 250,
-            priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
-            memoryAdditions: {
-                role: 'controllerUpgrader',
-            }
-        }
-    })())
+                    for (const roomName of remoteNamesByEfficacy) {
+                         partsMultiplier += Math.max(Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHauler], 0)
+                    }
 
-    // Get remotes by order of efficacy
+                    // If there are no needs for this room, inform false
 
-    const remoteNamesByEfficacy: string[] = room.get('remoteNamesByEfficacy')
+                    if (remoteNeeds[remoteNeedsIndex.remoteHauler] <= 0) return false
 
-    for (let index = 0; index < remoteNamesByEfficacy.length; index++) {
+                    return {
+                         defaultParts: [],
+                         extraParts: [CARRY, MOVE],
+                         threshold: 0.1,
+                         partsMultiplier,
+                         minCreeps: undefined,
+                         maxCreeps: Infinity,
+                         minCost: 200,
+                         priority: 4.2 + index,
+                         memoryAdditions: {
+                              role: 'remoteHauler',
+                         },
+                    }
+               })(),
+          )
 
-        const remoteName = remoteNamesByEfficacy[index],
+          // Construct requests for remoteReservers
 
-            remoteNeeds = Memory.rooms[remoteName].needs,
+          constructSpawnRequests(
+               (function (): SpawnRequestOpts | false {
+                    // If there isn't enough spawnEnergyCapacity to spawn a remoteReserver, inform false
 
-            // Add up econ needs for this room
+                    if (spawnEnergyCapacity < 750) return false
 
-            remoteEconNeed = Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0) +
-            Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0) +
-            Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0) +
-            Math.max(remoteNeeds[remoteNeedsIndex.remoteReserver], 0)
+                    // If there are no needs for this room, inform false
 
-        // If there is a need for any econ creep, inform the index
+                    if (remoteNeeds[remoteNeedsIndex.remoteReserver] <= 0) return false
 
-        if (remoteEconNeed <= 0) continue
+                    return {
+                         defaultParts: [],
+                         extraParts: [MOVE, CLAIM],
+                         partsMultiplier: 4,
+                         groupComparator: room.creepsFromRoomWithRemote[remoteName]?.remoteReserver,
+                         minCreeps: 1,
+                         maxCreeps: Infinity,
+                         minCost: 750,
+                         priority: 4.3 + index,
+                         memoryAdditions: {
+                              role: 'remoteReserver',
+                         },
+                    }
+               })(),
+          )
 
-        // Get the sources in order of efficacy
+          // Construct requests for remoteDefenders
 
-        const sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
+          constructSpawnRequests(
+               (function (): SpawnRequestOpts | false {
+                    // Define the minCost and strength
 
-        // Construct requests for source1RemoteHarvesters
+                    const minCost = 400
+                    const cost = 900
+                    const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
+                    const strengthOfParts = findStrengthOfParts(extraParts)
 
-        constructSpawnRequests((function(): SpawnRequestOpts | false {
+                    // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
 
-            // If there are no needs for this room, inform false
+                    if (spawnEnergyCapacity < minCost) return false
 
-            if (remoteNeeds[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
+                    // If there are no related needs
 
-            if (spawnEnergyCapacity >= 950) {
+                    if (remoteNeeds[remoteNeedsIndex.remoteDefender] <= 0) return false
 
-                return {
-                    defaultParts: [CARRY],
-                    extraParts: [WORK, MOVE],
-                    partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0),
-                    groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source1RemoteHarvester,
-                    threshold: 0.1,
-                    minCreeps: 1,
+                    // If max spawnable strength is less that needed
+
+                    if (strengthOfParts * (spawnEnergyCapacity / cost) < remoteNeeds[remoteNeedsIndex.remoteDefender]) {
+                         // Abandon the room for some time
+
+                         Memory.rooms[remoteName].abandoned = 1000
+                         return false
+                    }
+
+                    const requiredParts =
+                         Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthOfParts) * 1.2
+
+                    return {
+                         defaultParts: [],
+                         extraParts,
+                         partsMultiplier: Math.max(requiredParts, 1),
+                         groupComparator: room.creepsFromRoomWithRemote[remoteName]?.remoteDefender,
+                         minCreeps: undefined,
+                         maxCreeps: Infinity,
+                         minCost,
+                         priority: 4,
+                         memoryAdditions: {
+                              role: 'remoteDefender',
+                         },
+                    }
+               })(),
+          )
+     }
+
+     // Construct requests for scouts
+
+     constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               return {
+                    defaultParts: [MOVE],
+                    extraParts: [],
+                    partsMultiplier: 1,
+                    minCreeps: 2,
                     maxCreeps: Infinity,
-                    maxCostPerCreep: 50 + 150 * 6,
-                    minCost: 200,
-                    priority: 4 + index - (sourcesByEfficacy[0] == 'source1' ? .1 : 0),
+                    minCost: 100,
+                    priority: 2,
                     memoryAdditions: {
-                        role: 'source1RemoteHarvester',
+                         role: 'scout',
+                    },
+               }
+          })(),
+     )
+
+     if (room.memory.claimRequest) {
+          const claimRequestNeeds = Memory.claimRequests[room.memory.claimRequest].needs
+
+          // Construct requests for claimers
+
+          constructSpawnRequests(
+               (function (): SpawnRequestOpts | false {
+                    // If there is no claimer need
+
+                    if (claimRequestNeeds[claimRequestNeedsIndex.claimer] <= 0) return false
+
+                    return {
+                         defaultParts: [MOVE, MOVE, CLAIM, MOVE],
+                         extraParts: [],
+                         partsMultiplier: 1,
+                         minCreeps: 1,
+                         minCost: 750,
+                         priority: 3,
+                         memoryAdditions: {
+                              role: 'claimer',
+                         },
                     }
-                }
-            }
+               })(),
+          )
 
-            return {
-                defaultParts: [CARRY],
-                extraParts: [WORK, MOVE],
-                partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0),
-                groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source1RemoteHarvester,
-                threshold: 0.1,
-                minCreeps: undefined,
-                maxCreeps: global[remoteName]?.source1HarvestPositions?.length || Infinity,
-                maxCostPerCreep: 50 + 150 * 6,
-                minCost: 200,
-                priority: 4 + index - (sourcesByEfficacy[0] == 'source1' ? .1 : 0),
-                memoryAdditions: {
-                    role: 'source1RemoteHarvester',
-                }
-            }
-        })())
+          // Requests for vanguard
 
-        // Construct requests for source2RemoteHarvesters
+          constructSpawnRequests(
+               (function (): SpawnRequestOpts | false {
+                    // If there is no vanguard need
 
-        constructSpawnRequests((function(): SpawnRequestOpts | false {
+                    if (claimRequestNeeds[claimRequestNeedsIndex.vanguard] <= 0) return false
 
-            // If there are no needs for this room, inform false
-
-            if (remoteNeeds[remoteNeedsIndex.source2RemoteHarvester] <= 0) return false
-
-            if (spawnEnergyCapacity >= 950) {
-
-                return {
-                    defaultParts: [CARRY],
-                    extraParts: [WORK, MOVE],
-                    partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0),
-                    groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source2RemoteHarvester,
-                    threshold: 0.1,
-                    minCreeps: 1,
-                    maxCreeps: Infinity,
-                    minCost: 200,
-                    priority: 4 + index - (sourcesByEfficacy[0] == 'source2' ? .1 : 0),
-                    memoryAdditions: {
-                        role: 'source2RemoteHarvester',
+                    return {
+                         defaultParts: [],
+                         extraParts: [WORK, MOVE, CARRY, MOVE],
+                         partsMultiplier: claimRequestNeeds[claimRequestNeedsIndex.vanguard],
+                         minCreeps: undefined,
+                         maxCreeps: Infinity,
+                         minCost: 250,
+                         priority: 3.1 + room.creepsFromRoom.vanguard.length,
+                         memoryAdditions: {
+                              role: 'vanguard',
+                         },
                     }
-                }
-            }
+               })(),
+          )
+     }
 
-            return {
-                defaultParts: [],
-                extraParts: [WORK, MOVE],
-                partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0),
-                groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source2RemoteHarvester,
-                threshold: 0.1,
-                minCreeps: undefined,
-                maxCreeps: global[remoteName]?.source2HarvestPositions?.length || Infinity,
-                maxCostPerCreep: 150 * 6,
-                minCost: 200,
-                priority: 4 + index - (sourcesByEfficacy[0] == 'source2' ? .1 : 0),
-                memoryAdditions: {
-                    role: 'source2RemoteHarvester',
-                }
-            }
-        })())
+     // If CPU logging is enabled, log the CPU used by this manager
 
-        // Construct requests for remoteHaulers
+     if (Memory.cpuLogging)
+          customLog(
+               'Spawn Request Manager',
+               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+               undefined,
+               constants.colors.lightGrey,
+          )
 
-        constructSpawnRequests((function(): SpawnRequestOpts | false {
+     // Inform spawnRequests
 
-            let partsMultiplier = 0
-
-            for (const roomName of remoteNamesByEfficacy) {
-
-                partsMultiplier += Math.max(Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHauler], 0)
-            }
-
-            // If there are no needs for this room, inform false
-
-            if (remoteNeeds[remoteNeedsIndex.remoteHauler] <= 0) return false
-
-            return {
-                defaultParts: [],
-                extraParts: [CARRY, MOVE],
-                threshold: 0.1,
-                partsMultiplier,
-                minCreeps: undefined,
-                maxCreeps: Infinity,
-                minCost: 200,
-                priority: 4.2 + index,
-                memoryAdditions: {
-                    role: 'remoteHauler',
-                }
-            }
-        })())
-
-        // Construct requests for remoteReservers
-
-        constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-            // If there isn't enough spawnEnergyCapacity to spawn a remoteReserver, inform false
-
-            if (spawnEnergyCapacity < 750) return false
-
-            // If there are no needs for this room, inform false
-
-            if (remoteNeeds[remoteNeedsIndex.remoteReserver] <= 0) return false
-
-            return {
-                defaultParts: [],
-                extraParts: [MOVE, CLAIM],
-                partsMultiplier: 4,
-                groupComparator: room.creepsFromRoomWithRemote[remoteName]?.remoteReserver,
-                minCreeps: 1,
-                maxCreeps: Infinity,
-                minCost: 750,
-                priority: 4.3 + index,
-                memoryAdditions: {
-                    role: 'remoteReserver',
-                }
-            }
-        })())
-
-        // Construct requests for remoteDefenders
-
-        constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-            // Define the minCost and strength
-
-            const minCost = 400,
-                cost = 900,
-                extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE],
-                strengthOfParts = findStrengthOfParts(extraParts)
-
-            // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
-
-            if (spawnEnergyCapacity < minCost) return false
-
-            // If there are no related needs
-
-            if (remoteNeeds[remoteNeedsIndex.remoteDefender] <= 0) return false
-
-            // If max spawnable strength is less that needed
-
-            if (strengthOfParts * (spawnEnergyCapacity / cost) < remoteNeeds[remoteNeedsIndex.remoteDefender]) {
-
-                // Abandon the room for some time
-
-                Memory.rooms[remoteName].abandoned = 1000
-                return false
-            }
-
-            const requiredParts = Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthOfParts) * 1.2
-
-            return {
-                defaultParts: [],
-                extraParts,
-                partsMultiplier: Math.max(requiredParts, 1),
-                groupComparator: room.creepsFromRoomWithRemote[remoteName]?.remoteDefender,
-                minCreeps: undefined,
-                maxCreeps: Infinity,
-                minCost,
-                priority: 4,
-                memoryAdditions: {
-                    role: 'remoteDefender',
-                }
-            }
-        })())
-    }
-
-    // Construct requests for scouts
-
-    constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-        return {
-            defaultParts: [MOVE],
-            extraParts: [],
-            partsMultiplier: 1,
-            minCreeps: 2,
-            maxCreeps: Infinity,
-            minCost: 100,
-            priority: 2,
-            memoryAdditions: {
-                role: 'scout',
-            }
-        }
-    })())
-
-    if (room.memory.claimRequest) {
-
-        const claimRequestNeeds = Memory.claimRequests[room.memory.claimRequest].needs
-
-        // Construct requests for claimers
-
-        constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-            // If there is no claimer need
-
-            if (claimRequestNeeds[claimRequestNeedsIndex.claimer] <= 0) return false
-
-            return {
-                defaultParts: [MOVE, MOVE, CLAIM, MOVE],
-                extraParts: [],
-                partsMultiplier: 1,
-                minCreeps: 1,
-                minCost: 750,
-                priority: 3,
-                memoryAdditions: {
-                    role: 'claimer'
-                }
-            }
-        })())
-
-        // Requests for vanguard
-
-        constructSpawnRequests((function(): SpawnRequestOpts | false {
-
-            // If there is no vanguard need
-
-            if (claimRequestNeeds[claimRequestNeedsIndex.vanguard] <= 0) return false
-
-            return {
-                defaultParts: [],
-                extraParts: [WORK, MOVE, CARRY, MOVE],
-                partsMultiplier: claimRequestNeeds[claimRequestNeedsIndex.vanguard],
-                minCreeps: undefined,
-                maxCreeps: Infinity,
-                minCost: 250,
-                priority: 3.1 + room.creepsFromRoom.vanguard.length,
-                memoryAdditions: {
-                    role: 'vanguard',
-                }
-            }
-        })())
-    }
-
-    // If CPU logging is enabled, log the CPU used by this manager
-
-    if (Memory.cpuLogging) customLog('Spawn Request Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
-
-    // Inform spawnRequests
-
-    return spawnRequests
+     return spawnRequests
 }

@@ -1,160 +1,162 @@
-import { allyList, constants } from "international/constants"
-import { customLog, findObjectWithID } from "international/generalFunctions"
+import { allyList, constants } from 'international/constants'
+import { customLog, findObjectWithID } from 'international/generalFunctions'
 
 /**
  * Adds annotations to the room if roomVisuals are enabled
  */
 export function roomVisualsManager(room: Room) {
+     // Stop if roomVisuals are disabled
 
-    // Stop if roomVisuals are disabled
+     if (!Memory.roomVisuals) return
 
-    if (!Memory.roomVisuals) return
+     // If CPU logging is enabled, get the CPU used at the start
 
-    // If CPU logging is enabled, get the CPU used at the start
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+     // If there is an anchor, show a rectangle around it
 
-    // If there is an anchor, show a rectangle around it
+     if (room.anchor)
+          room.visual.rect(room.anchor.x - 0.5, room.anchor.y - 0.5, 1, 1, {
+               stroke: constants.colors.lightBlue,
+               fill: 'transparent',
+          })
 
-    if (room.anchor) room.visual.rect(room.anchor.x - 0.5, room.anchor.y - 0.5, 1, 1, {
-        stroke: constants.colors.lightBlue,
-        fill: 'transparent',
-    })
+     controllerVisuals()
 
-    controllerVisuals()
+     function controllerVisuals() {
+          // Stop if there is no controller
 
-    function controllerVisuals() {
+          if (!room.controller) return
 
-        // Stop if there is no controller
+          // If the controller is mine
 
-        if (!room.controller) return
+          if (room.controller.my) {
+               // If the controller level is less than 8, show percentage to next level
 
-        // If the controller is mine
+               if (room.controller.level < 8)
+                    room.visual.text(
+                         `%${((room.controller.progress / room.controller.progressTotal) * 100).toFixed(2)}`,
+                         room.controller.pos.x,
+                         room.controller.pos.y - 1,
+                         {
+                              backgroundColor: 'rgb(255, 0, 0, 0)',
+                              font: 0.5,
+                              opacity: 1,
+                              color: constants.colors.lightBlue,
+                         },
+                    )
 
-        if (room.controller.my) {
+               // Show the controller's level
 
-            // If the controller level is less than 8, show percentage to next level
+               room.visual.text(`${room.controller.level}`, room.controller.pos, {
+                    backgroundColor: 'rgb(255, 0, 0, 0)',
+                    font: 0.5,
+                    opacity: 0.8,
+               })
+               return
+          }
 
-            if(room.controller.level < 8) room.visual.text(`%${(room.controller.progress / room.controller.progressTotal * 100).toFixed(2)}`, room.controller.pos.x, room.controller.pos.y - 1, {
-                backgroundColor: 'rgb(255, 0, 0, 0)',
-                font: 0.5,
-                opacity: 1,
-                color: constants.colors.lightBlue,
-            })
+          // If the controller is reserved
 
-            // Show the controller's level
+          if (room.controller.reservation) {
+               // Define the reservationColor based on some conditions
 
-            room.visual.text(`${room.controller.level}`, room.controller.pos, {
-                backgroundColor: 'rgb(255, 0, 0, 0)',
-                font: 0.5,
-                opacity: 0.8
-            })
-            return
-        }
+               const color = reservationColor()
 
-        // If the controller is reserved
+               function reservationColor() {
+                    if (room.controller.reservation.username == constants.me) {
+                         return constants.colors.lightBlue
+                    }
 
-        if (room.controller.reservation) {
+                    if (allyList.has(room.controller.reservation.username)) {
+                         return constants.colors.green
+                    }
 
-            // Define the reservationColor based on some conditions
+                    return constants.colors.red
+               }
 
-            const color = reservationColor()
+               // Show the reservation time
 
-            function reservationColor() {
+               room.visual.text(`${room.controller.reservation.ticksToEnd}`, room.controller.pos, {
+                    backgroundColor: 'rgb(255, 0, 0, 0)',
+                    font: 0.5,
+                    opacity: 0.8,
+                    color,
+               })
+          }
+     }
 
-                if (room.controller.reservation.username == constants.me) {
+     spawnVisuals()
 
-                    return constants.colors.lightBlue
-                }
+     function spawnVisuals() {
+          // Get the spawns in the room
 
-                if (allyList.has(room.controller.reservation.username)) {
+          const spawns: StructureSpawn[] = room.get('spawn')
 
-                    return constants.colors.green
-                }
+          // Loop through them
 
-                return constants.colors.red
-            }
+          for (const spawn of spawns) {
+               // Iterate if the spawn isn't spawning
 
-            // Show the reservation time
+               if (!spawn.spawning) continue
 
-            room.visual.text(`${room.controller.reservation.ticksToEnd}`, room.controller.pos, {
-                backgroundColor: 'rgb(255, 0, 0, 0)',
-                font: 0.5,
-                opacity: 0.8,
-                color
-            })
-            return
-        }
-    }
+               // Get the spawning creep, iterating if it's undefined
 
-    spawnVisuals()
+               const creep = Game.creeps[spawn.spawning.name]
+               if (!creep) continue
 
-    function spawnVisuals() {
+               // Otherwise display the role of the creep being spawn
 
-        // Get the spawns in the room
+               room.visual.text(creep.memory.role, spawn.pos, {
+                    backgroundColor: 'rgb(255, 0, 0, 0)',
+                    font: 0.5,
+                    opacity: 1,
+                    color: constants.colors.lightBlue,
+               })
 
-        const spawns: StructureSpawn[] = room.get('spawn')
+               // And display how many ticks left until spawned
 
-        // Loop through them
+               room.visual.text((spawn.spawning.remainingTime - 1).toString(), spawn.pos.x, spawn.pos.y - 1, {
+                    backgroundColor: 'rgb(255, 0, 0, 0)',
+                    font: 0.5,
+                    opacity: 1,
+                    color: constants.colors.lightBlue,
+               })
+          }
+     }
 
-        for (const spawn of spawns) {
+     constructionTargetVisuals()
 
-            // Iterate if the spawn isn't spawning
+     function constructionTargetVisuals() {
+          // If there is not a cSiteTargetID, stop
 
-            if (!spawn.spawning) continue
+          if (!room.memory.cSiteTargetID) return
 
-            // Get the spawning creep, iterating if it's undefined
+          // Convert the construction target ID into a game object
 
-            const creep = Game.creeps[spawn.spawning.name]
-            if(!creep) continue
+          const constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
 
-            // Otherwise display the role of the creep being spawn
+          // If the constructionTarget exists, show visuals for it
 
-            room.visual.text(creep.memory.role, spawn.pos, {
-                backgroundColor: 'rgb(255, 0, 0, 0)',
-                font: 0.5,
-                opacity: 1,
-                color: constants.colors.lightBlue,
-            })
+          if (constructionTarget) room.visual.text('🚧', constructionTarget.pos)
+     }
 
-            // And display how many ticks left until spawned
+     function towerVisuals() {}
+     function labVisuals() {}
+     function factoryVisuals() {}
+     function powerSpawnVisuals() {}
+     function nukerVisuals() {}
+     function observerVisuals() {}
+     function sourceVisuals() {}
+     function mineralVisuals() {}
 
-            room.visual.text((spawn.spawning.remainingTime - 1).toString(), spawn.pos.x, spawn.pos.y - 1, {
-                backgroundColor: 'rgb(255, 0, 0, 0)',
-                font: 0.5,
-                opacity: 1,
-                color: constants.colors.lightBlue,
-            })
-        }
-    }
+     // If CPU logging is enabled, log the CPU used by this manager
 
-    constructionTargetVisuals()
-
-    function constructionTargetVisuals() {
-
-        // If there is not a cSiteTargetID, stop
-
-        if (!room.memory.cSiteTargetID) return
-
-        // Convert the construction target ID into a game object
-
-        const constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
-
-        // If the constructionTarget exists, show visuals for it
-
-        if (constructionTarget) room.visual.text('🚧', constructionTarget.pos)
-    }
-
-    function towerVisuals() {}
-    function labVisuals() {}
-    function factoryVisuals() {}
-    function powerSpawnVisuals() {}
-    function nukerVisuals() {}
-    function observerVisuals() {}
-    function sourceVisuals() {}
-    function mineralVisuals() {}
-
-    // If CPU logging is enabled, log the CPU used by this manager
-
-    if (Memory.cpuLogging) customLog('Room Visual Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, constants.colors.lightGrey)
+     if (Memory.cpuLogging)
+          customLog(
+               'Room Visual Manager',
+               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+               undefined,
+               constants.colors.lightGrey,
+          )
 }

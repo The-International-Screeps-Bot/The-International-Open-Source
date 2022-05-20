@@ -1,163 +1,161 @@
-import { RoomOfferTask, RoomTransferTask } from "./roomTasks"
+import { RoomOfferTask, RoomTransferTask } from './roomTasks'
 
 export function storageStructuresManager(room: Room) {
+     // Get the room's storage, stopping if it's undefined
 
-    // Get the room's storage, stopping if it's undefined
+     const { storage } = room
+     if (!storage) return
 
-    const storage = room.storage
-    if (!storage) return
+     storageOffers()
 
-    storageOffers()
+     function storageOffers() {
+          // Construct an undefined taskWithoutResponder
 
-    function storageOffers() {
+          let taskWithoutResponder: RoomOfferTask
 
-        // Construct an undefined taskWithoutResponder
+          // Construct totalResourcesOffered at 0
 
-        let taskWithoutResponder: RoomOfferTask,
+          const totalResourcesOffered = 0
 
-        // Construct totalResourcesOffered at 0
+          // if there is no global for the structure, make one
 
-        totalResourcesOffered = 0
+          if (!global[storage.id]) global[storage.id] = {}
 
-        // if there is no global for the structure, make one
+          // If there is no created task ID obj for the structure's global, create one
 
-        if (!global[storage.id]) global[storage.id] = {}
+          if (!global[storage.id].createdTaskIDs) global[storage.id].createdTaskIDs = {}
+          // Otherwise
+          else {
+               // Find the structure's tasks of type tansfer
 
-        // If there is no created task ID obj for the structure's global, create one
+               const structuresWithdrawTasks = room.findTasksOfTypes(
+                    global[storage.id].createdTaskIDs,
+                    new Set(['offer']),
+               )
 
-        if (!global[storage.id].createdTaskIDs) global[storage.id].createdTaskIDs = {}
+               // Track the amount of energy the resource has offered in tasks
 
-        // Otherwise
+               let totalResourcesOffered = 0
 
-        else {
+               // Loop through each task
 
-            // Find the structure's tasks of type tansfer
+               for (const task of structuresWithdrawTasks) {
+                    // Otherwise find how many resources the task has requested to pick up
 
-            const structuresWithdrawTasks = room.findTasksOfTypes(global[storage.id].createdTaskIDs, new Set(['offer']))
+                    totalResourcesOffered += task.taskAmount
 
-            // Track the amount of energy the resource has offered in tasks
+                    // If the task doesn't have a responder, set it as taskWithoutResponder
 
-            let totalResourcesOffered = 0
+                    if (!task.responderID) taskWithoutResponder = task
+               }
 
-            // Loop through each task
+               // If there are more or equal resources offered than the used capacity of the structure, stop
 
-            for (const task of structuresWithdrawTasks) {
+               if (totalResourcesOffered >= storage.store.getUsedCapacity(RESOURCE_ENERGY)) return
+          }
 
-                // Otherwise find how many resources the task has requested to pick up
+          // Assign amountToOffer as the energy left not assigned to tasks
 
-                totalResourcesOffered += task.taskAmount
+          const amountToOffer = storage.store.getUsedCapacity(RESOURCE_ENERGY) - totalResourcesOffered
 
-                // If the task doesn't have a responder, set it as taskWithoutResponder
+          // If there is a taskWithoutResponder
 
-                if (!task.responderID) taskWithoutResponder = task
-            }
+          if (taskWithoutResponder) {
+               // Set the taskAmount to match amountToOffer
 
-            // If there are more or equal resources offered than the used capacity of the structure, stop
+               taskWithoutResponder.taskAmount = amountToOffer
 
-            if (totalResourcesOffered >= storage.store.getUsedCapacity(RESOURCE_ENERGY)) return
-        }
+               // Update the task's priority to match new amountToOffer
 
-        // Assign amountToOffer as the energy left not assigned to tasks
+               taskWithoutResponder.priority = 1
 
-        const amountToOffer = storage.store.getUsedCapacity(RESOURCE_ENERGY) - totalResourcesOffered
+               // And stop
 
-        // If there is a taskWithoutResponder
+               return
+          }
 
-        if (taskWithoutResponder) {
+          // If the amountToOffer is more than x
 
-            // Set the taskAmount to match amountToOffer
+          if (amountToOffer > 500) {
+               // Create a new transfer task for the structure
 
-            taskWithoutResponder.taskAmount = amountToOffer
+               new RoomOfferTask(room.name, RESOURCE_ENERGY, amountToOffer, storage.id, 1)
+          }
+     }
 
-            // Update the task's priority to match new amountToOffer
+     storageRequests()
 
-            taskWithoutResponder.priority = 1
+     function storageRequests() {
+          // Construct an undefined taskWithoutResponder
 
-            // And stop
+          let taskWithoutResponder: RoomTransferTask
 
-            return
-        }
+          // Construct totalResourcesRequested at 0
 
-        // If the amountToOffer is more than x
+          let totalResourcesRequested = 0
 
-        if (amountToOffer > 500) {
+          // if there is no global for the storage, make one
 
-            // Create a new transfer task for the structure
+          if (!global[storage.id]) global[storage.id] = {}
 
-            new RoomOfferTask(room.name, RESOURCE_ENERGY, amountToOffer, storage.id, 1)
-        }
-    }
+          // If there is no created task ID obj for the storage's global, create one
 
-    storageRequests()
+          if (!global[storage.id].createdTaskIDs) global[storage.id].createdTaskIDs = {}
+          // Otherwise
+          else {
+               // Find the storage's tasks of type tansfer
 
-    function storageRequests() {
+               const structuresTransferTasks = room.findTasksOfTypes(
+                    global[storage.id].createdTaskIDs,
+                    new Set(['transfer']),
+               ) as RoomTransferTask[]
 
-        // Construct an undefined taskWithoutResponder
+               // Loop through each pickup task
 
-        let taskWithoutResponder: RoomTransferTask,
+               for (const task of structuresTransferTasks) {
+                    // Otherwise find how many resources the task has requested to pick up
 
-        // Construct totalResourcesRequested at 0
+                    totalResourcesRequested += task.taskAmount
 
-        totalResourcesRequested = 0
+                    // If the task doesn't have a responder, set it as taskWithoutResponder
 
-        // if there is no global for the storage, make one
+                    if (!task.responderID) taskWithoutResponder = task
+               }
 
-        if (!global[storage.id]) global[storage.id] = {}
+               // If there are more or equal resources offered than the free energy capacity of the structure, stop
 
-        // If there is no created task ID obj for the storage's global, create one
+               if (totalResourcesRequested >= storage.store.getFreeCapacity(RESOURCE_ENERGY)) return
+          }
 
-        if (!global[storage.id].createdTaskIDs) global[storage.id].createdTaskIDs = {}
+          // Assign amountToRequest as the energy left not assigned to tasks, iterating if 0
 
-        // Otherwise
+          const amountToRequest = storage.store.getFreeCapacity(RESOURCE_ENERGY) - totalResourcesRequested
+          if (amountToRequest == 0) return
 
-        else {
+          // If there is a taskWithoutResponder
 
-            // Find the storage's tasks of type tansfer
+          if (taskWithoutResponder) {
+               // Set the taskAmount to match amountToRequest
 
-            const structuresTransferTasks = room.findTasksOfTypes(global[storage.id].createdTaskIDs, new Set(['transfer'])) as RoomTransferTask[]
+               taskWithoutResponder.taskAmount = amountToRequest
 
-            // Loop through each pickup task
+               // Update the task's priority to match new amountToRequest
 
-            for (const task of structuresTransferTasks) {
+               taskWithoutResponder.priority = 1 - storage.store.getUsedCapacity(RESOURCE_ENERGY) / 2000
 
-                // Otherwise find how many resources the task has requested to pick up
+               // And stop
 
-                totalResourcesRequested += task.taskAmount
+               return
+          }
 
-                // If the task doesn't have a responder, set it as taskWithoutResponder
+          // Create a new transfer task for the storage
 
-                if (!task.responderID) taskWithoutResponder = task
-            }
-
-            // If there are more or equal resources offered than the free energy capacity of the structure, stop
-
-            if (totalResourcesRequested >= storage.store.getFreeCapacity(RESOURCE_ENERGY)) return
-        }
-
-        // Assign amountToRequest as the energy left not assigned to tasks, iterating if 0
-
-        const amountToRequest = storage.store.getFreeCapacity(RESOURCE_ENERGY) - totalResourcesRequested
-        if (amountToRequest == 0) return
-
-        // If there is a taskWithoutResponder
-
-        if (taskWithoutResponder) {
-
-            // Set the taskAmount to match amountToRequest
-
-            taskWithoutResponder.taskAmount = amountToRequest
-
-            // Update the task's priority to match new amountToRequest
-
-            taskWithoutResponder.priority = 1 - storage.store.getUsedCapacity(RESOURCE_ENERGY) / 2000
-
-            // And stop
-
-            return
-        }
-
-        // Create a new transfer task for the storage
-
-        new RoomTransferTask(room.name, RESOURCE_ENERGY, amountToRequest, storage.id, 1 - storage.store.getUsedCapacity(RESOURCE_ENERGY) / 2000)
-    }
+          new RoomTransferTask(
+               room.name,
+               RESOURCE_ENERGY,
+               amountToRequest,
+               storage.id,
+               1 - storage.store.getUsedCapacity(RESOURCE_ENERGY) / 2000,
+          )
+     }
 }

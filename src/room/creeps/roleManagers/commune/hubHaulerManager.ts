@@ -2,23 +2,21 @@ import { HubHauler } from '../../creepClasses'
 import './hubHaulerFunctions'
 
 export function hubHaulerManager(room: Room, creepsOfRole: string[]) {
+     for (const creepName of creepsOfRole) {
+          const creep: HubHauler = Game.creeps[creepName]
 
-    for (const creepName of creepsOfRole) {
+          // Try to travel to the hub, iterate if there was movement
 
-        const creep: HubHauler = Game.creeps[creepName]
+          if (creep.travelToHub()) continue
 
-        // Try to travel to the hub, iterate if there was movement
+          // Try balancing storing structures, iterating if there were resources moved
 
-        if (creep.travelToHub()) continue
+          if (creep.balanceStoringStructures()) continue
 
-        // Try balancing storing structures, iterating if there were resources moved
+          // Try filling the hubLink, iterating if there were resources moved
 
-        if (creep.balanceStoringStructures()) continue
+          if (creep.fillHubLink()) continue
 
-        // Try filling the hubLink, iterating if there were resources moved
-
-        if (creep.fillHubLink()) continue
-
-        creep.say('🚬')
-    }
+          creep.say('🚬')
+     }
 }
