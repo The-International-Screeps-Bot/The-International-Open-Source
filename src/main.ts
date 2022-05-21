@@ -1235,5 +1235,6 @@ export const loop = function () {
      if (constants.me === 'PandaMaster') {
           new Market().HandleOrderEveryTick()
           new ShardVision().Handle()
+          RawMemory.segments[98] = JSON.stringify(Memory.stats)
      }
 }

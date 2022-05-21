@@ -6,6 +6,7 @@ InternationalManager.prototype.config = function () {
      // Check if Memory is constructed
 
      if (!Memory.constructed) {
+          RawMemory.setActiveSegments([98])
           // Record that Memory is now constructed
 
           Memory.constructed = true
