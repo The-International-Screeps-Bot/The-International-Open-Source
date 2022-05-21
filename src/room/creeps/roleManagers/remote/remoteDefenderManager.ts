@@ -1,59 +1,54 @@
-import { RemoteDefender } from "room/creeps/creepClasses"
+import { RemoteDefender } from 'room/creeps/creepClasses'
 import './remoteDefenderFunctions'
 
 export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
+     for (const creepName of creepsOfRole) {
+          const creep: RemoteDefender = Game.creeps[creepName]
 
-    for (const creepName of creepsOfRole) {
+          // Try to find a remote
 
-        const creep: RemoteDefender = Game.creeps[creepName]
+          if (!creep.findRemote()) {
+               // If the room is the creep's commune
 
-        // Try to find a remote
+               if (room.name === creep.memory.communeName) {
+                    // Advanced recycle and iterate
 
-        if (!creep.findRemote()) {
+                    creep.advancedRecycle()
+                    continue
+               }
 
-            // If the room is the creep's commune
+               // Otherwise, have the creep make a moveRequest to its commune and iterate
 
-            if (room.name == creep.memory.communeName) {
+               creep.createMoveRequest({
+                    origin: creep.pos,
+                    goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 25 },
+                    cacheAmount: 200,
+               })
 
-                // Advanced recycle and iterate
+               continue
+          }
 
-                creep.advancedRecycle()
-                continue
-            }
+          creep.say(creep.memory.remoteName)
 
-            // Otherwise, have the creep make a moveRequest to its commune and iterate
+          // Try to attack enemyAttackers, iterating if there are none or one was attacked
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 25 },
-                cacheAmount: 200,
-            })
+          if (creep.advancedAttackAttackers()) continue
 
-            continue
-        }
+          // If the creep is its remote
 
-        creep.say(creep.memory.remoteName)
+          if (room.name === creep.memory.remoteName) {
+               // Otherwise, remove the remote from the creep
 
-        // Try to attack enemyAttackers, iterating if there are none or one was attacked
+               delete creep.memory.remoteName
+               continue
+          }
 
-        if (creep.advancedAttackAttackers()) continue
+          // Otherwise, create a moveRequest to its remote
 
-        // If the creep is its remote
-
-        if (room.name == creep.memory.remoteName) {
-
-            // Otherwise, remove the remote from the creep
-
-            delete creep.memory.remoteName
-            continue
-        }
-
-        // Otherwise, create a moveRequest to its remote
-
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
-            cacheAmount: 200,
-        })
-    }
+          creep.createMoveRequest({
+               origin: creep.pos,
+               goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
+               cacheAmount: 200,
+          })
+     }
 }

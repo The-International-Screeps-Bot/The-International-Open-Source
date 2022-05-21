@@ -1,41 +1,38 @@
-import { InternationalManager } from "./internationalManager"
+import { InternationalManager } from './internationalManager'
 
-InternationalManager.prototype.config = function() {
+InternationalManager.prototype.config = function () {
+     // Construct Memory if it isn't constructed yet
 
-    // Construct Memory if it isn't constructed yet
+     // Check if Memory is constructed
 
-    // Check if Memory is constructed
+     if (!Memory.constructed) {
+          // Record that Memory is now constructed
 
-    if (!Memory.constructed) {
+          Memory.constructed = true
 
-        // Record that Memory is now constructed
+          // Construct foundation
 
-        Memory.constructed = true
+          Memory.ID = 0
+          Memory.constructionSites = {}
 
-        // Construct foundation
+          Memory.claimRequests = {}
+          Memory.attackRequests = {}
 
-        Memory.ID = 0
-        Memory.constructionSites = {}
+          // Config settings
 
-        Memory.claimRequests = {}
-        Memory.attackRequests = {}
+          Memory.roomVisuals = false
+          Memory.mapVisuals = false
+          Memory.cpuLogging = false
 
-        // Config settings
+          //
 
-        Memory.roomVisuals = false
-        Memory.mapVisuals = false
-        Memory.cpuLogging = false
+          Memory.stats.memoryLimit = 2097
+     }
 
-        //
+     if (!global.constructed) {
+          global.constructed = true
 
-        Memory.stats.memoryLimit = 2097
-    }
-
-    if (!global.constructed) {
-
-        global.constructed = true
-
-        global.packedRoomNames = {}
-        global.unpackedRoomNames = {}
-    }
+          global.packedRoomNames = {}
+          global.unpackedRoomNames = {}
+     }
 }

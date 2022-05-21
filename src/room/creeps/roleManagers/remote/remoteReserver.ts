@@ -3,53 +3,49 @@ import { RoomTask } from 'room/roomTasks'
 import { RemoteHauler } from '../../creepClasses'
 
 export function remoteReserverManager(room: Room, creepsOfRole: string[]) {
+     for (const creepName of creepsOfRole) {
+          const creep: RemoteHauler = Game.creeps[creepName]
 
-    for (const creepName of creepsOfRole) {
+          if (!creep.memory.remoteName) {
+               const remoteNamesByEfficacy: string[] =
+                    Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
 
-        const creep: RemoteHauler = Game.creeps[creepName]
+               for (const roomName of remoteNamesByEfficacy) {
+                    const roomMemory = Memory.rooms[roomName]
 
-        if (!creep.memory.remoteName) {
+                    if (roomMemory.needs[remoteNeedsIndex.remoteReserver] <= 0) continue
 
-            const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
+                    creep.memory.remoteName = roomName
+                    roomMemory.needs[remoteNeedsIndex.remoteReserver] -= 1
+                    break
+               }
+          }
 
-            for (const roomName of remoteNamesByEfficacy) {
+          //
 
-                const roomMemory = Memory.rooms[roomName]
+          if (!creep.memory.remoteName) continue
 
-                if (roomMemory.needs[remoteNeedsIndex.remoteReserver] <= 0) continue
+          creep.say(creep.memory.remoteName)
 
-                creep.memory.remoteName = roomName
-                roomMemory.needs[remoteNeedsIndex.remoteReserver] -= 1
-                break
-            }
-        }
+          // If the creep is in the remote
 
-        //
+          if (room.name === creep.memory.remoteName) {
+               // Try to reserve the controller
 
-        if (!creep.memory.remoteName) continue
+               creep.advancedReserveController()
+               continue
+          }
 
-        creep.say(creep.memory.remoteName)
+          // Otherwise, make a moveRequest to it
 
-        // If the creep is in the remote
+          creep.createMoveRequest({
+               origin: creep.pos,
+               goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
+               avoidEnemyRanges: true,
+               cacheAmount: 200,
+               plainCost: 1,
+          })
 
-        if (room.name == creep.memory.remoteName) {
-
-            // Try to reserve the controller
-
-            creep.advancedReserveController()
-            continue
-        }
-
-        // Otherwise, make a moveRequest to it
-
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
-            avoidEnemyRanges: true,
-            cacheAmount: 200,
-            plainCost: 1,
-        })
-
-        continue
-    }
+          continue
+     }
 }

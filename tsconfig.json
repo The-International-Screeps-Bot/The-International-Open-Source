@@ -1,21 +1,19 @@
 {
-    "compilerOptions": {
-        "module": "esnext",
-        "lib": ["es2018"],
-        "target": "es2018",
-        "moduleResolution": "Node",
-        "outDir": "dist",
-        "baseUrl": "src/",
-        "strict": true,
-        "noImplicitAny": true,
-        "removeComments": true,
-        "noImplicitReturns": true,
-        "allowSyntheticDefaultImports": true,
-        "allowUnreachableCode": true,
-        "strictNullChecks": false,
-        "esModuleInterop": true
-    },
-    "exclude": [
-        "node_modules"
-    ]
+     "compilerOptions": {
+          "module": "esnext",
+          "lib": ["es2019"],
+          "target": "es2019",
+          "moduleResolution": "node",
+          "outDir": "dist",
+          "baseUrl": "src/",
+          "strict": true,
+          "noImplicitAny": true,
+          "removeComments": true,
+          "noImplicitReturns": true,
+          "allowSyntheticDefaultImports": true,
+          "allowUnreachableCode": true,
+          "strictNullChecks": false,
+          "esModuleInterop": true
+     },
+     "exclude": ["node_modules"]
 }

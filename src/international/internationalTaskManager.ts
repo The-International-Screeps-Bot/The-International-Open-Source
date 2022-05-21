@@ -1,6 +1,3 @@
-import { InternationalManager } from "./internationalManager";
+import { InternationalManager } from './internationalManager'
 
-InternationalManager.prototype.taskManager = function() {
-
-
-}
+InternationalManager.prototype.taskManager = function () {}

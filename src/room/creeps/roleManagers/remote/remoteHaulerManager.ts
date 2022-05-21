@@ -3,45 +3,121 @@ import { RoomTask } from 'room/roomTasks'
 import { RemoteHauler } from '../../creepClasses'
 
 export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
+     for (const creepName of creepsOfRole) {
+          const creep: RemoteHauler = Game.creeps[creepName]
 
-    for (const creepName of creepsOfRole) {
+          // If the creep needs resources
 
-        const creep: RemoteHauler = Game.creeps[creepName]
+          if (creep.needsResources()) {
+               if (!creep.memory.remoteName) {
+                    const remoteNamesByEfficacy: string[] =
+                         Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
 
-        // If the creep needs resources
+                    for (const roomName of remoteNamesByEfficacy) {
+                         const roomMemory = Memory.rooms[roomName]
 
-        if (creep.needsResources()) {
+                         if (roomMemory.needs[remoteNeedsIndex.remoteHauler] <= 0) continue
 
-            if (!creep.memory.remoteName) {
+                         creep.memory.remoteName = roomName
+                         roomMemory.needs[remoteNeedsIndex.remoteHauler] -= creep.partsOfType(CARRY)
+                         break
+                    }
+               }
 
-                const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
+               //
 
-                for (const roomName of remoteNamesByEfficacy) {
+               if (!creep.memory.remoteName) continue
 
-                    const roomMemory = Memory.rooms[roomName]
+               creep.say(creep.memory.remoteName)
 
-                    if (roomMemory.needs[remoteNeedsIndex.remoteHauler] <= 0) continue
+               // If the creep is in the remote
 
-                    creep.memory.remoteName = roomName
-                    roomMemory.needs[remoteNeedsIndex.remoteHauler] -= creep.partsOfType(CARRY)
-                    break
-                }
-            }
+               if (room.name === creep.memory.remoteName) {
+                    // If creep has a task
 
-            //
+                    if (global[creep.id]?.respondingTaskID) {
+                         // Try to filfill task
 
-            if (!creep.memory.remoteName) continue
+                         const fulfillTaskResult = creep.fulfillTask()
 
-            creep.say(creep.memory.remoteName)
+                         // Iterate if the task wasn't fulfilled
 
-            // If the creep is in the remote
+                         if (!fulfillTaskResult) continue
 
-            if (room.name == creep.memory.remoteName) {
+                         // Otherwise find the task
 
-                // If creep has a task
+                         const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
 
-                if (global[creep.id]?.respondingTaskID) {
+                         // Delete it
 
+                         task.delete()
+                    }
+
+                    // Try to find a new task
+
+                    const findTaskResult = creep.findTask(new Set(['pickup']), RESOURCE_ENERGY)
+
+                    // If a task wasn't found, iterate
+
+                    if (!findTaskResult) continue
+
+                    // Try to filfill task
+
+                    const fulfillTaskResult = creep.fulfillTask()
+
+                    // Iterate if the task wasn't fulfilled
+
+                    if (!fulfillTaskResult) continue
+
+                    // Otherwise find the task
+
+                    const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
+
+                    // Delete it and iterate
+
+                    task.delete()
+                    continue
+               }
+
+               creep.createMoveRequest({
+                    origin: creep.pos,
+                    goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
+                    avoidEnemyRanges: true,
+                    cacheAmount: 200,
+                    weightGamebjects: {
+                         1: room.get('road'),
+                    },
+               })
+
+               continue
+          }
+
+          // Otherwise
+
+          if (room.name === creep.memory.communeName) {
+               // Try to renew the creep
+
+               creep.advancedRenew()
+
+               // If the creep has a remoteName, delete it
+
+               if (creep.memory.remoteName) delete creep.memory.remoteName
+               /*
+            // If there is a storage
+
+            if (room.storage) {
+
+                creep.say('S')
+
+                // Advanced transfer to it and stop
+
+                creep.advancedTransfer(room.storage)
+                return
+            } */
+
+               // If creep has a task
+
+               if (global[creep.id]?.respondingTaskID) {
                     // Try to filfill task
 
                     const fulfillTaskResult = creep.fulfillTask()
@@ -57,132 +133,44 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                     // Delete it
 
                     task.delete()
-                }
+               }
 
-                // Try to find a new task
+               // Try to find a new task
 
-                const findTaskResult = creep.findTask(new Set([
-                    'pickup',
-                ]), RESOURCE_ENERGY)
+               const findTaskResult = creep.findTask(new Set(['transfer']), RESOURCE_ENERGY)
 
-                // If a task wasn't found, iterate
+               // If a task wasn't found, iterate
 
-                if (!findTaskResult) continue
+               if (!findTaskResult) continue
 
-                // Try to filfill task
+               // Try to filfill task
 
-                const fulfillTaskResult = creep.fulfillTask()
+               const fulfillTaskResult = creep.fulfillTask()
 
-                // Iterate if the task wasn't fulfilled
+               // Iterate if the task wasn't fulfilled
 
-                if (!fulfillTaskResult) continue
+               if (!fulfillTaskResult) continue
 
-                // Otherwise find the task
+               // Otherwise find the task
 
-                const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
+               const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
 
-                // Delete it and iterate
+               // Delete it and iterate
 
-                task.delete()
-                continue
-            }
+               task.delete()
+               continue
+          }
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, creep.memory.remoteName), range: 25 },
-                avoidEnemyRanges: true,
-                cacheAmount: 200,
-                weightGamebjects: {
-                    1: room.get('road')
-                }
-            })
+          creep.say(creep.memory.communeName)
 
-            continue
-        }
-
-        // Otherwise
-
-        if (room.name == creep.memory.communeName) {
-
-            // Try to renew the creep
-
-            creep.advancedRenew()
-
-            // If the creep has a remoteName, delete it
-
-            if (creep.memory.remoteName) delete creep.memory.remoteName
-/*
-            // If there is a storage
-
-            if (room.storage) {
-
-                creep.say('S')
-
-                // Advanced transfer to it and stop
-
-                creep.advancedTransfer(room.storage)
-                return
-            } */
-
-            // If creep has a task
-
-            if (global[creep.id]?.respondingTaskID) {
-
-                // Try to filfill task
-
-                const fulfillTaskResult = creep.fulfillTask()
-
-                // Iterate if the task wasn't fulfilled
-
-                if (!fulfillTaskResult) continue
-
-                // Otherwise find the task
-
-                const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
-
-                // Delete it
-
-                task.delete()
-            }
-
-            // Try to find a new task
-
-            const findTaskResult = creep.findTask(new Set([
-                'transfer',
-            ]), RESOURCE_ENERGY)
-
-            // If a task wasn't found, iterate
-
-            if (!findTaskResult) continue
-
-            // Try to filfill task
-
-            const fulfillTaskResult = creep.fulfillTask()
-
-            // Iterate if the task wasn't fulfilled
-
-            if (!fulfillTaskResult) continue
-
-            // Otherwise find the task
-
-            const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
-
-            // Delete it and iterate
-
-            task.delete()
-            continue
-        }
-
-        creep.say(creep.memory.communeName)
-
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 25 },
-            avoidEnemyRanges: true,
-            cacheAmount: 200,
-            weightGamebjects: {
-                1: room.get('road')
-            }
-        })
-    }
+          creep.createMoveRequest({
+               origin: creep.pos,
+               goal: { pos: new RoomPosition(25, 25, creep.memory.communeName), range: 25 },
+               avoidEnemyRanges: true,
+               cacheAmount: 200,
+               weightGamebjects: {
+                    1: room.get('road'),
+               },
+          })
+     }
 }

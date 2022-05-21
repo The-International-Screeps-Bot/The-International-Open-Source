@@ -1,191 +1,184 @@
-import { RoomTransferTask } from "./roomTasks"
+import { RoomTransferTask } from './roomTasks'
 
-Room.prototype.towersRequestResources = function() {
+Room.prototype.towersRequestResources = function () {
+     const room = this
 
-    const room = this,
+     const towers = room.structures.tower
 
-    towers = room.structures.tower
+     // Get and loop through each tower
 
-    // Get and loop through each tower
+     for (const tower of towers) {
+          // if there is no global for the tower, make one
 
-    for (const tower of towers) {
+          if (!global[tower.id]) global[tower.id] = {}
 
-        // if there is no global for the tower, make one
+          // If there is no created task ID obj for the tower's global, create one
 
-        if (!global[tower.id]) global[tower.id] = {}
+          if (!global[tower.id].createdTaskIDs) global[tower.id].createdTaskIDs = {}
+          // Otherwise
+          else {
+               // Find the towers's tasks of type tansfer
 
-        // If there is no created task ID obj for the tower's global, create one
+               const towersTransferTasks = room.findTasksOfTypes(
+                    global[tower.id].createdTaskIDs,
+                    new Set(['transfer']),
+               ) as RoomTransferTask[]
 
-        if (!global[tower.id].createdTaskIDs) global[tower.id].createdTaskIDs = {}
+               // Track the amount of energy the resource has offered in tasks
 
-        // Otherwise
+               let totalResourcesRequested = 0
 
-        else {
+               // Loop through each pickup task
 
-            // Find the towers's tasks of type tansfer
+               for (const task of towersTransferTasks) {
+                    // Otherwise find how many resources the task has requested to pick up
 
-            const towersTransferTasks = room.findTasksOfTypes(global[tower.id].createdTaskIDs, new Set(['transfer'])) as RoomTransferTask[]
+                    totalResourcesRequested += task.taskAmount
+               }
 
-            // Track the amount of energy the resource has offered in tasks
+               // If there are more or equal resources offered than the free energy capacity of the tower, iterate
 
-            let totalResourcesRequested = 0
+               if (totalResourcesRequested >= tower.store.getFreeCapacity(RESOURCE_ENERGY)) continue
+          }
 
-            // Loop through each pickup task
+          // Get the amount of energy the tower needs at a max of the hauler's capacity
 
-            for (const task of towersTransferTasks) {
+          const taskAmount = Math.min(tower.store.getFreeCapacity(RESOURCE_ENERGY))
 
-                // Otherwise find how many resources the task has requested to pick up
+          // If the taskAmount is more than 0
 
-                totalResourcesRequested += task.taskAmount
-            }
+          if (taskAmount > 0) {
+               // Create a new transfer task for the tower
 
-            // If there are more or equal resources offered than the free energy capacity of the tower, iterate
-
-            if (totalResourcesRequested >= tower.store.getFreeCapacity(RESOURCE_ENERGY)) continue
-        }
-
-        // Get the amount of energy the tower needs at a max of the hauler's capacity
-
-        const taskAmount = Math.min(tower.store.getFreeCapacity(RESOURCE_ENERGY))
-
-        // If the taskAmount is more than 0
-
-        if (taskAmount > 0) {
-
-            // Create a new transfer task for the tower
-
-            new RoomTransferTask(room.name, RESOURCE_ENERGY, taskAmount, tower.id, 8)
-        }
-    }
+               new RoomTransferTask(room.name, RESOURCE_ENERGY, taskAmount, tower.id, 8)
+          }
+     }
 }
 
-Room.prototype.towersHealCreeps = function() {
+Room.prototype.towersHealCreeps = function () {
+     const room = this
 
-    const room = this,
+     const towers = room.structures.tower
 
-    towers = room.structures.tower
+     // Stop if there are no towers
 
-    // Stop if there are no towers
+     if (!towers.length) return
 
-    if (!towers.length) return
+     // Construct heal targets from my and allied damaged creeps in the room
 
-    // Construct heal targets from my and allied damaged creeps in the room
+     const healTargets: Creep[] = room
+          .find(FIND_MY_CREEPS)
+          .concat(room.get('allyCreeps'))
+          .filter(creep => creep.hits < creep.hitsMax && !creep.isOnExit())
 
-    const healTargets: Creep[] = room.find(FIND_MY_CREEPS).concat(room.get('allyCreeps')).filter(creep => creep.hits < creep.hitsMax && !creep.isOnExit())
+     // Loop through the room's towers
 
-    // Loop through the room's towers
+     for (const tower of towers) {
+          // Iterate if the tower is inactionable
 
-    for (const tower of towers) {
+          if (tower.inactionable) continue
 
-        // Iterate if the tower is inactionable
+          // Try to heal the creep
 
-        if (tower.inactionable) continue
+          const healResult = tower.heal(healTargets[0])
 
-        // Try to heal the creep
+          // If the heal failed, iterate
 
-        const healResult = tower.heal(healTargets[0])
+          if (healResult !== OK) continue
 
-        // If the heal failed, iterate
+          // Otherwise record that the tower is no longer inactionable
 
-        if (healResult != OK) continue
+          tower.inactionable = true
 
-        // Otherwise record that the tower is no longer inactionable
+          /* // Remove healTarget if it is fully healed
 
-        tower.inactionable = true
+        if (creep.hitsMax - creep.hits === 0) delete healTargets[0] */
 
-        /* // Remove healTarget if it is fully healed
+          // And iterate
 
-        if (creep.hitsMax - creep.hits == 0) delete healTargets[0] */
-
-        // And iterate
-
-        continue
-    }
+          continue
+     }
 }
 
-Room.prototype.towersAttackCreeps = function() {
+Room.prototype.towersAttackCreeps = function () {
+     const room = this
 
-    const room = this
+     if (room.controller.safeMode) return
 
-    if (room.controller.safeMode) return
+     const towers = room.structures.tower
 
-    const towers = room.structures.tower,
+     // Construct attack targets from my and allied damaged creeps in the room
 
-        // Construct attack targets from my and allied damaged creeps in the room
+     const attackTargets = room.enemyCreeps.filter(creep => !creep.isOnExit())
 
-        attackTargets = room.enemyCreeps.filter(creep => !creep.isOnExit())
+     // Loop through the room's towers
 
-    // Loop through the room's towers
+     for (const tower of towers) {
+          // Iterate if the tower is inactionable
 
-    for (const tower of towers) {
+          if (tower.inactionable) continue
 
-        // Iterate if the tower is inactionable
+          // Try to attack the creep
 
-        if (tower.inactionable) continue
+          const attackResult = tower.attack(attackTargets[0])
 
-        // Try to attack the creep
+          // If the attack failed, iterate
 
-        const attackResult = tower.attack(attackTargets[0])
+          if (attackResult !== OK) continue
 
-        // If the attack failed, iterate
+          // Otherwise record that the tower is no longer inactionable
 
-        if (attackResult != OK) continue
+          tower.inactionable = true
 
-        // Otherwise record that the tower is no longer inactionable
+          /* // Remove healTarget if it is fully healed
 
-        tower.inactionable = true
+        if (creep.hitsMax - creep.hits === 0) delete healTargets[0] */
 
-        /* // Remove healTarget if it is fully healed
+          // And iterate
 
-        if (creep.hitsMax - creep.hits == 0) delete healTargets[0] */
-
-        // And iterate
-
-        continue
-    }
+          continue
+     }
 }
 
-Room.prototype.towersRepairRamparts = function() {
+Room.prototype.towersRepairRamparts = function () {
+     const room = this
 
-    const room = this,
+     const towers = room.structures.tower
 
-    towers = room.structures.tower
+     // Find ramparts at 300 hits or less
 
-    // Find ramparts at 300 hits or less
+     const ramparts = (room.get('rampart') as StructureRampart[]).filter(rampart => rampart.hits <= 300)
 
-    const ramparts = (room.get('rampart') as StructureRampart[]).filter(rampart => rampart.hits <= 300)
+     // Loop through the room's towers
 
-    // Loop through the room's towers
+     for (const tower of towers) {
+          // Iterate if the tower is inactionable
 
-    for (const tower of towers) {
+          if (tower.inactionable) continue
 
-        // Iterate if the tower is inactionable
+          // Try to get the last element of ramparts, iterating if it's undefined
 
-        if (tower.inactionable) continue
+          const target = ramparts[ramparts.length - 1]
+          if (!target) continue
 
-        // Try to get the last element of ramparts, iterating if it's undefined
+          // Try to repair the target
 
-        const target = ramparts[ramparts.length - 1]
-        if (!target) continue
+          const healResult = tower.repair(target)
 
-        // Try to repair the target
+          // If the attack failed, iterate
 
-        const healResult = tower.repair(target)
+          if (healResult !== OK) continue
 
-        // If the attack failed, iterate
+          // Otherwise record that the tower is no longer inactionable
 
-        if (healResult != OK) continue
+          tower.inactionable = true
 
-        // Otherwise record that the tower is no longer inactionable
+          // And remove the rampart from ramparts
 
-        tower.inactionable = true
+          ramparts.pop()
 
-        // And remove the rampart from ramparts
+          // And iterate
 
-        ramparts.pop()
-
-        // And iterate
-
-        continue
-    }
+          continue
+     }
 }

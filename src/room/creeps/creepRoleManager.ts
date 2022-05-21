@@ -1,13 +1,13 @@
 import './creepFunctions'
 
+import { constants } from 'international/constants'
+import { customLog } from 'international/generalFunctions'
 import { controllerUpgraderManager } from './roleManagers/commune/controllerUpgraderManager'
 import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvesterManager'
 import { antifaManager } from './roleManagers/antifa/antifaManager'
 import { maintainerManager } from './roleManagers/commune/maintainerManager'
 import { builderManager } from './roleManagers/commune/builderManager'
 import { scoutManager } from './roleManagers/international/scoutManager'
-import { constants } from 'international/constants'
-import { customLog } from 'international/generalFunctions'
 import { haulerManager } from './roleManagers/commune/haulerManager'
 import { source2RemoteHarvesterManager } from './roleManagers/remote/source2RemoteHarvesterManager'
 import { remoteHaulerManager } from './roleManagers/remote/remoteHaulerManager'
@@ -24,63 +24,76 @@ import { sourceHarvesterManager } from './roleManagers/commune/sourceHarvesterMa
 // Construct managers
 
 const managers: Record<CreepRoles, Function> = {
-    source1Harvester: sourceHarvesterManager,
-    source2Harvester: sourceHarvesterManager,
-    hauler: haulerManager,
-    controllerUpgrader: controllerUpgraderManager,
-    builder: builderManager,
-    maintainer: maintainerManager,
-    mineralHarvester: mineralHarvesterManager,
-    hubHauler: hubHaulerManager,
-    fastFiller: fastFillerManager,
-    meleeDefender: meleeDefenderManager,
-    source1RemoteHarvester: source1RemoteHarvesterManager,
-    source2RemoteHarvester: source2RemoteHarvesterManager,
-    remoteHauler: remoteHaulerManager,
-    remoteReserver: remoteReserverManager,
-    remoteDefender: remoteDefenderManager,
-    scout: scoutManager,
-    claimer: claimerManager,
-    vanguard: vanguardManager,
-    antifa: antifaManager,
+     source1Harvester: sourceHarvesterManager,
+     source2Harvester: sourceHarvesterManager,
+     hauler: haulerManager,
+     controllerUpgrader: controllerUpgraderManager,
+     builder: builderManager,
+     maintainer: maintainerManager,
+     mineralHarvester: mineralHarvesterManager,
+     hubHauler: hubHaulerManager,
+     fastFiller: fastFillerManager,
+     meleeDefender: meleeDefenderManager,
+     source1RemoteHarvester: source1RemoteHarvesterManager,
+     source2RemoteHarvester: source2RemoteHarvesterManager,
+     remoteHauler: remoteHaulerManager,
+     remoteReserver: remoteReserverManager,
+     remoteDefender: remoteDefenderManager,
+     scout: scoutManager,
+     claimer: claimerManager,
+     vanguard: vanguardManager,
+     antifa: antifaManager,
 }
 
 export function roleManager(room: Room) {
+     // If CPU logging is enabled, get the CPU used at the start
 
-    // If CPU logging is enabled, get the CPU used at the start
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+     // Loop through each role in managers
 
-    // Loop through each role in managers
+     for (const role of constants.creepRoles) {
+          // Get the CPU used at the start
 
-    for (const role of constants.creepRoles) {
+          const roleCPUStart = Game.cpu.getUsed()
 
-        // Get the CPU used at the start
+          // Get the manager using the role
 
-        const roleCPUStart = Game.cpu.getUsed(),
+          const manager = managers[role]
 
-        // Get the manager using the role
+          // Get the amount of creeps with the role
 
-        manager = managers[role],
+          const creepsOfRoleAmount = room.myCreeps[role].length
 
-        // Get the amount of creeps with the role
+          // If there are no creeps for this manager, iterate
 
-        creepsOfRoleAmount = room.myCreeps[role].length
+          if (!room.myCreeps[role].length) continue
 
-        // If there are no creeps for this manager, iterate
+          // Run manager
 
-        if (!room.myCreeps[role].length) continue
+          manager(room, room.myCreeps[role])
 
-        // Run manager
+          // Log role stats
 
-        manager(room, room.myCreeps[role])
+          customLog(
+               `${role}s`,
+               `Creeps: ${creepsOfRoleAmount}, CPU: ${(Game.cpu.getUsed() - roleCPUStart).toFixed(
+                    2,
+               )}, CPU Per Creep: ${((Game.cpu.getUsed() - roleCPUStart) / creepsOfRoleAmount).toFixed(2)}`,
+               undefined,
+          )
+     }
 
-        // Log role stats
+     // If CPU logging is enabled, log the CPU used by this manager
 
-        customLog(role + 's', 'Creeps: ' + creepsOfRoleAmount + ', CPU: ' + (Game.cpu.getUsed() - roleCPUStart).toFixed(2) + ', CPU Per Creep: ' + ((Game.cpu.getUsed() - roleCPUStart) / creepsOfRoleAmount).toFixed(2), undefined)
-    }
-
-    // If CPU logging is enabled, log the CPU used by this manager
-
-    if (Memory.cpuLogging) customLog('Role Manager', 'CPU: ' + (Game.cpu.getUsed() - managerCPUStart).toFixed(2) + ', CPU Per Creep: ' + ((Game.cpu.getUsed() - managerCPUStart) / room.myCreepsAmount).toFixed(2), undefined, constants.colors.lightGrey)
+     if (Memory.cpuLogging)
+          customLog(
+               'Role Manager',
+               `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}, CPU Per Creep: ${(
+                    (Game.cpu.getUsed() - managerCPUStart) /
+                    room.myCreepsAmount
+               ).toFixed(2)}`,
+               undefined,
+               constants.colors.lightGrey,
+          )
 }

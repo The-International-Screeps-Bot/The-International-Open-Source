@@ -3,30 +3,27 @@ import { customLog } from 'international/generalFunctions'
 import { RoomTask } from './roomTasks'
 
 export function taskManager(room: Room) {
+     // Iterate through tasks without responders
 
-    // Iterate through tasks without responders
+     for (const taskID in room.global.tasksWithoutResponders) {
+          const task: RoomTask = room.global.tasksWithoutResponders[taskID]
 
-    for (const taskID in room.global.tasksWithoutResponders) {
+          // If the task should be deleted, delete it
 
-        const task: RoomTask = room.global.tasksWithoutResponders[taskID]
+          if (!task.shouldStayActive()) task.delete()
+     }
 
-        // If the task should be deleted, delete it
+     // Iterate through tasks with responders
 
-        if (!task.shouldStayActive()) task.delete()
-    }
+     for (const taskID in room.global.tasksWithResponders) {
+          const task: RoomTask = room.global.tasksWithResponders[taskID]
 
-    // Iterate through tasks with responders
+          // If the task should be deleted, delete it
 
-    for (const taskID in room.global.tasksWithResponders) {
+          if (!task.shouldStayActive()) task.delete()
+     }
 
-        const task: RoomTask = room.global.tasksWithResponders[taskID]
-
-        // If the task should be deleted, delete it
-
-        if (!task.shouldStayActive()) task.delete()
-    }
-
-    /*
+     /*
     customLog('TWOR', JSON.stringify(room.global.tasksWithoutResponders))
     customLog('TWR', JSON.stringify(room.global.tasksWithResponders))
     */

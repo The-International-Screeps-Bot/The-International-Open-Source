@@ -76,8 +76,8 @@ export const constants: Partial<Constants> = {}
 constants.me = 'MarvinTMB'
 constants.mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
-export const allyList = new Set(['Q13214', 'HerrKai', 'clarkok']),
-     autoClaim = false
+export const allyList = new Set(['Q13214', 'HerrKai', 'clarkok'])
+export const autoClaim = false
 
 constants.tradeBlacklist = new Set([])
 
@@ -511,15 +511,15 @@ export const stamps: Record<StampTypes, Partial<Stamp>> = {
 }
 
 export const minerals: Partial<ResourceConstant[]> = [
-          RESOURCE_HYDROGEN,
-          RESOURCE_OXYGEN,
-          RESOURCE_UTRIUM,
-          RESOURCE_KEANIUM,
-          RESOURCE_LEMERGIUM,
-          RESOURCE_ZYNTHIUM,
-          RESOURCE_CATALYST,
-     ],
-     boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
+     RESOURCE_HYDROGEN,
+     RESOURCE_OXYGEN,
+     RESOURCE_UTRIUM,
+     RESOURCE_KEANIUM,
+     RESOURCE_LEMERGIUM,
+     RESOURCE_ZYNTHIUM,
+     RESOURCE_CATALYST,
+]
+export const boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
 
 export const remoteNeedsIndex = {
      source1RemoteHarvester: 0,
@@ -559,7 +559,7 @@ export const upgraderSpawningWhenStorageThreshold = 60000
 
 export const CPUBucketCapacity = 10000
 
-export const CPUBucketRenewThreshold = 5000,
-     prefferedCommuneRange = 6,
-     allyTrading = false,
-     relayRoles: Partial<CreepRoles>[] = ['hauler', 'remoteHauler']
+export const CPUBucketRenewThreshold = 5000
+export const prefferedCommuneRange = 6
+export const allyTrading = false
+export const relayRoles: Partial<CreepRoles>[] = ['hauler', 'remoteHauler']

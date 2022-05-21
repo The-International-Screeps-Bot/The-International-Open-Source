@@ -1,124 +1,130 @@
-import { customLog, getRangeBetween, unpackAsRoomPos } from "international/generalFunctions";
-import { FastFiller } from "room/creeps/creepClasses";
+import { customLog, getRangeBetween, unpackAsRoomPos } from 'international/generalFunctions'
+import { FastFiller } from 'room/creeps/creepClasses'
 
-FastFiller.prototype.travelToFastFiller = function() {
+FastFiller.prototype.travelToFastFiller = function () {
+     const creep = this
+     const { room } = creep
 
-    const creep = this,
-    room = creep.room
+     // Try to find a fastFillerPos, inform true if it failed
 
-    // Try to find a fastFillerPos, inform true if it failed
+     if (!creep.findFastFillerPos()) return true
 
-    if (!creep.findFastFillerPos()) return true
+     // Unpack the creep's packedFastFillerPos
 
-    // Unpack the creep's packedFastFillerPos
+     const fastFillerPos = unpackAsRoomPos(creep.memory.packedPos, room.name)
 
-    const fastFillerPos = unpackAsRoomPos(creep.memory.packedPos, room.name)
+     // If the creep is standing on the fastFillerPos, inform false
 
-    // If the creep is standing on the fastFillerPos, inform false
+     if (getRangeBetween(creep.pos.x, creep.pos.y, fastFillerPos.x, fastFillerPos.y) === 0) return false
 
-    if (getRangeBetween(creep.pos.x, creep.pos.y, fastFillerPos.x, fastFillerPos.y) == 0) return false
+     // Otherwise, make a move request to it
 
-    // Otherwise, make a move request to it
+     creep.say('⏩F')
 
-    creep.say('⏩F')
+     creep.createMoveRequest({
+          origin: creep.pos,
+          goal: { pos: fastFillerPos, range: 0 },
+     })
 
-    creep.createMoveRequest({
-        origin: creep.pos,
-        goal: { pos: fastFillerPos, range: 0 }
-    })
+     // And inform true
 
-    // And inform true
-
-    return true
+     return true
 }
 
-FastFiller.prototype.fillFastFiller = function() {
+FastFiller.prototype.fillFastFiller = function () {
+     const creep = this
+     const { room } = creep
 
-    const creep = this,
-    room = creep.room
+     creep.say('FFF')
 
-    creep.say('FFF')
+     // If all spawningStructures are filled, inform false
 
-    // If all spawningStructures are filled, inform false
+     if (room.energyAvailable === room.energyCapacityAvailable) return false
 
-    if (room.energyAvailable == room.energyCapacityAvailable) return false
+     // If the creep needs resources
 
-    // If the creep needs resources
+     if (creep.needsResources()) {
+          // Get the sourceLinks
 
-    if (creep.needsResources()) {
+          const fastFillerStoringStructure: (StructureContainer | StructureLink | false)[] = [
+               room.get('fastFillerContainerLeft'),
+               room.get('fastFillerContainerRight'),
+               room.get('fastFillerLink'),
+          ]
 
-        // Get the sourceLinks
+          // Loop through each fastFillerStoringStructure
 
-        const fastFillerStoringStructure: (StructureContainer | StructureLink | false)[] = [room.get('fastFillerContainerLeft'), room.get('fastFillerContainerRight'), room.get('fastFillerLink')]
+          for (const structure of fastFillerStoringStructure) {
+               // If the structure is undefined, iterate
 
-        // Loop through each fastFillerStoringStructure
+               if (!structure) continue
 
-        for (const structure of fastFillerStoringStructure) {
+               // Otherwise, if the structure is not in range 1 to the creep
 
-            // If the structure is undefined, iterate
+               if (getRangeBetween(creep.pos.x, creep.pos.y, structure.pos.x, structure.pos.y) !== 1) continue
 
-            if (!structure) continue
+               // Otherwise, if there is insufficient energy in the structure, iterate
 
-            // Otherwise, if the structure is not in range 1 to the creep
+               if (structure.store.getUsedCapacity(RESOURCE_ENERGY) < creep.store.getCapacity()) continue
 
-            if (getRangeBetween(creep.pos.x, creep.pos.y, structure.pos.x, structure.pos.y) != 1) continue
+               // Otherwise, withdraw from the structure and inform true
 
-            // Otherwise, if there is insufficient energy in the structure, iterate
+               creep.say('W')
 
-            if (structure.store.getUsedCapacity(RESOURCE_ENERGY) < creep.store.getCapacity()) continue
+               creep.withdraw(structure, RESOURCE_ENERGY)
+               return true
+          }
 
-            // Otherwise, withdraw from the structure and inform true
+          // Inform false
 
-            creep.say('W')
+          return false
+     }
 
-            creep.withdraw(structure, RESOURCE_ENERGY)
-            return true
-        }
+     // Otherwise if the creep doesn't need energy, get adjacent extensions and spawns to the creep
 
-        // Inform false
+     const adjacentStructures = room.lookForAtArea(
+          LOOK_STRUCTURES,
+          creep.pos.y - 1,
+          creep.pos.x - 1,
+          creep.pos.y + 1,
+          creep.pos.x + 1,
+          true,
+     )
 
-        return false
-    }
+     // For each structure of adjacentStructures
 
-    // Otherwise if the creep doesn't need energy, get adjacent extensions and spawns to the creep
+     for (const adjacentPosData of adjacentStructures) {
+          // Get the structure at the adjacentPos
 
-    const adjacentStructures = room.lookForAtArea(LOOK_STRUCTURES, creep.pos.y - 1, creep.pos.x - 1, creep.pos.y + 1, creep.pos.x + 1, true)
+          const structure = adjacentPosData.structure as StructureSpawn | StructureExtension
 
-    // For each structure of adjacentStructures
+          // If the structure has no store property, iterate
 
-    for (const adjacentPosData of adjacentStructures) {
+          if (!structure.store) continue
 
-        // Get the structure at the adjacentPos
+          // If the structure has already had resources moved, iterate
 
-        const structure = adjacentPosData.structure as StructureSpawn | StructureExtension
+          if (structure.hasHadResourcesMoved) continue
 
-        // If the structure has no store property, iterate
+          // If the structureType is an extension or spawn, iterate
 
-        if (!structure.store) continue
+          if (structure.structureType !== STRUCTURE_SPAWN && structure.structureType !== STRUCTURE_EXTENSION) continue
 
-        // If the structure has already had resources moved, iterate
+          // , iterate
 
-        if (structure.hasHadResourcesMoved) continue
+          if (structure.store.getFreeCapacity(RESOURCE_ENERGY) === 0) continue
 
-        // If the structureType is an extension or spawn, iterate
+          // Otherwise, transfer to the structure record the action and inform true
 
-        if (structure.structureType != STRUCTURE_SPAWN && structure.structureType != STRUCTURE_EXTENSION) continue
+          creep.say('T')
 
-        // , iterate
+          creep.transfer(structure, RESOURCE_ENERGY)
+          structure.hasHadResourcesMoved = true
 
-        if (structure.store.getFreeCapacity(RESOURCE_ENERGY) == 0) continue
+          return true
+     }
 
-        // Otherwise, transfer to the structure record the action and inform true
+     // Otherwise inform false
 
-        creep.say('T')
-
-        creep.transfer(structure, RESOURCE_ENERGY)
-        structure.hasHadResourcesMoved = true
-
-        return true
-    }
-
-    // Otherwise inform false
-
-    return false
+     return false
 }

@@ -1,84 +1,77 @@
-import { remoteHarvesterRoles, remoteNeedsIndex } from "./constants"
-import { customLog, findCarryPartsRequired } from "./generalFunctions"
-import { InternationalManager } from "./internationalManager"
+import { remoteHarvesterRoles, remoteNeedsIndex } from './constants'
+import { customLog, findCarryPartsRequired } from './generalFunctions'
+import { InternationalManager } from './internationalManager'
 
-InternationalManager.prototype.remoteNeedsManager = function() {
+InternationalManager.prototype.remoteNeedsManager = function () {
+     // For each roomName in the memory's communes
 
-    // For each roomName in the memory's communes
+     for (const roomName of Memory.communes) {
+          // Get the room using the roomName
 
-    for (const roomName of Memory.communes) {
+          const room = Game.rooms[roomName]
 
-        // Get the room using the roomName
+          // Loop through each remote operated by the room
 
-        const room = Game.rooms[roomName]
+          for (const remoteName of room.memory.remotes) {
+               // Get the remote's memory using its name
 
-        // Loop through each remote operated by the room
+               const remoteMemory = Memory.rooms[remoteName]
 
-        for (const remoteName of room.memory.remotes) {
+               if (remoteMemory.abandoned > 0) {
+                    remoteMemory.abandoned -= 1
 
-            // Get the remote's memory using its name
+                    for (const need in remoteMemory.needs) {
+                         remoteMemory.needs[need] = 0
+                    }
 
-            const remoteMemory = Memory.rooms[remoteName]
+                    continue
+               }
 
-            if (remoteMemory.abandoned > 0) {
+               // See if the remote is reserved
 
-                remoteMemory.abandoned--
+               const isReserved = remoteMemory.needs[remoteNeedsIndex.remoteReserver] === 0
 
-                for (const need in remoteMemory.needs) {
+               // If the remote is reserved
 
-                    remoteMemory.needs[need] = 0
-                }
+               if (isReserved) {
+                    // Increase the remoteHarvester need accordingly
 
-                continue
-            }
+                    remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] += 3
+                    remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.source2 ? 3 : 0
+               }
 
-            // See if the remote is reserved
+               // Get the remote
 
-            const isReserved = remoteMemory.needs[remoteNeedsIndex.remoteReserver] == 0
+               const remote = Game.rooms[remoteName]
 
-            // If the remote is reserved
+               if (remote) {
+                    // Get enemyCreeps in the room and loop through them
 
-            if (isReserved) {
+                    const enemyCreeps: Creep[] = remote.get('enemyCreeps')
+                    for (const enemyCreep of enemyCreeps) {
+                         // Increase the defenderNeed according to the creep's strength
 
-                // Increase the remoteHarvester need accordingly
+                         remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.findStrength()
+                    }
+               }
 
-                remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] += 3
-                remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.source2 ? 3 : 0
-            }
+               // Loop through each index of sourceEfficacies
 
-            // Get the remote
+               for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
+                    // Get the efficacy using the index
 
-            const remote = Game.rooms[remoteName]
+                    const efficacy = remoteMemory.sourceEfficacies[index]
 
-            if (remote) {
+                    // Get the income based on the reservation of the room and remoteHarvester need
 
-                // Get enemyCreeps in the room and loop through them
+                    const income = isReserved
+                         ? 10
+                         : 5 /* - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2)) */
 
-                const enemyCreeps: Creep[] = remote.get('enemyCreeps')
-                for (const enemyCreep of enemyCreeps) {
+                    // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-                    // Increase the defenderNeed according to the creep's strength
-
-                    remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.findStrength()
-                }
-            }
-
-            // Loop through each index of sourceEfficacies
-
-            for (let index = 0; index < remoteMemory.sourceEfficacies.length; index++) {
-
-                // Get the efficacy using the index
-
-                const efficacy = remoteMemory.sourceEfficacies[index]
-
-                // Get the income based on the reservation of the room and remoteHarvester need
-
-                let income = (isReserved ? 10 : 5) /* - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2)) */
-
-                // Find the number of carry parts required for the source, and add it to the remoteHauler need
-
-                remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(efficacy, income)
-            }
-        }
-    }
+                    remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(efficacy, income)
+               }
+          }
+     }
 }

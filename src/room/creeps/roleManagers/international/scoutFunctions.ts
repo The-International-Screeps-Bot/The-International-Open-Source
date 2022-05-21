@@ -1,59 +1,60 @@
-import { Scout } from "../../creepClasses"
+import { Scout } from '../../creepClasses'
 
-Scout.prototype.findScoutTarget = function() {
+Scout.prototype.findScoutTarget = function () {
+     if (this.memory.scoutTarget) return true
 
-    if(this.memory.scoutTarget) return true
+     const commune = Game.rooms[this.memory.communeName]
 
-    const commune = Game.rooms[this.memory.communeName],
+     // Construct storage of exit information
 
-        // Construct storage of exit information
+     const scoutedRooms: string[] = []
+     const unscoutedRooms: string[] = []
 
-        scoutedRooms: string[] = [],
-        unscoutedRooms: string[] = [],
+     // Get information about the room's exits
 
-        // Get information about the room's exits
+     const exits = Game.map.describeExits(this.room.name)
 
-        exits = Game.map.describeExits(this.room.name)
+     // Loop through each exit type
 
-    // Loop through each exit type
+     for (const exitType in exits) {
+          // Get the roomName using the exitType
 
-    for (const exitType in exits) {
+          const roomName = exits[exitType as ExitKey]
 
-        // Get the roomName using the exitType
+          // Iterate if the room statuses aren't the same
 
-        const roomName = exits[exitType as ExitKey]
+          if (Game.map.getRoomStatus(roomName).status !== Game.map.getRoomStatus(this.room.name).status) continue
 
-        // Iterate if the room statuses aren't the same
+          // If a scout already has this room as a target
 
-        if (Game.map.getRoomStatus(roomName).status != Game.map.getRoomStatus(this.room.name).status) continue
+          if (commune.scoutTargets.has(roomName)) continue
 
-        // If a scout already has this room as a target
+          // If the room has memory and a lastScout
 
-        if (commune.scoutTargets.has(roomName)) continue
+          if (Memory.rooms[roomName] && Memory.rooms[roomName].lastScout) {
+               // Add it to scoutedRooms and iterate
 
-        // If the room has memory and a lastScout
+               scoutedRooms.push(roomName)
+               continue
+          }
 
-        if (Memory.rooms[roomName] && Memory.rooms[roomName].lastScout) {
+          // Otherwise add it to unscouted rooms
 
-            // Add it to scoutedRooms and iterate
+          unscoutedRooms.push(roomName)
+     }
 
-            scoutedRooms.push(roomName)
-            continue
-        }
+     const scoutTarget = unscoutedRooms.length
+          ? unscoutedRooms.sort(
+                 (a, b) =>
+                      Game.map.getRoomLinearDistance(this.memory.communeName, a) -
+                      Game.map.getRoomLinearDistance(this.memory.communeName, b),
+            )[0]
+          : scoutedRooms.sort((a, b) => Memory.rooms[a].lastScout - Memory.rooms[b].lastScout)[0]
 
-        // Otherwise add it to unscouted rooms
+     if (!scoutTarget) return false
 
-        unscoutedRooms.push(roomName)
-    }
+     this.memory.scoutTarget = scoutTarget
+     commune.scoutTargets.add(scoutTarget)
 
-    const scoutTarget = unscoutedRooms.length ?
-        unscoutedRooms.sort((a, b) => Game.map.getRoomLinearDistance(this.memory.communeName, a) - Game.map.getRoomLinearDistance(this.memory.communeName, b))[0] :
-        scoutedRooms.sort((a, b) => Memory.rooms[a].lastScout - Memory.rooms[b].lastScout)[0]
-
-    if (!scoutTarget) return false
-
-    this.memory.scoutTarget = scoutTarget
-    commune.scoutTargets.add(scoutTarget)
-
-    return true
+     return true
 }

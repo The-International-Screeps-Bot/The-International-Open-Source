@@ -3,46 +3,45 @@ import { Claimer } from '../../creepClasses'
 import './claimerFunctions'
 
 export function claimerManager(room: Room, creepsOfRole: string[]) {
+     // Loop through the names of the creeps of the role
 
-    // Loop through the names of the creeps of the role
+     for (const creepName of creepsOfRole) {
+          // Get the creep using its name
 
-    for (const creepName of creepsOfRole) {
+          const creep: Claimer = Game.creeps[creepName]
 
-        // Get the creep using its name
+          const claimTarget = Memory.rooms[creep.memory.communeName].claimRequest
 
-        const creep: Claimer = Game.creeps[creepName],
+          // If the creep has no claim target, stop
 
-        claimTarget = Memory.rooms[creep.memory.communeName].claimRequest
+          if (!claimTarget) return
 
-        // If the creep has no claim target, stop
+          creep.say(claimTarget)
 
-        if (!claimTarget) return
+          Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[
+               claimRequestNeedsIndex.claimer
+          ] = 0
 
-        creep.say(claimTarget)
+          if (room.name === claimTarget) {
+               creep.claimRoom()
+               continue
+          }
 
-        Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[claimRequestNeedsIndex.claimer] = 0
+          // Otherwise if the creep is not in the claimTarget
 
-        if (room.name == claimTarget) {
+          // Move to it
 
-            creep.claimRoom()
-            continue
-        }
-
-        // Otherwise if the creep is not in the claimTarget
-
-        // Move to it
-
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, claimTarget), range: 25 },
-            avoidEnemyRanges: true,
-            swampCost: 1,
-            cacheAmount: 200,
-            typeWeights: {
-                enemy: Infinity,
-                ally: Infinity,
-                keeper: Infinity
-            }
-        })
-    }
+          creep.createMoveRequest({
+               origin: creep.pos,
+               goal: { pos: new RoomPosition(25, 25, claimTarget), range: 25 },
+               avoidEnemyRanges: true,
+               swampCost: 1,
+               cacheAmount: 200,
+               typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+               },
+          })
+     }
 }

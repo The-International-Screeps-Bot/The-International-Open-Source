@@ -1,151 +1,141 @@
-import { creepClasses } from "room/creeps/creepClasses"
-import { claimRequestNeedsIndex, remoteNeedsIndex, spawnByRoomRemoteRoles } from "./constants"
-import { customLog, pack } from "./generalFunctions"
-import { InternationalManager } from "./internationalManager"
+import { creepClasses } from 'room/creeps/creepClasses'
+import { claimRequestNeedsIndex, remoteNeedsIndex, spawnByRoomRemoteRoles } from './constants'
+import { customLog, pack } from './generalFunctions'
+import { InternationalManager } from './internationalManager'
 
 import '../room/creeps/preTickManagers/international/scoutPreTickManager'
 
-InternationalManager.prototype.creepOrganizer = function() {
+InternationalManager.prototype.creepOrganizer = function () {
+     // Construct counter for creeps
 
-    // Construct counter for creeps
+     let totalCreepCount = 0
 
-    let totalCreepCount = 0
+     // Loop through all of my creeps
 
-    // Loop through all of my creeps
+     for (const creepName in Memory.creeps) {
+          let creep = Game.creeps[creepName]
 
-    for (const creepName in Memory.creeps) {
+          // If creep doesn't exist
 
-        let creep = Game.creeps[creepName]
+          if (!creep) {
+               // Delete creep from memory and iterate
 
-        // If creep doesn't exist
+               delete Memory.creeps[creepName]
+               continue
+          }
 
-        if (!creep) {
+          // Increase total creep counter
 
-            // Delete creep from memory and iterate
+          totalCreepCount += 1
 
-            delete Memory.creeps[creepName]
-            continue
-        }
+          // Get the creep's current room and the room it's from
 
-        // Increase total creep counter
+          const { room } = creep
+          // Get the creep's role
 
-        totalCreepCount += 1
+          const { role } = creep.memory
 
-        // Get the creep's current room and the room it's from
+          if (!role) continue
 
-        const room = creep.room,
+          // Assign creep proper class
 
-            // Get the creep's role
+          creep = Game.creeps[creepName] = new creepClasses[role](creep.id)
 
-            role = creep.memory.role
+          // Organize creep in its room by its role
 
-        if (!role) continue
+          room.myCreeps[role].push(creepName)
 
-        // Assign creep proper class
+          // Record the creep's presence in the room
 
-        creep = Game.creeps[creepName] = new creepClasses[role](creep.id)
+          room.myCreepsAmount += 1
 
-        // Organize creep in its room by its role
+          // Add the creep's name to the position in its room
 
-        room.myCreeps[role].push(creepName)
+          if (!creep.spawning) room.creepPositions[pack(creep.pos)] = creep.name
 
-        // Record the creep's presence in the room
+          // Get the commune the creep is from
 
-        room.myCreepsAmount++
+          const commune = Game.rooms[creep.memory.communeName]
 
-        // Add the creep's name to the position in its room
+          creep.preTickManager()
 
-        if (!creep.spawning) room.creepPositions[pack(creep.pos)] = creep.name
+          // If there is not vision in the commune, stop
 
-        // Get the commune the creep is from
+          if (!commune) continue
 
-        const commune = Game.rooms[creep.memory.communeName]
+          // If the creep isn't dying, organize by its roomFrom and role
 
-        creep.preTickManager()
+          if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
 
-        // If there is not vision in the commune, stop
+          // Record that the creep's existence in its roomFrom
 
-        if (!commune) continue
+          commune.creepsFromRoomAmount += 1
 
-        // If the creep isn't dying, organize by its roomFrom and role
+          // Get the creep's remoteName
 
-        if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
+          const { remoteName } = creep.memory
 
-        // Record that the creep's existence in its roomFrom
+          // If the creep has a remote
 
-        commune.creepsFromRoomAmount++
+          if (remoteName && commune.memory.remotes.includes(remoteName)) {
+               // If the creep is a source1RemoteHarvester
 
-        // Get the creep's remoteName
+               if (role === 'source1RemoteHarvester') {
+                    // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
 
-        const remoteName = creep.memory.remoteName
+                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
 
-        // If the creep has a remote
+                    // Add the creep to creepsFromRoomWithRemote relative to its remote
 
-        if (remoteName && commune.memory.remotes.includes(remoteName)) {
+                    commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
+                    continue
+               }
 
-            // If the creep is a source1RemoteHarvester
+               // If the creep is a source2RemoteHarvester
 
-            if (role == 'source1RemoteHarvester') {
+               if (role === 'source2RemoteHarvester') {
+                    // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
 
-                // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
+                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
 
-                Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
+                    // Add the creep to creepsFromRoomWithRemote relative to its remote
 
-                // Add the creep to creepsFromRoomWithRemote relative to its remote
+                    commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
+                    continue
+               }
 
-                commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
-                continue
-            }
+               // Otherwise if the creep is a remoteHauler, reduce its remote's needs by their number of carry parts
 
-            // If the creep is a source2RemoteHarvester
+               if (role === 'remoteHauler') {
+                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(CARRY)
+                    continue
+               }
 
-            if (role == 'source2RemoteHarvester') {
+               // Otherwise if the creep is a remoteReserver
 
-                // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
+               if (role === 'remoteReserver') {
+                    // Reduce its remote's needs by 1
 
-                Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
+                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= 1
 
-                // Add the creep to creepsFromRoomWithRemote relative to its remote
+                    // Add the creep to creepsFromRoomWithRemote relative to its remote
 
-                commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
-                continue
-            }
+                    commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
+                    continue
+               }
 
-            // Otherwise if the creep is a remoteHauler, reduce its remote's needs by their number of carry parts
+               // Otherwise if the creep is a remoteDefender
 
-            if (role == 'remoteHauler') {
+               if (role === 'remoteDefender') {
+                    // Reduduce the remote's defender need proportionate to the creep's strength
 
-                Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(CARRY)
-                continue
-            }
+                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.findStrength()
+                    continue
+               }
+          }
+     }
 
-            // Otherwise if the creep is a remoteReserver
+     // Record number of creeps
 
-            if (role == 'remoteReserver') {
-
-                // Reduce its remote's needs by 1
-
-                Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= 1
-
-                // Add the creep to creepsFromRoomWithRemote relative to its remote
-
-                commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
-                continue
-            }
-
-            // Otherwise if the creep is a remoteDefender
-
-            if (role == 'remoteDefender') {
-
-                // Reduduce the remote's defender need proportionate to the creep's strength
-
-                Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.findStrength()
-                continue
-            }
-        }
-    }
-
-    // Record number of creeps
-
-    Memory.stats.creeps = totalCreepCount
+     Memory.stats.creeps = totalCreepCount
 }

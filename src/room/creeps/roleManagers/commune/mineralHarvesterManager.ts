@@ -2,38 +2,33 @@ import { MineralHarvester } from '../../creepClasses'
 import './mineralHarvesterFunctions'
 
 export function mineralHarvesterManager(room: Room, creepsOfRole: string[]) {
+     for (const creepName of creepsOfRole) {
+          const creep: MineralHarvester = Game.creeps[creepName]
 
-    for (const creepName of creepsOfRole) {
+          // Get the mineral
 
-        const creep: MineralHarvester = Game.creeps[creepName],
+          const mineral: Mineral = room.get('mineral')
 
-        // Get the mineral
+          if (mineral.mineralAmount === 0) {
+               creep.advancedRecycle()
+               continue
+          }
 
-        mineral: Mineral = room.get('mineral')
+          // If the creep needs resources
 
-        if (mineral.mineralAmount == 0) {
+          if (creep.needsResources()) {
+               // Harvest the mineral and iterate
 
-            creep.advancedRecycle()
-            continue
-        }
+               creep.advancedHarvestMineral(mineral)
+               continue
+          }
 
-        // If the creep needs resources
+          // If there is a terminal
 
-        if (creep.needsResources()) {
+          if (room.terminal) {
+               // Transfer the creep's minerals to it
 
-            // Harvest the mineral and iterate
-
-            creep.advancedHarvestMineral(mineral)
-            continue
-        }
-
-        // If there is a terminal
-
-        if (room.terminal) {
-
-            // Transfer the creep's minerals to it
-
-            creep.advancedTransfer(room.terminal, mineral.mineralType)
-        }
-    }
+               creep.advancedTransfer(room.terminal, mineral.mineralType)
+          }
+     }
 }

@@ -1,78 +1,74 @@
-import { constants, remoteNeedsIndex } from "international/constants";
-import { getRange, getRangeBetween, unpackAsPos } from "international/generalFunctions";
-import { RemoteHarvester } from "room/creeps/creepClasses";
+import { constants, remoteNeedsIndex } from 'international/constants'
+import { getRange, getRangeBetween, unpackAsPos } from 'international/generalFunctions'
+import { RemoteHarvester } from 'room/creeps/creepClasses'
 
-RemoteHarvester.prototype.findRemote = function() {
+RemoteHarvester.prototype.findRemote = function () {
+     const creep = this
+     // If the creep already has a remote, inform true
 
-    const creep = this
-    // If the creep already has a remote, inform true
+     if (creep.memory.remoteName) return true
 
-    if (creep.memory.remoteName) return true
+     // Otherwise, get the creep's role
 
-    // Otherwise, get the creep's role
+     const role = creep.memory.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+     // Get remotes by their efficacy
 
-    const role = creep.memory.role as ('source1RemoteHarvester' | 'source2RemoteHarvester'),
+     const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
 
-    // Get remotes by their efficacy
+     // Loop through each remote name
 
-    remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
+     for (const roomName of remoteNamesByEfficacy) {
+          // Get the remote's memory using its name
 
-    // Loop through each remote name
+          const roomMemory = Memory.rooms[roomName]
 
-    for (const roomName of remoteNamesByEfficacy) {
+          // If the needs of this remote are met, iterate
 
-        // Get the remote's memory using its name
+          if (roomMemory.needs[remoteNeedsIndex[role]] <= 0) continue
 
-        const roomMemory = Memory.rooms[roomName]
+          // Otherwise assign the remote to the creep and inform true
 
-        // If the needs of this remote are met, iterate
+          creep.memory.remoteName = roomName
+          roomMemory.needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
 
-        if (roomMemory.needs[remoteNeedsIndex[role]] <= 0) continue
+          return true
+     }
 
-        // Otherwise assign the remote to the creep and inform true
+     // Inform false
 
-        creep.memory.remoteName = roomName
-        roomMemory.needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
-
-        return true
-    }
-
-    // Inform false
-
-    return false
+     return false
 }
 
-RemoteHarvester.prototype.travelToSource = function(sourceName) {
+RemoteHarvester.prototype.travelToSource = function (sourceName) {
+     const creep = this
+     const { room } = creep
 
-    const creep = this,
-    room = creep.room
+     // Try to find a harvestPosition, inform false if it failed
 
-    // Try to find a harvestPosition, inform false if it failed
+     if (!creep.findSourceHarvestPos(sourceName)) return false
 
-    if (!creep.findSourceHarvestPos(sourceName)) return false
+     creep.say('🚬')
 
-    creep.say('🚬')
+     // Unpack the harvestPos
 
-    // Unpack the harvestPos
+     const harvestPos = unpackAsPos(creep.memory.packedPos)
 
-    const harvestPos = unpackAsPos(creep.memory.packedPos)
+     // If the creep is at the creep's packedHarvestPos, inform false
 
-    // If the creep is at the creep's packedHarvestPos, inform false
+     if (getRange(creep.pos.x - harvestPos.x, creep.pos.y - harvestPos.y) === 0) return false
 
-    if (getRange(creep.pos.x - harvestPos.x, creep.pos.y - harvestPos.y) == 0) return false
+     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-    // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
+     creep.say(`⏩ ${sourceName}`)
 
-    creep.say('⏩ ' + sourceName)
+     creep.createMoveRequest({
+          origin: creep.pos,
+          goal: { pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name), range: 0 },
+          avoidEnemyRanges: true,
+          weightGamebjects: {
+               1: room.get('road'),
+          },
+     })
 
-    creep.createMoveRequest({
-        origin: creep.pos,
-        goal: { pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name), range: 0 },
-        avoidEnemyRanges: true,
-        weightGamebjects: {
-            1: room.get('road')
-        }
-    })
-
-    return true
+     return true
 }
