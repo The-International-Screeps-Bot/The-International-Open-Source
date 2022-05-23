@@ -1,4 +1,4 @@
-import { allyList, constants, remoteNeedsIndex } from 'international/constants'
+import { remoteNeedsIndex } from 'international/constants'
 import { getRange } from 'international/generalFunctions'
 import { creepClasses, RemoteCoreAttacker } from 'room/creeps/creepClasses'
 
@@ -59,7 +59,7 @@ RemoteCoreAttacker.prototype.advancedAttackCores = function() {
 
           this.say('🗡️C')
 
-          creepClasses.remoteCoreAttacker(closestCore)
+          this.attack(closestCore)
           return true
      }
 
