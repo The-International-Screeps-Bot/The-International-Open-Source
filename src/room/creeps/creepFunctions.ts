@@ -1522,6 +1522,8 @@ Creep.prototype.advancedSignController = function () {
 
      if (room.memory.type === 'ally' || room.memory.type === 'enemy') return false
 
+     if (room.controller.reservation && room.controller.reservation.username != constants.me) return false
+
      // If the room is a commune
 
      if (room.memory.type === 'commune') {
