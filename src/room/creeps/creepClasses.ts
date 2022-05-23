@@ -115,12 +115,12 @@ export class RemoteHauler extends Creep {
 }
 creepClasses.remoteHauler = RemoteHauler
 
-export class Reserver extends Creep {
+export class RemoteReserver extends Creep {
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }
 }
-creepClasses.remoteReserver = Reserver
+creepClasses.remoteReserver = RemoteReserver
 
 export class RemoteDefender extends Creep {
      /**

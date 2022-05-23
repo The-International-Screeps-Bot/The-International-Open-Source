@@ -152,6 +152,8 @@ InternationalManager.prototype.tickConfig = function () {
                roomMemory.needs[remoteNeedsIndex.remoteHauler] = 0
 
                roomMemory.needs[remoteNeedsIndex.remoteDefender] = 0
+
+               roomMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = 0
           }
 
           // Add roomName to commune list

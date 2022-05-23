@@ -1,4 +1,4 @@
-import { remoteHarvesterRoles, remoteNeedsIndex } from './constants'
+import { remoteNeedsIndex } from './constants'
 import { customLog, findCarryPartsRequired } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
@@ -47,11 +47,15 @@ InternationalManager.prototype.remoteNeedsManager = function () {
                if (remote) {
                     // Get enemyCreeps in the room and loop through them
 
-                    const enemyCreeps: Creep[] = remote.get('enemyCreeps')
-                    for (const enemyCreep of enemyCreeps) {
+                    for (const enemyCreep of remote.enemyCreeps) {
                          // Increase the defenderNeed according to the creep's strength
 
                          remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.findStrength()
+                    }
+                    
+                    if (remote.structures.invaderCore.length) {
+
+                         remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = 1
                     }
                }
 

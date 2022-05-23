@@ -1,7 +1,7 @@
 import { RemoteCoreAttacker } from 'room/creeps/creepClasses'
 import './remoteCoreAttackerFunctions'
 
-export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
+export function remoteCoreAttackerManager(room: Room, creepsOfRole: string[]) {
      for (const creepName of creepsOfRole) {
           const creep: RemoteCoreAttacker = Game.creeps[creepName]
 

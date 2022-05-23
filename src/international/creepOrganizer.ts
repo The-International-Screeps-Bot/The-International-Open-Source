@@ -132,6 +132,15 @@ InternationalManager.prototype.creepOrganizer = function () {
                     Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.findStrength()
                     continue
                }
+
+               // Otherwise if the creep is a remoteCoreAttacker
+
+               if (role === 'remoteCoreAttacker') {
+                    // Reduduce the remote's defender need proportionate to the creep's strength
+
+                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= 1
+                    continue
+               }
           }
      }
 
