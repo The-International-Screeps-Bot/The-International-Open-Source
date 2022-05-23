@@ -383,6 +383,16 @@ declare global {
           cpuLogging: boolean
 
           /**
+           * Wether the bot should enable ramparts when there is no enemy present
+           */
+          publicRamparts: boolean
+
+          /**
+           * Wether the bot should automatically respond to claimRequests
+           */
+          autoClaim: boolean
+
+          /**
            * An ongoing record of the latest ID assigned by the bot
            */
           ID: number

@@ -24,6 +24,8 @@ InternationalManager.prototype.config = function () {
           Memory.roomVisuals = false
           Memory.mapVisuals = false
           Memory.cpuLogging = false
+          Memory.publicRamparts = true
+          Memory.autoClaim = true
 
           //
 

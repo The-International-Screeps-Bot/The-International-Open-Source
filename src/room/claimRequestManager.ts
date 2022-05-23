@@ -1,4 +1,4 @@
-import { autoClaim, claimRequestNeedsIndex, constants } from 'international/constants'
+import { claimRequestNeedsIndex, constants } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 
@@ -41,7 +41,7 @@ Room.prototype.claimRequestManager = function () {
 
      // If autoClaim is disabled
 
-     if (!autoClaim) return
+     if (!Memory.autoClaim) return
 
      // If there are enough communes for the GCL
 

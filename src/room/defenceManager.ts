@@ -18,9 +18,13 @@ export function defenceManager(room: Room) {
      manageRampartPublicity()
 
      function manageRampartPublicity() {
+
           // If there are no enemyAttackers
 
           if (!enemyAttackers.length) {
+
+               if (!Memory.publicRamparts) return
+
                // Stop if the tick is not divisible by a random range
 
                if (Game.time % Math.floor(Math.random() * 50) !== 0) return
