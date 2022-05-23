@@ -33,7 +33,7 @@ export function defenceManager(room: Room) {
 
                // Get the room's ramparts and loop through them
 
-               const ramparts: StructureRampart[] = room.get('rampart')
+               const ramparts = room.structures.rampart
                for (const rampart of ramparts) {
                     // If increment is more or equal to 10, stop
 
@@ -56,7 +56,7 @@ export function defenceManager(room: Room) {
 
           // Get the room's ramparts and loop through them
 
-          const ramparts: StructureRampart[] = room.get('rampart')
+          const ramparts = room.structures.rampart
           for (const rampart of ramparts) {
                // If the rampart is public, make it private
 

@@ -110,6 +110,7 @@ declare global {
           | 'remoteHauler'
           | 'remoteReserver'
           | 'remoteDefender'
+          | 'remoteCoreAttacker'
           | 'scout'
           | 'claimer'
           | 'vanguard'

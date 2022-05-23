@@ -1114,15 +1114,17 @@ export function spawnRequester(room: Room) {
           const remoteNeeds = Memory.rooms[remoteName].needs
           // Add up econ needs for this room
 
-          const remoteEconNeed =
+          const remoteNeed =
                Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0) +
                Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0) +
                Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0) +
-               Math.max(remoteNeeds[remoteNeedsIndex.remoteReserver], 0)
+               Math.max(remoteNeeds[remoteNeedsIndex.remoteReserver], 0) +
+               Math.max(remoteNeeds[remoteNeedsIndex.remoteDefender], 0) +
+               Math.max(remoteNeeds[remoteNeedsIndex.remoteCoreAttacker], 0)
 
           // If there is a need for any econ creep, inform the index
 
-          if (remoteEconNeed <= 0) continue
+          if (remoteNeed <= 0) continue
 
           // Get the sources in order of efficacy
 
@@ -1315,6 +1317,37 @@ export function spawnRequester(room: Room) {
                          priority: 4,
                          memoryAdditions: {
                               role: 'remoteDefender',
+                         },
+                    }
+               })(),
+          )
+
+          // Construct requests for remoteCoreAttackers
+
+          constructSpawnRequests(
+               (function (): SpawnRequestOpts | false {
+
+                    // If there are no related needs
+
+                    if (remoteNeeds[remoteNeedsIndex.remoteCoreAttacker] <= 0) return false
+
+                    // Define the minCost and strength
+
+                    const cost = 130
+                    const minCost = cost * 2
+                    const extraParts = [ATTACK, MOVE]
+
+                    return {
+                         defaultParts: [],
+                         extraParts,
+                         partsMultiplier: 50 / extraParts.length,
+                         groupComparator: room.creepsFromRoomWithRemote[remoteName]?.remoteCoreAttacker,
+                         minCreeps: undefined,
+                         maxCreeps: Infinity,
+                         minCost,
+                         priority: 4,
+                         memoryAdditions: {
+                              role: 'remoteCoreAttacker',
                          },
                     }
                })(),

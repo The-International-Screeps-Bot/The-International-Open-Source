@@ -141,6 +141,23 @@ export class RemoteDefender extends Creep {
 }
 creepClasses.remoteDefender = RemoteDefender
 
+export class RemoteCoreAttacker extends Creep {
+     /**
+      * Finds a remote to defend
+      */
+     findRemote?(): boolean
+
+     /**
+      * Find and attack cores
+      */
+     advancedAttackCores?(): boolean
+
+     constructor(creepID: Id<Creep>) {
+          super(creepID)
+     }
+}
+creepClasses.remoteCoreAttacker = RemoteCoreAttacker
+
 export class Scout extends Creep {
      /**
       * Finds a room name for the scout to target
