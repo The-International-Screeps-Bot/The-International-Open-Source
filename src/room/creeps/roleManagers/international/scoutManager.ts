@@ -16,6 +16,9 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
           // If the creep is in the scoutTarget
 
           if (creep.memory.scoutTarget === room.name) {
+
+               creep.say('👁️')
+
                // Get information about the room
 
                room.findType(commune)

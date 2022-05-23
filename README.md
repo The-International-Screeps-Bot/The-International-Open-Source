@@ -15,7 +15,9 @@ This bot intended to provide experienced and new players a reference for when th
 
 Feel welcome to fork it and otherwise use it, however do not be overly aggressive on the Screeps world, especially to newer players. The bot is intended to be automated, but can perform manual actions via the console. It has an information panel showing progress, events, economy and military, and more.
 
-If you have specific questions or want to discuss the bot, DM me on discord: `Carson A&0#6757`.
+If you have specific questions or want to discuss the bot, please join our discord
+
+[![Discord link](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/5QubDsB786)
 
 ![Room with bot](images/room.png)
 ![Map view with visuals](images/visuals.png)
