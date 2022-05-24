@@ -366,6 +366,11 @@ declare global {
 
      interface Memory {
           /**
+           * The name of the user
+           */
+          me: string
+
+          /**
            * Whether Memory is constructed or not
            */
           constructed: true | undefined

@@ -8,7 +8,7 @@ InternationalManager.prototype.config = function () {
      if (!Memory.constructed) {
           RawMemory.setActiveSegments([98])
           // Record that Memory is now constructed
-
+          Memory.me = Game.spawns[0].room.controller ? Game.spawns[0].room.controller.owner.username : 'Username'
           Memory.constructed = true
 
           // Construct foundation
