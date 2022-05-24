@@ -6,7 +6,6 @@ InternationalManager.prototype.config = function () {
      // Check if Memory is constructed
 
      if (!Memory.constructed) {
-          RawMemory.setActiveSegments([98])
           // Record that Memory is now constructed
           Memory.me = Game.spawns[0].room.controller ? Game.spawns[0].room.controller.owner.username : 'Username'
           Memory.constructed = true
@@ -33,6 +32,7 @@ InternationalManager.prototype.config = function () {
      }
 
      if (!global.constructed) {
+          RawMemory.setActiveSegments([98])
           global.constructed = true
 
           global.packedRoomNames = {}
