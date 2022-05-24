@@ -19,7 +19,7 @@
           "watch-pserver": "rollup -cw --environment DEST:pserver",
           "watch-season": "rollup -cw --environment DEST:season",
           "watch-sim": "rollup -cw --environment DEST:sim",
-          "test-server": "npm run build && node server/index.js 150"
+          "test-server": "npm run build && node server/index.js 115"
      },
      "repository": {
           "type": "git",
