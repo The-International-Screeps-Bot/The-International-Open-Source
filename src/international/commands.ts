@@ -1,37 +1,29 @@
 import { constants } from './constants'
 
 global.killAllCreeps = function (roles?: CreepRoles[]) {
-     // Loop through each creepName
+     const filteredCreeps = Object.entries(Game.creeps).filter(
+          ([creepName, creep]) => !roles || roles.includes(creep.memory.role),
+     )
+     let killedCreepCount = 0
+     filteredCreeps.forEach(([creepName, creep]) => {
+          if (creep.suicide() === OK) killedCreepCount += 1
+     })
 
-     for (const creepName in Game.creeps) {
-          // Construct and suicide the creep
-
-          const creep = Game.creeps[creepName]
-
-          if (!roles || roles.includes(creep.memory.role)) creep.suicide()
-     }
-
-     // Inform the result
-
-     return `Killed all creeps of role ${roles || 'all'}`
+     return `Killed an total of ${killedCreepCount} creeps ${roles ? `with one of the following roles: ${roles}` : ''}`
 }
 
 global.removeAllCSites = function (types?: BuildableStructureConstant[]) {
-     // Loop through cSite IDs in construction sites
+     const filteredCS = Object.entries(Game.constructionSites).filter(
+          ([ID, cSite]) => types || types.includes(cSite.structureType),
+     )
+     let removedCSCount = 0
+     filteredCS.forEach(([id, cSite]) => {
+          if (cSite.remove() === OK) removedCSCount += 1
+     })
 
-     for (const ID in Game.constructionSites) {
-          // Get the site using its ID
-
-          const cSite = Game.constructionSites[ID]
-
-          // If the cSite type matches the specified types, delete the cSite
-
-          if (!types || types.includes(cSite.structureType)) cSite.remove()
-     }
-
-     // Inform the result
-
-     return `Destroyed all construction sites of types ${types || 'all'}`
+     return `Removed an total of ${removedCSCount} construction sites ${
+          types ? `with one of the following types: ${types}` : ''
+     }`
 }
 
 global.destroyAllStructures = function (roomName: string, types?: StructureConstant[]) {
@@ -45,6 +37,8 @@ global.destroyAllStructures = function (roomName: string, types?: StructureConst
 
      // Otherwise loop through each structureType
 
+     let destroyedStructureCount = 0
+
      for (const structureType of constants.allStructureTypes) {
           // If types is constructed and the part isn't in types, iterate
 
@@ -56,18 +50,22 @@ global.destroyAllStructures = function (roomName: string, types?: StructureConst
 
           // Loop through the structures
 
-          for (const structure of structures) structure.destroy()
+          for (const structure of structures) {
+               if (structure.destroy() === OK) destroyedStructureCount += 1
+          }
      }
 
      // Inform the result
 
-     return `Destroyed all structures of types ${types || 'all'} in ${roomName}`
+     return `Destroyed all an total of ${destroyedStructureCount} structures in ${roomName} ${
+          types ? `with one of the following types: ${types}` : ''
+     }`
 }
 
 /**
  *
- * @param commune The commune to respond to the claimRequest
  * @param claimRequest The roomName of the claimRequest to respond to
+ * @param commune The commune to respond to the claimRequest
  */
 global.claim = function (claimRequest: string, communeName: string) {
      const roomMemory = Memory.rooms[communeName]
@@ -86,5 +84,5 @@ global.claim = function (claimRequest: string, communeName: string) {
      }
 
      roomMemory.claimRequest = claimRequest
-     return `${communeName} is responding to claimRequest for ${claimRequest}`
+     return `${communeName} started responding to the claimRequest for ${claimRequest}`
 }
