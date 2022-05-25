@@ -74,7 +74,7 @@ interface Constants {
 export const constants: Partial<Constants> = {}
 
 // constants.me = Memory.me
-constants.me = 'MarvinTMB'
+constants.me = Memory.me
 constants.mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
 export const allyList = new Set(['Q13214', 'HerrKai', 'clarkok', 'PandaMaster'])
