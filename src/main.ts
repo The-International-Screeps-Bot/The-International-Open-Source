@@ -865,6 +865,10 @@ declare global {
           stampAnchors: Partial<Record<StampTypes, number[]>>
 
           abandoned: number | undefined
+
+          powerBanks: {[roomName: string]: number[]}
+
+          deposits: {[roomName: string]: number[] }
      }
 
      // Creeps
@@ -1248,7 +1252,7 @@ export const loop = function () {
      internationalManager.mapVisualsManager()
      internationalManager.endTickManager()
 
-     if (constants.me === 'PandaMaster') {
+     if (Memory.me === 'PandaMaster') {
           new Market().HandleOrderEveryTick()
           new ShardVision().Handle()
           RawMemory.segments[98] = JSON.stringify(Memory.stats)

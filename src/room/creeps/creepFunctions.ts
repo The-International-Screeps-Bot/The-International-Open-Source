@@ -1522,7 +1522,7 @@ Creep.prototype.advancedSignController = function () {
 
      if (room.memory.type === 'ally' || room.memory.type === 'enemy') return false
 
-     if (room.controller.reservation && room.controller.reservation.username != constants.me) return false
+     if (room.controller.reservation && room.controller.reservation.username != Memory.me) return false
 
      // If the room is a commune
 
@@ -1729,7 +1729,7 @@ Creep.prototype.advancedReserveController = function () {
      if (creep.pos.getRangeTo(controller.pos) === 1) {
           // If the controller is reserved and it isn't reserved by me
 
-          if (controller.reservation && controller.reservation.username !== constants.me) {
+          if (controller.reservation && controller.reservation.username !== Memory.me) {
                // Try to attack it, informing the result
 
                creep.say('🗡️')

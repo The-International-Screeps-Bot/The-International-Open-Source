@@ -1,7 +1,5 @@
 export const constants: Partial<Constants> = {}
 
-// constants.me = Memory.me
-constants.me = Memory.me
 constants.mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
 export const allyList = new Set(['Q13214', 'HerrKai', 'clarkok', 'PandaMaster'])
@@ -12,7 +10,7 @@ constants.roomTypeProperties = {
      source1: true,
      source2: true,
      remotes: true,
-     commodities: true,
+     deposits: true,
      powerBanks: true,
      notClaimable: true,
 
@@ -37,7 +35,7 @@ constants.roomTypes = {
           source1: true,
           source2: true,
           remotes: true,
-          commodities: true,
+          deposits: true,
           powerBanks: true,
      },
      remote: {

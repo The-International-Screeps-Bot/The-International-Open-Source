@@ -137,7 +137,7 @@ InternationalManager.prototype.tickConfig = function () {
                if (
                     remote &&
                     remote.controller.reservation &&
-                    remote.controller.reservation.username === constants.me &&
+                    remote.controller.reservation.username === Memory.me &&
                     remote.controller.reservation.ticksToEnd >= roomMemory.sourceEfficacies.reduce((a, b) => a + b) * 2
                ) {
                     // Set the reservation need to 0
@@ -196,5 +196,7 @@ InternationalManager.prototype.tickConfig = function () {
           }
 
           room.scoutTargets = new Set()
+
+          if (!room.memory.deposits) room.memory.deposits = {}
      }
 }

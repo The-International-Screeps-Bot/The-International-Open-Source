@@ -30,7 +30,7 @@ Claimer.prototype.claimRoom = function () {
 
      if (
           room.controller.owner ||
-          (room.controller.reservation && room.controller.reservation.username !== constants.me)
+          (room.controller.reservation && room.controller.reservation.username !== Memory.me)
      ) {
           creep.attackController(room.controller)
           return

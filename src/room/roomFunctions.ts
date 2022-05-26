@@ -1727,7 +1727,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
                // If I am the reserver, inform false
 
-               if (controller.reservation.username === constants.me) return false
+               if (controller.reservation.username === Memory.me) return false
 
                // If the reserver is an Invader, inform false
 
@@ -1770,7 +1770,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
                if (controller.reservation) {
                     // If I am the reserver, inform false
 
-                    if (controller.reservation.username === constants.me) return false
+                    if (controller.reservation.username === Memory.me) return false
 
                     // If the reserver is an Invader, inform false
 

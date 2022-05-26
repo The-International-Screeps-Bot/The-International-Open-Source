@@ -64,7 +64,7 @@ export function roomVisualsManager(room: Room) {
                const color = reservationColor()
 
                function reservationColor() {
-                    if (room.controller.reservation.username === constants.me) {
+                    if (room.controller.reservation.username === Memory.me) {
                          return constants.colors.lightBlue
                     }
 
