@@ -164,6 +164,8 @@ export class Scout extends Creep {
       */
      findScoutTarget?(): boolean
 
+     recordDeposits?(): void
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }

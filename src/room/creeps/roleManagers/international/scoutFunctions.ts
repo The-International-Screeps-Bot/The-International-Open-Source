@@ -1,3 +1,4 @@
+import { findClosestCommuneName } from 'international/generalFunctions'
 import { Scout } from '../../creepClasses'
 
 Scout.prototype.findScoutTarget = function () {
@@ -57,4 +58,42 @@ Scout.prototype.findScoutTarget = function () {
      commune.scoutTargets.add(scoutTarget)
 
      return true
+}
+
+Scout.prototype.recordDeposits = function() {
+
+     const { room } = this
+
+     if (room.memory.type != 'highway') return
+
+     // Make sure the room has a commune
+
+     if (room.memory.commune) {
+
+          if (!Memory.communes.includes(room.memory.commune)) {
+
+               room.memory.commune = findClosestCommuneName(room.name)
+          }
+     }
+
+     else {
+
+          room.memory.commune = findClosestCommuneName(room.name)
+     }
+
+     const communeMemory = Memory.rooms[room.memory.communeName]
+
+     const deposits = room.find(FIND_DEPOSITS)
+
+     // Filter deposits that haven't been assigned a commune and are viable
+
+     const unAssignedDeposits = deposits.filter(function(deposit) {
+
+          return !communeMemory[deposit.id] && deposit.lastCooldown <= 100
+     })
+
+     for (const deposit of unAssignedDeposits)
+          communeMemory.deposits[deposit.id] = {
+               decay: deposit.ticksToDecay
+          }
 }

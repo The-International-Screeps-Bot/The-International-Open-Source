@@ -780,6 +780,10 @@ declare global {
           hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
      }
 
+     interface DepositRecord {
+          decay: number
+     }
+
      interface RoomMemory {
           [key: string]: any
 
@@ -868,7 +872,7 @@ declare global {
 
           powerBanks: {[roomName: string]: number[]}
 
-          deposits: {[roomName: string]: number[] }
+          deposits: Record<Id<Deposit>, DepositRecord>
      }
 
      // Creeps

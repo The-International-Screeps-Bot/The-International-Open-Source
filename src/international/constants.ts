@@ -74,7 +74,9 @@ constants.roomTypes = {
      keeperCenter: {
           owner: true,
      },
-     highway: {},
+     highway: {
+          commune: true,
+     },
      intersection: {
           portalsTo: true,
      },
