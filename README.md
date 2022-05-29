@@ -15,7 +15,7 @@ This bot intended to provide experienced and new players a reference for when th
 
 Feel welcome to fork it and otherwise use it, however do not be overly aggressive on the Screeps world, especially to newer players. The bot is intended to be automated, but can perform manual actions via the console. It has an information panel showing progress, events, economy and military, and more.
 
-If you have specific questions or want to discuss the bot, please join our discord
+If you have specific questions or want to discuss the bot, please join our discord server.
 
 [![Discord link](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/5QubDsB786)
 
@@ -33,7 +33,7 @@ If you have specific questions or want to discuss the bot, please join our disco
 
 Please read the about section before installing and using this bot.
 
-First you'll want to download the repository. It's the big green button that says code - you can't miss it.
+First you'll want to download or fork the repository.
 
 ### NPM
 
@@ -49,7 +49,7 @@ Then, when in the project folder, you'll want to install the devDependencies lik
 npm install --only=dev
 ```
 
-And that's it. Contact me on discord `Carson A&0#6757` if you need help.
+And that's it. Join our [discord server](https://discord.gg/5QubDsB786) if you need help.
 
 ## Usage
 
@@ -59,6 +59,18 @@ First, rename example.screeps.json to screeps.json and fill in the required info
 
 To then run the bot, use the command `npm run push-mmo` replacing mmo with the environment you want to compile to. This wiil initially compile to the environment, as well as automatically compiling and pushing to the environment on code changes.
 
+### Grafana
+
+You can set up [grafana](https://grafana.com/), a graphing and stat recording tool, using the screepsplus supported tool [hosted agent](https://screepspl.us/services/grafana/). With this, metrics recorded in Memory.stats can be viewed. There is a JSON model in this repository, grafanaModel.json which you can use this to instantiate your graphs. 
+
 ### Private server
 
-If you'd like to use this method to compile to a private server, you'll need to download and configure [screepsmod-auth](https://github.com/ScreepsMods/screepsmod-auth) to push your code.
+If you'd like to use rollup to compile to a private server, you'll need to download and configure [screepsmod-auth](https://github.com/ScreepsMods/screepsmod-auth) to push your code.
+
+I'd also suggest using this less-laggy tool [steamless-client](https://github.com/laverdet/screeps-steamless-client ) to watch your private server run from the comfort of your browser.
+
+## Contribution 
+
+I'm a huge fan of teamwork, and many useful features of this bot have been added by contributors.
+
+If you want to join us in development for this bot, please join our [discord server](https://discord.gg/5QubDsB786) and share what you're working on, or hoping to add. We're happy to review issues, merge pull requests, and add collaborators!
