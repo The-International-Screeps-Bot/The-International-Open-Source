@@ -1629,7 +1629,7 @@ Creep.prototype.advancedRecycle = function () {
                | undefined
           )[]
      ).filter(function (container) {
-          return container && getRange(container.pos.x - closestSpawn.pos.x, container.pos.y - closestSpawn.pos.y)
+          return container && getRange(container.pos.x - closestSpawn.pos.x, container.pos.y - closestSpawn.pos.y) == 1
      })
 
      if (fastFillerContainers.length) {
@@ -1650,9 +1650,9 @@ Creep.prototype.advancedRecycle = function () {
                return
           }
      } else {
-          // If the creep is in range of 1
 
           if (creep.pos.getRangeTo(closestSpawn.pos) > 1) {
+
                creep.createMoveRequest({
                     origin: creep.pos,
                     goal: { pos: closestSpawn.pos, range: 1 },
