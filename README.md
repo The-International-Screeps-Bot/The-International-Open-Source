@@ -29,6 +29,8 @@ If you have specific questions or want to discuss the bot, please join our disco
 
 [Videos](https://www.youtube.com/playlist?list=PLGlzrjCmziEj7hQZSwcmkXkMXgkQXUQ6C)
 
+[My screeps profile](https://screeps.com/a/#!/profile/MarvinTMB)
+
 ## Requirements
 
 Please read the about section before installing and using this bot.
