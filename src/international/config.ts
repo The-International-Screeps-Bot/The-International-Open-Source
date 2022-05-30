@@ -6,10 +6,12 @@ InternationalManager.prototype.config = function () {
      // Check if Memory is constructed
 
      if (!Memory.constructed) {
-
           Memory.constructed = true
 
-          Memory.me = (Game.structures[0] as OwnedStructure)?.owner?.username || Game.creeps[0]?.owner?.username || 'username'
+          Memory.me =
+               (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
+               Object.values(Game.creeps)[0]?.owner?.username ||
+               'username'
 
           // Construct foundation
 
