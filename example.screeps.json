@@ -7,7 +7,7 @@
           "path": "/",
           "branch": "branch name"
      },
-     "pServer": {
+     "pserver": {
           "email": "your username (case sensitive!)",
           "password": "your password",
           "protocol": "http",
