@@ -115,12 +115,12 @@ export class RemoteHauler extends Creep {
 }
 creepClasses.remoteHauler = RemoteHauler
 
-export class Reserver extends Creep {
+export class RemoteReserver extends Creep {
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }
 }
-creepClasses.remoteReserver = Reserver
+creepClasses.remoteReserver = RemoteReserver
 
 export class RemoteDefender extends Creep {
      /**
@@ -141,11 +141,30 @@ export class RemoteDefender extends Creep {
 }
 creepClasses.remoteDefender = RemoteDefender
 
+export class RemoteCoreAttacker extends Creep {
+     /**
+      * Finds a remote to defend
+      */
+     findRemote?(): boolean
+
+     /**
+      * Find and attack cores
+      */
+     advancedAttackCores?(): boolean
+
+     constructor(creepID: Id<Creep>) {
+          super(creepID)
+     }
+}
+creepClasses.remoteCoreAttacker = RemoteCoreAttacker
+
 export class Scout extends Creep {
      /**
       * Finds a room name for the scout to target
       */
      findScoutTarget?(): boolean
+
+     recordDeposits?(): void
 
      constructor(creepID: Id<Creep>) {
           super(creepID)

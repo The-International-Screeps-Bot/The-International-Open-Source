@@ -1,0 +1,14 @@
+container:
+  image: node:12
+  cpu: 8
+  memory: 8G
+  use_static_ip: "true"
+
+testServer_task:
+  timeout_in: 120
+  node_modules_cache:
+    folder: node_modules
+    fingerprint_script: cat package-lock.json
+    populate_script: npm ci
+  ip_script: wget -qO- ifconfig.co
+  testServer_script: npm run test-server

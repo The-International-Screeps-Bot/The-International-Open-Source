@@ -18,9 +18,13 @@ export function defenceManager(room: Room) {
      manageRampartPublicity()
 
      function manageRampartPublicity() {
+
           // If there are no enemyAttackers
 
           if (!enemyAttackers.length) {
+
+               if (!Memory.publicRamparts) return
+
                // Stop if the tick is not divisible by a random range
 
                if (Game.time % Math.floor(Math.random() * 50) !== 0) return
@@ -29,7 +33,7 @@ export function defenceManager(room: Room) {
 
                // Get the room's ramparts and loop through them
 
-               const ramparts: StructureRampart[] = room.get('rampart')
+               const ramparts = room.structures.rampart
                for (const rampart of ramparts) {
                     // If increment is more or equal to 10, stop
 
@@ -52,7 +56,7 @@ export function defenceManager(room: Room) {
 
           // Get the room's ramparts and loop through them
 
-          const ramparts: StructureRampart[] = room.get('rampart')
+          const ramparts = room.structures.rampart
           for (const rampart of ramparts) {
                // If the rampart is public, make it private
 

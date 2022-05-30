@@ -816,6 +816,8 @@ Creep.prototype.createMoveRequest = function (opts) {
 
           opts.avoidStationaryPositions = true
 
+          opts.avoidNotMyCreeps = true
+
           // Generate a new path
 
           path = room.advancedFindPath(opts)
@@ -1522,6 +1524,8 @@ Creep.prototype.advancedSignController = function () {
 
      if (room.memory.type === 'ally' || room.memory.type === 'enemy') return false
 
+     if (room.controller.reservation && room.controller.reservation.username != Memory.me) return false
+
      // If the room is a commune
 
      if (room.memory.type === 'commune') {
@@ -1627,7 +1631,7 @@ Creep.prototype.advancedRecycle = function () {
                | undefined
           )[]
      ).filter(function (container) {
-          return container && getRange(container.pos.x - closestSpawn.pos.x, container.pos.y - closestSpawn.pos.y)
+          return container && getRange(container.pos.x - closestSpawn.pos.x, container.pos.y - closestSpawn.pos.y) == 1
      })
 
      if (fastFillerContainers.length) {
@@ -1648,9 +1652,9 @@ Creep.prototype.advancedRecycle = function () {
                return
           }
      } else {
-          // If the creep is in range of 1
 
           if (creep.pos.getRangeTo(closestSpawn.pos) > 1) {
+
                creep.createMoveRequest({
                     origin: creep.pos,
                     goal: { pos: closestSpawn.pos, range: 1 },
@@ -1727,7 +1731,7 @@ Creep.prototype.advancedReserveController = function () {
      if (creep.pos.getRangeTo(controller.pos) === 1) {
           // If the controller is reserved and it isn't reserved by me
 
-          if (controller.reservation && controller.reservation.username !== constants.me) {
+          if (controller.reservation && controller.reservation.username !== Memory.me) {
                // Try to attack it, informing the result
 
                creep.say('🗡️')

@@ -1,6 +1,6 @@
 import { allyManager } from 'international/simpleAllies'
 import { customLog, getAvgPrice } from './generalFunctions'
-
+import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
@@ -182,6 +182,7 @@ InternationalManager.prototype.run = function () {
 
      allyManager.tickConfig()
      allyManager.getAllyRequests()
+     ExecutePandaMasterCode()
 }
 
 InternationalManager.prototype.getSellOrders = function (resourceType, maxPrice) {

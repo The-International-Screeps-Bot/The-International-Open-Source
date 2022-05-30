@@ -31,8 +31,6 @@ import {
 } from 'room/roomTasks'
 import { RoomObject } from 'room/roomObject'
 import { ErrorMapper } from 'other/ErrorMapper'
-import Market from 'other/PandaMaster/Market'
-import ShardVision from 'other/PandaMaster/ShardVision'
 import { constants } from 'international/constants'
 
 // Type declareations for global
@@ -110,6 +108,7 @@ declare global {
           | 'remoteHauler'
           | 'remoteReserver'
           | 'remoteDefender'
+          | 'remoteCoreAttacker'
           | 'scout'
           | 'claimer'
           | 'vanguard'
@@ -205,9 +204,14 @@ declare global {
           avoidStationaryPositions?: boolean
 
           /**
-           * Deprecate
+           *
            */
           avoidImpassibleStructures?: boolean
+
+          /**
+           * Marks creeps not owned by the bot as avoid
+           */
+          avoidNotMyCreeps?: boolean
 
           /**
            * Weight my ramparts by this value
@@ -365,6 +369,11 @@ declare global {
 
      interface Memory {
           /**
+           * The name of the user
+           */
+          me: string
+
+          /**
            * Whether Memory is constructed or not
            */
           constructed: true | undefined
@@ -381,6 +390,16 @@ declare global {
            * Determines if cpu usage for modules will be logged
            */
           cpuLogging: boolean
+
+          /**
+           * Wether the bot should enable ramparts when there is no enemy present
+           */
+          publicRamparts: boolean
+
+          /**
+           * Wether the bot should automatically respond to claimRequests
+           */
+          autoClaim: boolean
 
           /**
            * An ongoing record of the latest ID assigned by the bot
@@ -764,6 +783,10 @@ declare global {
           hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
      }
 
+     interface DepositRecord {
+          decay: number
+     }
+
      interface RoomMemory {
           [key: string]: any
 
@@ -849,6 +872,10 @@ declare global {
           stampAnchors: Partial<Record<StampTypes, number[]>>
 
           abandoned: number | undefined
+
+          powerBanks: { [roomName: string]: number[] }
+
+          deposits: Record<Id<Deposit>, DepositRecord>
      }
 
      // Creeps
@@ -1231,10 +1258,4 @@ export const loop = function () {
 
      internationalManager.mapVisualsManager()
      internationalManager.endTickManager()
-
-     if (constants.me === 'PandaMaster') {
-          new Market().HandleOrderEveryTick()
-          new ShardVision().Handle()
-          RawMemory.segments[98] = JSON.stringify(Memory.stats)
-     }
 }

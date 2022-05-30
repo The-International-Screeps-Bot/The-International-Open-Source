@@ -19,7 +19,7 @@ Room.prototype.sourcesToReceivers = function (sourceLinks, receiverLinks) {
 
                if (!receiverLink) continue
 
-               // If the link is more than half full, iterate
+               // If the link is more than 25% full, iterate
 
                if (receiverLink.store.energy > receiverLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) continue
 
@@ -46,7 +46,7 @@ Room.prototype.hubToFastFiller = function (hubLink, fastFillerLink) {
 
      if (hubLink.store.getCapacity(RESOURCE_ENERGY) - hubLink.store.energy > 100) return
 
-     // If the fastFillerLink is more than half full, stop
+     // If the fastFillerLink is more than 25% full, stop
 
      if (fastFillerLink.store.energy > fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) return
 
@@ -75,7 +75,7 @@ Room.prototype.hubToController = function (hubLink, controllerLink) {
 
      if (hubLink.store.getCapacity(RESOURCE_ENERGY) - hubLink.store.energy > 100) return
 
-     // If the controllerLink is more than half full, stop
+     // If the controllerLink is more than 25% full, stop
 
      if (controllerLink.store.energy > controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) return
 

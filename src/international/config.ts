@@ -6,10 +6,12 @@ InternationalManager.prototype.config = function () {
      // Check if Memory is constructed
 
      if (!Memory.constructed) {
-          RawMemory.setActiveSegments([98])
-          // Record that Memory is now constructed
-
           Memory.constructed = true
+
+          Memory.me =
+               (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
+               Object.values(Game.creeps)[0]?.owner?.username ||
+               'username'
 
           // Construct foundation
 
@@ -24,6 +26,8 @@ InternationalManager.prototype.config = function () {
           Memory.roomVisuals = false
           Memory.mapVisuals = false
           Memory.cpuLogging = false
+          Memory.publicRamparts = true
+          Memory.autoClaim = true
 
           //
 
@@ -31,6 +35,7 @@ InternationalManager.prototype.config = function () {
      }
 
      if (!global.constructed) {
+          RawMemory.setActiveSegments([98])
           global.constructed = true
 
           global.packedRoomNames = {}

@@ -1,10 +1,10 @@
 import { remoteNeedsIndex } from 'international/constants'
-import { RoomTask } from 'room/roomTasks'
-import { RemoteHauler } from '../../creepClasses'
+import { RemoteReserver } from '../../creepClasses'
+import './remoteReserverFunctions'
 
 export function remoteReserverManager(room: Room, creepsOfRole: string[]) {
      for (const creepName of creepsOfRole) {
-          const creep: RemoteHauler = Game.creeps[creepName]
+          const creep: RemoteReserver = Game.creeps[creepName]
 
           if (!creep.memory.remoteName) {
                const remoteNamesByEfficacy: string[] =
