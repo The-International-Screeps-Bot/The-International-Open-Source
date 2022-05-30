@@ -816,6 +816,8 @@ Creep.prototype.createMoveRequest = function (opts) {
 
           opts.avoidStationaryPositions = true
 
+          opts.avoidNotMyCreeps = true
+
           // Generate a new path
 
           path = room.advancedFindPath(opts)

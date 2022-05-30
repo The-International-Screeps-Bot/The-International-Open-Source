@@ -1491,6 +1491,15 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                          }
                     }
 
+                    if (opts.avoidNotMyCreeps) {
+
+                         for (const creep of room.find(FIND_HOSTILE_CREEPS))
+                              cm.set(creep.pos.x, creep.pos.y, 255)
+
+                         for (const creep of room.find(FIND_HOSTILE_POWER_CREEPS))
+                              cm.set(creep.pos.x, creep.pos.y, 255)
+                    }
+
                     // If avoiding structures that can't be walked on is enabled
 
                     if (opts.avoidImpassibleStructures) {

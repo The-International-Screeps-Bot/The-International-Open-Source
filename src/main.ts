@@ -206,9 +206,14 @@ declare global {
           avoidStationaryPositions?: boolean
 
           /**
-           * Deprecate
+           *
            */
           avoidImpassibleStructures?: boolean
+
+          /**
+           * Marks creeps not owned by the bot as avoid
+           */
+          avoidNotMyCreeps?: boolean
 
           /**
            * Weight my ramparts by this value
