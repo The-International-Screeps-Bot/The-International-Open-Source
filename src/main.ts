@@ -31,8 +31,6 @@ import {
 } from 'room/roomTasks'
 import { RoomObject } from 'room/roomObject'
 import { ErrorMapper } from 'other/ErrorMapper'
-import Market from 'other/PandaMaster/Market'
-import ShardVision from 'other/PandaMaster/ShardVision'
 import { constants } from 'international/constants'
 
 // Type declareations for global
@@ -875,7 +873,7 @@ declare global {
 
           abandoned: number | undefined
 
-          powerBanks: {[roomName: string]: number[]}
+          powerBanks: { [roomName: string]: number[] }
 
           deposits: Record<Id<Deposit>, DepositRecord>
      }
@@ -1260,10 +1258,4 @@ export const loop = function () {
 
      internationalManager.mapVisualsManager()
      internationalManager.endTickManager()
-
-     if (Memory.me === 'PandaMaster') {
-          new Market().HandleOrderEveryTick()
-          new ShardVision().Handle()
-          RawMemory.segments[98] = JSON.stringify(Memory.stats)
-     }
 }
