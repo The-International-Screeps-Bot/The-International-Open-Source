@@ -1099,8 +1099,20 @@ Creep.prototype.runMoveRequest = function (packedPos) {
      creep.hasMoved = true
 
      // Move the creep to the position and inform the result
+     
+     const x = constants.roomDimensions
 
-     return creep.move(creep.pos.getDirectionTo(unpackAsRoomPos(packedPos, room.name))) === OK
+     //offsets = [current, up, left, down, right, lower right, upper left, upper right, lower left]
+     const offsets = [0, -x, -1, x, 1, x + 1, -x - 1, -x + 1, x - 1]
+
+     //try different direction to avoid collision
+     for (let index = 0; index < offsets.length; index += 1){
+          if (creep.move(creep.pos.getDirectionTo(unpackAsRoomPos(packedPos + offsets[index], room.name))) === OK)
+              return true
+      }
+      return false;
+     
+     //return creep.move(creep.pos.getDirectionTo(unpackAsRoomPos(packedPos, room.name))) === OK
 }
 
 Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
