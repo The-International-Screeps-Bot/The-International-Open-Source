@@ -1158,7 +1158,7 @@ export function spawnRequester(room: Room) {
 
                     return {
                          defaultParts: [CARRY],
-                         extraParts: [WORK, MOVE],
+                         extraParts: [WORK, WORK, MOVE],
                          partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0),
                          groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source1RemoteHarvester,
                          threshold: 0.1,

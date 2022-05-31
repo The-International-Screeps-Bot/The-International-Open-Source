@@ -1235,6 +1235,11 @@ declare global {
                // Command functions
 
                /**
+                *
+                */
+               clearMemory(): string
+
+               /**
                 * Kills all owned creeps
                 */
                killAllCreeps(): string

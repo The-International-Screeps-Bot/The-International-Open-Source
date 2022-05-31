@@ -1,5 +1,13 @@
 import { constants } from './constants'
 
+global.clearMemory = function() {
+
+     for (const key in Memory)
+          delete Memory[key as keyof typeof Memory]
+
+     return 'Cleared all of Memory'
+}
+
 global.killAllCreeps = function (roles?: CreepRoles[]) {
      const filteredCreeps = Object.entries(Game.creeps).filter(
           ([creepName, creep]) => !roles || roles.includes(creep.memory.role),
