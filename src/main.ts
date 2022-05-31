@@ -745,6 +745,10 @@ declare global {
 
           readonly enemyCreeps: Creep[]
 
+          _enemyAttackers: Creep[]
+
+          readonly enemyAttackers: Creep[]
+
           _structures: Partial<OrganizedStructures>
 
           readonly structures: OrganizedStructures
@@ -1210,7 +1214,7 @@ declare global {
 
      namespace NodeJS {
           interface Global {
-               [key: string | number]: any
+               [key: string]: any
 
                /**
                 * Whether global is constructed or not
