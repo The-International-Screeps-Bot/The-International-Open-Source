@@ -23,9 +23,19 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._enemyCreeps) return this._enemyCreeps
 
-               return (this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
+               return this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
                     filter: creep => !allyList.has(creep.owner.username),
-               }))
+               })
+          },
+     },
+     enemyAttackers: {
+          get() {
+               if (this._enemyAttackers) return this._enemyAttackers
+
+               return this._enemyCreeps.filter(function(creep) {
+
+                    return creep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
+               })
           },
      },
      structures: {
