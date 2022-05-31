@@ -3,6 +3,7 @@ import {
      builderSpawningWhenStorageThreshold,
      claimRequestNeedsIndex,
      constants,
+     controllerDowngradeUpgraderNeed,
      remoteNeedsIndex,
      upgraderSpawningWhenStorageThreshold,
 } from 'international/constants'
@@ -926,6 +927,11 @@ export function spawnRequester(room: Room) {
                let partsMultiplier = 1
                let maxCreeps = room.get('upgradePositions').length
 
+               // If there are enemyAttackers and the controller isn't soon to downgrade
+
+               if (enemyAttackers.length && room.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed)
+                    return false
+
                // Get the controllerLink and baseLink
 
                const controllerLink: StructureLink | undefined = room.get('controllerLink')
@@ -1007,7 +1013,7 @@ export function spawnRequester(room: Room) {
                     if (room.controller.level === 8) {
                          // If the controller is near to downgrading
 
-                         if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 5
+                         if (room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed) partsMultiplier = 5
 
                          partsMultiplier = Math.min(Math.round(partsMultiplier / 5), 3)
                          if (partsMultiplier === 0) return false
@@ -1031,7 +1037,7 @@ export function spawnRequester(room: Room) {
                     if (spawnEnergyCapacity >= 800) {
                          // If the controller is near to downgrading, set partsMultiplier to x
 
-                         if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 6
+                         if (room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed) partsMultiplier = 6
 
                          partsMultiplier = Math.round(partsMultiplier / 6)
                          if (partsMultiplier === 0) return false
@@ -1053,7 +1059,7 @@ export function spawnRequester(room: Room) {
 
                     // If the controller is near to downgrading, set partsMultiplier to x
 
-                    if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 4
+                    if (room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed) partsMultiplier = 4
 
                     partsMultiplier = Math.round(partsMultiplier / 4)
                     if (partsMultiplier === 0) return false
@@ -1075,7 +1081,8 @@ export function spawnRequester(room: Room) {
 
                // If the controller is near to downgrading, set partsMultiplier to x
 
-               if (room.controller.ticksToDowngrade < 10000) partsMultiplier = 1
+               if (room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed) partsMultiplier = 1
+               if (room.controller.level < 2) partsMultiplier = Math.max(partsMultiplier, 1)
 
                if (spawnEnergyCapacity >= 800) {
                     return {
@@ -1094,7 +1101,7 @@ export function spawnRequester(room: Room) {
                return {
                     defaultParts: [],
                     extraParts: [MOVE, CARRY, MOVE, WORK],
-                    partsMultiplier: Math.max(partsMultiplier, 1),
+                    partsMultiplier: partsMultiplier,
                     threshold,
                     minCost: 250,
                     priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
