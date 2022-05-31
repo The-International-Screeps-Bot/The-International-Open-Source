@@ -1074,45 +1074,134 @@ Creep.prototype.shove = function (shoverPos) {
 }
 
 Creep.prototype.runMoveRequest = function (packedPos) {
-     const creep = this
-     const { room } = creep
+
+     const { room } = this
 
      // If requests are not allowed for this pos, inform false
 
      if (!room.moveRequests[packedPos]) return false
 
-     // Remove all moveRequests to the position
-
-     room.moveRequests[packedPos] = []
-     delete creep.moveRequest
-
-     // Remove record of the creep being on its current position
-
-     room.creepPositions[pack(creep.pos)] = undefined
-
-     // Record the creep at its new position
-
-     room.creepPositions[packedPos] = creep.name
-
-     // Record that the creep has moved this tick
-
-     creep.hasMoved = true
-
-     // Move the creep to the position and inform the result
-     
      const x = constants.roomDimensions
 
-     //offsets = [current, up, left, down, right, lower right, upper left, upper right, lower left]
+     // Offsets = [current, up, left, down, right, lower right, upper left, upper right, lower left]
+
      const offsets = [0, -x, -1, x, 1, x + 1, -x - 1, -x + 1, x - 1]
 
-     //try different direction to avoid collision
+     // Try different direction to avoid collision
+
      for (let index = 0; index < offsets.length; index += 1){
-          if (creep.move(creep.pos.getDirectionTo(unpackAsRoomPos(packedPos + offsets[index], room.name))) === OK)
-              return true
+
+          if (this.move(this.pos.getDirectionTo(unpackAsRoomPos(packedPos + offsets[index], room.name))) !== OK) continue
+
+          delete this.moveRequest
+
+          // Remove all moveRequests to the position
+
+          room.moveRequests[packedPos] = []
+
+          // Remove record of the creep being on its current position
+
+          room.creepPositions[pack(this.pos)] = undefined
+
+          // Record the creep at its new position
+
+          room.creepPositions[packedPos + offsets[index]] = this.name
+
+          // Record that the creep has moved this tick
+
+          this.hasMoved = true
+
+          return true
       }
-      return false;
-     
-     //return creep.move(creep.pos.getDirectionTo(unpackAsRoomPos(packedPos, room.name))) === OK
+      return false
+
+/*
+     const { room } = this
+
+     // If requests are not allowed for this pos, inform false
+
+     if (!room.moveRequests[packedPos]) return false
+
+     const targetPos = unpackAsPos(packedPos)
+
+     // Offsets of [current, up, left, down, right, lower right, upper left, upper right, lower left]
+
+     const offsets = [
+          {
+               x: 0,
+               y: 0,
+          },
+          {
+               x: -1,
+               y: 0,
+          },
+          {
+               x: -1,
+               y: -1,
+          },
+          {
+               x: 0,
+               y: -1,
+          },
+          {
+               x: 1,
+               y: -1,
+          },
+          {
+               x: 1,
+               y: 0,
+          },
+          {
+               x: 1,
+               y: 1,
+          },
+          {
+               x: 0,
+               y: 1,
+          },
+          {
+               x: -1,
+               y: 1,
+          },
+     ]
+
+     const terrain = room.getTerrain()
+
+     // Try different direction to avoid collision
+
+     for (let index = 0; index < offsets.length; index += 1) {
+
+          const movePos = new RoomPosition(Math.max(Math.min(targetPos.x + offsets[index].x, constants.roomDimensions), 0), Math.max(Math.min(targetPos.y + offsets[index].y, constants.roomDimensions), 0), room.name)
+
+          if (terrain.get(movePos.x, movePos.y) === TERRAIN_MASK_WALL) continue
+
+          if (room.creepPositions[pack(movePos)]) continue
+
+          // Remove all moveRequests to the position
+
+          room.moveRequests[pack(movePos)] = []
+          delete this.moveRequest
+
+          // Remove record of the creep being on its current position
+
+          delete room.creepPositions[pack(this.pos)]
+
+          // Record the creep at its new position
+
+          room.creepPositions[pack(movePos)] = this.name
+
+          // Record that the creep has moved this tick
+
+          this.hasMoved = true
+
+          this.move(this.pos.getDirectionTo(movePos))
+          return true
+     }
+
+     return false */
+/*
+     return creep.move(creep.pos.getDirectionTo(unpackAsRoomPos(packedPos, room.name))) === OK
+*/
 }
 
 Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
