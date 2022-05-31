@@ -1150,10 +1150,16 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
 
      if (creepAtPos.hasMoved) return
 
+     if (creepAtPos.shove(creep.pos)) {
+
+          creep.runMoveRequest(packedPos)
+          return
+     }
+     /*
      // If the creepAtPos has a moveRequest and it's valid
 
      if (creepAtPos.moveRequest && room.moveRequests[pack(creepAtPos.pos)]) {
-          
+
           // If the creep's pos and the creepAtPos's moveRequests are aligned
 
           if (pack(creep.pos) === creepAtPos.moveRequest) {
@@ -1201,7 +1207,7 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
           creepAtPos.recurseMoveRequest(creepAtPos.moveRequest, queue)
           return
      }
-
+ */
      // Otherwise if creepAtPos is fatigued, stop
 
      if (creepAtPos.fatigue > 0) return
@@ -1209,10 +1215,11 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
      // Otherwise the creepAtPos has no moveRequest and isn't fatigued
 
      if (creepAtPos.shove(creep.pos)) {
+
           creep.runMoveRequest(packedPos)
           return
      }
-
+     /*
      // Have the creep move to its moveRequest
 
      creep.runMoveRequest(packedPos)
@@ -1220,6 +1227,7 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
      // Have the creepAtPos move to the creep and inform true
 
      creepAtPos.runMoveRequest(pack(creep.pos))
+      */
 }
 
 Creep.prototype.getPushed = function () {

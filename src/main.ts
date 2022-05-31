@@ -271,6 +271,9 @@ declare global {
      }
 
      interface Stats {
+
+          lastReset: number
+
           communes: number
 
           credits: number
