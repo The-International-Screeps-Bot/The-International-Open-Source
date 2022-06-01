@@ -12,5 +12,5 @@ testServer_task:
     populate_script: npm ci
   ip_script: wget -qO- ifconfig.co
   installPackages_script: npm i ncp@^2.0.0
-  installDevPackages_script: npm i --save-dev q@^1.5.1  screeps@4.2.14 dotenv@^16.0.1 screeps-api@1.16.0 screepsmod-admin-utils@1.28.1 screepsmod-auth@2.6.2",
+  installDevPackages_script: npm i --save-dev q@^1.5.1  screeps@4.2.14 dotenv@^16.0.1 screeps-api@1.16.0 screepsmod-admin-utils@1.28.1 screepsmod-auth@2.6.2
   testServer_script: npm run test-server
