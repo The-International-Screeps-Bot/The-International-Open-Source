@@ -274,6 +274,8 @@ declare global {
 
           lastReset: number
 
+          tickLength: number
+
           communes: number
 
           credits: number

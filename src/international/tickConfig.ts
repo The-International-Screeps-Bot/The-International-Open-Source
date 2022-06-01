@@ -11,7 +11,8 @@ InternationalManager.prototype.tickConfig = function () {
      Memory.communes = []
 
      Memory.stats = {
-          lastReset: (Memory.stats.lastReset || 0) + 1,
+          lastReset: (Memory.stats?.lastReset || 0) + 1,
+          tickLength: Date.now() - (Memory.stats?.tickLength || Date.now()),
           credits: Game.market.credits,
           energy: 0,
 
