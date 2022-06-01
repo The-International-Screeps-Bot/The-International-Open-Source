@@ -1060,7 +1060,7 @@ Creep.prototype.shove = function (shoverPos) {
           origin: this.pos,
           goal: { pos: goalPos, range: 1 },
           weightGamebjects: { 255: this.room.find(FIND_MY_CREEPS) },
-          weightPositions: { 255: shoverPos },
+          weightPositions: { 255: [shoverPos] },
           flee,
           cacheAmount: 0,
      })
@@ -1075,7 +1075,6 @@ Creep.prototype.shove = function (shoverPos) {
 }
 
 Creep.prototype.runMoveRequest = function (packedPos) {
-
      const { room } = this
 
      // If requests are not allowed for this pos, inform false
@@ -1087,7 +1086,6 @@ Creep.prototype.runMoveRequest = function (packedPos) {
      /* room.visual.text(moveResult.toString(), this.pos) */
 
      if (moveResult) {
-
           // Remove all moveRequests to the position
 
           room.moveRequests[packedPos] = []
@@ -1158,7 +1156,6 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
      // If the creepAtPos has a moveRequest and it's valid
 
      if (creepAtPos.moveRequest && room.moveRequests[pack(creepAtPos.pos)]) {
-
           // If the creep's pos and the creepAtPos's moveRequests are aligned
 
           if (pack(creep.pos) === creepAtPos.moveRequest) {
@@ -1210,7 +1207,6 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
      // Otherwise the creepAtPos has no moveRequest and isn't fatigued
 
      if (creepAtPos.shove(creep.pos)) {
-
           creep.runMoveRequest(packedPos)
           return
      }
@@ -1661,9 +1657,7 @@ Creep.prototype.advancedRecycle = function () {
                return
           }
      } else {
-
           if (creep.pos.getRangeTo(closestSpawn.pos) > 1) {
-
                creep.createMoveRequest({
                     origin: creep.pos,
                     goal: { pos: closestSpawn.pos, range: 1 },

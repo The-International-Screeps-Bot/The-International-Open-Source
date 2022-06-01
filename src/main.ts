@@ -190,7 +190,7 @@ declare global {
            * An object with keys of weights and values of positions
            */
 
-          weightPositions?: { [key: string]: Pos | RoomPosition }
+          weightPositions?: { [key: string]: Pos[] | RoomPosition[] }
           /**
            *
            */
