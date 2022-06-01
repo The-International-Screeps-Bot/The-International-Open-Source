@@ -1146,16 +1146,14 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
 
      const creepAtPos = Game.creeps[creepNameAtPos]
 
-     //
+     // If the creep has already acted on a moveRequest, stop
 
      if (creepAtPos.hasMoved) return
 
-     if (creepAtPos.shove(creep.pos)) {
+     // Otherwise if creepAtPos is fatigued, stop
 
-          creep.runMoveRequest(packedPos)
-          return
-     }
-     /*
+     if (creepAtPos.fatigue > 0) return
+
      // If the creepAtPos has a moveRequest and it's valid
 
      if (creepAtPos.moveRequest && room.moveRequests[pack(creepAtPos.pos)]) {
@@ -1207,10 +1205,6 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
           creepAtPos.recurseMoveRequest(creepAtPos.moveRequest, queue)
           return
      }
- */
-     // Otherwise if creepAtPos is fatigued, stop
-
-     if (creepAtPos.fatigue > 0) return
 
      // Otherwise the creepAtPos has no moveRequest and isn't fatigued
 
