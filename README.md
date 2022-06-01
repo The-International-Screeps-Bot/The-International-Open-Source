@@ -55,7 +55,7 @@ And that's it. Join our [discord server](https://discord.gg/5QubDsB786) if you n
 
 ## Usage
 
-Using rollup we will translate the code into a single js file, which will be used in environments set in the screeps.json file. This reduces cpu usage, and compiles the code so it can be run by Screeps.
+Using [rollup](https://rollupjs.org/guide/en/) we will translate the code into a single js file, which will be used in environments set in the screeps.json file. This reduces cpu usage, and compiles the code so it can be run by Screeps while we develop using folders and typescript.
 
 First, rename example.screeps.json to screeps.json and fill in the required information for each environment you want to run the bot in.
 
