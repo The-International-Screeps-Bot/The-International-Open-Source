@@ -117,8 +117,8 @@ async function initServer() {
   let config = fs.readFileSync(configFilename, { encoding: "utf8" });
   config = config
     .replace("{{STEAM_KEY}}", process.env.STEAM_API_KEY)
-    .replace("runner_threads = 2", "runner_threads = 4")
-    .replace("processors_cnt = 2", "processors_cnt = 4");
+    .replace("runner_threads = 2", "runner_threads =8")
+    .replace("processors_cnt = 2", "processors_cnt = 8");
 
   fs.writeFileSync(configFilename, config);
   fs.chmodSync(path.resolve(dir, "node_modules/.hooks/install"), "755");
