@@ -3,102 +3,122 @@ import { RoomTask } from 'room/roomTasks'
 import { Builder } from '../../creepClasses'
 
 export function builderManager(room: Room, creepsOfRole: string[]) {
-     // If there is no construction target ID
+    // If there is no construction target ID
 
-     if (!room.memory.cSiteTargetID) {
-          // Try to find a construction target. If none are found, stop
+    if (!room.memory.cSiteTargetID) {
+        // Try to find a construction target. If none are found, stop
 
-          room.findCSiteTargetID(Game.creeps[creepsOfRole[0]])
-     }
+        room.findCSiteTargetID(Game.creeps[creepsOfRole[0]])
+    }
 
-     // Convert the construction target ID into a game object
+    // Convert the construction target ID into a game object
 
-     let constructionTarget: ConstructionSite | undefined = findObjectWithID(room.memory.cSiteTargetID)
+    let constructionTarget: ConstructionSite | undefined = findObjectWithID(
+        room.memory.cSiteTargetID
+    )
 
-     // If there is no construction target
+    // If there is no construction target
 
-     if (!constructionTarget) {
-          // Try to find a construction target. If none are found, stop
+    if (!constructionTarget) {
+        // Try to find a construction target. If none are found, stop
 
-          room.findCSiteTargetID(Game.creeps[creepsOfRole[0]])
-     }
+        room.findCSiteTargetID(Game.creeps[creepsOfRole[0]])
+    }
 
-     // Convert the construction target ID into a game object, stopping if it's undefined
+    // Convert the construction target ID into a game object, stopping if it's undefined
 
-     constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
+    constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
 
-     // Loop through creep names of creeps of the manager's role
+    // Loop through creep names of creeps of the manager's role
 
-     for (const creepName of creepsOfRole) {
-          // Get the creep using its name
+    for (const creepName of creepsOfRole) {
+        // Get the creep using its name
 
-          const creep: Builder = Game.creeps[creepName]
+        const creep: Builder = Game.creeps[creepName]
 
-          if (!constructionTarget) {
-               creep.advancedRecycle()
-               continue
-          }
+        if (!constructionTarget) {
+            creep.advancedRecycle()
+            continue
+        }
 
-          // If the creep needs resources
+        // If the creep needs resources
 
-          if (creep.needsResources()) {
-               // If there are no sourceHarvesters in the room, harvest a source
+        if (creep.needsResources()) {
+            // If there are no sourceHarvesters in the room, harvest a source
 
-               if (!(room.myCreeps.source1Harvester.length + room.myCreeps.source2Harvester.length)) {
-                    const sources = room.find(FIND_SOURCES_ACTIVE)
-                    if (!sources.length) continue
+            if (
+                !(
+                    room.myCreeps.source1Harvester.length +
+                    room.myCreeps.source2Harvester.length
+                )
+            ) {
+                const sources = room.find(FIND_SOURCES_ACTIVE)
+                if (!sources.length) continue
 
-                    const source = creep.pos.findClosestByPath(sources, { ignoreCreeps: true })
+                const source = creep.pos.findClosestByPath(sources, {
+                    ignoreCreeps: true,
+                })
 
-                    if (getRange(creep.pos.x - source.pos.x, creep.pos.y - source.pos.y) > 1) {
-                         creep.createMoveRequest({
-                              origin: creep.pos,
-                              goal: { pos: source.pos, range: 1 },
-                              avoidEnemyRanges: true,
-                              weightGamebjects: {
-                                   1: room.get('road'),
-                              },
-                         })
+                if (
+                    getRange(
+                        creep.pos.x - source.pos.x,
+                        creep.pos.y - source.pos.y
+                    ) > 1
+                ) {
+                    creep.createMoveRequest({
+                        origin: creep.pos,
+                        goal: { pos: source.pos, range: 1 },
+                        avoidEnemyRanges: true,
+                        weightGamebjects: {
+                            1: room.get('road'),
+                        },
+                    })
 
-                         continue
-                    }
-
-                    creep.advancedHarvestSource(source)
                     continue
-               }
+                }
 
-               creep.say('DR')
+                creep.advancedHarvestSource(source)
+                continue
+            }
 
-               // If creep has a task
+            creep.say('DR')
 
-               if (global[creep.id]?.respondingTaskID) {
-                    // Try to filfill task
+            // If creep has a task
 
-                    const fulfillTaskResult = creep.fulfillTask()
+            if (global[creep.id]?.respondingTaskID) {
+                // Try to filfill task
 
-                    // If the task wasn't fulfilled, inform true
+                const fulfillTaskResult = creep.fulfillTask()
 
-                    if (!fulfillTaskResult) continue
+                // If the task wasn't fulfilled, inform true
 
-                    // Otherwise find the task
+                if (!fulfillTaskResult) continue
 
-                    const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
+                // Otherwise find the task
 
-                    // Delete it and inform true
+                const task: RoomTask =
+                    room.global.tasksWithResponders[
+                        global[creep.id].respondingTaskID
+                    ]
 
-                    task.delete()
-                    continue
-               }
+                // Delete it and inform true
 
-               // Otherwise try to find a new task
+                task.delete()
+                continue
+            }
 
-               creep.findTask(new Set(['pickup', 'withdraw', 'offer']), RESOURCE_ENERGY)
+            // Otherwise try to find a new task
 
-               continue
-          }
+            creep.findTask(
+                new Set(['pickup', 'withdraw', 'offer']),
+                RESOURCE_ENERGY
+            )
 
-          // If there is a cSite, try to build it and iterate
+            continue
+        }
 
-          if (creep.advancedBuildCSite(constructionTarget)) continue
-     }
+        // If there is a cSite, try to build it and iterate
+
+        if (creep.advancedBuildCSite(constructionTarget)) continue
+    }
 }

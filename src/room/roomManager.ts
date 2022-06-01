@@ -16,72 +16,76 @@ import { customLog } from 'international/generalFunctions'
 import { droppedResourceManager } from './droppedResourceManager'
 
 const specificRoomManagers: { [key: string]: Function } = {
-     commune: communeManager,
+    commune: communeManager,
 }
 
 export function roomManager() {
-     // If CPU logging is enabled, get the CPU used at the start
+    // If CPU logging is enabled, get the CPU used at the start
 
-     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-     // Loop through room names in Game.rooms
+    // Loop through room names in Game.rooms
 
-     for (const roomName in Game.rooms) {
-          // Get the CPU used at the start
+    for (const roomName in Game.rooms) {
+        // Get the CPU used at the start
 
-          const roomCPUStart = Game.cpu.getUsed()
+        const roomCPUStart = Game.cpu.getUsed()
 
-          // Get the room using the roomName
+        // Get the room using the roomName
 
-          const room = Game.rooms[roomName]
+        const room = Game.rooms[roomName]
 
-          taskManager(room)
+        taskManager(room)
 
-          // If there is a specific manager for this room's type, run it
+        // If there is a specific manager for this room's type, run it
 
-          if (specificRoomManagers[room.memory.type]) specificRoomManagers[room.memory.type](room)
+        if (specificRoomManagers[room.memory.type])
+            specificRoomManagers[room.memory.type](room)
 
-          droppedResourceManager(room)
+        droppedResourceManager(room)
 
-          //
+        //
 
-          containerManager(room)
+        containerManager(room)
 
-          //
+        //
 
-          roleManager(room)
+        roleManager(room)
 
-          //
+        //
 
-          trafficManager(room)
+        trafficManager(room)
 
-          //
+        //
 
-          roomVisualsManager(room)
+        roomVisualsManager(room)
 
-          // Testing
-          /* 
+        // Testing
+        /* 
         let cpuUsed = Game.cpu.getUsed()
 
         cpuUsed = Game.cpu.getUsed() - cpuUsed
         customLog('Testing CPU', cpuUsed.toFixed(2))
  */
-          // Log room stats
+        // Log room stats
 
-          let logMessage = `Creeps: ${room.myCreepsAmount}`
+        let logMessage = `Creeps: ${room.myCreepsAmount}`
 
-          if (Memory.cpuLogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
+        if (Memory.cpuLogging)
+            logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(
+                2
+            )}`
 
-          customLog(room.name, logMessage, undefined, constants.colors.lightGrey)
-     }
+        customLog(room.name, logMessage, undefined, constants.colors.lightGrey)
+    }
 
-     // If CPU logging is enabled, log the CPU used by this manager
+    // If CPU logging is enabled, log the CPU used by this manager
 
-     if (Memory.cpuLogging)
-          customLog(
-               'Room Manager',
-               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-               undefined,
-               constants.colors.lightGrey,
-          )
+    if (Memory.cpuLogging)
+        customLog(
+            'Room Manager',
+            (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+            undefined,
+            constants.colors.lightGrey
+        )
 }

@@ -15,25 +15,25 @@ import { linkManager } from './linkManager'
 import './claimRequestManager'
 
 export function communeManager(room: Room) {
-     constructionManager(room)
+    constructionManager(room)
 
-     towerManager(room)
+    towerManager(room)
 
-     marketManager(room)
+    marketManager(room)
 
-     linkManager(room)
+    linkManager(room)
 
-     defenceManager(room)
+    defenceManager(room)
 
-     structuresForSpawningManager(room)
+    structuresForSpawningManager(room)
 
-     storageStructuresManager(room)
+    storageStructuresManager(room)
 
-     room.claimRequestManager()
+    room.claimRequestManager()
 
-     spawnManager(room)
+    spawnManager(room)
 
-     /*
+    /*
     let cpu = Game.cpu.getUsed()
 
     room.specialDT(undefined)

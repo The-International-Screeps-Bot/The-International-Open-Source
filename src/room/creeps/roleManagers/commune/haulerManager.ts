@@ -3,57 +3,63 @@ import { Hauler } from '../../creepClasses'
 import './haulerFunctions'
 
 export function haulerManager(room: Room, creepsOfRole: string[]) {
-     // Loop through creep names of this role
+    // Loop through creep names of this role
 
-     for (const creepName of creepsOfRole) {
-          // Get the creep using its name
+    for (const creepName of creepsOfRole) {
+        // Get the creep using its name
 
-          const creep: Hauler = Game.creeps[creepName]
+        const creep: Hauler = Game.creeps[creepName]
 
-          creep.advancedRenew()
+        creep.advancedRenew()
 
-          // If creep has a task
+        // If creep has a task
 
-          if (global[creep.id]?.respondingTaskID) {
-               // Try to filfill task
+        if (global[creep.id]?.respondingTaskID) {
+            // Try to filfill task
 
-               const fulfillTaskResult = creep.fulfillTask()
+            const fulfillTaskResult = creep.fulfillTask()
 
-               // Iterate if the task wasn't fulfilled
+            // Iterate if the task wasn't fulfilled
 
-               if (!fulfillTaskResult) continue
+            if (!fulfillTaskResult) continue
 
-               // Otherwise find the task
+            // Otherwise find the task
 
-               const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
+            const task: RoomTask =
+                room.global.tasksWithResponders[
+                    global[creep.id].respondingTaskID
+                ]
 
-               // Delete it
+            // Delete it
 
-               task.delete()
-          }
+            task.delete()
+        }
 
-          // Try to find a new task
+        // Try to find a new task
 
-          const findTaskResult = creep.findTask(new Set(['transfer', 'withdraw', 'pull', 'pickup']))
+        const findTaskResult = creep.findTask(
+            new Set(['transfer', 'withdraw', 'pull', 'pickup'])
+        )
 
-          // If a task wasn't found, iterate
+        // If a task wasn't found, iterate
 
-          if (!findTaskResult) continue
+        if (!findTaskResult) continue
 
-          // Try to filfill task
+        // Try to filfill task
 
-          const fulfillTaskResult = creep.fulfillTask()
+        const fulfillTaskResult = creep.fulfillTask()
 
-          // Iterate if the task wasn't fulfilled
+        // Iterate if the task wasn't fulfilled
 
-          if (!fulfillTaskResult) continue
+        if (!fulfillTaskResult) continue
 
-          // Otherwise find the task
+        // Otherwise find the task
 
-          const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
+        const task: RoomTask =
+            room.global.tasksWithResponders[global[creep.id].respondingTaskID]
 
-          // Delete it
+        // Delete it
 
-          task.delete()
-     }
+        task.delete()
+    }
 }
