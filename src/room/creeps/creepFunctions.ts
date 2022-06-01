@@ -1060,6 +1060,7 @@ Creep.prototype.shove = function (shoverPos) {
           origin: this.pos,
           goal: { pos: goalPos, range: 1 },
           weightGamebjects: { 255: this.room.find(FIND_MY_CREEPS) },
+          weightPositions: { 255: shoverPos },
           flee,
           cacheAmount: 0,
      })
