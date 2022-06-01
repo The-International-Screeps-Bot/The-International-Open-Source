@@ -190,7 +190,7 @@ declare global {
            * An object with keys of weights and values of positions
            */
 
-          weightPositions?: { [key: string]: Pos[] }
+          weightPositions?: { [key: string]: Pos | RoomPosition }
           /**
            *
            */
@@ -271,7 +271,6 @@ declare global {
      }
 
      interface Stats {
-
           lastReset: number
 
           tickLength: number
@@ -1267,7 +1266,7 @@ declare global {
                 * Responds, or if needed, creates, a claim request for a specified room, by a specified room
                 * @param claimRequest The roomName of the claimRequest to respond to
                 * @param commune The commune to respond to the claimRequest
-               */
+                */
                claim(claimRequest: string, communeName: string): string
           }
      }
