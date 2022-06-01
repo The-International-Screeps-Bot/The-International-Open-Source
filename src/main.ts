@@ -381,7 +381,7 @@ declare global {
           /**
            * The current version of the bot
            */
-          version: number | undefined
+          breakingVersion: number | undefined
 
           /**
            * Determines if roomVisuals will be generated
