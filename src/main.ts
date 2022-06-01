@@ -379,9 +379,9 @@ declare global {
           me: string
 
           /**
-           * Whether Memory is constructed or not
+           * The current version of the bot
            */
-          constructed: true | undefined
+          version: number | undefined
 
           /**
            * Determines if roomVisuals will be generated
@@ -1244,19 +1244,29 @@ declare global {
                // Command functions
 
                /**
-                *
+                * Deletes all properties of Memory
                 */
                clearMemory(): string
 
                /**
-                * Kills all owned creeps
+                * Kills all creeps owned by the bot
                 */
                killAllCreeps(): string
 
                /**
-                * Destroys all owned construction sites
+                * Removes all construction sites owned by the bot
+                */
+               removeAllCSites(): string
+
+               /**
+                * Destroys all structures owned by the bot
                 */
                destroyAllCSites(types: StructureConstant[]): string
+
+               /**
+                * Responds, or if needed, creates, a claim request for a specified room, by a specified room
+                */
+               claim(): string
           }
      }
 }

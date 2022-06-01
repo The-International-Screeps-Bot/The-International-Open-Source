@@ -1,3 +1,5 @@
+export const version = 1
+
 export const constants: Partial<Constants> = {}
 
 constants.mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])

@@ -1,12 +1,22 @@
+import { version } from './constants'
 import { InternationalManager } from './internationalManager'
 
 InternationalManager.prototype.config = function () {
+
+     if (Memory.version < version) {
+
+          global.clearMemory()
+
+          global.killAllCreeps()
+     }
+
      // Construct Memory if it isn't constructed yet
 
      // Check if Memory is constructed
 
-     if (!Memory.constructed) {
-          Memory.constructed = true
+     if (!Memory.version) {
+
+          Memory.version = version
 
           Memory.me =
                (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
