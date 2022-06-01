@@ -1265,8 +1265,10 @@ declare global {
 
                /**
                 * Responds, or if needed, creates, a claim request for a specified room, by a specified room
-                */
-               claim(): string
+                * @param claimRequest The roomName of the claimRequest to respond to
+                * @param commune The commune to respond to the claimRequest
+               */
+               claim(claimRequest: string, communeName: string): string
           }
      }
 }
