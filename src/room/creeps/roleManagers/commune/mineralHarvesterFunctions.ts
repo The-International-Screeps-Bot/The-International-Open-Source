@@ -1,54 +1,64 @@
 import { constants } from 'international/constants'
-import { getRangeBetween, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
+import {
+    getRangeBetween,
+    unpackAsPos,
+    unpackAsRoomPos,
+} from 'international/generalFunctions'
 import { MineralHarvester } from '../../creepClasses'
 
 MineralHarvester.prototype.advancedHarvestMineral = function (mineral) {
-     const creep = this
-     const { room } = creep
+    const creep = this
+    const { room } = creep
 
-     // Try to find a harvestPosition, inform false if it failed
+    // Try to find a harvestPosition, inform false if it failed
 
-     if (!creep.findMineralHarvestPos()) return false
+    if (!creep.findMineralHarvestPos()) return false
 
-     creep.say('🚬')
+    creep.say('🚬')
 
-     // Unpack the creep's packedHarvestPos
+    // Unpack the creep's packedHarvestPos
 
-     const harvestPos = unpackAsRoomPos(creep.memory.packedPos, room.name)
+    const harvestPos = unpackAsRoomPos(creep.memory.packedPos, room.name)
 
-     // If the creep is not standing on the harvestPos
+    // If the creep is not standing on the harvestPos
 
-     if (getRangeBetween(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) > 0) {
-          creep.say('⏩M')
+    if (
+        getRangeBetween(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) >
+        0
+    ) {
+        creep.say('⏩M')
 
-          // Make a move request to it
+        // Make a move request to it
 
-          creep.createMoveRequest({
-               origin: creep.pos,
-               goal: { pos: harvestPos, range: 0 },
-               avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.get('road'),
-               },
-          })
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: harvestPos, range: 0 },
+            avoidEnemyRanges: true,
+            weightGamebjects: {
+                1: room.get('road'),
+            },
+        })
 
-          // And inform false
+        // And inform false
 
-          return false
-     }
+        return false
+    }
 
-     // Harvest the mineral, informing the result if it didn't succeed
+    // Harvest the mineral, informing the result if it didn't succeed
 
-     if (creep.harvest(mineral) !== OK) return false
+    if (creep.harvest(mineral) !== OK) return false
 
-     // Find amount of minerals harvested and record it in data
+    // Find amount of minerals harvested and record it in data
 
-     const mineralsHarvested = Math.min(creep.partsOfType(WORK) * HARVEST_POWER, mineral.mineralAmount)
-     Memory.stats.mineralsHarvested += mineralsHarvested
+    const mineralsHarvested = Math.min(
+        creep.partsOfType(WORK) * HARVEST_POWER,
+        mineral.mineralAmount
+    )
+    Memory.stats.mineralsHarvested += mineralsHarvested
 
-     creep.say(`⛏️${mineralsHarvested}`)
+    creep.say(`⛏️${mineralsHarvested}`)
 
-     // Inform true
+    // Inform true
 
-     return true
+    return true
 }

@@ -1,4 +1,4 @@
-import { RemoteReserver } from "room/creeps/creepClasses"
+import { RemoteReserver } from 'room/creeps/creepClasses'
 
 RemoteReserver.prototype.isDying = function () {
     // Inform as dying if creep is already recorded as dying
