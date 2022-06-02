@@ -145,19 +145,10 @@ Maintainer.prototype.advancedMaintain = function () {
 
     // Find repair targets that don't include the current target, informing true if none were found
 
-    const newRepairTargets = room.findRepairTargets(
-        workPartCount,
+    const newRepairTarget = creep.findRepairTarget(
         new Set([repairTarget.id])
     )
-    if (!newRepairTargets.length) return true
-
-    // Otherwise search for the closest newRepairTarget
-
-    const newRepairTarget = creep.pos.findClosestByRange(newRepairTargets)
-
-    // Otherwise, if the new repair target is in repair range, inform true
-
-    if (creep.pos.getRangeTo(newRepairTarget.pos) > 3) return true
+    if (!newRepairTarget) return true
 
     // Make a move request to it
 

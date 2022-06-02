@@ -1022,8 +1022,8 @@ declare global {
          *
          */
         findRepairTarget(
-            excluded?: Set<Id<StructureRoad | StructureContainer>>
-        ): Structure | false
+          excluded?: Set<Id<Structure<StructureConstant>>>
+          ): Structure | false
 
         findOptimalSourceName(): boolean
 
