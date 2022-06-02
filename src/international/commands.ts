@@ -16,7 +16,7 @@ global.killAllCreeps = function (roles?: CreepRoles[]) {
     })
 
     return `Killed an total of ${killedCreepCount} creeps ${
-        roles ? `with one of the following roles: ${roles}` : ''
+        roles ? `with the roles ${roles}` : ''
     }`
 }
 
@@ -29,8 +29,8 @@ global.removeAllCSites = function (types?: BuildableStructureConstant[]) {
         if (cSite.remove() === OK) removedCSCount += 1
     })
 
-    return `Removed an total of ${removedCSCount} construction sites ${
-        types ? `with one of the following types: ${types}` : ''
+    return `Removed a total of ${removedCSCount} construction sites ${
+        types ? `with the types ${types}` : ''
     }`
 }
 
@@ -68,8 +68,8 @@ global.destroyAllStructures = function (
 
     // Inform the result
 
-    return `Destroyed all an total of ${destroyedStructureCount} structures in ${roomName} ${
-        types ? `with one of the following types: ${types}` : ''
+    return `Destroyed a total of ${destroyedStructureCount} structures in ${roomName} ${
+        types ? `with the types ${types}` : ''
     }`
 }
 
