@@ -1213,6 +1213,9 @@ Creep.prototype.findTask = function (
 }
 
 Creep.prototype.shove = function (shoverPos) {
+/*
+    if (!this.moveRequest) {
+ */
     let goalPos: RoomPosition | undefined
     let flee = false
 
@@ -1232,18 +1235,21 @@ Creep.prototype.shove = function (shoverPos) {
         origin: this.pos,
         goal: { pos: goalPos, range: 1 },
         weightGamebjects: { 255: this.room.find(FIND_MY_CREEPS) },
-        weightPositions: { 255: [shoverPos] },
+        /* weightPositions: { 255: [shoverPos] }, */
         flee,
         cacheAmount: 0,
     })
 
-    if (!this.moveRequest) return false
+    return this.runMoveRequest(this.moveRequest)
+/*
+        return false
+    }
 
-    /*
     this.room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), { color: constants.colors.yellow })
-    */
+
     this.recurseMoveRequest(this.moveRequest)
-    return true
+
+    return true */
 }
 
 Creep.prototype.runMoveRequest = function (packedPos) {
@@ -1382,9 +1388,11 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
     // Otherwise the creepAtPos has no moveRequest and isn't fatigued
 
     if (creepAtPos.shove(creep.pos)) {
+
         creep.runMoveRequest(packedPos)
+        return
     }
-    /*
+
      // Have the creep move to its moveRequest
 
      creep.runMoveRequest(packedPos)
@@ -1392,7 +1400,6 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
      // Have the creepAtPos move to the creep and inform true
 
      creepAtPos.runMoveRequest(pack(creep.pos))
-      */
 }
 
 Creep.prototype.getPushed = function () {
