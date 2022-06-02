@@ -5,262 +5,147 @@ import { RoomOfferTask, RoomTransferTask, RoomWithdrawTask } from './roomTasks'
  * Creates tasks for containers in the room
  */
 export function containerManager(room: Room) {
-    sourceContainers()
+     sourceContainers()
 
-    function sourceContainers() {
-        // Get the room's sourceContainers
+     function sourceContainers() {
+          // Get the room's sourceContainers
 
-        const sourceContainers: StructureContainer[] = [
-            room.get('source1Container'),
-            room.get('source2Container'),
-        ]
+          const sourceContainers: StructureContainer[] = [room.get('source1Container'), room.get('source2Container')]
 
-        // Loop through sourceContainers
+          // Loop through sourceContainers
 
-        for (const container of sourceContainers) {
-            // If the container isn't defined, iterate
+          for (const container of sourceContainers) {
+               // If the container isn't defined, iterate
 
-            if (!container) continue
+               if (!container) continue
 
-            // Construct an undefined taskWithoutResponder
+               // Construct an undefined taskWithoutResponder
 
-            let taskWithoutResponder: RoomWithdrawTask
+               let taskWithoutResponder: RoomWithdrawTask
 
-            // Construct totalResourcesOffered at 0
+               // Construct totalResourcesOffered at 0
 
-            let totalResourcesOffered = 0
+               let totalResourcesOffered = 0
 
-            // if there is no global for the container, make one
+               // if there is no global for the container, make one
 
-            if (!global[container.id]) global[container.id] = {}
+               if (!global[container.id]) global[container.id] = {}
 
-            // If there is no created task ID obj for the container's global, create one
+               // If there is no created task ID obj for the container's global, create one
 
-            if (!global[container.id].createdTaskIDs)
-                global[container.id].createdTaskIDs = {}
-            // Otherwise
-            else {
-                // Find the container's tasks of type tansfer
+               if (!global[container.id].createdTaskIDs) global[container.id].createdTaskIDs = {}
+               // Otherwise
+               else {
+                    // Find the container's tasks of type tansfer
 
-                const containersWithdrawTasks = room.findTasksOfTypes(
-                    global[container.id].createdTaskIDs,
-                    new Set(['withdraw'])
-                ) as RoomWithdrawTask[]
+                    const containersWithdrawTasks = room.findTasksOfTypes(
+                         global[container.id].createdTaskIDs,
+                         new Set(['withdraw']),
+                    ) as RoomWithdrawTask[]
 
-                // Track the amount of energy the resource has offered in tasks
+                    // Track the amount of energy the resource has offered in tasks
 
-                totalResourcesOffered = 0
+                    totalResourcesOffered = 0
 
-                // Loop through each pickup task
+                    // Loop through each pickup task
 
-                for (const task of containersWithdrawTasks) {
-                    // Otherwise find how many resources the task has requested to pick up
+                    for (const task of containersWithdrawTasks) {
+                         // Otherwise find how many resources the task has requested to pick up
 
-                    totalResourcesOffered += task.taskAmount
+                         totalResourcesOffered += task.taskAmount
 
-                    // If the task doesn't have a responder, set it as taskWithoutResponder
+                         // If the task doesn't have a responder, set it as taskWithoutResponder
 
-                    if (!task.responderID) taskWithoutResponder = task
-                }
+                         if (!task.responderID) taskWithoutResponder = task
+                    }
 
-                // If there are more or equal resources offered than the used capacity of the container, iterate
+                    // If there are more or equal resources offered than the used capacity of the container, iterate
 
-                if (
-                    totalResourcesOffered >=
-                    container.store.getUsedCapacity(RESOURCE_ENERGY)
-                )
+                    if (totalResourcesOffered >= container.store.getUsedCapacity(RESOURCE_ENERGY)) continue
+               }
+
+               // Assign amountToOffer as the energy left not assigned to tasks
+
+               const amountToOffer = container.store.getUsedCapacity(RESOURCE_ENERGY) - totalResourcesOffered
+
+               // If there is a taskWithoutResponder
+
+               if (taskWithoutResponder) {
+                    // Set the taskAmount to match amountToOffer
+
+                    taskWithoutResponder.taskAmount = amountToOffer
+
+                    // Update the task's priority to match new amountToOffer
+
+                    taskWithoutResponder.priority = 1 + amountToOffer / 500
+
+                    // And iterate
+
                     continue
-            }
+               }
 
-            // Assign amountToOffer as the energy left not assigned to tasks
+               // If the amountToOffer is more than x
 
-            const amountToOffer =
-                container.store.getUsedCapacity(RESOURCE_ENERGY) -
-                totalResourcesOffered
+               if (amountToOffer > 500) {
+                    // Create a new transfer task for the container
 
-            // If there is a taskWithoutResponder
+                    new RoomWithdrawTask(
+                         room.name,
+                         RESOURCE_ENERGY,
+                         amountToOffer,
+                         container.id,
+                         1 + amountToOffer / 500,
+                    )
+               }
+          }
+     }
 
-            if (taskWithoutResponder) {
-                // Set the taskAmount to match amountToOffer
+     //
 
-                taskWithoutResponder.taskAmount = amountToOffer
+     controllerContainer()
 
-                // Update the task's priority to match new amountToOffer
+     function controllerContainer() {
+          // Get the controllerContainer
 
-                taskWithoutResponder.priority = 1 + amountToOffer / 500
+          const controllerContainer = room.get('controllerContainer')
 
-                // And iterate
+          // If it doesn't exist, stop
 
-                continue
-            }
+          if (!controllerContainer) return
 
-            // If the amountToOffer is more than x
+          // Otherwise
 
-            if (amountToOffer > 500) {
-                // Create a new transfer task for the container
+          // Construct an undefined taskWithoutResponder
 
-                new RoomWithdrawTask(
-                    room.name,
-                    RESOURCE_ENERGY,
-                    amountToOffer,
-                    container.id,
-                    1 + amountToOffer / 500
-                )
-            }
-        }
-    }
+          let taskWithoutResponder: RoomTransferTask
 
-    //
+          // Construct totalResourcesRequested at 0
 
-    controllerContainer()
+          let totalResourcesRequested = 0
 
-    function controllerContainer() {
-        // Get the controllerContainer
+          // if there is no global for the container, make one
 
-        const controllerContainer = room.get('controllerContainer')
+          if (!global[controllerContainer.id]) global[controllerContainer.id] = {}
 
-        // If it doesn't exist, stop
+          // If there is no created task ID obj for the container's global, create one
 
-        if (!controllerContainer) return
+          if (!global[controllerContainer.id].createdTaskIDs) global[controllerContainer.id].createdTaskIDs = {}
+          // Otherwise
+          else {
+               // Find the container's tasks of type tansfer
 
-        // Otherwise
+               const containersTransferTasks = room.findTasksOfTypes(
+                    global[controllerContainer.id].createdTaskIDs,
+                    new Set(['transfer']),
+               ) as RoomTransferTask[]
 
-        // Construct an undefined taskWithoutResponder
+               // Track the amount of energy the resource has offered in tasks
 
-        let taskWithoutResponder: RoomTransferTask
+               totalResourcesRequested = 0
 
-        // Construct totalResourcesRequested at 0
+               // Loop through each pickup task
 
-        let totalResourcesRequested = 0
-
-        // if there is no global for the container, make one
-
-        if (!global[controllerContainer.id]) global[controllerContainer.id] = {}
-
-        // If there is no created task ID obj for the container's global, create one
-
-        if (!global[controllerContainer.id].createdTaskIDs)
-            global[controllerContainer.id].createdTaskIDs = {}
-        // Otherwise
-        else {
-            // Find the container's tasks of type tansfer
-
-            const containersTransferTasks = room.findTasksOfTypes(
-                global[controllerContainer.id].createdTaskIDs,
-                new Set(['transfer'])
-            ) as RoomTransferTask[]
-
-            // Track the amount of energy the resource has offered in tasks
-
-            totalResourcesRequested = 0
-
-            // Loop through each pickup task
-
-            for (const task of containersTransferTasks) {
-                // Otherwise find how many resources the task has requested to pick up
-
-                totalResourcesRequested += task.taskAmount
-
-                // If the task doesn't have a responder, set it as taskWithoutResponder
-
-                if (!task.responderID) taskWithoutResponder = task
-            }
-
-            // If there are more or equal resources offered than the free capacity of the container, stop
-
-            if (
-                totalResourcesRequested >=
-                controllerContainer.store.getFreeCapacity(RESOURCE_ENERGY)
-            )
-                return
-        }
-
-        // Assign amountToRequest as the energy left not assigned to tasks
-
-        const amountToRequest =
-            controllerContainer.store.getFreeCapacity(RESOURCE_ENERGY) -
-            totalResourcesRequested
-
-        // If there is a taskWithoutResponder
-
-        if (taskWithoutResponder) {
-            // Set the taskAmount to match amountToRequest
-
-            taskWithoutResponder.taskAmount = amountToRequest
-
-            // Update the task's priority to match new amountToRequest
-
-            taskWithoutResponder.priority = 0 + amountToRequest / 800
-
-            // And stop
-
-            return
-        }
-
-        // If the amountToRequest is more than x
-
-        if (amountToRequest > 500) {
-            // Create a new transfer task for the container
-
-            new RoomTransferTask(
-                room.name,
-                RESOURCE_ENERGY,
-                amountToRequest,
-                controllerContainer.id,
-                0 + amountToRequest / 800
-            )
-        }
-    }
-
-    fastFillerContainers()
-
-    function fastFillerContainers() {
-        // Get the room's fastFillerContainers
-
-        const fastFillerContainers: StructureContainer[] = [
-            room.get('fastFillerContainerLeft'),
-            room.get('fastFillerContainerRight'),
-        ]
-
-        // Loop through fastFillerContainers
-
-        for (const container of fastFillerContainers) {
-            // If the container isn't defined, iterate
-
-            if (!container) continue
-
-            // Construct an undefined taskWithoutResponder
-
-            let taskWithoutResponder: RoomTransferTask
-
-            // Construct totalResourcesRequested at 0
-
-            let totalResourcesRequested = 0
-
-            // if there is no global for the container, make one
-
-            if (!global[container.id]) global[container.id] = {}
-
-            // If there is no created task ID obj for the container's global, create one
-
-            if (!global[container.id].createdTaskIDs)
-                global[container.id].createdTaskIDs = {}
-            // Otherwise
-            else {
-                // Find the container's tasks of type tansfer
-
-                const containersTransferTasks = room.findTasksOfTypes(
-                    global[container.id].createdTaskIDs,
-                    new Set(['transfer'])
-                ) as RoomTransferTask[]
-
-                // Track the amount of energy the resource has offered in tasks
-
-                totalResourcesRequested = 0
-
-                // Loop through each pickup task
-
-                for (const task of containersTransferTasks) {
+               for (const task of containersTransferTasks) {
                     // Otherwise find how many resources the task has requested to pick up
 
                     totalResourcesRequested += task.taskAmount
@@ -268,140 +153,218 @@ export function containerManager(room: Room) {
                     // If the task doesn't have a responder, set it as taskWithoutResponder
 
                     if (!task.responderID) taskWithoutResponder = task
-                }
+               }
 
-                // If there are more or equal resources offered than the free capacity of the container, stop
+               // If there are more or equal resources offered than the free capacity of the container, stop
 
-                if (
-                    totalResourcesRequested >=
-                    container.store.getFreeCapacity(RESOURCE_ENERGY)
-                )
-                    return
-            }
+               if (totalResourcesRequested >= controllerContainer.store.getFreeCapacity(RESOURCE_ENERGY)) return
+          }
 
-            // Assign amountToRequest as the energy left not assigned to tasks
+          // Assign amountToRequest as the energy left not assigned to tasks
 
-            const amountToRequest =
-                container.store.getFreeCapacity(RESOURCE_ENERGY) -
-                totalResourcesRequested
+          const amountToRequest = controllerContainer.store.getFreeCapacity(RESOURCE_ENERGY) - totalResourcesRequested
 
-            // If there is a taskWithoutResponder
+          // If there is a taskWithoutResponder
 
-            if (taskWithoutResponder) {
-                // Set the taskAmount to match amountToRequest
+          if (taskWithoutResponder) {
+               // Set the taskAmount to match amountToRequest
 
-                taskWithoutResponder.taskAmount = amountToRequest
+               taskWithoutResponder.taskAmount = amountToRequest
 
-                // Update the task's priority to match new amountToRequest
+               // Update the task's priority to match new amountToRequest
 
-                taskWithoutResponder.priority = 2 + amountToRequest / 300
+               taskWithoutResponder.priority = 0 + amountToRequest / 800
 
-                // And iterate
+               // And stop
 
-                continue
-            }
+               return
+          }
 
-            // If the amountToRequest is more than 0
+          // If the amountToRequest is more than x
 
-            if (amountToRequest > 500) {
-                // Create a new transfer task for the container
+          if (amountToRequest > 500) {
+               // Create a new transfer task for the container
 
-                new RoomTransferTask(
+               new RoomTransferTask(
                     room.name,
                     RESOURCE_ENERGY,
                     amountToRequest,
-                    container.id,
-                    2 + amountToRequest / 300
-                )
-            }
+                    controllerContainer.id,
+                    0 + amountToRequest / 800,
+               )
+          }
+     }
 
-            // Offer tasks
+     fastFillerContainers()
 
-            // Construct an undefined taskWithoutResponder
+     function fastFillerContainers() {
+          // Get the room's fastFillerContainers
 
-            taskWithoutResponder = undefined
+          const fastFillerContainers: StructureContainer[] = [
+               room.get('fastFillerContainerLeft'),
+               room.get('fastFillerContainerRight'),
+          ]
 
-            // Construct totalResourcesOffered at 0
+          // Loop through fastFillerContainers
 
-            let totalResourcesOffered = 0
+          for (const container of fastFillerContainers) {
+               // If the container isn't defined, iterate
 
-            // if there is no global for the container, make one
+               if (!container) continue
 
-            if (!global[container.id]) global[container.id] = {}
+               // Construct an undefined taskWithoutResponder
 
-            // If there is no created task ID obj for the container's global, create one
+               let taskWithoutResponder: RoomTransferTask
 
-            if (!global[container.id].createdTaskIDs)
-                global[container.id].createdTaskIDs = {}
-            // Otherwise
-            else {
-                // Find the container's tasks of type tansfer
+               // Construct totalResourcesRequested at 0
 
-                const containersOfferTasks = room.findTasksOfTypes(
-                    global[container.id].createdTaskIDs,
-                    new Set(['offer'])
-                ) as RoomWithdrawTask[]
+               let totalResourcesRequested = 0
 
-                // Track the amount of energy the resource has offered in tasks
+               // if there is no global for the container, make one
 
-                totalResourcesOffered = 0
+               if (!global[container.id]) global[container.id] = {}
 
-                // Loop through each pickup task
+               // If there is no created task ID obj for the container's global, create one
 
-                for (const task of containersOfferTasks) {
-                    // Otherwise find how many resources the task has requested to pick up
+               if (!global[container.id].createdTaskIDs) global[container.id].createdTaskIDs = {}
+               // Otherwise
+               else {
+                    // Find the container's tasks of type tansfer
 
-                    totalResourcesOffered += task.taskAmount
+                    const containersTransferTasks = room.findTasksOfTypes(
+                         global[container.id].createdTaskIDs,
+                         new Set(['transfer']),
+                    ) as RoomTransferTask[]
 
-                    // If the task doesn't have a responder, set it as taskWithoutResponder
+                    // Track the amount of energy the resource has offered in tasks
 
-                    if (!task.responderID) taskWithoutResponder = task
-                }
+                    totalResourcesRequested = 0
 
-                // If there are more or equal resources offered than the used capacity of the container, iterate
+                    // Loop through each pickup task
 
-                if (
-                    totalResourcesOffered >=
-                    container.store.getUsedCapacity(RESOURCE_ENERGY)
-                )
+                    for (const task of containersTransferTasks) {
+                         // Otherwise find how many resources the task has requested to pick up
+
+                         totalResourcesRequested += task.taskAmount
+
+                         // If the task doesn't have a responder, set it as taskWithoutResponder
+
+                         if (!task.responderID) taskWithoutResponder = task
+                    }
+
+                    // If there are more or equal resources offered than the free capacity of the container, stop
+
+                    if (totalResourcesRequested >= container.store.getFreeCapacity(RESOURCE_ENERGY)) return
+               }
+
+               // Assign amountToRequest as the energy left not assigned to tasks
+
+               const amountToRequest = container.store.getFreeCapacity(RESOURCE_ENERGY) - totalResourcesRequested
+
+               // If there is a taskWithoutResponder
+
+               if (taskWithoutResponder) {
+                    // Set the taskAmount to match amountToRequest
+
+                    taskWithoutResponder.taskAmount = amountToRequest
+
+                    // Update the task's priority to match new amountToRequest
+
+                    taskWithoutResponder.priority = 2 + amountToRequest / 300
+
+                    // And iterate
+
                     continue
-            }
+               }
 
-            // Assign amountToOffer as the energy left not assigned to tasks
+               // If the amountToRequest is more than 0
 
-            const amountToOffer =
-                container.store.getUsedCapacity(RESOURCE_ENERGY) -
-                totalResourcesOffered
+               if (amountToRequest > 500) {
+                    // Create a new transfer task for the container
 
-            // If there is a taskWithoutResponder
+                    new RoomTransferTask(
+                         room.name,
+                         RESOURCE_ENERGY,
+                         amountToRequest,
+                         container.id,
+                         2 + amountToRequest / 300,
+                    )
+               }
 
-            if (taskWithoutResponder) {
-                // Set the taskAmount to match amountToOffer
+               // Offer tasks
 
-                taskWithoutResponder.taskAmount = amountToOffer
+               // Construct an undefined taskWithoutResponder
 
-                // Update the task's priority to match new amountToOffer
+               taskWithoutResponder = undefined
 
-                taskWithoutResponder.priority = 1
+               // Construct totalResourcesOffered at 0
 
-                // And iterate
+               let totalResourcesOffered = 0
 
-                continue
-            }
+               // if there is no global for the container, make one
 
-            // If the amountToOffer is more than x
+               if (!global[container.id]) global[container.id] = {}
 
-            if (amountToOffer > 500) {
-                // Create a new transfer task for the container
+               // If there is no created task ID obj for the container's global, create one
 
-                new RoomOfferTask(
-                    room.name,
-                    RESOURCE_ENERGY,
-                    amountToOffer,
-                    container.id,
-                    1
-                )
-            }
-        }
-    }
+               if (!global[container.id].createdTaskIDs) global[container.id].createdTaskIDs = {}
+               // Otherwise
+               else {
+                    // Find the container's tasks of type tansfer
+
+                    const containersOfferTasks = room.findTasksOfTypes(
+                         global[container.id].createdTaskIDs,
+                         new Set(['offer']),
+                    ) as RoomWithdrawTask[]
+
+                    // Track the amount of energy the resource has offered in tasks
+
+                    totalResourcesOffered = 0
+
+                    // Loop through each pickup task
+
+                    for (const task of containersOfferTasks) {
+                         // Otherwise find how many resources the task has requested to pick up
+
+                         totalResourcesOffered += task.taskAmount
+
+                         // If the task doesn't have a responder, set it as taskWithoutResponder
+
+                         if (!task.responderID) taskWithoutResponder = task
+                    }
+
+                    // If there are more or equal resources offered than the used capacity of the container, iterate
+
+                    if (totalResourcesOffered >= container.store.getUsedCapacity(RESOURCE_ENERGY)) continue
+               }
+
+               // Assign amountToOffer as the energy left not assigned to tasks
+
+               const amountToOffer = container.store.getUsedCapacity(RESOURCE_ENERGY) - totalResourcesOffered
+
+               // If there is a taskWithoutResponder
+
+               if (taskWithoutResponder) {
+                    // Set the taskAmount to match amountToOffer
+
+                    taskWithoutResponder.taskAmount = amountToOffer
+
+                    // Update the task's priority to match new amountToOffer
+
+                    taskWithoutResponder.priority = 1
+
+                    // And iterate
+
+                    continue
+               }
+
+               // If the amountToOffer is more than x
+
+               if (amountToOffer > 500) {
+                    // Create a new transfer task for the container
+
+                    new RoomOfferTask(room.name, RESOURCE_ENERGY, amountToOffer, container.id, 1)
+               }
+          }
+     }
 }

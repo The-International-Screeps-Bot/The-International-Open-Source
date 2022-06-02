@@ -16,8 +16,7 @@ InternationalManager.prototype.config = function () {
           Memory.breakingVersion = breakingVersion
 
           Memory.me =
-               (Object.values(Game.structures)[0] as OwnedStructure)?.owner
-                    ?.username ||
+               (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
                Object.values(Game.creeps)[0]?.owner?.username ||
                'username'
 

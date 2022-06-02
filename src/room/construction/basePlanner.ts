@@ -1,13 +1,13 @@
 import { constants, stamps } from 'international/constants'
 import {
-    customLog,
-    findAvgBetweenPosotions,
-    findPositionsInsideRect,
-    getRange,
-    getRangeBetween,
-    pack,
-    unpackAsPos,
-    unpackAsRoomPos,
+     customLog,
+     findAvgBetweenPosotions,
+     findPositionsInsideRect,
+     getRange,
+     getRangeBetween,
+     pack,
+     unpackAsPos,
+     unpackAsRoomPos,
 } from 'international/generalFunctions'
 import 'other/RoomVisual'
 
@@ -15,435 +15,393 @@ import 'other/RoomVisual'
  * Checks if a room can be planner. If it can, it informs information on how to build the room
  */
 export function basePlanner(room: Room) {
-    // Get a cost matrix of walls and exit areas
+     // Get a cost matrix of walls and exit areas
 
-    const baseCM: CostMatrix = room.get('baseCM')
-    const roadCM: CostMatrix = room.get('roadCM')
-    const structurePlans: CostMatrix = room.get('structurePlans')
+     const baseCM: CostMatrix = room.get('baseCM')
+     const roadCM: CostMatrix = room.get('roadCM')
+     const structurePlans: CostMatrix = room.get('structurePlans')
 
-    const terrain = room.getTerrain()
+     const terrain = room.getTerrain()
 
-    if (!room.memory.stampAnchors) {
-        room.memory.stampAnchors = {}
+     if (!room.memory.stampAnchors) {
+          room.memory.stampAnchors = {}
 
-        for (const type in stamps)
-            room.memory.stampAnchors[type as StampTypes] = []
-    }
+          for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
+     }
 
-    function recordAdjacentPositions(
-        x: number,
-        y: number,
-        range: number,
-        weight?: number
-    ) {
-        // Construct a rect and get the positions in a range of 1
+     function recordAdjacentPositions(x: number, y: number, range: number, weight?: number) {
+          // Construct a rect and get the positions in a range of 1
 
-        const adjacentPositions = findPositionsInsideRect(
-            x - range,
-            y - range,
-            x + range,
-            y + range
-        )
+          const adjacentPositions = findPositionsInsideRect(x - range, y - range, x + range, y + range)
 
-        // Loop through adjacent positions
+          // Loop through adjacent positions
 
-        for (const adjacentPos of adjacentPositions) {
-            // Iterate if the adjacent pos is to avoid
+          for (const adjacentPos of adjacentPositions) {
+               // Iterate if the adjacent pos is to avoid
 
-            if (baseCM.get(adjacentPos.x, adjacentPos.y) > 0) continue
+               if (baseCM.get(adjacentPos.x, adjacentPos.y) > 0) continue
 
-            // Otherwise record the position in the base cost matrix as avoid
+               // Otherwise record the position in the base cost matrix as avoid
 
-            baseCM.set(adjacentPos.x, adjacentPos.y, weight || 255)
-        }
-    }
+               baseCM.set(adjacentPos.x, adjacentPos.y, weight || 255)
+          }
+     }
 
-    // Get the controller and set positions nearby to avoid
+     // Get the controller and set positions nearby to avoid
 
-    recordAdjacentPositions(room.controller.pos.x, room.controller.pos.y, 2)
+     recordAdjacentPositions(room.controller.pos.x, room.controller.pos.y, 2)
 
-    // Get and record the mineralHarvestPos as avoid
+     // Get and record the mineralHarvestPos as avoid
 
-    for (const pos of room.get('mineralHarvestPositions') as RoomPosition[]) {
-        baseCM.set(pos.x, pos.y, 255)
-    }
+     for (const pos of room.get('mineralHarvestPositions') as RoomPosition[]) {
+          baseCM.set(pos.x, pos.y, 255)
+     }
 
-    // Record the positions around sources as unusable
+     // Record the positions around sources as unusable
 
-    const sources: Source[] = room.get('sources')
+     const sources: Source[] = room.get('sources')
 
-    // Loop through each source, marking nearby positions as avoid
+     // Loop through each source, marking nearby positions as avoid
 
-    for (const source of sources)
-        recordAdjacentPositions(source.pos.x, source.pos.y, 2)
+     for (const source of sources) recordAdjacentPositions(source.pos.x, source.pos.y, 2)
 
-    // Find the average pos between the sources
+     // Find the average pos between the sources
 
-    const avgSourcePos = findAvgBetweenPosotions(sources[0].pos, sources[1].pos)
+     const avgSourcePos = findAvgBetweenPosotions(sources[0].pos, sources[1].pos)
 
-    // Find the average pos between the two sources and the controller
+     // Find the average pos between the two sources and the controller
 
-    const avgControllerSourcePos = findAvgBetweenPosotions(
-        room.controller.pos,
-        avgSourcePos
-    )
+     const avgControllerSourcePos = findAvgBetweenPosotions(room.controller.pos, avgSourcePos)
 
-    interface PlanStampOpts {
-        stampType: StampTypes
-        count: number
-        anchorOrient: Pos
-        initialWeight?: number
-        adjacentToRoads?: boolean
-        normalDT?: boolean
-    }
+     interface PlanStampOpts {
+          stampType: StampTypes
+          count: number
+          anchorOrient: Pos
+          initialWeight?: number
+          adjacentToRoads?: boolean
+          normalDT?: boolean
+     }
 
-    /**
-     * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
-     */
-    function planStamp(opts: PlanStampOpts): boolean {
-        // Define the stamp using the stampType
+     /**
+      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
+      */
+     function planStamp(opts: PlanStampOpts): boolean {
+          // Define the stamp using the stampType
 
-        const stamp = stamps[opts.stampType]
+          const stamp = stamps[opts.stampType]
 
-        // So long as the count is more than 0
+          // So long as the count is more than 0
 
-        while (opts.count > 0) {
-            opts.count -= 1
+          while (opts.count > 0) {
+               opts.count -= 1
 
-            // If an anchor already exists with this index
+               // If an anchor already exists with this index
 
-            if (room.memory.stampAnchors[opts.stampType][opts.count]) {
-                for (const packedStampAnchor of room.memory.stampAnchors[
-                    opts.stampType
-                ]) {
-                    const stampAnchor = unpackAsPos(packedStampAnchor)
+               if (room.memory.stampAnchors[opts.stampType][opts.count]) {
+                    for (const packedStampAnchor of room.memory.stampAnchors[opts.stampType]) {
+                         const stampAnchor = unpackAsPos(packedStampAnchor)
 
-                    for (const structureType in stamp.structures) {
-                        const positions = stamp.structures[structureType]
+                         for (const structureType in stamp.structures) {
+                              const positions = stamp.structures[structureType]
 
-                        for (const pos of positions) {
-                            // Re-assign the pos's x and y to align with the offset
+                              for (const pos of positions) {
+                                   // Re-assign the pos's x and y to align with the offset
 
-                            const x = pos.x + stampAnchor.x - stamp.offset
-                            const y = pos.y + stampAnchor.y - stamp.offset
+                                   const x = pos.x + stampAnchor.x - stamp.offset
+                                   const y = pos.y + stampAnchor.y - stamp.offset
 
-                            // If the structureType is a road
+                                   // If the structureType is a road
 
-                            if (structureType === STRUCTURE_ROAD) {
-                                // Record the position in roadCM and iterate
+                                   if (structureType === STRUCTURE_ROAD) {
+                                        // Record the position in roadCM and iterate
 
-                                roadCM.set(x, y, 1)
-                                continue
-                            }
+                                        roadCM.set(x, y, 1)
+                                        continue
+                                   }
 
-                            baseCM.set(x, y, 255)
-                            roadCM.set(x, y, 255)
-                        }
-                    }
-                }
-
-                continue
-            }
-
-            // Run distance transform with the baseCM
-
-            const distanceCM = opts.normalDT
-                ? room.distanceTransform(baseCM)
-                : room.specialDT(baseCM)
-
-            // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
-
-            const stampAnchor = room.findClosestPosOfValue({
-                CM: distanceCM,
-                startPos: opts.anchorOrient,
-                requiredValue: stamp.size,
-                initialWeight: opts.initialWeight || 0,
-                adjacentToRoads: opts.adjacentToRoads,
-                roadCM: opts.adjacentToRoads ? roadCM : undefined,
-            })
-
-            // Inform false if no anchor was generated
-
-            if (!stampAnchor) return false
-
-            // Add the anchor to stampAnchors based on its type
-
-            room.memory.stampAnchors[opts.stampType].push(pack(stampAnchor))
-
-            for (const structureType in stamp.structures) {
-                // Get the positions for this structre type
-
-                const positions = stamp.structures[structureType]
-
-                // Loop through positions
-
-                for (const pos of positions) {
-                    // Re-assign the pos's x and y to align with the offset
-
-                    const x = pos.x + stampAnchor.x - stamp.offset
-                    const y = pos.y + stampAnchor.y - stamp.offset
-
-                    // If the structureType is a road
-
-                    if (structureType === STRUCTURE_ROAD) {
-                        // Record the position in roadCM and iterate
-
-                        roadCM.set(x, y, 1)
-                        continue
+                                   baseCM.set(x, y, 255)
+                                   roadCM.set(x, y, 255)
+                              }
+                         }
                     }
 
-                    // Otherwise record the position as avoid in baseCM and roadCM and iterate
+                    continue
+               }
 
-                    baseCM.set(x, y, 255)
-                    roadCM.set(x, y, 255)
-                }
-            }
-        }
+               // Run distance transform with the baseCM
 
-        return true
-    }
+               const distanceCM = opts.normalDT ? room.distanceTransform(baseCM) : room.specialDT(baseCM)
 
-    // Try to plan the stamp
+               // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 
-    if (
-        !planStamp({
-            stampType: 'fastFiller',
-            count: 1,
-            anchorOrient: avgControllerSourcePos,
-            normalDT: true,
-        })
-    )
-        return false
+               const stampAnchor = room.findClosestPosOfValue({
+                    CM: distanceCM,
+                    startPos: opts.anchorOrient,
+                    requiredValue: stamp.size,
+                    initialWeight: opts.initialWeight || 0,
+                    adjacentToRoads: opts.adjacentToRoads,
+                    roadCM: opts.adjacentToRoads ? roadCM : undefined,
+               })
 
-    // If the stamp failed to be planned
+               // Inform false if no anchor was generated
 
-    if (!room.memory.stampAnchors.fastFiller.length) {
-        // Record that the room is not claimable and stop
+               if (!stampAnchor) return false
 
-        room.memory.notClaimable = true
-        return false
-    }
+               // Add the anchor to stampAnchors based on its type
 
-    // Get the centerUpgradePos, informing false if it's undefined
+               room.memory.stampAnchors[opts.stampType].push(pack(stampAnchor))
 
-    const centerUpgadePos: RoomPosition = room.get('centerUpgradePos')
-    if (!centerUpgadePos) return false
+               for (const structureType in stamp.structures) {
+                    // Get the positions for this structre type
 
-    // Get the upgradePositions
+                    const positions = stamp.structures[structureType]
 
-    const upgradePositions: RoomPosition[] = room.get('upgradePositions')
+                    // Loop through positions
 
-    // Loop through each upgradePos
+                    for (const pos of positions) {
+                         // Re-assign the pos's x and y to align with the offset
 
-    for (const upgradePos of upgradePositions) {
-        // Mark as avoid in road and base cost matrixes
+                         const x = pos.x + stampAnchor.x - stamp.offset
+                         const y = pos.y + stampAnchor.y - stamp.offset
 
-        baseCM.set(upgradePos.x, upgradePos.y, 255)
-        roadCM.set(upgradePos.x, upgradePos.y, 20)
-    }
+                         // If the structureType is a road
 
-    // Try to plan the stamp
+                         if (structureType === STRUCTURE_ROAD) {
+                              // Record the position in roadCM and iterate
 
-    if (
-        !planStamp({
-            stampType: 'hub',
-            count: 1,
-            anchorOrient: room.anchor,
-            normalDT: true,
-        })
-    )
-        return false
+                              roadCM.set(x, y, 1)
+                              continue
+                         }
 
-    const hubAnchor = unpackAsRoomPos(
-        room.memory.stampAnchors.hub[0],
-        room.name
-    )
-    const fastFillerHubAnchor = findAvgBetweenPosotions(room.anchor, hubAnchor)
-    // Get the closest upgrade pos and mark it as fair use in roadCM
+                         // Otherwise record the position as avoid in baseCM and roadCM and iterate
 
-    const closestUpgradePos = upgradePositions[0]
-    roadCM.set(closestUpgradePos.x, closestUpgradePos.y, 5)
+                         baseCM.set(x, y, 255)
+                         roadCM.set(x, y, 255)
+                    }
+               }
+          }
 
-    // Construct path
+          return true
+     }
 
-    let path: RoomPosition[] = []
+     // Try to plan the stamp
 
-    // Try to plan the stamp
+     if (
+          !planStamp({
+               stampType: 'fastFiller',
+               count: 1,
+               anchorOrient: avgControllerSourcePos,
+               normalDT: true,
+          })
+     )
+          return false
 
-    if (
-        !planStamp({
-            stampType: 'extensions',
-            count: 7,
-            anchorOrient: fastFillerHubAnchor,
-        })
-    )
-        return false
+     // If the stamp failed to be planned
 
-    // Plan the stamp x times
+     if (!room.memory.stampAnchors.fastFiller.length) {
+          // Record that the room is not claimable and stop
 
-    for (const extensionsAnchor of room.memory.stampAnchors.extensions) {
-        // Path from the extensionsAnchor to the hubAnchor
+          room.memory.notClaimable = true
+          return false
+     }
 
-        path = room.advancedFindPath({
-            origin: unpackAsRoomPos(extensionsAnchor, room.name),
-            goal: { pos: hubAnchor, range: 2 },
-            weightCostMatrixes: [roadCM],
-        })
+     // Get the centerUpgradePos, informing false if it's undefined
 
-        // Loop through positions of the path
+     const centerUpgadePos: RoomPosition = room.get('centerUpgradePos')
+     if (!centerUpgadePos) return false
 
-        for (const pos of path) {
-            // Record the pos in roadCM
+     // Get the upgradePositions
 
-            roadCM.set(pos.x, pos.y, 1)
+     const upgradePositions: RoomPosition[] = room.get('upgradePositions')
 
-            // Plan for a road at this position
+     // Loop through each upgradePos
 
-            structurePlans.set(
-                pos.x,
-                pos.y,
-                constants.structureTypesByNumber[STRUCTURE_ROAD]
-            )
-        }
-    }
+     for (const upgradePos of upgradePositions) {
+          // Mark as avoid in road and base cost matrixes
 
-    // Try to plan the stamp
+          baseCM.set(upgradePos.x, upgradePos.y, 255)
+          roadCM.set(upgradePos.x, upgradePos.y, 20)
+     }
 
-    if (
-        !planStamp({
-            stampType: 'labs',
-            count: 1,
-            anchorOrient: fastFillerHubAnchor,
-        })
-    )
-        return false
+     // Try to plan the stamp
 
-    // Plan roads
+     if (
+          !planStamp({
+               stampType: 'hub',
+               count: 1,
+               anchorOrient: room.anchor,
+               normalDT: true,
+          })
+     )
+          return false
 
-    // Path from the fastFillerAnchor to the hubAnchor
+     const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
+     const fastFillerHubAnchor = findAvgBetweenPosotions(room.anchor, hubAnchor)
+     // Get the closest upgrade pos and mark it as fair use in roadCM
 
-    path = room.advancedFindPath({
-        origin: hubAnchor,
-        goal: { pos: room.anchor, range: 3 },
-        weightCostMatrixes: [roadCM],
-    })
+     const closestUpgradePos = upgradePositions[0]
+     roadCM.set(closestUpgradePos.x, closestUpgradePos.y, 5)
 
-    // Loop through positions of the path
+     // Construct path
 
-    for (const pos of path) {
-        // Record the pos in roadCM
+     let path: RoomPosition[] = []
 
-        roadCM.set(pos.x, pos.y, 1)
+     // Try to plan the stamp
 
-        // Plan for a road at this position
+     if (
+          !planStamp({
+               stampType: 'extensions',
+               count: 7,
+               anchorOrient: fastFillerHubAnchor,
+          })
+     )
+          return false
 
-        structurePlans.set(
-            pos.x,
-            pos.y,
-            constants.structureTypesByNumber[STRUCTURE_ROAD]
-        )
-    }
+     // Plan the stamp x times
 
-    // Plan for a container at the pos
+     for (const extensionsAnchor of room.memory.stampAnchors.extensions) {
+          // Path from the extensionsAnchor to the hubAnchor
 
-    /* structurePlans.set(centerUpgadePos.x, centerUpgadePos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER]) */
+          path = room.advancedFindPath({
+               origin: unpackAsRoomPos(extensionsAnchor, room.name),
+               goal: { pos: hubAnchor, range: 2 },
+               weightCostMatrixes: [roadCM],
+          })
 
-    // Path from the hubAnchor to the closestUpgradePos
+          // Loop through positions of the path
 
-    path = room.advancedFindPath({
-        origin: centerUpgadePos,
-        goal: { pos: hubAnchor, range: 2 },
-        weightCostMatrixes: [roadCM],
-    })
+          for (const pos of path) {
+               // Record the pos in roadCM
 
-    // Record the path's length in global
+               roadCM.set(pos.x, pos.y, 1)
 
-    room.global.upgradePathLength = path.length
+               // Plan for a road at this position
 
-    // Loop through positions of the path
+               structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+          }
+     }
 
-    for (const pos of path) {
-        // Record the pos in roadCM
+     // Try to plan the stamp
 
-        roadCM.set(pos.x, pos.y, 1)
+     if (
+          !planStamp({
+               stampType: 'labs',
+               count: 1,
+               anchorOrient: fastFillerHubAnchor,
+          })
+     )
+          return false
 
-        // Plan for a road at this position
+     // Plan roads
 
-        structurePlans.set(
-            pos.x,
-            pos.y,
-            constants.structureTypesByNumber[STRUCTURE_ROAD]
-        )
-    }
+     // Path from the fastFillerAnchor to the hubAnchor
 
-    // Get the room's sourceNames
+     path = room.advancedFindPath({
+          origin: hubAnchor,
+          goal: { pos: room.anchor, range: 3 },
+          weightCostMatrixes: [roadCM],
+     })
 
-    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+     // Loop through positions of the path
 
-    // loop through sourceNames
+     for (const pos of path) {
+          // Record the pos in roadCM
 
-    for (const sourceName of sourceNames) {
-        // Get the closestHarvestPos using the sourceName, iterating if undefined
+          roadCM.set(pos.x, pos.y, 1)
 
-        const closestHarvestPos: RoomPosition | undefined = room.get(
-            `${sourceName}ClosestHarvestPos`
-        )
-        if (!closestHarvestPos) continue
+          // Plan for a road at this position
 
-        // Record the pos in roadCM
+          structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+     }
 
-        roadCM.set(closestHarvestPos.x, closestHarvestPos.y, 255)
-    }
+     // Plan for a container at the pos
 
-    // loop through sourceNames
+     /* structurePlans.set(centerUpgadePos.x, centerUpgadePos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER]) */
 
-    for (const sourceName of sourceNames) {
-        // get the closestHarvestPos using the sourceName, iterating if undefined
+     // Path from the hubAnchor to the closestUpgradePos
 
-        const closestHarvestPos: RoomPosition | undefined = room.get(
-            `${sourceName}ClosestHarvestPos`
-        )
-        if (!closestHarvestPos) continue
+     path = room.advancedFindPath({
+          origin: centerUpgadePos,
+          goal: { pos: hubAnchor, range: 2 },
+          weightCostMatrixes: [roadCM],
+     })
 
-        // Plan for a road at the pos
+     // Record the path's length in global
 
-        structurePlans.set(
-            closestHarvestPos.x,
-            closestHarvestPos.y,
-            constants.structureTypesByNumber[STRUCTURE_CONTAINER]
-        )
+     room.global.upgradePathLength = path.length
 
-        // Path from the fastFillerAnchor to the closestHarvestPos
+     // Loop through positions of the path
 
-        path = room.advancedFindPath({
-            origin: closestHarvestPos,
-            goal: { pos: room.anchor, range: 3 },
-            weightCostMatrixes: [roadCM],
-        })
+     for (const pos of path) {
+          // Record the pos in roadCM
 
-        // Record the path's length in global
+          roadCM.set(pos.x, pos.y, 1)
 
-        room.global[`${sourceName}PathLength`] = path.length
+          // Plan for a road at this position
 
-        // Loop through positions of the path
+          structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+     }
 
-        for (const pos of path) {
-            // Record the pos in roadCM
+     // Get the room's sourceNames
 
-            roadCM.set(pos.x, pos.y, 1)
+     const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
 
-            // Plan for a road at this position
+     // loop through sourceNames
 
-            structurePlans.set(
-                pos.x,
-                pos.y,
-                constants.structureTypesByNumber[STRUCTURE_ROAD]
-            )
-        }
+     for (const sourceName of sourceNames) {
+          // Get the closestHarvestPos using the sourceName, iterating if undefined
 
-        // Path from the centerUpgradePos to the closestHarvestPos
+          const closestHarvestPos: RoomPosition | undefined = room.get(`${sourceName}ClosestHarvestPos`)
+          if (!closestHarvestPos) continue
 
-        /* path = room.advancedFindPath({
+          // Record the pos in roadCM
+
+          roadCM.set(closestHarvestPos.x, closestHarvestPos.y, 255)
+     }
+
+     // loop through sourceNames
+
+     for (const sourceName of sourceNames) {
+          // get the closestHarvestPos using the sourceName, iterating if undefined
+
+          const closestHarvestPos: RoomPosition | undefined = room.get(`${sourceName}ClosestHarvestPos`)
+          if (!closestHarvestPos) continue
+
+          // Plan for a road at the pos
+
+          structurePlans.set(
+               closestHarvestPos.x,
+               closestHarvestPos.y,
+               constants.structureTypesByNumber[STRUCTURE_CONTAINER],
+          )
+
+          // Path from the fastFillerAnchor to the closestHarvestPos
+
+          path = room.advancedFindPath({
+               origin: closestHarvestPos,
+               goal: { pos: room.anchor, range: 3 },
+               weightCostMatrixes: [roadCM],
+          })
+
+          // Record the path's length in global
+
+          room.global[`${sourceName}PathLength`] = path.length
+
+          // Loop through positions of the path
+
+          for (const pos of path) {
+               // Record the pos in roadCM
+
+               roadCM.set(pos.x, pos.y, 1)
+
+               // Plan for a road at this position
+
+               structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+          }
+
+          // Path from the centerUpgradePos to the closestHarvestPos
+
+          /* path = room.advancedFindPath({
             origin: closestHarvestPos,
             goal: { pos: closestUpgradePos, range: 1 },
             weightCostMatrixes: [roadCM]
@@ -461,225 +419,205 @@ export function basePlanner(room: Room) {
 
             structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
         } */
-    }
+     }
 
-    // Path from the hubAnchor to the labsAnchor
+     // Path from the hubAnchor to the labsAnchor
 
-    path = room.advancedFindPath({
-        origin: unpackAsRoomPos(room.memory.stampAnchors.labs[0], room.name),
-        goal: { pos: hubAnchor, range: 2 },
-        weightCostMatrixes: [roadCM],
-    })
+     path = room.advancedFindPath({
+          origin: unpackAsRoomPos(room.memory.stampAnchors.labs[0], room.name),
+          goal: { pos: hubAnchor, range: 2 },
+          weightCostMatrixes: [roadCM],
+     })
 
-    // Loop through positions of the path
+     // Loop through positions of the path
 
-    for (const pos of path) {
-        // Record the pos in roadCM
+     for (const pos of path) {
+          // Record the pos in roadCM
 
-        roadCM.set(pos.x, pos.y, 1)
+          roadCM.set(pos.x, pos.y, 1)
 
-        // Plan for a road at this position
+          // Plan for a road at this position
 
-        structurePlans.set(
-            pos.x,
-            pos.y,
-            constants.structureTypesByNumber[STRUCTURE_ROAD]
-        )
-    }
+          structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+     }
 
-    const mineralHarvestPos: RoomPosition = room.get('closestMineralHarvestPos')
+     const mineralHarvestPos: RoomPosition = room.get('closestMineralHarvestPos')
 
-    // Record the pos in roadCM
+     // Record the pos in roadCM
 
-    roadCM.set(mineralHarvestPos.x, mineralHarvestPos.y, 255)
-    /*
+     roadCM.set(mineralHarvestPos.x, mineralHarvestPos.y, 255)
+     /*
     // Plan for a road at the pos
 
     structurePlans.set(mineralHarvestPos.x, mineralHarvestPos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER])
  */
-    // Path from the hubAnchor to the mineralHarvestPos
+     // Path from the hubAnchor to the mineralHarvestPos
 
-    path = room.advancedFindPath({
-        origin: mineralHarvestPos,
-        goal: { pos: hubAnchor, range: 2 },
-        weightCostMatrixes: [roadCM],
-    })
+     path = room.advancedFindPath({
+          origin: mineralHarvestPos,
+          goal: { pos: hubAnchor, range: 2 },
+          weightCostMatrixes: [roadCM],
+     })
 
-    // Loop through positions of the path
+     // Loop through positions of the path
 
-    for (const pos of path) {
-        // Record the pos in roadCM
+     for (const pos of path) {
+          // Record the pos in roadCM
 
-        roadCM.set(pos.x, pos.y, 1)
+          roadCM.set(pos.x, pos.y, 1)
 
-        // Plan for a road at this position
+          // Plan for a road at this position
 
-        structurePlans.set(
-            pos.x,
-            pos.y,
-            constants.structureTypesByNumber[STRUCTURE_ROAD]
-        )
-    }
+          structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+     }
 
-    // Otherwise get the mineral
+     // Otherwise get the mineral
 
-    const mineral: Mineral = room.get('mineral')
+     const mineral: Mineral = room.get('mineral')
 
-    // Plan for a road at the mineral's pos
+     // Plan for a road at the mineral's pos
 
-    structurePlans.set(
-        mineral.pos.x,
-        mineral.pos.y,
-        constants.structureTypesByNumber[STRUCTURE_EXTRACTOR]
-    )
+     structurePlans.set(mineral.pos.x, mineral.pos.y, constants.structureTypesByNumber[STRUCTURE_EXTRACTOR])
 
-    // Record road plans in the baseCM
+     // Record road plans in the baseCM
 
-    // Iterate through each x and y in the room
+     // Iterate through each x and y in the room
 
-    for (let x = 0; x < constants.roomDimensions; x += 1) {
-        for (let y = 0; y < constants.roomDimensions; y += 1) {
-            // Get the value of this pos in roadCM, iterate if the value is 0, iterate
+     for (let x = 0; x < constants.roomDimensions; x += 1) {
+          for (let y = 0; y < constants.roomDimensions; y += 1) {
+               // Get the value of this pos in roadCM, iterate if the value is 0, iterate
 
-            const roadValue = roadCM.get(x, y)
-            if (roadValue === 0) continue
+               const roadValue = roadCM.get(x, y)
+               if (roadValue === 0) continue
 
-            // Otherwise assign 255 to this pos in baseCM
+               // Otherwise assign 255 to this pos in baseCM
 
-            baseCM.set(x, y, 255)
-        }
-    }
+               baseCM.set(x, y, 255)
+          }
+     }
 
-    // Mark the closestUpgradePos as avoid in the CM
+     // Mark the closestUpgradePos as avoid in the CM
 
-    baseCM.set(closestUpgradePos.x, closestUpgradePos.y, 255)
+     baseCM.set(closestUpgradePos.x, closestUpgradePos.y, 255)
 
-    // Construct extraExtensions count
+     // Construct extraExtensions count
 
-    let extraExtensionsAmount =
-        CONTROLLER_STRUCTURES.extension[8] -
-        stamps.fastFiller.structures.extension.length -
-        stamps.hub.structures.extension.length -
-        room.memory.stampAnchors.extensions.length *
-            stamps.extensions.structures.extension.length -
-        room.memory.stampAnchors.extension.length -
-        room.memory.stampAnchors.sourceExtension.length
+     let extraExtensionsAmount =
+          CONTROLLER_STRUCTURES.extension[8] -
+          stamps.fastFiller.structures.extension.length -
+          stamps.hub.structures.extension.length -
+          room.memory.stampAnchors.extensions.length * stamps.extensions.structures.extension.length -
+          room.memory.stampAnchors.extension.length -
+          room.memory.stampAnchors.sourceExtension.length
 
-    if (
-        room.memory.stampAnchors.sourceLink.length +
-            room.memory.stampAnchors.sourceExtension.length ===
-        0
-    ) {
-        // loop through sourceNames
+     if (room.memory.stampAnchors.sourceLink.length + room.memory.stampAnchors.sourceExtension.length === 0) {
+          // loop through sourceNames
 
-        for (const sourceName of sourceNames) {
-            // Record that the source has no link
+          for (const sourceName of sourceNames) {
+               // Record that the source has no link
 
-            let sourceHasLink = false
+               let sourceHasLink = false
 
-            // Get the closestHarvestPos of this sourceName
+               // Get the closestHarvestPos of this sourceName
 
-            const closestHarvestPos: RoomPosition = room.get(
-                `${sourceName}ClosestHarvestPos`
-            )
+               const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`)
 
-            // Find positions adjacent to source
+               // Find positions adjacent to source
 
-            const adjacentPositions = findPositionsInsideRect(
-                closestHarvestPos.x - 1,
-                closestHarvestPos.y - 1,
-                closestHarvestPos.x + 1,
-                closestHarvestPos.y + 1
-            )
+               const adjacentPositions = findPositionsInsideRect(
+                    closestHarvestPos.x - 1,
+                    closestHarvestPos.y - 1,
+                    closestHarvestPos.x + 1,
+                    closestHarvestPos.y + 1,
+               )
 
-            // Sort adjacentPositions by range from the anchor
+               // Sort adjacentPositions by range from the anchor
 
-            adjacentPositions.sort(function (a, b) {
-                return (
-                    getRange(a.x - hubAnchor.x, a.y - hubAnchor.y) -
-                    getRange(b.x - hubAnchor.x, b.y - hubAnchor.y)
-                )
-            })
+               adjacentPositions.sort(function (a, b) {
+                    return (
+                         getRange(a.x - hubAnchor.x, a.y - hubAnchor.y) - getRange(b.x - hubAnchor.x, b.y - hubAnchor.y)
+                    )
+               })
 
-            // Loop through each pos
+               // Loop through each pos
 
-            for (const pos of adjacentPositions) {
-                // Iterate if plan for pos is in use
+               for (const pos of adjacentPositions) {
+                    // Iterate if plan for pos is in use
 
-                if (roadCM.get(pos.x, pos.y) > 0) continue
+                    if (roadCM.get(pos.x, pos.y) > 0) continue
 
-                // Iterate if the pos is a wall
+                    // Iterate if the pos is a wall
 
-                if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+                    if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
-                // Otherwise
+                    // Otherwise
 
-                // Assign 255 to this pos in baseCM
+                    // Assign 255 to this pos in baseCM
 
-                baseCM.set(pos.x, pos.y, 255)
+                    baseCM.set(pos.x, pos.y, 255)
 
-                // Assign 255 to this pos in roadCM
+                    // Assign 255 to this pos in roadCM
 
-                roadCM.set(pos.x, pos.y, 255)
+                    roadCM.set(pos.x, pos.y, 255)
 
-                // If there is no planned link for this source, plan one
+                    // If there is no planned link for this source, plan one
 
-                if (!sourceHasLink) {
-                    room.memory.stampAnchors.sourceLink.push(pack(pos))
+                    if (!sourceHasLink) {
+                         room.memory.stampAnchors.sourceLink.push(pack(pos))
 
-                    sourceHasLink = true
+                         sourceHasLink = true
+                         continue
+                    }
+
+                    // Otherwise plan for an extension
+
+                    room.memory.stampAnchors.sourceExtension.push(pack(pos))
+
+                    // Decrease the extraExtensionsAmount and iterate
+
+                    extraExtensionsAmount -= 1
                     continue
-                }
+               }
+          }
+     }
 
-                // Otherwise plan for an extension
+     // Try to plan the stamp
 
-                room.memory.stampAnchors.sourceExtension.push(pack(pos))
+     if (
+          !planStamp({
+               stampType: 'tower',
+               count: 6,
+               anchorOrient: fastFillerHubAnchor,
+               adjacentToRoads: true,
+          })
+     )
+          return false
 
-                // Decrease the extraExtensionsAmount and iterate
+     // Try to plan the stamp
 
-                extraExtensionsAmount -= 1
-                continue
-            }
-        }
-    }
+     if (
+          !planStamp({
+               stampType: 'extension',
+               count: extraExtensionsAmount,
+               anchorOrient: hubAnchor,
+               adjacentToRoads: true,
+          })
+     )
+          return false
 
-    // Try to plan the stamp
+     // Try to plan the stamp
 
-    if (
-        !planStamp({
-            stampType: 'tower',
-            count: 6,
-            anchorOrient: fastFillerHubAnchor,
-            adjacentToRoads: true,
-        })
-    )
-        return false
+     if (
+          !planStamp({
+               stampType: 'observer',
+               count: 1,
+               anchorOrient: fastFillerHubAnchor,
+          })
+     )
+          return false
 
-    // Try to plan the stamp
+     // Record planning results in the room's global and inform true
 
-    if (
-        !planStamp({
-            stampType: 'extension',
-            count: extraExtensionsAmount,
-            anchorOrient: hubAnchor,
-            adjacentToRoads: true,
-        })
-    )
-        return false
-
-    // Try to plan the stamp
-
-    if (
-        !planStamp({
-            stampType: 'observer',
-            count: 1,
-            anchorOrient: fastFillerHubAnchor,
-        })
-    )
-        return false
-
-    // Record planning results in the room's global and inform true
-
-    room.global.plannedBase = true
-    return true
+     room.global.plannedBase = true
+     return true
 }

@@ -25,82 +25,77 @@ import { remoteCoreAttackerManager } from './roleManagers/remote/remoteCoreAttac
 // Construct managers
 
 const managers: Record<CreepRoles, Function> = {
-    source1Harvester: sourceHarvesterManager,
-    source2Harvester: sourceHarvesterManager,
-    hauler: haulerManager,
-    controllerUpgrader: controllerUpgraderManager,
-    builder: builderManager,
-    maintainer: maintainerManager,
-    mineralHarvester: mineralHarvesterManager,
-    hubHauler: hubHaulerManager,
-    fastFiller: fastFillerManager,
-    meleeDefender: meleeDefenderManager,
-    source1RemoteHarvester: source1RemoteHarvesterManager,
-    source2RemoteHarvester: source2RemoteHarvesterManager,
-    remoteHauler: remoteHaulerManager,
-    remoteReserver: remoteReserverManager,
-    remoteDefender: remoteDefenderManager,
-    remoteCoreAttacker: remoteCoreAttackerManager,
-    scout: scoutManager,
-    claimer: claimerManager,
-    vanguard: vanguardManager,
-    antifa: antifaManager,
+     source1Harvester: sourceHarvesterManager,
+     source2Harvester: sourceHarvesterManager,
+     hauler: haulerManager,
+     controllerUpgrader: controllerUpgraderManager,
+     builder: builderManager,
+     maintainer: maintainerManager,
+     mineralHarvester: mineralHarvesterManager,
+     hubHauler: hubHaulerManager,
+     fastFiller: fastFillerManager,
+     meleeDefender: meleeDefenderManager,
+     source1RemoteHarvester: source1RemoteHarvesterManager,
+     source2RemoteHarvester: source2RemoteHarvesterManager,
+     remoteHauler: remoteHaulerManager,
+     remoteReserver: remoteReserverManager,
+     remoteDefender: remoteDefenderManager,
+     remoteCoreAttacker: remoteCoreAttackerManager,
+     scout: scoutManager,
+     claimer: claimerManager,
+     vanguard: vanguardManager,
+     antifa: antifaManager,
 }
 
 export function roleManager(room: Room) {
-    // If CPU logging is enabled, get the CPU used at the start
+     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    // Loop through each role in managers
+     // Loop through each role in managers
 
-    for (const role of constants.creepRoles) {
-        // Get the CPU used at the start
+     for (const role of constants.creepRoles) {
+          // Get the CPU used at the start
 
-        const roleCPUStart = Game.cpu.getUsed()
+          const roleCPUStart = Game.cpu.getUsed()
 
-        // Get the manager using the role
+          // Get the manager using the role
 
-        const manager = managers[role]
+          const manager = managers[role]
 
-        // Get the amount of creeps with the role
+          // Get the amount of creeps with the role
 
-        const creepsOfRoleAmount = room.myCreeps[role].length
+          const creepsOfRoleAmount = room.myCreeps[role].length
 
-        // If there are no creeps for this manager, iterate
+          // If there are no creeps for this manager, iterate
 
-        if (!room.myCreeps[role].length) continue
+          if (!room.myCreeps[role].length) continue
 
-        // Run manager
+          // Run manager
 
-        manager(room, room.myCreeps[role])
+          manager(room, room.myCreeps[role])
 
-        // Log role stats
+          // Log role stats
 
-        customLog(
-            `${role}s`,
-            `Creeps: ${creepsOfRoleAmount}, CPU: ${(
-                Game.cpu.getUsed() - roleCPUStart
-            ).toFixed(2)}, CPU Per Creep: ${(
-                (Game.cpu.getUsed() - roleCPUStart) /
-                creepsOfRoleAmount
-            ).toFixed(2)}`,
-            undefined
-        )
-    }
+          customLog(
+               `${role}s`,
+               `Creeps: ${creepsOfRoleAmount}, CPU: ${(Game.cpu.getUsed() - roleCPUStart).toFixed(
+                    2,
+               )}, CPU Per Creep: ${((Game.cpu.getUsed() - roleCPUStart) / creepsOfRoleAmount).toFixed(2)}`,
+               undefined,
+          )
+     }
 
-    // If CPU logging is enabled, log the CPU used by this manager
+     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.cpuLogging)
-        customLog(
-            'Role Manager',
-            `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(
-                2
-            )}, CPU Per Creep: ${(
-                (Game.cpu.getUsed() - managerCPUStart) /
-                room.myCreepsAmount
-            ).toFixed(2)}`,
-            undefined,
-            constants.colors.lightGrey
-        )
+     if (Memory.cpuLogging)
+          customLog(
+               'Role Manager',
+               `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}, CPU Per Creep: ${(
+                    (Game.cpu.getUsed() - managerCPUStart) /
+                    room.myCreepsAmount
+               ).toFixed(2)}`,
+               undefined,
+               constants.colors.lightGrey,
+          )
 }

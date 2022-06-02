@@ -1,25 +1,25 @@
 export interface Squad {
-    enterAttackMode(): boolean
+     enterAttackMode(): boolean
 
-    do(): void
+     do(): void
 }
 
 export class Squad {
-    constructor() {}
+     constructor() {}
 }
 
 export interface Duo {}
 
 export class Duo extends Squad {
-    constructor() {
-        super()
-    }
+     constructor() {
+          super()
+     }
 }
 
 export interface Quad {}
 
 export class Quad extends Squad {
-    constructor() {
-        super()
-    }
+     constructor() {
+          super()
+     }
 }

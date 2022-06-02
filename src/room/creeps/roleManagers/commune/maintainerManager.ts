@@ -2,19 +2,19 @@ import { Maintainer } from '../../creepClasses'
 import './maintainerFunctions'
 
 export function maintainerManager(room: Room, creepsOfRole: string[]) {
-    // Loop through creep names of creeps of the manager's role
+     // Loop through creep names of creeps of the manager's role
 
-    for (const creepName of creepsOfRole) {
-        // Get the creep using its name
+     for (const creepName of creepsOfRole) {
+          // Get the creep using its name
 
-        const creep: Maintainer = Game.creeps[creepName]
+          const creep: Maintainer = Game.creeps[creepName]
 
-        // Try to maintain structures, iterating if success
+          // Try to maintain structures, iterating if success
 
-        if (creep.advancedMaintain()) continue
+          if (creep.advancedMaintain()) continue
 
-        // Otherwise, try to maintain at feet, iterating if success
+          // Otherwise, try to maintain at feet, iterating if success
 
-        if (creep.maintainAtFeet()) continue
-    }
+          if (creep.maintainAtFeet()) continue
+     }
 }

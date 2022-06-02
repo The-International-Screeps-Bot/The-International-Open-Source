@@ -1,260 +1,223 @@
 import { constants } from 'international/constants'
-import {
-    customLog,
-    getRangeBetween,
-    unpackAsPos,
-} from 'international/generalFunctions'
+import { customLog, getRangeBetween, unpackAsPos } from 'international/generalFunctions'
 import { RoomPullTask } from 'room/roomTasks'
 import { SourceHarvester } from '../../creepClasses'
 
 SourceHarvester.prototype.isDying = function () {
-    // Inform as dying if creep is already recorded as dying
+     // Inform as dying if creep is already recorded as dying
 
-    if (this.memory.dying) return true
+     if (this.memory.dying) return true
 
-    // Stop if creep is spawning
+     // Stop if creep is spawning
 
-    if (!this.ticksToLive) return false
+     if (!this.ticksToLive) return false
 
-    // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
+     // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
-    if (
-        this.ticksToLive >
-        this.body.length * CREEP_SPAWN_TIME +
-            (this.room.global[`${this.memory.sourceName}PathLength`] || 0)
-    )
-        return false
+     if (
+          this.ticksToLive >
+          this.body.length * CREEP_SPAWN_TIME + (this.room.global[`${this.memory.sourceName}PathLength`] || 0)
+     )
+          return false
 
-    // Record creep as dying
+     // Record creep as dying
 
-    this.memory.dying = true
-    return true
+     this.memory.dying = true
+     return true
 }
 
 SourceHarvester.prototype.travelToSource = function () {
-    const creep = this
-    const { room } = creep
+     const creep = this
+     const { room } = creep
 
-    // Define the creep's designated source
+     // Define the creep's designated source
 
-    const { sourceName } = creep.memory
+     const { sourceName } = creep.memory
 
-    // Try to find a harvestPosition, inform false if it failed
+     // Try to find a harvestPosition, inform false if it failed
 
-    if (!creep.findSourceHarvestPos(sourceName)) return false
+     if (!creep.findSourceHarvestPos(sourceName)) return false
 
-    creep.say('🚬')
+     creep.say('🚬')
 
-    // Unpack the harvestPos
+     // Unpack the harvestPos
 
-    const harvestPos = unpackAsPos(creep.memory.packedPos)
+     const harvestPos = unpackAsPos(creep.memory.packedPos)
 
-    // If the creep is at the creep's packedHarvestPos, inform false
+     // If the creep is at the creep's packedHarvestPos, inform false
 
-    if (
-        getRangeBetween(
-            creep.pos.x,
-            creep.pos.y,
-            harvestPos.x,
-            harvestPos.y
-        ) === 0
-    )
-        return false
+     if (getRangeBetween(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) === 0) return false
 
-    // If the creep's movement type is pull
+     // If the creep's movement type is pull
 
-    if (creep.memory.getPulled) {
-        creep.say('GP')
+     if (creep.memory.getPulled) {
+          creep.say('GP')
 
-        // if there is no global for the creep, make one
+          // if there is no global for the creep, make one
 
-        if (!global[creep.id]) global[creep.id] = {}
+          if (!global[creep.id]) global[creep.id] = {}
 
-        // If there is no created task IDs object for the creator, make it
+          // If there is no created task IDs object for the creator, make it
 
-        if (!global[creep.id].createdTaskIDs)
-            global[creep.id].createdTaskIDs = {}
+          if (!global[creep.id].createdTaskIDs) global[creep.id].createdTaskIDs = {}
 
-        // Find the creep's task of type pull
+          // Find the creep's task of type pull
 
-        const creepsPullTasks = room.findTasksOfTypes(
-            global[creep.id].createdTaskIDs,
-            new Set(['pull'])
-        )
+          const creepsPullTasks = room.findTasksOfTypes(global[creep.id].createdTaskIDs, new Set(['pull']))
 
-        // If there are no pull tasks for the creep, make one for the creep's harvestPos
+          // If there are no pull tasks for the creep, make one for the creep's harvestPos
 
-        if (creepsPullTasks.length === 0)
-            new RoomPullTask(
-                room.name,
-                creep.id,
-                new RoomPosition(harvestPos.x, harvestPos.y, room.name),
-                1
-            )
+          if (creepsPullTasks.length === 0)
+               new RoomPullTask(room.name, creep.id, new RoomPosition(harvestPos.x, harvestPos.y, room.name), 1)
 
-        // Inform false
+          // Inform false
 
-        return true
-    }
+          return true
+     }
 
-    // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
+     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-    creep.say(`⏩${sourceName}`)
+     creep.say(`⏩${sourceName}`)
 
-    creep.createMoveRequest({
-        origin: creep.pos,
-        goal: {
-            pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
-            range: 0,
-        },
-        avoidEnemyRanges: true,
-        weightGamebjects: {
-            1: room.get('road'),
-        },
-    })
+     creep.createMoveRequest({
+          origin: creep.pos,
+          goal: {
+               pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
+               range: 0,
+          },
+          avoidEnemyRanges: true,
+          weightGamebjects: {
+               1: room.get('road'),
+          },
+     })
 
-    return true
+     return true
 }
 
 SourceHarvester.prototype.transferToSourceExtensions = function () {
-    const creep = this
-    const { room } = creep
+     const creep = this
+     const { room } = creep
 
-    // If all spawningStructures are filled, inform false
+     // If all spawningStructures are filled, inform false
 
-    if (room.energyAvailable === room.energyCapacityAvailable) return false
+     if (room.energyAvailable === room.energyCapacityAvailable) return false
 
-    // If the creep is not nearly full, inform false
+     // If the creep is not nearly full, inform false
 
-    if (
-        creep.store.getFreeCapacity(RESOURCE_ENERGY) >
-        creep.partsOfType(WORK) * HARVEST_POWER
-    )
-        return false
+     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > creep.partsOfType(WORK) * HARVEST_POWER) return false
 
-    // Get adjacent structures to the creep
+     // Get adjacent structures to the creep
 
-    const adjacentStructures = room.lookForAtArea(
-        LOOK_STRUCTURES,
-        creep.pos.y - 1,
-        creep.pos.x - 1,
-        creep.pos.y + 1,
-        creep.pos.x + 1,
-        true
-    )
+     const adjacentStructures = room.lookForAtArea(
+          LOOK_STRUCTURES,
+          creep.pos.y - 1,
+          creep.pos.x - 1,
+          creep.pos.y + 1,
+          creep.pos.x + 1,
+          true,
+     )
 
-    // For each structure of adjacentStructures
+     // For each structure of adjacentStructures
 
-    for (const adjacentPosData of adjacentStructures) {
-        // Get the structure at the adjacentPos
+     for (const adjacentPosData of adjacentStructures) {
+          // Get the structure at the adjacentPos
 
-        const structure = adjacentPosData.structure as AnyStoreStructure
+          const structure = adjacentPosData.structure as AnyStoreStructure
 
-        // If the structure has no store property, iterate
+          // If the structure has no store property, iterate
 
-        if (!structure.store) continue
+          if (!structure.store) continue
 
-        // If the structureType is an extension, iterate
+          // If the structureType is an extension, iterate
 
-        if (structure.structureType !== STRUCTURE_EXTENSION) continue
+          if (structure.structureType !== STRUCTURE_EXTENSION) continue
 
-        // Otherwise, if the structure is full, iterate
+          // Otherwise, if the structure is full, iterate
 
-        if (structure.store.getFreeCapacity(RESOURCE_ENERGY) === 0) continue
+          if (structure.store.getFreeCapacity(RESOURCE_ENERGY) === 0) continue
 
-        // Otherwise, transfer to the structure and inform true
+          // Otherwise, transfer to the structure and inform true
 
-        creep.transfer(structure, RESOURCE_ENERGY)
-        return true
-    }
+          creep.transfer(structure, RESOURCE_ENERGY)
+          return true
+     }
 
-    // Inform false
+     // Inform false
 
-    return false
+     return false
 }
 
 SourceHarvester.prototype.transferToSourceLink = function () {
-    const creep = this
-    const { room } = creep
+     const creep = this
+     const { room } = creep
 
-    // If the creep is not nearly full, stop
+     // If the creep is not nearly full, stop
 
-    if (
-        creep.store.getFreeCapacity(RESOURCE_ENERGY) >
-        creep.partsOfType(WORK) * HARVEST_POWER
-    )
-        return false
+     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > creep.partsOfType(WORK) * HARVEST_POWER) return false
 
-    // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
+     // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
-    const sourceLink = room.get(`${creep.memory.sourceName}Link`)
-    if (!sourceLink) return false
+     const sourceLink = room.get(`${creep.memory.sourceName}Link`)
+     if (!sourceLink) return false
 
-    // Try to transfer to the sourceLink and inform true
+     // Try to transfer to the sourceLink and inform true
 
-    return creep.advancedTransfer(sourceLink)
+     return creep.advancedTransfer(sourceLink)
 }
 
 SourceHarvester.prototype.repairSourceContainer = function (sourceContainer) {
-    const creep = this
+     const creep = this
 
-    // If there is no container, inform false
+     // If there is no container, inform false
 
-    if (!sourceContainer) return false
+     if (!sourceContainer) return false
 
-    // Get the creep's number of work parts
+     // Get the creep's number of work parts
 
-    const workPartCount = creep.partsOfType(WORK)
+     const workPartCount = creep.partsOfType(WORK)
 
-    // If the sourceContainer doesn't need repairing, inform false
+     // If the sourceContainer doesn't need repairing, inform false
 
-    if (
-        sourceContainer.hitsMax - sourceContainer.hits <
-        workPartCount * REPAIR_POWER
-    )
-        return false
+     if (sourceContainer.hitsMax - sourceContainer.hits < workPartCount * REPAIR_POWER) return false
 
-    // If the creep doesn't have enough energy and it hasn't yet moved resources, withdraw from the sourceContainer
+     // If the creep doesn't have enough energy and it hasn't yet moved resources, withdraw from the sourceContainer
 
-    if (
-        creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount &&
-        !creep.hasMovedResources
-    )
-        creep.withdraw(sourceContainer, RESOURCE_ENERGY)
+     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount && !creep.hasMovedResources)
+          creep.withdraw(sourceContainer, RESOURCE_ENERGY)
 
-    // If the creep has already worked, inform false
+     // If the creep has already worked, inform false
 
-    if (creep.hasWorked) return false
+     if (creep.hasWorked) return false
 
-    // Try to repair the target
+     // Try to repair the target
 
-    const repairResult = creep.repair(sourceContainer)
+     const repairResult = creep.repair(sourceContainer)
 
-    // If the repair worked
+     // If the repair worked
 
-    if (repairResult === OK) {
-        // Record that the creep has worked
+     if (repairResult === OK) {
+          // Record that the creep has worked
 
-        creep.hasWorked = true
+          creep.hasWorked = true
 
-        // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
+          // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
 
-        const energySpentOnRepairs = Math.min(
-            workPartCount,
-            (sourceContainer.hitsMax - sourceContainer.hits) / REPAIR_POWER
-        )
+          const energySpentOnRepairs = Math.min(
+               workPartCount,
+               (sourceContainer.hitsMax - sourceContainer.hits) / REPAIR_POWER,
+          )
 
-        // Add control points to total controlPoints counter and say the success
+          // Add control points to total controlPoints counter and say the success
 
-        Memory.stats.energySpentOnRepairing += energySpentOnRepairs
-        creep.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
+          Memory.stats.energySpentOnRepairing += energySpentOnRepairs
+          creep.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
 
-        // Inform success
+          // Inform success
 
-        return true
-    }
+          return true
+     }
 
-    // Inform failure
+     // Inform failure
 
-    return false
+     return false
 }

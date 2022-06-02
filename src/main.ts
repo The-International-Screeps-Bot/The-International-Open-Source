@@ -22,12 +22,12 @@ import './room/roomGetters'
 
 import { memHack } from 'other/memHack'
 import {
-    RoomOfferTask,
-    RoomPickupTask,
-    RoomPullTask,
-    RoomTask,
-    RoomTransferTask,
-    RoomWithdrawTask,
+     RoomOfferTask,
+     RoomPickupTask,
+     RoomPullTask,
+     RoomTask,
+     RoomTransferTask,
+     RoomWithdrawTask,
 } from 'room/roomTasks'
 import { RoomObject } from 'room/roomObject'
 import { ErrorMapper } from 'other/ErrorMapper'
@@ -36,342 +36,342 @@ import { constants } from 'international/constants'
 // Type declareations for global
 
 declare global {
-    interface Pos {
-        x: number
-        y: number
-    }
+     interface Pos {
+          x: number
+          y: number
+     }
 
-    export interface Coord {
-        x: number
-        y: number
-    }
+     export interface Coord {
+          x: number
+          y: number
+     }
 
-    interface Rect {
-        x1: number
-        y1: number
-        x2: number
-        y2: number
-    }
+     interface Rect {
+          x1: number
+          y1: number
+          x2: number
+          y2: number
+     }
 
-    interface Colors {
-        white: string
-        lightGrey: string
-        lightBlue: string
-        darkBlue: string
-        black: string
-        yellow: string
-        red: string
-        green: string
-        brown: string
-    }
+     interface Colors {
+          white: string
+          lightGrey: string
+          lightBlue: string
+          darkBlue: string
+          black: string
+          yellow: string
+          red: string
+          green: string
+          brown: string
+     }
 
-    type StampTypes =
-        | 'fastFiller'
-        | 'hub'
-        | 'extensions'
-        | 'labs'
-        | 'tower'
-        | 'extension'
-        | 'observer'
-        | 'sourceLink'
-        | 'sourceExtension'
-        | 'rampart'
-        | 'boardingRampart'
+     type StampTypes =
+          | 'fastFiller'
+          | 'hub'
+          | 'extensions'
+          | 'labs'
+          | 'tower'
+          | 'extension'
+          | 'observer'
+          | 'sourceLink'
+          | 'sourceExtension'
+          | 'rampart'
+          | 'boardingRampart'
 
-    interface Stamp {
-        offset: number
-        /**
-         * The range of protection from the anchor to provide when deciding rampart placement
-         */
-        protectionOffset: number
-        size: number
-        structures: { [structureType: string]: Pos[] }
-    }
+     interface Stamp {
+          offset: number
+          /**
+           * The range of protection from the anchor to provide when deciding rampart placement
+           */
+          protectionOffset: number
+          size: number
+          structures: { [structureType: string]: Pos[] }
+     }
 
-    type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
+     type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
 
-    type PackedPosMap = any[]
+     type PackedPosMap = any[]
 
-    type CreepRoles =
-        | 'source1Harvester'
-        | 'source2Harvester'
-        | 'hauler'
-        | 'controllerUpgrader'
-        | 'builder'
-        | 'maintainer'
-        | 'mineralHarvester'
-        | 'hubHauler'
-        | 'fastFiller'
-        | 'meleeDefender'
-        | 'source1RemoteHarvester'
-        | 'source2RemoteHarvester'
-        | 'remoteHauler'
-        | 'remoteReserver'
-        | 'remoteDefender'
-        | 'remoteCoreAttacker'
-        | 'scout'
-        | 'claimer'
-        | 'vanguard'
-        | 'antifa'
+     type CreepRoles =
+          | 'source1Harvester'
+          | 'source2Harvester'
+          | 'hauler'
+          | 'controllerUpgrader'
+          | 'builder'
+          | 'maintainer'
+          | 'mineralHarvester'
+          | 'hubHauler'
+          | 'fastFiller'
+          | 'meleeDefender'
+          | 'source1RemoteHarvester'
+          | 'source2RemoteHarvester'
+          | 'remoteHauler'
+          | 'remoteReserver'
+          | 'remoteDefender'
+          | 'remoteCoreAttacker'
+          | 'scout'
+          | 'claimer'
+          | 'vanguard'
+          | 'antifa'
 
-    type RoomObjectName =
-        | 'terrainCM'
-        | 'baseCM'
-        | 'roadCM'
-        | 'structurePlans'
-        | 'mineral'
-        | 'source1'
-        | 'source2'
-        | 'sources'
-        | 'structuresByType'
-        | 'cSitesByType'
-        | StructureConstant
-        | `${StructureConstant}CSite`
-        | 'enemyCSites'
-        | 'allyCSites'
-        | 'mineralHarvestPositions'
-        | 'closestMineralHarvestPos'
-        | 'source1HarvestPositions'
-        | 'source1ClosestHarvestPos'
-        | 'source2HarvestPositions'
-        | 'source2ClosestHarvestPos'
-        | 'centerUpgradePos'
-        | 'upgradePositions'
-        | 'fastFillerPositions'
-        | 'source1Container'
-        | 'source2Container'
-        | 'controllerContainer'
-        | 'mineralContainer'
-        | 'fastFillerContainerLeft'
-        | 'fastFillerContainerRight'
-        | 'labContainer'
-        | 'source1Link'
-        | 'source2Link'
-        | 'fastFillerLink'
-        | 'hubLink'
-        | 'controllerLink'
-        | 'source1Container'
-        | 'source2Container'
-        | 'usedMineralHarvestPositions'
-        | 'usedSourceHarvestPositions'
-        | 'usedUpgradePositions'
-        | 'usedFastFillerPositions'
-        | 'structuresForSpawning'
-        | 'notMyCreeps'
-        | 'enemyCreeps'
-        | 'allyCreeps'
-        | 'myDamagedCreeps'
-        | 'damagedAllyCreeps'
-        | 'remoteNamesByEfficacy'
+     type RoomObjectName =
+          | 'terrainCM'
+          | 'baseCM'
+          | 'roadCM'
+          | 'structurePlans'
+          | 'mineral'
+          | 'source1'
+          | 'source2'
+          | 'sources'
+          | 'structuresByType'
+          | 'cSitesByType'
+          | StructureConstant
+          | `${StructureConstant}CSite`
+          | 'enemyCSites'
+          | 'allyCSites'
+          | 'mineralHarvestPositions'
+          | 'closestMineralHarvestPos'
+          | 'source1HarvestPositions'
+          | 'source1ClosestHarvestPos'
+          | 'source2HarvestPositions'
+          | 'source2ClosestHarvestPos'
+          | 'centerUpgradePos'
+          | 'upgradePositions'
+          | 'fastFillerPositions'
+          | 'source1Container'
+          | 'source2Container'
+          | 'controllerContainer'
+          | 'mineralContainer'
+          | 'fastFillerContainerLeft'
+          | 'fastFillerContainerRight'
+          | 'labContainer'
+          | 'source1Link'
+          | 'source2Link'
+          | 'fastFillerLink'
+          | 'hubLink'
+          | 'controllerLink'
+          | 'source1Container'
+          | 'source2Container'
+          | 'usedMineralHarvestPositions'
+          | 'usedSourceHarvestPositions'
+          | 'usedUpgradePositions'
+          | 'usedFastFillerPositions'
+          | 'structuresForSpawning'
+          | 'notMyCreeps'
+          | 'enemyCreeps'
+          | 'allyCreeps'
+          | 'myDamagedCreeps'
+          | 'damagedAllyCreeps'
+          | 'remoteNamesByEfficacy'
 
-    interface PathGoal {
-        pos: RoomPosition
-        range: number
-    }
+     interface PathGoal {
+          pos: RoomPosition
+          range: number
+     }
 
-    interface PathOpts {
-        origin: RoomPosition
-        goal: PathGoal
-        typeWeights?: { [key: string]: number }
-        plainCost?: number
-        swampCost?: number
-        maxRooms?: number
-        flee?: boolean
-        creep?: Creep
+     interface PathOpts {
+          origin: RoomPosition
+          goal: PathGoal
+          typeWeights?: { [key: string]: number }
+          plainCost?: number
+          swampCost?: number
+          maxRooms?: number
+          flee?: boolean
+          creep?: Creep
 
-        weightStructures?: { [key: string]: number }
+          weightStructures?: { [key: string]: number }
 
-        /**
-         * An object with keys of weights and values of structures / creeps / cSites to weight
-         */
-        weightGamebjects?: {
-            [key: string]: (Structure | Creep | ConstructionSite)[]
-        }
+          /**
+           * An object with keys of weights and values of structures / creeps / cSites to weight
+           */
+          weightGamebjects?: {
+               [key: string]: (Structure | Creep | ConstructionSite)[]
+          }
 
-        /**
-         * An object with keys of weights and values of positions
-         */
+          /**
+           * An object with keys of weights and values of positions
+           */
 
-        weightPositions?: { [key: string]: Pos[] | RoomPosition[] }
-        /**
-         *
-         */
+          weightPositions?: { [key: string]: Pos[] | RoomPosition[] }
+          /**
+           *
+           */
 
-        weightCostMatrixes?: CostMatrix[]
-        /**
-         *
-         */
-        avoidEnemyRanges?: boolean
+          weightCostMatrixes?: CostMatrix[]
+          /**
+           *
+           */
+          avoidEnemyRanges?: boolean
 
-        avoidStationaryPositions?: boolean
+          avoidStationaryPositions?: boolean
 
-        /**
-         *
-         */
-        avoidImpassibleStructures?: boolean
+          /**
+           *
+           */
+          avoidImpassibleStructures?: boolean
 
-        /**
-         * Marks creeps not owned by the bot as avoid
-         */
-        avoidNotMyCreeps?: boolean
+          /**
+           * Marks creeps not owned by the bot as avoid
+           */
+          avoidNotMyCreeps?: boolean
 
-        /**
-         * Weight my ramparts by this value
-         */
-        myRampartWeight?: number
-    }
+          /**
+           * Weight my ramparts by this value
+           */
+          myRampartWeight?: number
+     }
 
-    interface FindClosestPosOfValueOpts {
-        CM: CostMatrix
-        startPos: Pos
-        requiredValue: number
-        reduceIterations?: number
-        initialWeight?: number
-        adjacentToRoads?: boolean
-        roadCM?: CostMatrix
-    }
+     interface FindClosestPosOfValueOpts {
+          CM: CostMatrix
+          startPos: Pos
+          requiredValue: number
+          reduceIterations?: number
+          initialWeight?: number
+          adjacentToRoads?: boolean
+          roadCM?: CostMatrix
+     }
 
-    interface MoveRequestOpts extends PathOpts {
-        cacheAmount?: number
-    }
+     interface MoveRequestOpts extends PathOpts {
+          cacheAmount?: number
+     }
 
-    type OrderedStructurePlans = BuildObj[]
+     type OrderedStructurePlans = BuildObj[]
 
-    interface BuildObj {
-        structureType: BuildableStructureConstant
-        x: number
-        y: number
-    }
+     interface BuildObj {
+          structureType: BuildableStructureConstant
+          x: number
+          y: number
+     }
 
-    type RoomTaskTypes = 'pull' | 'withdraw' | 'transfer' | 'pickup' | 'offer'
+     type RoomTaskTypes = 'pull' | 'withdraw' | 'transfer' | 'pickup' | 'offer'
 
-    interface SpawnRequestOpts {
-        defaultParts: BodyPartConstant[]
-        extraParts: BodyPartConstant[]
-        partsMultiplier: number
-        minCost: number
-        priority: number
-        memoryAdditions: Partial<CreepMemory>
-        groupComparator?: string[]
-        threshold?: number
-        minCreeps?: number | undefined
-        maxCreeps?: number | undefined
-        maxCostPerCreep?: number | undefined
-    }
+     interface SpawnRequestOpts {
+          defaultParts: BodyPartConstant[]
+          extraParts: BodyPartConstant[]
+          partsMultiplier: number
+          minCost: number
+          priority: number
+          memoryAdditions: Partial<CreepMemory>
+          groupComparator?: string[]
+          threshold?: number
+          minCreeps?: number | undefined
+          maxCreeps?: number | undefined
+          maxCostPerCreep?: number | undefined
+     }
 
-    interface ExtraOpts {
-        memory: CreepMemory
-        energyStructures: (StructureSpawn | StructureExtension)[]
-        dryRun: boolean
-    }
+     interface ExtraOpts {
+          memory: CreepMemory
+          energyStructures: (StructureSpawn | StructureExtension)[]
+          dryRun: boolean
+     }
 
-    interface SpawnRequest {
-        body: BodyPartConstant[]
-        tier: number
-        cost: number
-        extraOpts: ExtraOpts
-    }
+     interface SpawnRequest {
+          body: BodyPartConstant[]
+          tier: number
+          cost: number
+          extraOpts: ExtraOpts
+     }
 
-    interface Stats {
-        lastReset: number
+     interface Stats {
+          lastReset: number
 
-        tickLength: number
+          tickLength: number
 
-        communes: number
+          communes: number
 
-        credits: number
+          credits: number
 
-        /**
-         * The amount of energy in storages and terminals in owned rooms
-         */
-        energy: number
+          /**
+           * The amount of energy in storages and terminals in owned rooms
+           */
+          energy: number
 
-        /**
-         * An object of boosts representing the amount of each boost in storages and terminals in owned rooms
-         */
-        boosts: { [key: string]: MineralBoostConstant }
+          /**
+           * An object of boosts representing the amount of each boost in storages and terminals in owned rooms
+           */
+          boosts: { [key: string]: MineralBoostConstant }
 
-        /**
-         * The total amount of CPU used
-         */
-        cpuUsage: number
+          /**
+           * The total amount of CPU used
+           */
+          cpuUsage: number
 
-        /**
-         * The amount of CPU generated per tick
-         */
-        cpuLimit: number
+          /**
+           * The amount of CPU generated per tick
+           */
+          cpuLimit: number
 
-        /**
-         * The amount of CPU left in the bucket
-         */
-        cpuBucket: number
+          /**
+           * The amount of CPU left in the bucket
+           */
+          cpuBucket: number
 
-        /**
-         * The amount of memory used by the bot
-         */
-        memorUsage: number
+          /**
+           * The amount of memory used by the bot
+           */
+          memorUsage: number
 
-        /**
-         * The maximum memory the bot can use
-         */
-        memoryLimit: number
+          /**
+           * The maximum memory the bot can use
+           */
+          memoryLimit: number
 
-        /**
-         * The amount of memory used by the bot
-         */
-        memoryUsage: number
+          /**
+           * The amount of memory used by the bot
+           */
+          memoryUsage: number
 
-        /**
-         * The percent to the next GCL level
-         */
-        GCLPercent: number
+          /**
+           * The percent to the next GCL level
+           */
+          GCLPercent: number
 
-        /**
-         * The total amount of GCL
-         */
-        totalGCL: number
+          /**
+           * The total amount of GCL
+           */
+          totalGCL: number
 
-        GCLLevel: number
+          GCLLevel: number
 
-        /**
-         * The percent to the next PCL level
-         */
-        GPLPercent: number
+          /**
+           * The percent to the next PCL level
+           */
+          GPLPercent: number
 
-        /**
-         * The total amount of PCL
-         */
-        totalGPL: number
+          /**
+           * The total amount of PCL
+           */
+          totalGPL: number
 
-        GPLLevel: number
+          GPLLevel: number
 
-        /**
-         * The total number of creeps the bot owns
-         */
-        creeps: number
+          /**
+           * The total number of creeps the bot owns
+           */
+          creeps: number
 
-        /**
-         * The total number of powerCreeps the bot owns
-         */
-        powerCreepCount: number
+          /**
+           * The total number of powerCreeps the bot owns
+           */
+          powerCreepCount: number
 
-        /**
-         * The total amount of energy harvested by the bot per tick
-         */
-        energyHarvested: number
+          /**
+           * The total amount of energy harvested by the bot per tick
+           */
+          energyHarvested: number
 
-        mineralsHarvested: number
+          mineralsHarvested: number
 
-        controlPoints: number
+          controlPoints: number
 
-        energySpentOnCreeps: number
+          energySpentOnCreeps: number
 
-        energySpentOnConstruction: number
+          energySpentOnConstruction: number
 
-        energySpentOnRepairing: number
+          energySpentOnRepairing: number
 
-        energySpentOnBarricades: number
-    }
+          energySpentOnBarricades: number
+     }
 
      interface Memory {
           /**
@@ -678,646 +678,609 @@ declare global {
            */
           findCSiteTargetID(creep: Creep): boolean
 
-        /**
-         * Groups positions with contigiousness, structured similarily to a flood fill
-         */
-        groupRampartPositions(
-            rampartPositions: number[],
-            rampartPlans: CostMatrix
-        ): RoomPosition[][]
+          /**
+           * Groups positions with contigiousness, structured similarily to a flood fill
+           */
+          groupRampartPositions(rampartPositions: number[], rampartPlans: CostMatrix): RoomPosition[][]
 
-        /**
-         *
-         */
-        findRoomPositionsInsideRect(
-            x1: number,
-            y1: number,
-            x2: number,
-            y2: number
-        ): RoomPosition[]
+          /**
+           *
+           */
+          findRoomPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
 
-        /**
-         *
-         */
-        advancedConstructStructurePlans(): void
+          /**
+           *
+           */
+          advancedConstructStructurePlans(): void
 
-        /**
-         *
-         */
-        createPullTask(creator: Structure | Creep | Resource): void
+          /**
+           *
+           */
+          createPullTask(creator: Structure | Creep | Resource): void
 
-        /**
-         *
-         */
-        createPickupTasks(creator: Structure | Creep | Resource): void
+          /**
+           *
+           */
+          createPickupTasks(creator: Structure | Creep | Resource): void
 
-        /**
-         *
-         */
-        createOfferTasks(creator: Structure | Creep | Resource): void
+          /**
+           *
+           */
+          createOfferTasks(creator: Structure | Creep | Resource): void
 
-        /**
-         *
-         */
-        createTransferTasks(creator: Structure | Creep | Resource): void
+          /**
+           *
+           */
+          createTransferTasks(creator: Structure | Creep | Resource): void
 
-        /**
-         *
-         */
-        createWithdrawTasks(creator: Structure | Creep | Resource): void
+          /**
+           *
+           */
+          createWithdrawTasks(creator: Structure | Creep | Resource): void
 
-        /**
-         * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
-         */
-        estimateIncome(): number
+          /**
+           * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
+           */
+          estimateIncome(): number
 
-        getPartsOfRoleAmount(role: CreepRoles, type?: BodyPartConstant): number
+          getPartsOfRoleAmount(role: CreepRoles, type?: BodyPartConstant): number
 
-        findSourcesByEfficacy(): ('source1' | 'source2')[]
+          findSourcesByEfficacy(): ('source1' | 'source2')[]
 
-        createClaimRequest(): boolean
+          createClaimRequest(): boolean
 
-        findSwampPlainsRatio(): number
+          findSwampPlainsRatio(): number
 
-        // Getters
+          // Getters
 
-        readonly global: Partial<RoomGlobal>
+          readonly global: Partial<RoomGlobal>
 
-        _anchor: RoomPosition | undefined
+          _anchor: RoomPosition | undefined
 
-        readonly anchor: RoomPosition | undefined
+          readonly anchor: RoomPosition | undefined
 
-        readonly sourceHarvestPositions: SourceHarvestPositions
+          readonly sourceHarvestPositions: SourceHarvestPositions
 
-        _enemyCreeps: Creep[]
+          _enemyCreeps: Creep[]
 
-        readonly enemyCreeps: Creep[]
+          readonly enemyCreeps: Creep[]
 
-        _enemyAttackers: Creep[]
+          _enemyAttackers: Creep[]
 
-        readonly enemyAttackers: Creep[]
+          readonly enemyAttackers: Creep[]
 
-        _structures: Partial<OrganizedStructures>
+          _structures: Partial<OrganizedStructures>
 
-        readonly structures: OrganizedStructures
+          readonly structures: OrganizedStructures
 
-        _cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
+          _cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
 
-        readonly cSites: Record<StructureConstant, ConstructionSite[]>
+          readonly cSites: Record<StructureConstant, ConstructionSite[]>
 
-        readonly cSiteTarget: Id<ConstructionSite> | undefined
+          readonly cSiteTarget: Id<ConstructionSite> | undefined
 
-        _spawningStructures: SpawningStructures
+          _spawningStructures: SpawningStructures
 
-        readonly spawningStructures: SpawningStructures
+          readonly spawningStructures: SpawningStructures
 
-        _taskNeedingSpawningStructures: SpawningStructures
+          _taskNeedingSpawningStructures: SpawningStructures
 
-        readonly taskNeedingSpawningStructures: SpawningStructures
+          readonly taskNeedingSpawningStructures: SpawningStructures
 
-        _spawningStructuresByPriority: SpawningStructures
+          _spawningStructuresByPriority: SpawningStructures
 
-        readonly spawningStructuresByPriority: SpawningStructures
+          readonly spawningStructuresByPriority: SpawningStructures
 
-        // Main roomFunctions
+          // Main roomFunctions
 
-        claimRequestManager(): void
+          claimRequestManager(): void
 
-        // Market functions
+          // Market functions
 
-        advancedSell(resourceType: ResourceConstant, amount: number): boolean
+          advancedSell(resourceType: ResourceConstant, amount: number): boolean
 
-        advancedBuy(resourceType: ResourceConstant, amount: number): boolean
+          advancedBuy(resourceType: ResourceConstant, amount: number): boolean
 
-        // Link functions
+          // Link functions
 
-        sourcesToReceivers(
-            sourceLinks: (StructureLink | false)[],
-            receiverLinks: (StructureLink | false)[]
-        ): void
+          sourcesToReceivers(sourceLinks: (StructureLink | false)[], receiverLinks: (StructureLink | false)[]): void
 
-        hubToFastFiller(
-            hubLink: StructureLink | undefined,
-            fastFillerLink: StructureLink | undefined
-        ): void
+          hubToFastFiller(hubLink: StructureLink | undefined, fastFillerLink: StructureLink | undefined): void
 
-        hubToController(
-            hubLink: StructureLink | undefined,
-            controllerLink: StructureLink | undefined
-        ): void
-    }
+          hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
+     }
 
-    interface DepositRecord {
-        decay: number
-    }
+     interface DepositRecord {
+          decay: number
+     }
 
-    interface RoomMemory {
-        [key: string]: any
+     interface RoomMemory {
+          [key: string]: any
 
-        /**
-         * A packed representation of the center of the fastFiller
-         */
-        anchor: number
+          /**
+           * A packed representation of the center of the fastFiller
+           */
+          anchor: number
 
-        /**
-         * A description of the room's defining properties that can be used to assume other properties
-         */
-        type: string
+          /**
+           * A description of the room's defining properties that can be used to assume other properties
+           */
+          type: string
 
-        /**
-         * A set of names of remotes controlled by this room
-         */
-        remotes: string[]
+          /**
+           * A set of names of remotes controlled by this room
+           */
+          remotes: string[]
 
-        /**
-         * If the room can be constructed by the base planner
-         */
-        notClaimable: boolean
+          /**
+           * If the room can be constructed by the base planner
+           */
+          notClaimable: boolean
 
-        source1: Id<Source>
-        source2: Id<Source>
+          source1: Id<Source>
+          source2: Id<Source>
 
-        commune: string
+          commune: string
 
-        /**
-         * A list of the efficacies of each source in the room
-         */
-        sourceEfficacies: number[]
+          /**
+           * A list of the efficacies of each source in the room
+           */
+          sourceEfficacies: number[]
 
-        /**
-         * A list of needs the remote wants met
-         */
-        needs: number[]
+          /**
+           * A list of needs the remote wants met
+           */
+          needs: number[]
 
-        /**
-         * The room owner
-         */
-        owner: string
+          /**
+           * The room owner
+           */
+          owner: string
 
-        /**
-         * The controller's level
-         */
-        level: number
+          /**
+           * The controller's level
+           */
+          level: number
 
-        powerEnabled: boolean
+          powerEnabled: boolean
 
-        /**
-         * The number of towers in the room
-         */
-        towers: number
+          /**
+           * The number of towers in the room
+           */
+          towers: number
 
-        /**
-         * If a terminal is present in the room
-         */
-        hasTerminal: boolean
+          /**
+           * If a terminal is present in the room
+           */
+          hasTerminal: boolean
 
-        /**
-         * The amount of stored energy in the room
-         */
-        storedEnergy: number
+          /**
+           * The amount of stored energy in the room
+           */
+          storedEnergy: number
 
-        /**
-         * A set of roomNames that portals in this room go to
-         */
-        portalsTo: string[]
+          /**
+           * A set of roomNames that portals in this room go to
+           */
+          portalsTo: string[]
 
-        /**
-         * The last tick the room was scouted at
-         */
-        lastScout: number | undefined
+          /**
+           * The last tick the room was scouted at
+           */
+          lastScout: number | undefined
 
-        /**
-         * The room name of the commune's claim target
-         */
-        claimRequest: string
+          /**
+           * The room name of the commune's claim target
+           */
+          claimRequest: string
 
-        cSiteTargetID: Id<ConstructionSite>
+          cSiteTargetID: Id<ConstructionSite>
 
-        stampAnchors: Partial<Record<StampTypes, number[]>>
+          stampAnchors: Partial<Record<StampTypes, number[]>>
 
-        abandoned: number | undefined
+          abandoned: number | undefined
 
-        powerBanks: { [roomName: string]: number[] }
+          powerBanks: { [roomName: string]: number[] }
 
-        deposits: Record<Id<Deposit>, DepositRecord>
-    }
+          deposits: Record<Id<Deposit>, DepositRecord>
+     }
 
-    // Creeps
+     // Creeps
 
-    interface Creep {
-        [key: string]: any
+     interface Creep {
+          [key: string]: any
 
-        /**
-         * The packed position of the moveRequest, if one has been made
-         */
-        moveRequest: number
+          /**
+           * The packed position of the moveRequest, if one has been made
+           */
+          moveRequest: number
 
-        /**
-         *
-         */
-        hasMoved: boolean
+          /**
+           *
+           */
+          hasMoved: boolean
 
-        hasMovedResources: boolean
+          hasMovedResources: boolean
 
-        hasWorked: boolean
+          hasWorked: boolean
 
-        hasAttacked: boolean
+          hasAttacked: boolean
 
-        hasRangedAttacked: boolean
+          hasRangedAttacked: boolean
 
-        hasHealed: boolean
+          hasHealed: boolean
 
-        /**
-         * Whether the creep is actively pulling another creep or not
-         */
-        pulling: boolean
+          /**
+           * Whether the creep is actively pulling another creep or not
+           */
+          pulling: boolean
 
-        /**
-         * Whether the creep is actively getting pulled by another creep or not
-         */
-        gettingPulled: boolean
+          /**
+           * Whether the creep is actively getting pulled by another creep or not
+           */
+          gettingPulled: boolean
 
-        /**
-         * The creep's opts when trying to make a moveRequest intra tick
-         */
-        pathOpts: PathOpts
+          /**
+           * The creep's opts when trying to make a moveRequest intra tick
+           */
+          pathOpts: PathOpts
 
-        /**
-         * A numerical measurement of the combat abilites of the creep
-         */
-        strength: number
+          /**
+           * A numerical measurement of the combat abilites of the creep
+           */
+          strength: number
 
-        healStrength: number
+          healStrength: number
 
-        /**
-         * If the creep is expected to be full next tick
-         */
-        estimatedFull: boolean
+          /**
+           * If the creep is expected to be full next tick
+           */
+          estimatedFull: boolean
 
-        /**
-         * If the creep is expected to be empty next tick
-         */
-        estimatedEmpty: boolean
+          /**
+           * If the creep is expected to be empty next tick
+           */
+          estimatedEmpty: boolean
 
-        // Functions
+          // Functions
 
-        preTickManager(): void
+          preTickManager(): void
 
-        /**
-         * Wether the creep's respawn time is equal to its remaining ticks to live
-         */
-        isDying(): boolean
+          /**
+           * Wether the creep's respawn time is equal to its remaining ticks to live
+           */
+          isDying(): boolean
 
-        /**
-         * Sets a task to be responded by a creep
-         */
-        acceptTask(task: RoomTask): void
+          /**
+           * Sets a task to be responded by a creep
+           */
+          acceptTask(task: RoomTask): void
 
-        /**
-         * Tries to find a task for the creep with a type that matches the allowedTaskTypes
-         */
-        findTask(
-            allowedTaskTypes: Set<RoomTaskTypes>,
-            resourceType?: ResourceConstant
-        ): boolean
+          /**
+           * Tries to find a task for the creep with a type that matches the allowedTaskTypes
+           */
+          findTask(allowedTaskTypes: Set<RoomTaskTypes>, resourceType?: ResourceConstant): boolean
 
-        advancedPickup(target: Resource): boolean
+          advancedPickup(target: Resource): boolean
 
-        advancedTransfer(
-            target: any,
-            resourceType?: ResourceConstant,
-            amount?: number
-        ): boolean
-
-        advancedWithdraw(
-            target: any,
-            resourceType?: ResourceConstant,
-            amount?: number
-        ): boolean
+          advancedTransfer(target: any, resourceType?: ResourceConstant, amount?: number): boolean
 
-        /**
-         * Harvests a source and informs the result, while recording the result if successful
-         */
-        advancedHarvestSource(source: Source): boolean
-
-        /**
-         * Attempts multiple methods to upgrade the controller
-         */
-        advancedUpgraderController(): boolean
-
-        /**
-         * Attempts multiple methods to build a construction site
-         */
-        advancedBuildCSite(cSite: ConstructionSite | undefined): boolean
-
-        /**
-         *
-         */
-        findRampartRepairTarget(
-            workPartCount: number,
-            excluded?: Set<Id<StructureRampart>>
-        ): Structure | false
-
-        /**
-         *
-         */
-        findRepairTarget(
-          excluded?: Set<Id<Structure<StructureConstant>>>
-          ): Structure | false
+          advancedWithdraw(target: any, resourceType?: ResourceConstant, amount?: number): boolean
 
-        findOptimalSourceName(): boolean
+          /**
+           * Harvests a source and informs the result, while recording the result if successful
+           */
+          advancedHarvestSource(source: Source): boolean
 
-        findSourceHarvestPos(sourceName: 'source1' | 'source2'): boolean
+          /**
+           * Attempts multiple methods to upgrade the controller
+           */
+          advancedUpgraderController(): boolean
 
-        findMineralHarvestPos(): boolean
+          /**
+           * Attempts multiple methods to build a construction site
+           */
+          advancedBuildCSite(cSite: ConstructionSite | undefined): boolean
 
-        findFastFillerPos(): boolean
+          /**
+           *
+           */
+          findRampartRepairTarget(workPartCount: number, excluded?: Set<Id<StructureRampart>>): Structure | false
 
-        /**
-         * Checks if the creep has some parts of specified types
-         */
-        hasPartsOfTypes(partTypes: BodyPartConstant[]): boolean
+          /**
+           *
+           */
+          findRepairTarget(excluded?: Set<Id<Structure<StructureConstant>>>): Structure | false
 
-        /**
-         * Gets the number of parts of a specified type a creep has
-         */
-        partsOfType(type: BodyPartConstant): number
+          findOptimalSourceName(): boolean
 
-        /**
-         *
-         */
-        needsNewPath(
-            goalPos: RoomPosition,
-            cacheAmount: number,
-            path: RoomPosition[] | undefined
-        ): boolean
+          findSourceHarvestPos(sourceName: 'source1' | 'source2'): boolean
 
-        /**
-         *
-         */
-        createMoveRequest(opts: MoveRequestOpts): boolean
+          findMineralHarvestPos(): boolean
 
-        shove(shoverPos: RoomPosition): boolean
+          findFastFillerPos(): boolean
 
-        /**
-         * Try to enforce a moveRequest and inform the result
-         */
-        runMoveRequest(packedPos: number): boolean
+          /**
+           * Checks if the creep has some parts of specified types
+           */
+          hasPartsOfTypes(partTypes: BodyPartConstant[]): boolean
 
-        /**
-         *
-         */
-        recurseMoveRequest(pos: number, queue?: string[]): void
+          /**
+           * Gets the number of parts of a specified type a creep has
+           */
+          partsOfType(type: BodyPartConstant): number
 
-        /**
-         *
-         */
-        getPushed(): void
+          /**
+           *
+           */
+          needsNewPath(goalPos: RoomPosition, cacheAmount: number, path: RoomPosition[] | undefined): boolean
 
-        /**
-         * Decides if the creep needs to get more resources or not
-         */
-        needsResources(): boolean
+          /**
+           *
+           */
+          createMoveRequest(opts: MoveRequestOpts): boolean
 
-        /**
-         * Runs the appropriate task for the creep's task
-         */
-        fulfillTask(): boolean
+          shove(shoverPos: RoomPosition): boolean
 
-        /**
-         * Has the creep attempt to fulfill its pull task
-         */
-        fulfillPullTask(task: RoomPullTask): boolean
+          /**
+           * Try to enforce a moveRequest and inform the result
+           */
+          runMoveRequest(packedPos: number): boolean
 
-        /**
-         * Has the creep attempt to fulfill its transfer task
-         */
-        fulfillTransferTask(task: RoomTransferTask): boolean
+          /**
+           *
+           */
+          recurseMoveRequest(pos: number, queue?: string[]): void
 
-        /**
-         * Has the creep attempt to fulfill its offer task
-         */
-        fulfillOfferTask(task: RoomOfferTask): boolean
+          /**
+           *
+           */
+          getPushed(): void
 
-        /**
-         * Has the creep attempt to fulfill its withdraw task
-         */
-        fulfillWithdrawTask(task: RoomWithdrawTask): boolean
+          /**
+           * Decides if the creep needs to get more resources or not
+           */
+          needsResources(): boolean
 
-        /**
-         * Have the creep attempt to fulfill its pickup task
-         */
-        fulfillPickupTask(task: RoomPickupTask): boolean
+          /**
+           * Runs the appropriate task for the creep's task
+           */
+          fulfillTask(): boolean
 
-        /**
-         * Tries to sign a room's controller depending on the situation
-         */
-        advancedSignController(): boolean
+          /**
+           * Has the creep attempt to fulfill its pull task
+           */
+          fulfillPullTask(task: RoomPullTask): boolean
 
-        isOnExit(): boolean
+          /**
+           * Has the creep attempt to fulfill its transfer task
+           */
+          fulfillTransferTask(task: RoomTransferTask): boolean
 
-        findHealPower(): number
+          /**
+           * Has the creep attempt to fulfill its offer task
+           */
+          fulfillOfferTask(task: RoomOfferTask): boolean
 
-        advancedRecycle(): void
+          /**
+           * Has the creep attempt to fulfill its withdraw task
+           */
+          fulfillWithdrawTask(task: RoomWithdrawTask): boolean
 
-        advancedRenew(): boolean
+          /**
+           * Have the creep attempt to fulfill its pickup task
+           */
+          fulfillPickupTask(task: RoomPickupTask): boolean
 
-        advancedReserveController(): boolean
+          /**
+           * Tries to sign a room's controller depending on the situation
+           */
+          advancedSignController(): boolean
 
-        findStrength(): number
+          isOnExit(): boolean
 
-        findHealStrength(): number
+          findHealPower(): number
 
-        findCost(): number
-    }
+          advancedRecycle(): void
 
-    interface CreepMemory {
-        [key: string]: any
+          advancedRenew(): boolean
 
-        /**
-         * Generally describes the body parts and tasks the creep is expected to do
-         */
-        role: CreepRoles
+          advancedReserveController(): boolean
 
-        /**
-         * The energy the creep cost to spawn
-         */
-        cost: number
+          findStrength(): number
 
-        /**
-         * The name of the room the creep is from
-         */
-        communeName: string
+          findHealStrength(): number
 
-        /**
-         * A name of the creep's designated source
-         */
-        sourceName: 'source1' | 'source2'
+          findCost(): number
+     }
 
-        /**
-         * The creep's packedPos for a designated target
-         */
-        packedPos: number
+     interface CreepMemory {
+          [key: string]: any
 
-        /**
-         * The last time a path was cached in memory
-         */
-        lastCache: number
+          /**
+           * Generally describes the body parts and tasks the creep is expected to do
+           */
+          role: CreepRoles
 
-        /**
-         * An array of positions desciring where the creep neeeds to move to get to its goal
-         */
-        path: string
+          /**
+           * The energy the creep cost to spawn
+           */
+          cost: number
 
-        goalPos: string
+          /**
+           * The name of the room the creep is from
+           */
+          communeName: string
 
-        /**
-         * Whether the creep is intended to move on its own or not
-         */
-        getPulled: boolean
+          /**
+           * A name of the creep's designated source
+           */
+          sourceName: 'source1' | 'source2'
 
-        repairTarget: Id<Structure>
+          /**
+           * The creep's packedPos for a designated target
+           */
+          packedPos: number
 
-        /**
-         * The name of the room the scout is trying to scout
-         */
-        scoutTarget: string
+          /**
+           * The last time a path was cached in memory
+           */
+          lastCache: number
 
-        /**
-         * The name of the room the creep is remoting for
-         */
-        remoteName: string
+          /**
+           * An array of positions desciring where the creep neeeds to move to get to its goal
+           */
+          path: string
 
-        /**
-         * The type of task the creep has been assigned
-         */
-        task: RoomTaskTypes
+          goalPos: string
 
-        /**
-         * The target ID of the task
-         */
-        taskTargetID: Id<Creep | AnyStoreStructure>
+          /**
+           * Whether the creep is intended to move on its own or not
+           */
+          getPulled: boolean
 
-        taskAmount: number
+          repairTarget: Id<Structure>
 
-        taskResource: ResourceConstant
-    }
+          /**
+           * The name of the room the scout is trying to scout
+           */
+          scoutTarget: string
 
-    // PowerCreeps
+          /**
+           * The name of the room the creep is remoting for
+           */
+          remoteName: string
 
-    interface PowerCreep {
-        [key: string]: any
-    }
+          /**
+           * The type of task the creep has been assigned
+           */
+          task: RoomTaskTypes
 
-    interface PowerCreepMemory {
-        [key: string]: any
-        role: string
-    }
+          /**
+           * The target ID of the task
+           */
+          taskTargetID: Id<Creep | AnyStoreStructure>
 
-    // Structures
+          taskAmount: number
 
-    interface Structure {
-        realHits: number
-    }
+          taskResource: ResourceConstant
+     }
 
-    interface StructureSpawn {
-        /**
-         * Wether the spawn has renewed a creep this tick
-         */
-        hasRenewed: boolean
+     // PowerCreeps
 
-        /**
-         * Wether the structure has been transfered or withdrawn from
-         */
-        hasHadResourcesMoved: boolean
+     interface PowerCreep {
+          [key: string]: any
+     }
 
-        // Functions
+     interface PowerCreepMemory {
+          [key: string]: any
+          role: string
+     }
 
-        advancedSpawn(spawnRequest: SpawnRequest): ScreepsReturnCode
-    }
+     // Structures
 
-    interface StructureExtension {
-        /**
-         * Wether the structure has been transfered or withdrawn from
-         */
-        hasHadResourcesMoved: boolean
-    }
+     interface Structure {
+          realHits: number
+     }
 
-    interface StructureTower {
-        inactionable: boolean
-    }
+     interface StructureSpawn {
+          /**
+           * Wether the spawn has renewed a creep this tick
+           */
+          hasRenewed: boolean
 
-    // Global
+          /**
+           * Wether the structure has been transfered or withdrawn from
+           */
+          hasHadResourcesMoved: boolean
 
-    namespace NodeJS {
-        interface Global {
-            [key: string]: any
+          // Functions
 
-            /**
-             * Whether global is constructed or not
-             */
-            constructed: true | undefined
+          advancedSpawn(spawnRequest: SpawnRequest): ScreepsReturnCode
+     }
 
-            /**
-             * A strings to custom log as rich text
-             */
-            logs: string
+     interface StructureExtension {
+          /**
+           * Wether the structure has been transfered or withdrawn from
+           */
+          hasHadResourcesMoved: boolean
+     }
 
-            /**
-             * The number of construction sites placed by the bot
-             */
-            constructionSitesCount: number
+     interface StructureTower {
+          inactionable: boolean
+     }
 
-            tasksWithoutResponders: { [key: string]: RoomTask }
+     // Global
 
-            tasksWithResponders: { [key: string]: RoomTask }
+     namespace NodeJS {
+          interface Global {
+               [key: string]: any
 
-            packedRoomNames: { [roomManager: string]: string }
+               /**
+                * Whether global is constructed or not
+                */
+               constructed: true | undefined
 
-            unpackedRoomNames: { [key: string]: string }
+               /**
+                * A strings to custom log as rich text
+                */
+               logs: string
 
-            // Command functions
+               /**
+                * The number of construction sites placed by the bot
+                */
+               constructionSitesCount: number
 
-            /**
-             * Deletes all properties of Memory
-             */
-            clearMemory(): string
+               tasksWithoutResponders: { [key: string]: RoomTask }
 
-            /**
-             * Kills all creeps owned by the bot
-             */
-            killAllCreeps(): string
+               tasksWithResponders: { [key: string]: RoomTask }
 
-            /**
-             * Removes all construction sites owned by the bot
-             */
-            removeAllCSites(): string
+               packedRoomNames: { [roomManager: string]: string }
 
-            /**
-             * Destroys all structures owned by the bot
-             */
-            destroyAllCSites(types: StructureConstant[]): string
+               unpackedRoomNames: { [key: string]: string }
 
-            /**
-             * Responds, or if needed, creates, a claim request for a specified room, by a specified room
-             * @param claimRequest The roomName of the claimRequest to respond to
-             * @param commune The commune to respond to the claimRequest
-             */
-            claim(claimRequest: string, communeName: string): string
-        }
-    }
+               // Command functions
+
+               /**
+                * Deletes all properties of Memory
+                */
+               clearMemory(): string
+
+               /**
+                * Kills all creeps owned by the bot
+                */
+               killAllCreeps(): string
+
+               /**
+                * Removes all construction sites owned by the bot
+                */
+               removeAllCSites(): string
+
+               /**
+                * Destroys all structures owned by the bot
+                */
+               destroyAllCSites(types: StructureConstant[]): string
+
+               /**
+                * Responds, or if needed, creates, a claim request for a specified room, by a specified room
+                * @param claimRequest The roomName of the claimRequest to respond to
+                * @param commune The commune to respond to the claimRequest
+                */
+               claim(claimRequest: string, communeName: string): string
+          }
+     }
 }
 
 // Loop
 
 export const loop = function () {
-    memHack.modifyMemory()
+     memHack.modifyMemory()
 
-    internationalManager.run()
+     internationalManager.run()
 
-    roomManager()
+     roomManager()
 
-    internationalManager.mapVisualsManager()
-    internationalManager.advancedSellPixels()
-    internationalManager.endTickManager()
+     internationalManager.mapVisualsManager()
+     internationalManager.advancedSellPixels()
+     internationalManager.endTickManager()
 }
