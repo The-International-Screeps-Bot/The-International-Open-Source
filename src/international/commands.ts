@@ -89,6 +89,6 @@ global.claim = function (claimRequest, communeName) {
         `
     }
 
-    roomMemory.claimRequest = claimRequest
-    return `${communeName} started responding to the claimRequest for ${claimRequest}`
+     roomMemory.claimRequest = claimRequest
+     return `${communeName} is responding to the claimRequest for ${claimRequest}`
 }

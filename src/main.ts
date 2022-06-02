@@ -373,324 +373,310 @@ declare global {
         energySpentOnBarricades: number
     }
 
-    interface Memory {
-        /**
-         * The name of the user
-         */
-        me: string
+     interface Memory {
+          /**
+           * The name of the user
+           */
+          me: string
 
-        /**
-         * The current version of the bot
-         */
-        breakingVersion: number | undefined
+          /**
+           * The current version of the bot
+           */
+          breakingVersion: number | undefined
 
-        /**
-         * Determines if roomVisuals will be generated
-         */
-        roomVisuals: boolean
-        /**
-         * Determines if mapVisuals will be generated
-         */
-        mapVisuals: boolean
-        /**
-         * Determines if cpu usage for modules will be logged
-         */
-        cpuLogging: boolean
+          /**
+           * An array of usernames to treat as allies
+           */
+          allyList: Set<string>
 
-        /**
-         * Wether the bot should enable ramparts when there is no enemy present
-         */
-        publicRamparts: boolean
+          /**
+           * Wether or not the bot should try to sell pixels
+           */
+          pixelSelling: boolean
 
-        /**
-         * Wether the bot should automatically respond to claimRequests
-         */
-        autoClaim: boolean
+          /**
+           * Determines if roomVisuals will be generated
+           */
+          roomVisuals: boolean
+          /**
+           * Determines if mapVisuals will be generated
+           */
+          mapVisuals: boolean
+          /**
+           * Determines if cpu usage for modules will be logged
+           */
+          cpuLogging: boolean
 
-        /**
-         * An ongoing record of the latest ID assigned by the bot
-         */
-        ID: number
+          /**
+           * Wether the bot should enable ramparts when there is no enemy present
+           */
+          publicRamparts: boolean
 
-        /**
-         * An object of constrctionsSites with keys of site IDs and properties of the site's age
-         */
-        constructionSites: { [key: string]: number }
+          /**
+           * Wether the bot should automatically respond to claimRequests
+           */
+          autoClaim: boolean
 
-        /**
-         *
-         */
-        claimRequests: { [key: string]: { needs: number[]; score: number } }
+          /**
+           * An ongoing record of the latest ID assigned by the bot
+           */
+          ID: number
 
-        attackRequests: { [key: string]: { needs: number[] } }
+          /**
+           * An object of constrctionsSites with keys of site IDs and properties of the site's age
+           */
+          constructionSites: { [key: string]: number }
 
-        /**
-         * An array of roomNames that have controllers we own
-         */
-        communes: string[]
+          /**
+           *
+           */
+          claimRequests: { [key: string]: { needs: number[]; score: number } }
 
-        stats: Partial<Stats>
-    }
+          attackRequests: { [key: string]: { needs: number[] } }
 
-    interface RawMemory {
-        [key: string]: any
-    }
+          /**
+           * An array of roomNames that have controllers we own
+           */
+          communes: string[]
 
-    type SpawningStructures = (StructureSpawn | StructureExtension)[]
+          stats: Partial<Stats>
+     }
 
-    type SourceHarvestPositions = Map<number, boolean>[]
+     interface RawMemory {
+          [key: string]: any
+     }
 
-    interface RoomGlobal {
-        [key: string]: any
+     type SpawningStructures = (StructureSpawn | StructureExtension)[]
 
-        // RoomObjects
+     type SourceHarvestPositions = Map<number, boolean>[]
 
-        stampAnchors: StampAnchors
+     interface RoomGlobal {
+          [key: string]: any
 
-        sourceHarvestPositions: SourceHarvestPositions
+          // RoomObjects
 
-        source1PathLength: number
+          stampAnchors: StampAnchors
 
-        source2PathLength: number
+          sourceHarvestPositions: SourceHarvestPositions
 
-        upgradePathLength: number
+          source1PathLength: number
 
-        //
+          source2PathLength: number
 
-        tasksWithResponders: Record<string | number, RoomTask>
+          upgradePathLength: number
 
-        tasksWithoutResponders: Record<string | number, RoomTask>
+          //
 
-        plannedBase: boolean
+          tasksWithResponders: Record<string | number, RoomTask>
 
-        plannedRamparts: boolean
-    }
+          tasksWithoutResponders: Record<string | number, RoomTask>
 
-    interface OrganizedStructures {
-        spawn: StructureSpawn[]
-        extension: StructureExtension[]
-        road: StructureRoad[]
-        constructedWall: StructureWall[]
-        rampart: StructureRampart[]
-        keeperLair: StructureKeeperLair[]
-        portal: StructurePortal[]
-        controller: StructureController[]
-        link: StructureLink[]
-        storage: StructureStorage[]
-        tower: StructureTower[]
-        observer: StructureObserver[]
-        powerBank: StructurePowerBank[]
-        powerSpawn: StructurePowerSpawn[]
-        extractor: StructureExtractor[]
-        lab: StructureLab[]
-        terminal: StructureTerminal[]
-        container: StructureContainer[]
-        nuker: StructureNuker[]
-        factory: StructureFactory[]
-        invaderCore: StructureInvaderCore[]
-    }
+          plannedBase: boolean
 
-    interface Room {
-        /**
-         * The amount of creeps with a task of harvesting sources in the room
-         */
-        creepsOfSourceAmount: { [key: string]: number }
+          plannedRamparts: boolean
+     }
 
-        /**
-         * An object with keys of roles with properties of arrays of creep names belonging to the role
-         */
-        myCreeps: { [key: string]: string[] }
+     interface OrganizedStructures {
+          spawn: StructureSpawn[]
+          extension: StructureExtension[]
+          road: StructureRoad[]
+          constructedWall: StructureWall[]
+          rampart: StructureRampart[]
+          keeperLair: StructureKeeperLair[]
+          portal: StructurePortal[]
+          controller: StructureController[]
+          link: StructureLink[]
+          storage: StructureStorage[]
+          tower: StructureTower[]
+          observer: StructureObserver[]
+          powerBank: StructurePowerBank[]
+          powerSpawn: StructurePowerSpawn[]
+          extractor: StructureExtractor[]
+          lab: StructureLab[]
+          terminal: StructureTerminal[]
+          container: StructureContainer[]
+          nuker: StructureNuker[]
+          factory: StructureFactory[]
+          invaderCore: StructureInvaderCore[]
+     }
 
-        /**
-         * The number of my creeps in the room
-         */
-        myCreepsAmount: number
+     interface Room {
+          /**
+           * The amount of creeps with a task of harvesting sources in the room
+           */
+          creepsOfSourceAmount: { [key: string]: number }
 
-        roomObjects: Partial<Record<RoomObjectName, RoomObject>>
+          /**
+           * An object with keys of roles with properties of arrays of creep names belonging to the role
+           */
+          myCreeps: { [key: string]: string[] }
 
-        /**
-         * An object with keys of roles and properties of the number of creeps with the role from this room
-         */
-        creepsFromRoom: { [key: string]: string[] }
+          /**
+           * The number of my creeps in the room
+           */
+          myCreepsAmount: number
 
-        /**
-         * The cumulative amount of creeps with a communeName value of this room's name
-         */
-        creepsFromRoomAmount: number
+          roomObjects: Partial<Record<RoomObjectName, RoomObject>>
 
-        /**
-         * An object with keys of roles and properties of the number of creeps with the role from this room
-         */
-        creepsFromRoomWithRemote: {
-            [key: string]: { [key: string]: string[] }
-        }
+          /**
+           * An object with keys of roles and properties of the number of creeps with the role from this room
+           */
+          creepsFromRoom: { [key: string]: string[] }
 
-        /**
-         * Tasks that currently have a creep trying to fulfill them
-         */
-        tasksWithResponders: { [key: string]: RoomTask }
+          /**
+           * The cumulative amount of creeps with a communeName value of this room's name
+           */
+          creepsFromRoomAmount: number
 
-        /**
-         * Tasks that don't currently have a responder
-         */
-        tasksWithoutResponders: { [key: string]: RoomTask }
+          /**
+           * An object with keys of roles and properties of the number of creeps with the role from this room
+           */
+          creepsFromRoomWithRemote: { [key: string]: { [key: string]: string[] } }
 
-        /**
-         * An object, if constructed, containing keys of resource types and values of the number of those resources in the room's terminal and storage
-         */
-        storedResources: { [key: string]: number }
+          /**
+           * Tasks that currently have a creep trying to fulfill them
+           */
+          tasksWithResponders: { [key: string]: RoomTask }
 
-        /**
-         * A matrix with indexes of packed positions and values of creep names
-         */
-        creepPositions: PackedPosMap
+          /**
+           * Tasks that don't currently have a responder
+           */
+          tasksWithoutResponders: { [key: string]: RoomTask }
 
-        /**
-         * A matrix with indexes of packed positions and values of move requests
-         */
-        moveRequests: PackedPosMap
+          /**
+           * An object, if constructed, containing keys of resource types and values of the number of those resources in the room's terminal and storage
+           */
+          storedResources: { [key: string]: number }
 
-        /**
-         * A set of roomNames representing the targets of scouts from this commune
-         */
-        scoutTargets: Set<string>
+          /**
+           * A matrix with indexes of packed positions and values of creep names
+           */
+          creepPositions: PackedPosMap
 
-        // Functions
+          /**
+           * A matrix with indexes of packed positions and values of move requests
+           */
+          moveRequests: PackedPosMap
 
-        /**
-         * Uses caching and only operating on request to construct and get a specific roomObject based on its name
-         * @param roomObjectName The name of the requested roomObject
-         * @returns Either the roomObject's value, or, if the request failed, undefined
-         */
-        get(roomObjectName: RoomObjectName): any | undefined
+          /**
+           * A set of roomNames representing the targets of scouts from this commune
+           */
+          scoutTargets: Set<string>
 
-        /**
-         * Removes roomType-based values in the room's memory that don't match its type
-         */
-        cleanMemory(): void
+          // Functions
 
-        /**
-         * Converts a custom Pos into a Game's RoomPosition
-         */
-        newPos(pos: Pos): RoomPosition
+          /**
+           * Uses caching and only operating on request to construct and get a specific roomObject based on its name
+           * @param roomObjectName The name of the requested roomObject
+           * @returns Either the roomObject's value, or, if the request failed, undefined
+           */
+          get(roomObjectName: RoomObjectName): any | undefined
 
-        /**
-         *
-         * @param pos1 The position of the thing performing the action
-         * @param pos2 The position of the thing getting intereacted with
-         * @param type The type of interaction, success if not provided
-         */
-        actionVisual(
-            pos1: RoomPosition,
-            pos2: RoomPosition,
-            type?: string
-        ): void
+          /**
+           * Removes roomType-based values in the room's memory that don't match its type
+           */
+          cleanMemory(): void
 
-        /**
-         * Generates a path between two positions
-         */
-        advancedFindPath(opts: PathOpts): RoomPosition[]
+          /**
+           * Converts a custom Pos into a Game's RoomPosition
+           */
+          newPos(pos: Pos): RoomPosition
 
-        /**
-         * Finds the amount of a specified resourceType in the room's storage and teminal
-         */
-        findStoredResourceAmount(resourceType: ResourceConstant): number
+          /**
+           *
+           * @param pos1 The position of the thing performing the action
+           * @param pos2 The position of the thing getting intereacted with
+           * @param type The type of interaction, success if not provided
+           */
+          actionVisual(pos1: RoomPosition, pos2: RoomPosition, type?: string): void
 
-        /**
-         * Tries to delete a task with the provided ID and response state
-         */
-        deleteTask(taskID: any, responder: boolean): void
+          /**
+           * Generates a path between two positions
+           */
+          advancedFindPath(opts: PathOpts): RoomPosition[]
 
-        /**
-         * Finds the type of a room and initializes its custom properties
-         * @param scoutingRoom The room that is performing the scout operation
-         */
-        findType(scoutingRoom: Room): void
+          /**
+           * Finds the amount of a specified resourceType in the room's storage and teminal
+           */
+          findStoredResourceAmount(resourceType: ResourceConstant): number
 
-        makeRemote(scoutingRoom: Room): boolean
+          /**
+           * Tries to delete a task with the provided ID and response state
+           */
+          deleteTask(taskID: any, responder: boolean): void
 
-        /**
-         * Finds the score of rooms for potential communes
-         */
-        findScore(): void
+          /**
+           * Finds the type of a room and initializes its custom properties
+           * @param scoutingRoom The room that is performing the scout operation
+           */
+          findType(scoutingRoom: Room): void
 
-        towersRequestResources(): void
+          makeRemote(scoutingRoom: Room): boolean
 
-        /**
-         * Finds and has towers heal damaged my or allied creeps
-         */
-        towersHealCreeps(): void
+          /**
+           * Finds the score of rooms for potential communes
+           */
+          findScore(): void
 
-        towersAttackCreeps(): void
+          towersRequestResources(): void
 
-        towersRepairRamparts(): void
+          /**
+           * Finds and has towers heal damaged my or allied creeps
+           */
+          towersHealCreeps(): void
 
-        /**
-         * Finds open spaces in a room and records them in a cost matrix
-         */
-        distanceTransform(
-            initialCM?: CostMatrix,
-            enableVisuals?: boolean,
-            x1?: number,
-            y1?: number,
-            x2?: number,
-            y2?: number
-        ): CostMatrix
+          towersAttackCreeps(): void
 
-        /**
-         * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix
-         */
-        specialDT(
-            initialCM?: CostMatrix,
-            enableVisuals?: boolean,
-            x1?: number,
-            y1?: number,
-            x2?: number,
-            y2?: number
-        ): CostMatrix
+          towersRepairRamparts(): void
 
-        /**
-         * Gets ranges from for each position from a certain point
-         */
-        floodFill(seeds: Pos[]): CostMatrix
+          /**
+           * Finds open spaces in a room and records them in a cost matrix
+           */
+          distanceTransform(
+               initialCM?: CostMatrix,
+               enableVisuals?: boolean,
+               x1?: number,
+               y1?: number,
+               x2?: number,
+               y2?: number,
+          ): CostMatrix
 
-        /**
-         * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
-         */
-        findClosestPosOfValue(
-            opts: FindClosestPosOfValueOpts
-        ): RoomPosition | false
+          /**
+           * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix
+           */
+          specialDT(
+               initialCM?: CostMatrix,
+               enableVisuals?: boolean,
+               x1?: number,
+               y1?: number,
+               x2?: number,
+               y2?: number,
+          ): CostMatrix
 
-        /**
-         * Checks if the creator has a task of with specified types
-         */
-        findTasksOfTypes(
-            createdTaskIDs: { [key: string]: boolean },
-            types: Set<string>
-        ): RoomTask[]
+          /**
+           * Gets ranges from for each position from a certain point
+           */
+          floodFill(seeds: Pos[]): CostMatrix
 
-        /**
-         *
-         */
-        pathVisual(path: RoomPosition[], color: keyof Colors): void
+          /**
+           * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
+           */
+          findClosestPosOfValue(opts: FindClosestPosOfValueOpts): RoomPosition | false
 
-        /**
-         * Finds amd records a construction site for builders to target
-         */
-        findCSiteTargetID(creep: Creep): boolean
+          /**
+           * Checks if the creator has a task of with specified types
+           */
+          findTasksOfTypes(createdTaskIDs: { [key: string]: boolean }, types: Set<string>): RoomTask[]
 
-        /**
-         * Finds and records certain information about the room's sourceHarvesters
-         */
-        findSourceHarvesterInfo(): void
+          /**
+           *
+           */
+          pathVisual(path: RoomPosition[], color: keyof Colors): void
 
-        /**
-         * Finds targets to repair given work part counts and target IDs to avoid
-         */
-        findRepairTargets(
-            workPartCount: number,
-            excludedIDs?: Set<Id<Structure>>
-        ): (StructureRoad | StructureContainer)[]
+          /**
+           * Finds amd records a construction site for builders to target
+           */
+          findCSiteTargetID(creep: Creep): boolean
 
         /**
          * Groups positions with contigiousness, structured similarily to a flood fill
@@ -1332,5 +1318,6 @@ export const loop = function () {
     roomManager()
 
     internationalManager.mapVisualsManager()
+    internationalManager.advancedSellPixels()
     internationalManager.endTickManager()
 }

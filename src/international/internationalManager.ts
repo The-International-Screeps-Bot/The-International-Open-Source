@@ -1,6 +1,7 @@
 import { allyManager } from 'international/simpleAllies'
 import { customLog, getAvgPrice } from './generalFunctions'
 import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
+import { CPUBucketCapacity } from './constants'
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
@@ -67,6 +68,8 @@ export class InternationalManager {
     ): Order[]
 
     findClaimRequestsByScore?(): string[]
+
+    advancedSellPixels?(): void
 
     /**
      * My outgoing orders organized by room, order type and resourceType
@@ -249,4 +252,21 @@ InternationalManager.prototype.findClaimRequestsByScore = function () {
     return Object.keys(Memory.claimRequests).sort(
         (a, b) => Memory.claimRequests[a].score - Memory.claimRequests[b].score
     )
+}
+
+InternationalManager.prototype.advancedSellPixels = function () {
+
+    if (!Memory.pixelSelling) return
+
+    if (Game.cpu.bucket < CPUBucketCapacity) return
+
+    const orders = Game.market.getAllOrders({ type: PIXEL })
+
+    for (const order of orders) {
+
+        if (order.price > getAvgPrice(PIXEL)) continue
+
+        Game.market.deal(order.id, Math.min(order.amount, Game.resources[PIXEL]))
+        return
+    }
 }

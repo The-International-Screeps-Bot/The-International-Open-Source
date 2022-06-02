@@ -13,6 +13,8 @@ export const allyList = new Set([
     'Morningtea',
 ])
 
+export const pixelSelling = false
+
 constants.tradeBlacklist = new Set([])
 
 constants.roomTypeProperties = {
