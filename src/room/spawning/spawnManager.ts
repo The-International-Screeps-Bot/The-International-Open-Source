@@ -24,7 +24,7 @@ export function spawnManager(room: Room) {
     const requestsByPriority = Object.keys(spawnRequests).sort(
         (a, b) => parseInt(a) - parseInt(b)
     )
-
+    for (const priority in spawnRequests) customLog(priority, spawnRequests[priority].extraOpts.memory.role)
     // Track the inactive spawn index
 
     let spawnIndex = inactiveSpawns.length - 1

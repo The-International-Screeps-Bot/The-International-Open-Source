@@ -882,17 +882,17 @@ export function spawnRequester(room: Room) {
             if (room.storage) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-                if (
-                    room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >=
-                    builderSpawningWhenStorageThreshold
-                )
-                    partsMultiplier +=
-                        room.storage.store.getUsedCapacity(RESOURCE_ENERGY) /
-                        8000
+               if (
+               room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >=
+               builderSpawningWhenStorageThreshold
+               )
+               partsMultiplier +=
+                    room.storage.store.getUsedCapacity(RESOURCE_ENERGY) /
+                    8000
             }
 
             // Otherwise if there is no storage
-            else partsMultiplier += estimatedIncome
+            else partsMultiplier += estimatedIncome * 2
 
             // If all RCL 3 extensions are build
 
@@ -1142,7 +1142,7 @@ export function spawnRequester(room: Room) {
                         room.controller.ticksToDowngrade <
                         controllerDowngradeUpgraderNeed
                     )
-                        partsMultiplier = 5
+                    partsMultiplier = Math.max(partsMultiplier, 5)
 
                     partsMultiplier = Math.min(
                         Math.round(partsMultiplier / 5),
@@ -1174,7 +1174,7 @@ export function spawnRequester(room: Room) {
                         room.controller.ticksToDowngrade <
                         controllerDowngradeUpgraderNeed
                     )
-                        partsMultiplier = 6
+                    partsMultiplier = Math.max(partsMultiplier, 6)
 
                     partsMultiplier = Math.round(partsMultiplier / 6)
                     if (partsMultiplier === 0) return false
@@ -1201,7 +1201,7 @@ export function spawnRequester(room: Room) {
                     room.controller.ticksToDowngrade <
                     controllerDowngradeUpgraderNeed
                 )
-                    partsMultiplier = 4
+                partsMultiplier = Math.max(partsMultiplier, 4)
 
                 partsMultiplier = Math.round(partsMultiplier / 4)
                 if (partsMultiplier === 0) return false
@@ -1224,40 +1224,41 @@ export function spawnRequester(room: Room) {
 
             // If the controller is near to downgrading, set partsMultiplier to x
 
-            if (
-                room.controller.ticksToDowngrade <
-                controllerDowngradeUpgraderNeed
-            )
-                partsMultiplier = 1
-            if (room.controller.level < 2)
-                partsMultiplier = Math.max(partsMultiplier, 1)
+          if (
+               room.controller.ticksToDowngrade <
+               controllerDowngradeUpgraderNeed
+          )
+          partsMultiplier = Math.max(partsMultiplier, 1)
+          if (room.controller.level < 2)
+               partsMultiplier = Math.max(partsMultiplier, 1)
 
-            if (spawnEnergyCapacity >= 800) {
-                return {
+          if (spawnEnergyCapacity >= 800) {
+               return {
                     defaultParts: [],
                     extraParts: [CARRY, MOVE, WORK],
                     partsMultiplier,
                     threshold,
+                    maxCreeps: Infinity,
                     minCost: 200,
-                    priority:
-                        2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                    priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
                     memoryAdditions: {
-                        role: 'controllerUpgrader',
+                         role: 'controllerUpgrader',
                     },
-                }
-            }
+               }
+          }
 
-            return {
-                defaultParts: [],
-                extraParts: [MOVE, CARRY, MOVE, WORK],
-                partsMultiplier,
-                threshold,
-                minCost: 250,
-                priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
-                memoryAdditions: {
+          return {
+               defaultParts: [],
+               extraParts: [MOVE, CARRY, MOVE, WORK],
+               partsMultiplier,
+               threshold,
+               maxCreeps: Infinity,
+               minCost: 250,
+               priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+               memoryAdditions: {
                     role: 'controllerUpgrader',
-                },
-            }
+               },
+          }
         })()
     )
 
