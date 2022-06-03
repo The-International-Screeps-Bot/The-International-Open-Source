@@ -35,7 +35,6 @@ export default class GetShardVision {
      private MoveCreepsToTarget(creep: Creep, targetPos: RoomPosition) {
           if (!creep.pos.inRangeTo(targetPos, 0)) {
                creep.moveTo(targetPos)
-               creep.room.createConstructionSite(2, 2, STRUCTURE_ROAD)
           }
      }
 
@@ -50,17 +49,17 @@ export default class GetShardVision {
 
                const creeps = Object.values(Game.creeps).filter(c => c.name.includes(shardName))
                creeps.forEach(creep => {
-                    if (Game.shard.name === 'shard0' && index === 0) {
+                    if (Game.shard.name === 'shard0' && shardName === 'shard0') {
                          this.MoveCreepsToTarget(creep, Game.flags.shard0.pos)
-                    } else if (Game.shard.name === 'shard0' && index === 1) {
+                    } else if (Game.shard.name === 'shard0' && shardName === 'shard1') {
                          this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
-                    } else if (index === 2) {
+                    } else if (shardName === 'shard2') {
                          if (Game.shard.name === 'shard0') {
                               this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
                          } else if (Game.shard.name === 'shard1') {
                               this.MoveCreepsToTarget(creep, Game.flags.shard2.pos)
                          }
-                    } else if (index === 3) {
+                    } else if (shardName === 'shard3') {
                          if (Game.shard.name === 'shard0') {
                               this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
                          } else if (Game.shard.name === 'shard1') {
