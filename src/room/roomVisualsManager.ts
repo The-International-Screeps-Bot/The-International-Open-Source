@@ -141,14 +141,117 @@ export function roomVisualsManager(room: Room) {
           if (constructionTarget) room.visual.text('🚧', constructionTarget.pos)
      }
 
-     function towerVisuals() {}
-     function labVisuals() {}
-     function factoryVisuals() {}
-     function powerSpawnVisuals() {}
-     function nukerVisuals() {}
-     function observerVisuals() {}
-     function sourceVisuals() {}
-     function mineralVisuals() {}
+    function towerVisuals() {
+        //If there is not a tower, stop
+
+        if (!room.memory.towerID) return
+
+        //Convert the tower ID into a game object
+
+        const tower = findObjectWithID(room.memory.towerID)
+
+        //If the tower exists, show visuals for it
+
+        if (tower) room.visual.text('🔫', tower.pos)
+    }
+    
+    function labVisuals() {
+        //If there is not a lab, stop
+
+        if (!room.memory.labID) return
+
+        //Convert the lab ID into a game object
+
+        const lab = findObjectWithID(room.memory.labID)
+
+        //If the lab exists, show visuals for it
+
+        if (lab) room.visual.text('🧬', lab.pos)
+    }
+    
+    function factoryVisuals() {
+        //If there is not a factory, stop
+
+        if (!room.memory.factoryID) return
+
+        //Convert the factory ID into a game object
+
+        const factory = findObjectWithID(room.memory.factoryID)
+
+        //If the factory exists, show visuals for it
+
+        if (factory) room.visual.text('🏭', factory.pos)
+    }
+    
+    function powerSpawnVisuals() {
+        //If there is not a powerSpawn, stop
+
+        if (!room.memory.powerSpawnID) return
+
+        //Convert the powerSpawn ID into a game object
+
+        const powerSpawn = findObjectWithID(room.memory.powerSpawnID)
+
+        //If the powerSpawn exists, show visuals for it
+
+        if (powerSpawn) room.visual.text('📳', powerSpawn.pos)
+    }
+    
+    function nukerVisuals() {
+        //If there is not a nuker, stop
+
+        if (!room.memory.nukerID) return
+
+        //Convert the nuker ID into a game object
+
+        const nuker = findObjectWithID(room.memory.nukerID)
+
+        //If the nuker exists, show visuals for it
+
+        if (nuker) room.visual.text('💥', nuker.pos)
+    }
+    
+    function observerVisuals() {
+        //If there is not an observer, stop
+
+        if (!room.memory.observerID) return
+
+        //Convert the observer ID into a game object
+
+        const observer = findObjectWithID(room.memory.observerID)
+
+        //If the observer exists, show visuals for it
+
+        if (observer) room.visual.text('📡', observer.pos)
+    }
+    
+    function sourceVisuals() {
+        //If there is not a source, stop
+
+        if (!room.memory.sourceID) return
+
+        //Convert the source ID into a game object
+
+        const source = findObjectWithID(room.memory.sourceID)
+
+        //If the source exists, show visuals for it
+
+        if (source) room.visual.text('🌳', source.pos)
+    }
+    
+    function mineralVisuals() {
+        //If there is not a mineral, stop
+
+        if (!room.memory.mineralID) return
+
+        //Convert the mineral ID into a game object
+
+        const mineral = findObjectWithID(room.memory.mineralID)
+
+        //If the mineral exists, show visuals for it
+
+        if (mineral) room.visual.text('💎', mineral.pos)
+    }
 
      // If CPU logging is enabled, log the CPU used by this manager
 
