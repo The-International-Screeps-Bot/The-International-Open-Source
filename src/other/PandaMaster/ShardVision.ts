@@ -1,5 +1,6 @@
 /* eslint class-methods-use-this: ["error", { "exceptMethods": ["MoveCreepsToTarget"] }] */
 export default class GetShardVision {
+     private _mainShard = 'shard2'
      private _shardNames = ['shard0', 'shard1', 'shard2', 'shard3']
 
      private _lastShardIndex = this._shardNames.indexOf(
@@ -49,18 +50,38 @@ export default class GetShardVision {
 
                const creeps = Object.values(Game.creeps).filter(c => c.name.includes(shardName))
                creeps.forEach(creep => {
-                    if (Game.shard.name === 'shard0' && shardName === 'shard0') {
-                         this.MoveCreepsToTarget(creep, Game.flags.shard0.pos)
-                    } else if (Game.shard.name === 'shard0' && shardName === 'shard1') {
+                    // * If main shard isn't shard3 or shard0
+                    // * Ask PandaMaster to modify this code!
+                    // if (Game.shard.name === this._mainShard && shardName === this._mainShard) {
+                    //      this.MoveCreepsToTarget(creep, Game.flags[this._mainShard].pos)
+                    // } else if (Game.shard.name === this._mainShard && shardName === 'shard3') {
+                    //      this.MoveCreepsToTarget(creep, Game.flags.shard3.pos)
+                    // } else if (shardName === 'shard1') {
+                    //      if (Game.shard.name === this._mainShard) {
+                    //           this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
+                    //      }
+                    // } else if (shardName === 'shard0') {
+                    //      if (Game.shard.name === this._mainShard) {
+                    //           this.MoveCreepsToTarget(creep, Game.flags[this._mainShard].pos)
+                    //      } else if (Game.shard.name === 'shard1') {
+                    //           this.MoveCreepsToTarget(creep, Game.flags.shard0.pos)
+                    //      }
+                    // }
+
+                    // * If main shard is shard3 or shard0
+                    // * Ask PandaMaster to modify this code!
+                    if (Game.shard.name === this._mainShard && shardName === this._mainShard) {
+                         this.MoveCreepsToTarget(creep, Game.flags[this._mainShard].pos)
+                    } else if (Game.shard.name === this._mainShard && shardName === 'shard1') {
                          this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
                     } else if (shardName === 'shard2') {
-                         if (Game.shard.name === 'shard0') {
+                         if (Game.shard.name === this._mainShard) {
                               this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
                          } else if (Game.shard.name === 'shard1') {
                               this.MoveCreepsToTarget(creep, Game.flags.shard2.pos)
                          }
                     } else if (shardName === 'shard3') {
-                         if (Game.shard.name === 'shard0') {
+                         if (Game.shard.name === this._mainShard) {
                               this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
                          } else if (Game.shard.name === 'shard1') {
                               this.MoveCreepsToTarget(creep, Game.flags.shard2.pos)
