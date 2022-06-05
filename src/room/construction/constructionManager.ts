@@ -30,7 +30,6 @@ export function constructionManager(room: Room) {
 
           manageControllerStructures()
           manageBasePlanning()
-          manageRampartPlanning()
      }
 
      function manageControllerStructures() {
@@ -62,12 +61,8 @@ export function constructionManager(room: Room) {
 
                if (!basePlannerResult) return
           }
-
-          // Use floodfill from the anchor to plan structures
-
-          room.advancedConstructStructurePlans()
      }
-
+/*
      function manageRampartPlanning() {
           // Stop if there is no storage and no terminal
 
@@ -85,6 +80,10 @@ export function constructionManager(room: Room) {
                rampartPlanner(room)
           }
      }
+ */
+     // Use floodfill from the anchor to plan structures
+
+     room.advancedConstructStructurePlans()
 
      // If CPU logging is enabled, log the CPU used by this manager
 

@@ -75,11 +75,13 @@ declare global {
           | 'observer'
           | 'sourceLink'
           | 'sourceExtension'
+          | 'container'
+          | 'road'
           | 'rampart'
-          | 'boardingRampart'
 
      interface Stamp {
           offset: number
+
           /**
            * The range of protection from the anchor to provide when deciding rampart placement
            */
@@ -739,8 +741,6 @@ declare global {
 
           readonly anchor: RoomPosition | undefined
 
-          readonly sourceHarvestPositions: SourceHarvestPositions
-
           _enemyCreeps: Creep[]
 
           readonly enemyCreeps: Creep[]
@@ -771,6 +771,12 @@ declare global {
 
           readonly spawningStructuresByPriority: SpawningStructures
 
+          readonly sourceHarvestPositions: SourceHarvestPositions
+
+          _rampartPlans: CostMatrix
+
+          readonly rampartPlans: CostMatrix
+
           // Main roomFunctions
 
           claimRequestManager(): void
@@ -790,10 +796,10 @@ declare global {
           hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
      }
 
-    interface DepositRecord {
-        decay: number
-        needs: number[]
-    }
+     interface DepositRecord {
+          decay: number
+          needs: number[]
+     }
 
      interface RoomMemory {
           [key: string]: any

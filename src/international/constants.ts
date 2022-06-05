@@ -1,14 +1,26 @@
-export const breakingVersion = 2
+/**
+ * Increment by 1 when a change has been made that will break previous versions of the bot
+ */
+export const breakingVersion = 3
 
 export const constants: Partial<Constants> = {}
 
 constants.mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
 export const allyList = new Set(['Q13214', 'HerrKai', 'clarkok', 'PandaMaster', 'lokenwow', 'Morningtea'])
 
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
 export const pixelSelling = false
 
-constants.tradeBlacklist = new Set([])
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const tradeBlacklist = new Set([])
 
 constants.roomTypeProperties = {
      source1: true,
@@ -424,15 +436,23 @@ export const stamps: Record<StampTypes, Partial<Stamp>> = {
                extension: [{ x: 0, y: 0 }],
           },
      },
-     rampart: {
+     container: {
           offset: 0,
           protectionOffset: 0,
           size: 1,
           structures: {
-               rampart: [{ x: 0, y: 0 }],
+               container: [{ x: 0, y: 0 }],
           },
      },
-     boardingRampart: {
+     road: {
+          offset: 0,
+          protectionOffset: 0,
+          size: 1,
+          structures: {
+               road: [{ x: 0, y: 0 }],
+          },
+     },
+     rampart: {
           offset: 0,
           protectionOffset: 0,
           size: 1,

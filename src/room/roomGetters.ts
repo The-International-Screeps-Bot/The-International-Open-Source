@@ -220,4 +220,11 @@ Object.defineProperties(Room.prototype, {
                return sourceHarvestPositions
           },
      },
+     rampartPlans: {
+          get() {
+               if (this._rampartPlans) return this._rampartPlans
+
+               return this._rampartPlans = new PathFinder.CostMatrix()
+          }
+     }
 } as PropertyDescriptorMap & ThisType<Room>)

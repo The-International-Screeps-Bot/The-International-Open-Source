@@ -2642,7 +2642,7 @@ Room.prototype.advancedConstructStructurePlans = function () {
                     )
                          continue
 
-                    if (structureType === STRUCTURE_RAMPART && (!room.storage || room.controller.level < 4)) continue
+                    if (structureType === STRUCTURE_RAMPART && (!room.storage || room.controller.level < 4 || room.storage.store.energy < 30000)) continue
 
                     // If the structureType is a road and RCL 3 extensions aren't built, stop
 
@@ -2661,7 +2661,7 @@ Room.prototype.advancedConstructStructurePlans = function () {
                }
           }
      }
-
+/*
      // If RCL 3 extensions are built
 
      if (room.energyCapacityAvailable >= 800) {
@@ -2733,7 +2733,7 @@ Room.prototype.advancedConstructStructurePlans = function () {
                thisGeneration = nextGeneration
           }
      }
-
+ */
      // If visuals are enabled, visually connect roads
 
      if (Memory.roomVisuals) room.visual.connectRoads()

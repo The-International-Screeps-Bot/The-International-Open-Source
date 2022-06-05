@@ -10,6 +10,7 @@ import {
      unpackAsRoomPos,
 } from 'international/generalFunctions'
 import 'other/RoomVisual'
+import { rampartPlanner } from './rampartPlanner'
 
 /**
  * Checks if a room can be planner. If it can, it informs information on how to build the room
@@ -367,13 +368,9 @@ export function basePlanner(room: Room) {
           const closestHarvestPos: RoomPosition | undefined = room.get(`${sourceName}ClosestHarvestPos`)
           if (!closestHarvestPos) continue
 
-          // Plan for a road at the pos
-
-          structurePlans.set(
-               closestHarvestPos.x,
-               closestHarvestPos.y,
-               constants.structureTypesByNumber[STRUCTURE_CONTAINER],
-          )
+          if (!room.memory.stampAnchors.container.includes(pack(closestHarvestPos))) {
+               room.memory.stampAnchors.container.push(pack(closestHarvestPos))
+          }
 
           // Path from the fastFillerAnchor to the closestHarvestPos
 
@@ -485,14 +482,9 @@ export function basePlanner(room: Room) {
 
      for (let x = 0; x < constants.roomDimensions; x += 1) {
           for (let y = 0; y < constants.roomDimensions; y += 1) {
-               // Get the value of this pos in roadCM, iterate if the value is 0, iterate
+               // If there is road at the pos, assign it as avoid in baseCM
 
-               const roadValue = roadCM.get(x, y)
-               if (roadValue === 0) continue
-
-               // Otherwise assign 255 to this pos in baseCM
-
-               baseCM.set(x, y, 255)
+               if (roadCM.get(x, y) === 1) baseCM.set(x, y, 255)
           }
      }
 
@@ -615,6 +607,21 @@ export function basePlanner(room: Room) {
           })
      )
           return false
+
+     rampartPlanner(room)
+
+     // Iterate through each x and y in the room
+
+     for (let x = 0; x < constants.roomDimensions; x += 1) {
+          for (let y = 0; y < constants.roomDimensions; y += 1) {
+
+               if (room.rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(x * constants.roomDimensions + y)
+
+               // Get the value of this pos in roadCM, iterate if the value is 0, iterate
+
+               if (roadCM.get(x, y) === 1) room.memory.stampAnchors.road.push(x * constants.roomDimensions + y)
+          }
+     }
 
      // Record planning results in the room's global and inform true
 
