@@ -5,11 +5,6 @@ interface Constants {
      me: string
 
      /**
-      * The names of the shards for the mmo server
-      */
-     mmoShardNames: Set<string>
-
-     /**
       * A set of properties that are relative to a room's type
       */
      roomTypeProperties: { [key: string]: boolean }

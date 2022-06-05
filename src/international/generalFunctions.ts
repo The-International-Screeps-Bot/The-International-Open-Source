@@ -1,4 +1,4 @@
-import { constants } from './constants'
+import { constants, mmoShardNames } from './constants'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -86,7 +86,7 @@ export function customLog(
 export function advancedGeneratePixel() {
      // Stop if the bot is not running on MMO
 
-     if (!constants.mmoShardNames.has(Game.shard.name)) return false
+     if (!mmoShardNames.has(Game.shard.name)) return false
 
      // Stop if the cpu bucket isn't full
 

@@ -1,4 +1,4 @@
-import { allyList, breakingVersion, pixelSelling } from './constants'
+import { allyList, autoClaim, baseVisuals, breakingVersion, cpuLogging, mapVisuals, pixelGeneration, pixelSelling, publicRamparts, roomVisuals, tradeBlacklist } from './constants'
 import { InternationalManager } from './internationalManager'
 
 InternationalManager.prototype.config = function () {
@@ -20,9 +20,18 @@ InternationalManager.prototype.config = function () {
                Object.values(Game.creeps)[0]?.owner?.username ||
                'username'
 
-          Memory.allyList = allyList
+          // Settings
 
+          Memory.roomVisuals = roomVisuals
+          Memory.baseVisuals = baseVisuals
+          Memory.mapVisuals = mapVisuals
+          Memory.cpuLogging = cpuLogging
+          Memory.allyList = allyList
           Memory.pixelSelling = pixelSelling
+          Memory.pixelGeneration = pixelGeneration
+          Memory.tradeBlacklist = tradeBlacklist
+          Memory.autoClaim = autoClaim
+          Memory.publicRamparts = publicRamparts
 
           // Construct foundation
 
@@ -31,14 +40,6 @@ InternationalManager.prototype.config = function () {
 
           Memory.claimRequests = {}
           Memory.attackRequests = {}
-
-          // Config settings
-
-          Memory.roomVisuals = false
-          Memory.mapVisuals = false
-          Memory.cpuLogging = false
-          Memory.publicRamparts = true
-          Memory.autoClaim = true
 
           //
 

@@ -382,32 +382,49 @@ declare global {
           me: string
 
           /**
-           * The current version of the bot
+           * The current breaking version of the bot
            */
           breakingVersion: number | undefined
 
           /**
-           * An array of usernames to treat as allies
+           * Wether the bot should generate any room visuals
+           */
+          roomVisuals: boolean
+
+          /**
+           * Wether the bot should generate base room visuals
+           */
+          baseVisuals: boolean
+
+          /**
+           * Wether the bot should generate map visuals
+           */
+          mapVisuals: boolean
+
+          /**
+           * Wether the bot should log CPU data
+           */
+          cpuLogging: boolean
+
+          /**
+           * A list of usernames to treat as allies
            */
           allyList: Set<string>
 
           /**
-           * Wether or not the bot should try to sell pixels
+           * Wether the bot should sell pixels
            */
           pixelSelling: boolean
 
           /**
-           * Determines if roomVisuals will be generated
+           * Wether the bot should generate pixels
            */
-          roomVisuals: boolean
+          pixelGeneration: boolean
+
           /**
-           * Determines if mapVisuals will be generated
+           * An list of usernames to not trade with
            */
-          mapVisuals: boolean
-          /**
-           * Determines if cpu usage for modules will be logged
-           */
-          cpuLogging: boolean
+          tradeBlacklist: Set<string>
 
           /**
            * Wether the bot should enable ramparts when there is no enemy present

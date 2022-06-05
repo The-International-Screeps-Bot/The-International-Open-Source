@@ -1,11 +1,29 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 18
+ export const breakingVersion = 18
 
-export const constants: Partial<Constants> = {}
+// Settings
 
-constants.mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const roomVisuals = false
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+ export const baseVisuals = false
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const mapVisuals = false
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const cpuLogging = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -20,7 +38,28 @@ export const pixelSelling = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
+export const pixelGeneration = false
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
 export const tradeBlacklist = new Set([])
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const autoClaim = true
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+ export const publicRamparts = false
+
+// General
+
+export const constants: Partial<Constants> = {}
+
+export const mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
 constants.roomTypeProperties = {
      source1: true,
