@@ -790,9 +790,10 @@ declare global {
           hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
      }
 
-     interface DepositRecord {
-          decay: number
-     }
+    interface DepositRecord {
+        decay: number
+        needs: number[]
+    }
 
      interface RoomMemory {
           [key: string]: any

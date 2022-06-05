@@ -475,6 +475,11 @@ export const attackRequestNeedsIndex = {
      dismantle: 2,
 }
 
+export const depositNeedsIndex = {
+     depositHarvester: 0,
+     depositHauler: 1,
+}
+
 export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester')[] = [
      'source1RemoteHarvester',
      'source2RemoteHarvester',
