@@ -630,9 +630,11 @@ export function spawnRequester(room: Room) {
           (function (): SpawnRequestOpts | false {
                // If there is no extractor, inform false
 
-               if (!room.get('extractor').length) return false
+               if (!room.structures.extractor.length) return false
 
-               if (!room.storage || room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < 40000) return false
+               if (!room.storage) return false
+
+               if (room.storage.store.energy < 40000) return false
 
                // If there is no terminal, inform false
 
