@@ -1,4 +1,4 @@
-import { allyList, breakingVersion, pixelSelling, planningVisuals } from './constants'
+import { allyList, breakingVersion, pixelSelling } from './constants'
 import { InternationalManager } from './internationalManager'
 
 InternationalManager.prototype.config = function () {
