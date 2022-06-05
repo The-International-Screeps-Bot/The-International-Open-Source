@@ -1,4 +1,4 @@
-export const breakingVersion = 1
+export const breakingVersion = 2
 
 export const constants: Partial<Constants> = {}
 

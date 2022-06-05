@@ -2656,13 +2656,6 @@ Room.prototype.advancedConstructStructurePlans = function () {
                          const x = pos.x + stampAnchor.x - stamp.offset
                          const y = pos.y + stampAnchor.y - stamp.offset
 
-                         // Display visuals if enabled
-
-                         if (Memory.roomVisuals)
-                              room.visual.structure(x, y, structureType as StructureConstant, {
-                                   opacity: 0.5,
-                              })
-
                          room.createConstructionSite(x, y, structureType as BuildableStructureConstant)
                     }
                }

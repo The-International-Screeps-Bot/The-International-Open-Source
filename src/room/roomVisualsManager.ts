@@ -1,5 +1,5 @@
-import { allyList, constants } from 'international/constants'
-import { customLog, findObjectWithID } from 'international/generalFunctions'
+import { allyList, constants, planningVisuals, stamps } from 'international/constants'
+import { customLog, findObjectWithID, unpackAsPos } from 'international/generalFunctions'
 
 /**
  * Adds annotations to the room if roomVisuals are enabled
@@ -139,6 +139,36 @@ export function roomVisualsManager(room: Room) {
           // If the constructionTarget exists, show visuals for it
 
           if (constructionTarget) room.visual.text('🚧', constructionTarget.pos)
+     }
+
+     planningVisuals()
+
+     function planningVisuals() {
+
+          for (const stampType in stamps) {
+               const stamp = stamps[stampType as StampTypes]
+
+               for (const packedStampAnchor of room.memory.stampAnchors[stampType as StampTypes]) {
+                    const stampAnchor = unpackAsPos(packedStampAnchor)
+
+                    for (const structureType in stamp.structures) {
+                         if (structureType === 'empty') continue
+
+                         const positions = stamp.structures[structureType]
+
+                         for (const pos of positions) {
+                              // Re-assign the pos's x and y to align with the offset
+
+                              const x = pos.x + stampAnchor.x - stamp.offset
+                              const y = pos.y + stampAnchor.y - stamp.offset
+
+                              room.visual.structure(x, y, structureType as StructureConstant, {
+                                   opacity: 0.5,
+                              })
+                         }
+                    }
+               }
+          }
      }
 
      function towerVisuals() {}
