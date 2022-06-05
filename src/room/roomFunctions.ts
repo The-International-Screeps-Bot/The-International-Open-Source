@@ -115,19 +115,6 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     // structurePlans
-
-     new RoomObject({
-          name: 'structurePlans',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: () => {
-               return new PathFinder.CostMatrix()
-          },
-     })
-
      // Resources
 
      // Mineral
@@ -1866,11 +1853,6 @@ Room.prototype.makeRemote = function (scoutingRoom) {
           const newSourceEfficacies = []
 
           // Get base planning data
-
-          /*
-        const roadCM: CostMatrix = room.get('roadCM'),
-        structurePlans: CostMatrix = room.get('structurePlans'),
-        */
 
           // Get the room's sourceNames
 

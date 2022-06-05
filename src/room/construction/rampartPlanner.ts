@@ -584,7 +584,6 @@ export function rampartPlanner(room: Room) {
      // Get base planning data
 
      const roadCM: CostMatrix = room.get('roadCM')
-     const structurePlans: CostMatrix = room.get('structurePlans')
 
      // Get the hubAnchor
 
@@ -621,10 +620,6 @@ export function rampartPlanner(room: Room) {
 
           roadCM.set(pos.x, pos.y, 1)
 
-          // And add the position to the base plans
-
-          structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
-
           room.rampartPlans.set(pos.x, pos.y, 1)
      }
 
@@ -659,15 +654,7 @@ export function rampartPlanner(room: Room) {
 
           // Loop through positions of the path
 
-          for (const pos of path) {
-               // Record the pos in roadCM
-
-               roadCM.set(pos.x, pos.y, 1)
-
-               // And add the position to the structurePlans
-
-               structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
-          }
+          for (const pos of path) roadCM.set(pos.x, pos.y, 1)
 
           // Construct the onboardingIndex
 
@@ -692,10 +679,6 @@ export function rampartPlanner(room: Room) {
                // Record the pos in roadCM
 
                roadCM.set(onboardingPos.x, onboardingPos.y, 1)
-
-               // Plan for a road and rampart at pos and stop
-
-               structurePlans.set(onboardingPos.x, onboardingPos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
 
                room.rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
 

@@ -76,6 +76,7 @@ declare global {
           | 'sourceLink'
           | 'sourceExtension'
           | 'container'
+          | 'extractor'
           | 'road'
           | 'rampart'
 
@@ -120,7 +121,6 @@ declare global {
           | 'terrainCM'
           | 'baseCM'
           | 'roadCM'
-          | 'structurePlans'
           | 'mineral'
           | 'source1'
           | 'source2'

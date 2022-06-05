@@ -145,7 +145,7 @@ export function roomVisualsManager(room: Room) {
 
      function planningVisuals() {
 
-          if (!room.memory.stampAnchors) return
+          if (!room.memory.planned) return
 
           for (const stampType in stamps) {
                const stamp = stamps[stampType as StampTypes]
@@ -156,16 +156,14 @@ export function roomVisualsManager(room: Room) {
                     for (const structureType in stamp.structures) {
                          if (structureType === 'empty') continue
 
-                         const positions = stamp.structures[structureType]
-
-                         for (const pos of positions) {
+                         for (const pos of stamp.structures[structureType]) {
                               // Re-assign the pos's x and y to align with the offset
 
                               const x = pos.x + stampAnchor.x - stamp.offset
                               const y = pos.y + stampAnchor.y - stamp.offset
 
                               room.visual.structure(x, y, structureType as StructureConstant, {
-                                   opacity: 0.5,
+                                   opacity: 0.3,
                               })
                          }
                     }

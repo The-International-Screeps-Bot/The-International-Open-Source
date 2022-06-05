@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 3
+export const breakingVersion = 16
 
 export const constants: Partial<Constants> = {}
 
@@ -446,6 +446,14 @@ export const stamps: Record<StampTypes, Stamp> = {
           size: 1,
           structures: {
                container: [{ x: 0, y: 0 }],
+          },
+     },
+     extractor: {
+          offset: 0,
+          protectionOffset: 0,
+          size: 1,
+          structures: {
+               extractor: [{ x: 0, y: 0 }],
           },
      },
      road: {

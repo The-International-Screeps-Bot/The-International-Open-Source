@@ -4,7 +4,6 @@ import {
      findAvgBetweenPosotions,
      findPositionsInsideRect,
      getRange,
-     getRangeBetween,
      pack,
      unpackAsPos,
      unpackAsRoomPos,
@@ -20,7 +19,6 @@ export function basePlanner(room: Room) {
 
      const baseCM: CostMatrix = room.get('baseCM')
      const roadCM: CostMatrix = room.get('roadCM')
-     const structurePlans: CostMatrix = room.get('structurePlans')
 
      const terrain = room.getTerrain()
 
@@ -91,6 +89,8 @@ export function basePlanner(room: Room) {
 
           const stamp = stamps[opts.stampType]
 
+          const newStampAnchors: number[] = []
+
           // So long as the count is more than 0
 
           while (opts.count > 0) {
@@ -103,9 +103,7 @@ export function basePlanner(room: Room) {
                          const stampAnchor = unpackAsPos(packedStampAnchor)
 
                          for (const structureType in stamp.structures) {
-                              const positions = stamp.structures[structureType]
-
-                              for (const pos of positions) {
+                              for (const pos of stamp.structures[structureType]) {
                                    // Re-assign the pos's x and y to align with the offset
 
                                    const x = pos.x + stampAnchor.x - stamp.offset
@@ -150,16 +148,12 @@ export function basePlanner(room: Room) {
 
                // Add the anchor to stampAnchors based on its type
 
-               room.memory.stampAnchors[opts.stampType].push(pack(stampAnchor))
+               newStampAnchors.push(pack(stampAnchor))
 
                for (const structureType in stamp.structures) {
-                    // Get the positions for this structre type
-
-                    const positions = stamp.structures[structureType]
-
                     // Loop through positions
 
-                    for (const pos of positions) {
+                    for (const pos of stamp.structures[structureType]) {
                          // Re-assign the pos's x and y to align with the offset
 
                          const x = pos.x + stampAnchor.x - stamp.offset
@@ -174,14 +168,13 @@ export function basePlanner(room: Room) {
                               continue
                          }
 
-                         // Otherwise record the position as avoid in baseCM and roadCM and iterate
-
                          baseCM.set(x, y, 255)
                          roadCM.set(x, y, 255)
                     }
                }
           }
 
+          room.memory.stampAnchors[opts.stampType] = room.memory.stampAnchors[opts.stampType].concat(newStampAnchors)
           return true
      }
 
@@ -275,10 +268,6 @@ export function basePlanner(room: Room) {
                // Record the pos in roadCM
 
                roadCM.set(pos.x, pos.y, 1)
-
-               // Plan for a road at this position
-
-               structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
           }
      }
 
@@ -309,10 +298,6 @@ export function basePlanner(room: Room) {
           // Record the pos in roadCM
 
           roadCM.set(pos.x, pos.y, 1)
-
-          // Plan for a road at this position
-
-          structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
      }
 
      // Plan for a container at the pos
@@ -337,10 +322,6 @@ export function basePlanner(room: Room) {
           // Record the pos in roadCM
 
           roadCM.set(pos.x, pos.y, 1)
-
-          // Plan for a road at this position
-
-          structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
      }
 
      // Get the room's sourceNames
@@ -390,10 +371,6 @@ export function basePlanner(room: Room) {
                // Record the pos in roadCM
 
                roadCM.set(pos.x, pos.y, 1)
-
-               // Plan for a road at this position
-
-               structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
           }
 
           // Path from the centerUpgradePos to the closestHarvestPos
@@ -432,10 +409,6 @@ export function basePlanner(room: Room) {
           // Record the pos in roadCM
 
           roadCM.set(pos.x, pos.y, 1)
-
-          // Plan for a road at this position
-
-          structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
      }
 
      const mineralHarvestPos: RoomPosition = room.get('closestMineralHarvestPos')
@@ -462,10 +435,6 @@ export function basePlanner(room: Room) {
           // Record the pos in roadCM
 
           roadCM.set(pos.x, pos.y, 1)
-
-          // Plan for a road at this position
-
-          structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
      }
 
      // Otherwise get the mineral
@@ -474,7 +443,7 @@ export function basePlanner(room: Room) {
 
      // Plan for a road at the mineral's pos
 
-     structurePlans.set(mineral.pos.x, mineral.pos.y, constants.structureTypesByNumber[STRUCTURE_EXTRACTOR])
+     if (!room.memory.stampAnchors.extractor.length) room.memory.stampAnchors.extractor.push(pack(mineral.pos))
 
      // Record road plans in the baseCM
 
@@ -491,6 +460,20 @@ export function basePlanner(room: Room) {
      // Mark the closestUpgradePos as avoid in the CM
 
      baseCM.set(closestUpgradePos.x, closestUpgradePos.y, 255)
+
+     // Try to plan the stamp
+
+     if (
+          !planStamp({
+               stampType: 'tower',
+               count: 6,
+               anchorOrient: fastFillerHubAnchor,
+               adjacentToRoads: true,
+          })
+     )
+          return false
+
+     rampartPlanner(room)
 
      // Construct extraExtensions count
 
@@ -577,18 +560,6 @@ export function basePlanner(room: Room) {
 
      if (
           !planStamp({
-               stampType: 'tower',
-               count: 6,
-               anchorOrient: fastFillerHubAnchor,
-               adjacentToRoads: true,
-          })
-     )
-          return false
-
-     // Try to plan the stamp
-
-     if (
-          !planStamp({
                stampType: 'extension',
                count: extraExtensionsAmount,
                anchorOrient: hubAnchor,
@@ -608,18 +579,18 @@ export function basePlanner(room: Room) {
      )
           return false
 
-     rampartPlanner(room)
+     let packedPos: number
 
      // Iterate through each x and y in the room
 
      for (let x = 0; x < constants.roomDimensions; x += 1) {
           for (let y = 0; y < constants.roomDimensions; y += 1) {
+               packedPos = x * constants.roomDimensions + y
 
-               if (room.rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(x * constants.roomDimensions + y)
+               if (room.rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(packedPos)
 
-               // Get the value of this pos in roadCM, iterate if the value is 0, iterate
-
-               if (roadCM.get(x, y) === 1) room.memory.stampAnchors.road.push(x * constants.roomDimensions + y)
+               if (!room.memory.stampAnchors.road.includes(packedPos) && roadCM.get(x, y) === 1)
+                    room.memory.stampAnchors.road.push(packedPos)
           }
      }
 
