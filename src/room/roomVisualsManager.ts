@@ -145,6 +145,8 @@ export function roomVisualsManager(room: Room) {
 
      function planningVisuals() {
 
+          if (!Memory.baseVisuals) return
+
           if (!room.memory.planned) return
 
           for (const stampType in stamps) {

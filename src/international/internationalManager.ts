@@ -1,7 +1,7 @@
 import { allyManager } from 'international/simpleAllies'
 import { customLog, getAvgPrice } from './generalFunctions'
 import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
-import { CPUBucketCapacity } from './constants'
+import { CPUBucketCapacity, mmoShardNames } from './constants'
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
@@ -64,6 +64,23 @@ export class InternationalManager {
      findClaimRequestsByScore?(): string[]
 
      advancedSellPixels?(): void
+
+     advancedGeneratePixel() {
+
+          if (!Memory.pixelGeneration) return
+
+          // Stop if the bot is not running on MMO
+
+          if (!mmoShardNames.has(Game.shard.name)) return
+
+          // Stop if the cpu bucket isn't full
+
+          if (Game.cpu.bucket !== 10000) return
+
+          // Try to generate a pixel
+
+          Game.cpu.generatePixel()
+     }
 
      /**
       * My outgoing orders organized by room, order type and resourceType

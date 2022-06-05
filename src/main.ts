@@ -1306,6 +1306,9 @@ export const loop = function () {
      roomManager()
 
      internationalManager.mapVisualsManager()
+
+     internationalManager.advancedGeneratePixel()
      internationalManager.advancedSellPixels()
+
      internationalManager.endTickManager()
 }

@@ -81,23 +81,6 @@ export function customLog(
 }
 
 /**
- * Generates a pixel at the cost of depleting the bucket if the bucket is full
- */
-export function advancedGeneratePixel() {
-     // Stop if the bot is not running on MMO
-
-     if (!mmoShardNames.has(Game.shard.name)) return false
-
-     // Stop if the cpu bucket isn't full
-
-     if (Game.cpu.bucket !== 10000) return false
-
-     // Try to generate a pixel
-
-     return Game.cpu.generatePixel()
-}
-
-/**
  * Incrememnts Memory.ID and informs the result
  * @returns an incremented ID
  */
