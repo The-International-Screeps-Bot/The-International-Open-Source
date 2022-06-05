@@ -236,6 +236,9 @@ const spawnBots = async function (line, socket, rooms, players, tickDuration) {
     await sleep(5);
     console.log(`> utils.removeBots()`);
     socket.write(`utils.removeBots()\r\n`);
+    await sleep(5);
+    console.log(`> utils.enableGCLToCPU()`);
+    socket.write(`utils.enableGCLToCPU()\r\n`);
 
     // Setup NPC terminals
     for (const room of ["W0N0", "W10N0", "W10N10", "W0N10"]) {
