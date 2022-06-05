@@ -145,6 +145,8 @@ export function roomVisualsManager(room: Room) {
 
      function planningVisuals() {
 
+          if (!room.memory.stampAnchors) return
+
           for (const stampType in stamps) {
                const stamp = stamps[stampType as StampTypes]
 
@@ -169,6 +171,8 @@ export function roomVisualsManager(room: Room) {
                     }
                }
           }
+
+          room.visual.connectRoads()
      }
 
      function towerVisuals() {}
