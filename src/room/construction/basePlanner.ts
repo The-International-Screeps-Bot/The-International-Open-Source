@@ -475,6 +475,16 @@ export function basePlanner(room: Room) {
 
      rampartPlanner(room)
 
+     // Iterate through each x and y in the room
+
+     for (let x = 0; x < constants.roomDimensions; x += 1) {
+          for (let y = 0; y < constants.roomDimensions; y += 1) {
+               // If there is road at the pos, assign it as avoid in baseCM
+
+               if (roadCM.get(x, y) === 1) baseCM.set(x, y, 255)
+          }
+     }
+
      // Construct extraExtensions count
 
      let extraExtensionsAmount =
