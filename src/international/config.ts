@@ -20,9 +20,9 @@ InternationalManager.prototype.config = function () {
                Object.values(Game.creeps)[0]?.owner?.username ||
                'username'
 
-          if (!Memory.allyList) Memory.allyList = allyList
+          Memory.allyList = allyList
 
-          if (!Memory.pixelSelling) Memory.pixelSelling = pixelSelling
+          Memory.pixelSelling = pixelSelling
 
           // Construct foundation
 

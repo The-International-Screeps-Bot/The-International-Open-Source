@@ -1,14 +1,26 @@
-export const breakingVersion = 1
+/**
+ * Increment by 1 when a change has been made that will break previous versions of the bot
+ */
+export const breakingVersion = 3
 
 export const constants: Partial<Constants> = {}
 
 constants.mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
 export const allyList = new Set(['Q13214', 'HerrKai', 'clarkok', 'PandaMaster', 'lokenwow', 'Morningtea'])
 
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
 export const pixelSelling = false
 
-constants.tradeBlacklist = new Set([])
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const tradeBlacklist = new Set([])
 
 constants.roomTypeProperties = {
      source1: true,
@@ -17,6 +29,7 @@ constants.roomTypeProperties = {
      deposits: true,
      powerBanks: true,
      notClaimable: true,
+     planned: true,
 
      commune: true,
      needs: true,
@@ -41,6 +54,7 @@ constants.roomTypes = {
           remotes: true,
           deposits: true,
           powerBanks: true,
+          planned: true,
      },
      remote: {
           commune: true,
@@ -50,6 +64,7 @@ constants.roomTypes = {
           sourceEfficacies: true,
           abandoned: true,
           notClaimable: true,
+          planned: true,
      },
      ally: {
           level: true,
@@ -71,6 +86,7 @@ constants.roomTypes = {
      },
      neutral: {
           notClaimable: true,
+          planned: true,
      },
      keeper: {
           owner: true,
@@ -243,7 +259,7 @@ constants.numbersByStructureTypes = {
      16: STRUCTURE_OBSERVER,
 }
 
-export const stamps: Record<StampTypes, Partial<Stamp>> = {
+export const stamps: Record<StampTypes, Stamp> = {
      fastFiller: {
           offset: 3,
           protectionOffset: 6,
@@ -424,15 +440,23 @@ export const stamps: Record<StampTypes, Partial<Stamp>> = {
                extension: [{ x: 0, y: 0 }],
           },
      },
-     rampart: {
+     container: {
           offset: 0,
           protectionOffset: 0,
           size: 1,
           structures: {
-               rampart: [{ x: 0, y: 0 }],
+               container: [{ x: 0, y: 0 }],
           },
      },
-     boardingRampart: {
+     road: {
+          offset: 0,
+          protectionOffset: 0,
+          size: 1,
+          structures: {
+               road: [{ x: 0, y: 0 }],
+          },
+     },
+     rampart: {
           offset: 0,
           protectionOffset: 0,
           size: 1,
@@ -473,6 +497,11 @@ export const attackRequestNeedsIndex = {
      ranged: 0,
      attack: 1,
      dismantle: 2,
+}
+
+export const depositNeedsIndex = {
+     depositHarvester: 0,
+     depositHauler: 1,
 }
 
 export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester')[] = [

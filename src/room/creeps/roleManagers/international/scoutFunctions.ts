@@ -71,9 +71,9 @@ Scout.prototype.recordDeposits = function () {
           if (!Memory.communes.includes(room.memory.commune)) {
                room.memory.commune = findClosestCommuneName(room.name)
           }
-     } else {
+     } /* else {
           room.memory.commune = findClosestCommuneName(room.name)
-     }
+     } */
 
      const communeMemory = Memory.rooms[room.memory.communeName]
 
@@ -81,12 +81,13 @@ Scout.prototype.recordDeposits = function () {
 
      // Filter deposits that haven't been assigned a commune and are viable
 
-     const unAssignedDeposits = deposits.filter(function (deposit) {
-          return !communeMemory[deposit.id] && deposit.lastCooldown <= 100
+     const unAssignedDeposits = deposits.filter(function(deposit) {
+          return !communeMemory[deposit.id] && deposit.lastCooldown <= 100 && deposit.ticksToDecay > 500
      })
 
      for (const deposit of unAssignedDeposits)
           communeMemory.deposits[deposit.id] = {
                decay: deposit.ticksToDecay,
+               needs: [1, 1],
           }
 }

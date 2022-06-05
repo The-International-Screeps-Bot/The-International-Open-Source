@@ -75,11 +75,13 @@ declare global {
           | 'observer'
           | 'sourceLink'
           | 'sourceExtension'
+          | 'container'
+          | 'road'
           | 'rampart'
-          | 'boardingRampart'
 
      interface Stamp {
           offset: number
+
           /**
            * The range of protection from the anchor to provide when deciding rampart placement
            */
@@ -470,10 +472,6 @@ declare global {
           tasksWithResponders: Record<string | number, RoomTask>
 
           tasksWithoutResponders: Record<string | number, RoomTask>
-
-          plannedBase: boolean
-
-          plannedRamparts: boolean
      }
 
      interface OrganizedStructures {
@@ -739,8 +737,6 @@ declare global {
 
           readonly anchor: RoomPosition | undefined
 
-          readonly sourceHarvestPositions: SourceHarvestPositions
-
           _enemyCreeps: Creep[]
 
           readonly enemyCreeps: Creep[]
@@ -771,6 +767,12 @@ declare global {
 
           readonly spawningStructuresByPriority: SpawningStructures
 
+          readonly sourceHarvestPositions: SourceHarvestPositions
+
+          _rampartPlans: CostMatrix
+
+          readonly rampartPlans: CostMatrix
+
           // Main roomFunctions
 
           claimRequestManager(): void
@@ -792,6 +794,7 @@ declare global {
 
      interface DepositRecord {
           decay: number
+          needs: number[]
      }
 
      interface RoomMemory {
@@ -883,6 +886,11 @@ declare global {
           powerBanks: { [roomName: string]: number[] }
 
           deposits: Record<Id<Deposit>, DepositRecord>
+
+          /**
+           * Wether or not the room has completed base planning
+           */
+          planned: boolean
      }
 
      // Creeps

@@ -2,7 +2,7 @@ import { constants, stamps } from 'international/constants'
 import { customLog, pack, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 
 export function rampartPlanner(room: Room) {
-     if (!room.global.plannedBase) return false
+     if (room.memory.stampAnchors.rampart.length) return false
 
      // require('util.min_cut').test('W5N9');
 
@@ -585,7 +585,6 @@ export function rampartPlanner(room: Room) {
 
      const roadCM: CostMatrix = room.get('roadCM')
      const structurePlans: CostMatrix = room.get('structurePlans')
-     const rampartPlans = new PathFinder.CostMatrix()
 
      // Get the hubAnchor
 
@@ -596,22 +595,22 @@ export function rampartPlanner(room: Room) {
      for (const packedStampAnchor of stampAnchors.tower) {
           const stampAnchor = unpackAsPos(packedStampAnchor)
 
-          rampartPlans.set(stampAnchor.x, stampAnchor.y, 1)
+          room.rampartPlans.set(stampAnchor.x, stampAnchor.y, 1)
      }
 
      // Protect fastFiller spawns
 
-     rampartPlans.set(room.anchor.x - 2, room.anchor.y - 1, 1)
+     room.rampartPlans.set(room.anchor.x - 2, room.anchor.y - 1, 1)
 
-     rampartPlans.set(room.anchor.x + 2, room.anchor.y - 1, 1)
+     room.rampartPlans.set(room.anchor.x + 2, room.anchor.y - 1, 1)
 
-     rampartPlans.set(room.anchor.x, room.anchor.y + 2, 1)
+     room.rampartPlans.set(room.anchor.x, room.anchor.y + 2, 1)
 
      // Protect useful hub structures
 
-     rampartPlans.set(hubAnchor.x + 1, hubAnchor.y - 1, 1)
+     room.rampartPlans.set(hubAnchor.x + 1, hubAnchor.y - 1, 1)
 
-     rampartPlans.set(hubAnchor.x - 1, hubAnchor.y + 1, 1)
+     room.rampartPlans.set(hubAnchor.x - 1, hubAnchor.y + 1, 1)
 
      // Plan the positions
 
@@ -626,157 +625,83 @@ export function rampartPlanner(room: Room) {
 
           structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
 
-          rampartPlans.set(pos.x, pos.y, 1)
+          room.rampartPlans.set(pos.x, pos.y, 1)
      }
 
      if (recordRamparts) {
           for (let x = 0; x < constants.roomDimensions; x += 1) {
                for (let y = 0; y < constants.roomDimensions; y += 1) {
-                    if (rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(pack({ x, y }))
+                    if (room.rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(pack({ x, y }))
                }
           }
      }
 
-     const needsBoardingRamparts = room.memory.stampAnchors.boardingRampart.length === 0
+     // Group rampart positions
 
-     if (room.memory.stampAnchors.boardingRampart.length) {
-          for (const packedPos of room.memory.stampAnchors.boardingRampart) {
-               const pos = unpackAsRoomPos(packedPos, room.name)
+     const groupedRampartPositions = room.groupRampartPositions(rampartPositions, room.rampartPlans)
 
-               // Path from the hubAnchor to the cloestPosToAnchor
+     // Loop through each group
 
-               const path = room.advancedFindPath({
-                    origin: pos,
-                    goal: { pos: hubAnchor, range: 2 },
-                    weightCostMatrixes: [roadCM],
-               })
+     for (const group of groupedRampartPositions) {
+          // Get the closest pos of the group by range to the anchor
 
-               // Loop through positions of the path
+          const closestPosToAnchor = hubAnchor.findClosestByPath(group, {
+               ignoreCreeps: true,
+          })
 
-               for (const pos of path) {
-                    // Record the pos in roadCM
+          // Path from the hubAnchor to the cloestPosToAnchor
 
-                    roadCM.set(pos.x, pos.y, 1)
+          const path = room.advancedFindPath({
+               origin: closestPosToAnchor,
+               goal: { pos: hubAnchor, range: 2 },
+               weightCostMatrixes: [roadCM],
+          })
 
-                    // And add the position to the structurePlans
+          // Loop through positions of the path
 
-                    structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
-               }
+          for (const pos of path) {
+               // Record the pos in roadCM
 
-               // Construct the onboardingIndex
+               roadCM.set(pos.x, pos.y, 1)
 
-               let onboardingIndex = 0
+               // And add the position to the structurePlans
 
-               // So long as there is a pos in path with an index of onboardingIndex
-
-               while (path[onboardingIndex]) {
-                    // Get the pos in path with an index of onboardingIndex
-
-                    const onboardingPos = path[onboardingIndex]
-
-                    // If there are already rampart plans at this pos
-
-                    if (rampartPlans.get(onboardingPos.x, onboardingPos.y) === 1) {
-                         // Increase the onboardingIndex and iterate
-
-                         onboardingIndex += 1
-                         continue
-                    }
-
-                    // Record the pos in roadCM
-
-                    roadCM.set(onboardingPos.x, onboardingPos.y, 1)
-
-                    // Plan for a road and rampart at pos and stop
-
-                    structurePlans.set(
-                         onboardingPos.x,
-                         onboardingPos.y,
-                         constants.structureTypesByNumber[STRUCTURE_ROAD],
-                    )
-
-                    rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
-
-                    break
-               }
+               structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
           }
-     } else {
-          // Group rampart positions
 
-          const groupedRampartPositions = room.groupRampartPositions(rampartPositions, rampartPlans)
+          // Construct the onboardingIndex
 
-          // Loop through each group
+          let onboardingIndex = 0
 
-          for (const group of groupedRampartPositions) {
-               // Get the closest pos of the group by range to the anchor
+          // So long as there is a pos in path with an index of onboardingIndex
 
-               const closestPosToAnchor = hubAnchor.findClosestByPath(group, {
-                    ignoreCreeps: true,
-               })
+          while (path[onboardingIndex]) {
+               // Get the pos in path with an index of onboardingIndex
 
-               // Path from the hubAnchor to the cloestPosToAnchor
+               const onboardingPos = path[onboardingIndex]
 
-               const path = room.advancedFindPath({
-                    origin: closestPosToAnchor,
-                    goal: { pos: hubAnchor, range: 2 },
-                    weightCostMatrixes: [roadCM],
-               })
+               // If there are already rampart plans at this pos
 
-               // Loop through positions of the path
+               if (room.rampartPlans.get(onboardingPos.x, onboardingPos.y) === 1) {
+                    // Increase the onboardingIndex and iterate
 
-               for (const pos of path) {
-                    // Record the pos in roadCM
-
-                    roadCM.set(pos.x, pos.y, 1)
-
-                    // And add the position to the structurePlans
-
-                    structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+                    onboardingIndex += 1
+                    continue
                }
 
-               // Construct the onboardingIndex
+               // Record the pos in roadCM
 
-               let onboardingIndex = 0
+               roadCM.set(onboardingPos.x, onboardingPos.y, 1)
 
-               // So long as there is a pos in path with an index of onboardingIndex
+               // Plan for a road and rampart at pos and stop
 
-               while (path[onboardingIndex]) {
-                    // Get the pos in path with an index of onboardingIndex
+               structurePlans.set(onboardingPos.x, onboardingPos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
 
-                    const onboardingPos = path[onboardingIndex]
+               room.rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
 
-                    // If there are already rampart plans at this pos
-
-                    if (rampartPlans.get(onboardingPos.x, onboardingPos.y) === 1) {
-                         // Increase the onboardingIndex and iterate
-
-                         onboardingIndex += 1
-                         continue
-                    }
-
-                    // Record the pos in roadCM
-
-                    roadCM.set(onboardingPos.x, onboardingPos.y, 1)
-
-                    // Plan for a road and rampart at pos and stop
-
-                    structurePlans.set(
-                         onboardingPos.x,
-                         onboardingPos.y,
-                         constants.structureTypesByNumber[STRUCTURE_ROAD],
-                    )
-
-                    rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
-
-                    if (needsBoardingRamparts)
-                         room.memory.stampAnchors.boardingRampart.push(pack({ x: onboardingPos.x, y: onboardingPos.y }))
-
-                    break
-               }
+               break
           }
      }
-
-     room.global.plannedRamparts = true
 
      // Inform true
 

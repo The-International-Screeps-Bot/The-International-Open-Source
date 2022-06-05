@@ -10,11 +10,6 @@ interface Constants {
      mmoShardNames: Set<string>
 
      /**
-      * An array of usernames of players to avoid trading with
-      */
-     tradeBlacklist: Set<string>
-
-     /**
       * A set of properties that are relative to a room's type
       */
      roomTypeProperties: { [key: string]: boolean }
