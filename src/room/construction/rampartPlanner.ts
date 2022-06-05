@@ -635,7 +635,7 @@ export function rampartPlanner(room: Room) {
                }
           }
      }
-     
+
      // Group rampart positions
 
      const groupedRampartPositions = room.groupRampartPositions(rampartPositions, room.rampartPlans)
@@ -702,8 +702,6 @@ export function rampartPlanner(room: Room) {
                break
           }
      }
-
-     room.global.plannedRamparts = true
 
      // Inform true
 

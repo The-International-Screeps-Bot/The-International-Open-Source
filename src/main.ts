@@ -472,10 +472,6 @@ declare global {
           tasksWithResponders: Record<string | number, RoomTask>
 
           tasksWithoutResponders: Record<string | number, RoomTask>
-
-          plannedBase: boolean
-
-          plannedRamparts: boolean
      }
 
      interface OrganizedStructures {
@@ -890,6 +886,11 @@ declare global {
           powerBanks: { [roomName: string]: number[] }
 
           deposits: Record<Id<Deposit>, DepositRecord>
+
+          /**
+           * Wether or not the room has completed base planning
+           */
+          planned: boolean
      }
 
      // Creeps

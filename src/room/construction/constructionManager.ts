@@ -10,10 +10,11 @@ export function constructionManager(room: Room) {
      // If CPU logging is enabled, get the CPU used at the start
 
      if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
-
+/*
      runPlanning()
 
      function runPlanning() {
+
           if (room.global.plannedBase) {
                // Only run the planner every x ticks (temporary fix)
 
@@ -31,6 +32,24 @@ export function constructionManager(room: Room) {
           manageControllerStructures()
           manageBasePlanning()
      }
+ */
+
+     manageBasePlanning()
+
+     function manageBasePlanning() {
+
+          if (room.memory.planned) return
+
+          // Generate and record base plans
+
+          const basePlannerResult = basePlanner(room)
+
+          // Stop if there base planning failed
+
+          if (!basePlannerResult) return
+     }
+
+     manageControllerStructures()
 
      function manageControllerStructures() {
           //
@@ -49,19 +68,6 @@ export function constructionManager(room: Room) {
           room.createConstructionSite(centerUpgradePos, STRUCTURE_CONTAINER)
      }
 
-     function manageBasePlanning() {
-          // If there are no base plans yet
-
-          if (!room.global.plannedBase) {
-               // Generate and record base plans
-
-               const basePlannerResult = basePlanner(room)
-
-               // Stop if there base planning failed
-
-               if (!basePlannerResult) return
-          }
-     }
 /*
      function manageRampartPlanning() {
           // Stop if there is no storage and no terminal

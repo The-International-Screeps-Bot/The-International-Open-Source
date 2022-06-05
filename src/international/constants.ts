@@ -29,6 +29,7 @@ constants.roomTypeProperties = {
      deposits: true,
      powerBanks: true,
      notClaimable: true,
+     planned: true,
 
      commune: true,
      needs: true,
@@ -53,6 +54,7 @@ constants.roomTypes = {
           remotes: true,
           deposits: true,
           powerBanks: true,
+          planned: true,
      },
      remote: {
           commune: true,
@@ -62,6 +64,7 @@ constants.roomTypes = {
           sourceEfficacies: true,
           abandoned: true,
           notClaimable: true,
+          planned: true,
      },
      ally: {
           level: true,
@@ -83,6 +86,7 @@ constants.roomTypes = {
      },
      neutral: {
           notClaimable: true,
+          planned: true,
      },
      keeper: {
           owner: true,
@@ -255,7 +259,7 @@ constants.numbersByStructureTypes = {
      16: STRUCTURE_OBSERVER,
 }
 
-export const stamps: Record<StampTypes, Partial<Stamp>> = {
+export const stamps: Record<StampTypes, Stamp> = {
      fastFiller: {
           offset: 3,
           protectionOffset: 6,

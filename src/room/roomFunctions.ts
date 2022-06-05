@@ -2612,20 +2612,25 @@ Room.prototype.groupRampartPositions = function (rampartPositions, rampartPlans)
 Room.prototype.advancedConstructStructurePlans = function () {
      const room = this
 
-     // Get structurePlans
+     if (!room.memory.planned) return
 
-     const structurePlans: CostMatrix = room.get('structurePlans')
+     // Only run the planner every x ticks (temporary fix)
 
-     // Construct a cost matrix for visited tiles and add seeds to it
+     if (Game.time % Math.floor(Math.random() * 100) !== 0) return
 
-     const visitedCM = new PathFinder.CostMatrix()
+     // If the construction site count is at its limit, stop
 
-     // Get the room's anchor, stopping if it's undefined
+     if (global.constructionSitesCount === 100) return
 
-     if (!room.anchor) return
+     // If the room is above 1 construction site, stop
+
+     if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
+
+     let stamp: Stamp
 
      for (const stampType in stamps) {
-          const stamp = stamps[stampType as StampTypes]
+
+          stamp = stamps[stampType as StampTypes]
 
           for (const packedStampAnchor of room.memory.stampAnchors[stampType as StampTypes]) {
                const stampAnchor = unpackAsPos(packedStampAnchor)
@@ -2642,98 +2647,26 @@ Room.prototype.advancedConstructStructurePlans = function () {
                     )
                          continue
 
+                    // If the structureType is a rampart and the storage isn't full enough, stop
+
                     if (structureType === STRUCTURE_RAMPART && (!room.storage || room.controller.level < 4 || room.storage.store.energy < 30000)) continue
 
                     // If the structureType is a road and RCL 3 extensions aren't built, stop
 
                     if (structureType === STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue
 
-                    const positions = stamp.structures[structureType]
-
-                    for (const pos of positions) {
+                    for (const pos of stamp.structures[structureType]) {
                          // Re-assign the pos's x and y to align with the offset
 
-                         const x = pos.x + stampAnchor.x - stamp.offset
-                         const y = pos.y + stampAnchor.y - stamp.offset
+                         pos.x = pos.x + stampAnchor.x - stamp.offset
+                         pos.y = pos.y + stampAnchor.y - stamp.offset
 
-                         room.createConstructionSite(x, y, structureType as BuildableStructureConstant)
+                         room.createConstructionSite(pos.x, pos.y, structureType as BuildableStructureConstant)
                     }
                }
           }
      }
-/*
-     // If RCL 3 extensions are built
 
-     if (room.energyCapacityAvailable >= 800) {
-          // Record the anchor as visited
-
-          visitedCM.set(this.anchor.x, this.anchor.y, 1)
-
-          // Construct values for the flood
-
-          let thisGeneration: Pos[] = [this.anchor]
-          let nextGeneration: Pos[] = []
-
-          function planPos(x: number, y: number) {
-               // Get the planned structureType for the x and y, try to build a structure
-
-               const structureType = constants.numbersByStructureTypes[structurePlans.get(x, y)]
-
-               // If the structureType is empty, stop
-
-               if (structureType === 'empty') return
-
-               // Display visuals if enabled
-
-               if (Memory.roomVisuals)
-                    room.visual.structure(x, y, structureType, {
-                         opacity: 0.5,
-                    })
-
-               room.createConstructionSite(x, y, structureType)
-          }
-
-          // So long as there are positions in this gen
-
-          while (thisGeneration.length) {
-               // Reset next gen
-
-               nextGeneration = []
-
-               // Iterate through positions of this gen
-
-               for (const pos of thisGeneration) {
-                    // Plan structures for this pos
-
-                    planPos(pos.x, pos.y)
-
-                    // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
-
-                    const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
-
-                    // Loop through adjacent positions
-
-                    for (const adjacentPos of adjacentPositions) {
-                         // Iterate if the adjacent pos has been visited or isn't a tile
-
-                         if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
-
-                         // Otherwise record that it has been visited
-
-                         visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
-
-                         // Add it to the next gen
-
-                         nextGeneration.push(adjacentPos)
-                    }
-               }
-
-               // Set this gen to next gen
-
-               thisGeneration = nextGeneration
-          }
-     }
- */
      // If visuals are enabled, visually connect roads
 
      if (Memory.roomVisuals) room.visual.connectRoads()
@@ -2866,7 +2799,7 @@ Room.prototype.createClaimRequest = function () {
 
      basePlanner(this)
 
-     if (!this.global.plannedBase) return false
+     if (!this.memory.planned) return false
 
      let score = 0
 
