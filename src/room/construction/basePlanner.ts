@@ -72,6 +72,10 @@ export function basePlanner(room: Room) {
 
      const avgControllerSourcePos = findAvgBetweenPosotions(room.controller.pos, avgSourcePos)
 
+     const controllerAdjacentPositions = findPositionsInsideRect(room.controller.pos.x - 3, room.controller.pos.y - 3, room.controller.pos.x + 3, room.controller.pos.y + 3)
+
+     for (const pos of controllerAdjacentPositions) baseCM.set(pos.x, pos.y, 255)
+
      interface PlanStampOpts {
           stampType: StampTypes
           count: number
@@ -197,6 +201,13 @@ export function basePlanner(room: Room) {
 
           room.memory.notClaimable = true
           return false
+     }
+
+     for (const pos of controllerAdjacentPositions) {
+
+          if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
+
+          baseCM.set(pos.x, pos.y, 0)
      }
 
      // Get the centerUpgradePos, informing false if it's undefined
