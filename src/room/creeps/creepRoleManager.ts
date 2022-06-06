@@ -47,7 +47,7 @@ const managers: Record<CreepRoles, Function> = {
      antifa: antifaManager,
 }
 
-export function roleManager(room: Room) {
+export function creepRoleManager(room: Room) {
      // If CPU logging is enabled, get the CPU used at the start
 
      if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()

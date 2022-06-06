@@ -6,7 +6,7 @@ import { taskManager } from './roomTaskManager'
 
 import { communeManager } from './communeManager'
 
-import { roleManager } from './creeps/creepRoleManager'
+import { creepRoleManager } from './creeps/creepRoleManager'
 
 import { powerCreepManager } from './powerCreeps/powerCreepManager'
 import { trafficManager } from './trafficManager'
@@ -49,7 +49,7 @@ export function roomManager() {
 
           //
 
-          roleManager(room)
+          creepRoleManager(room)
 
           //
 
@@ -60,7 +60,7 @@ export function roomManager() {
           roomVisualsManager(room)
 
           // Testing
-          /* 
+          /*
         let cpuUsed = Game.cpu.getUsed()
 
         cpuUsed = Game.cpu.getUsed() - cpuUsed
