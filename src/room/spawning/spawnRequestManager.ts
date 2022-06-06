@@ -847,7 +847,10 @@ export function spawnRequester(room: Room) {
 
      constructSpawnRequests(
           (function (): SpawnRequestOpts | false {
-               // Get roads
+
+            const priority = 7 + room.creepsFromRoom.maintainer.length
+
+            // Get roads
 
                const roads: (StructureRoad | StructureContainer)[] = room.get('road')
                // Get containers
@@ -902,7 +905,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost: 200,
-                         priority: 8 + room.creepsFromRoom.maintainer.length,
+                         priority,
                          memoryAdditions: {
                               role: 'maintainer',
                          },
@@ -916,7 +919,7 @@ export function spawnRequester(room: Room) {
                     minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 250,
-                    priority: 8 + room.creepsFromRoom.maintainer.length,
+                    priority,
                     memoryAdditions: {
                          role: 'maintainer',
                     },
@@ -930,7 +933,7 @@ export function spawnRequester(room: Room) {
           (function (): SpawnRequestOpts | false {
                let partsMultiplier = 1
                let maxCreeps = room.get('upgradePositions').length
-               const priority = 7 + room.creepsFromRoom.controllerUpgrader.length
+               const priority = 8 + room.creepsFromRoom.controllerUpgrader.length
 
                // If there are enemyAttackers and the controller isn't soon to downgrade
 
