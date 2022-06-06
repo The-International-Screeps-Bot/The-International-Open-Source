@@ -640,6 +640,8 @@ export function spawnRequester(room: Room) {
 
                if (!room.terminal) return false
 
+               if (room.terminal.store.getFreeCapacity() <= 10000) return false
+
                // Get the mineral. If it's out of resources, inform false
 
                const mineral: Mineral = room.get('mineral')
