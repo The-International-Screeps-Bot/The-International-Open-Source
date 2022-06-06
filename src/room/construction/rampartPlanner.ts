@@ -572,7 +572,7 @@ export function rampartPlanner(room: Room) {
           }
      }
 
-     const recordRamparts = room.memory.stampAnchors.rampart.length === 0
+     const recordRamparts = !room.memory.stampAnchors.rampart.length
 
      // Get Min cut
      // Positions is an array where to build walls/ramparts
@@ -584,32 +584,6 @@ export function rampartPlanner(room: Room) {
      // Get base planning data
 
      const roadCM: CostMatrix = room.get('roadCM')
-
-     // Get the hubAnchor
-
-     const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
-
-     // Loop through each tower anchor and plan for a rampart at it
-
-     for (const packedStampAnchor of stampAnchors.tower) {
-          const stampAnchor = unpackAsPos(packedStampAnchor)
-
-          room.rampartPlans.set(stampAnchor.x, stampAnchor.y, 1)
-     }
-
-     // Protect fastFiller spawns
-
-     room.rampartPlans.set(room.anchor.x - 2, room.anchor.y - 1, 1)
-
-     room.rampartPlans.set(room.anchor.x + 2, room.anchor.y - 1, 1)
-
-     room.rampartPlans.set(room.anchor.x, room.anchor.y + 2, 1)
-
-     // Protect useful hub structures
-
-     room.rampartPlans.set(hubAnchor.x + 1, hubAnchor.y - 1, 1)
-
-     room.rampartPlans.set(hubAnchor.x - 1, hubAnchor.y + 1, 1)
 
      // Plan the positions
 
@@ -623,13 +597,9 @@ export function rampartPlanner(room: Room) {
           room.rampartPlans.set(pos.x, pos.y, 1)
      }
 
-     if (recordRamparts) {
-          for (let x = 0; x < constants.roomDimensions; x += 1) {
-               for (let y = 0; y < constants.roomDimensions; y += 1) {
-                    if (room.rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(pack({ x, y }))
-               }
-          }
-     }
+     // Get the hubAnchor
+
+     const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
 
      // Group rampart positions
 
@@ -683,6 +653,36 @@ export function rampartPlanner(room: Room) {
                room.rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
 
                break
+          }
+     }
+
+     // Loop through each tower anchor and plan for a rampart at it
+
+     for (const packedStampAnchor of stampAnchors.tower) {
+          const stampAnchor = unpackAsPos(packedStampAnchor)
+
+          room.rampartPlans.set(stampAnchor.x, stampAnchor.y, 1)
+     }
+
+     // Protect fastFiller spawns
+
+     room.rampartPlans.set(room.anchor.x - 2, room.anchor.y - 1, 1)
+
+     room.rampartPlans.set(room.anchor.x + 2, room.anchor.y - 1, 1)
+
+     room.rampartPlans.set(room.anchor.x, room.anchor.y + 2, 1)
+
+     // Protect useful hub structures
+
+     room.rampartPlans.set(hubAnchor.x + 1, hubAnchor.y - 1, 1)
+
+     room.rampartPlans.set(hubAnchor.x - 1, hubAnchor.y + 1, 1)
+
+     if (recordRamparts) {
+          for (let x = 0; x < constants.roomDimensions; x += 1) {
+               for (let y = 0; y < constants.roomDimensions; y += 1) {
+                    if (room.rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(pack({ x, y }))
+               }
           }
      }
 
