@@ -568,7 +568,7 @@ export function spawnRequester(room: Room) {
 
      constructSpawnRequests(
           (function (): SpawnRequestOpts | false {
-               const priority = 0.5 + room.creepsFromRoom.hauler.length * 0.75
+               const priority = 0.5 + room.creepsFromRoom.hauler.length * 1.5
 
                // Construct the required carry parts
 
@@ -720,7 +720,7 @@ export function spawnRequester(room: Room) {
 
      // If there are no towers
 
-     if (!room.get('tower').length) {
+     if (!room.structures.tower.length) {
           // Consider invaders as significant attackers
 
           enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
@@ -773,7 +773,7 @@ export function spawnRequester(room: Room) {
                     minCreeps: undefined,
                     maxCreeps: Math.max(enemyAttackers.length, 5),
                     minCost: 210,
-                    priority: 2 + room.creepsFromRoom.meleeDefender.length,
+                    priority: 6 + room.creepsFromRoom.meleeDefender.length,
                     memoryAdditions: {
                          role: 'meleeDefender',
                     },
@@ -819,7 +819,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost: 750,
-                         priority: 3.5 + room.creepsFromRoom.builder.length,
+                         priority: 9 + room.creepsFromRoom.builder.length,
                          memoryAdditions: {
                               role: 'builder',
                          },
@@ -833,7 +833,7 @@ export function spawnRequester(room: Room) {
                     minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 250,
-                    priority: 3.5 + room.creepsFromRoom.builder.length,
+                    priority: 9 + room.creepsFromRoom.builder.length,
                     memoryAdditions: {
                          role: 'builder',
                     },
@@ -900,7 +900,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost: 200,
-                         priority: 3.5 + room.creepsFromRoom.maintainer.length,
+                         priority: 8 + room.creepsFromRoom.maintainer.length,
                          memoryAdditions: {
                               role: 'maintainer',
                          },
@@ -914,7 +914,7 @@ export function spawnRequester(room: Room) {
                     minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 250,
-                    priority: 3.5 + room.creepsFromRoom.maintainer.length,
+                    priority: 8 + room.creepsFromRoom.maintainer.length,
                     memoryAdditions: {
                          role: 'maintainer',
                     },
@@ -928,6 +928,7 @@ export function spawnRequester(room: Room) {
           (function (): SpawnRequestOpts | false {
                let partsMultiplier = 1
                let maxCreeps = room.get('upgradePositions').length
+               const priority = 7 + room.creepsFromRoom.controllerUpgrader.length
 
                // If there are enemyAttackers and the controller isn't soon to downgrade
 
@@ -1028,7 +1029,7 @@ export function spawnRequester(room: Room) {
                               threshold,
                               minCreeps: 1,
                               minCost: 650,
-                              priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                              priority,
                               memoryAdditions: {
                                    role: 'controllerUpgrader',
                               },
@@ -1054,7 +1055,7 @@ export function spawnRequester(room: Room) {
                               minCreeps: undefined,
                               maxCreeps,
                               minCost: 700,
-                              priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                              priority,
                               memoryAdditions: {
                                    role: 'controllerUpgrader',
                               },
@@ -1077,7 +1078,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps,
                          minCost: 200,
-                         priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                         priority,
                          memoryAdditions: {
                               role: 'controllerUpgrader',
                          },
@@ -1098,7 +1099,7 @@ export function spawnRequester(room: Room) {
                          threshold,
                          maxCreeps: Infinity,
                          minCost: 200,
-                         priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                         priority,
                          memoryAdditions: {
                               role: 'controllerUpgrader',
                          },
@@ -1112,7 +1113,7 @@ export function spawnRequester(room: Room) {
                     threshold,
                     maxCreeps: Infinity,
                     minCost: 250,
-                    priority: 2.5 + room.creepsFromRoom.controllerUpgrader.length,
+                    priority,
                     memoryAdditions: {
                          role: 'controllerUpgrader',
                     },
@@ -1164,7 +1165,7 @@ export function spawnRequester(room: Room) {
                               maxCreeps: Infinity,
                               maxCostPerCreep: 50 + 150 * 6,
                               minCost: 200,
-                              priority: 4 + index - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
+                              priority: 10 + index - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                               memoryAdditions: {
                                    role: 'source1RemoteHarvester',
                               },
@@ -1181,7 +1182,7 @@ export function spawnRequester(room: Room) {
                          maxCreeps: global[remoteName]?.source1HarvestPositions?.length || Infinity,
                          maxCostPerCreep: 50 + 150 * 6,
                          minCost: 200,
-                         priority: 4 + index - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
+                         priority: 10 + index - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                          memoryAdditions: {
                               role: 'source1RemoteHarvester',
                          },
@@ -1207,7 +1208,7 @@ export function spawnRequester(room: Room) {
                               minCreeps: 1,
                               maxCreeps: Infinity,
                               minCost: 200,
-                              priority: 4 + index - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
+                              priority: 10 + index - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                               memoryAdditions: {
                                    role: 'source2RemoteHarvester',
                               },
@@ -1224,7 +1225,7 @@ export function spawnRequester(room: Room) {
                          maxCreeps: global[remoteName]?.source2HarvestPositions?.length || Infinity,
                          maxCostPerCreep: 150 * 6,
                          minCost: 200,
-                         priority: 4 + index - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
+                         priority: 10 + index - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                          memoryAdditions: {
                               role: 'source2RemoteHarvester',
                          },
@@ -1254,7 +1255,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost: 200,
-                         priority: 4.2 + index,
+                         priority: 10.2 + index,
                          memoryAdditions: {
                               role: 'remoteHauler',
                          },
@@ -1282,7 +1283,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: 1,
                          maxCreeps: Infinity,
                          minCost: 750,
-                         priority: 4.3 + index,
+                         priority: 10.3 + index,
                          memoryAdditions: {
                               role: 'remoteReserver',
                          },
@@ -1329,7 +1330,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost,
-                         priority: 4,
+                         priority: 7,
                          memoryAdditions: {
                               role: 'remoteDefender',
                          },
@@ -1359,7 +1360,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost,
-                         priority: 4,
+                         priority: 9,
                          memoryAdditions: {
                               role: 'remoteCoreAttacker',
                          },
@@ -1379,7 +1380,7 @@ export function spawnRequester(room: Room) {
                     minCreeps: 2,
                     maxCreeps: Infinity,
                     minCost: 100,
-                    priority: 2,
+                    priority: 6,
                     memoryAdditions: {
                          role: 'scout',
                     },
@@ -1404,7 +1405,7 @@ export function spawnRequester(room: Room) {
                          partsMultiplier: 1,
                          minCreeps: 1,
                          minCost: 750,
-                         priority: 3,
+                         priority: 8,
                          memoryAdditions: {
                               role: 'claimer',
                          },
@@ -1427,7 +1428,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost: 250,
-                         priority: 3.1 + room.creepsFromRoom.vanguard.length,
+                         priority: 8.1 + room.creepsFromRoom.vanguard.length,
                          memoryAdditions: {
                               role: 'vanguard',
                          },
