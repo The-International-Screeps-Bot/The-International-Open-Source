@@ -11,7 +11,7 @@ export default class GetShardVision {
           const spawnShardFlag = Game.flags[this._shardNames[0]]
           if (!spawnShardFlag) return
 
-          let headSpawn: StructureSpawn = Game.spawns['Spawn6']
+          let headSpawn: StructureSpawn = Game.spawns['Spawn1']
           if (!headSpawn) return
 
           const shardTarget =
@@ -35,7 +35,7 @@ export default class GetShardVision {
           if (!this._shardNames.includes(Game.shard.name)) return
 
           this._shardNames.forEach((shardName, index): void => {
-               if (Game.time % 200 === 0 && index === 0) {
+               if (Game.time % 100 === 0 && index === 0) {
                     this.SpawnCreeps()
                }
                let loggedOrders = false
@@ -45,43 +45,43 @@ export default class GetShardVision {
                     creep.notifyWhenAttacked(false)
                     // * If main shard isn't shard3 or shard0
                     // * Ask PandaMaster to modify this code!
-                    if (Game.shard.name === this._mainShard && shardName === this._mainShard) {
-                         this.MoveCreepsToTarget(creep, Game.flags[this._mainShard].pos)
-                    } else if (Game.shard.name === this._mainShard && shardName === 'shard3') {
-                         this.MoveCreepsToTarget(creep, Game.flags.shard3.pos)
-                    } else if (shardName === 'shard1') {
-                         if (Game.shard.name === this._mainShard) {
-                              this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
-                         }
-                    } else if (shardName === 'shard0') {
-                         if (Game.shard.name === this._mainShard) {
-                              this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
-                         } else if (Game.shard.name === 'shard1') {
-                              this.MoveCreepsToTarget(creep, Game.flags.shard0.pos)
-                         }
-                    }
+                    // if (Game.shard.name === this._mainShard && shardName === this._mainShard) {
+                    //      this.MoveCreepsToTarget(creep, Game.flags[this._mainShard].pos)
+                    // } else if (Game.shard.name === this._mainShard && shardName === 'shard3') {
+                    //      this.MoveCreepsToTarget(creep, Game.flags.shard3.pos)
+                    // } else if (shardName === 'shard1') {
+                    //      if (Game.shard.name === this._mainShard) {
+                    //           this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
+                    //      }
+                    // } else if (shardName === 'shard0') {
+                    //      if (Game.shard.name === this._mainShard) {
+                    //           this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
+                    //      } else if (Game.shard.name === 'shard1') {
+                    //           this.MoveCreepsToTarget(creep, Game.flags.shard0.pos)
+                    //      }
+                    // }
 
                     // * If main shard is shard3 or shard0
                     // * Ask PandaMaster to modify this code!
-                    // if (Game.shard.name === this._mainShard && shardName === this._mainShard) {
-                    //      this.MoveCreepsToTarget(creep, Game.flags[this._mainShard].pos)
-                    // } else if (Game.shard.name === this._mainShard && shardName === 'shard1') {
-                    //      this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
-                    // } else if (shardName === 'shard2') {
-                    //      if (Game.shard.name === this._mainShard) {
-                    //           this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
-                    //      } else if (Game.shard.name === 'shard1') {
-                    //           this.MoveCreepsToTarget(creep, Game.flags.shard2.pos)
-                    //      }
-                    // } else if (shardName === 'shard3') {
-                    //      if (Game.shard.name === this._mainShard) {
-                    //           this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
-                    //      } else if (Game.shard.name === 'shard1') {
-                    //           this.MoveCreepsToTarget(creep, Game.flags.shard2.pos)
-                    //      } else if (Game.shard.name === 'shard2') {
-                    //           this.MoveCreepsToTarget(creep, Game.flags.shard3.pos)
-                    //      }
-                    // }
+                    if (Game.shard.name === this._mainShard && shardName === this._mainShard) {
+                         this.MoveCreepsToTarget(creep, Game.flags[this._mainShard].pos)
+                    } else if (Game.shard.name === this._mainShard && shardName === 'shard1') {
+                         this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
+                    } else if (shardName === 'shard2') {
+                         if (Game.shard.name === this._mainShard) {
+                              this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
+                         } else if (Game.shard.name === 'shard1') {
+                              this.MoveCreepsToTarget(creep, Game.flags.shard2.pos)
+                         }
+                    } else if (shardName === 'shard3') {
+                         if (Game.shard.name === this._mainShard) {
+                              this.MoveCreepsToTarget(creep, Game.flags.shard1.pos)
+                         } else if (Game.shard.name === 'shard1') {
+                              this.MoveCreepsToTarget(creep, Game.flags.shard2.pos)
+                         } else if (Game.shard.name === 'shard2') {
+                              this.MoveCreepsToTarget(creep, Game.flags.shard3.pos)
+                         }
+                    }
 
                     if (Game.shard.name === shardName) {
                          if (!loggedOrders && Game.time % 100 === 0) {
