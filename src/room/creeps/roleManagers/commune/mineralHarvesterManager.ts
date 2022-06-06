@@ -25,7 +25,7 @@ export function mineralHarvesterManager(room: Room, creepsOfRole: string[]) {
 
           // If there is a terminal
 
-          if (room.terminal) {
+          if (room.terminal && room.terminal.store.getFreeCapacity() >= 10000) {
                // Transfer the creep's minerals to it
 
                creep.advancedTransfer(room.terminal, mineral.mineralType)
