@@ -1,4 +1,4 @@
-import { allyList, autoClaim, baseVisuals, breakingVersion, cpuLogging, mapVisuals, pixelGeneration, pixelSelling, publicRamparts, roomVisuals, tradeBlacklist } from './constants'
+import { allyList, allyTrading, autoClaim, baseVisuals, breakingVersion, cpuLogging, mapVisuals, pixelGeneration, pixelSelling, publicRamparts, roomVisuals, tradeBlacklist } from './constants'
 import { InternationalManager } from './internationalManager'
 
 InternationalManager.prototype.config = function () {
@@ -32,6 +32,7 @@ InternationalManager.prototype.config = function () {
           Memory.tradeBlacklist = tradeBlacklist
           Memory.autoClaim = autoClaim
           Memory.publicRamparts = publicRamparts
+          Memory.allyTrading = allyTrading
 
           // Construct foundation
 

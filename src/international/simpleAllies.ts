@@ -1,4 +1,4 @@
-import { allyList, allyTrading } from 'international/constants'
+import { allyList } from 'international/constants'
 
 const segmentID = 90
 const allyArray = [...allyList]
@@ -63,7 +63,7 @@ class AllyManager {
 // Up to you to fix that.
 
 AllyManager.prototype.getAllyRequests = function () {
-     if (!allyTrading) return
+     if (!Memory.allyTrading) return
 
      // Stop if there are no allies
 
@@ -97,7 +97,7 @@ AllyManager.prototype.tickConfig = function () {
 }
 
 AllyManager.prototype.endTickManager = function () {
-     if (!allyTrading) return
+     if (!Memory.allyTrading) return
 
      if (Object.keys(RawMemory.segments).length < 10) {
           // Assign myRequests to the public segment

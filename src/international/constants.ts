@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
- export const breakingVersion = 18
+ export const breakingVersion = 19
 
 // Settings
 
@@ -53,7 +53,12 @@ export const autoClaim = true
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
- export const publicRamparts = false
+export const publicRamparts = false
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const allyTrading = true
 
 // General
 
@@ -570,7 +575,6 @@ export const CPUBucketCapacity = 10000
 
 export const CPUBucketRenewThreshold = 5000
 export const prefferedCommuneRange = 6
-export const allyTrading = false
 export const relayRoles: Partial<CreepRoles>[] = ['hauler', 'remoteHauler']
 
 // The dowwngrade timer for when upgrading the controller is required
