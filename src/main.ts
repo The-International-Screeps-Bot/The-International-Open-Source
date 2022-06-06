@@ -1279,17 +1279,22 @@ declare global {
                /**
                 * Kills all creeps owned by the bot
                 */
-               killAllCreeps(): string
+               killAllCreeps(roles?: CreepRoles[]): string
 
                /**
-                * Removes all construction sites owned by the bot
+                * Removes all specified construction sites owned by the bot
                 */
-               removeAllCSites(): string
+               removeAllCSites(types?: BuildableStructureConstant[]): string
 
                /**
-                * Destroys all structures owned by the bot
+                * Destroys all specified structures owned by the bot
                 */
-               destroyAllCSites(types: StructureConstant[]): string
+               destroyAllStructures(roomName: string, types?: StructureConstant[]): string
+
+                /**
+                * Destroys all specified structures in communes
+                */
+                destroyCommuneStructures(types?: StructureConstant[]): string
 
                /**
                 * Responds, or if needed, creates, a claim request for a specified room, by a specified room
