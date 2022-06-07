@@ -772,6 +772,14 @@ declare global {
 
           readonly anchor: RoomPosition | undefined
 
+          _sources: Source[]
+
+          readonly sources: Source[]
+
+          _mineral: Mineral
+
+          readonly mineral: Mineral
+
           _enemyCreeps: Creep[]
 
           readonly enemyCreeps: Creep[]
@@ -857,6 +865,8 @@ declare global {
 
           source1: Id<Source>
           source2: Id<Source>
+
+          sourceIds: Id<Source>[]
 
           commune: string
 

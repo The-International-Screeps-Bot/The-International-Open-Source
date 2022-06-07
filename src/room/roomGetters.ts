@@ -19,6 +19,31 @@ Object.defineProperties(Room.prototype, {
                          : undefined)
           },
      },
+     sources: {
+          get() {
+               if (this._sources) return this._sources
+
+               if (!this.memory.sourceIds) {
+
+                    this.memory.sourceIds = []
+
+                    for (const source of this.find(FIND_SOURCES)) this.memory.sourceIds.push(source.id)
+               }
+
+               this._sources = []
+
+               for (const sourceId of this.memory.sourceIds) this._sources.push(findObjectWithID(sourceId))
+
+               return this._sources
+          },
+     },
+     mineral: {
+          get() {
+               if (this._mineral) return this._mineral
+
+               return this._mineral = this.find(FIND_MINERALS)[0]
+          },
+     },
      enemyCreeps: {
           get() {
                if (this._enemyCreeps) return this._enemyCreeps
