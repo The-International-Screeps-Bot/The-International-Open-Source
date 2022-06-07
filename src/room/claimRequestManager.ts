@@ -18,11 +18,9 @@ Room.prototype.claimRequestManager = function () {
                return
           }
 
-          const spawns: StructureSpawn[] = claimTarget.get('spawn')
+          // If the room is claimed and there are spawns, delete the claimRequest
 
-          // If there are no spawns, delete the claimRequest
-
-          if (spawns.length) {
+          if (claimTarget.controller.my && claimTarget.structures.spawn.length) {
                delete Memory.claimRequests[this.memory.claimRequest]
                delete this.memory.claimRequest
 
