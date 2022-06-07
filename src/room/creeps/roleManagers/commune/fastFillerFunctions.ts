@@ -2,27 +2,26 @@ import { customLog, getRangeBetween, unpackAsRoomPos } from 'international/gener
 import { FastFiller } from 'room/creeps/creepClasses'
 
 FastFiller.prototype.travelToFastFiller = function () {
-     const creep = this
-     const { room } = creep
+     const { room } = this
 
      // Try to find a fastFillerPos, inform true if it failed
 
-     if (!creep.findFastFillerPos()) return true
+     if (!this.findFastFillerPos()) return true
 
-     // Unpack the creep's packedFastFillerPos
+     // Unpack the this's packedFastFillerPos
 
-     const fastFillerPos = unpackAsRoomPos(creep.memory.packedPos, room.name)
+     const fastFillerPos = unpackAsRoomPos(this.memory.packedPos, room.name)
 
-     // If the creep is standing on the fastFillerPos, inform false
+     // If the this is standing on the fastFillerPos, inform false
 
-     if (getRangeBetween(creep.pos.x, creep.pos.y, fastFillerPos.x, fastFillerPos.y) === 0) return false
+     if (getRangeBetween(this.pos.x, this.pos.y, fastFillerPos.x, fastFillerPos.y) === 0) return false
 
      // Otherwise, make a move request to it
 
-     creep.say('⏩F')
+     this.say('⏩F')
 
-     creep.createMoveRequest({
-          origin: creep.pos,
+     this.createMoveRequest({
+          origin: this.pos,
           goal: { pos: fastFillerPos, range: 0 },
      })
 
@@ -32,23 +31,53 @@ FastFiller.prototype.travelToFastFiller = function () {
 }
 
 FastFiller.prototype.fillFastFiller = function () {
-     const creep = this
-     const { room } = creep
+     const { room } = this
 
-     creep.say('FFF')
+     this.say('FFF')
+
+     // Drop a resource if the creep has a non-energy resource
+
+     if (this.store.energy < _.sum(Object.values(this.store))) {
+          for (const resourceType in this.store) {
+               if (resourceType == RESOURCE_ENERGY) continue
+
+               this.drop(resourceType as ResourceConstant)
+               return true
+          }
+     }
 
      // If all spawningStructures are filled, inform false
 
      if (room.energyAvailable === room.energyCapacityAvailable) return false
 
-     // If the creep needs resources
+     // If the this needs resources
 
-     if (creep.needsResources()) {
+     if (this.needsResources()) {
+
+          const fastFillerContainers: (StructureContainer | false)[] = [
+               room.get('fastFillerContainerLeft'),
+               room.get('fastFillerContainerRight'),
+          ]
+
+          // Withdraw from a fastFiller container if it has a non-energy resource
+
+          for (const container of fastFillerContainers) {
+               if (!container) continue
+
+               if (container.store.energy >= _.sum(Object.values(container.store))) continue
+
+               for (const resourceType in container.store) {
+                    if (resourceType == RESOURCE_ENERGY) continue
+
+                    this.withdraw(container, resourceType as ResourceConstant)
+                    return true
+               }
+          }
+
           // Get the sourceLinks
 
           const fastFillerStoringStructure: (StructureContainer | StructureLink | false)[] = [
-               room.get('fastFillerContainerLeft'),
-               room.get('fastFillerContainerRight'),
+               ...fastFillerContainers,
                room.get('fastFillerLink'),
           ]
 
@@ -59,19 +88,19 @@ FastFiller.prototype.fillFastFiller = function () {
 
                if (!structure) continue
 
-               // Otherwise, if the structure is not in range 1 to the creep
+               // Otherwise, if the structure is not in range 1 to the this
 
-               if (getRangeBetween(creep.pos.x, creep.pos.y, structure.pos.x, structure.pos.y) !== 1) continue
+               if (getRangeBetween(this.pos.x, this.pos.y, structure.pos.x, structure.pos.y) !== 1) continue
 
                // Otherwise, if there is insufficient energy in the structure, iterate
 
-               if (structure.store.getUsedCapacity(RESOURCE_ENERGY) < creep.store.getCapacity()) continue
+               if (structure.store.getUsedCapacity(RESOURCE_ENERGY) < this.store.getCapacity()) continue
 
                // Otherwise, withdraw from the structure and inform true
 
-               creep.say('W')
+               this.say('W')
 
-               creep.withdraw(structure, RESOURCE_ENERGY)
+               this.withdraw(structure, RESOURCE_ENERGY)
                return true
           }
 
@@ -80,14 +109,14 @@ FastFiller.prototype.fillFastFiller = function () {
           return false
      }
 
-     // Otherwise if the creep doesn't need energy, get adjacent extensions and spawns to the creep
+     // Otherwise if the this doesn't need energy, get adjacent extensions and spawns to the this
 
      const adjacentStructures = room.lookForAtArea(
           LOOK_STRUCTURES,
-          creep.pos.y - 1,
-          creep.pos.x - 1,
-          creep.pos.y + 1,
-          creep.pos.x + 1,
+          this.pos.y - 1,
+          this.pos.x - 1,
+          this.pos.y + 1,
+          this.pos.x + 1,
           true,
      )
 
@@ -116,9 +145,9 @@ FastFiller.prototype.fillFastFiller = function () {
 
           // Otherwise, transfer to the structure record the action and inform true
 
-          creep.say('T')
+          this.say('T')
 
-          creep.transfer(structure, RESOURCE_ENERGY)
+          this.transfer(structure, RESOURCE_ENERGY)
           structure.hasHadResourcesMoved = true
 
           return true
