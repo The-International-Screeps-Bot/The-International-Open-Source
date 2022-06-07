@@ -1,4 +1,5 @@
 import { constants } from './constants'
+const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN, STRUCTURE_STORAGE, STRUCTURE_TERMINAL]
 
 global.clearMemory = function () {
      for (const key in Memory) delete Memory[key as keyof typeof Memory]
@@ -47,7 +48,8 @@ global.destroyAllStructures = function (roomName, types) {
      for (const structureType of constants.allStructureTypes) {
           // If types is constructed and the part isn't in types, iterate
 
-          if (types && !types.includes(structureType)) continue
+          if ((types && !types.includes(structureType)) || (importantStructures.includes(structureType) && !types))
+               continue
 
           // Get the structures of the type
 
@@ -85,7 +87,8 @@ global.destroyCommuneStructures = function (types) {
           for (const structureType of constants.allStructureTypes) {
                // If types is constructed and the part isn't in types, iterate
 
-               if (types && !types.includes(structureType)) continue
+               if ((types && !types.includes(structureType)) || (importantStructures.includes(structureType) && !types))
+                    continue
 
                // Get the structures of the type
 
