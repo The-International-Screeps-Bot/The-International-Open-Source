@@ -18,6 +18,10 @@ import './international/endTickManager'
 import { roomManager } from 'room/roomManager'
 import './room/roomGetters'
 
+// Creep
+
+import './room/creeps/creepGetters'
+
 // Other
 
 import { memHack } from 'other/memHack'
@@ -274,6 +278,15 @@ declare global {
           extraOpts: ExtraOpts
      }
 
+     type Reservations = 'transfer' | 'withdraw' | 'pickup'
+
+     interface Reservation {
+          type: Reservations
+          amount: number
+          resourceType: ResourceConstant
+          targetID: Id<AnyStoreStructure | Creep | Tombstone | Resource>
+     }
+
      interface Stats {
           lastReset: number
 
@@ -429,7 +442,7 @@ declare global {
           /**
            * Wether the bot should automatically respond to claimRequests
            */
-           autoClaim: boolean
+          autoClaim: boolean
 
           /**
            * Wether the bot should enable ramparts when there is no enemy present
@@ -1122,6 +1135,18 @@ declare global {
           findHealStrength(): number
 
           findCost(): number
+
+          // Reservation
+
+          reservationManager(): void
+
+          createReservation(): void
+
+          // Getters
+
+          _reservation: Reservation | false
+
+          readonly reservation: Reservation | false
      }
 
      interface CreepMemory {
@@ -1194,6 +1219,8 @@ declare global {
           taskAmount: number
 
           taskResource: ResourceConstant
+
+          reservations: Reservation[]
      }
 
      // PowerCreeps
@@ -1291,10 +1318,10 @@ declare global {
                 */
                destroyAllStructures(roomName: string, types?: StructureConstant[]): string
 
-                /**
+               /**
                 * Destroys all specified structures in communes
                 */
-                destroyCommuneStructures(types?: StructureConstant[]): string
+               destroyCommuneStructures(types?: StructureConstant[]): string
 
                /**
                 * Responds, or if needed, creates, a claim request for a specified room, by a specified room
