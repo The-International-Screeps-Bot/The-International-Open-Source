@@ -12,13 +12,14 @@ Creep.prototype.reservationManager = function () {
         target = findObjectWithID(reservation.targetID)
 
         if (!target) this.memory.reservations.splice(index, 1)
-
+/*
         if (target.amount) {
 
-            
+
         }
 
         target.store || target.amount
+ */
     }
 }
 
