@@ -44,6 +44,8 @@ InternationalManager.prototype.config = function () {
 
           //
 
+          Memory.stats = {}
+
           Memory.stats.memoryLimit = 2097
      }
 
