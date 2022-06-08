@@ -2640,10 +2640,10 @@ Room.prototype.advancedConstructStructurePlans = function () {
                     for (const pos of stamp.structures[structureType]) {
                          // Re-assign the pos's x and y to align with the offset
 
-                         pos.x = pos.x + stampAnchor.x - stamp.offset
-                         pos.y = pos.y + stampAnchor.y - stamp.offset
+                         const x = pos.x + stampAnchor.x - stamp.offset
+                         const y = pos.y + stampAnchor.y - stamp.offset
 
-                         room.createConstructionSite(pos.x, pos.y, structureType as BuildableStructureConstant)
+                         room.createConstructionSite(x, y, structureType as BuildableStructureConstant)
                     }
                }
           }
