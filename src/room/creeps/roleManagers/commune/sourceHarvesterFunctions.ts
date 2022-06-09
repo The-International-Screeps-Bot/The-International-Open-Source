@@ -16,7 +16,7 @@ SourceHarvester.prototype.isDying = function () {
 
      if (
           this.ticksToLive >
-          this.body.length * CREEP_SPAWN_TIME + (this.room.global[`${this.memory.sourceName}PathLength`] || 0)
+          this.body.length * CREEP_SPAWN_TIME + (this.room.global[`${this.memory.sourceName}PathLength`] - 3 || 0)
      )
           return false
 
