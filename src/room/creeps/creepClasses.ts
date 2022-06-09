@@ -160,6 +160,11 @@ creepClasses.remoteCoreAttacker = RemoteCoreAttacker
 
 export class Scout extends Creep {
      /**
+      * If the creep sends notifications to the mail when its attacked
+      */
+     notifiesWhenAttacked?: boolean
+
+     /**
       * Finds a room name for the scout to target
       */
      findScoutTarget?(): boolean
@@ -185,7 +190,6 @@ export class Claimer extends Creep {
 creepClasses.claimer = Claimer
 
 export class Vanguard extends Creep {
-
      /**
       *
       */

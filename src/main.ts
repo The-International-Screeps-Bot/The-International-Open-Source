@@ -71,7 +71,6 @@ declare global {
 
      type RemoteStampTypes = 'road' | 'container'
 
-
      type StampTypes =
           | 'fastFiller'
           | 'hub'
