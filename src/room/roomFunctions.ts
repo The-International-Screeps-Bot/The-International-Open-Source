@@ -2591,69 +2591,6 @@ Room.prototype.groupRampartPositions = function (rampartPositions, rampartPlans)
      return groupedPositions
 }
 
-Room.prototype.advancedConstructStructurePlans = function () {
-     const room = this
-
-     if (!room.memory.planned) return
-
-     // Only run the planner every x ticks (temporary fix)
-
-     if (Game.time % Math.floor(Math.random() * 100) !== 0) return
-
-     // If the construction site count is at its limit, stop
-
-     if (global.constructionSitesCount === 100) return
-
-     // If the room is above 1 construction site, stop
-
-     if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
-
-     let stamp: Stamp
-
-     for (const stampType in stamps) {
-
-          stamp = stamps[stampType as StampTypes]
-
-          for (const packedStampAnchor of room.memory.stampAnchors[stampType as StampTypes]) {
-               const stampAnchor = unpackAsPos(packedStampAnchor)
-
-               for (const structureType in stamp.structures) {
-                    if (structureType === 'empty') continue
-
-                    // If there are already sufficient structures + cSites
-
-                    if (
-                         room.get(structureType as BuildableStructureConstant).length +
-                              room.get(`${structureType as BuildableStructureConstant}CSite`).length >=
-                         CONTROLLER_STRUCTURES[structureType as BuildableStructureConstant][room.controller.level]
-                    )
-                         continue
-
-                    // If the structureType is a rampart and the storage isn't full enough, stop
-
-                    if (structureType === STRUCTURE_RAMPART && (!room.storage || room.controller.level < 4 || room.storage.store.energy < 30000)) continue
-
-                    // If the structureType is a road and RCL 3 extensions aren't built, stop
-
-                    if (structureType === STRUCTURE_ROAD && room.energyCapacityAvailable < 800) continue
-
-                    for (const pos of stamp.structures[structureType]) {
-                         // Re-assign the pos's x and y to align with the offset
-
-                         const x = pos.x + stampAnchor.x - stamp.offset
-                         const y = pos.y + stampAnchor.y - stamp.offset
-
-                         room.createConstructionSite(x, y, structureType as BuildableStructureConstant)
-                    }
-               }
-          }
-     }
-
-     // If visuals are enabled, visually connect roads
-
-     if (Memory.roomVisuals) room.visual.connectRoads()
-}
-
 Room.prototype.createPullTask = function (creator) {
      const room = this
 }

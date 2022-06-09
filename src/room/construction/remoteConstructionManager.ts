@@ -1,0 +1,4 @@
+Room.prototype.remoteConstructionManager = function() {
+
+    
+}

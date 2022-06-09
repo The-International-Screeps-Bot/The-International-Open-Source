@@ -10,7 +10,7 @@ export function constructionManager(room: Room) {
      // If CPU logging is enabled, get the CPU used at the start
 
      if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
-     
+
      if (!room.memory.planned) basePlanner(room)
 
      manageControllerStructures()
@@ -33,7 +33,7 @@ export function constructionManager(room: Room) {
 
      // Use floodfill from the anchor to plan structures
 
-     room.advancedConstructStructurePlans()
+     room.communeConstructionPlacement()
 
      // If CPU logging is enabled, log the CPU used by this manager
 

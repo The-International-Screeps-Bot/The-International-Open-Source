@@ -303,6 +303,25 @@ constants.numbersByStructureTypes = {
      16: STRUCTURE_OBSERVER,
 }
 
+export const remoteStamps: Record<RemoteStampTypes, Stamp> = {
+     container: {
+          offset: 0,
+          protectionOffset: 0,
+          size: 1,
+          structures: {
+               container: [{ x: 0, y: 0 }],
+          },
+     },
+     road: {
+          offset: 0,
+          protectionOffset: 0,
+          size: 1,
+          structures: {
+               road: [{ x: 0, y: 0 }],
+          },
+     },
+}
+
 export const stamps: Record<StampTypes, Stamp> = {
      fastFiller: {
           offset: 3,

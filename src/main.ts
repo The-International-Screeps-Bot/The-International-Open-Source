@@ -69,6 +69,9 @@ declare global {
           brown: string
      }
 
+     type RemoteStampTypes = 'road' | 'container'
+
+
      type StampTypes =
           | 'fastFiller'
           | 'hub'
@@ -724,11 +727,6 @@ declare global {
           /**
            *
            */
-          advancedConstructStructurePlans(): void
-
-          /**
-           *
-           */
           createPullTask(creator: Structure | Creep | Resource): void
 
           /**
@@ -763,6 +761,34 @@ declare global {
           createClaimRequest(): boolean
 
           findSwampPlainsRatio(): number
+
+          // General roomFunctions
+
+          claimRequestManager(): void
+
+          // Market functions
+
+          advancedSell(resourceType: ResourceConstant, amount: number): boolean
+
+          advancedBuy(resourceType: ResourceConstant, amount: number): boolean
+
+          // Construction functions
+
+          remoteConstructionManager(): void
+
+          remotePlanner(commune: Room): boolean
+
+          remoteConstructionPlacement(): void
+
+          communeConstructionPlacement(): void
+
+          // Link functions
+
+          sourcesToReceivers(sourceLinks: (StructureLink | false)[], receiverLinks: (StructureLink | false)[]): void
+
+          hubToFastFiller(hubLink: StructureLink | undefined, fastFillerLink: StructureLink | undefined): void
+
+          hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
 
           // Getters
 
@@ -815,24 +841,6 @@ declare global {
           _rampartPlans: CostMatrix
 
           readonly rampartPlans: CostMatrix
-
-          // Main roomFunctions
-
-          claimRequestManager(): void
-
-          // Market functions
-
-          advancedSell(resourceType: ResourceConstant, amount: number): boolean
-
-          advancedBuy(resourceType: ResourceConstant, amount: number): boolean
-
-          // Link functions
-
-          sourcesToReceivers(sourceLinks: (StructureLink | false)[], receiverLinks: (StructureLink | false)[]): void
-
-          hubToFastFiller(hubLink: StructureLink | undefined, fastFillerLink: StructureLink | undefined): void
-
-          hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
      }
 
      interface DepositRecord {
@@ -933,9 +941,16 @@ declare global {
           deposits: Record<Id<Deposit>, DepositRecord>
 
           /**
-           * Wether or not the room has completed base planning
+           * Wether or not commune planning has been completed for the room
            */
           planned: boolean
+
+          /**
+           * Wether or not remote planning has been completed for the room
+           */
+          remotePlanned: boolean
+
+          remoteStampAnchors: Partial<Record<RemoteStampTypes, number[]>>
      }
 
      // Creeps
