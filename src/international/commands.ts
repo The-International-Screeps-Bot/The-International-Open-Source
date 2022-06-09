@@ -20,13 +20,18 @@ global.killAllCreeps = function (roles) {
 }
 
 global.removeAllCSites = function (types) {
-     const filteredCS = Object.entries(Game.constructionSites).filter(
-          ([ID, cSite]) => types || types.includes(cSite.structureType),
-     )
+
      let removedCSCount = 0
-     filteredCS.forEach(([id, cSite]) => {
+     let cSite
+
+     for (const cSiteID in Game.constructionSites) {
+
+          cSite = Game.constructionSites[cSiteID]
+
+          if (types && !types.includes(cSite.structureType)) continue
+
           if (cSite.remove() === OK) removedCSCount += 1
-     })
+     }
 
      return `Removed a total of ${removedCSCount} construction sites ${types ? `with the types ${types}` : ''}`
 }

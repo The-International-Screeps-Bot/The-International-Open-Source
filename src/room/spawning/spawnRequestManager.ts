@@ -647,12 +647,16 @@ export function spawnRequester(room: Room) {
                const mineral: Mineral = room.get('mineral')
                if (mineral.mineralAmount === 0) return false
 
+               let minCost = 900
+
+               if (spawnEnergyCapacity < minCost) return false
+
                return {
                     defaultParts: [],
                     extraParts: [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, MOVE, CARRY, CARRY, MOVE, WORK],
                     partsMultiplier: room.get('mineralHarvestPositions')?.length * 4,
                     minCreeps: 1,
-                    minCost: 900,
+                    minCost,
                     priority: 6 + room.creepsFromRoom.mineralHarvester.length * 3,
                     memoryAdditions: {
                          role: 'mineralHarvester',
@@ -674,12 +678,12 @@ export function spawnRequester(room: Room) {
                if (!room.get('hubLink') && !room.terminal) return false
 
                return {
-                    defaultParts: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, CARRY],
-                    extraParts: [],
-                    partsMultiplier: 1,
+                    defaultParts: [MOVE],
+                    extraParts: [CARRY],
+                    partsMultiplier: 8,
                     minCreeps: 1,
-                    minCost: 800,
-                    priority: 3,
+                    minCost: 300,
+                    priority: 6,
                     memoryAdditions: {
                          role: 'hubHauler',
                     },

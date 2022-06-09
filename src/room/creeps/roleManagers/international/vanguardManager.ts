@@ -23,6 +23,7 @@ export function vanguardManager(room: Room, creepsOfRole: string[]) {
           creep.say(claimTarget)
 
           if (room.name === claimTarget) {
+
                creep.buildRoom()
                continue
           }

@@ -185,6 +185,7 @@ export class Claimer extends Creep {
 creepClasses.claimer = Claimer
 
 export class Vanguard extends Creep {
+
      /**
       *
       */
