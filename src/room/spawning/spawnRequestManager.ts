@@ -1367,7 +1367,7 @@ export function spawnRequester(room: Room) {
                          partsMultiplier: 50 / extraParts.length,
                          groupComparator: room.creepsFromRoomWithRemote[remoteName]?.remoteCoreAttacker,
                          minCreeps: undefined,
-                         maxCreeps: Infinity,
+                         maxCreeps: 1,
                          minCost,
                          priority: 9,
                          memoryAdditions: {

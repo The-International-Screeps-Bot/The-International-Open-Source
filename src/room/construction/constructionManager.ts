@@ -2,6 +2,7 @@ import { constants } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import { basePlanner } from './basePlanner'
 import { rampartPlanner } from './rampartPlanner'
+import './constructionFunctions'
 
 /**
  * Creates construction sites and deletes structures in a room
