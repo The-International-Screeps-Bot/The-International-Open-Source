@@ -21,6 +21,7 @@ import { remoteDefenderManager } from './roleManagers/remote/remoteDefenderManag
 import { vanguardManager } from './roleManagers/international/vanguardManager'
 import { sourceHarvesterManager } from './roleManagers/commune/sourceHarvesterManager'
 import { remoteCoreAttackerManager } from './roleManagers/remote/remoteCoreAttackerManager'
+import { vanguardDefenderManager } from './roleManagers/international/vanguardDefender'
 
 // Construct managers
 
@@ -44,6 +45,7 @@ const managers: Record<CreepRoles, Function> = {
      scout: scoutManager,
      claimer: claimerManager,
      vanguard: vanguardManager,
+     vanguardDefender: vanguardDefenderManager,
      antifa: antifaManager,
 }
 

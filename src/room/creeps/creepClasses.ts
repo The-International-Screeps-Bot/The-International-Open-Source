@@ -206,6 +206,21 @@ export class Vanguard extends Creep {
 }
 creepClasses.vanguard = Vanguard
 
+export class VanguardDefender extends Creep {
+
+     advancedHeal?(): boolean
+
+     /**
+      * Find and attack enemyAttackers
+      */
+     advancedAttackAttackers?(): boolean
+
+     constructor(creepID: Id<Creep>) {
+          super(creepID)
+     }
+}
+creepClasses.vanguardDefender = VanguardDefender
+
 export class Antifa extends Creep {
      constructor(creepID: Id<Creep>) {
           super(creepID)

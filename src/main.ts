@@ -121,6 +121,7 @@ declare global {
           | 'scout'
           | 'claimer'
           | 'vanguard'
+          | 'vanguardDefender'
           | 'antifa'
 
      type RoomObjectName =
