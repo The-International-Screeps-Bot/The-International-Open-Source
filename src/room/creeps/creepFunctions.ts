@@ -1829,38 +1829,6 @@ Creep.prototype.advancedReserveController = function () {
      return true
 }
 
-Creep.prototype.findStrength = function () {
-     const creep = this
-
-     // If the creep already has a recorded strength, inform it
-
-     if (creep.strength) return creep.strength
-
-     creep.strength = 1
-
-     for (const part of creep.body) {
-          switch (part.type) {
-               case RANGED_ATTACK:
-                    creep.strength +=
-                         RANGED_ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
-                    break
-               case ATTACK:
-                    creep.strength += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
-                    break
-               case HEAL:
-                    creep.strength += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
-                    break
-               case TOUGH:
-                    creep.strength += 1 + 5 / (part.boost ? BOOSTS[part.type][part.boost].damage : 1)
-                    break
-               default:
-                    creep.strength += 1
-          }
-     }
-
-     return creep.strength
-}
-
 Creep.prototype.findHealStrength = function () {
      if (this.healStrength) return this.healStrength
 

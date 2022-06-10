@@ -993,11 +993,6 @@ declare global {
            */
           pathOpts: PathOpts
 
-          /**
-           * A numerical measurement of the combat abilites of the creep
-           */
-          strength: number
-
           healStrength: number
 
           /**
@@ -1155,7 +1150,7 @@ declare global {
 
           advancedReserveController(): boolean
 
-          findStrength(): number
+          strength: number
 
           findHealStrength(): number
 
@@ -1168,6 +1163,13 @@ declare global {
           createReservation(): void
 
           // Getters
+
+          _strength: number
+
+          /**
+           * A numerical measurement of the combat abilites of the creep
+           */
+          readonly strength: number
 
           _reservation: Reservation | false
 

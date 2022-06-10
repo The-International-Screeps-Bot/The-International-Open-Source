@@ -10,7 +10,6 @@ Room.prototype.claimRequestManager = function () {
      // If there is an existing claimRequest and it's valid, check if there is claimer need
 
      if (this.memory.claimRequest) {
-
           const claimTarget = Game.rooms[this.memory.claimRequest]
           if (!claimTarget) {
                Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer] += 1
@@ -33,7 +32,8 @@ Room.prototype.claimRequestManager = function () {
           for (const enemyCreep of claimTarget.enemyCreeps) {
                // Increase the defenderNeed according to the creep's strength
 
-               Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] += enemyCreep.findStrength()
+               Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] +=
+                    enemyCreep.strength
           }
 
           if (claimTarget.controller.my) return

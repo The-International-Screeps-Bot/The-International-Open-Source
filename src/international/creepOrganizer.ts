@@ -129,7 +129,7 @@ InternationalManager.prototype.creepOrganizer = function () {
                if (role === 'remoteDefender') {
                     // Reduduce the remote's defender need proportionate to the creep's strength
 
-                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.findStrength()
+                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.strength
                     continue
                }
 

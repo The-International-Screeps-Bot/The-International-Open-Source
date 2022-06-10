@@ -759,7 +759,7 @@ export function spawnRequester(room: Room) {
      for (const enemyAttacker of enemyAttackers) {
           // Increase attackValue by the creep's heal power
 
-          attackStrength += enemyAttacker.findStrength()
+          attackStrength += enemyAttacker.strength
      }
 
      // Construct requests for meleeDefenders
@@ -851,10 +851,9 @@ export function spawnRequester(room: Room) {
 
      constructSpawnRequests(
           (function (): SpawnRequestOpts | false {
+               const priority = 7 + room.creepsFromRoom.maintainer.length
 
-            const priority = 7 + room.creepsFromRoom.maintainer.length
-
-            // Get roads
+               // Get roads
 
                const roads: (StructureRoad | StructureContainer)[] = room.get('road')
                // Get containers

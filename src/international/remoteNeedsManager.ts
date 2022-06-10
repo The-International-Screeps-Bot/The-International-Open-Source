@@ -50,7 +50,7 @@ InternationalManager.prototype.remoteNeedsManager = function () {
                     for (const enemyCreep of remote.enemyCreeps) {
                          // Increase the defenderNeed according to the creep's strength
 
-                         remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.findStrength()
+                         remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.strength
                     }
 
                     if (remote.structures.invaderCore.length) {

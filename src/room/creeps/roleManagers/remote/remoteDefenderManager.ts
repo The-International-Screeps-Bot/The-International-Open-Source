@@ -35,7 +35,7 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
 
           // Try to attack enemyAttackers, iterating if there are none or one was attacked
 
-          if (creep.advancedAttackAttackers()) continue
+          if (creep.advancedAttackEnemies()) continue
 
           // If the creep is its remote
 

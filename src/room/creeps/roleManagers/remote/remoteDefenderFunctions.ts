@@ -31,7 +31,7 @@ RemoteDefender.prototype.findRemote = function () {
           // Otherwise assign the remote to the creep and inform true
 
           creep.memory.remoteName = roomName
-          roomMemory.needs[remoteNeedsIndex[role]] -= creep.findStrength()
+          roomMemory.needs[remoteNeedsIndex[role]] -= creep.strength
 
           return true
      }
@@ -86,7 +86,7 @@ RemoteDefender.prototype.advancedHeal = function () {
           return false
      }
 
-     (top = Math.max(Math.min(creep.pos.y - 3, constants.roomDimensions - 2), 2)),
+     ;(top = Math.max(Math.min(creep.pos.y - 3, constants.roomDimensions - 2), 2)),
           (left = Math.max(Math.min(creep.pos.x - 3, constants.roomDimensions - 2), 2)),
           (bottom = Math.max(Math.min(creep.pos.y + 3, constants.roomDimensions - 2), 2)),
           (right = Math.max(Math.min(creep.pos.x + 3, constants.roomDimensions - 2), 2))
@@ -119,7 +119,7 @@ RemoteDefender.prototype.advancedHeal = function () {
      return false
 }
 
-RemoteDefender.prototype.advancedAttackAttackers = function () {
+RemoteDefender.prototype.advancedAttackEnemies = function () {
      const creep = this
      const { room } = creep
 
@@ -210,7 +210,7 @@ RemoteDefender.prototype.advancedAttackAttackers = function () {
 
      // If the creep is out matched, try to always stay in range 3
 
-     if (creep.findStrength() < enemyAttacker.findStrength()) {
+     if (creep.strength < enemyAttacker.strength) {
           if (range === 3) return true
 
           if (range >= 3) {
@@ -233,7 +233,7 @@ RemoteDefender.prototype.advancedAttackAttackers = function () {
 
      // If the creep has less heal power than the enemyAttacker's attack power
 
-     if (creep.findStrength() < enemyAttacker.findStrength()) {
+     if (creep.strength < enemyAttacker.strength) {
           // If the range is less or equal to 2
 
           if (range <= 2) {

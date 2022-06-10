@@ -131,9 +131,9 @@ export class RemoteDefender extends Creep {
      advancedHeal?(): boolean
 
      /**
-      * Find and attack enemyAttackers
+      * Find and attack enemyCreeps
       */
-     advancedAttackAttackers?(): boolean
+      advancedAttackEnemies?(): boolean
 
      constructor(creepID: Id<Creep>) {
           super(creepID)
@@ -211,9 +211,9 @@ export class VanguardDefender extends Creep {
      advancedHeal?(): boolean
 
      /**
-      * Find and attack enemyAttackers
+      * Find and attack enemyCreeps
       */
-     advancedAttackAttackers?(): boolean
+      advancedAttackEnemies?(): boolean
 
      constructor(creepID: Id<Creep>) {
           super(creepID)
