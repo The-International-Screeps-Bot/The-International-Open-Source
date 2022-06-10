@@ -1150,8 +1150,6 @@ declare global {
 
           advancedReserveController(): boolean
 
-          strength: number
-
           findHealStrength(): number
 
           findCost(): number
