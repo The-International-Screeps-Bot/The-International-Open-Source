@@ -1,5 +1,5 @@
 import { spawn } from 'child_process'
-import { constants, CPUBucketRenewThreshold } from 'international/constants'
+import { allyList, constants, CPUBucketRenewThreshold } from 'international/constants'
 import {
      arePositionsEqual,
      customLog,
@@ -1859,6 +1859,120 @@ Creep.prototype.findCost = function () {
      return cost
 }
 
+Creep.prototype.passiveHeal = function () {
+     const { room } = this
+
+     this.say('PH')
+
+     // If the creep is below max hits
+
+     if (this.hitsMax > this.hits) {
+          // Have it heal itself and stop
+
+          this.heal(this)
+          return false
+     }
+
+     let top = Math.max(Math.min(this.pos.y - 1, constants.roomDimensions - 2), 2)
+     let left = Math.max(Math.min(this.pos.x - 1, constants.roomDimensions - 2), 2)
+     let bottom = Math.max(Math.min(this.pos.y + 1, constants.roomDimensions - 2), 2)
+     let right = Math.max(Math.min(this.pos.x + 1, constants.roomDimensions - 2), 2)
+
+     // Find adjacent creeps
+
+     const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+
+     // Loop through each adjacentCreep
+
+     for (const posData of adjacentCreeps) {
+          // If the creep is the posData creep, iterate
+
+          if (this.id === posData.creep.id) continue
+
+          // If the creep is not owned and isn't an ally
+
+          if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
+
+          // If the creep is at full health, iterate
+
+          if (posData.creep.hitsMax === posData.creep.hits) continue
+
+          // have the creep heal the adjacentCreep and stop
+
+          this.heal(posData.creep)
+          return false
+     }
+
+     ;(top = Math.max(Math.min(this.pos.y - 3, constants.roomDimensions - 2), 2)),
+          (left = Math.max(Math.min(this.pos.x - 3, constants.roomDimensions - 2), 2)),
+          (bottom = Math.max(Math.min(this.pos.y + 3, constants.roomDimensions - 2), 2)),
+          (right = Math.max(Math.min(this.pos.x + 3, constants.roomDimensions - 2), 2))
+
+     // Find my creeps in range of creep
+
+     const nearbyCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+
+     // Loop through each nearbyCreep
+
+     for (const posData of nearbyCreeps) {
+          // If the creep is the posData creep, iterate
+
+          if (this.id === posData.creep.id) continue
+
+          // If the creep is not owned and isn't an ally
+
+          if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
+
+          // If the creep is at full health, iterate
+
+          if (posData.creep.hitsMax === posData.creep.hits) continue
+
+          // have the creep rangedHeal the nearbyCreep and stop
+
+          this.rangedHeal(posData.creep)
+          return true
+     }
+
+     return false
+}
+
+Creep.prototype.aggressiveHeal = function () {
+     const { room } = this
+
+     this.say('AH')
+
+     // If the creep is below max hits
+
+     if (this.hitsMax > this.hits) {
+          // Have it heal itself and stop
+
+          this.heal(this)
+          return false
+     }
+
+     if (!room.allyCreeps.length) return false
+
+     const allyCreep = this.pos.findClosestByRange(room.allyCreeps)
+     const range = getRange(this.pos.x - allyCreep.pos.x, this.pos.y - allyCreep.pos.y)
+
+     if (range > 1) {
+          this.createMoveRequest({
+               origin: this.pos,
+               goal: { pos: allyCreep.pos, range: 1 },
+          })
+
+          if (range <= 3) {
+               this.rangedHeal(allyCreep)
+               return true
+          }
+
+          return this.passiveHeal()
+     }
+
+     this.heal(allyCreep)
+     return true
+}
+
 Creep.prototype.reservationManager = function () {
      let reservation
      let target
@@ -1870,9 +1984,7 @@ Creep.prototype.reservationManager = function () {
           if (!target) this.memory.reservations.splice(index, 1)
 
           if (target instanceof Resource) {
-
                target.amount -= reservation.amount
-
           } else target.store[reservation.resourceType] -= reservation.amount
      }
 }

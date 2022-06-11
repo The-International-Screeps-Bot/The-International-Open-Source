@@ -128,8 +128,6 @@ export class RemoteDefender extends Creep {
       */
      findRemote?(): boolean
 
-     advancedHeal?(): boolean
-
      /**
       * Find and attack enemyCreeps
       */
@@ -207,8 +205,6 @@ export class Vanguard extends Creep {
 creepClasses.vanguard = Vanguard
 
 export class VanguardDefender extends Creep {
-
-     advancedHeal?(): boolean
 
      /**
       * Find and attack enemyCreeps

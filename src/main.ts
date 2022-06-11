@@ -814,6 +814,10 @@ declare global {
 
           readonly enemyAttackers: Creep[]
 
+          _allyCreeps: Creep[]
+
+            readonly allyCreeps: Creep[]
+
           _structures: Partial<OrganizedStructures>
 
           readonly structures: OrganizedStructures
@@ -1153,6 +1157,10 @@ declare global {
           findHealStrength(): number
 
           findCost(): number
+
+          passiveHeal(): boolean
+
+          aggressiveHeal(): boolean
 
           // Reservation
 

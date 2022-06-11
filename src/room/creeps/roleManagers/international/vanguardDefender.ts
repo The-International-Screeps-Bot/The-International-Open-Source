@@ -51,83 +51,6 @@ export function vanguardDefenderManager(room: Room, creepsOfRole: string[]) {
      }
 }
 
-VanguardDefender.prototype.advancedHeal = function () {
-     const { room } = this
-
-     this.say('AH')
-
-     // If the creep is below max hits
-
-     if (this.hitsMax > this.hits) {
-          // Have it heal itself and stop
-
-          this.heal(this)
-          return false
-     }
-
-     let top = Math.max(Math.min(this.pos.y - 1, constants.roomDimensions - 2), 2)
-     let left = Math.max(Math.min(this.pos.x - 1, constants.roomDimensions - 2), 2)
-     let bottom = Math.max(Math.min(this.pos.y + 1, constants.roomDimensions - 2), 2)
-     let right = Math.max(Math.min(this.pos.x + 1, constants.roomDimensions - 2), 2)
-
-     // Find adjacent creeps
-
-     const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
-
-     // Loop through each adjacentCreep
-
-     for (const posData of adjacentCreeps) {
-          // If the creep is the posData creep, iterate
-
-          if (this.id === posData.creep.id) continue
-
-          // If the creep is not owned and isn't an ally
-
-          if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
-
-          // If the creep is at full health, iterate
-
-          if (posData.creep.hitsMax === posData.creep.hits) continue
-
-          // have the creep heal the adjacentCreep and stop
-
-          this.heal(posData.creep)
-          return false
-     }
-
-     ;(top = Math.max(Math.min(this.pos.y - 3, constants.roomDimensions - 2), 2)),
-          (left = Math.max(Math.min(this.pos.x - 3, constants.roomDimensions - 2), 2)),
-          (bottom = Math.max(Math.min(this.pos.y + 3, constants.roomDimensions - 2), 2)),
-          (right = Math.max(Math.min(this.pos.x + 3, constants.roomDimensions - 2), 2))
-
-     // Find my creeps in range of creep
-
-     const nearbyCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
-
-     // Loop through each nearbyCreep
-
-     for (const posData of nearbyCreeps) {
-          // If the creep is the posData creep, iterate
-
-          if (this.id === posData.creep.id) continue
-
-          // If the creep is not owned and isn't an ally
-
-          if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
-
-          // If the creep is at full health, iterate
-
-          if (posData.creep.hitsMax === posData.creep.hits) continue
-
-          // have the creep rangedHeal the nearbyCreep and stop
-
-          this.rangedHeal(posData.creep)
-          return true
-     }
-
-     return false
-}
-
 VanguardDefender.prototype.advancedAttackEnemies = function () {
      const { room } = this
 
@@ -142,10 +65,14 @@ VanguardDefender.prototype.advancedAttackEnemies = function () {
      if (!enemyAttackers.length) {
           // Heal nearby creeps
 
-          if (this.advancedHeal()) return true
+          if (this.passiveHeal()) return true
 
           const { enemyCreeps } = room
-          if (!enemyCreeps.length) return false
+          if (!enemyCreeps.length) {
+
+            this.aggressiveHeal()
+            return true
+          }
 
           this.say('EC')
 
@@ -188,7 +115,7 @@ VanguardDefender.prototype.advancedAttackEnemies = function () {
      if (range > 3) {
           // Heal nearby creeps
 
-          this.advancedHeal()
+          this.passiveHeal()
 
           // Make a moveRequest to it and inform true
 

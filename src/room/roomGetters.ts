@@ -62,6 +62,15 @@ Object.defineProperties(Room.prototype, {
                })
           },
      },
+     allyCreeps: {
+          get() {
+               if (this._allyCreeps) return this._allyCreeps
+
+               return (this._allyCreeps = this.find(FIND_HOSTILE_CREEPS, {
+                    filter: creep => allyList.has(creep.owner.username),
+               }))
+          }
+     },
      structures: {
           get() {
                if (this._structures) return this._structures
