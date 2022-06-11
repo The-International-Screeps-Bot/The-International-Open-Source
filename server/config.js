@@ -6,10 +6,11 @@ module.exports.tickDuration = 10
 
 module.exports.playerRoom = 'W6N1'
 players = {
-     W6N1: { x: 43, y: 35 },
      W8N3: { x: 21, y: 28 },
-     W7N4: { x: 33, y: 13 },
-     W1N8: { x: 10, y: 9 },
+     W2N5: { x: 33, y: 13 },
+     W1N1: { x: 10, y: 9 },
+     W2N2: { x: 10, y: 9 },
+     W5N8: { x: 10, y: 9 },
 }
 module.exports.players = players
 module.exports.rooms = Object.keys(players)

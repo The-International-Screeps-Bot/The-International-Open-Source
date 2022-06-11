@@ -236,9 +236,9 @@ const spawnBots = async function (line, socket, rooms, players, tickDuration) {
     await sleep(5);
     console.log(`> utils.removeBots()`);
     socket.write(`utils.removeBots()\r\n`);
-    await sleep(5);
-    console.log(`> utils.enableGCLToCPU()`);
-    socket.write(`utils.enableGCLToCPU()\r\n`);
+    // await sleep(5);
+    // console.log(`> utils.enableGCLToCPU()`);
+    // socket.write(`utils.enableGCLToCPU()\r\n`);
 
     // Setup NPC terminals
     for (const room of ["W0N0", "W10N0", "W10N10", "W0N10"]) {
@@ -255,7 +255,7 @@ const spawnBots = async function (line, socket, rooms, players, tickDuration) {
     for (const room of rooms) {
       console.log(`> Spawn bot ${room} as Carson AI`);
       socket.write(
-        `bots.spawn('my-bot', '${room}', {username: '${room}', cpu: 100, gcl: 1, x: ${players[room].x}, y: ${players[room].y}})\r\n`
+        `bots.spawn('my-bot', '${room}', {username: '${room}', cpu: 300, gcl: 1})\r\n`
       );
       await sleep(1);
     }
