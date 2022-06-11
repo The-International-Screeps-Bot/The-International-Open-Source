@@ -201,4 +201,19 @@ InternationalManager.prototype.tickConfig = function () {
 
           if (!room.memory.deposits) room.memory.deposits = {}
      }
+
+     let claimTarget
+
+     for (const roomName in Memory.claimRequests) {
+
+          claimTarget = Memory.claimRequests[roomName]
+
+          if (claimTarget.abadon > 0) {
+
+               claimTarget.abadon -= 1
+               continue
+          }
+
+          claimTarget.abadon = undefined
+     }
 }

@@ -1464,6 +1464,7 @@ export function spawnRequester(room: Room) {
                     if (strengthOfParts * (spawnEnergyCapacity / cost) < claimRequestNeeds[claimRequestNeedsIndex.vanguardDefender]) {
                          // Abandon the room for some time
 
+                         Memory.claimRequests[room.memory.claimRequest].abadon = 20000
                          /* Memory.rooms[remoteName].abandoned = 1000 */
                          return false
                     }

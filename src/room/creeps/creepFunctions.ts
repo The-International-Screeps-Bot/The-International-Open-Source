@@ -1125,22 +1125,29 @@ Creep.prototype.shove = function (shoverPos) {
      this.createMoveRequest({
           origin: this.pos,
           goal: { pos: goalPos, range: 1 },
-          weightGamebjects: { 255: this.room.find(FIND_MY_CREEPS) },
-          /* weightPositions: { 255: [shoverPos] }, */
+          /* weightGamebjects: { 255: this.room.find(FIND_MY_CREEPS) }, */
+          weightPositions: { 255: [shoverPos] },
           flee,
           cacheAmount: 0,
      })
 
-     return this.runMoveRequest(this.moveRequest)
-     /*
-        return false
-    }
+     if (!this.moveRequest) return false
 
+     console.log(this.moveRequest, unpackAsRoomPos(this.moveRequest, this.room.name))
+
+/*
+     this.room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), { color: constants.colors.yellow })
+
+     return this.runMoveRequest(this.moveRequest)
+
+        return false
+
+ */
     this.room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), { color: constants.colors.yellow })
 
     this.recurseMoveRequest(this.moveRequest)
 
-    return true */
+    return true
 }
 
 Creep.prototype.runMoveRequest = function (packedPos) {

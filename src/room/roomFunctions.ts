@@ -557,6 +557,9 @@ Room.prototype.get = function (roomObjectName) {
                },
           ]
 
+          let adjacentStructures
+          let adjacentStructuresByType: Partial<Record<StructureConstant, number>>
+
           // Loop through each fastFillerPos
 
           for (let index = fastFillerPositions.length - 1; index >= 0; index -= 1) {
@@ -566,7 +569,7 @@ Room.prototype.get = function (roomObjectName) {
 
                // Get adjacent structures
 
-               const adjacentStructures = room.lookForAtArea(
+               adjacentStructures = room.lookForAtArea(
                     LOOK_STRUCTURES,
                     pos.y - 1,
                     pos.x - 1,
@@ -577,7 +580,12 @@ Room.prototype.get = function (roomObjectName) {
 
                // Construct organized adjacent structures
 
-               const adjacentStructuresByType: Partial<Record<StructureConstant, number>> = {}
+               adjacentStructuresByType = {
+                    spawn: 0,
+                    extension: 0,
+                    container: 0,
+                    link: 0,
+               }
 
                // For each structure of adjacentStructures
 
@@ -598,8 +606,8 @@ Room.prototype.get = function (roomObjectName) {
                // If there is more than one adjacent extension and container, iterate
 
                if (
-                    adjacentStructuresByType[STRUCTURE_CONTAINER] > 0 &&
-                    (adjacentStructuresByType[STRUCTURE_SPAWN] > 0 || adjacentStructuresByType[STRUCTURE_EXTENSION] > 1)
+                    adjacentStructuresByType[STRUCTURE_CONTAINER] + adjacentStructuresByType[STRUCTURE_LINK] > 0 &&
+                    adjacentStructuresByType[STRUCTURE_SPAWN] + adjacentStructuresByType[STRUCTURE_EXTENSION] > 0
                )
                     continue
 
@@ -617,7 +625,7 @@ Room.prototype.get = function (roomObjectName) {
           name: 'fastFillerPositions',
           valueType: 'object',
           cacheType: 'global',
-          cacheAmount: 10,
+          cacheAmount: 1,
           room,
           valueConstructor: findFastFillerPositions,
      })
@@ -1342,60 +1350,66 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     weightStructures()
 
                     function weightStructures() {
-                         // Loop through weights in weightGameObjects
+                         let roomObjects
+                         let weightNum
+                         let roomObj
 
                          for (const weight in opts.weightStructures) {
-                              // Use the weight to get the gameObjects
+                              // Use the weight to get the positions
 
-                              const gameObjects = opts.weightGamebjects[weight]
+                              roomObjects = opts.weightGamebjects[weight]
 
                               // Get the numeric value of the weight
 
-                              const weightNumber = parseInt(weight)
+                              weightNum = parseInt(weight)
 
                               // Loop through each gameObject and set their pos to the weight in the cm
 
-                              for (const gameObj of gameObjects) cm.set(gameObj.pos.x, gameObj.pos.y, weightNumber)
+                              for (roomObj of roomObjects) cm.set(roomObj.pos.x, roomObj.pos.y, weightNum)
                          }
                     }
 
                     weightGamebjects()
 
                     function weightGamebjects() {
-                         // Loop through weights in weightGameObjects
+                         let roomObjects
+                         let weightNum
+                         let roomObj
 
                          for (const weight in opts.weightGamebjects) {
-                              // Use the weight to get the gameObjects
+                              // Use the weight to get the positions
 
-                              const gameObjects = opts.weightGamebjects[weight]
+                              roomObjects = opts.weightGamebjects[weight]
 
                               // Get the numeric value of the weight
 
-                              const weightNumber = parseInt(weight)
+                              weightNum = parseInt(weight)
 
                               // Loop through each gameObject and set their pos to the weight in the cm
 
-                              for (const gameObj of gameObjects) cm.set(gameObj.pos.x, gameObj.pos.y, weightNumber)
+                              for (roomObj of roomObjects) cm.set(roomObj.pos.x, roomObj.pos.y, weightNum)
                          }
                     }
 
                     weightPositions()
 
                     function weightPositions() {
-                         // Loop through weights in weightGameObjects
+                         let positions
+                         let weightNum
+                         let pos
 
                          for (const weight in opts.weightPositions) {
                               // Use the weight to get the positions
 
-                              const positions = opts.weightPositions[weight]
+                              positions = opts.weightPositions[weight]
 
                               // Get the numeric value of the weight
 
-                              const weightNumber = parseInt(weight)
+                              weightNum = parseInt(weight)
 
                               // Loop through each gameObject and set their pos to the weight in the cm
 
-                              for (const pos of positions) cm.set(pos.x, pos.y, weightNumber)
+                              for (pos of positions) cm.set(pos.x, pos.y, weightNum)
                          }
                     }
 

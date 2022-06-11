@@ -10,6 +10,13 @@ Room.prototype.claimRequestManager = function () {
      // If there is an existing claimRequest and it's valid, check if there is claimer need
 
      if (this.memory.claimRequest) {
+
+          if (Memory.claimRequests[this.memory.claimRequest].abadon > 0) {
+
+               delete this.memory.claimRequest
+               return
+          }
+
           const claimTarget = Game.rooms[this.memory.claimRequest]
           if (!claimTarget) {
                Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer] += 1
@@ -27,13 +34,18 @@ Room.prototype.claimRequestManager = function () {
 
           Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguard] = 20
 
-          // Get enemyCreeps in the room and loop through them
+          Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] = 0
 
-          for (const enemyCreep of claimTarget.enemyCreeps) {
-               // Increase the defenderNeed according to the creep's strength
+          if (claimTarget.enemyCreeps.length) {
 
-               Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] +=
-                    enemyCreep.strength
+               // Get enemyCreeps in the room and loop through them
+
+               for (const enemyCreep of claimTarget.enemyCreeps) {
+                    // Increase the defenderNeed according to the creep's strength
+
+                    Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] +=
+                         enemyCreep.strength
+               }
           }
 
           if (claimTarget.controller.my) return
@@ -58,8 +70,13 @@ Room.prototype.claimRequestManager = function () {
 
      if (this.energyCapacityAvailable < 750) return
 
+     let distance
+
      for (const roomName of internationalManager.findClaimRequestsByScore()) {
-          const distance = advancedFindDistance(this.name, roomName, {
+
+          if (Memory.claimRequests[roomName].abadon > 0) continue
+
+          distance = advancedFindDistance(this.name, roomName, {
                keeper: Infinity,
                enemy: Infinity,
                enemyRemote: Infinity,
