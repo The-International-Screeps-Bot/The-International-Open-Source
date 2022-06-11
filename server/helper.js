@@ -259,7 +259,7 @@ const spawnBots = async function (line, socket, rooms, players, tickDuration) {
       );
       await sleep(5);
       socket.write(
-        `utils.setCPULimit('${room}', 300)\r\n`
+        `storage.db['users'].update({ username: '${room}' },{ $set: { cpu: 300 }})\r\n`
       );
       await sleep(5);
     }
