@@ -1303,8 +1303,6 @@ export function spawnRequester(room: Room) {
 
           constructSpawnRequests(
                (function (): SpawnRequestOpts | false {
-                    // Define the minCost and strength
-
                     const minCost = 400
                     const cost = 900
                     const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
@@ -1327,13 +1325,13 @@ export function spawnRequester(room: Room) {
                          return false
                     }
 
-                    const requiredParts =
-                         Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthOfParts) * 1.2
+                    const partsMultiplier =
+                    Math.max(Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthOfParts) * 1.2, 1)
 
                     return {
                          defaultParts: [],
                          extraParts,
-                         partsMultiplier: Math.max(requiredParts, 1),
+                         partsMultiplier,
                          groupComparator: room.creepsFromRoomWithRemote[remoteName]?.remoteDefender,
                          minCreeps: undefined,
                          maxCreeps: Infinity,
@@ -1413,7 +1411,7 @@ export function spawnRequester(room: Room) {
                          partsMultiplier: 1,
                          minCreeps: 1,
                          minCost: 750,
-                         priority: 8,
+                         priority: 8.1,
                          memoryAdditions: {
                               role: 'claimer',
                          },
@@ -1436,9 +1434,57 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost: 250,
-                         priority: 8.1 + room.creepsFromRoom.vanguard.length,
+                         priority: 8.2 + room.creepsFromRoom.vanguard.length,
                          memoryAdditions: {
                               role: 'vanguard',
+                         },
+                    }
+               })(),
+          )
+
+          // Requests for vanguardDefender
+
+          constructSpawnRequests(
+               (function (): SpawnRequestOpts | false {
+                    const minCost = 400
+                    const cost = 900
+                    const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
+                    const strengthOfParts = findStrengthOfParts(extraParts)
+
+                    // If there isn't enough spawnEnergyCapacity to spawn a vanguardDefender, inform false
+
+                    if (spawnEnergyCapacity < minCost) return false
+
+                    // If there are no related needs
+
+                    if (claimRequestNeeds[claimRequestNeedsIndex.vanguardDefender] <= 0) return false
+
+                    // If max spawnable strength is less that needed
+
+                    if (strengthOfParts * (spawnEnergyCapacity / cost) < claimRequestNeeds[claimRequestNeedsIndex.vanguardDefender]) {
+                         // Abandon the room for some time
+
+                         /* Memory.rooms[remoteName].abandoned = 1000 */
+                         return false
+                    }
+
+                    const partsMultiplier =
+                         Math.max(Math.floor(claimRequestNeeds[claimRequestNeedsIndex.vanguardDefender] / strengthOfParts) * 1.2, 1)
+
+                    // If there is no vanguardDefender need
+
+                    if (claimRequestNeeds[claimRequestNeedsIndex.vanguardDefender] <= 0) return false
+
+                    return {
+                         defaultParts: [],
+                         extraParts,
+                         partsMultiplier,
+                         minCreeps: undefined,
+                         maxCreeps: Infinity,
+                         minCost,
+                         priority: 8 + room.creepsFromRoom.vanguardDefender.length,
+                         memoryAdditions: {
+                              role: 'vanguardDefender',
                          },
                     }
                })(),
