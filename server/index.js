@@ -37,6 +37,7 @@ class Tester {
      constructor(length) {
           this.roomsSeen = {}
           this.maxRuntime = 0
+          this.maxTicks = 100 * 1000;
           if (process.argv.length > 2) {
                try {
                     this.maxRuntime = parseInt(process.argv[2], 10) * 60
@@ -56,12 +57,13 @@ class Tester {
           if (botsSpawned && line.startsWith(`'OK'`)) {
                let appendix = ''
                if (this.maxRuntime > 0) {
-                    appendix = ` with runtime ${this.maxRuntime / 60} minutes`
+                    appendix = ` with runtime ${this.maxTicks}`
+                    // appendix = ` with runtime ${this.maxRuntime / 60} minutes`
                }
                console.log(`> Start the simulation${appendix}`)
                if (this.maxRuntime > 0) {
                     // await sleep(this.maxRuntime);
-                    while (lastTick === undefined || lastTick < 100 * 1000) {
+                    while (lastTick === undefined || lastTick < this.maxTicks) {
                          await sleep(60)
                     }
                     console.log(`${lastTick} End of simulation`)
