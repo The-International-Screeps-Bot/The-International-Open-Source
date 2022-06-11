@@ -4,7 +4,7 @@ module.exports.verbose = false
 
 module.exports.tickDuration = 10
 
-module.exports.playerRoom = 'W6N1'
+module.exports.playerRoom = 'W1N1'
 players = {
      W8N3: { x: 21, y: 28 },
      W2N5: { x: 33, y: 13 },
