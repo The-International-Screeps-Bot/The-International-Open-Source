@@ -290,6 +290,12 @@ declare global {
           targetID: Id<AnyStoreStructure | Creep | Tombstone | Resource>
      }
 
+     interface ClaimRequest {
+          needs: number[]
+          score: number
+          abadon?: number
+     }
+
      interface Stats {
           lastReset: number
 
@@ -470,7 +476,7 @@ declare global {
           /**
            *
            */
-          claimRequests: { [key: string]: { needs: number[]; score: number } }
+          claimRequests: { [key: string]: ClaimRequest }
 
           attackRequests: { [key: string]: { needs: number[] } }
 
@@ -816,7 +822,7 @@ declare global {
 
           _allyCreeps: Creep[]
 
-            readonly allyCreeps: Creep[]
+          readonly allyCreeps: Creep[]
 
           _structures: Partial<OrganizedStructures>
 
