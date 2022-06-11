@@ -255,9 +255,13 @@ const spawnBots = async function (line, socket, rooms, players, tickDuration) {
     for (const room of rooms) {
       console.log(`> Spawn bot ${room} as Carson AI`);
       socket.write(
-        `bots.spawn('my-bot', '${room}', {username: '${room}', cpu: 300, gcl: 1})\r\n`
+        `bots.spawn('my-bot', '${room}', {username: '${room}', gcl: 2})\r\n`
       );
-      await sleep(1);
+      await sleep(5);
+      socket.write(
+        `utils.setCPULimit('${room}', 300)\r\n`
+      );
+      await sleep(5);
     }
     return true;
   }
