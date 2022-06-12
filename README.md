@@ -19,7 +19,7 @@ If you have specific questions or want to discuss the bot, please join our disco
 
 [![Discord link](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/5QubDsB786)
 
-![Room with bot](images/room.png)
+![image](https://user-images.githubusercontent.com/48334001/173211544-2fa17ab0-b491-4e02-8f94-cc767b455ccc.png)
 ![Map view with visuals](images/visuals.png)
 ![Information panel](images/grafana.png)
 
