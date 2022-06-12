@@ -19,37 +19,33 @@ import { creepClasses } from './creepClasses'
 Creep.prototype.preTickManager = function () {}
 
 Creep.prototype.isDying = function () {
-     const creep = this
-
      // Inform as dying if creep is already recorded as dying
 
-     if (creep.memory.dying) return true
+     if (this.memory.dying) return true
 
      // Stop if creep is spawning
 
-     if (!creep.ticksToLive) return false
+     if (!this.ticksToLive) return false
 
      // If the creep's remaining ticks are more than the estimated spawn time, inform false
 
-     if (creep.ticksToLive > creep.body.length * CREEP_SPAWN_TIME) return false
+     if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
      // Record creep as dying
 
-     creep.memory.dying = true
-     return true
+     return (this.memory.dying = true)
 }
 
 Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENERGY, amount) {
-     const creep = this
-     const { room } = creep
+     const { room } = this
 
      // If creep isn't in transfer range
 
-     if (creep.pos.getRangeTo(target.pos) > 1) {
+     if (this.pos.getRangeTo(target.pos) > 1) {
           // Make a moveRequest to target and inform false
 
-          creep.createMoveRequest({
-               origin: creep.pos,
+          this.createMoveRequest({
+               origin: this.pos,
                goal: { pos: target.pos, range: 1 },
                avoidEnemyRanges: true,
                weightGamebjects: {
@@ -61,14 +57,14 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
 
      // Try to transfer, recording the result
 
-     const transferResult = creep.transfer(target, resourceType, amount)
+     const transferResult = this.transfer(target, resourceType, amount)
 
      // If the action can be considered a success
 
      if (transferResult === OK || transferResult === ERR_FULL || transferResult === ERR_NOT_ENOUGH_RESOURCES) {
           // Record that the creep has done the action and inform true
 
-          creep.hasMovedResources = true
+          this.hasMovedResources = true
           return true
      }
 
@@ -78,16 +74,15 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
 }
 
 Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENERGY, amount) {
-     const creep = this
-     const { room } = creep
+     const { room } = this
 
      // If creep isn't in transfer range
 
-     if (creep.pos.getRangeTo(target.pos) > 1) {
+     if (this.pos.getRangeTo(target.pos) > 1) {
           // Create a moveRequest to the target and inform failure
 
-          creep.createMoveRequest({
-               origin: creep.pos,
+          this.createMoveRequest({
+               origin: this.pos,
                goal: { pos: target.pos, range: 1 },
                avoidEnemyRanges: true,
                weightGamebjects: {
@@ -100,14 +95,14 @@ Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENE
 
      // Try to withdraw, recording the result
 
-     const withdrawResult = creep.withdraw(target, resourceType, amount)
+     const withdrawResult = this.withdraw(target, resourceType, amount)
 
      // If the action can be considered a success
 
      if (withdrawResult === OK || withdrawResult === ERR_FULL) {
           // Record that the creep has done the action and inform true
 
-          creep.hasMovedResources = true
+          this.hasMovedResources = true
           return true
      }
 
@@ -117,16 +112,15 @@ Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENE
 }
 
 Creep.prototype.advancedPickup = function (target) {
-     const creep = this
-     const { room } = creep
+     const { room } = this
 
      // If creep isn't in transfer range
 
-     if (creep.pos.getRangeTo(target.pos) > 1) {
+     if (this.pos.getRangeTo(target.pos) > 1) {
           // Make a moveRequest to the target and inform failure
 
-          creep.createMoveRequest({
-               origin: creep.pos,
+          this.createMoveRequest({
+               origin: this.pos,
                goal: { pos: target.pos, range: 1 },
                avoidEnemyRanges: true,
                weightGamebjects: {
@@ -139,10 +133,10 @@ Creep.prototype.advancedPickup = function (target) {
 
      // Try to pickup. if the action can be considered a success
 
-     if (creep.pickup(target) === OK) {
+     if (this.pickup(target) === OK) {
           // Record that the creep has done the action and inform true
 
-          creep.hasMovedResources = true
+          this.hasMovedResources = true
           return true
      }
 
@@ -152,22 +146,20 @@ Creep.prototype.advancedPickup = function (target) {
 }
 
 Creep.prototype.advancedHarvestSource = function (source) {
-     const creep = this
-
      // Harvest the source, informing the result if it didn't succeed
 
-     if (creep.harvest(source) !== OK) return false
+     if (this.harvest(source) !== OK) return false
 
      // Record that the creep has worked
 
-     creep.hasWorked = true
+     this.hasWorked = true
 
      // Find amount of energy harvested and record it in data
 
-     const energyHarvested = Math.min(creep.partsOfType(WORK) * HARVEST_POWER, source.energy)
+     const energyHarvested = Math.min(this.partsOfType(WORK) * HARVEST_POWER, source.energy)
      Memory.stats.energyHarvested += energyHarvested
 
-     creep.say(`⛏️${energyHarvested}`)
+     this.say(`⛏️${energyHarvested}`)
 
      // Inform true
 
@@ -175,8 +167,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
 }
 
 Creep.prototype.advancedUpgradeController = function () {
-     const creep = this
-     const { room } = creep
+     const { room } = this
 
      // The the controller
 
@@ -187,14 +178,14 @@ Creep.prototype.advancedUpgradeController = function () {
      const controllerStructure: StructureLink | StructureContainer | undefined =
           room.get('controllerLink') || room.get('controllerContainer')
 
-     creep.say('AUC')
+     this.say('AUC')
 
      // If there is a controllerContainer
 
      if (controllerStructure) {
           // if the creep doesn't have an upgrade pos
 
-          if (!creep.memory.packedPos) {
+          if (!this.memory.packedPos) {
                // Get upgrade positions
 
                const upgradePositions: RoomPosition[] = room.get('upgradePositions')
@@ -204,12 +195,14 @@ Creep.prototype.advancedUpgradeController = function () {
                const usedUpgradePositions: Set<number> = room.get('usedUpgradePositions')
                if (!usedUpgradePositions) return false
 
+               let packedPos
+
                // Loop through each upgradePositions
 
                for (const pos of upgradePositions) {
                     // Construct the packedPos using pos
 
-                    const packedPos = pack(pos)
+                    packedPos = pack(pos)
 
                     // Iterate if the pos is used
 
@@ -217,47 +210,47 @@ Creep.prototype.advancedUpgradeController = function () {
 
                     // Otherwise record packedPos in the creep's memory and in usedUpgradePositions
 
-                    creep.memory.packedPos = packedPos
+                    this.memory.packedPos = packedPos
                     usedUpgradePositions.add(packedPos)
                     break
                }
           }
 
-          const upgradeControllerResult = creep.upgradeController(controller)
+          const upgradeControllerResult = this.upgradeController(controller)
 
-          const workPartCount = creep.partsOfType(WORK)
+          const workPartCount = this.partsOfType(WORK)
 
           let controlPoints = 0
 
           // Try to upgrade the controller, and if the result is a success
 
           if (upgradeControllerResult === OK) {
-               creep.say('UC')
+               this.say('UC')
 
-               controlPoints = Math.min(creep.store.energy, creep.partsOfType(WORK))
-               creep.store.energy -= workPartCount
+               controlPoints = Math.min(this.store.energy, this.partsOfType(WORK))
+               this.store.energy -= workPartCount
           }
 
           // If packedUpgradePos is out of range
 
           if (
                getRangeBetween(
-                    creep.pos.x,
-                    creep.pos.y,
-                    Math.floor(creep.memory.packedPos / constants.roomDimensions),
-                    Math.floor(creep.memory.packedPos % constants.roomDimensions),
+                    this.pos.x,
+                    this.pos.y,
+                    Math.floor(this.memory.packedPos / constants.roomDimensions),
+                    Math.floor(this.memory.packedPos % constants.roomDimensions),
                ) > 0
           ) {
-               creep.say('➡️🔋')
+               this.say('➡️🔋')
 
                // Make a move request to it
 
-               creep.createMoveRequest({
-                    origin: creep.pos,
+               this.createMoveRequest({
+                    origin: this.pos,
                     goal: {
                          pos: new RoomPosition(
-                              Math.floor(creep.memory.packedPos / constants.roomDimensions),
-                              Math.floor(creep.memory.packedPos % constants.roomDimensions),
+                              Math.floor(this.memory.packedPos / constants.roomDimensions),
+                              Math.floor(this.memory.packedPos % constants.roomDimensions),
                               room.name,
                          ),
                          range: 0,
@@ -277,23 +270,23 @@ Creep.prototype.advancedUpgradeController = function () {
 
           // If the creep has less energy than its workPartCount
 
-          if (creep.store.energy <= 0) {
+          if (this.store.energy <= 0) {
                // Withdraw from the controllerContainer, informing false if the withdraw failed
 
-               if (creep.withdraw(controllerStructure, RESOURCE_ENERGY) !== OK) return false
+               if (this.withdraw(controllerStructure, RESOURCE_ENERGY) !== OK) return false
 
-               creep.store.energy = creep.store.getCapacity(RESOURCE_ENERGY)
+               this.store.energy = this.store.getCapacity(RESOURCE_ENERGY)
 
                // Calculate the control points added
 
-               controlPoints = Math.min(creep.store.energy, creep.partsOfType(WORK))
+               controlPoints = Math.min(this.store.energy, this.partsOfType(WORK))
           }
 
           if (upgradeControllerResult === OK) {
                // Add control points to total controlPoints counter
 
                Memory.stats.controlPoints += controlPoints
-               creep.say(`🔋${controlPoints}`)
+               this.say(`🔋${controlPoints}`)
 
                return true
           }
@@ -307,7 +300,7 @@ Creep.prototype.advancedUpgradeController = function () {
           ) {
                // Try to repair the controllerContainer
 
-               const repairResult = creep.repair(controllerStructure)
+               const repairResult = this.repair(controllerStructure)
 
                // If the repair worked
 
@@ -322,7 +315,7 @@ Creep.prototype.advancedUpgradeController = function () {
                     // Add control points to total controlPoints counter and say the success
 
                     Memory.stats.energySpentOnRepairing += energySpentOnRepairs
-                    creep.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
+                    this.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
 
                     // And inform true
 
@@ -337,15 +330,15 @@ Creep.prototype.advancedUpgradeController = function () {
 
      // If the creep needs resources
 
-     if (creep.needsResources()) {
-          creep.say('DR')
+     if (this.needsResources()) {
+          this.say('DR')
 
           // If creep has a task
 
-          if (global[creep.id]?.respondingTaskID) {
+          if (global[this.id]?.respondingTaskID) {
                // Try to filfill task
 
-               const fulfillTaskResult = creep.fulfillTask()
+               const fulfillTaskResult = this.fulfillTask()
 
                // If the task wasn't fulfilled, inform false
 
@@ -353,7 +346,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
                // Otherwise find the task
 
-               const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
+               const task: RoomTask = room.global.tasksWithResponders[global[this.id].respondingTaskID]
 
                // Delete it and inform false
 
@@ -363,7 +356,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
           // Otherwise try to find a new task
 
-          creep.findTask(new Set(['pickup', 'withdraw', 'offer']), RESOURCE_ENERGY)
+          this.findTask(new Set(['pickup', 'withdraw', 'offer']), RESOURCE_ENERGY)
 
           return false
      }
@@ -372,11 +365,11 @@ Creep.prototype.advancedUpgradeController = function () {
 
      // If the controller is out of upgrade range
 
-     if (creep.pos.getRangeTo(controller.pos) > 3) {
+     if (this.pos.getRangeTo(controller.pos) > 3) {
           // Make a move request to it
 
-          creep.createMoveRequest({
-               origin: creep.pos,
+          this.createMoveRequest({
+               origin: this.pos,
                goal: { pos: controller.pos, range: 3 },
                avoidEnemyRanges: true,
                weightGamebjects: {
@@ -391,15 +384,15 @@ Creep.prototype.advancedUpgradeController = function () {
 
      // Try to upgrade the controller, and if it worked
 
-     if (creep.upgradeController(controller) === OK) {
+     if (this.upgradeController(controller) === OK) {
           // Calculate the control points added
 
-          const controlPoints = creep.partsOfType(WORK)
+          const controlPoints = this.partsOfType(WORK)
 
           // Add control points to total controlPoints counter and say the success
 
           Memory.stats.controlPoints += controlPoints
-          creep.say(`🔋${controlPoints}`)
+          this.say(`🔋${controlPoints}`)
 
           // Inform true
 
@@ -412,26 +405,26 @@ Creep.prototype.advancedUpgradeController = function () {
 }
 
 Creep.prototype.advancedBuildCSite = function (cSite) {
-     const creep = this
-     const { room } = creep
+
+     const { room } = this
 
      // Stop if the cSite is undefined
 
      if (!cSite) return false
 
-     creep.say('ABCS')
+     this.say('ABCS')
 
-     const range = getRange(creep.pos.x - cSite.pos.x, creep.pos.y - cSite.pos.y)
+     const range = getRange(this.pos.x - cSite.pos.x, this.pos.y - cSite.pos.y)
 
      // If the cSite is out of range
 
      if (range > 3) {
-          creep.say('➡️CS')
+          this.say('➡️CS')
 
           // Make a move request to it
 
-          creep.createMoveRequest({
-               origin: creep.pos,
+          this.createMoveRequest({
+               origin: this.pos,
                goal: { pos: cSite.pos, range: 3 },
                avoidEnemyRanges: true,
                weightGamebjects: {
@@ -446,7 +439,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
      // Try to build the construction site
 
-     const buildResult = creep.build(cSite)
+     const buildResult = this.build(cSite)
 
      // If the build worked
 
@@ -454,17 +447,17 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
           // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
           const energySpentOnConstruction = Math.min(
-               creep.partsOfType(WORK) * BUILD_POWER,
+               this.partsOfType(WORK) * BUILD_POWER,
                (cSite.progressTotal - cSite.progress) * BUILD_POWER,
           )
 
           // Add control points to total controlPoints counter and say the success
 
           Memory.stats.energySpentOnConstruction += Math.min(
-               creep.partsOfType(WORK) * BUILD_POWER,
+               this.partsOfType(WORK) * BUILD_POWER,
                (cSite.progressTotal - cSite.progress) * BUILD_POWER,
           )
-          creep.say(`🚧${energySpentOnConstruction}`)
+          this.say(`🚧${energySpentOnConstruction}`)
 
           // Inform true
 
@@ -477,18 +470,18 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 }
 
 Creep.prototype.findRampartRepairTarget = function (workPartCount) {
-     const creep = this
-     const { room } = creep
+
+     const { room } = this
 
      // Get the repairTarget using the ID in the creep's memory
 
-     const repairTarget: Structure | false = findObjectWithID(creep.memory.repairTarget)
+     const repairTarget: Structure | false = findObjectWithID(this.memory.repairTarget)
 
-     const rampartRepairExpectation = (workPartCount * REPAIR_POWER * creep.store.getCapacity()) / CARRY_CAPACITY
+     const rampartRepairExpectation = (workPartCount * REPAIR_POWER * this.store.getCapacity()) / CARRY_CAPACITY
 
      // If the repairTarget exists and it's under the quota, it
 
-     if (repairTarget && repairTarget.hits < creep.memory.quota + rampartRepairExpectation) return repairTarget
+     if (repairTarget && repairTarget.hits < this.memory.quota + rampartRepairExpectation) return repairTarget
 
      // Get ramparts in the room, informing false is there are none
 
@@ -498,7 +491,7 @@ Creep.prototype.findRampartRepairTarget = function (workPartCount) {
      // Assign the quota to the value of the creep's quota, or its workPartCount times 1000, increasing it each iteration based on the creep's workPartCount
 
      for (
-          let quota = creep.memory.quota || rampartRepairExpectation;
+          let quota = this.memory.quota || rampartRepairExpectation;
           quota < ramparts[0].hitsMax;
           quota += rampartRepairExpectation
      ) {
@@ -509,11 +502,11 @@ Creep.prototype.findRampartRepairTarget = function (workPartCount) {
 
           // Assign the quota to the creep's memory
 
-          creep.memory.quota = quota
+          this.memory.quota = quota
 
           // Find the closest rampart under the quota and inform it
 
-          return creep.pos.findClosestByRange(rampartsUnderQuota)
+          return this.pos.findClosestByRange(rampartsUnderQuota)
      }
 
      // If no rampart was found, inform false
@@ -522,8 +515,8 @@ Creep.prototype.findRampartRepairTarget = function (workPartCount) {
 }
 
 Creep.prototype.findRepairTarget = function (excludedIDs = new Set()) {
-     const creep = this
-     const { room } = creep
+
+     const { room } = this
 
      // Get roads and containers in the room
 
@@ -543,7 +536,7 @@ Creep.prototype.findRepairTarget = function (excludedIDs = new Set()) {
           return structure.hitsMax * 0.2 >= structure.hits
      })
 
-     creep.say('FRT')
+     this.say('FRT')
 
      // If there are no viableRepairTargets, inform false
 
@@ -551,18 +544,18 @@ Creep.prototype.findRepairTarget = function (excludedIDs = new Set()) {
 
      // Inform the closest viableRepairTarget to the creep's memory
 
-     return creep.pos.findClosestByRange(viableRepairTargets)
+     return this.pos.findClosestByRange(viableRepairTargets)
 }
 
 Creep.prototype.findOptimalSourceName = function () {
-     const creep = this
-     const { room } = creep
 
-     creep.say('FOSN')
+     const { room } = this
+
+     this.say('FOSN')
 
      // If the creep already has a sourceName, inform true
 
-     if (creep.memory.sourceName) return true
+     if (this.memory.sourceName) return true
 
      // Get the rooms anchor, if it's undefined inform false
 
@@ -599,7 +592,7 @@ Creep.prototype.findOptimalSourceName = function () {
                ) {
                     // Assign the sourceName to the creep's memory and Inform true
 
-                    creep.memory.sourceName = sourceName
+                    this.memory.sourceName = sourceName
                     return true
                }
           }
@@ -615,18 +608,18 @@ Creep.prototype.findOptimalSourceName = function () {
 }
 
 Creep.prototype.findSourceHarvestPos = function (sourceName) {
-     const creep = this
-     const { room } = creep
 
-     creep.say('FSHP')
+     const { room } = this
+
+     this.say('FSHP')
 
      // Stop if the creep already has a packedHarvestPos
 
-     if (creep.memory.packedPos) return true
+     if (this.memory.packedPos) return true
 
      // Define an anchor
 
-     const anchor: RoomPosition = room.anchor || creep.pos
+     const anchor: RoomPosition = room.anchor || this.pos
 
      // Get usedSourceHarvestPositions
 
@@ -645,7 +638,7 @@ Creep.prototype.findSourceHarvestPos = function (sourceName) {
           if (!usedSourceHarvestPositions.has(packedPos)) {
                // Assign it as the creep's harvest pos and inform true
 
-               creep.memory.packedPos = packedPos
+               this.memory.packedPos = packedPos
                usedSourceHarvestPositions.add(packedPos)
 
                return true
@@ -665,25 +658,25 @@ Creep.prototype.findSourceHarvestPos = function (sourceName) {
 
      packedPos = pack(openHarvestPositions[0])
 
-     creep.memory.packedPos = packedPos
+     this.memory.packedPos = packedPos
      usedSourceHarvestPositions.add(packedPos)
 
      return true
 }
 
 Creep.prototype.findMineralHarvestPos = function () {
-     const creep = this
-     const { room } = creep
 
-     creep.say('FMHP')
+     const { room } = this
+
+     this.say('FMHP')
 
      // Stop if the creep already has a packedHarvestPos
 
-     if (creep.memory.packedPos) return true
+     if (this.memory.packedPos) return true
 
      // Define an anchor
 
-     const anchor: RoomPosition = room.anchor || creep.pos
+     const anchor: RoomPosition = room.anchor || this.pos
 
      // Get usedMineralHarvestPositions
 
@@ -702,7 +695,7 @@ Creep.prototype.findMineralHarvestPos = function () {
           if (!usedHarvestPositions.has(packedPos)) {
                // Assign it as the creep's harvest pos and inform true
 
-               creep.memory.packedPos = packedPos
+               this.memory.packedPos = packedPos
                usedHarvestPositions.add(packedPos)
 
                return true
@@ -722,21 +715,21 @@ Creep.prototype.findMineralHarvestPos = function () {
 
      packedPos = pack(openHarvestPositions[0])
 
-     creep.memory.packedPos = packedPos
+     this.memory.packedPos = packedPos
      usedHarvestPositions.add(packedPos)
 
      return true
 }
 
 Creep.prototype.findFastFillerPos = function () {
-     const creep = this
-     const { room } = creep
 
-     creep.say('FFP')
+     const { room } = this
+
+     this.say('FFP')
 
      // Stop if the creep already has a packedFastFillerPos
 
-     if (creep.memory.packedPos) return true
+     if (this.memory.packedPos) return true
 
      // Get usedFastFillerPositions
 
@@ -751,24 +744,23 @@ Creep.prototype.findFastFillerPos = function () {
 
      openFastFillerPositions.sort(
           (a, b) =>
-               getRangeBetween(creep.pos.x, creep.pos.y, a.x, a.y) -
-               getRangeBetween(creep.pos.x, creep.pos.y, b.x, b.y),
+               getRangeBetween(this.pos.x, this.pos.y, a.x, a.y) -
+               getRangeBetween(this.pos.x, this.pos.y, b.x, b.y),
      )
 
      const packedPos = pack(openFastFillerPositions[0])
 
-     creep.memory.packedPos = packedPos
+     this.memory.packedPos = packedPos
      usedFastFillerPositions.add(packedPos)
 
      return true
 }
 
 Creep.prototype.hasPartsOfTypes = function (partTypes) {
-     const creep = this
 
      // If the doesn't have any parts of the specified types, inform false
 
-     if (!creep.body.some(part => partTypes.includes(part.type))) return false
+     if (!this.body.some(part => partTypes.includes(part.type))) return false
 
      // If the creep has all the parts, inform true
 
@@ -776,15 +768,13 @@ Creep.prototype.hasPartsOfTypes = function (partTypes) {
 }
 
 Creep.prototype.partsOfType = function (type) {
-     const creep = this
 
      // Filter body parts that are of a specified type, informing their count
 
-     return creep.body.filter(part => part.type === type).length
+     return this.body.filter(part => part.type === type).length
 }
 
 Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
-     const creep = this
 
      // Inform true if there is no path
 
@@ -796,25 +786,25 @@ Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
 
      // Inform true if there is no lastCache value in the creep's memory
 
-     if (!creep.memory.lastCache) return true
+     if (!this.memory.lastCache) return true
 
      // Inform true if the path is out of caching time
 
-     if (creep.memory.lastCache + cacheAmount <= Game.time) return true
+     if (this.memory.lastCache + cacheAmount <= Game.time) return true
 
      // Inform true if the path isn't in the same room as the creep
 
-     if (path[0].roomName !== creep.room.name) return true
+     if (path[0].roomName !== this.room.name) return true
 
-     if (!creep.memory.goalPos) return true
+     if (!this.memory.goalPos) return true
 
      // Inform true if the creep's previous target isn't its current
 
-     if (!arePositionsEqual(unpackPos(creep.memory.goalPos), goalPos)) return true
+     if (!arePositionsEqual(unpackPos(this.memory.goalPos), goalPos)) return true
 
      // If next pos in the path is not in range, inform true
 
-     if (creep.pos.getRangeTo(path[0]) > 1) return true
+     if (this.pos.getRangeTo(path[0]) > 1) return true
 
      // Otherwise inform false
 
@@ -822,20 +812,20 @@ Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
 }
 
 Creep.prototype.createMoveRequest = function (opts) {
-     const creep = this
-     const { room } = creep
+
+     const { room } = this
 
      // If creep can't move, inform false
 
-     if (creep.fatigue > 0) return false
+     if (this.fatigue > 0) return false
 
      // If creep is spawning, inform false
 
-     if (creep.spawning) return false
+     if (this.spawning) return false
 
      // If the creep already has a moveRequest, inform false
 
-     if (creep.moveRequest) return false
+     if (this.moveRequest) return false
 
      // Assign default opts
 
@@ -845,12 +835,12 @@ Creep.prototype.createMoveRequest = function (opts) {
 
      // If there is a path in the creep's memory
 
-     if (creep.memory.path) {
-          path = unpackPosList(creep.memory.path)
+     if (this.memory.path) {
+          path = unpackPosList(this.memory.path)
 
           // So long as the creep isn't standing on the first position in the path
 
-          while (path[0] && arePositionsEqual(creep.pos, path[0])) {
+          while (path[0] && arePositionsEqual(this.pos, path[0])) {
                // Remove the first pos of the path
 
                path.shift()
@@ -859,14 +849,14 @@ Creep.prototype.createMoveRequest = function (opts) {
 
      // See if the creep needs a new path
 
-     const needsNewPathResult = creep.needsNewPath(opts.goal.pos, opts.cacheAmount, path)
+     const needsNewPathResult = this.needsNewPath(opts.goal.pos, opts.cacheAmount, path)
 
      // If the creep need a new path, make one
 
      if (needsNewPathResult) {
           // Assign the creep to the opts
 
-          opts.creep = creep
+          opts.creep = this
 
           // Inform opts to avoid impassible structures
 
@@ -888,7 +878,7 @@ Creep.prototype.createMoveRequest = function (opts) {
 
           // Set the lastCache to the current tick
 
-          creep.memory.lastCache = Game.time
+          this.memory.lastCache = Game.time
 
           // Show that a new path has been created
 
@@ -900,7 +890,7 @@ Creep.prototype.createMoveRequest = function (opts) {
 
           // So long as the creep isn't standing on the first position in the path
 
-          while (path[0] && arePositionsEqual(creep.pos, path[0])) {
+          while (path[0] && arePositionsEqual(this.pos, path[0])) {
                // Remove the first pos of the path
 
                path.shift()
@@ -921,23 +911,23 @@ Creep.prototype.createMoveRequest = function (opts) {
 
      // Add the creep's name to its moveRequest position
 
-     room.moveRequests[packedPos].push(creep.name)
+     room.moveRequests[packedPos].push(this.name)
 
      // Set the creep's pathOpts to reflect this moveRequest's opts
 
-     creep.pathOpts = opts
+     this.pathOpts = opts
 
      // Assign the goal's pos to the creep's goalPos
 
-     creep.memory.goalPos = packPos(opts.goal.pos)
+     this.memory.goalPos = packPos(opts.goal.pos)
 
      // Make moveRequest true to inform a moveRequest has been made
 
-     creep.moveRequest = packedPos
+     this.moveRequest = packedPos
 
      // Set the path in the creep's memory
 
-     creep.memory.path = packPosList(path)
+     this.memory.path = packPosList(path)
 
      // Inform success
 
@@ -1135,7 +1125,7 @@ Creep.prototype.shove = function (shoverPos) {
 
      console.log(this.moveRequest, unpackAsRoomPos(this.moveRequest, this.room.name))
 
-/*
+     /*
      this.room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), { color: constants.colors.yellow })
 
      return this.runMoveRequest(this.moveRequest)
@@ -1143,11 +1133,13 @@ Creep.prototype.shove = function (shoverPos) {
         return false
 
  */
-    this.room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), { color: constants.colors.yellow })
+     this.room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), {
+          color: constants.colors.yellow,
+     })
 
-    this.recurseMoveRequest(this.moveRequest)
+     this.recurseMoveRequest(this.moveRequest)
 
-    return true
+     return true
 }
 
 Creep.prototype.runMoveRequest = function (packedPos) {
@@ -1184,8 +1176,8 @@ Creep.prototype.runMoveRequest = function (packedPos) {
 }
 
 Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
-     const creep = this
-     const { room } = creep
+
+     const { room } = this
 
      // Try to find the name of the creep at pos
 
@@ -1196,7 +1188,7 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
      if (!creepNameAtPos) {
           // If there are no creeps at the pos, operate the moveRequest
 
-          creep.runMoveRequest(packedPos)
+          this.runMoveRequest(packedPos)
 
           // Otherwise, loop through each index of the queue
 
@@ -1234,10 +1226,10 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
      if (creepAtPos.moveRequest && room.moveRequests[pack(creepAtPos.pos)]) {
           // If the creep's pos and the creepAtPos's moveRequests are aligned
 
-          if (pack(creep.pos) === creepAtPos.moveRequest) {
+          if (pack(this.pos) === creepAtPos.moveRequest) {
                // Have the creep move to its moveRequest
 
-               creep.runMoveRequest(packedPos)
+               this.runMoveRequest(packedPos)
 
                // Have the creepAtPos move to the creepAtPos and stop
 
@@ -1250,7 +1242,7 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
           if (queue.includes(creepAtPos.name)) {
                // Operate the moveRequest
 
-               creep.runMoveRequest(packedPos)
+               this.runMoveRequest(packedPos)
 
                //
 
@@ -1275,25 +1267,25 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
 
           // Otherwise add the creep to the traffic queue and stop
 
-          queue.push(creep.name)
+          queue.push(this.name)
           creepAtPos.recurseMoveRequest(creepAtPos.moveRequest, queue)
           return
      }
 
      // Otherwise the creepAtPos has no moveRequest and isn't fatigued
 
-     if (creepAtPos.shove(creep.pos)) {
-          creep.runMoveRequest(packedPos)
+     if (creepAtPos.shove(this.pos)) {
+          this.runMoveRequest(packedPos)
           return
      }
 
      // Have the creep move to its moveRequest
 
-     creep.runMoveRequest(packedPos)
+     this.runMoveRequest(packedPos)
 
      // Have the creepAtPos move to the creep and inform true
 
-     creepAtPos.runMoveRequest(pack(creep.pos))
+     creepAtPos.runMoveRequest(pack(this.pos))
 }
 
 Creep.prototype.getPushed = function () {
@@ -1324,61 +1316,60 @@ Creep.prototype.getPushed = function () {
 }
 
 Creep.prototype.needsResources = function () {
-     const creep = this
 
      // If the creep is empty
 
-     if (creep.store.getUsedCapacity() === 0) {
+     if (this.store.getUsedCapacity() === 0) {
           // Record and inform that the creep needs resources
 
-          creep.memory.needsResources = true
+          this.memory.needsResources = true
           return true
      }
 
      // Otherwise if the creep is full
 
-     if (creep.store.getFreeCapacity() === 0) {
+     if (this.store.getFreeCapacity() === 0) {
           // Record and inform that the creep does not resources
 
-          delete creep.memory.needsResources
+          delete this.memory.needsResources
           return false
      }
 
      // Otherwise inform the state of needsResources
 
-     return creep.memory.needsResources
+     return this.memory.needsResources
 }
 
 Creep.prototype.fulfillTask = function () {
-     const creep = this
-     const { room } = creep
 
-     creep.say('FT')
+     const { room } = this
+
+     this.say('FT')
 
      // Get the creep's task
 
-     const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
+     const task: RoomTask = room.global.tasksWithResponders[global[this.id].respondingTaskID]
 
      // If the task is undefined
 
      if (!task) {
           // Remove it as the creep's task and inform false
 
-          delete global[creep.id].respondingTaskID
+          delete global[this.id].respondingTaskID
           return false
      }
 
      // If visuals are enabled, show the task targeting
 
      if (Memory.roomVisuals)
-          room.visual.line(creep.pos, unpackAsRoomPos(task.pos, room.name), {
+          room.visual.line(this.pos, unpackAsRoomPos(task.pos, room.name), {
                color: constants.colors.lightBlue,
                width: 0.15,
           })
 
      // Run the creep's function based on the task type and inform its result
 
-     return creep[`fulfill${task.type.charAt(0).toUpperCase()}${task.type.slice(1)}Task`](task)
+     return this[`fulfill${task.type.charAt(0).toUpperCase()}${task.type.slice(1)}Task`](task)
 }
 
 Creep.prototype.fulfillPullTask = function (task) {
@@ -1593,8 +1584,7 @@ Creep.prototype.fulfillPickupTask = function (task) {
 }
 
 Creep.prototype.advancedSignController = function () {
-     const creep = this
-     const { room } = creep
+     const { room } = this
 
      // Construct the signMessage
 
@@ -1635,33 +1625,32 @@ Creep.prototype.advancedSignController = function () {
 
      // If the controller is not in range
 
-     if (creep.pos.getRangeTo(room.controller.pos) > 1) {
+     if (this.pos.getRangeTo(room.controller.pos) > 1) {
           // Request to move to the controller and inform false
 
-          creep.createMoveRequest({
-               origin: creep.pos,
+          this.createMoveRequest({
+               origin: this.pos,
                goal: { pos: room.controller.pos, range: 1 },
                avoidEnemyRanges: true,
                plainCost: 1,
                swampCost: 1,
           })
 
-          if (!creep.moveRequest) return false
+          if (!this.moveRequest) return false
 
           return true
      }
 
      // Otherwise Try to sign the controller, informing the result
 
-     return creep.signController(room.controller, signMessage) === OK
+     return this.signController(room.controller, signMessage) === OK
 }
 
 Creep.prototype.isOnExit = function () {
-     const creep = this
      // Define an x and y aligned with the creep's pos
 
-     const { x } = creep.pos
-     const { y } = creep.pos
+     const { x } = this.pos
+     const { y } = this.pos
 
      // If the creep is on an exit, inform true. Otherwise inform false
 
@@ -1670,15 +1659,13 @@ Creep.prototype.isOnExit = function () {
 }
 
 Creep.prototype.findHealPower = function () {
-     const creep = this
-
      // Initialize the healValue
 
      let healValue = 0
 
      // Loop through the creep's body
 
-     for (const part of creep.body) {
+     for (const part of this.body) {
           // If the part isn't heal, iterate
 
           if (part.type !== HEAL) continue
@@ -1694,16 +1681,15 @@ Creep.prototype.findHealPower = function () {
 }
 
 Creep.prototype.advancedRecycle = function () {
-     const creep = this
-     const { room } = creep
+     const { room } = this
 
      if (!room.structures.spawn.length) return
 
-     creep.say('♻️')
+     this.say('♻️')
 
      // Otherwise, find the closest spawn to the creep
 
-     const closestSpawn = creep.pos.findClosestByRange(room.structures.spawn)
+     const closestSpawn = this.pos.findClosestByRange(room.structures.spawn)
 
      const fastFillerContainers = (
           [room.get('fastFillerContainerLeft'), room.get('fastFillerContainerRight')] as (
@@ -1719,9 +1705,9 @@ Creep.prototype.advancedRecycle = function () {
 
           // If the creep is in range of 1
 
-          if (getRange(creep.pos.x - closestContainer.pos.x, creep.pos.y - closestContainer.pos.y) > 0) {
-               creep.createMoveRequest({
-                    origin: creep.pos,
+          if (getRange(this.pos.x - closestContainer.pos.x, this.pos.y - closestContainer.pos.y) > 0) {
+               this.createMoveRequest({
+                    origin: this.pos,
                     goal: { pos: closestContainer.pos, range: 0 },
                     avoidEnemyRanges: true,
                     weightGamebjects: {
@@ -1731,9 +1717,9 @@ Creep.prototype.advancedRecycle = function () {
 
                return
           }
-     } else if (creep.pos.getRangeTo(closestSpawn.pos) > 1) {
-          creep.createMoveRequest({
-               origin: creep.pos,
+     } else if (this.pos.getRangeTo(closestSpawn.pos) > 1) {
+          this.createMoveRequest({
+               origin: this.pos,
                goal: { pos: closestSpawn.pos, range: 1 },
                avoidEnemyRanges: true,
                weightGamebjects: {
@@ -1744,14 +1730,13 @@ Creep.prototype.advancedRecycle = function () {
           return
      }
 
-     closestSpawn.recycleCreep(creep)
+     closestSpawn.recycleCreep(this)
 }
 
 Creep.prototype.advancedRenew = function () {
-     const creep = this
-     const { room } = creep
+     const { room } = this
 
-     if (creep.body.length > 8) return false
+     if (this.body.length > 8) return false
 
      // If there is insufficient CPU to renew, inform false
 
@@ -1761,11 +1746,11 @@ Creep.prototype.advancedRenew = function () {
 
      //
 
-     if (creep.isDying()) return false
+     if (this.isDying()) return false
 
      // If the creep's age is less than the benefit from renewing, inform false
 
-     if (CREEP_LIFE_TIME - creep.ticksToLive < Math.ceil(creep.findCost() / 2.5 / creep.body.length)) return false
+     if (CREEP_LIFE_TIME - this.ticksToLive < Math.ceil(this.findCost() / 2.5 / this.body.length)) return false
 
      // Get the room's spawns, stopping if there are none
 
@@ -1774,7 +1759,7 @@ Creep.prototype.advancedRenew = function () {
 
      // Get a spawn in range of 1, informing false if there are none
 
-     const spawn = spawns.find(spawn => creep.pos.getRangeTo(spawn.pos) === 1)
+     const spawn = spawns.find(spawn => this.pos.getRangeTo(spawn.pos) === 1)
      if (!spawn) return false
 
      // If the spawn has already renewed this tick, inform false
@@ -1793,12 +1778,11 @@ Creep.prototype.advancedRenew = function () {
 
      // And try to renew the creep, informing the result
 
-     return spawn.renewCreep(creep) === OK
+     return spawn.renewCreep(this) === OK
 }
 
 Creep.prototype.advancedReserveController = function () {
-     const creep = this
-     const { room } = creep
+     const { room } = this
 
      // Get the controller
 
@@ -1806,30 +1790,30 @@ Creep.prototype.advancedReserveController = function () {
 
      // If the creep is in range of 1 of the controller
 
-     if (creep.pos.getRangeTo(controller.pos) === 1) {
+     if (this.pos.getRangeTo(controller.pos) === 1) {
           // If the controller is reserved and it isn't reserved by me
 
           if (controller.reservation && controller.reservation.username !== Memory.me) {
                // Try to attack it, informing the result
 
-               creep.say('🗡️')
+               this.say('🗡️')
 
-               return creep.attackController(controller) === OK
+               return this.attackController(controller) === OK
           }
 
           // Try to reserve it, informing the result
 
-          creep.say('🤳')
+          this.say('🤳')
 
-          return creep.reserveController(controller) === OK
+          return this.reserveController(controller) === OK
      }
 
      // Otherwise, make a move request to it and inform true
 
-     creep.say('⏩🤳')
+     this.say('⏩🤳')
 
-     creep.createMoveRequest({
-          origin: creep.pos,
+     this.createMoveRequest({
+          origin: this.pos,
           goal: { pos: controller.pos, range: 1 },
           avoidEnemyRanges: true,
           plainCost: 1,
@@ -1959,10 +1943,12 @@ Creep.prototype.aggressiveHeal = function () {
           return false
      }
 
-     const healTargets = room.find(FIND_MY_CREEPS).concat(room.allyCreeps).filter(function(creep) {
-
-          return creep.hitsMax > creep.hits
-     })
+     const healTargets = room
+          .find(FIND_MY_CREEPS)
+          .concat(room.allyCreeps)
+          .filter(function (creep) {
+               return creep.hitsMax > creep.hits
+          })
 
      if (!healTargets.length) return false
 
