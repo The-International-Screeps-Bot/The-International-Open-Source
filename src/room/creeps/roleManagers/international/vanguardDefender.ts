@@ -23,7 +23,6 @@ export function vanguardDefenderManager(room: Room, creepsOfRole: string[]) {
           creep.say(claimTarget)
 
           if (room.name === claimTarget) {
-               if (creep.advancedHeal()) continue
 
                if (creep.advancedAttackEnemies()) continue
 
