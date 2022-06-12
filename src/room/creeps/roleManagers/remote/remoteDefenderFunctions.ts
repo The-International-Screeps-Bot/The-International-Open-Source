@@ -54,16 +54,15 @@ RemoteDefender.prototype.advancedAttackEnemies = function () {
      // If there are none
 
      if (!enemyAttackers.length) {
-          // Heal nearby creeps
-
-          if (creep.passiveHeal()) return true
-
           const { enemyCreeps } = room
           if (!enemyCreeps.length) {
-
                creep.aggressiveHeal()
                return true
           }
+
+          // Heal nearby creeps
+
+          if (creep.passiveHeal()) return true
 
           creep.say('EC')
 

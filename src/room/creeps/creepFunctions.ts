@@ -1957,26 +1957,29 @@ Creep.prototype.aggressiveHeal = function () {
           return false
      }
 
-     if (!room.allyCreeps.length) return false
+     const healTargets = room.find(FIND_MY_CREEPS).concat(room.allyCreeps).filter(function(creep) {
 
-     const allyCreep = this.pos.findClosestByRange(room.allyCreeps)
-     const range = getRange(this.pos.x - allyCreep.pos.x, this.pos.y - allyCreep.pos.y)
+          return creep.hitsMax > creep.hits
+     })
+
+     if (!healTargets.length) return false
+
+     const healTarget = this.pos.findClosestByRange(healTargets)
+     const range = getRange(this.pos.x - healTarget.pos.x, this.pos.y - healTarget.pos.y)
 
      if (range > 1) {
           this.createMoveRequest({
                origin: this.pos,
-               goal: { pos: allyCreep.pos, range: 1 },
+               goal: { pos: healTarget.pos, range: 1 },
           })
 
           if (range <= 3) {
-               this.rangedHeal(allyCreep)
+               this.rangedHeal(healTarget)
                return true
           }
-
-          return this.passiveHeal()
      }
 
-     this.heal(allyCreep)
+     this.heal(healTarget)
      return true
 }
 
