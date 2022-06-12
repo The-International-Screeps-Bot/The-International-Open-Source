@@ -145,6 +145,7 @@ Maintainer.prototype.advancedMaintain = function () {
 }
 
 Maintainer.prototype.maintainNearby = function () {
+     const { room } = this
 
      // If the creep has no energy, inform false
 
@@ -154,20 +155,22 @@ Maintainer.prototype.maintainNearby = function () {
 
      const structuresAsPos = this.pos.lookFor(LOOK_STRUCTURES)
 
+     // Get the creep's work parts
+
+     const workPartCount = this.partsOfType(WORK)
+
+     let structure
+
      // Loop through structuresAtPos
 
-     for (const structure of structuresAsPos) {
+     for (structure of structuresAsPos) {
           // If the structure is not a road, iterate
 
-          if (structure.structureType !== STRUCTURE_ROAD) continue
-
-          // Get the creep's work parts
-
-          const workPartCount = this.partsOfType(WORK)
+          if (structure.structureType !== STRUCTURE_ROAD && structure.structureType !== STRUCTURE_CONTAINER) continue
 
           // If the structure is sufficiently repaired, inform false
 
-          if (structure.hitsMax - structure.hits < workPartCount * REPAIR_POWER) return false
+          if (structure.hitsMax - structure.hits < workPartCount * REPAIR_POWER) break
 
           // Otherwise, try to repair the structure, informing false if failure
 
@@ -182,9 +185,42 @@ Maintainer.prototype.maintainNearby = function () {
           // Show the creep tried to repair
 
           this.say(`👣🔧${energySpentOnRepairs * REPAIR_POWER}`)
+          return true
+     }
 
-          // And inform true
+     const adjacentStructures = room.lookForAtArea(
+          LOOK_STRUCTURES,
+          this.pos.y - 3,
+          this.pos.x - 3,
+          this.pos.y + 3,
+          this.pos.x + 3,
+          true,
+     )
 
+     for (const adjacentPosData of adjacentStructures) {
+          structure = adjacentPosData.structure
+
+          // If the structure is not a road, iterate
+
+          if (structure.structureType !== STRUCTURE_ROAD && structure.structureType !== STRUCTURE_CONTAINER) continue
+
+          // If the structure is sufficiently repaired, inform false
+
+          if (structure.hitsMax - structure.hits < workPartCount * REPAIR_POWER) continue
+
+          // Otherwise, try to repair the structure, informing false if failure
+
+          if (this.repair(structure) !== OK) return false
+
+          // Otherwise
+
+          // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
+
+          const energySpentOnRepairs = Math.min(workPartCount, (structure.hitsMax - structure.hits) / REPAIR_POWER)
+
+          // Show the creep tried to repair
+
+          this.say(`🗺️🔧${energySpentOnRepairs * REPAIR_POWER}`)
           return true
      }
 
