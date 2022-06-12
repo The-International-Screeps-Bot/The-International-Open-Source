@@ -1,5 +1,5 @@
 import { allyList, constants, remoteNeedsIndex } from 'international/constants'
-import { getRange } from 'international/generalFunctions'
+import { getRange, pack } from 'international/generalFunctions'
 import { RemoteDefender } from 'room/creeps/creepClasses'
 
 RemoteDefender.prototype.findRemote = function () {
@@ -42,107 +42,105 @@ RemoteDefender.prototype.findRemote = function () {
 }
 
 RemoteDefender.prototype.advancedAttackEnemies = function () {
-     const creep = this
-     const { room } = creep
+     const { room } = this
 
      // If there are none
 
      if (!room.enemyAttackers.length) {
           const { enemyCreeps } = room
           if (!enemyCreeps.length) {
-
-               return creep.aggressiveHeal()
+               return this.aggressiveHeal()
           }
 
           // Heal nearby creeps
 
-          if (creep.passiveHeal()) return true
+          if (this.passiveHeal()) return true
 
-          creep.say('EC')
+          this.say('EC')
 
-          const enemyCreep = creep.pos.findClosestByRange(enemyCreeps)
+          const enemyCreep = this.pos.findClosestByRange(enemyCreeps)
           // Get the range between the creeps
 
-          const range = getRange(creep.pos.x - enemyCreep.pos.x, creep.pos.y - enemyCreep.pos.y)
+          const range = getRange(this.pos.x - enemyCreep.pos.x, this.pos.y - enemyCreep.pos.y)
 
           // If the range is more than 1
 
           if (range > 1) {
-               creep.rangedAttack(enemyCreep)
+               this.rangedAttack(enemyCreep)
 
                // Have the create a moveRequest to the enemyAttacker and inform true
 
-               creep.createMoveRequest({
-                    origin: creep.pos,
+               this.createMoveRequest({
+                    origin: this.pos,
                     goal: { pos: enemyCreep.pos, range: 1 },
                })
 
                return true
           }
 
-          creep.rangedMassAttack()
-          if (enemyCreep.owner.username !== 'Invader') creep.move(creep.pos.getDirectionTo(enemyCreep.pos))
+          this.rangedMassAttack()
+          this.moveRequest = pack(enemyCreep.pos)
 
           return true
      }
 
      // Otherwise, get the closest enemyAttacker
 
-     const enemyAttacker = creep.pos.findClosestByRange(room.enemyAttackers)
+     const enemyAttacker = this.pos.findClosestByRange(room.enemyAttackers)
 
      // Get the range between the creeps
 
-     const range = getRange(creep.pos.x - enemyAttacker.pos.x, creep.pos.y - enemyAttacker.pos.y)
+     const range = getRange(this.pos.x - enemyAttacker.pos.x, this.pos.y - enemyAttacker.pos.y)
 
      // If it's more than range 3
 
      if (range > 3) {
           // Heal nearby creeps
 
-          creep.passiveHeal()
+          this.passiveHeal()
 
           // Make a moveRequest to it and inform true
 
-          creep.createMoveRequest({
-               origin: creep.pos,
+          this.createMoveRequest({
+               origin: this.pos,
                goal: { pos: enemyAttacker.pos, range: 1 },
           })
 
           return true
      }
 
-     creep.say('AEA')
+     this.say('AEA')
 
      // Otherwise, have the creep pre-heal itself
 
-     creep.heal(creep)
+     this.heal(this)
 
      // If the range is 1, rangedMassAttack
 
      if (range === 1) {
-          creep.rangedMassAttack()
-          creep.move(creep.pos.getDirectionTo(enemyAttacker.pos))
+          this.rangedMassAttack()
+          this.moveRequest = pack(enemyAttacker.pos)
      }
 
      // Otherwise, rangedAttack the enemyAttacker
-     else creep.rangedAttack(enemyAttacker)
+     else this.rangedAttack(enemyAttacker)
 
      // If the creep is out matched, try to always stay in range 3
 
-     if (creep.strength < enemyAttacker.strength) {
+     if (this.strength < enemyAttacker.strength) {
           if (range === 3) return true
 
           if (range >= 3) {
-               creep.createMoveRequest({
-                    origin: creep.pos,
+               this.createMoveRequest({
+                    origin: this.pos,
                     goal: { pos: enemyAttacker.pos, range: 3 },
                })
 
                return true
           }
 
-          creep.createMoveRequest({
-               origin: creep.pos,
+          this.createMoveRequest({
+               origin: this.pos,
                goal: { pos: enemyAttacker.pos, range: 25 },
                flee: true,
           })
@@ -152,14 +150,14 @@ RemoteDefender.prototype.advancedAttackEnemies = function () {
 
      // If the creep has less heal power than the enemyAttacker's attack power
 
-     if (creep.strength < enemyAttacker.strength) {
+     if (this.strength < enemyAttacker.strength) {
           // If the range is less or equal to 2
 
           if (range <= 2) {
                // Have the creep flee and inform true
 
-               creep.createMoveRequest({
-                    origin: creep.pos,
+               this.createMoveRequest({
+                    origin: this.pos,
                     goal: { pos: enemyAttacker.pos, range: 1 },
                     flee: true,
                })
@@ -173,8 +171,8 @@ RemoteDefender.prototype.advancedAttackEnemies = function () {
      if (range > 1) {
           // Have the create a moveRequest to the enemyAttacker and inform true
 
-          creep.createMoveRequest({
-               origin: creep.pos,
+          this.createMoveRequest({
+               origin: this.pos,
                goal: { pos: enemyAttacker.pos, range: 1 },
           })
 

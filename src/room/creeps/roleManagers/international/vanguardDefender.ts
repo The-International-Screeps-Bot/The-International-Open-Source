@@ -1,5 +1,5 @@
 import { allyList, claimRequestNeedsIndex, constants } from 'international/constants'
-import { getRange } from 'international/generalFunctions'
+import { getRange, pack } from 'international/generalFunctions'
 import { VanguardDefender } from 'room/creeps/creepClasses'
 
 export function vanguardDefenderManager(room: Room, creepsOfRole: string[]) {
@@ -87,7 +87,7 @@ VanguardDefender.prototype.advancedAttackEnemies = function () {
           }
 
           this.rangedMassAttack()
-          if (enemyCreep.owner.username !== 'Invader') this.move(this.pos.getDirectionTo(enemyCreep.pos))
+          this.moveRequest = pack(enemyCreep.pos)
 
           return true
      }
@@ -127,7 +127,7 @@ VanguardDefender.prototype.advancedAttackEnemies = function () {
 
      if (range === 1) {
           this.rangedMassAttack()
-          this.move(this.pos.getDirectionTo(enemyAttacker.pos))
+          this.moveRequest = pack(enemyAttacker.pos)
      }
 
      // Otherwise, rangedAttack the enemyAttacker
