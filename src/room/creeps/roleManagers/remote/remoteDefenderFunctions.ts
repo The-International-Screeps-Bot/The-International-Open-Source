@@ -45,19 +45,13 @@ RemoteDefender.prototype.advancedAttackEnemies = function () {
      const creep = this
      const { room } = creep
 
-     // Get enemyAttackers in the room
-
-     const enemyAttackers = room.enemyCreeps.filter(enemyCreep =>
-          /* !enemyCreep.isOnExit() && */ enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK]),
-     )
-
      // If there are none
 
-     if (!enemyAttackers.length) {
+     if (!room.enemyAttackers.length) {
           const { enemyCreeps } = room
           if (!enemyCreeps.length) {
-               creep.aggressiveHeal()
-               return true
+
+               return creep.aggressiveHeal()
           }
 
           // Heal nearby creeps
@@ -94,7 +88,7 @@ RemoteDefender.prototype.advancedAttackEnemies = function () {
 
      // Otherwise, get the closest enemyAttacker
 
-     const enemyAttacker = creep.pos.findClosestByRange(enemyAttackers)
+     const enemyAttacker = creep.pos.findClosestByRange(room.enemyAttackers)
 
      // Get the range between the creeps
 

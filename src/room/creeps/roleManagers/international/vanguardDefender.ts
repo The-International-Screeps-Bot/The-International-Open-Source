@@ -52,15 +52,9 @@ export function vanguardDefenderManager(room: Room, creepsOfRole: string[]) {
 VanguardDefender.prototype.advancedAttackEnemies = function () {
      const { room } = this
 
-     // Get enemyAttackers in the room
-
-     const enemyAttackers = room.enemyCreeps.filter(enemyCreep =>
-          /* !enemyCreep.isOnExit() && */ enemyCreep.hasPartsOfTypes([ATTACK, RANGED_ATTACK]),
-     )
-
      // If there are none
 
-     if (!enemyAttackers.length) {
+     if (!room.enemyAttackers.length) {
           const { enemyCreeps } = room
           if (!enemyCreeps.length) {
                return this.aggressiveHeal()
@@ -100,7 +94,7 @@ VanguardDefender.prototype.advancedAttackEnemies = function () {
 
      // Otherwise, get the closest enemyAttacker
 
-     const enemyAttacker = this.pos.findClosestByRange(enemyAttackers)
+     const enemyAttacker = this.pos.findClosestByRange(room.enemyAttackers)
 
      // Get the range between the creeps
 
