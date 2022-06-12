@@ -612,6 +612,8 @@ export function rampartPlanner(room: Room) {
 
           const closestPosToAnchor = hubAnchor.findClosestByPath(group, {
                ignoreCreeps: true,
+               ignoreDestructibleStructures: true,
+               ignoreRoads: true,
           })
 
           // Path from the hubAnchor to the cloestPosToAnchor
