@@ -594,9 +594,7 @@ Room.prototype.get = function (roomObjectName) {
 
                     const { structureType } = adjacentPosData.structure
 
-                    // If the adjacentStructuresByType doesn't have a number for this structureType, intialize one
-
-                    if (!adjacentStructuresByType[structureType]) adjacentStructuresByType[structureType] = 0
+                    if (!adjacentStructuresByType[structureType]) continue
 
                     // Increase structure amount for this structureType on the adjacentPos
 
@@ -607,7 +605,7 @@ Room.prototype.get = function (roomObjectName) {
 
                if (
                     adjacentStructuresByType[STRUCTURE_CONTAINER] + adjacentStructuresByType[STRUCTURE_LINK] > 0 &&
-                    adjacentStructuresByType[STRUCTURE_SPAWN] + adjacentStructuresByType[STRUCTURE_EXTENSION] > 0
+                    (adjacentStructuresByType[STRUCTURE_SPAWN] > 0 || adjacentStructuresByType[STRUCTURE_EXTENSION] > 1)
                )
                     continue
 

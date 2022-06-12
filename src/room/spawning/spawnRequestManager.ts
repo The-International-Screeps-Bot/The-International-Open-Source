@@ -332,7 +332,7 @@ export function spawnRequester(room: Room) {
                }
 
                // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
-
+               
                if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
                     // Assign partIndex as the length of extraParts
 
@@ -1325,8 +1325,10 @@ export function spawnRequester(room: Room) {
                          return false
                     }
 
-                    const partsMultiplier =
-                    Math.max(Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthOfParts) * 1.2, 1)
+                    const partsMultiplier = Math.max(
+                         Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthOfParts) * 1.2,
+                         1,
+                    )
 
                     return {
                          defaultParts: [],
@@ -1461,7 +1463,10 @@ export function spawnRequester(room: Room) {
 
                     // If max spawnable strength is less that needed
 
-                    if (strengthOfParts * (spawnEnergyCapacity / cost) < claimRequestNeeds[claimRequestNeedsIndex.vanguardDefender]) {
+                    if (
+                         strengthOfParts * (spawnEnergyCapacity / cost) <
+                         claimRequestNeeds[claimRequestNeedsIndex.vanguardDefender]
+                    ) {
                          // Abandon the room for some time
 
                          Memory.claimRequests[room.memory.claimRequest].abadon = 20000
@@ -1469,8 +1474,10 @@ export function spawnRequester(room: Room) {
                          return false
                     }
 
-                    const partsMultiplier =
-                         Math.max(Math.floor(claimRequestNeeds[claimRequestNeedsIndex.vanguardDefender] / strengthOfParts) * 1.2, 1)
+                    const partsMultiplier = Math.max(
+                         Math.floor(claimRequestNeeds[claimRequestNeedsIndex.vanguardDefender] / strengthOfParts) * 1.2,
+                         1,
+                    )
 
                     // If there is no vanguardDefender need
 
