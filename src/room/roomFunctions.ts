@@ -1928,9 +1928,9 @@ Room.prototype.makeRemote = function (scoutingRoom) {
                room.memory.sourceEfficacies.reduce((sum, el) => sum + el) / room.memory.sourceEfficacies.length
           const newAvgSourceEfficacy = newSourceEfficacies.reduce((sum, el) => sum + el) / newSourceEfficacies.length
 
-          // If the new average source efficacy is below the current, stop
+          // If the new average source efficacy is above the current, stop
 
-          if (newAvgSourceEfficacy <= currentAvgSourceEfficacy) return true
+          if (newAvgSourceEfficacy >= currentAvgSourceEfficacy) return true
 
           room.memory.type = 'remote'
 
