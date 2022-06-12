@@ -369,6 +369,8 @@ Room.prototype.get = function (roomObjectName) {
 
           return room.anchor.findClosestByPath(harvestPositions, {
                ignoreCreeps: true,
+               ignoreDestructibleStructures: true,
+               ignoreRoads: true,
           })
      }
 
@@ -797,6 +799,8 @@ Room.prototype.get = function (roomObjectName) {
                pack(
                     hubAnchor.findClosestByPath(upgradePositions, {
                          ignoreCreeps: true,
+                         ignoreDestructibleStructures: true,
+                         ignoreRoads: true,
                     }),
                ),
           )
@@ -1579,6 +1583,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                               const upgradePositions: RoomPosition[] = room.get('upgradePositions')
                               const deliverUpgradePos = room.anchor.findClosestByPath(upgradePositions, {
                                    ignoreCreeps: true,
+                                   ignoreDestructibleStructures: true,
+                                   ignoreRoads: true,
                               })
 
                               // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
@@ -2494,7 +2500,11 @@ Room.prototype.findCSiteTargetID = function (creep) {
 
           // Record the closest site to the anchor in the room's global and inform true
 
-          room.memory.cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id
+          room.memory.cSiteTargetID = anchor.findClosestByPath(cSitesOfType, {
+               ignoreCreeps: true,
+               ignoreDestructibleStructures: true,
+               ignoreRoads: true,
+          }).id
           return true
      }
 
