@@ -1,4 +1,4 @@
-import { customLog, getRangeBetween, unpackAsRoomPos } from 'international/generalFunctions'
+import { customLog, getRange, getRangeBetween, unpackAsRoomPos } from 'international/generalFunctions'
 import { FastFiller } from 'room/creeps/creepClasses'
 
 FastFiller.prototype.travelToFastFiller = function () {
@@ -33,18 +33,25 @@ FastFiller.prototype.travelToFastFiller = function () {
 FastFiller.prototype.fillFastFiller = function () {
      const { room } = this
 
-     this.say('FFF')
+     this.say('💁')
 
-     // Drop a resource if the creep has a non-energy resource
+     // If the creep has a non-energy resource
 
-     if (this.store.energy < _.sum(Object.values(this.store))) {
+     if (_.sum(Object.values(this.store)) > this.store.energy) {
           for (const resourceType in this.store) {
                if (resourceType == RESOURCE_ENERGY) continue
+
+               this.say('WR')
 
                this.drop(resourceType as ResourceConstant)
                return true
           }
      }
+
+     const fastFillerContainers: (StructureContainer | false)[] = [
+          room.get('fastFillerContainerLeft'),
+          room.get('fastFillerContainerRight'),
+     ]
 
      // If all spawningStructures are filled, inform false
 
@@ -53,33 +60,11 @@ FastFiller.prototype.fillFastFiller = function () {
      // If the this needs resources
 
      if (this.needsResources()) {
-
-          const fastFillerContainers: (StructureContainer | false)[] = [
-               room.get('fastFillerContainerLeft'),
-               room.get('fastFillerContainerRight'),
-          ]
-
-          // Withdraw from a fastFiller container if it has a non-energy resource
-
-          for (const container of fastFillerContainers) {
-               if (!container) continue
-
-               if (container.store.energy >= _.sum(Object.values(container.store))) continue
-
-               for (const resourceType in container.store) {
-                    if (resourceType == RESOURCE_ENERGY) continue
-
-                    this.withdraw(container, resourceType as ResourceConstant)
-                    return true
-               }
-          }
-
           // Get the sourceLinks
 
           const fastFillerStoringStructure: (StructureContainer | StructureLink | false)[] = [
-               ...fastFillerContainers,
                room.get('fastFillerLink'),
-          ]
+          ].concat(fastFillerContainers)
 
           // Loop through each fastFillerStoringStructure
 
@@ -90,17 +75,34 @@ FastFiller.prototype.fillFastFiller = function () {
 
                // Otherwise, if the structure is not in range 1 to the this
 
-               if (getRangeBetween(this.pos.x, this.pos.y, structure.pos.x, structure.pos.y) !== 1) continue
+               if (getRange(this.pos.x - structure.pos.x, this.pos.y - structure.pos.y) > 1) continue
+
+               // If there is a non-energy resource in the structure
+
+               if (
+                    structure.structureType != STRUCTURE_LINK &&
+                    _.sum(Object.values(structure.store)) > structure.store.energy
+               ) {
+                    for (const resourceType in structure.store) {
+                         if (resourceType == RESOURCE_ENERGY) continue
+
+                         this.say('WCR')
+
+                         this.withdraw(structure, resourceType as ResourceConstant)
+                         return true
+                    }
+               }
 
                // Otherwise, if there is insufficient energy in the structure, iterate
 
-               if (structure.store.getUsedCapacity(RESOURCE_ENERGY) < this.store.getCapacity()) continue
+               if (structure.store.energy < this.store.getCapacity()) continue
 
                // Otherwise, withdraw from the structure and inform true
 
                this.say('W')
 
                this.withdraw(structure, RESOURCE_ENERGY)
+               structure.store.energy -= this.store.getCapacity() - this.store.energy
                return true
           }
 
@@ -131,28 +133,35 @@ FastFiller.prototype.fillFastFiller = function () {
 
           if (!structure.store) continue
 
-          // If the structure has already had resources moved, iterate
-
-          if (structure.hasHadResourcesMoved) continue
-
           // If the structureType is an extension or spawn, iterate
 
           if (structure.structureType !== STRUCTURE_SPAWN && structure.structureType !== STRUCTURE_EXTENSION) continue
 
-          // , iterate
-
-          if (structure.store.getFreeCapacity(RESOURCE_ENERGY) === 0) continue
+          if (structure.store.energy >= structure.store.getCapacity(RESOURCE_ENERGY)) continue
 
           // Otherwise, transfer to the structure record the action and inform true
 
           this.say('T')
 
-          this.transfer(structure, RESOURCE_ENERGY)
-          structure.hasHadResourcesMoved = true
+          this.transfer(structure, RESOURCE_ENERGY).toString()
+          structure.store.energy += this.store.energy
 
           return true
      }
+/*
+     if (this.store.energy === 0) return false
 
+     for (const container of fastFillerContainers) {
+          if (!container) continue
+
+          if (container.store.getCapacity() - container.store.energy < this.store.energy) continue
+
+          this.say('FC')
+
+          this.transfer(container, RESOURCE_ENERGY)
+          return true
+     }
+ */
      // Otherwise inform false
 
      return false

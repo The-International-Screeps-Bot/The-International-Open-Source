@@ -11,6 +11,6 @@ export function fastFillerManager(room: Room, creepsOfRole: string[]) {
 
           if (creep.advancedRenew()) continue
 
-          creep.say('🚬')
+          /* creep.say('🚬') */
      }
 }
