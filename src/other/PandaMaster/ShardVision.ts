@@ -11,7 +11,7 @@ export default class GetShardVision {
           const spawnShardFlag = Game.flags[this._shardNames[0]]
           if (!spawnShardFlag) return
 
-          let headSpawn: StructureSpawn = Game.spawns['Spawn1']
+          let headSpawn: StructureSpawn = Game.spawns['Spawn2']
           if (!headSpawn) return
 
           const shardTarget =
