@@ -40,7 +40,7 @@ creepClasses.builder = Builder
 export class Maintainer extends Creep {
      advancedMaintain?(): boolean
 
-     maintainAtFeet?(): boolean
+     maintainNearby?(): boolean
 
      constructor(creepID: Id<Creep>) {
           super(creepID)
@@ -131,7 +131,7 @@ export class RemoteDefender extends Creep {
      /**
       * Find and attack enemyCreeps
       */
-      advancedAttackEnemies?(): boolean
+     advancedAttackEnemies?(): boolean
 
      constructor(creepID: Id<Creep>) {
           super(creepID)
@@ -205,11 +205,10 @@ export class Vanguard extends Creep {
 creepClasses.vanguard = Vanguard
 
 export class VanguardDefender extends Creep {
-
      /**
       * Find and attack enemyCreeps
       */
-      advancedAttackEnemies?(): boolean
+     advancedAttackEnemies?(): boolean
 
      constructor(creepID: Id<Creep>) {
           super(creepID)

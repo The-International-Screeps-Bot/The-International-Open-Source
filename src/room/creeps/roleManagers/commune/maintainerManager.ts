@@ -15,6 +15,6 @@ export function maintainerManager(room: Room, creepsOfRole: string[]) {
 
           // Otherwise, try to maintain at feet, iterating if success
 
-          if (creep.maintainAtFeet()) continue
+          if (creep.maintainNearby()) continue
      }
 }

@@ -144,16 +144,15 @@ Maintainer.prototype.advancedMaintain = function () {
      return true
 }
 
-Maintainer.prototype.maintainAtFeet = function () {
-     const creep = this
+Maintainer.prototype.maintainNearby = function () {
 
      // If the creep has no energy, inform false
 
-     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return false
+     if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return false
 
      // Otherwise, look at the creep's pos for structures
 
-     const structuresAsPos = creep.pos.lookFor(LOOK_STRUCTURES)
+     const structuresAsPos = this.pos.lookFor(LOOK_STRUCTURES)
 
      // Loop through structuresAtPos
 
@@ -164,7 +163,7 @@ Maintainer.prototype.maintainAtFeet = function () {
 
           // Get the creep's work parts
 
-          const workPartCount = creep.partsOfType(WORK)
+          const workPartCount = this.partsOfType(WORK)
 
           // If the structure is sufficiently repaired, inform false
 
@@ -172,7 +171,7 @@ Maintainer.prototype.maintainAtFeet = function () {
 
           // Otherwise, try to repair the structure, informing false if failure
 
-          if (creep.repair(structure) !== OK) return false
+          if (this.repair(structure) !== OK) return false
 
           // Otherwise
 
@@ -182,7 +181,7 @@ Maintainer.prototype.maintainAtFeet = function () {
 
           // Show the creep tried to repair
 
-          creep.say(`👣🔧${energySpentOnRepairs * REPAIR_POWER}`)
+          this.say(`👣🔧${energySpentOnRepairs * REPAIR_POWER}`)
 
           // And inform true
 
