@@ -1,11 +1,15 @@
 import { constants } from './constants'
-import { unpackAsRoomPos } from './generalFunctions'
+import { customLog, unpackAsRoomPos } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
 InternationalManager.prototype.mapVisualsManager = function () {
      // Stop if mapVisuals are disabled
 
      if (!Memory.mapVisuals) return
+
+     // If CPU logging is enabled, get the CPU used at the start
+
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
      // Loop through each roomName in Memory
 
@@ -104,4 +108,14 @@ InternationalManager.prototype.mapVisualsManager = function () {
                },
           )
      }
+
+     // If CPU logging is enabled, log the CPU used by this manager
+
+     if (Memory.cpuLogging)
+          customLog(
+               'Map Visuals Manager',
+               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+               undefined,
+               constants.colors.lightGrey,
+          )
 }

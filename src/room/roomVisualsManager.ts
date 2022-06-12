@@ -188,7 +188,7 @@ export function roomVisualsManager(room: Room) {
 
      if (Memory.cpuLogging)
           customLog(
-               'Room Visual Manager',
+               'Room Visuals Manager',
                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
                undefined,
                constants.colors.lightGrey,
