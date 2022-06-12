@@ -1751,6 +1751,8 @@ Creep.prototype.advancedRenew = function () {
      const creep = this
      const { room } = creep
 
+     if (creep.body.length > 8) return false
+
      // If there is insufficient CPU to renew, inform false
 
      if (Game.cpu.bucket < CPUBucketRenewThreshold) return false
