@@ -1097,6 +1097,9 @@ Creep.prototype.findTask = function (allowedTaskTypes, resourceType = RESOURCE_E
 }
 
 Creep.prototype.shove = function (shoverPos) {
+
+     const {room} = this
+
      /*
     if (!this.moveRequest) {
  */
@@ -1123,8 +1126,6 @@ Creep.prototype.shove = function (shoverPos) {
 
      if (!this.moveRequest) return false
 
-     console.log(this.moveRequest, unpackAsRoomPos(this.moveRequest, this.room.name))
-
      /*
      this.room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), { color: constants.colors.yellow })
 
@@ -1133,7 +1134,7 @@ Creep.prototype.shove = function (shoverPos) {
         return false
 
  */
-     this.room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), {
+     if (Memory.roomVisuals) room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), {
           color: constants.colors.yellow,
      })
 
