@@ -66,8 +66,12 @@ Room.prototype.claimRequestManager = function () {
 
      let distance
 
-     for (const roomName of internationalManager.findClaimRequestsByScore()) {
+     for (const roomName of internationalManager.claimRequestsByScore) {
           if (Memory.claimRequests[roomName].abadon > 0) continue
+
+          distance = Game.map.getRoomLinearDistance(this.name, roomName)
+
+          if (distance > 10) continue
 
           distance = advancedFindDistance(this.name, roomName, {
                keeper: Infinity,

@@ -1848,9 +1848,11 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 Room.prototype.makeRemote = function (scoutingRoom) {
      const room = this
 
+     let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, room.name)
+
      // Find distance from scoutingRoom
 
-     const distanceFromScoutingRoom = advancedFindDistance(scoutingRoom.name, room.name, {
+     if (distance < 4) distance = advancedFindDistance(scoutingRoom.name, room.name, {
           keeper: Infinity,
           enemy: Infinity,
           enemyRemote: Infinity,
@@ -1859,7 +1861,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
           highway: Infinity,
      })
 
-     if (distanceFromScoutingRoom < 4) {
+     if (distance < 4) {
           // If the room is already a remote of the scoutingRoom
 
           if (room.memory.type === 'remote' && scoutingRoom.name === room.memory.commune) return true

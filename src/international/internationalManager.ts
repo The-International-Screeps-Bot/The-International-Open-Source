@@ -61,8 +61,6 @@ export class InternationalManager {
       */
      getBuyOrders?(resourceType: MarketResourceConstant, minPrice?: number): Order[]
 
-     findClaimRequestsByScore?(): string[]
-
      advancedSellPixels?(): void
 
      advancedGeneratePixel() {
@@ -184,6 +182,17 @@ export class InternationalManager {
 
           return (this._myOrdersCount = Object.keys(Game.market.orders).length)
      }
+
+     _claimRequestsByScore: string[]
+
+     get claimRequestsByScore() {
+
+          if (this._claimRequestsByScore) return this._claimRequestsByScore
+
+          return this._claimRequestsByScore = Object.keys(Memory.claimRequests).sort(
+               (a, b) => Memory.claimRequests[a].score - Memory.claimRequests[b].score,
+          )
+     }
 }
 
 InternationalManager.prototype.run = function () {
@@ -244,12 +253,6 @@ InternationalManager.prototype.getBuyOrders = function (resourceType, minPrice) 
 }
 
 export const internationalManager = new InternationalManager()
-
-InternationalManager.prototype.findClaimRequestsByScore = function () {
-     return Object.keys(Memory.claimRequests).sort(
-          (a, b) => Memory.claimRequests[a].score - Memory.claimRequests[b].score,
-     )
-}
 
 InternationalManager.prototype.advancedSellPixels = function () {
      if (!Memory.pixelSelling) return
