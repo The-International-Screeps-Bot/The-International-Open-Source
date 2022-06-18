@@ -98,32 +98,17 @@ RemoteDismantler.prototype.findRemote = function () {
 RemoteDismantler.prototype.advancedDismantle = function () {
      const { room } = this
 
-     // If there are no cores
+     if (room.structures.constructedWall.length) {
 
-     if (!room.structures.invaderCore.length) return false
-
-     // Find the closest core
-
-     const closestCore = this.pos.findClosestByRange(room.structures.invaderCore)
-
-     // If the creep at the core
-
-     if (getRange(this.pos.x - closestCore.pos.x, this.pos.y - closestCore.pos.y) === 1) {
-          this.say('🗡️C')
-
-          this.attack(closestCore)
           return true
      }
 
-     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
+     const enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
 
-     this.say('⏩C')
+     if (enemyStructures.length) {
 
-     this.createMoveRequest({
-          origin: this.pos,
-          goal: { pos: closestCore.pos, range: 1 },
-          avoidEnemyRanges: true,
-     })
+          return true
+     }
 
-     return true
+     return false
 }

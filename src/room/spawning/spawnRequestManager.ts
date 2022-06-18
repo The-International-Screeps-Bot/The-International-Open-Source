@@ -332,7 +332,7 @@ export function spawnRequester(room: Room) {
                }
 
                // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
-               
+
                if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
                     // Assign partIndex as the length of extraParts
 

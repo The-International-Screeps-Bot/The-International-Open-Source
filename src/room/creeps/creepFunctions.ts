@@ -177,6 +177,7 @@ Creep.prototype.advancedUpgradeController = function () {
      // If there is a controllerContainer
 
      if (controllerStructure) {
+
           // if the creep doesn't have an upgrade pos
 
           if (!this.memory.packedPos) {
@@ -209,6 +210,8 @@ Creep.prototype.advancedUpgradeController = function () {
                     break
                }
           }
+
+          if (!this.memory.packedPos) return false
 
           let say = ``
 
