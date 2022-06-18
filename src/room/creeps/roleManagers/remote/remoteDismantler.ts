@@ -65,7 +65,7 @@ RemoteDismantler.prototype.findRemote = function () {
 
      // Otherwise, get the creep's role
 
-     const role = creep.memory.role as 'remoteCoreAttacker'
+     const role = creep.memory.role as 'remoteDismantler'
 
      // Get remotes by their efficacy
 
@@ -98,7 +98,30 @@ RemoteDismantler.prototype.findRemote = function () {
 RemoteDismantler.prototype.advancedDismantle = function () {
      const { room } = this
 
+     let structure
+     let range
+
      if (room.structures.constructedWall.length) {
+
+          structure = this.pos.findClosestByRange(room.structures.constructedWall)
+
+          range = getRange(this.pos.x - structure.pos.x, this.pos.y - structure.pos.y)
+
+          if (range > 1) {
+
+               this.createMoveRequest({
+                    origin: this.pos,
+                    goal: {
+                         pos: structure.pos,
+                         range: 1,
+                    },
+                    avoidEnemyRanges: true
+               })
+
+               return true
+          }
+
+          this.dismantle(structure)
 
           return true
      }
@@ -106,6 +129,26 @@ RemoteDismantler.prototype.advancedDismantle = function () {
      const enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
 
      if (enemyStructures.length) {
+
+          structure = this.pos.findClosestByRange(enemyStructures)
+
+          range = getRange(this.pos.x - structure.pos.x, this.pos.y - structure.pos.y)
+
+          if (range > 1) {
+
+               this.createMoveRequest({
+                    origin: this.pos,
+                    goal: {
+                         pos: structure.pos,
+                         range: 1,
+                    },
+                    avoidEnemyRanges: true
+               })
+
+               return true
+          }
+
+          this.dismantle(structure)
 
           return true
      }
