@@ -163,6 +163,7 @@ constants.creepRoles = [
      'remoteReserver',
      'remoteDefender',
      'remoteCoreAttacker',
+     'remoteDismantler',
      'scout',
      'claimer',
      'vanguard',

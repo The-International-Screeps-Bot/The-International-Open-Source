@@ -276,7 +276,6 @@ Creep.prototype.advancedUpgradeController = function () {
                          )
 
                          this.store.energy -= workPartCount
-                         controllerStructure.hits += workPartCount * REPAIR_POWER
 
                          // Add control points to total controlPoints counter and say the success
 
@@ -292,6 +291,8 @@ Creep.prototype.advancedUpgradeController = function () {
 
                     this.store.energy += Math.min(this.store.getCapacity(), controllerStructure.store.energy)
                     controllerStructure.store.energy -= this.store.energy
+
+                    say += `⚡`
                }
           }
 

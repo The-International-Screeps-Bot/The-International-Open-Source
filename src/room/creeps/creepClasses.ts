@@ -141,7 +141,7 @@ creepClasses.remoteDefender = RemoteDefender
 
 export class RemoteCoreAttacker extends Creep {
      /**
-      * Finds a remote to defend
+      * Finds a remote
       */
      findRemote?(): boolean
 
@@ -155,6 +155,23 @@ export class RemoteCoreAttacker extends Creep {
      }
 }
 creepClasses.remoteCoreAttacker = RemoteCoreAttacker
+
+export class RemoteDismantler extends Creep {
+     /**
+      * Finds a remote
+      */
+     findRemote?(): boolean
+
+     /**
+      * Find and attack structures
+      */
+     advancedDismantle?(): boolean
+
+     constructor(creepID: Id<Creep>) {
+          super(creepID)
+     }
+}
+creepClasses.remoteDismantler = RemoteDismantler
 
 export class Scout extends Creep {
      /**
