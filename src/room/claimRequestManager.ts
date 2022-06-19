@@ -30,20 +30,20 @@ Room.prototype.claimRequestManager = function () {
                return
           }
 
-          if (!claimTarget.structures.spawn.length)
-               Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguard] = 20
+          Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguard] = claimTarget.structures
+               .spawn.length
+               ? 0
+               : 20
 
           Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] = 0
 
-          if (claimTarget.enemyCreeps.length) {
-               // Get enemyCreeps in the room and loop through them
+          // Get enemyCreeps in the room and loop through them
 
-               for (const enemyCreep of claimTarget.enemyCreeps) {
-                    // Increase the defenderNeed according to the creep's strength
+          for (const enemyCreep of claimTarget.enemyCreeps) {
+               // Increase the defenderNeed according to the creep's strength
 
-                    Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] +=
-                         enemyCreep.strength
-               }
+               Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] +=
+                    enemyCreep.strength
           }
 
           return

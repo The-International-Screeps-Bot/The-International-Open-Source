@@ -45,25 +45,22 @@ InternationalManager.prototype.remoteNeedsManager = function () {
                const remote = Game.rooms[remoteName]
 
                if (remote) {
-                    if (room.enemyCreeps.length) {
-                         // Get enemyCreeps in the room and loop through them
+                    remoteMemory.needs[remoteNeedsIndex.remoteDefender] = 0
 
-                         for (const enemyCreep of remote.enemyCreeps) {
-                              // Increase the defenderNeed according to the creep's strength
+                    for (const enemyCreep of remote.enemyCreeps) {
+                         // Increase the defenderNeed according to the creep's strength
 
-                              remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.strength
-                         }
-                    } else remoteMemory.needs[remoteNeedsIndex.remoteDefender] = 0
+                         remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.strength
+                    }
 
-                    if (remote.structures.invaderCore.length)
-                         remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = 1
-                    else remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = 0
+                    remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = remote.structures.invaderCore.length
+                         ? 1
+                         : 0
 
                     // If there are walls or enemyStructures, set dismantler need
 
-                    if (remote.structures.constructedWall.length || remote.find(FIND_HOSTILE_STRUCTURES).length)
-                         remoteMemory.needs[remoteNeedsIndex.remoteDismantler] = 1
-                    else remoteMemory.needs[remoteNeedsIndex.remoteDismantler] = 0
+                    remoteMemory.needs[remoteNeedsIndex.remoteDismantler] =
+                         remote.structures.constructedWall.length || remote.find(FIND_HOSTILE_STRUCTURES).length ? 1 : 0
                }
 
                // Loop through each index of sourceEfficacies

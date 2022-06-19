@@ -183,9 +183,9 @@ export class InternationalManager {
           return (this._myOrdersCount = Object.keys(Game.market.orders).length)
      }
 
-     _claimRequestsByScore: string[]
+     _claimRequestsByScore: (string | undefined)[]
 
-     get claimRequestsByScore() {
+     get claimRequestsByScore(): (string | undefined)[] {
 
           if (this._claimRequestsByScore) return this._claimRequestsByScore
 
