@@ -30,7 +30,8 @@ Room.prototype.claimRequestManager = function () {
                return
           }
 
-          if (!claimTarget.structures.spawn.length) Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguard] = 20
+          if (!claimTarget.structures.spawn.length)
+               Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguard] = 20
 
           Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] = 0
 
@@ -67,7 +68,7 @@ Room.prototype.claimRequestManager = function () {
      let distance
 
      for (const roomName of internationalManager.claimRequestsByScore) {
-          if (Memory.claimRequests[roomName].abadon > 0) continue
+          if (!Memory.claimRequests[roomName] || Memory.claimRequests[roomName].abadon > 0) continue
 
           distance = Game.map.getRoomLinearDistance(this.name, roomName)
 
