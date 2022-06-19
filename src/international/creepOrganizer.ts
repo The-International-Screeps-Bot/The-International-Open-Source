@@ -5,6 +5,10 @@ import { InternationalManager } from './internationalManager'
 
 import '../room/creeps/preTickManagers/international/scoutPreTick'
 
+import '../room/creeps/preTickManagers/remote/remoteDefender'
+import '../room/creeps/preTickManagers/remote/remoteCoreAttackerPreTick'
+import '../room/creeps/preTickManagers/remote/remoteDismantler'
+
 InternationalManager.prototype.creepOrganizer = function () {
      // Construct counter for creeps
 
