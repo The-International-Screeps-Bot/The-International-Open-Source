@@ -558,6 +558,7 @@ export const remoteNeedsIndex = {
      remoteDefender: 4,
      remoteCoreAttacker: 5,
      remoteBuilder: 6,
+     remoteDismantler: 7,
 }
 
 export const claimRequestNeedsIndex = {

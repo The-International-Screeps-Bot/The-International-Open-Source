@@ -1025,18 +1025,18 @@ export function spawnRequester(room: Room) {
                          // If the controller is near to downgrading
 
                          if (room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
-                              partsMultiplier = Math.max(partsMultiplier, 5)
+                              partsMultiplier = Math.max(partsMultiplier, 3)
 
-                         partsMultiplier = Math.min(Math.round(partsMultiplier / 5), 3)
+                         partsMultiplier = Math.min(Math.round(partsMultiplier / 3), 5)
                          if (partsMultiplier === 0) return false
 
                          return {
-                              defaultParts: [MOVE],
-                              extraParts: [WORK, WORK, WORK, WORK, MOVE, CARRY, WORK],
+                              defaultParts: [],
+                              extraParts: [WORK, WORK, MOVE, CARRY, WORK, WORK, MOVE, WORK, WORK, WORK, MOVE, WORK, WORK, MOVE, CARRY, WORK, MOVE, WORK, WORK, MOVE, WORK, WORK, MOVE, CARRY, WORK, MOVE],
                               partsMultiplier,
                               threshold,
                               minCreeps: 1,
-                              minCost: 650,
+                              minCost: 300,
                               priority,
                               memoryAdditions: {
                                    role: 'controllerUpgrader',
