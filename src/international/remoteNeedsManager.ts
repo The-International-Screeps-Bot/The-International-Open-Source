@@ -27,9 +27,13 @@ InternationalManager.prototype.remoteNeedsManager = function () {
                     continue
                }
 
-               // See if the remote is reserved
+               // Get the remote
 
-               const isReserved = remoteMemory.needs[remoteNeedsIndex.remoteReserver] === 0
+               const remote = Game.rooms[remoteName]
+
+               let isReserved = remote &&
+               remote.controller.reservation &&
+               remote.controller.reservation.username === Memory.me
 
                // If the remote is reserved
 
@@ -39,10 +43,6 @@ InternationalManager.prototype.remoteNeedsManager = function () {
                     remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] += 3
                     remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.source2 ? 3 : 0
                }
-
-               // Get the remote
-
-               const remote = Game.rooms[remoteName]
 
                if (remote) {
                     remoteMemory.needs[remoteNeedsIndex.remoteDefender] = 0
