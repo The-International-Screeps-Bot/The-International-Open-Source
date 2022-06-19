@@ -157,6 +157,7 @@ export class RemoteCoreAttacker extends Creep {
 creepClasses.remoteCoreAttacker = RemoteCoreAttacker
 
 export class RemoteDismantler extends Creep {
+
      /**
       * Finds a remote
       */

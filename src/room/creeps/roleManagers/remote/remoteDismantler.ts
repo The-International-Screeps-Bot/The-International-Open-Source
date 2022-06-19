@@ -85,7 +85,7 @@ RemoteDismantler.prototype.findRemote = function () {
           // Otherwise assign the remote to the creep and inform true
 
           creep.memory.remoteName = roomName
-          roomMemory.needs[remoteNeedsIndex[role]] -= 1
+          if (!creep.isDying()) roomMemory.needs[remoteNeedsIndex[role]] -= 1
 
           return true
      }
@@ -126,7 +126,10 @@ RemoteDismantler.prototype.advancedDismantle = function () {
           return true
      }
 
-     const enemyStructures = room.find(FIND_HOSTILE_STRUCTURES)
+     const enemyStructures = room.find(FIND_HOSTILE_STRUCTURES).filter(function(structure) {
+
+          return structure.structureType != STRUCTURE_INVADER_CORE
+     })
 
      if (enemyStructures.length) {
 

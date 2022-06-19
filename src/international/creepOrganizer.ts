@@ -3,7 +3,7 @@ import { claimRequestNeedsIndex, remoteNeedsIndex, spawnByRoomRemoteRoles } from
 import { customLog, pack } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
-import '../room/creeps/preTickManagers/international/scoutPreTickManager'
+import '../room/creeps/preTickManagers/international/scoutPreTick'
 
 InternationalManager.prototype.creepOrganizer = function () {
      // Construct counter for creeps
@@ -121,24 +121,6 @@ InternationalManager.prototype.creepOrganizer = function () {
                     // Add the creep to creepsFromRoomWithRemote relative to its remote
 
                     commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
-                    continue
-               }
-
-               // Otherwise if the creep is a remoteDefender
-
-               if (role === 'remoteDefender') {
-                    // Reduduce the remote's defender need proportionate to the creep's strength
-
-                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.strength
-                    continue
-               }
-
-               // Otherwise if the creep is a remoteCoreAttacker
-
-               if (role === 'remoteCoreAttacker') {
-                    // Reduduce the remote's defender need proportionate to the creep's strength
-
-                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= 1
                     continue
                }
           }

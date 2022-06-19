@@ -85,7 +85,7 @@ RemoteCoreAttacker.prototype.findRemote = function () {
           // Otherwise assign the remote to the creep and inform true
 
           creep.memory.remoteName = roomName
-          roomMemory.needs[remoteNeedsIndex[role]] -= 1
+          if (!this.isDying()) roomMemory.needs[remoteNeedsIndex[role]] -= 1
 
           return true
      }

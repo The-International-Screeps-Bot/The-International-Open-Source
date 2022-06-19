@@ -16,7 +16,8 @@ export function remoteReserverManager(room: Room, creepsOfRole: string[]) {
                     if (roomMemory.needs[remoteNeedsIndex.remoteReserver] <= 0) continue
 
                     creep.memory.remoteName = roomName
-                    roomMemory.needs[remoteNeedsIndex.remoteReserver] -= 1
+                    if (!creep.isDying()) roomMemory.needs[remoteNeedsIndex.remoteReserver] -= 1
+                    
                     break
                }
           }

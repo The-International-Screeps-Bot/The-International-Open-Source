@@ -59,8 +59,13 @@ InternationalManager.prototype.remoteNeedsManager = function () {
 
                     // If there are walls or enemyStructures, set dismantler need
 
+                    const enemyStructures = remote.find(FIND_HOSTILE_STRUCTURES).filter(function(structure) {
+
+                         return structure.structureType != STRUCTURE_INVADER_CORE
+                    })
+
                     remoteMemory.needs[remoteNeedsIndex.remoteDismantler] =
-                         remote.structures.constructedWall.length || remote.find(FIND_HOSTILE_STRUCTURES).length ? 1 : 0
+                         remote.structures.constructedWall.length || enemyStructures.length ? 1 : 0
                }
 
                // Loop through each index of sourceEfficacies

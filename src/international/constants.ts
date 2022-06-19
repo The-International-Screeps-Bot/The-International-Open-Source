@@ -587,9 +587,10 @@ export const spawnByRoomRemoteRoles: (
      | 'source1RemoteHarvester'
      | 'source2RemoteHarvester'
      | 'remoteReserver'
+     | 'remoteDefender'
      | 'remoteCoreAttacker'
      | 'remoteDismantler'
-)[] = ['source1RemoteHarvester', 'source2RemoteHarvester', 'remoteReserver', 'remoteCoreAttacker', 'remoteDismantler']
+)[] = ['source1RemoteHarvester', 'source2RemoteHarvester', 'remoteReserver', 'remoteDefender', 'remoteCoreAttacker', 'remoteDismantler']
 
 export const builderSpawningWhenStorageThreshold = 40000
 
