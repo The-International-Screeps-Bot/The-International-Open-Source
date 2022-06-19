@@ -171,13 +171,13 @@ Creep.prototype.advancedUpgradeController = function () {
 
      // Assign either the controllerLink or controllerContainer as the controllerStructure
 
-     const controllerStructure: StructureLink | StructureContainer | undefined =
-          room.get('controllerLink') || room.get('controllerContainer')
+     let controllerStructure: StructureLink | StructureContainer | undefined = room.get('controllerContainer')
+
+     if (!controllerStructure && room.get('hubLink')) controllerStructure = room.get('controllerLink')
 
      // If there is a controllerContainer
 
      if (controllerStructure) {
-
           // if the creep doesn't have an upgrade pos
 
           if (!this.memory.packedPos) {
@@ -237,13 +237,8 @@ Creep.prototype.advancedUpgradeController = function () {
           const workPartCount = this.partsOfType(WORK)
           const controllerRange = getRange(this.pos.x - room.controller.pos.x, this.pos.y - room.controller.pos.y)
 
-          if (
-               controllerRange <= 3 &&
-               this.store.energy > 0
-          ) {
-
+          if (controllerRange <= 3 && this.store.energy > 0) {
                if (this.upgradeController(room.controller) === OK) {
-
                     this.store.energy -= workPartCount
 
                     const controlPoints = workPartCount * UPGRADE_CONTROLLER_POWER
@@ -264,10 +259,8 @@ Creep.prototype.advancedUpgradeController = function () {
                if (
                     this.store.energy > 0 &&
                     controllerStructure.structureType === STRUCTURE_CONTAINER &&
-                    controllerStructure.hitsMax - controllerStructure.hits >=
-                         workPartCount * REPAIR_POWER
+                    controllerStructure.hitsMax - controllerStructure.hits >= workPartCount * REPAIR_POWER
                ) {
-
                     // If the repair worked
 
                     if (this.repair(controllerStructure) === OK) {
