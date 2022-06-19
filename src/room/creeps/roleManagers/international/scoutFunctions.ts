@@ -71,9 +71,9 @@ Scout.prototype.recordDeposits = function () {
           if (!Memory.communes.includes(room.memory.commune)) {
                room.memory.commune = findClosestCommuneName(room.name)
           }
-     } /* else {
+     } else {
           room.memory.commune = findClosestCommuneName(room.name)
-     } */
+     }
 
      const communeMemory = Memory.rooms[room.memory.communeName]
 

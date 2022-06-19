@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
- export const breakingVersion = 24
+export const breakingVersion = 25
 
 // Settings
 
@@ -13,7 +13,7 @@ export const roomVisuals = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
- export const baseVisuals = false
+export const baseVisuals = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -583,11 +583,13 @@ export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHar
      'source2RemoteHarvester',
 ]
 
-export const spawnByRoomRemoteRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester' | 'remoteReserver')[] = [
-     'source1RemoteHarvester',
-     'source2RemoteHarvester',
-     'remoteReserver',
-]
+export const spawnByRoomRemoteRoles: (
+     | 'source1RemoteHarvester'
+     | 'source2RemoteHarvester'
+     | 'remoteReserver'
+     | 'remoteCoreAttacker'
+     | 'remoteDismantler'
+)[] = ['source1RemoteHarvester', 'source2RemoteHarvester', 'remoteReserver', 'remoteCoreAttacker', 'remoteDismantler']
 
 export const builderSpawningWhenStorageThreshold = 40000
 

@@ -1032,7 +1032,34 @@ export function spawnRequester(room: Room) {
 
                          return {
                               defaultParts: [],
-                              extraParts: [WORK, WORK, MOVE, CARRY, WORK, WORK, MOVE, WORK, WORK, WORK, MOVE, WORK, WORK, MOVE, CARRY, WORK, MOVE, WORK, WORK, MOVE, WORK, WORK, MOVE, CARRY, WORK, MOVE],
+                              extraParts: [
+                                   WORK,
+                                   WORK,
+                                   MOVE,
+                                   CARRY,
+                                   WORK,
+                                   WORK,
+                                   MOVE,
+                                   WORK,
+                                   WORK,
+                                   WORK,
+                                   MOVE,
+                                   WORK,
+                                   WORK,
+                                   MOVE,
+                                   CARRY,
+                                   WORK,
+                                   MOVE,
+                                   WORK,
+                                   WORK,
+                                   MOVE,
+                                   WORK,
+                                   WORK,
+                                   MOVE,
+                                   CARRY,
+                                   WORK,
+                                   MOVE,
+                              ],
                               partsMultiplier,
                               threshold,
                               minCreeps: 1,
@@ -1144,7 +1171,8 @@ export function spawnRequester(room: Room) {
                Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0) +
                Math.max(remoteNeeds[remoteNeedsIndex.remoteReserver], 0) +
                Math.max(remoteNeeds[remoteNeedsIndex.remoteDefender], 0) +
-               Math.max(remoteNeeds[remoteNeedsIndex.remoteCoreAttacker], 0)
+               Math.max(remoteNeeds[remoteNeedsIndex.remoteCoreAttacker], 0) +
+               Math.max(remoteNeeds[remoteNeedsIndex.remoteDismantler], 0)
 
           // If there is a need for any econ creep, inform the index
 
@@ -1167,7 +1195,7 @@ export function spawnRequester(room: Room) {
                               defaultParts: [CARRY],
                               extraParts: [WORK, MOVE],
                               partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0),
-                              groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source1RemoteHarvester,
+                              groupComparator: room.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
                               threshold: 0.1,
                               minCreeps: 1,
                               maxCreeps: Infinity,
@@ -1184,7 +1212,7 @@ export function spawnRequester(room: Room) {
                          defaultParts: [CARRY],
                          extraParts: [WORK, WORK, MOVE],
                          partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0),
-                         groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source1RemoteHarvester,
+                         groupComparator: room.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
                          threshold: 0.1,
                          minCreeps: undefined,
                          maxCreeps: global[remoteName]?.source1HarvestPositions?.length || Infinity,
@@ -1211,7 +1239,7 @@ export function spawnRequester(room: Room) {
                               defaultParts: [CARRY],
                               extraParts: [WORK, MOVE],
                               partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0),
-                              groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source2RemoteHarvester,
+                              groupComparator: room.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
                               threshold: 0.1,
                               minCreeps: 1,
                               maxCreeps: Infinity,
@@ -1227,7 +1255,7 @@ export function spawnRequester(room: Room) {
                          defaultParts: [],
                          extraParts: [WORK, MOVE],
                          partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0),
-                         groupComparator: room.creepsFromRoomWithRemote[remoteName]?.source2RemoteHarvester,
+                         groupComparator: room.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
                          threshold: 0.1,
                          minCreeps: undefined,
                          maxCreeps: global[remoteName]?.source2HarvestPositions?.length || Infinity,
@@ -1287,7 +1315,7 @@ export function spawnRequester(room: Room) {
                          defaultParts: [],
                          extraParts: [MOVE, CLAIM],
                          partsMultiplier: 4,
-                         groupComparator: room.creepsFromRoomWithRemote[remoteName]?.remoteReserver,
+                         groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteReserver,
                          minCreeps: 1,
                          maxCreeps: Infinity,
                          minCost: 750,
@@ -1334,7 +1362,7 @@ export function spawnRequester(room: Room) {
                          defaultParts: [],
                          extraParts,
                          partsMultiplier,
-                         groupComparator: room.creepsFromRoomWithRemote[remoteName]?.remoteDefender,
+                         groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDefender,
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost,
@@ -1357,14 +1385,14 @@ export function spawnRequester(room: Room) {
                     // Define the minCost and strength
 
                     const cost = 130
-                    const minCost = cost * 2
                     const extraParts = [ATTACK, MOVE]
+                    const minCost = cost * extraParts.length
 
                     return {
                          defaultParts: [],
                          extraParts,
                          partsMultiplier: 50 / extraParts.length,
-                         groupComparator: room.creepsFromRoomWithRemote[remoteName]?.remoteCoreAttacker,
+                         groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteCoreAttacker,
                          minCreeps: undefined,
                          maxCreeps: 1,
                          minCost,
@@ -1375,6 +1403,36 @@ export function spawnRequester(room: Room) {
                     }
                })(),
           )
+
+          // Construct requests for remoteDismantler
+
+          constructSpawnRequests(
+            (function (): SpawnRequestOpts | false {
+                 // If there are no related needs
+
+                 if (remoteNeeds[remoteNeedsIndex.remoteDismantler] <= 0) return false
+
+                 // Define the minCost and strength
+
+                 const cost = 150
+                 const extraParts = [WORK, MOVE]
+                 const minCost = cost * extraParts.length * 2
+
+                 return {
+                      defaultParts: [],
+                      extraParts,
+                      partsMultiplier: 50 / extraParts.length,
+                      groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDismantler,
+                      minCreeps: undefined,
+                      maxCreeps: 1,
+                      minCost,
+                      priority: 9,
+                      memoryAdditions: {
+                           role: 'remoteDismantler',
+                      },
+                 }
+            })(),
+       )
      }
 
      // Construct requests for scouts

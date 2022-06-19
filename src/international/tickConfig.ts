@@ -108,7 +108,7 @@ InternationalManager.prototype.tickConfig = function () {
 
           if (!room.memory.remotes) room.memory.remotes = []
 
-          // Loop through the name of each of the commune's remotes
+          // Loop through the commune's remote names
 
           for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
                // Get the name of the remote using the index
@@ -152,10 +152,6 @@ InternationalManager.prototype.tickConfig = function () {
                roomMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = roomMemory.source2 ? 3 : 0
 
                roomMemory.needs[remoteNeedsIndex.remoteHauler] = 0
-
-               roomMemory.needs[remoteNeedsIndex.remoteDefender] = 0
-
-               roomMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = 0
           }
 
           // Add roomName to commune list

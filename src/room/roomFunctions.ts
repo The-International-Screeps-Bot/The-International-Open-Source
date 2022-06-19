@@ -1,4 +1,4 @@
-import { allyList, constants, prefferedCommuneRange, stamps } from 'international/constants'
+import { allyList, constants, prefferedCommuneRange, remoteNeedsIndex, stamps } from 'international/constants'
 import {
      advancedFindDistance,
      arePositionsEqual,
@@ -1925,10 +1925,11 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
                scoutingRoom.memory.remotes.push(room.name)
 
-               // Construct needs and sourceEfficacies
+               room.memory.sourceEfficacies = newSourceEfficacies
 
                room.memory.needs = []
-               room.memory.sourceEfficacies = newSourceEfficacies
+               for (const key in remoteNeedsIndex) room.memory.needs[parseInt(key)] = 0
+
                return true
           }
 
@@ -1950,10 +1951,11 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
           scoutingRoom.memory.remotes.push(room.name)
 
-          // Construct needs and sourceEfficacies
+          room.memory.sourceEfficacies = newSourceEfficacies
 
           room.memory.needs = []
-          room.memory.sourceEfficacies = newSourceEfficacies
+          for (const key in remoteNeedsIndex) room.memory.needs[parseInt(key)] = 0
+
           return true
      }
 
