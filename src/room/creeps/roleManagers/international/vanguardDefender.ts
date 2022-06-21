@@ -52,10 +52,17 @@ export function vanguardDefenderManager(room: Room, creepsOfRole: string[]) {
 VanguardDefender.prototype.advancedAttackEnemies = function () {
      const { room } = this
 
+     const enemyAttackers = room.enemyAttackers.filter(function (creep) {
+          return !creep.isOnExit()
+     })
+
      // If there are none
 
-     if (!room.enemyAttackers.length) {
-          const { enemyCreeps } = room
+     if (!enemyAttackers.length) {
+          const enemyCreeps = room.enemyCreeps.filter(function (creep) {
+               return !creep.isOnExit()
+          })
+
           if (!enemyCreeps.length) {
                return this.aggressiveHeal()
           }
