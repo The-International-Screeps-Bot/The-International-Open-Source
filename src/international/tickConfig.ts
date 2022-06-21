@@ -92,17 +92,15 @@ InternationalManager.prototype.tickConfig = function () {
           if (!room.global.tasksWithoutResponders) room.global.tasksWithoutResponders = {}
           if (!room.global.tasksWithResponders) room.global.tasksWithResponders = {}
 
-          // Iterate if there isn't a controller
-
-          if (!controller) continue
+          if (room.memory.type != 'commune') continue
 
           // Iterate if the controller is not mine
 
-          if (!controller.my) continue
+          if (!controller.my) {
 
-          // Set type to commune
-
-          room.memory.type = 'commune'
+               delete room.memory.type
+               continue
+          }
 
           //
 
