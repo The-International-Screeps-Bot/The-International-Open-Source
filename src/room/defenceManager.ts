@@ -11,9 +11,9 @@ export function defenceManager(room: Room) {
 
      // Get enemyAttackers in the room
 
-     const enemyAttackers = room.enemyCreeps.filter(
-          creep => !creep.isOnExit() && creep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK]),
-     )
+     const enemyAttackers = room.enemyAttackers.filter(function(creep) {
+          return !creep.isOnExit()
+     })
 
      manageRampartPublicity()
 
@@ -31,8 +31,7 @@ export function defenceManager(room: Room) {
 
                // Get the room's ramparts and loop through them
 
-               const ramparts = room.structures.rampart
-               for (const rampart of ramparts) {
+               for (const rampart of room.structures.rampart) {
                     // If increment is more or equal to 10, stop
 
                     if (increment >= 10) return
@@ -54,8 +53,7 @@ export function defenceManager(room: Room) {
 
           // Get the room's ramparts and loop through them
 
-          const ramparts = room.structures.rampart
-          for (const rampart of ramparts) {
+          for (const rampart of room.structures.rampart) {
                // If the rampart is public, make it private
 
                if (rampart.isPublic) rampart.setPublic(false)
@@ -88,6 +86,8 @@ export function defenceManager(room: Room) {
 
           const eventLog = room.getEventLog()
 
+          let attackTarget
+
           // Loop through each eventItem
 
           for (const eventItem of eventLog) {
@@ -97,7 +97,7 @@ export function defenceManager(room: Room) {
 
                // Otherwise get the target of the attack
 
-               const attackTarget: Structure | Creep = findObjectWithID(eventItem.data.targetId as Id<any>)
+               attackTarget = findObjectWithID(eventItem.data.targetId as Id<Structure | Creep>)
 
                // If the attackTarget doesn't have a structureType, iterate
 
