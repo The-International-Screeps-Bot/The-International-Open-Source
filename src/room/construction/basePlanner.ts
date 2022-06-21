@@ -615,6 +615,9 @@ export function basePlanner(room: Room) {
           }
      }
 
+     for (const wall of room.structures.constructedWall)
+          wall.destroy()
+
      // Record planning results in the room's global and inform true
 
      room.memory.planned = true
