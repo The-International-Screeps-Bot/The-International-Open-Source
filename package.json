@@ -67,7 +67,7 @@
      },
      "dependencies": {
           "source-map": "~0.6.1"
-     }
+     },
      "optionalDependencies": {
           "screeps": "4.2.14",
           "ncp": "^2.0.0",
