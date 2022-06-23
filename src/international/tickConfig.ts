@@ -57,12 +57,15 @@ InternationalManager.prototype.tickConfig = function () {
 
      // Other
 
+     let room
+     let controller
+
      // Configure rooms
 
      for (const roomName in Game.rooms) {
-          const room = Game.rooms[roomName]
+          room = Game.rooms[roomName]
 
-          const { controller } = room
+          controller = room.controller
 
           // Single tick properties
 
@@ -110,55 +113,13 @@ InternationalManager.prototype.tickConfig = function () {
 
           if (!room.memory.remotes) room.memory.remotes = []
 
-          // Loop through the commune's remote names
-
-          for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
-               // Get the name of the remote using the index
-
-               const roomName = room.memory.remotes[index]
-
-               // Get the room's memory using its name
-
-               const roomMemory = Memory.rooms[roomName]
-
-               // If the room isn't a remote, remove it from the remotes array
-
-               if (roomMemory.type !== 'remote' || roomMemory.commune !== room.name) {
-                    room.memory.remotes.splice(index, 1)
-                    continue
-               }
-
-               // Initialize aspects of needs
-
-               roomMemory.needs[remoteNeedsIndex.remoteReserver] = 1
-
-               // Get the room using the roomName
-
-               const remote = Game.rooms[roomName]
-
-               // If there is vision in the room, the controller is reserved, it's reserved be me, and there is sufficient reservation left
-
-               if (
-                    remote &&
-                    remote.controller.reservation &&
-                    remote.controller.reservation.username === Memory.me &&
-                    remote.controller.reservation.ticksToEnd >= roomMemory.sourceEfficacies.reduce((a, b) => a + b) * 2
-               ) {
-                    // Set the reservation need to 0
-
-                    roomMemory.needs[remoteNeedsIndex.remoteReserver] = 0
-               }
-
-               roomMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 3
-
-               roomMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = roomMemory.source2 ? 3 : 0
-
-               roomMemory.needs[remoteNeedsIndex.remoteHauler] = 0
-          }
+          room.remotesManager()
 
           // Add roomName to commune list
 
           Memory.communes.push(roomName)
+
+          Memory.stats.energy += room.findStoredResourceAmount(RESOURCE_ENERGY)
 
           room.creepsFromRoom = {}
 
@@ -169,20 +130,6 @@ InternationalManager.prototype.tickConfig = function () {
           room.creepsFromRoomAmount = 0
 
           room.creepsFromRoomWithRemote = {}
-
-          // For each remoteName in the room's recorded remotes
-
-          for (const remoteName of room.memory.remotes) {
-               // Intialize an array for this room's creepsFromRoomWithRemote
-
-               room.creepsFromRoomWithRemote[remoteName] = {}
-
-               // For each role, construct an array for the role in creepsFromWithRemote
-
-               for (const role of spawnByRoomRemoteRoles) room.creepsFromRoomWithRemote[remoteName][role] = []
-          }
-
-          Memory.stats.energy += room.findStoredResourceAmount(RESOURCE_ENERGY)
 
           // If there is an existing claimRequest and it's invalid, delete it from the room memory
 
