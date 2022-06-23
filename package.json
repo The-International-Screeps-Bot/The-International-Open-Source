@@ -69,10 +69,11 @@
           "source-map": "~0.6.1"
      },
      "optionalDependencies": {
-          "screeps": "4.2.14",
+          "dotenv": "^16.0.1",
+          "fsevents": "^2.3.2",
           "ncp": "^2.0.0",
           "q": "^1.5.1",
-          "dotenv": "^16.0.1",
+          "screeps": "4.2.14",
           "screeps-api": "1.16.0",
           "screepsmod-admin-utils": "1.29.0",
           "screepsmod-auth": "2.6.2"
