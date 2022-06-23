@@ -713,16 +713,6 @@ Creep.prototype.findFastFillerPos = function () {
      return true
 }
 
-Creep.prototype.hasPartsOfTypes = function (partTypes) {
-     // If the doesn't have any parts of the specified types, inform false
-
-     if (!this.body.some(part => partTypes.includes(part.type))) return false
-
-     // If the creep has all the parts, inform true
-
-     return true
-}
-
 Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
      // Inform true if there is no path
 

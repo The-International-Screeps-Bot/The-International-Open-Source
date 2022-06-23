@@ -1463,12 +1463,12 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                          const enemyRangedAttackers: Creep[] = []
 
                          for (const enemyCreep of room.enemyCreeps) {
-                              if (enemyCreep.hasPartsOfTypes([RANGED_ATTACK])) {
+                              if (enemyCreep.parts.ranged_attack > 0) {
                                    enemyRangedAttackers.push(enemyCreep)
                                    return
                               }
 
-                              if (enemyCreep.hasPartsOfTypes([ATTACK])) enemyAttackers.push(enemyCreep)
+                              if (enemyCreep.parts.attack > 0) enemyAttackers.push(enemyCreep)
                          }
 
                          for (const enemyAttacker of enemyAttackers) {
@@ -1813,7 +1813,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
                     // If the creep has work parts
 
-                    if (creep.hasPartsOfTypes([WORK])) {
+                    if (creep.parts.work > 0) {
                          // If the creep is owned by an ally
 
                          if (allyList.has(creep.owner.username)) {

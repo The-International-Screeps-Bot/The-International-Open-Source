@@ -8,11 +8,9 @@ MeleeDefender.prototype.advancedDefend = function () {
 
      // Get enemyAttackers in the room, informing false if there are none
 
-     const enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-          filter: enemyAttacker =>
-               !allyList.has(enemyAttacker.owner.username) &&
-               !enemyAttacker.isOnExit() &&
-               enemyAttacker.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK]),
+     const enemyAttackers = room.enemyAttackers.filter(function(enemyAttacker) {
+
+          return !enemyAttacker.isOnExit()
      })
 
      if (!enemyAttackers.length) return false
@@ -21,9 +19,9 @@ MeleeDefender.prototype.advancedDefend = function () {
 
      const enemyAttacker = creep.pos.findClosestByRange(enemyAttackers)
 
-     // Get the room's ramparts, filtering for thoseinforming false if there are none
+     // Get the room's ramparts, filtering for those and informing false if there are none
 
-     const ramparts = (room.get('rampart') as StructureRampart[]).filter(function (rampart) {
+     const ramparts = room.structures.rampart.filter(function (rampart) {
           // Get structures at the rampart's pos
 
           const structuresAtPos = room.lookForAt(LOOK_STRUCTURES, rampart.pos)

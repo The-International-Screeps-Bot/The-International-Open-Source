@@ -1078,11 +1078,6 @@ declare global {
           findFastFillerPos(): boolean
 
           /**
-           * Checks if the creep has some parts of specified types
-           */
-          hasPartsOfTypes(partTypes: BodyPartConstant[]): boolean
-
-          /**
            *
            */
           needsNewPath(goalPos: RoomPosition, cacheAmount: number, path: RoomPosition[] | undefined): boolean

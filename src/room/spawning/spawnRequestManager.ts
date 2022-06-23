@@ -729,11 +729,9 @@ export function spawnRequester(room: Room) {
      if (!room.structures.tower.length) {
           // Consider invaders as significant attackers
 
-          enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-               filter: creep =>
-                    !allyList.has(creep.owner.username) &&
-                    !creep.isOnExit() &&
-                    creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK]),
+          enemyAttackers = room.enemyAttackers.filter(function(creep) {
+
+               return !creep.isOnExit()
           })
      }
 
@@ -741,12 +739,9 @@ export function spawnRequester(room: Room) {
      else {
           // Don't consider invaders
 
-          enemyAttackers = room.find(FIND_HOSTILE_CREEPS, {
-               filter: creep =>
-                    creep.owner.username !== 'Invader' &&
-                    !allyList.has(creep.owner.username) &&
-                    !creep.isOnExit() &&
-                    creep.hasPartsOfTypes([WORK, ATTACK, RANGED_ATTACK]),
+          enemyAttackers = room.enemyAttackers.filter(function(creep) {
+
+               return creep.owner.username !== 'Invader' && !creep.isOnExit()
           })
      }
 
