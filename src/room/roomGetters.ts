@@ -57,7 +57,7 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._enemyAttackers) return this._enemyAttackers
 
-               return this._enemyCreeps.filter(function (creep) {
+               return this.enemyCreeps.filter(function (creep) {
                     return creep.hasPartsOfTypes([ATTACK, RANGED_ATTACK, WORK])
                })
           },
