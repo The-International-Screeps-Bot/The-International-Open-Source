@@ -189,9 +189,6 @@ export class InternationalManager {
 }
 
 InternationalManager.prototype.run = function () {
-     delete this._myOrders
-     delete this._orders
-     delete this._myOrdersCount
 
      // Run prototypes
 
@@ -232,8 +229,6 @@ InternationalManager.prototype.getBuyOrders = function (resourceType, minPrice =
      })
 }
 
-export const internationalManager = new InternationalManager()
-
 InternationalManager.prototype.advancedSellPixels = function () {
      if (!Memory.pixelSelling) return
 
@@ -248,3 +243,5 @@ InternationalManager.prototype.advancedSellPixels = function () {
           return
      }
 }
+
+export const internationalManager = new InternationalManager()
