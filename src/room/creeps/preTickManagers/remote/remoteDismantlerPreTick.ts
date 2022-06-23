@@ -15,5 +15,5 @@ RemoteDismantler.prototype.preTickManager = function () {
 
      // Add the creep to creepsFromRoomWithRemote relative to its remote
 
-     commune.creepsFromRoomWithRemote[this.memory.remoteName][role].push(this.name)
+     if (commune.creepsFromRoomWithRemote[this.memory.remoteName])commune.creepsFromRoomWithRemote[this.memory.remoteName][role].push(this.name)
 }
