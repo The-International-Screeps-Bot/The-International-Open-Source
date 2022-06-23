@@ -19,7 +19,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                          if (roomMemory.needs[remoteNeedsIndex.remoteHauler] <= 0) continue
 
                          creep.memory.remoteName = roomName
-                         roomMemory.needs[remoteNeedsIndex.remoteHauler] -= this.parts.work
+                         roomMemory.needs[remoteNeedsIndex.remoteHauler] -= creep.parts.work
                          break
                     }
                }

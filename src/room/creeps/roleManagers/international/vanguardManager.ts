@@ -18,7 +18,7 @@ export function vanguardManager(room: Room, creepsOfRole: string[]) {
 
           Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[
                claimRequestNeedsIndex.vanguard
-          ] -= this.parts.work
+          ] -= creep.parts.work
 
           creep.say(claimTarget)
 
