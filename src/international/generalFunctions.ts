@@ -14,9 +14,7 @@ export function getAvgPrice(resourceType: MarketResourceConstant, days = 2) {
 
      // Iterate through each index less than days
 
-     for (let index = 0; index < days - 1; index += 1) {
-          totalPrice += history[index].avgPrice
-     }
+     for (let index = 0; index <= days; index += 1) totalPrice += history[index].avgPrice
 
      // Inform the totalPrice divided by the days
 
@@ -282,13 +280,13 @@ export function findLargestTransactionAmount(budget: number, amount: number, roo
 
      // So long as the the transactions cost is more than the budget
 
-     while (Game.market.calcTransactionCost(amount, roomName1, roomName2) > budget) {
+     while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
           // Decrease amount exponentially
-
+          
           amount *= 0.8
      }
 
-     return amount
+     return Math.floor(amount)
 }
 
 /**

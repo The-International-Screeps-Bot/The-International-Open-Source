@@ -59,7 +59,6 @@ export class InternationalManager {
      advancedSellPixels?(): void
 
      advancedGeneratePixel() {
-
           if (!Memory.pixelGeneration) return
 
           // Stop if the bot is not running on MMO
@@ -134,27 +133,27 @@ export class InternationalManager {
 
           if (this._orders) return this._orders
 
-          this._orders = {}
+          this._orders = {
+               buy: {},
+               sell: {},
+          }
 
           // Get the market's order and loop through them
 
           const orders = Game.market.getAllOrders()
+
+          let order
+
           for (const orderID in orders) {
                // Get the order using its ID
 
-               const order = orders[orderID]
+               order = orders[orderID]
 
-               // If there is no foundation for this structure, create one
+               // Assign the order to a resource-ordered location, creating it if undefined
 
-               if (!this._orders[order.type]) this._orders[order.type] = {}
-
-               // If there is no array for this structure, create one
-
-               if (!this._orders[order.type][order.resourceType]) this._orders[order.type][order.resourceType] = []
-
-               // Add the order to the structure's array
-
-               this._orders[order.type][order.resourceType].push(order)
+               this._orders[order.type][order.resourceType]
+                    ? this._orders[order.type][order.resourceType].push(order)
+                    : (this._orders[order.type][order.resourceType] = [order])
           }
 
           return this._orders
@@ -181,12 +180,11 @@ export class InternationalManager {
      _claimRequestsByScore: (string | undefined)[]
 
      get claimRequestsByScore(): (string | undefined)[] {
-
           if (this._claimRequestsByScore) return this._claimRequestsByScore
 
-          return this._claimRequestsByScore = Object.keys(Memory.claimRequests).sort(
+          return (this._claimRequestsByScore = Object.keys(Memory.claimRequests).sort(
                (a, b) => Memory.claimRequests[a].score - Memory.claimRequests[b].score,
-          )
+          ))
      }
 }
 
@@ -210,40 +208,28 @@ InternationalManager.prototype.run = function () {
      ExecutePandaMasterCode()
 }
 
-InternationalManager.prototype.getSellOrders = function (resourceType, maxPrice) {
-     // If the price limit isn't defined, construct it using the avgPrice
-
-     if (!maxPrice) maxPrice = getAvgPrice(resourceType) * 1.2
-
+InternationalManager.prototype.getSellOrders = function (resourceType, maxPrice = getAvgPrice(resourceType) * 1.2) {
      const orders = this.orders[ORDER_SELL]?.[resourceType] || []
-
+     customLog(resourceType, maxPrice)
      // Filter orders
 
-     orders.filter(function (order) {
+     return orders.filter(function (order) {
           // Inform if the price is below or equal to the maxPrice
 
           return order.price <= maxPrice
      })
-
-     // Inform orders
-
-     return orders
 }
 
-InternationalManager.prototype.getBuyOrders = function (resourceType, minPrice) {
+InternationalManager.prototype.getBuyOrders = function (resourceType, minPrice = getAvgPrice(resourceType) * 0.8) {
      const orders = this.orders[ORDER_BUY]?.[resourceType] || []
 
      // Filter orders
 
-     orders.filter(function (order) {
+     return orders.filter(function (order) {
           // Inform if the price is more or equal to the minPrice
 
           return order.price >= minPrice
      })
-
-     // Inform orders
-
-     return orders
 }
 
 export const internationalManager = new InternationalManager()

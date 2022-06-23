@@ -59,13 +59,6 @@ export function roomManager() {
 
           roomVisualsManager(room)
 
-          // Testing
-          /*
-        let cpuUsed = Game.cpu.getUsed()
-
-        cpuUsed = Game.cpu.getUsed() - cpuUsed
-        customLog('Testing CPU', cpuUsed.toFixed(2))
- */
           // Log room stats
 
           let logMessage = `Creeps: ${room.myCreepsAmount}`
