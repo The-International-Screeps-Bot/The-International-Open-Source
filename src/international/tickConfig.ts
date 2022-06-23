@@ -113,6 +113,8 @@ InternationalManager.prototype.tickConfig = function () {
 
           if (!room.memory.remotes) room.memory.remotes = []
 
+          room.creepsFromRoomWithRemote = {}
+
           room.remotesManager()
 
           // Add roomName to commune list
@@ -128,8 +130,6 @@ InternationalManager.prototype.tickConfig = function () {
           for (const role of constants.creepRoles) room.creepsFromRoom[role] = []
 
           room.creepsFromRoomAmount = 0
-
-          room.creepsFromRoomWithRemote = {}
 
           // If there is an existing claimRequest and it's invalid, delete it from the room memory
 
