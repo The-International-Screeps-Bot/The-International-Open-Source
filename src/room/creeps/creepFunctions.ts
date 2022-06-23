@@ -156,7 +156,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
 
      // Find amount of energy harvested and record it in data
 
-     const energyHarvested = Math.min(this.partsOfType(WORK) * HARVEST_POWER, source.energy)
+     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
      Memory.stats.energyHarvested += energyHarvested
 
      this.say(`⛏️${energyHarvested}`)
@@ -234,7 +234,7 @@ Creep.prototype.advancedUpgradeController = function () {
                say += '➡️'
           }
 
-          const workPartCount = this.partsOfType(WORK)
+          const workPartCount = this.parts.work
           const controllerRange = getRange(this.pos.x - room.controller.pos.x, this.pos.y - room.controller.pos.y)
 
           if (controllerRange <= 3 && this.store.energy > 0) {
@@ -353,14 +353,11 @@ Creep.prototype.advancedUpgradeController = function () {
      // Try to upgrade the controller, and if it worked
 
      if (this.upgradeController(room.controller) === OK) {
-          // Calculate the control points added
-
-          const controlPoints = this.partsOfType(WORK)
 
           // Add control points to total controlPoints counter and say the success
 
-          Memory.stats.controlPoints += controlPoints
-          this.say(`🔋${controlPoints}`)
+          Memory.stats.controlPoints += this.parts.work
+          this.say(`🔋${this.parts.work}`)
 
           // Inform true
 
@@ -414,14 +411,14 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
           // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
           const energySpentOnConstruction = Math.min(
-               this.partsOfType(WORK) * BUILD_POWER,
+               this.parts.work * BUILD_POWER,
                (cSite.progressTotal - cSite.progress) * BUILD_POWER,
           )
 
           // Add control points to total controlPoints counter and say the success
 
           Memory.stats.energySpentOnConstruction += Math.min(
-               this.partsOfType(WORK) * BUILD_POWER,
+               this.parts.work * BUILD_POWER,
                (cSite.progressTotal - cSite.progress) * BUILD_POWER,
           )
           this.say(`🚧${energySpentOnConstruction}`)
@@ -724,12 +721,6 @@ Creep.prototype.hasPartsOfTypes = function (partTypes) {
      // If the creep has all the parts, inform true
 
      return true
-}
-
-Creep.prototype.partsOfType = function (type) {
-     // Filter body parts that are of a specified type, informing their count
-
-     return this.body.filter(part => part.type === type).length
 }
 
 Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {

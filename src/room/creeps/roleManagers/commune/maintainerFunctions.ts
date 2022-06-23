@@ -43,7 +43,7 @@ Maintainer.prototype.advancedMaintain = function () {
 
      // Get the creep's work part count
 
-     const workPartCount = creep.partsOfType(WORK)
+     const workPartCount = this.parts.work
 
      // Find a repair target based on the creeps work parts. If none are found, inform false
 
@@ -158,7 +158,7 @@ Maintainer.prototype.maintainNearby = function () {
 
      // Get the creep's work parts
 
-     const workPartCount = this.partsOfType(WORK)
+     const workPartCount = this.parts.work
 
      let structure
 

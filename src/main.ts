@@ -1083,11 +1083,6 @@ declare global {
           hasPartsOfTypes(partTypes: BodyPartConstant[]): boolean
 
           /**
-           * Gets the number of parts of a specified type a creep has
-           */
-          partsOfType(type: BodyPartConstant): number
-
-          /**
            *
            */
           needsNewPath(goalPos: RoomPosition, cacheAmount: number, path: RoomPosition[] | undefined): boolean

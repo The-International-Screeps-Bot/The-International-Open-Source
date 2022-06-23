@@ -43,7 +43,7 @@ MineralHarvester.prototype.advancedHarvestMineral = function (mineral) {
 
      // Find amount of minerals harvested and record it in data
 
-     const mineralsHarvested = Math.min(creep.partsOfType(WORK) * HARVEST_POWER, mineral.mineralAmount)
+     const mineralsHarvested = Math.min(this.parts.work * HARVEST_POWER, mineral.mineralAmount)
      Memory.stats.mineralsHarvested += mineralsHarvested
 
      creep.say(`⛏️${mineralsHarvested}`)
