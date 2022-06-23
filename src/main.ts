@@ -1173,7 +1173,7 @@ declare global {
 
           reservationManager(): void
 
-          createReservation(): void
+          createReservation(type: Reservations, target: Id<AnyStoreStructure | Creep | Tombstone | Resource>, amount: number, resourceType: ResourceConstant): void
 
           // Getters
 

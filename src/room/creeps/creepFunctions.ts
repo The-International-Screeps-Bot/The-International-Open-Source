@@ -1941,4 +1941,12 @@ Creep.prototype.reservationManager = function () {
      }
 }
 
-Creep.prototype.createReservation = function () {}
+Creep.prototype.createReservation = function (type, targetID, amount, resourceType) {
+
+     this.memory.reservations.push({
+          type,
+          targetID,
+          amount,
+          resourceType
+     })
+}
