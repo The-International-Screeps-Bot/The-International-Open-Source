@@ -49,6 +49,8 @@ Room.prototype.remotesManager = function () {
 
           remoteMemory.needs[remoteNeedsIndex.remoteHauler] = 0
 
+          remoteMemory.needs[remoteNeedsIndex.remoteReserver] = 1
+
           // Get the remote
 
           remote = Game.rooms[remoteName]
@@ -63,7 +65,7 @@ Room.prototype.remotesManager = function () {
                remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] += 3
                remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.source2 ? 3 : 0
 
-               // If the reservation isn't soom to run out, relative to the room's sourceEfficacy average
+               // If the reservation isn't soon to run out, relative to the room's sourceEfficacy average
 
                if (
                     remote.controller.reservation.ticksToEnd >=

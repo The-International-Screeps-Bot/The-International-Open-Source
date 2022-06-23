@@ -5,9 +5,12 @@ import { InternationalManager } from './internationalManager'
 
 import '../room/creeps/preTickManagers/international/scoutPreTick'
 
-import '../room/creeps/preTickManagers/remote/remoteDefender'
-import '../room/creeps/preTickManagers/remote/remoteCoreAttacker'
-import '../room/creeps/preTickManagers/remote/remoteDismantler'
+import '../room/creeps/preTickManagers/remote/remoteHarvesterPreTick'
+import '../room/creeps/preTickManagers/remote/remoteHaulerPreTick'
+import '../room/creeps/preTickManagers/remote/remoteReserverPreTick'
+import '../room/creeps/preTickManagers/remote/remoteDefenderPreTick'
+import '../room/creeps/preTickManagers/remote/remoteCoreAttackerPreTick'
+import '../room/creeps/preTickManagers/remote/remoteDismantlerPreTick'
 
 InternationalManager.prototype.creepOrganizer = function () {
      // Construct counter for creeps
@@ -59,11 +62,11 @@ InternationalManager.prototype.creepOrganizer = function () {
 
           if (!creep.spawning) room.creepPositions[pack(creep.pos)] = creep.name
 
+          creep.preTickManager()
+
           // Get the commune the creep is from
 
           const commune = Game.rooms[creep.memory.communeName]
-
-          creep.preTickManager()
 
           // If there is not vision in the commune, stop
 
@@ -76,60 +79,6 @@ InternationalManager.prototype.creepOrganizer = function () {
           // Record that the creep's existence in its roomFrom
 
           commune.creepsFromRoomAmount += 1
-
-          // Get the creep's remoteName
-
-          const { remoteName } = creep.memory
-
-          // If the creep has a remote
-
-          if (remoteName && commune.memory.remotes.includes(remoteName)) {
-               // If the creep is a source1RemoteHarvester
-
-               if (role === 'source1RemoteHarvester') {
-                    // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
-
-                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
-
-                    // Add the creep to creepsFromRoomWithRemote relative to its remote
-
-                    commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
-                    continue
-               }
-
-               // If the creep is a source2RemoteHarvester
-
-               if (role === 'source2RemoteHarvester') {
-                    // Reduce the needs for its remote's remoteHarvester needs by the creeps number of work parts * harvest power
-
-                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
-
-                    // Add the creep to creepsFromRoomWithRemote relative to its remote
-
-                    commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
-                    continue
-               }
-
-               // Otherwise if the creep is a remoteHauler, reduce its remote's needs by their number of carry parts
-
-               if (role === 'remoteHauler') {
-                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= creep.partsOfType(CARRY)
-                    continue
-               }
-
-               // Otherwise if the creep is a remoteReserver
-
-               if (role === 'remoteReserver') {
-                    // Reduce its remote's needs by 1
-
-                    Memory.rooms[remoteName].needs[remoteNeedsIndex[role]] -= 1
-
-                    // Add the creep to creepsFromRoomWithRemote relative to its remote
-
-                    commune.creepsFromRoomWithRemote[remoteName][role].push(creep.name)
-                    continue
-               }
-          }
      }
 
      // Record number of creeps
