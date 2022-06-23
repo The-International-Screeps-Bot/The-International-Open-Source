@@ -26,11 +26,6 @@ export class InternationalManager {
      creepOrganizer?(): void
 
      /**
-      * Construct remote needs using data collected from the creepOrganizer
-      */
-     remoteNeedsManager?(): void
-
-     /**
       * Deletes or edits international classes
       */
      taskManager?(): void
@@ -205,7 +200,6 @@ InternationalManager.prototype.run = function () {
      this.config()
      this.tickConfig()
      this.creepOrganizer()
-     this.remoteNeedsManager()
      this.taskManager()
      this.constructionSiteManager()
 

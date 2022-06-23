@@ -7,7 +7,7 @@ import { internationalManager } from 'international/internationalManager'
 import './international/config'
 import './international/tickConfig'
 import './international/creepOrganizer'
-import './international/remoteNeedsManager'
+import './room/remotesManager'
 import './international/internationalTaskManager'
 import './international/constructionSiteManager'
 import './international/mapVisualsManager'
@@ -15,6 +15,7 @@ import './international/endTickManager'
 
 // Room
 
+import './room/remotesManager'
 import { roomManager } from 'room/roomManager'
 import './room/roomGetters'
 
@@ -772,6 +773,8 @@ declare global {
           // General roomFunctions
 
           claimRequestManager(): void
+
+          remotesManager(): void
 
           // Market functions
 

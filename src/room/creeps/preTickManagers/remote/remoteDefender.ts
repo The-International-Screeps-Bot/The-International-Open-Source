@@ -2,20 +2,18 @@ import { remoteNeedsIndex } from 'international/constants'
 import { RemoteDefender } from 'room/creeps/creepClasses'
 
 RemoteDefender.prototype.preTickManager = function () {
+     if (!this.memory.remoteName) return
 
-    const { remoteName } = this.memory
-    if (!remoteName) return
+     const role = this.memory.role as 'remoteDefender'
 
-    const { commune } = this.memory
-    if (!commune) return
+     // Reduce remote need
 
-    const { role } = this.memory
+     Memory.rooms[this.memory.remoteName].needs[remoteNeedsIndex[role]] -= this.strength
 
-    // Reduce remote need
+     const commune = Game.rooms[this.memory.communeName]
+     if (!commune) return
 
-    Memory.rooms[remoteName].needs[remoteNeedsIndex[role as 'remoteDefender']] -= this.strength
+     // Add the creep to creepsFromRoomWithRemote relative to its remote
 
-    // Add the creep to creepsFromRoomWithRemote relative to its remote
-
-    commune.creepsFromRoomWithRemote[remoteName][role].push(this.name)
+     commune.creepsFromRoomWithRemote[this.memory.remoteName][role].push(this.name)
 }

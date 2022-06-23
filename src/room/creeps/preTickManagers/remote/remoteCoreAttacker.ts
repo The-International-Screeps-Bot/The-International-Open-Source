@@ -1,10 +1,10 @@
 import { remoteNeedsIndex } from 'international/constants'
-import { RemoteDismantler } from 'room/creeps/creepClasses'
+import { RemoteCoreAttacker } from 'room/creeps/creepClasses'
 
-RemoteDismantler.prototype.preTickManager = function () {
+RemoteCoreAttacker.prototype.preTickManager = function () {
      if (!this.memory.remoteName) return
 
-     const role = this.memory.role as 'remoteDismantler'
+     const role = this.memory.role as 'remoteCoreAttacker'
 
      // Reduce remote need
 
