@@ -6,7 +6,7 @@ import { InternationalManager } from './internationalManager'
 import '../room/creeps/preTickManagers/international/scoutPreTick'
 
 import '../room/creeps/preTickManagers/remote/remoteDefender'
-import '../room/creeps/preTickManagers/remote/remoteCoreAttackerPreTick'
+import '../room/creeps/preTickManagers/remote/remoteCoreAttacker'
 import '../room/creeps/preTickManagers/remote/remoteDismantler'
 
 InternationalManager.prototype.creepOrganizer = function () {
@@ -14,10 +14,12 @@ InternationalManager.prototype.creepOrganizer = function () {
 
      let totalCreepCount = 0
 
+     let creep
+
      // Loop through all of my creeps
 
      for (const creepName in Memory.creeps) {
-          let creep = Game.creeps[creepName]
+          creep = Game.creeps[creepName]
 
           // If creep doesn't exist
 
