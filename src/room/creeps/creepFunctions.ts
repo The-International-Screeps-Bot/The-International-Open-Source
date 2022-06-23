@@ -1612,10 +1612,10 @@ Creep.prototype.isOnExit = function () {
      return false
 }
 
-Creep.prototype.findHealPower = function () {
+Creep.prototype.findHealPower = function (range) {
      // Initialize the healValue
 
-     let healValue = 0
+     let heal = 0
 
      // Loop through the creep's body
 
@@ -1626,12 +1626,12 @@ Creep.prototype.findHealPower = function () {
 
           // Otherwise increase healValue by heal power * the part's boost
 
-          healValue += HEAL_POWER * BOOSTS[part.type][part.boost][part.type]
+          heal += BOOSTS[part.type][part.boost][part.type] * (range <= 1 ? HEAL_POWER : RANGED_HEAL_POWER)
      }
 
      // Inform healValue
 
-     return healValue
+     return heal
 }
 
 Creep.prototype.advancedRecycle = function () {

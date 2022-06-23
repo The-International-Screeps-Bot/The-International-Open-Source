@@ -1,3 +1,6 @@
+import { allyList, constants } from 'international/constants'
+import { getRange } from 'international/generalFunctions'
+
 Object.defineProperties(Creep.prototype, {
      reservation: {
           get() {
@@ -8,7 +11,6 @@ Object.defineProperties(Creep.prototype, {
      },
      strength: {
           get() {
-
                if (this._strength) return this._strength
 
                this._strength = 1
@@ -34,6 +36,97 @@ Object.defineProperties(Creep.prototype, {
                }
 
                return this._strength
+          },
+     },
+     parts: {
+          get() {
+               if (this._parts) return this._parts
+
+               this._parts = {}
+
+               for (const part of this.body) {
+                    this._parts[part.type] ? (this._parts[part.type] = 1) : (this._parts[part.type] += 1)
+               }
+
+               return this._parts
+          },
+     },
+     boosts: {
+          get() {
+               if (this._boosts) return this._boosts
+
+               this._boosts = {}
+
+               let boost
+
+               for (const part of this.body) {
+                    boost = part.boost as MineralBoostConstant
+                    if (!boost) continue
+
+                    this._boosts[boost] ? (this._boosts[boost] = 1) : (this._boosts[boost] += 1)
+               }
+
+               return this._boosts
+          },
+     },
+     towerDamage: {
+          get() {
+               if (this._towerDamage) return this._towerDamage
+
+               const { room } = this
+
+               this._towerDamage = 0
+               let range
+               let factor
+
+               for (const tower of room.structures.tower) {
+
+                    if (tower.store.energy <= 0) continue
+
+                    range = getRange(this.pos.x - tower.pos.x, this.pos.y - tower.pos.y)
+
+                    if (range <= TOWER_OPTIMAL_RANGE) {
+                         this._towerDamage += TOWER_POWER_ATTACK
+                         continue
+                    }
+
+                    factor =
+                         range < TOWER_FALLOFF_RANGE
+                              ? (range - TOWER_OPTIMAL_RANGE) / (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
+                              : 1
+                    this._towerDamage += Math.floor(TOWER_POWER_ATTACK * (1 - TOWER_FALLOFF * factor))
+               }
+
+               // Find adjacent creeps
+
+               const adjacentCreeps = room.lookForAtArea(
+                    LOOK_CREEPS,
+                    Math.max(Math.min(this.pos.y - 3, constants.roomDimensions - 2), 2),
+                    Math.max(Math.min(this.pos.x - 3, constants.roomDimensions - 2), 2),
+                    Math.max(Math.min(this.pos.y + 3, constants.roomDimensions - 2), 2),
+                    Math.max(Math.min(this.pos.x + 3, constants.roomDimensions - 2), 2),
+                    true,
+               )
+
+               // Loop through each adjacentCreep
+
+               for (const posData of adjacentCreeps) {
+                    // If the creep is not owned and isn't an ally
+
+                    if (posData.creep.my || allyList.has(posData.creep.owner.username)) continue
+
+                    range = getRange(this.pos.x - posData.creep.pos.x, this.pos.y - posData.creep.pos.y)
+
+                    if (range > 3) continue
+
+                    this._towerDamage -= posData.creep.findHealPower(range)
+               }
+
+               if (this.boosts.GO > 0) this._towerDamage *= BOOSTS.tough.GO.damage
+               if (this.boosts.GHO2 > 0) this._towerDamage *= BOOSTS.tough.GHO2.damage
+               if (this.boosts.XGHO2 > 0) this._towerDamage *= BOOSTS.tough.XGHO2.damage
+
+               return this._towerDamage
           },
      },
 } as PropertyDescriptorMap & ThisType<Creep>)

@@ -1,13 +1,10 @@
 import { RoomTransferTask } from './roomTasks'
 
 Room.prototype.towersRequestResources = function () {
-     const room = this
-
-     const towers = room.structures.tower
 
      // Get and loop through each tower
 
-     for (const tower of towers) {
+     for (const tower of this.structures.tower) {
           // if there is no global for the tower, make one
 
           if (!global[tower.id]) global[tower.id] = {}
@@ -19,7 +16,7 @@ Room.prototype.towersRequestResources = function () {
           else {
                // Find the towers's tasks of type tansfer
 
-               const towersTransferTasks = room.findTasksOfTypes(
+               const towersTransferTasks = this.findTasksOfTypes(
                     global[tower.id].createdTaskIDs,
                     new Set(['transfer']),
                ) as RoomTransferTask[]
@@ -50,30 +47,23 @@ Room.prototype.towersRequestResources = function () {
           if (taskAmount > 0) {
                // Create a new transfer task for the tower
 
-               new RoomTransferTask(room.name, RESOURCE_ENERGY, taskAmount, tower.id, 8)
+               new RoomTransferTask(this.name, RESOURCE_ENERGY, taskAmount, tower.id, 8)
           }
      }
 }
 
 Room.prototype.towersHealCreeps = function () {
-     const room = this
 
-     const towers = room.structures.tower
+     // Construct heal targets from my and allied damaged creeps in the this
 
-     // Stop if there are no towers
+     const healTargets = this.find(FIND_MY_CREEPS).concat(this.allyCreeps).filter(function(creep) {
 
-     if (!towers.length) return
+          return creep.hits < creep.hitsMax && !creep.isOnExit()
+     })
 
-     // Construct heal targets from my and allied damaged creeps in the room
+     // Loop through the this's towers
 
-     const healTargets: Creep[] = room
-          .find(FIND_MY_CREEPS)
-          .concat(room.get('allyCreeps'))
-          .filter(creep => creep.hits < creep.hitsMax && !creep.isOnExit())
-
-     // Loop through the room's towers
-
-     for (const tower of towers) {
+     for (const tower of this.structures.tower) {
           // Iterate if the tower is inactionable
 
           if (tower.inactionable) continue
@@ -101,38 +91,37 @@ Room.prototype.towersHealCreeps = function () {
 }
 
 Room.prototype.towersAttackCreeps = function () {
-     const room = this
 
-     if (room.controller.safeMode) return
+     if (this.controller.safeMode) return
 
-     const towers = room.structures.tower
+     // Construct attack targets from my and allied damaged creeps in the this
 
-     // Construct attack targets from my and allied damaged creeps in the room
+     const attackTargets = this.enemyCreeps.filter(function(creep) {
 
-     const attackTargets = room.enemyCreeps.filter(creep => !creep.isOnExit())
+          return !creep.isOnExit()
+     })
 
-     // Loop through the room's towers
+     if (!attackTargets.length) return
 
-     for (const tower of towers) {
+     const attackTarget = attackTargets.sort(function(a, b) {
+
+          return a.towerDamage - b.towerDamage
+     })[attackTargets.length - 1]
+
+     if (attackTarget.towerDamage <= 0) return
+
+     // Loop through the this's towers
+
+     for (const tower of this.structures.tower) {
           // Iterate if the tower is inactionable
 
           if (tower.inactionable) continue
 
-          // Try to attack the creep
-
-          const attackResult = tower.attack(attackTargets[0])
-
-          // If the attack failed, iterate
-
-          if (attackResult !== OK) continue
+          if (tower.attack(attackTarget) !== OK) continue
 
           // Otherwise record that the tower is no longer inactionable
 
           tower.inactionable = true
-
-          /* // Remove healTarget if it is fully healed
-
-        if (creep.hitsMax - creep.hits === 0) delete healTargets[0] */
 
           // And iterate
 
@@ -141,17 +130,17 @@ Room.prototype.towersAttackCreeps = function () {
 }
 
 Room.prototype.towersRepairRamparts = function () {
-     const room = this
-
-     const towers = room.structures.tower
 
      // Find ramparts at 300 hits or less
 
-     const ramparts = (room.get('rampart') as StructureRampart[]).filter(rampart => rampart.hits <= 300)
+     const ramparts = this.structures.rampart.filter(function(rampart) {
 
-     // Loop through the room's towers
+          return rampart.hits <= 300
+     })
 
-     for (const tower of towers) {
+     // Loop through the this's towers
+
+     for (const tower of this.structures.tower) {
           // Iterate if the tower is inactionable
 
           if (tower.inactionable) continue

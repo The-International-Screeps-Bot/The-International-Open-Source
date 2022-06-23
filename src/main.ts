@@ -1153,7 +1153,7 @@ declare global {
 
           isOnExit(): boolean
 
-          findHealPower(): number
+          findHealPower(range: number): number
 
           advancedRecycle(): void
 
@@ -1187,6 +1187,18 @@ declare global {
           _reservation: Reservation | false
 
           readonly reservation: Reservation | false
+
+          _parts: Partial<Record<BodyPartConstant, number>>
+
+          readonly parts: Partial<Record<BodyPartConstant, number>>
+
+          _boosts: Partial<Record<MineralBoostConstant, number>>
+
+          readonly boosts: Partial<Record<MineralBoostConstant, number>>
+
+          _towerDamage: number
+
+          readonly towerDamage: number
      }
 
      interface CreepMemory {
