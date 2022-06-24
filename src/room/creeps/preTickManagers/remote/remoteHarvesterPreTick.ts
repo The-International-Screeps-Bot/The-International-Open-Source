@@ -8,8 +8,9 @@ RemoteHarvester.prototype.preTickManager = function () {
      const role = this.memory.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
      // Reduce remote need
-     customLog('REMOTE HARVESTER CHECK', JSON.stringify(this.parts))
-     Memory.rooms[this.memory.remoteName].needs[remoteNeedsIndex[role]] -= this.parts.work
+
+     if (Memory.rooms[this.memory.remoteName].needs)
+          Memory.rooms[this.memory.remoteName].needs[remoteNeedsIndex[role]] -= this.parts.work
 
      const commune = Game.rooms[this.memory.communeName]
      if (!commune) return

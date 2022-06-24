@@ -8,7 +8,8 @@ RemoteReserver.prototype.preTickManager = function () {
 
      // Reduce remote need
 
-     Memory.rooms[this.memory.remoteName].needs[remoteNeedsIndex[role]] -= 1
+     if (Memory.rooms[this.memory.remoteName].needs)
+          Memory.rooms[this.memory.remoteName].needs[remoteNeedsIndex[role]] -= 1
 
      const commune = Game.rooms[this.memory.communeName]
      if (!commune) return
