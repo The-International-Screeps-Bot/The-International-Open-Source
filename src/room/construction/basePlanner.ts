@@ -323,10 +323,6 @@ export function basePlanner(room: Room) {
           weightCostMatrixes: [roadCM],
      })
 
-     // Record the path's length in global
-
-     room.global.upgradePathLength = path.length
-
      // Loop through positions of the path
 
      for (const pos of path) {
@@ -448,13 +444,9 @@ export function basePlanner(room: Room) {
           roadCM.set(pos.x, pos.y, 1)
      }
 
-     // Otherwise get the mineral
-
-     const mineral: Mineral = room.get('mineral')
-
      // Plan for a road at the mineral's pos
 
-     if (!room.memory.stampAnchors.extractor.length) room.memory.stampAnchors.extractor.push(pack(mineral.pos))
+     if (!room.memory.stampAnchors.extractor.length) room.memory.stampAnchors.extractor.push(pack(room.mineral.pos))
 
      // Record road plans in the baseCM
 

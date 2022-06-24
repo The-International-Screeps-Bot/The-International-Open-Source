@@ -24,7 +24,6 @@ Object.defineProperties(Room.prototype, {
                if (this._sources) return this._sources
 
                if (!this.memory.sourceIds) {
-
                     this.memory.sourceIds = []
 
                     for (const source of this.find(FIND_SOURCES)) this.memory.sourceIds.push(source.id)
@@ -41,7 +40,7 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._mineral) return this._mineral
 
-               return this._mineral = this.find(FIND_MINERALS)[0]
+               return (this._mineral = this.find(FIND_MINERALS)[0])
           },
      },
      enemyCreeps: {
@@ -69,7 +68,7 @@ Object.defineProperties(Room.prototype, {
                return (this._allyCreeps = this.find(FIND_HOSTILE_CREEPS, {
                     filter: creep => allyList.has(creep.owner.username),
                }))
-          }
+          },
      },
      structures: {
           get() {
@@ -117,10 +116,12 @@ Object.defineProperties(Room.prototype, {
                     if (cSiteTarget) return cSiteTarget
                }
 
+               let cSitesOfType
+
                // Loop through structuretypes of the build priority
 
                for (const structureType of constants.structureTypesByBuildPriority) {
-                    const cSitesOfType = this.cSites[structureType]
+                    cSitesOfType = this.cSites[structureType]
                     if (!cSitesOfType.length) continue
 
                     const anchor = this.anchor || new RoomPosition(25, 25, this.name)
@@ -144,8 +145,10 @@ Object.defineProperties(Room.prototype, {
 
                this._taskNeedingSpawningStructures = []
 
+               let structuresAtPos
+
                for (const pos of this.global.stampAnchors.extensions) {
-                    const structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
+                    structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
 
                     for (const structure of structuresAtPos) {
                          if (
@@ -160,7 +163,7 @@ Object.defineProperties(Room.prototype, {
                }
 
                for (const pos of this.global.stampAnchors.extension) {
-                    const structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
+                    structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
 
                     for (const structure of structuresAtPos) {
                          if (
@@ -194,8 +197,10 @@ Object.defineProperties(Room.prototype, {
                     true,
                )
 
+               let structureType
+
                for (const adjacentPosData of adjacentStructures) {
-                    const { structureType } = adjacentPosData.structure
+                    structureType = adjacentPosData.structure.structureType
 
                     if (structureType !== STRUCTURE_SPAWN && structureType !== STRUCTURE_EXTENSION) continue
 
@@ -258,7 +263,51 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._rampartPlans) return this._rampartPlans
 
-               return this._rampartPlans = new PathFinder.CostMatrix()
-          }
-     }
+               return (this._rampartPlans = new PathFinder.CostMatrix())
+          },
+     },
+     source1PathLength: {
+          get() {
+               if (this.global.source1PathLength) return this.global.source1PathLength
+
+               if (!this.sources[0]) return 0
+
+               if (!this.anchor) return 0
+
+               return (this.global.source1PathLength = this.advancedFindPath({
+                    origin: this.sources[0].pos,
+                    goal: { pos: this.anchor, range: 3 },
+               }).length)
+          },
+     },
+     source2PathLength: {
+          get() {
+               if (this.global.source2PathLength) return this.global.source2PathLength
+
+               if (!this.sources[1]) return 0
+
+               if (!this.anchor) return 0
+
+               return (this.global.source2PathLength = this.advancedFindPath({
+                    origin: this.sources[1].pos,
+                    goal: { pos: this.anchor, range: 3 },
+               }).length)
+          },
+     },
+     upgradePathLength: {
+          get() {
+               if (this.global.upgradePathLength) return this.global.upgradePathLength
+
+               if (!this.anchor) return 0
+
+               const centerUpgradePos = this.get('centerUpgradePos')
+
+               if (!centerUpgradePos) return 0
+
+               return (this.global.upgradePathLength = this.advancedFindPath({
+                    origin: centerUpgradePos,
+                    goal: { pos: this.anchor, range: 3 },
+               }).length)
+          },
+     },
 } as PropertyDescriptorMap & ThisType<Room>)

@@ -218,18 +218,18 @@ export function spawnRequester(room: Room) {
                // If there is no source1Link, increase requiredCarryParts using the source's path length
 
                if (!room.get('source1Link'))
-                    requiredCarryParts += findCarryPartsRequired((room.global.source1PathLength || 0) * 2, 10)
+                    requiredCarryParts += findCarryPartsRequired(room.source1PathLength * 2, 10)
 
                // If there is no source2Link, increase requiredCarryParts using the source's path length
 
                if (!room.get('source2Link'))
-                    requiredCarryParts += findCarryPartsRequired((room.global.source2PathLength || 0) * 2, 10)
+                    requiredCarryParts += findCarryPartsRequired(room.source2PathLength * 2, 10)
 
                // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
                if (room.get('controllerContainer') && !room.get('controllerLink'))
                     requiredCarryParts += findCarryPartsRequired(
-                         (room.global.upgradePathLength || 0) * 2,
+                         room.upgradePathLength * 2,
                          room.getPartsOfRoleAmount('controllerUpgrader', WORK),
                     )
 
@@ -369,8 +369,7 @@ export function spawnRequester(room: Room) {
      if (!room.structures.tower.length) {
           // Consider invaders as significant attackers
 
-          enemyAttackers = room.enemyAttackers.filter(function(creep) {
-
+          enemyAttackers = room.enemyAttackers.filter(function (creep) {
                return !creep.isOnExit()
           })
      }
@@ -379,8 +378,7 @@ export function spawnRequester(room: Room) {
      else {
           // Don't consider invaders
 
-          enemyAttackers = room.enemyAttackers.filter(function(creep) {
-
+          enemyAttackers = room.enemyAttackers.filter(function (creep) {
                return creep.owner.username !== 'Invader' && !creep.isOnExit()
           })
      }
@@ -1040,31 +1038,31 @@ export function spawnRequester(room: Room) {
           // Construct requests for remoteDismantler
 
           room.constructSpawnRequests(
-            (function (): SpawnRequestOpts | false {
-                 // If there are no related needs
+               (function (): SpawnRequestOpts | false {
+                    // If there are no related needs
 
-                 if (remoteNeeds[remoteNeedsIndex.remoteDismantler] <= 0) return false
+                    if (remoteNeeds[remoteNeedsIndex.remoteDismantler] <= 0) return false
 
-                 // Define the minCost and strength
+                    // Define the minCost and strength
 
-                 const cost = 150
-                 const extraParts = [WORK, MOVE]
-                 const minCost = cost * extraParts.length * 2
+                    const cost = 150
+                    const extraParts = [WORK, MOVE]
+                    const minCost = cost * extraParts.length * 2
 
-                 return {
-                      defaultParts: [],
-                      extraParts,
-                      partsMultiplier: 50 / extraParts.length,
-                      groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDismantler,
-                      minCreeps: 1,
-                      minCost,
-                      priority: 9,
-                      memoryAdditions: {
-                           role: 'remoteDismantler',
-                      },
-                 }
-            })(),
-       )
+                    return {
+                         defaultParts: [],
+                         extraParts,
+                         partsMultiplier: 50 / extraParts.length,
+                         groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDismantler,
+                         minCreeps: 1,
+                         minCost,
+                         priority: 9,
+                         memoryAdditions: {
+                              role: 'remoteDismantler',
+                         },
+                    }
+               })(),
+          )
      }
 
      // Construct requests for scouts

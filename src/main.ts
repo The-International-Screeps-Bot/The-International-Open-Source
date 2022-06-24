@@ -498,28 +498,6 @@ declare global {
 
      type SourceHarvestPositions = Map<number, boolean>[]
 
-     interface RoomGlobal {
-          [key: string]: any
-
-          // RoomObjects
-
-          stampAnchors: StampAnchors
-
-          sourceHarvestPositions: SourceHarvestPositions
-
-          source1PathLength: number
-
-          source2PathLength: number
-
-          upgradePathLength: number
-
-          //
-
-          tasksWithResponders: Record<string | number, RoomTask>
-
-          tasksWithoutResponders: Record<string | number, RoomTask>
-     }
-
      interface OrganizedStructures {
           spawn: StructureSpawn[]
           extension: StructureExtension[]
@@ -542,6 +520,28 @@ declare global {
           nuker: StructureNuker[]
           factory: StructureFactory[]
           invaderCore: StructureInvaderCore[]
+     }
+
+     interface RoomGlobal {
+          [key: string]: any
+
+          // RoomObjects
+
+          stampAnchors: StampAnchors
+
+          sourceHarvestPositions: SourceHarvestPositions
+
+          source1PathLength: number
+
+          source2PathLength: number
+
+          upgradePathLength: number
+
+          //
+
+          tasksWithResponders: Record<string | number, RoomTask>
+
+          tasksWithoutResponders: Record<string | number, RoomTask>
      }
 
      interface Room {
@@ -607,7 +607,7 @@ declare global {
            */
           scoutTargets: Set<string>
 
-          spawnRequests: {[priority: string]: SpawnRequest}
+          spawnRequests: { [priority: string]: SpawnRequest }
 
           // Functions
 
@@ -871,6 +871,12 @@ declare global {
           _rampartPlans: CostMatrix
 
           readonly rampartPlans: CostMatrix
+
+          readonly source1PathLength: number
+
+          readonly source2PathLength: number
+
+          readonly upgradePathLength: number
      }
 
      interface DepositRecord {
@@ -1182,7 +1188,12 @@ declare global {
 
           reservationManager(): void
 
-          createReservation(type: Reservations, target: Id<AnyStoreStructure | Creep | Tombstone | Resource>, amount: number, resourceType: ResourceConstant): void
+          createReservation(
+               type: Reservations,
+               target: Id<AnyStoreStructure | Creep | Tombstone | Resource>,
+               amount: number,
+               resourceType: ResourceConstant,
+          ): void
 
           // Getters
 
