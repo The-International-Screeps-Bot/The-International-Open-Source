@@ -607,6 +607,8 @@ declare global {
            */
           scoutTargets: Set<string>
 
+          spawnRequests: {[priority: string]: SpawnRequest}
+
           // Functions
 
           /**
@@ -775,6 +777,20 @@ declare global {
           claimRequestManager(): void
 
           remotesManager(): void
+
+          // Spawn functions
+
+          spawnRequester(): void
+
+          constructSpawnRequests(opts: SpawnRequestOpts | false): void
+
+          decideMaxCostPerCreep(maxCostPerCreep: number): number
+
+          createSpawnRequest(priority: number, body: BodyPartConstant[], tier: number, cost: number, memory: any): void
+
+          spawnRequestIndividually(opts: SpawnRequestOpts): void
+
+          spawnRequestByGroup(opts: SpawnRequestOpts): void
 
           // Market functions
 

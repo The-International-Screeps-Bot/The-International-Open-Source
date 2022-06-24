@@ -111,6 +111,8 @@ InternationalManager.prototype.tickConfig = function () {
 
           //
 
+          room.spawnRequests = {}
+
           if (!room.memory.remotes) room.memory.remotes = []
 
           room.creepsFromRoomWithRemote = {}
