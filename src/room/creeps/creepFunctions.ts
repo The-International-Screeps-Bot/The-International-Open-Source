@@ -1612,7 +1612,7 @@ Creep.prototype.isOnExit = function () {
      return false
 }
 
-Creep.prototype.findHealPower = function (range) {
+Creep.prototype.findHealPower = function (range = 1) {
      // Initialize the healValue
 
      let heal = 0
@@ -1625,7 +1625,7 @@ Creep.prototype.findHealPower = function (range) {
           if (part.type !== HEAL) continue
 
           // Otherwise increase healValue by heal power * the part's boost
-
+          
           heal += BOOSTS[part.type][part.boost][part.type] * (range <= 1 ? HEAL_POWER : RANGED_HEAL_POWER)
      }
 

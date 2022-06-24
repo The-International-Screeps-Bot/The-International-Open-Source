@@ -1156,7 +1156,7 @@ declare global {
 
           isOnExit(): boolean
 
-          findHealPower(range: number): number
+          findHealPower(range?: number): number
 
           advancedRecycle(): void
 
