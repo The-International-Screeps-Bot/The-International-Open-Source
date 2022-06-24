@@ -768,7 +768,7 @@ Creep.prototype.createMoveRequest = function (opts) {
      // Assign default opts
 
      if (!opts.cacheAmount) opts.cacheAmount = internationalManager.defaultCacheAmount
-     
+
      let path: RoomPosition[]
 
      // If there is a path in the creep's memory
@@ -1907,6 +1907,35 @@ Creep.prototype.aggressiveHeal = function () {
      return true
 }
 
+Creep.prototype.deleteReservation = function(index) {
+
+     const reservation = this.memory.reservations[index]
+
+     const target = findObjectWithID(reservation.targetID)
+
+     if (target instanceof Resource) {
+          target.amount += reservation.amount
+     } else target.store[reservation.resourceType] += reservation.amount
+}
+
+Creep.prototype.createReservation = function (type, targetID, amount, resourceType) {
+
+     this.memory.reservations.push({
+          type,
+          targetID,
+          amount,
+          resourceType
+     })
+
+     const reservation = this.memory.reservations[0]
+
+     const target = findObjectWithID(reservation.targetID)
+
+     if (target instanceof Resource) {
+          target.amount -= reservation.amount
+     } else target.store[reservation.resourceType] -= reservation.amount
+}
+
 Creep.prototype.reservationManager = function () {
      let reservation
      let target
@@ -1923,12 +1952,18 @@ Creep.prototype.reservationManager = function () {
      }
 }
 
-Creep.prototype.createReservation = function (type, targetID, amount, resourceType) {
+Creep.prototype.fulfillReservation = function() {
 
-     this.memory.reservations.push({
-          type,
-          targetID,
-          amount,
-          resourceType
-     })
+     const reservation = this.memory.reservations[0]
+     if (!reservation) return false
+
+     const target = findObjectWithID(reservation.targetID)
+     if (!target) {
+
+          this.deleteReservation(0)
+          return false
+     }
+
+     this.say('📲')
+     return true
 }

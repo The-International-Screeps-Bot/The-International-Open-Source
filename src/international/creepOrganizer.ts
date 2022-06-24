@@ -17,7 +17,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
      let totalCreepCount = 0
 
-     let creep
+     let creep: Creep
 
      // Loop through all of my creeps
 
@@ -63,6 +63,8 @@ InternationalManager.prototype.creepOrganizer = function () {
           if (!creep.spawning) room.creepPositions[pack(creep.pos)] = creep.name
 
           creep.preTickManager()
+
+          creep.reservationManager()
 
           // Get the commune the creep is from
 

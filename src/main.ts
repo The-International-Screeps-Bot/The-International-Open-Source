@@ -1186,7 +1186,7 @@ declare global {
 
           // Reservation
 
-          reservationManager(): void
+          deleteReservation(index: number): void
 
           createReservation(
                type: Reservations,
@@ -1194,6 +1194,13 @@ declare global {
                amount: number,
                resourceType: ResourceConstant,
           ): void
+
+          /**
+           * Deletes reservations with no target, pre-emptively modifies store values
+           */
+          reservationManager(): void
+
+          fulfillReservation(): boolean
 
           // Getters
 
