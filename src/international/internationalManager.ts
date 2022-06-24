@@ -1,7 +1,7 @@
 import { allyManager } from 'international/simpleAllies'
 import { customLog, getAvgPrice } from './generalFunctions'
 import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
-import { CPUBucketCapacity, mmoShardNames } from './constants'
+import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames } from './constants'
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
@@ -186,10 +186,17 @@ export class InternationalManager {
                (a, b) => Memory.claimRequests[a].score - Memory.claimRequests[b].score,
           ))
      }
+
+     _defaultCacheAmount: number
+
+     get defaultCacheAmount() {
+          if (this._defaultCacheAmount) return this._defaultCacheAmount
+
+          return Math.floor((CPUBucketCapacity - Game.cpu.bucket) / cacheAmountModifier) + 1
+     }
 }
 
 InternationalManager.prototype.run = function () {
-
      // Run prototypes
 
      this.config()

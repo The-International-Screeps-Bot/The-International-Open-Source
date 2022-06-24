@@ -86,7 +86,6 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                          range: 25,
                     },
                     avoidEnemyRanges: true,
-                    cacheAmount: 200,
                     weightGamebjects: {
                          1: room.get('road'),
                     },
@@ -173,7 +172,6 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                     range: 25,
                },
                avoidEnemyRanges: true,
-               cacheAmount: 200,
                weightGamebjects: {
                     1: room.get('road'),
                },

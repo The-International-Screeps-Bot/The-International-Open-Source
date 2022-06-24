@@ -1,5 +1,5 @@
 import { spawn } from 'child_process'
-import { allyList, constants, CPUBucketRenewThreshold } from 'international/constants'
+import { allyList, cacheAmountModifier, constants, CPUBucketCapacity, CPUBucketRenewThreshold } from 'international/constants'
 import {
      arePositionsEqual,
      customLog,
@@ -11,6 +11,7 @@ import {
      unpackAsPos,
      unpackAsRoomPos,
 } from 'international/generalFunctions'
+import { internationalManager } from 'international/internationalManager'
 import { repeat } from 'lodash'
 import { packCoord, packPos, packPosList, unpackPos, unpackPosList } from 'other/packrat'
 import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
@@ -766,8 +767,8 @@ Creep.prototype.createMoveRequest = function (opts) {
 
      // Assign default opts
 
-     if (!opts.cacheAmount) opts.cacheAmount = 50
-
+     if (!opts.cacheAmount) opts.cacheAmount = internationalManager.defaultCacheAmount
+     
      let path: RoomPosition[]
 
      // If there is a path in the creep's memory

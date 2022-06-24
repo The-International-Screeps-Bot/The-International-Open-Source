@@ -36,7 +36,6 @@ export function claimerManager(room: Room, creepsOfRole: string[]) {
                goal: { pos: new RoomPosition(25, 25, claimTarget), range: 25 },
                avoidEnemyRanges: true,
                swampCost: 1,
-               cacheAmount: 200,
                typeWeights: {
                     enemy: Infinity,
                     ally: Infinity,

@@ -26,7 +26,6 @@ export function remoteDismantlerManager(room: Room, creepsOfRole: string[]) {
                          pos: new RoomPosition(25, 25, creep.memory.communeName),
                          range: 25,
                     },
-                    cacheAmount: 200,
                })
 
                continue
@@ -51,7 +50,6 @@ export function remoteDismantlerManager(room: Room, creepsOfRole: string[]) {
                     pos: new RoomPosition(25, 25, creep.memory.remoteName),
                     range: 25,
                },
-               cacheAmount: 200,
           })
      }
 }

@@ -605,3 +605,8 @@ export const relayRoles: Partial<CreepRoles>[] = ['hauler', 'remoteHauler']
 // The dowwngrade timer for when upgrading the controller is required
 
 export const controllerDowngradeUpgraderNeed = 10000
+
+/**
+ * Used to modify the remaining bucket amount, resulting in the default cacheAmount for moveRequests
+ */
+export const cacheAmountModifier = 25
