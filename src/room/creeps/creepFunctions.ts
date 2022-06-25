@@ -1,5 +1,11 @@
 import { spawn } from 'child_process'
-import { allyList, cacheAmountModifier, constants, CPUBucketCapacity, CPUBucketRenewThreshold } from 'international/constants'
+import {
+     allyList,
+     cacheAmountModifier,
+     constants,
+     CPUBucketCapacity,
+     CPUBucketRenewThreshold,
+} from 'international/constants'
 import {
      arePositionsEqual,
      customLog,
@@ -354,7 +360,6 @@ Creep.prototype.advancedUpgradeController = function () {
      // Try to upgrade the controller, and if it worked
 
      if (this.upgradeController(room.controller) === OK) {
-
           // Add control points to total controlPoints counter and say the success
 
           Memory.stats.controlPoints += this.parts.work
@@ -1907,8 +1912,7 @@ Creep.prototype.aggressiveHeal = function () {
      return true
 }
 
-Creep.prototype.deleteReservation = function(index) {
-
+Creep.prototype.deleteReservation = function (index) {
      const reservation = this.memory.reservations[index]
 
      const target = findObjectWithID(reservation.targetID)
@@ -1919,14 +1923,13 @@ Creep.prototype.deleteReservation = function(index) {
 }
 
 Creep.prototype.createReservation = function (type, targetID, amount, resourceType) {
-
      if (!this.memory.reservations) this.memory.reservations = []
 
      this.memory.reservations.push({
           type,
           targetID,
           amount,
-          resourceType
+          resourceType,
      })
 
      const reservation = this.memory.reservations[0]
@@ -1939,7 +1942,6 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
 }
 
 Creep.prototype.reservationManager = function () {
-
      if (!this.memory.reservations) return
 
      let reservation
@@ -1957,7 +1959,8 @@ Creep.prototype.reservationManager = function () {
      }
 }
 
-Creep.prototype.fulfillReservation = function() {
+Creep.prototype.fulfillReservation = function () {
+     const { room } = this
 
      if (!this.memory.reservations) return false
 
@@ -1966,11 +1969,32 @@ Creep.prototype.fulfillReservation = function() {
 
      const target = findObjectWithID(reservation.targetID)
      if (!target) {
-
           this.deleteReservation(0)
           return false
      }
 
+     if (getRange(this.pos.x - target.pos.x, this.pos.y - target.pos.y) > 1) {
+
+          this.say('📲➡️')
+
+          this.createMoveRequest({
+               origin: this.pos,
+               goal: { pos: target.pos, range: 1 },
+               avoidEnemyRanges: true,
+               weightGamebjects: {
+                    1: room.get('road'),
+               },
+          })
+
+          return true
+     }
+
      this.say('📲')
+
+     if (target instanceof Resource) {
+          target.amount -= reservation.amount
+     } else target.store[reservation.resourceType] -= reservation.amount
+
+
      return true
 }
