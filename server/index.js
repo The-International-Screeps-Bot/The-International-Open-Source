@@ -36,11 +36,10 @@ let botsSpawned = false
 class Tester {
      constructor(length) {
           this.roomsSeen = {}
-          this.maxRuntime = 0
-          this.maxTicks = 100 * 1000;
+          this.maxTicks;
           if (process.argv.length > 2) {
                try {
-                    this.maxRuntime = parseInt(process.argv[2], 10) * 60
+                    this.maxTicks = parseInt(process.argv[2], 10)
                } catch (e) {
                     console.log(`Cannot parse runtime argument ${process.argv} ${e}`)
                }
@@ -54,14 +53,15 @@ class Tester {
       * @return {undefined}
       */
      async checkForSuccess(line, defer) {
+          console.log(botsSpawned,line)
           if (botsSpawned && line.startsWith(`'OK'`)) {
                let appendix = ''
-               if (this.maxRuntime > 0) {
+               if (this.maxTicks > 0) {
                     appendix = ` with runtime ${this.maxTicks} ticks`
                     // appendix = ` with runtime ${this.maxRuntime / 60} minutes`
                }
                console.log(`> Start the simulation${appendix}`)
-               if (this.maxRuntime > 0) {
+               if (this.maxTicks > 0) {
                     // await sleep(this.maxRuntime);
                     while (lastTick === undefined || lastTick < this.maxTicks) {
                          await sleep(60)
@@ -111,6 +111,7 @@ class Tester {
                     botsSpawned = true
                     return
                }
+
                if (setPassword(line, socket, rooms, this.roomsSeen, playerRoom)) {
                     if (rooms.length === Object.keys(this.roomsSeen).length) {
                          console.log('> Listen to the log')
