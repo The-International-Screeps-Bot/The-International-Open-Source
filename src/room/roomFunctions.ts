@@ -14,7 +14,7 @@ import {
 } from 'international/generalFunctions'
 import { basePlanner } from './construction/basePlanner'
 import { ControllerUpgrader, MineralHarvester, SourceHarvester } from './creeps/creepClasses'
-import { RoomObject } from './roomObject'
+import { RoomCacheObject } from './roomObject'
 import { RoomTask } from './roomTasks'
 
 Room.prototype.get = function (roomObjectName) {
@@ -50,7 +50,7 @@ Room.prototype.get = function (roomObjectName) {
           return terrainCM
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'terrainCM',
           valueType: 'object',
           cacheType: 'global',
@@ -93,7 +93,7 @@ Room.prototype.get = function (roomObjectName) {
           return baseCM
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'baseCM',
           valueType: 'object',
           cacheType: 'global',
@@ -104,7 +104,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // roadCM
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'roadCM',
           valueType: 'object',
           cacheType: 'global',
@@ -119,7 +119,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // Mineral
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'mineral',
           valueType: 'id',
           cacheType: 'global',
@@ -132,7 +132,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // Source 1
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source1',
           valueType: 'id',
           cacheType: 'memory',
@@ -151,7 +151,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // Source 2
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source2',
           valueType: 'id',
           cacheType: 'memory',
@@ -170,7 +170,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // Sources
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'sources',
           valueType: 'object',
           cacheType: 'global',
@@ -210,7 +210,7 @@ Room.prototype.get = function (roomObjectName) {
           return structuresByType
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'structuresByType',
           valueType: 'object',
           cacheType: 'global',
@@ -241,7 +241,7 @@ Room.prototype.get = function (roomObjectName) {
           return cSitesByType
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'cSitesByType',
           valueType: 'object',
           cacheType: 'global',
@@ -255,7 +255,7 @@ Room.prototype.get = function (roomObjectName) {
      for (const structureType of constants.allStructureTypes) {
           // Create roomObject for structures with the structureType
 
-          new RoomObject({
+          new RoomCacheObject({
                name: structureType,
                valueType: 'object',
                cacheType: 'global',
@@ -268,7 +268,7 @@ Room.prototype.get = function (roomObjectName) {
 
           // Create a roomObject for sites with the structureType
 
-          new RoomObject({
+          new RoomCacheObject({
                name: `${structureType}CSite`,
                valueType: 'object',
                cacheType: 'global',
@@ -280,7 +280,7 @@ Room.prototype.get = function (roomObjectName) {
           })
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'enemyCSites',
           valueType: 'object',
           cacheType: 'global',
@@ -295,7 +295,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'allyCSites',
           valueType: 'object',
           cacheType: 'global',
@@ -374,7 +374,7 @@ Room.prototype.get = function (roomObjectName) {
           })
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'mineralHarvestPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -385,7 +385,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'closestMineralHarvestPos',
           valueType: 'pos',
           cacheType: 'global',
@@ -396,7 +396,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source1HarvestPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -407,7 +407,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source1ClosestHarvestPos',
           valueType: 'pos',
           cacheType: 'global',
@@ -418,7 +418,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source2HarvestPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -429,7 +429,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source2ClosestHarvestPos',
           valueType: 'pos',
           cacheType: 'global',
@@ -468,7 +468,7 @@ Room.prototype.get = function (roomObjectName) {
           })
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'centerUpgradePos',
           valueType: 'pos',
           cacheType: 'global',
@@ -526,7 +526,7 @@ Room.prototype.get = function (roomObjectName) {
           return upgradePositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'upgradePositions',
           valueType: 'object',
           cacheType: 'global',
@@ -621,7 +621,7 @@ Room.prototype.get = function (roomObjectName) {
           return fastFillerPositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'fastFillerPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -654,7 +654,7 @@ Room.prototype.get = function (roomObjectName) {
           return false
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source1Container',
           valueType: 'id',
           cacheType: 'global',
@@ -665,7 +665,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source2Container',
           valueType: 'id',
           cacheType: 'global',
@@ -704,7 +704,7 @@ Room.prototype.get = function (roomObjectName) {
           return usedHarvestPositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'usedMineralHarvestPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -754,7 +754,7 @@ Room.prototype.get = function (roomObjectName) {
           return usedHarvestPositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'usedSourceHarvestPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -826,7 +826,7 @@ Room.prototype.get = function (roomObjectName) {
           return usedUpgradePositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'usedUpgradePositions',
           valueType: 'object',
           cacheType: 'global',
@@ -861,7 +861,7 @@ Room.prototype.get = function (roomObjectName) {
           return usedFastFillerPositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'usedFastFillerPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -898,7 +898,7 @@ Room.prototype.get = function (roomObjectName) {
           return false
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'controllerContainer',
           valueType: 'id',
           cacheType: 'global',
@@ -932,7 +932,7 @@ Room.prototype.get = function (roomObjectName) {
           return false
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'mineralContainer',
           valueType: 'id',
           cacheType: 'global',
@@ -965,7 +965,7 @@ Room.prototype.get = function (roomObjectName) {
           return false
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'fastFillerContainerLeft',
           valueType: 'id',
           cacheType: 'global',
@@ -976,7 +976,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'fastFillerContainerRight',
           valueType: 'id',
           cacheType: 'global',
@@ -987,7 +987,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'labContainer',
           valueType: 'id',
           cacheType: 'global',
@@ -1012,7 +1012,7 @@ Room.prototype.get = function (roomObjectName) {
           return links.find(link => getRangeBetween(anchor.x, anchor.y, link.pos.x, link.pos.y) === 1)?.id
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source1Link',
           valueType: 'id',
           cacheType: 'global',
@@ -1023,7 +1023,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source2Link',
           valueType: 'id',
           cacheType: 'global',
@@ -1056,7 +1056,7 @@ Room.prototype.get = function (roomObjectName) {
           return false
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'fastFillerLink',
           valueType: 'id',
           cacheType: 'global',
@@ -1067,7 +1067,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'hubLink',
           valueType: 'id',
           cacheType: 'global',
@@ -1078,7 +1078,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'controllerLink',
           valueType: 'id',
           cacheType: 'global',
@@ -1111,7 +1111,7 @@ Room.prototype.get = function (roomObjectName) {
           return filteredSpawnStructures
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'structuresForSpawning',
           valueType: 'object',
           cacheType: 'global',
@@ -1122,7 +1122,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // Creeps
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'notMyCreeps',
           valueType: 'object',
           cacheType: 'global',
@@ -1133,7 +1133,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'enemyCreeps',
           valueType: 'object',
           cacheType: 'global',
@@ -1146,7 +1146,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'allyCreeps',
           valueType: 'object',
           cacheType: 'global',
@@ -1159,7 +1159,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'remoteNamesByEfficacy',
           valueType: 'object',
           cacheType: 'global',

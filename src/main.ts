@@ -19,6 +19,8 @@ import './room/remotesManager'
 import { roomManager } from 'room/roomManager'
 import './room/roomGetters'
 
+import './room/roomObjectFunctions'
+
 // Creep
 
 import './room/creeps/creepGetters'
@@ -34,7 +36,7 @@ import {
      RoomTransferTask,
      RoomWithdrawTask,
 } from 'room/roomTasks'
-import { RoomObject } from 'room/roomObject'
+import { RoomCacheObject } from 'room/roomObject'
 import { ErrorMapper } from 'other/ErrorMapper'
 import { constants } from 'international/constants'
 
@@ -560,7 +562,7 @@ declare global {
            */
           myCreepsAmount: number
 
-          roomObjects: Partial<Record<RoomObjectName, RoomObject>>
+          roomObjects: Partial<Record<RoomObjectName, RoomCacheObject>>
 
           /**
            * An object with keys of roles and properties of the number of creeps with the role from this room
@@ -1350,7 +1352,20 @@ declare global {
 
           // Functions
 
+          /**
+           * Finds the present total store usage number of this RoomObject
+           */
           usedStore(): number
+
+          /**
+           * Finds the total free store capacity of this RoomObject
+           */
+           freeStore(resourceType: ResourceConstant): number
+
+          /**
+           * Finds the total free store capacity of a specific resource for this RoomObject
+           */
+           freeSpecificStore(resourceType: ResourceConstant): number
      }
 
      // Global

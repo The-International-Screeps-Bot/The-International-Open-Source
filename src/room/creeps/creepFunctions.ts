@@ -1999,7 +1999,17 @@ Creep.prototype.fulfillReservation = function () {
      // Transfer
 
      if (reservation.type == 'transfer') {
-          if (this.advancedTransfer(target, reservation.resourceType, reservation.amount)) {
+
+          if (
+               this.advancedTransfer(
+                    target,
+                    reservation.resourceType,
+                    Math.min(
+                         Math.min(this.store.getUsedCapacity(reservation.resourceType), reservation.amount),
+                         target.store.getFreeCapacity(reservation.resourceType),
+                    ),
+               )
+          ) {
                this.deleteReservation(0)
                return true
           }
@@ -2009,21 +2019,19 @@ Creep.prototype.fulfillReservation = function () {
 
      // Withdraw
 
-     if (this.advancedWithdraw(target, reservation.resourceType, reservation.amount)) {
+     if (
+          this.advancedWithdraw(
+               target,
+               reservation.resourceType,
+               Math.min(
+                    Math.min(target.store.getUsedCapacity(reservation.resourceType), reservation.amount),
+                    this.store.getFreeCapacity(reservation.resourceType),
+               ),
+          )
+     ) {
           this.deleteReservation(0)
           return true
      }
 
      return false
-}
-
-RoomObject.prototype.usedStore = function(this: RoomObject & { store?: StoreDefinition }) {
-
-     if (!this.store) return 0
-
-     let amount = 0
-
-     for (const type in this.store) amount += this.store[type as ResourceConstant]
-
-     return amount
 }

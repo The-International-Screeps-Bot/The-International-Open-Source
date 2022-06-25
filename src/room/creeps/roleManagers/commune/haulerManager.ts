@@ -15,7 +15,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
                creep.fulfillReservation()
                return
           }
-          customLog('USED STORE', creep.usedStore())
+          
           let targets
           let target
           let amount
@@ -31,7 +31,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
                     if (!target) continue
 
-                    amount = Math.min(creep.store.getCapacity(RESOURCE_ENERGY) - _.sum(Object.values(creep.store)), target.store.energy)
+                    amount = Math.min(creep.store.getCapacity(RESOURCE_ENERGY) - creep.usedStore(), target.store.energy)
 
                     creep.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
                     break

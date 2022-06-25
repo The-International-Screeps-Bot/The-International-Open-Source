@@ -37,7 +37,7 @@ FastFiller.prototype.fillFastFiller = function () {
 
      // If the creep has a non-energy resource
 
-     if (_.sum(Object.values(this.store)) > this.store.energy) {
+     if (this.usedStore() > this.store.energy) {
           for (const resourceType in this.store) {
                if (resourceType == RESOURCE_ENERGY) continue
 
@@ -81,7 +81,7 @@ FastFiller.prototype.fillFastFiller = function () {
 
                if (
                     structure.structureType != STRUCTURE_LINK &&
-                    _.sum(Object.values(structure.store)) > structure.store.energy
+                    this.usedStore() > structure.store.energy
                ) {
                     for (const resourceType in structure.store) {
                          if (resourceType == RESOURCE_ENERGY) continue
