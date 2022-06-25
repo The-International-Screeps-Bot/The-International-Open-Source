@@ -10,6 +10,47 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
           const creep: Hauler = Game.creeps[creepName]
 
+          if (creep.memory.reservations && creep.memory.reservations.length) {
+               creep.fulfillReservation()
+               return
+          }
+
+          let targets
+          let target
+          let amount
+
+          if (creep.needsResources()) {
+
+               const sourceContainers: (StructureContainer | undefined)[] = [
+                    room.get('source1Container'),
+                    room.get('source2Container')
+               ]
+
+               for (const target of sourceContainers) {
+
+                    if (!target) continue
+
+                    amount = Math.min(creep.store.getCapacity(RESOURCE_ENERGY) - _.sum(Object.values(creep.store)), target.store.energy)
+
+                    creep.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
+                    break
+               }
+          } else {
+
+               targets = room.structures.extension.filter(function (structure) {
+                    return structure.store.energy < structure.store.getCapacity(RESOURCE_ENERGY)
+               })
+
+               if (targets.length) {
+                    target = creep.pos.findClosestByRange(targets)
+
+                    creep.createReservation('transfer', target.id, creep.store.energy, RESOURCE_ENERGY)
+               }
+          }
+
+          creep.fulfillReservation()
+
+          /*
           creep.advancedRenew()
 
           // If creep has a task
@@ -55,5 +96,6 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
           // Delete it
 
           task.delete()
+           */
      }
 }

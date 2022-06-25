@@ -1920,6 +1920,8 @@ Creep.prototype.deleteReservation = function(index) {
 
 Creep.prototype.createReservation = function (type, targetID, amount, resourceType) {
 
+     if (!this.memory.reservations) this.memory.reservations = []
+
      this.memory.reservations.push({
           type,
           targetID,
@@ -1937,6 +1939,9 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
 }
 
 Creep.prototype.reservationManager = function () {
+
+     if (!this.memory.reservations) return
+
      let reservation
      let target
 
@@ -1953,6 +1958,8 @@ Creep.prototype.reservationManager = function () {
 }
 
 Creep.prototype.fulfillReservation = function() {
+
+     if (!this.memory.reservations) return false
 
      const reservation = this.memory.reservations[0]
      if (!reservation) return false
