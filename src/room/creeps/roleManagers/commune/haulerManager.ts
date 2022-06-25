@@ -1,3 +1,4 @@
+import { customLog } from 'international/generalFunctions'
 import { RoomTask } from 'room/roomTasks'
 import { Hauler } from '../../creepClasses'
 import './haulerFunctions'
@@ -14,7 +15,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
                creep.fulfillReservation()
                return
           }
-
+          customLog('USED STORE', creep.usedStore())
           let targets
           let target
           let amount
@@ -44,7 +45,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
                if (targets.length) {
                     target = creep.pos.findClosestByRange(targets)
 
-                    creep.createReservation('transfer', target.id, creep.store.energy, RESOURCE_ENERGY)
+                    creep.createReservation('transfer', target.id, Math.min(creep.usedStore(), target.store.getCapacity(RESOURCE_ENERGY)), RESOURCE_ENERGY)
                }
           }
 

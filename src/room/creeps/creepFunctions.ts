@@ -1920,6 +1920,8 @@ Creep.prototype.deleteReservation = function (index) {
      if (target instanceof Resource) {
           target.amount += reservation.amount
      } else target.store[reservation.resourceType] += reservation.amount
+
+     this.memory.reservations.splice(index)
 }
 
 Creep.prototype.createReservation = function (type, targetID, amount, resourceType) {
@@ -1960,8 +1962,6 @@ Creep.prototype.reservationManager = function () {
 }
 
 Creep.prototype.fulfillReservation = function () {
-     const { room } = this
-
      if (!this.memory.reservations) return false
 
      const reservation = this.memory.reservations[0]
@@ -1973,28 +1973,57 @@ Creep.prototype.fulfillReservation = function () {
           return false
      }
 
-     if (getRange(this.pos.x - target.pos.x, this.pos.y - target.pos.y) > 1) {
+     const { room } = this
 
-          this.say('📲➡️')
+     // If visuals are enabled, show the task targeting
 
-          this.createMoveRequest({
-               origin: this.pos,
-               goal: { pos: target.pos, range: 1 },
-               avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.get('road'),
-               },
+     if (Memory.roomVisuals)
+          room.visual.line(this.pos, target.pos, {
+               color: constants.colors.lightBlue,
+               width: 0.15,
           })
-
-          return true
-     }
 
      this.say('📲')
 
+     // Pickup
+
      if (target instanceof Resource) {
-          target.amount -= reservation.amount
-     } else target.store[reservation.resourceType] -= reservation.amount
+          if (this.advancedPickup(target)) {
+               this.deleteReservation(0)
+               return true
+          }
 
+          return false
+     }
 
-     return true
+     // Transfer
+
+     if (reservation.type == 'transfer') {
+          if (this.advancedTransfer(target, reservation.resourceType, reservation.amount)) {
+               this.deleteReservation(0)
+               return true
+          }
+
+          return false
+     }
+
+     // Withdraw
+
+     if (this.advancedWithdraw(target, reservation.resourceType, reservation.amount)) {
+          this.deleteReservation(0)
+          return true
+     }
+
+     return false
+}
+
+RoomObject.prototype.usedStore = function(this: RoomObject & { store?: StoreDefinition }) {
+
+     if (!this.store) return 0
+
+     let amount = 0
+
+     for (const type in this.store) amount += this.store[type as ResourceConstant]
+
+     return amount
 }

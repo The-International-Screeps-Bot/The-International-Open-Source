@@ -1346,6 +1346,13 @@ declare global {
           inactionable: boolean
      }
 
+     interface RoomObject {
+
+          // Functions
+
+          usedStore(): number
+     }
+
      // Global
 
      namespace NodeJS {
