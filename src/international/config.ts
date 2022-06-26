@@ -1,4 +1,17 @@
-import { allyList, allyTrading, autoClaim, baseVisuals, breakingVersion, cpuLogging, mapVisuals, pixelGeneration, pixelSelling, publicRamparts, roomVisuals, tradeBlacklist } from './constants'
+import {
+     allyList,
+     allyTrading,
+     autoClaim,
+     baseVisuals,
+     breakingVersion,
+     cpuLogging,
+     mapVisuals,
+     pixelGeneration,
+     pixelSelling,
+     publicRamparts,
+     roomVisuals,
+     tradeBlacklist,
+} from './constants'
 import { InternationalManager } from './internationalManager'
 
 InternationalManager.prototype.config = function () {
@@ -19,6 +32,7 @@ InternationalManager.prototype.config = function () {
                (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
                Object.values(Game.creeps)[0]?.owner?.username ||
                'username'
+          Memory.isMainShard = Object.keys(Game.spawns).length > 0
 
           // Settings
 

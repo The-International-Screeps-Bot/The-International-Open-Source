@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 26
+export const breakingVersion = 27
 
 // Settings
 
@@ -590,7 +590,14 @@ export const spawnByRoomRemoteRoles: (
      | 'remoteDefender'
      | 'remoteCoreAttacker'
      | 'remoteDismantler'
-)[] = ['source1RemoteHarvester', 'source2RemoteHarvester', 'remoteReserver', 'remoteDefender', 'remoteCoreAttacker', 'remoteDismantler']
+)[] = [
+     'source1RemoteHarvester',
+     'source2RemoteHarvester',
+     'remoteReserver',
+     'remoteDefender',
+     'remoteCoreAttacker',
+     'remoteDismantler',
+]
 
 export const builderSpawningWhenStorageThreshold = 40000
 

@@ -409,6 +409,11 @@ declare global {
           me: string
 
           /**
+           * IsMainShard
+           */
+          isMainShard: boolean
+
+          /**
            * The current breaking version of the bot
            */
           breakingVersion: number | undefined
@@ -1475,7 +1480,6 @@ declare global {
      }
 
      interface Resource {
-
           // Getters
 
           _reserveAmount: number
