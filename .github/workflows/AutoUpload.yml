@@ -6,12 +6,11 @@ name: Auto upload
 on:
      push:
         branches:
-          - auto-deploy
-          - 'releases/**'
+          - Typescript
 jobs:
      VerifyUpload:
           timeout-minutes: 10000
-          runs-on: ubuntu-latest
+          runs-on: self-hosted
           steps:
                - name: 'Cleanup build folder'
                  run: |
@@ -39,7 +38,7 @@ jobs:
                  env:
                     STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                     STEAM_ID: ${{ secrets.STEAM_ID }}
-                 run: node server/index.js 250
+                 run: node server/index.js 250000
                - name: Upload code
                  env:
                     PANDAMASTER_TOKEN: ${{ secrets.PANDAMASTER_TOKEN }}
