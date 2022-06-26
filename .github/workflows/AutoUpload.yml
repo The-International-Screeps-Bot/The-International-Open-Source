@@ -35,11 +35,11 @@ jobs:
                  run: npm ci
                - name: Run build
                  run: npm run build
-              #  - name: Execute server
-              #    env:
-              #       STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-              #       STEAM_ID: ${{ secrets.STEAM_ID }}
-              #    run: node server/index.js 250000
+               - name: Execute server
+                 env:
+                    STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+                    STEAM_ID: ${{ secrets.STEAM_ID }}
+                 run: node server/index.js 250
                - name: Upload code
                  env:
                     PANDAMASTER_TOKEN: ${{ secrets.PANDAMASTER_TOKEN }}
