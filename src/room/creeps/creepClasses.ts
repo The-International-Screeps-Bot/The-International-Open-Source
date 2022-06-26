@@ -17,6 +17,9 @@ creepClasses.source1Harvester = SourceHarvester
 creepClasses.source2Harvester = SourceHarvester
 
 export class Hauler extends Creep {
+
+     reserve?(): void
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }

@@ -322,7 +322,6 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-
                     if (structure.structureType === STRUCTURE_CONTAINER)
                          return (this.global.source1Container = structure.id as Id<StructureContainer>)
                }
@@ -342,7 +341,6 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-
                     if (structure.structureType === STRUCTURE_CONTAINER)
                          return (this.global.source2Container = structure.id as Id<StructureContainer>)
                }
@@ -361,7 +359,6 @@ Object.defineProperties(Room.prototype, {
                if (!this.anchor) return false
 
                for (const structure of this.lookForAt(LOOK_STRUCTURES, this.anchor.x - 2, this.anchor.y)) {
-
                     if (structure.structureType === STRUCTURE_CONTAINER)
                          return (this.global.fastFillerContainerLeft = structure.id as Id<StructureContainer>)
                }
@@ -380,7 +377,6 @@ Object.defineProperties(Room.prototype, {
                if (!this.anchor) return false
 
                for (const structure of this.lookForAt(LOOK_STRUCTURES, this.anchor.x + 2, this.anchor.y)) {
-
                     if (structure.structureType === STRUCTURE_CONTAINER)
                          return (this.global.fastFillerContainerRight = structure.id as Id<StructureContainer>)
                }
@@ -400,7 +396,6 @@ Object.defineProperties(Room.prototype, {
                if (!centerUpgradePos) return false
 
                for (const structure of centerUpgradePos.lookFor(LOOK_STRUCTURES)) {
-
                     if (structure.structureType === STRUCTURE_CONTAINER)
                          return (this.global.controllerContainer = structure.id as Id<StructureContainer>)
                }
@@ -420,7 +415,6 @@ Object.defineProperties(Room.prototype, {
                if (!mineralHarvestPos) return false
 
                for (const structure of mineralHarvestPos.lookFor(LOOK_STRUCTURES)) {
-
                     if (structure.structureType === STRUCTURE_CONTAINER)
                          return (this.global.mineralContainer = structure.id as Id<StructureContainer>)
                }
@@ -441,7 +435,6 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-
                     if (structure.structureType === STRUCTURE_LINK)
                          return (this.global.source1Link = structure.id as Id<StructureLink>)
                }
@@ -462,7 +455,6 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-
                     if (structure.structureType === STRUCTURE_LINK)
                          return (this.global.source2Link = structure.id as Id<StructureLink>)
                }
@@ -483,7 +475,6 @@ Object.defineProperties(Room.prototype, {
                if (!centerUpgradePos) return false
 
                for (const structure of centerUpgradePos.lookFor(LOOK_STRUCTURES)) {
-
                     if (structure.structureType === STRUCTURE_LINK)
                          return (this.global.controllerLink = structure.id as Id<StructureLink>)
                }
@@ -502,7 +493,6 @@ Object.defineProperties(Room.prototype, {
                if (!this.anchor) return false
 
                for (const structure of this.anchor.lookFor(LOOK_STRUCTURES)) {
-
                     if (structure.structureType === STRUCTURE_LINK)
                          return (this.global.fastFillerLink = structure.id as Id<StructureLink>)
                }
@@ -510,11 +500,23 @@ Object.defineProperties(Room.prototype, {
                return false
           },
      },
+     droppedEnergy: {
+          get() {
+               if (this._droppedEnergy) return this._droppedEnergy
+
+               return (this._droppedEnergy = this.find(FIND_DROPPED_RESOURCES, {
+                    filter: resource => resource.resourceType === RESOURCE_ENERGY,
+               }))
+          },
+     },
      MEWT: {
           get() {
                if (this._MEWT) return this._MEWT
 
-               this._MEWT = []
+               this._MEWT = [...this.droppedEnergy]
+
+               if (this.source1Container) this._MEWT.push(this.source1Container)
+               if (this.source2Container) this._MEWT.push(this.source2Container)
 
                return this._MEWT
           },
@@ -532,7 +534,7 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._MAWT) return this._MAWT
 
-               this._MAWT = []
+               this._MAWT = this.MEWT
 
                return this._MAWT
           },
@@ -550,36 +552,21 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._METT) return this._METT
 
-               this._METT = []
+               this._METT = [...this.structures.spawn, ...this.structures.extension, ...this.structures.tower]
+
+               if (this.fastFillerContainerLeft) this._METT.push(this.fastFillerContainerLeft)
+               if (this.fastFillerContainerRight) this._METT.push(this.fastFillerContainerRight)
 
                return this._METT
-          },
-     },
-     OETT: {
-          get() {
-               if (this._OETT) return this._OETT
-
-               this._OETT = []
-
-               return this._OETT
           },
      },
      MATT: {
           get() {
                if (this._MATT) return this._MATT
 
-               this._MATT = []
+               this._MATT = this.METT
 
                return this._MATT
-          },
-     },
-     OATT: {
-          get() {
-               if (this._OATT) return this._OATT
-
-               this._OATT = []
-
-               return this._OATT
           },
      },
 } as PropertyDescriptorMap & ThisType<Room>)

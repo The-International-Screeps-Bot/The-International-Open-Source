@@ -19,6 +19,7 @@ import './room/remotesManager'
 import { roomManager } from 'room/roomManager'
 import './room/roomGetters'
 
+import './room/Resource'
 import './room/roomObjectFunctions'
 
 // Creep
@@ -906,17 +907,17 @@ declare global {
 
           // Container
 
-          readonly source1Container: StructureConstant | undefined
+          readonly source1Container: StructureContainer | undefined
 
-          readonly source2Container: StructureConstant | undefined
+          readonly source2Container: StructureContainer | undefined
 
-          readonly fastFillerContainerLeft: StructureConstant | undefined
+          readonly fastFillerContainerLeft: StructureContainer | undefined
 
-          readonly fastFillerContainerRight: StructureConstant | undefined
+          readonly fastFillerContainerRight: StructureContainer | undefined
 
-          readonly controllerContainer: StructureConstant | undefined
+          readonly controllerContainer: StructureContainer | undefined
 
-          readonly mineralContainer: StructureConstant | undefined
+          readonly mineralContainer: StructureContainer | undefined
 
           // Links
 
@@ -928,61 +929,51 @@ declare global {
 
           readonly fastFillerLink: StructureLink | undefined
 
-          _MEWT: (AnyStructure | Tombstone | Resource)[]
+          _droppedEnergy: Resource[]
+
+          readonly droppedEnergy: Resource[]
+
+          _MEWT: (AnyStoreStructure | Tombstone | Resource)[]
 
           /**
-           * Mandatory energy withdrawl targets
+           * Mandatory energy withdraw targets
            */
-          readonly MEWT: (AnyStructure | Tombstone | Resource)[]
+          readonly MEWT: (AnyStoreStructure | Tombstone | Resource)[]
 
-          _OEWT: (AnyStructure | Tombstone | Resource)[]
+          _OEWT: (AnyStoreStructure | Tombstone | Resource)[]
 
           /**
-           * Optional energy withdrawl targets
+           * Optional energy withdraw targets
            */
-          readonly OEWT: (AnyStructure | Tombstone | Resource)[]
+          readonly OEWT: (AnyStoreStructure | Tombstone | Resource)[]
 
-          _MAWT: (AnyStructure | Tombstone | Resource)[]
+          _MAWT: (AnyStoreStructure | Tombstone | Resource)[]
 
           /**
-           * Mandatory all withdrawl targets
+           * Mandatory all withdraw targets
            */
-          readonly MAWT: (AnyStructure | Tombstone | Resource)[]
+          readonly MAWT: (AnyStoreStructure | Tombstone | Resource)[]
 
-          _OAWT: (AnyStructure | Tombstone | Resource)[]
+          _OAWT: (AnyStoreStructure | Tombstone | Resource)[]
 
           /**
-           * Optional all withdrawl targets
+           * Optional all withdraw targets
            */
-          readonly OAWT: (AnyStructure | Tombstone | Resource)[]
+          readonly OAWT: (AnyStoreStructure | Tombstone | Resource)[]
 
-          _METT: (AnyStructure | Tombstone | Resource)[]
+          _METT: (AnyStoreStructure | Tombstone)[]
 
           /**
            * Mandatory energy transfer targets
            */
-          readonly METT: (AnyStructure | Tombstone | Resource)[]
+          readonly METT: (AnyStoreStructure | Tombstone)[]
 
-          _OETT: (AnyStructure | Tombstone | Resource)[]
-
-          /**
-           * Optional energy transfer targets
-           */
-          readonly OETT: (AnyStructure | Tombstone | Resource)[]
-
-          _MATT: (AnyStructure | Tombstone | Resource)[]
+          _MATT: (AnyStoreStructure | Tombstone)[]
 
           /**
            * Mandatory all transfer targets
            */
-          readonly MATT: (AnyStructure | Tombstone | Resource)[]
-
-          _OATT: (AnyStructure | Tombstone | Resource)[]
-
-          /**
-           * Optional all transfer targets
-           */
-          readonly OATT: (AnyStructure | Tombstone | Resource)[]
+          readonly MATT: (AnyStoreStructure | Tombstone)[]
      }
 
      interface DepositRecord {
@@ -1469,6 +1460,15 @@ declare global {
            * Finds the total free store capacity of a specific resource for this RoomObject
            */
           freeSpecificStore(resourceType: ResourceConstant): number
+     }
+
+     interface Resource {
+
+          // Getters
+
+          _reserveAmount: number
+
+          reserveAmount: number
      }
 
      // Global

@@ -18,7 +18,7 @@ import {
      unpackAsRoomPos,
 } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
-import { repeat } from 'lodash'
+import { pick, repeat } from 'lodash'
 import { packCoord, packPos, packPosList, unpackPos, unpackPosList } from 'other/packrat'
 import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
 import { creepClasses } from './creepClasses'
@@ -138,9 +138,11 @@ Creep.prototype.advancedPickup = function (target) {
           return false
      }
 
+     const pickupResult = this.pickup(target)
+
      // Try to pickup. if the action can be considered a success
 
-     if (this.pickup(target) === OK) {
+     if (pickupResult === OK || pickupResult === ERR_FULL) {
           // Record that the creep has done the action and inform true
 
           this.hasMovedResources = true
@@ -1918,7 +1920,7 @@ Creep.prototype.deleteReservation = function (index) {
      const target = findObjectWithID(reservation.targetID)
 
      if (target instanceof Resource) {
-          target.amount += reservation.amount
+          target.reserveAmount += reservation.amount
      } else target.store[reservation.resourceType] += reservation.amount
 
      this.memory.reservations.splice(index)
@@ -1939,7 +1941,7 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
      const target = findObjectWithID(reservation.targetID)
 
      if (target instanceof Resource) {
-          target.amount -= reservation.amount
+          target.reserveAmount -= reservation.amount
      } else target.store[reservation.resourceType] -= reservation.amount
 }
 
@@ -1956,7 +1958,7 @@ Creep.prototype.reservationManager = function () {
           if (!target) this.memory.reservations.splice(index, 1)
 
           if (target instanceof Resource) {
-               target.amount -= reservation.amount
+               target.reserveAmount -= reservation.amount
           } else target.store[reservation.resourceType] -= reservation.amount
      }
 }
