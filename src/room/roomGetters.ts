@@ -84,7 +84,12 @@ Object.defineProperties(Room.prototype, {
 
                // Group structures by structureType
 
-               for (const structure of this.find(FIND_STRUCTURES))
+               for (const structure of this.find(FIND_STRUCTURES).filter(function (s) {
+                    return (
+                         s.structureType !== 'constructedWall' ||
+                         (s.structureType === 'constructedWall' && s.hits !== undefined)
+                    )
+               }))
                     this._structures[structure.structureType].push(structure as any)
 
                return this._structures
