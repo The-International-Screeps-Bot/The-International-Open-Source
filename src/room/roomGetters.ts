@@ -310,6 +310,206 @@ Object.defineProperties(Room.prototype, {
                }).length)
           },
      },
+     source1Container: {
+          get() {
+               if (this.global.source1Container) {
+                    const container = findObjectWithID(this.global.source1Container)
+
+                    if (container) return container
+               }
+
+               const closestHarvestPos: RoomPosition | undefined = this.get('source1ClosestHarvestPos')
+               if (!closestHarvestPos) return false
+
+               for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
+
+                    if (structure.structureType === STRUCTURE_CONTAINER)
+                         return (this.global.source1Container = structure.id as Id<StructureContainer>)
+               }
+
+               return false
+          },
+     },
+     source2Container: {
+          get() {
+               if (this.global.source2Container) {
+                    const container = findObjectWithID(this.global.source2Container)
+
+                    if (container) return container
+               }
+
+               const closestHarvestPos: RoomPosition | undefined = this.get('source2ClosestHarvestPos')
+               if (!closestHarvestPos) return false
+
+               for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
+
+                    if (structure.structureType === STRUCTURE_CONTAINER)
+                         return (this.global.source2Container = structure.id as Id<StructureContainer>)
+               }
+
+               return false
+          },
+     },
+     fastFillerContainerLeft: {
+          get() {
+               if (this.global.fastFillerContainerLeft) {
+                    const container = findObjectWithID(this.global.fastFillerContainerLeft)
+
+                    if (container) return container
+               }
+
+               if (!this.anchor) return false
+
+               for (const structure of this.lookForAt(LOOK_STRUCTURES, this.anchor.x - 2, this.anchor.y)) {
+
+                    if (structure.structureType === STRUCTURE_CONTAINER)
+                         return (this.global.fastFillerContainerLeft = structure.id as Id<StructureContainer>)
+               }
+
+               return false
+          },
+     },
+     fastFillerContainerRight: {
+          get() {
+               if (this.global.fastFillerContainerRight) {
+                    const container = findObjectWithID(this.global.fastFillerContainerRight)
+
+                    if (container) return container
+               }
+
+               if (!this.anchor) return false
+
+               for (const structure of this.lookForAt(LOOK_STRUCTURES, this.anchor.x + 2, this.anchor.y)) {
+
+                    if (structure.structureType === STRUCTURE_CONTAINER)
+                         return (this.global.fastFillerContainerRight = structure.id as Id<StructureContainer>)
+               }
+
+               return false
+          },
+     },
+     controllerContainer: {
+          get() {
+               if (this.global.controllerContainer) {
+                    const container = findObjectWithID(this.global.controllerContainer)
+
+                    if (container) return container
+               }
+
+               const centerUpgradePos: RoomPosition = this.get('centerUpgradePos')
+               if (!centerUpgradePos) return false
+
+               for (const structure of centerUpgradePos.lookFor(LOOK_STRUCTURES)) {
+
+                    if (structure.structureType === STRUCTURE_CONTAINER)
+                         return (this.global.controllerContainer = structure.id as Id<StructureContainer>)
+               }
+
+               return false
+          },
+     },
+     mineralContainer: {
+          get() {
+               if (this.global.mineralContainer) {
+                    const container = findObjectWithID(this.global.mineralContainer)
+
+                    if (container) return container
+               }
+
+               const mineralHarvestPos: RoomPosition = this.get('closestMineralHarvestPos')
+               if (!mineralHarvestPos) return false
+
+               for (const structure of mineralHarvestPos.lookFor(LOOK_STRUCTURES)) {
+
+                    if (structure.structureType === STRUCTURE_CONTAINER)
+                         return (this.global.mineralContainer = structure.id as Id<StructureContainer>)
+               }
+
+               return false
+          },
+     },
+     source1Link: {
+          get() {
+               if (this.global.source1Link) {
+                    const container = findObjectWithID(this.global.source1Link)
+
+                    if (container) return container
+               }
+
+               const closestHarvestPos = this.get('source1ClosestHarvestPos')
+
+               if (!closestHarvestPos) return false
+
+               for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
+
+                    if (structure.structureType === STRUCTURE_LINK)
+                         return (this.global.source1Link = structure.id as Id<StructureLink>)
+               }
+
+               return false
+          },
+     },
+     source2Link: {
+          get() {
+               if (this.global.source2Link) {
+                    const container = findObjectWithID(this.global.source2Link)
+
+                    if (container) return container
+               }
+
+               const closestHarvestPos = this.get('source2ClosestHarvestPos')
+
+               if (!closestHarvestPos) return false
+
+               for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
+
+                    if (structure.structureType === STRUCTURE_LINK)
+                         return (this.global.source2Link = structure.id as Id<StructureLink>)
+               }
+
+               return false
+          },
+     },
+     controllerLink: {
+          get() {
+               if (this.global.controllerLink) {
+                    const container = findObjectWithID(this.global.controllerLink)
+
+                    if (container) return container
+               }
+
+               const centerUpgradePos = this.get('centerUpgradePos')
+
+               if (!centerUpgradePos) return false
+
+               for (const structure of centerUpgradePos.lookFor(LOOK_STRUCTURES)) {
+
+                    if (structure.structureType === STRUCTURE_LINK)
+                         return (this.global.controllerLink = structure.id as Id<StructureLink>)
+               }
+
+               return false
+          },
+     },
+     fastFillerLink: {
+          get() {
+               if (this.global.fastFillerLink) {
+                    const container = findObjectWithID(this.global.fastFillerLink)
+
+                    if (container) return container
+               }
+
+               if (!this.anchor) return false
+
+               for (const structure of this.anchor.lookFor(LOOK_STRUCTURES)) {
+
+                    if (structure.structureType === STRUCTURE_LINK)
+                         return (this.global.fastFillerLink = structure.id as Id<StructureLink>)
+               }
+
+               return false
+          },
+     },
      MEWT: {
           get() {
                if (this._MEWT) return this._MEWT
@@ -317,6 +517,69 @@ Object.defineProperties(Room.prototype, {
                this._MEWT = []
 
                return this._MEWT
+          },
+     },
+     OEWT: {
+          get() {
+               if (this._OEWT) return this._OEWT
+
+               this._OEWT = []
+
+               return this._OEWT
+          },
+     },
+     MAWT: {
+          get() {
+               if (this._MAWT) return this._MAWT
+
+               this._MAWT = []
+
+               return this._MAWT
+          },
+     },
+     OAWT: {
+          get() {
+               if (this._OAWT) return this._OAWT
+
+               this._OAWT = []
+
+               return this._OAWT
+          },
+     },
+     METT: {
+          get() {
+               if (this._METT) return this._METT
+
+               this._METT = []
+
+               return this._METT
+          },
+     },
+     OETT: {
+          get() {
+               if (this._OETT) return this._OETT
+
+               this._OETT = []
+
+               return this._OETT
+          },
+     },
+     MATT: {
+          get() {
+               if (this._MATT) return this._MATT
+
+               this._MATT = []
+
+               return this._MATT
+          },
+     },
+     OATT: {
+          get() {
+               if (this._OATT) return this._OATT
+
+               this._OATT = []
+
+               return this._OATT
           },
      },
 } as PropertyDescriptorMap & ThisType<Room>)

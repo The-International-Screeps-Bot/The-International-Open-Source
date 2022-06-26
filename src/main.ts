@@ -539,6 +539,30 @@ declare global {
 
           upgradePathLength: number
 
+          // Containers
+
+          source1Container: Id<StructureContainer> | undefined
+
+          source2Container: Id<StructureContainer> | undefined
+
+          fastFillerContainerLeft: Id<StructureContainer> | undefined
+
+          fastFillerContainerRight: Id<StructureContainer> | undefined
+
+          controllerContainer: Id<StructureContainer> | undefined
+
+          mineralContainer: Id<StructureContainer> | undefined
+
+          // Links
+
+          source1Link: Id<StructureLink> | undefined
+
+          source2Link: Id<StructureLink> | undefined
+
+          controllerLink: Id<StructureLink> | undefined
+
+          fastFillerLink: Id<StructureLink> | undefined
+
           //
 
           tasksWithResponders: Record<string | number, RoomTask>
@@ -879,6 +903,30 @@ declare global {
           readonly source2PathLength: number
 
           readonly upgradePathLength: number
+
+          // Container
+
+          readonly source1Container: StructureConstant | undefined
+
+          readonly source2Container: StructureConstant | undefined
+
+          readonly fastFillerContainerLeft: StructureConstant | undefined
+
+          readonly fastFillerContainerRight: StructureConstant | undefined
+
+          readonly controllerContainer: StructureConstant | undefined
+
+          readonly mineralContainer: StructureConstant | undefined
+
+          // Links
+
+          readonly source1Link: StructureLink | undefined
+
+          readonly source2Link: StructureLink | undefined
+
+          readonly controllerLink: StructureLink | undefined
+
+          readonly fastFillerLink: StructureLink | undefined
 
           _MEWT: (AnyStructure | Tombstone | Resource)[]
 
