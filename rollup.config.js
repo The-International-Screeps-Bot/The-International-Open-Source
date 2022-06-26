@@ -7,7 +7,6 @@ import screeps from 'rollup-plugin-screeps'
 let cfg
 const dest = process.env.DEST
 const token = process.env.TOKEN
-console.log(token)
 if (!dest && !token) {
      console.log('No destination specified - code will be compiled but not uploaded')
 } else if (token && (cfg = require('./example.screeps.json')["mmo"])) {

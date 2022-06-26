@@ -1415,8 +1415,6 @@ declare global {
 // Loop
 
 export const loop = function () {
-     console.log('works')
-     return
      memHack.modifyMemory()
 
      internationalManager.run()
