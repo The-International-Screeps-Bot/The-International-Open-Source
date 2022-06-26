@@ -53,7 +53,6 @@ class Tester {
       * @return {undefined}
       */
      async checkForSuccess(line, defer) {
-          console.log(botsSpawned,line)
           if (botsSpawned && line.startsWith(`'OK'`)) {
                let appendix = ''
                if (this.maxTicks > 0) {

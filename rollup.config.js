@@ -6,8 +6,13 @@ import screeps from 'rollup-plugin-screeps'
 
 let cfg
 const dest = process.env.DEST
-if (!dest) {
+const token = process.env.TOKEN
+console.log(token)
+if (!dest && !token) {
      console.log('No destination specified - code will be compiled but not uploaded')
+} else if (token && (cfg = require('./example.screeps.json')["mmo"])) {
+     if (cfg  == null) throw new Error('Invalid upload destination')
+     else cfg.token = token;
 } else if ((cfg = require('./screeps.json')[dest]) == null) {
      throw new Error('Invalid upload destination')
 }
@@ -25,6 +30,6 @@ export default {
           resolve({ rootDir: 'src' }),
           commonjs(),
           typescript({ tsconfig: './tsconfig.json' }),
-          screeps({ config: cfg, dryRun: cfg == null }),
+          screeps({ config: cfg, dryRun: cfg == null  }),
      ],
 }
