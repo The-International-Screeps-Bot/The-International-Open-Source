@@ -9,9 +9,9 @@ on:
           - auto-deploy
           - 'releases/**'
 jobs:
-     PerformanceTest:
+     VerifyUpload:
           timeout-minutes: 10000
-          runs-on: ubuntu
+          runs-on: ubuntu-latest
           steps:
                - name: 'Cleanup build folder'
                  run: |
