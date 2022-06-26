@@ -500,6 +500,33 @@ Object.defineProperties(Room.prototype, {
                return false
           },
      },
+     factory: {
+          get() {
+               if (this._factory) return this._factory
+
+               return (this._factory = this.find(FIND_MY_STRUCTURES, {
+                    filter: structure => structure.structureType === STRUCTURE_FACTORY,
+               })[0] as StructureFactory)
+          },
+     },
+     nuker: {
+          get() {
+               if (this._nuker) return this._nuker
+
+               return (this._nuker = this.find(FIND_MY_STRUCTURES, {
+                    filter: structure => structure.structureType === STRUCTURE_NUKER,
+               })[0] as StructureNuker)
+          },
+     },
+     powerSpawn: {
+          get() {
+               if (this._powerSpawn) return this._powerSpawn
+
+               return (this._powerSpawn = this.find(FIND_MY_STRUCTURES, {
+                    filter: structure => structure.structureType === STRUCTURE_POWER_SPAWN,
+               })[0] as StructureNuker)
+          },
+     },
      droppedEnergy: {
           get() {
                if (this._droppedEnergy) return this._droppedEnergy
@@ -525,7 +552,7 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._OEWT) return this._OEWT
 
-               this._OEWT = []
+               this._OEWT = [this.storage, this.terminal, this.factory, this.nuker, this.powerSpawn]
 
                return this._OEWT
           },
@@ -543,7 +570,7 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._OAWT) return this._OAWT
 
-               this._OAWT = []
+               this._OAWT = this.OEWT
 
                return this._OAWT
           },
