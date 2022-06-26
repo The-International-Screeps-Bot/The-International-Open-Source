@@ -310,4 +310,13 @@ Object.defineProperties(Room.prototype, {
                }).length)
           },
      },
+     MEWT: {
+          get() {
+               if (this._MEWT) return this._MEWT
+
+               this._MEWT = []
+
+               return this._MEWT
+          },
+     },
 } as PropertyDescriptorMap & ThisType<Room>)

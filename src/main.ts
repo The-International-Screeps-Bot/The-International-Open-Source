@@ -879,6 +879,62 @@ declare global {
           readonly source2PathLength: number
 
           readonly upgradePathLength: number
+
+          _MEWT: (AnyStructure | Tombstone | Resource)[]
+
+          /**
+           * Mandatory energy withdrawl targets
+           */
+          readonly MEWT: (AnyStructure | Tombstone | Resource)[]
+
+          _OEWT: (AnyStructure | Tombstone | Resource)[]
+
+          /**
+           * Optional energy withdrawl targets
+           */
+          readonly OEWT: (AnyStructure | Tombstone | Resource)[]
+
+          _MAWT: (AnyStructure | Tombstone | Resource)[]
+
+          /**
+           * Mandatory all withdrawl targets
+           */
+          readonly MAWT: (AnyStructure | Tombstone | Resource)[]
+
+          _OAWT: (AnyStructure | Tombstone | Resource)[]
+
+          /**
+           * Optional all withdrawl targets
+           */
+          readonly OAWT: (AnyStructure | Tombstone | Resource)[]
+
+          _METT: (AnyStructure | Tombstone | Resource)[]
+
+          /**
+           * Mandatory energy transfer targets
+           */
+          readonly METT: (AnyStructure | Tombstone | Resource)[]
+
+          _OETT: (AnyStructure | Tombstone | Resource)[]
+
+          /**
+           * Optional energy transfer targets
+           */
+          readonly OETT: (AnyStructure | Tombstone | Resource)[]
+
+          _MATT: (AnyStructure | Tombstone | Resource)[]
+
+          /**
+           * Mandatory all transfer targets
+           */
+          readonly MATT: (AnyStructure | Tombstone | Resource)[]
+
+          _OATT: (AnyStructure | Tombstone | Resource)[]
+
+          /**
+           * Optional all transfer targets
+           */
+          readonly OATT: (AnyStructure | Tombstone | Resource)[]
      }
 
      interface DepositRecord {
@@ -1349,7 +1405,6 @@ declare global {
      }
 
      interface RoomObject {
-
           // Functions
 
           /**
@@ -1360,12 +1415,12 @@ declare global {
           /**
            * Finds the total free store capacity of this RoomObject
            */
-           freeStore(resourceType: ResourceConstant): number
+          freeStore(resourceType: ResourceConstant): number
 
           /**
            * Finds the total free store capacity of a specific resource for this RoomObject
            */
-           freeSpecificStore(resourceType: ResourceConstant): number
+          freeSpecificStore(resourceType: ResourceConstant): number
      }
 
      // Global
