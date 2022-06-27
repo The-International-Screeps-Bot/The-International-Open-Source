@@ -2756,7 +2756,12 @@ Room.prototype.createClaimRequest = function () {
 
      score += preference
 
-     score += this.findSwampPlainsRatio() * 12
+     score += this.source1PathLength / 10
+     score += this.source2PathLength / 10
+
+     score += this.upgradePathLength / 10
+
+     score += this.findSwampPlainsRatio() * 10
 
      Memory.claimRequests[this.name] = {
           needs: [1, 20, 0],

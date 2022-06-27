@@ -297,7 +297,13 @@ declare global {
 
      interface ClaimRequest {
           needs: number[]
+          /**
+           * The weight for which to prefer this room, where higher values are prefered less
+           */
           score: number
+          /**
+           * The number of ticks to abandon the claimRequest for
+           */
           abadon?: number
      }
 
