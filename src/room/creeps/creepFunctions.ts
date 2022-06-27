@@ -1994,6 +1994,7 @@ Creep.prototype.fulfillReservation = function () {
      if (target instanceof Resource) {
           if (this.advancedPickup(target)) {
                this.store[reservation.resourceType] += reservation.amount
+               target.reserveAmount -= Math.min(this.freeSpecificStore(reservation.resourceType), target.amount)
 
                this.deleteReservation(0)
                return true
@@ -2012,6 +2013,7 @@ Creep.prototype.fulfillReservation = function () {
      if (reservation.type === 'transfer') {
           if (this.advancedTransfer(target, reservation.resourceType, amount)) {
                this.store[reservation.resourceType] -= amount
+               target.store[reservation.resourceType] += amount
 
                this.deleteReservation(0)
                return true
@@ -2029,6 +2031,7 @@ Creep.prototype.fulfillReservation = function () {
 
      if (this.advancedWithdraw(target, reservation.resourceType, amount)) {
           this.store[reservation.resourceType] += amount
+          target.store[reservation.resourceType] -= amount
 
           this.deleteReservation(0)
           return true

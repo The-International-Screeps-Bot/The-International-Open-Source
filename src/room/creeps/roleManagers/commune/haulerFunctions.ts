@@ -15,7 +15,7 @@ Hauler.prototype.reserve = function () {
           targets = room.MAWT
 
           targets = targets.filter((target) => {
-               if (target instanceof Resource) return target.amount * 0.2 >= this.store.getCapacity(RESOURCE_ENERGY)
+               if (target instanceof Resource) return target.reserveAmount * 0.2 >= this.store.getCapacity(RESOURCE_ENERGY)
 
                return target.store.energy * 0.2 >= this.store.getCapacity(RESOURCE_ENERGY)
           })
