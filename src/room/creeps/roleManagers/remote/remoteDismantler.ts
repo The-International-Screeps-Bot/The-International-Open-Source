@@ -1,5 +1,5 @@
 import { remoteNeedsIndex } from 'international/constants'
-import { getRange } from 'international/generalFunctions'
+import { findObjectWithID, getRange } from 'international/generalFunctions'
 import { creepClasses, RemoteCoreAttacker, RemoteDismantler } from 'room/creeps/creepClasses'
 
 export function remoteDismantlerManager(room: Room, creepsOfRole: string[]) {
@@ -96,19 +96,45 @@ RemoteDismantler.prototype.findRemote = function () {
 RemoteDismantler.prototype.advancedDismantle = function () {
      const { room } = this
 
-     let structure
+     let target
      let range
 
-     if (room.actionableWalls.length) {
-          structure = this.pos.findClosestByPath(room.actionableWalls, { ignoreRoads: true, ignoreCreeps: true })
+     if (this.memory.dismantleTarget) {
 
-          range = getRange(this.pos.x - structure.pos.x, this.pos.y - structure.pos.y)
+          target = findObjectWithID(this.memory.dismantleTarget)
+
+          if (target) {
+
+               range = getRange(this.pos.x - target.pos.x, this.pos.y - target.pos.y)
+
+               if (range > 1) {
+                    this.createMoveRequest({
+                         origin: this.pos,
+                         goal: {
+                              pos: target.pos,
+                              range: 1,
+                         },
+                         avoidEnemyRanges: true,
+                    })
+
+                    return true
+               }
+
+               this.dismantle(target)
+               return true
+          }
+     }
+
+     if (room.actionableWalls.length) {
+          target = this.pos.findClosestByPath(room.actionableWalls, { ignoreRoads: true, ignoreCreeps: true })
+
+          range = getRange(this.pos.x - target.pos.x, this.pos.y - target.pos.y)
 
           if (range > 1) {
                this.createMoveRequest({
                     origin: this.pos,
                     goal: {
-                         pos: structure.pos,
+                         pos: target.pos,
                          range: 1,
                     },
                     avoidEnemyRanges: true,
@@ -117,7 +143,7 @@ RemoteDismantler.prototype.advancedDismantle = function () {
                return true
           }
 
-          this.dismantle(structure)
+          this.dismantle(target)
           return true
      }
 
@@ -126,15 +152,15 @@ RemoteDismantler.prototype.advancedDismantle = function () {
      })
 
      if (enemyStructures.length) {
-          structure = this.pos.findClosestByPath(enemyStructures, { ignoreRoads: true, ignoreCreeps: true })
+          target = this.pos.findClosestByPath(enemyStructures, { ignoreRoads: true, ignoreCreeps: true })
 
-          range = getRange(this.pos.x - structure.pos.x, this.pos.y - structure.pos.y)
+          range = getRange(this.pos.x - target.pos.x, this.pos.y - target.pos.y)
 
           if (range > 1) {
                this.createMoveRequest({
                     origin: this.pos,
                     goal: {
-                         pos: structure.pos,
+                         pos: target.pos,
                          range: 1,
                     },
                     avoidEnemyRanges: true,
@@ -143,7 +169,7 @@ RemoteDismantler.prototype.advancedDismantle = function () {
                return true
           }
 
-          this.dismantle(structure)
+          this.dismantle(target)
           return true
      }
 

@@ -1439,6 +1439,8 @@ declare global {
           taskResource: ResourceConstant
 
           reservations: Reservation[]
+
+          dismantleTarget: Id<Structure>
      }
 
      // PowerCreeps
