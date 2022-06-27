@@ -14,15 +14,24 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
           creep.advancedRenew()
 
           if (creep.memory.reservations && creep.memory.reservations.length) {
+               if (!creep.fulfillReservation()) {
 
-               if (!creep.fulfillReservation()) continue
+                    creep.say(creep.message)
+                    continue
+               }
           }
 
           creep.reserve()
 
-          if (!creep.fulfillReservation()) continue
+          if (!creep.fulfillReservation()) {
 
-          creep.reserve()
+               creep.say(creep.message)
+               continue
+          }
+
+          /* creep.reserve() */
+
+          if (creep.message.length) creep.say(creep.message)
 
           /*
           creep.advancedRenew()

@@ -19,12 +19,12 @@ import './room/remotesManager'
 import { roomManager } from 'room/roomManager'
 import './room/roomGetters'
 
-import './room/Resource'
+import './room/resourceAdditions'
 import './room/roomObjectFunctions'
 
 // Creep
 
-import './room/creeps/creepGetters'
+import './room/creeps/creepAdditions'
 
 // Other
 
@@ -1340,6 +1340,13 @@ declare global {
           _towerDamage: number
 
           readonly towerDamage: number
+
+          _message: string
+
+          /**
+           * The cumulative message to present in say()
+           */
+          message: string
      }
 
      interface CreepMemory {

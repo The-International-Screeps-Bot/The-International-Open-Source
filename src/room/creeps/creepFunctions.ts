@@ -1263,16 +1263,14 @@ Creep.prototype.getPushed = function () {
 Creep.prototype.needsResources = function () {
      // If the creep is empty
 
-     if (this.store.getUsedCapacity() === 0) {
+     if (this.usedStore() === 0)
           // Record and inform that the creep needs resources
 
-          this.memory.needsResources = true
-          return true
-     }
+          return (this.memory.needsResources = true)
 
      // Otherwise if the creep is full
 
-     if (this.store.getFreeCapacity() === 0) {
+     if (this.freeStore(RESOURCE_ENERGY) === 0) {
           // Record and inform that the creep does not resources
 
           delete this.memory.needsResources
@@ -1924,6 +1922,8 @@ Creep.prototype.deleteReservation = function (index) {
      } else target.store[reservation.resourceType] += reservation.amount
 
      this.memory.reservations.splice(index)
+
+     this.message += '❌'
 }
 
 Creep.prototype.createReservation = function (type, targetID, amount, resourceType) {
@@ -1943,6 +1943,8 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
      if (target instanceof Resource) {
           target.reserveAmount -= reservation.amount
      } else target.store[reservation.resourceType] -= reservation.amount
+
+     this.message += '➕' + type[0]
 }
 
 Creep.prototype.reservationManager = function () {
@@ -1964,15 +1966,15 @@ Creep.prototype.reservationManager = function () {
 }
 
 Creep.prototype.fulfillReservation = function () {
-     if (!this.memory.reservations) return false
+     if (!this.memory.reservations) return true
 
      const reservation = this.memory.reservations[0]
-     if (!reservation) return false
+     if (!reservation) return true
 
      const target = findObjectWithID(reservation.targetID)
      if (!target) {
           this.deleteReservation(0)
-          return false
+          return true
      }
 
      const { room } = this
@@ -1985,33 +1987,32 @@ Creep.prototype.fulfillReservation = function () {
                width: 0.15,
           })
 
-     this.say('📲')
+     this.message += '📲'
 
      // Pickup
 
      if (target instanceof Resource) {
           if (this.advancedPickup(target)) {
+               this.store[reservation.resourceType] += reservation.amount
+
                this.deleteReservation(0)
                return true
           }
 
           return false
      }
+
+     let amount = Math.min(
+          Math.min(this.store.getUsedCapacity(reservation.resourceType), reservation.amount),
+          target.store.getFreeCapacity(reservation.resourceType),
+     )
 
      // Transfer
 
-     if (reservation.type == 'transfer') {
+     if (reservation.type === 'transfer') {
+          if (this.advancedTransfer(target, reservation.resourceType, amount)) {
+               this.store[reservation.resourceType] -= amount
 
-          if (
-               this.advancedTransfer(
-                    target,
-                    reservation.resourceType,
-                    Math.min(
-                         Math.min(this.store.getUsedCapacity(reservation.resourceType), reservation.amount),
-                         target.store.getFreeCapacity(reservation.resourceType),
-                    ),
-               )
-          ) {
                this.deleteReservation(0)
                return true
           }
@@ -2019,18 +2020,16 @@ Creep.prototype.fulfillReservation = function () {
           return false
      }
 
+     amount = Math.min(
+          Math.min(target.store.getUsedCapacity(reservation.resourceType), reservation.amount),
+          this.store.getFreeCapacity(reservation.resourceType),
+     )
+
      // Withdraw
 
-     if (
-          this.advancedWithdraw(
-               target,
-               reservation.resourceType,
-               Math.min(
-                    Math.min(target.store.getUsedCapacity(reservation.resourceType), reservation.amount),
-                    this.store.getFreeCapacity(reservation.resourceType),
-               ),
-          )
-     ) {
+     if (this.advancedWithdraw(target, reservation.resourceType, amount)) {
+          this.store[reservation.resourceType] += amount
+
           this.deleteReservation(0)
           return true
      }

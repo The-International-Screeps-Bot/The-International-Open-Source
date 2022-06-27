@@ -80,7 +80,6 @@ Object.defineProperties(Creep.prototype, {
                let factor
 
                for (const tower of room.structures.tower) {
-
                     if (tower.store.energy <= 0) continue
 
                     range = getRange(this.pos.x - tower.pos.x, this.pos.y - tower.pos.y)
@@ -127,6 +126,16 @@ Object.defineProperties(Creep.prototype, {
                if (this.boosts.XGHO2 > 0) this._towerDamage *= BOOSTS.tough.XGHO2.damage
 
                return this._towerDamage
+          },
+     },
+     message: {
+          get() {
+               if (this._message) return this._message
+
+               return (this._message = '')
+          },
+          set(newMessage) {
+               this._message = newMessage
           },
      },
 } as PropertyDescriptorMap & ThisType<Creep>)
