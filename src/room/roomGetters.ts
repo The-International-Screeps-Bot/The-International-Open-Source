@@ -587,6 +587,15 @@ Object.defineProperties(Room.prototype, {
                return this._METT
           },
      },
+     OETT: {
+          get() {
+               if (this._OETT) return this._OETT
+
+               this._OETT = []
+
+               return this._OETT
+          },
+     },
      MATT: {
           get() {
                if (this._MATT) return this._MATT
@@ -594,6 +603,15 @@ Object.defineProperties(Room.prototype, {
                this._MATT = this.METT
 
                return this._MATT
+          },
+     },
+     OATT: {
+          get() {
+               if (this._OATT) return this._OATT
+
+               this._OATT = []
+
+               return this._OATT
           },
      },
 } as PropertyDescriptorMap & ThisType<Room>)

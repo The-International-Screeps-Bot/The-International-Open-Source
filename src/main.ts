@@ -985,12 +985,26 @@ declare global {
            */
           readonly METT: (AnyStoreStructure | Tombstone)[]
 
+          _OETT: (AnyStoreStructure | Tombstone)[]
+
+          /**
+           * Optional energy transfer targets
+           */
+          readonly OETT: (AnyStoreStructure | Tombstone)[]
+
           _MATT: (AnyStoreStructure | Tombstone)[]
 
           /**
            * Mandatory all transfer targets
            */
           readonly MATT: (AnyStoreStructure | Tombstone)[]
+
+          _OATT: (AnyStoreStructure | Tombstone)[]
+
+          /**
+           * Optional all transfer targets
+           */
+          readonly OATT: (AnyStoreStructure | Tombstone)[]
      }
 
      interface DepositRecord {
