@@ -29,7 +29,7 @@ Hauler.prototype.reserve = function () {
           }
      } else {
           targets = room.MATT.filter(function (target) {
-               return target.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+               return target.freeSpecificStore(RESOURCE_ENERGY) > 0
           })
 
           if (targets.length) {
