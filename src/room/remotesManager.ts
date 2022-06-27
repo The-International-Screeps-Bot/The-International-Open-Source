@@ -93,7 +93,7 @@ Room.prototype.remotesManager = function () {
                })
 
                remoteMemory.needs[remoteNeedsIndex.remoteDismantler] =
-                    remote.structures.constructedWall.length || enemyStructures.length ? 1 : 0
+                    (remote.actionableWalls.length || enemyStructures.length) ? 1 : 0
           }
 
           // Loop through each index of sourceEfficacies

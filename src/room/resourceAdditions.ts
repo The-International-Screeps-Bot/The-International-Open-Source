@@ -3,7 +3,7 @@ Object.defineProperties(Resource.prototype, {
           get() {
                if (this._reserveAmount) return this._reserveAmount
 
-               return this._reserveAmount
+               return this._reserveAmount = this.amount
           },
           set(newAmount: number) {
                this._reserveAmount = newAmount

@@ -17,7 +17,7 @@ import './international/endTickManager'
 
 import './room/remotesManager'
 import { roomManager } from 'room/roomManager'
-import './room/roomGetters'
+import './room/roomAdditions'
 
 import './room/resourceAdditions'
 import './room/roomObjectFunctions'
@@ -949,6 +949,10 @@ declare global {
           _droppedEnergy: Resource[]
 
           readonly droppedEnergy: Resource[]
+
+          _actionableWalls: StructureWall[]
+
+          readonly actionableWalls: StructureWall[]
 
           _MEWT: (AnyStoreStructure | Tombstone | Resource)[]
 

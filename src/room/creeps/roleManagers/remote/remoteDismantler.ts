@@ -99,58 +99,51 @@ RemoteDismantler.prototype.advancedDismantle = function () {
      let structure
      let range
 
-     if (room.structures.constructedWall.length) {
-
-          structure = this.pos.findClosestByRange(room.structures.constructedWall)
+     if (room.actionableWalls.length) {
+          structure = this.pos.findClosestByPath(room.actionableWalls, { ignoreRoads: true, ignoreCreeps: true })
 
           range = getRange(this.pos.x - structure.pos.x, this.pos.y - structure.pos.y)
 
           if (range > 1) {
-
                this.createMoveRequest({
                     origin: this.pos,
                     goal: {
                          pos: structure.pos,
                          range: 1,
                     },
-                    avoidEnemyRanges: true
+                    avoidEnemyRanges: true,
                })
 
                return true
           }
 
           this.dismantle(structure)
-
           return true
      }
 
-     const enemyStructures = room.find(FIND_HOSTILE_STRUCTURES).filter(function(structure) {
-
+     const enemyStructures = room.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
           return structure.structureType != STRUCTURE_INVADER_CORE
      })
 
      if (enemyStructures.length) {
-
-          structure = this.pos.findClosestByRange(enemyStructures)
+          structure = this.pos.findClosestByPath(enemyStructures, { ignoreRoads: true, ignoreCreeps: true })
 
           range = getRange(this.pos.x - structure.pos.x, this.pos.y - structure.pos.y)
 
           if (range > 1) {
-
                this.createMoveRequest({
                     origin: this.pos,
                     goal: {
                          pos: structure.pos,
                          range: 1,
                     },
-                    avoidEnemyRanges: true
+                    avoidEnemyRanges: true,
                })
 
                return true
           }
 
           this.dismantle(structure)
-
           return true
      }
 

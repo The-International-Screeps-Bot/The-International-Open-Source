@@ -536,11 +536,21 @@ Object.defineProperties(Room.prototype, {
                }))
           },
      },
+     actionableWalls: {
+          get() {
+               if (this._actionableWalls) return this._actionableWalls
+
+               return this._actionableWalls = this.structures.constructedWall.filter(function(structure) {
+
+                    return structure.hits
+               })
+          }
+     },
      MEWT: {
           get() {
                if (this._MEWT) return this._MEWT
 
-               this._MEWT = [...this.droppedEnergy]
+               this._MEWT = [...this.droppedEnergy, ...this.find(FIND_TOMBSTONES)]
 
                if (this.source1Container) this._MEWT.push(this.source1Container)
                if (this.source2Container) this._MEWT.push(this.source2Container)
