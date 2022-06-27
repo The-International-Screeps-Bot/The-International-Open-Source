@@ -1940,11 +1940,20 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
 
      const target = findObjectWithID(reservation.targetID)
 
-     if (target instanceof Resource) {
-          target.reserveAmount -= reservation.amount
-     } else target.store[reservation.resourceType] -= reservation.amount
-
      this.message += '➕' + type[0]
+
+     if (target instanceof Resource) {
+          target.reserveAmount += reservation.amount
+          return
+     }
+
+     if (reservation.type === 'transfer') {
+
+          target.store[reservation.resourceType] += reservation.amount
+          return
+     }
+
+     target.store[reservation.resourceType] -= reservation.amount
 }
 
 Creep.prototype.reservationManager = function () {
@@ -1960,8 +1969,17 @@ Creep.prototype.reservationManager = function () {
           if (!target) this.memory.reservations.splice(index, 1)
 
           if (target instanceof Resource) {
-               target.reserveAmount -= reservation.amount
-          } else target.store[reservation.resourceType] -= reservation.amount
+               target.reserveAmount += reservation.amount
+               continue
+          }
+
+          if (reservation.type === 'transfer') {
+
+               target.store[reservation.resourceType] += reservation.amount
+               continue
+          }
+
+          target.store[reservation.resourceType] -= reservation.amount
      }
 }
 

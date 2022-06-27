@@ -17,7 +17,7 @@ Hauler.prototype.reserve = function () {
 
                return target.store.energy >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2
           })
-          this.say(targets.length.toString())
+          
           if (targets.length) {
                target = this.pos.findClosestByRange(targets)
 
@@ -35,7 +35,7 @@ Hauler.prototype.reserve = function () {
           if (targets.length) {
                target = this.pos.findClosestByRange(targets)
 
-               amount = Math.min(this.usedStore(), target.store.getFreeCapacity(RESOURCE_ENERGY))
+               amount = Math.min(this.usedStore(), target.freeSpecificStore(RESOURCE_ENERGY))
 
                this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
           }
