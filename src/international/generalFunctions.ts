@@ -279,7 +279,7 @@ export function findLargestTransactionAmount(budget: number, amount: number, roo
      budget = Math.max(budget, 1)
 
      // So long as the the transactions cost is more than the budget
-     console.log(budget, amount)
+     
      while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
           // Decrease amount exponentially
 

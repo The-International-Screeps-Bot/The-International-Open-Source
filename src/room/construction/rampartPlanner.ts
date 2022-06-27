@@ -452,14 +452,10 @@ export function rampartPlanner(room: Room) {
 
           const sink = 2 * 50 * 50 + 1
 
-          const count = graph.Calcmincut(source, sink)
-
-          if (verbose) console.log('Number of Tiles in Cut:', count)
-
           const positions: Pos[] = []
           const packedPositions: number[] = []
 
-          if (count > 0) {
+          if (graph.Calcmincut(source, sink) > 0) {
                const cut_edges = graph.Bfsthecut(source)
 
                // Get Positions from Edge
