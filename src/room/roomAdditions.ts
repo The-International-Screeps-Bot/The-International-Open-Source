@@ -322,8 +322,10 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.source1Container = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.source1Container = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -341,8 +343,10 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.source2Container = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.source2Container = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -359,8 +363,10 @@ Object.defineProperties(Room.prototype, {
                if (!this.anchor) return false
 
                for (const structure of this.lookForAt(LOOK_STRUCTURES, this.anchor.x - 2, this.anchor.y)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.fastFillerContainerLeft = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.fastFillerContainerLeft = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -377,8 +383,10 @@ Object.defineProperties(Room.prototype, {
                if (!this.anchor) return false
 
                for (const structure of this.lookForAt(LOOK_STRUCTURES, this.anchor.x + 2, this.anchor.y)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.fastFillerContainerRight = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.fastFillerContainerRight = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -396,8 +404,10 @@ Object.defineProperties(Room.prototype, {
                if (!centerUpgradePos) return false
 
                for (const structure of centerUpgradePos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.controllerContainer = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.controllerContainer = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -415,8 +425,10 @@ Object.defineProperties(Room.prototype, {
                if (!mineralHarvestPos) return false
 
                for (const structure of mineralHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.mineralContainer = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.mineralContainer = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -435,8 +447,10 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_LINK)
-                         return (this.global.source1Link = structure.id as Id<StructureLink>)
+                    if (structure.structureType !== STRUCTURE_LINK) continue
+
+                    this.global.source1Link = structure.id as Id<StructureLink>
+                    return structure
                }
 
                return false
@@ -455,8 +469,10 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_LINK)
-                         return (this.global.source2Link = structure.id as Id<StructureLink>)
+                    if (structure.structureType !== STRUCTURE_LINK) continue
+
+                    this.global.source2Link = structure.id as Id<StructureLink>
+                    return structure
                }
 
                return false
@@ -475,8 +491,10 @@ Object.defineProperties(Room.prototype, {
                if (!centerUpgradePos) return false
 
                for (const structure of centerUpgradePos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_LINK)
-                         return (this.global.controllerLink = structure.id as Id<StructureLink>)
+                    if (structure.structureType !== STRUCTURE_LINK) continue
+
+                    this.global.controllerLink = structure.id as Id<StructureLink>
+                    return structure
                }
 
                return false
@@ -493,8 +511,10 @@ Object.defineProperties(Room.prototype, {
                if (!this.anchor) return false
 
                for (const structure of this.anchor.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_LINK)
-                         return (this.global.fastFillerLink = structure.id as Id<StructureLink>)
+                    if (structure.structureType !== STRUCTURE_LINK) continue
+
+                    this.global.fastFillerLink = structure.id as Id<StructureLink>
+                    return structure
                }
 
                return false
@@ -540,11 +560,10 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._actionableWalls) return this._actionableWalls
 
-               return this._actionableWalls = this.structures.constructedWall.filter(function(structure) {
-
+               return (this._actionableWalls = this.structures.constructedWall.filter(function (structure) {
                     return structure.hits
-               })
-          }
+               }))
+          },
      },
      MEWT: {
           get() {
