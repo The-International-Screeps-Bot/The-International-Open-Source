@@ -35,9 +35,22 @@ Hauler.prototype.reserve = function () {
           if (transferTargets.length) {
                target = this.pos.findClosestByRange(transferTargets)
 
-               amount = Math.min(this.usedStore(), target.freeSpecificStore(RESOURCE_ENERGY))
+               amount = Math.min(this.usedStore(), target.freeStore(RESOURCE_ENERGY))
 
                this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
           }
+
+          transferTargets = room.OATT.filter((target) => {
+
+                return target.freeStore(RESOURCE_ENERGY) >= this.usedStore()
+          })
+
+          if (transferTargets.length) {
+            target = this.pos.findClosestByRange(transferTargets)
+
+            amount = this.usedStore()
+
+            this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
+       }
      }
 }

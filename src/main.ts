@@ -1194,9 +1194,9 @@ declare global {
 
           advancedPickup(target: Resource): boolean
 
-          advancedTransfer(target: any, resourceType?: ResourceConstant, amount?: number): boolean
+          advancedTransfer(target: Creep | AnyStoreStructure | Tombstone, resourceType?: ResourceConstant, amount?: number): boolean
 
-          advancedWithdraw(target: any, resourceType?: ResourceConstant, amount?: number): boolean
+          advancedWithdraw(target: Creep | AnyStoreStructure | Tombstone, resourceType?: ResourceConstant, amount?: number): boolean
 
           /**
            * Harvests a source and informs the result, while recording the result if successful

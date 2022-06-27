@@ -64,16 +64,12 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
 
      // Try to transfer, recording the result
 
-     const transferResult = this.transfer(target, resourceType, amount)
-
+     const transferResult = this.transfer(target as any, resourceType, amount)
+     this.message += transferResult
      // If the action can be considered a success
 
-     if (transferResult === OK || transferResult === ERR_FULL || transferResult === ERR_NOT_ENOUGH_RESOURCES) {
-          // Record that the creep has done the action and inform true
-
-          this.hasMovedResources = true
+     if (transferResult === OK || transferResult === ERR_FULL || transferResult === ERR_NOT_ENOUGH_RESOURCES)
           return true
-     }
 
      // Otherwise inform false
 
@@ -102,16 +98,11 @@ Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENE
 
      // Try to withdraw, recording the result
 
-     const withdrawResult = this.withdraw(target, resourceType, amount)
-
+     const withdrawResult = this.withdraw(target as any, resourceType, amount)
+     this.message += withdrawResult
      // If the action can be considered a success
 
-     if (withdrawResult === OK || withdrawResult === ERR_FULL) {
-          // Record that the creep has done the action and inform true
-
-          this.hasMovedResources = true
-          return true
-     }
+     if (withdrawResult === OK || withdrawResult === ERR_FULL) return true
 
      // Otherwise inform false
 
@@ -139,15 +130,10 @@ Creep.prototype.advancedPickup = function (target) {
      }
 
      const pickupResult = this.pickup(target)
-
+     this.message += pickupResult
      // Try to pickup. if the action can be considered a success
 
-     if (pickupResult === OK || pickupResult === ERR_FULL) {
-          // Record that the creep has done the action and inform true
-
-          this.hasMovedResources = true
-          return true
-     }
+     if (pickupResult === OK || pickupResult === ERR_FULL) return true
 
      // Otherwise inform false
 
@@ -222,8 +208,6 @@ Creep.prototype.advancedUpgradeController = function () {
 
           if (!this.memory.packedPos) return false
 
-          let say = ``
-
           const upgradePos = unpackAsRoomPos(this.memory.packedPos, room.name)
           const upgradePosRange = getRange(this.pos.x - upgradePos.x, this.pos.y - upgradePos.y)
 
@@ -240,7 +224,7 @@ Creep.prototype.advancedUpgradeController = function () {
                     },
                })
 
-               say += '➡️'
+               this.message += '➡️'
           }
 
           const workPartCount = this.parts.work
@@ -253,7 +237,7 @@ Creep.prototype.advancedUpgradeController = function () {
                     const controlPoints = workPartCount * UPGRADE_CONTROLLER_POWER
 
                     Memory.stats.controlPoints += controlPoints
-                    say += `🔋${controlPoints}`
+                    this.message += `🔋${controlPoints}`
                }
           }
 
@@ -285,7 +269,7 @@ Creep.prototype.advancedUpgradeController = function () {
                          // Add control points to total controlPoints counter and say the success
 
                          Memory.stats.energySpentOnRepairing += energySpentOnRepairs
-                         say += `🔧${energySpentOnRepairs * REPAIR_POWER}`
+                         this.message += `🔧${energySpentOnRepairs * REPAIR_POWER}`
                     }
                }
 
@@ -297,11 +281,11 @@ Creep.prototype.advancedUpgradeController = function () {
                     this.store.energy += Math.min(this.store.getCapacity(), controllerStructure.store.energy)
                     controllerStructure.store.energy -= this.store.energy
 
-                    say += `⚡`
+                    this.message += `⚡`
                }
           }
 
-          this.say(say)
+          this.say(this.message)
           return true
      }
 
@@ -1948,7 +1932,6 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
      }
 
      if (reservation.type === 'transfer') {
-
           target.store[reservation.resourceType] += reservation.amount
           return
      }
@@ -1974,7 +1957,6 @@ Creep.prototype.reservationManager = function () {
           }
 
           if (reservation.type === 'transfer') {
-
                target.store[reservation.resourceType] += reservation.amount
                continue
           }
