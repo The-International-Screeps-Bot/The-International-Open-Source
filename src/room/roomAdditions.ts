@@ -1,5 +1,5 @@
 import { allyList, constants } from 'international/constants'
-import { findObjectWithID, getRange, unpackAsRoomPos } from 'international/generalFunctions'
+import { customLog, findObjectWithID, getRange, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 
 Object.defineProperties(Room.prototype, {
      global: {
@@ -520,6 +520,30 @@ Object.defineProperties(Room.prototype, {
                return false
           },
      },
+     hubLink: {
+          get() {
+               if (this.global.hubLink) {
+                    const container = findObjectWithID(this.global.hubLink)
+
+                    if (container) return container
+               }
+
+               if (!this.memory.stampAnchors.hub) return false
+
+               let hubAnchor = unpackAsPos(this.memory.stampAnchors.hub[0])
+
+               for (const structure of new RoomPosition(hubAnchor.x - 1, hubAnchor.y - 1, this.name).lookFor(
+                    LOOK_STRUCTURES,
+               )) {
+                    if (structure.structureType !== STRUCTURE_LINK) continue
+
+                    this.global.hubLink = structure.id as Id<StructureLink>
+                    return structure
+               }
+
+               return false
+          },
+     },
      factory: {
           get() {
                if (this._factory) return this._factory
@@ -581,7 +605,13 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._OEWT) return this._OEWT
 
-               this._OEWT = [this.storage, this.terminal, this.factory, this.nuker, this.powerSpawn]
+               this._OEWT = []
+
+               if (this.storage) this._OEWT.push(this.storage)
+               if (this.terminal) this._OEWT.push(this.terminal)
+               if (this.factory) this._OEWT.push(this.factory)
+               if (this.nuker) this._OEWT.push(this.nuker)
+               if (this.powerSpawn) this._OEWT.push(this.powerSpawn)
 
                return this._OEWT
           },
@@ -613,6 +643,8 @@ Object.defineProperties(Room.prototype, {
                if (this.fastFillerContainerLeft) this._METT.push(this.fastFillerContainerLeft)
                if (this.fastFillerContainerRight) this._METT.push(this.fastFillerContainerRight)
 
+               if (this.controllerLink && !this.hubLink) this._METT.push(this.controllerLink)
+
                return this._METT
           },
      },
@@ -621,6 +653,9 @@ Object.defineProperties(Room.prototype, {
                if (this._OETT) return this._OETT
 
                this._OETT = []
+
+               if (this.storage) this._OETT.push(this.storage)
+               if (this.terminal) this._OETT.push(this.terminal)
 
                return this._OETT
           },
@@ -638,7 +673,7 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._OATT) return this._OATT
 
-               this._OATT = []
+               this._OATT = this.OETT
 
                return this._OATT
           },

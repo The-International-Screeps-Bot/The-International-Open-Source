@@ -579,6 +579,8 @@ declare global {
 
           fastFillerLink: Id<StructureLink> | undefined
 
+          hubLink: Id<StructureLink> | undefined
+
           //
 
           tasksWithResponders: Record<string | number, RoomTask>
@@ -944,6 +946,8 @@ declare global {
 
           readonly fastFillerLink: StructureLink | undefined
 
+          readonly hubLink: StructureLink | undefined
+
           _factory: StructureFactory | undefined
 
           readonly factory: StructureFactory | undefined
@@ -1141,20 +1145,9 @@ declare global {
            */
           moveRequest: number
 
-          /**
-           *
-           */
-          hasMoved: boolean
+          movedResource: boolean
 
-          hasMovedResources: boolean
-
-          hasWorked: boolean
-
-          hasAttacked: boolean
-
-          hasRangedAttacked: boolean
-
-          hasHealed: boolean
+          moved: boolean
 
           /**
            * Whether the creep is actively pulling another creep or not

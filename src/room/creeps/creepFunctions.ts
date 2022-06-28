@@ -44,6 +44,7 @@ Creep.prototype.isDying = function () {
 }
 
 Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENERGY, amount) {
+
      const { room } = this
 
      // If creep isn't in transfer range
@@ -62,14 +63,19 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
           return false
      }
 
+     if (this.movedResource) return false
+
      // Try to transfer, recording the result
 
      const transferResult = this.transfer(target as any, resourceType, amount)
      this.message += transferResult
+
      // If the action can be considered a success
 
-     if (transferResult === OK || transferResult === ERR_FULL || transferResult === ERR_NOT_ENOUGH_RESOURCES)
+     if (transferResult === OK || transferResult === ERR_FULL || transferResult === ERR_NOT_ENOUGH_RESOURCES) {
+          this.movedResource = true
           return true
+     }
 
      // Otherwise inform false
 
@@ -77,6 +83,7 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
 }
 
 Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENERGY, amount) {
+
      const { room } = this
 
      // If creep isn't in transfer range
@@ -96,13 +103,19 @@ Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENE
           return false
      }
 
+     if (this.movedResource) return false
+
      // Try to withdraw, recording the result
 
      const withdrawResult = this.withdraw(target as any, resourceType, amount)
      this.message += withdrawResult
+
      // If the action can be considered a success
 
-     if (withdrawResult === OK || withdrawResult === ERR_FULL) return true
+     if (withdrawResult === OK || withdrawResult === ERR_FULL) {
+          this.movedResource = true
+          return true
+     }
 
      // Otherwise inform false
 
@@ -110,6 +123,7 @@ Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENE
 }
 
 Creep.prototype.advancedPickup = function (target) {
+
      const { room } = this
 
      // If creep isn't in transfer range
@@ -129,11 +143,17 @@ Creep.prototype.advancedPickup = function (target) {
           return false
      }
 
+     if (this.movedResource) return false
+
      const pickupResult = this.pickup(target)
      this.message += pickupResult
+
      // Try to pickup. if the action can be considered a success
 
-     if (pickupResult === OK || pickupResult === ERR_FULL) return true
+     if (pickupResult === OK || pickupResult === ERR_FULL) {
+          this.movedResource = true
+          return true
+     }
 
      // Otherwise inform false
 
@@ -2011,10 +2031,8 @@ Creep.prototype.fulfillReservation = function () {
      // Transfer
 
      if (reservation.type === 'transfer') {
-
           target.store[reservation.resourceType] -= reservation.amount
 
-          room.visual.text(target.store[reservation.resourceType].toString(), target.pos)
           if (this.advancedTransfer(target, reservation.resourceType, amount)) {
                this.store[reservation.resourceType] -= amount
                target.store[reservation.resourceType] += amount
