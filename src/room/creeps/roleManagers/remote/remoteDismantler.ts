@@ -125,34 +125,14 @@ RemoteDismantler.prototype.advancedDismantle = function () {
           }
      }
 
-     if (room.actionableWalls.length) {
-          target = this.pos.findClosestByPath(room.actionableWalls, { ignoreRoads: true, ignoreCreeps: true })
+     let targets: Structure[] = room.actionableWalls
 
-          range = getRange(this.pos.x - target.pos.x, this.pos.y - target.pos.y)
-
-          if (range > 1) {
-               this.createMoveRequest({
-                    origin: this.pos,
-                    goal: {
-                         pos: target.pos,
-                         range: 1,
-                    },
-                    avoidEnemyRanges: true,
-               })
-
-               return true
-          }
-
-          this.dismantle(target)
-          return true
-     }
-
-     const enemyStructures = room.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
+     targets = targets.concat(room.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
           return structure.structureType != STRUCTURE_INVADER_CORE
-     })
+     }))
 
-     if (enemyStructures.length) {
-          target = this.pos.findClosestByPath(enemyStructures, { ignoreRoads: true, ignoreCreeps: true })
+     if (targets.length) {
+          target = this.pos.findClosestByPath(targets, { ignoreRoads: true, ignoreCreeps: true })
 
           range = getRange(this.pos.x - target.pos.x, this.pos.y - target.pos.y)
 
@@ -168,6 +148,8 @@ RemoteDismantler.prototype.advancedDismantle = function () {
 
                return true
           }
+
+          this.memory.dismantleTarget = target.id
 
           this.dismantle(target)
           return true
