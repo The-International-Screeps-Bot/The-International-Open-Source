@@ -4,7 +4,6 @@ import { constants } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import { controllerUpgraderManager } from './roleManagers/commune/controllerUpgraderManager'
 import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvesterManager'
-import { antifaManager } from './roleManagers/antifa/antifaManager'
 import { maintainerManager } from './roleManagers/commune/maintainerManager'
 import { builderManager } from './roleManagers/commune/builderManager'
 import { scoutManager } from './roleManagers/international/scoutManager'
@@ -23,6 +22,7 @@ import { sourceHarvesterManager } from './roleManagers/commune/sourceHarvesterMa
 import { remoteCoreAttackerManager } from './roleManagers/remote/remoteCoreAttacker'
 import { vanguardDefenderManager } from './roleManagers/international/vanguardDefender'
 import { remoteDismantlerManager } from './roleManagers/remote/remoteDismantler'
+import { antifaAssaulterManager } from './roleManagers/antifa/antifaAssaulter'
 
 // Construct managers
 
@@ -48,7 +48,8 @@ const managers: Record<CreepRoles, Function> = {
      claimer: claimerManager,
      vanguard: vanguardManager,
      vanguardDefender: vanguardDefenderManager,
-     antifa: antifaManager,
+     antifaAssaulter: antifaAssaulterManager,
+     antifaSupporter: () => {},
 }
 
 export function creepRoleManager(room: Room) {

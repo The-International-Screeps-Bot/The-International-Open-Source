@@ -1,7 +1,7 @@
 import { AntifaAssaulter } from "room/creeps/creepClasses";
 import { Quad } from "./quad";
 
-export function antifaAssaulter(room: Room, creepsOfRole: string[]) {
+export function antifaAssaulterManager(room: Room, creepsOfRole: string[]) {
     for (const creepName of creepsOfRole) {
          const creep: AntifaAssaulter = Game.creeps[creepName]
 
