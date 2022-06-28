@@ -1444,7 +1444,12 @@ declare global {
           /**
            * The target ID of the task
            */
-          taskTargetID: Id<Creep | AnyStoreStructure>
+           taskTargetID: Id<Creep | AnyStoreStructure | Tombstone>
+
+          /**
+           * The target ID of the task
+           */
+          taskTarget: Id<Creep | AnyStoreStructure | Tombstone>
 
           taskAmount: number
 
