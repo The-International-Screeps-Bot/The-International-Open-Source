@@ -168,7 +168,8 @@ constants.creepRoles = [
      'claimer',
      'vanguard',
      'vanguardDefender',
-     'antifa',
+     'antifaAssaulter',
+     'antifaSupporter'
 ]
 
 // Set of messages to randomly apply to commune rooms

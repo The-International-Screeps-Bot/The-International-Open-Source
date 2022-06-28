@@ -127,7 +127,8 @@ declare global {
           | 'claimer'
           | 'vanguard'
           | 'vanguardDefender'
-          | 'antifa'
+          | 'antifaAssaulter'
+          | 'antifaSupporter'
 
      type RoomObjectName =
           | 'terrainCM'

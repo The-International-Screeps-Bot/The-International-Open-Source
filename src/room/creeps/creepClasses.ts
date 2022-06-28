@@ -237,11 +237,18 @@ export class VanguardDefender extends Creep {
 }
 creepClasses.vanguardDefender = VanguardDefender
 
-export class Antifa extends Creep {
+export class AntifaAssaulter extends Creep {
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }
 }
-creepClasses.antifa = Antifa
+creepClasses.antifaAssaulter = AntifaAssaulter
+
+export class AntifaSupporter extends Creep {
+     constructor(creepID: Id<Creep>) {
+          super(creepID)
+     }
+}
+creepClasses.antifaSupporter = AntifaSupporter
 
 export { creepClasses }
