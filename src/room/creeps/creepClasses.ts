@@ -238,6 +238,12 @@ export class VanguardDefender extends Creep {
 creepClasses.vanguardDefender = VanguardDefender
 
 export class AntifaAssaulter extends Creep {
+
+     /**
+      * Tries to find a squad, creating one if none could be found
+      */
+     findSquad?(): boolean
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }

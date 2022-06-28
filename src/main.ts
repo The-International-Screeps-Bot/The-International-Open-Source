@@ -40,6 +40,9 @@ import {
 import { RoomCacheObject } from 'room/roomObject'
 import { ErrorMapper } from 'other/ErrorMapper'
 import { constants } from 'international/constants'
+import { Single } from 'room/creeps/roleManagers/antifa/single'
+import { Duo } from 'room/creeps/roleManagers/antifa/duo'
+import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 
 // Type declareations for global
 
@@ -1179,6 +1182,8 @@ declare global {
            * If the creep is expected to be empty next tick
            */
           estimatedEmpty: boolean
+
+          squad: Single | Duo | Quad
 
           // Functions
 
