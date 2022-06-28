@@ -195,7 +195,7 @@ export function containerManager(room: Room) {
           }
      }
 
-     fastFillerContainers()
+     // fastFillerContainers()
 
      function fastFillerContainers() {
           // Get the room's fastFillerContainers
