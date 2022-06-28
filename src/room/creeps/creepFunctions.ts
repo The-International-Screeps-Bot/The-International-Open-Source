@@ -44,7 +44,6 @@ Creep.prototype.isDying = function () {
 }
 
 Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENERGY, amount) {
-
      const { room } = this
 
      // If creep isn't in transfer range
@@ -83,7 +82,6 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
 }
 
 Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENERGY, amount) {
-
      const { room } = this
 
      // If creep isn't in transfer range
@@ -123,7 +121,6 @@ Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENE
 }
 
 Creep.prototype.advancedPickup = function (target) {
-
      const { room } = this
 
      // If creep isn't in transfer range
@@ -186,9 +183,8 @@ Creep.prototype.advancedUpgradeController = function () {
 
      // Assign either the controllerLink or controllerContainer as the controllerStructure
 
-     let controllerStructure: StructureLink | StructureContainer | undefined = room.get('controllerContainer')
-
-     if (!controllerStructure && room.get('hubLink')) controllerStructure = room.get('controllerLink')
+     const controllerStructure: StructureLink | StructureContainer | undefined =
+          room.controllerContainer || room.controllerLink
 
      // If there is a controllerContainer
 
