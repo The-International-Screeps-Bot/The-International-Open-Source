@@ -13,6 +13,7 @@ import {
      tradeBlacklist,
 } from './constants'
 import { InternationalManager } from './internationalManager'
+import { statsManager } from './statsManager'
 
 InternationalManager.prototype.config = function () {
      if (Memory.breakingVersion < breakingVersion) {
@@ -55,12 +56,7 @@ InternationalManager.prototype.config = function () {
 
           Memory.claimRequests = {}
           Memory.attackRequests = {}
-
-          //
-
-          Memory.stats = {}
-
-          Memory.stats.memoryLimit = 2097
+          statsManager.config()
      }
 
      if (!global.constructed) {

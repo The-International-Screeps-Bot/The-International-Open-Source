@@ -2,6 +2,7 @@ import { allyManager } from 'international/simpleAllies'
 import { customLog, getAvgPrice } from './generalFunctions'
 import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
 import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames } from './constants'
+import { statsManager, StatsManager } from './statsManager'
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
@@ -200,6 +201,7 @@ InternationalManager.prototype.run = function () {
      // Run prototypes
 
      this.config()
+     statsManager.config()
      this.tickConfig()
      this.creepOrganizer()
      this.taskManager()

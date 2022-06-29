@@ -2,53 +2,12 @@ import { allyManager } from 'international/simpleAllies'
 import { constants, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles, stamps } from './constants'
 import { createPackedPosMap, customLog, findCarryPartsRequired } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
+import { statsManager } from './statsManager'
 
 InternationalManager.prototype.tickConfig = function () {
-     // Memory
-
      // General
 
      Memory.communes = []
-
-     Memory.stats = {
-          lastReset: (Memory.stats?.lastReset || 0) + 1,
-          tickLength: Date.now() - (Memory.stats?.tickLength || Date.now()),
-          credits: Game.market.credits,
-          energy: 0,
-
-          boosts: {},
-
-          // CPU
-
-          cpuLimit: Game.cpu.limit,
-          cpuBucket: Game.cpu.bucket,
-
-          // Memory memory
-
-          memoryUsage: Math.floor(RawMemory.get().length / 1000),
-
-          //
-
-          GCLPercent: (Game.gcl.progress / Game.gcl.progressTotal) * 100,
-          totalGCL: Math.pow(Game.gcl.level - 1, 2.4) * 1000000 + Game.gcl.progress,
-          GCLLevel: Game.gcl.level,
-
-          GPLPercent: (Game.gpl.progress / Game.gpl.progressTotal) * 100,
-          totalGPL: Math.pow(Game.gpl.level - 1, 2) * 1000 + Game.gpl.progress,
-          GPLLevel: Game.gpl.level,
-
-          //
-
-          energyHarvested: 0,
-          mineralsHarvested: 0,
-
-          controlPoints: 0,
-
-          energySpentOnCreeps: 0,
-          energySpentOnConstruction: 0,
-          energySpentOnRepairing: 0,
-          energySpentOnBarricades: 0,
-     }
 
      // global
 
@@ -104,7 +63,6 @@ InternationalManager.prototype.tickConfig = function () {
           // Iterate if the controller is not mine
 
           if (!controller.my) {
-
                delete room.memory.type
                continue
           }
@@ -152,11 +110,9 @@ InternationalManager.prototype.tickConfig = function () {
      let claimTarget
 
      for (const roomName in Memory.claimRequests) {
-
           claimTarget = Memory.claimRequests[roomName]
 
           if (claimTarget.abadon > 0) {
-
                claimTarget.abadon -= 1
                continue
           }
