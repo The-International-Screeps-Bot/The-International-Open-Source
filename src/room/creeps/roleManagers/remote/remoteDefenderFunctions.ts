@@ -17,12 +17,14 @@ RemoteDefender.prototype.findRemote = function () {
 
      const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
 
+     let roomMemory
+
      // Loop through each remote name
 
      for (const roomName of remoteNamesByEfficacy) {
           // Get the remote's memory using its name
 
-          const roomMemory = Memory.rooms[roomName]
+          roomMemory = Memory.rooms[roomName]
 
           // If the needs of this remote are met, iterate
 
