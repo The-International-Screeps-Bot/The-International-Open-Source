@@ -112,6 +112,16 @@ creepClasses.source1RemoteHarvester = RemoteHarvester
 creepClasses.source2RemoteHarvester = RemoteHarvester
 
 export class RemoteHauler extends Creep {
+
+     /**
+      * Finds a remote to haul from
+      */
+     findRemote?(): boolean
+
+     reserveTransfer?(): void
+
+     reserveWithdraw?(): void
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }
@@ -119,6 +129,12 @@ export class RemoteHauler extends Creep {
 creepClasses.remoteHauler = RemoteHauler
 
 export class RemoteReserver extends Creep {
+
+     /**
+      * Finds a remote to reserve
+      */
+      findRemote?(): boolean
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }

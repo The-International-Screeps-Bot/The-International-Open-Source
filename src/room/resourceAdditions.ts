@@ -1,5 +1,5 @@
 Object.defineProperties(Resource.prototype, {
-     global: {
+     reserveAmount: {
           get() {
                if (this._reserveAmount) return this._reserveAmount
 

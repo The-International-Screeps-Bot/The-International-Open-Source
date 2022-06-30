@@ -1115,7 +1115,7 @@ Creep.prototype.runMoveRequest = function (packedPos) {
 
           // Record that the creep has moved this tick
 
-          this.hasMoved = true
+          this.moved = true
      }
 
      return moveResult
@@ -1160,7 +1160,7 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
 
      // If the creep has already acted on a moveRequest, stop
 
-     if (creepAtPos.hasMoved) return
+     if (creepAtPos.moved) return
 
      // Otherwise if creepAtPos is fatigued, stop
 
@@ -1965,7 +1965,11 @@ Creep.prototype.reservationManager = function () {
           reservation = this.memory.reservations[index]
           target = findObjectWithID(reservation.targetID)
 
-          if (!target) this.memory.reservations.splice(index, 1)
+          if (!target || target.room.name !== this.room.name) {
+
+               this.memory.reservations.splice(index, 1)
+               continue
+          }
 
           if (target instanceof Resource) {
                target.reserveAmount += reservation.amount

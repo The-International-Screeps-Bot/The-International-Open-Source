@@ -33,7 +33,7 @@ RemoteDefender.prototype.findRemote = function () {
           // Otherwise assign the remote to the creep and inform true
 
           creep.memory.remoteName = roomName
-          if (!creep.isDying()) roomMemory.needs[remoteNeedsIndex[role]] -= creep.strength
+          roomMemory.needs[remoteNeedsIndex[role]] -= creep.strength
 
           return true
      }

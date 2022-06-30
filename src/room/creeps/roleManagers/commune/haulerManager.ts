@@ -30,53 +30,5 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
           }
 
           if (creep.message.length) creep.say(creep.message)
-
-          /*
-          creep.advancedRenew()
-
-          // If creep has a task
-
-          if (global[creep.id]?.respondingTaskID) {
-               // Try to filfill task
-
-               const fulfillTaskResult = creep.fulfillTask()
-
-               // Iterate if the task wasn't fulfilled
-
-               if (!fulfillTaskResult) continue
-
-               // Otherwise find the task
-
-               const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
-
-               // Delete it
-
-               task.delete()
-          }
-
-          // Try to find a new task
-
-          const findTaskResult = creep.findTask(new Set(['transfer', 'withdraw', 'pull', 'pickup']))
-
-          // If a task wasn't found, iterate
-
-          if (!findTaskResult) continue
-
-          // Try to filfill task
-
-          const fulfillTaskResult = creep.fulfillTask()
-
-          // Iterate if the task wasn't fulfilled
-
-          if (!fulfillTaskResult) continue
-
-          // Otherwise find the task
-
-          const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
-
-          // Delete it
-
-          task.delete()
-           */
      }
 }
