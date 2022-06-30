@@ -35,13 +35,14 @@ export function roomManager() {
           // Get the room using the roomName
 
           const room = Game.rooms[roomName]
-          statsManager.roomPreTick(room)
+          const roomType = room.memory.type
+          statsManager.roomPreTick(room, roomType)
 
           taskManager(room)
 
           // If there is a specific manager for this room's type, run it
 
-          if (specificRoomManagers[room.memory.type]) specificRoomManagers[room.memory.type](room)
+          if (specificRoomManagers[roomType]) specificRoomManagers[roomType](room)
 
           droppedResourceManager(room)
 
@@ -67,7 +68,7 @@ export function roomManager() {
 
           if (Memory.cpuLogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
 
-          statsManager.roomEndTick(room)
+          statsManager.roomEndTick(room, roomType)
           customLog(room.name, logMessage, undefined, constants.colors.lightGrey)
      }
 

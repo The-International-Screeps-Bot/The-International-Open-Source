@@ -11,6 +11,7 @@ import {
      publicRamparts,
      roomVisuals,
      tradeBlacklist,
+     roomStats,
 } from './constants'
 import { InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
@@ -41,6 +42,7 @@ InternationalManager.prototype.config = function () {
           Memory.baseVisuals = baseVisuals
           Memory.mapVisuals = mapVisuals
           Memory.cpuLogging = cpuLogging
+          Memory.roomStats = roomStats
           Memory.allyList = allyList
           Memory.pixelSelling = pixelSelling
           Memory.pixelGeneration = pixelGeneration

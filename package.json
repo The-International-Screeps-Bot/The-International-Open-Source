@@ -18,7 +18,8 @@
           "watch-mmo": "rollup -cw --environment DEST:mmo",
           "watch-pserver": "rollup -cw --environment DEST:pserver",
           "watch-season": "rollup -cw --environment DEST:season",
-          "watch-sim": "rollup -cw --environment DEST:sim"
+          "watch-sim": "rollup -cw --environment DEST:sim",
+          "run-server": "npm run build && node server/index.js 100000"
      },
      "repository": {
           "type": "git",

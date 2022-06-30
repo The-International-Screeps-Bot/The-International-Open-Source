@@ -308,24 +308,18 @@ declare global {
      }
      interface RoomStats {
           controllerLevel?: number
-          energyInput: {
-               harvest: number
-               externalTransferred: number
-               bought: number
-          }
-          energyOutput: {
-               upgrade: number
-               repair: {
-                    other: number
-                    wallOrRampart: number
-               }
-               build: number
-               sold: number
-               spawn: number
-          }
+          energyInputHarvest: number
+          energyInputExternalTransferred: number
+          energyInputBought: number
+          energyOutputUpgrade: number
+          energyOutputRepairOther: number
+          energyOutputRepairWallOrRampart: number
+          energyOutputBuild: number
+          energyOutputSold: number
+          energyOutputSpawn: number
           mineralsHarvested: number
-          energyStored: number
-          creepCount: number
+          energyStored?: number
+          creepCount?: number
           cpuUsage: number
      }
 
@@ -358,7 +352,6 @@ declare global {
           gpl: ControllerLevel
           rooms: { [key: string]: RoomStats }
           constructionSiteCount: number
-          roomStatsCpuUsage: number
      }
 
      interface Memory {
@@ -396,6 +389,11 @@ declare global {
            * Wether the bot should log CPU data
            */
           cpuLogging: boolean
+
+          /**
+           * Wether the bot save RoomStats data
+           */
+          roomStats: boolean
 
           /**
            * A list of usernames to treat as allies
@@ -1528,4 +1526,10 @@ export const loop = function () {
      internationalManager.advancedSellPixels()
 
      internationalManager.endTickManager()
+     console.log('PRE: ', Memory.stats.roomStatsCpuUsage1)
+     console.log('END: ', Memory.stats.roomStatsCpuUsage2)
+     console.log(
+          `Total per room for ${Memory.stats.roomStatsRoomCount} rooms: `,
+          (Memory.stats.roomStatsCpuUsage1 + Memory.stats.roomStatsCpuUsage2) / Memory.stats.roomStatsRoomCount,
+     )
 }

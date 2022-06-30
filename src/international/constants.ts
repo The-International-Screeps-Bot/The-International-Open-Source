@@ -28,6 +28,11 @@ export const cpuLogging = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
+export const roomStats = false
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
 export const allyList = new Set(['MarvinTMB', 'Q13214', 'HerrKai', 'clarkok', 'PandaMaster', 'lokenwow', 'Morningtea'])
 
 /**
