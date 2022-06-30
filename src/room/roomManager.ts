@@ -14,6 +14,7 @@ import { roomVisualsManager } from './roomVisualsManager'
 import { containerManager } from './containerManager'
 import { customLog } from 'international/generalFunctions'
 import { droppedResourceManager } from './droppedResourceManager'
+import { statsManager } from 'international/statsManager'
 
 const specificRoomManagers: { [key: string]: Function } = {
      commune: communeManager,
@@ -34,6 +35,7 @@ export function roomManager() {
           // Get the room using the roomName
 
           const room = Game.rooms[roomName]
+          statsManager.roomPreTick(room)
 
           taskManager(room)
 
@@ -65,6 +67,7 @@ export function roomManager() {
 
           if (Memory.cpuLogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
 
+          statsManager.roomEndTick(room)
           customLog(room.name, logMessage, undefined, constants.colors.lightGrey)
      }
 

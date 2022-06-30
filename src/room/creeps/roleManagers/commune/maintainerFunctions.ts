@@ -96,10 +96,11 @@ Maintainer.prototype.advancedMaintain = function () {
      const energySpentOnRepairs = Math.min(workPartCount, (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER)
 
      if (repairTarget.structureType === STRUCTURE_RAMPART) {
-          Memory.stats.energySpentOnBarricades += energySpentOnRepairs
+          if (global.roomStats[this.room.name])
+               global.roomStats[this.room.name].energyOutput.repair.wallOrRampart += energySpentOnRepairs
           creep.say(`🧱${energySpentOnRepairs * REPAIR_POWER}`)
      } else {
-          Memory.stats.energySpentOnRepairing += energySpentOnRepairs
+          global.roomStats[this.room.name].energyOutput.repair.other += energySpentOnRepairs
           creep.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
      }
 

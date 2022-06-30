@@ -8,6 +8,7 @@ InternationalManager.prototype.tickConfig = function () {
      // General
 
      Memory.communes = []
+     statsManager.internationalPreTick()
 
      // global
 
@@ -80,8 +81,6 @@ InternationalManager.prototype.tickConfig = function () {
           // Add roomName to commune list
 
           Memory.communes.push(roomName)
-
-          Memory.stats.energy += room.findStoredResourceAmount(RESOURCE_ENERGY)
 
           room.creepsFromRoom = {}
 

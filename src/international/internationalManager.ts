@@ -201,7 +201,7 @@ InternationalManager.prototype.run = function () {
      // Run prototypes
 
      this.config()
-     statsManager.config()
+     statsManager.internationalConfig()
      this.tickConfig()
      this.creepOrganizer()
      this.taskManager()

@@ -56,7 +56,7 @@ InternationalManager.prototype.config = function () {
 
           Memory.claimRequests = {}
           Memory.attackRequests = {}
-          statsManager.config()
+          statsManager.internationalConfig()
      }
 
      if (!global.constructed) {

@@ -145,6 +145,7 @@ constants.roomTypes = {
           portalsTo: true,
      },
 }
+constants.roomTypesUsedForStats = ['commune', 'remote']
 
 constants.creepRoles = [
      'source1Harvester',

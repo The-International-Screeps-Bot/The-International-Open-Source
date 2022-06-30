@@ -307,10 +307,10 @@ declare global {
           progressTotal: number
      }
      interface RoomStats {
-          controller: ControllerLevel
+          controllerLevel?: number
           energyInput: {
                harvest: number
-               transferred: number
+               externalTransferred: number
                bought: number
           }
           energyOutput: {
@@ -321,16 +321,11 @@ declare global {
                }
                build: number
                sold: number
+               spawn: number
           }
-          energyStored: {
-               storage: number
-               terminal: number
-               links: number
-               containers: number
-          }
-          cpuUsagePerRole: { [key: string]: number }
-          creepCountPerRole: { [key: string]: number }
-          cpuUsageDetailedInRoom: { [key: string]: number }
+          mineralsHarvested: number
+          energyStored: number
+          creepCount: number
           cpuUsage: number
      }
 
@@ -363,6 +358,7 @@ declare global {
           gpl: ControllerLevel
           rooms: { [key: string]: RoomStats }
           constructionSiteCount: number
+          roomStatsCpuUsage: number
      }
 
      interface Memory {
