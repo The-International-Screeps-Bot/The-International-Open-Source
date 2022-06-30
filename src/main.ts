@@ -1526,10 +1526,4 @@ export const loop = function () {
      internationalManager.advancedSellPixels()
 
      internationalManager.endTickManager()
-     console.log('PRE: ', Memory.stats.roomStatsCpuUsage1)
-     console.log('END: ', Memory.stats.roomStatsCpuUsage2)
-     console.log(
-          `Total per room for ${Memory.stats.roomStatsRoomCount} rooms: `,
-          (Memory.stats.roomStatsCpuUsage1 + Memory.stats.roomStatsCpuUsage2) / Memory.stats.roomStatsRoomCount,
-     )
 }

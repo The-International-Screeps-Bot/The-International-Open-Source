@@ -164,10 +164,6 @@ StatsManager.prototype.internationalEndTick = function () {
           level: Game.gpl.level,
      }
      global.roomStats = {}
-
-     Memory.stats.roomStatsCpuUsage1 = this.average(Memory.stats.roomStatsCpuUsage1, global.roomStatsCpuUsage1, 100)
-     Memory.stats.roomStatsCpuUsage2 = this.average(Memory.stats.roomStatsCpuUsage2, global.roomStatsCpuUsage2, 100)
-     Memory.stats.roomStatsRoomCount = this.average(Memory.stats.roomStatsRoomCount, global.roomStatsRoomCount, 100)
 }
 StatsManager.prototype.average = function (
      originalNumber: number,
