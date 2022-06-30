@@ -1,8 +1,8 @@
 import { constants } from './constants'
 export class StatsManager {
      roomConfig?(roomName: string, roomController?: StructureController): void
-     roomPreTick?(room: Room, roomType: string): void
-     roomEndTick?(room: Room, roomType: string): void
+     roomPreTick?(roomName: string, roomType: string): void
+     roomEndTick?(roomName: string, room: Room, roomType: string): void
      internationalConfig?(): void
      internationalPreTick?(): void
      internationalEndTick?(): void
@@ -27,20 +27,20 @@ StatsManager.prototype.roomConfig = function (roomName: string) {
      global.roomStats[roomName] = roomStats
      if (Memory.stats.rooms[roomName] === undefined) Memory.stats.rooms[roomName] = roomStats
 }
-StatsManager.prototype.roomPreTick = function (room: Room, roomType: string) {
+StatsManager.prototype.roomPreTick = function (roomName: string, roomType: string) {
      if (!Memory.roomStats) return
 
      if (!constants.roomTypesUsedForStats.includes(roomType)) {
-          delete Memory.stats.rooms[room.name]
-          delete global.roomStats[room.name]
+          delete Memory.stats.rooms[roomName]
+          delete global.roomStats[roomName]
           return
      }
-     this.roomConfig(room.name)
+     this.roomConfig(roomName)
 
-     const globalStats = global.roomStats[room.name]
+     const globalStats = global.roomStats[roomName]
      globalStats.cpuUsage = Game.cpu.getUsed()
 }
-StatsManager.prototype.roomEndTick = function (room: Room, roomType: string) {
+StatsManager.prototype.roomEndTick = function (roomName: string, room: Room, roomType: string) {
      if (!Memory.roomStats) return
 
      if (!constants.roomTypesUsedForStats.includes(roomType)) {
@@ -49,13 +49,17 @@ StatsManager.prototype.roomEndTick = function (room: Room, roomType: string) {
           return
      }
      if (Memory.stats.rooms[room.name] === undefined || global.roomStats[room.name] === undefined) return
-     const roomStats = Memory.stats.rooms[room.name]
-     const globalStats = global.roomStats[room.name]
+     const roomStats = Memory.stats.rooms[roomName]
+     const globalStats = global.roomStats[roomName]
 
      if (Game.time % 100 === 0) {
           roomStats.controllerLevel =
                room.controller && room.controller.owner && room.controller.owner.username === Memory.me
-                    ? room.controller.level + room.controller.progress / room.controller.progressTotal
+                    ? parseFloat(
+                           (room.controller.level + room.controller.progress / room.controller.progressTotal).toFixed(
+                                2,
+                           ),
+                      )
                     : undefined
           roomStats.energyStored = this.average(
                roomStats.energyStored,
