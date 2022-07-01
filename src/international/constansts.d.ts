@@ -61,4 +61,5 @@ interface Constants {
      }
 
      styleForStructureTypes: { [key: string]: CircleStyle }
+     roomTypesUsedForStats: string[]
 }

@@ -209,7 +209,7 @@ SourceHarvester.prototype.repairSourceContainer = function (sourceContainer) {
 
           // Add control points to total controlPoints counter and say the success
 
-          Memory.stats.energySpentOnRepairing += energySpentOnRepairs
+          if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eoro += energySpentOnRepairs
           creep.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
 
           // Inform success

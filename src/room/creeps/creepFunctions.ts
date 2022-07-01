@@ -169,7 +169,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
      // Find amount of energy harvested and record it in data
 
      const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
-     Memory.stats.energyHarvested += energyHarvested
+     if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eih += energyHarvested
 
      this.say(`⛏️${energyHarvested}`)
 
@@ -252,7 +252,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
                     const controlPoints = workPartCount * UPGRADE_CONTROLLER_POWER
 
-                    Memory.stats.controlPoints += controlPoints
+                    if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eou += controlPoints
                     this.message += `🔋${controlPoints}`
                }
           }
@@ -284,8 +284,9 @@ Creep.prototype.advancedUpgradeController = function () {
 
                          // Add control points to total controlPoints counter and say the success
 
-                         Memory.stats.energySpentOnRepairing += energySpentOnRepairs
-                         this.message += `🔧${energySpentOnRepairs * REPAIR_POWER}`
+                         if (global.roomStats[this.room.name])
+                              global.roomStats[this.room.name].eoro += energySpentOnRepairs
+                         this.message  += `🔧${energySpentOnRepairs * REPAIR_POWER}`
                     }
                }
 
@@ -364,7 +365,7 @@ Creep.prototype.advancedUpgradeController = function () {
      if (this.upgradeController(room.controller) === OK) {
           // Add control points to total controlPoints counter and say the success
 
-          Memory.stats.controlPoints += this.parts.work
+          if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eou += this.parts.work
           this.say(`🔋${this.parts.work}`)
 
           // Inform true
@@ -425,10 +426,12 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
           // Add control points to total controlPoints counter and say the success
 
-          Memory.stats.energySpentOnConstruction += Math.min(
-               this.parts.work * BUILD_POWER,
-               (cSite.progressTotal - cSite.progress) * BUILD_POWER,
-          )
+          if (global.roomStats[this.room.name])
+               global.roomStats[this.room.name].eob += Math.min(
+                    this.parts.work * BUILD_POWER,
+                    (cSite.progressTotal - cSite.progress) * BUILD_POWER,
+               )
+
           this.say(`🚧${energySpentOnConstruction}`)
 
           // Inform true

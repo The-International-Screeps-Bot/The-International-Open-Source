@@ -75,7 +75,7 @@ export function spawnManager(room: Room) {
 
           room.energyAvailable -= spawnRequest.cost
 
-          Memory.stats.energySpentOnCreeps += spawnRequest.cost
+          if (global.roomStats[room.name]) global.roomStats[room.name].eosp += spawnRequest.cost
 
           // Decrease the spawnIndex
 

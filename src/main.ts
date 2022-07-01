@@ -310,105 +310,67 @@ declare global {
           abadon?: number
      }
 
+     interface ControllerLevel {
+          level: number
+          progress: number
+          progressTotal: number
+     }
+     interface RoomStats {
+          cl?: number // controllerLevel
+          eih: number // energyInputHarvest
+          eiet?: number // energyInputExternalTransferred
+          eib?: number // energyInputBought
+          eou?: number // energyOutputUpgrade
+          eoro: number // energyOutputRepairOther
+          eorwr?: number // energyOutputRepairWallOrRampart
+          eob: number // energyOutputBuild
+          eoso?: number // energyOutputSold
+          eosp?: number // energyOutputSpawn
+          mh?: number // mineralsHarvested
+          es: number // energyStored
+          cc: number // creepCount
+          cu: number // cpuUsage
+     }
+
      interface Stats {
           lastReset: number
 
+          lastTickTimestamp: number
           tickLength: number
 
-          communes: number
+          communeCount: number
 
-          credits: number
+          resources: {
+               pixels: number
+               cpuUnlocks: number
+               accessKeys: number
+               credits: number
+          }
 
-          /**
-           * The amount of energy in storages and terminals in owned rooms
-           */
-          energy: number
+          cpu: {
+               bucket: number
+               usage: number
+          }
 
-          /**
-           * An object of boosts representing the amount of each boost in storages and terminals in owned rooms
-           */
-          boosts: { [key: string]: MineralBoostConstant }
+          memory: {
+               usage: number
+               limit: number
+          }
 
-          /**
-           * The total amount of CPU used
-           */
-          cpuUsage: number
+          gcl: ControllerLevel
 
-          /**
-           * The amount of CPU generated per tick
-           */
-          cpuLimit: number
-
-          /**
-           * The amount of CPU left in the bucket
-           */
-          cpuBucket: number
-
-          /**
-           * The amount of memory used by the bot
-           */
-          memorUsage: number
-
-          /**
-           * The maximum memory the bot can use
-           */
-          memoryLimit: number
-
-          /**
-           * The amount of memory used by the bot
-           */
-          memoryUsage: number
-
-          /**
-           * The percent to the next GCL level
-           */
-          GCLPercent: number
-
-          /**
-           * The total amount of GCL
-           */
-          totalGCL: number
-
-          GCLLevel: number
-
-          /**
-           * The percent to the next PCL level
-           */
-          GPLPercent: number
-
-          /**
-           * The total amount of PCL
-           */
-          totalGPL: number
-
-          GPLLevel: number
-
-          /**
-           * The total number of creeps the bot owns
-           */
-          creeps: number
-
-          /**
-           * The total number of powerCreeps the bot owns
-           */
-          powerCreepCount: number
-
-          /**
-           * The total amount of energy harvested by the bot per tick
-           */
-          energyHarvested: number
-
-          mineralsHarvested: number
-
-          controlPoints: number
-
-          energySpentOnCreeps: number
-
-          energySpentOnConstruction: number
-
-          energySpentOnRepairing: number
-
-          energySpentOnBarricades: number
+          gpl: ControllerLevel
+          rooms: { [key: string]: RoomStats }
+          constructionSiteCount: number
+          debugCpu11: number
+          debugCpu12: number
+          debugCpu21: number
+          debugCpu22: number
+          debugCpu31: number
+          debugCpu32: number
+          debugRoomCount1: number
+          debugRoomCount2: number
+          debugRoomCount3: number
      }
 
      interface Memory {
@@ -446,6 +408,11 @@ declare global {
            * Wether the bot should log CPU data
            */
           cpuLogging: boolean
+
+          /**
+           * Wether the bot save RoomStats data
+           */
+          roomStats: 0 | 1 | 2
 
           /**
            * A list of usernames to treat as allies
@@ -1543,6 +1510,7 @@ declare global {
                packedRoomNames: { [roomManager: string]: string }
 
                unpackedRoomNames: { [key: string]: string }
+               roomStats: { [key: string]: RoomStats }
 
                // Command functions
 
@@ -1596,4 +1564,26 @@ export const loop = function () {
      internationalManager.advancedSellPixels()
 
      internationalManager.endTickManager()
+     console.log('Stats cpu logging')
+     console.log(
+          `Non stats room count: ${Memory.stats.debugRoomCount1} - Pre: ${Memory.stats.debugCpu11} - End: ${
+               Memory.stats.debugCpu12
+          } - Per room: ${((Memory.stats.debugCpu11 + Memory.stats.debugCpu12) / Memory.stats.debugRoomCount1).toFixed(
+               4,
+          )}`,
+     )
+     console.log(
+          `Commune stats room count: ${Memory.stats.debugRoomCount2} - Pre: ${Memory.stats.debugCpu21} - End: ${
+               Memory.stats.debugCpu22
+          } - Per room: ${((Memory.stats.debugCpu21 + Memory.stats.debugCpu22) / Memory.stats.debugRoomCount2).toFixed(
+               4,
+          )}`,
+     )
+     console.log(
+          `Remote stats room count: ${Memory.stats.debugRoomCount3} - Pre: ${Memory.stats.debugCpu31} - End: ${
+               Memory.stats.debugCpu32
+          } - Per room: ${((Memory.stats.debugCpu31 + Memory.stats.debugCpu32) / Memory.stats.debugRoomCount3).toFixed(
+               4,
+          )}`,
+     )
 }

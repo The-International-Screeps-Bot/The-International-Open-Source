@@ -2,9 +2,13 @@ import { constants } from 'international/constants'
 import { customLog, findCPUColor } from 'international/generalFunctions'
 import { allyManager } from 'international/simpleAllies'
 import { InternationalManager } from './internationalManager'
+import { statsManager } from './statsManager'
 
 InternationalManager.prototype.endTickManager = function () {
      allyManager.endTickManager()
+     statsManager.internationalEndTick()
+
+     if (!Memory.isMainShard) return
 
      const CPU = Game.cpu.getUsed()
 
@@ -12,22 +16,12 @@ InternationalManager.prototype.endTickManager = function () {
 
      const CPUColor = findCPUColor(CPU)
 
-     // Stats recording
-
-     Memory.stats.communes = Memory.communes.length
-
-     Memory.stats.cpuUsage = Game.cpu.getUsed()
-
-     // customLog the CPU used
-
      customLog(
           'Total CPU',
           `${CPU.toFixed(2)} / ${Game.cpu.limit} CPU Bucket: ${Game.cpu.bucket}`,
           constants.colors.white,
           CPUColor,
      )
-
-     if (!Memory.isMainShard) return
 
      // Fill up the console with empty logs
 

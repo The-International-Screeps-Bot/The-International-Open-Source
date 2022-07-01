@@ -82,8 +82,4 @@ InternationalManager.prototype.creepOrganizer = function () {
 
           commune.creepsFromRoomAmount += 1
      }
-
-     // Record number of creeps
-
-     Memory.stats.creeps = totalCreepCount
 }

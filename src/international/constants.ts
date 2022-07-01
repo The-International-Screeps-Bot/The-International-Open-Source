@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 27
+export const breakingVersion = 28
 
 // Settings
 
@@ -24,6 +24,11 @@ export const mapVisuals = false
  * Default value, do not change. Modify this property in Memory instead
  */
 export const cpuLogging = false
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const roomStats: 0 | 1 | 2 = 0
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -145,6 +150,7 @@ constants.roomTypes = {
           portalsTo: true,
      },
 }
+constants.roomTypesUsedForStats = ['commune', 'remote']
 
 constants.creepRoles = [
      'source1Harvester',

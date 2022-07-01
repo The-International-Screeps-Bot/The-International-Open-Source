@@ -11,8 +11,10 @@ import {
      publicRamparts,
      roomVisuals,
      tradeBlacklist,
+     roomStats,
 } from './constants'
 import { InternationalManager } from './internationalManager'
+import { statsManager } from './statsManager'
 
 InternationalManager.prototype.config = function () {
      if (Memory.breakingVersion < breakingVersion) {
@@ -41,6 +43,7 @@ InternationalManager.prototype.config = function () {
           Memory.baseVisuals = baseVisuals
           Memory.mapVisuals = mapVisuals
           Memory.cpuLogging = cpuLogging
+          Memory.roomStats = roomStats
           Memory.allyList = allyList
           Memory.pixelSelling = pixelSelling
           Memory.pixelGeneration = pixelGeneration
@@ -56,12 +59,7 @@ InternationalManager.prototype.config = function () {
 
           Memory.claimRequests = {}
           Memory.attackRequests = {}
-
-          //
-
-          Memory.stats = {}
-
-          Memory.stats.memoryLimit = 2097
+          statsManager.internationalConfig()
      }
 
      if (!global.constructed) {
