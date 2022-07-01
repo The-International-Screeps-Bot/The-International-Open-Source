@@ -111,6 +111,7 @@ export class StatsManager {
           Memory.stats = {
                lastReset: 0,
                tickLength: 0,
+               lastTickTimestamp: 0,
                communeCount: 0,
                resources: {
                     pixels: 0,
@@ -167,8 +168,10 @@ export class StatsManager {
      }
 
      internationalEndTick() {
-          Memory.stats.lastReset = (Memory.stats?.lastReset || 0) + 1
-          Memory.stats.tickLength = Date.now() - (Memory.stats?.tickLength || Date.now())
+          Memory.stats.lastReset = (Memory.stats.lastReset || 0) + 1
+          const timestamp = Date.now()
+          Memory.stats.tickLength = timestamp - Memory.stats.lastTickTimestamp
+          Memory.stats.lastTickTimestamp = timestamp
           Memory.stats.constructionSiteCount = global.constructionSitesCount
           Memory.stats.communeCount = Object.keys(Game.rooms).length
 
@@ -196,6 +199,7 @@ export class StatsManager {
           }
 
           if (global.debugCpu21) {
+               console.log(Memory.stats.debugRoomCount2)
                Memory.stats.debugCpu11 = this.average(Memory.stats.debugCpu11, global.debugCpu11, 10)
                Memory.stats.debugCpu12 = this.average(Memory.stats.debugCpu12, global.debugCpu12, 10)
                Memory.stats.debugCpu21 = this.average(Memory.stats.debugCpu21, global.debugCpu21, 10)

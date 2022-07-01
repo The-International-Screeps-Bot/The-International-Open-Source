@@ -326,6 +326,7 @@ declare global {
      interface Stats {
           lastReset: number
 
+          lastTickTimestamp: number
           tickLength: number
 
           communeCount: number
