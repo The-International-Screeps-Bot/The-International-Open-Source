@@ -28,7 +28,7 @@ export const cpuLogging = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const roomStats = true
+export const roomStats: 0 | 1 | 2 = 0
 
 /**
  * Default value, do not change. Modify this property in Memory instead

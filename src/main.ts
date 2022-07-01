@@ -318,7 +318,7 @@ declare global {
           eoso?: number // energyOutputSold
           eosp?: number // energyOutputSpawn
           mh?: number // mineralsHarvested
-          es: number //energyStored
+          es: number // energyStored
           cc: number // creepCount
           cu: number // cpuUsage
      }
@@ -402,7 +402,7 @@ declare global {
           /**
            * Wether the bot save RoomStats data
            */
-          roomStats: boolean
+          roomStats: 0 | 1 | 2
 
           /**
            * A list of usernames to treat as allies

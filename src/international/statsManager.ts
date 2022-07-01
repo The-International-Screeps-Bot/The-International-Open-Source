@@ -1,4 +1,4 @@
-import { constants } from './constants'
+import { constants, roomStats as roomStatsLevel } from './constants'
 export class StatsManager {
      roomConfig(roomName: string, roomType: string) {
           if (roomType === 'commune') {
@@ -68,30 +68,38 @@ export class StatsManager {
           const globalStats = global.roomStats[roomName]
 
           if (Game.time % 250 === 0 && room) {
-               if (roomType === 'commune') {
+               if (Game.time % 1000 === 0 && roomType === 'commune') {
                     roomStats.cl =
                          room.controller && room.controller.owner && room.controller.owner.username === Memory.me
-                              ? room.controller.level + room.controller.progress / room.controller.progressTotal
+                              ? parseFloat(
+                                     (
+                                          room.controller.level +
+                                          room.controller.progress / room.controller.progressTotal
+                                     ).toFixed(2),
+                                )
                               : undefined
+                    roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY)
                }
-               roomStats.es = this.average(roomStats.es, room.findStoredResourceAmount(RESOURCE_ENERGY), 10)
-               roomStats.cc = this.average(roomStats.cc, room.myCreepsAmount, 1000, 0)
+               roomStats.cc = this.average(roomStats.cc, room.myCreepsAmount, 1000)
           }
-          roomStats.cu = this.average(roomStats.cu, Game.cpu.getUsed() - globalStats.cu, 1000)
-          roomStats.mh = this.average(roomStats.mh, globalStats.mh, 10000)
+          if (roomStatsLevel === 2) {
+               roomStats.mh = this.average(roomStats.mh, globalStats.mh, 10000)
+               if (roomType === 'commune') {
+                    // roomStats.eib = this.average(roomStats.eib, globalStats.eib, 1000)
+                    // roomStats.eoso = this.average(roomStats.eoso, globalStats.eoso, 1000)
 
-          if (roomType === 'commune') {
-               roomStats.eib = this.average(roomStats.eib, globalStats.eib, 1000)
-               roomStats.eiet = this.average(roomStats.eiet, globalStats.eiet, 1000)
-               roomStats.eou = this.average(roomStats.eou, globalStats.eou, 1000)
-               roomStats.eorwr = this.average(roomStats.eorwr, globalStats.eorwr, 1000)
-               roomStats.eoso = this.average(roomStats.eoso, globalStats.eoso, 1000)
-               roomStats.eosp = this.average(roomStats.eosp, globalStats.eosp, 1000)
+                    // roomStats.eiet = this.average(roomStats.eiet, globalStats.eiet, 1000)
+                    roomStats.eou = parseFloat(this.average(roomStats.eou, globalStats.eou, 1000).toFixed(2))
+                    roomStats.eorwr = parseFloat(this.average(roomStats.eorwr, globalStats.eorwr, 1000).toFixed(2))
+                    roomStats.eosp = parseFloat(this.average(roomStats.eosp, globalStats.eosp, 1000).toFixed(2))
+               }
+               roomStats.eih = parseFloat(this.average(roomStats.eih, globalStats.eih, 1000).toFixed(2))
+
+               roomStats.eob = parseFloat(this.average(roomStats.eob, globalStats.eob, 1000).toFixed(2))
+               roomStats.eoro = parseFloat(this.average(roomStats.eoro, globalStats.eoro, 1000).toFixed(2))
           }
-          roomStats.eih = this.average(roomStats.eih, globalStats.eih, 1000)
 
-          roomStats.eob = this.average(roomStats.eob, globalStats.eob, 1000)
-          roomStats.eoro = this.average(roomStats.eoro, globalStats.eoro, 1000)
+          roomStats.cu = parseFloat(this.average(roomStats.cu, Game.cpu.getUsed() - globalStats.cu, 1000).toFixed(2))
           if (roomType === 'commune') {
                global.debugCpu22 += Game.cpu.getUsed() - cpu
           } else {
@@ -188,15 +196,15 @@ export class StatsManager {
           }
 
           if (global.debugCpu21) {
-               Memory.stats.debugCpu11 = this.average(Memory.stats.debugCpu11, global.debugCpu11, 100, 10)
-               Memory.stats.debugCpu12 = this.average(Memory.stats.debugCpu12, global.debugCpu12, 100, 10)
-               Memory.stats.debugCpu21 = this.average(Memory.stats.debugCpu21, global.debugCpu21, 100, 10)
-               Memory.stats.debugCpu22 = this.average(Memory.stats.debugCpu22, global.debugCpu22, 100, 10)
-               Memory.stats.debugCpu31 = this.average(Memory.stats.debugCpu31, global.debugCpu31, 100, 10)
-               Memory.stats.debugCpu32 = this.average(Memory.stats.debugCpu32, global.debugCpu32, 100, 10)
-               Memory.stats.debugRoomCount1 = this.average(Memory.stats.debugRoomCount1, global.debugRoomCount1, 100)
-               Memory.stats.debugRoomCount2 = this.average(Memory.stats.debugRoomCount2, global.debugRoomCount2, 100)
-               Memory.stats.debugRoomCount3 = this.average(Memory.stats.debugRoomCount3, global.debugRoomCount3, 100)
+               Memory.stats.debugCpu11 = this.average(Memory.stats.debugCpu11, global.debugCpu11, 10)
+               Memory.stats.debugCpu12 = this.average(Memory.stats.debugCpu12, global.debugCpu12, 10)
+               Memory.stats.debugCpu21 = this.average(Memory.stats.debugCpu21, global.debugCpu21, 10)
+               Memory.stats.debugCpu22 = this.average(Memory.stats.debugCpu22, global.debugCpu22, 10)
+               Memory.stats.debugCpu31 = this.average(Memory.stats.debugCpu31, global.debugCpu31, 10)
+               Memory.stats.debugCpu32 = this.average(Memory.stats.debugCpu32, global.debugCpu32, 10)
+               Memory.stats.debugRoomCount1 = this.average(Memory.stats.debugRoomCount1, global.debugRoomCount1, 10)
+               Memory.stats.debugRoomCount2 = this.average(Memory.stats.debugRoomCount2, global.debugRoomCount2, 10)
+               Memory.stats.debugRoomCount3 = this.average(Memory.stats.debugRoomCount3, global.debugRoomCount3, 10)
           }
 
           const globalRoomKeys = Object.keys(global.roomStats)
@@ -213,11 +221,12 @@ export class StatsManager {
           })
      }
 
-     average(originalNumber: number, newNumber: number, averagedOverTickCount: number, roundDigits: number = 3) {
+     average(originalNumber: number, newNumber: number, averagedOverTickCount: number, roundDigits: number = 5) {
+          // if (averagedOverTickCount !== 10) return newNumber
           const newWeight = 1 / averagedOverTickCount
           const originalWeight = 1 - newWeight
 
-          return parseFloat((originalNumber * originalWeight + newNumber * newWeight).toFixed(10))
+          return originalNumber * originalWeight + newNumber * newWeight
      }
 }
 

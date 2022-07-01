@@ -36,7 +36,7 @@ export function roomManager() {
 
           const room = Game.rooms[roomName]
           const roomType = room.memory.type
-          const saveStats = Memory.roomStats && constants.roomTypesUsedForStats.includes(roomType)
+          const saveStats = Memory.roomStats > 0 && constants.roomTypesUsedForStats.includes(roomType)
           if (saveStats) statsManager.roomPreTick(room.name, roomType)
 
           taskManager(room)
