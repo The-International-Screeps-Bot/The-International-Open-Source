@@ -36,7 +36,8 @@ export function roomManager() {
 
           const room = Game.rooms[roomName]
           const roomType = room.memory.type
-          statsManager.roomPreTick(room.name, roomType)
+          const saveStats = Memory.roomStats && constants.roomTypesUsedForStats.includes(roomType)
+          if (saveStats) statsManager.roomPreTick(room.name, roomType)
 
           taskManager(room)
 
@@ -68,7 +69,7 @@ export function roomManager() {
 
           if (Memory.cpuLogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
 
-          statsManager.roomEndTick(room.name, roomType, room)
+          if (saveStats) statsManager.roomEndTick(room.name, roomType, room)
           customLog(room.name, logMessage, undefined, constants.colors.lightGrey)
      }
 
