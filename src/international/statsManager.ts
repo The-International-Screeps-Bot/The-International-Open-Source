@@ -82,7 +82,7 @@ export class StatsManager {
                }
                roomStats.cc = this.average(roomStats.cc, room.myCreepsAmount, 1000)
           }
-          if (roomStatsLevel === 2) {
+          if (roomStatsLevel >= 2) {
                roomStats.mh = this.average(roomStats.mh, globalStats.mh, 10000)
                if (roomType === 'commune') {
                     // roomStats.eib = this.average(roomStats.eib, globalStats.eib, 1000)
