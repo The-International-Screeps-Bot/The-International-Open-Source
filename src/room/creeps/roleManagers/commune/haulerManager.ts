@@ -13,63 +13,22 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
           creep.advancedRenew()
 
-          if (creep.memory.reservations && creep.memory.reservations.length) {
+          if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserve()
 
-               if (!creep.fulfillReservation()) continue
+          if (!creep.fulfillReservation()) {
+
+               creep.say(creep.message)
+               continue
           }
 
           creep.reserve()
 
-          if (!creep.fulfillReservation()) continue
+          if (!creep.fulfillReservation()) {
 
-          creep.reserve()
-
-          /*
-          creep.advancedRenew()
-
-          // If creep has a task
-
-          if (global[creep.id]?.respondingTaskID) {
-               // Try to filfill task
-
-               const fulfillTaskResult = creep.fulfillTask()
-
-               // Iterate if the task wasn't fulfilled
-
-               if (!fulfillTaskResult) continue
-
-               // Otherwise find the task
-
-               const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
-
-               // Delete it
-
-               task.delete()
+               creep.say(creep.message)
+               continue
           }
 
-          // Try to find a new task
-
-          const findTaskResult = creep.findTask(new Set(['transfer', 'withdraw', 'pull', 'pickup']))
-
-          // If a task wasn't found, iterate
-
-          if (!findTaskResult) continue
-
-          // Try to filfill task
-
-          const fulfillTaskResult = creep.fulfillTask()
-
-          // Iterate if the task wasn't fulfilled
-
-          if (!fulfillTaskResult) continue
-
-          // Otherwise find the task
-
-          const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
-
-          // Delete it
-
-          task.delete()
-           */
+          if (creep.message.length) creep.say(creep.message)
      }
 }

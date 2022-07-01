@@ -85,7 +85,7 @@ export function spawnRequester(room: Room) {
                     }
                }
 
-               if (room.get(`${sourceName}Container`)) {
+               if (room[`${sourceName}Container`]) {
                     return {
                          defaultParts: [MOVE],
                          extraParts: [WORK],
@@ -173,7 +173,7 @@ export function spawnRequester(room: Room) {
                     }
                }
 
-               if (room.get(`${sourceName}Container`)) {
+               if (room[`${sourceName}Container`]) {
                     return {
                          defaultParts: [MOVE],
                          extraParts: [WORK],
@@ -217,17 +217,17 @@ export function spawnRequester(room: Room) {
 
                // If there is no source1Link, increase requiredCarryParts using the source's path length
 
-               if (!room.get('source1Link'))
+               if (!room.source1Link)
                     requiredCarryParts += findCarryPartsRequired(room.source1PathLength * 2, 10)
 
                // If there is no source2Link, increase requiredCarryParts using the source's path length
 
-               if (!room.get('source2Link'))
+               if (!room.source2Link)
                     requiredCarryParts += findCarryPartsRequired(room.source2PathLength * 2, 10)
 
                // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
-               if (room.get('controllerContainer') && !room.get('controllerLink'))
+               if (room.controllerContainer)
                     requiredCarryParts += findCarryPartsRequired(
                          room.upgradePathLength * 2,
                          room.getPartsOfRoleAmount('controllerUpgrader', WORK),
@@ -486,20 +486,13 @@ export function spawnRequester(room: Room) {
           (function (): SpawnRequestOpts | false {
                const priority = 7 + room.creepsFromRoom.maintainer.length
 
-               // Get roads
-
-               const roads: (StructureRoad | StructureContainer)[] = room.get('road')
-               // Get containers
-
-               const containers: StructureContainer[] = room.get('container')
                // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
-               const repairTargets = roads
-                    .concat(containers)
+               const repairTargets = [...room.structures.road, ...room.structures.container]
                     .filter(structure => structure.hitsMax * 0.2 >= structure.hits)
                // Get ramparts below their max hits
 
-               const ramparts = (room.get('rampart') as StructureRampart[]).filter(
+               const ramparts = room.structures.rampart.filter(
                     rampart => rampart.hits < rampart.hitsMax,
                )
 
@@ -513,11 +506,11 @@ export function spawnRequester(room: Room) {
 
                // For each road, add a multiplier
 
-               partsMultiplier += roads.length * 0.015
+               partsMultiplier += room.structures.road.length * 0.015
 
                // For each container, add a multiplier
 
-               partsMultiplier += containers.length * 0.3
+               partsMultiplier += room.structures.container.length * 0.3
 
                // For each rampart, add a multiplier
 
@@ -578,15 +571,15 @@ export function spawnRequester(room: Room) {
 
                // Get the controllerLink and baseLink
 
-               const controllerLink: StructureLink | undefined = room.get('controllerLink')
+               const controllerLink = room.controllerLink
 
                // If the controllerLink is defined
 
                if (controllerLink) {
                     maxCreeps -= 1
 
-                    const hubLink: StructureLink | undefined = room.get('hubLink')
-                    const sourceLinks: StructureLink[] = [room.get('source1Link'), room.get('source2Link')]
+                    const hubLink = room.hubLink
+                    const sourceLinks = [room.source1Link, room.source2Link]
 
                     partsMultiplier = 0
 

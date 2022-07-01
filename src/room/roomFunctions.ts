@@ -1111,15 +1111,6 @@ Room.prototype.get = function (roomObjectName) {
           return filteredSpawnStructures
      }
 
-     new RoomCacheObject({
-          name: 'structuresForSpawning',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor: findStructuresForSpawning,
-     })
-
      // Creeps
 
      new RoomCacheObject({
@@ -2638,12 +2629,11 @@ Room.prototype.createWithdrawTasks = function (creator) {
 }
 
 Room.prototype.estimateIncome = function () {
-     const room = this
 
-     const harvesterNames = room.creepsFromRoom.source1Harvester
-          .concat(room.creepsFromRoom.source2Harvester)
-          .concat(room.creepsFromRoom.source1RemoteHarvester)
-          .concat(room.creepsFromRoom.source2RemoteHarvester)
+     const harvesterNames = this.creepsFromRoom.source1Harvester
+          .concat(this.creepsFromRoom.source2Harvester)
+          .concat(this.creepsFromRoom.source1RemoteHarvester)
+          .concat(this.creepsFromRoom.source2RemoteHarvester)
 
      // Construct income starting at 0
 
@@ -2665,7 +2655,6 @@ Room.prototype.estimateIncome = function () {
 }
 
 Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
-     const room = this
 
      // Construct positions
 
@@ -2681,7 +2670,7 @@ Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
 
                // Otherwise ass the x and y to positions
 
-               positions.push(new RoomPosition(x, y, room.name))
+               positions.push(new RoomPosition(x, y, this.name))
           }
      }
 
@@ -2691,18 +2680,18 @@ Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
 }
 
 Room.prototype.getPartsOfRoleAmount = function (role, type) {
-     const room = this
 
      // Intilaize the partsAmount
 
      let partsAmount = 0
+     let creep
 
      // Loop through every creepName in the creepsFromRoom of the specified role
 
-     for (const creepName of room.creepsFromRoom[role]) {
+     for (const creepName of this.creepsFromRoom[role]) {
           // Get the creep using creepName
 
-          const creep = Game.creeps[creepName]
+          creep = Game.creeps[creepName]
 
           // If there is no specified type
 
@@ -2724,7 +2713,6 @@ Room.prototype.getPartsOfRoleAmount = function (role, type) {
 }
 
 Room.prototype.findSourcesByEfficacy = function () {
-     const room = this
 
      // Get the room's sourceNames
 
@@ -2732,7 +2720,7 @@ Room.prototype.findSourcesByEfficacy = function () {
 
      // Sort sourceNames based on their efficacy, informing the result
 
-     return sourceNames.sort((a, b) => room.global[a] - room.global[b])
+     return sourceNames.sort((a, b) => this.global[a] - this.global[b])
 }
 
 Room.prototype.createClaimRequest = function () {
@@ -2752,11 +2740,15 @@ Room.prototype.createClaimRequest = function () {
 
      const closestClaimTypeName = findClosestClaimType(this.name)
      const closestCommuneRange = Game.map.getRoomLinearDistance(closestClaimTypeName, this.name)
-     const preference = Math.abs(prefferedCommuneRange - closestCommuneRange)
 
-     score += preference
+     score += Math.abs(prefferedCommuneRange - closestCommuneRange)
 
-     score += this.findSwampPlainsRatio() * 12
+     score += this.source1PathLength / 10
+     score += this.source2PathLength / 10
+
+     score += this.upgradePathLength / 10
+
+     score += this.findSwampPlainsRatio() * 10
 
      Memory.claimRequests[this.name] = {
           needs: [1, 20, 0],
@@ -2767,7 +2759,7 @@ Room.prototype.createClaimRequest = function () {
 }
 
 Room.prototype.findSwampPlainsRatio = function () {
-     const terrainAmounts: number[] = [0, 0, 0]
+     const terrainAmounts = [0, 0, 0]
 
      const terrain = this.getTerrain()
 

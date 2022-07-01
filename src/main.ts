@@ -17,14 +17,14 @@ import './international/endTickManager'
 
 import './room/remotesManager'
 import { roomManager } from 'room/roomManager'
-import './room/roomGetters'
+import './room/roomAdditions'
 
-import './room/Resource'
+import './room/resourceAdditions'
 import './room/roomObjectFunctions'
 
 // Creep
 
-import './room/creeps/creepGetters'
+import './room/creeps/creepAdditions'
 
 // Other
 
@@ -40,6 +40,9 @@ import {
 import { RoomCacheObject } from 'room/roomObject'
 import { ErrorMapper } from 'other/ErrorMapper'
 import { constants } from 'international/constants'
+import { Single } from 'room/creeps/roleManagers/antifa/single'
+import { Duo } from 'room/creeps/roleManagers/antifa/duo'
+import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 
 // Type declareations for global
 
@@ -127,7 +130,8 @@ declare global {
           | 'claimer'
           | 'vanguard'
           | 'vanguardDefender'
-          | 'antifa'
+          | 'antifaAssaulter'
+          | 'antifaSupporter'
 
      type RoomObjectName =
           | 'terrainCM'
@@ -170,7 +174,6 @@ declare global {
           | 'usedSourceHarvestPositions'
           | 'usedUpgradePositions'
           | 'usedFastFillerPositions'
-          | 'structuresForSpawning'
           | 'notMyCreeps'
           | 'enemyCreeps'
           | 'allyCreeps'
@@ -297,7 +300,13 @@ declare global {
 
      interface ClaimRequest {
           needs: number[]
+          /**
+           * The weight for which to prefer this room, where higher values are prefered less
+           */
           score: number
+          /**
+           * The number of ticks to abandon the claimRequest for
+           */
           abadon?: number
      }
 
@@ -535,6 +544,8 @@ declare global {
           controllerLink: Id<StructureLink> | undefined
 
           fastFillerLink: Id<StructureLink> | undefined
+
+          hubLink: Id<StructureLink> | undefined
 
           //
 
@@ -857,13 +868,17 @@ declare global {
 
           readonly spawningStructures: SpawningStructures
 
-          _taskNeedingSpawningStructures: SpawningStructures
-
-          readonly taskNeedingSpawningStructures: SpawningStructures
-
           _spawningStructuresByPriority: SpawningStructures
 
           readonly spawningStructuresByPriority: SpawningStructures
+
+          _spawningStructuresByNeed: SpawningStructures
+
+          readonly spawningStructuresByNeed: SpawningStructures
+
+          _taskNeedingSpawningStructures: SpawningStructures
+
+          readonly taskNeedingSpawningStructures: SpawningStructures
 
           readonly sourceHarvestPositions: SourceHarvestPositions
 
@@ -901,6 +916,8 @@ declare global {
 
           readonly fastFillerLink: StructureLink | undefined
 
+          readonly hubLink: StructureLink | undefined
+
           _factory: StructureFactory | undefined
 
           readonly factory: StructureFactory | undefined
@@ -916,6 +933,10 @@ declare global {
           _droppedEnergy: Resource[]
 
           readonly droppedEnergy: Resource[]
+
+          _actionableWalls: StructureWall[]
+
+          readonly actionableWalls: StructureWall[]
 
           _MEWT: (AnyStoreStructure | Tombstone | Resource)[]
 
@@ -952,12 +973,26 @@ declare global {
            */
           readonly METT: (AnyStoreStructure | Tombstone)[]
 
+          _OETT: (AnyStoreStructure | Tombstone)[]
+
+          /**
+           * Optional energy transfer targets
+           */
+          readonly OETT: (AnyStoreStructure | Tombstone)[]
+
           _MATT: (AnyStoreStructure | Tombstone)[]
 
           /**
            * Mandatory all transfer targets
            */
           readonly MATT: (AnyStoreStructure | Tombstone)[]
+
+          _OATT: (AnyStoreStructure | Tombstone)[]
+
+          /**
+           * Optional all transfer targets
+           */
+          readonly OATT: (AnyStoreStructure | Tombstone)[]
      }
 
      interface DepositRecord {
@@ -1080,20 +1115,9 @@ declare global {
            */
           moveRequest: number
 
-          /**
-           *
-           */
-          hasMoved: boolean
+          movedResource: boolean
 
-          hasMovedResources: boolean
-
-          hasWorked: boolean
-
-          hasAttacked: boolean
-
-          hasRangedAttacked: boolean
-
-          hasHealed: boolean
+          moved: boolean
 
           /**
            * Whether the creep is actively pulling another creep or not
@@ -1122,6 +1146,8 @@ declare global {
            */
           estimatedEmpty: boolean
 
+          squad: Single | Duo | Quad
+
           // Functions
 
           preTickManager(): void
@@ -1143,9 +1169,9 @@ declare global {
 
           advancedPickup(target: Resource): boolean
 
-          advancedTransfer(target: any, resourceType?: ResourceConstant, amount?: number): boolean
+          advancedTransfer(target: Creep | AnyStoreStructure | Tombstone, resourceType?: ResourceConstant, amount?: number): boolean
 
-          advancedWithdraw(target: any, resourceType?: ResourceConstant, amount?: number): boolean
+          advancedWithdraw(target: Creep | AnyStoreStructure | Tombstone, resourceType?: ResourceConstant, amount?: number): boolean
 
           /**
            * Harvests a source and informs the result, while recording the result if successful
@@ -1307,6 +1333,13 @@ declare global {
           _towerDamage: number
 
           readonly towerDamage: number
+
+          _message: string
+
+          /**
+           * The cumulative message to present in say()
+           */
+          message: string
      }
 
      interface CreepMemory {
@@ -1374,13 +1407,20 @@ declare global {
           /**
            * The target ID of the task
            */
-          taskTargetID: Id<Creep | AnyStoreStructure>
+           taskTargetID: Id<Creep | AnyStoreStructure | Tombstone>
+
+          /**
+           * The target ID of the task
+           */
+          taskTarget: Id<Creep | AnyStoreStructure | Tombstone>
 
           taskAmount: number
 
           taskResource: ResourceConstant
 
           reservations: Reservation[]
+
+          dismantleTarget: Id<Structure>
      }
 
      // PowerCreeps

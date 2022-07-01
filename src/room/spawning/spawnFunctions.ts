@@ -1,4 +1,4 @@
-import { newID } from 'international/generalFunctions'
+import { customLog, newID } from 'international/generalFunctions'
 
 StructureSpawn.prototype.advancedSpawn = function (spawnRequest) {
      // Attempt to spawn using the values in the spawnRequest
@@ -61,7 +61,7 @@ Room.prototype.createSpawnRequest = function (priority, body, tier, cost, memory
           cost,
           extraOpts: {
                memory,
-               energyStructures: this.get('structuresForSpawning'),
+               energyStructures: this.spawningStructuresByPriority,
                dryRun: true,
           },
      }
@@ -84,6 +84,8 @@ Room.prototype.spawnRequestIndividually = function (opts) {
           let tier = 0
           let cost = 0
 
+          let partCost
+
           // If there are defaultParts
 
           if (opts.defaultParts.length) {
@@ -96,7 +98,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
                for (const part of opts.defaultParts) {
                     // Get the cost of the part
 
-                    const partCost = BODYPART_COST[part]
+                    partCost = BODYPART_COST[part]
 
                     // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, stop the loop
 
@@ -155,14 +157,16 @@ Room.prototype.spawnRequestIndividually = function (opts) {
                if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
                     // So long as partIndex is above 0
 
+                    let part
+
                     while (partIndex > 0) {
                          // Get the part using the partIndex
 
-                         const part = opts.extraParts[partIndex]
+                         part = opts.extraParts[partIndex]
 
                          // Get the cost of the part
 
-                         const partCost = BODYPART_COST[part]
+                         partCost = BODYPART_COST[part]
 
                          // If the cost minus partCost is below minCost, stop the loop
 
@@ -243,6 +247,8 @@ Room.prototype.spawnRequestByGroup = function (opts) {
           let tier = 0
           let cost = 0
 
+          let partCost
+
           // Construct from totalExtraParts at a max of 50, at equal to extraOpts's length
 
           let remainingAllowedParts = maxPartsPerCreep
@@ -259,7 +265,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
                for (const part of opts.defaultParts) {
                     // Get the cost of the part
 
-                    const partCost = BODYPART_COST[part]
+                    partCost = BODYPART_COST[part]
 
                     // And add the partCost to the cost
 
@@ -299,6 +305,10 @@ Room.prototype.spawnRequestByGroup = function (opts) {
           // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
 
           if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
+
+
+               let part
+
                // Assign partIndex as the length of extraParts
 
                let partIndex = opts.extraParts.length - 1
@@ -308,11 +318,11 @@ Room.prototype.spawnRequestByGroup = function (opts) {
                while (partIndex >= 0) {
                     // Get the part using the partIndex
 
-                    const part = opts.extraParts[partIndex]
+                    part = opts.extraParts[partIndex]
 
                     // Get the cost of the part
 
-                    const partCost = BODYPART_COST[part]
+                    partCost = BODYPART_COST[part]
 
                     // If the cost minus partCost is below minCost, stop the loop
 

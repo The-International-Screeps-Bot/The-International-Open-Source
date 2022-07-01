@@ -1,5 +1,5 @@
 import { allyList, constants } from 'international/constants'
-import { findObjectWithID, getRange, unpackAsRoomPos } from 'international/generalFunctions'
+import { customLog, findObjectWithID, getRange, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 
 Object.defineProperties(Room.prototype, {
      global: {
@@ -136,118 +136,64 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._spawningStructures) return this._spawningStructures
 
-               return (this._spawningStructures = this.get('spawn').concat(this.get('extension')))
-          },
-     },
-     taskNeedingSpawningStructures: {
-          get() {
-               if (this._taskNeedingSpawningStructures) return this._taskNeedingSpawningStructures
+               if (!this.anchor) return []
 
-               this._taskNeedingSpawningStructures = []
-
-               let structuresAtPos
-
-               for (const pos of this.global.stampAnchors.extensions) {
-                    structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
-
-                    for (const structure of structuresAtPos) {
-                         if (
-                              structure.structureType !== STRUCTURE_SPAWN &&
-                              structure.structureType !== STRUCTURE_EXTENSION
-                         )
-                              continue
-
-                         this._taskNeedingSpawningStructures.push(structure as StructureSpawn | StructureExtension)
-                         break
-                    }
-               }
-
-               for (const pos of this.global.stampAnchors.extension) {
-                    structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
-
-                    for (const structure of structuresAtPos) {
-                         if (
-                              structure.structureType !== STRUCTURE_SPAWN &&
-                              structure.structureType !== STRUCTURE_EXTENSION
-                         )
-                              continue
-
-                         this._taskNeedingSpawningStructures.push(structure as StructureSpawn | StructureExtension)
-                         break
-                    }
-               }
-
-               return this._taskNeedingSpawningStructures
+               return (this._spawningStructures = [...this.structures.spawn, ...this.structures.extension])
           },
      },
      spawningStructuresByPriority: {
           get() {
                if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
 
-               this._spawningStructuresByPriority = []
+               // Sort based on lowest range from the anchor
 
-               // Fastfiller
+               return (this._spawningStructuresByPriority = this.spawningStructures.sort(
+                    (a, b) =>
+                         getRange(a.pos.x - this.anchor.x, a.pos.y - this.anchor.y) -
+                         getRange(b.pos.x - this.anchor.x, b.pos.y - this.anchor.y),
+               ))
+          },
+     },
+     spawningStructuresByNeed: {
+          get() {
+               if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
 
-               const adjacentStructures = this.lookForAtArea(
-                    LOOK_STRUCTURES,
-                    this.anchor.y - 2,
-                    this.anchor.x - 2,
-                    this.anchor.y + 2,
-                    this.anchor.x + 2,
-                    true,
-               )
-
-               let structureType
-
-               for (const adjacentPosData of adjacentStructures) {
-                    structureType = adjacentPosData.structure.structureType
-
-                    if (structureType !== STRUCTURE_SPAWN && structureType !== STRUCTURE_EXTENSION) continue
-
-                    this.spawningStructuresByPriority.push(
-                         adjacentPosData.structure as StructureSpawn | StructureExtension,
-                    )
-               }
+               this._spawningStructuresByNeed = this.spawningStructures
 
                const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+
+               let closestHarvestPos: RoomPosition
+
+               // loop through sourceNames
 
                for (const sourceName of sourceNames) {
                     // Get the closestHarvestPos using the sourceName, iterating if undefined
 
-                    const closestHarvestPos: RoomPosition | undefined = this.get(`${sourceName}ClosestHarvestPos`)
+                    closestHarvestPos = this.get(`${sourceName}ClosestHarvestPos`)
+
                     if (!closestHarvestPos) continue
 
-                    // Harvest extensions
+                    // Assign structuresForSpawning that are not in range of 1 to the closestHarvestPos
 
-                    const adjacentStructures = this.lookForAtArea(
-                         LOOK_STRUCTURES,
-                         closestHarvestPos.y - 1,
-                         closestHarvestPos.x - 1,
-                         closestHarvestPos.y + 1,
-                         closestHarvestPos.x + 1,
-                         true,
+                    this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
+                         structure =>
+                              getRange(structure.pos.x - closestHarvestPos.x, structure.pos.y - closestHarvestPos.y) >
+                              1,
                     )
-
-                    for (const adjacentPosData of adjacentStructures) {
-                         const { structureType } = adjacentPosData.structure
-
-                         if (structureType !== STRUCTURE_SPAWN && structureType !== STRUCTURE_EXTENSION) continue
-
-                         this.spawningStructuresByPriority.push(
-                              adjacentPosData.structure as StructureSpawn | StructureExtension,
-                         )
-                    }
                }
 
-               // Assign taskNeedingSpawningStructures by lowest range from the anchor
+               if (
+                    this.anchor &&
+                    this.myCreeps.fastFiller.length &&
+                    ((this.fastFillerLink && this.hubLink && this.storage) ||
+                         (this.fastFillerContainerLeft && this.fastFillerContainerRight))
+               ) {
+                    this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
+                         structure => getRange(structure.pos.x - this.anchor.x, structure.pos.y - this.anchor.y) > 2,
+                    )
+               }
 
-               return this._spawningStructuresByPriority.concat(
-                    this.taskNeedingSpawningStructures.sort(
-                         (a, b) =>
-                              getRange(a.pos.x - this.anchor.x, a.pos.y - this.anchor.y) -
-                              getRange(b.pos.x - this.anchor.x, b.pos.y - this.anchor.y),
-                    ),
-               )
+               return this._spawningStructuresByNeed
           },
      },
      sourceHarvestPositions: {
@@ -322,8 +268,10 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.source1Container = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.source1Container = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -341,8 +289,10 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.source2Container = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.source2Container = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -359,8 +309,10 @@ Object.defineProperties(Room.prototype, {
                if (!this.anchor) return false
 
                for (const structure of this.lookForAt(LOOK_STRUCTURES, this.anchor.x - 2, this.anchor.y)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.fastFillerContainerLeft = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.fastFillerContainerLeft = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -377,8 +329,10 @@ Object.defineProperties(Room.prototype, {
                if (!this.anchor) return false
 
                for (const structure of this.lookForAt(LOOK_STRUCTURES, this.anchor.x + 2, this.anchor.y)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.fastFillerContainerRight = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.fastFillerContainerRight = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -396,8 +350,10 @@ Object.defineProperties(Room.prototype, {
                if (!centerUpgradePos) return false
 
                for (const structure of centerUpgradePos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.controllerContainer = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.controllerContainer = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -415,8 +371,10 @@ Object.defineProperties(Room.prototype, {
                if (!mineralHarvestPos) return false
 
                for (const structure of mineralHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_CONTAINER)
-                         return (this.global.mineralContainer = structure.id as Id<StructureContainer>)
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+
+                    this.global.mineralContainer = structure.id as Id<StructureContainer>
+                    return structure
                }
 
                return false
@@ -435,8 +393,10 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_LINK)
-                         return (this.global.source1Link = structure.id as Id<StructureLink>)
+                    if (structure.structureType !== STRUCTURE_LINK) continue
+
+                    this.global.source1Link = structure.id as Id<StructureLink>
+                    return structure
                }
 
                return false
@@ -455,8 +415,10 @@ Object.defineProperties(Room.prototype, {
                if (!closestHarvestPos) return false
 
                for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_LINK)
-                         return (this.global.source2Link = structure.id as Id<StructureLink>)
+                    if (structure.structureType !== STRUCTURE_LINK) continue
+
+                    this.global.source2Link = structure.id as Id<StructureLink>
+                    return structure
                }
 
                return false
@@ -475,8 +437,10 @@ Object.defineProperties(Room.prototype, {
                if (!centerUpgradePos) return false
 
                for (const structure of centerUpgradePos.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_LINK)
-                         return (this.global.controllerLink = structure.id as Id<StructureLink>)
+                    if (structure.structureType !== STRUCTURE_LINK) continue
+
+                    this.global.controllerLink = structure.id as Id<StructureLink>
+                    return structure
                }
 
                return false
@@ -493,8 +457,34 @@ Object.defineProperties(Room.prototype, {
                if (!this.anchor) return false
 
                for (const structure of this.anchor.lookFor(LOOK_STRUCTURES)) {
-                    if (structure.structureType === STRUCTURE_LINK)
-                         return (this.global.fastFillerLink = structure.id as Id<StructureLink>)
+                    if (structure.structureType !== STRUCTURE_LINK) continue
+
+                    this.global.fastFillerLink = structure.id as Id<StructureLink>
+                    return structure
+               }
+
+               return false
+          },
+     },
+     hubLink: {
+          get() {
+               if (this.global.hubLink) {
+                    const container = findObjectWithID(this.global.hubLink)
+
+                    if (container) return container
+               }
+
+               if (!this.memory.stampAnchors.hub) return false
+
+               let hubAnchor = unpackAsPos(this.memory.stampAnchors.hub[0])
+
+               for (const structure of new RoomPosition(hubAnchor.x - 1, hubAnchor.y - 1, this.name).lookFor(
+                    LOOK_STRUCTURES,
+               )) {
+                    if (structure.structureType !== STRUCTURE_LINK) continue
+
+                    this.global.hubLink = structure.id as Id<StructureLink>
+                    return structure
                }
 
                return false
@@ -536,11 +526,20 @@ Object.defineProperties(Room.prototype, {
                }))
           },
      },
+     actionableWalls: {
+          get() {
+               if (this._actionableWalls) return this._actionableWalls
+
+               return (this._actionableWalls = this.structures.constructedWall.filter(function (structure) {
+                    return structure.hits
+               }))
+          },
+     },
      MEWT: {
           get() {
                if (this._MEWT) return this._MEWT
 
-               this._MEWT = [...this.droppedEnergy]
+               this._MEWT = [...this.droppedEnergy, ...this.find(FIND_TOMBSTONES)]
 
                if (this.source1Container) this._MEWT.push(this.source1Container)
                if (this.source2Container) this._MEWT.push(this.source2Container)
@@ -552,7 +551,13 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._OEWT) return this._OEWT
 
-               this._OEWT = [this.storage, this.terminal, this.factory, this.nuker, this.powerSpawn]
+               this._OEWT = []
+
+               if (this.storage) this._OEWT.push(this.storage)
+               if (this.terminal) this._OEWT.push(this.terminal)
+               if (this.factory) this._OEWT.push(this.factory)
+               if (this.nuker) this._OEWT.push(this.nuker)
+               if (this.powerSpawn) this._OEWT.push(this.powerSpawn)
 
                return this._OEWT
           },
@@ -579,12 +584,26 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._METT) return this._METT
 
-               this._METT = [...this.structures.spawn, ...this.structures.extension, ...this.structures.tower]
+               this._METT = [...this.spawningStructuresByNeed, ...this.structures.tower]
 
-               if (this.fastFillerContainerLeft) this._METT.push(this.fastFillerContainerLeft)
-               if (this.fastFillerContainerRight) this._METT.push(this.fastFillerContainerRight)
+               if (this.fastFillerContainerLeft && this.fastFillerContainerLeft.store.energy <= this.fastFillerContainerLeft.store.getCapacity(RESOURCE_ENERGY) * 0.5) this._METT.push(this.fastFillerContainerLeft)
+               if (this.fastFillerContainerRight && this.fastFillerContainerRight.store.energy <= this.fastFillerContainerRight.store.getCapacity(RESOURCE_ENERGY) * 0.5) this._METT.push(this.fastFillerContainerRight)
+
+               if (this.controllerLink && !this.hubLink) this._METT.push(this.controllerLink)
 
                return this._METT
+          },
+     },
+     OETT: {
+          get() {
+               if (this._OETT) return this._OETT
+
+               this._OETT = []
+
+               if (this.storage) this._OETT.push(this.storage)
+               if (this.terminal) this._OETT.push(this.terminal)
+
+               return this._OETT
           },
      },
      MATT: {
@@ -594,6 +613,15 @@ Object.defineProperties(Room.prototype, {
                this._MATT = this.METT
 
                return this._MATT
+          },
+     },
+     OATT: {
+          get() {
+               if (this._OATT) return this._OATT
+
+               this._OATT = this.OETT
+
+               return this._OATT
           },
      },
 } as PropertyDescriptorMap & ThisType<Room>)
