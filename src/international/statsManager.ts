@@ -27,11 +27,12 @@ export class StatsManager {
           if (!Memory.roomStats) return
           if (!global.debugRoomCount1) global.debugRoomCount1 = 0
           if (!global.debugRoomCount2) global.debugRoomCount2 = 0
+          if (!global.debugRoomCount3) global.debugRoomCount3 = 0
           if (!global.debugCpu11) global.debugCpu11 = 0
-          if (!global.debugCpu12) global.debugCpu12 = 0
+          if (!global.debugCpu21) global.debugCpu12 = 0
+          if (!global.debugCpu31) global.debugCpu12 = 0
           const cpu = Game.cpu.getUsed()
 
-          global.debugRoomCount1 += 1
           if (!constants.roomTypesUsedForStats.includes(roomType)) {
                delete Memory.stats.rooms[roomName]
                delete global.roomStats[roomName]
@@ -44,20 +45,26 @@ export class StatsManager {
 
           const globalStats = global.roomStats[roomName]
           globalStats.cpuUsage = Game.cpu.getUsed()
-          global.debugRoomCount2 += 1
-          global.debugCpu12 += Game.cpu.getUsed() - cpu
+          if (roomType === 'commune') {
+               global.debugRoomCount2 += 1
+               global.debugCpu21 += Game.cpu.getUsed() - cpu
+          } else {
+               global.debugRoomCount3 += 1
+               global.debugCpu31 += Game.cpu.getUsed() - cpu
+          }
      }
 
      roomEndTick(roomName: string, room: Room, roomType: string) {
           if (!Memory.roomStats) return
           if (!global.debugCpu21) global.debugCpu21 = 0
           if (!global.debugCpu22) global.debugCpu22 = 0
+          if (!global.debugCpu32) global.debugCpu22 = 0
           const cpu = Game.cpu.getUsed()
 
           if (!constants.roomTypesUsedForStats.includes(roomType)) {
                delete Memory.stats.rooms[roomName]
                delete global.roomStats[roomName]
-               global.debugCpu21 = Game.cpu.getUsed() - cpu
+               global.debugCpu12 = Game.cpu.getUsed() - cpu
                return
           }
 
@@ -110,7 +117,11 @@ export class StatsManager {
           )
           roomStats.energyOutputSold = this.average(roomStats.energyOutputSold, globalStats.energyOutputSold, 1000)
           roomStats.energyOutputSpawn = this.average(roomStats.energyOutputSold, globalStats.energyOutputSpawn, 1000)
-          global.debugCpu22 = Game.cpu.getUsed() - cpu
+          if (roomType === 'commune') {
+               global.debugCpu22 += Game.cpu.getUsed() - cpu
+          } else {
+               global.debugCpu32 += Game.cpu.getUsed() - cpu
+          }
      }
 
      internationalConfig() {
@@ -148,8 +159,11 @@ export class StatsManager {
                debugCpu12: 0,
                debugCpu21: 0,
                debugCpu22: 0,
+               debugCpu31: 0,
+               debugCpu32: 0,
                debugRoomCount1: 0,
                debugRoomCount2: 0,
+               debugRoomCount3: 0,
           }
 
           this.internationalEndTick()
@@ -162,8 +176,11 @@ export class StatsManager {
           global.debugCpu12 = 0
           global.debugCpu21 = 0
           global.debugCpu22 = 0
+          global.debugCpu31 = 0
+          global.debugCpu32 = 0
           global.debugRoomCount1 = 0
           global.debugRoomCount2 = 0
+          global.debugRoomCount3 = 0
      }
 
      internationalEndTick() {
@@ -198,17 +215,18 @@ export class StatsManager {
                progressTotal: Game.gpl.progressTotal,
                level: Game.gpl.level,
           }
-          console.log(
-               Memory.stats.debugCpu11,
-               global.debugCpu11,
-               this.average(Memory.stats.debugCpu11, global.debugCpu11, 250, 10),
-          )
-          Memory.stats.debugCpu11 = this.average(Memory.stats.debugCpu11, global.debugCpu11, 250, 10)
-          Memory.stats.debugCpu12 = this.average(Memory.stats.debugCpu12, global.debugCpu12, 250, 10)
-          Memory.stats.debugCpu21 = this.average(Memory.stats.debugCpu21, global.debugCpu21, 250, 10)
-          Memory.stats.debugCpu22 = this.average(Memory.stats.debugCpu22, global.debugCpu22, 250, 10)
-          Memory.stats.debugRoomCount1 = this.average(Memory.stats.debugRoomCount1, global.debugRoomCount1, 250)
-          Memory.stats.debugRoomCount2 = this.average(Memory.stats.debugRoomCount2, global.debugRoomCount2, 250)
+
+          if (global.debugCpu21) {
+               Memory.stats.debugCpu11 = this.average(Memory.stats.debugCpu11, global.debugCpu11, 250, 10)
+               Memory.stats.debugCpu12 = this.average(Memory.stats.debugCpu12, global.debugCpu12, 250, 10)
+               Memory.stats.debugCpu21 = this.average(Memory.stats.debugCpu21, global.debugCpu21, 250, 10)
+               Memory.stats.debugCpu22 = this.average(Memory.stats.debugCpu22, global.debugCpu22, 250, 10)
+               Memory.stats.debugCpu31 = this.average(Memory.stats.debugCpu31, global.debugCpu31, 250, 10)
+               Memory.stats.debugCpu32 = this.average(Memory.stats.debugCpu32, global.debugCpu32, 250, 10)
+               Memory.stats.debugRoomCount1 = this.average(Memory.stats.debugRoomCount1, global.debugRoomCount1, 250)
+               Memory.stats.debugRoomCount2 = this.average(Memory.stats.debugRoomCount2, global.debugRoomCount2, 250)
+               Memory.stats.debugRoomCount3 = this.average(Memory.stats.debugRoomCount3, global.debugRoomCount3, 250)
+          }
           global.roomStats = {}
      }
 

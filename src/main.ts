@@ -356,8 +356,11 @@ declare global {
           debugCpu12: number
           debugCpu21: number
           debugCpu22: number
+          debugCpu31: number
+          debugCpu32: number
           debugRoomCount1: number
           debugRoomCount2: number
+          debugRoomCount3: number
      }
 
      interface Memory {
@@ -1534,9 +1537,24 @@ export const loop = function () {
      internationalManager.endTickManager()
      console.log('Stats cpu logging')
      console.log(
-          `Non stats room count: ${Memory.stats.debugRoomCount1} - Pre: ${Memory.stats.debugCpu11} - End: ${Memory.stats.debugCpu21}`,
+          `Non stats room count: ${Memory.stats.debugRoomCount1} - Pre: ${Memory.stats.debugCpu11} - End: ${
+               Memory.stats.debugCpu12
+          } - Per room: ${((Memory.stats.debugCpu11 + Memory.stats.debugCpu12) / Memory.stats.debugRoomCount1).toFixed(
+               4,
+          )}`,
      )
      console.log(
-          `Stats room count: ${Memory.stats.debugRoomCount2} - Pre: ${Memory.stats.debugCpu12} - End: ${Memory.stats.debugCpu22}`,
+          `Commune stats room count: ${Memory.stats.debugRoomCount2} - Pre: ${Memory.stats.debugCpu21} - End: ${
+               Memory.stats.debugCpu22
+          } - Per room: ${((Memory.stats.debugCpu21 + Memory.stats.debugCpu22) / Memory.stats.debugRoomCount2).toFixed(
+               4,
+          )}`,
+     )
+     console.log(
+          `Remote stats room count: ${Memory.stats.debugRoomCount3} - Pre: ${Memory.stats.debugCpu31} - End: ${
+               Memory.stats.debugCpu32
+          } - Per room: ${((Memory.stats.debugCpu31 + Memory.stats.debugCpu32) / Memory.stats.debugRoomCount3).toFixed(
+               4,
+          )}`,
      )
 }
