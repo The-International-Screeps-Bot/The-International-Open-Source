@@ -28,6 +28,29 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                          continue
                     }
 
+                    if (creep.needsResources()) {
+
+                         if (creep.isOnExit()) {
+
+                              creep.say('EM')
+
+                              creep.createMoveRequest({
+                                   origin: creep.pos,
+                                   goal: {
+                                        pos: creep.pos,
+                                        range: 1,
+                                   },
+                                   flee: true,
+                                   avoidEnemyRanges: true,
+                                   weightGamebjects: {
+                                        1: room.get('road'),
+                                   },
+                              })
+                         }
+
+                         continue
+                    }
+
                     creep.message += creep.memory.communeName
                     creep.say(creep.message)
 
@@ -86,6 +109,28 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                if (!creep.fulfillReservation()) {
                     creep.say(creep.message)
+                    continue
+               }
+
+               if (!creep.needsResources()) {
+
+                    if (creep.isOnExit()) {
+
+                         creep.say('EM')
+
+                         creep.createMoveRequest({
+                              origin: creep.pos,
+                              goal: {
+                                   pos: creep.pos,
+                                   range: 1,
+                              },
+                              flee: true,
+                              avoidEnemyRanges: true,
+                              weightGamebjects: {
+                                   1: room.get('road'),
+                              },
+                         })
+                    }
                     continue
                }
 
@@ -162,10 +207,10 @@ RemoteHauler.prototype.reserveWithdraw = function () {
           return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
      })
 
+     if (!withdrawTargets.length) return
+
      let target
      let amount
-
-     if (!withdrawTargets.length) return
 
      target = this.pos.findClosestByRange(withdrawTargets)
 

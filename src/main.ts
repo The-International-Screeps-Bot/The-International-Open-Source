@@ -951,18 +951,6 @@ declare global {
 
           readonly hubLink: StructureLink | undefined
 
-          _factory: StructureFactory | undefined
-
-          readonly factory: StructureFactory | undefined
-
-          _nuker: StructureNuker | undefined
-
-          readonly nuker: StructureNuker | undefined
-
-          _powerSpawn: StructureNuker | undefined
-
-          readonly powerSpawn: StructureNuker | undefined
-
           _droppedEnergy: Resource[]
 
           readonly droppedEnergy: Resource[]

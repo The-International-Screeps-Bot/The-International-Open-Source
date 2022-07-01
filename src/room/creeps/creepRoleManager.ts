@@ -7,7 +7,7 @@ import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvester
 import { maintainerManager } from './roleManagers/commune/maintainerManager'
 import { builderManager } from './roleManagers/commune/builderManager'
 import { scoutManager } from './roleManagers/international/scoutManager'
-import { haulerManager } from './roleManagers/commune/haulerManager'
+import { haulerManager } from './roleManagers/commune/hauler'
 import { source2RemoteHarvesterManager } from './roleManagers/remote/source2RemoteHarvesterManager'
 import { remoteHaulerManager } from './roleManagers/remote/remoteHauler'
 import { claimerManager } from './roleManagers/international/claimerManager'
@@ -97,8 +97,8 @@ export function creepRoleManager(room: Room) {
           customLog(
                'Role Manager',
                `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}, CPU Per Creep: ${(
-                    (Game.cpu.getUsed() - managerCPUStart) /
-                    room.myCreepsAmount
+                    room.myCreepsAmount ? (Game.cpu.getUsed() - managerCPUStart) /
+                    room.myCreepsAmount : 0
                ).toFixed(2)}`,
                undefined,
                constants.colors.lightGrey,

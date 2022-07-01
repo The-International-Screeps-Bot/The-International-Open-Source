@@ -1,7 +1,35 @@
-import { Console } from 'console'
-import { RoomTask, RoomPullTask } from 'room/roomTasks'
-
+import { customLog } from 'international/generalFunctions'
 import { Hauler } from '../../creepClasses'
+
+export function haulerManager(room: Room, creepsOfRole: string[]) {
+     // Loop through creep names of this role
+
+     for (const creepName of creepsOfRole) {
+          // Get the creep using its name
+
+          const creep: Hauler = Game.creeps[creepName]
+
+          creep.advancedRenew()
+
+          if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserve()
+
+          if (!creep.fulfillReservation()) {
+
+               creep.say(creep.message)
+               continue
+          }
+
+          creep.reserve()
+
+          if (!creep.fulfillReservation()) {
+
+               creep.say(creep.message)
+               continue
+          }
+
+          if (creep.message.length) creep.say(creep.message)
+     }
+}
 
 Hauler.prototype.reserve = function () {
      const { room } = this
@@ -16,15 +44,15 @@ Hauler.prototype.reserve = function () {
           return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
      })
 
-     let transferTargets = room.MATT.filter(function (target) {
-          return target.freeSpecificStore(RESOURCE_ENERGY) > 0
-     })
+     let transferTargets
 
      let target
      let amount
 
      if (this.needsResources()) {
+
           if (withdrawTargets.length) {
+
                target = this.pos.findClosestByRange(withdrawTargets)
 
                if (target instanceof Resource)
@@ -34,6 +62,10 @@ Hauler.prototype.reserve = function () {
                this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
                return
           }
+
+          transferTargets = room.MATT.filter(function (target) {
+               return target.freeSpecificStore(RESOURCE_ENERGY) > 0
+          })
 
           if (transferTargets.length) {
                withdrawTargets = room.OAWT.filter(target => {
@@ -45,6 +77,8 @@ Hauler.prototype.reserve = function () {
 
                     return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
                })
+
+               if (!withdrawTargets.length) return
 
                target = this.pos.findClosestByRange(withdrawTargets)
 
@@ -59,25 +93,30 @@ Hauler.prototype.reserve = function () {
 
      if (this.usedStore() === 0) return
 
+     if (!transferTargets) transferTargets = room.MATT.filter(function (target) {
+          return target.freeSpecificStore(RESOURCE_ENERGY) > 0
+     })
+
      if (transferTargets.length) {
-        target = this.pos.findClosestByRange(transferTargets)
 
-        amount = Math.min(this.usedStore(), target.freeStore(RESOURCE_ENERGY))
+          target = this.pos.findClosestByRange(transferTargets)
 
-        this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
-        return
-   }
+          amount = Math.min(this.usedStore(), target.freeStore(RESOURCE_ENERGY))
+
+          this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
+          return
+     }
 
      transferTargets = room.OATT.filter(target => {
           return target.freeStore(RESOURCE_ENERGY) >= this.usedStore()
      })
 
-     if (transferTargets.length) {
-          target = this.pos.findClosestByRange(transferTargets)
+     if (!transferTargets.length) return
 
-          amount = this.usedStore()
+     target = this.pos.findClosestByRange(transferTargets)
 
-          this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
-          return
-     }
+     amount = this.usedStore()
+
+     this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
+     return
 }

@@ -490,33 +490,6 @@ Object.defineProperties(Room.prototype, {
                return false
           },
      },
-     factory: {
-          get() {
-               if (this._factory) return this._factory
-
-               return (this._factory = this.find(FIND_MY_STRUCTURES, {
-                    filter: structure => structure.structureType === STRUCTURE_FACTORY,
-               })[0] as StructureFactory)
-          },
-     },
-     nuker: {
-          get() {
-               if (this._nuker) return this._nuker
-
-               return (this._nuker = this.find(FIND_MY_STRUCTURES, {
-                    filter: structure => structure.structureType === STRUCTURE_NUKER,
-               })[0] as StructureNuker)
-          },
-     },
-     powerSpawn: {
-          get() {
-               if (this._powerSpawn) return this._powerSpawn
-
-               return (this._powerSpawn = this.find(FIND_MY_STRUCTURES, {
-                    filter: structure => structure.structureType === STRUCTURE_POWER_SPAWN,
-               })[0] as StructureNuker)
-          },
-     },
      droppedEnergy: {
           get() {
                if (this._droppedEnergy) return this._droppedEnergy
@@ -555,9 +528,9 @@ Object.defineProperties(Room.prototype, {
 
                if (this.storage) this._OEWT.push(this.storage)
                if (this.terminal) this._OEWT.push(this.terminal)
-               if (this.factory) this._OEWT.push(this.factory)
-               if (this.nuker) this._OEWT.push(this.nuker)
-               if (this.powerSpawn) this._OEWT.push(this.powerSpawn)
+               if (this.structures.factory[0]) this._OEWT.push(this.structures.factory[0])
+               if (this.structures.nuker[0]) this._OEWT.push(this.structures.nuker[0])
+               if (this.structures.powerSpawn[0]) this._OEWT.push(this.structures.powerSpawn[0])
 
                return this._OEWT
           },
@@ -602,6 +575,9 @@ Object.defineProperties(Room.prototype, {
 
                if (this.storage) this._OETT.push(this.storage)
                if (this.terminal) this._OETT.push(this.terminal)
+               if (this.structures.factory[0]) this._OETT.push(this.structures.factory[0])
+               if (this.structures.nuker[0]) this._OETT.push(this.structures.nuker[0])
+               if (this.structures.powerSpawn[0]) this._OETT.push(this.structures.powerSpawn[0])
 
                return this._OETT
           },
