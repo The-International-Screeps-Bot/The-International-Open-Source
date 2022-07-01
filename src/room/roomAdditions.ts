@@ -586,8 +586,8 @@ Object.defineProperties(Room.prototype, {
 
                this._METT = [...this.spawningStructuresByNeed, ...this.structures.tower]
 
-               if (this.fastFillerContainerLeft) this._METT.push(this.fastFillerContainerLeft)
-               if (this.fastFillerContainerRight) this._METT.push(this.fastFillerContainerRight)
+               if (this.fastFillerContainerLeft && this.fastFillerContainerLeft.store.energy <= this.fastFillerContainerLeft.store.getCapacity(RESOURCE_ENERGY) * 0.5) this._METT.push(this.fastFillerContainerLeft)
+               if (this.fastFillerContainerRight && this.fastFillerContainerRight.store.energy <= this.fastFillerContainerRight.store.getCapacity(RESOURCE_ENERGY) * 0.5) this._METT.push(this.fastFillerContainerRight)
 
                if (this.controllerLink && !this.hubLink) this._METT.push(this.controllerLink)
 
