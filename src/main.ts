@@ -352,6 +352,12 @@ declare global {
           gpl: ControllerLevel
           rooms: { [key: string]: RoomStats }
           constructionSiteCount: number
+          debugCpu11: number
+          debugCpu12: number
+          debugCpu21: number
+          debugCpu22: number
+          debugRoomCount1: number
+          debugRoomCount2: number
      }
 
      interface Memory {
@@ -1526,4 +1532,11 @@ export const loop = function () {
      internationalManager.advancedSellPixels()
 
      internationalManager.endTickManager()
+     console.log('Stats cpu logging')
+     console.log(
+          `Non stats room count: ${Memory.stats.debugRoomCount1} - Pre: ${Memory.stats.debugCpu11} - End: ${Memory.stats.debugCpu21}`,
+     )
+     console.log(
+          `Stats room count: ${Memory.stats.debugRoomCount2} - Pre: ${Memory.stats.debugCpu12} - End: ${Memory.stats.debugCpu22}`,
+     )
 }

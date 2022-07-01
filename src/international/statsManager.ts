@@ -29,23 +29,35 @@ StatsManager.prototype.roomConfig = function (roomName: string) {
 }
 StatsManager.prototype.roomPreTick = function (roomName: string, roomType: string) {
      if (!Memory.roomStats) return
+     if (!global.debugCpu11) global.debugCpu11 = 0
+     if (!global.debugCpu12) global.debugCpu12 = 0
+     const cpu = Game.cpu.getUsed()
 
      if (!constants.roomTypesUsedForStats.includes(roomType)) {
           delete Memory.stats.rooms[roomName]
           delete global.roomStats[roomName]
+          global.debugCpu12 = Game.cpu.getUsed() - cpu
           return
      }
      this.roomConfig(roomName)
 
      const globalStats = global.roomStats[roomName]
      globalStats.cpuUsage = Game.cpu.getUsed()
+     global.debugCpu12 = Game.cpu.getUsed() - cpu
 }
 StatsManager.prototype.roomEndTick = function (roomName: string, room: Room, roomType: string) {
      if (!Memory.roomStats) return
+     if (!global.debugCpu21) global.debugCpu21 = 0
+     if (!global.debugCpu22) global.debugCpu22 = 0
+     if (!global.debugRoomCount1) global.debugRoomCount1 = 0
+     if (!global.debugRoomCount2) global.debugRoomCount2 = 0
+     const cpu = Game.cpu.getUsed()
 
      if (!constants.roomTypesUsedForStats.includes(roomType)) {
           delete Memory.stats.rooms[room.name]
           delete global.roomStats[room.name]
+          global.debugCpu21 = Game.cpu.getUsed() - cpu
+          global.debugRoomCount1 += 1
           return
      }
      if (Memory.stats.rooms[room.name] === undefined || global.roomStats[room.name] === undefined) return
@@ -53,14 +65,6 @@ StatsManager.prototype.roomEndTick = function (roomName: string, room: Room, roo
      const globalStats = global.roomStats[roomName]
 
      if (Game.time % 100 === 0) {
-          roomStats.controllerLevel =
-               room.controller && room.controller.owner && room.controller.owner.username === Memory.me
-                    ? parseFloat(
-                           (room.controller.level + room.controller.progress / room.controller.progressTotal).toFixed(
-                                2,
-                           ),
-                      )
-                    : undefined
           roomStats.energyStored = this.average(
                roomStats.energyStored,
                room.findStoredResourceAmount(RESOURCE_ENERGY),
@@ -69,17 +73,38 @@ StatsManager.prototype.roomEndTick = function (roomName: string, room: Room, roo
      }
      roomStats.creepCount = this.average(roomStats.creepCount, room.myCreepsAmount, 1000, 0)
      roomStats.cpuUsage = this.average(roomStats.cpuUsage, Game.cpu.getUsed() - globalStats.cpuUsage, 1000)
-     roomStats.mineralsHarvested = this.average(roomStats.mineralsHarvested, globalStats.mineralsHarvested, 10000)
+
+     if (roomType === 'commune') {
+          if (Game.time % 100 === 0) {
+               roomStats.controllerLevel =
+                    room.controller && room.controller.owner && room.controller.owner.username === Memory.me
+                         ? parseFloat(
+                                (
+                                     room.controller.level +
+                                     room.controller.progress / room.controller.progressTotal
+                                ).toFixed(2),
+                           )
+                         : undefined
+          }
+          roomStats.mineralsHarvested = this.average(roomStats.mineralsHarvested, globalStats.mineralsHarvested, 10000)
+          roomStats.energyInputExternalTransferred = this.average(
+               roomStats.energyInputExternalTransferred,
+               globalStats.energyInputExternalTransferred,
+               1000,
+          )
+          roomStats.energyInputBought = this.average(roomStats.energyInputBought, globalStats.energyInputBought, 1000)
+
+          roomStats.energyOutputUpgrade = this.average(
+               roomStats.energyOutputUpgrade,
+               globalStats.energyOutputUpgrade,
+               1000,
+          )
+          roomStats.energyOutputSold = this.average(roomStats.energyOutputSold, globalStats.energyOutputSold, 1000)
+          roomStats.energyOutputSpawn = this.average(roomStats.energyOutputSold, globalStats.energyOutputSpawn, 1000)
+     }
 
      roomStats.energyInputHarvest = this.average(roomStats.energyInputHarvest, globalStats.energyInputHarvest, 1000)
-     roomStats.energyInputExternalTransferred = this.average(
-          roomStats.energyInputExternalTransferred,
-          globalStats.energyInputExternalTransferred,
-          1000,
-     )
-     roomStats.energyInputBought = this.average(roomStats.energyInputBought, globalStats.energyInputBought, 1000)
 
-     roomStats.energyOutputUpgrade = this.average(roomStats.energyOutputUpgrade, globalStats.energyOutputUpgrade, 1000)
      roomStats.energyOutputBuild = this.average(roomStats.energyOutputBuild, globalStats.energyOutputBuild, 1000)
      roomStats.energyOutputRepairOther = this.average(
           roomStats.energyOutputRepairOther,
@@ -91,8 +116,8 @@ StatsManager.prototype.roomEndTick = function (roomName: string, room: Room, roo
           globalStats.energyOutputRepairWallOrRampart,
           1000,
      )
-     roomStats.energyOutputSold = this.average(roomStats.energyOutputSold, globalStats.energyOutputSold, 1000)
-     roomStats.energyOutputSpawn = this.average(roomStats.energyOutputSold, globalStats.energyOutputSpawn, 1000)
+     global.debugRoomCount2 += 1
+     global.debugCpu22 = Game.cpu.getUsed() - cpu
 }
 
 StatsManager.prototype.internationalConfig = function () {
@@ -126,6 +151,13 @@ StatsManager.prototype.internationalConfig = function () {
           },
           rooms: {},
           constructionSiteCount: 0,
+
+          debugCpu11: 0,
+          debugCpu12: 0,
+          debugCpu21: 0,
+          debugCpu22: 0,
+          debugRoomCount1: 0,
+          debugRoomCount2: 0,
      }
      this.internationalEndTick()
      global.roomStats = {}
@@ -133,6 +165,12 @@ StatsManager.prototype.internationalConfig = function () {
 
 StatsManager.prototype.internationalPreTick = function () {
      global.roomStats = {}
+     global.debugCpu11 = 0
+     global.debugCpu12 = 0
+     global.debugCpu21 = 0
+     global.debugCpu22 = 0
+     global.debugRoomCount1 = 0
+     global.debugRoomCount2 = 0
 }
 
 StatsManager.prototype.internationalEndTick = function () {
@@ -168,12 +206,19 @@ StatsManager.prototype.internationalEndTick = function () {
           level: Game.gpl.level,
      }
      global.roomStats = {}
+
+     Memory.stats.debugCpu11 = this.average(Memory.stats.debugCpu11, global.debugCpu11, 250, 10)
+     Memory.stats.debugCpu12 = this.average(Memory.stats.debugCpu12, global.debugCpu12, 250, 10)
+     Memory.stats.debugCpu21 = this.average(Memory.stats.debugCpu21, global.debugCpu21, 250, 10)
+     Memory.stats.debugCpu22 = this.average(Memory.stats.debugCpu22, global.debugCpu22, 250, 10)
+     Memory.stats.debugRoomCount1 = this.average(Memory.stats.debugRoomCount1, global.debugRoomCount1, 250)
+     Memory.stats.debugRoomCount2 = this.average(Memory.stats.debugRoomCount2, global.debugRoomCount2, 250)
 }
 StatsManager.prototype.average = function (
      originalNumber: number,
      newNumber: number,
      averagedOverTickCount: number,
-     roundDigits: number = 2,
+     roundDigits: number = 3,
 ): number {
      const newWeight = 1 / averagedOverTickCount
      const originalWeight = 1 - newWeight
