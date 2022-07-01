@@ -307,20 +307,20 @@ declare global {
           progressTotal: number
      }
      interface RoomStats {
-          controllerLevel?: number
-          energyInputHarvest: number
-          energyInputExternalTransferred: number
-          energyInputBought: number
-          energyOutputUpgrade: number
-          energyOutputRepairOther: number
-          energyOutputRepairWallOrRampart: number
-          energyOutputBuild: number
-          energyOutputSold: number
-          energyOutputSpawn: number
-          mineralsHarvested: number
-          energyStored?: number
-          creepCount?: number
-          cpuUsage: number
+          cl?: number // controllerLevel
+          eih: number // energyInputHarvest
+          eiet?: number // energyInputExternalTransferred
+          eib?: number // energyInputBought
+          eou?: number // energyOutputUpgrade
+          eoro: number // energyOutputRepairOther
+          eorwr?: number // energyOutputRepairWallOrRampart
+          eob: number // energyOutputBuild
+          eoso?: number // energyOutputSold
+          eosp?: number // energyOutputSpawn
+          mh?: number // mineralsHarvested
+          es: number //energyStored
+          cc: number // creepCount
+          cu: number // cpuUsage
      }
 
      interface Stats {

@@ -68,7 +68,7 @@ export function roomManager() {
 
           if (Memory.cpuLogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
 
-          statsManager.roomEndTick(room.name, room, roomType)
+          statsManager.roomEndTick(room.name, roomType, room)
           customLog(room.name, logMessage, undefined, constants.colors.lightGrey)
      }
 
