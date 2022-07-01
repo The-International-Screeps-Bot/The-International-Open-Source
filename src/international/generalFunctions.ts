@@ -64,7 +64,7 @@ export function arePositionsEqual(pos1: Pos, pos2: Pos) {
  * @param bgColor Colour of the background. Default is white
  */
 export function customLog(
-     title: string,
+     title: any,
      message: any,
      color: string = constants.colors.black,
      bgColor: string = constants.colors.white,
@@ -279,7 +279,7 @@ export function findLargestTransactionAmount(budget: number, amount: number, roo
      budget = Math.max(budget, 1)
 
      // So long as the the transactions cost is more than the budget
-     
+
      while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
           // Decrease amount exponentially
 

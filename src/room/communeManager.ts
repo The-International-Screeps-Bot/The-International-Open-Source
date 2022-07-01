@@ -7,7 +7,6 @@ import { spawnManager } from './spawning/spawnManager'
 
 import { towerManager } from './towerManager'
 import { constructionManager } from './construction/constructionManager'
-import { structuresForSpawningManager } from './structuresForSpawningManager'
 import { droppedResourceManager } from './droppedResourceManager'
 import { defenceManager } from './defenceManager'
 import { storageStructuresManager } from './storingStructuresManager'
@@ -24,8 +23,6 @@ export function communeManager(room: Room) {
      linkManager(room)
 
      defenceManager(room)
-
-     structuresForSpawningManager(room)
 
      storageStructuresManager(room)
 

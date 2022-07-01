@@ -1111,15 +1111,6 @@ Room.prototype.get = function (roomObjectName) {
           return filteredSpawnStructures
      }
 
-     new RoomCacheObject({
-          name: 'structuresForSpawning',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor: findStructuresForSpawning,
-     })
-
      // Creeps
 
      new RoomCacheObject({

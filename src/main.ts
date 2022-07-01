@@ -174,7 +174,6 @@ declare global {
           | 'usedSourceHarvestPositions'
           | 'usedUpgradePositions'
           | 'usedFastFillerPositions'
-          | 'structuresForSpawning'
           | 'notMyCreeps'
           | 'enemyCreeps'
           | 'allyCreeps'
@@ -902,13 +901,17 @@ declare global {
 
           readonly spawningStructures: SpawningStructures
 
-          _taskNeedingSpawningStructures: SpawningStructures
-
-          readonly taskNeedingSpawningStructures: SpawningStructures
-
           _spawningStructuresByPriority: SpawningStructures
 
           readonly spawningStructuresByPriority: SpawningStructures
+
+          _spawningStructuresByNeed: SpawningStructures
+
+          readonly spawningStructuresByNeed: SpawningStructures
+
+          _taskNeedingSpawningStructures: SpawningStructures
+
+          readonly taskNeedingSpawningStructures: SpawningStructures
 
           readonly sourceHarvestPositions: SourceHarvestPositions
 

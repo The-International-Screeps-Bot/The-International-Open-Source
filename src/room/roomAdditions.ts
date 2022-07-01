@@ -136,118 +136,64 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._spawningStructures) return this._spawningStructures
 
-               return (this._spawningStructures = this.get('spawn').concat(this.get('extension')))
-          },
-     },
-     taskNeedingSpawningStructures: {
-          get() {
-               if (this._taskNeedingSpawningStructures) return this._taskNeedingSpawningStructures
+               if (!this.anchor) return []
 
-               this._taskNeedingSpawningStructures = []
-
-               let structuresAtPos
-
-               for (const pos of this.global.stampAnchors.extensions) {
-                    structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
-
-                    for (const structure of structuresAtPos) {
-                         if (
-                              structure.structureType !== STRUCTURE_SPAWN &&
-                              structure.structureType !== STRUCTURE_EXTENSION
-                         )
-                              continue
-
-                         this._taskNeedingSpawningStructures.push(structure as StructureSpawn | StructureExtension)
-                         break
-                    }
-               }
-
-               for (const pos of this.global.stampAnchors.extension) {
-                    structuresAtPos = this.lookForAt(LOOK_STRUCTURES, pos)
-
-                    for (const structure of structuresAtPos) {
-                         if (
-                              structure.structureType !== STRUCTURE_SPAWN &&
-                              structure.structureType !== STRUCTURE_EXTENSION
-                         )
-                              continue
-
-                         this._taskNeedingSpawningStructures.push(structure as StructureSpawn | StructureExtension)
-                         break
-                    }
-               }
-
-               return this._taskNeedingSpawningStructures
+               return (this._spawningStructures = [...this.structures.spawn, ...this.structures.extension])
           },
      },
      spawningStructuresByPriority: {
           get() {
                if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
 
-               this._spawningStructuresByPriority = []
+               // Sort based on lowest range from the anchor
 
-               // Fastfiller
+               return (this._spawningStructuresByPriority = this.spawningStructures.sort(
+                    (a, b) =>
+                         getRange(a.pos.x - this.anchor.x, a.pos.y - this.anchor.y) -
+                         getRange(b.pos.x - this.anchor.x, b.pos.y - this.anchor.y),
+               ))
+          },
+     },
+     spawningStructuresByNeed: {
+          get() {
+               if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
 
-               const adjacentStructures = this.lookForAtArea(
-                    LOOK_STRUCTURES,
-                    this.anchor.y - 2,
-                    this.anchor.x - 2,
-                    this.anchor.y + 2,
-                    this.anchor.x + 2,
-                    true,
-               )
-
-               let structureType
-
-               for (const adjacentPosData of adjacentStructures) {
-                    structureType = adjacentPosData.structure.structureType
-
-                    if (structureType !== STRUCTURE_SPAWN && structureType !== STRUCTURE_EXTENSION) continue
-
-                    this.spawningStructuresByPriority.push(
-                         adjacentPosData.structure as StructureSpawn | StructureExtension,
-                    )
-               }
+               this._spawningStructuresByNeed = this.spawningStructures
 
                const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+
+               let closestHarvestPos: RoomPosition
+
+               // loop through sourceNames
 
                for (const sourceName of sourceNames) {
                     // Get the closestHarvestPos using the sourceName, iterating if undefined
 
-                    const closestHarvestPos: RoomPosition | undefined = this.get(`${sourceName}ClosestHarvestPos`)
+                    closestHarvestPos = this.get(`${sourceName}ClosestHarvestPos`)
+
                     if (!closestHarvestPos) continue
 
-                    // Harvest extensions
+                    // Assign structuresForSpawning that are not in range of 1 to the closestHarvestPos
 
-                    const adjacentStructures = this.lookForAtArea(
-                         LOOK_STRUCTURES,
-                         closestHarvestPos.y - 1,
-                         closestHarvestPos.x - 1,
-                         closestHarvestPos.y + 1,
-                         closestHarvestPos.x + 1,
-                         true,
+                    this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
+                         structure =>
+                              getRange(structure.pos.x - closestHarvestPos.x, structure.pos.y - closestHarvestPos.y) >
+                              1,
                     )
-
-                    for (const adjacentPosData of adjacentStructures) {
-                         const { structureType } = adjacentPosData.structure
-
-                         if (structureType !== STRUCTURE_SPAWN && structureType !== STRUCTURE_EXTENSION) continue
-
-                         this.spawningStructuresByPriority.push(
-                              adjacentPosData.structure as StructureSpawn | StructureExtension,
-                         )
-                    }
                }
 
-               // Assign taskNeedingSpawningStructures by lowest range from the anchor
+               if (
+                    this.anchor &&
+                    this.myCreeps.fastFiller.length &&
+                    ((this.fastFillerLink && this.hubLink && this.storage) ||
+                         (this.fastFillerContainerLeft && this.fastFillerContainerRight))
+               ) {
+                    this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
+                         structure => getRange(structure.pos.x - this.anchor.x, structure.pos.y - this.anchor.y) > 2,
+                    )
+               }
 
-               return this._spawningStructuresByPriority.concat(
-                    this.taskNeedingSpawningStructures.sort(
-                         (a, b) =>
-                              getRange(a.pos.x - this.anchor.x, a.pos.y - this.anchor.y) -
-                              getRange(b.pos.x - this.anchor.x, b.pos.y - this.anchor.y),
-                    ),
-               )
+               return this._spawningStructuresByNeed
           },
      },
      sourceHarvestPositions: {
@@ -638,7 +584,7 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._METT) return this._METT
 
-               this._METT = [...this.structures.spawn, ...this.structures.extension, ...this.structures.tower]
+               this._METT = [...this.spawningStructuresByNeed, ...this.structures.tower]
 
                if (this.fastFillerContainerLeft) this._METT.push(this.fastFillerContainerLeft)
                if (this.fastFillerContainerRight) this._METT.push(this.fastFillerContainerRight)
