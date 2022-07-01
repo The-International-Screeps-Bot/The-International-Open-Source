@@ -1,6 +1,7 @@
 import { constants } from './constants'
 export class StatsManager {
      roomConfig(roomName: string) {
+          // const a = Game.cpu.getUsed()
           const roomStats: RoomStats = {
                energyInputBought: 0,
                energyInputHarvest: 0,
@@ -16,11 +17,10 @@ export class StatsManager {
                creepCount: 0,
                energyStored: 0,
           }
-          if (!global.debugCpu11) global.debugCpu11 = 0
-          if (!global.debugCpu12) global.debugCpu12 = 0
 
           global.roomStats[roomName] = roomStats
           if (!Memory.stats.rooms[roomName]) Memory.stats.rooms[roomName] = roomStats
+          // console.log(Memory.stats.rooms[roomName], Game.cpu.getUsed() - a)
      }
 
      roomPreTick(roomName: string, roomType: string) {
@@ -34,8 +34,6 @@ export class StatsManager {
           const cpu = Game.cpu.getUsed()
 
           if (!constants.roomTypesUsedForStats.includes(roomType)) {
-               delete Memory.stats.rooms[roomName]
-               delete global.roomStats[roomName]
                global.debugRoomCount1 += 1
                global.debugCpu11 = Game.cpu.getUsed() - cpu
                return
@@ -54,7 +52,7 @@ export class StatsManager {
           }
      }
 
-     roomEndTick(roomName: string, room: Room, roomType: string) {
+     roomEndTick(roomName: string, roomType: string, room?: Room) {
           if (!Memory.roomStats) return
           if (!global.debugCpu21) global.debugCpu21 = 0
           if (!global.debugCpu22) global.debugCpu22 = 0
@@ -62,8 +60,6 @@ export class StatsManager {
           const cpu = Game.cpu.getUsed()
 
           if (!constants.roomTypesUsedForStats.includes(roomType)) {
-               delete Memory.stats.rooms[roomName]
-               delete global.roomStats[roomName]
                global.debugCpu12 = Game.cpu.getUsed() - cpu
                return
           }
@@ -72,51 +68,63 @@ export class StatsManager {
           const roomStats = Memory.stats.rooms[roomName]
           const globalStats = global.roomStats[roomName]
 
-          if (Game.time % 100 === 0) {
-               roomStats.controllerLevel =
-                    room.controller && room.controller.owner && room.controller.owner.username === Memory.me
-                         ? room.controller.level + room.controller.progress / room.controller.progressTotal
-                         : undefined
+          if (Game.time % 100 === 0 && room) {
+               if (roomType === 'commune') {
+                    roomStats.controllerLevel =
+                         room.controller && room.controller.owner && room.controller.owner.username === Memory.me
+                              ? room.controller.level + room.controller.progress / room.controller.progressTotal
+                              : undefined
+               }
                roomStats.energyStored = this.average(
                     roomStats.energyStored,
                     room.findStoredResourceAmount(RESOURCE_ENERGY),
                     10,
                )
+               roomStats.creepCount = this.average(roomStats.creepCount, room.myCreepsAmount, 1000, 0)
           }
-          roomStats.creepCount = this.average(roomStats.creepCount, room.myCreepsAmount, 1000, 0)
           roomStats.cpuUsage = this.average(roomStats.cpuUsage, Game.cpu.getUsed() - globalStats.cpuUsage, 1000)
           roomStats.mineralsHarvested = this.average(roomStats.mineralsHarvested, globalStats.mineralsHarvested, 10000)
 
+          if (roomType === 'commune') {
+               roomStats.energyInputBought = this.average(
+                    roomStats.energyInputBought,
+                    globalStats.energyInputBought,
+                    1000,
+               )
+               roomStats.energyInputExternalTransferred = this.average(
+                    roomStats.energyInputExternalTransferred,
+                    globalStats.energyInputExternalTransferred,
+                    1000,
+               )
+               roomStats.energyOutputUpgrade = this.average(
+                    roomStats.energyOutputUpgrade,
+                    globalStats.energyOutputUpgrade,
+                    1000,
+               )
+               roomStats.energyOutputRepairWallOrRampart = this.average(
+                    roomStats.energyOutputRepairWallOrRampart,
+                    globalStats.energyOutputRepairWallOrRampart,
+                    1000,
+               )
+               roomStats.energyOutputSold = this.average(roomStats.energyOutputSold, globalStats.energyOutputSold, 1000)
+               roomStats.energyOutputSpawn = this.average(
+                    roomStats.energyOutputSold,
+                    globalStats.energyOutputSpawn,
+                    1000,
+               )
+          }
           roomStats.energyInputHarvest = this.average(
                roomStats.energyInputHarvest,
                globalStats.energyInputHarvest,
                1000,
           )
-          roomStats.energyInputExternalTransferred = this.average(
-               roomStats.energyInputExternalTransferred,
-               globalStats.energyInputExternalTransferred,
-               1000,
-          )
-          roomStats.energyInputBought = this.average(roomStats.energyInputBought, globalStats.energyInputBought, 1000)
 
-          roomStats.energyOutputUpgrade = this.average(
-               roomStats.energyOutputUpgrade,
-               globalStats.energyOutputUpgrade,
-               1000,
-          )
           roomStats.energyOutputBuild = this.average(roomStats.energyOutputBuild, globalStats.energyOutputBuild, 1000)
           roomStats.energyOutputRepairOther = this.average(
                roomStats.energyOutputRepairOther,
                globalStats.energyOutputRepairOther,
                1000,
           )
-          roomStats.energyOutputRepairWallOrRampart = this.average(
-               roomStats.energyOutputRepairWallOrRampart,
-               globalStats.energyOutputRepairWallOrRampart,
-               1000,
-          )
-          roomStats.energyOutputSold = this.average(roomStats.energyOutputSold, globalStats.energyOutputSold, 1000)
-          roomStats.energyOutputSpawn = this.average(roomStats.energyOutputSold, globalStats.energyOutputSpawn, 1000)
           if (roomType === 'commune') {
                global.debugCpu22 += Game.cpu.getUsed() - cpu
           } else {
@@ -217,20 +225,36 @@ export class StatsManager {
           }
 
           if (global.debugCpu21) {
-               Memory.stats.debugCpu11 = this.average(Memory.stats.debugCpu11, global.debugCpu11, 250, 10)
-               Memory.stats.debugCpu12 = this.average(Memory.stats.debugCpu12, global.debugCpu12, 250, 10)
-               Memory.stats.debugCpu21 = this.average(Memory.stats.debugCpu21, global.debugCpu21, 250, 10)
-               Memory.stats.debugCpu22 = this.average(Memory.stats.debugCpu22, global.debugCpu22, 250, 10)
-               Memory.stats.debugCpu31 = this.average(Memory.stats.debugCpu31, global.debugCpu31, 250, 10)
-               Memory.stats.debugCpu32 = this.average(Memory.stats.debugCpu32, global.debugCpu32, 250, 10)
-               Memory.stats.debugRoomCount1 = this.average(Memory.stats.debugRoomCount1, global.debugRoomCount1, 250)
-               Memory.stats.debugRoomCount2 = this.average(Memory.stats.debugRoomCount2, global.debugRoomCount2, 250)
-               Memory.stats.debugRoomCount3 = this.average(Memory.stats.debugRoomCount3, global.debugRoomCount3, 250)
+               Memory.stats.debugCpu11 = this.average(Memory.stats.debugCpu11, global.debugCpu11, 10, 10)
+               Memory.stats.debugCpu12 = this.average(Memory.stats.debugCpu12, global.debugCpu12, 10, 10)
+               Memory.stats.debugCpu21 = this.average(Memory.stats.debugCpu21, global.debugCpu21, 10, 10)
+               Memory.stats.debugCpu22 = this.average(Memory.stats.debugCpu22, global.debugCpu22, 10, 10)
+               Memory.stats.debugCpu31 = this.average(Memory.stats.debugCpu31, global.debugCpu31, 10, 10)
+               Memory.stats.debugCpu32 = this.average(Memory.stats.debugCpu32, global.debugCpu32, 10, 10)
+               Memory.stats.debugRoomCount1 = this.average(Memory.stats.debugRoomCount1, global.debugRoomCount1, 10)
+               Memory.stats.debugRoomCount2 = this.average(Memory.stats.debugRoomCount2, global.debugRoomCount2, 10)
+               Memory.stats.debugRoomCount3 = this.average(Memory.stats.debugRoomCount3, global.debugRoomCount3, 10)
           }
-          global.roomStats = {}
+
+          // find all rooms that are missing in roomStats
+          function differenceInArray(arr1: string[], arr2: string[]) {
+               return arr1.filter(a => !arr2.find(v => v[0] == a[0]))
+          }
+          const globalRoomKeys = Object.keys(global.roomStats)
+          const notCheckedRooms = Object.keys(Memory.stats.rooms).filter(a => !globalRoomKeys.find(v => v == a))
+          notCheckedRooms.forEach(missingRoom => {
+               const roomType = Memory.rooms[missingRoom].type
+               if (!constants.roomTypesUsedForStats.includes(roomType)) {
+                    delete Memory.stats.rooms[missingRoom]
+                    delete global.roomStats[missingRoom]
+               } else {
+                    this.roomConfig(missingRoom)
+                    this.roomEndTick(missingRoom, roomType)
+               }
+          })
      }
 
-     average(originalNumber: number, newNumber: number, averagedOverTickCount: number, roundDigits: number = 3) {
+     average(originalNumber: number, newNumber: number, averagedOverTickCount: number, roundDigits: number = 4) {
           const newWeight = 1 / averagedOverTickCount
           const originalWeight = 1 - newWeight
 
