@@ -1045,19 +1045,36 @@ Creep.prototype.findTask = function (allowedTaskTypes, resourceType = RESOURCE_E
      return false
 }
 
-Creep.prototype.shove = function (shoverPos) {
+Creep.prototype.shove = function (shoverPos, queue) {
      const { room } = this
 
+     queue.push(this.name)
+
      let goalPos: RoomPosition
+     let range = 1
+     let goalRange
      let weightPositions: {[key: string]: RoomPosition[]} = {}
 
      if (this.memory.goalPos) {
 
           goalPos = unpackPos(this.memory.goalPos)
+
           weightPositions[255] = [this.pos, shoverPos]
+
+          goalRange = getRange(goalPos.x - this.pos.x, goalPos.y - this.pos.y)
+
+          if (goalRange <= 1) weightPositions[255].push(goalPos)
+
+          this.message += 'a'
+
+          this.createMoveRequest({
+               origin: this.pos,
+               goal: { pos: goalPos, range },
+               weightPositions,
+          })
      }
 
-     if (!goalPos || getRange(goalPos.x - this.pos.x, goalPos.y - this.pos.y) === 0) {
+     if (!goalPos || ((goalRange || getRange(goalPos.x - this.pos.x, goalPos.y - this.pos.y)) === 0)) {
 
           const adjacentPositions = room.findWalkableRoomPositionsInsideRect(this.pos.x - 1, this.pos.y - 1, this.pos.x + 1, this.pos.y + 1)
 
@@ -1065,16 +1082,23 @@ Creep.prototype.shove = function (shoverPos) {
 
                return !arePositionsEqual(this.pos, pos) && !arePositionsEqual(shoverPos, pos)
           })[0]
+          range = 0
+          this.message += 'b'
+
+          const packedPos = pack(goalPos)
+
+          room.moveRequests[pack(this.pos)].push(packedPos)
+          this.moveRequest = packedPos
      }
-
-     this.createMoveRequest({
-          origin: this.pos,
-          goal: { pos: goalPos, range: 1 },
-          weightPositions,
+     room.visual.circle(this.pos, {
+          fill: '',
+          stroke: constants.colors.red,
+          radius: 0.5,
+          strokeWidth: 0.15,
      })
-     this.say('s')
+     this.say(this.message += 'c')
      if (!this.moveRequest) return false
-
+     this.say(this.message += 'd')
      if (Memory.roomVisuals) {
           room.visual.circle(this.pos, {
                fill: '',
@@ -1088,7 +1112,7 @@ Creep.prototype.shove = function (shoverPos) {
           })
      }
 
-     this.recurseMoveRequest(this.moveRequest, [], true)
+     this.recurseMoveRequest(this.moveRequest, queue, true)
 
      return true
 }
@@ -1140,12 +1164,14 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = [], shove) {
 
           this.runMoveRequest(packedPos)
 
+          let queuedCreep
+
           // Otherwise, loop through each index of the queue
 
           for (let index = queue.length - 1; index > 0; index -= 1) {
                // Get the creep using the creepName
 
-               const queuedCreep = Game.creeps[queue[index]]
+               queuedCreep = Game.creeps[queue[index]]
 
                // Have the creep run its moveRequest
 
@@ -1172,7 +1198,28 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = [], shove) {
      if (creepAtPos.fatigue > 0) return
 
      if (shove) {
-          if (creepAtPos.shove(this.pos)) this.runMoveRequest(packedPos)
+          if (queue.includes(creepAtPos.name)) {
+
+               let queuedCreep
+
+               // Otherwise, loop through each index of the queue
+
+               for (let index = queue.length - 1; index > 0; index -= 1) {
+                    // Get the creep using the creepName
+
+                    queuedCreep = Game.creeps[queue[index]]
+
+                    // Have the creep run its moveRequest
+
+                    queuedCreep.runMoveRequest(queuedCreep.moveRequest)
+               }
+
+               this.moved = true
+               delete this.moveRequest
+               return
+          }
+
+          if (creepAtPos.shove(this.pos, queue)) this.runMoveRequest(packedPos)
 
           return
      }
@@ -1204,12 +1251,14 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = [], shove) {
 
                creepAtPos.recurseMoveRequest(creepAtPos.moveRequest)
 
+               let queuedCreep
+
                // Loop through each index of the queue
 
                for (let index = queue.length - 1; index > 0; index -= 1) {
                     // Get the creep using the creepName
 
-                    const queuedCreep = Game.creeps[queue[index]]
+                    queuedCreep = Game.creeps[queue[index]]
 
                     // Have the creep run its moveRequest
 
@@ -1230,7 +1279,9 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = [], shove) {
 
      // Otherwise the creepAtPos has no moveRequest
 
-     if (creepAtPos.shove(this.pos)) {
+     queue.push(this.name)
+
+     if (creepAtPos.shove(this.pos, queue)) {
           this.runMoveRequest(packedPos)
           return
      }

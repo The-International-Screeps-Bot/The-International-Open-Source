@@ -608,7 +608,7 @@ declare global {
           creepPositions: PackedPosMap
 
           /**
-           * A matrix with indexes of packed positions and values of move requests
+           * A matrix with indexes of packed positions and values of creep names
            */
           moveRequests: PackedPosMap
 
@@ -1217,7 +1217,7 @@ declare global {
            */
           createMoveRequest(opts: MoveRequestOpts): boolean
 
-          shove(shoverPos: RoomPosition): boolean
+          shove(shoverPos: RoomPosition, queue?: string[]): boolean
 
           /**
            * Try to enforce a moveRequest and inform the result

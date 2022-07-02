@@ -15,6 +15,12 @@ Room.prototype.claimRequestManager = function () {
                return
           }
 
+          if (this.energyCapacityAvailable < 750) {
+
+               delete this.memory.claimRequest
+               return
+          }
+
           const claimTarget = Game.rooms[this.memory.claimRequest]
           if (!claimTarget || !claimTarget.controller.my) {
                Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer] += 1
