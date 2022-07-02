@@ -99,7 +99,7 @@ Maintainer.prototype.advancedMaintain = function () {
           if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eorwr += energySpentOnRepairs
           creep.say(`🧱${energySpentOnRepairs * REPAIR_POWER}`)
      } else {
-          global.roomStats[this.room.name].eoro += energySpentOnRepairs
+          if (global.roomStats[this.room.name])  global.roomStats[this.room.name].eoro += energySpentOnRepairs
           creep.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
      }
 

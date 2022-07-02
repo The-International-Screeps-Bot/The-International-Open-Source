@@ -747,7 +747,7 @@ declare global {
           /**
            *
            */
-           findWalkableRoomPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
+          findWalkableRoomPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
 
           /**
            *
@@ -1162,9 +1162,17 @@ declare global {
 
           advancedPickup(target: Resource): boolean
 
-          advancedTransfer(target: Creep | AnyStoreStructure | Tombstone, resourceType?: ResourceConstant, amount?: number): boolean
+          advancedTransfer(
+               target: Creep | AnyStoreStructure | Tombstone,
+               resourceType?: ResourceConstant,
+               amount?: number,
+          ): boolean
 
-          advancedWithdraw(target: Creep | AnyStoreStructure | Tombstone, resourceType?: ResourceConstant, amount?: number): boolean
+          advancedWithdraw(
+               target: Creep | AnyStoreStructure | Tombstone,
+               resourceType?: ResourceConstant,
+               amount?: number,
+          ): boolean
 
           /**
            * Harvests a source and informs the result, while recording the result if successful
@@ -1400,7 +1408,7 @@ declare global {
           /**
            * The target ID of the task
            */
-           taskTargetID: Id<Creep | AnyStoreStructure | Tombstone>
+          taskTargetID: Id<Creep | AnyStoreStructure | Tombstone>
 
           /**
            * The target ID of the task
@@ -1569,4 +1577,26 @@ export const loop = function () {
      internationalManager.advancedSellPixels()
 
      internationalManager.endTickManager()
+     // console.log('Stats cpu logging')
+     // console.log(
+     //      `Non stats room count: ${Memory.stats.debugRoomCount1} - Pre: ${Memory.stats.debugCpu11} - End: ${
+     //           Memory.stats.debugCpu12
+     //      } - Per room: ${((Memory.stats.debugCpu11 + Memory.stats.debugCpu12) / Memory.stats.debugRoomCount1).toFixed(
+     //           4,
+     //      )}`,
+     // )
+     // console.log(
+     //      `Commune stats room count: ${Memory.stats.debugRoomCount2} - Pre: ${Memory.stats.debugCpu21} - End: ${
+     //           Memory.stats.debugCpu22
+     //      } - Per room: ${((Memory.stats.debugCpu21 + Memory.stats.debugCpu22) / Memory.stats.debugRoomCount2).toFixed(
+     //           4,
+     //      )}`,
+     // )
+     // console.log(
+     //      `Remote stats room count: ${Memory.stats.debugRoomCount3} - Pre: ${Memory.stats.debugCpu31} - End: ${
+     //           Memory.stats.debugCpu32
+     //      } - Per room: ${((Memory.stats.debugCpu31 + Memory.stats.debugCpu32) / Memory.stats.debugRoomCount3).toFixed(
+     //           4,
+     //      )}`,
+     // )
 }

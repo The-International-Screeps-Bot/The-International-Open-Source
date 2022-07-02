@@ -71,11 +71,9 @@ export class StatsManager {
                if (Game.time % 1000 === 0 && roomType === 'commune') {
                     roomStats.cl =
                          room.controller && room.controller.owner && room.controller.owner.username === Memory.me
-                              ? parseFloat(
-                                     (
-                                          room.controller.level +
-                                          room.controller.progress / room.controller.progressTotal
-                                     ).toFixed(2),
+                              ? this.round(
+                                     room.controller.level + room.controller.progress / room.controller.progressTotal,
+                                     2,
                                 )
                               : undefined
                     roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY)
@@ -89,17 +87,17 @@ export class StatsManager {
                     // roomStats.eoso = this.average(roomStats.eoso, globalStats.eoso, 1000)
 
                     // roomStats.eiet = this.average(roomStats.eiet, globalStats.eiet, 1000)
-                    roomStats.eou = parseFloat(this.average(roomStats.eou, globalStats.eou, 1000).toFixed(2))
-                    roomStats.eorwr = parseFloat(this.average(roomStats.eorwr, globalStats.eorwr, 1000).toFixed(2))
-                    roomStats.eosp = parseFloat(this.average(roomStats.eosp, globalStats.eosp, 1000).toFixed(2))
+                    roomStats.eou = this.round(this.average(roomStats.eou, globalStats.eou, 1000), 2)
+                    roomStats.eorwr = this.round(this.average(roomStats.eorwr, globalStats.eorwr, 1000), 2)
+                    roomStats.eosp = this.round(this.average(roomStats.eosp, globalStats.eosp, 1000), 2)
                }
-               roomStats.eih = parseFloat(this.average(roomStats.eih, globalStats.eih, 1000).toFixed(2))
+               roomStats.eih = this.round(this.average(roomStats.eih, globalStats.eih, 1000), 2)
 
-               roomStats.eob = parseFloat(this.average(roomStats.eob, globalStats.eob, 1000).toFixed(2))
-               roomStats.eoro = parseFloat(this.average(roomStats.eoro, globalStats.eoro, 1000).toFixed(2))
+               roomStats.eob = this.round(this.average(roomStats.eob, globalStats.eob, 1000), 2)
+               roomStats.eoro = this.round(this.average(roomStats.eoro, globalStats.eoro, 1000), 2)
           }
 
-          roomStats.cu = parseFloat(this.average(roomStats.cu, Game.cpu.getUsed() - globalStats.cu, 1000).toFixed(2))
+          roomStats.cu = this.round(this.average(roomStats.cu, Game.cpu.getUsed() - globalStats.cu, 1000), 2)
           if (roomType === 'commune') {
                global.debugCpu22 += Game.cpu.getUsed() - cpu
           } else {
@@ -183,8 +181,9 @@ export class StatsManager {
           }
           Memory.stats.cpu = {
                bucket: Game.cpu.bucket,
-               usage: this.average(Memory.stats.cpu.usage, Game.cpu.getUsed(), 1000, 2),
+               usage: this.round(this.average(Memory.stats.cpu.usage, Game.cpu.getUsed(), 1000)),
           }
+          console.log(Math.floor(RawMemory.get().length / 1000), Math.floor(RawMemory.get().length))
           Memory.stats.memory.usage = Math.floor(RawMemory.get().length / 1000)
           Memory.stats.memory.usage = 0
           Memory.stats.gcl = {
@@ -199,7 +198,6 @@ export class StatsManager {
           }
 
           if (global.debugCpu21) {
-               console.log(Memory.stats.debugRoomCount2)
                Memory.stats.debugCpu11 = this.average(Memory.stats.debugCpu11, global.debugCpu11, 10)
                Memory.stats.debugCpu12 = this.average(Memory.stats.debugCpu12, global.debugCpu12, 10)
                Memory.stats.debugCpu21 = this.average(Memory.stats.debugCpu21, global.debugCpu21, 10)
@@ -226,11 +224,13 @@ export class StatsManager {
      }
 
      average(originalNumber: number, newNumber: number, averagedOverTickCount: number, roundDigits: number = 5) {
-          // if (averagedOverTickCount !== 10) return newNumber
           const newWeight = 1 / averagedOverTickCount
           const originalWeight = 1 - newWeight
 
           return originalNumber * originalWeight + newNumber * newWeight
+     }
+     round(number: number, digits: number = 2) {
+          return parseFloat(number.toFixed(digits))
      }
 }
 
