@@ -11,6 +11,7 @@ import {
      customLog,
      findCreepInQueueMatchingRequest,
      findObjectWithID,
+     findPositionsInsideRect,
      getRange,
      getRangeBetween,
      pack,
@@ -286,7 +287,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
                          if (global.roomStats[this.room.name])
                               global.roomStats[this.room.name].eoro += energySpentOnRepairs
-                         this.message  += `🔧${energySpentOnRepairs * REPAIR_POWER}`
+                         this.message += `🔧${energySpentOnRepairs * REPAIR_POWER}`
                     }
                }
 
@@ -1047,46 +1048,47 @@ Creep.prototype.findTask = function (allowedTaskTypes, resourceType = RESOURCE_E
 Creep.prototype.shove = function (shoverPos) {
      const { room } = this
 
-     /*
-    if (!this.moveRequest) {
- */
-     let goalPos: RoomPosition | undefined
-     let flee = false
+     let goalPos: RoomPosition
+     let weightPositions: {[key: string]: RoomPosition[]} = {}
 
      if (this.memory.goalPos) {
+
           goalPos = unpackPos(this.memory.goalPos)
+          weightPositions[255] = [this.pos, shoverPos]
      }
 
      if (!goalPos || getRange(goalPos.x - this.pos.x, goalPos.y - this.pos.y) === 0) {
-          goalPos = this.pos
-          flee = true
+
+          const adjacentPositions = room.findWalkableRoomPositionsInsideRect(this.pos.x - 1, this.pos.y - 1, this.pos.x + 1, this.pos.y + 1)
+
+          goalPos = adjacentPositions.filter(pos => {
+
+               return !arePositionsEqual(this.pos, pos) && !arePositionsEqual(shoverPos, pos)
+          })[0]
      }
 
      this.createMoveRequest({
           origin: this.pos,
           goal: { pos: goalPos, range: 1 },
-          /* weightGamebjects: { 255: this.room.find(FIND_MY_CREEPS) }, */
-          weightPositions: { 255: [shoverPos] },
-          flee,
-          cacheAmount: 0,
+          weightPositions,
      })
-
+     this.say('s')
      if (!this.moveRequest) return false
 
-     /*
-     this.room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), { color: constants.colors.yellow })
+     if (Memory.roomVisuals) {
+          room.visual.circle(this.pos, {
+               fill: '',
+               stroke: constants.colors.yellow,
+               radius: 0.5,
+               strokeWidth: 0.15,
+          })
 
-     return this.runMoveRequest(this.moveRequest)
-
-        return false
-
- */
-     if (Memory.roomVisuals)
           room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), {
                color: constants.colors.yellow,
           })
+     }
 
-     this.recurseMoveRequest(this.moveRequest)
+     this.recurseMoveRequest(this.moveRequest, [], true)
 
      return true
 }
@@ -1124,7 +1126,7 @@ Creep.prototype.runMoveRequest = function (packedPos) {
      return moveResult
 }
 
-Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
+Creep.prototype.recurseMoveRequest = function (packedPos, queue = [], shove) {
      const { room } = this
 
      // Try to find the name of the creep at pos
@@ -1168,6 +1170,12 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
      // Otherwise if creepAtPos is fatigued, stop
 
      if (creepAtPos.fatigue > 0) return
+
+     if (shove) {
+          if (creepAtPos.shove(this.pos)) this.runMoveRequest(packedPos)
+
+          return
+     }
 
      // If the creepAtPos has a moveRequest and it's valid
 
@@ -1220,7 +1228,7 @@ Creep.prototype.recurseMoveRequest = function (packedPos, queue = []) {
           return
      }
 
-     // Otherwise the creepAtPos has no moveRequest and isn't fatigued
+     // Otherwise the creepAtPos has no moveRequest
 
      if (creepAtPos.shove(this.pos)) {
           this.runMoveRequest(packedPos)
@@ -1969,7 +1977,6 @@ Creep.prototype.reservationManager = function () {
           target = findObjectWithID(reservation.targetID)
 
           if (!target || target.room.name !== this.room.name) {
-
                this.memory.reservations.splice(index, 1)
                continue
           }

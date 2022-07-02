@@ -562,6 +562,8 @@ Object.defineProperties(Room.prototype, {
                if (this.fastFillerContainerLeft && this.fastFillerContainerLeft.store.energy <= this.fastFillerContainerLeft.store.getCapacity(RESOURCE_ENERGY) * 0.5) this._METT.push(this.fastFillerContainerLeft)
                if (this.fastFillerContainerRight && this.fastFillerContainerRight.store.energy <= this.fastFillerContainerRight.store.getCapacity(RESOURCE_ENERGY) * 0.5) this._METT.push(this.fastFillerContainerRight)
 
+               if (this.controllerContainer) this._METT.push(this.controllerContainer)
+
                if (this.controllerLink && !this.hubLink) this._METT.push(this.controllerLink)
 
                return this._METT

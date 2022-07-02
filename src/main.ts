@@ -747,6 +747,11 @@ declare global {
           /**
            *
            */
+           findWalkableRoomPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
+
+          /**
+           *
+           */
           createPullTask(creator: Structure | Creep | Resource): void
 
           /**
@@ -1214,7 +1219,7 @@ declare global {
           /**
            *
            */
-          recurseMoveRequest(pos: number, queue?: string[]): void
+          recurseMoveRequest(pos: number, queue?: string[], shove?: boolean): void
 
           /**
            *
@@ -1564,26 +1569,4 @@ export const loop = function () {
      internationalManager.advancedSellPixels()
 
      internationalManager.endTickManager()
-     console.log('Stats cpu logging')
-     console.log(
-          `Non stats room count: ${Memory.stats.debugRoomCount1} - Pre: ${Memory.stats.debugCpu11} - End: ${
-               Memory.stats.debugCpu12
-          } - Per room: ${((Memory.stats.debugCpu11 + Memory.stats.debugCpu12) / Memory.stats.debugRoomCount1).toFixed(
-               4,
-          )}`,
-     )
-     console.log(
-          `Commune stats room count: ${Memory.stats.debugRoomCount2} - Pre: ${Memory.stats.debugCpu21} - End: ${
-               Memory.stats.debugCpu22
-          } - Per room: ${((Memory.stats.debugCpu21 + Memory.stats.debugCpu22) / Memory.stats.debugRoomCount2).toFixed(
-               4,
-          )}`,
-     )
-     console.log(
-          `Remote stats room count: ${Memory.stats.debugRoomCount3} - Pre: ${Memory.stats.debugCpu31} - End: ${
-               Memory.stats.debugCpu32
-          } - Per room: ${((Memory.stats.debugCpu31 + Memory.stats.debugCpu32) / Memory.stats.debugRoomCount3).toFixed(
-               4,
-          )}`,
-     )
 }

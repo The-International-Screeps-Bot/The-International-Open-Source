@@ -89,9 +89,9 @@ Hauler.prototype.reserve = function () {
                this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
                return
           }
-     }
 
-     if (this.usedStore() === 0) return
+          return
+     }
 
      if (!transferTargets) transferTargets = room.MATT.filter(function (target) {
           return target.freeSpecificStore(RESOURCE_ENERGY) > 0

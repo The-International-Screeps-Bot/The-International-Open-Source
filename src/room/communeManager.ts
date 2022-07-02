@@ -29,12 +29,11 @@ export function communeManager(room: Room) {
      room.claimRequestManager()
 
      spawnManager(room)
+     /*
+     let cpu = Game.cpu.getUsed()
 
-/*
-    let cpu = Game.cpu.getUsed()
 
-    new RoomPosition(25, 25, room.name).findClosestByRange([])
 
-    customLog('CPU USED FOR TEST', Game.cpu.getUsed() - cpu)
+     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu)
  */
 }

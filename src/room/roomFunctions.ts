@@ -1316,12 +1316,11 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     // If there is no route
 
                     if (!route) {
-                         let y = 0
-                         let x = 0
+                         let x
 
                          // Configure y and loop through top exits
 
-                         y = 0
+                         let y = 0
                          for (x = 0; x < 50; x += 1) cm.set(x, y, 255)
 
                          // Configure x and loop through left exits
@@ -2658,7 +2657,7 @@ Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
 
      // Construct positions
 
-     const positions: RoomPosition[] = []
+     const positions = []
 
      // Loop through coordinates inside the rect
 
@@ -2667,6 +2666,34 @@ Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
                // Iterate if the pos doesn't map onto a room
 
                if (x < 0 || x >= constants.roomDimensions || y < 0 || y >= constants.roomDimensions) continue
+
+               // Otherwise ass the x and y to positions
+
+               positions.push(new RoomPosition(x, y, this.name))
+          }
+     }
+
+     // Inform positions
+
+     return positions
+}
+
+Room.prototype.findWalkableRoomPositionsInsideRect = function (x1, y1, x2, y2) {
+
+     // Construct positions
+
+     const positions = []
+     const terrain = this.getTerrain()
+
+     // Loop through coordinates inside the rect
+
+     for (let x = x1; x <= x2; x += 1) {
+          for (let y = y1; y <= y2; y += 1) {
+               // Iterate if the pos doesn't map onto a room
+
+               if (x < 0 || x >= constants.roomDimensions || y < 0 || y >= constants.roomDimensions) continue
+
+               if (terrain.get(x, y) == TERRAIN_MASK_WALL) continue
 
                // Otherwise ass the x and y to positions
 
