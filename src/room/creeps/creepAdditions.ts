@@ -38,6 +38,28 @@ Object.defineProperties(Creep.prototype, {
                return this._strength
           },
      },
+     healStrength: {
+          get() {
+
+               if (this._healStrength) return this._healStrength
+
+               this._healStrength = 0
+
+               let toughBoost = 0
+
+               for (const part of this.body) {
+                    if (part.type === TOUGH) {
+                         toughBoost = Math.max(part.boost ? BOOSTS[part.type][part.boost].damage : 0, toughBoost)
+                         continue
+                    }
+
+                    if (part.type === HEAL)
+                         this._healStrength += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
+               }
+
+               return this._healStrength += this._healStrength * toughBoost
+          }
+     },
      parts: {
           get() {
                if (this._parts) return this._parts
@@ -118,7 +140,7 @@ Object.defineProperties(Creep.prototype, {
 
                     if (range > 3) continue
 
-                    this._towerDamage -= posData.creep.findHealPower(range)
+                    this._towerDamage -= posData.creep.findTotalHealPower(range)
                }
 
                if (this.boosts.GO > 0) this._towerDamage *= BOOSTS.tough.GO.damage

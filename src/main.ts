@@ -1125,8 +1125,6 @@ declare global {
            */
           pathOpts: PathOpts
 
-          healStrength: number
-
           /**
            * If the creep is expected to be full next tick
            */
@@ -1276,15 +1274,13 @@ declare global {
 
           isOnExit(): boolean
 
-          findHealPower(range?: number): number
+          findTotalHealPower(range?: number): number
 
           advancedRecycle(): void
 
           advancedRenew(): boolean
 
           advancedReserveController(): boolean
-
-          findHealStrength(): number
 
           findCost(): number
 
@@ -1322,6 +1318,10 @@ declare global {
            * A numerical measurement of the combat abilites of the creep
            */
           readonly strength: number
+
+          _healStrength: number
+
+          readonly healStrength: number
 
           _reservation: Reservation | false
 
