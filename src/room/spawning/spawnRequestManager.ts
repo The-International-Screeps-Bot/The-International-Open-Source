@@ -217,13 +217,11 @@ export function spawnRequester(room: Room) {
 
                // If there is no source1Link, increase requiredCarryParts using the source's path length
 
-               if (!room.source1Link)
-                    requiredCarryParts += findCarryPartsRequired(room.source1PathLength * 2, 10)
+               if (!room.source1Link) requiredCarryParts += findCarryPartsRequired(room.source1PathLength * 2, 10)
 
                // If there is no source2Link, increase requiredCarryParts using the source's path length
 
-               if (!room.source2Link)
-                    requiredCarryParts += findCarryPartsRequired(room.source2PathLength * 2, 10)
+               if (!room.source2Link) requiredCarryParts += findCarryPartsRequired(room.source2PathLength * 2, 10)
 
                // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
@@ -444,13 +442,11 @@ export function spawnRequester(room: Room) {
                }
 
                // Otherwise if there is no storage
-               else partsMultiplier += estimatedIncome * 2
+               else partsMultiplier += estimatedIncome / 2
 
                // If all RCL 3 extensions are build
 
                if (spawnEnergyCapacity >= 800) {
-                    partsMultiplier /= 3
-
                     return {
                          defaultParts: [],
                          extraParts: [WORK, WORK, MOVE, CARRY, CARRY, MOVE, CARRY, CARRY, MOVE, CARRY, MOVE, WORK],
@@ -488,13 +484,12 @@ export function spawnRequester(room: Room) {
 
                // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
-               const repairTargets = [...room.structures.road, ...room.structures.container]
-                    .filter(structure => structure.hitsMax * 0.2 >= structure.hits)
+               const repairTargets = [...room.structures.road, ...room.structures.container].filter(
+                    structure => structure.hitsMax * 0.2 >= structure.hits,
+               )
                // Get ramparts below their max hits
 
-               const ramparts = room.structures.rampart.filter(
-                    rampart => rampart.hits < rampart.hitsMax,
-               )
+               const ramparts = room.structures.rampart.filter(rampart => rampart.hits < rampart.hitsMax)
 
                // If there are no ramparts or repair targets
 
