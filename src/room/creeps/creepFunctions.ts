@@ -1051,19 +1051,25 @@ Creep.prototype.shove = function (shoverPos, queue) {
      queue.push(this.name)
 
      let goalPos: RoomPosition
-     let range = 1
      let goalRange
-     let weightPositions: {[key: string]: RoomPosition[]} = {}
 
      if (this.memory.goalPos) {
 
           goalPos = unpackPos(this.memory.goalPos)
 
-          weightPositions[255] = [this.pos, shoverPos]
+          const weightPositions: {[key: string]: RoomPosition[]} = {
+               255: [this.pos, shoverPos]
+          }
 
           goalRange = getRange(goalPos.x - this.pos.x, goalPos.y - this.pos.y)
 
-          if (goalRange <= 1) weightPositions[255].push(goalPos)
+          let range = 1
+
+          if (goalRange <= 1) {
+
+               weightPositions[255].push(goalPos)
+               range = 0
+          }
 
           this.message += 'a'
 
@@ -1082,14 +1088,16 @@ Creep.prototype.shove = function (shoverPos, queue) {
 
                return !arePositionsEqual(this.pos, pos) && !arePositionsEqual(shoverPos, pos)
           })[0]
-          range = 0
           this.message += 'b'
 
           const packedPos = pack(goalPos)
 
-          room.moveRequests[pack(this.pos)].push(packedPos)
+          room.moveRequests[packedPos].push(this.name)
           this.moveRequest = packedPos
      }
+     room.visual.line(this.pos, goalPos, {
+          color: constants.colors.red,
+     })
      room.visual.circle(this.pos, {
           fill: '',
           stroke: constants.colors.red,

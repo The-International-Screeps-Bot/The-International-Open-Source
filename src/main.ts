@@ -1091,11 +1091,14 @@ declare global {
           planned: boolean
 
           /**
-           * Wether or not remote planning has been completed for the room
+           * Remote Planned, wether or not remote planning has been completed for the room
            */
-          remotePlanned: boolean
+          RP: boolean
 
-          remoteStampAnchors: Partial<Record<RemoteStampTypes, number[]>>
+          /**
+           * Remote Stamp Anchors, 
+           */
+          RSA: Partial<Record<RemoteStampTypes, string>>
      }
 
      // Creeps
