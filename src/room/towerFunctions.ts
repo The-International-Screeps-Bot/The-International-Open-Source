@@ -90,7 +90,7 @@ Room.prototype.towersHealCreeps = function () {
 }
 
 Room.prototype.towersAttackCreeps = function () {
-     if (this.controller.safeMode) return
+     // if (this.controller.safeMode) return
 
      // Construct attack targets from my and allied damaged creeps in the this
 
@@ -99,6 +99,8 @@ Room.prototype.towersAttackCreeps = function () {
      })
 
      if (!attackTargets.length) return
+
+     // Find the target the creep can deal the most damage to
 
      const attackTarget = attackTargets.sort(function (a, b) {
           return a.towerDamage - b.towerDamage

@@ -225,11 +225,21 @@ export function spawnRequester(room: Room) {
 
                // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
-               if (room.controllerContainer)
+               if (room.controllerContainer) {
+
+                    let income
+
+                    if (room.storage) {
+
+                         income = room.getPartsOfRoleAmount('controllerUpgrader', WORK)
+                    }
+                    else Math.min(room.getPartsOfRoleAmount('controllerUpgrader', WORK) * 0.75, room.sources.length * 0.75)
+
                     requiredCarryParts += findCarryPartsRequired(
                          room.upgradePathLength * 2,
-                         room.getPartsOfRoleAmount('controllerUpgrader', WORK),
+                         income,
                     )
+               }
 
                // If all RCL 3 extensions are build
 
@@ -442,7 +452,7 @@ export function spawnRequester(room: Room) {
                }
 
                // Otherwise if there is no storage
-               else partsMultiplier += estimatedIncome / 2
+               else partsMultiplier += Math.floor(estimatedIncome / 2)
 
                // If all RCL 3 extensions are build
 
@@ -1035,7 +1045,6 @@ export function spawnRequester(room: Room) {
 
                     const cost = 150
                     const extraParts = [WORK, MOVE]
-                    const minCost = cost * extraParts.length * 2
 
                     return {
                          defaultParts: [],
@@ -1043,7 +1052,7 @@ export function spawnRequester(room: Room) {
                          partsMultiplier: 50 / extraParts.length,
                          groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDismantler,
                          minCreeps: 1,
-                         minCost,
+                         minCost: cost * 2,
                          priority: 9,
                          memoryAdditions: {
                               role: 'remoteDismantler',

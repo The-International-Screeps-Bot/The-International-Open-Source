@@ -1640,7 +1640,7 @@ Creep.prototype.isOnExit = function () {
      return false
 }
 
-Creep.prototype.findHealPower = function (range) {
+Creep.prototype.findTotalHealPower = function (range = 1) {
      // Initialize the healValue
 
      let heal = 0
@@ -1654,7 +1654,7 @@ Creep.prototype.findHealPower = function (range) {
 
           // Otherwise increase healValue by heal power * the part's boost
 
-          heal += BOOSTS[part.type][part.boost][part.type] * (range <= 1 ? HEAL_POWER : RANGED_HEAL_POWER)
+          heal += (part.boost ? BOOSTS[part.type][part.boost][part.type] : 1) * (range <= 1 ? HEAL_POWER : RANGED_HEAL_POWER)
      }
 
      // Inform healValue
@@ -1802,28 +1802,6 @@ Creep.prototype.advancedReserveController = function () {
      })
 
      return true
-}
-
-Creep.prototype.findHealStrength = function () {
-     if (this.healStrength) return this.healStrength
-
-     this.healStrength = 0
-
-     let toughBoost = 0
-
-     for (const part of this.body) {
-          if (part.type === TOUGH) {
-               toughBoost = Math.max(part.boost ? BOOSTS[part.type][part.boost].damage : 0, toughBoost)
-               continue
-          }
-
-          if (part.type === HEAL)
-               this.healStrength += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
-     }
-
-     this.healStrength += this.healStrength * toughBoost
-
-     return this.healStrength
 }
 
 Creep.prototype.findCost = function () {
