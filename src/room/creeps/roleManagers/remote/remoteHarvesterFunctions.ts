@@ -29,7 +29,7 @@ RemoteHarvester.prototype.findRemote = function () {
           // Otherwise assign the remote to the creep and inform true
 
           creep.memory.remoteName = roomName
-          if (!creep.isDying()) roomMemory.needs[remoteNeedsIndex[role]] -= creep.partsOfType(WORK)
+          roomMemory.needs[remoteNeedsIndex[role]] -= this.parts.work
 
           return true
      }

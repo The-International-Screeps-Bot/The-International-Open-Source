@@ -33,7 +33,6 @@ Vanguard.prototype.travelToSource = function (sourceName) {
                range: 0,
           },
           avoidEnemyRanges: true,
-          cacheAmount: 50,
      })
 
      return true

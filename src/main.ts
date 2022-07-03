@@ -17,11 +17,14 @@ import './international/endTickManager'
 
 import './room/remotesManager'
 import { roomManager } from 'room/roomManager'
-import './room/roomGetters'
+import './room/roomAdditions'
+
+import './room/resourceAdditions'
+import './room/roomObjectFunctions'
 
 // Creep
 
-import './room/creeps/creepGetters'
+import './room/creeps/creepAdditions'
 
 // Other
 
@@ -34,9 +37,12 @@ import {
      RoomTransferTask,
      RoomWithdrawTask,
 } from 'room/roomTasks'
-import { RoomObject } from 'room/roomObject'
+import { RoomCacheObject } from 'room/roomObject'
 import { ErrorMapper } from 'other/ErrorMapper'
 import { constants } from 'international/constants'
+import { Single } from 'room/creeps/roleManagers/antifa/single'
+import { Duo } from 'room/creeps/roleManagers/antifa/duo'
+import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 
 // Type declareations for global
 
@@ -124,7 +130,8 @@ declare global {
           | 'claimer'
           | 'vanguard'
           | 'vanguardDefender'
-          | 'antifa'
+          | 'antifaAssaulter'
+          | 'antifaSupporter'
 
      type RoomObjectName =
           | 'terrainCM'
@@ -167,7 +174,6 @@ declare global {
           | 'usedSourceHarvestPositions'
           | 'usedUpgradePositions'
           | 'usedFastFillerPositions'
-          | 'structuresForSpawning'
           | 'notMyCreeps'
           | 'enemyCreeps'
           | 'allyCreeps'
@@ -294,109 +300,77 @@ declare global {
 
      interface ClaimRequest {
           needs: number[]
+          /**
+           * The weight for which to prefer this room, where higher values are prefered less
+           */
           score: number
+          /**
+           * The number of ticks to abandon the claimRequest for
+           */
           abadon?: number
+     }
+
+     interface ControllerLevel {
+          level: number
+          progress: number
+          progressTotal: number
+     }
+     interface RoomStats {
+          cl?: number // controllerLevel
+          eih: number // energyInputHarvest
+          eiet?: number // energyInputExternalTransferred
+          eib?: number // energyInputBought
+          eou?: number // energyOutputUpgrade
+          eoro: number // energyOutputRepairOther
+          eorwr?: number // energyOutputRepairWallOrRampart
+          eob: number // energyOutputBuild
+          eoso?: number // energyOutputSold
+          eosp?: number // energyOutputSpawn
+          mh?: number // mineralsHarvested
+          es: number // energyStored
+          cc: number // creepCount
+          cu: number // cpuUsage
      }
 
      interface Stats {
           lastReset: number
 
+          lastTickTimestamp: number
           tickLength: number
 
-          communes: number
+          communeCount: number
 
-          credits: number
+          resources: {
+               pixels: number
+               cpuUnlocks: number
+               accessKeys: number
+               credits: number
+          }
 
-          /**
-           * The amount of energy in storages and terminals in owned rooms
-           */
-          energy: number
+          cpu: {
+               bucket: number
+               usage: number
+          }
 
-          /**
-           * An object of boosts representing the amount of each boost in storages and terminals in owned rooms
-           */
-          boosts: { [key: string]: MineralBoostConstant }
+          memory: {
+               usage: number
+               limit: number
+          }
 
-          /**
-           * The total amount of CPU used
-           */
-          cpuUsage: number
+          gcl: ControllerLevel
 
-          /**
-           * The amount of CPU generated per tick
-           */
-          cpuLimit: number
-
-          /**
-           * The amount of CPU left in the bucket
-           */
-          cpuBucket: number
-
-          /**
-           * The amount of memory used by the bot
-           */
-          memorUsage: number
-
-          /**
-           * The maximum memory the bot can use
-           */
-          memoryLimit: number
-
-          /**
-           * The amount of memory used by the bot
-           */
-          memoryUsage: number
-
-          /**
-           * The percent to the next GCL level
-           */
-          GCLPercent: number
-
-          /**
-           * The total amount of GCL
-           */
-          totalGCL: number
-
-          GCLLevel: number
-
-          /**
-           * The percent to the next PCL level
-           */
-          GPLPercent: number
-
-          /**
-           * The total amount of PCL
-           */
-          totalGPL: number
-
-          GPLLevel: number
-
-          /**
-           * The total number of creeps the bot owns
-           */
-          creeps: number
-
-          /**
-           * The total number of powerCreeps the bot owns
-           */
-          powerCreepCount: number
-
-          /**
-           * The total amount of energy harvested by the bot per tick
-           */
-          energyHarvested: number
-
-          mineralsHarvested: number
-
-          controlPoints: number
-
-          energySpentOnCreeps: number
-
-          energySpentOnConstruction: number
-
-          energySpentOnRepairing: number
-
-          energySpentOnBarricades: number
+          gpl: ControllerLevel
+          rooms: { [key: string]: RoomStats }
+          constructionSiteCount: number
+          debugCpu11: number
+          debugCpu12: number
+          debugCpu21: number
+          debugCpu22: number
+          debugCpu31: number
+          debugCpu32: number
+          debugRoomCount1: number
+          debugRoomCount2: number
+          debugRoomCount3: number
      }
 
      interface Memory {
@@ -404,6 +378,11 @@ declare global {
            * The name of the user
            */
           me: string
+
+          /**
+           * IsMainShard
+           */
+          isMainShard: boolean
 
           /**
            * The current breaking version of the bot
@@ -429,6 +408,11 @@ declare global {
            * Wether the bot should log CPU data
            */
           cpuLogging: boolean
+
+          /**
+           * Wether the bot save RoomStats data
+           */
+          roomStats: 0 | 1 | 2
 
           /**
            * A list of usernames to treat as allies
@@ -498,28 +482,6 @@ declare global {
 
      type SourceHarvestPositions = Map<number, boolean>[]
 
-     interface RoomGlobal {
-          [key: string]: any
-
-          // RoomObjects
-
-          stampAnchors: StampAnchors
-
-          sourceHarvestPositions: SourceHarvestPositions
-
-          source1PathLength: number
-
-          source2PathLength: number
-
-          upgradePathLength: number
-
-          //
-
-          tasksWithResponders: Record<string | number, RoomTask>
-
-          tasksWithoutResponders: Record<string | number, RoomTask>
-     }
-
      interface OrganizedStructures {
           spawn: StructureSpawn[]
           extension: StructureExtension[]
@@ -544,6 +506,54 @@ declare global {
           invaderCore: StructureInvaderCore[]
      }
 
+     interface RoomGlobal {
+          [key: string]: any
+
+          // RoomObjects
+
+          stampAnchors: StampAnchors
+
+          sourceHarvestPositions: SourceHarvestPositions
+
+          source1PathLength: number
+
+          source2PathLength: number
+
+          upgradePathLength: number
+
+          // Containers
+
+          source1Container: Id<StructureContainer> | undefined
+
+          source2Container: Id<StructureContainer> | undefined
+
+          fastFillerContainerLeft: Id<StructureContainer> | undefined
+
+          fastFillerContainerRight: Id<StructureContainer> | undefined
+
+          controllerContainer: Id<StructureContainer> | undefined
+
+          mineralContainer: Id<StructureContainer> | undefined
+
+          // Links
+
+          source1Link: Id<StructureLink> | undefined
+
+          source2Link: Id<StructureLink> | undefined
+
+          controllerLink: Id<StructureLink> | undefined
+
+          fastFillerLink: Id<StructureLink> | undefined
+
+          hubLink: Id<StructureLink> | undefined
+
+          //
+
+          tasksWithResponders: Record<string | number, RoomTask>
+
+          tasksWithoutResponders: Record<string | number, RoomTask>
+     }
+
      interface Room {
           /**
            * The amount of creeps with a task of harvesting sources in the room
@@ -560,7 +570,7 @@ declare global {
            */
           myCreepsAmount: number
 
-          roomObjects: Partial<Record<RoomObjectName, RoomObject>>
+          roomObjects: Partial<Record<RoomObjectName, RoomCacheObject>>
 
           /**
            * An object with keys of roles and properties of the number of creeps with the role from this room
@@ -598,7 +608,7 @@ declare global {
           creepPositions: PackedPosMap
 
           /**
-           * A matrix with indexes of packed positions and values of move requests
+           * A matrix with indexes of packed positions and values of creep names
            */
           moveRequests: PackedPosMap
 
@@ -606,6 +616,8 @@ declare global {
            * A set of roomNames representing the targets of scouts from this commune
            */
           scoutTargets: Set<string>
+
+          spawnRequests: { [priority: string]: SpawnRequest }
 
           // Functions
 
@@ -776,6 +788,20 @@ declare global {
 
           remotesManager(): void
 
+          // Spawn functions
+
+          spawnRequester(): void
+
+          constructSpawnRequests(opts: SpawnRequestOpts | false): void
+
+          decideMaxCostPerCreep(maxCostPerCreep: number): number
+
+          createSpawnRequest(priority: number, body: BodyPartConstant[], tier: number, cost: number, memory: any): void
+
+          spawnRequestIndividually(opts: SpawnRequestOpts): void
+
+          spawnRequestByGroup(opts: SpawnRequestOpts): void
+
           // Market functions
 
           advancedSell(resourceType: ResourceConstant, amount: number): boolean
@@ -842,19 +868,119 @@ declare global {
 
           readonly spawningStructures: SpawningStructures
 
-          _taskNeedingSpawningStructures: SpawningStructures
-
-          readonly taskNeedingSpawningStructures: SpawningStructures
-
           _spawningStructuresByPriority: SpawningStructures
 
           readonly spawningStructuresByPriority: SpawningStructures
+
+          _spawningStructuresByNeed: SpawningStructures
+
+          readonly spawningStructuresByNeed: SpawningStructures
+
+          _taskNeedingSpawningStructures: SpawningStructures
+
+          readonly taskNeedingSpawningStructures: SpawningStructures
 
           readonly sourceHarvestPositions: SourceHarvestPositions
 
           _rampartPlans: CostMatrix
 
           readonly rampartPlans: CostMatrix
+
+          readonly source1PathLength: number
+
+          readonly source2PathLength: number
+
+          readonly upgradePathLength: number
+
+          // Container
+
+          readonly source1Container: StructureContainer | undefined
+
+          readonly source2Container: StructureContainer | undefined
+
+          readonly fastFillerContainerLeft: StructureContainer | undefined
+
+          readonly fastFillerContainerRight: StructureContainer | undefined
+
+          readonly controllerContainer: StructureContainer | undefined
+
+          readonly mineralContainer: StructureContainer | undefined
+
+          // Links
+
+          readonly source1Link: StructureLink | undefined
+
+          readonly source2Link: StructureLink | undefined
+
+          readonly controllerLink: StructureLink | undefined
+
+          readonly fastFillerLink: StructureLink | undefined
+
+          readonly hubLink: StructureLink | undefined
+
+          _droppedEnergy: Resource[]
+
+          readonly droppedEnergy: Resource[]
+
+          _actionableWalls: StructureWall[]
+
+          readonly actionableWalls: StructureWall[]
+
+          _MEWT: (AnyStoreStructure | Tombstone | Resource)[]
+
+          /**
+           * Mandatory energy withdraw targets
+           */
+          readonly MEWT: (AnyStoreStructure | Tombstone | Resource)[]
+
+          _OEWT: (AnyStoreStructure | Tombstone | Resource)[]
+
+          /**
+           * Optional energy withdraw targets
+           */
+          readonly OEWT: (AnyStoreStructure | Tombstone | Resource)[]
+
+          _MAWT: (AnyStoreStructure | Tombstone | Resource)[]
+
+          /**
+           * Mandatory all withdraw targets
+           */
+          readonly MAWT: (AnyStoreStructure | Tombstone | Resource)[]
+
+          _OAWT: (AnyStoreStructure | Tombstone | Resource)[]
+
+          /**
+           * Optional all withdraw targets
+           */
+          readonly OAWT: (AnyStoreStructure | Tombstone | Resource)[]
+
+          _METT: (AnyStoreStructure | Tombstone)[]
+
+          /**
+           * Mandatory energy transfer targets
+           */
+          readonly METT: (AnyStoreStructure | Tombstone)[]
+
+          _OETT: (AnyStoreStructure | Tombstone)[]
+
+          /**
+           * Optional energy transfer targets
+           */
+          readonly OETT: (AnyStoreStructure | Tombstone)[]
+
+          _MATT: (AnyStoreStructure | Tombstone)[]
+
+          /**
+           * Mandatory all transfer targets
+           */
+          readonly MATT: (AnyStoreStructure | Tombstone)[]
+
+          _OATT: (AnyStoreStructure | Tombstone)[]
+
+          /**
+           * Optional all transfer targets
+           */
+          readonly OATT: (AnyStoreStructure | Tombstone)[]
      }
 
      interface DepositRecord {
@@ -960,11 +1086,14 @@ declare global {
           planned: boolean
 
           /**
-           * Wether or not remote planning has been completed for the room
+           * Remote Planned, wether or not remote planning has been completed for the room
            */
-          remotePlanned: boolean
+          RP: boolean
 
-          remoteStampAnchors: Partial<Record<RemoteStampTypes, number[]>>
+          /**
+           * Remote Stamp Anchors,
+           */
+          RSA: Partial<Record<RemoteStampTypes, string>>
      }
 
      // Creeps
@@ -977,20 +1106,9 @@ declare global {
            */
           moveRequest: number
 
-          /**
-           *
-           */
-          hasMoved: boolean
+          movedResource: boolean
 
-          hasMovedResources: boolean
-
-          hasWorked: boolean
-
-          hasAttacked: boolean
-
-          hasRangedAttacked: boolean
-
-          hasHealed: boolean
+          moved: boolean
 
           /**
            * Whether the creep is actively pulling another creep or not
@@ -1019,6 +1137,8 @@ declare global {
            */
           estimatedEmpty: boolean
 
+          squad: Single | Duo | Quad
+
           // Functions
 
           preTickManager(): void
@@ -1040,9 +1160,17 @@ declare global {
 
           advancedPickup(target: Resource): boolean
 
-          advancedTransfer(target: any, resourceType?: ResourceConstant, amount?: number): boolean
+          advancedTransfer(
+               target: Creep | AnyStoreStructure | Tombstone,
+               resourceType?: ResourceConstant,
+               amount?: number,
+          ): boolean
 
-          advancedWithdraw(target: any, resourceType?: ResourceConstant, amount?: number): boolean
+          advancedWithdraw(
+               target: Creep | AnyStoreStructure | Tombstone,
+               resourceType?: ResourceConstant,
+               amount?: number,
+          ): boolean
 
           /**
            * Harvests a source and informs the result, while recording the result if successful
@@ -1078,16 +1206,6 @@ declare global {
           findFastFillerPos(): boolean
 
           /**
-           * Checks if the creep has some parts of specified types
-           */
-          hasPartsOfTypes(partTypes: BodyPartConstant[]): boolean
-
-          /**
-           * Gets the number of parts of a specified type a creep has
-           */
-          partsOfType(type: BodyPartConstant): number
-
-          /**
            *
            */
           needsNewPath(goalPos: RoomPosition, cacheAmount: number, path: RoomPosition[] | undefined): boolean
@@ -1097,17 +1215,19 @@ declare global {
            */
           createMoveRequest(opts: MoveRequestOpts): boolean
 
+          findShovePositions(avoidPackedPositions: Set<number>): RoomPosition[]
+
           shove(shoverPos: RoomPosition): boolean
 
           /**
            * Try to enforce a moveRequest and inform the result
            */
-          runMoveRequest(packedPos: number): boolean
+          runMoveRequest(): boolean
 
           /**
            *
            */
-          recurseMoveRequest(pos: number, queue?: string[]): void
+          recurseMoveRequest(queue?: string[]): void
 
           /**
            *
@@ -1172,11 +1292,27 @@ declare global {
 
           aggressiveHeal(): boolean
 
+          reserveWithdrawEnergy(): void
+
+          reserveTransferEnergy(): void
+
           // Reservation
 
+          deleteReservation(index: number): void
+
+          createReservation(
+               type: Reservations,
+               target: Id<AnyStoreStructure | Creep | Tombstone | Resource>,
+               amount: number,
+               resourceType: ResourceConstant,
+          ): void
+
+          /**
+           * Deletes reservations with no target, pre-emptively modifies store values
+           */
           reservationManager(): void
 
-          createReservation(type: Reservations, target: Id<AnyStoreStructure | Creep | Tombstone | Resource>, amount: number, resourceType: ResourceConstant): void
+          fulfillReservation(): boolean
 
           // Getters
 
@@ -1202,6 +1338,13 @@ declare global {
           _towerDamage: number
 
           readonly towerDamage: number
+
+          _message: string
+
+          /**
+           * The cumulative message to present in say()
+           */
+          message: string
      }
 
      interface CreepMemory {
@@ -1269,13 +1412,20 @@ declare global {
           /**
            * The target ID of the task
            */
-          taskTargetID: Id<Creep | AnyStoreStructure>
+          taskTargetID: Id<Creep | AnyStoreStructure | Tombstone>
+
+          /**
+           * The target ID of the task
+           */
+          taskTarget: Id<Creep | AnyStoreStructure | Tombstone>
 
           taskAmount: number
 
           taskResource: ResourceConstant
 
           reservations: Reservation[]
+
+          dismantleTarget: Id<Structure>
      }
 
      // PowerCreeps
@@ -1322,6 +1472,33 @@ declare global {
           inactionable: boolean
      }
 
+     interface RoomObject {
+          // Functions
+
+          /**
+           * Finds the present total store usage number of this RoomObject
+           */
+          usedStore(): number
+
+          /**
+           * Finds the total free store capacity of this RoomObject
+           */
+          freeStore(resourceType: ResourceConstant): number
+
+          /**
+           * Finds the total free store capacity of a specific resource for this RoomObject
+           */
+          freeSpecificStore(resourceType: ResourceConstant): number
+     }
+
+     interface Resource {
+          // Getters
+
+          _reserveAmount: number
+
+          reserveAmount: number
+     }
+
      // Global
 
      namespace NodeJS {
@@ -1350,6 +1527,7 @@ declare global {
                packedRoomNames: { [roomManager: string]: string }
 
                unpackedRoomNames: { [key: string]: string }
+               roomStats: { [key: string]: RoomStats }
 
                // Command functions
 
@@ -1403,4 +1581,26 @@ export const loop = function () {
      internationalManager.advancedSellPixels()
 
      internationalManager.endTickManager()
+     // console.log('Stats cpu logging')
+     // console.log(
+     //      `Non stats room count: ${Memory.stats.debugRoomCount1} - Pre: ${Memory.stats.debugCpu11} - End: ${
+     //           Memory.stats.debugCpu12
+     //      } - Per room: ${((Memory.stats.debugCpu11 + Memory.stats.debugCpu12) / Memory.stats.debugRoomCount1).toFixed(
+     //           4,
+     //      )}`,
+     // )
+     // console.log(
+     //      `Commune stats room count: ${Memory.stats.debugRoomCount2} - Pre: ${Memory.stats.debugCpu21} - End: ${
+     //           Memory.stats.debugCpu22
+     //      } - Per room: ${((Memory.stats.debugCpu21 + Memory.stats.debugCpu22) / Memory.stats.debugRoomCount2).toFixed(
+     //           4,
+     //      )}`,
+     // )
+     // console.log(
+     //      `Remote stats room count: ${Memory.stats.debugRoomCount3} - Pre: ${Memory.stats.debugCpu31} - End: ${
+     //           Memory.stats.debugCpu32
+     //      } - Per room: ${((Memory.stats.debugCpu31 + Memory.stats.debugCpu32) / Memory.stats.debugRoomCount3).toFixed(
+     //           4,
+     //      )}`,
+     // )
 }

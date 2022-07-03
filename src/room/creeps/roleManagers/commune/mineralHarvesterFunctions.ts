@@ -43,8 +43,8 @@ MineralHarvester.prototype.advancedHarvestMineral = function (mineral) {
 
      // Find amount of minerals harvested and record it in data
 
-     const mineralsHarvested = Math.min(creep.partsOfType(WORK) * HARVEST_POWER, mineral.mineralAmount)
-     Memory.stats.mineralsHarvested += mineralsHarvested
+     const mineralsHarvested = Math.min(this.parts.work * HARVEST_POWER, mineral.mineralAmount)
+     if (global.roomStats[this.room.name]) global.roomStats[this.room.name].mh += mineralsHarvested
 
      creep.say(`⛏️${mineralsHarvested}`)
 

@@ -14,18 +14,19 @@ Room.prototype.advancedSell = function (resourceType, amount) {
 
      if (amount <= 0) return false
 
+     let dealAmount
+
      // Otherwise, find buy orders for the resourceType and loop through them
 
      for (const order of internationalManager.getBuyOrders(resourceType)) {
-          amount = findLargestTransactionAmount(
-               this.terminal.store.getUsedCapacity(RESOURCE_ENERGY),
+          dealAmount = findLargestTransactionAmount(
+               this.terminal.store.energy * 0.75,
                amount,
                this.name,
                order.roomName,
           )
 
-          Game.market.deal(order.id, Math.min(amount, order.remainingAmount), this.name)
-          return true
+          return Game.market.deal(order.id, Math.min(dealAmount, order.remainingAmount), this.name) == OK
      }
 
      // If there is already an order in this room for the resourceType, inform true
@@ -38,15 +39,15 @@ Room.prototype.advancedSell = function (resourceType, amount) {
 
      // Otherwise, create a new market order and inform true
 
-     Game.market.createOrder({
-          roomName: this.name,
-          type: ORDER_SELL,
-          resourceType,
-          price: getAvgPrice(resourceType) * 0.8,
-          totalAmount: amount,
-     })
-
-     return true
+     return (
+          Game.market.createOrder({
+               roomName: this.name,
+               type: ORDER_SELL,
+               resourceType,
+               price: getAvgPrice(resourceType) * 0.8,
+               totalAmount: amount,
+          }) == OK
+     )
 }
 
 Room.prototype.advancedBuy = function (resourceType, amount) {
@@ -62,18 +63,14 @@ Room.prototype.advancedBuy = function (resourceType, amount) {
 
      if (amount <= 0) return false
 
+     let dealAmount
+
      // Otherwise, find buy orders for the resourceType and loop through them
 
-     for (const order of internationalManager.getSellOrders(resourceType)) {
-          amount = findLargestTransactionAmount(
-               this.terminal.store.getUsedCapacity(RESOURCE_ENERGY),
-               amount,
-               this.name,
-               order.roomName,
-          )
+     for (const order of internationalManager.getSellOrders(resourceType, getAvgPrice(resourceType) * 1.2)) {
+          dealAmount = findLargestTransactionAmount(this.terminal.store.energy, amount, this.name, order.roomName)
 
-          Game.market.deal(order.id, Math.min(amount, order.remainingAmount), this.name)
-          return true
+          return Game.market.deal(order.id, Math.min(dealAmount, order.remainingAmount), this.name) == OK
      }
 
      // If there is already an order in this room for the resourceType, inform true
@@ -86,13 +83,13 @@ Room.prototype.advancedBuy = function (resourceType, amount) {
 
      // Otherwise, create a new market order and inform true
 
-     Game.market.createOrder({
-          roomName: this.name,
-          type: ORDER_BUY,
-          resourceType,
-          price: getAvgPrice(resourceType) * 0.8,
-          totalAmount: amount,
-     })
-
-     return true
+     return (
+          Game.market.createOrder({
+               roomName: this.name,
+               type: ORDER_BUY,
+               resourceType,
+               price: getAvgPrice(resourceType) * 1.2,
+               totalAmount: amount,
+          }) == OK
+     )
 }

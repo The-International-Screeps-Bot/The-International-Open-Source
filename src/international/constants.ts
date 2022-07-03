@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 25
+export const breakingVersion = 28
 
 // Settings
 
@@ -28,7 +28,12 @@ export const cpuLogging = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const allyList = new Set(['MarvinTMB', 'Q13214', 'HerrKai', 'clarkok', 'PandaMaster', 'lokenwow', 'Morningtea'])
+export const roomStats: 0 | 1 | 2 = 0
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const allyList = new Set(['MarvinTMB', 'Q13214', 'HerrKai', 'clarkok', 'PandaMaster', 'lokenwow', 'Morningtea', 'LittleBitBlue'])
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -145,6 +150,7 @@ constants.roomTypes = {
           portalsTo: true,
      },
 }
+constants.roomTypesUsedForStats = ['commune', 'remote']
 
 constants.creepRoles = [
      'source1Harvester',
@@ -168,7 +174,8 @@ constants.creepRoles = [
      'claimer',
      'vanguard',
      'vanguardDefender',
-     'antifa',
+     'antifaAssaulter',
+     'antifaSupporter'
 ]
 
 // Set of messages to randomly apply to commune rooms
@@ -590,7 +597,14 @@ export const spawnByRoomRemoteRoles: (
      | 'remoteDefender'
      | 'remoteCoreAttacker'
      | 'remoteDismantler'
-)[] = ['source1RemoteHarvester', 'source2RemoteHarvester', 'remoteReserver', 'remoteDefender', 'remoteCoreAttacker', 'remoteDismantler']
+)[] = [
+     'source1RemoteHarvester',
+     'source2RemoteHarvester',
+     'remoteReserver',
+     'remoteDefender',
+     'remoteCoreAttacker',
+     'remoteDismantler',
+]
 
 export const builderSpawningWhenStorageThreshold = 40000
 
@@ -605,3 +619,8 @@ export const relayRoles: Partial<CreepRoles>[] = ['hauler', 'remoteHauler']
 // The dowwngrade timer for when upgrading the controller is required
 
 export const controllerDowngradeUpgraderNeed = 10000
+
+/**
+ * Used to modify the remaining bucket amount, resulting in the default cacheAmount for moveRequests
+ */
+export const cacheAmountModifier = 25

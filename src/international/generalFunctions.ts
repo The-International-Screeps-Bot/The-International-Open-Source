@@ -14,9 +14,7 @@ export function getAvgPrice(resourceType: MarketResourceConstant, days = 2) {
 
      // Iterate through each index less than days
 
-     for (let index = 0; index < days - 1; index += 1) {
-          totalPrice += history[index].avgPrice
-     }
+     for (let index = 0; index <= days; index += 1) totalPrice += history[index].avgPrice
 
      // Inform the totalPrice divided by the days
 
@@ -66,7 +64,7 @@ export function arePositionsEqual(pos1: Pos, pos2: Pos) {
  * @param bgColor Colour of the background. Default is white
  */
 export function customLog(
-     title: string,
+     title: any,
      message: any,
      color: string = constants.colors.black,
      bgColor: string = constants.colors.white,
@@ -230,6 +228,12 @@ export function pack(pos: Pos) {
      return pos.x * constants.roomDimensions + pos.y
 }
 
+export function packXY(x: number, y: number) {
+     // Inform a packed pos
+
+     return x * constants.roomDimensions + y
+}
+
 export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPos: number) {
      // Loop through each creepName of the queue
 
@@ -282,13 +286,13 @@ export function findLargestTransactionAmount(budget: number, amount: number, roo
 
      // So long as the the transactions cost is more than the budget
 
-     while (Game.market.calcTransactionCost(amount, roomName1, roomName2) > budget) {
+     while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
           // Decrease amount exponentially
 
-          amount *= 0.8
+          amount = (amount - 1) * 0.8
      }
 
-     return amount
+     return Math.floor(amount)
 }
 
 /**

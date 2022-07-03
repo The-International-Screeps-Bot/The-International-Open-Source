@@ -43,7 +43,7 @@ Maintainer.prototype.advancedMaintain = function () {
 
      // Get the creep's work part count
 
-     const workPartCount = creep.partsOfType(WORK)
+     const workPartCount = this.parts.work
 
      // Find a repair target based on the creeps work parts. If none are found, inform false
 
@@ -96,10 +96,10 @@ Maintainer.prototype.advancedMaintain = function () {
      const energySpentOnRepairs = Math.min(workPartCount, (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER)
 
      if (repairTarget.structureType === STRUCTURE_RAMPART) {
-          Memory.stats.energySpentOnBarricades += energySpentOnRepairs
+          if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eorwr += energySpentOnRepairs
           creep.say(`🧱${energySpentOnRepairs * REPAIR_POWER}`)
      } else {
-          Memory.stats.energySpentOnRepairing += energySpentOnRepairs
+          if (global.roomStats[this.room.name])  global.roomStats[this.room.name].eoro += energySpentOnRepairs
           creep.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
      }
 
@@ -158,7 +158,7 @@ Maintainer.prototype.maintainNearby = function () {
 
      // Get the creep's work parts
 
-     const workPartCount = this.partsOfType(WORK)
+     const workPartCount = this.parts.work
 
      let structure
 

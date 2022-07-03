@@ -26,7 +26,6 @@ export function remoteCoreAttackerManager(room: Room, creepsOfRole: string[]) {
                          pos: new RoomPosition(25, 25, creep.memory.communeName),
                          range: 25,
                     },
-                    cacheAmount: 200,
                })
 
                continue
@@ -51,7 +50,6 @@ export function remoteCoreAttackerManager(room: Room, creepsOfRole: string[]) {
                     pos: new RoomPosition(25, 25, creep.memory.remoteName),
                     range: 25,
                },
-               cacheAmount: 200,
           })
      }
 }
@@ -85,7 +83,7 @@ RemoteCoreAttacker.prototype.findRemote = function () {
           // Otherwise assign the remote to the creep and inform true
 
           creep.memory.remoteName = roomName
-          if (!this.isDying()) roomMemory.needs[remoteNeedsIndex[role]] -= 1
+          roomMemory.needs[remoteNeedsIndex[role]] -= 1
 
           return true
      }

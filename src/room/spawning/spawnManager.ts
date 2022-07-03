@@ -13,17 +13,23 @@ export function spawnManager(room: Room) {
      const inactiveSpawns = room.structures.spawn.filter(spawn => !spawn.spawning)
      if (!inactiveSpawns.length) return
 
-     // Otherwise get spawnRequests by running the spawnRequester
+     // Construct spawnRequests
 
-     const spawnRequests = spawnRequester(room)
+     spawnRequester(room)
 
      // Sort spawnRequests by their priority
 
-     const requestsByPriority = Object.keys(spawnRequests).sort((a, b) => parseInt(a) - parseInt(b))
+     const requestsByPriority = Object.keys(room.spawnRequests).sort(function (a, b) {
+          return parseInt(a) - parseInt(b)
+     })
 
      // Track the inactive spawn index
 
      let spawnIndex = inactiveSpawns.length - 1
+
+     let spawn
+     let spawnRequest
+     let testSpawnResult
 
      // Loop through priorities inside requestsByPriority
 
@@ -34,15 +40,15 @@ export function spawnManager(room: Room) {
 
           // Try to find inactive spawn, if can't, stop the loop
 
-          const spawn = inactiveSpawns[spawnIndex]
+          spawn = inactiveSpawns[spawnIndex]
 
           // Otherwise get the spawnRequest using its priority
 
-          const spawnRequest = spawnRequests[priority]
+          spawnRequest = room.spawnRequests[priority]
 
           // See if creep can be spawned
 
-          const testSpawnResult = spawn.advancedSpawn(spawnRequest)
+          testSpawnResult = spawn.advancedSpawn(spawnRequest)
 
           // If creep can't be spawned
 
@@ -69,7 +75,7 @@ export function spawnManager(room: Room) {
 
           room.energyAvailable -= spawnRequest.cost
 
-          Memory.stats.energySpentOnCreeps += spawnRequest.cost
+          if (global.roomStats[room.name]) global.roomStats[room.name].eosp += spawnRequest.cost
 
           // Decrease the spawnIndex
 

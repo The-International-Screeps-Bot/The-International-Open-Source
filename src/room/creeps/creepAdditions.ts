@@ -45,7 +45,7 @@ Object.defineProperties(Creep.prototype, {
                this._parts = {}
 
                for (const part of this.body) {
-                    this._parts[part.type] ? (this._parts[part.type] = 1) : (this._parts[part.type] += 1)
+                    this._parts[part.type] ? (this._parts[part.type] += 1) : (this._parts[part.type] = 1)
                }
 
                return this._parts
@@ -63,7 +63,7 @@ Object.defineProperties(Creep.prototype, {
                     boost = part.boost as MineralBoostConstant
                     if (!boost) continue
 
-                    this._boosts[boost] ? (this._boosts[boost] = 1) : (this._boosts[boost] += 1)
+                    this._boosts[boost] ? (this._boosts[boost] += 1) : (this._boosts[boost] = 1)
                }
 
                return this._boosts
@@ -80,7 +80,6 @@ Object.defineProperties(Creep.prototype, {
                let factor
 
                for (const tower of room.structures.tower) {
-
                     if (tower.store.energy <= 0) continue
 
                     range = getRange(this.pos.x - tower.pos.x, this.pos.y - tower.pos.y)
@@ -127,6 +126,16 @@ Object.defineProperties(Creep.prototype, {
                if (this.boosts.XGHO2 > 0) this._towerDamage *= BOOSTS.tough.XGHO2.damage
 
                return this._towerDamage
+          },
+     },
+     message: {
+          get() {
+               if (this._message) return this._message
+
+               return (this._message = '')
+          },
+          set(newMessage) {
+               this._message = newMessage
           },
      },
 } as PropertyDescriptorMap & ThisType<Creep>)

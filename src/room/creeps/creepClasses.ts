@@ -17,6 +17,9 @@ creepClasses.source1Harvester = SourceHarvester
 creepClasses.source2Harvester = SourceHarvester
 
 export class Hauler extends Creep {
+
+     reserve?(): void
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }
@@ -109,6 +112,16 @@ creepClasses.source1RemoteHarvester = RemoteHarvester
 creepClasses.source2RemoteHarvester = RemoteHarvester
 
 export class RemoteHauler extends Creep {
+
+     /**
+      * Finds a remote to haul from
+      */
+     findRemote?(): boolean
+
+     reserveTransfer?(): void
+
+     reserveWithdraw?(): void
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }
@@ -116,6 +129,12 @@ export class RemoteHauler extends Creep {
 creepClasses.remoteHauler = RemoteHauler
 
 export class RemoteReserver extends Creep {
+
+     /**
+      * Finds a remote to reserve
+      */
+      findRemote?(): boolean
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }
@@ -234,11 +253,24 @@ export class VanguardDefender extends Creep {
 }
 creepClasses.vanguardDefender = VanguardDefender
 
-export class Antifa extends Creep {
+export class AntifaAssaulter extends Creep {
+
+     /**
+      * Tries to find a squad, creating one if none could be found
+      */
+     findSquad?(): boolean
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }
 }
-creepClasses.antifa = Antifa
+creepClasses.antifaAssaulter = AntifaAssaulter
+
+export class AntifaSupporter extends Creep {
+     constructor(creepID: Id<Creep>) {
+          super(creepID)
+     }
+}
+creepClasses.antifaSupporter = AntifaSupporter
 
 export { creepClasses }

@@ -1,5 +1,20 @@
-import { allyList, allyTrading, autoClaim, baseVisuals, breakingVersion, cpuLogging, mapVisuals, pixelGeneration, pixelSelling, publicRamparts, roomVisuals, tradeBlacklist } from './constants'
+import {
+     allyList,
+     allyTrading,
+     autoClaim,
+     baseVisuals,
+     breakingVersion,
+     cpuLogging,
+     mapVisuals,
+     pixelGeneration,
+     pixelSelling,
+     publicRamparts,
+     roomVisuals,
+     tradeBlacklist,
+     roomStats,
+} from './constants'
 import { InternationalManager } from './internationalManager'
+import { statsManager } from './statsManager'
 
 InternationalManager.prototype.config = function () {
      if (Memory.breakingVersion < breakingVersion) {
@@ -19,6 +34,8 @@ InternationalManager.prototype.config = function () {
                (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
                Object.values(Game.creeps)[0]?.owner?.username ||
                'username'
+          Memory.isMainShard = Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
+          // Memory.isMainShard = Game.shard.name.search('shard[0-3]') === -1
 
           // Settings
 
@@ -26,6 +43,7 @@ InternationalManager.prototype.config = function () {
           Memory.baseVisuals = baseVisuals
           Memory.mapVisuals = mapVisuals
           Memory.cpuLogging = cpuLogging
+          Memory.roomStats = roomStats
           Memory.allyList = allyList
           Memory.pixelSelling = pixelSelling
           Memory.pixelGeneration = pixelGeneration
@@ -41,12 +59,7 @@ InternationalManager.prototype.config = function () {
 
           Memory.claimRequests = {}
           Memory.attackRequests = {}
-
-          //
-
-          Memory.stats = {}
-
-          Memory.stats.memoryLimit = 2097
+          statsManager.internationalConfig()
      }
 
      if (!global.constructed) {

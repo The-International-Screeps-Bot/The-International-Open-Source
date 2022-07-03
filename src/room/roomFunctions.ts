@@ -14,7 +14,7 @@ import {
 } from 'international/generalFunctions'
 import { basePlanner } from './construction/basePlanner'
 import { ControllerUpgrader, MineralHarvester, SourceHarvester } from './creeps/creepClasses'
-import { RoomObject } from './roomObject'
+import { RoomCacheObject } from './roomObject'
 import { RoomTask } from './roomTasks'
 
 Room.prototype.get = function (roomObjectName) {
@@ -50,7 +50,7 @@ Room.prototype.get = function (roomObjectName) {
           return terrainCM
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'terrainCM',
           valueType: 'object',
           cacheType: 'global',
@@ -93,7 +93,7 @@ Room.prototype.get = function (roomObjectName) {
           return baseCM
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'baseCM',
           valueType: 'object',
           cacheType: 'global',
@@ -104,7 +104,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // roadCM
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'roadCM',
           valueType: 'object',
           cacheType: 'global',
@@ -119,7 +119,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // Mineral
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'mineral',
           valueType: 'id',
           cacheType: 'global',
@@ -132,7 +132,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // Source 1
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source1',
           valueType: 'id',
           cacheType: 'memory',
@@ -151,7 +151,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // Source 2
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source2',
           valueType: 'id',
           cacheType: 'memory',
@@ -170,7 +170,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // Sources
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'sources',
           valueType: 'object',
           cacheType: 'global',
@@ -210,7 +210,7 @@ Room.prototype.get = function (roomObjectName) {
           return structuresByType
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'structuresByType',
           valueType: 'object',
           cacheType: 'global',
@@ -241,7 +241,7 @@ Room.prototype.get = function (roomObjectName) {
           return cSitesByType
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'cSitesByType',
           valueType: 'object',
           cacheType: 'global',
@@ -255,7 +255,7 @@ Room.prototype.get = function (roomObjectName) {
      for (const structureType of constants.allStructureTypes) {
           // Create roomObject for structures with the structureType
 
-          new RoomObject({
+          new RoomCacheObject({
                name: structureType,
                valueType: 'object',
                cacheType: 'global',
@@ -268,7 +268,7 @@ Room.prototype.get = function (roomObjectName) {
 
           // Create a roomObject for sites with the structureType
 
-          new RoomObject({
+          new RoomCacheObject({
                name: `${structureType}CSite`,
                valueType: 'object',
                cacheType: 'global',
@@ -280,7 +280,7 @@ Room.prototype.get = function (roomObjectName) {
           })
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'enemyCSites',
           valueType: 'object',
           cacheType: 'global',
@@ -295,7 +295,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'allyCSites',
           valueType: 'object',
           cacheType: 'global',
@@ -374,7 +374,7 @@ Room.prototype.get = function (roomObjectName) {
           })
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'mineralHarvestPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -385,7 +385,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'closestMineralHarvestPos',
           valueType: 'pos',
           cacheType: 'global',
@@ -396,7 +396,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source1HarvestPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -407,7 +407,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source1ClosestHarvestPos',
           valueType: 'pos',
           cacheType: 'global',
@@ -418,7 +418,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source2HarvestPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -429,7 +429,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source2ClosestHarvestPos',
           valueType: 'pos',
           cacheType: 'global',
@@ -468,7 +468,7 @@ Room.prototype.get = function (roomObjectName) {
           })
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'centerUpgradePos',
           valueType: 'pos',
           cacheType: 'global',
@@ -526,7 +526,7 @@ Room.prototype.get = function (roomObjectName) {
           return upgradePositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'upgradePositions',
           valueType: 'object',
           cacheType: 'global',
@@ -621,7 +621,7 @@ Room.prototype.get = function (roomObjectName) {
           return fastFillerPositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'fastFillerPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -654,7 +654,7 @@ Room.prototype.get = function (roomObjectName) {
           return false
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source1Container',
           valueType: 'id',
           cacheType: 'global',
@@ -665,7 +665,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source2Container',
           valueType: 'id',
           cacheType: 'global',
@@ -704,7 +704,7 @@ Room.prototype.get = function (roomObjectName) {
           return usedHarvestPositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'usedMineralHarvestPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -754,7 +754,7 @@ Room.prototype.get = function (roomObjectName) {
           return usedHarvestPositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'usedSourceHarvestPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -826,7 +826,7 @@ Room.prototype.get = function (roomObjectName) {
           return usedUpgradePositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'usedUpgradePositions',
           valueType: 'object',
           cacheType: 'global',
@@ -861,7 +861,7 @@ Room.prototype.get = function (roomObjectName) {
           return usedFastFillerPositions
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'usedFastFillerPositions',
           valueType: 'object',
           cacheType: 'global',
@@ -898,7 +898,7 @@ Room.prototype.get = function (roomObjectName) {
           return false
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'controllerContainer',
           valueType: 'id',
           cacheType: 'global',
@@ -932,7 +932,7 @@ Room.prototype.get = function (roomObjectName) {
           return false
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'mineralContainer',
           valueType: 'id',
           cacheType: 'global',
@@ -965,7 +965,7 @@ Room.prototype.get = function (roomObjectName) {
           return false
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'fastFillerContainerLeft',
           valueType: 'id',
           cacheType: 'global',
@@ -976,7 +976,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'fastFillerContainerRight',
           valueType: 'id',
           cacheType: 'global',
@@ -987,7 +987,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'labContainer',
           valueType: 'id',
           cacheType: 'global',
@@ -1012,7 +1012,7 @@ Room.prototype.get = function (roomObjectName) {
           return links.find(link => getRangeBetween(anchor.x, anchor.y, link.pos.x, link.pos.y) === 1)?.id
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source1Link',
           valueType: 'id',
           cacheType: 'global',
@@ -1023,7 +1023,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'source2Link',
           valueType: 'id',
           cacheType: 'global',
@@ -1056,7 +1056,7 @@ Room.prototype.get = function (roomObjectName) {
           return false
      }
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'fastFillerLink',
           valueType: 'id',
           cacheType: 'global',
@@ -1067,7 +1067,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'hubLink',
           valueType: 'id',
           cacheType: 'global',
@@ -1078,7 +1078,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'controllerLink',
           valueType: 'id',
           cacheType: 'global',
@@ -1111,18 +1111,9 @@ Room.prototype.get = function (roomObjectName) {
           return filteredSpawnStructures
      }
 
-     new RoomObject({
-          name: 'structuresForSpawning',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor: findStructuresForSpawning,
-     })
-
      // Creeps
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'notMyCreeps',
           valueType: 'object',
           cacheType: 'global',
@@ -1133,7 +1124,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'enemyCreeps',
           valueType: 'object',
           cacheType: 'global',
@@ -1146,7 +1137,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'allyCreeps',
           valueType: 'object',
           cacheType: 'global',
@@ -1159,7 +1150,7 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     new RoomObject({
+     new RoomCacheObject({
           name: 'remoteNamesByEfficacy',
           valueType: 'object',
           cacheType: 'global',
@@ -1325,12 +1316,11 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     // If there is no route
 
                     if (!route) {
-                         let y = 0
-                         let x = 0
+                         let x
 
                          // Configure y and loop through top exits
 
-                         y = 0
+                         let y = 0
                          for (x = 0; x < 50; x += 1) cm.set(x, y, 255)
 
                          // Configure x and loop through left exits
@@ -1463,12 +1453,12 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                          const enemyRangedAttackers: Creep[] = []
 
                          for (const enemyCreep of room.enemyCreeps) {
-                              if (enemyCreep.hasPartsOfTypes([RANGED_ATTACK])) {
+                              if (enemyCreep.parts.ranged_attack > 0) {
                                    enemyRangedAttackers.push(enemyCreep)
                                    return
                               }
 
-                              if (enemyCreep.hasPartsOfTypes([ATTACK])) enemyAttackers.push(enemyCreep)
+                              if (enemyCreep.parts.attack > 0) enemyAttackers.push(enemyCreep)
                          }
 
                          for (const enemyAttacker of enemyAttackers) {
@@ -1813,7 +1803,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
                     // If the creep has work parts
 
-                    if (creep.hasPartsOfTypes([WORK])) {
+                    if (creep.parts.work > 0) {
                          // If the creep is owned by an ally
 
                          if (allyList.has(creep.owner.username)) {
@@ -2638,12 +2628,11 @@ Room.prototype.createWithdrawTasks = function (creator) {
 }
 
 Room.prototype.estimateIncome = function () {
-     const room = this
 
-     const harvesterNames = room.creepsFromRoom.source1Harvester
-          .concat(room.creepsFromRoom.source2Harvester)
-          .concat(room.creepsFromRoom.source1RemoteHarvester)
-          .concat(room.creepsFromRoom.source2RemoteHarvester)
+     const harvesterNames = this.creepsFromRoom.source1Harvester
+          .concat(this.creepsFromRoom.source2Harvester)
+          .concat(this.creepsFromRoom.source1RemoteHarvester)
+          .concat(this.creepsFromRoom.source2RemoteHarvester)
 
      // Construct income starting at 0
 
@@ -2656,7 +2645,7 @@ Room.prototype.estimateIncome = function () {
 
           // Add the number of work parts owned by the creep at a max of 5, times harvest power
 
-          income += Math.min(5, creep.partsOfType(WORK)) * HARVEST_POWER
+          income += Math.min(5, creep.parts.work) * HARVEST_POWER
      }
 
      // Inform income
@@ -2665,11 +2654,10 @@ Room.prototype.estimateIncome = function () {
 }
 
 Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
-     const room = this
 
      // Construct positions
 
-     const positions: RoomPosition[] = []
+     const positions = []
 
      // Loop through coordinates inside the rect
 
@@ -2681,7 +2669,7 @@ Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
 
                // Otherwise ass the x and y to positions
 
-               positions.push(new RoomPosition(x, y, room.name))
+               positions.push(new RoomPosition(x, y, this.name))
           }
      }
 
@@ -2691,18 +2679,18 @@ Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
 }
 
 Room.prototype.getPartsOfRoleAmount = function (role, type) {
-     const room = this
 
      // Intilaize the partsAmount
 
      let partsAmount = 0
+     let creep
 
      // Loop through every creepName in the creepsFromRoom of the specified role
 
-     for (const creepName of room.creepsFromRoom[role]) {
+     for (const creepName of this.creepsFromRoom[role]) {
           // Get the creep using creepName
 
-          const creep = Game.creeps[creepName]
+          creep = Game.creeps[creepName]
 
           // If there is no specified type
 
@@ -2724,7 +2712,6 @@ Room.prototype.getPartsOfRoleAmount = function (role, type) {
 }
 
 Room.prototype.findSourcesByEfficacy = function () {
-     const room = this
 
      // Get the room's sourceNames
 
@@ -2732,7 +2719,7 @@ Room.prototype.findSourcesByEfficacy = function () {
 
      // Sort sourceNames based on their efficacy, informing the result
 
-     return sourceNames.sort((a, b) => room.global[a] - room.global[b])
+     return sourceNames.sort((a, b) => this.global[a] - this.global[b])
 }
 
 Room.prototype.createClaimRequest = function () {
@@ -2752,11 +2739,15 @@ Room.prototype.createClaimRequest = function () {
 
      const closestClaimTypeName = findClosestClaimType(this.name)
      const closestCommuneRange = Game.map.getRoomLinearDistance(closestClaimTypeName, this.name)
-     const preference = Math.abs(prefferedCommuneRange - closestCommuneRange)
 
-     score += preference
+     score += Math.abs(prefferedCommuneRange - closestCommuneRange)
 
-     score += this.findSwampPlainsRatio() * 12
+     score += this.source1PathLength / 10
+     score += this.source2PathLength / 10
+
+     score += this.upgradePathLength / 10
+
+     score += this.findSwampPlainsRatio() * 10
 
      Memory.claimRequests[this.name] = {
           needs: [1, 20, 0],
@@ -2767,7 +2758,7 @@ Room.prototype.createClaimRequest = function () {
 }
 
 Room.prototype.findSwampPlainsRatio = function () {
-     const terrainAmounts: number[] = [0, 0, 0]
+     const terrainAmounts = [0, 0, 0]
 
      const terrain = this.getTerrain()
 

@@ -20,7 +20,7 @@ export interface RoomObjectOpts {
      valueConstructor(): any
 }
 
-export interface RoomObject extends RoomObjectOpts {
+export interface RoomCacheObject extends RoomObjectOpts {
      lastCache?: number
      value: any
 
@@ -35,7 +35,7 @@ export interface RoomObject extends RoomObjectOpts {
      cache(): void
 }
 
-export class RoomObject {
+export class RoomCacheObject {
      constructor(opts: RoomObjectOpts) {
           const roomObject = this
 
@@ -49,7 +49,7 @@ export class RoomObject {
      }
 }
 
-RoomObject.prototype.formatValue = function () {
+RoomCacheObject.prototype.formatValue = function () {
      const roomObject = this
      const { room } = roomObject
 
@@ -75,7 +75,7 @@ RoomObject.prototype.formatValue = function () {
      }
 }
 
-RoomObject.prototype.getCachedValue = function () {
+RoomCacheObject.prototype.getCachedValue = function () {
      const roomObject = this
      const { room } = roomObject
 
@@ -97,7 +97,7 @@ RoomObject.prototype.getCachedValue = function () {
      if (roomObject.cacheType === 'global') {
           // Query room's global for cachedRoomObject
 
-          const cachedRoomObject: RoomObject | undefined = room.global[roomObject.name]
+          const cachedRoomObject: RoomCacheObject | undefined = room.global[roomObject.name]
 
           // If cachedRoomObject doesn't exist, and inform false
 
@@ -123,7 +123,7 @@ RoomObject.prototype.getCachedValue = function () {
      return false
 }
 
-RoomObject.prototype.getValue = function () {
+RoomCacheObject.prototype.getValue = function () {
      const roomObject = this
 
      // If the roomObject's value can be acquired from its cache
@@ -155,7 +155,7 @@ RoomObject.prototype.getValue = function () {
      return roomObject.value
 }
 
-RoomObject.prototype.cache = function () {
+RoomCacheObject.prototype.cache = function () {
      const roomObject = this
      const { room } = roomObject
 
@@ -177,7 +177,7 @@ RoomObject.prototype.cache = function () {
      if (roomObject.cacheType === 'global') {
           // Create a copy of the roomObject
 
-          const roomObjectCopy = new RoomObject({
+          const roomObjectCopy = new RoomCacheObject({
                name: roomObject.name,
                valueType: roomObject.valueType,
                cacheType: roomObject.cacheType,

@@ -8,5 +8,6 @@ RemoteHauler.prototype.preTickManager = function () {
 
      // Reduce remote need
 
-     Memory.rooms[this.memory.remoteName].needs[remoteNeedsIndex[role]] -= this.parts.carry
+     if (Memory.rooms[this.memory.remoteName].needs)
+          Memory.rooms[this.memory.remoteName].needs[remoteNeedsIndex[role]] -= this.parts.carry
 }

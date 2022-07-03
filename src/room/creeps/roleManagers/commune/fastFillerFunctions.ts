@@ -37,7 +37,7 @@ FastFiller.prototype.fillFastFiller = function () {
 
      // If the creep has a non-energy resource
 
-     if (_.sum(Object.values(this.store)) > this.store.energy) {
+     if (this.usedStore() > this.store.energy) {
           for (const resourceType in this.store) {
                if (resourceType == RESOURCE_ENERGY) continue
 
@@ -48,9 +48,9 @@ FastFiller.prototype.fillFastFiller = function () {
           }
      }
 
-     const fastFillerContainers: (StructureContainer | false)[] = [
-          room.get('fastFillerContainerLeft'),
-          room.get('fastFillerContainerRight'),
+     const fastFillerContainers: (StructureContainer)[] = [
+          room.fastFillerContainerLeft,
+          room.fastFillerContainerRight,
      ]
 
      // If all spawningStructures are filled, inform false
@@ -62,16 +62,23 @@ FastFiller.prototype.fillFastFiller = function () {
      if (this.needsResources()) {
           // Get the sourceLinks
 
-          const fastFillerStoringStructure: (StructureContainer | StructureLink | false)[] = [
-               room.get('fastFillerLink'),
-          ].concat(fastFillerContainers)
+          const fastFillerStoringStructures: (StructureContainer | StructureLink)[] = [
+               room.fastFillerLink,
+               ...fastFillerContainers
+          ]
+
+          let structures = fastFillerStoringStructures.length
 
           // Loop through each fastFillerStoringStructure
 
-          for (const structure of fastFillerStoringStructure) {
+          for (const structure of fastFillerStoringStructures) {
                // If the structure is undefined, iterate
 
-               if (!structure) continue
+               if (!structure) {
+
+                    structures -= 1
+                    continue
+               }
 
                // Otherwise, if the structure is not in range 1 to the this
 
@@ -81,7 +88,7 @@ FastFiller.prototype.fillFastFiller = function () {
 
                if (
                     structure.structureType != STRUCTURE_LINK &&
-                    _.sum(Object.values(structure.store)) > structure.store.energy
+                    this.usedStore() > structure.store.energy
                ) {
                     for (const resourceType in structure.store) {
                          if (resourceType == RESOURCE_ENERGY) continue
@@ -104,6 +111,12 @@ FastFiller.prototype.fillFastFiller = function () {
                this.withdraw(structure, RESOURCE_ENERGY)
                structure.store.energy -= this.store.getCapacity() - this.store.energy
                return true
+          }
+
+          if (structures === 0) {
+
+               this.suicide()
+               return false
           }
 
           // Inform false

@@ -104,7 +104,7 @@ SourceHarvester.prototype.transferToSourceExtensions = function () {
 
      // If the creep is not nearly full, inform false
 
-     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > creep.partsOfType(WORK) * HARVEST_POWER) return false
+     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > this.parts.work * HARVEST_POWER) return false
 
      // Get adjacent structures to the creep
 
@@ -153,7 +153,7 @@ SourceHarvester.prototype.transferToSourceLink = function () {
 
      // If the creep is not nearly full, stop
 
-     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > creep.partsOfType(WORK) * HARVEST_POWER) return false
+     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > this.parts.work * HARVEST_POWER) return false
 
      // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
@@ -174,7 +174,7 @@ SourceHarvester.prototype.repairSourceContainer = function (sourceContainer) {
 
      // Get the creep's number of work parts
 
-     const workPartCount = creep.partsOfType(WORK)
+     const workPartCount = this.parts.work
 
      // If the sourceContainer doesn't need repairing, inform false
 
@@ -209,7 +209,7 @@ SourceHarvester.prototype.repairSourceContainer = function (sourceContainer) {
 
           // Add control points to total controlPoints counter and say the success
 
-          Memory.stats.energySpentOnRepairing += energySpentOnRepairs
+          if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eoro += energySpentOnRepairs
           creep.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
 
           // Inform success

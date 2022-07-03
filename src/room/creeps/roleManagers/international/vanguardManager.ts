@@ -18,7 +18,7 @@ export function vanguardManager(room: Room, creepsOfRole: string[]) {
 
           Memory.claimRequests[Memory.rooms[creep.memory.communeName].claimRequest].needs[
                claimRequestNeedsIndex.vanguard
-          ] -= creep.partsOfType(WORK)
+          ] -= creep.parts.work
 
           creep.say(claimTarget)
 
@@ -36,7 +36,6 @@ export function vanguardManager(room: Room, creepsOfRole: string[]) {
                origin: creep.pos,
                goal: { pos: new RoomPosition(25, 25, claimTarget), range: 25 },
                avoidEnemyRanges: true,
-               cacheAmount: 200,
                typeWeights: {
                     enemy: Infinity,
                     ally: Infinity,

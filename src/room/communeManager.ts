@@ -7,7 +7,6 @@ import { spawnManager } from './spawning/spawnManager'
 
 import { towerManager } from './towerManager'
 import { constructionManager } from './construction/constructionManager'
-import { structuresForSpawningManager } from './structuresForSpawningManager'
 import { droppedResourceManager } from './droppedResourceManager'
 import { defenceManager } from './defenceManager'
 import { storageStructuresManager } from './storingStructuresManager'
@@ -25,19 +24,16 @@ export function communeManager(room: Room) {
 
      defenceManager(room)
 
-     structuresForSpawningManager(room)
-
      storageStructuresManager(room)
 
      room.claimRequestManager()
 
      spawnManager(room)
-
      /*
-    let cpu = Game.cpu.getUsed()
+     let cpu = Game.cpu.getUsed()
 
-    room.specialDT(undefined)
 
-    customLog('CPU USED FOR TEST', Game.cpu.getUsed() - cpu)
+
+     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu)
  */
 }

@@ -11,7 +11,7 @@ ControllerUpgrader.prototype.isDying = function () {
 
      // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
-     if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.global.upgradePathLength - 3 || 0))
+     if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.upgradePathLength - 3))
           return false
 
      // Record creep as dying

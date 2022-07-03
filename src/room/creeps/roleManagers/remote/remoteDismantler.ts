@@ -1,5 +1,5 @@
 import { remoteNeedsIndex } from 'international/constants'
-import { getRange } from 'international/generalFunctions'
+import { findObjectWithID, getRange } from 'international/generalFunctions'
 import { creepClasses, RemoteCoreAttacker, RemoteDismantler } from 'room/creeps/creepClasses'
 
 export function remoteDismantlerManager(room: Room, creepsOfRole: string[]) {
@@ -26,7 +26,6 @@ export function remoteDismantlerManager(room: Room, creepsOfRole: string[]) {
                          pos: new RoomPosition(25, 25, creep.memory.communeName),
                          range: 25,
                     },
-                    cacheAmount: 200,
                })
 
                continue
@@ -51,7 +50,6 @@ export function remoteDismantlerManager(room: Room, creepsOfRole: string[]) {
                     pos: new RoomPosition(25, 25, creep.memory.remoteName),
                     range: 25,
                },
-               cacheAmount: 200,
           })
      }
 }
@@ -85,7 +83,7 @@ RemoteDismantler.prototype.findRemote = function () {
           // Otherwise assign the remote to the creep and inform true
 
           creep.memory.remoteName = roomName
-          if (!creep.isDying()) roomMemory.needs[remoteNeedsIndex[role]] -= 1
+          roomMemory.needs[remoteNeedsIndex[role]] -= 1
 
           return true
      }
@@ -98,61 +96,62 @@ RemoteDismantler.prototype.findRemote = function () {
 RemoteDismantler.prototype.advancedDismantle = function () {
      const { room } = this
 
-     let structure
+     let target
      let range
 
-     if (room.structures.constructedWall.length) {
+     if (this.memory.dismantleTarget) {
 
-          structure = this.pos.findClosestByRange(room.structures.constructedWall)
+          target = findObjectWithID(this.memory.dismantleTarget)
 
-          range = getRange(this.pos.x - structure.pos.x, this.pos.y - structure.pos.y)
+          if (target) {
 
-          if (range > 1) {
+               range = getRange(this.pos.x - target.pos.x, this.pos.y - target.pos.y)
 
-               this.createMoveRequest({
-                    origin: this.pos,
-                    goal: {
-                         pos: structure.pos,
-                         range: 1,
-                    },
-                    avoidEnemyRanges: true
-               })
+               if (range > 1) {
+                    this.createMoveRequest({
+                         origin: this.pos,
+                         goal: {
+                              pos: target.pos,
+                              range: 1,
+                         },
+                         avoidEnemyRanges: true,
+                    })
 
+                    return true
+               }
+
+               this.dismantle(target)
                return true
           }
-
-          this.dismantle(structure)
-
-          return true
      }
 
-     const enemyStructures = room.find(FIND_HOSTILE_STRUCTURES).filter(function(structure) {
+     let targets: Structure[] = room.actionableWalls
 
+     targets = targets.concat(room.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
           return structure.structureType != STRUCTURE_INVADER_CORE
-     })
+     }))
 
-     if (enemyStructures.length) {
+     if (targets.length) {
+          target = this.pos.findClosestByPath(targets, { ignoreRoads: true, ignoreCreeps: true })
 
-          structure = this.pos.findClosestByRange(enemyStructures)
-
-          range = getRange(this.pos.x - structure.pos.x, this.pos.y - structure.pos.y)
+          range = getRange(this.pos.x - target.pos.x, this.pos.y - target.pos.y)
 
           if (range > 1) {
-
                this.createMoveRequest({
                     origin: this.pos,
                     goal: {
-                         pos: structure.pos,
+                         pos: target.pos,
                          range: 1,
                     },
-                    avoidEnemyRanges: true
+                    avoidEnemyRanges: true,
                })
 
                return true
           }
 
-          this.dismantle(structure)
+          this.memory.dismantleTarget = target.id
 
+          this.dismantle(target)
           return true
      }
 

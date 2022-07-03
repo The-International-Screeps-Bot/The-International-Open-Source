@@ -14,6 +14,7 @@ import { roomVisualsManager } from './roomVisualsManager'
 import { containerManager } from './containerManager'
 import { customLog } from 'international/generalFunctions'
 import { droppedResourceManager } from './droppedResourceManager'
+import { statsManager } from 'international/statsManager'
 
 const specificRoomManagers: { [key: string]: Function } = {
      commune: communeManager,
@@ -34,12 +35,15 @@ export function roomManager() {
           // Get the room using the roomName
 
           const room = Game.rooms[roomName]
+          const roomType = room.memory.type
+          const saveStats = Memory.roomStats > 0 && constants.roomTypesUsedForStats.includes(roomType)
+          if (saveStats) statsManager.roomPreTick(room.name, roomType)
 
           taskManager(room)
 
           // If there is a specific manager for this room's type, run it
 
-          if (specificRoomManagers[room.memory.type]) specificRoomManagers[room.memory.type](room)
+          if (specificRoomManagers[roomType]) specificRoomManagers[roomType](room)
 
           droppedResourceManager(room)
 
@@ -59,19 +63,13 @@ export function roomManager() {
 
           roomVisualsManager(room)
 
-          // Testing
-          /*
-        let cpuUsed = Game.cpu.getUsed()
-
-        cpuUsed = Game.cpu.getUsed() - cpuUsed
-        customLog('Testing CPU', cpuUsed.toFixed(2))
- */
           // Log room stats
 
           let logMessage = `Creeps: ${room.myCreepsAmount}`
 
           if (Memory.cpuLogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
 
+          if (saveStats) statsManager.roomEndTick(room.name, roomType, room)
           customLog(room.name, logMessage, undefined, constants.colors.lightGrey)
      }
 
