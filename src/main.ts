@@ -814,6 +814,8 @@ declare global {
 
           remotePlanner(commune: Room): boolean
 
+          clearOtherStructures(): void
+
           remoteConstructionPlacement(): void
 
           communeConstructionPlacement(): void

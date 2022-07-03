@@ -32,6 +32,8 @@ export function constructionManager(room: Room) {
           room.createConstructionSite(centerUpgradePos, STRUCTURE_CONTAINER)
      }
 
+     room.clearOtherStructures()
+
      // Use floodfill from the anchor to plan structures
 
      room.communeConstructionPlacement()

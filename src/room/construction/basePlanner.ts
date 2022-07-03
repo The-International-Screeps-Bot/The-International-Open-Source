@@ -334,13 +334,14 @@ export function basePlanner(room: Room) {
      // Get the room's sourceNames
 
      const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+     let closestHarvestPos: RoomPosition
 
      // loop through sourceNames
 
      for (const sourceName of sourceNames) {
           // Get the closestHarvestPos using the sourceName, iterating if undefined
 
-          const closestHarvestPos: RoomPosition | undefined = room.get(`${sourceName}ClosestHarvestPos`)
+          closestHarvestPos = room.get(`${sourceName}ClosestHarvestPos`)
           if (!closestHarvestPos) continue
 
           // Record the pos in roadCM
@@ -353,7 +354,7 @@ export function basePlanner(room: Room) {
      for (const sourceName of sourceNames) {
           // get the closestHarvestPos using the sourceName, iterating if undefined
 
-          const closestHarvestPos: RoomPosition | undefined = room.get(`${sourceName}ClosestHarvestPos`)
+          closestHarvestPos = room.get(`${sourceName}ClosestHarvestPos`)
           if (!closestHarvestPos) continue
 
           if (!room.memory.stampAnchors.container.includes(pack(closestHarvestPos))) {
@@ -508,7 +509,7 @@ export function basePlanner(room: Room) {
 
                // Get the closestHarvestPos of this sourceName
 
-               const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`)
+               closestHarvestPos = room.get(`${sourceName}ClosestHarvestPos`)
 
                // Find positions adjacent to source
 
@@ -606,9 +607,6 @@ export function basePlanner(room: Room) {
                     room.memory.stampAnchors.road.push(packedPos)
           }
      }
-
-     for (const wall of room.structures.constructedWall)
-          wall.destroy()
 
      // Record planning results in the room's global and inform true
 
