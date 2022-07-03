@@ -1237,9 +1237,6 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
           // If the creep's moveRequests aren't aligned
 
           if (queue.includes(creepAtPos.name)) {
-               //
-
-               creepAtPos.recurseMoveRequest()
 
                // Otherwise, loop through each index of the queue
 

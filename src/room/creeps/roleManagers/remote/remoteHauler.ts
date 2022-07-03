@@ -28,26 +28,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                          continue
                     }
 
-                    if (creep.needsResources()) {
-
-                         if (creep.isOnExit()) {
-
-                              creep.createMoveRequest({
-                                   origin: creep.pos,
-                                   goal: {
-                                        pos: creep.pos,
-                                        range: 1,
-                                   },
-                                   flee: true,
-                                   avoidEnemyRanges: true,
-                                   weightGamebjects: {
-                                        1: room.get('road'),
-                                   },
-                              })
-                         }
-
-                         continue
-                    }
+                    if (creep.needsResources()) continue
 
                     creep.message += creep.memory.communeName
                     creep.say(creep.message)
@@ -110,25 +91,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                     continue
                }
 
-               if (!creep.needsResources()) {
-
-                    if (creep.isOnExit()) {
-
-                         creep.createMoveRequest({
-                              origin: creep.pos,
-                              goal: {
-                                   pos: creep.pos,
-                                   range: 1,
-                              },
-                              flee: true,
-                              avoidEnemyRanges: true,
-                              weightGamebjects: {
-                                   1: room.get('road'),
-                              },
-                         })
-                    }
-                    continue
-               }
+               if (!creep.needsResources()) continue
 
                if (!creep.findRemote()) continue
 
