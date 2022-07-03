@@ -32,8 +32,6 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                          if (creep.isOnExit()) {
 
-                              creep.say('EM')
-
                               creep.createMoveRequest({
                                    origin: creep.pos,
                                    goal: {
@@ -58,7 +56,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                          origin: creep.pos,
                          goal: {
                               pos: new RoomPosition(25, 25, creep.memory.communeName),
-                              range: 25,
+                              range: 20,
                          },
                          avoidEnemyRanges: true,
                          weightGamebjects: {
@@ -76,7 +74,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                     origin: creep.pos,
                     goal: {
                          pos: new RoomPosition(25, 25, creep.memory.remoteName),
-                         range: 25,
+                         range: 20,
                     },
                     avoidEnemyRanges: true,
                     weightGamebjects: {
@@ -116,8 +114,6 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                     if (creep.isOnExit()) {
 
-                         creep.say('EM')
-
                          creep.createMoveRequest({
                               origin: creep.pos,
                               goal: {
@@ -143,7 +139,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                     origin: creep.pos,
                     goal: {
                          pos: new RoomPosition(25, 25, creep.memory.remoteName),
-                         range: 25,
+                         range: 20,
                     },
                     avoidEnemyRanges: true,
                     weightGamebjects: {
@@ -161,7 +157,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                origin: creep.pos,
                goal: {
                     pos: new RoomPosition(25, 25, creep.memory.communeName),
-                    range: 25,
+                    range: 20,
                },
                avoidEnemyRanges: true,
                weightGamebjects: {

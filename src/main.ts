@@ -747,11 +747,6 @@ declare global {
           /**
            *
            */
-          findWalkableRoomPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
-
-          /**
-           *
-           */
           createPullTask(creator: Structure | Creep | Resource): void
 
           /**
@@ -1096,7 +1091,7 @@ declare global {
           RP: boolean
 
           /**
-           * Remote Stamp Anchors, 
+           * Remote Stamp Anchors,
            */
           RSA: Partial<Record<RemoteStampTypes, string>>
      }
@@ -1220,17 +1215,19 @@ declare global {
            */
           createMoveRequest(opts: MoveRequestOpts): boolean
 
-          shove(shoverPos: RoomPosition, queue?: string[]): boolean
+          findShovePositions(avoidPackedPositions: Set<number>): RoomPosition[]
+
+          shove(shoverPos: RoomPosition): boolean
 
           /**
            * Try to enforce a moveRequest and inform the result
            */
-          runMoveRequest(packedPos: number): boolean
+          runMoveRequest(): boolean
 
           /**
            *
            */
-          recurseMoveRequest(pos: number, queue?: string[], shove?: boolean): void
+          recurseMoveRequest(queue?: string[]): void
 
           /**
            *

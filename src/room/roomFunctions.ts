@@ -2678,34 +2678,6 @@ Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
      return positions
 }
 
-Room.prototype.findWalkableRoomPositionsInsideRect = function (x1, y1, x2, y2) {
-
-     // Construct positions
-
-     const positions = []
-     const terrain = this.getTerrain()
-
-     // Loop through coordinates inside the rect
-
-     for (let x = x1; x <= x2; x += 1) {
-          for (let y = y1; y <= y2; y += 1) {
-               // Iterate if the pos doesn't map onto a room
-
-               if (x < 0 || x >= constants.roomDimensions || y < 0 || y >= constants.roomDimensions) continue
-
-               if (terrain.get(x, y) == TERRAIN_MASK_WALL) continue
-
-               // Otherwise ass the x and y to positions
-
-               positions.push(new RoomPosition(x, y, this.name))
-          }
-     }
-
-     // Inform positions
-
-     return positions
-}
-
 Room.prototype.getPartsOfRoleAmount = function (role, type) {
 
      // Intilaize the partsAmount

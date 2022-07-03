@@ -228,6 +228,12 @@ export function pack(pos: Pos) {
      return pos.x * constants.roomDimensions + pos.y
 }
 
+export function packXY(x: number, y: number) {
+     // Inform a packed pos
+
+     return x * constants.roomDimensions + y
+}
+
 export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPos: number) {
      // Loop through each creepName of the queue
 
