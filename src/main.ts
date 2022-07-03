@@ -1292,6 +1292,10 @@ declare global {
 
           aggressiveHeal(): boolean
 
+          reserveWithdrawEnergy(): void
+
+          reserveTransferEnergy(): void
+
           // Reservation
 
           deleteReservation(index: number): void

@@ -1079,9 +1079,11 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
 
           if (avoidPackedPositions.has(packedPos)) continue
 
-          pos = unpackAsRoomPos(packedPos, room.name)
+          pos = unpackAsPos(packedPos)
 
           if (pos.x < 1 || pos.x >= constants.roomDimensions - 1 || pos.y < 1 || pos.y >= constants.roomDimensions - 1) continue
+
+          pos = unpackAsRoomPos(packedPos, room.name)
 
           if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
@@ -2104,4 +2106,67 @@ Creep.prototype.fulfillReservation = function () {
      target.store[reservation.resourceType] -= reservation.amount
 
      return false
+}
+
+Creep.prototype.reserveWithdrawEnergy = function () {
+     const { room } = this
+
+     if (!this.needsResources()) return
+
+     const withdrawTargets = room.MAWT.filter(target => {
+          if (target instanceof Resource)
+               return (
+                    target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
+                    target.reserveAmount >= this.freeStore(RESOURCE_ENERGY)
+               )
+
+          return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
+     })
+
+     if (!withdrawTargets.length) return
+
+     let target
+     let amount
+
+     target = this.pos.findClosestByRange(withdrawTargets)
+
+     if (target instanceof Resource)
+          amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.reserveAmount)
+     else amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.store.energy)
+
+     this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
+}
+
+Creep.prototype.reserveTransferEnergy = function () {
+     const { room } = this
+
+     if (this.usedStore() === 0) return
+
+     let transferTargets = room.MATT.filter(function (target) {
+          return target.freeSpecificStore(RESOURCE_ENERGY) > 0
+     })
+
+     let target
+     let amount
+
+     if (transferTargets.length) {
+          target = this.pos.findClosestByRange(transferTargets)
+
+          amount = Math.min(this.usedStore(), target.freeStore(RESOURCE_ENERGY))
+
+          this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
+          return
+     }
+
+     transferTargets = room.OATT.filter(target => {
+          return target.freeStore(RESOURCE_ENERGY) >= this.usedStore()
+     })
+
+     if (!transferTargets.length) return
+
+     target = this.pos.findClosestByRange(transferTargets)
+
+     amount = this.usedStore()
+
+     this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
 }

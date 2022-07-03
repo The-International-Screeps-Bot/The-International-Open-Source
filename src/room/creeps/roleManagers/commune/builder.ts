@@ -69,32 +69,19 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
                     continue
                }
 
-               creep.say('DR')
+               if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveWithdrawEnergy()
 
-               // If creep has a task
-
-               if (global[creep.id]?.respondingTaskID) {
-                    // Try to filfill task
-
-                    const fulfillTaskResult = creep.fulfillTask()
-
-                    // If the task wasn't fulfilled, inform true
-
-                    if (!fulfillTaskResult) continue
-
-                    // Otherwise find the task
-
-                    const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
-
-                    // Delete it and inform true
-
-                    task.delete()
+               if (!creep.fulfillReservation()) {
+                    creep.say(creep.message)
                     continue
                }
 
-               // Otherwise try to find a new task
+               creep.reserveWithdrawEnergy()
 
-               creep.findTask(new Set(['pickup', 'withdraw', 'offer']), RESOURCE_ENERGY)
+               if (!creep.fulfillReservation()) {
+                    creep.say(creep.message)
+                    continue
+               }
 
                continue
           }
