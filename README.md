@@ -75,6 +75,6 @@ I'd also suggest using this less-laggy tool [steamless-client](https://github.co
 
 ## Contribution 
 
-I'm a huge fan of teamwork, and many useful features of this bot have been added by contributors.
+We're a huge fan of teamwork, and many useful features of this bot have been added by contributors.
 
 If you want to join us in development for this bot, please join our [discord server](https://discord.gg/5QubDsB786) and share what you're working on, or hoping to add. We're happy to review issues, merge pull requests, and add collaborators!
