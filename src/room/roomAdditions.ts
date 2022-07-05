@@ -532,9 +532,6 @@ Object.defineProperties(Room.prototype, {
                if (this.structures.nuker[0]) this._OEWT.push(this.structures.nuker[0])
                if (this.structures.powerSpawn[0]) this._OEWT.push(this.structures.powerSpawn[0])
 
-               if (this.fastFillerContainerLeft && this.fastFillerContainerLeft.store.energy >= this.fastFillerContainerLeft.store.getCapacity(RESOURCE_ENERGY) * 0.25) this._METT.push(this.fastFillerContainerLeft)
-               if (this.fastFillerContainerRight && this.fastFillerContainerRight.store.energy >= this.fastFillerContainerRight.store.getCapacity(RESOURCE_ENERGY) * 0.25) this._METT.push(this.fastFillerContainerRight)
-
                return this._OEWT
           },
      },

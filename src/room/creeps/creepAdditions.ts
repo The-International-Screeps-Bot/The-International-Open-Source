@@ -40,7 +40,6 @@ Object.defineProperties(Creep.prototype, {
      },
      healStrength: {
           get() {
-
                if (this._healStrength) return this._healStrength
 
                this._healStrength = 0
@@ -57,8 +56,8 @@ Object.defineProperties(Creep.prototype, {
                          this._healStrength += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
                }
 
-               return this._healStrength += this._healStrength * toughBoost
-          }
+               return (this._healStrength += this._healStrength * toughBoost)
+          },
      },
      parts: {
           get() {

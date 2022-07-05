@@ -1936,13 +1936,21 @@ Creep.prototype.deleteReservation = function (index) {
 
      const target = findObjectWithID(reservation.targetID)
 
-     if (target instanceof Resource) {
-          target.reserveAmount += reservation.amount
-     } else target.store[reservation.resourceType] += reservation.amount
-
      this.memory.reservations.splice(index)
 
      this.message += '❌'
+
+     if (target instanceof Resource) {
+          target.reserveAmount += reservation.amount
+          return
+     }
+
+     if (reservation.type === 'transfer') {
+          target.store[reservation.resourceType] -= reservation.amount
+          return
+     }
+
+     target.store[reservation.resourceType] += reservation.amount
 }
 
 Creep.prototype.createReservation = function (type, targetID, amount, resourceType) {
@@ -1962,7 +1970,7 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
      this.message += '➕' + type[0]
 
      if (target instanceof Resource) {
-          target.reserveAmount += reservation.amount
+          target.reserveAmount -= reservation.amount
           return
      }
 
@@ -1990,7 +1998,7 @@ Creep.prototype.reservationManager = function () {
           }
 
           if (target instanceof Resource) {
-               target.reserveAmount += reservation.amount
+               target.reserveAmount -= reservation.amount
                continue
           }
 
@@ -2032,7 +2040,6 @@ Creep.prototype.fulfillReservation = function () {
      if (target instanceof Resource) {
           if (this.advancedPickup(target)) {
                this.store[reservation.resourceType] += reservation.amount
-               target.reserveAmount -= Math.min(this.freeSpecificStore(reservation.resourceType), target.amount)
 
                this.deleteReservation(0)
                return true

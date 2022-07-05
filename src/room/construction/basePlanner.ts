@@ -85,15 +85,24 @@ export function basePlanner(room: Room) {
           normalDT?: boolean
      }
 
+     let stamp
+     let newStampAnchors
+     let packedStampAnchor
+     let stampAnchor
+     let structureType
+     let pos
+     let x
+     let y
+
      /**
       * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
       */
      function planStamp(opts: PlanStampOpts): boolean {
           // Define the stamp using the stampType
 
-          const stamp = stamps[opts.stampType]
+          stamp = stamps[opts.stampType]
 
-          const newStampAnchors: number[] = []
+          newStampAnchors = []
 
           // So long as the count is more than 0
 
@@ -103,15 +112,15 @@ export function basePlanner(room: Room) {
                // If an anchor already exists with this index
 
                if (room.memory.stampAnchors[opts.stampType][opts.count]) {
-                    for (const packedStampAnchor of room.memory.stampAnchors[opts.stampType]) {
-                         const stampAnchor = unpackAsPos(packedStampAnchor)
+                    for (packedStampAnchor of room.memory.stampAnchors[opts.stampType]) {
+                         stampAnchor = unpackAsPos(packedStampAnchor)
 
-                         for (const structureType in stamp.structures) {
-                              for (const pos of stamp.structures[structureType]) {
+                         for (structureType in stamp.structures) {
+                              for (pos of stamp.structures[structureType]) {
                                    // Re-assign the pos's x and y to align with the offset
 
-                                   const x = pos.x + stampAnchor.x - stamp.offset
-                                   const y = pos.y + stampAnchor.y - stamp.offset
+                                   x = pos.x + stampAnchor.x - stamp.offset
+                                   y = pos.y + stampAnchor.y - stamp.offset
 
                                    // If the structureType is a road
 
@@ -137,7 +146,7 @@ export function basePlanner(room: Room) {
 
                // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 
-               const stampAnchor = room.findClosestPosOfValue({
+               stampAnchor = room.findClosestPosOfValue({
                     CM: distanceCM,
                     startPos: opts.anchorOrient,
                     requiredValue: stamp.size,
@@ -154,14 +163,14 @@ export function basePlanner(room: Room) {
 
                newStampAnchors.push(pack(stampAnchor))
 
-               for (const structureType in stamp.structures) {
+               for (structureType in stamp.structures) {
                     // Loop through positions
 
-                    for (const pos of stamp.structures[structureType]) {
+                    for (pos of stamp.structures[structureType]) {
                          // Re-assign the pos's x and y to align with the offset
 
-                         const x = pos.x + stampAnchor.x - stamp.offset
-                         const y = pos.y + stampAnchor.y - stamp.offset
+                         x = pos.x + stampAnchor.x - stamp.offset
+                         y = pos.y + stampAnchor.y - stamp.offset
 
                          // If the structureType is a road
 

@@ -17,7 +17,8 @@ InternationalManager.prototype.creepOrganizer = function () {
 
      let totalCreepCount = 0
 
-     let creep: Creep
+     let creep
+     let commune
 
      // Loop through all of my creeps
 
@@ -68,7 +69,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
           // Get the commune the creep is from
 
-          const commune = Game.rooms[creep.memory.communeName]
+          commune = Game.rooms[creep.memory.communeName]
 
           // If there is not vision in the commune, stop
 

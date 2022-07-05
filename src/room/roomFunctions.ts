@@ -1842,14 +1842,15 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
      // Find distance from scoutingRoom
 
-     if (distance < 4) distance = advancedFindDistance(scoutingRoom.name, room.name, {
-          keeper: Infinity,
-          enemy: Infinity,
-          enemyRemote: Infinity,
-          ally: Infinity,
-          allyRemote: Infinity,
-          highway: Infinity,
-     })
+     if (distance < 4)
+          distance = advancedFindDistance(scoutingRoom.name, room.name, {
+               keeper: Infinity,
+               enemy: Infinity,
+               enemyRemote: Infinity,
+               ally: Infinity,
+               allyRemote: Infinity,
+               highway: Infinity,
+          })
 
      if (distance < 4) {
           // If the room is already a remote of the scoutingRoom
@@ -2062,22 +2063,25 @@ Room.prototype.distanceTransform = function (
 
      if (!initialCM) initialCM = room.get('terrainCM')
 
-     for (let x = Math.max(x1 - 1, 0); x <= Math.min(x2 + 1, constants.roomDimensions); x += 1) {
-          for (let y = Math.max(y1 - 1, 0); y <= Math.min(y2 + 1, constants.roomDimensions); y += 1) {
+     let x
+     let y
+
+     for (x = Math.max(x1 - 1, 0); x <= Math.min(x2 + 1, constants.roomDimensions); x += 1) {
+          for (y = Math.max(y1 - 1, 0); y <= Math.min(y2 + 1, constants.roomDimensions); y += 1) {
                distanceCM.set(x, y, initialCM.get(x, y) === 255 ? 0 : 255)
           }
      }
 
-     let top: number
-     let left: number
-     let topLeft: number
-     let topRight: number
-     let bottomLeft: number
+     let top
+     let left
+     let topLeft
+     let topRight
+     let bottomLeft
 
      // Loop through the xs and ys inside the bounds
 
-     for (let x = x1; x <= x2; x += 1) {
-          for (let y = y1; y <= y2; y += 1) {
+     for (x = x1; x <= x2; x += 1) {
+          for (y = y1; y <= y2; y += 1) {
                top = distanceCM.get(x, y - 1)
                left = distanceCM.get(x - 1, y)
                topLeft = distanceCM.get(x - 1, y - 1)
@@ -2092,14 +2096,14 @@ Room.prototype.distanceTransform = function (
           }
      }
 
-     let bottom: number
-     let right: number
-     let bottomRight: number
+     let bottom
+     let right
+     let bottomRight
 
      // Loop through the xs and ys inside the bounds
 
-     for (let x = x2; x >= x1; x -= 1) {
-          for (let y = y2; y >= y1; y -= 1) {
+     for (x = x2; x >= x1; x -= 1) {
+          for (y = y2; y >= y1; y -= 1) {
                bottom = distanceCM.get(x, y + 1)
                right = distanceCM.get(x + 1, y)
                bottomRight = distanceCM.get(x + 1, y + 1)
@@ -2117,8 +2121,8 @@ Room.prototype.distanceTransform = function (
      if (enableVisuals && Memory.roomVisuals) {
           // Loop through the xs and ys inside the bounds
 
-          for (let x = x1; x <= x2; x += 1) {
-               for (let y = y1; y <= y2; y += 1) {
+          for (x = x1; x <= x2; x += 1) {
+               for (y = y1; y <= y2; y += 1) {
                     room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                          fill: `hsl(${200}${distanceCM.get(x, y) * 10}, 100%, 60%)`,
                          opacity: 0.4,
@@ -2146,19 +2150,22 @@ Room.prototype.specialDT = function (
 
      if (!initialCM) initialCM = room.get('terrainCM')
 
-     for (let x = x1; x <= x2; x += 1) {
-          for (let y = y1; y <= y2; y += 1) {
+     let x
+     let y
+
+     for (x = x1; x <= x2; x += 1) {
+          for (y = y1; y <= y2; y += 1) {
                distanceCM.set(x, y, initialCM.get(x, y) === 255 ? 0 : 255)
           }
      }
 
-     let top: number
-     let left: number
+     let top
+     let left
 
      // Loop through the xs and ys inside the bounds
 
-     for (let x = x1; x <= x2; x += 1) {
-          for (let y = y1; y <= y2; y += 1) {
+     for (x = x1; x <= x2; x += 1) {
+          for (y = y1; y <= y2; y += 1) {
                top = distanceCM.get(x, y - 1)
                left = distanceCM.get(x - 1, y)
 
@@ -2166,13 +2173,13 @@ Room.prototype.specialDT = function (
           }
      }
 
-     let bottom: number
-     let right: number
+     let bottom
+     let right
 
      // Loop through the xs and ys inside the bounds
 
-     for (let x = x2; x >= x1; x -= 1) {
-          for (let y = y2; y >= y1; y -= 1) {
+     for (x = x2; x >= x1; x -= 1) {
+          for (y = y2; y >= y1; y -= 1) {
                bottom = distanceCM.get(x, y + 1)
                right = distanceCM.get(x + 1, y)
 
@@ -2183,8 +2190,8 @@ Room.prototype.specialDT = function (
      if (enableVisuals && Memory.roomVisuals) {
           // Loop through the xs and ys inside the bounds
 
-          for (let x = x1; x <= x2; x += 1) {
-               for (let y = y1; y <= y2; y += 1) {
+          for (x = x1; x <= x2; x += 1) {
+               for (y = y1; y <= y2; y += 1) {
                     room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                          fill: `hsl(${200}${distanceCM.get(x, y) * 10}, 100%, 60%)`,
                          opacity: 0.4,
@@ -2215,13 +2222,18 @@ Room.prototype.floodFill = function (seeds) {
      let thisGeneration: Pos[] = seeds
      let nextGeneration: Pos[] = []
 
+     let pos
+
      // Loop through positions of seeds
 
-     for (const pos of seeds) {
+     for (pos of seeds) {
           // Record the seedsPos as visited
 
           visitedCM.set(pos.x, pos.y, 1)
      }
+
+     let adjacentPositions
+     let adjacentPos
 
      // So long as there are positions in this gen
 
@@ -2232,10 +2244,10 @@ Room.prototype.floodFill = function (seeds) {
 
           // Iterate through positions of this gen
 
-          for (const pos of thisGeneration) {
+          for (pos of thisGeneration) {
                // If the depth isn't 0
 
-               if (depth !== 0) {
+               if (depth > 0) {
                     // Iterate if the terrain is a wall
 
                     if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
@@ -2255,11 +2267,11 @@ Room.prototype.floodFill = function (seeds) {
 
                // Construct a rect and get the positions in a range of 1
 
-               const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
+               adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
 
                // Loop through adjacent positions
 
-               for (const adjacentPos of adjacentPositions) {
+               for (adjacentPos of adjacentPositions) {
                     // Iterate if the adjacent pos has been visited or isn't a tile
 
                     if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
@@ -2307,37 +2319,33 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
           // If adjacentToRoads is a requirement
 
-          if (opts.adjacentToRoads) {
-               // Construct a rect and get the positions in a range of 1
+          if (!opts.adjacentToRoads) return true
 
-               const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
+          // Construct a rect and get the positions in a range of 1
 
-               // Construct a default no for nearby roads
+          const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
 
-               let nearbyRoad = false
+          // Construct a default no for nearby roads
 
-               // Loop through adjacent positions
+          let nearbyRoad = false
 
-               for (const adjacentPos of adjacentPositions) {
-                    // If the adjacentPos isn't a roadPosition, iterate
+          // Loop through adjacent positions
 
-                    if (opts.roadCM.get(adjacentPos.x, adjacentPos.y) !== 1) continue
+          for (const adjacentPos of adjacentPositions) {
+               // If the adjacentPos isn't a roadPosition, iterate
 
-                    // Otherwise set nearbyRoad to true and stop the loop
+               if (opts.roadCM.get(adjacentPos.x, adjacentPos.y) !== 1) continue
 
-                    nearbyRoad = true
-                    break
-               }
+               // Otherwise set nearbyRoad to true and stop the loop
 
-               // If nearbyRoad is false, inform false
-
-               if (!nearbyRoad) return false
+               return nearbyRoad = true
           }
 
-          // Inform true
-
-          return true
+          return false
      }
+
+     let pos
+     let adjacentPos
 
      while ((opts.reduceIterations || 0) >= 0) {
           // Construct a cost matrix for visited tiles and add seeds to it
@@ -2363,7 +2371,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                // Iterate through positions of this gen
 
-               for (const pos of thisGeneration) {
+               for (pos of thisGeneration) {
                     // If the pos can be an anchor, inform it
 
                     if (isViableAnchor(pos)) return room.newPos(pos)
@@ -2391,7 +2399,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                     // Loop through adjacent positions
 
-                    for (const adjacentPos of adjacentPositions) {
+                    for (adjacentPos of adjacentPositions) {
                          // Iterate if the pos doesn't map onto a room
 
                          if (
@@ -2628,7 +2636,6 @@ Room.prototype.createWithdrawTasks = function (creator) {
 }
 
 Room.prototype.estimateIncome = function () {
-
      const harvesterNames = this.creepsFromRoom.source1Harvester
           .concat(this.creepsFromRoom.source2Harvester)
           .concat(this.creepsFromRoom.source1RemoteHarvester)
@@ -2654,7 +2661,6 @@ Room.prototype.estimateIncome = function () {
 }
 
 Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
-
      // Construct positions
 
      const positions = []
@@ -2679,7 +2685,6 @@ Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
 }
 
 Room.prototype.getPartsOfRoleAmount = function (role, type) {
-
      // Intilaize the partsAmount
 
      let partsAmount = 0
@@ -2712,7 +2717,6 @@ Room.prototype.getPartsOfRoleAmount = function (role, type) {
 }
 
 Room.prototype.findSourcesByEfficacy = function () {
-
      // Get the room's sourceNames
 
      const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']

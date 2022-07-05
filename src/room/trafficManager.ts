@@ -9,7 +9,6 @@ export function trafficManager(room: Room) {
      if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
      let creepName
-     let creep
 
      // Loop through each x and y in the room
 
@@ -18,13 +17,10 @@ export function trafficManager(room: Room) {
                // Loop through those creeps
 
                for (creepName of room.moveRequests[packXY(x, y)]) {
-                    // Get the creep with the name of creepName
-
-                    creep = Game.creeps[creepName]
 
                     // Handle traffic for this position
 
-                    creep.recurseMoveRequest()
+                    Game.creeps[creepName].recurseMoveRequest()
                }
           }
      }
