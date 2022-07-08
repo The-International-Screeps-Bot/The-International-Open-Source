@@ -29,7 +29,10 @@ export function spawnRequester(room: Room) {
 
      const mostOptimalSource = room.findSourcesByEfficacy()[0]
 
-     let partsMultiplier = 0
+     let partsMultiplier: number
+     let extraParts: BodyPartConstant[]
+     let cost: number
+     let minCost: number
 
      // Construct requests for sourceHarvesters
 
@@ -249,7 +252,7 @@ export function spawnRequester(room: Room) {
                     requiredCarryParts += findCarryPartsRequired(room.upgradePathLength * 2, income)
                }
 
-               // If all RCL 3 extensions are build
+               // If all RCL 3 extensions are built
 
                if (spawnEnergyCapacity >= 800) {
                     return {
@@ -1055,6 +1058,30 @@ export function spawnRequester(room: Room) {
 
      room.constructSpawnRequests(
           (function (): SpawnRequestOpts | false {
+
+
+               if (remoteHaulerNeed === 0) return false
+/*
+               // If all RCL 3 extensions are built
+
+               if (spawnEnergyCapacity >= 800) {
+
+                    partsMultiplier = remoteHaulerNeed / 2
+
+                    return {
+                         defaultParts: [],
+                         extraParts: [CARRY, CARRY, MOVE],
+                         threshold: 0.1,
+                         partsMultiplier,
+                         maxCreeps: Infinity,
+                         minCost: 300,
+                         priority: minRemotePriority - 0.2,
+                         memoryAdditions: {
+                              role: 'remoteHauler',
+                         },
+                    }
+               }
+ */
                partsMultiplier = remoteHaulerNeed
 
                return {
