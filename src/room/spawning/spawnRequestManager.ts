@@ -29,6 +29,8 @@ export function spawnRequester(room: Room) {
 
      const mostOptimalSource = room.findSourcesByEfficacy()[0]
 
+     let partsMultiplier = 0
+
      // Construct requests for sourceHarvesters
 
      room.constructSpawnRequests(
@@ -217,28 +219,34 @@ export function spawnRequester(room: Room) {
 
                // If there is no source1Link, increase requiredCarryParts using the source's path length
 
-               if (!room.source1Link) requiredCarryParts += findCarryPartsRequired(room.source1PathLength * 2, 10)
+               if (!room.source1Link)
+                    requiredCarryParts += findCarryPartsRequired(
+                         room.source1PathLength * 2,
+                         Math.min(room.getPartsOfRoleAmount('source1Harvester', WORK), 10),
+                    )
 
                // If there is no source2Link, increase requiredCarryParts using the source's path length
 
-               if (!room.source2Link) requiredCarryParts += findCarryPartsRequired(room.source2PathLength * 2, 10)
+               if (!room.source2Link)
+                    requiredCarryParts += findCarryPartsRequired(
+                         room.source2PathLength * 2,
+                         Math.min(room.getPartsOfRoleAmount('source1Harvester', WORK), 10),
+                    )
 
                // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
                if (room.controllerContainer) {
-
                     let income
 
                     if (room.storage) {
-
                          income = room.getPartsOfRoleAmount('controllerUpgrader', WORK)
-                    }
-                    else Math.min(room.getPartsOfRoleAmount('controllerUpgrader', WORK) * 0.75, room.sources.length * 0.75)
+                    } else
+                         Math.min(
+                              room.getPartsOfRoleAmount('controllerUpgrader', WORK) * 0.75,
+                              room.sources.length * 0.75,
+                         )
 
-                    requiredCarryParts += findCarryPartsRequired(
-                         room.upgradePathLength * 2,
-                         income,
-                    )
+                    requiredCarryParts += findCarryPartsRequired(room.upgradePathLength * 2, income)
                }
 
                // If all RCL 3 extensions are build
@@ -439,8 +447,6 @@ export function spawnRequester(room: Room) {
                // Stop if there are no construction sites
 
                if (room.find(FIND_MY_CONSTRUCTION_SITES).length === 0) return false
-
-               let partsMultiplier = 0
 
                // If there is a storage
 
@@ -787,16 +793,25 @@ export function spawnRequester(room: Room) {
           })(),
      )
 
-     // Get remotes by order of efficacy
+     let remoteHaulerNeed = 0
+
+     const minRemotePriority = 10
+     let remotePriority
+
+     let remoteName
+     let remoteNeeds
+     let totalRemoteNeed
+     let sourcesByEfficacy
 
      const remoteNamesByEfficacy: string[] = room.get('remoteNamesByEfficacy')
 
      for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
-          const remoteName = remoteNamesByEfficacy[index]
-          const remoteNeeds = Memory.rooms[remoteName].needs
+          remoteName = remoteNamesByEfficacy[index]
+          remoteNeeds = Memory.rooms[remoteName].needs
+
           // Add up econ needs for this room
 
-          const remoteNeed =
+          totalRemoteNeed =
                Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0) +
                Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0) +
                Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0) +
@@ -807,11 +822,15 @@ export function spawnRequester(room: Room) {
 
           // If there is a need for any econ creep, inform the index
 
-          if (remoteNeed <= 0) continue
+          if (totalRemoteNeed <= 0) continue
+
+          remotePriority = minRemotePriority + index
 
           // Get the sources in order of efficacy
 
-          const sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
+          sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
+
+          remoteHaulerNeed += Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0)
 
           // Construct requests for source1RemoteHarvesters
 
@@ -832,7 +851,7 @@ export function spawnRequester(room: Room) {
                               maxCreeps: Infinity,
                               maxCostPerCreep: 50 + 150 * 6,
                               minCost: 200,
-                              priority: 10 + index - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
+                              priority: remotePriority - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                               memoryAdditions: {
                                    role: 'source1RemoteHarvester',
                               },
@@ -849,7 +868,7 @@ export function spawnRequester(room: Room) {
                          maxCreeps: global[remoteName]?.source1HarvestPositions?.length || Infinity,
                          maxCostPerCreep: 50 + 150 * 6,
                          minCost: 200,
-                         priority: 10 + index - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
+                         priority: remotePriority - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                          memoryAdditions: {
                               role: 'source1RemoteHarvester',
                          },
@@ -875,7 +894,7 @@ export function spawnRequester(room: Room) {
                               minCreeps: 1,
                               maxCreeps: Infinity,
                               minCost: 200,
-                              priority: 10 + index - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
+                              priority: remotePriority - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                               memoryAdditions: {
                                    role: 'source2RemoteHarvester',
                               },
@@ -892,39 +911,9 @@ export function spawnRequester(room: Room) {
                          maxCreeps: global[remoteName]?.source2HarvestPositions?.length || Infinity,
                          maxCostPerCreep: 150 * 6,
                          minCost: 200,
-                         priority: 10 + index - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
+                         priority: remotePriority - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                          memoryAdditions: {
                               role: 'source2RemoteHarvester',
-                         },
-                    }
-               })(),
-          )
-
-          // Construct requests for remoteHaulers
-
-          room.constructSpawnRequests(
-               (function (): SpawnRequestOpts | false {
-                    let partsMultiplier = 0
-
-                    for (const roomName of remoteNamesByEfficacy) {
-                         partsMultiplier += Math.max(Memory.rooms[roomName].needs[remoteNeedsIndex.remoteHauler], 0)
-                    }
-
-                    // If there are no needs for this room, inform false
-
-                    if (remoteNeeds[remoteNeedsIndex.remoteHauler] <= 0) return false
-
-                    return {
-                         defaultParts: [],
-                         extraParts: [CARRY, MOVE],
-                         threshold: 0.1,
-                         partsMultiplier,
-                         minCreeps: undefined,
-                         maxCreeps: Infinity,
-                         minCost: 200,
-                         priority: 10.2 + index,
-                         memoryAdditions: {
-                              role: 'remoteHauler',
                          },
                     }
                })(),
@@ -950,7 +939,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: 1,
                          maxCreeps: Infinity,
                          minCost: 750,
-                         priority: 10.3 + index,
+                         priority: remotePriority + 0.3,
                          memoryAdditions: {
                               role: 'remoteReserver',
                          },
@@ -996,7 +985,7 @@ export function spawnRequester(room: Room) {
                          groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDefender,
                          minCreeps: 1,
                          minCost,
-                         priority: 7,
+                         priority: minRemotePriority - 3,
                          memoryAdditions: {
                               role: 'remoteDefender',
                          },
@@ -1025,7 +1014,7 @@ export function spawnRequester(room: Room) {
                          groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteCoreAttacker,
                          minCreeps: 1,
                          minCost,
-                         priority: 9,
+                         priority: minRemotePriority - 2,
                          memoryAdditions: {
                               role: 'remoteCoreAttacker',
                          },
@@ -1053,7 +1042,7 @@ export function spawnRequester(room: Room) {
                          groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteDismantler,
                          minCreeps: 1,
                          minCost: cost * 2,
-                         priority: 9,
+                         priority: minRemotePriority - 1,
                          memoryAdditions: {
                               role: 'remoteDismantler',
                          },
@@ -1061,6 +1050,27 @@ export function spawnRequester(room: Room) {
                })(),
           )
      }
+
+     // Construct requests for remoteHaulers
+
+     room.constructSpawnRequests(
+          (function (): SpawnRequestOpts | false {
+               partsMultiplier = remoteHaulerNeed
+
+               return {
+                    defaultParts: [],
+                    extraParts: [CARRY, MOVE],
+                    threshold: 0.1,
+                    partsMultiplier,
+                    maxCreeps: Infinity,
+                    minCost: 200,
+                    priority: minRemotePriority - 0.2,
+                    memoryAdditions: {
+                         role: 'remoteHauler',
+                    },
+               }
+          })(),
+     )
 
      // Construct requests for scouts
 
