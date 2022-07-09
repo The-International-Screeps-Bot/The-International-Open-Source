@@ -8,28 +8,10 @@ export function trafficManager(room: Room) {
 
      if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-     // Loop through each x and y in the room
-
-     for (let x = 0; x < constants.roomDimensions; x += 1) {
-          for (let y = 0; y < constants.roomDimensions; y += 1) {
-               // Loop through those creeps
-
-               for (const creepName of room.moveRequests[packXY(x, y)]) {
-
-                    // Handle traffic for this position
-
-                    Game.creeps[creepName].recurseMoveRequest()
-               }
-          }
-     }
+     for (const creep of room.find(FIND_MY_CREEPS)) creep.recurseMoveRequest()
 
      // If CPU logging is enabled, log the CPU used by this manager
 
      if (Memory.cpuLogging)
-          customLog(
-               'Traffic Manager',
-               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-               undefined,
-               myColors.lightGrey,
-          )
+          customLog('Traffic Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
 }
