@@ -72,7 +72,7 @@ Maintainer.prototype.advancedMaintain = function () {
                goal: { pos: repairTarget.pos, range: 3 },
                avoidEnemyRanges: true,
                weightGamebjects: {
-                    1: room.get('road'),
+                    1: room.structures.road,
                },
           })
 
@@ -99,7 +99,7 @@ Maintainer.prototype.advancedMaintain = function () {
           if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eorwr += energySpentOnRepairs
           creep.say(`🧱${energySpentOnRepairs * REPAIR_POWER}`)
      } else {
-          if (global.roomStats[this.room.name])  global.roomStats[this.room.name].eoro += energySpentOnRepairs
+          if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eoro += energySpentOnRepairs
           creep.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
      }
 
@@ -136,7 +136,7 @@ Maintainer.prototype.advancedMaintain = function () {
           goal: { pos: newRepairTarget.pos, range: 3 },
           avoidEnemyRanges: true,
           weightGamebjects: {
-               1: room.get('road'),
+               1: room.structures.road,
           },
      })
 

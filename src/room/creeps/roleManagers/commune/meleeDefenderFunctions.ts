@@ -8,8 +8,7 @@ MeleeDefender.prototype.advancedDefend = function () {
 
      // Get enemyAttackers in the room, informing false if there are none
 
-     const enemyAttackers = room.enemyAttackers.filter(function(enemyAttacker) {
-
+     const enemyAttackers = room.enemyAttackers.filter(function (enemyAttacker) {
           return !enemyAttacker.isOnExit()
      })
 
@@ -57,7 +56,7 @@ MeleeDefender.prototype.advancedDefend = function () {
                     origin: creep.pos,
                     goal: { pos: enemyAttacker.pos, range: 1 },
                     weightGamebjects: {
-                         1: room.get('road'),
+                         1: room.structures.road,
                     },
                })
 

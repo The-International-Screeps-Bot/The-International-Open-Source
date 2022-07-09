@@ -336,7 +336,7 @@ export function spawnRequester(room: Room) {
 
                // Otherwise if there is no hubLink or terminal, inform false
 
-               if (!room.get('hubLink') && !room.terminal) return false
+               if (!room.hubLink && !room.terminal) return false
 
                return {
                     defaultParts: [MOVE],
@@ -660,7 +660,7 @@ export function spawnRequester(room: Room) {
 
                // If the controllerContainer or controllerLink exists
 
-               if (room.get('controllerContainer') || controllerLink) {
+               if (room.controllerContainer || controllerLink) {
                     // If the controller is level 8
 
                     if (room.controller.level === 8) {

@@ -8,21 +8,15 @@ export function linkManager(room: Room) {
 
      if (!room.storage) return
 
-     // Get the receiver links
-
-     const fastFillerLink = room.get('fastFillerLink')
-     const hubLink = room.get('hubLink')
-     const controllerLink = room.get('controllerLink')
-
      // Get the sourceLinks
 
-     const sourceLinks: (StructureLink | false)[] = [room.get('source1Link'), room.get('source2Link')]
+     const sourceLinks: (StructureLink | false)[] = [room.source1Link, room.source2Link]
 
-     const receiverLinks: (StructureLink | false)[] = [fastFillerLink, hubLink, controllerLink]
+     const receiverLinks: (StructureLink | false)[] = [room.fastFillerLink, room.hubLink, room.controllerLink]
 
      room.sourcesToReceivers(sourceLinks, receiverLinks)
 
-     room.hubToFastFiller(hubLink, fastFillerLink)
+     room.hubToFastFiller(room.hubLink, room.fastFillerLink)
 
-     room.hubToController(hubLink, controllerLink)
+     room.hubToController(room.hubLink, room.controllerLink)
 }

@@ -26,7 +26,13 @@ Object.defineProperties(Room.prototype, {
                if (!this.memory.sourceIds) {
                     this.memory.sourceIds = []
 
-                    for (const source of this.find(FIND_SOURCES)) this.memory.sourceIds.push(source.id)
+                    for (const source of this.find(FIND_SOURCES)) {
+
+                         this.memory.sourceIds.push(source.id)
+                         this._sources.push(source)
+                    }
+
+                    return this._sources
                }
 
                this._sources = []

@@ -59,7 +59,7 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
                goal: { pos: target.pos, range: 1 },
                avoidEnemyRanges: true,
                weightGamebjects: {
-                    1: room.get('road'),
+                    1: room.structures.road,
                },
           })
           return false
@@ -97,7 +97,7 @@ Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENE
                goal: { pos: target.pos, range: 1 },
                avoidEnemyRanges: true,
                weightGamebjects: {
-                    1: room.get('road'),
+                    1: room.structures.road,
                },
           })
 
@@ -136,7 +136,7 @@ Creep.prototype.advancedPickup = function (target) {
                goal: { pos: target.pos, range: 1 },
                avoidEnemyRanges: true,
                weightGamebjects: {
-                    1: room.get('road'),
+                    1: room.structures.road,
                },
           })
 
@@ -150,7 +150,7 @@ Creep.prototype.advancedPickup = function (target) {
 
      // Try to pickup. if the action can be considered a success
 
-     if (pickupResult === OK || pickupResult === ERR_FULL) {
+     if (pickupResult === OK) {
           this.movedResource = true
           return true
      }
@@ -239,7 +239,7 @@ Creep.prototype.advancedUpgradeController = function () {
                     },
                     avoidEnemyRanges: true,
                     weightGamebjects: {
-                         1: room.get('road'),
+                         1: room.structures.road,
                     },
                })
 
@@ -354,7 +354,7 @@ Creep.prototype.advancedUpgradeController = function () {
                goal: { pos: room.controller.pos, range: 3 },
                avoidEnemyRanges: true,
                weightGamebjects: {
-                    1: room.get('road'),
+                    1: room.structures.road,
                },
           })
 
@@ -404,7 +404,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
                goal: { pos: cSite.pos, range: 3 },
                avoidEnemyRanges: true,
                weightGamebjects: {
-                    1: room.get('road'),
+                    1: room.structures.road,
                },
           })
 
@@ -1342,7 +1342,7 @@ Creep.prototype.fulfillPullTask = function (task) {
                goal: { pos: taskTarget.pos, range: 1 },
                avoidEnemyRanges: true,
                weightGamebjects: {
-                    1: room.get('road'),
+                    1: room.structures.road,
                },
           })
 
@@ -1368,7 +1368,7 @@ Creep.prototype.fulfillPullTask = function (task) {
                goal: { pos: targetPos, range: 0 },
                avoidEnemyRanges: true,
                weightGamebjects: {
-                    1: room.get('road'),
+                    1: room.structures.road,
                },
           })
           return false
@@ -1488,7 +1488,7 @@ Creep.prototype.fulfillWithdrawTask = function (task) {
                     goal: { pos: withdrawTarget.pos, range: 1 },
                     avoidEnemyRanges: true,
                     weightGamebjects: {
-                         1: room.get('road'),
+                         1: room.structures.road,
                     },
                })
 
@@ -1643,12 +1643,9 @@ Creep.prototype.advancedRecycle = function () {
 
      const closestSpawn = this.pos.findClosestByRange(room.structures.spawn)
 
-     const fastFillerContainers = (
-          [room.get('fastFillerContainerLeft'), room.get('fastFillerContainerRight')] as (
-               | StructureContainer
-               | undefined
-          )[]
-     ).filter(function (container) {
+     const fastFillerContainers = [room.fastFillerContainerLeft, room.fastFillerContainerRight].filter(function (
+          container,
+     ) {
           return container && getRange(container.pos.x - closestSpawn.pos.x, container.pos.y - closestSpawn.pos.y) == 1
      })
 
@@ -1663,7 +1660,7 @@ Creep.prototype.advancedRecycle = function () {
                     goal: { pos: closestContainer.pos, range: 0 },
                     avoidEnemyRanges: true,
                     weightGamebjects: {
-                         1: room.get('road'),
+                         1: room.structures.road,
                     },
                })
 
@@ -1675,7 +1672,7 @@ Creep.prototype.advancedRecycle = function () {
                goal: { pos: closestSpawn.pos, range: 1 },
                avoidEnemyRanges: true,
                weightGamebjects: {
-                    1: room.get('road'),
+                    1: room.structures.road,
                },
           })
 
@@ -1901,28 +1898,11 @@ Creep.prototype.aggressiveHeal = function () {
      return true
 }
 
-Creep.prototype.deleteReservation = function (index, changeResources) {
-     const reservation = this.memory.reservations[index]
-
-     const target = findObjectWithID(reservation.targetID)
+Creep.prototype.deleteReservation = function (index) {
 
      this.memory.reservations.splice(index)
 
      this.message += '❌'
-
-     if (!changeResources) return
-
-     if (target instanceof Resource) {
-          target.reserveAmount += reservation.amount
-          return
-     }
-
-     if (reservation.type === 'transfer') {
-          target.store[reservation.resourceType] -= reservation.amount
-          return
-     }
-
-     target.store[reservation.resourceType] += reservation.amount
 }
 
 Creep.prototype.createReservation = function (type, targetID, amount, resourceType) {
@@ -1962,7 +1942,7 @@ Creep.prototype.reservationManager = function () {
           const target = findObjectWithID(reservation.targetID)
 
           if (!target || target.room.name !== this.room.name) {
-               this.memory.reservations.splice(index, 1)
+               this.deleteReservation(index)
                continue
           }
 
@@ -1987,10 +1967,6 @@ Creep.prototype.fulfillReservation = function () {
      if (!reservation) return true
 
      const target = findObjectWithID(reservation.targetID)
-     if (!target) {
-          this.deleteReservation(0)
-          return true
-     }
 
      const { room } = this
 
@@ -2009,8 +1985,9 @@ Creep.prototype.fulfillReservation = function () {
      if (target instanceof Resource) {
           if (this.advancedPickup(target)) {
                this.store[reservation.resourceType] += reservation.amount
+               target.reserveAmount -= reservation.amount
 
-               this.deleteReservation(0, true)
+               this.deleteReservation(0)
                return true
           }
 
@@ -2028,7 +2005,7 @@ Creep.prototype.fulfillReservation = function () {
                this.store[reservation.resourceType] -= amount
                target.store[reservation.resourceType] += amount
 
-               this.deleteReservation(0, true)
+               this.deleteReservation(0)
                return true
           }
 
@@ -2047,7 +2024,7 @@ Creep.prototype.fulfillReservation = function () {
           this.store[reservation.resourceType] += amount
           target.store[reservation.resourceType] -= amount
 
-          this.deleteReservation(0, true)
+          this.deleteReservation(0)
           return true
      }
 

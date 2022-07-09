@@ -58,7 +58,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
                               goal: { pos: source.pos, range: 1 },
                               avoidEnemyRanges: true,
                               weightGamebjects: {
-                                   1: room.get('road'),
+                                   1: room.structures.road,
                               },
                          })
 

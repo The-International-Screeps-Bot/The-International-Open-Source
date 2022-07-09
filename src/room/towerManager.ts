@@ -12,8 +12,6 @@ export function towerManager(room: Room) {
 
      if (!room.structures.tower.length) return
 
-     room.towersRequestResources()
-
      room.towersAttackCreeps()
 
      room.towersHealCreeps()

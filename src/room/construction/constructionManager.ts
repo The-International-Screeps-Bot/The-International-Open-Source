@@ -22,7 +22,7 @@ export function constructionManager(room: Room) {
           if (!centerUpgradePos) return
 
           if (room.controller.level >= 5) {
-               const controllerContainer: StructureContainer | undefined = room.get('controllerContainer')
+               const controllerContainer = room.controllerContainer
                if (controllerContainer) controllerContainer.destroy()
 
                room.createConstructionSite(centerUpgradePos, STRUCTURE_LINK)

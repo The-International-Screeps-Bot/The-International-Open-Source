@@ -28,7 +28,7 @@ MineralHarvester.prototype.advancedHarvestMineral = function (mineral) {
                goal: { pos: harvestPos, range: 0 },
                avoidEnemyRanges: true,
                weightGamebjects: {
-                    1: room.get('road'),
+                    1: room.structures.road,
                },
           })
 

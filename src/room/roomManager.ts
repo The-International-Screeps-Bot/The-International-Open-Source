@@ -11,9 +11,7 @@ import { creepRoleManager } from './creeps/creepRoleManager'
 import { powerCreepManager } from './powerCreeps/powerCreepManager'
 import { trafficManager } from './trafficManager'
 import { roomVisualsManager } from './roomVisualsManager'
-import { containerManager } from './containerManager'
 import { createPackedPosMap, customLog } from 'international/generalFunctions'
-import { droppedResourceManager } from './droppedResourceManager'
 import { statsManager } from 'international/statsManager'
 
 const specificRoomManagers: { [key: string]: Function } = {
@@ -45,12 +43,6 @@ export function roomManager() {
           // If there is a specific manager for this room's type, run it
 
           if (specificRoomManagers[roomType]) specificRoomManagers[roomType](room)
-
-          droppedResourceManager(room)
-
-          //
-
-          containerManager(room)
 
           //
 

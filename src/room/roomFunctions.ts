@@ -168,24 +168,6 @@ Room.prototype.get = function (roomObjectName) {
           },
      })
 
-     // Sources
-
-     new RoomCacheObject({
-          name: 'sources',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               const sources = [room.roomObjects.source1.getValue()]
-               const source2 = room.roomObjects.source2.getValue()
-
-               if (source2) sources.push(source2)
-
-               return sources
-          },
-     })
-
      // Structures and cSites
 
      function findStructuresByType() {
@@ -630,52 +612,6 @@ Room.prototype.get = function (roomObjectName) {
           valueConstructor: findFastFillerPositions,
      })
 
-     // Source containers
-
-     function findSourceContainer(closestHarvestPos: RoomPosition) {
-          // Stop and inform false if no closestHarvestPos
-
-          if (!closestHarvestPos) return false
-
-          // Look at the closestHarvestPos for structures
-
-          const structuresAsPos = closestHarvestPos.lookFor(LOOK_STRUCTURES)
-
-          // Loop through structuresAtPos
-
-          for (const structure of structuresAsPos) {
-               // If the structureType is container, inform the container's ID
-
-               if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
-          }
-
-          // Otherwise inform false
-
-          return false
-     }
-
-     new RoomCacheObject({
-          name: 'source1Container',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findSourceContainer(room.roomObjects.source1ClosestHarvestPos.getValue())
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'source2Container',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findSourceContainer(room.roomObjects.source2ClosestHarvestPos.getValue())
-          },
-     })
-
      // usedMineralHarvestPositions
 
      function findUsedMineralHarvestPositions() {
@@ -772,7 +708,7 @@ Room.prototype.get = function (roomObjectName) {
 
           // Get the controllerContainer
 
-          const controllerContainer: StructureContainer = room.roomObjects.controllerContainer.getValue()
+          const controllerContainer: StructureContainer = room.controllerContainer
 
           // If there is no controllerContainer
 
@@ -899,95 +835,6 @@ Room.prototype.get = function (roomObjectName) {
      }
 
      new RoomCacheObject({
-          name: 'controllerContainer',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: findControllerContainer,
-     })
-
-     // mineralContainer
-
-     function findMineralContainer() {
-          // Get the mineralHarvestPos, informing false if it's undefined
-
-          const mineralHarvestPos: RoomPosition = room.roomObjects.closestMineralHarvestPos.getValue()
-          if (!mineralHarvestPos) return false
-
-          // Look at the mineralHarvestPos for structures
-
-          const structuresAsPos = mineralHarvestPos.lookFor(LOOK_STRUCTURES)
-
-          // Loop through structuresAtPos
-
-          for (const structure of structuresAsPos) {
-               // If the structureType is container, inform the container's ID
-
-               if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
-          }
-
-          // Otherwise inform false
-
-          return false
-     }
-
-     new RoomCacheObject({
-          name: 'mineralContainer',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: findMineralContainer,
-     })
-
-     // base containers
-
-     function findFastFillerContainer(offset: number) {
-          // Get the anchor, stopping if it isn't defined
-
-          if (!room.anchor) return false
-
-          // Otherwise search based on an offset from the anchor's x
-
-          const structuresAsPos = room.lookForAt(LOOK_STRUCTURES, room.anchor.x + offset, room.anchor.y)
-
-          // Loop through structuresAtPos
-
-          for (const structure of structuresAsPos) {
-               // If the structureType is container, inform the container's ID
-
-               if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
-          }
-
-          // Otherwise inform false
-
-          return false
-     }
-
-     new RoomCacheObject({
-          name: 'fastFillerContainerLeft',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: () => {
-               return findFastFillerContainer(-2)
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'fastFillerContainerRight',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: () => {
-               return findFastFillerContainer(2)
-          },
-     })
-
-     new RoomCacheObject({
           name: 'labContainer',
           valueType: 'id',
           cacheType: 'global',
@@ -995,121 +842,6 @@ Room.prototype.get = function (roomObjectName) {
           room,
           valueConstructor() {},
      })
-
-     // Links
-
-     function findLinkNearby(anchor: RoomPosition | undefined): Id<Structure> | false {
-          // If the anchor isn't defined, inform false
-
-          if (!anchor) return false
-
-          // Otherwise get the room's links
-
-          const links: StructureLink[] = room.get('link')
-
-          // Inform a link's id if it's adjacent to the anchor
-
-          return links.find(link => getRangeBetween(anchor.x, anchor.y, link.pos.x, link.pos.y) === 1)?.id
-     }
-
-     new RoomCacheObject({
-          name: 'source1Link',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findLinkNearby(room.roomObjects.source1ClosestHarvestPos.getValue())
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'source2Link',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findLinkNearby(room.roomObjects.source2ClosestHarvestPos.getValue())
-          },
-     })
-
-     function findLinkAtPos(pos: RoomPosition | undefined): Id<Structure> | false {
-          // If the pos isn't defined, inform false
-
-          if (!pos) return false
-
-          // Otherwise search based on an offset from the anchor's x
-
-          const structuresAsPos = pos.lookFor(LOOK_STRUCTURES)
-
-          // Loop through structuresAtPos
-
-          for (const structure of structuresAsPos) {
-               // If the structureType is link, inform the structures's ID
-
-               if (structure.structureType === STRUCTURE_LINK) return structure.id
-          }
-
-          // Otherwise inform false
-
-          return false
-     }
-
-     new RoomCacheObject({
-          name: 'fastFillerLink',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findLinkAtPos(room.anchor)
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'hubLink',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findLinkNearby(unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name))
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'controllerLink',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findLinkAtPos(room.roomObjects.centerUpgradePos.getValue())
-          },
-     })
-
-     // StructuresForSpawning
-
-     function findStructuresForSpawning() {
-          // Get the room anchor. If not defined, inform an empty array
-
-          const anchor = room.anchor || new RoomPosition(25, 25, room.name)
-
-          // Get array of spawns and extensions
-
-          const spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = room.roomObjects.spawn
-               .getValue()
-               .concat(room.roomObjects.extension.getValue())
-
-          // Filter energy structures by distance from anchor
-
-          const filteredSpawnStructures = spawnsAndExtensions.sort(
-               (a, b) => a.pos.getRangeTo(anchor.x, anchor.y) - b.pos.getRangeTo(anchor.x, anchor.y),
-          )
-
-          return filteredSpawnStructures
-     }
 
      // Creeps
 
@@ -1121,32 +853,6 @@ Room.prototype.get = function (roomObjectName) {
           room,
           valueConstructor() {
                return room.find(FIND_HOSTILE_CREEPS)
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'enemyCreeps',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor() {
-               return room.find(FIND_HOSTILE_CREEPS, {
-                    filter: creep => !allyList.has(creep.owner.username),
-               })
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'allyCreeps',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor() {
-               return room.find(FIND_HOSTILE_CREEPS, {
-                    filter: creep => allyList.has(creep.owner.username),
-               })
           },
      })
 
@@ -1744,7 +1450,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
                // Get roads
 
-               const roads: StructureRoad[] = room.get('road')
+               const roads: StructureRoad[] = room.structures.road
 
                // Get containers
 
@@ -1792,7 +1498,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
                // Find creeps that I don't own that aren't invaders
 
-               const creepsNotMine: Creep[] = room.get('enemyCreeps').concat(room.get('allyCreeps'))
+               const creepsNotMine: Creep[] = room.enemyCreeps.concat(room.allyCreeps)
 
                // Iterate through them
 
@@ -2338,7 +2044,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                // Otherwise set nearbyRoad to true and stop the loop
 
-               return nearbyRoad = true
+               return (nearbyRoad = true)
           }
 
           return false
@@ -2727,7 +2433,7 @@ Room.prototype.findSourcesByEfficacy = function () {
 }
 
 Room.prototype.createClaimRequest = function () {
-     if (this.get('sources').length !== 2) return false
+     if (this.sources.length !== 2) return false
 
      if (this.memory.notClaimable) return false
 

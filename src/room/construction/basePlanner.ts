@@ -58,7 +58,7 @@ export function basePlanner(room: Room) {
 
      // Record the positions around sources as unusable
 
-     const sources: Source[] = room.get('sources')
+     const sources = room.sources
 
      // Loop through each source, marking nearby positions as avoid
 

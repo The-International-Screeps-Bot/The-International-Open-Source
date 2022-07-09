@@ -157,7 +157,7 @@ SourceHarvester.prototype.transferToSourceLink = function () {
 
      // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
-     const sourceLink = room.get(`${creep.memory.sourceName}Link`)
+     const sourceLink = room[`${creep.memory.sourceName}Link`]
      if (!sourceLink) return false
 
      // Try to transfer to the sourceLink and inform true

@@ -110,7 +110,7 @@ HubHauler.prototype.fillHubLink = function () {
      // Define the storage and hubLink
 
      const { storage } = room
-     const hubLink: StructureLink | undefined = room.get('hubLink')
+     const hubLink = room.hubLink
 
      // If there is no terminal or hubLink, inform false
 
@@ -137,7 +137,7 @@ HubHauler.prototype.fillHubLink = function () {
 
      // Get the fastFillerLink
 
-     const fastFillerLink: StructureLink | undefined = room.get('fastFillerLink')
+     const fastFillerLink = room.fastFillerLink
 
      // If the controller is near to downgrade, the fastFillerLink is insufficiently full, or the storage is sufficiently full and the hubLink is not full
 

@@ -140,7 +140,6 @@ declare global {
           | 'mineral'
           | 'source1'
           | 'source2'
-          | 'sources'
           | 'structuresByType'
           | 'cSitesByType'
           | StructureConstant
@@ -156,27 +155,12 @@ declare global {
           | 'centerUpgradePos'
           | 'upgradePositions'
           | 'fastFillerPositions'
-          | 'source1Container'
-          | 'source2Container'
-          | 'controllerContainer'
-          | 'mineralContainer'
-          | 'fastFillerContainerLeft'
-          | 'fastFillerContainerRight'
           | 'labContainer'
-          | 'source1Link'
-          | 'source2Link'
-          | 'fastFillerLink'
-          | 'hubLink'
-          | 'controllerLink'
-          | 'source1Container'
-          | 'source2Container'
           | 'usedMineralHarvestPositions'
           | 'usedSourceHarvestPositions'
           | 'usedUpgradePositions'
           | 'usedFastFillerPositions'
           | 'notMyCreeps'
-          | 'enemyCreeps'
-          | 'allyCreeps'
           | 'myDamagedCreeps'
           | 'damagedAllyCreeps'
           | 'remoteNamesByEfficacy'
@@ -696,8 +680,6 @@ declare global {
            * Finds the score of rooms for potential communes
            */
           findScore(): void
-
-          towersRequestResources(): void
 
           /**
            * Finds and has towers heal damaged my or allied creeps
@@ -1320,7 +1302,7 @@ declare global {
 
           // Reservation
 
-          deleteReservation(index: number, changeResources?: boolean): void
+          deleteReservation(index: number): void
 
           createReservation(
                type: Reservations,
@@ -1513,6 +1495,7 @@ declare global {
 
           /**
            * Finds the total free store capacity of this RoomObject
+           * @param resourceType A resourceConstant to ensure proper querying of limit store RoomObjects
            */
           freeStore(resourceType: ResourceConstant): number
 
