@@ -192,12 +192,10 @@ export class InternationalManager {
      }
 }
 
-let managerCPUStart: number
-
 InternationalManager.prototype.run = function () {
      // If CPU logging is enabled, get the CPU used at the start
 
-     if (Memory.cpuLogging) managerCPUStart = Game.cpu.getUsed()
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
      // Run prototypes
 

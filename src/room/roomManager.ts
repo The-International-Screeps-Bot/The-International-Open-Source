@@ -12,7 +12,7 @@ import { powerCreepManager } from './powerCreeps/powerCreepManager'
 import { trafficManager } from './trafficManager'
 import { roomVisualsManager } from './roomVisualsManager'
 import { containerManager } from './containerManager'
-import { customLog } from 'international/generalFunctions'
+import { createPackedPosMap, customLog } from 'international/generalFunctions'
 import { droppedResourceManager } from './droppedResourceManager'
 import { statsManager } from 'international/statsManager'
 
@@ -25,26 +25,19 @@ export function roomManager() {
 
      if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-     let roomName
-     let roomCPUStart
-     let room
-     let roomType
-     let saveStats
-     let logMessage
-
      // Loop through room names in Game.rooms
 
-     for (roomName in Game.rooms) {
+     for (const roomName in Game.rooms) {
           // Get the CPU used at the start
 
-          roomCPUStart = Game.cpu.getUsed()
+          const roomCPUStart = Game.cpu.getUsed()
 
           // Get the room using the roomName
 
-          room = Game.rooms[roomName]
-          roomType = room.memory.type
+          const room = Game.rooms[roomName]
+          const roomType = room.memory.type
 
-          saveStats = Memory.roomStats > 0 && constants.roomTypesUsedForStats.includes(roomType)
+          const saveStats = Memory.roomStats > 0 && constants.roomTypesUsedForStats.includes(roomType)
           if (saveStats) statsManager.roomPreTick(room.name, roomType)
 
           taskManager(room)
@@ -73,7 +66,7 @@ export function roomManager() {
 
           // Log room stats
 
-          logMessage = `Creeps: ${room.myCreepsAmount}`
+          let logMessage = `Creeps: ${room.myCreepsAmount}`
 
           if (Memory.cpuLogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
 

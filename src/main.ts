@@ -636,16 +636,6 @@ declare global {
           storedResources: { [key: string]: number }
 
           /**
-           * A matrix with indexes of packed positions and values of creep names
-           */
-          creepPositions: PackedPosMap
-
-          /**
-           * A matrix with indexes of packed positions and values of creep names
-           */
-          moveRequests: PackedPosMap
-
-          /**
            * A set of roomNames representing the targets of scouts from this commune
            */
           scoutTargets: Set<string>
@@ -961,6 +951,22 @@ declare global {
 
           readonly actionableWalls: StructureWall[]
 
+          _creepPositions: PackedPosMap
+
+          /**
+           * A matrix with indexes of packed positions and values of creep names
+           */
+          readonly creepPositions: PackedPosMap
+
+          _moveRequests: PackedPosMap
+
+          /**
+           * A matrix with indexes of packed positions and values of creep names
+           */
+           readonly moveRequests: PackedPosMap
+
+          // Target finding
+
           _MEWT: (AnyStoreStructure | Tombstone | Resource)[]
 
           /**
@@ -1159,16 +1165,6 @@ declare global {
            * The creep's opts when trying to make a moveRequest intra tick
            */
           pathOpts: PathOpts
-
-          /**
-           * If the creep is expected to be full next tick
-           */
-          estimatedFull: boolean
-
-          /**
-           * If the creep is expected to be empty next tick
-           */
-          estimatedEmpty: boolean
 
           squad: Single | Duo | Quad
 
@@ -1461,6 +1457,11 @@ declare global {
           reservations: Reservation[]
 
           dismantleTarget: Id<Structure>
+
+          /**
+           * Wether or not the creep Needs Resources
+           */
+          NR: boolean
      }
 
      // PowerCreeps

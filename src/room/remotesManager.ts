@@ -89,7 +89,7 @@ Room.prototype.remotesManager = function () {
           }
 
           // Loop through each index of sourceEfficacies
-          console.log(remoteMemory.sourceEfficacies.length)
+          
           for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
                // Get the income based on the reservation of the room and remoteHarvester need
 

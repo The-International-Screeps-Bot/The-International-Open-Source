@@ -71,7 +71,7 @@ export function customLog(
 ) {
      // Create the title
 
-     global.logs += `<div style='width: 90vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${bgColor};'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ${color};'>${title}:</div>`
+     global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${bgColor};'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ${color};'>${title}:</div>`
 
      // Create the content
 

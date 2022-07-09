@@ -4,8 +4,6 @@ import { createPackedPosMap, customLog, findCarryPartsRequired } from './general
 import { InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
 
-let managerCPUStart: number
-
 let roomName
 let room
 let controller
@@ -17,7 +15,7 @@ InternationalManager.prototype.tickConfig = function () {
 
      // If CPU logging is enabled, get the CPU used at the start
 
-     if (Memory.cpuLogging) managerCPUStart = Game.cpu.getUsed()
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
      // General
 
@@ -47,17 +45,6 @@ InternationalManager.prototype.tickConfig = function () {
           for (role of constants.creepRoles) room.myCreeps[role] = []
 
           room.myCreepsAmount = 0
-
-          if (room.find(FIND_MY_CREEPS).length) {
-
-               // Assign a position map
-
-               room.creepPositions = createPackedPosMap()
-
-               // Assign a 2d position map
-
-               room.moveRequests = createPackedPosMap(true)
-          }
 
           room.roomObjects = {}
 
@@ -119,6 +106,8 @@ InternationalManager.prototype.tickConfig = function () {
 
           if (!room.memory.deposits) room.memory.deposits = {}
      }
+
+     // Decrease abadonment for abadoned claimRequests
 
      for (roomName in Memory.claimRequests) {
           claimTarget = Memory.claimRequests[roomName]

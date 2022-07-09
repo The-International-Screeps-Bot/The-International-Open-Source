@@ -1,5 +1,5 @@
 import { creepClasses } from 'room/creeps/creepClasses'
-import { claimRequestNeedsIndex, remoteNeedsIndex, spawnByRoomRemoteRoles } from './constants'
+import { claimRequestNeedsIndex, myColors, remoteNeedsIndex, spawnByRoomRemoteRoles } from './constants'
 import { customLog, pack } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
@@ -13,17 +13,19 @@ import '../room/creeps/preTickManagers/remote/remoteCoreAttackerPreTick'
 import '../room/creeps/preTickManagers/remote/remoteDismantlerPreTick'
 
 InternationalManager.prototype.creepOrganizer = function () {
+
+     // If CPU logging is enabled, get the CPU used at the start
+
+     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+
      // Construct counter for creeps
 
      let totalCreepCount = 0
 
-     let creep
-     let commune
-
      // Loop through all of my creeps
 
      for (const creepName in Memory.creeps) {
-          creep = Game.creeps[creepName]
+          let creep = Game.creeps[creepName]
 
           // If creep doesn't exist
 
@@ -38,18 +40,18 @@ InternationalManager.prototype.creepOrganizer = function () {
 
           totalCreepCount += 1
 
-          // Get the creep's current room and the room it's from
-
-          const { room } = creep
           // Get the creep's role
 
           const { role } = creep.memory
-
           if (!role) continue
 
-          // Assign creep proper class
+          // Assign creep a class based on role
 
           creep = Game.creeps[creepName] = new creepClasses[role](creep.id)
+
+          // Get the creep's current room and the room it's from
+
+          const { room } = creep
 
           // Organize creep in its room by its role
 
@@ -69,7 +71,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
           // Get the commune the creep is from
 
-          commune = Game.rooms[creep.memory.communeName]
+          const commune = Game.rooms[creep.memory.communeName]
 
           // If there is not vision in the commune, stop
 
@@ -83,4 +85,12 @@ InternationalManager.prototype.creepOrganizer = function () {
 
           commune.creepsFromRoomAmount += 1
      }
+
+     if (Memory.cpuLogging)
+          customLog(
+               'Creep Organizer',
+               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+               undefined,
+               myColors.midGrey,
+          )
 }

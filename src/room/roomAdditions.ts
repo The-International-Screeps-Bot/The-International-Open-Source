@@ -1,5 +1,5 @@
 import { allyList, constants } from 'international/constants'
-import { customLog, findObjectWithID, getRange, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
+import { createPackedPosMap, customLog, findObjectWithID, getRange, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 
 Object.defineProperties(Room.prototype, {
      global: {
@@ -489,6 +489,22 @@ Object.defineProperties(Room.prototype, {
 
                return false
           },
+     },
+     creepPositions: {
+          get() {
+
+               if (this._creepPositions) return this._creepPositions
+
+               return this._creepPositions = createPackedPosMap()
+          }
+     },
+     moveRequests: {
+          get() {
+
+               if (this._moveRequests) return this._moveRequests
+
+               return this._moveRequests = createPackedPosMap(true)
+          }
      },
      droppedEnergy: {
           get() {

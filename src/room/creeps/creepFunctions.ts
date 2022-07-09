@@ -1308,20 +1308,18 @@ Creep.prototype.needsResources = function () {
      if (this.usedStore() === 0)
           // Record and inform that the creep needs resources
 
-          return (this.memory.needsResources = true)
+          return (this.memory.NR = true)
 
      // Otherwise if the creep is full
 
      if (this.freeStore(RESOURCE_ENERGY) === 0) {
           // Record and inform that the creep does not resources
 
-          delete this.memory.needsResources
+          delete this.memory.NR
           return false
      }
 
-     // Otherwise inform the state of needsResources
-
-     return this.memory.needsResources
+     return this.memory.NR
 }
 
 Creep.prototype.fulfillTask = function () {
@@ -1986,12 +1984,9 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
 Creep.prototype.reservationManager = function () {
      if (!this.memory.reservations) return
 
-     let reservation
-     let target
-
      for (let index = 0; index < this.memory.reservations.length; index++) {
-          reservation = this.memory.reservations[index]
-          target = findObjectWithID(reservation.targetID)
+          const reservation = this.memory.reservations[index]
+          const target = findObjectWithID(reservation.targetID)
 
           if (!target || target.room.name !== this.room.name) {
                this.memory.reservations.splice(index, 1)
