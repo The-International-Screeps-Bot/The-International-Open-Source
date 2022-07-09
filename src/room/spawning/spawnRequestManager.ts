@@ -5,6 +5,7 @@ import {
      constants,
      controllerDowngradeUpgraderNeed,
      myColors,
+     remoteHarvesterRoles,
      remoteNeedsIndex,
      upgraderSpawningWhenStorageThreshold,
 } from 'international/constants'
@@ -822,13 +823,32 @@ export function spawnRequester(room: Room) {
 
           if (totalRemoteNeed <= 0) continue
 
-          const remotePriority = minRemotePriority + index
+          const remoteMemory = Memory.rooms[remoteName]
 
           // Get the sources in order of efficacy
 
           const sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
 
-          remoteHaulerNeed += Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0)
+          const remote = Game.rooms[remoteName]
+
+          const isReserved =
+               remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
+
+          // Loop through each index of sourceEfficacies
+
+          for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
+               // Get the income based on the reservation of the room and remoteHarvester need
+
+               const income = isReserved
+                    ? 10
+                    : 5 - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2))
+
+               // Find the number of carry parts required for the source, and add it to the remoteHauler need
+
+               remoteHaulerNeed += findCarryPartsRequired(remoteMemory.sourceEfficacies[index], income)
+          }
+
+          const remotePriority = minRemotePriority + index
 
           // Construct requests for source1RemoteHarvesters
 
@@ -1053,10 +1073,9 @@ export function spawnRequester(room: Room) {
 
      room.constructSpawnRequests(
           (function (): SpawnRequestOpts | false {
-
                if (remoteHaulerNeed === 0) return false
 
-/*
+               /*
                // If all RCL 3 extensions are built
 
                if (spawnEnergyCapacity >= 800) {
@@ -1217,9 +1236,5 @@ export function spawnRequester(room: Room) {
 
      // If CPU logging is enabled, log the CPU used by this manager
 
-     if (Memory.cpuLogging)
-          customLog(
-               'Spawn Request Manager',
-               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-          )
+     if (Memory.cpuLogging) customLog('Spawn Request Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2))
 }
