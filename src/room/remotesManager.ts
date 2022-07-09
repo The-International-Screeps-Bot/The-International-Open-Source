@@ -67,42 +67,25 @@ Room.prototype.remotesManager = function () {
                }
           }
 
-          if (remote) {
-               remoteMemory.needs[remoteNeedsIndex.remoteDefender] = 0
+          if (!remote) continue
 
-               for (const enemyCreep of remote.enemyCreeps) {
-                    // Increase the defenderNeed according to the creep's strength
+          remoteMemory.needs[remoteNeedsIndex.remoteDefender] = 0
 
-                    remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.strength
-               }
+          for (const enemyCreep of remote.enemyCreeps) {
+               // Increase the defenderNeed according to the creep's strength
 
-               remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = remote.structures.invaderCore.length ? 1 : 0
-
-               // If there are walls or enemyStructures, set dismantler need
-
-               const enemyStructures = remote.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
-                    return structure.structureType != STRUCTURE_INVADER_CORE
-               })
-
-               remoteMemory.needs[remoteNeedsIndex.remoteDismantler] =
-                    remote.actionableWalls.length || enemyStructures.length ? 1 : 0
+               remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.strength
           }
 
-          // Loop through each index of sourceEfficacies
+          remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = remote.structures.invaderCore.length ? 1 : 0
 
-          for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
-               // Get the income based on the reservation of the room and remoteHarvester need
+          // If there are walls or enemyStructures, set dismantler need
 
-               const income = isReserved
-                    ? 10
-                    : 5 /* - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2)) */
+          const enemyStructures = remote.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
+               return structure.structureType != STRUCTURE_INVADER_CORE
+          })
 
-               // Find the number of carry parts required for the source, and add it to the remoteHauler need
-
-               remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(
-                    remoteMemory.sourceEfficacies[index],
-                    income,
-               )
-          }
+          remoteMemory.needs[remoteNeedsIndex.remoteDismantler] =
+               remote.actionableWalls.length || enemyStructures.length ? 1 : 0
      }
 }
