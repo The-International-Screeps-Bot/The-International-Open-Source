@@ -1,7 +1,7 @@
 import { allyManager } from 'international/simpleAllies'
 import { customLog, getAvgPrice } from './generalFunctions'
 import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
-import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames } from './constants'
+import { cacheAmountModifier, constants, CPUBucketCapacity, mmoShardNames, myColors } from './constants'
 import { statsManager, StatsManager } from './statsManager'
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
@@ -25,11 +25,6 @@ export class InternationalManager {
       * Organizes creeps into properties for their communeName, and tracks total creep count
       */
      creepOrganizer?(): void
-
-     /**
-      * Deletes or edits international classes
-      */
-     taskManager?(): void
 
      /**
       * Tracks and records constructionSites and thier age, deleting old sites
@@ -197,13 +192,18 @@ export class InternationalManager {
      }
 }
 
+let managerCPUStart: number
+
 InternationalManager.prototype.run = function () {
+     // If CPU logging is enabled, get the CPU used at the start
+
+     if (Memory.cpuLogging) managerCPUStart = Game.cpu.getUsed()
+
      // Run prototypes
 
      this.config()
      this.tickConfig()
      this.creepOrganizer()
-     this.taskManager()
      this.constructionSiteManager()
 
      // Handle ally requests
@@ -211,6 +211,14 @@ InternationalManager.prototype.run = function () {
      allyManager.tickConfig()
      allyManager.getAllyRequests()
      ExecutePandaMasterCode()
+
+     if (Memory.cpuLogging)
+          customLog(
+               'International Manager',
+               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+               myColors.white,
+               myColors.lightBlue,
+          )
 }
 
 InternationalManager.prototype.getSellOrders = function (resourceType, maxPrice = getAvgPrice(resourceType) * 1.2) {

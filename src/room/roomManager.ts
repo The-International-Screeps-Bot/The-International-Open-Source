@@ -1,4 +1,4 @@
-import { constants } from '../international/constants'
+import { constants, myColors } from '../international/constants'
 
 import './roomFunctions'
 
@@ -25,18 +25,26 @@ export function roomManager() {
 
      if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
+     let roomName
+     let roomCPUStart
+     let room
+     let roomType
+     let saveStats
+     let logMessage
+
      // Loop through room names in Game.rooms
 
-     for (const roomName in Game.rooms) {
+     for (roomName in Game.rooms) {
           // Get the CPU used at the start
 
-          const roomCPUStart = Game.cpu.getUsed()
+          roomCPUStart = Game.cpu.getUsed()
 
           // Get the room using the roomName
 
-          const room = Game.rooms[roomName]
-          const roomType = room.memory.type
-          const saveStats = Memory.roomStats > 0 && constants.roomTypesUsedForStats.includes(roomType)
+          room = Game.rooms[roomName]
+          roomType = room.memory.type
+
+          saveStats = Memory.roomStats > 0 && constants.roomTypesUsedForStats.includes(roomType)
           if (saveStats) statsManager.roomPreTick(room.name, roomType)
 
           taskManager(room)
@@ -65,12 +73,12 @@ export function roomManager() {
 
           // Log room stats
 
-          let logMessage = `Creeps: ${room.myCreepsAmount}`
+          logMessage = `Creeps: ${room.myCreepsAmount}`
 
           if (Memory.cpuLogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
 
           if (saveStats) statsManager.roomEndTick(room.name, roomType, room)
-          customLog(room.name, logMessage, undefined, constants.colors.lightGrey)
+          customLog(room.name + ' ' + roomType, logMessage, undefined, myColors.midGrey)
      }
 
      // If CPU logging is enabled, log the CPU used by this manager
@@ -79,7 +87,7 @@ export function roomManager() {
           customLog(
                'Room Manager',
                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-               undefined,
-               constants.colors.lightGrey,
+               myColors.white,
+               myColors.lightBlue,
           )
 }

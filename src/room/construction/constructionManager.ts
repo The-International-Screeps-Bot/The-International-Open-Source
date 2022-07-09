@@ -1,4 +1,4 @@
-import { constants } from 'international/constants'
+import { constants, myColors } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import { basePlanner } from './basePlanner'
 import { rampartPlanner } from './rampartPlanner'
@@ -45,6 +45,6 @@ export function constructionManager(room: Room) {
                'Construction Manager',
                `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}`,
                undefined,
-               constants.colors.lightGrey,
+               myColors.lightGrey,
           )
 }

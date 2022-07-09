@@ -1,9 +1,14 @@
 import { InternationalManager } from './internationalManager'
 
+let cSiteID
+let cSite
+let cSiteAge
+
 InternationalManager.prototype.constructionSiteManager = function () {
+
      // Loop through my sites
 
-     for (const cSiteID in Game.constructionSites) {
+     for (cSiteID in Game.constructionSites) {
           // If the site's ID is stored in Memory's constructionSites, iterate
 
           if (Memory.constructionSites[cSiteID]) continue
@@ -15,10 +20,10 @@ InternationalManager.prototype.constructionSiteManager = function () {
 
      // Loop through recorded site IDs
 
-     for (const cSiteID in Memory.constructionSites) {
+     for (cSiteID in Memory.constructionSites) {
           // Try to find the site using the recorded ID
 
-          const cSite = Game.constructionSites[cSiteID]
+          cSite = Game.constructionSites[cSiteID]
 
           // If the site with the recorded ID doesn't exist
 
@@ -31,7 +36,7 @@ InternationalManager.prototype.constructionSiteManager = function () {
 
           // Find the site's age
 
-          const cSiteAge = Memory.constructionSites[cSiteID]
+          cSiteAge = Memory.constructionSites[cSiteID]
 
           // If the site is past a certain age in respect to progress
 

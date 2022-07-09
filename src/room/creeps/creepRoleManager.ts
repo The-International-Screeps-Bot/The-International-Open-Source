@@ -1,6 +1,6 @@
 import './creepFunctions'
 
-import { constants } from 'international/constants'
+import { constants, myColors } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import { controllerUpgraderManager } from './roleManagers/commune/controllerUpgraderManager'
 import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvesterManager'
@@ -100,6 +100,6 @@ export function creepRoleManager(room: Room) {
                     room.myCreepsAmount : 0
                ).toFixed(2)}`,
                undefined,
-               constants.colors.lightGrey,
+               myColors.lightGrey,
           )
 }

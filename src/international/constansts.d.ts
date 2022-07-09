@@ -35,11 +35,6 @@ interface Constants {
      roomDimensions: number
 
      /**
-      * An object with colour names as keys and hex codes as properties
-      */
-     colors: Colors
-
-     /**
       * An array of all the structureTypes in the game
       */
      allStructureTypes: StructureConstant[]

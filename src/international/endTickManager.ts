@@ -1,4 +1,4 @@
-import { constants } from 'international/constants'
+import { constants, myColors } from 'international/constants'
 import { customLog, findCPUColor } from 'international/generalFunctions'
 import { allyManager } from 'international/simpleAllies'
 import { InternationalManager } from './internationalManager'
@@ -19,7 +19,7 @@ InternationalManager.prototype.endTickManager = function () {
      customLog(
           'Total CPU',
           `${CPU.toFixed(2)} / ${Game.cpu.limit} CPU Bucket: ${Game.cpu.bucket}`,
-          constants.colors.white,
+          myColors.white,
           CPUColor,
      )
 

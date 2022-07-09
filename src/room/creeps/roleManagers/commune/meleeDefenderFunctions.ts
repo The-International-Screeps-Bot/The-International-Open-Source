@@ -1,4 +1,4 @@
-import { allyList, constants } from 'international/constants'
+import { allyList, constants, myColors } from 'international/constants'
 import { getRange } from 'international/generalFunctions'
 import { MeleeDefender } from 'room/creeps/creepClasses'
 
@@ -83,7 +83,7 @@ MeleeDefender.prototype.advancedDefend = function () {
 
      if (Memory.roomVisuals)
           room.visual.line(creep.pos, closestRampart.pos, {
-               color: constants.colors.lightBlue,
+               color: myColors.lightBlue,
           })
 
      // If the creep is range 0 to the closestRampart, inform false
@@ -98,8 +98,8 @@ MeleeDefender.prototype.advancedDefend = function () {
           plainCost: 30,
           swampCost: 80,
           weightGamebjects: {
-               2: room.get('road'),
-               1: room.get('rampart'),
+               2: room.structures.road,
+               1: room.structures.rampart,
           },
      })
 

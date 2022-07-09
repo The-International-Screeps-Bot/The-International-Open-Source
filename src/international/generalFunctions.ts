@@ -1,4 +1,4 @@
-import { constants, mmoShardNames } from './constants'
+import { constants, mmoShardNames, myColors } from './constants'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -66,8 +66,8 @@ export function arePositionsEqual(pos1: Pos, pos2: Pos) {
 export function customLog(
      title: any,
      message: any,
-     color: string = constants.colors.black,
-     bgColor: string = constants.colors.white,
+     color: string = myColors.black,
+     bgColor: string = myColors.white,
 ) {
      // Create the title
 
@@ -178,9 +178,9 @@ export function getRange(xDif: number, yDif: number) {
 export function findCPUColor(CPU: number): string {
      // Inform color based on percent of cpu used of limit
 
-     if (CPU > Game.cpu.limit * 0.6) return constants.colors.green
-     if (CPU > Game.cpu.limit * 0.9) return constants.colors.green
-     return constants.colors.green
+     if (CPU > Game.cpu.limit * 0.6) return myColors.green
+     if (CPU > Game.cpu.limit * 0.9) return myColors.green
+     return myColors.green
 }
 
 export function createPackedPosMap(innerArray?: boolean) {

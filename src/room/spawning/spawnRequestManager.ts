@@ -4,6 +4,7 @@ import {
      claimRequestNeedsIndex,
      constants,
      controllerDowngradeUpgraderNeed,
+     myColors,
      remoteNeedsIndex,
      upgraderSpawningWhenStorageThreshold,
 } from 'international/constants'
@@ -1059,7 +1060,6 @@ export function spawnRequester(room: Room) {
      room.constructSpawnRequests(
           (function (): SpawnRequestOpts | false {
 
-
                if (remoteHaulerNeed === 0) return false
 /*
                // If all RCL 3 extensions are built
@@ -1227,6 +1227,6 @@ export function spawnRequester(room: Room) {
                'Spawn Request Manager',
                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
                undefined,
-               constants.colors.lightGrey,
+               myColors.lightGrey,
           )
 }

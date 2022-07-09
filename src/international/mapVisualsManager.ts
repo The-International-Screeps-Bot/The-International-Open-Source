@@ -1,4 +1,4 @@
-import { constants } from './constants'
+import { constants, myColors } from './constants'
 import { customLog, unpackAsRoomPos } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
@@ -41,7 +41,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                          room.anchor || new RoomPosition(25, 25, roomName),
                          new RoomPosition(25, 25, roomMemory.claimRequest),
                          {
-                              color: constants.colors.lightBlue,
+                              color: myColors.lightBlue,
                               width: 1.2,
                               opacity: 0.5,
                               lineStyle: 'dashed',
@@ -61,7 +61,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                          new RoomPosition(25, 25, roomName),
                          commune.anchor || new RoomPosition(25, 25, roomMemory.commune),
                          {
-                              color: constants.colors.yellow,
+                              color: myColors.yellow,
                               width: 1.2,
                               opacity: 0.5,
                               lineStyle: 'dashed',
@@ -90,7 +90,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
           if (roomMemory.notClaimable) {
                Game.map.visual.circle(new RoomPosition(25, 25, roomName), {
-                    stroke: constants.colors.red,
+                    stroke: myColors.red,
                     strokeWidth: 2,
                     fill: 'transparent',
                })
@@ -116,6 +116,6 @@ InternationalManager.prototype.mapVisualsManager = function () {
                'Map Visuals Manager',
                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
                undefined,
-               constants.colors.lightGrey,
+               myColors.lightGrey,
           )
 }

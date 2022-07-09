@@ -1,4 +1,4 @@
-import { allyList, constants, prefferedCommuneRange, remoteNeedsIndex, stamps } from 'international/constants'
+import { allyList, constants, myColors, prefferedCommuneRange, remoteNeedsIndex, stamps } from 'international/constants'
 import {
      advancedFindDistance,
      arePositionsEqual,
@@ -1208,8 +1208,8 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
      // Construct colors for each type
 
      const colorsForTypes: { [key: string]: string } = {
-          success: constants.colors.lightBlue,
-          fail: constants.colors.red,
+          success: myColors.lightBlue,
+          fail: myColors.red,
      }
 
      // If no type, type is success. Construct type from color
@@ -1626,13 +1626,13 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                customLog(
                     'Incomplete Path',
                     `${pathFinderResult.path}, ${JSON.stringify(opts.goal.pos)}`,
-                    constants.colors.white,
-                    constants.colors.red,
+                    myColors.white,
+                    myColors.red,
                )
 
                room.pathVisual(pathFinderResult.path, 'red')
                room.visual.line(opts.origin, opts.goal.pos, {
-                    color: constants.colors.red,
+                    color: myColors.red,
                     width: 0.15,
                     opacity: 0.3,
                     lineStyle: 'solid',
@@ -2467,7 +2467,7 @@ Room.prototype.pathVisual = function (path, color) {
      // Generate the visual
 
      room.visual.poly(path, {
-          stroke: constants.colors[color],
+          stroke: myColors[color],
           strokeWidth: 0.15,
           opacity: 0.3,
           lineStyle: 'solid',

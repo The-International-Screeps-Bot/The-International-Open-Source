@@ -1,4 +1,4 @@
-import { allyList, constants, stamps } from 'international/constants'
+import { allyList, constants, myColors, stamps } from 'international/constants'
 import { customLog, findObjectWithID, unpackAsPos } from 'international/generalFunctions'
 
 /**
@@ -17,7 +17,7 @@ export function roomVisualsManager(room: Room) {
 
      if (room.anchor)
           room.visual.rect(room.anchor.x - 0.5, room.anchor.y - 0.5, 1, 1, {
-               stroke: constants.colors.lightBlue,
+               stroke: myColors.lightBlue,
                fill: 'transparent',
           })
 
@@ -42,7 +42,7 @@ export function roomVisualsManager(room: Room) {
                               backgroundColor: 'rgb(255, 0, 0, 0)',
                               font: 0.5,
                               opacity: 1,
-                              color: constants.colors.lightBlue,
+                              color: myColors.lightBlue,
                          },
                     )
 
@@ -65,14 +65,14 @@ export function roomVisualsManager(room: Room) {
 
                function reservationColor() {
                     if (room.controller.reservation.username === Memory.me) {
-                         return constants.colors.lightBlue
+                         return myColors.lightBlue
                     }
 
                     if (allyList.has(room.controller.reservation.username)) {
-                         return constants.colors.green
+                         return myColors.green
                     }
 
-                    return constants.colors.red
+                    return myColors.red
                }
 
                // Show the reservation time
@@ -111,7 +111,7 @@ export function roomVisualsManager(room: Room) {
                     backgroundColor: 'rgb(255, 0, 0, 0)',
                     font: 0.5,
                     opacity: 1,
-                    color: constants.colors.lightBlue,
+                    color: myColors.lightBlue,
                })
 
                // And display how many ticks left until spawned
@@ -120,7 +120,7 @@ export function roomVisualsManager(room: Room) {
                     backgroundColor: 'rgb(255, 0, 0, 0)',
                     font: 0.5,
                     opacity: 1,
-                    color: constants.colors.lightBlue,
+                    color: myColors.lightBlue,
                })
           }
      }
@@ -191,6 +191,6 @@ export function roomVisualsManager(room: Room) {
                'Room Visuals Manager',
                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
                undefined,
-               constants.colors.lightGrey,
+               myColors.lightGrey,
           )
 }

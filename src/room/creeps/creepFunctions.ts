@@ -5,6 +5,7 @@ import {
      constants,
      CPUBucketCapacity,
      CPUBucketRenewThreshold,
+     myColors,
 } from 'international/constants'
 import {
      arePositionsEqual,
@@ -835,7 +836,7 @@ Creep.prototype.createMoveRequest = function (opts) {
           if (Memory.roomVisuals)
                room.visual.text('NP', path[0], {
                     align: 'center',
-                    color: constants.colors.lightBlue,
+                    color: myColors.lightBlue,
                })
 
           // So long as the creep isn't standing on the first position in the path
@@ -1128,7 +1129,7 @@ Creep.prototype.shove = function (shoverPos) {
      if (Memory.roomVisuals)
           room.visual.circle(this.pos, {
                fill: '',
-               stroke: constants.colors.red,
+               stroke: myColors.red,
                radius: 0.5,
                strokeWidth: 0.15,
           })
@@ -1138,13 +1139,13 @@ Creep.prototype.shove = function (shoverPos) {
      if (Memory.roomVisuals) {
           room.visual.circle(this.pos, {
                fill: '',
-               stroke: constants.colors.yellow,
+               stroke: myColors.yellow,
                radius: 0.5,
                strokeWidth: 0.15,
           })
 
           room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), {
-               color: constants.colors.yellow,
+               color: myColors.yellow,
           })
      }
 
@@ -1345,7 +1346,7 @@ Creep.prototype.fulfillTask = function () {
 
      if (Memory.roomVisuals)
           room.visual.line(this.pos, unpackAsRoomPos(task.pos, room.name), {
-               color: constants.colors.lightBlue,
+               color: myColors.lightBlue,
                width: 0.15,
           })
 
@@ -2029,7 +2030,7 @@ Creep.prototype.fulfillReservation = function () {
 
      if (Memory.roomVisuals)
           room.visual.line(this.pos, target.pos, {
-               color: constants.colors.lightBlue,
+               color: myColors.lightBlue,
                width: 0.15,
           })
 

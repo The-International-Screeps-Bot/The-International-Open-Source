@@ -1,24 +1,15 @@
-import { remoteNeedsIndex, spawnByRoomRemoteRoles } from 'international/constants'
+import { remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles } from 'international/constants'
 import { findCarryPartsRequired } from 'international/generalFunctions'
 
 Room.prototype.remotesManager = function () {
-     let remoteName
-     let remoteMemory
-     let remote
-     let isReserved
-     let enemyStructures
-
-     let efficacy
-     let income
-
      // Loop through the commune's remote names
 
      for (let index = this.memory.remotes.length - 1; index >= 0; index -= 1) {
           // Get the name of the remote using the index
 
-          remoteName = this.memory.remotes[index]
+          const remoteName = this.memory.remotes[index]
 
-          remoteMemory = Memory.rooms[remoteName]
+          const remoteMemory = Memory.rooms[remoteName]
 
           // If the room isn't a remote, remove it from the remotes array
 
@@ -53,9 +44,10 @@ Room.prototype.remotesManager = function () {
 
           // Get the remote
 
-          remote = Game.rooms[remoteName]
+          const remote = Game.rooms[remoteName]
 
-          isReserved = remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
+          const isReserved =
+               remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
 
           // If the remote is reserved
 
@@ -88,30 +80,29 @@ Room.prototype.remotesManager = function () {
 
                // If there are walls or enemyStructures, set dismantler need
 
-               enemyStructures = remote.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
+               const enemyStructures = remote.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
                     return structure.structureType != STRUCTURE_INVADER_CORE
                })
 
                remoteMemory.needs[remoteNeedsIndex.remoteDismantler] =
-                    (remote.actionableWalls.length || enemyStructures.length) ? 1 : 0
+                    remote.actionableWalls.length || enemyStructures.length ? 1 : 0
           }
 
           // Loop through each index of sourceEfficacies
-
+          console.log(remoteMemory.sourceEfficacies.length)
           for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
-               // Get the efficacy using the index
-
-               efficacy = remoteMemory.sourceEfficacies[index]
-
                // Get the income based on the reservation of the room and remoteHarvester need
 
-               income = isReserved
+               const income = isReserved
                     ? 10
-                    : 5 /* - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2)) */
+                    : 5 - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2))
 
                // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-               remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(efficacy, income)
+               remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(
+                    remoteMemory.sourceEfficacies[index],
+                    income,
+               )
           }
      }
 }

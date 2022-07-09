@@ -193,20 +193,6 @@ constants.nonCommuneSigns = [
      'Adults spend a combined 13 years of their life under a dictatorship: the workplace',
 ]
 
-//
-
-constants.colors = {
-     white: '#ffffff',
-     lightGrey: '#eaeaea',
-     lightBlue: '#0f66fc',
-     darkBlue: '#02007d',
-     black: '#000000',
-     yellow: '#d8f100',
-     red: '#d10000',
-     green: '#00d137',
-     brown: '#aa7253',
-}
-
 constants.roomDimensions = 50
 
 constants.allStructureTypes = [
@@ -310,6 +296,20 @@ constants.numbersByStructureTypes = {
      14: STRUCTURE_POWER_SPAWN,
      15: STRUCTURE_NUKER,
      16: STRUCTURE_OBSERVER,
+}
+
+export const myColors = {
+     white: '#ffffff',
+     lightGrey: '#eaeaea',
+     midGrey: '#bcbcbc',
+     darkGrey: '#5e5e5e',
+     lightBlue: '#0f66fc',
+     darkBlue: '#02007d',
+     black: '#000000',
+     yellow: '#d8f100',
+     red: '#d10000',
+     green: '#00d137',
+     brown: '#aa7253',
 }
 
 export const remoteStamps: Record<RemoteStampTypes, Stamp> = {

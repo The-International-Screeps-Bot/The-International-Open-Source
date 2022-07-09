@@ -1,4 +1,4 @@
-import { claimRequestNeedsIndex, constants } from 'international/constants'
+import { claimRequestNeedsIndex, constants, myColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 
@@ -101,6 +101,6 @@ Room.prototype.claimRequestManager = function () {
                'Claim Request Manager',
                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
                undefined,
-               constants.colors.lightGrey,
+               myColors.lightGrey,
           )
 }

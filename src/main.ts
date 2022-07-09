@@ -8,7 +8,6 @@ import './international/config'
 import './international/tickConfig'
 import './international/creepOrganizer'
 import './room/remotesManager'
-import './international/internationalTaskManager'
 import './international/constructionSiteManager'
 import './international/mapVisualsManager'
 import './international/endTickManager'
@@ -43,6 +42,7 @@ import { constants } from 'international/constants'
 import { Single } from 'room/creeps/roleManagers/antifa/single'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
+import { createPackedPosMap, customLog } from 'international/generalFunctions'
 
 // Type declareations for global
 
@@ -292,7 +292,7 @@ declare global {
            */
           groupComparator?: string[]
           /**
-           * 
+           *
            */
           threshold?: number
           /**
@@ -1614,7 +1614,13 @@ export const loop = function () {
 
      internationalManager.advancedGeneratePixel()
      internationalManager.advancedSellPixels()
+/*
+     let cpu = Game.cpu.getUsed()
 
+     createPackedPosMap()
+
+     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu)
+ */
      internationalManager.endTickManager()
      // console.log('Stats cpu logging')
      // console.log(

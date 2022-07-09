@@ -1,4 +1,4 @@
-import { constants } from 'international/constants'
+import { constants, myColors } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import './spawnFunctions'
 import { spawnRequester } from './spawnRequestManager'
@@ -89,6 +89,6 @@ export function spawnManager(room: Room) {
                'Spawn Manager',
                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
                undefined,
-               constants.colors.lightGrey,
+               myColors.lightGrey,
           )
 }

@@ -1,10 +1,24 @@
 import { allyManager } from 'international/simpleAllies'
-import { constants, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles, stamps } from './constants'
+import { constants, myColors, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles, stamps } from './constants'
 import { createPackedPosMap, customLog, findCarryPartsRequired } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
 
+let managerCPUStart: number
+
+let roomName
+let room
+let controller
+let role
+let type
+let claimTarget
+
 InternationalManager.prototype.tickConfig = function () {
+
+     // If CPU logging is enabled, get the CPU used at the start
+
+     if (Memory.cpuLogging) managerCPUStart = Game.cpu.getUsed()
+
      // General
 
      Memory.communes = []
@@ -17,12 +31,9 @@ InternationalManager.prototype.tickConfig = function () {
 
      // Other
 
-     let room
-     let controller
-
      // Configure rooms
 
-     for (const roomName in Game.rooms) {
+     for (roomName in Game.rooms) {
           room = Game.rooms[roomName]
 
           controller = room.controller
@@ -33,17 +44,20 @@ InternationalManager.prototype.tickConfig = function () {
 
           // For each role, construct an array for myCreeps
 
-          for (const role of constants.creepRoles) room.myCreeps[role] = []
+          for (role of constants.creepRoles) room.myCreeps[role] = []
 
           room.myCreepsAmount = 0
 
-          // Assign a position map
+          if (room.find(FIND_MY_CREEPS).length) {
 
-          room.creepPositions = createPackedPosMap()
+               // Assign a position map
 
-          // Assign a 2d position map
+               room.creepPositions = createPackedPosMap()
 
-          room.moveRequests = createPackedPosMap(true)
+               // Assign a 2d position map
+
+               room.moveRequests = createPackedPosMap(true)
+          }
 
           room.roomObjects = {}
 
@@ -86,7 +100,7 @@ InternationalManager.prototype.tickConfig = function () {
 
           // For each role, construct an array for creepsFromRoom
 
-          for (const role of constants.creepRoles) room.creepsFromRoom[role] = []
+          for (role of constants.creepRoles) room.creepsFromRoom[role] = []
 
           room.creepsFromRoomAmount = 0
 
@@ -98,7 +112,7 @@ InternationalManager.prototype.tickConfig = function () {
           if (!room.memory.stampAnchors) {
                room.memory.stampAnchors = {}
 
-               for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
+               for (type in stamps) room.memory.stampAnchors[type as StampTypes] = []
           }
 
           room.scoutTargets = new Set()
@@ -106,9 +120,7 @@ InternationalManager.prototype.tickConfig = function () {
           if (!room.memory.deposits) room.memory.deposits = {}
      }
 
-     let claimTarget
-
-     for (const roomName in Memory.claimRequests) {
+     for (roomName in Memory.claimRequests) {
           claimTarget = Memory.claimRequests[roomName]
 
           if (claimTarget.abadon > 0) {
@@ -118,4 +130,12 @@ InternationalManager.prototype.tickConfig = function () {
 
           claimTarget.abadon = undefined
      }
+
+     if (Memory.cpuLogging)
+          customLog(
+               'Tick Config',
+               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+               undefined,
+               myColors.midGrey,
+          )
 }

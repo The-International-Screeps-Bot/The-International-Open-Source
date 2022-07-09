@@ -1,4 +1,4 @@
-import { allyList, constants } from 'international/constants'
+import { allyList, constants, myColors } from 'international/constants'
 import { customLog, findObjectWithID } from 'international/generalFunctions'
 
 /**
@@ -117,6 +117,6 @@ export function defenceManager(room: Room) {
                'Defence Manager',
                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
                undefined,
-               constants.colors.lightGrey,
+               myColors.lightGrey,
           )
 }
