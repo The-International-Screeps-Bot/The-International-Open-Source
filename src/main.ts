@@ -1320,7 +1320,7 @@ declare global {
 
           // Reservation
 
-          deleteReservation(index: number): void
+          deleteReservation(index: number, changeResources?: boolean): void
 
           createReservation(
                type: Reservations,

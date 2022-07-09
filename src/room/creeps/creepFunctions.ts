@@ -867,7 +867,7 @@ Creep.prototype.createMoveRequest = function (opts) {
      // Make moveRequest true to inform a moveRequest has been made
 
      this.moveRequest = packedPos
-     
+
      // Set the creep's pathOpts to reflect this moveRequest's opts
 
      this.pathOpts = opts
@@ -1901,7 +1901,7 @@ Creep.prototype.aggressiveHeal = function () {
      return true
 }
 
-Creep.prototype.deleteReservation = function (index) {
+Creep.prototype.deleteReservation = function (index, changeResources) {
      const reservation = this.memory.reservations[index]
 
      const target = findObjectWithID(reservation.targetID)
@@ -1909,6 +1909,8 @@ Creep.prototype.deleteReservation = function (index) {
      this.memory.reservations.splice(index)
 
      this.message += '❌'
+
+     if (!changeResources) return
 
      if (target instanceof Resource) {
           target.reserveAmount += reservation.amount
@@ -2008,17 +2010,14 @@ Creep.prototype.fulfillReservation = function () {
           if (this.advancedPickup(target)) {
                this.store[reservation.resourceType] += reservation.amount
 
-               this.deleteReservation(0)
+               this.deleteReservation(0, true)
                return true
           }
 
           return false
      }
 
-     let amount = Math.min(
-          Math.min(this.store.getUsedCapacity(reservation.resourceType), reservation.amount),
-          target.store.getFreeCapacity(reservation.resourceType),
-     )
+     let amount = Math.min(reservation.amount, target.store.getFreeCapacity(reservation.resourceType))
 
      // Transfer
 
@@ -2029,7 +2028,7 @@ Creep.prototype.fulfillReservation = function () {
                this.store[reservation.resourceType] -= amount
                target.store[reservation.resourceType] += amount
 
-               this.deleteReservation(0)
+               this.deleteReservation(0, true)
                return true
           }
 
@@ -2038,10 +2037,7 @@ Creep.prototype.fulfillReservation = function () {
           return false
      }
 
-     amount = Math.min(
-          Math.min(target.store.getUsedCapacity(reservation.resourceType), reservation.amount),
-          this.store.getFreeCapacity(reservation.resourceType),
-     )
+     amount = Math.min(target.store.getUsedCapacity(reservation.resourceType), reservation.amount)
 
      // Withdraw
 
@@ -2051,7 +2047,7 @@ Creep.prototype.fulfillReservation = function () {
           this.store[reservation.resourceType] += amount
           target.store[reservation.resourceType] -= amount
 
-          this.deleteReservation(0)
+          this.deleteReservation(0, true)
           return true
      }
 
