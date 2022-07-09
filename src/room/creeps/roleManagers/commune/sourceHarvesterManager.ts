@@ -16,9 +16,6 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
           // Get the creeps sourceName
 
           const { sourceName } = creep.memory
-          // Get the sourceContainer for the creep's source
-
-          const sourceContainer: StructureContainer = room.get(`${sourceName}Container`)
 
           // Try to harvest the designated source
 
@@ -34,6 +31,6 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
           // Try to repair the sourceContainer
 
-          creep.repairSourceContainer(sourceContainer)
+          creep.repairSourceContainer(room[`${sourceName}Container`])
      }
 }

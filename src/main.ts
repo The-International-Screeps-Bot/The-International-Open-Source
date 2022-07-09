@@ -1259,11 +1259,6 @@ declare global {
           recurseMoveRequest(queue?: string[]): void
 
           /**
-           *
-           */
-          getPushed(): void
-
-          /**
            * Decides if the creep needs to get more resources or not
            */
           needsResources(): boolean

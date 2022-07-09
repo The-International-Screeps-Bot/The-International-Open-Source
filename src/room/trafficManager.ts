@@ -8,7 +8,9 @@ export function trafficManager(room: Room) {
 
      if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-     for (const creep of room.find(FIND_MY_CREEPS)) creep.recurseMoveRequest()
+     for (const role in room.myCreeps) {
+          for (const creepName of room.myCreeps[role]) Game.creeps[creepName].recurseMoveRequest()
+     }
 
      // If CPU logging is enabled, log the CPU used by this manager
 

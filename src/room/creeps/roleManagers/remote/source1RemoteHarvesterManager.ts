@@ -38,7 +38,7 @@ export function source1RemoteHarvesterManager(room: Room, creepsOfRole: string[]
                },
                avoidEnemyRanges: true,
                weightGamebjects: {
-                    1: room.get('road'),
+                    1: room.structures.road,
                },
           })
      }

@@ -800,22 +800,16 @@ export function spawnRequester(room: Room) {
      let remoteHaulerNeed = 0
 
      const minRemotePriority = 10
-     let remotePriority
-
-     let remoteName
-     let remoteNeeds
-     let totalRemoteNeed
-     let sourcesByEfficacy
 
      const remoteNamesByEfficacy: string[] = room.get('remoteNamesByEfficacy')
 
      for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
-          remoteName = remoteNamesByEfficacy[index]
-          remoteNeeds = Memory.rooms[remoteName].needs
+          const remoteName = remoteNamesByEfficacy[index]
+          const remoteNeeds = Memory.rooms[remoteName].needs
 
           // Add up econ needs for this room
 
-          totalRemoteNeed =
+          const totalRemoteNeed =
                Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0) +
                Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0) +
                Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0) +
@@ -828,11 +822,11 @@ export function spawnRequester(room: Room) {
 
           if (totalRemoteNeed <= 0) continue
 
-          remotePriority = minRemotePriority + index
+          const remotePriority = minRemotePriority + index
 
           // Get the sources in order of efficacy
 
-          sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
+          const sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
 
           remoteHaulerNeed += Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0)
 
@@ -1061,6 +1055,7 @@ export function spawnRequester(room: Room) {
           (function (): SpawnRequestOpts | false {
 
                if (remoteHaulerNeed === 0) return false
+
 /*
                // If all RCL 3 extensions are built
 
@@ -1226,7 +1221,5 @@ export function spawnRequester(room: Room) {
           customLog(
                'Spawn Request Manager',
                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-               undefined,
-               myColors.lightGrey,
           )
 }

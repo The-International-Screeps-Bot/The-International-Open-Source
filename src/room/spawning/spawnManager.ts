@@ -58,6 +58,8 @@ export function spawnManager(room: Room) {
                customLog(
                     'Failed to spawn',
                     `error: ${testSpawnResult}, role: ${spawnRequest.extraOpts.memory.role}, cost: ${spawnRequest.cost}, body: (${spawnRequest.body.length}) ${spawnRequest.body}`,
+                    myColors.white,
+                    myColors.red
                )
 
                break

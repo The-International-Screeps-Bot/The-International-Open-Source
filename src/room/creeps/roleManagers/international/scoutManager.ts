@@ -43,13 +43,9 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 
           creep.say(`🔭${creep.memory.scoutTarget.toString()}`)
 
-          // If there is a controller and it isn't in safeMode
+          // If there is a controller and it isn't in safeMode, sign the controller
 
-          if (room.controller && !room.controller.safeMode) {
-               // Try to sign the controller, iterating if there is success
-
-               if (creep.advancedSignController()) continue
-          }
+          if (room.controller && !room.controller.safeMode) if (creep.advancedSignController()) continue
 
           // Try to go to the scoutTarget
 

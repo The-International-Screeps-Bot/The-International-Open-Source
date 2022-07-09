@@ -89,13 +89,13 @@ Room.prototype.remotesManager = function () {
           }
 
           // Loop through each index of sourceEfficacies
-          
+
           for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
                // Get the income based on the reservation of the room and remoteHarvester need
 
                const income = isReserved
                     ? 10
-                    : 5 - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2))
+                    : 5 /* - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2)) */
 
                // Find the number of carry parts required for the source, and add it to the remoteHauler need
 

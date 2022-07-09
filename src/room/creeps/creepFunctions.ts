@@ -864,6 +864,10 @@ Creep.prototype.createMoveRequest = function (opts) {
 
      room.moveRequests[packedPos].push(this.name)
 
+     // Make moveRequest true to inform a moveRequest has been made
+
+     this.moveRequest = packedPos
+     
      // Set the creep's pathOpts to reflect this moveRequest's opts
 
      this.pathOpts = opts
@@ -871,10 +875,6 @@ Creep.prototype.createMoveRequest = function (opts) {
      // Assign the goal's pos to the creep's goalPos
 
      this.memory.goalPos = packPos(opts.goal.pos)
-
-     // Make moveRequest true to inform a moveRequest has been made
-
-     this.moveRequest = packedPos
 
      // Set the path in the creep's memory
 
@@ -1082,7 +1082,8 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
 
           pos = unpackAsPos(packedPos)
 
-          if (pos.x < 1 || pos.x >= constants.roomDimensions - 1 || pos.y < 1 || pos.y >= constants.roomDimensions - 1) continue
+          if (pos.x < 1 || pos.x >= constants.roomDimensions - 1 || pos.y < 1 || pos.y >= constants.roomDimensions - 1)
+               continue
 
           pos = unpackAsRoomPos(packedPos, room.name)
 
@@ -1092,7 +1093,6 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
 
           for (structure of pos.lookFor(LOOK_STRUCTURES))
                if (constants.impassibleStructureTypes.includes(structure.structureType)) {
-
                     hasImpassibleStructure = true
                     break
                }
@@ -1178,12 +1178,13 @@ Creep.prototype.runMoveRequest = function () {
      // Record that the creep has moved this tick
 
      this.moved = true
-
      return true
 }
 
 Creep.prototype.recurseMoveRequest = function (queue = []) {
      const { room } = this
+
+     if (!this.moveRequest) return
 
      queue.push(this.name)
 
@@ -1196,13 +1197,10 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
      if (!creepNameAtPos) {
           // Otherwise, loop through each index of the queue
 
-          for (let index = 0; index < queue.length; index++) {
+          for (let index = 0; index < queue.length; index++)
                // Have the creep run its moveRequest
 
                Game.creeps[queue[index]].runMoveRequest()
-          }
-
-          // And stop
 
           return
      }
@@ -1240,14 +1238,12 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
           // If the creep's moveRequests aren't aligned
 
           if (queue.includes(creepAtPos.name)) {
-
                // Otherwise, loop through each index of the queue
 
-               for (let index = 0; index < queue.length; index++) {
+               for (let index = 0; index < queue.length; index++)
                     // Have the creep run its moveRequest
 
                     Game.creeps[queue[index]].runMoveRequest()
-               }
 
                return
           }
@@ -1273,33 +1269,6 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
      creepAtPos.moveRequest = pack(this.pos)
      creepAtPos.runMoveRequest()
-}
-
-Creep.prototype.getPushed = function () {
-     /*
-    const creep = this,
-        room = creep.room
-
-    // Create a moveRequest to flee the current position
-
-    const createMoveRequestResult = creep.createMoveRequest({
-        origin: creep.pos,
-        goal: { pos: creep.pos, range: 1 },
-        flee: true,
-        avoidEnemyRanges: true,
-        weightGamebjects: {
-            1: room.get('road')
-        }
-    })
-
-    // Stop if the moveRequest wasn't created
-
-    if (!createMoveRequestResult) return
-
-    // Otherwise enforce the moveRequest
-
-    creep.runMoveRequest(pack(creep.memory.path[0]))
-    */
 }
 
 Creep.prototype.needsResources = function () {
@@ -1653,7 +1622,9 @@ Creep.prototype.findTotalHealPower = function (range = 1) {
 
           // Otherwise increase healValue by heal power * the part's boost
 
-          heal += (part.boost ? BOOSTS[part.type][part.boost][part.type] : 1) * (range <= 1 ? HEAL_POWER : RANGED_HEAL_POWER)
+          heal +=
+               (part.boost ? BOOSTS[part.type][part.boost][part.type] : 1) *
+               (range <= 1 ? HEAL_POWER : RANGED_HEAL_POWER)
      }
 
      // Inform healValue

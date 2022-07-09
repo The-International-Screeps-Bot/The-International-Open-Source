@@ -87,7 +87,7 @@ SourceHarvester.prototype.travelToSource = function () {
           },
           avoidEnemyRanges: true,
           weightGamebjects: {
-               1: room.get('road'),
+               1: room.structures.road,
           },
      })
 
