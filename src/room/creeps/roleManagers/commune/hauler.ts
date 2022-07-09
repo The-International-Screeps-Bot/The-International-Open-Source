@@ -50,14 +50,14 @@ Hauler.prototype.reserve = function () {
      let amount
 
      if (this.needsResources()) {
-          
+          this.message += this.freeStore(RESOURCE_ENERGY)
           if (withdrawTargets.length) {
 
                target = this.pos.findClosestByRange(withdrawTargets)
 
                if (target instanceof Resource)
-                    amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.reserveAmount)
-               else amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.store.energy)
+                    amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
+               else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
 
                this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
                return
@@ -83,8 +83,8 @@ Hauler.prototype.reserve = function () {
                target = this.pos.findClosestByRange(withdrawTargets)
 
                if (target instanceof Resource)
-                    amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.reserveAmount)
-               else amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.store.energy)
+                    amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
+               else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
 
                this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
                return

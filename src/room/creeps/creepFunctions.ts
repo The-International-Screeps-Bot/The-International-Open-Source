@@ -150,7 +150,7 @@ Creep.prototype.advancedPickup = function (target) {
 
      // Try to pickup. if the action can be considered a success
 
-     if (pickupResult === OK) {
+     if (pickupResult === OK || pickupResult === ERR_FULL) {
           this.movedResource = true
           return true
      }
@@ -1281,7 +1281,7 @@ Creep.prototype.needsResources = function () {
 
      // Otherwise if the creep is full
 
-     if (this.freeStore(RESOURCE_ENERGY) === 0) {
+     if (this.freeStore(RESOURCE_ENERGY) <= 0) {
           // Record and inform that the creep does not resources
 
           delete this.memory.NR
@@ -1985,7 +1985,6 @@ Creep.prototype.fulfillReservation = function () {
      if (target instanceof Resource) {
           if (this.advancedPickup(target)) {
                this.store[reservation.resourceType] += reservation.amount
-               target.reserveAmount -= reservation.amount
 
                this.deleteReservation(0)
                return true
@@ -2056,8 +2055,8 @@ Creep.prototype.reserveWithdrawEnergy = function () {
      target = this.pos.findClosestByRange(withdrawTargets)
 
      if (target instanceof Resource)
-          amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.reserveAmount)
-     else amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.store.energy)
+          amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
+     else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
 
      this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
 }
