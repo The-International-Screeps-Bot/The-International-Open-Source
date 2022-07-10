@@ -69,7 +69,7 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
 
      // Try to transfer, recording the result
 
-     const transferResult = this.transfer(target as any, resourceType, amount)
+     const transferResult = this.transfer(target, resourceType, amount)
      this.message += transferResult
 
      // If the action can be considered a success
@@ -312,32 +312,19 @@ Creep.prototype.advancedUpgradeController = function () {
      // If the creep needs resources
 
      if (this.needsResources()) {
-          this.say('DR')
+          if (!this.memory.reservations || !this.memory.reservations.length) this.reserveWithdrawEnergy()
 
-          // If creep has a task
-
-          if (global[this.id]?.respondingTaskID) {
-               // Try to filfill task
-
-               const fulfillTaskResult = this.fulfillTask()
-
-               // If the task wasn't fulfilled, inform false
-
-               if (!fulfillTaskResult) return false
-
-               // Otherwise find the task
-
-               const task: RoomTask = room.global.tasksWithResponders[global[this.id].respondingTaskID]
-
-               // Delete it and inform false
-
-               task.delete()
+          if (!this.fulfillReservation()) {
+               this.say(this.message)
                return false
           }
 
-          // Otherwise try to find a new task
+          this.reserveWithdrawEnergy()
 
-          this.findTask(new Set(['pickup', 'withdraw', 'offer']), RESOURCE_ENERGY)
+          if (!this.fulfillReservation()) {
+               this.say(this.message)
+               return false
+          }
 
           return false
      }
@@ -1291,248 +1278,6 @@ Creep.prototype.needsResources = function () {
      return this.memory.NR
 }
 
-Creep.prototype.fulfillTask = function () {
-     const { room } = this
-
-     this.say('FT')
-
-     // Get the creep's task
-
-     const task: RoomTask = room.global.tasksWithResponders[global[this.id].respondingTaskID]
-
-     // If the task is undefined
-
-     if (!task) {
-          // Remove it as the creep's task and inform false
-
-          delete global[this.id].respondingTaskID
-          return false
-     }
-
-     // If visuals are enabled, show the task targeting
-
-     if (Memory.roomVisuals)
-          room.visual.line(this.pos, unpackAsRoomPos(task.pos, room.name), {
-               color: myColors.lightBlue,
-               width: 0.15,
-          })
-
-     // Run the creep's function based on the task type and inform its result
-
-     return this[`fulfill${task.type.charAt(0).toUpperCase()}${task.type.slice(1)}Task`](task)
-}
-
-Creep.prototype.fulfillPullTask = function (task) {
-     const creep = this
-     const { room } = creep
-
-     creep.say('PT')
-
-     // Get the task info
-
-     const taskTarget = findObjectWithID(task.creatorID) as Creep
-
-     // If the creep is not close enough to pull the target
-
-     if (creep.pos.getRangeTo(taskTarget.pos) > 1) {
-          // Create a moveRequest to the target and inform false
-
-          creep.createMoveRequest({
-               origin: creep.pos,
-               goal: { pos: taskTarget.pos, range: 1 },
-               avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.structures.road,
-               },
-          })
-
-          return false
-     }
-
-     // Otherwise
-
-     // Find the targetPos
-
-     const { targetPos } = task
-
-     // If the creep is not in range of the targetPos
-
-     if (creep.pos.getRangeTo(targetPos) > 0) {
-          // Have the creep pull the target and have it move with the creep and inform false
-
-          creep.pull(taskTarget)
-          taskTarget.move(creep)
-
-          creep.createMoveRequest({
-               origin: creep.pos,
-               goal: { pos: targetPos, range: 0 },
-               avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.structures.road,
-               },
-          })
-          return false
-     }
-
-     // Otherwise
-
-     // If the creep is fatigued, inform false
-
-     if (creep.fatigue > 0) return false
-
-     // Otherwise record that the creep is pulling and the taskTarget is getting pulled
-
-     creep.pulling = true
-     taskTarget.gettingPulled = true
-
-     // Have the creep move to where the taskTarget pos is
-
-     creep.move(creep.pos.getDirectionTo(taskTarget.pos))
-
-     // Have the creep pull the taskTarget to trade places with the creep
-
-     creep.pull(taskTarget)
-     taskTarget.move(creep)
-
-     // Inform true
-
-     return true
-}
-
-Creep.prototype.fulfillTransferTask = function (task) {
-     const creep = this
-
-     creep.say('TT')
-
-     // If the creep is empty of the task resource, inform true
-
-     if (creep.store.getUsedCapacity(task.resourceType) === 0) return true
-
-     // Get the transfer target using the task's transfer target IDs
-
-     const transferTarget = findObjectWithID(task.creatorID) as AnyStoreStructure | Creep | Tombstone
-
-     // Inform the result of the adancedTransfer to the transferTarget
-
-     return creep.advancedTransfer(
-          transferTarget,
-          task.resourceType,
-          Math.min(
-               task.taskAmount,
-               Math.min(
-                    transferTarget.store.getFreeCapacity(task.resourceType),
-                    creep.store.getUsedCapacity(task.resourceType),
-               ),
-          ),
-     )
-}
-
-Creep.prototype.fulfillOfferTask = function (task) {
-     const creep = this
-
-     // Get the withdraw target
-
-     const offerTarget = findObjectWithID(task.creatorID) as AnyStoreStructure | Creep | Tombstone
-
-     creep.say('OT')
-
-     // Try to withdraw from the target, informing the amount
-
-     return creep.advancedWithdraw(
-          offerTarget,
-          task.resourceType,
-          Math.min(
-               task.taskAmount,
-               Math.min(
-                    creep.store.getFreeCapacity(task.resourceType),
-                    offerTarget.store.getUsedCapacity(task.resourceType),
-               ),
-          ),
-     )
-}
-
-Creep.prototype.fulfillWithdrawTask = function (task) {
-     const creep = this
-     const { room } = creep
-
-     // Get the withdraw target
-
-     const withdrawTarget = findObjectWithID(task.creatorID) as AnyStoreStructure | Creep | Tombstone
-
-     creep.say('WT')
-
-     // If the withdrawTarget is a creep
-
-     if (withdrawTarget instanceof Creep) {
-          // Inform the result of the adancedTransfer from the transferTarget
-
-          const transferResult = withdrawTarget.transfer(
-               creep,
-               task.resourceType,
-               Math.min(
-                    task.taskAmount,
-                    Math.min(
-                         creep.store.getFreeCapacity(task.resourceType),
-                         withdrawTarget.store.getUsedCapacity(task.resourceType),
-                    ),
-               ),
-          )
-
-          // creep isn't in range, move to the withdrawTarget
-
-          if (transferResult === ERR_NOT_IN_RANGE) {
-               // Create a moveRequest to the target and inform failure
-
-               creep.createMoveRequest({
-                    origin: creep.pos,
-                    goal: { pos: withdrawTarget.pos, range: 1 },
-                    avoidEnemyRanges: true,
-                    weightGamebjects: {
-                         1: room.structures.road,
-                    },
-               })
-
-               return false
-          }
-
-          // Inform transferResult if the result is acceptable
-
-          return transferResult === OK || transferResult === ERR_FULL || transferResult === ERR_NOT_ENOUGH_RESOURCES
-     }
-
-     // Try to withdraw from the target, informing the result
-
-     return creep.advancedWithdraw(
-          withdrawTarget,
-          task.resourceType,
-          Math.min(
-               task.taskAmount,
-               Math.min(
-                    creep.store.getFreeCapacity(task.resourceType),
-                    withdrawTarget.store.getUsedCapacity(task.resourceType),
-               ),
-          ),
-     )
-}
-
-Creep.prototype.fulfillPickupTask = function (task) {
-     const creep = this
-
-     creep.say('PUT')
-
-     // If the creep is full, inform true
-
-     if (creep.store.getFreeCapacity() === 0) return true
-
-     // Otherwise get the pickup target
-
-     const pickupTarget = findObjectWithID(task.creatorID) as Resource
-
-     // Try to pickup from the target, informing the result
-
-     return creep.advancedPickup(pickupTarget)
-}
-
 Creep.prototype.advancedSignController = function () {
      const { room } = this
 
@@ -1993,14 +1738,14 @@ Creep.prototype.fulfillReservation = function () {
           return false
      }
 
-     let amount = Math.min(reservation.amount, target.store.getFreeCapacity(reservation.resourceType))
+     let amount = Math.min(reservation.amount, target.freeStore(reservation.resourceType) + reservation.amount)
 
      // Transfer
 
      if (reservation.type === 'transfer') {
           target.store[reservation.resourceType] -= reservation.amount
-
-          if (this.advancedTransfer(target, reservation.resourceType, amount)) {
+          customLog('TESTING', target + ', ' + reservation.resourceType + ', ' + amount)
+          if (this.advancedTransfer(target as Creep | AnyStoreStructure, reservation.resourceType, amount)) {
                this.store[reservation.resourceType] -= amount
                target.store[reservation.resourceType] += amount
 
@@ -2013,7 +1758,7 @@ Creep.prototype.fulfillReservation = function () {
           return false
      }
 
-     amount = Math.min(target.store.getUsedCapacity(reservation.resourceType), reservation.amount)
+     amount = Math.min(target.store[reservation.resourceType] - reservation.amount, reservation.amount)
 
      // Withdraw
 

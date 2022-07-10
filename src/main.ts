@@ -1172,7 +1172,7 @@ declare global {
           advancedPickup(target: Resource): boolean
 
           advancedTransfer(
-               target: Creep | AnyStoreStructure | Tombstone,
+               target: Creep | AnyStoreStructure,
                resourceType?: ResourceConstant,
                amount?: number,
           ): boolean

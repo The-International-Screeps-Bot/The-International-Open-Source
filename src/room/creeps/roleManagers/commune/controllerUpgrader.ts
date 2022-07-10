@@ -1,5 +1,17 @@
 import { ControllerUpgrader } from '../../creepClasses'
 
+export function controllerUpgraderManager(room: Room, creepsOfRole: string[]) {
+     // Loop through creepNames
+
+     for (const creepName of creepsOfRole) {
+          // Get the creep using its creepName
+
+          const creep: ControllerUpgrader = Game.creeps[creepName]
+
+          creep.advancedUpgradeController()
+     }
+}
+
 ControllerUpgrader.prototype.isDying = function () {
      // Inform as dying if creep is already recorded as dying
 

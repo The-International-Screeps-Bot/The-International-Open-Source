@@ -50,7 +50,7 @@ Hauler.prototype.reserve = function () {
      let amount
 
      if (this.needsResources()) {
-          this.message += this.freeStore(RESOURCE_ENERGY)
+          
           if (withdrawTargets.length) {
 
                target = this.pos.findClosestByRange(withdrawTargets)

@@ -30,10 +30,8 @@ Room.prototype.communeConstructionPlacement = function () {
 
      if (this.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
 
-     let stamp
-
      for (const stampType in stamps) {
-          stamp = stamps[stampType as StampTypes]
+          const stamp = stamps[stampType as StampTypes]
 
           for (const packedStampAnchor of this.memory.stampAnchors[stampType as StampTypes]) {
                const stampAnchor = unpackAsPos(packedStampAnchor)
@@ -44,7 +42,7 @@ Room.prototype.communeConstructionPlacement = function () {
                     // If there are already sufficient structures + cSites
 
                     if (
-                         this.get(structureType as BuildableStructureConstant).length +
+                         this.structures[structureType as StructureConstant].length +
                               this.get(`${structureType as BuildableStructureConstant}CSite`).length >=
                          CONTROLLER_STRUCTURES[structureType as BuildableStructureConstant][this.controller.level]
                     )

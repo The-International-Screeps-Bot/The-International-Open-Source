@@ -65,8 +65,8 @@ export function basePlanner(room: Room) {
      for (const source of sources) recordAdjacentPositions(source.pos.x, source.pos.y, 2)
 
      // Find the average pos between the sources
-
-     const avgSourcePos = findAvgBetweenPosotions(sources[0].pos, sources[1].pos)
+     
+     const avgSourcePos = sources.length > 1 ? findAvgBetweenPosotions(sources[0].pos, sources[1].pos) : sources[0].pos
 
      // Find the average pos between the two sources and the controller
 

@@ -23,6 +23,8 @@ Object.defineProperties(Room.prototype, {
           get() {
                if (this._sources) return this._sources
 
+               this._sources = []
+
                if (!this.memory.sourceIds) {
                     this.memory.sourceIds = []
 
@@ -34,8 +36,6 @@ Object.defineProperties(Room.prototype, {
 
                     return this._sources
                }
-
-               this._sources = []
 
                for (const sourceId of this.memory.sourceIds) this._sources.push(findObjectWithID(sourceId))
 

@@ -1,61 +1,68 @@
 import { constants } from 'international/constants'
 import { findObjectWithID } from 'international/generalFunctions'
-import { Maintainer } from 'room/creeps/creepClasses'
-import { RoomTask } from 'room/roomTasks'
+import { Maintainer } from '../../creepClasses'
+
+export function maintainerManager(room: Room, creepsOfRole: string[]) {
+     // Loop through creep names of creeps of the manager's role
+
+     for (const creepName of creepsOfRole) {
+          // Get the creep using its name
+
+          const creep: Maintainer = Game.creeps[creepName]
+
+          // Try to maintain structures, iterating if success
+
+          if (creep.advancedMaintain()) continue
+
+          // Otherwise, try to maintain at feet, iterating if success
+
+          if (creep.maintainNearby()) continue
+     }
+}
 
 Maintainer.prototype.advancedMaintain = function () {
-     const creep = this
-     const { room } = creep
 
-     creep.say('⏩🔧')
+     const { room } = this
 
-     // If the creep needs resources
+     this.say('⏩🔧')
 
-     if (creep.needsResources()) {
-          creep.say('DR')
+     // If the this needs resources
 
-          // If creep has a task
+     if (this.needsResources()) {
+          if (!this.memory.reservations || !this.memory.reservations.length) this.reserveWithdrawEnergy()
 
-          if (global[creep.id]?.respondingTaskID) {
-               // Try to filfill task, informing false if it wasn't fulfilled
-
-               const fulfillTaskResult = creep.fulfillTask()
-               if (!fulfillTaskResult) return false
-
-               // Otherwise find the task
-
-               const task: RoomTask = room.global.tasksWithResponders[global[creep.id].respondingTaskID]
-
-               // Delete it and inform false
-
-               task.delete()
+          if (!this.fulfillReservation()) {
+               this.say(this.message)
                return false
           }
 
-          // Otherwise try to find a new task and stop
+          this.reserveWithdrawEnergy()
 
-          creep.findTask(new Set(['pickup', 'withdraw', 'offer']), RESOURCE_ENERGY)
+          if (!this.fulfillReservation()) {
+               this.say(this.message)
+               return false
+          }
 
           return false
      }
 
-     // Otherwise if the creep doesn't need resources
+     // Otherwise if the this doesn't need resources
 
-     // Get the creep's work part count
+     // Get the this's work part count
 
      const workPartCount = this.parts.work
 
-     // Find a repair target based on the creeps work parts. If none are found, inform false
+     // Find a repair target based on the thiss work parts. If none are found, inform false
 
      const repairTarget: Structure | false =
-          findObjectWithID(creep.memory.repairTarget) ||
-          creep.findRepairTarget() ||
-          creep.findRampartRepairTarget(workPartCount)
+          findObjectWithID(this.memory.repairTarget) ||
+          this.findRepairTarget() ||
+          this.findRampartRepairTarget(workPartCount)
      if (!repairTarget) return false
 
      // Add the repair target to memory
 
-     creep.memory.repairTarget = repairTarget.id
+     this.memory.repairTarget = repairTarget.id
 
      // If roomVisuals are enabled
 
@@ -64,11 +71,11 @@ Maintainer.prototype.advancedMaintain = function () {
 
      // If the repairTarget is out of repair range
 
-     if (creep.pos.getRangeTo(repairTarget.pos) > 3) {
+     if (this.pos.getRangeTo(repairTarget.pos) > 3) {
           // Make a move request to it
 
-          creep.createMoveRequest({
-               origin: creep.pos,
+          this.createMoveRequest({
+               origin: this.pos,
                goal: { pos: repairTarget.pos, range: 3 },
                avoidEnemyRanges: true,
                weightGamebjects: {
@@ -85,22 +92,22 @@ Maintainer.prototype.advancedMaintain = function () {
 
      // Try to repair the target
 
-     const repairResult = creep.repair(repairTarget)
+     const repairResult = this.repair(repairTarget)
 
      // If the repair failed, inform false
 
      if (repairResult !== OK) return false
 
-     // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
+     // Find the repair amount by finding the smaller of the this's work and the progress left for the cSite divided by repair power
 
      const energySpentOnRepairs = Math.min(workPartCount, (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER)
 
      if (repairTarget.structureType === STRUCTURE_RAMPART) {
           if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eorwr += energySpentOnRepairs
-          creep.say(`🧱${energySpentOnRepairs * REPAIR_POWER}`)
+          this.say(`🧱${energySpentOnRepairs * REPAIR_POWER}`)
      } else {
           if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eoro += energySpentOnRepairs
-          creep.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
+          this.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
      }
 
      // Implement the results of the repair pre-emptively
@@ -112,7 +119,7 @@ Maintainer.prototype.advancedMaintain = function () {
      if (repairTarget.structureType === STRUCTURE_RAMPART) {
           // If the repairTarget will be below or equal to expectations next tick, inform true
 
-          if (repairTarget.realHits <= creep.memory.quota + workPartCount * REPAIR_POWER * 25) return true
+          if (repairTarget.realHits <= this.memory.quota + workPartCount * REPAIR_POWER * 25) return true
      }
 
      // Otherwise if it isn't a rampart and it will be viable to repair next tick, inform true
@@ -122,17 +129,17 @@ Maintainer.prototype.advancedMaintain = function () {
 
      // Delete the target from memory
 
-     delete creep.memory.repairTarget
+     delete this.memory.repairTarget
 
      // Find repair targets that don't include the current target, informing true if none were found
 
-     const newRepairTarget = creep.findRepairTarget(new Set([repairTarget.id]))
+     const newRepairTarget = this.findRepairTarget(new Set([repairTarget.id]))
      if (!newRepairTarget) return true
 
      // Make a move request to it
 
-     creep.createMoveRequest({
-          origin: creep.pos,
+     this.createMoveRequest({
+          origin: this.pos,
           goal: { pos: newRepairTarget.pos, range: 3 },
           avoidEnemyRanges: true,
           weightGamebjects: {
@@ -148,15 +155,15 @@ Maintainer.prototype.advancedMaintain = function () {
 Maintainer.prototype.maintainNearby = function () {
      const { room } = this
 
-     // If the creep has no energy, inform false
+     // If the this has no energy, inform false
 
      if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return false
 
-     // Otherwise, look at the creep's pos for structures
+     // Otherwise, look at the this's pos for structures
 
      const structuresAsPos = this.pos.lookFor(LOOK_STRUCTURES)
 
-     // Get the creep's work parts
+     // Get the this's work parts
 
      const workPartCount = this.parts.work
 
@@ -179,11 +186,11 @@ Maintainer.prototype.maintainNearby = function () {
 
           // Otherwise
 
-          // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
+          // Find the repair amount by finding the smaller of the this's work and the progress left for the cSite divided by repair power
 
           const energySpentOnRepairs = Math.min(workPartCount, (structure.hitsMax - structure.hits) / REPAIR_POWER)
 
-          // Show the creep tried to repair
+          // Show the this tried to repair
 
           this.say(`👣🔧${energySpentOnRepairs * REPAIR_POWER}`)
           return true
@@ -215,11 +222,11 @@ Maintainer.prototype.maintainNearby = function () {
 
           // Otherwise
 
-          // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
+          // Find the repair amount by finding the smaller of the this's work and the progress left for the cSite divided by repair power
 
           const energySpentOnRepairs = Math.min(workPartCount, (structure.hitsMax - structure.hits) / REPAIR_POWER)
 
-          // Show the creep tried to repair
+          // Show the this tried to repair
 
           this.say(`🗺️🔧${energySpentOnRepairs * REPAIR_POWER}`)
           return true
