@@ -50,7 +50,7 @@ Hauler.prototype.reserve = function () {
      let amount
 
      if (this.needsResources()) {
-          
+
           if (withdrawTargets.length) {
 
                target = this.pos.findClosestByRange(withdrawTargets)
@@ -64,7 +64,7 @@ Hauler.prototype.reserve = function () {
           }
 
           transferTargets = room.MATT.filter(function (target) {
-               return target.freeSpecificStore(RESOURCE_ENERGY) > 0
+               return target.freeStore(RESOURCE_ENERGY) > 0
           })
 
           if (transferTargets.length) {
@@ -94,13 +94,13 @@ Hauler.prototype.reserve = function () {
      }
 
      if (!transferTargets) transferTargets = room.MATT.filter(function (target) {
-          return target.freeSpecificStore(RESOURCE_ENERGY) > 0
+          return target.freeStore(RESOURCE_ENERGY) > 0
      })
 
      if (transferTargets.length) {
 
           target = this.pos.findClosestByRange(transferTargets)
-
+          this.message += target.store[RESOURCE_ENERGY]
           amount = Math.min(this.usedStore(), target.freeStore(RESOURCE_ENERGY))
 
           this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)

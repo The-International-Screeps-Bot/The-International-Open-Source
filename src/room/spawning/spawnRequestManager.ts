@@ -484,11 +484,11 @@ export function spawnRequester(room: Room) {
                if (!room.fastFillerContainerLeft && !room.fastFillerContainerRight) {
                     return {
                          defaultParts: [],
-                         extraParts: [WORK, WORK, CARRY, MOVE],
-                         partsMultiplier: partsMultiplier / 2,
+                         extraParts: [WORK, CARRY, CARRY, MOVE],
+                         partsMultiplier: partsMultiplier,
                          minCreeps: undefined,
                          maxCreeps: Infinity,
-                         minCost: 300,
+                         minCost: 250,
                          priority: 9 + room.creepsFromRoom.builder.length,
                          memoryAdditions: {
                               role: 'builder',

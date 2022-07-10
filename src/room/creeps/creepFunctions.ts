@@ -73,7 +73,7 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
 
      // If the action can be considered a success
 
-     if (transferResult === OK || transferResult === ERR_FULL || transferResult === ERR_NOT_ENOUGH_RESOURCES) {
+     if (transferResult === OK /* || transferResult === ERR_FULL */ || transferResult === ERR_NOT_ENOUGH_RESOURCES) {
           this.movedResource = true
           return true
      }
@@ -1526,6 +1526,8 @@ Creep.prototype.reservationManager = function () {
           }
 
           if (reservation.type === 'transfer') {
+
+               reservation.amount = Math.min(reservation.amount, target.freeStore(RESOURCE_ENERGY) + reservation.amount)
                target.store[reservation.resourceType] += reservation.amount
                continue
           }
@@ -1567,13 +1569,16 @@ Creep.prototype.fulfillReservation = function () {
           return false
      }
 
-     let amount = Math.min(reservation.amount, target.freeStore(reservation.resourceType) + reservation.amount)
+     let amount = 0
 
      // Transfer
 
      if (reservation.type === 'transfer') {
-          target.store[reservation.resourceType] -= reservation.amount
 
+          amount = Math.min(reservation.amount, target.freeStore(RESOURCE_ENERGY) + reservation.amount)
+
+          target.store[reservation.resourceType] -= reservation.amount
+          this.message += amount
           if (this.advancedTransfer(target as Creep | AnyStoreStructure, reservation.resourceType, amount)) {
                this.store[reservation.resourceType] -= amount
                target.store[reservation.resourceType] += amount
@@ -1587,7 +1592,7 @@ Creep.prototype.fulfillReservation = function () {
           return false
      }
 
-     amount = Math.min(target.store[reservation.resourceType] - reservation.amount, reservation.amount)
+     amount = reservation.amount/* Math.min(target.store[reservation.resourceType] - reservation.amount, reservation.amount) */
 
      // Withdraw
 
@@ -1629,7 +1634,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
 
           if (target instanceof Resource) amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
           else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
-          
+
           this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
      }
 
@@ -1659,7 +1664,7 @@ Creep.prototype.reserveTransferEnergy = function () {
      if (this.usedStore() === 0) return
 
      let transferTargets = room.MATT.filter(function (target) {
-          return target.freeSpecificStore(RESOURCE_ENERGY) > 0
+          return target.freeStore(RESOURCE_ENERGY) > 0
      })
 
      let target

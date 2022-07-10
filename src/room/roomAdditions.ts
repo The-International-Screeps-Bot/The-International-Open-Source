@@ -1,5 +1,12 @@
 import { allyList, constants } from 'international/constants'
-import { createPackedPosMap, customLog, findObjectWithID, getRange, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
+import {
+     createPackedPosMap,
+     customLog,
+     findObjectWithID,
+     getRange,
+     unpackAsPos,
+     unpackAsRoomPos,
+} from 'international/generalFunctions'
 
 Object.defineProperties(Room.prototype, {
      global: {
@@ -29,7 +36,6 @@ Object.defineProperties(Room.prototype, {
                     this.memory.sourceIds = []
 
                     for (const source of this.find(FIND_SOURCES)) {
-
                          this.memory.sourceIds.push(source.id)
                          this._sources.push(source)
                     }
@@ -496,19 +502,17 @@ Object.defineProperties(Room.prototype, {
      },
      creepPositions: {
           get() {
-
                if (this._creepPositions) return this._creepPositions
 
-               return this._creepPositions = createPackedPosMap()
-          }
+               return (this._creepPositions = createPackedPosMap())
+          },
      },
      moveRequests: {
           get() {
-
                if (this._moveRequests) return this._moveRequests
 
-               return this._moveRequests = createPackedPosMap(true)
-          }
+               return (this._moveRequests = createPackedPosMap(true))
+          },
      },
      droppedEnergy: {
           get() {
@@ -579,20 +583,26 @@ Object.defineProperties(Room.prototype, {
 
                this._METT = [...this.spawningStructuresByNeed, ...this.structures.tower]
 
-               if (this.fastFillerContainerLeft && this.fastFillerContainerLeft.store.energy <= this.fastFillerContainerLeft.store.getCapacity(RESOURCE_ENERGY) * 0.75) this._METT.push(this.fastFillerContainerLeft)
-               if (this.fastFillerContainerRight && this.fastFillerContainerRight.store.energy <= this.fastFillerContainerRight.store.getCapacity(RESOURCE_ENERGY) * 0.75) this._METT.push(this.fastFillerContainerRight)
+               if (
+                    this.fastFillerContainerLeft &&
+                    this.fastFillerContainerLeft.store.energy <=
+                         this.fastFillerContainerLeft.store.getCapacity(RESOURCE_ENERGY) * 0.75
+               )
+                    this._METT.push(this.fastFillerContainerLeft)
+               if (
+                    this.fastFillerContainerRight &&
+                    this.fastFillerContainerRight.store.energy <=
+                         this.fastFillerContainerRight.store.getCapacity(RESOURCE_ENERGY) * 0.75
+               )
+                    this._METT.push(this.fastFillerContainerRight)
 
                if (!this.fastFillerContainerLeft && !this.fastFillerContainerRight) {
-
                     // Add builders that need energy
 
                     for (const creepName of this.myCreeps.builder) {
-
                          const creep = Game.creeps[creepName]
 
-                         if (creep.usedStore() * 0.5 >= creep.store.getCapacity()) continue
-
-                         this._METT.push(creep)
+                         if (creep.store.getCapacity() * 0.5 >= creep.usedStore()) this._METT.push(creep)
                     }
                }
 
