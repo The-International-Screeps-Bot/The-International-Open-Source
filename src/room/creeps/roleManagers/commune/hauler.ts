@@ -1,4 +1,4 @@
-import { customLog } from 'international/generalFunctions'
+import { customLog, getRange } from 'international/generalFunctions'
 import { Hauler } from '../../creepClasses'
 
 export function haulerManager(room: Room, creepsOfRole: string[]) {
@@ -14,7 +14,6 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
           if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserve()
 
           if (!creep.fulfillReservation()) {
-
                creep.say(creep.message)
                continue
           }
@@ -22,7 +21,6 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
           creep.reserve()
 
           if (!creep.fulfillReservation()) {
-
                creep.say(creep.message)
                continue
           }
@@ -50,13 +48,10 @@ Hauler.prototype.reserve = function () {
      let amount
 
      if (this.needsResources()) {
-
           if (withdrawTargets.length) {
-
                target = this.pos.findClosestByRange(withdrawTargets)
 
-               if (target instanceof Resource)
-                    amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
+               if (target instanceof Resource) amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
                else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
 
                this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
@@ -82,8 +77,7 @@ Hauler.prototype.reserve = function () {
 
                target = this.pos.findClosestByRange(withdrawTargets)
 
-               if (target instanceof Resource)
-                    amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
+               if (target instanceof Resource) amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
                else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
 
                this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
@@ -93,14 +87,17 @@ Hauler.prototype.reserve = function () {
           return
      }
 
-     if (!transferTargets) transferTargets = room.MATT.filter(function (target) {
-          return target.freeStore(RESOURCE_ENERGY) > 0
-     })
+     if (!transferTargets)
+          transferTargets = room.MATT.filter(function (target) {
+               return target.freeStore(RESOURCE_ENERGY) > 0
+          })
 
      if (transferTargets.length) {
+          target = transferTargets.sort((a, b) => {
 
-          target = this.pos.findClosestByRange(transferTargets)
-          this.message += target.store[RESOURCE_ENERGY]
+               return (getRange(this.pos.x - a.pos.x, this.pos.y - a.pos.y) +  a.store.energy * 0.05) - (getRange(this.pos.x - b.pos.x, this.pos.y - b.pos.y) +  b.store.energy * 0.05)
+          })[0]
+
           amount = Math.min(this.usedStore(), target.freeStore(RESOURCE_ENERGY))
 
           this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)

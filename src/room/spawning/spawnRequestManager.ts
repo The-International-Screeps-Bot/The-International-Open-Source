@@ -234,7 +234,7 @@ export function spawnRequester(room: Room) {
                if (!room.source1Link)
                     requiredCarryParts += findCarryPartsRequired(
                          room.source1PathLength * 2,
-                         Math.min(room.getPartsOfRoleAmount('source1Harvester', WORK), 10),
+                         10,
                     )
 
                // If there is no source2Link, increase requiredCarryParts using the source's path length
@@ -242,7 +242,7 @@ export function spawnRequester(room: Room) {
                if (!room.source2Link)
                     requiredCarryParts += findCarryPartsRequired(
                          room.source2PathLength * 2,
-                         Math.min(room.getPartsOfRoleAmount('source1Harvester', WORK), 10),
+                         10,
                     )
 
                // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
@@ -253,7 +253,7 @@ export function spawnRequester(room: Room) {
                     if (room.storage) {
                          income = room.getPartsOfRoleAmount('controllerUpgrader', WORK)
                     } else
-                         Math.min(
+                         income = Math.min(
                               room.getPartsOfRoleAmount('controllerUpgrader', WORK) * 0.75,
                               room.sources.length * 0.75,
                          )
@@ -463,6 +463,7 @@ export function spawnRequester(room: Room) {
 
                if (room.find(FIND_MY_CONSTRUCTION_SITES).length === 0) return false
 
+               let priority = 10 + room.creepsFromRoom.builder.length
                let partsMultiplier = 0
 
                // If there is a storage
@@ -487,7 +488,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost: 750,
-                         priority: 9 + room.creepsFromRoom.builder.length,
+                         priority,
                          memoryAdditions: {
                               role: 'builder',
                               roads: true,
@@ -503,7 +504,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost: 250,
-                         priority: 9 + room.creepsFromRoom.builder.length,
+                         priority,
                          memoryAdditions: {
                               role: 'builder',
                               roads: true,
@@ -518,7 +519,7 @@ export function spawnRequester(room: Room) {
                     minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 250,
-                    priority: 9 + room.creepsFromRoom.builder.length,
+                    priority,
                     memoryAdditions: {
                          role: 'builder',
                     },
@@ -530,7 +531,7 @@ export function spawnRequester(room: Room) {
 
      room.constructSpawnRequests(
           (function (): SpawnRequestOpts | false {
-               const priority = 7 + room.creepsFromRoom.maintainer.length
+               const priority = 8 + room.creepsFromRoom.maintainer.length
 
                // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
@@ -608,7 +609,7 @@ export function spawnRequester(room: Room) {
           (function (): SpawnRequestOpts | false {
                let partsMultiplier = 1
                let maxCreeps = room.get('upgradePositions').length
-               const priority = 8 + room.creepsFromRoom.controllerUpgrader.length
+               const priority = 12 + room.creepsFromRoom.controllerUpgrader.length
 
                // If there are enemyAttackers and the controller isn't soon to downgrade
 
@@ -920,7 +921,7 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: global[remoteName]?.source1HarvestPositions?.length || Infinity,
                          maxCostPerCreep: 50 + 150 * 6,
-                         minCost: 200,
+                         minCost: 300,
                          priority: remotePriority - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                          memoryAdditions: {
                               role: 'source1RemoteHarvester',
@@ -957,15 +958,15 @@ export function spawnRequester(room: Room) {
                     }
 
                     return {
-                         defaultParts: [],
-                         extraParts: [WORK, MOVE],
+                         defaultParts: [CARRY],
+                         extraParts: [WORK, WORK, MOVE],
                          partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0),
                          groupComparator: room.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
                          threshold: 0.1,
                          minCreeps: undefined,
                          maxCreeps: global[remoteName]?.source2HarvestPositions?.length || Infinity,
                          maxCostPerCreep: 150 * 6,
-                         minCost: 200,
+                         minCost: 300,
                          priority: remotePriority - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                          memoryAdditions: {
                               role: 'source2RemoteHarvester',
