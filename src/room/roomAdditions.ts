@@ -168,14 +168,12 @@ Object.defineProperties(Room.prototype, {
 
                const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
 
-               let closestHarvestPos: RoomPosition
-
                // loop through sourceNames
 
                for (const sourceName of sourceNames) {
                     // Get the closestHarvestPos using the sourceName, iterating if undefined
 
-                    closestHarvestPos = this.get(`${sourceName}ClosestHarvestPos`)
+                    let closestHarvestPos: RoomPosition = this.get(`${sourceName}ClosestHarvestPos`)
 
                     if (!closestHarvestPos) continue
 
@@ -583,6 +581,20 @@ Object.defineProperties(Room.prototype, {
 
                if (this.fastFillerContainerLeft && this.fastFillerContainerLeft.store.energy <= this.fastFillerContainerLeft.store.getCapacity(RESOURCE_ENERGY) * 0.75) this._METT.push(this.fastFillerContainerLeft)
                if (this.fastFillerContainerRight && this.fastFillerContainerRight.store.energy <= this.fastFillerContainerRight.store.getCapacity(RESOURCE_ENERGY) * 0.75) this._METT.push(this.fastFillerContainerRight)
+
+               if (!this.fastFillerContainerLeft && !this.fastFillerContainerRight) {
+
+                    // Add builders that need energy
+
+                    for (const creepName of this.myCreeps.builder) {
+
+                         const creep = Game.creeps[creepName]
+
+                         if (creep.usedStore() * 0.5 >= creep.store.getCapacity()) continue
+
+                         this._METT.push(creep)
+                    }
+               }
 
                if (this.controllerContainer) this._METT.push(this.controllerContainer)
 

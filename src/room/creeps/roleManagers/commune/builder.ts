@@ -68,6 +68,10 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
                     continue
                }
 
+               // If there are fastFiller containers
+
+               if (!room.fastFillerContainerLeft && !room.fastFillerContainerRight) continue
+               
                if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveWithdrawEnergy()
 
                if (!creep.fulfillReservation()) {
@@ -83,6 +87,8 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
                }
 
                continue
+
+               //
           }
 
           // If there is a cSite, try to build it and iterate

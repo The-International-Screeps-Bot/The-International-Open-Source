@@ -118,10 +118,6 @@ export class RemoteHauler extends Creep {
       */
      findRemote?(): boolean
 
-     reserveTransfer?(): void
-
-     reserveWithdraw?(): void
-
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }

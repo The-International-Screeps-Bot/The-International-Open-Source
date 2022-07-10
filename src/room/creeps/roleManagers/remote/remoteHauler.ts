@@ -13,14 +13,14 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                // If the creep is in the remote
 
                if (room.name === creep.memory.remoteName) {
-                    if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveWithdraw()
+                    if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveWithdrawEnergy()
 
                     if (!creep.fulfillReservation()) {
                          creep.say(creep.message)
                          continue
                     }
 
-                    creep.reserveWithdraw()
+                    creep.reserveWithdrawEnergy()
 
                     if (!creep.fulfillReservation()) {
                          creep.say(creep.message)
@@ -76,14 +76,14 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                if (creep.memory.remoteName) delete creep.memory.remoteName
 
-               if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveTransfer()
+               if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveTransferEnergy()
 
                if (!creep.fulfillReservation()) {
                     creep.say(creep.message)
                     continue
                }
 
-               creep.reserveTransfer()
+               creep.reserveTransferEnergy()
 
                if (!creep.fulfillReservation()) {
                     creep.say(creep.message)
@@ -148,67 +148,4 @@ RemoteHauler.prototype.findRemote = function () {
      }
 
      return false
-}
-
-RemoteHauler.prototype.reserveWithdraw = function () {
-     const { room } = this
-
-     if (!this.needsResources()) return
-
-     const withdrawTargets = room.MAWT.filter(target => {
-          if (target instanceof Resource)
-               return (
-                    target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
-                    target.reserveAmount >= this.freeStore(RESOURCE_ENERGY)
-               )
-
-          return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
-     })
-
-     if (!withdrawTargets.length) return
-
-     let target
-     let amount
-
-     target = this.pos.findClosestByRange(withdrawTargets)
-
-     if (target instanceof Resource)
-          amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.reserveAmount)
-     else amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.store.energy)
-
-     this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
-}
-
-RemoteHauler.prototype.reserveTransfer = function () {
-     const { room } = this
-
-     if (this.usedStore() === 0) return
-
-     let transferTargets = room.MATT.filter(function (target) {
-          return target.freeSpecificStore(RESOURCE_ENERGY) > 0
-     })
-
-     let target
-     let amount
-
-     if (transferTargets.length) {
-          target = this.pos.findClosestByRange(transferTargets)
-
-          amount = Math.min(this.usedStore(), target.freeStore(RESOURCE_ENERGY))
-
-          this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
-          return
-     }
-
-     transferTargets = room.OATT.filter(target => {
-          return target.freeStore(RESOURCE_ENERGY) >= this.usedStore()
-     })
-
-     if (!transferTargets.length) return
-
-     target = this.pos.findClosestByRange(transferTargets)
-
-     amount = this.usedStore()
-
-     this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
 }

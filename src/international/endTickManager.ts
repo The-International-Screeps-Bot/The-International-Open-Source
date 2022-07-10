@@ -10,6 +10,10 @@ InternationalManager.prototype.endTickManager = function () {
 
      if (!Memory.isMainShard) return
 
+     // Fill up the console with empty logs
+
+     for (let i = 0; i < 99; i += 1) console.log()
+
      const CPU = Game.cpu.getUsed()
 
      // Get the CPU color based on the amount of used CPU
@@ -22,10 +26,6 @@ InternationalManager.prototype.endTickManager = function () {
           myColors.white,
           CPUColor,
      )
-
-     // Fill up the console with empty logs
-
-     for (let i = 0; i < 99; i += 1) console.log()
 
      // Log the accumilated global logs
 

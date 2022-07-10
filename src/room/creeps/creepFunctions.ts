@@ -892,30 +892,23 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
 
      const terrain = room.getTerrain()
 
-     let packedPos
-     let pos
-     let structure: Structure
-     let hasImpassibleStructure
-
      for (let index = 0; index < adjacentPackedPositions.length; index++) {
-          packedPos = adjacentPackedPositions[index]
+          const packedPos = adjacentPackedPositions[index]
 
           if (room.creepPositions[packedPos]) continue
 
           if (avoidPackedPositions.has(packedPos)) continue
 
-          pos = unpackAsPos(packedPos)
+          let pos = unpackAsRoomPos(packedPos, room.name)
 
           if (pos.x < 1 || pos.x >= constants.roomDimensions - 1 || pos.y < 1 || pos.y >= constants.roomDimensions - 1)
                continue
 
-          pos = unpackAsRoomPos(packedPos, room.name)
-
           if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
-          hasImpassibleStructure = false
+          let hasImpassibleStructure
 
-          for (structure of pos.lookFor(LOOK_STRUCTURES))
+          for (const structure of pos.lookFor(LOOK_STRUCTURES))
                if (constants.impassibleStructureTypes.includes(structure.structureType)) {
                     hasImpassibleStructure = true
                     break
@@ -1481,7 +1474,6 @@ Creep.prototype.aggressiveHeal = function () {
 }
 
 Creep.prototype.deleteReservation = function (index) {
-
      this.memory.reservations.splice(index)
 
      this.message += '❌'
@@ -1581,7 +1573,7 @@ Creep.prototype.fulfillReservation = function () {
 
      if (reservation.type === 'transfer') {
           target.store[reservation.resourceType] -= reservation.amount
-          customLog('TESTING', target + ', ' + reservation.resourceType + ', ' + amount)
+
           if (this.advancedTransfer(target as Creep | AnyStoreStructure, reservation.resourceType, amount)) {
                this.store[reservation.resourceType] -= amount
                target.store[reservation.resourceType] += amount
@@ -1619,7 +1611,29 @@ Creep.prototype.reserveWithdrawEnergy = function () {
 
      if (!this.needsResources()) return
 
-     const withdrawTargets = room.MAWT.filter(target => {
+     let withdrawTargets = room.MAWT.filter(target => {
+          if (target instanceof Resource)
+               return (
+                    target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
+                    target.reserveAmount >= this.freeStore(RESOURCE_ENERGY)
+               )
+
+          return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
+     })
+
+     let target
+     let amount
+
+     if (withdrawTargets.length) {
+          target = this.pos.findClosestByRange(withdrawTargets)
+
+          if (target instanceof Resource) amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
+          else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
+          
+          this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
+     }
+
+     withdrawTargets = room.OAWT.filter(target => {
           if (target instanceof Resource)
                return (
                     target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
@@ -1631,13 +1645,9 @@ Creep.prototype.reserveWithdrawEnergy = function () {
 
      if (!withdrawTargets.length) return
 
-     let target
-     let amount
-
      target = this.pos.findClosestByRange(withdrawTargets)
 
-     if (target instanceof Resource)
-          amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
+     if (target instanceof Resource) amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
      else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
 
      this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)

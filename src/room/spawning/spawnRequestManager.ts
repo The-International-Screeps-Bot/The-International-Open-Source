@@ -32,9 +32,6 @@ export function spawnRequester(room: Room) {
      const mostOptimalSource = room.findSourcesByEfficacy()[0]
 
      let partsMultiplier: number
-     let extraParts: BodyPartConstant[]
-     let cost: number
-     let minCost: number
 
      // Construct requests for sourceHarvesters
 
@@ -453,6 +450,8 @@ export function spawnRequester(room: Room) {
 
                if (room.find(FIND_MY_CONSTRUCTION_SITES).length === 0) return false
 
+               let partsMultiplier = 0
+
                // If there is a storage
 
                if (room.storage) {
@@ -475,6 +474,21 @@ export function spawnRequester(room: Room) {
                          minCreeps: undefined,
                          maxCreeps: Infinity,
                          minCost: 750,
+                         priority: 9 + room.creepsFromRoom.builder.length,
+                         memoryAdditions: {
+                              role: 'builder',
+                         },
+                    }
+               }
+
+               if (!room.fastFillerContainerLeft && !room.fastFillerContainerRight) {
+                    return {
+                         defaultParts: [],
+                         extraParts: [WORK, WORK, CARRY, MOVE],
+                         partsMultiplier: partsMultiplier / 2,
+                         minCreeps: undefined,
+                         maxCreeps: Infinity,
+                         minCost: 300,
                          priority: 9 + room.creepsFromRoom.builder.length,
                          memoryAdditions: {
                               role: 'builder',
