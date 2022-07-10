@@ -50,30 +50,7 @@ SourceHarvester.prototype.travelToSource = function () {
 
      // If the creep's movement type is pull
 
-     if (creep.memory.getPulled) {
-          creep.say('GP')
-
-          // if there is no global for the creep, make one
-
-          if (!global[creep.id]) global[creep.id] = {}
-
-          // If there is no created task IDs object for the creator, make it
-
-          if (!global[creep.id].createdTaskIDs) global[creep.id].createdTaskIDs = {}
-
-          // Find the creep's task of type pull
-
-          const creepsPullTasks = room.findTasksOfTypes(global[creep.id].createdTaskIDs, new Set(['pull']))
-
-          // If there are no pull tasks for the creep, make one for the creep's harvestPos
-
-          if (creepsPullTasks.length === 0)
-               new RoomPullTask(room.name, creep.id, new RoomPosition(harvestPos.x, harvestPos.y, room.name), 1)
-
-          // Inform false
-
-          return true
-     }
+     if (creep.memory.getPulled) return true
 
      // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
@@ -182,12 +159,12 @@ SourceHarvester.prototype.repairSourceContainer = function (sourceContainer) {
 
      // If the creep doesn't have enough energy and it hasn't yet moved resources, withdraw from the sourceContainer
 
-     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount && !creep.hasMovedResources)
+     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount && !creep.movedResource)
           creep.withdraw(sourceContainer, RESOURCE_ENERGY)
 
      // If the creep has already worked, inform false
 
-     if (creep.hasWorked) return false
+     if (creep.worked) return false
 
      // Try to repair the target
 
@@ -198,7 +175,7 @@ SourceHarvester.prototype.repairSourceContainer = function (sourceContainer) {
      if (repairResult === OK) {
           // Record that the creep has worked
 
-          creep.hasWorked = true
+          creep.worked = true
 
           // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
 

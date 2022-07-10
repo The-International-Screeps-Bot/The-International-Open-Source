@@ -1721,38 +1721,6 @@ Room.prototype.findStoredResourceAmount = function (resourceType) {
      return room.storedResources[resourceType]
 }
 
-Room.prototype.findTasksOfTypes = function (createdTaskIDs, types) {
-     const room = this
-
-     // Initialize tasks of types
-
-     const tasksOfTypes = []
-
-     // Iterate through IDs of createdTasks
-
-     for (const taskID in createdTaskIDs) {
-          // Set the task from tasks without responders, or if undefined, from tasksWithResponders
-
-          const task: RoomTask = room.global.tasksWithoutResponders[taskID] || room.global.tasksWithResponders[taskID]
-
-          // If the task isn't defined, iterate
-
-          if (!task) continue
-
-          // If the task is not of the specified types, iterate
-
-          if (!types.has(task.type)) continue
-
-          // Otherwise add the task to tasksOfTypes
-
-          tasksOfTypes.push(task)
-     }
-
-     // Inform false if no tasks had the specified types
-
-     return tasksOfTypes
-}
-
 Room.prototype.distanceTransform = function (
      initialCM,
      enableVisuals,
@@ -1840,7 +1808,7 @@ Room.prototype.distanceTransform = function (
      return distanceCM
 }
 
-Room.prototype.specialDT = function (
+Room.prototype.diagonalDistanceTransform = function (
      initialCM,
      enableVisuals,
      x1 = 0,

@@ -65,7 +65,7 @@ export function basePlanner(room: Room) {
      for (const source of sources) recordAdjacentPositions(source.pos.x, source.pos.y, 2)
 
      // Find the average pos between the sources
-     
+
      const avgSourcePos = sources.length > 1 ? findAvgBetweenPosotions(sources[0].pos, sources[1].pos) : sources[0].pos
 
      // Find the average pos between the two sources and the controller
@@ -142,7 +142,7 @@ export function basePlanner(room: Room) {
 
                // Run distance transform with the baseCM
 
-               const distanceCM = opts.normalDT ? room.distanceTransform(baseCM) : room.specialDT(baseCM)
+               const distanceCM = opts.normalDT ? room.distanceTransform(baseCM) : room.diagonalDistanceTransform(baseCM)
 
                // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 

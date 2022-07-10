@@ -705,7 +705,7 @@ declare global {
           /**
            * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix
            */
-          specialDT(
+          diagonalDistanceTransform(
                initialCM?: CostMatrix,
                enableVisuals?: boolean,
                x1?: number,
@@ -723,11 +723,6 @@ declare global {
            * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
            */
           findClosestPosOfValue(opts: FindClosestPosOfValueOpts): RoomPosition | false
-
-          /**
-           * Checks if the creator has a task of with specified types
-           */
-          findTasksOfTypes(createdTaskIDs: { [key: string]: boolean }, types: Set<string>): RoomTask[]
 
           /**
            *
@@ -945,7 +940,7 @@ declare global {
           /**
            * A matrix with indexes of packed positions and values of creep names
            */
-           readonly moveRequests: PackedPosMap
+          readonly moveRequests: PackedPosMap
 
           // Target finding
 
@@ -1122,8 +1117,6 @@ declare global {
      // Creeps
 
      interface Creep {
-          [key: string]: any
-
           /**
            * The packed position of the moveRequest, if one has been made
            */
@@ -1132,6 +1125,8 @@ declare global {
           movedResource: boolean
 
           moved: boolean
+
+          worked: boolean
 
           /**
            * Whether the creep is actively pulling another creep or not
@@ -1159,23 +1154,9 @@ declare global {
            */
           isDying(): boolean
 
-          /**
-           * Sets a task to be responded by a creep
-           */
-          acceptTask(task: RoomTask): void
-
-          /**
-           * Tries to find a task for the creep with a type that matches the allowedTaskTypes
-           */
-          findTask(allowedTaskTypes: Set<RoomTaskTypes>, resourceType?: ResourceConstant): boolean
-
           advancedPickup(target: Resource): boolean
 
-          advancedTransfer(
-               target: Creep | AnyStoreStructure,
-               resourceType?: ResourceConstant,
-               amount?: number,
-          ): boolean
+          advancedTransfer(target: Creep | AnyStoreStructure, resourceType?: ResourceConstant, amount?: number): boolean
 
           advancedWithdraw(
                target: Creep | AnyStoreStructure | Tombstone,
@@ -1191,7 +1172,7 @@ declare global {
           /**
            * Attempts multiple methods to upgrade the controller
            */
-          advancedUpgraderController(): boolean
+          advancedUpgradeController(): boolean
 
           /**
            * Attempts multiple methods to build a construction site
@@ -1244,36 +1225,6 @@ declare global {
            * Decides if the creep needs to get more resources or not
            */
           needsResources(): boolean
-
-          /**
-           * Runs the appropriate task for the creep's task
-           */
-          fulfillTask(): boolean
-
-          /**
-           * Has the creep attempt to fulfill its pull task
-           */
-          fulfillPullTask(task: RoomPullTask): boolean
-
-          /**
-           * Has the creep attempt to fulfill its transfer task
-           */
-          fulfillTransferTask(task: RoomTransferTask): boolean
-
-          /**
-           * Has the creep attempt to fulfill its offer task
-           */
-          fulfillOfferTask(task: RoomOfferTask): boolean
-
-          /**
-           * Has the creep attempt to fulfill its withdraw task
-           */
-          fulfillWithdrawTask(task: RoomWithdrawTask): boolean
-
-          /**
-           * Have the creep attempt to fulfill its pickup task
-           */
-          fulfillPickupTask(task: RoomPickupTask): boolean
 
           /**
            * Tries to sign a room's controller depending on the situation
@@ -1356,12 +1307,15 @@ declare global {
      }
 
      interface CreepMemory {
-          [key: string]: any
-
           /**
            * Generally describes the body parts and tasks the creep is expected to do
            */
           role: CreepRoles
+
+          /**
+           * Wether the creep is old enough to need a replacement
+           */
+          dying: boolean
 
           /**
            * The energy the creep cost to spawn
@@ -1413,23 +1367,9 @@ declare global {
           remoteName: string
 
           /**
-           * The type of task the creep has been assigned
-           */
-          task: RoomTaskTypes
-
-          /**
            * The target ID of the task
            */
-          taskTargetID: Id<Creep | AnyStoreStructure | Tombstone>
-
-          /**
-           * The target ID of the task
-           */
-          taskTarget: Id<Creep | AnyStoreStructure | Tombstone>
-
-          taskAmount: number
-
-          taskResource: ResourceConstant
+          taskTarget: Id<Creep | AnyStoreStructure>
 
           reservations: Reservation[]
 
@@ -1439,6 +1379,8 @@ declare global {
            * Wether or not the creep Needs Resources
            */
           NR: boolean
+
+          quota: number
      }
 
      // PowerCreeps
@@ -1593,7 +1535,7 @@ export const loop = function () {
 
      internationalManager.advancedGeneratePixel()
      internationalManager.advancedSellPixels()
-/*
+     /*
      let cpu = Game.cpu.getUsed()
 
      createPackedPosMap()
