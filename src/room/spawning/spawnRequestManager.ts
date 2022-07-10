@@ -609,7 +609,7 @@ export function spawnRequester(room: Room) {
           (function (): SpawnRequestOpts | false {
                let partsMultiplier = 1
                let maxCreeps = room.get('upgradePositions').length
-               const priority = 12 + room.creepsFromRoom.controllerUpgrader.length
+               const priority = 9
 
                // If there are enemyAttackers and the controller isn't soon to downgrade
 
