@@ -165,31 +165,27 @@ declare global {
      interface PathOpts {
           origin: RoomPosition
           goal: PathGoal
-          typeWeights?: { [key: string]: number }
+          /**
+           * room types as keys to weight based on properties
+           */
+          typeWeights?: { [weight: string]: number }
           plainCost?: number
           swampCost?: number
           maxRooms?: number
           flee?: boolean
           creep?: Creep
 
-          weightStructures?: { [key: string]: number }
-
-          /**
-           * An object with keys of weights and values of structures / creeps / cSites to weight
-           */
-          weightGamebjects?: {
-               [key: string]: (Structure | Creep | ConstructionSite)[]
-          }
+          weightStructures?: { [weight: string]: StructureConstant[] }
 
           /**
            * An object with keys of weights and values of positions
            */
 
-          weightPositions?: { [key: string]: Pos[] | RoomPosition[] }
+          weightPositions?: { [weight: string]: Pos[] | RoomPosition[] }
+          
           /**
            *
            */
-
           weightCostMatrixes?: CostMatrix[]
           /**
            *

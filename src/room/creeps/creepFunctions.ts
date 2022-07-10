@@ -57,9 +57,6 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
                origin: this.pos,
                goal: { pos: target.pos, range: 1 },
                avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.structures.road,
-               },
           })
           return false
      }
@@ -95,9 +92,6 @@ Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENE
                origin: this.pos,
                goal: { pos: target.pos, range: 1 },
                avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.structures.road,
-               },
           })
 
           return false
@@ -134,9 +128,6 @@ Creep.prototype.advancedPickup = function (target) {
                origin: this.pos,
                goal: { pos: target.pos, range: 1 },
                avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.structures.road,
-               },
           })
 
           return false
@@ -237,9 +228,6 @@ Creep.prototype.advancedUpgradeController = function () {
                          range: 0,
                     },
                     avoidEnemyRanges: true,
-                    weightGamebjects: {
-                         1: room.structures.road,
-                    },
                })
 
                this.message += '➡️'
@@ -339,9 +327,6 @@ Creep.prototype.advancedUpgradeController = function () {
                origin: this.pos,
                goal: { pos: room.controller.pos, range: 3 },
                avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.structures.road,
-               },
           })
 
           // Inform false
@@ -389,9 +374,6 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
                origin: this.pos,
                goal: { pos: cSite.pos, range: 3 },
                avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.structures.road,
-               },
           })
 
           return true
@@ -916,6 +898,18 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
 
           if (hasImpassibleStructure) continue
 
+          for (const cSite of pos.lookFor(LOOK_CONSTRUCTION_SITES)) {
+
+               if (!cSite.my) continue
+
+               if (constants.impassibleStructureTypes.includes(cSite.structureType)) {
+                    hasImpassibleStructure = true
+                    break
+               }
+          }
+
+          if (hasImpassibleStructure) continue
+
           shovePositions.push(pos)
      }
 
@@ -1234,9 +1228,6 @@ Creep.prototype.advancedRecycle = function () {
                     origin: this.pos,
                     goal: { pos: closestContainer.pos, range: 0 },
                     avoidEnemyRanges: true,
-                    weightGamebjects: {
-                         1: room.structures.road,
-                    },
                })
 
                return
@@ -1246,9 +1237,6 @@ Creep.prototype.advancedRecycle = function () {
                origin: this.pos,
                goal: { pos: closestSpawn.pos, range: 1 },
                avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.structures.road,
-               },
           })
 
           return
@@ -1526,7 +1514,6 @@ Creep.prototype.reservationManager = function () {
           }
 
           if (reservation.type === 'transfer') {
-
                reservation.amount = Math.min(reservation.amount, target.freeStore(RESOURCE_ENERGY) + reservation.amount)
                target.store[reservation.resourceType] += reservation.amount
                continue
@@ -1574,7 +1561,6 @@ Creep.prototype.fulfillReservation = function () {
      // Transfer
 
      if (reservation.type === 'transfer') {
-
           amount = Math.min(reservation.amount, target.freeStore(RESOURCE_ENERGY) + reservation.amount)
 
           target.store[reservation.resourceType] -= reservation.amount
@@ -1592,7 +1578,8 @@ Creep.prototype.fulfillReservation = function () {
           return false
      }
 
-     amount = reservation.amount/* Math.min(target.store[reservation.resourceType] - reservation.amount, reservation.amount) */
+     amount =
+          reservation.amount /* Math.min(target.store[reservation.resourceType] - reservation.amount, reservation.amount) */
 
      // Withdraw
 
@@ -1625,6 +1612,12 @@ Creep.prototype.reserveWithdrawEnergy = function () {
 
           return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
      })
+
+     withdrawTargets = withdrawTargets.concat(
+          [room.fastFillerContainerLeft, room.fastFillerContainerRight].filter(target => {
+               return target && target.store.energy >= this.freeStore(RESOURCE_ENERGY) * 2
+          }),
+     )
 
      let target
      let amount

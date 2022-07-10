@@ -11,7 +11,6 @@ export function meleeDefenderManager(room: Room, creepsOfRole: string[]) {
 }
 
 MeleeDefender.prototype.advancedDefend = function () {
-
      const { room } = this
 
      // Get enemyAttackers in the room, informing false if there are none
@@ -55,9 +54,6 @@ MeleeDefender.prototype.advancedDefend = function () {
                this.createMoveRequest({
                     origin: this.pos,
                     goal: { pos: enemyAttacker.pos, range: 1 },
-                    weightGamebjects: {
-                         1: room.structures.road,
-                    },
                })
 
                return true
@@ -94,12 +90,8 @@ MeleeDefender.prototype.advancedDefend = function () {
      this.createMoveRequest({
           origin: this.pos,
           goal: { pos: closestRampart.pos, range: 0 },
-          plainCost: 30,
+          plainCost: 20,
           swampCost: 80,
-          weightGamebjects: {
-               2: room.structures.road,
-               1: room.structures.rampart,
-          },
      })
 
      return true

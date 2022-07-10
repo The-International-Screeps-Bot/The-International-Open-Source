@@ -1044,79 +1044,27 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                          for (y = 0; y < 50; y += 1) cm.set(x, y, 255)
                     }
 
-                    weightStructures()
+                    // Weight positions
 
-                    function weightStructures() {
-                         let roomObjects
-                         let weightNum
-                         let roomObj
+                    for (const weight in opts.weightPositions) {
+                         // Use the weight to get the positions
 
-                         for (const weight in opts.weightStructures) {
-                              // Use the weight to get the positions
+                         const positions = opts.weightPositions[weight]
 
-                              roomObjects = opts.weightGamebjects[weight]
+                         // Get the numeric value of the weight
 
-                              // Get the numeric value of the weight
+                         const weightNum = parseInt(weight)
 
-                              weightNum = parseInt(weight)
+                         // Loop through each gameObject and set their pos to the weight in the cm
 
-                              // Loop through each gameObject and set their pos to the weight in the cm
-
-                              for (roomObj of roomObjects) cm.set(roomObj.pos.x, roomObj.pos.y, weightNum)
-                         }
+                         for (const pos of positions) cm.set(pos.x, pos.y, weightNum)
                     }
 
-                    weightGamebjects()
+                    // Weight costMatrixes
 
-                    function weightGamebjects() {
-                         let roomObjects
-                         let weightNum
-                         let roomObj
+                    // Stop if there are no cost matrixes to weight
 
-                         for (const weight in opts.weightGamebjects) {
-                              // Use the weight to get the positions
-
-                              roomObjects = opts.weightGamebjects[weight]
-
-                              // Get the numeric value of the weight
-
-                              weightNum = parseInt(weight)
-
-                              // Loop through each gameObject and set their pos to the weight in the cm
-
-                              for (roomObj of roomObjects) cm.set(roomObj.pos.x, roomObj.pos.y, weightNum)
-                         }
-                    }
-
-                    weightPositions()
-
-                    function weightPositions() {
-                         let positions
-                         let weightNum
-                         let pos
-
-                         for (const weight in opts.weightPositions) {
-                              // Use the weight to get the positions
-
-                              positions = opts.weightPositions[weight]
-
-                              // Get the numeric value of the weight
-
-                              weightNum = parseInt(weight)
-
-                              // Loop through each gameObject and set their pos to the weight in the cm
-
-                              for (pos of positions) cm.set(pos.x, pos.y, weightNum)
-                         }
-                    }
-
-                    weightCostMatrixes()
-
-                    function weightCostMatrixes() {
-                         // Stop if there are no cost matrixes to weight
-
-                         if (!opts.weightCostMatrixes) return
-
+                    if (opts.weightCostMatrixes) {
                          // Otherwise iterate through each x and y in the room
 
                          for (let x = 0; x < constants.roomDimensions; x += 1) {
@@ -1132,6 +1080,22 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     // If there is no vision in the room, inform the costMatrix
 
                     if (!room) return cm
+
+                    // Weight structures
+
+                    for (const weight in opts.weightStructures) {
+                         // Get the numeric value of the weight
+
+                         const weightNum = parseInt(weight)
+
+                         for (const structureType of opts.weightStructures[weight]) {
+                              for (const structure of room.structures[structureType])
+                                   cm.set(structure.pos.x, structure.pos.y, weightNum)
+                         }
+                    }
+
+                    if (opts.creep && opts.creep.memory.roads)
+                         for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, 1)
 
                     for (const portal of room.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
 
@@ -1198,7 +1162,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
 
                     if (opts.avoidNotMyCreeps) {
-                         for (const creep of room.find(FIND_HOSTILE_CREEPS)) cm.set(creep.pos.x, creep.pos.y, 255)
+                         for (const creep of room.enemyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
 
                          for (const creep of room.find(FIND_HOSTILE_POWER_CREEPS)) cm.set(creep.pos.x, creep.pos.y, 255)
                     }

@@ -68,9 +68,6 @@ RemoteHarvester.prototype.travelToSource = function (sourceName) {
                range: 0,
           },
           avoidEnemyRanges: true,
-          weightGamebjects: {
-               1: room.structures.road,
-          },
      })
 
      return true

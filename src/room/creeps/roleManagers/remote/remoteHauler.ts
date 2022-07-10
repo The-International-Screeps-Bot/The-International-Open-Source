@@ -39,9 +39,6 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                               range: 20,
                          },
                          avoidEnemyRanges: true,
-                         weightGamebjects: {
-                              1: room.structures.road,
-                         },
                     })
 
                     continue
@@ -57,9 +54,6 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                          range: 20,
                     },
                     avoidEnemyRanges: true,
-                    weightGamebjects: {
-                         1: room.structures.road,
-                    },
                })
 
                continue
@@ -104,9 +98,6 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                          range: 20,
                     },
                     avoidEnemyRanges: true,
-                    weightGamebjects: {
-                         1: room.structures.road,
-                    },
                })
 
                continue
@@ -122,9 +113,6 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                     range: 20,
                },
                avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.structures.road,
-               },
           })
      }
 }

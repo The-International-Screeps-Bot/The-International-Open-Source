@@ -21,7 +21,6 @@ export function maintainerManager(room: Room, creepsOfRole: string[]) {
 }
 
 Maintainer.prototype.advancedMaintain = function () {
-
      const { room } = this
 
      this.say('⏩🔧')
@@ -78,9 +77,6 @@ Maintainer.prototype.advancedMaintain = function () {
                origin: this.pos,
                goal: { pos: repairTarget.pos, range: 3 },
                avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.structures.road,
-               },
           })
 
           // Inform false
@@ -142,9 +138,6 @@ Maintainer.prototype.advancedMaintain = function () {
           origin: this.pos,
           goal: { pos: newRepairTarget.pos, range: 3 },
           avoidEnemyRanges: true,
-          weightGamebjects: {
-               1: room.structures.road,
-          },
      })
 
      // Inform false

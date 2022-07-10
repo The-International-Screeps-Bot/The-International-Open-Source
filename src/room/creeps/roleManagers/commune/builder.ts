@@ -56,9 +56,6 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
                               origin: creep.pos,
                               goal: { pos: source.pos, range: 1 },
                               avoidEnemyRanges: true,
-                              weightGamebjects: {
-                                   1: room.structures.road,
-                              },
                          })
 
                          continue
@@ -71,7 +68,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
                // If there are fastFiller containers
 
                if (!room.fastFillerContainerLeft && !room.fastFillerContainerRight) continue
-               
+
                if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveWithdrawEnergy()
 
                if (!creep.fulfillReservation()) {

@@ -475,7 +475,7 @@ export function spawnRequester(room: Room) {
                }
 
                // Otherwise if there is no storage
-               else partsMultiplier += Math.floor(estimatedIncome / 2)
+               else partsMultiplier += Math.floor(estimatedIncome / 3)
 
                // If all RCL 3 extensions are build
 

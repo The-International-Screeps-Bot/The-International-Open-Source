@@ -27,9 +27,6 @@ MineralHarvester.prototype.advancedHarvestMineral = function (mineral) {
                origin: creep.pos,
                goal: { pos: harvestPos, range: 0 },
                avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.structures.road,
-               },
           })
 
           // And inform false
