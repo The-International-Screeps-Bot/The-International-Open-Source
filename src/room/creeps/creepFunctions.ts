@@ -23,7 +23,6 @@ import {
 import { internationalManager } from 'international/internationalManager'
 import { pick, repeat } from 'lodash'
 import { packCoord, packPos, packPosList, unpackPos, unpackPosList } from 'other/packrat'
-import { RoomOfferTask, RoomPickupTask, RoomTask, RoomTransferTask, RoomWithdrawTask } from 'room/roomTasks'
 import { creepClasses } from './creepClasses'
 
 Creep.prototype.preTickManager = function () {}

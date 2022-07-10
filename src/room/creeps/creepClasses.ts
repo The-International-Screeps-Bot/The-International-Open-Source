@@ -194,10 +194,6 @@ export class RemoteDismantler extends Creep {
 creepClasses.remoteDismantler = RemoteDismantler
 
 export class Scout extends Creep {
-     /**
-      * If the creep sends notifications to the mail when its attacked
-      */
-     notifiesWhenAttacked?: boolean
 
      /**
       * Finds a room name for the scout to target

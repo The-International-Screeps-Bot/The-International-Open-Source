@@ -1,6 +1,5 @@
 import { constants } from 'international/constants'
 import { customLog, getRangeBetween, unpackAsPos } from 'international/generalFunctions'
-import { RoomPullTask } from 'room/roomTasks'
 import { SourceHarvester } from '../../creepClasses'
 
 SourceHarvester.prototype.isDying = function () {

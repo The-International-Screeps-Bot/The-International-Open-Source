@@ -42,10 +42,6 @@ export default class GetShardVision {
 
                const creeps = Object.values(Game.creeps).filter(c => c.name.includes(shardName))
                creeps.forEach(creep => {
-                    if (creep.memory.notifiesWhenAttacked === undefined || creep.memory.notifiesWhenAttacked === true) {
-                         creep.notifyWhenAttacked(false)
-                         creep.memory.notifiesWhenAttacked = false
-                    }
                     // * If main shard isn't shard3 or shard0
                     // * Ask PandaMaster to modify this code!
                     // if (Game.shard.name === this._mainShard && shardName === this._mainShard) {

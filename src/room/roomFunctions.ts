@@ -15,7 +15,6 @@ import {
 import { basePlanner } from './construction/basePlanner'
 import { ControllerUpgrader, MineralHarvester, SourceHarvester } from './creeps/creepClasses'
 import { RoomCacheObject } from './roomObject'
-import { RoomTask } from './roomTasks'
 
 Room.prototype.get = function (roomObjectName) {
      const room = this

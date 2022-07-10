@@ -2,8 +2,6 @@ import { constants, myColors } from '../international/constants'
 
 import './roomFunctions'
 
-import { taskManager } from './roomTaskManager'
-
 import { communeManager } from './communeManager'
 
 import { creepRoleManager } from './creeps/creepRoleManager'
@@ -37,8 +35,6 @@ export function roomManager() {
 
           const saveStats = Memory.roomStats > 0 && constants.roomTypesUsedForStats.includes(roomType)
           if (saveStats) statsManager.roomPreTick(room.name, roomType)
-
-          taskManager(room)
 
           // If there is a specific manager for this room's type, run it
 

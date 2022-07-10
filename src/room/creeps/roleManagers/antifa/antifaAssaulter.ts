@@ -11,7 +11,7 @@ export function antifaAssaulterManager(room: Room, creepsOfRole: string[]) {
 
             if (!creep.findSquad()) continue
         }
-
+/*
         // If creep has a squad
 
         if (creep.squad instanceof Quad) {
@@ -21,6 +21,7 @@ export function antifaAssaulterManager(room: Room, creepsOfRole: string[]) {
         }
 
         if (creep.name === creep.squad.assaulter.name) creep.squad.run()
+ */
     }
 }
 

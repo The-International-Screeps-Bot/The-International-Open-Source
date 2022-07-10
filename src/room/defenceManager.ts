@@ -11,7 +11,7 @@ export function defenceManager(room: Room) {
 
      // Get enemyAttackers in the room
 
-     const enemyAttackers = room.enemyAttackers.filter(function(creep) {
+     const enemyAttackers = room.enemyAttackers.filter(function (creep) {
           return !creep.isOnExit()
      })
 
@@ -99,24 +99,25 @@ export function defenceManager(room: Room) {
 
                attackTarget = findObjectWithID(eventItem.data.targetId as Id<Structure | Creep>)
 
-               // If the attackTarget doesn't have a structureType, iterate
+               // If the attackTarget isn't a structure, iterate
 
-               if (!attackTarget.structureType) continue
+               if (!(attackTarget instanceof Structure)) continue
 
-               // Otherwise activate safeMode and stop the loop
-
-               room.controller.activateSafeMode()
-               break
+               if (
+                    attackTarget.structureType === STRUCTURE_SPAWN ||
+                    attackTarget.structureType === STRUCTURE_TOWER ||
+                    attackTarget.structureType === STRUCTURE_EXTENSION ||
+                    attackTarget.structureType === STRUCTURE_STORAGE ||
+                    attackTarget.structureType === STRUCTURE_TERMINAL
+               ) {
+                    room.controller.activateSafeMode()
+                    return
+               }
           }
      }
 
      // If CPU logging is enabled, log the CPU used by this manager
 
      if (Memory.cpuLogging)
-          customLog(
-               'Defence Manager',
-               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-               undefined,
-               myColors.lightGrey,
-          )
+          customLog('Defence Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
 }

@@ -1,5 +1,4 @@
 import { findObjectWithID, getRange } from 'international/generalFunctions'
-import { RoomTask } from 'room/roomTasks'
 import { Builder } from '../../creepClasses'
 
 export function builderManager(room: Room, creepsOfRole: string[]) {

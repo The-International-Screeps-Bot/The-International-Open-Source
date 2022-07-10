@@ -28,14 +28,6 @@ import './room/creeps/creepAdditions'
 // Other
 
 import { memHack } from 'other/memHack'
-import {
-     RoomOfferTask,
-     RoomPickupTask,
-     RoomPullTask,
-     RoomTask,
-     RoomTransferTask,
-     RoomWithdrawTask,
-} from 'room/roomTasks'
 import { RoomCacheObject } from 'room/roomObject'
 import { ErrorMapper } from 'other/ErrorMapper'
 import { constants } from 'international/constants'
@@ -243,8 +235,6 @@ declare global {
           x: number
           y: number
      }
-
-     type RoomTaskTypes = 'pull' | 'withdraw' | 'transfer' | 'pickup' | 'offer'
 
      interface SpawnRequestOpts {
           /**
@@ -563,12 +553,6 @@ declare global {
           fastFillerLink: Id<StructureLink> | undefined
 
           hubLink: Id<StructureLink> | undefined
-
-          //
-
-          tasksWithResponders: Record<string | number, RoomTask>
-
-          tasksWithoutResponders: Record<string | number, RoomTask>
      }
 
      interface Room {
@@ -603,16 +587,6 @@ declare global {
            * An object with keys of roles and properties of the number of creeps with the role from this room
            */
           creepsFromRoomWithRemote: { [key: string]: { [key: string]: string[] } }
-
-          /**
-           * Tasks that currently have a creep trying to fulfill them
-           */
-          tasksWithResponders: { [key: string]: RoomTask }
-
-          /**
-           * Tasks that don't currently have a responder
-           */
-          tasksWithoutResponders: { [key: string]: RoomTask }
 
           /**
            * An object, if constructed, containing keys of resource types and values of the number of those resources in the room's terminal and storage
@@ -1475,10 +1449,6 @@ declare global {
                 * The number of construction sites placed by the bot
                 */
                constructionSitesCount: number
-
-               tasksWithoutResponders: { [key: string]: RoomTask }
-
-               tasksWithResponders: { [key: string]: RoomTask }
 
                packedRoomNames: { [roomManager: string]: string }
 

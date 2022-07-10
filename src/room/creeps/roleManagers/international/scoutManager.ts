@@ -11,10 +11,6 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 
           const commune = Game.rooms[creep.memory.communeName]
 
-          if (creep.notifiesWhenAttacked === undefined || creep.notifiesWhenAttacked === true) {
-               if (creep.notifyWhenAttacked(false) === OK) creep.notifiesWhenAttacked = false
-          }
-
           if (!commune) continue
 
           // If the creep is in the scoutTarget

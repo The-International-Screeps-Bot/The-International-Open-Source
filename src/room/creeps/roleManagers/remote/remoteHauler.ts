@@ -1,5 +1,4 @@
 import { remoteNeedsIndex } from 'international/constants'
-import { RoomTask } from 'room/roomTasks'
 import { RemoteHauler } from '../../creepClasses'
 
 export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
