@@ -1354,6 +1354,11 @@ declare global {
            */
           NR: boolean
 
+          /**
+           * Wether or not the creep should Use Roads
+           */
+          roads: boolean
+
           quota: number
      }
 

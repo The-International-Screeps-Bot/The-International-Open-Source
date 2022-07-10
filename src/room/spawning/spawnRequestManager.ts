@@ -53,6 +53,7 @@ export function spawnRequester(room: Room) {
                          memoryAdditions: {
                               role,
                               sourceName,
+                              roads: true,
                          },
                     }
                }
@@ -69,6 +70,7 @@ export function spawnRequester(room: Room) {
                          memoryAdditions: {
                               role,
                               sourceName,
+                              roads: true,
                          },
                     }
                }
@@ -85,6 +87,7 @@ export function spawnRequester(room: Room) {
                          memoryAdditions: {
                               role,
                               sourceName,
+                              roads: true,
                          },
                     }
                }
@@ -101,6 +104,7 @@ export function spawnRequester(room: Room) {
                          memoryAdditions: {
                               role,
                               sourceName,
+                              roads: true,
                          },
                     }
                }
@@ -116,6 +120,7 @@ export function spawnRequester(room: Room) {
                     memoryAdditions: {
                          role,
                          sourceName,
+                         roads: true,
                     },
                }
           })(),
@@ -141,6 +146,7 @@ export function spawnRequester(room: Room) {
                          memoryAdditions: {
                               role,
                               sourceName,
+                              roads: true,
                          },
                     }
                }
@@ -157,6 +163,7 @@ export function spawnRequester(room: Room) {
                          memoryAdditions: {
                               role,
                               sourceName,
+                              roads: true,
                          },
                     }
                }
@@ -173,6 +180,7 @@ export function spawnRequester(room: Room) {
                          memoryAdditions: {
                               role,
                               sourceName,
+                              roads: true,
                          },
                     }
                }
@@ -189,6 +197,7 @@ export function spawnRequester(room: Room) {
                          memoryAdditions: {
                               role,
                               sourceName,
+                              roads: true,
                          },
                     }
                }
@@ -204,6 +213,7 @@ export function spawnRequester(room: Room) {
                     memoryAdditions: {
                          role,
                          sourceName,
+                         roads: true,
                     },
                }
           })(),
@@ -264,6 +274,7 @@ export function spawnRequester(room: Room) {
                          priority,
                          memoryAdditions: {
                               role: 'hauler',
+                              roads: true,
                          },
                     }
                }
@@ -318,6 +329,7 @@ export function spawnRequester(room: Room) {
                     priority: 10 + room.creepsFromRoom.mineralHarvester.length * 3,
                     memoryAdditions: {
                          role: 'mineralHarvester',
+                         roads: true,
                     },
                }
           })(),
@@ -433,6 +445,7 @@ export function spawnRequester(room: Room) {
                     priority: 6 + room.creepsFromRoom.meleeDefender.length,
                     memoryAdditions: {
                          role: 'meleeDefender',
+                         roads: true,
                     },
                }
           })(),
@@ -477,6 +490,7 @@ export function spawnRequester(room: Room) {
                          priority: 9 + room.creepsFromRoom.builder.length,
                          memoryAdditions: {
                               role: 'builder',
+                              roads: true,
                          },
                     }
                }
@@ -492,6 +506,7 @@ export function spawnRequester(room: Room) {
                          priority: 9 + room.creepsFromRoom.builder.length,
                          memoryAdditions: {
                               role: 'builder',
+                              roads: true,
                          },
                     }
                }
@@ -567,6 +582,7 @@ export function spawnRequester(room: Room) {
                          priority,
                          memoryAdditions: {
                               role: 'maintainer',
+                              roads: true,
                          },
                     }
                }
@@ -723,6 +739,7 @@ export function spawnRequester(room: Room) {
                               priority,
                               memoryAdditions: {
                                    role: 'controllerUpgrader',
+                                   roads: true,
                               },
                          }
                     }
@@ -749,6 +766,7 @@ export function spawnRequester(room: Room) {
                               priority,
                               memoryAdditions: {
                                    role: 'controllerUpgrader',
+                                   roads: true,
                               },
                          }
                     }
@@ -772,6 +790,7 @@ export function spawnRequester(room: Room) {
                          priority,
                          memoryAdditions: {
                               role: 'controllerUpgrader',
+                              roads: true,
                          },
                     }
                }
@@ -793,6 +812,7 @@ export function spawnRequester(room: Room) {
                          priority,
                          memoryAdditions: {
                               role: 'controllerUpgrader',
+                              roads: true,
                          },
                     }
                }
@@ -886,6 +906,7 @@ export function spawnRequester(room: Room) {
                               priority: remotePriority - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                               memoryAdditions: {
                                    role: 'source1RemoteHarvester',
+                                   roads: true,
                               },
                          }
                     }
@@ -903,6 +924,7 @@ export function spawnRequester(room: Room) {
                          priority: remotePriority - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                          memoryAdditions: {
                               role: 'source1RemoteHarvester',
+                              roads: true,
                          },
                     }
                })(),
@@ -929,6 +951,7 @@ export function spawnRequester(room: Room) {
                               priority: remotePriority - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                               memoryAdditions: {
                                    role: 'source2RemoteHarvester',
+                                   roads: true,
                               },
                          }
                     }
@@ -946,6 +969,7 @@ export function spawnRequester(room: Room) {
                          priority: remotePriority - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                          memoryAdditions: {
                               role: 'source2RemoteHarvester',
+                              roads: true,
                          },
                     }
                })(),
@@ -1106,6 +1130,7 @@ export function spawnRequester(room: Room) {
                          priority: minRemotePriority - 0.2,
                          memoryAdditions: {
                               role: 'remoteHauler',
+                              roads: true,
                          },
                     }
                }
