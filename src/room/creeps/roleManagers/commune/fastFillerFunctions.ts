@@ -102,7 +102,7 @@ FastFiller.prototype.fillFastFiller = function () {
 
                // Otherwise, if there is insufficient energy in the structure, iterate
 
-               if (structure.store.energy < this.store.getCapacity()) continue
+               if (structure.store.energy < this.freeSpecificStore(RESOURCE_ENERGY) || structure.store.getUsedCapacity(RESOURCE_ENERGY) < this.freeSpecificStore(RESOURCE_ENERGY)) continue
 
                // Otherwise, withdraw from the structure and inform true
 

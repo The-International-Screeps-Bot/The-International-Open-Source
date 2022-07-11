@@ -1657,7 +1657,7 @@ Creep.prototype.reserveTransferEnergy = function () {
      if (this.usedStore() === 0) return
 
      let transferTargets = room.MATT.filter(function (target) {
-          return target.freeStore(RESOURCE_ENERGY) > 0
+          return target.freeSpecificStore(RESOURCE_ENERGY) > 0
      })
 
      let target
@@ -1666,7 +1666,7 @@ Creep.prototype.reserveTransferEnergy = function () {
      if (transferTargets.length) {
           target = this.pos.findClosestByRange(transferTargets)
 
-          amount = Math.min(Math.max(this.usedStore(), 0), target.freeStore(RESOURCE_ENERGY))
+          amount = Math.min(Math.max(this.usedStore(), 0), target.freeSpecificStore(RESOURCE_ENERGY))
 
           this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
           return

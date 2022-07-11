@@ -89,7 +89,7 @@ Hauler.prototype.reserve = function () {
 
      if (!transferTargets)
           transferTargets = room.MATT.filter(function (target) {
-               return target.freeStore(RESOURCE_ENERGY) > 0
+               return target.freeSpecificStore(RESOURCE_ENERGY) > 0
           })
 
      if (transferTargets.length) {
@@ -101,7 +101,7 @@ Hauler.prototype.reserve = function () {
                )
           })[0]
 
-          amount = Math.min(Math.max(this.store.energy, 0), target.freeStore(RESOURCE_ENERGY))
+          amount = Math.min(Math.max(this.store.energy, 0), target.freeSpecificStore(RESOURCE_ENERGY))
 
           this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
           return
