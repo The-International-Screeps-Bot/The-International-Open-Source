@@ -98,14 +98,14 @@ Hauler.prototype.reserve = function () {
                return (getRange(this.pos.x - a.pos.x, this.pos.y - a.pos.y) +  a.store.energy * 0.05) - (getRange(this.pos.x - b.pos.x, this.pos.y - b.pos.y) +  b.store.energy * 0.05)
           })[0]
 
-          amount = Math.min(this.usedStore(), target.freeStore(RESOURCE_ENERGY))
+          amount = Math.min(Math.max(this.usedStore(), 0), target.freeStore(RESOURCE_ENERGY))
 
           this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
           return
      }
 
      transferTargets = room.OATT.filter(target => {
-          return target.freeStore(RESOURCE_ENERGY) >= this.usedStore()
+          return target.freeStore(RESOURCE_ENERGY) >= this.store.energy
      })
 
      if (!transferTargets.length) return

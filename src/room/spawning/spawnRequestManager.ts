@@ -608,62 +608,13 @@ export function spawnRequester(room: Room) {
      room.constructSpawnRequests(
           (function (): SpawnRequestOpts | false {
                let partsMultiplier = 1
-               let maxCreeps = room.get('upgradePositions').length
+               let maxCreeps = room.get('upgradePositions').length - 1
                const priority = 9
 
                // If there are enemyAttackers and the controller isn't soon to downgrade
 
                if (enemyAttackers.length && room.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed)
                     return false
-
-               // Get the controllerLink and baseLink
-
-               const controllerLink = room.controllerLink
-
-               // If the controllerLink is defined
-
-               if (controllerLink) {
-                    maxCreeps -= 1
-
-                    const hubLink = room.hubLink
-                    const sourceLinks = [room.source1Link, room.source2Link]
-
-                    partsMultiplier = 0
-
-                    if (hubLink) {
-                         // Get the range between the controllerLink and hubLink
-
-                         const range = getRange(
-                              controllerLink.pos.x - hubLink.pos.x,
-                              controllerLink.pos.y - hubLink.pos.y,
-                         )
-
-                         // Limit partsMultiplier at the range with a multiplier
-
-                         partsMultiplier += Math.max(
-                              partsMultiplier,
-                              (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range,
-                         )
-                    }
-
-                    for (const sourceLink of sourceLinks) {
-                         if (!sourceLink) continue
-
-                         // Get the range between the controllerLink and hubLink
-
-                         const range = getRange(
-                              controllerLink.pos.x - sourceLink.pos.x,
-                              controllerLink.pos.y - sourceLink.pos.y,
-                         )
-
-                         // Limit partsMultiplier at the range with a multiplier
-
-                         partsMultiplier += Math.max(
-                              partsMultiplier,
-                              (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) / range,
-                         )
-                    }
-               }
 
                // If there is a storage
 
@@ -678,7 +629,52 @@ export function spawnRequester(room: Room) {
 
                // Otherwise if there is no storage
                else {
-                    partsMultiplier += estimatedIncome * 2
+                    partsMultiplier += estimatedIncome * 0.75
+               }
+
+               // Get the controllerLink and baseLink
+
+               const controllerLink = room.controllerLink
+
+               // If the controllerLink is defined
+
+               if (controllerLink) {
+
+                    const hubLink = room.hubLink
+                    const sourceLinks = [room.source1Link, room.source2Link]
+
+                    let maxPartsMultiplier = 0
+
+                    if (hubLink) {
+                         // Get the range between the controllerLink and hubLink
+
+                         const range = getRange(
+                              controllerLink.pos.x - hubLink.pos.x,
+                              controllerLink.pos.y - hubLink.pos.y,
+                         )
+
+                         // Limit partsMultiplier at the range with a multiplier
+
+                         maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range
+                    }
+                    else maxCreeps -= 1
+
+                    for (const sourceLink of sourceLinks) {
+                         if (!sourceLink) continue
+
+                         // Get the range between the controllerLink and hubLink
+
+                         const range = getRange(
+                              controllerLink.pos.x - sourceLink.pos.x,
+                              controllerLink.pos.y - sourceLink.pos.y,
+                         )
+
+                         // Limit partsMultiplier at the range with a multiplier
+
+                         maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) / range
+                    }
+
+                    partsMultiplier = Math.min(partsMultiplier, maxPartsMultiplier)
                }
 
                // If there are construction sites of my ownership in the room, set multiplier to 1

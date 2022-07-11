@@ -1514,7 +1514,7 @@ Creep.prototype.reservationManager = function () {
           }
 
           if (reservation.type === 'transfer') {
-               reservation.amount = Math.min(reservation.amount, target.freeStore(RESOURCE_ENERGY) + reservation.amount)
+
                target.store[reservation.resourceType] += reservation.amount
                continue
           }
