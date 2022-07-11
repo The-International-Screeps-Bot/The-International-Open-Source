@@ -1666,7 +1666,7 @@ Creep.prototype.reserveTransferEnergy = function () {
      if (transferTargets.length) {
           target = this.pos.findClosestByRange(transferTargets)
 
-          amount = Math.min(this.usedStore(), target.freeStore(RESOURCE_ENERGY))
+          amount = Math.min(Math.max(this.usedStore(), 0), target.freeStore(RESOURCE_ENERGY))
 
           this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
           return
@@ -1680,7 +1680,7 @@ Creep.prototype.reserveTransferEnergy = function () {
 
      target = this.pos.findClosestByRange(transferTargets)
 
-     amount = this.usedStore()
+     amount = Math.min(Math.max(this.usedStore(), 0), target.freeStore(RESOURCE_ENERGY))
 
      this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
 }
