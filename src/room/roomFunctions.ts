@@ -1081,6 +1081,9 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                     if (!room) return cm
 
+                    if (opts.creep && opts.creep.memory.roads)
+                         for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, 1)
+
                     // Weight structures
 
                     for (const weight in opts.weightStructures) {
@@ -1093,9 +1096,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                                    cm.set(structure.pos.x, structure.pos.y, weightNum)
                          }
                     }
-
-                    if (opts.creep && opts.creep.memory.roads)
-                         for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, 1)
 
                     for (const portal of room.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
 
