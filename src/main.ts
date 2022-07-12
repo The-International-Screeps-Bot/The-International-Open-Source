@@ -2,8 +2,8 @@
 
 // International
 
-import 'international/commands'
-import { internationalManager } from 'international/internationalManager'
+import './international/commands'
+import { internationalManager } from './international/internationalManager'
 import './international/config'
 import './international/tickConfig'
 import './international/creepOrganizer'
@@ -30,7 +30,6 @@ import './room/creeps/creepAdditions'
 import { memHack } from 'other/memHack'
 import { RoomCacheObject } from 'room/roomObject'
 import { ErrorMapper } from 'other/ErrorMapper'
-import { constants } from 'international/constants'
 import { Single } from 'room/creeps/roleManagers/antifa/single'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
@@ -182,7 +181,7 @@ declare global {
            */
 
           weightPositions?: { [weight: string]: Pos[] | RoomPosition[] }
-          
+
           /**
            *
            */
