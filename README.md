@@ -1,6 +1,6 @@
 # The International - A Fully Automated Screeps Bot
 
-![Rectangle 1](https://user-images.githubusercontent.com/48334001/178612975-1a8f6f92-3753-4d04-acbb-d797a32b61ae.png)
+![Group 1 (2)](https://user-images.githubusercontent.com/48334001/178613008-cd4dfdd3-bf8d-4d4a-a0a1-8f3aec7c01e9.png)
 
 [![Badge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 [![Badge](https://forthebadge.com/images/badges/open-source.svg)](https://forthebadge.com)
