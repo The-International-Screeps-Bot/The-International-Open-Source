@@ -1276,7 +1276,7 @@ Creep.prototype.advancedRenew = function () {
 
      // Get the room's spawns, stopping if there are none
 
-     const spawns: StructureSpawn[] = room.get('spawn')
+     const spawns = room.structures.spawn
      if (!spawns.length) return false
 
      // Get a spawn in range of 1, informing false if there are none

@@ -30,7 +30,6 @@ import './room/creeps/creepAdditions'
 import { memHack } from 'other/memHack'
 import { RoomCacheObject } from 'room/roomObject'
 import { ErrorMapper } from 'other/ErrorMapper'
-import { Single } from 'room/creeps/roleManagers/antifa/single'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { createPackedPosMap, customLog } from 'international/generalFunctions'
@@ -1112,7 +1111,7 @@ declare global {
            */
           pathOpts: PathOpts
 
-          squad: Single | Duo | Quad
+          squad: Duo | Quad | undefined
 
           // Functions
 
@@ -1355,6 +1354,11 @@ declare global {
           roads: boolean
 
           quota: number
+
+          /**
+           * The type of squad the creep is trying to form
+           */
+          squadType: 'quad' | 'duo' | undefined
      }
 
      // PowerCreeps

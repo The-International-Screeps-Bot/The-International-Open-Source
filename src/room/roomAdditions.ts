@@ -602,6 +602,8 @@ Object.defineProperties(Room.prototype, {
                     for (const creepName of this.myCreeps.builder) {
                          const creep = Game.creeps[creepName]
 
+                         if (creep.spawning) continue
+
                          if (creep.store.getCapacity() * 0.5 >= creep.usedStore()) this._METT.push(creep)
                     }
                }

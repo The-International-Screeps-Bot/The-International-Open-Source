@@ -252,6 +252,8 @@ export class AntifaAssaulter extends Creep {
       */
      findSquad?(): boolean
 
+     runSingle?(): void
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }

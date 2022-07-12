@@ -73,18 +73,6 @@ interface RoomTypeProperties {
      [key: string]: boolean
 }
 
-interface roomTypes {
-     [key: string]: { [key: string]: boolean }
-}
-
-interface NumbersByStructureTypes {
-     [key: string]: BuildableStructureConstant | 'empty'
-}
-
-interface StyleForStructureTypes {
-     [key: string]: CircleStyle
-}
-
 export const roomTypeProperties: RoomTypeProperties = {
      source1: true,
      source2: true,
@@ -108,6 +96,10 @@ export const roomTypeProperties: RoomTypeProperties = {
      storedEnergy: true,
 
      portalsTo: true,
+}
+
+interface roomTypes {
+     [key: string]: { [key: string]: boolean }
 }
 
 export const roomTypes: roomTypes = {

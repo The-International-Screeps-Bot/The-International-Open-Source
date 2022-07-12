@@ -851,19 +851,16 @@ export function spawnRequester(room: Room) {
 
           const sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
 
-          const remote = Game.rooms[remoteName]
-
-          const isReserved =
-               remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
+          const possibleReservation = spawnEnergyCapacity >= 650
 
           // Loop through each index of sourceEfficacies
 
           for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
                // Get the income based on the reservation of the room and remoteHarvester need
 
-               const income = isReserved
+               const income = (possibleReservation
                     ? 10
-                    : 5 - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2))
+                    : 5) - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (possibleReservation ? 4 : 2))
 
                // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
@@ -967,9 +964,12 @@ export function spawnRequester(room: Room) {
 
           room.constructSpawnRequests(
                (function (): SpawnRequestOpts | false {
+
+                    let cost = 650
+
                     // If there isn't enough spawnEnergyCapacity to spawn a remoteReserver, inform false
 
-                    if (spawnEnergyCapacity < 750) return false
+                    if (spawnEnergyCapacity < cost) return false
 
                     // If there are no needs for this room, inform false
 
@@ -978,11 +978,11 @@ export function spawnRequester(room: Room) {
                     return {
                          defaultParts: [],
                          extraParts: [MOVE, CLAIM],
-                         partsMultiplier: 4,
+                         partsMultiplier: 6,
                          groupComparator: room.creepsFromRoomWithRemote[remoteName].remoteReserver,
                          minCreeps: 1,
                          maxCreeps: Infinity,
-                         minCost: 750,
+                         minCost: cost,
                          priority: remotePriority + 0.3,
                          memoryAdditions: {
                               role: 'remoteReserver',
