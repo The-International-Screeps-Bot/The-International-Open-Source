@@ -1,4 +1,4 @@
-import { constants, myColors } from 'international/constants'
+import { impassibleStructureTypes, myColors } from 'international/constants'
 import { getRange, pack } from 'international/generalFunctions'
 import { MeleeDefender } from '../../creepClasses'
 
@@ -37,7 +37,7 @@ MeleeDefender.prototype.advancedDefend = function () {
           for (const structure of structuresAtPos) {
                // If the structure is impassible, inform false
 
-               if (constants.impassibleStructureTypes.includes(structure.structureType)) return false
+               if (impassibleStructureTypes.includes(structure.structureType)) return false
           }
 
           // Allow the rampart the creep is currently standing on

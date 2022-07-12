@@ -1,4 +1,3 @@
-import { constants } from 'international/constants'
 import { customLog, getRange } from 'international/generalFunctions'
 import { marketManager } from './market/marketManager'
 import { spawnManager } from './spawning/spawnManager'

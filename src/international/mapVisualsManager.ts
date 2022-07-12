@@ -1,4 +1,4 @@
-import { constants, myColors } from './constants'
+import { myColors } from './constants'
 import { customLog, unpackAsRoomPos } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
@@ -18,7 +18,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
           const roomMemory = Memory.rooms[roomName]
 
-          Game.map.visual.text(roomMemory.type, new RoomPosition(constants.roomDimensions - 2, 40, roomName), {
+          Game.map.visual.text(roomMemory.type, new RoomPosition(- 2, 40, roomName), {
                align: 'right',
                fontSize: 5,
           })

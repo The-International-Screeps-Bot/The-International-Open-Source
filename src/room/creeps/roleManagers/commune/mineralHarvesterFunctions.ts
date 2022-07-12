@@ -1,4 +1,3 @@
-import { constants } from 'international/constants'
 import { getRangeBetween, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 import { MineralHarvester } from '../../creepClasses'
 

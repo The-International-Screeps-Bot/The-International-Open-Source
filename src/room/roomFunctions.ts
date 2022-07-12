@@ -1,4 +1,4 @@
-import { allyList, constants, myColors, prefferedCommuneRange, remoteNeedsIndex, stamps } from 'international/constants'
+import { allStructureTypes, allyList, impassibleStructureTypes, myColors, prefferedCommuneRange, remoteNeedsIndex, roomDimensions, roomTypeProperties, roomTypes, stamps, structureTypesByBuildPriority } from 'international/constants'
 import {
      advancedFindDistance,
      arePositionsEqual,
@@ -30,8 +30,8 @@ Room.prototype.get = function (roomObjectName) {
 
           // Loop through each x and y in the room
 
-          for (let x = 0; x < constants.roomDimensions; x += 1) {
-               for (let y = 0; y < constants.roomDimensions; y += 1) {
+          for (let x = 0; x < roomDimensions; x += 1) {
+               for (let y = 0; y < roomDimensions; y += 1) {
                     // Try to find the terrainValue
 
                     const terrainValue = terrain.get(x, y)
@@ -233,7 +233,7 @@ Room.prototype.get = function (roomObjectName) {
 
      // Loop through each structureType in the game
 
-     for (const structureType of constants.allStructureTypes) {
+     for (const structureType of allStructureTypes) {
           // Create roomObject for structures with the structureType
 
           new RoomCacheObject({
@@ -660,8 +660,8 @@ Room.prototype.get = function (roomObjectName) {
           const harvesterNames =
                room.memory.type === 'commune'
                     ? room.myCreeps.source1Harvester
-                           .concat(room.myCreeps.source2Harvester)
-                           .concat(room.myCreeps.vanguard)
+                         .concat(room.myCreeps.source2Harvester)
+                         .concat(room.myCreeps.vanguard)
                     : room.myCreeps.source1RemoteHarvester.concat(room.myCreeps.source2RemoteHarvester)
 
           for (const creepName of harvesterNames) {
@@ -839,7 +839,7 @@ Room.prototype.get = function (roomObjectName) {
           cacheType: 'global',
           cacheAmount: Infinity,
           room,
-          valueConstructor() {},
+          valueConstructor() { },
      })
 
      // Creeps
@@ -873,9 +873,9 @@ Room.prototype.get = function (roomObjectName) {
                return remotesWithEfficacies.sort(function (a1, b1) {
                     return (
                          Memory.rooms[a1].sourceEfficacies.reduce((a2, b2) => a2 + b2) /
-                              Memory.rooms[a1].sourceEfficacies.length -
+                         Memory.rooms[a1].sourceEfficacies.length -
                          Memory.rooms[b1].sourceEfficacies.reduce((a2, b2) => a2 + b2) /
-                              Memory.rooms[b1].sourceEfficacies.length
+                         Memory.rooms[b1].sourceEfficacies.length
                     )
                })
           },
@@ -1067,8 +1067,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     if (opts.weightCostMatrixes) {
                          // Otherwise iterate through each x and y in the room
 
-                         for (let x = 0; x < constants.roomDimensions; x += 1) {
-                              for (let y = 0; y < constants.roomDimensions; y += 1) {
+                         for (let x = 0; x < roomDimensions; x += 1) {
+                              for (let y = 0; y < roomDimensions; y += 1) {
                                    // Loop through each costMatrix
 
                                    for (const weightCM of opts.weightCostMatrixes)
@@ -1199,7 +1199,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                          // Loop through structureTypes of impassibleStructureTypes
 
-                         for (const structureType of constants.impassibleStructureTypes) {
+                         for (const structureType of impassibleStructureTypes) {
                               for (const structure of room.structures[structureType]) {
                                    // Set pos as impassible
 
@@ -1567,7 +1567,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
                 // Plan for a road at this position
 
-                structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+                structurePlans.set(pos.x, pos.y, structureTypesByNumber[STRUCTURE_ROAD])
             }
             */
           }
@@ -1638,11 +1638,11 @@ Room.prototype.cleanMemory = function () {
      for (const key in room.memory) {
           // Iterate if key is not part of roomTypeProperties
 
-          if (!constants.roomTypeProperties[key]) continue
+          if (!roomTypeProperties[key]) continue
 
           // Iterate if key part of this roomType's properties
 
-          if (constants.roomTypes[room.memory.type][key]) continue
+          if (roomTypes[room.memory.type][key]) continue
 
           // Delete the property
 
@@ -1689,8 +1689,8 @@ Room.prototype.distanceTransform = function (
      enableVisuals,
      x1 = 0,
      y1 = 0,
-     x2 = constants.roomDimensions,
-     y2 = constants.roomDimensions,
+     x2 = roomDimensions,
+     y2 = roomDimensions,
 ) {
      const room = this
 
@@ -1703,8 +1703,8 @@ Room.prototype.distanceTransform = function (
      let x
      let y
 
-     for (x = Math.max(x1 - 1, 0); x <= Math.min(x2 + 1, constants.roomDimensions); x += 1) {
-          for (y = Math.max(y1 - 1, 0); y <= Math.min(y2 + 1, constants.roomDimensions); y += 1) {
+     for (x = Math.max(x1 - 1, 0); x <= Math.min(x2 + 1, roomDimensions); x += 1) {
+          for (y = Math.max(y1 - 1, 0); y <= Math.min(y2 + 1, roomDimensions); y += 1) {
                distanceCM.set(x, y, initialCM.get(x, y) === 255 ? 0 : 255)
           }
      }
@@ -1776,8 +1776,8 @@ Room.prototype.diagonalDistanceTransform = function (
      enableVisuals,
      x1 = 0,
      y1 = 0,
-     x2 = constants.roomDimensions,
-     y2 = constants.roomDimensions,
+     x2 = roomDimensions,
+     y2 = roomDimensions,
 ) {
      const room = this
 
@@ -2041,9 +2041,9 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                          if (
                               adjacentPos.x < 0 ||
-                              adjacentPos.x >= constants.roomDimensions ||
+                              adjacentPos.x >= roomDimensions ||
                               adjacentPos.y < 0 ||
-                              adjacentPos.y >= constants.roomDimensions
+                              adjacentPos.y >= roomDimensions
                          )
                               continue
 
@@ -2124,7 +2124,7 @@ Room.prototype.findCSiteTargetID = function (creep) {
 
      // Loop through structuretypes of the build priority
 
-     for (const structureType of constants.structureTypesByBuildPriority) {
+     for (const structureType of structureTypesByBuildPriority) {
           // Get the structures with the relevant type
 
           const cSitesOfType: ConstructionSite[] = room.get(`${structureType}CSite`)
@@ -2211,9 +2211,9 @@ Room.prototype.groupRampartPositions = function (rampartPositions, rampartPlans)
 
                          if (
                               adjacentPos.x <= 0 ||
-                              adjacentPos.x >= constants.roomDimensions ||
+                              adjacentPos.x >= roomDimensions ||
                               adjacentPos.y <= 0 ||
-                              adjacentPos.y >= constants.roomDimensions
+                              adjacentPos.y >= roomDimensions
                          )
                               continue
 
@@ -2308,7 +2308,7 @@ Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
           for (let y = y1; y <= y2; y += 1) {
                // Iterate if the pos doesn't map onto a room
 
-               if (x < 0 || x >= constants.roomDimensions || y < 0 || y >= constants.roomDimensions) continue
+               if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
                // Otherwise ass the x and y to positions
 
@@ -2403,8 +2403,8 @@ Room.prototype.findSwampPlainsRatio = function () {
 
      const terrain = this.getTerrain()
 
-     for (let x = 0; x < constants.roomDimensions; x += 1) {
-          for (let y = 0; y < constants.roomDimensions; y += 1) {
+     for (let x = 0; x < roomDimensions; x += 1) {
+          for (let y = 0; y < roomDimensions; y += 1) {
                terrainAmounts[terrain.get(x, y)] += 1
           }
      }

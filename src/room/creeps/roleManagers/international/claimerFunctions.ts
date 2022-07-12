@@ -1,4 +1,4 @@
-import { claimRequestNeedsIndex, constants } from 'international/constants'
+import { claimRequestNeedsIndex } from 'international/constants'
 import { Claimer } from '../../creepClasses'
 
 Claimer.prototype.claimRoom = function () {

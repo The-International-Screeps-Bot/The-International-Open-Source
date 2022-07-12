@@ -1,7 +1,7 @@
 import { allyManager } from 'international/simpleAllies'
 import { customLog, getAvgPrice } from './generalFunctions'
 import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
-import { cacheAmountModifier, constants, CPUBucketCapacity, mmoShardNames, myColors } from './constants'
+import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames, myColors } from './constants'
 import { statsManager, StatsManager } from './statsManager'
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters

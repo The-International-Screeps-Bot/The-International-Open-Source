@@ -1,4 +1,4 @@
-import { allyList, constants } from 'international/constants'
+import { allStructureTypes, allyList, structureTypesByBuildPriority } from 'international/constants'
 import {
      createPackedPosMap,
      customLog,
@@ -92,7 +92,7 @@ Object.defineProperties(Room.prototype, {
 
                // Make array keys for each structureType
 
-               for (const structureType of constants.allStructureTypes) this._structures[structureType] = []
+               for (const structureType of allStructureTypes) this._structures[structureType] = []
 
                // Group structures by structureType
 
@@ -112,7 +112,7 @@ Object.defineProperties(Room.prototype, {
 
                // Make array keys for each structureType
 
-               for (const structureType of constants.allStructureTypes) this._cSites[structureType] = []
+               for (const structureType of allStructureTypes) this._cSites[structureType] = []
 
                // Group cSites by structureType
 
@@ -132,7 +132,7 @@ Object.defineProperties(Room.prototype, {
 
                // Loop through structuretypes of the build priority
 
-               for (const structureType of constants.structureTypesByBuildPriority) {
+               for (const structureType of structureTypesByBuildPriority) {
                     cSitesOfType = this.cSites[structureType]
                     if (!cSitesOfType.length) continue
 
@@ -586,13 +586,13 @@ Object.defineProperties(Room.prototype, {
                if (
                     this.fastFillerContainerLeft &&
                     this.fastFillerContainerLeft.store.energy <=
-                         this.fastFillerContainerLeft.store.getCapacity(RESOURCE_ENERGY) * 0.75
+                    this.fastFillerContainerLeft.store.getCapacity(RESOURCE_ENERGY) * 0.75
                )
                     this._METT.push(this.fastFillerContainerLeft)
                if (
                     this.fastFillerContainerRight &&
                     this.fastFillerContainerRight.store.energy <=
-                         this.fastFillerContainerRight.store.getCapacity(RESOURCE_ENERGY) * 0.75
+                    this.fastFillerContainerRight.store.getCapacity(RESOURCE_ENERGY) * 0.75
                )
                     this._METT.push(this.fastFillerContainerRight)
 

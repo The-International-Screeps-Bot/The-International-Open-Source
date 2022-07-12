@@ -1,4 +1,3 @@
-import { constants } from 'international/constants'
 import { findObjectWithID } from 'international/generalFunctions'
 import { Maintainer } from '../../creepClasses'
 
@@ -191,10 +190,10 @@ Maintainer.prototype.maintainNearby = function () {
 
      const adjacentStructures = room.lookForAtArea(
           LOOK_STRUCTURES,
-          Math.max(Math.min(this.pos.y - 3, constants.roomDimensions - 1), 1),
-          Math.max(Math.min(this.pos.x - 3, constants.roomDimensions - 1), 1),
-          Math.max(Math.min(this.pos.y + 3, constants.roomDimensions - 1), 1),
-          Math.max(Math.min(this.pos.x + 3, constants.roomDimensions - 1), 1),
+          Math.max(Math.min(this.pos.y - 3, - 1), 1),
+          Math.max(Math.min(this.pos.x - 3, - 1), 1),
+          Math.max(Math.min(this.pos.y + 3, - 1), 1),
+          Math.max(Math.min(this.pos.x + 3, - 1), 1),
           true,
      )
 

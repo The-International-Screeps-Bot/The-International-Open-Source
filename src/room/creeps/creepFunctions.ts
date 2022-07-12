@@ -2,10 +2,13 @@ import { spawn } from 'child_process'
 import {
      allyList,
      cacheAmountModifier,
-     constants,
+     communeSigns,
      CPUBucketCapacity,
      CPUBucketRenewThreshold,
+     impassibleStructureTypes,
      myColors,
+     nonCommuneSigns,
+     roomDimensions,
 } from 'international/constants'
 import {
      arePositionsEqual,
@@ -25,7 +28,7 @@ import { pick, repeat } from 'lodash'
 import { packCoord, packPos, packPosList, unpackPos, unpackPosList } from 'other/packrat'
 import { creepClasses } from './creepClasses'
 
-Creep.prototype.preTickManager = function () {}
+Creep.prototype.preTickManager = function () { }
 
 Creep.prototype.isDying = function () {
      // Inform as dying if creep is already recorded as dying
@@ -537,7 +540,7 @@ Creep.prototype.findOptimalSourceName = function () {
 
                if (
                     Math.min(creepThreshold, room.get(`${sourceName}HarvestPositions`).length) -
-                         room.creepsOfSourceAmount[sourceName] >
+                    room.creepsOfSourceAmount[sourceName] >
                     0
                ) {
                     // Assign the sourceName to the creep's memory and Inform true
@@ -890,7 +893,7 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
 
           let pos = unpackAsRoomPos(packedPos, room.name)
 
-          if (pos.x < 1 || pos.x >= constants.roomDimensions - 1 || pos.y < 1 || pos.y >= constants.roomDimensions - 1)
+          if (pos.x < 1 || pos.x >= roomDimensions - 1 || pos.y < 1 || pos.y >= roomDimensions - 1)
                continue
 
           if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
@@ -898,7 +901,7 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
           let hasImpassibleStructure
 
           for (const structure of pos.lookFor(LOOK_STRUCTURES))
-               if (constants.impassibleStructureTypes.includes(structure.structureType)) {
+               if (impassibleStructureTypes.includes(structure.structureType)) {
                     hasImpassibleStructure = true
                     break
                }
@@ -909,7 +912,7 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
 
                if (!cSite.my) continue
 
-               if (constants.impassibleStructureTypes.includes(cSite.structureType)) {
+               if (impassibleStructureTypes.includes(cSite.structureType)) {
                     hasImpassibleStructure = true
                     break
                }
@@ -1127,26 +1130,26 @@ Creep.prototype.advancedSignController = function () {
      if (room.memory.type === 'commune') {
           // If the room already has a correct sign, inform false
 
-          if (room.controller.sign && constants.communeSigns.includes(room.controller.sign.text)) return false
+          if (room.controller.sign && communeSigns.includes(room.controller.sign.text)) return false
 
           // Otherwise assign the signMessage the commune sign
 
-          signMessage = constants.communeSigns[0]
+          signMessage = communeSigns[0]
      }
 
      // Otherwise if the room is not a commune
      else {
           // If the room already has a correct sign, inform false
 
-          if (room.controller.sign && constants.nonCommuneSigns.includes(room.controller.sign.text)) return false
+          if (room.controller.sign && nonCommuneSigns.includes(room.controller.sign.text)) return false
 
           // Otherwise get a rounded random value based on the length of nonCommuneSign
 
-          const randomSign = Math.floor(Math.random() * constants.nonCommuneSigns.length)
+          const randomSign = Math.floor(Math.random() * nonCommuneSigns.length)
 
           // And assign the message according to the index of randomSign
 
-          signMessage = constants.nonCommuneSigns[randomSign]
+          signMessage = nonCommuneSigns[randomSign]
      }
 
      // If the controller is not in range
@@ -1363,10 +1366,10 @@ Creep.prototype.passiveHeal = function () {
           return false
      }
 
-     let top = Math.max(Math.min(this.pos.y - 1, constants.roomDimensions - 2), 2)
-     let left = Math.max(Math.min(this.pos.x - 1, constants.roomDimensions - 2), 2)
-     let bottom = Math.max(Math.min(this.pos.y + 1, constants.roomDimensions - 2), 2)
-     let right = Math.max(Math.min(this.pos.x + 1, constants.roomDimensions - 2), 2)
+     let top = Math.max(Math.min(this.pos.y - 1, roomDimensions - 2), 2)
+     let left = Math.max(Math.min(this.pos.x - 1, roomDimensions - 2), 2)
+     let bottom = Math.max(Math.min(this.pos.y + 1, roomDimensions - 2), 2)
+     let right = Math.max(Math.min(this.pos.x + 1, roomDimensions - 2), 2)
 
      // Find adjacent creeps
 
@@ -1393,10 +1396,10 @@ Creep.prototype.passiveHeal = function () {
           return false
      }
 
-     ;(top = Math.max(Math.min(this.pos.y - 3, constants.roomDimensions - 2), 2)),
-          (left = Math.max(Math.min(this.pos.x - 3, constants.roomDimensions - 2), 2)),
-          (bottom = Math.max(Math.min(this.pos.y + 3, constants.roomDimensions - 2), 2)),
-          (right = Math.max(Math.min(this.pos.x + 3, constants.roomDimensions - 2), 2))
+     ; (top = Math.max(Math.min(this.pos.y - 3, roomDimensions - 2), 2)),
+          (left = Math.max(Math.min(this.pos.x - 3, roomDimensions - 2), 2)),
+          (bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 2), 2)),
+          (right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 2), 2))
 
      // Find my creeps in range of creep
 

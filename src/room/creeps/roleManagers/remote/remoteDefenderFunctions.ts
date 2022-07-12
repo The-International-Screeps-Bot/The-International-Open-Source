@@ -1,4 +1,4 @@
-import { allyList, constants, remoteNeedsIndex } from 'international/constants'
+import { allyList, remoteNeedsIndex } from 'international/constants'
 import { getRange, pack } from 'international/generalFunctions'
 import { RemoteDefender } from 'room/creeps/creepClasses'
 

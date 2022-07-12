@@ -1,4 +1,4 @@
-import { constants, mmoShardNames, myColors } from './constants'
+import { mmoShardNames, myColors, roomDimensions } from './constants'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -38,7 +38,7 @@ export function findPositionsInsideRect(x1: number, y1: number, x2: number, y2: 
           for (let y = y1; y <= y2; y += 1) {
                // Iterate if the pos doesn't map onto a room
 
-               if (x < 0 || x >= constants.roomDimensions || y < 0 || y >= constants.roomDimensions) continue
+               if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
                // Otherwise ass the x and y to positions
 
@@ -190,8 +190,8 @@ export function createPackedPosMap(innerArray?: boolean) {
 
      // Loop through each x and y in the room
 
-     for (let x = 0; x < constants.roomDimensions; x += 1) {
-          for (let y = 0; y < constants.roomDimensions; y += 1) {
+     for (let x = 0; x < roomDimensions; x += 1) {
+          for (let y = 0; y < roomDimensions; y += 1) {
                // Add an element for this pos
 
                packedPosMap.push(innerArray ? [] : undefined)
@@ -207,8 +207,8 @@ export function unpackAsPos(packedPos: number) {
      // Inform an unpacked pos
 
      return {
-          x: Math.floor(packedPos / constants.roomDimensions),
-          y: Math.floor(packedPos % constants.roomDimensions),
+          x: Math.floor(packedPos / roomDimensions),
+          y: Math.floor(packedPos % roomDimensions),
      }
 }
 
@@ -216,8 +216,8 @@ export function unpackAsRoomPos(packedPos: number, roomName: string) {
      // Inform an unpacked RoomPosition
 
      return new RoomPosition(
-          Math.floor(packedPos / constants.roomDimensions),
-          Math.floor(packedPos % constants.roomDimensions),
+          Math.floor(packedPos / roomDimensions),
+          Math.floor(packedPos % roomDimensions),
           roomName,
      )
 }
@@ -225,13 +225,13 @@ export function unpackAsRoomPos(packedPos: number, roomName: string) {
 export function pack(pos: Pos) {
      // Inform a packed pos
 
-     return pos.x * constants.roomDimensions + pos.y
+     return pos.x * roomDimensions + pos.y
 }
 
 export function packXY(x: number, y: number) {
      // Inform a packed pos
 
-     return x * constants.roomDimensions + y
+     return x * roomDimensions + y
 }
 
 export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPos: number) {

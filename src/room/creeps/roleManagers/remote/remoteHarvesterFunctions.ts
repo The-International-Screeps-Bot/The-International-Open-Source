@@ -1,4 +1,4 @@
-import { constants, remoteNeedsIndex } from 'international/constants'
+import { remoteNeedsIndex } from 'international/constants'
 import { getRange, getRangeBetween, unpackAsPos } from 'international/generalFunctions'
 import { RemoteHarvester } from 'room/creeps/creepClasses'
 

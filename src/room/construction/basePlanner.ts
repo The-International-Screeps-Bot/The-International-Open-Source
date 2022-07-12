@@ -1,4 +1,4 @@
-import { constants, stamps } from 'international/constants'
+import { roomDimensions, stamps } from 'international/constants'
 import {
      customLog,
      findAvgBetweenPosotions,
@@ -322,7 +322,7 @@ export function basePlanner(room: Room) {
 
      // Plan for a container at the pos
 
-     /* structurePlans.set(centerUpgadePos.x, centerUpgadePos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER]) */
+     /* structurePlans.set(centerUpgadePos.x, centerUpgadePos.y, structureTypesByNumber[STRUCTURE_CONTAINER]) */
 
      // Path from the hubAnchor to the closestUpgradePos
 
@@ -408,7 +408,7 @@ export function basePlanner(room: Room) {
 
             // Plan for a road at this position
 
-            structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+            structurePlans.set(pos.x, pos.y, structureTypesByNumber[STRUCTURE_ROAD])
         } */
      }
 
@@ -436,7 +436,7 @@ export function basePlanner(room: Room) {
      /*
     // Plan for a road at the pos
 
-    structurePlans.set(mineralHarvestPos.x, mineralHarvestPos.y, constants.structureTypesByNumber[STRUCTURE_CONTAINER])
+    structurePlans.set(mineralHarvestPos.x, mineralHarvestPos.y, structureTypesByNumber[STRUCTURE_CONTAINER])
  */
      // Path from the hubAnchor to the mineralHarvestPos
 
@@ -462,8 +462,8 @@ export function basePlanner(room: Room) {
 
      // Iterate through each x and y in the room
 
-     for (let x = 0; x < constants.roomDimensions; x += 1) {
-          for (let y = 0; y < constants.roomDimensions; y += 1) {
+     for (let x = 0; x < roomDimensions; x += 1) {
+          for (let y = 0; y < roomDimensions; y += 1) {
                // If there is road at the pos, assign it as avoid in baseCM
 
                if (roadCM.get(x, y) === 1) baseCM.set(x, y, 255)
@@ -490,8 +490,8 @@ export function basePlanner(room: Room) {
 
      // Iterate through each x and y in the room
 
-     for (let x = 0; x < constants.roomDimensions; x += 1) {
-          for (let y = 0; y < constants.roomDimensions; y += 1) {
+     for (let x = 0; x < roomDimensions; x += 1) {
+          for (let y = 0; y < roomDimensions; y += 1) {
                // If there is road at the pos, assign it as avoid in baseCM
 
                if (roadCM.get(x, y) === 1) baseCM.set(x, y, 255)
@@ -606,9 +606,9 @@ export function basePlanner(room: Room) {
 
      // Iterate through each x and y in the room
 
-     for (let x = 0; x < constants.roomDimensions; x += 1) {
-          for (let y = 0; y < constants.roomDimensions; y += 1) {
-               packedPos = x * constants.roomDimensions + y
+     for (let x = 0; x < roomDimensions; x += 1) {
+          for (let y = 0; y < roomDimensions; y += 1) {
+               packedPos = x * roomDimensions + y
 
                if (room.rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(packedPos)
 

@@ -1,4 +1,4 @@
-import { allyList, constants, myColors } from 'international/constants'
+import { allyList, myColors } from 'international/constants'
 import { customLog, findObjectWithID } from 'international/generalFunctions'
 
 /**

@@ -1,4 +1,4 @@
-import { constants, myColors } from 'international/constants'
+import { myColors } from 'international/constants'
 import { customLog, findCPUColor } from 'international/generalFunctions'
 import { allyManager } from 'international/simpleAllies'
 import { InternationalManager } from './internationalManager'

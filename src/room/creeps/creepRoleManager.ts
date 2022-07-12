@@ -1,6 +1,6 @@
 import './creepFunctions'
 
-import { constants, creepRoles, myColors } from 'international/constants'
+import { creepRoles, myColors } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import { controllerUpgraderManager } from './roleManagers/commune/controllerUpgrader'
 import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvesterManager'

@@ -1,4 +1,3 @@
-import { constants } from 'international/constants'
 import { customLog, getRangeBetween, unpackAsPos } from 'international/generalFunctions'
 import { SourceHarvester } from '../../creepClasses'
 

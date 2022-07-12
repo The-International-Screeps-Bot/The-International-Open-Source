@@ -2,7 +2,6 @@ import {
      allyList,
      builderSpawningWhenStorageThreshold,
      claimRequestNeedsIndex,
-     constants,
      controllerDowngradeUpgraderNeed,
      myColors,
      remoteHarvesterRoles,

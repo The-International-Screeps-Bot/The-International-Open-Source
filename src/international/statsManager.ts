@@ -1,4 +1,4 @@
-import { constants, roomStats as roomStatsLevel } from './constants'
+import { roomStats as roomStatsLevel, roomTypesUsedForStats } from './constants'
 export class StatsManager {
      roomConfig(roomName: string, roomType: string) {
           if (roomType === 'commune') {
@@ -213,7 +213,7 @@ export class StatsManager {
           const notCheckedRooms = Object.entries(Memory.stats.rooms).filter(vk => !globalRoomKeys.find(k => k == vk[0]))
           notCheckedRooms.forEach(missingRoomData => {
                const roomType = Memory.rooms[missingRoomData[0]].type
-               if (!constants.roomTypesUsedForStats.includes(roomType)) {
+               if (!roomTypesUsedForStats.includes(roomType)) {
                     delete Memory.stats.rooms[missingRoomData[0]]
                     delete global.roomStats[missingRoomData[0]]
                } else {

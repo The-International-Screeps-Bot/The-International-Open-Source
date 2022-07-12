@@ -1,4 +1,5 @@
-import { constants } from './constants'
+import { allStructureTypes } from "./constants"
+
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN, STRUCTURE_STORAGE, STRUCTURE_TERMINAL]
 
 global.clearMemory = function () {
@@ -50,7 +51,7 @@ global.destroyAllStructures = function (roomName, types) {
      let destroyedStructureCount = 0
      let structures: Structure[]
 
-     for (const structureType of constants.allStructureTypes) {
+     for (const structureType of allStructureTypes) {
           // If types is constructed and the part isn't in types, iterate
 
           if ((types && !types.includes(structureType)) || (importantStructures.includes(structureType) && !types))
@@ -69,9 +70,8 @@ global.destroyAllStructures = function (roomName, types) {
 
      // Inform the result
 
-     return `Destroyed a total of ${destroyedStructureCount} structures in ${roomName} ${
-          types ? `with the types ${types}` : ''
-     }`
+     return `Destroyed a total of ${destroyedStructureCount} structures in ${roomName} ${types ? `with the types ${types}` : ''
+          }`
 }
 
 global.destroyCommuneStructures = function (types) {
@@ -89,7 +89,7 @@ global.destroyCommuneStructures = function (types) {
 
           destroyedStructureCount = 0
 
-          for (const structureType of constants.allStructureTypes) {
+          for (const structureType of allStructureTypes) {
                // If types is constructed and the part isn't in types, iterate
 
                if ((types && !types.includes(structureType)) || (importantStructures.includes(structureType) && !types))

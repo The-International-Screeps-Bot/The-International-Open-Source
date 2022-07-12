@@ -1,6 +1,5 @@
 // Define roomObject types
 
-import { constants } from 'international/constants'
 import { findObjectWithID } from 'international/generalFunctions'
 
 export type RoomObjectValueTypes = 'pos' | 'id' | 'object'

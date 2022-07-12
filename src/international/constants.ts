@@ -1,77 +1,91 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 28
+export const   breakingVersion = 28
 
 // Settings
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const roomVisuals = false
+export const  roomVisuals = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const baseVisuals = false
+export const  baseVisuals = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const mapVisuals = false
+export const  mapVisuals = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const cpuLogging = false
+export const  cpuLogging = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const roomStats: 0 | 1 | 2 = 0
+export const  roomStats: 0 | 1 | 2 = 0
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const allyList = new Set(['MarvinTMB', 'Q13214', 'HerrKai', 'clarkok', 'PandaMaster', 'lokenwow', 'Morningtea', 'LittleBitBlue'])
+export const  allyList = new Set(['MarvinTMB', 'Q13214', 'HerrKai', 'clarkok', 'PandaMaster', 'lokenwow', 'Morningtea', 'LittleBitBlue'])
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const pixelSelling = false
+export const  pixelSelling = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const pixelGeneration = false
+export const  pixelGeneration = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const tradeBlacklist = new Set([])
+export const  tradeBlacklist = new Set([])
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const autoClaim = true
+export const  autoClaim = true
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const publicRamparts = false
+export const  publicRamparts = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const allyTrading = true
+export const  allyTrading = true
 
 // General
 
-export const constants: Partial<Constants> = {}
+export const  mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
-export const mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
+interface RoomTypeProperties {
+     [key: string]: boolean
+}
 
-constants.roomTypeProperties = {
+interface roomTypes {
+     [key: string]: { [key: string]: boolean }
+}
+
+interface NumbersByStructureTypes {
+     [key: string]: BuildableStructureConstant | 'empty'
+}
+
+interface StyleForStructureTypes {
+     [key: string]: CircleStyle
+}
+
+export const roomTypeProperties: RoomTypeProperties = {
      source1: true,
      source2: true,
      remotes: true,
@@ -96,7 +110,7 @@ constants.roomTypeProperties = {
      portalsTo: true,
 }
 
-constants.roomTypes = {
+export const roomTypes: roomTypes = {
      commune: {
           source1: true,
           source2: true,
@@ -150,9 +164,9 @@ constants.roomTypes = {
           portalsTo: true,
      },
 }
-constants.roomTypesUsedForStats = ['commune', 'remote']
+export const roomTypesUsedForStats = ['commune', 'remote']
 
-export const creepRoles: CreepRoles[] = [
+export const  creepRoles: CreepRoles[] = [
      'source1Harvester',
      'source2Harvester',
      'hauler',
@@ -180,11 +194,11 @@ export const creepRoles: CreepRoles[] = [
 
 // Set of messages to randomly apply to commune rooms
 
-constants.communeSigns = ['A commune of the proletariat. Bourgeoisie not welcome here!']
+export const communeSigns = ['A commune of the proletariat. Bourgeoisie not welcome here!']
 
 // Set of messages to randomly apply to non-commune rooms
 
-constants.nonCommuneSigns = [
+export const nonCommuneSigns = [
      'The top 1% have more money than the poorest 4.5 billion',
      'McDonalds workers in the US make $10/hour. In Denmark, as a result of unions, they make $22/hour',
      'We have democracy in our policial system, why do we not have it in our companies?',
@@ -193,9 +207,9 @@ constants.nonCommuneSigns = [
      'Adults spend a combined 13 years of their life under a dictatorship: the workplace',
 ]
 
-constants.roomDimensions = 50
+export const roomDimensions = 50
 
-constants.allStructureTypes = [
+export const allStructureTypes: StructureConstant[] = [
      STRUCTURE_SPAWN,
      STRUCTURE_EXTENSION,
      STRUCTURE_ROAD,
@@ -219,7 +233,7 @@ constants.allStructureTypes = [
      STRUCTURE_INVADER_CORE,
 ]
 
-constants.impassibleStructureTypes = [
+export const impassibleStructureTypes: StructureConstant[] = [
      STRUCTURE_SPAWN,
      STRUCTURE_EXTENSION,
      STRUCTURE_WALL,
@@ -239,7 +253,7 @@ constants.impassibleStructureTypes = [
      STRUCTURE_INVADER_CORE,
 ]
 
-constants.structureTypesByBuildPriority = [
+export const structureTypesByBuildPriority: StructureConstant[] = [
      STRUCTURE_SPAWN,
      STRUCTURE_EXTENSION,
      STRUCTURE_CONTAINER,
@@ -258,7 +272,7 @@ constants.structureTypesByBuildPriority = [
      STRUCTURE_OBSERVER,
 ]
 
-constants.structureTypesByNumber = {
+export const structureTypesByNumber = {
      empty: 0,
      spawn: 1,
      extension: 2,
@@ -278,7 +292,7 @@ constants.structureTypesByNumber = {
      observer: 16,
 }
 
-constants.numbersByStructureTypes = {
+export const numbersByStructureTypes = {
      0: 'empty',
      1: STRUCTURE_SPAWN,
      2: STRUCTURE_EXTENSION,
@@ -298,7 +312,7 @@ constants.numbersByStructureTypes = {
      16: STRUCTURE_OBSERVER,
 }
 
-export const myColors = {
+export const   myColors = {
      white: '#ffffff',
      lightGrey: '#eaeaea',
      midGrey: '#bcbcbc',
@@ -312,7 +326,7 @@ export const myColors = {
      brown: '#aa7253',
 }
 
-export const remoteStamps: Record<RemoteStampTypes, Stamp> = {
+export const   remoteStamps: Record<RemoteStampTypes, Stamp> = {
      container: {
           offset: 0,
           protectionOffset: 0,
@@ -331,7 +345,7 @@ export const remoteStamps: Record<RemoteStampTypes, Stamp> = {
      },
 }
 
-export const stamps: Record<StampTypes, Stamp> = {
+export const   stamps: Record<StampTypes, Stamp> = {
      fastFiller: {
           offset: 3,
           protectionOffset: 6,
@@ -546,7 +560,8 @@ export const stamps: Record<StampTypes, Stamp> = {
      },
 }
 
-export const minerals: Partial<ResourceConstant[]> = [
+
+export const   minerals: Partial<ResourceConstant[]> = [
      RESOURCE_HYDROGEN,
      RESOURCE_OXYGEN,
      RESOURCE_UTRIUM,
@@ -555,9 +570,9 @@ export const minerals: Partial<ResourceConstant[]> = [
      RESOURCE_ZYNTHIUM,
      RESOURCE_CATALYST,
 ]
-export const boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
+export const   boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
 
-export const remoteNeedsIndex = {
+export const   remoteNeedsIndex = {
      source1RemoteHarvester: 0,
      source2RemoteHarvester: 1,
      remoteHauler: 2,
@@ -568,29 +583,29 @@ export const remoteNeedsIndex = {
      remoteDismantler: 7,
 }
 
-export const claimRequestNeedsIndex = {
+export const   claimRequestNeedsIndex = {
      claimer: 0,
      vanguard: 1,
      vanguardDefender: 2,
 }
 
-export const attackRequestNeedsIndex = {
+export const   attackRequestNeedsIndex = {
      ranged: 0,
      attack: 1,
      dismantle: 2,
 }
 
-export const depositNeedsIndex = {
+export const   depositNeedsIndex = {
      depositHarvester: 0,
      depositHauler: 1,
 }
 
-export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester')[] = [
+export const   remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester')[] = [
      'source1RemoteHarvester',
      'source2RemoteHarvester',
 ]
 
-export const spawnByRoomRemoteRoles: (
+export const   spawnByRoomRemoteRoles: (
      | 'source1RemoteHarvester'
      | 'source2RemoteHarvester'
      | 'remoteReserver'
@@ -606,21 +621,21 @@ export const spawnByRoomRemoteRoles: (
      'remoteDismantler',
 ]
 
-export const builderSpawningWhenStorageThreshold = 40000
+export const   builderSpawningWhenStorageThreshold = 40000
 
-export const upgraderSpawningWhenStorageThreshold = 60000
+export const   upgraderSpawningWhenStorageThreshold = 60000
 
-export const CPUBucketCapacity = 10000
+export const   CPUBucketCapacity = 10000
 
-export const CPUBucketRenewThreshold = 5000
-export const prefferedCommuneRange = 6
-export const relayRoles: Partial<CreepRoles>[] = ['hauler', 'remoteHauler']
+export const   CPUBucketRenewThreshold = 5000
+export const   prefferedCommuneRange = 6
+export const   relayRoles: Partial<CreepRoles>[] = ['hauler', 'remoteHauler']
 
 // The dowwngrade timer for when upgrading the controller is required
 
-export const controllerDowngradeUpgraderNeed = 10000
+export const   controllerDowngradeUpgraderNeed = 10000
 
 /**
  * Used to modify the remaining bucket amount, resulting in the default cacheAmount for moveRequests
  */
-export const cacheAmountModifier = 25
+export const   cacheAmountModifier = 25

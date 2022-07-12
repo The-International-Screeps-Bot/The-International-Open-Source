@@ -1,4 +1,4 @@
-import { constants, myColors } from 'international/constants'
+import { myColors } from 'international/constants'
 import { customLog, pack, packXY } from 'international/generalFunctions'
 
 export function trafficManager(room: Room) {

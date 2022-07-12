@@ -1,4 +1,4 @@
-import { constants, myColors } from '../international/constants'
+import { myColors, roomTypesUsedForStats } from '../international/constants'
 
 import './roomFunctions'
 
@@ -33,7 +33,7 @@ export function roomManager() {
           const room = Game.rooms[roomName]
           const roomType = room.memory.type
 
-          const saveStats = Memory.roomStats > 0 && constants.roomTypesUsedForStats.includes(roomType)
+          const saveStats = Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType)
           if (saveStats) statsManager.roomPreTick(room.name, roomType)
 
           // If there is a specific manager for this room's type, run it

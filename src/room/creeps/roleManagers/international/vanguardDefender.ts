@@ -1,4 +1,4 @@
-import { allyList, claimRequestNeedsIndex, constants } from 'international/constants'
+import { allyList, claimRequestNeedsIndex } from 'international/constants'
 import { getRange, pack } from 'international/generalFunctions'
 import { VanguardDefender } from 'room/creeps/creepClasses'
 

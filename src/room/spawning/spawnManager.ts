@@ -1,4 +1,4 @@
-import { constants, myColors } from 'international/constants'
+import { myColors } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import './spawnFunctions'
 import { spawnRequester } from './spawnRequestManager'

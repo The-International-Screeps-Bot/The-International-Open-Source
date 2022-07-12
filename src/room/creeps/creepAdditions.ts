@@ -1,4 +1,4 @@
-import { allyList, constants } from 'international/constants'
+import { allyList } from 'international/constants'
 import { getRange } from 'international/generalFunctions'
 
 Object.defineProperties(Creep.prototype, {
@@ -121,10 +121,10 @@ Object.defineProperties(Creep.prototype, {
 
                const adjacentCreeps = room.lookForAtArea(
                     LOOK_CREEPS,
-                    Math.max(Math.min(this.pos.y - 3, constants.roomDimensions - 2), 2),
-                    Math.max(Math.min(this.pos.x - 3, constants.roomDimensions - 2), 2),
-                    Math.max(Math.min(this.pos.y + 3, constants.roomDimensions - 2), 2),
-                    Math.max(Math.min(this.pos.x + 3, constants.roomDimensions - 2), 2),
+                    Math.max(Math.min(this.pos.y - 3, - 2), 2),
+                    Math.max(Math.min(this.pos.x - 3, - 2), 2),
+                    Math.max(Math.min(this.pos.y + 3, - 2), 2),
+                    Math.max(Math.min(this.pos.x + 3, - 2), 2),
                     true,
                )
 

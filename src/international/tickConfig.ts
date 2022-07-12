@@ -1,5 +1,5 @@
 import { allyManager } from 'international/simpleAllies'
-import { constants, creepRoles, myColors, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles, stamps } from './constants'
+import { creepRoles, myColors, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles, stamps } from './constants'
 import { createPackedPosMap, customLog, findCarryPartsRequired } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'

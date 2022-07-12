@@ -1,4 +1,4 @@
-import { constants, stamps } from 'international/constants'
+import { roomDimensions, stamps } from 'international/constants'
 import { customLog, pack, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 
 export function rampartPlanner(room: Room) {
@@ -16,9 +16,9 @@ export function rampartPlanner(room: Room) {
 
      const bounds = {
           x1: 0,
-          x2: constants.roomDimensions - 1,
+          x2: roomDimensions - 1,
           y1: 0,
-          y2: constants.roomDimensions - 1,
+          y2: roomDimensions - 1,
      }
 
      const UNWALKABLE = -1
@@ -273,8 +273,8 @@ export function rampartPlanner(room: Room) {
           if (Memory.roomVisuals) {
                // Visualize position values
 
-               for (let x = 0; x < constants.roomDimensions; x += 1) {
-                    for (let y = 0; y < constants.roomDimensions; y += 1) {
+               for (let x = 0; x < roomDimensions; x += 1) {
+                    for (let y = 0; y < roomDimensions; y += 1) {
                          if (positionValues[x][y] === NORMAL) {
                               room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                                    fill: '#e8e863',
@@ -496,10 +496,10 @@ export function rampartPlanner(room: Room) {
      // Protect it
 
      protectionRects.push({
-          x1: Math.max(Math.min(controller.pos.x - 1, constants.roomDimensions - 2), 2),
-          y1: Math.max(Math.min(controller.pos.y - 1, constants.roomDimensions - 2), 2),
-          x2: Math.max(Math.min(controller.pos.x + 1, constants.roomDimensions - 2), 2),
-          y2: Math.max(Math.min(controller.pos.y + 1, constants.roomDimensions - 2), 2),
+          x1: Math.max(Math.min(controller.pos.x - 1, roomDimensions - 2), 2),
+          y1: Math.max(Math.min(controller.pos.y - 1, roomDimensions - 2), 2),
+          x2: Math.max(Math.min(controller.pos.x + 1, roomDimensions - 2), 2),
+          y2: Math.max(Math.min(controller.pos.y + 1, roomDimensions - 2), 2),
      })
 
      // Get the centerUpgradePos
@@ -509,10 +509,10 @@ export function rampartPlanner(room: Room) {
      // Protect it
 
      protectionRects.push({
-          x1: Math.max(Math.min(centerUpgradePos.x - 3, constants.roomDimensions - 2), 2),
-          y1: Math.max(Math.min(centerUpgradePos.y - 3, constants.roomDimensions - 2), 2),
-          x2: Math.max(Math.min(centerUpgradePos.x + 3, constants.roomDimensions - 2), 2),
-          y2: Math.max(Math.min(centerUpgradePos.y + 3, constants.roomDimensions - 2), 2),
+          x1: Math.max(Math.min(centerUpgradePos.x - 3, roomDimensions - 2), 2),
+          y1: Math.max(Math.min(centerUpgradePos.y - 3, roomDimensions - 2), 2),
+          x2: Math.max(Math.min(centerUpgradePos.x + 3, roomDimensions - 2), 2),
+          y2: Math.max(Math.min(centerUpgradePos.y + 3, roomDimensions - 2), 2),
      })
 
      // Get the source1ClosestHarvestPos
@@ -522,10 +522,10 @@ export function rampartPlanner(room: Room) {
      // Protect it
 
      protectionRects.push({
-          x1: Math.max(Math.min(source1ClosestHarvestPos.x - 2, constants.roomDimensions - 2), 2),
-          y1: Math.max(Math.min(source1ClosestHarvestPos.y - 2, constants.roomDimensions - 2), 2),
-          x2: Math.max(Math.min(source1ClosestHarvestPos.x + 2, constants.roomDimensions - 2), 2),
-          y2: Math.max(Math.min(source1ClosestHarvestPos.y + 2, constants.roomDimensions - 2), 2),
+          x1: Math.max(Math.min(source1ClosestHarvestPos.x - 2, roomDimensions - 2), 2),
+          y1: Math.max(Math.min(source1ClosestHarvestPos.y - 2, roomDimensions - 2), 2),
+          x2: Math.max(Math.min(source1ClosestHarvestPos.x + 2, roomDimensions - 2), 2),
+          y2: Math.max(Math.min(source1ClosestHarvestPos.y + 2, roomDimensions - 2), 2),
      })
 
      // Get the source2ClosestHarvestPos
@@ -535,10 +535,10 @@ export function rampartPlanner(room: Room) {
      // Protect it
 
      protectionRects.push({
-          x1: Math.max(Math.min(source2ClosestHarvestPos.x - 2, constants.roomDimensions - 2), 2),
-          y1: Math.max(Math.min(source2ClosestHarvestPos.y - 2, constants.roomDimensions - 2), 2),
-          x2: Math.max(Math.min(source2ClosestHarvestPos.x + 2, constants.roomDimensions - 2), 2),
-          y2: Math.max(Math.min(source2ClosestHarvestPos.y + 2, constants.roomDimensions - 2), 2),
+          x1: Math.max(Math.min(source2ClosestHarvestPos.x - 2, roomDimensions - 2), 2),
+          y1: Math.max(Math.min(source2ClosestHarvestPos.y - 2, roomDimensions - 2), 2),
+          x2: Math.max(Math.min(source2ClosestHarvestPos.x + 2, roomDimensions - 2), 2),
+          y2: Math.max(Math.min(source2ClosestHarvestPos.y + 2, roomDimensions - 2), 2),
      })
 
      // Get the room's stampAnchors
@@ -560,10 +560,10 @@ export function rampartPlanner(room: Room) {
                // Protect the stamp
 
                protectionRects.push({
-                    x1: Math.max(Math.min(stampAnchor.x - protectionOffset, constants.roomDimensions - 2), 2),
-                    y1: Math.max(Math.min(stampAnchor.y - protectionOffset, constants.roomDimensions - 2), 2),
-                    x2: Math.max(Math.min(stampAnchor.x + protectionOffset, constants.roomDimensions - 2), 2),
-                    y2: Math.max(Math.min(stampAnchor.y + protectionOffset, constants.roomDimensions - 2), 2),
+                    x1: Math.max(Math.min(stampAnchor.x - protectionOffset, roomDimensions - 2), 2),
+                    y1: Math.max(Math.min(stampAnchor.y - protectionOffset, roomDimensions - 2), 2),
+                    x2: Math.max(Math.min(stampAnchor.x + protectionOffset, roomDimensions - 2), 2),
+                    y2: Math.max(Math.min(stampAnchor.y + protectionOffset, roomDimensions - 2), 2),
                })
           }
      }
@@ -677,8 +677,8 @@ export function rampartPlanner(room: Room) {
      room.rampartPlans.set(hubAnchor.x - 1, hubAnchor.y + 1, 1)
 
      if (recordRamparts) {
-          for (let x = 0; x < constants.roomDimensions; x += 1) {
-               for (let y = 0; y < constants.roomDimensions; y += 1) {
+          for (let x = 0; x < roomDimensions; x += 1) {
+               for (let y = 0; y < roomDimensions; y += 1) {
                     if (room.rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(pack({ x, y }))
                }
           }
