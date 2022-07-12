@@ -313,6 +313,13 @@ Creep.prototype.advancedUpgradeController = function () {
                return false
           }
 
+          if (this.needsResources()) return false
+
+          this.createMoveRequest({
+               origin: this.pos,
+               goal: { pos: room.controller.pos, range: 3 },
+               avoidEnemyRanges: true,
+          })
           return false
      }
 

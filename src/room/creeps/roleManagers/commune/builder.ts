@@ -83,9 +83,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
                     continue
                }
 
-               continue
-
-               //
+               if (creep.needsResources()) continue
           }
 
           // If there is a cSite, try to build it and iterate

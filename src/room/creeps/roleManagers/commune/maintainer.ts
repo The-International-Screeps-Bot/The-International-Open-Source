@@ -42,7 +42,7 @@ Maintainer.prototype.advancedMaintain = function () {
                return false
           }
 
-          return false
+          if (this.needsResources()) return false
      }
 
      // Otherwise if the this doesn't need resources
