@@ -9,6 +9,9 @@ import { defenceManager } from './defenceManager'
 import { linkManager } from './linkManager'
 import './claimRequestManager'
 
+/**
+ * Handles managers for exclusively commune-related actions
+ */
 export function communeManager(room: Room) {
      constructionManager(room)
 

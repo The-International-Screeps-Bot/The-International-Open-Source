@@ -15,11 +15,6 @@ interface Constants {
      roomTypes: { [key: string]: { [key: string]: boolean } }
 
      /**
-      * an array of strings of names of roles
-      */
-     creepRoles: CreepRoles[]
-
-     /**
       * An array of messages of what to sign comunes with
       */
      communeSigns: string[]

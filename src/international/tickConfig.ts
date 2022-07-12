@@ -1,5 +1,5 @@
 import { allyManager } from 'international/simpleAllies'
-import { constants, myColors, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles, stamps } from './constants'
+import { constants, creepRoles, myColors, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles, stamps } from './constants'
 import { createPackedPosMap, customLog, findCarryPartsRequired } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
@@ -42,7 +42,7 @@ InternationalManager.prototype.tickConfig = function () {
 
           // For each role, construct an array for myCreeps
 
-          for (role of constants.creepRoles) room.myCreeps[role] = []
+          for (role of creepRoles) room.myCreeps[role] = []
 
           room.myCreepsAmount = 0
 
@@ -87,7 +87,7 @@ InternationalManager.prototype.tickConfig = function () {
 
           // For each role, construct an array for creepsFromRoom
 
-          for (role of constants.creepRoles) room.creepsFromRoom[role] = []
+          for (role of creepRoles) room.creepsFromRoom[role] = []
 
           room.creepsFromRoomAmount = 0
 

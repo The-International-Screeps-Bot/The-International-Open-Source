@@ -47,7 +47,6 @@ export function spawnRequester(room: Room) {
                          extraParts: [WORK, MOVE, WORK],
                          partsMultiplier: 3,
                          minCreeps: 1,
-                         maxCreeps: Infinity,
                          minCost: 200,
                          priority,
                          memoryAdditions: {
@@ -64,7 +63,6 @@ export function spawnRequester(room: Room) {
                          extraParts: [WORK, MOVE, WORK],
                          partsMultiplier: 3,
                          minCreeps: 1,
-                         maxCreeps: Infinity,
                          minCost: 200,
                          priority,
                          memoryAdditions: {
@@ -81,7 +79,6 @@ export function spawnRequester(room: Room) {
                          extraParts: [WORK],
                          partsMultiplier: 6,
                          minCreeps: 1,
-                         maxCreeps: Infinity,
                          minCost: 300,
                          priority,
                          memoryAdditions: {
@@ -98,7 +95,6 @@ export function spawnRequester(room: Room) {
                          extraParts: [WORK],
                          partsMultiplier: 6,
                          minCreeps: 1,
-                         maxCreeps: Infinity,
                          minCost: 150,
                          priority,
                          memoryAdditions: {
@@ -140,7 +136,6 @@ export function spawnRequester(room: Room) {
                          extraParts: [WORK, MOVE, WORK],
                          partsMultiplier: 3,
                          minCreeps: 1,
-                         maxCreeps: Infinity,
                          minCost: 200,
                          priority,
                          memoryAdditions: {
@@ -157,7 +152,6 @@ export function spawnRequester(room: Room) {
                          extraParts: [WORK, MOVE, WORK],
                          partsMultiplier: 3,
                          minCreeps: 1,
-                         maxCreeps: Infinity,
                          minCost: 200,
                          priority,
                          memoryAdditions: {
@@ -174,7 +168,6 @@ export function spawnRequester(room: Room) {
                          extraParts: [WORK],
                          partsMultiplier: 6,
                          minCreeps: 1,
-                         maxCreeps: Infinity,
                          minCost: 300,
                          priority,
                          memoryAdditions: {
@@ -191,7 +184,6 @@ export function spawnRequester(room: Room) {
                          extraParts: [WORK],
                          partsMultiplier: 6,
                          minCreeps: 1,
-                         maxCreeps: Infinity,
                          minCost: 150,
                          priority,
                          memoryAdditions: {

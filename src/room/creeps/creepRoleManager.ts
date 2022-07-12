@@ -1,6 +1,6 @@
 import './creepFunctions'
 
-import { constants, myColors } from 'international/constants'
+import { constants, creepRoles, myColors } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import { controllerUpgraderManager } from './roleManagers/commune/controllerUpgrader'
 import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvesterManager'
@@ -62,9 +62,7 @@ export function creepRoleManager(room: Room) {
 
      // Loop through each role in managers
 
-     for (const role of constants.creepRoles) {
-          // Get the CPU used at the start
-
+     for (const role of creepRoles) {
           roleCPUStart = Game.cpu.getUsed()
 
           // Get the amount of creeps with the role

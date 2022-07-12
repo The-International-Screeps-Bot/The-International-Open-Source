@@ -152,7 +152,7 @@ constants.roomTypes = {
 }
 constants.roomTypesUsedForStats = ['commune', 'remote']
 
-constants.creepRoles = [
+export const creepRoles: CreepRoles[] = [
      'source1Harvester',
      'source2Harvester',
      'hauler',
