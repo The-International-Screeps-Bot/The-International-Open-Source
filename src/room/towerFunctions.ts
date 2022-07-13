@@ -1,120 +1,113 @@
-
-
 Room.prototype.towersHealCreeps = function () {
-     // Construct heal targets from my and allied damaged creeps in the this
+    // Construct heal targets from my and allied damaged creeps in the this
 
-     const healTargets = this.find(FIND_MY_CREEPS)
-          .concat(this.allyCreeps)
-          .filter(function (creep) {
-               return creep.hits < creep.hitsMax && !creep.isOnExit()
-          })
+    const healTargets = this.myDamagedCreeps.concat(this.allyDamagedCreeps).filter(creep => {
+        return creep.hits < creep.hitsMax && !creep.isOnExit()
+    })
 
-     if (!healTargets.length) return
+    if (!healTargets.length) return
 
-     const target = healTargets[0]
+    const target = healTargets[0]
 
-     // Loop through the this's towers
+    // Loop through the this's towers
 
-     for (const tower of this.structures.tower) {
-          // Iterate if the tower is inactionable
+    for (const tower of this.structures.tower) {
+        // Iterate if the tower is inactionable
 
-          if (tower.inactionable) continue
+        if (tower.inactionable) continue
 
-          // If tower is below or equal to 50% capacity
+        // If tower is below or equal to 50% capacity
 
-          if (tower.store.energy <= tower.store.getCapacity(RESOURCE_ENERGY) * 0.5) continue
+        if (tower.store.energy <= tower.store.getCapacity(RESOURCE_ENERGY) * 0.5) continue
 
-          // If the heal failed, iterate
+        // If the heal failed, iterate
 
-          if (tower.heal(target) !== OK) continue
+        if (tower.heal(target) !== OK) continue
 
-          // Otherwise record that the tower is no longer inactionable
+        // Otherwise record that the tower is no longer inactionable
 
-          tower.inactionable = true
+        tower.inactionable = true
 
-          // And iterate
+        // And iterate
 
-          continue
-     }
+        continue
+    }
 }
 
 Room.prototype.towersAttackCreeps = function () {
-     // if (this.controller.safeMode) return
+    // if (this.controller.safeMode) return
 
-     // Construct attack targets from my and allied damaged creeps in the this
+    // Construct attack targets from my and allied damaged creeps in the this
 
-     const attackTargets = this.enemyCreeps.filter(function (creep) {
-          return !creep.isOnExit()
-     })
+    const attackTargets = this.enemyCreeps.filter(function (creep) {
+        return !creep.isOnExit()
+    })
 
-     if (!attackTargets.length) return
+    if (!attackTargets.length) return
 
-     // Find the target the creep can deal the most damage to
+    // Find the target the creep can deal the most damage to
 
-     const attackTarget = attackTargets.sort(function (a, b) {
-          return a.towerDamage - b.towerDamage
-     })[attackTargets.length - 1]
+    const attackTarget = attackTargets.sort(function (a, b) {
+        return a.towerDamage - b.towerDamage
+    })[attackTargets.length - 1]
 
-     if (attackTarget.towerDamage <= 0) return
+    if (attackTarget.towerDamage <= 0) return
 
-     // Loop through the this's towers
+    // Loop through the this's towers
 
-     for (const tower of this.structures.tower) {
-          // Iterate if the tower is inactionable
+    for (const tower of this.structures.tower) {
+        // Iterate if the tower is inactionable
 
-          if (tower.inactionable) continue
+        if (tower.inactionable) continue
 
-          if (tower.attack(attackTarget) !== OK) continue
+        if (tower.attack(attackTarget) !== OK) continue
 
-          // Otherwise record that the tower is no longer inactionable
+        // Otherwise record that the tower is no longer inactionable
 
-          tower.inactionable = true
+        tower.inactionable = true
 
-          // And iterate
+        // And iterate
 
-          continue
-     }
+        continue
+    }
 }
 
 Room.prototype.towersRepairRamparts = function () {
+    // Find ramparts at 300 hits or less
 
-     // Find ramparts at 300 hits or less
+    const ramparts = this.structures.rampart.filter(function (rampart) {
+        return rampart.hits <= RAMPART_DECAY_AMOUNT
+    })
 
-     const ramparts = this.structures.rampart.filter(function(rampart) {
-          return rampart.hits <= 300
-     })
+    if (!ramparts.length) return
 
-     if (!ramparts.length) return
+    // Loop through the this's towers
 
-     let target
+    for (const tower of this.structures.tower) {
+        // Iterate if the tower is inactionable
 
-     // Loop through the this's towers
+        if (tower.inactionable) continue
 
-     for (const tower of this.structures.tower) {
+        // Try to get the last element of ramparts, iterating if it's undefined
 
-          // Iterate if the tower is inactionable
+        const target = ramparts[ramparts.length - 1]
 
-          if (tower.inactionable) continue
+        if (!target) continue
 
-          // Try to get the last element of ramparts, iterating if it's undefined
-          target = ramparts[ramparts.length - 1]
+        // If the repair failed
 
-          if (!target) continue
+        if (tower.repair(target) !== OK) continue
 
-          // If the repair failed
+        // Otherwise record that the tower is no longer inactionable
 
-          if (tower.repair(target) !== OK) continue
+        tower.inactionable = true
 
-          // Otherwise record that the tower is no longer inactionable
+        // And remove the rampart from ramparts
 
-          tower.inactionable = true
+        ramparts.pop()
 
-          // And remove the rampart from ramparts
+        // And iterate
 
-          ramparts.pop()
-
-          // And iterate
-
-          continue
-     }
+        continue
+    }
 }

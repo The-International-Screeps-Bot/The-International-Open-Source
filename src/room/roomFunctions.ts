@@ -24,7 +24,6 @@ import {
     unpackAsRoomPos,
 } from 'international/generalFunctions'
 import { basePlanner } from './construction/basePlanner'
-import { ControllerUpgrader, MineralHarvester, SourceHarvester } from './creeps/creepClasses'
 import { RoomCacheObject } from './roomObject'
 
 Room.prototype.get = function (roomObjectName) {
@@ -804,34 +803,6 @@ Room.prototype.get = function (roomObjectName) {
         valueConstructor: findUsedFastFillerPositions,
     })
 
-    // controllerContainer
-
-    function findControllerContainer() {
-        // Get the centerUpgradePos
-
-        const centerUpgradePos: RoomPosition = room.roomObjects.centerUpgradePos.getValue()
-
-        // Stop and inform false if no centerUpgradePos
-
-        if (!centerUpgradePos) return false
-
-        // Look at the centerUpgradePos for structures
-
-        const structuresAsPos = centerUpgradePos.lookFor(LOOK_STRUCTURES)
-
-        // Loop through structuresAtPos
-
-        for (const structure of structuresAsPos) {
-            // If the structureType is container, inform the container's ID
-
-            if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
-        }
-
-        // Otherwise inform false
-
-        return false
-    }
-
     new RoomCacheObject({
         name: 'labContainer',
         valueType: 'id',
@@ -839,19 +810,6 @@ Room.prototype.get = function (roomObjectName) {
         cacheAmount: Infinity,
         room,
         valueConstructor() {},
-    })
-
-    // Creeps
-
-    new RoomCacheObject({
-        name: 'notMyCreeps',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: 1,
-        room,
-        valueConstructor() {
-            return room.find(FIND_HOSTILE_CREEPS)
-        },
     })
 
     new RoomCacheObject({
