@@ -1,4 +1,4 @@
-import { getRangeBetween, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
+import { getRange, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 import { MineralHarvester } from '../../creepClasses'
 
 MineralHarvester.prototype.advancedHarvestMineral = function (mineral) {
@@ -17,7 +17,7 @@ MineralHarvester.prototype.advancedHarvestMineral = function (mineral) {
 
      // If the creep is not standing on the harvestPos
 
-     if (getRangeBetween(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) > 0) {
+     if (getRange(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) > 0) {
           creep.say('⏩M')
 
           // Make a move request to it

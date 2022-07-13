@@ -70,7 +70,7 @@ RoomCacheObject.prototype.formatValue = function () {
 
           // Otherwise assign its value as a new RoomPosition and stop
 
-          roomObject.value = room.newPos(roomObject.value)
+          roomObject.value = new RoomPosition(roomObject.value.x, roomObject.value.y, room.name)
      }
 }
 

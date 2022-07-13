@@ -52,8 +52,8 @@ export function findPositionsInsideRect(x1: number, y1: number, x2: number, y2: 
 /**
  * Checks if two positions are equal
  */
-export function arePositionsEqual(pos1: Pos, pos2: Pos) {
-     return pos1?.x === pos2?.x && pos1?.y === pos2?.y
+export function arePositionsEqual(pos1: Coord, pos2: Coord) {
+     return pos1.x === pos2.x && pos1.y === pos2.y
 }
 
 /**
@@ -141,7 +141,7 @@ export function findCarryPartsRequired(distance: number, income: number) {
 /**
  * Finds a position equally between two positions
  */
-export function findAvgBetweenPosotions(pos1: Pos, pos2: Pos) {
+export function findAvgBetweenPosotions(pos1: Coord, pos2: Coord) {
      // Inform the rounded average of the two positions
 
      return {
@@ -157,22 +157,52 @@ export function findAvgBetweenPosotions(pos1: Pos, pos2: Pos) {
  * @param x2 the second position's x
  * @param y2 the second position's y
  */
-export function getRangeBetween(x1: number, y1: number, x2: number, y2: number) {
+export function getRange(x1: number, x2: number, y1: number, y2: number) {
      // Find the range using Chebyshev's formula
 
      return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2))
 }
 
 /**
- * Gets the range between two position's differences
- * @param xDif the difference between the two location's x's
- * @param yDif the difference between the two location's y's
- * @returns The range between the two position's differences
+ * Finds the closest object with a position to a given target (by linear range)
  */
-export function getRange(xDif: number, yDif: number) {
-     // Find the range using Chebyshev's formula
+export function findClosestObject<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[]) {
 
-     return Math.max(Math.abs(xDif), Math.abs(yDif))
+     let minRange = Infinity
+     let closest = undefined
+
+     for (const object of objects) {
+
+         const range = getRange(target.x, object.pos.x, target.y, object.pos.y)
+
+         if (range > minRange) continue
+
+         minRange = range
+         closest = object
+     }
+
+     return closest
+}
+
+/**
+ * Finds the closest position to a given target (by linear range)
+ */
+export function findClosestPos<T extends RoomPosition | Coord>(target: RoomPosition | Coord, positions: T[]) {
+
+     let minRange = Infinity
+     let closest = undefined
+
+     for (const pos of positions) {
+
+         const range = getRange(target.x, pos.x, target.y, pos.y)
+
+         if (range > minRange) continue
+
+         minRange = range
+         closest = pos
+     }
+
+     return closest
 }
 
 export function findCPUColor(CPU: number): string {
@@ -222,7 +252,7 @@ export function unpackAsRoomPos(packedPos: number, roomName: string) {
      )
 }
 
-export function pack(pos: Pos) {
+export function pack(pos: Coord) {
      // Inform a packed pos
 
      return pos.x * roomDimensions + pos.y

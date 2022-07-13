@@ -103,7 +103,7 @@ Object.defineProperties(Creep.prototype, {
                for (const tower of room.structures.tower) {
                     if (tower.store.energy <= 0) continue
 
-                    range = getRange(this.pos.x - tower.pos.x, this.pos.y - tower.pos.y)
+                    range = getRange(this.pos.x, tower.pos.x, this.pos.y, tower.pos.y)
 
                     if (range <= TOWER_OPTIMAL_RANGE) {
                          this._towerDamage += TOWER_POWER_ATTACK
@@ -135,7 +135,7 @@ Object.defineProperties(Creep.prototype, {
 
                     if (posData.creep.my || allyList.has(posData.creep.owner.username)) continue
 
-                    range = getRange(this.pos.x - posData.creep.pos.x, this.pos.y - posData.creep.pos.y)
+                    range = getRange(this.pos.x, posData.creep.pos.x, this.pos.y, posData.creep.pos.y)
 
                     if (range > 3) continue
 

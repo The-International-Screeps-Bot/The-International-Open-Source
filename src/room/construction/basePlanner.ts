@@ -79,7 +79,7 @@ export function basePlanner(room: Room) {
      interface PlanStampOpts {
           stampType: StampTypes
           count: number
-          anchorOrient: Pos
+          anchorOrient: Coord
           initialWeight?: number
           adjacentToRoads?: boolean
           normalDT?: boolean
@@ -533,7 +533,7 @@ export function basePlanner(room: Room) {
 
                adjacentPositions.sort(function (a, b) {
                     return (
-                         getRange(a.x - hubAnchor.x, a.y - hubAnchor.y) - getRange(b.x - hubAnchor.x, b.y - hubAnchor.y)
+                         getRange(a.x, hubAnchor.x, a.y, hubAnchor.y) - getRange(b.x, hubAnchor.x, b.y, hubAnchor.y)
                     )
                })
 

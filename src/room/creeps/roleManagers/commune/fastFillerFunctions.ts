@@ -1,4 +1,4 @@
-import { customLog, getRange, getRangeBetween, unpackAsRoomPos } from 'international/generalFunctions'
+import { customLog, getRange, unpackAsRoomPos } from 'international/generalFunctions'
 import { FastFiller } from 'room/creeps/creepClasses'
 
 FastFiller.prototype.travelToFastFiller = function () {
@@ -14,7 +14,7 @@ FastFiller.prototype.travelToFastFiller = function () {
 
      // If the this is standing on the fastFillerPos, inform false
 
-     if (getRangeBetween(this.pos.x, this.pos.y, fastFillerPos.x, fastFillerPos.y) === 0) return false
+     if (getRange(this.pos.x, this.pos.y, fastFillerPos.x, fastFillerPos.y) === 0) return false
 
      // Otherwise, make a move request to it
 
@@ -82,7 +82,7 @@ FastFiller.prototype.fillFastFiller = function () {
 
                // Otherwise, if the structure is not in range 1 to the this
 
-               if (getRange(this.pos.x - structure.pos.x, this.pos.y - structure.pos.y) > 1) continue
+               if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) continue
 
                // If there is a non-energy resource in the structure
 

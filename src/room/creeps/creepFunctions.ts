@@ -13,11 +13,12 @@ import {
 import {
      arePositionsEqual,
      customLog,
+     findClosestObject,
+     findClosestPos,
      findCreepInQueueMatchingRequest,
      findObjectWithID,
      findPositionsInsideRect,
      getRange,
-     getRangeBetween,
      pack,
      packXY,
      unpackAsPos,
@@ -221,7 +222,7 @@ Creep.prototype.advancedUpgradeController = function () {
           if (!this.memory.packedPos) return false
 
           const upgradePos = unpackAsRoomPos(this.memory.packedPos, room.name)
-          const upgradePosRange = getRange(this.pos.x - upgradePos.x, this.pos.y - upgradePos.y)
+          const upgradePosRange = getRange(this.pos.x, upgradePos.x, this.pos.y, upgradePos.y)
 
           if (upgradePosRange > 0) {
                this.createMoveRequest({
@@ -237,7 +238,7 @@ Creep.prototype.advancedUpgradeController = function () {
           }
 
           const workPartCount = this.parts.work
-          const controllerRange = getRange(this.pos.x - room.controller.pos.x, this.pos.y - room.controller.pos.y)
+          const controllerRange = getRange(this.pos.x, room.controller.pos.x, this.pos.y, room.controller.pos.y)
 
           if (controllerRange <= 3 && this.store.energy > 0) {
                if (this.upgradeController(room.controller) === OK) {
@@ -251,8 +252,8 @@ Creep.prototype.advancedUpgradeController = function () {
           }
 
           const controllerStructureRange = getRange(
-               this.pos.x - controllerStructure.pos.x,
-               this.pos.y - controllerStructure.pos.y,
+               this.pos.x, controllerStructure.pos.x,
+               this.pos.y, controllerStructure.pos.y,
           )
 
           if (controllerStructureRange <= 3) {
@@ -371,7 +372,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
      this.say('ABCS')
 
-     const range = getRange(this.pos.x - cSite.pos.x, this.pos.y - cSite.pos.y)
+     const range = getRange(this.pos.x, cSite.pos.x, this.pos.y, cSite.pos.y)
 
      // If the cSite is out of range
 
@@ -599,13 +600,13 @@ Creep.prototype.findSourceHarvestPos = function (sourceName) {
 
      // Otherwise get the harvest positions for the source
 
-     const harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`)
+     const harvestPositions: Coord[] = room.get(`${sourceName}HarvestPositions`)
 
      const openHarvestPositions = harvestPositions.filter(pos => !usedSourceHarvestPositions.has(pack(pos)))
      if (!openHarvestPositions.length) return false
 
      openHarvestPositions.sort(
-          (a, b) => getRangeBetween(anchor.x, anchor.y, a.x, a.y) - getRangeBetween(anchor.x, anchor.y, b.x, b.y),
+          (a, b) => getRange(anchor.x, anchor.y, a.x, a.y) - getRange(anchor.x, anchor.y, b.x, b.y),
      )
 
      packedPos = pack(openHarvestPositions[0])
@@ -655,13 +656,13 @@ Creep.prototype.findMineralHarvestPos = function () {
 
      // Otherwise get the harvest positions for the source
 
-     const harvestPositions: Pos[] = room.get('mineralHarvestPositions')
+     const harvestPositions: Coord[] = room.get('mineralHarvestPositions')
 
      const openHarvestPositions = harvestPositions.filter(pos => !usedHarvestPositions.has(pack(pos)))
      if (!openHarvestPositions.length) return false
 
      openHarvestPositions.sort(
-          (a, b) => getRangeBetween(anchor.x, anchor.y, a.x, a.y) - getRangeBetween(anchor.x, anchor.y, b.x, b.y),
+          (a, b) => getRange(anchor.x, anchor.y, a.x, a.y) - getRange(anchor.x, anchor.y, b.x, b.y),
      )
 
      packedPos = pack(openHarvestPositions[0])
@@ -687,17 +688,12 @@ Creep.prototype.findFastFillerPos = function () {
 
      // Otherwise get the harvest positions for the source
 
-     const fastFillerPositions: Pos[] = room.get('fastFillerPositions')
+     const fastFillerPositions: Coord[] = room.get('fastFillerPositions')
 
      const openFastFillerPositions = fastFillerPositions.filter(pos => !usedFastFillerPositions.has(pack(pos)))
      if (!openFastFillerPositions.length) return false
 
-     openFastFillerPositions.sort(
-          (a, b) =>
-               getRangeBetween(this.pos.x, this.pos.y, a.x, a.y) - getRangeBetween(this.pos.x, this.pos.y, b.x, b.y),
-     )
-
-     const packedPos = pack(openFastFillerPositions[0])
+     const packedPos = pack(findClosestPos(this.pos, openFastFillerPositions))
 
      this.memory.packedPos = packedPos
      usedFastFillerPositions.add(packedPos)
@@ -938,7 +934,7 @@ Creep.prototype.shove = function (shoverPos) {
           goalPos = unpackPos(this.memory.goalPos)
 
           goalPos = shovePositions.sort((a, b) => {
-               return getRange(goalPos.x - a.x, goalPos.y - a.y) - getRange(goalPos.x - b.x, goalPos.y - b.y)
+               return getRange(goalPos.x, a.x, goalPos.y, a.y) - getRange(goalPos.x, b.x, goalPos.y, b.y)
           })[0]
      } else goalPos = shovePositions[0]
 
@@ -1225,7 +1221,7 @@ Creep.prototype.advancedRecycle = function () {
      const fastFillerContainers = [room.fastFillerContainerLeft, room.fastFillerContainerRight].filter(function (
           container,
      ) {
-          return container && getRange(container.pos.x - closestSpawn.pos.x, container.pos.y - closestSpawn.pos.y) == 1
+          return container && getRange(container.pos.x, closestSpawn.pos.x, container.pos.y, closestSpawn.pos.y) == 1
      })
 
      if (fastFillerContainers.length) {
@@ -1233,7 +1229,7 @@ Creep.prototype.advancedRecycle = function () {
 
           // If the creep is in range of 1
 
-          if (getRange(this.pos.x - closestContainer.pos.x, this.pos.y - closestContainer.pos.y) > 0) {
+          if (getRange(this.pos.x, closestContainer.pos.x, this.pos.y, closestContainer.pos.y) > 0) {
                this.createMoveRequest({
                     origin: this.pos,
                     goal: { pos: closestContainer.pos, range: 0 },
@@ -1357,49 +1353,54 @@ Creep.prototype.passiveHeal = function () {
 
      this.say('PH')
 
-     // If the creep is below max hits
+     if (!this.meleed) {
 
-     if (this.hitsMax > this.hits) {
-          // Have it heal itself and stop
+          // If the creep is below max hits
 
-          this.heal(this)
-          return false
+          if (this.hitsMax > this.hits) {
+               // Have it heal itself and stop
+
+               this.heal(this)
+               return false
+          }
+
+          let top = Math.max(Math.min(this.pos.y - 1, roomDimensions - 2), 2)
+          let left = Math.max(Math.min(this.pos.x - 1, roomDimensions - 2), 2)
+          let bottom = Math.max(Math.min(this.pos.y + 1, roomDimensions - 2), 2)
+          let right = Math.max(Math.min(this.pos.x + 1, roomDimensions - 2), 2)
+
+          // Find adjacent creeps
+
+          const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+
+          // Loop through each adjacentCreep
+
+          for (const posData of adjacentCreeps) {
+               // If the creep is the posData creep, iterate
+
+               if (this.id === posData.creep.id) continue
+
+               // If the creep is not owned and isn't an ally
+
+               if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
+
+               // If the creep is at full health, iterate
+
+               if (posData.creep.hitsMax === posData.creep.hits) continue
+
+               // have the creep heal the adjacentCreep and stop
+
+               this.heal(posData.creep)
+               return false
+          }
      }
 
-     let top = Math.max(Math.min(this.pos.y - 1, roomDimensions - 2), 2)
-     let left = Math.max(Math.min(this.pos.x - 1, roomDimensions - 2), 2)
-     let bottom = Math.max(Math.min(this.pos.y + 1, roomDimensions - 2), 2)
-     let right = Math.max(Math.min(this.pos.x + 1, roomDimensions - 2), 2)
+     if (this.ranged) return false
 
-     // Find adjacent creeps
-
-     const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
-
-     // Loop through each adjacentCreep
-
-     for (const posData of adjacentCreeps) {
-          // If the creep is the posData creep, iterate
-
-          if (this.id === posData.creep.id) continue
-
-          // If the creep is not owned and isn't an ally
-
-          if (!posData.creep.my && !allyList.has(posData.creep.owner.username)) continue
-
-          // If the creep is at full health, iterate
-
-          if (posData.creep.hitsMax === posData.creep.hits) continue
-
-          // have the creep heal the adjacentCreep and stop
-
-          this.heal(posData.creep)
-          return false
-     }
-
-     ; (top = Math.max(Math.min(this.pos.y - 3, roomDimensions - 2), 2)),
-          (left = Math.max(Math.min(this.pos.x - 3, roomDimensions - 2), 2)),
-          (bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 2), 2)),
-          (right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 2), 2))
+     let top = Math.max(Math.min(this.pos.y - 3, roomDimensions - 2), 2)
+     let left = Math.max(Math.min(this.pos.x - 3, roomDimensions - 2), 2)
+     let bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 2), 2)
+     let right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 2), 2)
 
      // Find my creeps in range of creep
 
@@ -1434,13 +1435,16 @@ Creep.prototype.aggressiveHeal = function () {
 
      this.say('AH')
 
-     // If the creep is below max hits
+     if (this.meleed) {
 
-     if (this.hitsMax > this.hits) {
-          // Have it heal itself and stop
+          // If the creep is below max hits
 
-          this.heal(this)
-          return false
+          if (this.hitsMax > this.hits) {
+               // Have it heal itself and stop
+
+               this.heal(this)
+               return false
+          }
      }
 
      const healTargets = room
@@ -1452,10 +1456,13 @@ Creep.prototype.aggressiveHeal = function () {
 
      if (!healTargets.length) return false
 
-     const healTarget = this.pos.findClosestByRange(healTargets)
-     const range = getRange(this.pos.x - healTarget.pos.x, this.pos.y - healTarget.pos.y)
+     const healTarget = findClosestObject(this.pos, healTargets)
+     const range = getRange(this.pos.x, healTarget.pos.x, this.pos.y, healTarget.pos.y)
 
      if (range > 1) {
+
+          if (this.ranged) return false
+
           this.createMoveRequest({
                origin: this.pos,
                goal: { pos: healTarget.pos, range: 1 },
@@ -1467,7 +1474,14 @@ Creep.prototype.aggressiveHeal = function () {
           }
      }
 
+     if (this.meleed) return false
+
      this.heal(healTarget)
+     return true
+}
+
+Creep.prototype.passiveRangedAttack = function() {
+
      return true
 }
 
@@ -1505,6 +1519,8 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
 
      target.store[reservation.resourceType] -= reservation.amount
 }
+
+
 
 Creep.prototype.reservationManager = function () {
      if (!this.memory.reservations) return

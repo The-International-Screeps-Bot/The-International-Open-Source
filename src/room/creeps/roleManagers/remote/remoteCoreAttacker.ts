@@ -106,7 +106,7 @@ RemoteCoreAttacker.prototype.advancedAttackCores = function () {
 
      // If the creep at the core
 
-     if (getRange(this.pos.x - closestCore.pos.x, this.pos.y - closestCore.pos.y) === 1) {
+     if (getRange(this.pos.x, closestCore.pos.x, this.pos.y, closestCore.pos.y) === 1) {
           this.say('🗡️C')
 
           this.attack(closestCore)

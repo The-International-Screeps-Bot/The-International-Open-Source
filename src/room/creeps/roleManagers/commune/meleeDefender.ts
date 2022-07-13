@@ -50,7 +50,7 @@ MeleeDefender.prototype.advancedDefend = function () {
      })
 
      if (!ramparts.length) {
-          if (getRange(this.pos.x - enemyAttacker.pos.x, this.pos.y - enemyAttacker.pos.y) > 1) {
+          if (getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y) > 1) {
                this.createMoveRequest({
                     origin: this.pos,
                     goal: { pos: enemyAttacker.pos, range: 1 },

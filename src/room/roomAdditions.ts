@@ -161,8 +161,8 @@ Object.defineProperties(Room.prototype, {
 
                return (this._spawningStructuresByPriority = this.spawningStructures.sort(
                     (a, b) =>
-                         getRange(a.pos.x - this.anchor.x, a.pos.y - this.anchor.y) -
-                         getRange(b.pos.x - this.anchor.x, b.pos.y - this.anchor.y),
+                         getRange(a.pos.x, this.anchor.x, a.pos.y, this.anchor.y) -
+                         getRange(b.pos.x, this.anchor.x, b.pos.y, this.anchor.y),
                ))
           },
      },
@@ -187,7 +187,7 @@ Object.defineProperties(Room.prototype, {
 
                     this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
                          structure =>
-                              getRange(structure.pos.x - closestHarvestPos.x, structure.pos.y - closestHarvestPos.y) >
+                              getRange(structure.pos.x, closestHarvestPos.x, structure.pos.y, closestHarvestPos.y) >
                               1,
                     )
                }
@@ -199,7 +199,7 @@ Object.defineProperties(Room.prototype, {
                          (this.fastFillerContainerLeft && this.fastFillerContainerRight))
                ) {
                     this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
-                         structure => getRange(structure.pos.x - this.anchor.x, structure.pos.y - this.anchor.y) > 2,
+                         structure => getRange(structure.pos.x, this.anchor.x, structure.pos.y, this.anchor.y) > 2,
                     )
                }
 

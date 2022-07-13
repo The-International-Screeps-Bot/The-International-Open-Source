@@ -1,4 +1,4 @@
-import { customLog, getRangeBetween, unpackAsPos } from 'international/generalFunctions'
+import { customLog, getRange, unpackAsPos } from 'international/generalFunctions'
 import { SourceHarvester } from '../../creepClasses'
 
 SourceHarvester.prototype.isDying = function () {
@@ -44,7 +44,7 @@ SourceHarvester.prototype.travelToSource = function () {
 
      // If the creep is at the creep's packedHarvestPos, inform false
 
-     if (getRangeBetween(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) === 0) return false
+     if (getRange(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) === 0) return false
 
      // If the creep's movement type is pull
 

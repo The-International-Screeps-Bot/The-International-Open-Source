@@ -70,7 +70,7 @@ RemoteDefender.prototype.advancedAttackEnemies = function () {
           const enemyCreep = this.pos.findClosestByRange(enemyCreeps)
           // Get the range between the creeps
 
-          const range = getRange(this.pos.x - enemyCreep.pos.x, this.pos.y - enemyCreep.pos.y)
+          const range = getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y)
 
           // If the range is more than 1
 
@@ -99,7 +99,7 @@ RemoteDefender.prototype.advancedAttackEnemies = function () {
 
      // Get the range between the creeps
 
-     const range = getRange(this.pos.x - enemyAttacker.pos.x, this.pos.y - enemyAttacker.pos.y)
+     const range = getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y)
 
      // If it's more than range 3
 

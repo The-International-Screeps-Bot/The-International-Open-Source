@@ -1,4 +1,4 @@
-import { customLog, getRange } from 'international/generalFunctions'
+import { customLog, findClosestObject, getRange } from 'international/generalFunctions'
 import { marketManager } from './market/marketManager'
 import { spawnManager } from './spawning/spawnManager'
 
@@ -7,30 +7,37 @@ import { constructionManager } from './construction/constructionManager'
 import { defenceManager } from './defenceManager'
 import { linkManager } from './linkManager'
 import './claimRequestManager'
+import { myColors } from 'international/constants'
 
 /**
  * Handles managers for exclusively commune-related actions
  */
 export function communeManager(room: Room) {
-     constructionManager(room)
+    constructionManager(room)
 
-     towerManager(room)
+    towerManager(room)
 
-     marketManager(room)
+    marketManager(room)
 
-     linkManager(room)
+    linkManager(room)
 
-     defenceManager(room)
+    defenceManager(room)
 
-     room.claimRequestManager()
+    room.claimRequestManager()
 
-     spawnManager(room)
+    spawnManager(room)
 
-     /*
-     let cpu = Game.cpu.getUsed()
+    const creeps = room.find(FIND_MY_CREEPS)
+    const spawn = room.structures.spawn[0]
 
+    let cpu = Game.cpu.getUsed()
 
+    spawn.pos.findClosestByRange(creeps)
 
-     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu)
- */
+    customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
+    cpu = Game.cpu.getUsed()
+
+    findClosestObject(spawn.pos, creeps)
+
+    customLog('CPU USED FOR TEST 2', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
 }

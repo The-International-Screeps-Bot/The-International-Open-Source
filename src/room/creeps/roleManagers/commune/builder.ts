@@ -51,7 +51,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
                          ignoreCreeps: true,
                     })
 
-                    if (getRange(creep.pos.x - source.pos.x, creep.pos.y - source.pos.y) > 1) {
+                    if (getRange(creep.pos.x, source.pos.x, creep.pos.y, source.pos.y) > 1) {
                          creep.createMoveRequest({
                               origin: creep.pos,
                               goal: { pos: source.pos, range: 1 },

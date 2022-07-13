@@ -13,84 +13,78 @@ import '../room/creeps/preTickManagers/remote/remoteCoreAttackerPreTick'
 import '../room/creeps/preTickManagers/remote/remoteDismantlerPreTick'
 
 InternationalManager.prototype.creepOrganizer = function () {
+    // If CPU logging is enabled, get the CPU used at the start
 
-     // If CPU logging is enabled, get the CPU used at the start
+    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    // Construct counter for creeps
 
-     // Construct counter for creeps
+    let totalCreepCount = 0
 
-     let totalCreepCount = 0
+    // Loop through all of my creeps
 
-     // Loop through all of my creeps
+    for (const creepName in Memory.creeps) {
+        let creep = Game.creeps[creepName]
 
-     for (const creepName in Memory.creeps) {
-          let creep = Game.creeps[creepName]
+        // If creep doesn't exist
 
-          // If creep doesn't exist
+        if (!creep) {
+            // Delete creep from memory and iterate
 
-          if (!creep) {
-               // Delete creep from memory and iterate
+            delete Memory.creeps[creepName]
+            continue
+        }
 
-               delete Memory.creeps[creepName]
-               continue
-          }
+        // Increase total creep counter
 
-          // Increase total creep counter
+        totalCreepCount += 1
 
-          totalCreepCount += 1
+        // Get the creep's role
 
-          // Get the creep's role
+        const { role } = creep.memory
+        if (!role) continue
 
-          const { role } = creep.memory
-          if (!role) continue
+        // Assign creep a class based on role
 
-          // Assign creep a class based on role
+        creep = Game.creeps[creepName] = new creepClasses[role](creep.id)
 
-          creep = Game.creeps[creepName] = new creepClasses[role](creep.id)
+        // Get the creep's current room and the room it's from
 
-          // Get the creep's current room and the room it's from
+        const { room } = creep
 
-          const { room } = creep
+        // Organize creep in its room by its role
 
-          // Organize creep in its room by its role
+        room.myCreeps[role].push(creepName)
 
-          room.myCreeps[role].push(creepName)
+        // Record the creep's presence in the room
 
-          // Record the creep's presence in the room
+        room.myCreepsAmount += 1
 
-          room.myCreepsAmount += 1
+        // Add the creep's name to the position in its room
 
-          // Add the creep's name to the position in its room
+        if (!creep.spawning) room.creepPositions[pack(creep.pos)] = creep.name
 
-          if (!creep.spawning) room.creepPositions[pack(creep.pos)] = creep.name
+        creep.preTickManager()
 
-          creep.preTickManager()
+        creep.reservationManager()
 
-          creep.reservationManager()
+        // Get the commune the creep is from
 
-          // Get the commune the creep is from
+        const commune = Game.rooms[creep.memory.communeName]
 
-          const commune = Game.rooms[creep.memory.communeName]
+        // If there is not vision in the commune, stop
 
-          // If there is not vision in the commune, stop
+        if (!commune) continue
 
-          if (!commune) continue
+        // If the creep isn't dying, organize by its roomFrom and role
 
-          // If the creep isn't dying, organize by its roomFrom and role
+        if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
 
-          if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
+        // Record that the creep's existence in its roomFrom
 
-          // Record that the creep's existence in its roomFrom
+        commune.creepsFromRoomAmount += 1
+    }
 
-          commune.creepsFromRoomAmount += 1
-     }
-
-     if (Memory.cpuLogging)
-          customLog(
-               'Creep Organizer',
-               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-               undefined,
-               myColors.midGrey,
-          )
+    if (Memory.cpuLogging)
+        customLog('Creep Organizer', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.midGrey)
 }

@@ -105,7 +105,7 @@ RemoteDismantler.prototype.advancedDismantle = function () {
 
           if (target) {
 
-               range = getRange(this.pos.x - target.pos.x, this.pos.y - target.pos.y)
+               range = getRange(this.pos.x, target.pos.x, this.pos.y, target.pos.y)
 
                if (range > 1) {
                     this.createMoveRequest({
@@ -134,7 +134,7 @@ RemoteDismantler.prototype.advancedDismantle = function () {
      if (targets.length) {
           target = this.pos.findClosestByPath(targets, { ignoreRoads: true, ignoreCreeps: true })
 
-          range = getRange(this.pos.x - target.pos.x, this.pos.y - target.pos.y)
+          range = getRange(this.pos.x, target.pos.x, this.pos.y, target.pos.y)
 
           if (range > 1) {
                this.createMoveRequest({

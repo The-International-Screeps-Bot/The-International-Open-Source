@@ -37,12 +37,8 @@ import { createPackedPosMap, customLog } from 'international/generalFunctions'
 // Type declareations for global
 
 declare global {
-     interface Pos {
-          x: number
-          y: number
-     }
 
-     export interface Coord {
+     interface Coord {
           x: number
           y: number
      }
@@ -91,7 +87,7 @@ declare global {
            */
           protectionOffset: number
           size: number
-          structures: { [structureType: string]: Pos[] }
+          structures: { [structureType: string]: Coord[] }
      }
 
      type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
@@ -179,7 +175,7 @@ declare global {
            * An object with keys of weights and values of positions
            */
 
-          weightPositions?: { [weight: string]: Pos[] | RoomPosition[] }
+          weightPositions?: { [weight: string]: Coord[] | RoomPosition[] }
 
           /**
            *
@@ -210,7 +206,7 @@ declare global {
 
      interface FindClosestPosOfValueOpts {
           CM: CostMatrix
-          startPos: Pos
+          startPos: Coord
           requiredValue: number
           reduceIterations?: number
           initialWeight?: number
@@ -451,6 +447,11 @@ declare global {
           allyTrading: boolean
 
           /**
+           * Wether creeps should publically say communist propaganda (facts). Does not affect controller signs
+           */
+          propaganda: boolean
+
+          /**
            * An ongoing record of the latest ID assigned by the bot
            */
           ID: number
@@ -609,11 +610,6 @@ declare global {
           cleanMemory(): void
 
           /**
-           * Converts a custom Pos into a Game's RoomPosition
-           */
-          newPos(pos: Pos): RoomPosition
-
-          /**
            *
            * @param pos1 The position of the thing performing the action
            * @param pos2 The position of the thing getting intereacted with
@@ -685,7 +681,7 @@ declare global {
           /**
            * Gets ranges from for each position from a certain point
            */
-          floodFill(seeds: Pos[]): CostMatrix
+          floodFill(seeds: Coord[]): CostMatrix
 
           /**
            * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
@@ -1056,6 +1052,11 @@ declare global {
            */
           claimRequest: string
 
+          /**
+           *
+           */
+          attackRequest: string[]
+
           cSiteTargetID: Id<ConstructionSite>
 
           stampAnchors: Partial<Record<StampTypes, number[]>>
@@ -1077,7 +1078,7 @@ declare global {
           RP: boolean
 
           /**
-           * Remote Stamp Anchors,
+           * Remote Stamp Anchors
            */
           RSA: Partial<Record<RemoteStampTypes, string>>
      }
@@ -1090,11 +1091,30 @@ declare global {
            */
           moveRequest: number
 
+          /**
+           * Wether the creep moved a resource this tick
+           */
           movedResource: boolean
 
+          /**
+           * Wether the creep moved this tick
+           */
           moved: boolean
 
+          /**
+           * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
+           */
           worked: boolean
+
+          /**
+           * Wether the creep rangedHealed or rangedAttacked this tick
+           */
+          ranged: boolean
+
+          /**
+           * Wether the creep healed or attacked this tick
+           */
+          meleed: boolean
 
           /**
            * Whether the creep is actively pulling another creep or not
@@ -1213,7 +1233,15 @@ declare global {
 
           passiveHeal(): boolean
 
+          /**
+           * Heal nearby allies without moving
+           */
           aggressiveHeal(): boolean
+
+          /**
+           * Attack nearby enemies without moving
+           */
+          passiveRangedAttack(): boolean
 
           reserveWithdrawEnergy(): void
 
@@ -1350,7 +1378,7 @@ declare global {
           remoteName: string
 
           /**
-           * The target ID of the task
+           * The target ID of the task (for hubHaulers)
            */
           taskTarget: Id<Creep | AnyStoreStructure>
 
@@ -1390,9 +1418,9 @@ declare global {
           squadType: 'rangedAttack' | 'attack' | 'dismantle'
 
           /**
-           * The roomName of the room the creep is trying to attack
+           * Attack Request, the name of the room the creep should
            */
-          attackTarget: string
+          AR: string | undefined
      }
 
      // PowerCreeps
