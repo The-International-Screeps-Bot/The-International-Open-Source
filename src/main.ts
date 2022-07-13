@@ -91,7 +91,7 @@ declare global {
 
     type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
 
-    type PackedPosMap = any[]
+    type PackedPosMap<T> = T[]
 
     type CreepRoles =
         | 'source1Harvester'
@@ -947,19 +947,19 @@ declare global {
 
         readonly actionableWalls: StructureWall[]
 
-        _creepPositions: PackedPosMap
+        _creepPositions: PackedPosMap<string>
 
         /**
          * A matrix with indexes of packed positions and values of creep names
          */
-        readonly creepPositions: PackedPosMap
+        readonly creepPositions: PackedPosMap<string>
 
-        _moveRequests: PackedPosMap
+        _moveRequests: PackedPosMap<string[]>
 
         /**
          * A matrix with indexes of packed positions and values of creep names
          */
-        readonly moveRequests: PackedPosMap
+        readonly moveRequests: PackedPosMap<string[]>
 
         // Target finding
 
@@ -1391,6 +1391,11 @@ declare global {
          * A name of the creep's designated source
          */
         sourceName: 'source1' | 'source2'
+
+        /**
+         * The Source Index of recorded sources in the room
+         */
+        SI: number
 
         /**
          * The creep's packedPos for a designated target

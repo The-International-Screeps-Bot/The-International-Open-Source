@@ -18,7 +18,7 @@ import { source1RemoteHarvesterManager } from './roleManagers/remote/source1Remo
 import { remoteReserverManager } from './roleManagers/remote/remoteReserver'
 import { remoteDefenderManager } from './roleManagers/remote/remoteDefenderManager'
 import { vanguardManager } from './roleManagers/international/vanguardManager'
-import { sourceHarvesterManager } from './roleManagers/commune/sourceHarvesterManager'
+import { sourceHarvesterManager } from './roleManagers/commune/sourceHarvester'
 import { remoteCoreAttackerManager } from './roleManagers/remote/remoteCoreAttacker'
 import { vanguardDefenderManager } from './roleManagers/international/vanguardDefender'
 import { remoteDismantlerManager } from './roleManagers/remote/remoteDismantler'
