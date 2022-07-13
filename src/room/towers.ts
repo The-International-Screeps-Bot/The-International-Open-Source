@@ -1,3 +1,25 @@
+import { myColors } from 'international/constants'
+import { customLog } from 'international/generalFunctions'
+
+Room.prototype.towerManager = function() {
+    // If CPU logging is enabled, get the CPU used at the start
+
+    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+
+    if (!this.structures.tower.length) return
+
+    this.towersAttackCreeps()
+
+    this.towersHealCreeps()
+
+    this.towersRepairRamparts()
+
+    // If CPU logging is enabled, log the CPU used by this manager
+
+    if (Memory.cpuLogging)
+        customLog('Tower Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
+}
+
 Room.prototype.towersHealCreeps = function () {
     // Construct heal targets from my and allied damaged creeps in the this
 

@@ -244,18 +244,6 @@ Room.prototype.get = function (roomObjectName) {
     // Loop through each structureType in the game
 
     for (const structureType of allStructureTypes) {
-        // Create roomObject for structures with the structureType
-
-        new RoomCacheObject({
-            name: structureType,
-            valueType: 'object',
-            cacheType: 'global',
-            cacheAmount: 1,
-            room,
-            valueConstructor() {
-                return room.roomObjects.structuresByType.getValue()[structureType] || []
-            },
-        })
 
         // Create a roomObject for sites with the structureType
 
@@ -1362,11 +1350,11 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             // Get roads
 
-            const roads: StructureRoad[] = room.structures.road
+            const roads = room.structures.road
 
             // Get containers
 
-            const containers: StructureContainer[] = room.get('container')
+            const containers = room.structures.container
 
             // If there are roads or containers or sources harvested, inform false
 

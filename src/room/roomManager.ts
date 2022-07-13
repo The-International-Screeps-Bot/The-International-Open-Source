@@ -8,7 +8,7 @@ import { creepRoleManager } from './creeps/creepRoleManager'
 
 import { powerCreepManager } from './powerCreeps/powerCreepManager'
 import { trafficManager } from './trafficManager'
-import { roomVisualsManager } from './roomVisualsManager'
+import './roomVisualsManager'
 import { createPackedPosMap, customLog } from 'international/generalFunctions'
 import { statsManager } from 'international/statsManager'
 
@@ -50,7 +50,7 @@ export function roomManager() {
 
           //
 
-          roomVisualsManager(room)
+          room.roomVisualsManager()
 
           // Log room stats
 

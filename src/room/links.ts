@@ -1,5 +1,22 @@
 import { upgraderSpawningWhenStorageThreshold } from 'international/constants'
 
+Room.prototype.linkManager = function() {
+
+     if (!this.storage) return
+
+     // Get the sourceLinks
+
+     const sourceLinks: (StructureLink | false)[] = [this.source1Link, this.source2Link]
+
+     const receiverLinks: (StructureLink | false)[] = [this.fastFillerLink, this.hubLink, this.controllerLink]
+
+     this.sourcesToReceivers(sourceLinks, receiverLinks)
+
+     this.hubToFastFiller(this.hubLink, this.fastFillerLink)
+
+     this.hubToController(this.hubLink, this.controllerLink)
+}
+
 Room.prototype.sourcesToReceivers = function (sourceLinks, receiverLinks) {
      // Loop through each sourceLink
 

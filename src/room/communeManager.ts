@@ -1,11 +1,11 @@
 import { customLog, findClosestObject, getRange } from 'international/generalFunctions'
 import { marketManager } from './market/marketManager'
-import { spawnManager } from './spawning/spawnManager'
+import './spawning/spawnManager'
 
-import { towerManager } from './towerManager'
+import './towers'
 import { constructionManager } from './construction/constructionManager'
-import './defenceManager'
-import { linkManager } from './linkManager'
+import './defence'
+import './links'
 import './claimRequestManager'
 import { myColors } from 'international/constants'
 import { packCoord, packCoordList, packPosList } from 'other/packrat'
@@ -18,15 +18,15 @@ export function communeManager(room: Room) {
 
     room.defenceManager()
 
-    towerManager(room)
+    room.towerManager()
 
     marketManager(room)
 
-    linkManager(room)
+    room.linkManager()
 
     room.claimRequestManager()
 
-    spawnManager(room)
+    room.spawnManager()
     /*
    let cpu = Game.cpu.getUsed()
 

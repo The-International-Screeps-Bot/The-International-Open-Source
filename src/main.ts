@@ -127,7 +127,6 @@ declare global {
         | 'source2'
         | 'structuresByType'
         | 'cSitesByType'
-        | StructureConstant
         | `${StructureConstant}CSite`
         | 'enemyCSites'
         | 'allyCSites'
@@ -644,15 +643,6 @@ declare global {
         findScore(): void
 
         /**
-         * Finds and has towers heal damaged my or allied creeps
-         */
-        towersHealCreeps(): void
-
-        towersAttackCreeps(): void
-
-        towersRepairRamparts(): void
-
-        /**
          * Finds open spaces in a room and records them in a cost matrix
          */
         distanceTransform(
@@ -752,6 +742,14 @@ declare global {
 
         // Spawn functions
 
+        /**
+         * Takes spawnRequests and tries to spawn them in order of priority (lowest to highest)
+         */
+        spawnManager(): void
+
+        /**
+         * Creates spawn requests for the commune
+         */
         spawnRequester(): void
 
         constructSpawnRequests(opts: SpawnRequestOpts | false): void
@@ -799,13 +797,47 @@ declare global {
          */
         advancedActivateSafeMode(): void
 
+        // Tower functions
+
+        /**
+         * Dictates and operates tasks for towers
+         */
+        towerManager(): void
+
+        /**
+         * has towers heal my or allied damaged creeps
+         */
+        towersHealCreeps(): void
+
+        /**
+         * Has towers attack enemyCreeps, if they think they can deal damage
+         */
+        towersAttackCreeps(): void
+
+        /**
+         * Has towers repair ramparts that are soon to decay
+         */
+        towersRepairRamparts(): void
+
         // Link functions
+
+        /**
+         * Dictates and operates tasks for links
+         */
+        linkManager(): void
 
         sourcesToReceivers(sourceLinks: (StructureLink | false)[], receiverLinks: (StructureLink | false)[]): void
 
         hubToFastFiller(hubLink: StructureLink | undefined, fastFillerLink: StructureLink | undefined): void
 
         hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
+
+        // Room Visuals
+
+        /**
+         * Adds annotations to the room, if roomVisuals are enabled
+         */
+        roomVisualsManager(): void
 
         // Getters
 

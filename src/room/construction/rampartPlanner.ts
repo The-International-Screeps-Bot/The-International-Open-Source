@@ -362,7 +362,7 @@ export function rampartPlanner(room: Room) {
 
      // Removes unneccary cut-tiles if bounds are set to include some 	dead ends
 
-     function delete_tiles_to_dead_ends(roomName: string, cut_tiles_array: Pos[]) {
+     function delete_tiles_to_dead_ends(roomName: string, cut_tiles_array: Coord[]) {
           // Get Terrain and set all cut-tiles as unwalkable
 
           const positionValues = generadeRoomMatrix(roomName)
@@ -452,7 +452,7 @@ export function rampartPlanner(room: Room) {
 
           const sink = 2 * 50 * 50 + 1
 
-          const positions: Pos[] = []
+          const positions: Coord[] = []
           const packedPositions: number[] = []
 
           if (graph.Calcmincut(source, sink) > 0) {
