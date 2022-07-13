@@ -1,4 +1,4 @@
-import { customLog, getRange } from 'international/generalFunctions'
+import { customLog, findClosestObject, getRange } from 'international/generalFunctions'
 import { Hauler } from '../../creepClasses'
 
 export function haulerManager(room: Room, creepsOfRole: string[]) {
@@ -49,7 +49,7 @@ Hauler.prototype.reserve = function () {
 
      if (this.needsResources()) {
           if (withdrawTargets.length) {
-               target = this.pos.findClosestByRange(withdrawTargets)
+               target = findClosestObject(this.pos, withdrawTargets)
 
                if (target instanceof Resource) amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
                else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
@@ -75,7 +75,7 @@ Hauler.prototype.reserve = function () {
 
                if (!withdrawTargets.length) return
 
-               target = this.pos.findClosestByRange(withdrawTargets)
+               target = findClosestObject(this.pos, withdrawTargets)
 
                if (target instanceof Resource) amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
                else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
@@ -113,7 +113,7 @@ Hauler.prototype.reserve = function () {
 
      if (!transferTargets.length) return
 
-     target = this.pos.findClosestByRange(transferTargets)
+     target = findClosestObject(this.pos, transferTargets)
 
      amount = Math.min(Math.max(this.store.energy, 0), target.freeStore(RESOURCE_ENERGY))
 

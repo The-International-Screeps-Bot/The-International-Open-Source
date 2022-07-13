@@ -76,6 +76,11 @@ export const allyTrading = true
 
 // General
 
+/**
+ * Please avoid changing this. If you do change it, don't push it to the main repository
+ */
+export const simpleAlliesSegment = 90
+
 export const mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
 interface RoomTypeProperties {

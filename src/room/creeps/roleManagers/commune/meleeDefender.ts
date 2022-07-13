@@ -23,7 +23,9 @@ MeleeDefender.prototype.advancedDefend = function () {
 
      // Get the closest enemyAttacker
 
-     const enemyAttacker = this.pos.findClosestByRange(enemyAttackers)
+     const enemyAttacker = this.pos.findClosestByPath(enemyAttackers, {
+          ignoreCreeps: true,
+     })
 
      // Get the room's ramparts, filtering for those and informing false if there are none
 
@@ -72,7 +74,10 @@ MeleeDefender.prototype.advancedDefend = function () {
 
      // Find the closest rampart to the enemyAttacker
 
-     const closestRampart = enemyAttacker.pos.findClosestByRange(ramparts)
+     const closestRampart = enemyAttacker.pos.findClosestByPath(ramparts, {
+          ignoreCreeps: true,
+          ignoreRoads: true
+     })
 
      // Visualize the targeting, if roomVisuals are enabled
 

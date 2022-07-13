@@ -2,6 +2,7 @@ import { allStructureTypes, allyList, structureTypesByBuildPriority } from 'inte
 import {
      createPackedPosMap,
      customLog,
+     findClosestObject,
      findObjectWithID,
      getRange,
      unpackAsPos,
@@ -128,17 +129,16 @@ Object.defineProperties(Room.prototype, {
                     if (cSiteTarget) return cSiteTarget
                }
 
-               let cSitesOfType
-
                // Loop through structuretypes of the build priority
 
                for (const structureType of structureTypesByBuildPriority) {
-                    cSitesOfType = this.cSites[structureType]
+
+                    const cSitesOfType = this.cSites[structureType]
                     if (!cSitesOfType.length) continue
 
                     const anchor = this.anchor || new RoomPosition(25, 25, this.name)
 
-                    return (this.memory.cSiteTargetID = anchor.findClosestByRange(cSitesOfType).id)
+                    return (this.memory.cSiteTargetID = findClosestObject(anchor, cSitesOfType).id)
                }
 
                return undefined

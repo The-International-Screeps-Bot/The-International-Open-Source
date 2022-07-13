@@ -1,5 +1,5 @@
 import { allyList, remoteNeedsIndex } from 'international/constants'
-import { getRange, pack } from 'international/generalFunctions'
+import { findClosestObject, getRange, pack } from 'international/generalFunctions'
 import { RemoteDefender } from 'room/creeps/creepClasses'
 
 RemoteDefender.prototype.findRemote = function () {
@@ -67,7 +67,7 @@ RemoteDefender.prototype.advancedAttackEnemies = function () {
 
           this.say('EC')
 
-          const enemyCreep = this.pos.findClosestByRange(enemyCreeps)
+          const enemyCreep = findClosestObject(this.pos, enemyCreeps)
           // Get the range between the creeps
 
           const range = getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y)
@@ -95,7 +95,7 @@ RemoteDefender.prototype.advancedAttackEnemies = function () {
 
      // Otherwise, get the closest enemyAttacker
 
-     const enemyAttacker = this.pos.findClosestByRange(enemyAttackers)
+     const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
 
      // Get the range between the creeps
 

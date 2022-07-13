@@ -1,5 +1,5 @@
 import { allyList, claimRequestNeedsIndex } from 'international/constants'
-import { getRange, pack } from 'international/generalFunctions'
+import { findClosestObject, getRange, pack } from 'international/generalFunctions'
 import { VanguardDefender } from 'room/creeps/creepClasses'
 
 export function vanguardDefenderManager(room: Room, creepsOfRole: string[]) {
@@ -72,10 +72,10 @@ VanguardDefender.prototype.advancedAttackEnemies = function () {
 
           this.say('EC')
 
-          const enemyCreep = this.pos.findClosestByRange(enemyCreeps)
+          const enemyCreep = findClosestObject(this.pos, enemyCreeps)
           // Get the range between the creeps
 
-          const range = getRange(this.pos.x - enemyCreep.pos.x, this.pos.y - enemyCreep.pos.y)
+          const range = getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y)
 
           // If the range is more than 1
 
@@ -100,11 +100,11 @@ VanguardDefender.prototype.advancedAttackEnemies = function () {
 
      // Otherwise, get the closest enemyAttacker
 
-     const enemyAttacker = this.pos.findClosestByRange(room.enemyAttackers)
+     const enemyAttacker = findClosestObject(this.pos, room.enemyAttackers)
 
      // Get the range between the creeps
 
-     const range = getRange(this.pos.x - enemyAttacker.pos.x, this.pos.y - enemyAttacker.pos.y)
+     const range = getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y)
 
      // If it's more than range 3
 

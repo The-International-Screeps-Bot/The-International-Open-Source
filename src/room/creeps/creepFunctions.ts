@@ -462,7 +462,9 @@ Creep.prototype.findRampartRepairTarget = function (workPartCount) {
 
           // Find the closest rampart under the quota and inform it
 
-          return this.pos.findClosestByRange(rampartsUnderQuota)
+          return this.pos.findClosestByPath(rampartsUnderQuota, {
+               ignoreCreeps: true, range: 3
+          })
      }
 
      // If no rampart was found, inform false
@@ -499,7 +501,9 @@ Creep.prototype.findRepairTarget = function (excludedIDs = new Set()) {
 
      // Inform the closest viableRepairTarget to the creep's memory
 
-     return this.pos.findClosestByRange(viableRepairTargets)
+     return this.pos.findClosestByPath(viableRepairTargets, {
+          ignoreCreeps: true, range: 3
+     })
 }
 
 Creep.prototype.findOptimalSourceName = function () {
@@ -1216,7 +1220,7 @@ Creep.prototype.advancedRecycle = function () {
 
      // Otherwise, find the closest spawn to the creep
 
-     const closestSpawn = this.pos.findClosestByRange(room.structures.spawn)
+     const closestSpawn = findClosestObject(this.pos, room.structures.spawn)
 
      const fastFillerContainers = [room.fastFillerContainerLeft, room.fastFillerContainerRight].filter(function (
           container,
@@ -1225,7 +1229,7 @@ Creep.prototype.advancedRecycle = function () {
      })
 
      if (fastFillerContainers.length) {
-          const closestContainer = closestSpawn.pos.findClosestByRange(fastFillerContainers)
+          const closestContainer = findClosestObject(closestSpawn.pos, fastFillerContainers)
 
           // If the creep is in range of 1
 
@@ -1649,7 +1653,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
      let amount
 
      if (withdrawTargets.length) {
-          target = this.pos.findClosestByRange(withdrawTargets)
+          target = findClosestObject(this.pos, withdrawTargets)
 
           if (target instanceof Resource) amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
           else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
@@ -1669,7 +1673,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
 
      if (!withdrawTargets.length) return
 
-     target = this.pos.findClosestByRange(withdrawTargets)
+     target = findClosestObject(this.pos, withdrawTargets)
 
      if (target instanceof Resource) amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
      else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
@@ -1690,7 +1694,7 @@ Creep.prototype.reserveTransferEnergy = function () {
      let amount
 
      if (transferTargets.length) {
-          target = this.pos.findClosestByRange(transferTargets)
+          target = findClosestObject(this.pos, transferTargets)
 
           amount = Math.min(Math.max(this.usedStore(), 0), target.freeSpecificStore(RESOURCE_ENERGY))
 
@@ -1704,7 +1708,7 @@ Creep.prototype.reserveTransferEnergy = function () {
 
      if (!transferTargets.length) return
 
-     target = this.pos.findClosestByRange(transferTargets)
+     target = findClosestObject(this.pos, transferTargets)
 
      amount = Math.min(Math.max(this.usedStore(), 0), target.freeStore(RESOURCE_ENERGY))
 

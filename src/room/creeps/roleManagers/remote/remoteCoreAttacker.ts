@@ -102,7 +102,7 @@ RemoteCoreAttacker.prototype.advancedAttackCores = function () {
 
      // Find the closest core
 
-     const closestCore = this.pos.findClosestByRange(room.structures.invaderCore)
+     const closestCore = room.structures.invaderCore[0]
 
      // If the creep at the core
 
