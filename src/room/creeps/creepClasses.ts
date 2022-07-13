@@ -254,6 +254,12 @@ export class AntifaAssaulter extends Creep {
 
      runSingle?(): void
 
+     advancedRangedAttack?(): void
+
+     advancedAttack?(): void
+
+     advancedDismantle?(): void
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }

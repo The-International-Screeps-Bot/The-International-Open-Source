@@ -1256,14 +1256,23 @@ declare global {
 
           _parts: Partial<Record<BodyPartConstant, number>>
 
+          /**
+           * The number of parts organized by type the creep has
+           */
           readonly parts: Partial<Record<BodyPartConstant, number>>
 
           _boosts: Partial<Record<MineralBoostConstant, number>>
 
+          /**
+           * The number of boosts organized by type the creep has
+           */
           readonly boosts: Partial<Record<MineralBoostConstant, number>>
 
           _towerDamage: number
 
+          /**
+           * The amount of tower damage, accounting for maximum possible enemy heal, that can be done in the room
+           */
           readonly towerDamage: number
 
           _message: string
@@ -1315,6 +1324,9 @@ declare global {
            */
           path: string
 
+          /**
+           * The position the creep is or has tried to path to
+           */
           goalPos: string
 
           /**
@@ -1322,6 +1334,9 @@ declare global {
            */
           getPulled: boolean
 
+          /**
+           * The target for which the creep should repair
+           */
           repairTarget: Id<Structure>
 
           /**
@@ -1339,8 +1354,14 @@ declare global {
            */
           taskTarget: Id<Creep | AnyStoreStructure>
 
+          /**
+           * An array of targets with information to manage the resources of
+           */
           reservations: Reservation[]
 
+          /**
+           * The target for which the creep should dismantle
+           */
           dismantleTarget: Id<Structure>
 
           /**
@@ -1353,12 +1374,25 @@ declare global {
            */
           roads: boolean
 
+          /**
+           * The rampart repair quota the creep currently has decided on
+           */
           quota: number
 
           /**
-           * The type of squad the creep is trying to form
+           * The size of squad the creep is attempting to form
            */
-          squadType: 'quad' | 'duo' | undefined
+          squadSize: 'quad' | 'duo' | undefined
+
+          /**
+           * The type of attack the creep's squad is attempting
+           */
+          squadType: 'rangedAttack' | 'attack' | 'dismantle'
+
+          /**
+           * The roomName of the room the creep is trying to attack
+           */
+          attackTarget: string
      }
 
      // PowerCreeps
