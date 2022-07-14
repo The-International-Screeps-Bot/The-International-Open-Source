@@ -48,7 +48,7 @@ SourceHarvester.prototype.isDying = function () {
 
      if (
           this.ticksToLive >
-          this.body.length * CREEP_SPAWN_TIME + (this.room.global[`${this.memory.sourceName}PathLength`] - 3 || 0)
+          this.body.length * CREEP_SPAWN_TIME + (this.room[`${this.memory.sourceName}PathLength`] - 3 || 0)
      )
           return false
 
@@ -78,14 +78,14 @@ SourceHarvester.prototype.travelToSource = function () {
 
      // If the creep is at the creep's packedHarvestPos, inform false
 
-     if (getRange(this.pos.x, this.pos.y, harvestPos.x, harvestPos.y) === 0) return false
+     if (getRange(this.pos.x, harvestPos.x, this.pos.y, harvestPos.y) === 0) return false
 
      // If the creep's movement type is pull
 
      if (this.memory.getPulled) return true
 
      // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
-
+     
      this.say(`⏩${sourceName}`)
 
      this.createMoveRequest({
