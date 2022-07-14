@@ -126,19 +126,6 @@ Room.prototype.get = function (roomObjectName) {
 
     // Resources
 
-    // Mineral
-
-    new RoomCacheObject({
-        name: 'mineral',
-        valueType: 'id',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor() {
-            return room.find(FIND_MINERALS)[0]?.id
-        },
-    })
-
     // Source 1
 
     new RoomCacheObject({
@@ -175,39 +162,6 @@ Room.prototype.get = function (roomObjectName) {
             if (source) return source.id
             return false
         },
-    })
-
-    // Structures and cSites
-
-    function findStructuresByType() {
-        // Construct storage of structures based on structureType
-
-        const structuresByType: Partial<Record<StructureConstant, Structure[]>> = {}
-
-        // Loop through all structres in room
-
-        for (const structure of room.find(FIND_STRUCTURES)) {
-            // If there is no key for the structureType, create it and assign it an empty array
-
-            if (!structuresByType[structure.structureType]) structuresByType[structure.structureType] = []
-
-            // Group structure by structureType
-
-            structuresByType[structure.structureType].push(structure)
-        }
-
-        // Inform structuresByType
-
-        return structuresByType
-    }
-
-    new RoomCacheObject({
-        name: 'structuresByType',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: 1,
-        room,
-        valueConstructor: findStructuresByType,
     })
 
     function findCSitesByType() {
@@ -360,7 +314,7 @@ Room.prototype.get = function (roomObjectName) {
         cacheAmount: Infinity,
         room,
         valueConstructor() {
-            return findHarvestPositions(room.roomObjects.mineral.getValue())
+            return findHarvestPositions(room.mineral)
         },
     })
 

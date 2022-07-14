@@ -122,10 +122,8 @@ declare global {
         | 'terrainCM'
         | 'baseCM'
         | 'roadCM'
-        | 'mineral'
         | 'source1'
         | 'source2'
-        | 'structuresByType'
         | 'cSitesByType'
         | `${StructureConstant}CSite`
         | 'enemyCSites'
@@ -144,8 +142,6 @@ declare global {
         | 'usedSourceHarvestPositions'
         | 'usedUpgradePositions'
         | 'usedFastFillerPositions'
-        | 'myDamagedCreeps'
-        | 'damagedAllyCreeps'
         | 'remoteNamesByEfficacy'
 
     interface PathGoal {
