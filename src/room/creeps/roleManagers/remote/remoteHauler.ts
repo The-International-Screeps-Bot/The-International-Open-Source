@@ -68,7 +68,10 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
             // If the creep has a remoteName, delete it
 
-            if (creep.memory.remoteName) delete creep.memory.remoteName
+            if (creep.memory.remoteName) {
+
+                delete creep.memory.remoteName
+            }
 
             if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveTransferEnergy()
 

@@ -622,36 +622,41 @@ Room.prototype.spawnRequester = function() {
                 const hubLink = this.hubLink
                 const sourceLinks = [this.source1Link, this.source2Link]
 
-                let maxPartsMultiplier = 0
+                // If there are transfer links, max out partMultiplier to their ability
 
-                if (hubLink) {
-                    // Get the range between the controllerLink and hubLink
+                if (hubLink && sourceLinks.length) {
 
-                    const range = getRange(controllerLink.pos.x, hubLink.pos.x, controllerLink.pos.y, hubLink.pos.y)
+                    let maxPartsMultiplier = 0
 
-                    // Limit partsMultiplier at the range with a multiplier
+                    if (hubLink) {
+                        // Get the range between the controllerLink and hubLink
 
-                    maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range
-                } else maxCreeps -= 1
+                        const range = getRange(controllerLink.pos.x, hubLink.pos.x, controllerLink.pos.y, hubLink.pos.y)
 
-                for (const sourceLink of sourceLinks) {
-                    if (!sourceLink) continue
+                        // Limit partsMultiplier at the range with a multiplier
 
-                    // Get the range between the controllerLink and hubLink
+                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range
+                    } else maxCreeps -= 1
 
-                    const range = getRange(
-                        controllerLink.pos.x,
-                        sourceLink.pos.x,
-                        controllerLink.pos.y,
-                        sourceLink.pos.y,
-                    )
+                    for (const sourceLink of sourceLinks) {
+                        if (!sourceLink) continue
 
-                    // Limit partsMultiplier at the range with a multiplier
+                        // Get the range between the controllerLink and hubLink
 
-                    maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) / range
+                        const range = getRange(
+                            controllerLink.pos.x,
+                            sourceLink.pos.x,
+                            controllerLink.pos.y,
+                            sourceLink.pos.y,
+                        )
+
+                        // Limit partsMultiplier at the range with a multiplier
+
+                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) / range
+                    }
+
+                    partsMultiplier = Math.min(partsMultiplier, maxPartsMultiplier)
                 }
-
-                partsMultiplier = Math.min(partsMultiplier, maxPartsMultiplier)
             }
 
             // If there are construction sites of my ownership in the this, set multiplier to 1
