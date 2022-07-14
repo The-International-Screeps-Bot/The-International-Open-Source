@@ -60,7 +60,7 @@ Room.prototype.roomVisualsManager = function () {
                     return myColors.lightBlue
                 }
 
-                if (allyList.has(this.controller.reservation.username)) {
+                if (allyList.includes(this.controller.reservation.username)) {
                     return myColors.green
                 }
 

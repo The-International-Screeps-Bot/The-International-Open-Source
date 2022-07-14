@@ -407,7 +407,7 @@ declare global {
         /**
          * A list of usernames to treat as allies
          */
-        allyList: Set<string>
+        allyList: string[]
 
         /**
          * Wether the bot should sell pixels
@@ -422,7 +422,7 @@ declare global {
         /**
          * An list of usernames to not trade with
          */
-        tradeBlacklist: Set<string>
+        tradeBlacklist: string[]
 
         /**
          * Wether the bot should automatically respond to claimRequests

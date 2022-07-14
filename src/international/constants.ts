@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 28
+export const breakingVersion = 29
 
 // Settings
 
@@ -33,7 +33,7 @@ export const roomStats: 0 | 1 | 2 = 0
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const allyList = new Set([
+export const allyList = [
     'MarvinTMB',
     'Q13214',
     'HerrKai',
@@ -42,7 +42,7 @@ export const allyList = new Set([
     'lokenwow',
     'Morningtea',
     'LittleBitBlue',
-])
+]
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -57,7 +57,7 @@ export const pixelGeneration = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const tradeBlacklist = new Set([])
+export const tradeBlacklist = ['']
 
 /**
  * Default value, do not change. Modify this property in Memory instead

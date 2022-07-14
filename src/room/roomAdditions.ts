@@ -61,7 +61,7 @@ Object.defineProperties(Room.prototype, {
             if (this._enemyCreeps) return this._enemyCreeps
 
             return (this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
-                filter: creep => !allyList.has(creep.owner.username),
+                filter: creep => !allyList.includes(creep.owner.username),
             }))
         },
     },
@@ -79,7 +79,7 @@ Object.defineProperties(Room.prototype, {
             if (this._allyCreeps) return this._allyCreeps
 
             return (this._allyCreeps = this.find(FIND_HOSTILE_CREEPS, {
-                filter: creep => allyList.has(creep.owner.username),
+                filter: creep => allyList.includes(creep.owner.username),
             }))
         },
     },

@@ -198,7 +198,6 @@ Room.prototype.get = function (roomObjectName) {
     // Loop through each structureType in the game
 
     for (const structureType of allStructureTypes) {
-
         // Create a roomObject for sites with the structureType
 
         new RoomCacheObject({
@@ -223,7 +222,7 @@ Room.prototype.get = function (roomObjectName) {
             // Inform constuction sites that aren't owned by a member of the allyList
 
             return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => !allyList.has(cSite.owner.username),
+                filter: cSite => !allyList.includes(cSite.owner.username),
             })
         },
     })
@@ -238,7 +237,7 @@ Room.prototype.get = function (roomObjectName) {
             // Inform constuction sites that aren't owned by a member of the allyList
 
             return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => allyList.has(cSite.owner.username),
+                filter: cSite => allyList.includes(cSite.owner.username),
             })
         },
     })
@@ -1262,7 +1261,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             // If the controller is owned by an ally
 
-            if (allyList.has(controller.owner.username)) {
+            if (allyList.includes(controller.owner.username)) {
                 // Set the type to ally and stop
 
                 room.memory.type = 'ally'
@@ -1316,7 +1315,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             // If the controller is not reserved by an ally
 
-            if (!allyList.has(controller.reservation.username)) {
+            if (!allyList.includes(controller.reservation.username)) {
                 // Set type to enemyRemote and inform true
 
                 room.memory.type = 'enemyRemote'
@@ -1366,7 +1365,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
                 if (creep.parts.work > 0) {
                     // If the creep is owned by an ally
 
-                    if (allyList.has(creep.owner.username)) {
+                    if (allyList.includes(creep.owner.username)) {
                         // Set type to allyRemote and stop
 
                         room.memory.type = 'allyRemote'
