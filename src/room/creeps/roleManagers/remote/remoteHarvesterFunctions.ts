@@ -3,72 +3,72 @@ import { getRange, unpackAsPos } from 'international/generalFunctions'
 import { RemoteHarvester } from 'room/creeps/creepClasses'
 
 RemoteHarvester.prototype.findRemote = function () {
-     const creep = this
-     // If the creep already has a remote, inform true
+    const creep = this
+    // If the creep already has a remote, inform true
 
-     if (creep.memory.remoteName) return true
+    if (creep.memory.remoteName) return true
 
-     // Otherwise, get the creep's role
+    // Otherwise, get the creep's role
 
-     const role = creep.memory.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
-     // Get remotes by their efficacy
+    const role = creep.memory.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+    // Get remotes by their efficacy
 
-     const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
+    const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.commune]?.get('remoteNamesByEfficacy')
 
-     // Loop through each remote name
+    // Loop through each remote name
 
-     for (const roomName of remoteNamesByEfficacy) {
-          // Get the remote's memory using its name
+    for (const roomName of remoteNamesByEfficacy) {
+        // Get the remote's memory using its name
 
-          const roomMemory = Memory.rooms[roomName]
+        const roomMemory = Memory.rooms[roomName]
 
-          // If the needs of this remote are met, iterate
+        // If the needs of this remote are met, iterate
 
-          if (roomMemory.needs[remoteNeedsIndex[role]] <= 0) continue
+        if (roomMemory.needs[remoteNeedsIndex[role]] <= 0) continue
 
-          // Otherwise assign the remote to the creep and inform true
+        // Otherwise assign the remote to the creep and inform true
 
-          creep.memory.remoteName = roomName
-          roomMemory.needs[remoteNeedsIndex[role]] -= this.parts.work
+        creep.memory.remoteName = roomName
+        roomMemory.needs[remoteNeedsIndex[role]] -= this.parts.work
 
-          return true
-     }
+        return true
+    }
 
-     // Inform false
+    // Inform false
 
-     return false
+    return false
 }
 
 RemoteHarvester.prototype.travelToSource = function (sourceName) {
-     const creep = this
-     const { room } = creep
+    const creep = this
+    const { room } = creep
 
-     // Try to find a harvestPosition, inform false if it failed
+    // Try to find a harvestPosition, inform false if it failed
 
-     if (!creep.findSourceHarvestPos(sourceName)) return false
+    if (!creep.findSourceHarvestPos(sourceName)) return false
 
-     creep.say('🚬')
+    creep.say('🚬')
 
-     // Unpack the harvestPos
+    // Unpack the harvestPos
 
-     const harvestPos = unpackAsPos(creep.memory.packedPos)
+    const harvestPos = unpackAsPos(creep.memory.packedPos)
 
-     // If the creep is at the creep's packedHarvestPos, inform false
+    // If the creep is at the creep's packedHarvestPos, inform false
 
-     if (getRange(creep.pos.x, harvestPos.x, creep.pos.y, harvestPos.y) === 0) return false
+    if (getRange(creep.pos.x, harvestPos.x, creep.pos.y, harvestPos.y) === 0) return false
 
-     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
+    // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-     creep.say(`⏩ ${sourceName}`)
+    creep.say(`⏩ ${sourceName}`)
 
-     creep.createMoveRequest({
-          origin: creep.pos,
-          goal: {
-               pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
-               range: 0,
-          },
-          avoidEnemyRanges: true,
-     })
+    creep.createMoveRequest({
+        origin: creep.pos,
+        goal: {
+            pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
+            range: 0,
+        },
+        avoidEnemyRanges: true,
+    })
 
-     return true
+    return true
 }

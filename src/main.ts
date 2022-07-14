@@ -1022,7 +1022,6 @@ declare global {
     }
 
     interface RoomMemory {
-        [key: string]: any
 
         /**
          * A packed representation of the center of the fastFiller
@@ -1072,6 +1071,11 @@ declare global {
         level: number
 
         powerEnabled: boolean
+
+        /**
+         * Wether the room has a terminal
+         */
+        terminal: boolean
 
         /**
          * The number of towers in the room
@@ -1376,7 +1380,7 @@ declare global {
         /**
          * The name of the room the creep is from
          */
-        communeName: string
+        commune: string
 
         /**
          * A name of the creep's designated source
@@ -1477,12 +1481,12 @@ declare global {
     // PowerCreeps
 
     interface PowerCreep {
-        [key: string]: any
+
     }
 
     interface PowerCreepMemory {
-        [key: string]: any
-        role: string
+
+
     }
 
     // Structures

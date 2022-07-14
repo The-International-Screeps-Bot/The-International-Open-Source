@@ -532,15 +532,15 @@ Room.prototype.spawnRequester = function() {
 
             // For each road, add a multiplier
 
-            partsMultiplier += this.structures.road.length * 0.015
+            partsMultiplier += this.structures.road.length * 0.01
 
             // For each container, add a multiplier
 
-            partsMultiplier += this.structures.container.length * 0.3
+            partsMultiplier += this.structures.container.length * 0.2
 
             // For each rampart, add a multiplier
 
-            partsMultiplier += ramparts.length * 0.06
+            partsMultiplier += ramparts.length * 0.05
 
             // For every attackValue, add a multiplier
 

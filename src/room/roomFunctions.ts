@@ -1537,7 +1537,7 @@ Room.prototype.cleanMemory = function () {
 
         // Delete the property
 
-        delete room.memory[key]
+        delete room.memory[key as keyof RoomMemory]
     }
 }
 

@@ -4,244 +4,244 @@ import { Duo } from './duo'
 import { Quad } from './quad'
 
 export function antifaAssaulterManager(room: Room, creepsOfRole: string[]) {
-     for (const creepName of creepsOfRole) {
-          const creep: AntifaAssaulter = Game.creeps[creepName]
+    for (const creepName of creepsOfRole) {
+        const creep: AntifaAssaulter = Game.creeps[creepName]
 
-          // If no squad, try to make or find one
+        // If no squad, try to make or find one
 
-          if (!creep.squad && creep.memory.squadType) {
-               if (!creep.findSquad()) continue
-          }
+        if (!creep.squad && creep.memory.squadType) {
+            if (!creep.findSquad()) continue
+        }
 
-          // Quad
+        // Quad
 
-          if (creep.squad instanceof Quad) {
-               if (creep.name === creep.squad.assaulters[0].name) creep.squad.run()
-               continue
-          }
+        if (creep.squad instanceof Quad) {
+            if (creep.name === creep.squad.assaulters[0].name) creep.squad.run()
+            continue
+        }
 
-          // Duo
+        // Duo
 
-          if (creep.squad instanceof Duo) {
-               if (creep.name === creep.squad.assaulter.name) creep.squad.run()
-               continue
-          }
+        if (creep.squad instanceof Duo) {
+            if (creep.name === creep.squad.assaulter.name) creep.squad.run()
+            continue
+        }
 
-          // Single
+        // Single
 
-          creep.runSingle()
-     }
+        creep.runSingle()
+    }
 }
 
 AntifaAssaulter.prototype.findSquad = function () {
-     return true
+    return true
 }
 
 AntifaAssaulter.prototype.runSingle = function () {
-     const { room } = this
+    const { room } = this
 
-     // In attackTarget
+    // In attackTarget
 
-     if (!this.memory.AR || this.memory.AR === room.name) {
-          // rangedAttack
+    if (!this.memory.AR || this.memory.AR === room.name) {
+        // rangedAttack
 
-          if (this.memory.squadType === 'rangedAttack') {
-               this.advancedRangedAttack()
-               return
-          }
+        if (this.memory.squadType === 'rangedAttack') {
+            this.advancedRangedAttack()
+            return
+        }
 
-          // attack
+        // attack
 
-          if (this.memory.squadType === 'attack') {
-               this.advancedAttack()
-               return
-          }
+        if (this.memory.squadType === 'attack') {
+            this.advancedAttack()
+            return
+        }
 
-          // dismantle
+        // dismantle
 
-          this.advancedDismantle()
-          return
-     }
+        this.advancedDismantle()
+        return
+    }
 
-     this.passiveRangedAttack()
-     this.passiveHeal()
+    this.passiveRangedAttack()
+    this.passiveHeal()
 
-     // In the commune
+    // In the commune
 
-     if (this.memory.communeName === this.name) {
-          // Go to the attackTarget
+    if (this.memory.commune === this.name) {
+        // Go to the attackTarget
 
-          this.createMoveRequest({
-               origin: this.pos,
-               goal: {
-                    pos: new RoomPosition(25, 25, this.memory.AR),
-                    range: 25,
-               },
-          })
-          return
-     }
+        this.createMoveRequest({
+            origin: this.pos,
+            goal: {
+                pos: new RoomPosition(25, 25, this.memory.AR),
+                range: 25,
+            },
+        })
+        return
+    }
 
-     // In a non-attackTarget or commune room
+    // In a non-attackTarget or commune room
 
-     // Go to the attackTarget
+    // Go to the attackTarget
 
-     this.createMoveRequest({
-          origin: this.pos,
-          goal: {
-               pos: new RoomPosition(25, 25, this.memory.AR),
-               range: 25,
-          },
-     })
+    this.createMoveRequest({
+        origin: this.pos,
+        goal: {
+            pos: new RoomPosition(25, 25, this.memory.AR),
+            range: 25,
+        },
+    })
 }
 
 AntifaAssaulter.prototype.advancedRangedAttack = function () {
-     const { room } = this
+    const { room } = this
 
-     const enemyAttackers = room.enemyAttackers.filter(function (creep) {
-          return !creep.isOnExit()
-     })
+    const enemyAttackers = room.enemyAttackers.filter(function (creep) {
+        return !creep.isOnExit()
+    })
 
-     // If there are none
+    // If there are none
 
-     if (!enemyAttackers.length) {
-          const enemyCreeps = room.enemyCreeps.filter(function (creep) {
-               return !creep.isOnExit()
-          })
+    if (!enemyAttackers.length) {
+        const enemyCreeps = room.enemyCreeps.filter(function (creep) {
+            return !creep.isOnExit()
+        })
 
-          if (!enemyCreeps.length) {
-               return this.aggressiveHeal()
-          }
+        if (!enemyCreeps.length) {
+            return this.aggressiveHeal()
+        }
 
-          // Heal nearby creeps
+        // Heal nearby creeps
 
-          if (this.passiveHeal()) return true
+        if (this.passiveHeal()) return true
 
-          this.say('EC')
+        this.say('EC')
 
-          const enemyCreep = findClosestObject(this.pos, enemyCreeps)
-          // Get the range between the creeps
+        const enemyCreep = findClosestObject(this.pos, enemyCreeps)
+        // Get the range between the creeps
 
-          const range = getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y)
+        const range = getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y)
 
-          // If the range is more than 1
+        // If the range is more than 1
 
-          if (range > 1) {
-               this.rangedAttack(enemyCreep)
+        if (range > 1) {
+            this.rangedAttack(enemyCreep)
 
-               // Have the create a moveRequest to the enemyAttacker and inform true
+            // Have the create a moveRequest to the enemyAttacker and inform true
 
-               this.createMoveRequest({
-                    origin: this.pos,
-                    goal: { pos: enemyCreep.pos, range: 1 },
-               })
+            this.createMoveRequest({
+                origin: this.pos,
+                goal: { pos: enemyCreep.pos, range: 1 },
+            })
 
-               return true
-          }
+            return true
+        }
 
-          this.rangedMassAttack()
-          this.moveRequest = pack(enemyCreep.pos)
+        this.rangedMassAttack()
+        this.moveRequest = pack(enemyCreep.pos)
 
-          return true
-     }
+        return true
+    }
 
-     // Otherwise, get the closest enemyAttacker
+    // Otherwise, get the closest enemyAttacker
 
-     const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
+    const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
 
-     // Get the range between the creeps
+    // Get the range between the creeps
 
-     const range = getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y)
+    const range = getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y)
 
-     // If it's more than range 3
+    // If it's more than range 3
 
-     if (range > 3) {
-          // Heal nearby creeps
+    if (range > 3) {
+        // Heal nearby creeps
 
-          this.passiveHeal()
+        this.passiveHeal()
 
-          // Make a moveRequest to it and inform true
+        // Make a moveRequest to it and inform true
 
-          this.createMoveRequest({
-               origin: this.pos,
-               goal: { pos: enemyAttacker.pos, range: 1 },
-          })
+        this.createMoveRequest({
+            origin: this.pos,
+            goal: { pos: enemyAttacker.pos, range: 1 },
+        })
 
-          return true
-     }
+        return true
+    }
 
-     this.say('AEA')
+    this.say('AEA')
 
-     // Otherwise, have the creep pre-heal itself
+    // Otherwise, have the creep pre-heal itself
 
-     this.heal(this)
+    this.heal(this)
 
-     // If the range is 1, rangedMassAttack
+    // If the range is 1, rangedMassAttack
 
-     if (range === 1) {
-          this.rangedMassAttack()
-          this.moveRequest = pack(enemyAttacker.pos)
-     }
+    if (range === 1) {
+        this.rangedMassAttack()
+        this.moveRequest = pack(enemyAttacker.pos)
+    }
 
-     // Otherwise, rangedAttack the enemyAttacker
-     else this.rangedAttack(enemyAttacker)
+    // Otherwise, rangedAttack the enemyAttacker
+    else this.rangedAttack(enemyAttacker)
 
-     // If the creep is out matched, try to always stay in range 3
+    // If the creep is out matched, try to always stay in range 3
 
-     if (this.strength < enemyAttacker.strength) {
-          if (range === 3) return true
+    if (this.strength < enemyAttacker.strength) {
+        if (range === 3) return true
 
-          if (range >= 3) {
-               this.createMoveRequest({
-                    origin: this.pos,
-                    goal: { pos: enemyAttacker.pos, range: 3 },
-               })
+        if (range >= 3) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goal: { pos: enemyAttacker.pos, range: 3 },
+            })
 
-               return true
-          }
+            return true
+        }
 
-          this.createMoveRequest({
-               origin: this.pos,
-               goal: { pos: enemyAttacker.pos, range: 25 },
-               flee: true,
-          })
+        this.createMoveRequest({
+            origin: this.pos,
+            goal: { pos: enemyAttacker.pos, range: 25 },
+            flee: true,
+        })
 
-          return true
-     }
+        return true
+    }
 
-     // If the creep has less heal power than the enemyAttacker's attack power
+    // If the creep has less heal power than the enemyAttacker's attack power
 
-     if (this.strength < enemyAttacker.strength) {
-          // If the range is less or equal to 2
+    if (this.strength < enemyAttacker.strength) {
+        // If the range is less or equal to 2
 
-          if (range <= 2) {
-               // Have the creep flee and inform true
+        if (range <= 2) {
+            // Have the creep flee and inform true
 
-               this.createMoveRequest({
-                    origin: this.pos,
-                    goal: { pos: enemyAttacker.pos, range: 1 },
-                    flee: true,
-               })
+            this.createMoveRequest({
+                origin: this.pos,
+                goal: { pos: enemyAttacker.pos, range: 1 },
+                flee: true,
+            })
 
-               return true
-          }
-     }
+            return true
+        }
+    }
 
-     // If the range is more than 1
+    // If the range is more than 1
 
-     if (range > 1) {
-          // Have the create a moveRequest to the enemyAttacker and inform true
+    if (range > 1) {
+        // Have the create a moveRequest to the enemyAttacker and inform true
 
-          this.createMoveRequest({
-               origin: this.pos,
-               goal: { pos: enemyAttacker.pos, range: 1 },
-          })
+        this.createMoveRequest({
+            origin: this.pos,
+            goal: { pos: enemyAttacker.pos, range: 1 },
+        })
 
-          return true
-     }
+        return true
+    }
 
-     // Otherwise inform true
+    // Otherwise inform true
 
-     return true
+    return true
 }
 
 AntifaAssaulter.prototype.advancedAttack = function () {}

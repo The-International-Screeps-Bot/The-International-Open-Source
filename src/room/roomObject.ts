@@ -81,7 +81,7 @@ RoomCacheObject.prototype.getCachedValue = function () {
      if (roomObject.cacheType === 'memory') {
           // Query room memory for cachedRoomObject
 
-          const cachedValue: any = room.memory[roomObject.name]
+          const cachedValue = room.memory[roomObject.name as keyof RoomMemory]
 
           // If cachedRoomObject doesn't exist, and inform false
 
@@ -167,7 +167,7 @@ RoomCacheObject.prototype.cache = function () {
      if (roomObject.cacheType === 'memory') {
           // Store value in room's memory and stop
 
-          room.memory[roomObject.name] = roomObject.value
+          (room.memory[roomObject.name as keyof RoomMemory] as any) = roomObject.value
           return
      }
 

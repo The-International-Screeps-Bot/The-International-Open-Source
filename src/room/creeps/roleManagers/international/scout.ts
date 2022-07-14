@@ -10,7 +10,7 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 
         const creep: Scout = Game.creeps[creepName]
 
-        const commune = Game.rooms[creep.memory.communeName]
+        const commune = Game.rooms[creep.memory.commune]
 
         if (!commune) continue
 
@@ -74,7 +74,7 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 Scout.prototype.findScoutTarget = function () {
     if (this.memory.scoutTarget) return true
 
-    const commune = Game.rooms[this.memory.communeName]
+    const commune = Game.rooms[this.memory.commune]
 
     // Construct storage of exit information
 
@@ -117,8 +117,8 @@ Scout.prototype.findScoutTarget = function () {
     const scoutTarget = unscoutedRooms.length
         ? unscoutedRooms.sort(
               (a, b) =>
-                  Game.map.getRoomLinearDistance(this.memory.communeName, a) -
-                  Game.map.getRoomLinearDistance(this.memory.communeName, b),
+                  Game.map.getRoomLinearDistance(this.memory.commune, a) -
+                  Game.map.getRoomLinearDistance(this.memory.commune, b),
           )[0]
         : scoutedRooms.sort((a, b) => Memory.rooms[a].lastScout - Memory.rooms[b].lastScout)[0]
 
@@ -145,14 +145,14 @@ Scout.prototype.recordDeposits = function () {
         room.memory.commune = findClosestCommuneName(room.name)
     }
 
-    const communeMemory = Memory.rooms[room.memory.communeName]
+    const communeMemory = Memory.rooms[room.memory.commune]
 
     const deposits = room.find(FIND_DEPOSITS)
 
     // Filter deposits that haven't been assigned a commune and are viable
 
     const unAssignedDeposits = deposits.filter(function (deposit) {
-        return !communeMemory[deposit.id] && deposit.lastCooldown <= 100 && deposit.ticksToDecay > 500
+        return !communeMemory.deposits[deposit.id] && deposit.lastCooldown <= 100 && deposit.ticksToDecay > 500
     })
 
     for (const deposit of unAssignedDeposits)
