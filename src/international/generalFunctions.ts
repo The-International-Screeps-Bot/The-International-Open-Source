@@ -216,7 +216,7 @@ export function findCPUColor(CPU: number): string {
 export function createPackedPosMap(innerArray?: boolean) {
      // Construct the position map
 
-     const packedPosMap: PackedPosMap = []
+     const packedPosMap: PackedPosMap<any> = []
 
      // Loop through each x and y in the room
 

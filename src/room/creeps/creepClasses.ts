@@ -198,6 +198,11 @@ export class Scout extends Creep {
 
      recordDeposits?(): void
 
+     /**
+      * Tries to sign a room's controller depending on the situation
+      */
+     advancedSignController?(): boolean
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }

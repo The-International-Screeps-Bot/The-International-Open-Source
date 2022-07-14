@@ -6,7 +6,7 @@ import { controllerUpgraderManager } from './roleManagers/commune/controllerUpgr
 import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvesterManager'
 import { maintainerManager } from './roleManagers/commune/maintainer'
 import { builderManager } from './roleManagers/commune/builder'
-import { scoutManager } from './roleManagers/international/scoutManager'
+import { scoutManager } from './roleManagers/international/scout'
 import { haulerManager } from './roleManagers/commune/hauler'
 import { source2RemoteHarvesterManager } from './roleManagers/remote/source2RemoteHarvesterManager'
 import { remoteHaulerManager } from './roleManagers/remote/remoteHauler'

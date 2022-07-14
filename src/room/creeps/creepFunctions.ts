@@ -1107,69 +1107,6 @@ Creep.prototype.needsResources = function () {
     return this.memory.NR
 }
 
-Creep.prototype.advancedSignController = function () {
-    const { room } = this
-
-    // Construct the signMessage
-
-    let signMessage: string
-
-    // If the room is owned by an enemy or an ally, inform false
-
-    if (room.memory.type === 'ally' || room.memory.type === 'enemy') return false
-
-    if (room.controller.reservation && room.controller.reservation.username != Memory.me) return false
-
-    // If the room is a commune
-
-    if (room.memory.type === 'commune') {
-        // If the room already has a correct sign, inform false
-
-        if (room.controller.sign && communeSigns.includes(room.controller.sign.text)) return false
-
-        // Otherwise assign the signMessage the commune sign
-
-        signMessage = communeSigns[0]
-    }
-
-    // Otherwise if the room is not a commune
-    else {
-        // If the room already has a correct sign, inform false
-
-        if (room.controller.sign && nonCommuneSigns.includes(room.controller.sign.text)) return false
-
-        // Otherwise get a rounded random value based on the length of nonCommuneSign
-
-        const randomSign = Math.floor(Math.random() * nonCommuneSigns.length)
-
-        // And assign the message according to the index of randomSign
-
-        signMessage = nonCommuneSigns[randomSign]
-    }
-
-    // If the controller is not in range
-
-    if (this.pos.getRangeTo(room.controller.pos) > 1) {
-        // Request to move to the controller and inform false
-
-        this.createMoveRequest({
-            origin: this.pos,
-            goal: { pos: room.controller.pos, range: 1 },
-            avoidEnemyRanges: true,
-            plainCost: 1,
-            swampCost: 1,
-        })
-
-        if (!this.moveRequest) return false
-
-        return true
-    }
-
-    // Otherwise Try to sign the controller, informing the result
-
-    return this.signController(room.controller, signMessage) === OK
-}
-
 Creep.prototype.isOnExit = function () {
     // Define an x and y aligned with the creep's pos
 

@@ -1269,11 +1269,6 @@ declare global {
          */
         needsResources(): boolean
 
-        /**
-         * Tries to sign a room's controller depending on the situation
-         */
-        advancedSignController(): boolean
-
         isOnExit(): boolean
 
         findTotalHealPower(range?: number): number
