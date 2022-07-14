@@ -12,7 +12,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
             // If the creep is in the remote
 
-            if (room.name === creep.memory.remoteName) {
+            if (room.name === creep.memory.remote) {
                 if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveWithdrawEnergy()
 
                 if (!creep.fulfillReservation()) {
@@ -44,13 +44,13 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                 continue
             }
 
-            creep.message += creep.memory.remoteName
+            creep.message += creep.memory.remote
             creep.say(creep.message)
 
             creep.createMoveRequest({
                 origin: creep.pos,
                 goal: {
-                    pos: new RoomPosition(25, 25, creep.memory.remoteName),
+                    pos: new RoomPosition(25, 25, creep.memory.remote),
                     range: 20,
                 },
                 avoidEnemyRanges: true,
@@ -66,11 +66,11 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
             creep.advancedRenew()
 
-            // If the creep has a remoteName, delete it
+            // If the creep has a remoteName, delete it and delete it's fulfilled needs so the creep has a chance to find a better target
 
-            if (creep.memory.remoteName) {
-
-                delete creep.memory.remoteName
+            if (creep.memory.remote) {
+                delete creep.memory.remote
+                Memory.rooms[creep.memory.remote].needs[remoteNeedsIndex.remoteHauler] += creep.parts.carry
             }
 
             if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveTransferEnergy()
@@ -91,13 +91,13 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
             if (!creep.findRemote()) continue
 
-            creep.message += creep.memory.remoteName
+            creep.message += creep.memory.remote
             creep.say(creep.message)
 
             creep.createMoveRequest({
                 origin: creep.pos,
                 goal: {
-                    pos: new RoomPosition(25, 25, creep.memory.remoteName),
+                    pos: new RoomPosition(25, 25, creep.memory.remote),
                     range: 20,
                 },
                 avoidEnemyRanges: true,
@@ -121,7 +121,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 }
 
 RemoteHauler.prototype.findRemote = function () {
-    if (this.memory.remoteName) return true
+    if (this.memory.remote) return true
 
     const remoteNamesByEfficacy: string[] = Game.rooms[this.memory.commune]?.get('remoteNamesByEfficacy')
 
@@ -132,8 +132,8 @@ RemoteHauler.prototype.findRemote = function () {
 
         if (roomMemory.needs[remoteNeedsIndex.remoteHauler] <= 0) continue
 
-        this.memory.remoteName = roomName
-        roomMemory.needs[remoteNeedsIndex.remoteHauler] -= this.parts.work
+        this.memory.remote = roomName
+        roomMemory.needs[remoteNeedsIndex.remoteHauler] -= this.parts.carry
 
         return true
     }

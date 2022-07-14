@@ -31,14 +31,14 @@ export function remoteDismantlerManager(room: Room, creepsOfRole: string[]) {
             continue
         }
 
-        creep.say(creep.memory.remoteName)
+        creep.say(creep.memory.remote)
 
         if (creep.advancedDismantle()) continue
 
         // If the creep is its remote
 
-        if (room.name === creep.memory.remoteName) {
-            delete creep.memory.remoteName
+        if (room.name === creep.memory.remote) {
+            delete creep.memory.remote
             continue
         }
 
@@ -47,7 +47,7 @@ export function remoteDismantlerManager(room: Room, creepsOfRole: string[]) {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: {
-                pos: new RoomPosition(25, 25, creep.memory.remoteName),
+                pos: new RoomPosition(25, 25, creep.memory.remote),
                 range: 25,
             },
         })
@@ -59,7 +59,7 @@ RemoteDismantler.prototype.findRemote = function () {
 
     // If the creep already has a remote, inform true
 
-    if (creep.memory.remoteName) return true
+    if (creep.memory.remote) return true
 
     // Otherwise, get the creep's role
 
@@ -82,7 +82,7 @@ RemoteDismantler.prototype.findRemote = function () {
 
         // Otherwise assign the remote to the creep and inform true
 
-        creep.memory.remoteName = roomName
+        creep.memory.remote = roomName
         roomMemory.needs[remoteNeedsIndex[role]] -= 1
 
         return true

@@ -1430,7 +1430,7 @@ declare global {
         /**
          * The name of the room the creep is remoting for
          */
-        remoteName: string
+        remote: string
 
         /**
          * The target ID of the task (for hubHaulers)

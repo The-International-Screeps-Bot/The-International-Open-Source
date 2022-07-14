@@ -6,7 +6,7 @@ RemoteHarvester.prototype.findRemote = function () {
     const creep = this
     // If the creep already has a remote, inform true
 
-    if (creep.memory.remoteName) return true
+    if (creep.memory.remote) return true
 
     // Otherwise, get the creep's role
 
@@ -28,7 +28,7 @@ RemoteHarvester.prototype.findRemote = function () {
 
         // Otherwise assign the remote to the creep and inform true
 
-        creep.memory.remoteName = roomName
+        creep.memory.remote = roomName
         roomMemory.needs[remoteNeedsIndex[role]] -= this.parts.work
 
         return true

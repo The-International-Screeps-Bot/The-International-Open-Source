@@ -30,7 +30,7 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
             continue
         }
 
-        creep.say(creep.memory.remoteName)
+        creep.say(creep.memory.remote)
 
         // Try to attack enemyAttackers, iterating if there are none or one was attacked
 
@@ -38,10 +38,10 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
 
         // If the creep is its remote
 
-        if (room.name === creep.memory.remoteName) {
+        if (room.name === creep.memory.remote) {
             // Otherwise, remove the remote from the creep
 
-            delete creep.memory.remoteName
+            delete creep.memory.remote
             continue
         }
 
@@ -50,7 +50,7 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: {
-                pos: new RoomPosition(25, 25, creep.memory.remoteName),
+                pos: new RoomPosition(25, 25, creep.memory.remote),
                 range: 25,
             },
         })

@@ -7,11 +7,11 @@ export function remoteReserverManager(room: Room, creepsOfRole: string[]) {
 
         if (!creep.findRemote()) continue
 
-        creep.say(creep.memory.remoteName)
+        creep.say(creep.memory.remote)
 
         // If the creep is in the remote
 
-        if (room.name === creep.memory.remoteName) {
+        if (room.name === creep.memory.remote) {
             // Try to reserve the controller
 
             creep.advancedReserveController()
@@ -23,7 +23,7 @@ export function remoteReserverManager(room: Room, creepsOfRole: string[]) {
         creep.createMoveRequest({
             origin: creep.pos,
             goal: {
-                pos: new RoomPosition(25, 25, creep.memory.remoteName),
+                pos: new RoomPosition(25, 25, creep.memory.remote),
                 range: 25,
             },
             avoidEnemyRanges: true,
@@ -35,7 +35,7 @@ export function remoteReserverManager(room: Room, creepsOfRole: string[]) {
 }
 
 RemoteReserver.prototype.findRemote = function () {
-    if (this.memory.remoteName) return true
+    if (this.memory.remote) return true
 
     const remoteNamesByEfficacy: string[] = Game.rooms[this.memory.commune]?.get('remoteNamesByEfficacy')
 
@@ -46,7 +46,7 @@ RemoteReserver.prototype.findRemote = function () {
 
         if (roomMemory.needs[remoteNeedsIndex.remoteReserver] <= 0) continue
 
-        this.memory.remoteName = roomName
+        this.memory.remote = roomName
         roomMemory.needs[remoteNeedsIndex.remoteReserver] -= 1
 
         return true
