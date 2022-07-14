@@ -73,8 +73,8 @@ export class InternationalManager {
      /**
       * My outgoing orders organized by room, order type and resourceType
       */
-     _myOrders?: {
-          [key: string]: Partial<Record<string, Partial<Record<MarketResourceConstant, Order[]>>>>
+     _myOrders: {
+          [roomName: string]: Partial<Record<string, Partial<Record<MarketResourceConstant, Order[]>>>>
      }
 
      /**
@@ -158,7 +158,7 @@ export class InternationalManager {
      /**
       * The number of orders owned by me
       */
-     _myOrdersCount?: number
+     _myOrdersCount: number
 
      /**
       * Gets the number of orders owned by me
