@@ -85,7 +85,7 @@ Object.defineProperties(Room.prototype, {
     },
     myDamagedCreeps: {
         get() {
-            if (!this._myDamagedCreeps) return this._myDamagedCreeps
+            if (this._myDamagedCreeps) return this._myDamagedCreeps
 
             return (this._myDamagedCreeps = this.find(FIND_CREEPS, {
                 filter: creep => creep.hits < creep.hitsMax,
@@ -94,7 +94,7 @@ Object.defineProperties(Room.prototype, {
     },
     allyDamagedCreeps: {
         get() {
-            if (!this._allyDamagedCreeps) return this._allyDamagedCreeps
+            if (this._allyDamagedCreeps) return this._allyDamagedCreeps
 
             return (this._allyDamagedCreeps = this.allyCreeps.filter(creep => {
                 return creep.hits < creep.hitsMax
