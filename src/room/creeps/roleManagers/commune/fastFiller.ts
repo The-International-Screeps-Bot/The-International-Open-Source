@@ -1,5 +1,19 @@
-import { customLog, getRange, unpackAsRoomPos } from 'international/generalFunctions'
-import { FastFiller } from 'room/creeps/creepClasses'
+import { getRange, unpackAsRoomPos } from 'international/generalFunctions'
+import { FastFiller } from '../../creepClasses'
+
+export function fastFillerManager(room: Room, creepsOfRole: string[]) {
+     for (const creepName of creepsOfRole) {
+          const creep: FastFiller = Game.creeps[creepName]
+
+          if (creep.travelToFastFiller()) continue
+
+          if (creep.fillFastFiller()) continue
+
+          if (creep.advancedRenew()) continue
+
+          /* creep.say('🚬') */
+     }
+}
 
 FastFiller.prototype.travelToFastFiller = function () {
      const { room } = this
@@ -14,7 +28,7 @@ FastFiller.prototype.travelToFastFiller = function () {
 
      // If the this is standing on the fastFillerPos, inform false
 
-     if (getRange(this.pos.x, this.pos.y, fastFillerPos.x, fastFillerPos.y) === 0) return false
+     if (getRange(this.pos.x, fastFillerPos.x, this.pos.y, fastFillerPos.y) === 0) return false
 
      // Otherwise, make a move request to it
 

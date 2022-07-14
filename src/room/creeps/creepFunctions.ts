@@ -610,7 +610,7 @@ Creep.prototype.findSourceHarvestPos = function (sourceName) {
     const openHarvestPositions = harvestPositions.filter(pos => !usedSourceHarvestPositions.has(pack(pos)))
     if (!openHarvestPositions.length) return false
 
-    openHarvestPositions.sort((a, b) => getRange(anchor.x, anchor.y, a.x, a.y) - getRange(anchor.x, anchor.y, b.x, b.y))
+    openHarvestPositions.sort((a, b) => getRange(anchor.x, a.x, anchor.y, a.y) - getRange(anchor.x, anchor.y, b.x, b.y))
 
     packedPos = pack(openHarvestPositions[0])
 

@@ -49,7 +49,7 @@ MineralHarvester.prototype.advancedHarvestMineral = function (mineral) {
 
      // If the creep is not standing on the harvestPos
 
-     if (getRange(creep.pos.x, creep.pos.y, harvestPos.x, harvestPos.y) > 0) {
+     if (getRange(creep.pos.x, harvestPos.x, creep.pos.y, harvestPos.y) > 0) {
           creep.say('⏩M')
 
           // Make a move request to it
