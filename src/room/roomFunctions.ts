@@ -164,36 +164,6 @@ Room.prototype.get = function (roomObjectName) {
         },
     })
 
-    new RoomCacheObject({
-        name: 'enemyCSites',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: 1,
-        room,
-        valueConstructor() {
-            // Inform constuction sites that aren't owned by a member of the allyList
-
-            return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => !Memory.allyList.includes(cSite.owner.username),
-            })
-        },
-    })
-
-    new RoomCacheObject({
-        name: 'allyCSites',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: 1,
-        room,
-        valueConstructor() {
-            // Inform constuction sites that aren't owned by a member of the allyList
-
-            return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => Memory.allyList.includes(cSite.owner.username),
-            })
-        },
-    })
-
     // Harvest positions
 
     /**
@@ -943,7 +913,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 // Loop trough each construction site belonging to an ally
 
-                for (const cSite of room.get('allyCSites')) cm.set(cSite.x, cSite.y, 255)
+                for (const cSite of room.allyCSites) cm.set(cSite.pos.x, cSite.pos.y, 255)
 
                 // If there is a request to avoid enemy ranges
 

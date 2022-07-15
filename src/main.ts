@@ -125,8 +125,6 @@ declare global {
         | 'roadCM'
         | 'source1'
         | 'source2'
-        | 'enemyCSites'
-        | 'allyCSites'
         | 'mineralHarvestPositions'
         | 'closestMineralHarvestPos'
         | 'source1HarvestPositions'
@@ -877,6 +875,14 @@ declare global {
         _cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
 
         readonly cSites: Record<StructureConstant, ConstructionSite[]>
+
+        _enemyCSites: ConstructionSite[]
+
+        readonly enemyCSites: ConstructionSite[]
+
+        _allyCSites: ConstructionSite[]
+
+        readonly allyCSites: ConstructionSite[]
 
         readonly cSiteTarget: Id<ConstructionSite> | undefined
 

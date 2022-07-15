@@ -161,6 +161,24 @@ Object.defineProperties(Room.prototype, {
             return undefined
         },
     },
+    enemyCSites: {
+        get() {
+            if (this._enemyCSites) return this._enemyCSites
+
+            return this._enemyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
+                filter: cSite => !Memory.allyList.includes(cSite.owner.username)
+            })
+        },
+    },
+    allyCSites: {
+        get() {
+            if (this._allyCSites) return this._allyCSites
+
+            return this._allyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
+                filter: cSite => Memory.allyList.includes(cSite.owner.username)
+            })
+        },
+    },
     spawningStructures: {
         get() {
             if (this._spawningStructures) return this._spawningStructures
