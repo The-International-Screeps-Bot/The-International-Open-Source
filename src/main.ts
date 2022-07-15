@@ -1428,6 +1428,11 @@ declare global {
         scoutTarget: string
 
         /**
+         * The name of the room the scout is trying to sign
+         */
+        signTarget: string
+
+        /**
          * The name of the room the creep is remoting for
          */
         remote: string

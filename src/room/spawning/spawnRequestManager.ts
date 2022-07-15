@@ -985,6 +985,11 @@ Room.prototype.spawnRequester = function() {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
+
+                // If there are no related needs
+
+                if (remoteNeeds[remoteNeedsIndex.remoteDefender] <= 0) return false
+
                 const minCost = 400
                 const cost = 900
                 const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
@@ -993,10 +998,6 @@ Room.prototype.spawnRequester = function() {
                 // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
 
                 if (spawnEnergyCapacity < minCost) return false
-
-                // If there are no related needs
-
-                if (remoteNeeds[remoteNeedsIndex.remoteDefender] <= 0) return false
 
                 // If max spawnable strength is less that needed
 

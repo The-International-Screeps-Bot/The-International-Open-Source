@@ -1,11 +1,11 @@
 import { communeSigns, nonCommuneSigns } from 'international/constants'
-import { findClosestCommuneName } from 'international/generalFunctions'
+import { findClosestCommuneName, getRange } from 'international/generalFunctions'
 import { creepClasses, Scout } from '../../creepClasses'
 
 export function scoutManager(room: Room, creepsOfRole: string[]) {
-    // Loop through the names of the creeps of the role
+     // Loop through the names of the creeps of the role
 
-    for (const creepName of creepsOfRole) {
+     for (const creepName of creepsOfRole) {
         // Get the creep using its name
 
         const creep: Scout = Game.creeps[creepName]
@@ -14,61 +14,49 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 
         if (!commune) continue
 
+        // If the creep is in the scoutTarget
+
+        if (creep.memory.scoutTarget === room.name) {
+             creep.say('👁️')
+
+             // Get information about the room
+
+             room.findType(commune)
+
+             // Clean the room's memory
+
+             room.cleanMemory()
+
+             // And delete the creep's scoutTarget
+
+             delete creep.memory.scoutTarget
+        }
+
         // If there is no scoutTarget, find one
 
-        if (!creep.findScoutTarget()) continue
-
-        // If the room hasn't been scouted for some time, scout it
-
-        if (Game.time - 100 >= room.memory.lastScout) {
-            creep.say('👁️')
-
-            // Get information about the room
-
-            room.findType(commune)
-
-            // Clean the room's memory
-
-            room.cleanMemory()
-        }
+        if (!creep.findScoutTarget()) return
 
         // Say the scoutTarget
 
         creep.say(`🔭${creep.memory.scoutTarget.toString()}`)
 
-        // If there is a controller, sign the controller. If the creep signed it
+        if (!creep.advancedSignController()) continue
 
-        if (creep.advancedSignController() && creep.memory.scoutTarget === room.name) {
-            // Change scoutTarget
-
-            delete creep.memory.scoutTarget
-
-            if (!creep.findScoutTarget()) continue
-
-            // Say the scoutTarget
-
-            creep.say(`🔭x${creep.memory.scoutTarget.toString()}`)
-        }
-
-        if (creep.moveRequest) continue
+        creep.memory.signTarget = creep.memory.scoutTarget
 
         // Try to go to the scoutTarget
 
         creep.createMoveRequest({
-            origin: creep.pos,
-            goal: {
-                pos: new RoomPosition(25, 25, creep.memory.scoutTarget),
-                range: 25,
-            },
-            avoidEnemyRanges: true,
-            plainCost: 1,
-            swampCost: 1,
+             origin: creep.pos,
+             goal: {
+                  pos: new RoomPosition(25, 25, creep.memory.scoutTarget),
+                  range: 25,
+             },
+             avoidEnemyRanges: true,
+             plainCost: 1,
+             swampCost: 1,
         })
-
-        // If the creep can't get a moveRequest, find a new scoutTarget
-
-        if (!creep.moveRequest) delete creep.memory.scoutTarget
-    }
+   }
 }
 
 Scout.prototype.findScoutTarget = function () {
@@ -165,7 +153,11 @@ Scout.prototype.recordDeposits = function () {
 Scout.prototype.advancedSignController = function () {
     const { room } = this
 
-    if (!room.controller) return true
+    const { controller } = room
+
+    if (!controller) return true
+
+    if (room.name !== this.memory.signTarget) return true
 
     // Construct the signMessage
 
@@ -175,14 +167,14 @@ Scout.prototype.advancedSignController = function () {
 
     if (room.memory.type === 'ally' || room.memory.type === 'enemy') return true
 
-    if (room.controller.reservation && room.controller.reservation.username != Memory.me) return true
+    if (controller.reservation && controller.reservation.username != Memory.me) return true
 
     // If the room is a commune
 
     if (room.memory.type === 'commune') {
         // If the room already has a correct sign
 
-        if (room.controller.sign && communeSigns.includes(room.controller.sign.text)) return true
+        if (controller.sign && communeSigns.includes(controller.sign.text)) return true
 
         // Otherwise assign the signMessage the commune sign
 
@@ -193,7 +185,7 @@ Scout.prototype.advancedSignController = function () {
     else {
         // If the room already has a correct sign
 
-        if (room.controller.sign && nonCommuneSigns.includes(room.controller.sign.text)) return true
+        if (controller.sign && nonCommuneSigns.includes(controller.sign.text)) return true
 
         // And assign the message according to the index of randomSign
 
@@ -202,7 +194,7 @@ Scout.prototype.advancedSignController = function () {
 
     // If the controller is not in range
 
-    if (this.pos.getRangeTo(room.controller.pos) > 1) {
+    if (getRange(this.pos.x, controller.pos.x, this.pos.y, controller.pos.y) > 1) {
         // Request to move to the controller and inform false
 
         this.createMoveRequest({

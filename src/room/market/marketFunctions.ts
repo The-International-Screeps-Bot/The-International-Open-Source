@@ -15,12 +15,11 @@ Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
 
      if (amount <= targetAmount * 0.5) return false
 
-     let dealAmount
-
      // Otherwise, find buy orders for the resourceType and loop through them
 
      for (const order of internationalManager.getBuyOrders(resourceType)) {
-          dealAmount = findLargestTransactionAmount(
+
+          const dealAmount = findLargestTransactionAmount(
                this.terminal.store.energy * 0.75,
                amount,
                this.name,
@@ -64,12 +63,11 @@ Room.prototype.advancedBuy = function (resourceType, amount, targetAmount) {
 
      if (amount <= targetAmount * 0.5) return false
 
-     let dealAmount
-
      // Otherwise, find buy orders for the resourceType and loop through them
 
      for (const order of internationalManager.getSellOrders(resourceType, getAvgPrice(resourceType) * 1.2)) {
-          dealAmount = findLargestTransactionAmount(this.terminal.store.energy, amount, this.name, order.roomName)
+
+          const dealAmount = findLargestTransactionAmount(this.terminal.store.energy, amount, this.name, order.roomName)
 
           return Game.market.deal(order.id, Math.min(dealAmount, order.remainingAmount), this.name) == OK
      }
