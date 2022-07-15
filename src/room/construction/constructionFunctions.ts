@@ -37,13 +37,14 @@ Room.prototype.communeConstructionPlacement = function () {
                const stampAnchor = unpackAsPos(packedStampAnchor)
 
                for (const structureType in stamp.structures) {
+
                     if (structureType === 'empty') continue
 
                     // If there are already sufficient structures + cSites
 
                     if (
                          this.structures[structureType as StructureConstant].length +
-                              this.get(`${structureType as BuildableStructureConstant}CSite`).length >=
+                              this.cSites[structureType as BuildableStructureConstant].length >=
                          CONTROLLER_STRUCTURES[structureType as BuildableStructureConstant][this.controller.level]
                     )
                          continue
