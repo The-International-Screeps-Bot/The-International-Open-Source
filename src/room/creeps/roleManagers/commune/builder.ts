@@ -67,7 +67,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
 
             // If there are fastFiller containers
 
-            if (room.fastFillerContainerLeft && room.fastFillerContainerRight) {
+            if (room.fastFillerContainerLeft || room.fastFillerContainerRight) {
                 if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveWithdrawEnergy()
 
                 if (!creep.fulfillReservation()) {
