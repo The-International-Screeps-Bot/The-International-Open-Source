@@ -2,6 +2,7 @@ import { minerals } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import './marketFunctions'
 import { allyManager } from '../../international/simpleAllies'
+import { internationalManager } from 'international/internationalManager'
 
 export function marketManager(room: Room) {
      const { terminal } = room
@@ -22,7 +23,7 @@ export function marketManager(room: Room) {
 
      // If the market is disabled, stop
 
-     if (!Game.market.getHistory(RESOURCE_ENERGY).length) return
+     if (!internationalManager.marketIsFunctional) return
 
      // For each mineral
 

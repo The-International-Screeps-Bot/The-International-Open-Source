@@ -1569,7 +1569,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
 
     withdrawTargets = withdrawTargets.concat(
         [room.fastFillerContainerLeft, room.fastFillerContainerRight, room.controllerContainer].filter(target => {
-            return target && target.store.energy >= Math.min(this.freeStore(RESOURCE_ENERGY) * 8, target.store.getCapacity(RESOURCE_ENERGY))
+            return target && target.store.energy >= target.store.getCapacity(RESOURCE_ENERGY) * 0.5
         }),
     )
 

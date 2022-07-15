@@ -33,6 +33,7 @@ import { ErrorMapper } from 'other/ErrorMapper'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { createPackedPosMap, customLog } from 'international/generalFunctions'
+import { myColors } from 'international/constants'
 
 // Type declareations for global
 
@@ -1624,20 +1625,20 @@ export const loop = function () {
     memHack.modifyMemory()
 
     internationalManager.run()
+/*
+    let cpu = Game.cpu.getUsed()
 
+    Game.market.getHistory(RESOURCE_ENERGY).length
+
+    customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
+ */
     roomManager()
 
     internationalManager.mapVisualsManager()
 
     internationalManager.advancedGeneratePixel()
     internationalManager.advancedSellPixels()
-    /*
-     let cpu = Game.cpu.getUsed()
 
-     createPackedPosMap()
-
-     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu)
- */
     internationalManager.endTickManager()
     // console.log('Stats cpu logging')
     // console.log(

@@ -190,6 +190,17 @@ export class InternationalManager {
 
           return Math.floor((CPUBucketCapacity - Game.cpu.bucket) / cacheAmountModifier) + 1
      }
+
+     _marketIsFunctional: number
+
+     /**
+      * Determines if there is functional based on history
+      */
+     get marketIsFunctional() {
+          if (this._marketIsFunctional !== undefined) return this._marketIsFunctional
+
+          return this._marketIsFunctional = Game.market.getHistory(RESOURCE_ENERGY).length
+     }
 }
 
 InternationalManager.prototype.run = function () {

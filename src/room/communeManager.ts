@@ -27,13 +27,13 @@ export function communeManager(room: Room) {
     room.claimRequestManager()
 
     room.spawnManager()
-    /*
-   let cpu = Game.cpu.getUsed()
+/*
+    let cpu = Game.cpu.getUsed()
 
+    Game.market.getHistory(RESOURCE_ENERGY).length
 
-
-   customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
-   */
+    customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
+ */
     /*
    cpu = Game.cpu.getUsed()
 
