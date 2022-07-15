@@ -11,7 +11,7 @@ export function remoteCoreAttackerManager(room: Room, creepsOfRole: string[]) {
         if (!creep.findRemote()) {
             // If the room is the creep's commune
 
-            if (room.name === creep.memory.commune) {
+            if (room.name === creep.commune) {
                 // Advanced recycle and iterate
 
                 creep.advancedRecycle()
@@ -23,7 +23,7 @@ export function remoteCoreAttackerManager(room: Room, creepsOfRole: string[]) {
             creep.createMoveRequest({
                 origin: creep.pos,
                 goal: {
-                    pos: new RoomPosition(25, 25, creep.memory.commune),
+                    pos: new RoomPosition(25, 25, creep.commune),
                     range: 25,
                 },
             })
@@ -63,11 +63,11 @@ RemoteCoreAttacker.prototype.findRemote = function () {
 
     // Otherwise, get the creep's role
 
-    const role = creep.memory.role as 'remoteCoreAttacker'
+    const role = creep.role as 'remoteCoreAttacker'
 
     // Get remotes by their efficacy
 
-    const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.commune]?.get('remoteNamesByEfficacy')
+    const remoteNamesByEfficacy: string[] = Game.rooms[creep.commune]?.get('remoteNamesByEfficacy')
 
     // Loop through each remote name
 

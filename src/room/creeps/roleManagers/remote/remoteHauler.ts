@@ -29,13 +29,13 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
                 if (creep.needsResources()) continue
 
-                creep.message += creep.memory.commune
+                creep.message += creep.commune
                 creep.say(creep.message)
 
                 creep.createMoveRequest({
                     origin: creep.pos,
                     goal: {
-                        pos: new RoomPosition(25, 25, creep.memory.commune),
+                        pos: new RoomPosition(25, 25, creep.commune),
                         range: 20,
                     },
                     avoidEnemyRanges: true,
@@ -61,7 +61,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 
         // Otherwise if creep doesn't need resources
 
-        if (room.name === creep.memory.commune) {
+        if (room.name === creep.commune) {
             // Try to renew the creep
 
             creep.advancedRenew()
@@ -69,7 +69,6 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
             // If the creep has a remoteName, delete it and delete it's fulfilled needs so the creep has a chance to find a better target
 
             if (creep.memory.remote) {
-
                 Memory.rooms[creep.memory.remote].needs[remoteNeedsIndex.remoteHauler] += creep.parts.carry
                 delete creep.memory.remote
             }
@@ -107,13 +106,13 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
             continue
         }
 
-        creep.message += creep.memory.commune
+        creep.message += creep.commune
         creep.say(creep.message)
 
         creep.createMoveRequest({
             origin: creep.pos,
             goal: {
-                pos: new RoomPosition(25, 25, creep.memory.commune),
+                pos: new RoomPosition(25, 25, creep.commune),
                 range: 20,
             },
             avoidEnemyRanges: true,
@@ -124,7 +123,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
 RemoteHauler.prototype.findRemote = function () {
     if (this.memory.remote) return true
 
-    const remoteNamesByEfficacy: string[] = Game.rooms[this.memory.commune]?.get('remoteNamesByEfficacy')
+    const remoteNamesByEfficacy: string[] = Game.rooms[this.commune]?.get('remoteNamesByEfficacy')
 
     let roomMemory
 

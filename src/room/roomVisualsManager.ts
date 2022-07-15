@@ -96,7 +96,7 @@ Room.prototype.roomVisualsManager = function () {
 
             // Otherwise display the role of the creep being spawn
 
-            this.visual.text(creep.memory.role, spawn.pos, {
+            this.visual.text(creep.role, spawn.pos, {
                 backgroundColor: 'rgb(255, 0, 0, 0)',
                 font: 0.5,
                 opacity: 1,

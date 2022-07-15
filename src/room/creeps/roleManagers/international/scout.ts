@@ -3,33 +3,33 @@ import { findClosestCommuneName, getRange } from 'international/generalFunctions
 import { creepClasses, Scout } from '../../creepClasses'
 
 export function scoutManager(room: Room, creepsOfRole: string[]) {
-     // Loop through the names of the creeps of the role
+    // Loop through the names of the creeps of the role
 
-     for (const creepName of creepsOfRole) {
+    for (const creepName of creepsOfRole) {
         // Get the creep using its name
 
         const creep: Scout = Game.creeps[creepName]
 
-        const commune = Game.rooms[creep.memory.commune]
+        const commune = Game.rooms[creep.commune]
 
         if (!commune) continue
 
         // If the creep is in the scoutTarget
 
         if (creep.memory.scoutTarget === room.name) {
-             creep.say('👁️')
+            creep.say('👁️')
 
-             // Get information about the room
+            // Get information about the room
 
-             room.findType(commune)
+            room.findType(commune)
 
-             // Clean the room's memory
+            // Clean the room's memory
 
-             room.cleanMemory()
+            room.cleanMemory()
 
-             // And delete the creep's scoutTarget
+            // And delete the creep's scoutTarget
 
-             delete creep.memory.scoutTarget
+            delete creep.memory.scoutTarget
         }
 
         // If there is no scoutTarget, find one
@@ -47,22 +47,22 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
         // Try to go to the scoutTarget
 
         creep.createMoveRequest({
-             origin: creep.pos,
-             goal: {
-                  pos: new RoomPosition(25, 25, creep.memory.scoutTarget),
-                  range: 25,
-             },
-             avoidEnemyRanges: true,
-             plainCost: 1,
-             swampCost: 1,
+            origin: creep.pos,
+            goal: {
+                pos: new RoomPosition(25, 25, creep.memory.scoutTarget),
+                range: 25,
+            },
+            avoidEnemyRanges: true,
+            plainCost: 1,
+            swampCost: 1,
         })
-   }
+    }
 }
 
 Scout.prototype.findScoutTarget = function () {
     if (this.memory.scoutTarget) return true
 
-    const commune = Game.rooms[this.memory.commune]
+    const commune = Game.rooms[this.commune]
 
     // Construct storage of exit information
 
@@ -105,8 +105,7 @@ Scout.prototype.findScoutTarget = function () {
     const scoutTarget = unscoutedRooms.length
         ? unscoutedRooms.sort(
               (a, b) =>
-                  Game.map.getRoomLinearDistance(this.memory.commune, a) -
-                  Game.map.getRoomLinearDistance(this.memory.commune, b),
+                  Game.map.getRoomLinearDistance(this.commune, a) - Game.map.getRoomLinearDistance(this.commune, b),
           )[0]
         : scoutedRooms.sort((a, b) => Memory.rooms[a].lastScout - Memory.rooms[b].lastScout)[0]
 
@@ -204,7 +203,7 @@ Scout.prototype.advancedSignController = function () {
             plainCost: 1,
             swampCost: 1,
         })
-
+        this.say(this.moveRequest.toString())
         if (!this.moveRequest) return true
 
         return false

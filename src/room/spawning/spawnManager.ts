@@ -53,7 +53,7 @@ Room.prototype.spawnManager = function () {
 
             customLog(
                 'Failed to spawn',
-                `error: ${testSpawnResult}, role: ${spawnRequest.extraOpts.memory.role}, cost: ${spawnRequest.cost}, body: (${spawnRequest.body.length}) ${spawnRequest.body}`,
+                `error: ${testSpawnResult}, role: ${spawnRequest.role}, cost: ${spawnRequest.cost}, body: (${spawnRequest.body.length}) ${spawnRequest.body}`,
                 myColors.white,
                 myColors.red,
             )

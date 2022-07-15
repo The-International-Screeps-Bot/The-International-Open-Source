@@ -4,7 +4,7 @@ import { RemoteCoreAttacker, RemoteHauler, RemoteReserver } from 'room/creeps/cr
 RemoteHauler.prototype.preTickManager = function () {
     if (!this.memory.remote) return
 
-    const role = this.memory.role as 'remoteHauler'
+    const role = this.role as 'remoteHauler'
 
     // Reduce remote need
 

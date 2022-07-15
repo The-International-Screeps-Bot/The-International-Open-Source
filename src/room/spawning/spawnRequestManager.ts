@@ -16,12 +16,14 @@ import {
     getRange,
 } from 'international/generalFunctions'
 
-Room.prototype.spawnRequester = function() {
+Room.prototype.spawnRequester = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
     // Structure info about the this's spawn energy
+
+    const commune = this.name
 
     const spawnEnergyCapacity = this.energyCapacityAvailable
 
@@ -39,6 +41,7 @@ Room.prototype.spawnRequester = function() {
 
             if (spawnEnergyCapacity >= 800) {
                 return {
+                    role,
                     defaultParts: [CARRY],
                     extraParts: [WORK, MOVE, WORK],
                     partsMultiplier: 3,
@@ -46,7 +49,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 200,
                     priority,
                     memoryAdditions: {
-                        role,
                         sourceName,
                         roads: true,
                     },
@@ -55,6 +57,7 @@ Room.prototype.spawnRequester = function() {
 
             if (spawnEnergyCapacity >= 750) {
                 return {
+                    role,
                     defaultParts: [],
                     extraParts: [WORK, MOVE, WORK],
                     partsMultiplier: 3,
@@ -62,7 +65,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 200,
                     priority,
                     memoryAdditions: {
-                        role,
                         sourceName,
                         roads: true,
                     },
@@ -71,6 +73,7 @@ Room.prototype.spawnRequester = function() {
 
             if (spawnEnergyCapacity >= 600) {
                 return {
+                    role,
                     defaultParts: [MOVE, CARRY],
                     extraParts: [WORK],
                     partsMultiplier: 6,
@@ -78,7 +81,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 300,
                     priority,
                     memoryAdditions: {
-                        role,
                         sourceName,
                         roads: true,
                     },
@@ -87,6 +89,7 @@ Room.prototype.spawnRequester = function() {
 
             if (this[`${sourceName}Container`]) {
                 return {
+                    role,
                     defaultParts: [MOVE],
                     extraParts: [WORK],
                     partsMultiplier: 6,
@@ -94,7 +97,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 150,
                     priority,
                     memoryAdditions: {
-                        role,
                         sourceName,
                         roads: true,
                     },
@@ -102,6 +104,7 @@ Room.prototype.spawnRequester = function() {
             }
 
             return {
+                role,
                 defaultParts: [MOVE, CARRY],
                 extraParts: [WORK],
                 partsMultiplier: 6,
@@ -110,7 +113,6 @@ Room.prototype.spawnRequester = function() {
                 minCost: 200,
                 priority,
                 memoryAdditions: {
-                    role,
                     sourceName,
                     roads: true,
                 },
@@ -128,6 +130,7 @@ Room.prototype.spawnRequester = function() {
 
             if (spawnEnergyCapacity >= 800) {
                 return {
+                    role,
                     defaultParts: [CARRY],
                     extraParts: [WORK, MOVE, WORK],
                     partsMultiplier: 3,
@@ -135,7 +138,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 200,
                     priority,
                     memoryAdditions: {
-                        role,
                         sourceName,
                         roads: true,
                     },
@@ -144,6 +146,7 @@ Room.prototype.spawnRequester = function() {
 
             if (spawnEnergyCapacity >= 750) {
                 return {
+                    role,
                     defaultParts: [],
                     extraParts: [WORK, MOVE, WORK],
                     partsMultiplier: 3,
@@ -151,7 +154,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 200,
                     priority,
                     memoryAdditions: {
-                        role,
                         sourceName,
                         roads: true,
                     },
@@ -160,6 +162,7 @@ Room.prototype.spawnRequester = function() {
 
             if (spawnEnergyCapacity >= 600) {
                 return {
+                    role,
                     defaultParts: [MOVE, CARRY],
                     extraParts: [WORK],
                     partsMultiplier: 6,
@@ -167,7 +170,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 300,
                     priority,
                     memoryAdditions: {
-                        role,
                         sourceName,
                         roads: true,
                     },
@@ -176,6 +178,7 @@ Room.prototype.spawnRequester = function() {
 
             if (this[`${sourceName}Container`]) {
                 return {
+                    role,
                     defaultParts: [MOVE],
                     extraParts: [WORK],
                     partsMultiplier: 6,
@@ -183,7 +186,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 150,
                     priority,
                     memoryAdditions: {
-                        role,
                         sourceName,
                         roads: true,
                     },
@@ -191,6 +193,7 @@ Room.prototype.spawnRequester = function() {
             }
 
             return {
+                role,
                 defaultParts: [MOVE, CARRY],
                 extraParts: [WORK],
                 partsMultiplier: 6,
@@ -199,7 +202,6 @@ Room.prototype.spawnRequester = function() {
                 minCost: 200,
                 priority,
                 memoryAdditions: {
-                    role,
                     sourceName,
                     roads: true,
                 },
@@ -241,10 +243,13 @@ Room.prototype.spawnRequester = function() {
                 requiredCarryParts += findCarryPartsRequired(this.upgradePathLength * 2, income)
             }
 
+            const role = 'hauler'
+
             // If all RCL 3 extensions are built
 
             if (spawnEnergyCapacity >= 800) {
                 return {
+                    role,
                     defaultParts: [],
                     extraParts: [CARRY, CARRY, MOVE],
                     partsMultiplier: requiredCarryParts / 2,
@@ -253,13 +258,13 @@ Room.prototype.spawnRequester = function() {
                     minCost: 150,
                     priority,
                     memoryAdditions: {
-                        role: 'hauler',
                         roads: true,
                     },
                 }
             }
 
             return {
+                role,
                 defaultParts: [],
                 extraParts: [CARRY, MOVE],
                 partsMultiplier: requiredCarryParts,
@@ -267,9 +272,7 @@ Room.prototype.spawnRequester = function() {
                 maxCreeps: Infinity,
                 minCost: 100,
                 priority,
-                memoryAdditions: {
-                    role: 'hauler',
-                },
+                memoryAdditions: {},
             }
         })(),
     )
@@ -300,7 +303,10 @@ Room.prototype.spawnRequester = function() {
 
             if (spawnEnergyCapacity < minCost) return false
 
+            const role = 'mineralHarvester'
+
             return {
+                role,
                 defaultParts: [],
                 extraParts: [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, MOVE, CARRY, CARRY, MOVE, WORK],
                 partsMultiplier: this.get('mineralHarvestPositions')?.length * 4,
@@ -308,7 +314,6 @@ Room.prototype.spawnRequester = function() {
                 minCost,
                 priority: 10 + this.creepsFromRoom.mineralHarvester.length * 3,
                 memoryAdditions: {
-                    role: 'mineralHarvester',
                     roads: true,
                 },
             }
@@ -327,16 +332,17 @@ Room.prototype.spawnRequester = function() {
 
             if (!this.hubLink && !this.terminal) return false
 
+            const role = 'hubHauler'
+
             return {
+                role,
                 defaultParts: [MOVE],
                 extraParts: [CARRY],
                 partsMultiplier: 8,
                 minCreeps: 1,
                 minCost: 300,
                 priority: 7,
-                memoryAdditions: {
-                    role: 'hubHauler',
-                },
+                memoryAdditions: {},
             }
         })(),
     )
@@ -356,16 +362,17 @@ Room.prototype.spawnRequester = function() {
 
             if (this.controller.level >= 7) defaultParts = [CARRY, CARRY, CARRY, MOVE, CARRY]
 
+            const role = 'fastFiller'
+
             return {
+                role,
                 defaultParts,
                 extraParts: [],
                 partsMultiplier: 1,
                 minCreeps: fastFillerPositions.length,
                 minCost: 250,
                 priority: 0.75,
-                memoryAdditions: {
-                    role: 'fastFiller',
-                },
+                memoryAdditions: {},
             }
         })(),
     )
@@ -415,7 +422,10 @@ Room.prototype.spawnRequester = function() {
 
             if (this.controller.safeMode) return false
 
+            const role = 'meleeDefender'
+
             return {
+                role,
                 defaultParts: [],
                 extraParts: [ATTACK, ATTACK, MOVE],
                 partsMultiplier: attackStrength,
@@ -424,7 +434,6 @@ Room.prototype.spawnRequester = function() {
                 minCost: 210,
                 priority: 6 + this.creepsFromRoom.meleeDefender.length,
                 memoryAdditions: {
-                    role: 'meleeDefender',
                     roads: true,
                 },
             }
@@ -458,10 +467,13 @@ Room.prototype.spawnRequester = function() {
             // Otherwise if there is no storage
             else partsMultiplier += Math.floor(estimatedIncome / 3)
 
+            const role = 'builder'
+
             // If all RCL 3 extensions are build
 
             if (spawnEnergyCapacity >= 800) {
                 return {
+                    role,
                     defaultParts: [],
                     extraParts: [WORK, WORK, MOVE, CARRY, CARRY, MOVE, CARRY, CARRY, MOVE, CARRY, MOVE, WORK],
                     partsMultiplier: partsMultiplier / 3,
@@ -470,7 +482,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 750,
                     priority,
                     memoryAdditions: {
-                        role: 'builder',
                         roads: true,
                     },
                 }
@@ -478,6 +489,7 @@ Room.prototype.spawnRequester = function() {
 
             if (!this.fastFillerContainerLeft && !this.fastFillerContainerRight) {
                 return {
+                    role,
                     defaultParts: [],
                     extraParts: [WORK, CARRY, CARRY, MOVE],
                     partsMultiplier: partsMultiplier,
@@ -486,13 +498,13 @@ Room.prototype.spawnRequester = function() {
                     minCost: 250,
                     priority,
                     memoryAdditions: {
-                        role: 'builder',
                         roads: true,
                     },
                 }
             }
 
             return {
+                role,
                 defaultParts: [],
                 extraParts: [MOVE, CARRY, MOVE, WORK],
                 partsMultiplier,
@@ -500,9 +512,7 @@ Room.prototype.spawnRequester = function() {
                 maxCreeps: Infinity,
                 minCost: 250,
                 priority,
-                memoryAdditions: {
-                    role: 'builder',
-                },
+                memoryAdditions: {},
             }
         })(),
     )
@@ -550,10 +560,13 @@ Room.prototype.spawnRequester = function() {
 
             if (this.storage) partsMultiplier += this.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000
 
+            const role = 'maintainer'
+
             // If all RCL 3 extensions are build
 
             if (spawnEnergyCapacity >= 800) {
                 return {
+                    role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE, WORK],
                     partsMultiplier,
@@ -562,13 +575,13 @@ Room.prototype.spawnRequester = function() {
                     minCost: 200,
                     priority,
                     memoryAdditions: {
-                        role: 'maintainer',
                         roads: true,
                     },
                 }
             }
 
             return {
+                role,
                 defaultParts: [],
                 extraParts: [MOVE, CARRY, MOVE, WORK],
                 partsMultiplier,
@@ -576,9 +589,7 @@ Room.prototype.spawnRequester = function() {
                 maxCreeps: Infinity,
                 minCost: 250,
                 priority,
-                memoryAdditions: {
-                    role: 'maintainer',
-                },
+                memoryAdditions: {},
             }
         })(),
     )
@@ -625,7 +636,6 @@ Room.prototype.spawnRequester = function() {
                 // If there are transfer links, max out partMultiplier to their ability
 
                 if (hubLink && sourceLinks.length) {
-
                     let maxPartsMultiplier = 0
 
                     if (hubLink) {
@@ -663,9 +673,8 @@ Room.prototype.spawnRequester = function() {
 
             if (this.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
 
-            // Intitialize the threshold
-
             const threshold = 0.15
+            const role = 'controllerUpgrader'
 
             // If the controllerContainer or controllerLink exists
 
@@ -682,6 +691,7 @@ Room.prototype.spawnRequester = function() {
                     if (partsMultiplier === 0) return false
 
                     return {
+                        role,
                         defaultParts: [],
                         extraParts: [
                             WORK,
@@ -717,7 +727,6 @@ Room.prototype.spawnRequester = function() {
                         minCost: 300,
                         priority,
                         memoryAdditions: {
-                            role: 'controllerUpgrader',
                             roads: true,
                         },
                     }
@@ -735,6 +744,7 @@ Room.prototype.spawnRequester = function() {
                     if (partsMultiplier === 0) return false
 
                     return {
+                        role,
                         defaultParts: [CARRY],
                         extraParts: [WORK, WORK, WORK, MOVE, WORK, WORK, WORK],
                         partsMultiplier,
@@ -744,7 +754,6 @@ Room.prototype.spawnRequester = function() {
                         minCost: 700,
                         priority,
                         memoryAdditions: {
-                            role: 'controllerUpgrader',
                             roads: true,
                         },
                     }
@@ -759,6 +768,7 @@ Room.prototype.spawnRequester = function() {
                 if (partsMultiplier === 0) return false
 
                 return {
+                    role,
                     defaultParts: [CARRY],
                     extraParts: [WORK, MOVE, WORK, WORK, WORK],
                     partsMultiplier,
@@ -768,7 +778,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 200,
                     priority,
                     memoryAdditions: {
-                        role: 'controllerUpgrader',
                         roads: true,
                     },
                 }
@@ -782,6 +791,7 @@ Room.prototype.spawnRequester = function() {
 
             if (spawnEnergyCapacity >= 800) {
                 return {
+                    role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE, WORK],
                     partsMultiplier,
@@ -790,13 +800,13 @@ Room.prototype.spawnRequester = function() {
                     minCost: 200,
                     priority,
                     memoryAdditions: {
-                        role: 'controllerUpgrader',
                         roads: true,
                     },
                 }
             }
 
             return {
+                role,
                 defaultParts: [],
                 extraParts: [MOVE, CARRY, MOVE, WORK],
                 partsMultiplier,
@@ -804,9 +814,7 @@ Room.prototype.spawnRequester = function() {
                 maxCreeps: Infinity,
                 minCost: 250,
                 priority,
-                memoryAdditions: {
-                    role: 'controllerUpgrader',
-                },
+                memoryAdditions: {},
             }
         })(),
     )
@@ -868,8 +876,11 @@ Room.prototype.spawnRequester = function() {
 
                 if (remoteNeeds[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
 
+                const role = 'source1RemoteHarvester'
+
                 if (spawnEnergyCapacity >= 950) {
                     return {
+                        role,
                         defaultParts: [CARRY],
                         extraParts: [WORK, MOVE],
                         partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0),
@@ -881,13 +892,13 @@ Room.prototype.spawnRequester = function() {
                         minCost: 200,
                         priority: remotePriority - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                         memoryAdditions: {
-                            role: 'source1RemoteHarvester',
                             roads: true,
                         },
                     }
                 }
 
                 return {
+                    role,
                     defaultParts: [CARRY],
                     extraParts: [WORK, WORK, MOVE],
                     partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source1RemoteHarvester], 0),
@@ -899,7 +910,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 300,
                     priority: remotePriority - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                     memoryAdditions: {
-                        role: 'source1RemoteHarvester',
                         roads: true,
                     },
                 }
@@ -914,8 +924,11 @@ Room.prototype.spawnRequester = function() {
 
                 if (remoteNeeds[remoteNeedsIndex.source2RemoteHarvester] <= 0) return false
 
+                const role = 'source2RemoteHarvester'
+
                 if (spawnEnergyCapacity >= 950) {
                     return {
+                        role,
                         defaultParts: [CARRY],
                         extraParts: [WORK, MOVE],
                         partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0),
@@ -926,13 +939,13 @@ Room.prototype.spawnRequester = function() {
                         minCost: 200,
                         priority: remotePriority - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                         memoryAdditions: {
-                            role: 'source2RemoteHarvester',
                             roads: true,
                         },
                     }
                 }
 
                 return {
+                    role,
                     defaultParts: [CARRY],
                     extraParts: [WORK, WORK, MOVE],
                     partsMultiplier: Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0),
@@ -944,7 +957,6 @@ Room.prototype.spawnRequester = function() {
                     minCost: 300,
                     priority: remotePriority - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                     memoryAdditions: {
-                        role: 'source2RemoteHarvester',
                         roads: true,
                     },
                 }
@@ -965,7 +977,10 @@ Room.prototype.spawnRequester = function() {
 
                 if (remoteNeeds[remoteNeedsIndex.remoteReserver] <= 0) return false
 
+                const role = 'remoteReserver'
+
                 return {
+                    role,
                     defaultParts: [],
                     extraParts: [MOVE, CLAIM],
                     partsMultiplier: 6,
@@ -974,9 +989,7 @@ Room.prototype.spawnRequester = function() {
                     maxCreeps: Infinity,
                     minCost: cost,
                     priority: remotePriority + 0.3,
-                    memoryAdditions: {
-                        role: 'remoteReserver',
-                    },
+                    memoryAdditions: {},
                 }
             })(),
         )
@@ -985,7 +998,6 @@ Room.prototype.spawnRequester = function() {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-
                 // If there are no related needs
 
                 if (remoteNeeds[remoteNeedsIndex.remoteDefender] <= 0) return false
@@ -1013,7 +1025,10 @@ Room.prototype.spawnRequester = function() {
                     1,
                 )
 
+                const role = 'remoteDefender'
+
                 return {
+                    role,
                     defaultParts: [],
                     extraParts,
                     partsMultiplier,
@@ -1021,9 +1036,7 @@ Room.prototype.spawnRequester = function() {
                     minCreeps: 1,
                     minCost,
                     priority: minRemotePriority - 3,
-                    memoryAdditions: {
-                        role: 'remoteDefender',
-                    },
+                    memoryAdditions: {},
                 }
             })(),
         )
@@ -1042,7 +1055,10 @@ Room.prototype.spawnRequester = function() {
                 const extraParts = [ATTACK, MOVE]
                 const minCost = cost * extraParts.length
 
+                const role = 'remoteCoreAttacker'
+
                 return {
+                    role,
                     defaultParts: [],
                     extraParts,
                     partsMultiplier: 50 / extraParts.length,
@@ -1050,9 +1066,7 @@ Room.prototype.spawnRequester = function() {
                     minCreeps: 1,
                     minCost,
                     priority: minRemotePriority - 2,
-                    memoryAdditions: {
-                        role: 'remoteCoreAttacker',
-                    },
+                    memoryAdditions: {},
                 }
             })(),
         )
@@ -1070,7 +1084,10 @@ Room.prototype.spawnRequester = function() {
                 const cost = 150
                 const extraParts = [WORK, MOVE]
 
+                const role = 'remoteDismantler'
+
                 return {
+                    role,
                     defaultParts: [],
                     extraParts,
                     partsMultiplier: 50 / extraParts.length,
@@ -1078,9 +1095,7 @@ Room.prototype.spawnRequester = function() {
                     minCreeps: 1,
                     minCost: cost * 2,
                     priority: minRemotePriority - 1,
-                    memoryAdditions: {
-                        role: 'remoteDismantler',
-                    },
+                    memoryAdditions: {},
                 }
             })(),
         )
@@ -1116,7 +1131,10 @@ Room.prototype.spawnRequester = function() {
  */
             partsMultiplier = remoteHaulerNeed
 
+            const role = 'remoteHauler'
+
             return {
+                role,
                 defaultParts: [],
                 extraParts: [CARRY, MOVE],
                 threshold: 0.1,
@@ -1124,9 +1142,7 @@ Room.prototype.spawnRequester = function() {
                 maxCreeps: Infinity,
                 minCost: 200,
                 priority: minRemotePriority - 0.2,
-                memoryAdditions: {
-                    role: 'remoteHauler',
-                },
+                memoryAdditions: {},
             }
         })(),
     )
@@ -1135,7 +1151,10 @@ Room.prototype.spawnRequester = function() {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
+            const role = 'scout'
+
             return {
+                role,
                 defaultParts: [MOVE],
                 extraParts: [],
                 partsMultiplier: 1,
@@ -1143,9 +1162,7 @@ Room.prototype.spawnRequester = function() {
                 maxCreeps: Infinity,
                 minCost: 100,
                 priority: 6,
-                memoryAdditions: {
-                    role: 'scout',
-                },
+                memoryAdditions: {},
             }
         })(),
     )
@@ -1161,16 +1178,17 @@ Room.prototype.spawnRequester = function() {
 
                 if (claimRequestNeeds[claimRequestNeedsIndex.claimer] <= 0) return false
 
+                const role = 'claimer'
+
                 return {
+                    role,
                     defaultParts: [MOVE, MOVE, CLAIM, MOVE],
                     extraParts: [],
                     partsMultiplier: 1,
                     minCreeps: 1,
                     minCost: 750,
                     priority: 8.1,
-                    memoryAdditions: {
-                        role: 'claimer',
-                    },
+                    memoryAdditions: {},
                 }
             })(),
         )
@@ -1183,7 +1201,10 @@ Room.prototype.spawnRequester = function() {
 
                 if (claimRequestNeeds[claimRequestNeedsIndex.vanguard] <= 0) return false
 
+                const role = 'vanguard'
+
                 return {
+                    role,
                     defaultParts: [],
                     extraParts: [WORK, MOVE, CARRY, MOVE],
                     partsMultiplier: claimRequestNeeds[claimRequestNeedsIndex.vanguard],
@@ -1191,9 +1212,7 @@ Room.prototype.spawnRequester = function() {
                     maxCreeps: Infinity,
                     minCost: 250,
                     priority: 8.2 + this.creepsFromRoom.vanguard.length,
-                    memoryAdditions: {
-                        role: 'vanguard',
-                    },
+                    memoryAdditions: {},
                 }
             })(),
         )
@@ -1237,16 +1256,17 @@ Room.prototype.spawnRequester = function() {
 
                 if (claimRequestNeeds[claimRequestNeedsIndex.vanguardDefender] <= 0) return false
 
+                const role = 'vanguardDefender'
+
                 return {
+                    role,
                     defaultParts: [],
                     extraParts,
                     partsMultiplier,
                     minCreeps: 1,
                     minCost,
                     priority: 8 + this.creepsFromRoom.vanguardDefender.length,
-                    memoryAdditions: {
-                        role: 'vanguardDefender',
-                    },
+                    memoryAdditions: {},
                 }
             })(),
         )

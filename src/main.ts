@@ -217,6 +217,7 @@ declare global {
     }
 
     interface SpawnRequestOpts {
+        role: CreepRoles
         /**
          * Parts that should be attempted to be implemented once
          */
@@ -270,6 +271,7 @@ declare global {
     }
 
     interface SpawnRequest {
+        role: CreepRoles
         body: BodyPartConstant[]
         tier: number
         cost: number
@@ -749,7 +751,7 @@ declare global {
 
         decideMaxCostPerCreep(maxCostPerCreep: number): number
 
-        createSpawnRequest(priority: number, body: BodyPartConstant[], tier: number, cost: number, memory: any): void
+        createSpawnRequest(priority: number, role: CreepRoles, body: BodyPartConstant[], tier: number, cost: number, memory: any): void
 
         spawnRequestIndividually(opts: SpawnRequestOpts): void
 
@@ -1027,7 +1029,6 @@ declare global {
     }
 
     interface RoomMemory {
-
         /**
          * A packed representation of the center of the fastFiller
          */
@@ -1322,6 +1323,31 @@ declare global {
 
         // Getters
 
+        _role: CreepRoles
+
+        /**
+         * The lifetime designation that boardly describes what the creep should do
+         */
+        readonly role: CreepRoles
+
+        _cost: number
+
+        /**
+         * The amount of energy required to spawn the creep
+         */
+        readonly cost: number
+
+        _commune: string
+
+        /**
+         * The name of the room the creep is from
+         */
+        readonly commune: string
+
+        _reservation: Reservation | false
+
+        readonly reservation: Reservation | false
+
         _strength: number
 
         /**
@@ -1332,10 +1358,6 @@ declare global {
         _healStrength: number
 
         readonly healStrength: number
-
-        _reservation: Reservation | false
-
-        readonly reservation: Reservation | false
 
         _parts: Partial<Record<BodyPartConstant, number>>
 
@@ -1368,24 +1390,9 @@ declare global {
 
     interface CreepMemory {
         /**
-         * Generally describes the body parts and tasks the creep is expected to do
-         */
-        role: CreepRoles
-
-        /**
          * Wether the creep is old enough to need a replacement
          */
         dying: boolean
-
-        /**
-         * The energy the creep cost to spawn
-         */
-        cost: number
-
-        /**
-         * The name of the room the creep is from
-         */
-        commune: string
 
         /**
          * A name of the creep's designated source
@@ -1490,14 +1497,9 @@ declare global {
 
     // PowerCreeps
 
-    interface PowerCreep {
+    interface PowerCreep {}
 
-    }
-
-    interface PowerCreepMemory {
-
-
-    }
+    interface PowerCreepMemory {}
 
     // Structures
 
@@ -1629,7 +1631,7 @@ export const loop = function () {
     memHack.modifyMemory()
 
     internationalManager.run()
-/*
+    /*
     let cpu = Game.cpu.getUsed()
 
     Game.market.getHistory(RESOURCE_ENERGY).length

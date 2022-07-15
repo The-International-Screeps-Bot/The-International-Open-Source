@@ -11,11 +11,11 @@ RemoteDefender.prototype.findRemote = function () {
 
     // Otherwise, get the creep's role
 
-    const role = creep.memory.role as 'remoteDefender'
+    const role = creep.role as 'remoteDefender'
 
     // Get remotes by their efficacy
 
-    const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.commune]?.get('remoteNamesByEfficacy')
+    const remoteNamesByEfficacy: string[] = Game.rooms[creep.commune]?.get('remoteNamesByEfficacy')
 
     let roomMemory
 

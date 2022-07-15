@@ -10,7 +10,7 @@ export function claimerManager(room: Room, creepsOfRole: string[]) {
 
         const creep: Claimer = Game.creeps[creepName]
 
-        const claimTarget = Memory.rooms[creep.memory.commune].claimRequest
+        const claimTarget = Memory.rooms[creep.commune].claimRequest
 
         // If the creep has no claim target, stop
 
@@ -18,7 +18,7 @@ export function claimerManager(room: Room, creepsOfRole: string[]) {
 
         creep.say(claimTarget)
 
-        Memory.claimRequests[Memory.rooms[creep.memory.commune].claimRequest].needs[claimRequestNeedsIndex.claimer] = 0
+        Memory.claimRequests[Memory.rooms[creep.commune].claimRequest].needs[claimRequestNeedsIndex.claimer] = 0
 
         if (room.name === claimTarget) {
             creep.claimRoom()

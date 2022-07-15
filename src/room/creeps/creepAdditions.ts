@@ -2,6 +2,27 @@ import { allyList } from 'international/constants'
 import { getRange } from 'international/generalFunctions'
 
 Object.defineProperties(Creep.prototype, {
+    role: {
+        get() {
+            if (this._role) return this._role
+
+            return (this._role = this.name.split(' ')[0] as CreepRoles)
+        },
+    },
+    cost: {
+        get() {
+            if (this._cost) return this._cost
+
+            return (this._cost = parseInt(this.name.split(' ')[1]))
+        },
+    },
+    commune: {
+        get() {
+            if (this._commune) return this._commune
+
+            return (this._commune = this.name.split(' ')[2])
+        }
+    },
     reservation: {
         get() {
             if (!this.memory.reservations[0]) return false

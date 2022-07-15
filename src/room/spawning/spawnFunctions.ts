@@ -5,7 +5,7 @@ StructureSpawn.prototype.advancedSpawn = function (spawnRequest) {
 
     return this.spawnCreep(
         spawnRequest.body,
-        `${spawnRequest.extraOpts.memory.role}, T${spawnRequest.tier}, ${newID()}`,
+        `${spawnRequest.role} ${spawnRequest.cost} ${this.name} T${spawnRequest.tier} ${newID()}`,
         spawnRequest.extraOpts,
     )
 }
@@ -48,7 +48,7 @@ Room.prototype.decideMaxCostPerCreep = function (maxCostPerCreep) {
     return Math.min(maxCostPerCreep, this.energyCapacityAvailable)
 }
 
-Room.prototype.createSpawnRequest = function (priority, body, tier, cost, memory) {
+Room.prototype.createSpawnRequest = function (priority, role, body, tier, cost, memory) {
     // Set the memory's communeName to this room's name
 
     memory.commune = this.name
@@ -56,6 +56,7 @@ Room.prototype.createSpawnRequest = function (priority, body, tier, cost, memory
     // Add the components to spawnRequests
 
     this.spawnRequests[priority] = {
+        role,
         body,
         tier,
         cost,
@@ -76,7 +77,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
 
     while (
         opts.minCreeps >
-        (opts.groupComparator ? opts.groupComparator.length : this.creepsFromRoom[opts.memoryAdditions.role].length)
+        (opts.groupComparator ? opts.groupComparator.length : this.creepsFromRoom[opts.role].length)
     ) {
         // Construct important imformation for the spawnRequest
 
@@ -197,7 +198,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
 
         // Create a spawnRequest using previously constructed information
 
-        this.createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
+        this.createSpawnRequest(opts.priority, opts.role, body, tier, cost, opts.memoryAdditions)
 
         // Reduce the number of minCreeps
 
@@ -222,7 +223,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
     // Loop through creep names of the requested role
 
-    for (const creepName of opts.groupComparator || this.creepsFromRoom[opts.memoryAdditions.role]) {
+    for (const creepName of opts.groupComparator || this.creepsFromRoom[opts.role]) {
         // Take away the amount of parts the creep with the name has from totalExtraParts
 
         totalExtraParts -= Game.creeps[creepName].body.length - opts.defaultParts.length
@@ -236,7 +237,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
     opts.maxCreeps -= opts.groupComparator
         ? opts.groupComparator.length
-        : this.creepsFromRoom[opts.memoryAdditions.role].length
+        : this.creepsFromRoom[opts.role].length
 
     // So long as there are totalExtraParts left to assign
 
@@ -351,7 +352,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
         // Create a spawnRequest using previously constructed information
 
-        this.createSpawnRequest(opts.priority, body, tier, cost, opts.memoryAdditions)
+        this.createSpawnRequest(opts.priority, opts.role, body, tier, cost, opts.memoryAdditions)
 
         // Decrease maxCreeps counter
 

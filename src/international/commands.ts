@@ -10,7 +10,7 @@ global.clearMemory = function () {
 
 global.killAllCreeps = function (roles?) {
     const filteredCreeps = Object.values(Game.creeps).filter(creep => {
-        return !roles || roles.includes(creep.memory.role)
+        return !roles || roles.includes(creep.role)
     })
 
     let killedCreepCount = 0

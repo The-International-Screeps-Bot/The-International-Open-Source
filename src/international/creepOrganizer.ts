@@ -41,7 +41,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         // Get the creep's role
 
-        const { role } = creep.memory
+        const { role } = creep
         if (!role) continue
 
         // Assign creep a class based on role
@@ -70,7 +70,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         // Get the commune the creep is from
 
-        const commune = Game.rooms[creep.memory.commune]
+        const commune = Game.rooms[creep.commune]
 
         // If there is not vision in the commune, stop
 

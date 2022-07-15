@@ -37,7 +37,7 @@ export function remoteReserverManager(room: Room, creepsOfRole: string[]) {
 RemoteReserver.prototype.findRemote = function () {
     if (this.memory.remote) return true
 
-    const remoteNamesByEfficacy: string[] = Game.rooms[this.memory.commune]?.get('remoteNamesByEfficacy')
+    const remoteNamesByEfficacy: string[] = Game.rooms[this.commune]?.get('remoteNamesByEfficacy')
 
     let roomMemory
 

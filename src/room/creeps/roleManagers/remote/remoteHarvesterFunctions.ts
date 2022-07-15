@@ -10,10 +10,10 @@ RemoteHarvester.prototype.findRemote = function () {
 
     // Otherwise, get the creep's role
 
-    const role = creep.memory.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+    const role = creep.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
     // Get remotes by their efficacy
 
-    const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.commune]?.get('remoteNamesByEfficacy')
+    const remoteNamesByEfficacy: string[] = Game.rooms[creep.commune]?.get('remoteNamesByEfficacy')
 
     // Loop through each remote name
 

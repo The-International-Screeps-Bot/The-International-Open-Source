@@ -5,14 +5,14 @@ import { RemoteCoreAttacker, RemoteHarvester, RemoteHauler, RemoteReserver } fro
 RemoteHarvester.prototype.preTickManager = function () {
     if (!this.memory.remote) return
 
-    const role = this.memory.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+    const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
     // Reduce remote need
 
     if (Memory.rooms[this.memory.remote].needs)
         Memory.rooms[this.memory.remote].needs[remoteNeedsIndex[role]] -= this.parts.work
 
-    const commune = Game.rooms[this.memory.commune]
+    const commune = Game.rooms[this.commune]
     if (!commune) return
 
     // Add the creep to creepsFromRoomWithRemote relative to its remote

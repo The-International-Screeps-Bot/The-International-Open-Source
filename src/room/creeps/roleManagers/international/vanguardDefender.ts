@@ -10,15 +10,14 @@ export function vanguardDefenderManager(room: Room, creepsOfRole: string[]) {
 
         const creep: VanguardDefender = Game.creeps[creepName]
 
-        const claimTarget = Memory.rooms[creep.memory.commune].claimRequest
+        const claimTarget = Memory.rooms[creep.commune].claimRequest
 
         // If the creep has no claim target, stop
 
         if (!claimTarget) return
 
-        Memory.claimRequests[Memory.rooms[creep.memory.commune].claimRequest].needs[
-            claimRequestNeedsIndex.vanguardDefender
-        ] -= creep.strength
+        Memory.claimRequests[Memory.rooms[creep.commune].claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] -=
+            creep.strength
 
         creep.say(claimTarget)
 

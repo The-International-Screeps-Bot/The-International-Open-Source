@@ -68,7 +68,7 @@ AntifaAssaulter.prototype.runSingle = function () {
 
     // In the commune
 
-    if (this.memory.commune === this.name) {
+    if (this.commune === this.name) {
         // Go to the attackTarget
 
         this.createMoveRequest({
