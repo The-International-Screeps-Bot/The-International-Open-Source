@@ -164,54 +164,6 @@ Room.prototype.get = function (roomObjectName) {
         },
     })
 
-    function findCSitesByType() {
-        // Construct storage of cSites based on structureType
-
-        const cSitesByType: Partial<Record<StructureConstant, ConstructionSite[]>> = {}
-
-        // Loop through all structres in room
-
-        for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
-            // If there is no key for the structureType, create it and assign it an empty array
-
-            if (!cSitesByType[cSite.structureType]) cSitesByType[cSite.structureType] = []
-
-            // Group cSite by structureType
-
-            cSitesByType[cSite.structureType].push(cSite)
-        }
-
-        // Inform structuresByType
-
-        return cSitesByType
-    }
-
-    new RoomCacheObject({
-        name: 'cSitesByType',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: 1,
-        room,
-        valueConstructor: findCSitesByType,
-    })
-
-    // Loop through each structureType in the game
-
-    for (const structureType of allStructureTypes) {
-        // Create a roomObject for sites with the structureType
-
-        new RoomCacheObject({
-            name: `${structureType}CSite`,
-            valueType: 'object',
-            cacheType: 'global',
-            cacheAmount: 1,
-            room,
-            valueConstructor() {
-                return room.roomObjects.cSitesByType.getValue()[structureType] || []
-            },
-        })
-    }
-
     new RoomCacheObject({
         name: 'enemyCSites',
         valueType: 'object',
@@ -2013,7 +1965,7 @@ Room.prototype.findCSiteTargetID = function (creep) {
     for (const structureType of structureTypesByBuildPriority) {
         // Get the structures with the relevant type
 
-        const cSitesOfType: ConstructionSite[] = room.get(`${structureType}CSite`)
+        const cSitesOfType = room.cSites[structureType]
 
         // If there are no cSites of this type, iterate
 
@@ -2021,7 +1973,7 @@ Room.prototype.findCSiteTargetID = function (creep) {
 
         // Ptherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
 
-        const anchor: RoomPosition = room.anchor || creep?.pos || new RoomPosition(25, 25, room.name)
+        const anchor = room.anchor || creep?.pos || new RoomPosition(25, 25, room.name)
 
         // Record the closest site to the anchor in the room's global and inform true
 

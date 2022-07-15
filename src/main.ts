@@ -125,8 +125,6 @@ declare global {
         | 'roadCM'
         | 'source1'
         | 'source2'
-        | 'cSitesByType'
-        | `${StructureConstant}CSite`
         | 'enemyCSites'
         | 'allyCSites'
         | 'mineralHarvestPositions'
