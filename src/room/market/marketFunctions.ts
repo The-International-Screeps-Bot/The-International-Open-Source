@@ -1,7 +1,8 @@
 import { customLog, findLargestTransactionAmount, getAvgPrice } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 
-Room.prototype.advancedSell = function (resourceType, amount) {
+Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
+
      // Get orders specific to this situation
 
      const mySpecificOrders = internationalManager.myOrders[this.name]?.[ORDER_SELL][resourceType] || []
@@ -12,7 +13,7 @@ Room.prototype.advancedSell = function (resourceType, amount) {
 
      // If the amount is less or equal to 0, stop
 
-     if (amount <= 0) return false
+     if (amount <= targetAmount * 0.5) return false
 
      let dealAmount
 
@@ -50,7 +51,7 @@ Room.prototype.advancedSell = function (resourceType, amount) {
      )
 }
 
-Room.prototype.advancedBuy = function (resourceType, amount) {
+Room.prototype.advancedBuy = function (resourceType, amount, targetAmount) {
      // Get orders specific to this situation
 
      const mySpecificOrders = internationalManager.myOrders[this.name]?.[ORDER_BUY][resourceType] || []
@@ -61,7 +62,7 @@ Room.prototype.advancedBuy = function (resourceType, amount) {
 
      // If the amount is less or equal to 0, stop
 
-     if (amount <= 0) return false
+     if (amount <= targetAmount * 0.5) return false
 
      let dealAmount
 

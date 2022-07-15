@@ -905,7 +905,7 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
         if (hasImpassibleStructure) continue
 
         for (const cSite of pos.lookFor(LOOK_CONSTRUCTION_SITES)) {
-            if (!cSite.my) continue
+            if (!cSite.my && !Memory.allyList.includes(cSite.owner.username)) continue
 
             if (impassibleStructureTypes.includes(cSite.structureType)) {
                 hasImpassibleStructure = true
@@ -1316,7 +1316,7 @@ Creep.prototype.passiveHeal = function () {
 
             // If the creep is not owned and isn't an ally
 
-            if (!posData.creep.my && !allyList.includes(posData.creep.owner.username)) continue
+            if (!posData.creep.my && !Memory.allyList.includes(posData.creep.owner.username)) continue
 
             // If the creep is at full health, iterate
 
@@ -1349,7 +1349,7 @@ Creep.prototype.passiveHeal = function () {
 
         // If the creep is not owned and isn't an ally
 
-        if (!posData.creep.my && !allyList.includes(posData.creep.owner.username)) continue
+        if (!posData.creep.my && !Memory.allyList.includes(posData.creep.owner.username)) continue
 
         // If the creep is at full health, iterate
 

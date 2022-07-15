@@ -106,9 +106,11 @@ export function marketManager(room: Room) {
 
           if (terminal.store[resourceType] <= targetAmount) continue
 
+          targetAmount *= 0.75
+
           // Otherwise, try to sell the excess amount
 
-          if (room.advancedSell(resourceType, terminal.store[resourceType] - targetAmount * 0.75)) return
+          if (room.advancedSell(resourceType, terminal.store[resourceType] - targetAmount, targetAmount)) return
      }
 
      // Energy
@@ -119,8 +121,11 @@ export function marketManager(room: Room) {
      // If there is insufficient energy
 
      if (terminal.store[resourceType] < targetAmount) {
+
+          targetAmount *= 1.2
+
           // Try to buy some more
 
-          if (room.advancedBuy(resourceType, targetAmount * 1.2 - terminal.store[resourceType])) return
+          if (room.advancedBuy(resourceType, targetAmount - terminal.store[resourceType], targetAmount)) return
      }
 }

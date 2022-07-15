@@ -760,9 +760,9 @@ declare global {
 
         // Market functions
 
-        advancedSell(resourceType: ResourceConstant, amount: number): boolean
+        advancedSell(resourceType: ResourceConstant, amount: number, targetAmount: number): boolean
 
-        advancedBuy(resourceType: ResourceConstant, amount: number): boolean
+        advancedBuy(resourceType: ResourceConstant, amount: number, targetAmount: number): boolean
 
         // Construction functions
 
