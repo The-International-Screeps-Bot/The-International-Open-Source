@@ -1583,6 +1583,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
         else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
 
         this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
+        return
     }
 
     withdrawTargets = room.OAWT.filter(target => {

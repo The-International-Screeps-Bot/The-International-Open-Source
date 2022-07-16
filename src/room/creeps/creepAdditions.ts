@@ -118,20 +118,18 @@ Object.defineProperties(Creep.prototype, {
             const { room } = this
 
             this._towerDamage = 0
-            let range
-            let factor
 
             for (const tower of room.structures.tower) {
-                if (tower.store.energy <= 0) continue
+                if (tower.store.getUsedCapacity(RESOURCE_ENERGY) <= 0) continue
 
-                range = getRange(this.pos.x, tower.pos.x, this.pos.y, tower.pos.y)
+                const range = getRange(this.pos.x, tower.pos.x, this.pos.y, tower.pos.y)
 
                 if (range <= TOWER_OPTIMAL_RANGE) {
                     this._towerDamage += TOWER_POWER_ATTACK
                     continue
                 }
 
-                factor =
+                const factor =
                     range < TOWER_FALLOFF_RANGE
                         ? (range - TOWER_OPTIMAL_RANGE) / (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
                         : 1
@@ -142,10 +140,10 @@ Object.defineProperties(Creep.prototype, {
 
             const adjacentCreeps = room.lookForAtArea(
                 LOOK_CREEPS,
-                Math.max(Math.min(this.pos.y - 3, -2), 2),
-                Math.max(Math.min(this.pos.x - 3, -2), 2),
-                Math.max(Math.min(this.pos.y + 3, -2), 2),
-                Math.max(Math.min(this.pos.x + 3, -2), 2),
+                this.pos.y - 3,
+                this.pos.x - 3,
+                this.pos.y + 3,
+                this.pos.x + 3,
                 true,
             )
 
@@ -156,16 +154,16 @@ Object.defineProperties(Creep.prototype, {
 
                 if (posData.creep.my || Memory.allyList.includes(posData.creep.owner.username)) continue
 
-                range = getRange(this.pos.x, posData.creep.pos.x, this.pos.y, posData.creep.pos.y)
+                const range = getRange(this.pos.x, posData.creep.pos.x, this.pos.y, posData.creep.pos.y)
 
                 if (range > 3) continue
 
                 this._towerDamage -= posData.creep.findTotalHealPower(range)
             }
 
-            if (this.boosts.GO > 0) this._towerDamage *= BOOSTS.tough.GO.damage
-            if (this.boosts.GHO2 > 0) this._towerDamage *= BOOSTS.tough.GHO2.damage
             if (this.boosts.XGHO2 > 0) this._towerDamage *= BOOSTS.tough.XGHO2.damage
+            else if (this.boosts.GHO2 > 0) this._towerDamage *= BOOSTS.tough.GHO2.damage
+            else if (this.boosts.GO > 0) this._towerDamage *= BOOSTS.tough.GO.damage
 
             return this._towerDamage
         },
