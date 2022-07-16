@@ -5,7 +5,7 @@ StructureSpawn.prototype.advancedSpawn = function (spawnRequest) {
 
     return this.spawnCreep(
         spawnRequest.body,
-        `${spawnRequest.role} ${spawnRequest.cost} ${this.name} T${spawnRequest.tier} ${newID()}`,
+        `${spawnRequest.role} ${spawnRequest.cost} ${this.room.name} T${spawnRequest.tier} ${newID()}`,
         spawnRequest.extraOpts,
     )
 }
@@ -49,9 +49,6 @@ Room.prototype.decideMaxCostPerCreep = function (maxCostPerCreep) {
 }
 
 Room.prototype.createSpawnRequest = function (priority, role, body, tier, cost, memory) {
-    // Set the memory's communeName to this room's name
-
-    memory.commune = this.name
 
     // Add the components to spawnRequests
 

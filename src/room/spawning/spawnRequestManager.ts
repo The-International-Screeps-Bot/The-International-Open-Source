@@ -23,8 +23,6 @@ Room.prototype.spawnRequester = function () {
 
     // Structure info about the this's spawn energy
 
-    const commune = this.name
-
     const spawnEnergyCapacity = this.energyCapacityAvailable
 
     const mostOptimalSource = this.findSourcesByEfficacy()[0]
