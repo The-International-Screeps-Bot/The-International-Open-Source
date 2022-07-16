@@ -751,7 +751,14 @@ declare global {
 
         decideMaxCostPerCreep(maxCostPerCreep: number): number
 
-        createSpawnRequest(priority: number, role: CreepRoles, body: BodyPartConstant[], tier: number, cost: number, memory: any): void
+        createSpawnRequest(
+            priority: number,
+            role: CreepRoles,
+            body: BodyPartConstant[],
+            tier: number,
+            cost: number,
+            memory: any,
+        ): void
 
         spawnRequestIndividually(opts: SpawnRequestOpts): void
 
@@ -1539,8 +1546,9 @@ declare global {
 
         /**
          * Finds the present total store usage number of this RoomObject
+         * @param resourceType A resourceConstant to ensure proper querying of limit store RoomObjects
          */
-        usedStore(): number
+        usedStore(resourceType?: ResourceConstant): number
 
         /**
          * Finds the total free store capacity of this RoomObject
