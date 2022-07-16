@@ -570,7 +570,7 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._MEWT) return this._MEWT
 
-            this._MEWT = [...this.droppedEnergy, ...this.find(FIND_TOMBSTONES)]
+            this._MEWT = [...this.droppedEnergy, ...this.find(FIND_TOMBSTONES), ...this.find(FIND_RUINS)]
 
             if (this.source1Container) this._MEWT.push(this.source1Container)
             if (this.source2Container) this._MEWT.push(this.source2Container)

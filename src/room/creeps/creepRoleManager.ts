@@ -10,19 +10,20 @@ import { scoutManager } from './roleManagers/international/scout'
 import { haulerManager } from './roleManagers/commune/hauler'
 import { source2RemoteHarvesterManager } from './roleManagers/remote/source2RemoteHarvesterManager'
 import { remoteHaulerManager } from './roleManagers/remote/remoteHauler'
-import { claimerManager } from './roleManagers/international/claimerManager'
+import { claimerManager } from './roleManagers/international/claimer'
 import { meleeDefenderManager } from './roleManagers/commune/meleeDefender'
 import { hubHaulerManager } from './roleManagers/commune/hubHaulerManager'
 import { fastFillerManager } from './roleManagers/commune/fastFiller'
 import { source1RemoteHarvesterManager } from './roleManagers/remote/source1RemoteHarvesterManager'
 import { remoteReserverManager } from './roleManagers/remote/remoteReserver'
 import { remoteDefenderManager } from './roleManagers/remote/remoteDefenderManager'
-import { vanguardManager } from './roleManagers/international/vanguardManager'
+import { vanguardManager } from './roleManagers/international/vanguard'
 import { sourceHarvesterManager } from './roleManagers/commune/sourceHarvester'
 import { remoteCoreAttackerManager } from './roleManagers/remote/remoteCoreAttacker'
 import { vanguardDefenderManager } from './roleManagers/international/vanguardDefender'
 import { remoteDismantlerManager } from './roleManagers/remote/remoteDismantler'
 import { antifaAssaulterManager } from './roleManagers/antifa/antifaAssaulter'
+import { allyVanguardManager } from './roleManagers/international/allyVanguard'
 
 // Construct managers
 
@@ -48,6 +49,7 @@ const managers: Record<CreepRoles, Function> = {
      claimer: claimerManager,
      vanguard: vanguardManager,
      vanguardDefender: vanguardDefenderManager,
+     allyVanguard: allyVanguardManager,
      antifaAssaulter: antifaAssaulterManager,
      antifaSupporter: () => {},
 }

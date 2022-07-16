@@ -238,6 +238,23 @@ export class Vanguard extends Creep {
 }
 creepClasses.vanguard = Vanguard
 
+export class AllyVanguard extends Creep {
+     /**
+      *
+      */
+     travelToSource?(sourceName: 'source1' | 'source2'): boolean
+
+     /**
+      * Builds a spawn in the creep's commune claimRequest
+      */
+     buildRoom?(): void
+
+     constructor(creepID: Id<Creep>) {
+          super(creepID)
+     }
+}
+creepClasses.allyVanguard = AllyVanguard
+
 export class VanguardDefender extends Creep {
      /**
       * Find and attack enemyCreeps

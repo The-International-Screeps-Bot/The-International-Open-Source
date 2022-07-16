@@ -115,6 +115,7 @@ declare global {
         | 'scout'
         | 'claimer'
         | 'vanguard'
+        | 'allyVanguard'
         | 'vanguardDefender'
         | 'antifaAssaulter'
         | 'antifaSupporter'
@@ -284,7 +285,7 @@ declare global {
         type: Reservations
         amount: number
         resourceType: ResourceConstant
-        targetID: Id<AnyStoreStructure | Creep | Tombstone | Resource>
+        targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
     }
 
     interface ClaimRequest {
@@ -973,33 +974,33 @@ declare global {
 
         // Target finding
 
-        _MEWT: (Creep | AnyStoreStructure | Tombstone | Resource)[]
+        _MEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
 
         /**
          * Mandatory energy withdraw targets
          */
-        readonly MEWT: (Creep | AnyStoreStructure | Tombstone | Resource)[]
+        readonly MEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
 
-        _OEWT: (Creep | AnyStoreStructure | Tombstone | Resource)[]
+        _OEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
 
         /**
          * Optional energy withdraw targets
          */
-        readonly OEWT: (Creep | AnyStoreStructure | Tombstone | Resource)[]
+        readonly OEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
 
-        _MAWT: (Creep | AnyStoreStructure | Tombstone | Resource)[]
+        _MAWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
 
         /**
          * Mandatory all withdraw targets
          */
-        readonly MAWT: (Creep | AnyStoreStructure | Tombstone | Resource)[]
+        readonly MAWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
 
-        _OAWT: (Creep | AnyStoreStructure | Tombstone | Resource)[]
+        _OAWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
 
         /**
          * Optional all withdraw targets
          */
-        readonly OAWT: (Creep | AnyStoreStructure | Tombstone | Resource)[]
+        readonly OAWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
 
         _METT: (Creep | AnyStoreStructure | Tombstone)[]
 
@@ -1215,7 +1216,7 @@ declare global {
         advancedTransfer(target: Creep | AnyStoreStructure, resourceType?: ResourceConstant, amount?: number): boolean
 
         advancedWithdraw(
-            target: Creep | AnyStoreStructure | Tombstone,
+            target: Creep | AnyStoreStructure | Tombstone | Ruin,
             resourceType?: ResourceConstant,
             amount?: number,
         ): boolean
@@ -1316,7 +1317,7 @@ declare global {
 
         createReservation(
             type: Reservations,
-            target: Id<AnyStoreStructure | Creep | Tombstone | Resource>,
+            target: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>,
             amount: number,
             resourceType: ResourceConstant,
         ): void

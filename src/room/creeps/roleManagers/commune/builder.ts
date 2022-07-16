@@ -12,7 +12,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
 
     // Convert the construction target ID into a game object
 
-    let constructionTarget: ConstructionSite | undefined = findObjectWithID(room.memory.cSiteTargetID)
+    let constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
 
     // If there is no construction target
 
