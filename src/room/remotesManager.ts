@@ -26,7 +26,11 @@ Room.prototype.remotesManager = function () {
 
           for (const role of spawnByRoomRemoteRoles) this.creepsFromRoomWithRemote[remoteName][role] = []
 
+          let isAbandoned
+
           if (remoteMemory.abandoned > 0) {
+
+               isAbandoned = true
                remoteMemory.abandoned -= 1
 
                for (const need in remoteMemory.needs) remoteMemory.needs[need] = 0
@@ -34,12 +38,11 @@ Room.prototype.remotesManager = function () {
                continue
           }
 
+          if (isAbandoned) continue
+
           remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 3
-
           remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = remoteMemory.source2 ? 3 : 0
-
           remoteMemory.needs[remoteNeedsIndex.remoteHauler] = 0
-
           remoteMemory.needs[remoteNeedsIndex.remoteReserver] = 1
 
           // Get the remote
@@ -95,7 +98,14 @@ Room.prototype.remotesManager = function () {
                remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.strength
           }
 
-          remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = remote.structures.invaderCore.length ? 1 : 0
+          if (remote.structures.invaderCore.length) {
+
+               remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = 1
+               remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 0
+               remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = 0
+               remoteMemory.needs[remoteNeedsIndex.remoteHauler] = 0
+          }
+          else remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = 0
 
           // If there are walls or enemyStructures, set dismantler need
 

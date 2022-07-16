@@ -4,13 +4,6 @@ import { createPackedPosMap, customLog, findCarryPartsRequired } from './general
 import { InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
 
-let roomName
-let room
-let controller
-let role
-let type
-let claimTarget
-
 InternationalManager.prototype.tickConfig = function () {
 
      // If CPU logging is enabled, get the CPU used at the start
@@ -31,10 +24,10 @@ InternationalManager.prototype.tickConfig = function () {
 
      // Configure rooms
 
-     for (roomName in Game.rooms) {
-          room = Game.rooms[roomName]
+     for (const roomName in Game.rooms) {
+          const room = Game.rooms[roomName]
 
-          controller = room.controller
+          const { controller } = room
 
           // Single tick properties
 
@@ -42,7 +35,7 @@ InternationalManager.prototype.tickConfig = function () {
 
           // For each role, construct an array for myCreeps
 
-          for (role of creepRoles) room.myCreeps[role] = []
+          for (const role of creepRoles) room.myCreeps[role] = []
 
           room.myCreepsAmount = 0
 
@@ -87,7 +80,7 @@ InternationalManager.prototype.tickConfig = function () {
 
           // For each role, construct an array for creepsFromRoom
 
-          for (role of creepRoles) room.creepsFromRoom[role] = []
+          for (const role of creepRoles) room.creepsFromRoom[role] = []
 
           room.creepsFromRoomAmount = 0
 
@@ -99,7 +92,7 @@ InternationalManager.prototype.tickConfig = function () {
           if (!room.memory.stampAnchors) {
                room.memory.stampAnchors = {}
 
-               for (type in stamps) room.memory.stampAnchors[type as StampTypes] = []
+               for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
           }
 
           room.scoutTargets = new Set()
@@ -109,8 +102,8 @@ InternationalManager.prototype.tickConfig = function () {
 
      // Decrease abadonment for abadoned claimRequests
 
-     for (roomName in Memory.claimRequests) {
-          claimTarget = Memory.claimRequests[roomName]
+     for (const roomName in Memory.claimRequests) {
+          const claimTarget = Memory.claimRequests[roomName]
 
           if (claimTarget.abadon > 0) {
                claimTarget.abadon -= 1
