@@ -10,7 +10,7 @@ Room.prototype.claimRequestManager = function () {
      // If there is an existing claimRequest and it's valid, check if there is claimer need
 
      if (this.memory.claimRequest) {
-          if (Memory.claimRequests[this.memory.claimRequest].abadon > 0) {
+          if (Memory.claimRequests[this.memory.claimRequest].abandon > 0) {
                delete this.memory.claimRequest
                return
           }
@@ -27,9 +27,9 @@ Room.prototype.claimRequestManager = function () {
                return
           }
 
-          // If there is a spawn and the controller is above level 5
+          // If there is a spawn
 
-          if (claimTarget.structures.spawn.length && claimTarget.controller.level >= 5) {
+          if (claimTarget.structures.spawn.length) {
                delete Memory.claimRequests[this.memory.claimRequest]
                delete this.memory.claimRequest
 
@@ -74,7 +74,7 @@ Room.prototype.claimRequestManager = function () {
      let distance
 
      for (const roomName of internationalManager.claimRequestsByScore) {
-          if (!Memory.claimRequests[roomName] || Memory.claimRequests[roomName].abadon > 0) continue
+          if (!Memory.claimRequests[roomName] || Memory.claimRequests[roomName].abandon > 0) continue
 
           distance = Game.map.getRoomLinearDistance(this.name, roomName)
 

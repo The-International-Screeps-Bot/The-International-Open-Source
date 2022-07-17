@@ -367,3 +367,21 @@ export function findStrengthOfParts(body: BodyPartConstant[]) {
 
      return strength
 }
+
+export function findClosestRoomName(start: string, targets: string[]) {
+
+     let minRange = Infinity
+     let closest = undefined
+
+     for (const target of targets) {
+
+         const range = Game.map.getRoomLinearDistance(start, target)
+
+         if (range > minRange) continue
+
+         minRange = range
+         closest = target
+     }
+
+     return closest
+}

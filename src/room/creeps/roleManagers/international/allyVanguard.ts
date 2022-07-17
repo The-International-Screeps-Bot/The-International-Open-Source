@@ -1,5 +1,6 @@
-import { findObjectWithID, getRange, unpackAsPos } from "international/generalFunctions"
-import { AllyVanguard } from "room/creeps/creepClasses"
+import { allyCreepRequestNeedsIndex } from 'international/constants'
+import { findObjectWithID, getRange, unpackAsPos } from 'international/generalFunctions'
+import { AllyVanguard } from 'room/creeps/creepClasses'
 
 export function allyVanguardManager(room: Room, creepsOfRole: string[]) {
     // Loop through the names of the creeps of the role
@@ -9,15 +10,18 @@ export function allyVanguardManager(room: Room, creepsOfRole: string[]) {
 
         const creep: AllyVanguard = Game.creeps[creepName]
 
-        const claimTarget = Memory.rooms[creep.commune].claimRequest
+        const request = Memory.rooms[creep.commune].allyCreepRequest
 
         // If the creep has no claim target, stop
 
-        if (!claimTarget) return
+        if (!request) return
 
-        creep.say(claimTarget)
+        Memory.allyCreepRequests[Memory.rooms[creep.commune].allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] -=
+            creep.parts.work
 
-        if (room.name === claimTarget) {
+        creep.say(request)
+
+        if (room.name === request || (creep.memory.remote && room.name === creep.memory.remote)) {
             creep.buildRoom()
             continue
         }
@@ -28,7 +32,7 @@ export function allyVanguardManager(room: Room, creepsOfRole: string[]) {
 
         creep.createMoveRequest({
             origin: creep.pos,
-            goal: { pos: new RoomPosition(25, 25, claimTarget), range: 25 },
+            goal: { pos: new RoomPosition(25, 25, request), range: 25 },
             avoidEnemyRanges: true,
             typeWeights: {
                 enemy: Infinity,
@@ -43,7 +47,6 @@ export function allyVanguardManager(room: Room, creepsOfRole: string[]) {
 }
 
 AllyVanguard.prototype.travelToSource = function (sourceName) {
-
     const { room } = this
 
     this.say('FHP')
@@ -78,24 +81,135 @@ AllyVanguard.prototype.travelToSource = function (sourceName) {
     return true
 }
 
-AllyVanguard.prototype.buildRoom = function () {
+AllyVanguard.prototype.findRemote = function () {
+    if (this.memory.remote) return true
 
     const { room } = this
 
+    const exitRoomNames = Game.map.describeExits(room.name)
+
+    for (const exitKey in exitRoomNames) {
+        const roomName = exitRoomNames[exitKey as ExitKey]
+
+        const roomMemory = Memory.rooms[roomName]
+
+        // If the room type is not able to be harvested from
+
+        if (
+            !roomMemory ||
+            roomMemory.type === 'enemy' ||
+            roomMemory.type === 'enemyRemote' ||
+            roomMemory.type === 'keeper' ||
+            roomMemory.type === 'ally' ||
+            roomMemory.type === 'allyRemote'
+        )
+            continue
+
+        this.memory.remote = roomName
+        return true
+    }
+
+    // No viable remote was found
+
+    return false
+}
+
+AllyVanguard.prototype.getEnergyFromRemote = function () {
+    const { room } = this
+
+    if (room.name !== this.memory.remote) {
+        this.createMoveRequest({
+            origin: this.pos,
+            goal: { pos: new RoomPosition(25, 25, this.memory.remote), range: 25 },
+            avoidEnemyRanges: true,
+        })
+
+        return
+    }
+
+    if (!this.findRemote()) return
+
+    // Define the creep's sourceName
+
+    if (!this.findOptimalSourceName()) return
+
+    const { sourceName } = this.memory
+
+    // Try to move to source. If creep moved then iterate
+
+    if (this.travelToSource(sourceName)) return
+
+    // Try to normally harvest. Iterate if creep harvested
+
+    if (this.advancedHarvestSource(room.get(sourceName))) return
+}
+
+AllyVanguard.prototype.getEnergyFromRoom = function () {
+    const { room } = this
+
+    if (room.controller && (room.controller.owner || room.controller.reservation)) {
+        if (!this.memory.reservations || !this.memory.reservations.length) this.reserveWithdrawEnergy()
+
+        if (!this.fulfillReservation()) {
+            this.say(this.message)
+            return true
+        }
+
+        this.reserveWithdrawEnergy()
+
+        if (!this.fulfillReservation()) {
+            this.say(this.message)
+            return true
+        }
+
+        if (this.needsResources()) return false
+        return false
+    }
+
+    // Define the creep's sourceName
+
+    if (!this.findOptimalSourceName()) return true
+
+    const { sourceName } = this.memory
+
+    // Try to move to source. If creep moved then iterate
+
+    if (this.travelToSource(sourceName)) return true
+
+    // Try to normally harvest. Iterate if creep harvested
+
+    if (this.advancedHarvestSource(room.get(sourceName))) return true
+
+    return true
+}
+
+AllyVanguard.prototype.buildRoom = function () {
+    const { room } = this
+
     if (this.needsResources()) {
-        // Define the creep's sourceName
+        if (this.memory.remote) {
+            this.getEnergyFromRemote()
+            return
+        }
 
-        if (!this.findOptimalSourceName()) return
+        // If there is a controller and it's owned or reserved
 
-        const { sourceName } = this.memory
+        if (!this.getEnergyFromRoom()) {
+            this.getEnergyFromRemote()
+        }
 
-        // Try to move to source. If creep moved then iterate
+        return
+    }
 
-        if (this.travelToSource(sourceName)) return
+    const request = Memory.rooms[this.commune].allyCreepRequest
 
-        // Try to normally harvest. Iterate if creep harvested
+    if (room.name !== request) {
+        this.createMoveRequest({
+            origin: this.pos,
+            goal: { pos: new RoomPosition(25, 25, request), range: 25 },
+            avoidEnemyRanges: true,
+        })
 
-        if (this.advancedHarvestSource(room.get(sourceName))) return
         return
     }
 

@@ -114,18 +114,33 @@ global.claim = function (claimRequest, communeName) {
     const roomMemory = Memory.rooms[communeName]
     if (!roomMemory) return `No memory for ${communeName}`
 
-    let log = ``
-
     if (!Memory.claimRequests[claimRequest]) {
         Memory.claimRequests[claimRequest] = {
             needs: [1, 20, 0],
             score: 0,
         }
-
-        log += `Created a claimRequest for ${claimRequest}
-        `
     }
 
     roomMemory.claimRequest = claimRequest
     return `${communeName} is responding to the claimRequest for ${claimRequest}`
+}
+
+global.allyCreepRequest = function (request, communeName) {
+
+    if (!Memory.allyCreepRequests[request]) {
+        Memory.allyCreepRequests[request] = {
+            responder: communeName,
+            needs: [0],
+        }
+    }
+
+    if (communeName) {
+
+        const roomMemory = Memory.rooms[communeName]
+        if (!roomMemory) return `No memory for ${communeName}`
+
+        roomMemory.allyCreepRequest = request
+    }
+
+    return `${communeName ? `${communeName} is responding to the`  : `created`} allyCreepRequest for ${request}`
 }

@@ -59,6 +59,7 @@ InternationalManager.prototype.config = function () {
 
           Memory.claimRequests = {}
           Memory.attackRequests = {}
+          Memory.allyCreepRequests = {}
           statsManager.internationalConfig()
      }
 

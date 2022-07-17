@@ -1,4 +1,5 @@
 import {
+    allyCreepRequestNeedsIndex,
     allyList,
     builderSpawningWhenStorageThreshold,
     claimRequestNeedsIndex,
@@ -1242,7 +1243,7 @@ Room.prototype.spawnRequester = function () {
                 ) {
                     // Abandon the this for some time
 
-                    Memory.claimRequests[this.memory.claimRequest].abadon = 20000
+                    Memory.claimRequests[this.memory.claimRequest].abandon = 20000
                     /* Memory.thiss[remoteName].abandoned = 1000 */
                     return false
                 }
@@ -1266,6 +1267,35 @@ Room.prototype.spawnRequester = function () {
                     minCreeps: 1,
                     minCost,
                     priority: 8 + this.creepsFromRoom.vanguardDefender.length,
+                    memoryAdditions: {},
+                }
+            })(),
+        )
+    }
+
+    if (this.memory.allyCreepRequest) {
+
+        const allyCreepRequestNeeds = Memory.allyCreepRequests[this.memory.allyCreepRequest].needs
+
+        // Requests for vanguard
+
+        this.constructSpawnRequests(
+            ((): SpawnRequestOpts | false => {
+                // If there is no vanguard need
+
+                if (allyCreepRequestNeeds[allyCreepRequestNeedsIndex.allyVanguard] <= 0) return false
+
+                const role = 'allyVanguard'
+
+                return {
+                    role,
+                    defaultParts: [],
+                    extraParts: [WORK, MOVE, CARRY, MOVE],
+                    partsMultiplier: allyCreepRequestNeeds[allyCreepRequestNeedsIndex.allyVanguard],
+                    minCreeps: undefined,
+                    maxCreeps: Infinity,
+                    minCost: 250,
+                    priority: 10 + this.creepsFromRoom.allyVanguard.length,
                     memoryAdditions: {},
                 }
             })(),

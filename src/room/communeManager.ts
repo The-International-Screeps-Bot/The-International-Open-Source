@@ -6,6 +6,7 @@ import './towers'
 import { constructionManager } from './construction/constructionManager'
 import './defence'
 import './links'
+import './allyCreepRequestManager'
 import './claimRequestManager'
 import { myColors } from 'international/constants'
 import { packCoord, packCoordList, packPosList } from 'other/packrat'
@@ -26,8 +27,10 @@ export function communeManager(room: Room) {
 
     room.claimRequestManager()
 
+    room.allyCreepRequestManager()
+
     room.spawnManager()
-/*
+    /*
     let cpu = Game.cpu.getUsed()
 
     Game.market.getHistory(RESOURCE_ENERGY).length

@@ -289,15 +289,31 @@ declare global {
     }
 
     interface ClaimRequest {
+        /**
+         * The name of the room responding to the request
+         */
+        responder?: string
         needs: number[]
         /**
          * The weight for which to prefer this room, where higher values are prefered less
          */
         score: number
         /**
-         * The number of ticks to abandon the claimRequest for
+         * The number of ticks to abandon the request for
          */
-        abadon?: number
+        abandon?: number
+    }
+
+    interface AllyCreepRequest {
+        /**
+         * The name of the room responding to the request
+         */
+        responder: string
+        needs: number[]
+        /**
+         * The number of ticks to abandon the request for
+         */
+        abandon?: number
     }
 
     interface ControllerLevel {
@@ -361,6 +377,23 @@ declare global {
         debugRoomCount1: number
         debugRoomCount2: number
         debugRoomCount3: number
+    }
+
+    type RoomTypes =
+        | 'commune'
+        | 'remote'
+        | 'ally'
+        | 'allyRemote'
+        | 'enemy'
+        | 'enemyRemote'
+        | 'neutral'
+        | 'keeper'
+        | 'keeperCenter'
+        | 'highway'
+        | 'intersection'
+
+    interface RoomType {
+        [property: string]: true
     }
 
     interface Memory {
@@ -440,11 +473,6 @@ declare global {
         allyTrading: boolean
 
         /**
-         * Wether creeps should publically say communist propaganda (facts). Does not affect controller signs
-         */
-        propaganda: boolean
-
-        /**
          * An ongoing record of the latest ID assigned by the bot
          */
         ID: number
@@ -452,14 +480,16 @@ declare global {
         /**
          * An object of constrctionsSites with keys of site IDs and properties of the site's age
          */
-        constructionSites: { [key: string]: number }
+        constructionSites: { [ID: string]: number }
 
         /**
          *
          */
-        claimRequests: { [key: string]: ClaimRequest }
+        claimRequests: { [roomName: string]: ClaimRequest }
 
-        attackRequests: { [key: string]: { needs: number[] } }
+        attackRequests: { [roomName: string]: { needs: number[] } }
+
+        allyCreepRequests: { [roomName: string]: AllyCreepRequest }
 
         /**
          * An array of roomNames that have controllers we own
@@ -733,6 +763,8 @@ declare global {
         // General roomFunctions
 
         claimRequestManager(): void
+
+        allyCreepRequestManager(): void
 
         remotesManager(): void
 
@@ -1045,7 +1077,7 @@ declare global {
         /**
          * A description of the room's defining properties that can be used to assume other properties
          */
-        type: string
+        type: RoomTypes
 
         /**
          * A set of names of remotes controlled by this room
@@ -1125,6 +1157,11 @@ declare global {
          *
          */
         attackRequest: string[]
+
+        /**
+         * The room name of the room's ally creep target
+         */
+        allyCreepRequest: string
 
         cSiteTargetID: Id<ConstructionSite>
 
@@ -1630,6 +1667,11 @@ declare global {
              * @param commune The commune to respond to the claimRequest
              */
             claim(claimRequest: string, communeName: string): string
+
+            /**
+             * Creates an allyCreepRequest for a specified room, that can optionally be assigned to a specified commune
+             */
+            allyCreepRequest(request: string, communeName?: string): string
         }
     }
 }

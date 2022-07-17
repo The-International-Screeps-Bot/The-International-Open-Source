@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 32
+export const breakingVersion = 33
 
 // Settings
 
@@ -113,11 +113,7 @@ export const roomTypeProperties: RoomTypeProperties = {
     portalsTo: true,
 }
 
-interface roomTypes {
-    [key: string]: { [key: string]: boolean }
-}
-
-export const roomTypes: roomTypes = {
+export const roomTypes: Record<RoomTypes, RoomType> = {
     commune: {
         source1: true,
         source2: true,
@@ -194,6 +190,7 @@ export const creepRoles: CreepRoles[] = [
     'scout',
     'claimer',
     'vanguard',
+    'allyVanguard',
     'vanguardDefender',
     'antifaAssaulter',
     'antifaSupporter',
@@ -599,6 +596,10 @@ export const attackRequestNeedsIndex = {
     ranged: 0,
     attack: 1,
     dismantle: 2,
+}
+
+export const allyCreepRequestNeedsIndex = {
+    allyVanguard: 0,
 }
 
 export const depositNeedsIndex = {

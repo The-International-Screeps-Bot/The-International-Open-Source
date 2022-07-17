@@ -239,6 +239,13 @@ export class Vanguard extends Creep {
 creepClasses.vanguard = Vanguard
 
 export class AllyVanguard extends Creep {
+
+     findRemote?(): boolean
+
+     getEnergyFromRemote?(): void
+
+     getEnergyFromRoom?(): boolean
+
      /**
       *
       */
