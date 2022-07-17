@@ -136,7 +136,7 @@ InternationalManager.prototype.tickConfig = function () {
         if (!Memory.autoClaim) continue
 
         // If there are enough communes for the GCL
-        
+
         if (Memory.communes.length >= reservedGCL) continue
 
         const communes = Memory.communes.filter(roomName => {
@@ -157,10 +157,10 @@ InternationalManager.prototype.tickConfig = function () {
                 enemy: Infinity,
                 ally: Infinity,
             }) > maxRange
-        )
-            // If out of range, delete the request
-
+        ) {
+            Memory.claimRequests[roomName].abandon = 20000
             continue
+        }
 
         // Otherwise assign the request to the room, and record as such in Memory
 
@@ -202,8 +202,10 @@ InternationalManager.prototype.tickConfig = function () {
                 enemy: Infinity,
                 ally: Infinity,
             }) > maxRange
-        )
+        ) {
+            Memory.allyCreepRequests[roomName].abandon = 20000
             continue
+        }
 
         // Otherwise assign the request to the room, and record as such in Memory
 
