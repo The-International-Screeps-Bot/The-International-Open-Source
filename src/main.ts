@@ -708,9 +708,14 @@ declare global {
         pathVisual(path: RoomPosition[], color: keyof Colors): void
 
         /**
-         * Finds amd records a construction site for builders to target
+         * Finds and records a construction site for builders to target
          */
         findCSiteTargetID(creep: Creep): boolean
+
+        /**
+         * Finds and records a construction site for builders to target
+         */
+        findAllyCSiteTargetID(creep: Creep): boolean
 
         /**
          * Groups positions with contigiousness, structured similarily to a flood fill

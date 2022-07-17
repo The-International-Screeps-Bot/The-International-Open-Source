@@ -1920,11 +1920,10 @@ Room.prototype.pathVisual = function (path, color) {
 }
 
 Room.prototype.findCSiteTargetID = function (creep) {
-    const room = this
 
     // Find my construction sites
 
-    const myCSites = room.find(FIND_MY_CONSTRUCTION_SITES)
+    const myCSites = this.find(FIND_MY_CONSTRUCTION_SITES)
 
     // If there are no sites inform false
 
@@ -1935,7 +1934,7 @@ Room.prototype.findCSiteTargetID = function (creep) {
     for (const structureType of structureTypesByBuildPriority) {
         // Get the structures with the relevant type
 
-        const cSitesOfType = room.cSites[structureType]
+        const cSitesOfType = this.cSites[structureType]
 
         // If there are no cSites of this type, iterate
 
@@ -1943,11 +1942,51 @@ Room.prototype.findCSiteTargetID = function (creep) {
 
         // Ptherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
 
-        const anchor = room.anchor || creep?.pos || new RoomPosition(25, 25, room.name)
+        const anchor = this.anchor || creep?.pos || new RoomPosition(25, 25, this.name)
 
         // Record the closest site to the anchor in the room's global and inform true
 
-        room.memory.cSiteTargetID = anchor.findClosestByPath(cSitesOfType, {
+        this.memory.cSiteTargetID = anchor.findClosestByPath(cSitesOfType, {
+            ignoreCreeps: true,
+            ignoreDestructibleStructures: true,
+            ignoreRoads: true,
+        }).id
+        return true
+    }
+
+    // If no cSiteTarget was found, inform false
+
+    return false
+}
+
+Room.prototype.findAllyCSiteTargetID = function (creep) {
+
+    // Find my construction sites
+
+    const myCSites = this.allyCSites
+
+    // If there are no sites inform false
+
+    if (!myCSites.length) return false
+
+    // Loop through structuretypes of the build priority
+
+    for (const structureType of structureTypesByBuildPriority) {
+        // Get the structures with the relevant type
+
+        const cSitesOfType = this.cSites[structureType]
+
+        // If there are no cSites of this type, iterate
+
+        if (!cSitesOfType.length) continue
+
+        // Ptherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
+
+        const anchor = this.anchor || creep?.pos || new RoomPosition(25, 25, this.name)
+
+        // Record the closest site to the anchor in the room's global and inform true
+
+        this.memory.cSiteTargetID = anchor.findClosestByPath(cSitesOfType, {
             ignoreCreeps: true,
             ignoreDestructibleStructures: true,
             ignoreRoads: true,

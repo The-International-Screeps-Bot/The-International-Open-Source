@@ -218,7 +218,7 @@ AllyVanguard.prototype.buildRoom = function () {
     if (!room.memory.cSiteTargetID) {
         // Try to find a construction target. If none are found, stop
 
-        room.findCSiteTargetID(this)
+        room.findAllyCSiteTargetID(this)
     }
 
     // Convert the construction target ID into a game object
@@ -230,7 +230,7 @@ AllyVanguard.prototype.buildRoom = function () {
     if (!constructionTarget) {
         // Try to find a construction target. If none are found, stop
 
-        room.findCSiteTargetID(this)
+        room.findAllyCSiteTargetID(this)
     }
 
     // Convert the construction target ID into a game object, stopping if it's undefined

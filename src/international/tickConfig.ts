@@ -191,7 +191,7 @@ InternationalManager.prototype.tickConfig = function () {
         const communeName = findClosestRoomName(roomName, communes)
         if (!communeName) break
 
-        const maxRange = 20
+        const maxRange = 25
 
         // Run a more simple and less expensive check, then a more complex and expensive to confirm
 
