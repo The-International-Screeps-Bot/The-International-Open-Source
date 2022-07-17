@@ -7,43 +7,42 @@ Room.prototype.allyCreepRequestManager = function () {
 
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    //
+    if (this.memory.allyCreepRequest) {
 
-    if (!this.memory.allyCreepRequest) return
+        /*
+        if (Memory.allyCreepRequests[this.memory.allyCreepRequest].abandon > 0) {
+            delete this.memory.allyCreepRequest
+            return
+        }
+        */
 
-    /*
-    if (Memory.allyCreepRequests[this.memory.allyCreepRequest].abandon > 0) {
-        delete this.memory.allyCreepRequest
-        return
-    }
-     */
+        Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] = 20
 
-    Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] = 20
+        const request = Game.rooms[this.memory.allyCreepRequest]
 
-    const request = Game.rooms[this.memory.allyCreepRequest]
+        if (!request) return
 
-    if (!request) return
+        // If the room is owned and not by an ally, delete the request
 
-    // If the room is owned and not by an ally, delete the request
+        if (request.controller && request.controller.owner && !Memory.allyList.includes(request.controller.owner.username)) {
+            Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] += 1
+            return
+        }
 
-    if (request.controller && request.controller.owner && !Memory.allyList.includes(request.controller.owner.username)) {
-        Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] += 1
-        return
-    }
+        // If there are no longer ally construction sites
 
-    // If there is a spawn and the controller is above level 5
+        if (!request.allyCSites.length) {
+            delete Memory.allyCreepRequests[this.memory.allyCreepRequest]
+            delete this.memory.allyCreepRequest
 
-    if (request.structures.spawn.length) {
-        delete Memory.allyCreepRequests[this.memory.allyCreepRequest]
-        delete this.memory.allyCreepRequest
+            return
+        }
 
-        return
-    }
-
-    if (request.enemyCreeps.length) {
-        Memory.allyCreepRequests[this.memory.allyCreepRequest].abandon = 20000
-        Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] = 0
-        delete this.memory.allyCreepRequest
+        if (request.enemyCreeps.length) {
+            Memory.allyCreepRequests[this.memory.allyCreepRequest].abandon = 20000
+            Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] = 0
+            delete this.memory.allyCreepRequest
+        }
     }
 
     // If CPU logging is enabled, log the CPU used by this manager

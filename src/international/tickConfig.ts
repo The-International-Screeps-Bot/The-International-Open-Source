@@ -14,7 +14,7 @@ import {
     findCarryPartsRequired,
     findClosestRoomName,
 } from './generalFunctions'
-import { InternationalManager } from './internationalManager'
+import { internationalManager, InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
 
 InternationalManager.prototype.tickConfig = function () {
@@ -70,7 +70,7 @@ InternationalManager.prototype.tickConfig = function () {
         // Iterate if the controller is not mine
 
         if (!controller.my) {
-            delete room.memory.type
+            room.memory.type = 'neutral'
             continue
         }
 
@@ -111,10 +111,18 @@ InternationalManager.prototype.tickConfig = function () {
         if (!room.memory.deposits) room.memory.deposits = {}
     }
 
+    let reservedGCL = Game.gcl.level
+
+    reservedGCL += Object.values(Memory.claimRequests).filter(request => {
+        return request.responder
+    }).length
+
     // Decrease abandonment for abandoned claimRequests
 
-    for (const roomName in Memory.claimRequests) {
+    for (const roomName of internationalManager.claimRequestsByScore) {
         const request = Memory.claimRequests[roomName]
+
+        if (!request) continue
 
         if (request.abandon > 0) {
             request.abandon -= 1
@@ -122,6 +130,44 @@ InternationalManager.prototype.tickConfig = function () {
         }
 
         request.abandon = undefined
+
+        if (request.responder) continue
+
+        if (!Memory.autoClaim) continue
+
+        // If there are enough communes for the GCL
+        
+        if (Memory.communes.length >= reservedGCL) continue
+
+        const communes = Memory.communes.filter(roomName => {
+            return !Memory.rooms[roomName].claimRequest && Game.rooms[roomName].energyCapacityAvailable >= 750
+        })
+
+        const communeName = findClosestRoomName(roomName, communes)
+        if (!communeName) break
+
+        const maxRange = 10
+
+        // Run a more simple and less expensive check, then a more complex and expensive to confirm
+
+        if (
+            Game.map.getRoomLinearDistance(communeName, roomName) > maxRange ||
+            advancedFindDistance(communeName, roomName, {
+                keeper: Infinity,
+                enemy: Infinity,
+                ally: Infinity,
+            }) > maxRange
+        )
+            // If out of range, delete the request
+
+            continue
+
+        // Otherwise assign the request to the room, and record as such in Memory
+
+        Memory.rooms[communeName].claimRequest = roomName
+        Memory.claimRequests[roomName].responder = communeName
+
+        reservedGCL += 1
     }
 
     // Decrease abandonment for abandoned allyCreepRequests, and find those that aren't abandoned responders
@@ -138,7 +184,11 @@ InternationalManager.prototype.tickConfig = function () {
 
         if (request.responder) continue
 
-        const communeName = findClosestRoomName(roomName, Memory.communes)
+        const communes = Memory.communes.filter(roomName => {
+            return !Memory.rooms[roomName].allyCreepRequest
+        })
+
+        const communeName = findClosestRoomName(roomName, communes)
         if (!communeName) break
 
         const maxRange = 20
@@ -150,16 +200,10 @@ InternationalManager.prototype.tickConfig = function () {
             advancedFindDistance(communeName, roomName, {
                 keeper: Infinity,
                 enemy: Infinity,
-                enemyRemote: Infinity,
                 ally: Infinity,
-                allyRemote: Infinity,
             }) > maxRange
-        ) {
-            // If out of range, delete the request
-
-            delete Memory.allyCreepRequests[roomName]
+        )
             continue
-        }
 
         // Otherwise assign the request to the room, and record as such in Memory
 

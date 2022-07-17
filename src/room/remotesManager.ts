@@ -26,18 +26,13 @@ Room.prototype.remotesManager = function () {
 
         for (const role of spawnByRoomRemoteRoles) this.creepsFromRoomWithRemote[remoteName][role] = []
 
-        let isAbandoned
-
         if (remoteMemory.abandoned > 0) {
-            isAbandoned = true
             remoteMemory.abandoned -= 1
 
             for (const need in remoteMemory.needs) remoteMemory.needs[need] = 0
 
             continue
         }
-
-        if (isAbandoned) continue
 
         remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 3
         remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = remoteMemory.source2 ? 3 : 0

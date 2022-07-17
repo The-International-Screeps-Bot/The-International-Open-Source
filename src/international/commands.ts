@@ -110,23 +110,26 @@ global.destroyCommuneStructures = function (types?) {
     return log + ` ${types ? `with the types ${types}` : ''}`
 }
 
-global.claim = function (claimRequest, communeName) {
-    const roomMemory = Memory.rooms[communeName]
-    if (!roomMemory) return `No memory for ${communeName}`
-
-    if (!Memory.claimRequests[claimRequest]) {
-        Memory.claimRequests[claimRequest] = {
-            needs: [1, 20, 0],
+global.claim = function (request, communeName) {
+    if (!Memory.claimRequests[request]) {
+        Memory.claimRequests[request] = {
+            responder: communeName,
+            needs: [0],
             score: 0,
         }
     }
 
-    roomMemory.claimRequest = claimRequest
-    return `${communeName} is responding to the claimRequest for ${claimRequest}`
+    if (communeName) {
+        const roomMemory = Memory.rooms[communeName]
+        if (!roomMemory) return `No memory for ${communeName}`
+
+        roomMemory.claimRequest = request
+    }
+
+    return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${request}`
 }
 
-global.allyCreepRequest = function (request, communeName) {
-
+global.allyCreepRequest = function (request, communeName?) {
     if (!Memory.allyCreepRequests[request]) {
         Memory.allyCreepRequests[request] = {
             responder: communeName,
@@ -135,12 +138,11 @@ global.allyCreepRequest = function (request, communeName) {
     }
 
     if (communeName) {
-
         const roomMemory = Memory.rooms[communeName]
         if (!roomMemory) return `No memory for ${communeName}`
 
         roomMemory.allyCreepRequest = request
     }
 
-    return `${communeName ? `${communeName} is responding to the`  : `created`} allyCreepRequest for ${request}`
+    return `${communeName ? `${communeName} is responding to the` : `created`} allyCreepRequest for ${request}`
 }

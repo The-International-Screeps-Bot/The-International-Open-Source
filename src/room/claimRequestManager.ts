@@ -55,45 +55,6 @@ Room.prototype.claimRequestManager = function () {
           return
      }
 
-     // Every 50 or so ticks
-
-     /* if (Game.time % Math.floor(Math.random() * 100) !==0) return */
-
-     // If autoClaim is disabled
-
-     if (!Memory.autoClaim) return
-
-     // If there are enough communes for the GCL
-
-     if (Game.gcl.level <= Memory.communes.length) return
-
-     // If a claimer can't be spawned
-
-     if (this.energyCapacityAvailable < 750) return
-
-     let distance
-
-     for (const roomName of internationalManager.claimRequestsByScore) {
-          if (!Memory.claimRequests[roomName] || Memory.claimRequests[roomName].abandon > 0) continue
-
-          distance = Game.map.getRoomLinearDistance(this.name, roomName)
-
-          if (distance > 10) continue
-
-          distance = advancedFindDistance(this.name, roomName, {
-               keeper: Infinity,
-               enemy: Infinity,
-               enemyRemote: Infinity,
-               ally: Infinity,
-               allyRemote: Infinity,
-          })
-
-          if (distance > 10) continue
-
-          this.memory.claimRequest = roomName
-          return
-     }
-
      // If CPU logging is enabled, log the CPU used by this manager
 
      if (Memory.cpuLogging)

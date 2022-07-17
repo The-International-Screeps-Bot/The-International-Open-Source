@@ -308,7 +308,7 @@ declare global {
         /**
          * The name of the room responding to the request
          */
-        responder: string
+        responder?: string
         needs: number[]
         /**
          * The number of ticks to abandon the request for
@@ -1663,10 +1663,10 @@ declare global {
 
             /**
              * Responds, or if needed, creates, a claim request for a specified room, by a specified room
-             * @param claimRequest The roomName of the claimRequest to respond to
+             * @param request The roomName of the claimRequest to respond to
              * @param commune The commune to respond to the claimRequest
              */
-            claim(claimRequest: string, communeName: string): string
+            claim(request: string, communeName: string): string
 
             /**
              * Creates an allyCreepRequest for a specified room, that can optionally be assigned to a specified commune

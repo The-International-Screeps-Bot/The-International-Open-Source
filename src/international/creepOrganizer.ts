@@ -64,10 +64,6 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         if (!creep.spawning) room.creepPositions[pack(creep.pos)] = creep.name
 
-        creep.preTickManager()
-
-        creep.reservationManager()
-
         // Get the commune the creep is from
 
         const commune = Game.rooms[creep.commune]
@@ -75,6 +71,16 @@ InternationalManager.prototype.creepOrganizer = function () {
         // If there is not vision in the commune, stop
 
         if (!commune) continue
+
+        if (!commune.controller.my) {
+
+            creep.suicide()
+            continue
+        }
+
+        creep.preTickManager()
+
+        creep.reservationManager()
 
         // If the creep isn't dying, organize by its roomFrom and role
 
