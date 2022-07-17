@@ -304,6 +304,15 @@ declare global {
         abandon?: number
     }
 
+    interface AttackRequest {
+        /**
+         * The name of the room responding to the request
+         */
+        responder?: string
+        needs: number[]
+        abandon?: number
+    }
+
     interface AllyCreepRequest {
         /**
          * The name of the room responding to the request
@@ -487,7 +496,7 @@ declare global {
          */
         claimRequests: { [roomName: string]: ClaimRequest }
 
-        attackRequests: { [roomName: string]: { needs: number[] } }
+        attackRequests: { [roomName: string]: AttackRequest }
 
         allyCreepRequests: { [roomName: string]: AllyCreepRequest }
 
@@ -1671,7 +1680,12 @@ declare global {
              * @param request The roomName of the claimRequest to respond to
              * @param commune The commune to respond to the claimRequest
              */
-            claim(request: string, communeName: string): string
+            claim(request: string, communeName?: string): string
+
+            /**
+             * Responds, or if needed, creates, an attack request for a specified room, by a specified room
+             */
+            attack(request: string, communeName?: string): string
 
             /**
              * Creates an allyCreepRequest for a specified room, that can optionally be assigned to a specified commune

@@ -76,6 +76,8 @@ InternationalManager.prototype.tickConfig = function () {
 
         //
 
+        if (!room.memory.attackRequest) room.memory.attackRequest = []
+
         room.spawnRequests = {}
 
         if (!room.memory.remotes) room.memory.remotes = []
@@ -95,10 +97,6 @@ InternationalManager.prototype.tickConfig = function () {
         for (const role of creepRoles) room.creepsFromRoom[role] = []
 
         room.creepsFromRoomAmount = 0
-
-        // If there is an existing claimRequest and it's invalid, delete it from the room memory
-
-        if (room.memory.claimRequest && !Memory.claimRequests[room.memory.claimRequest]) delete room.memory.claimRequest
 
         if (!room.memory.stampAnchors) {
             room.memory.stampAnchors = {}

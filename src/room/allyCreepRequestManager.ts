@@ -41,6 +41,7 @@ Room.prototype.allyCreepRequestManager = function () {
         if (request.enemyCreeps.length) {
             Memory.allyCreepRequests[this.memory.allyCreepRequest].abandon = 20000
             Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] = 0
+
             delete this.memory.allyCreepRequest
         }
     }

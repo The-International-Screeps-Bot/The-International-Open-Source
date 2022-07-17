@@ -129,6 +129,24 @@ global.claim = function (request, communeName) {
     return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${request}`
 }
 
+global.attack = function (request, communeName) {
+    if (!Memory.attackRequests[request]) {
+        Memory.attackRequests[request] = {
+            responder: communeName,
+            needs: [0],
+        }
+    }
+
+    if (communeName) {
+        const roomMemory = Memory.rooms[communeName]
+        if (!roomMemory) return `No memory for ${communeName}`
+
+        roomMemory.attackRequest.push(request)
+    }
+
+    return `${communeName ? `${communeName} is responding to the` : `created`} attackRequest for ${request}`
+}
+
 global.allyCreepRequest = function (request, communeName?) {
     if (!Memory.allyCreepRequests[request]) {
         Memory.allyCreepRequests[request] = {

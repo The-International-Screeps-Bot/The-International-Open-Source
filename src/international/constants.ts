@@ -596,6 +596,8 @@ export const attackRequestNeedsIndex = {
     ranged: 0,
     attack: 1,
     dismantle: 2,
+    heal: 3,
+    downgrader: 4,
 }
 
 export const allyCreepRequestNeedsIndex = {
