@@ -50,7 +50,6 @@ Creep.prototype.isDying = function () {
 }
 
 Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENERGY, amount) {
-
     // If creep isn't in transfer range
 
     if (this.pos.getRangeTo(target.pos) > 1) {
@@ -84,7 +83,6 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
 }
 
 Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENERGY, amount) {
-
     // If creep isn't in transfer range
 
     if (this.pos.getRangeTo(target.pos) > 1) {
@@ -119,7 +117,6 @@ Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENE
 }
 
 Creep.prototype.advancedPickup = function (target) {
-
     // If creep isn't in transfer range
 
     if (this.pos.getRangeTo(target.pos) > 1) {
@@ -1467,7 +1464,10 @@ Creep.prototype.reservationManager = function () {
 
         if (reservation.type === 'transfer') {
             this.room.visual.text(`${target.store[reservation.resourceType]}`, target.pos.x, target.pos.y + 1)
-            target.store[reservation.resourceType] = Math.min(reservation.amount, target.freeStore(reservation.resourceType) + reservation.amount)
+            target.store[reservation.resourceType] = Math.min(
+                reservation.amount,
+                target.freeStore(reservation.resourceType) + reservation.amount,
+            )
             this.room.visual.text(`${target.store[reservation.resourceType]}`, target.pos.x, target.pos.y + 2)
             continue
         }
@@ -1496,10 +1496,28 @@ Creep.prototype.fulfillReservation = function () {
 
     this.message += '📲'
 
+    if (getRange(this.pos.x, target.pos.x, this.pos.y, target.pos.y) > 1) {
+        this.createMoveRequest({
+            origin: this.pos,
+            goal: { pos: target.pos, range: 1 },
+            avoidEnemyRanges: true,
+        })
+        return false
+    }
+
     // Pickup
 
     if (target instanceof Resource) {
-        if (this.advancedPickup(target)) {
+
+        const pickupResult = this.pickup(target)
+        this.message += pickupResult
+
+        if (pickupResult === ERR_FULL) {
+            this.deleteReservation(0)
+            return true
+        }
+
+        if (pickupResult === OK) {
             this.store[reservation.resourceType] += reservation.amount
 
             this.deleteReservation(0)
@@ -1516,37 +1534,50 @@ Creep.prototype.fulfillReservation = function () {
     if (reservation.type === 'transfer') {
         amount = Math.min(reservation.amount, target.freeStore(RESOURCE_ENERGY) + reservation.amount)
 
-        target.store[reservation.resourceType] -= reservation.amount
+        target.store[reservation.resourceType] -= amount
         this.message += amount
-        if (this.advancedTransfer(target as Creep | AnyStoreStructure, reservation.resourceType, amount)) {
+
+        const transferResult = this.transfer(target as any, reservation.resourceType, amount)
+        this.message += transferResult
+
+        target.store[reservation.resourceType] += amount
+
+        if (transferResult === ERR_FULL || transferResult === ERR_NOT_ENOUGH_RESOURCES) {
+            this.deleteReservation(0)
+            return true
+        }
+
+        if (transferResult === OK) {
             this.store[reservation.resourceType] -= amount
-            target.store[reservation.resourceType] += amount
 
             this.deleteReservation(0)
             return true
         }
 
-        target.store[reservation.resourceType] += reservation.amount
-
         return false
     }
 
-    amount =
-        reservation.amount /* Math.min(target.store[reservation.resourceType] - reservation.amount, reservation.amount) */
+    amount = Math.min(reservation.amount, target.store[reservation.resourceType] + reservation.amount)
 
     // Withdraw
 
-    target.store[reservation.resourceType] += reservation.amount
+    target.store[reservation.resourceType] += amount
 
-    if (this.advancedWithdraw(target, reservation.resourceType, amount)) {
-        this.store[reservation.resourceType] += amount
-        target.store[reservation.resourceType] -= amount
+    const withdrawResult = this.withdraw(target as any, reservation.resourceType, amount)
 
+    target.store[reservation.resourceType] -= amount
+
+    if (withdrawResult === ERR_FULL) {
         this.deleteReservation(0)
         return true
     }
 
-    target.store[reservation.resourceType] -= reservation.amount
+    if (withdrawResult === OK) {
+        this.store[reservation.resourceType] += amount
+
+        this.deleteReservation(0)
+        return true
+    }
 
     return false
 }
