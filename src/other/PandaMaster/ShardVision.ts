@@ -11,15 +11,16 @@ export default class GetShardVision {
         const spawnShardFlag = Game.flags[this._shardNames[0]]
         if (!spawnShardFlag) return
 
-        let headSpawn: StructureSpawn = Game.spawns['Spawn2']
-        if (!headSpawn) return
+        const spawns = [Game.spawns['Spawn8'], Game.spawns['Spawn6'], Game.spawns['Spawn4'], Game.spawns['Spawn20']]
+        const spawn = spawns.filter(s => s.spawning === null)[0]
+        if (!spawn) return
 
         const shardTarget =
             this._lastShardIndex === this._shardNames.length - 1
                 ? this._shardNames[0]
                 : this._shardNames[this._lastShardIndex + 1]
 
-        const spawnResult = headSpawn.spawnCreep([MOVE], `${shardTarget}-${Game.time}`)
+        const spawnResult = spawn.spawnCreep([MOVE], `${shardTarget}-${Game.time}`)
         if (spawnResult === OK || spawnResult === ERR_NAME_EXISTS) {
             global.lastShardTarget = shardTarget
         }
@@ -35,7 +36,7 @@ export default class GetShardVision {
         if (!this._shardNames.includes(Game.shard.name)) return
 
         this._shardNames.forEach((shardName, index): void => {
-            if (Game.time % 25 === 0 && index === 0) {
+            if (Game.time % 100 === 0 && index === 0) {
                 this.SpawnCreeps()
             }
             let loggedOrders = false
