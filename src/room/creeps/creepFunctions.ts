@@ -50,7 +50,6 @@ Creep.prototype.isDying = function () {
 }
 
 Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENERGY, amount) {
-    const { room } = this
 
     // If creep isn't in transfer range
 
@@ -85,7 +84,6 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
 }
 
 Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENERGY, amount) {
-    const { room } = this
 
     // If creep isn't in transfer range
 
@@ -121,7 +119,6 @@ Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENE
 }
 
 Creep.prototype.advancedPickup = function (target) {
-    const { room } = this
 
     // If creep isn't in transfer range
 
@@ -1469,7 +1466,9 @@ Creep.prototype.reservationManager = function () {
         }
 
         if (reservation.type === 'transfer') {
-            target.store[reservation.resourceType] += reservation.amount
+            this.room.visual.text(`${target.store[reservation.resourceType]}`, target.pos.x, target.pos.y + 1)
+            target.store[reservation.resourceType] = Math.min(reservation.amount, target.freeStore(reservation.resourceType) + reservation.amount)
+            this.room.visual.text(`${target.store[reservation.resourceType]}`, target.pos.x, target.pos.y + 2)
             continue
         }
 
