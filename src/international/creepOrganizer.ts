@@ -42,7 +42,7 @@ InternationalManager.prototype.creepOrganizer = function () {
         // Get the creep's role
 
         const { role } = creep
-        if (!role) continue
+        if (!role || role.startsWith('shard')) continue
 
         // Assign creep a class based on role
 
@@ -73,7 +73,6 @@ InternationalManager.prototype.creepOrganizer = function () {
         if (!commune) continue
 
         if (!commune.controller.my) {
-
             creep.suicide()
             continue
         }
