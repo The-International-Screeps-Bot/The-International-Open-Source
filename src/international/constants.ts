@@ -42,7 +42,8 @@ export const allyList = [
     'lokenwow',
     'Morningtea',
     'LittleBitBlue',
-    'Raggy'
+    'Raggy',
+    'DefaultO
 ]
 
 /**
