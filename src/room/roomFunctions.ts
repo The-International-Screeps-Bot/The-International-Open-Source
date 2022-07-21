@@ -1921,13 +1921,9 @@ Room.prototype.pathVisual = function (path, color) {
 
 Room.prototype.findCSiteTargetID = function (creep) {
 
-    // Find my construction sites
-
-    const myCSites = this.find(FIND_MY_CONSTRUCTION_SITES)
-
     // If there are no sites inform false
 
-    if (!myCSites.length) return false
+    if (!this.find(FIND_MY_CONSTRUCTION_SITES).length) return false
 
     // Loop through structuretypes of the build priority
 
@@ -1950,6 +1946,7 @@ Room.prototype.findCSiteTargetID = function (creep) {
             ignoreCreeps: true,
             ignoreDestructibleStructures: true,
             ignoreRoads: true,
+            range: 3,
         }).id
         return true
     }
@@ -1961,20 +1958,16 @@ Room.prototype.findCSiteTargetID = function (creep) {
 
 Room.prototype.findAllyCSiteTargetID = function (creep) {
 
-    // Find my construction sites
-
-    const myCSites = this.allyCSites
-
     // If there are no sites inform false
 
-    if (!myCSites.length) return false
+    if (!this.allyCSites.length) return false
 
     // Loop through structuretypes of the build priority
 
     for (const structureType of structureTypesByBuildPriority) {
         // Get the structures with the relevant type
 
-        const cSitesOfType = this.cSites[structureType]
+        const cSitesOfType = this.allyCSitesByType[structureType]
 
         // If there are no cSites of this type, iterate
 
@@ -1990,6 +1983,7 @@ Room.prototype.findAllyCSiteTargetID = function (creep) {
             ignoreCreeps: true,
             ignoreDestructibleStructures: true,
             ignoreRoads: true,
+            range: 3,
         }).id
         return true
     }

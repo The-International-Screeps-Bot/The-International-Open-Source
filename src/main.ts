@@ -940,6 +940,10 @@ declare global {
 
         readonly allyCSites: ConstructionSite[]
 
+        _allyCSitesByType: Partial<Record<StructureConstant, ConstructionSite[]>>
+
+        readonly allyCSitesByType: Record<StructureConstant, ConstructionSite[]>
+
         readonly cSiteTarget: Id<ConstructionSite> | undefined
 
         _spawningStructures: SpawningStructures

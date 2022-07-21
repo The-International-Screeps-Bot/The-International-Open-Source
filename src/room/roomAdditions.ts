@@ -179,6 +179,25 @@ Object.defineProperties(Room.prototype, {
             })
         },
     },
+    allyCSitesByType: {
+        get() {
+            if (this._allyCSitesByType) return this._allyCSitesByType
+
+            // Construct storage of structures based on structureType
+
+            this._allyCSitesByType = {}
+
+            // Make array keys for each structureType
+
+            for (const structureType of allStructureTypes) this._allyCSitesByType[structureType] = []
+
+            // Group cSites by structureType
+
+            for (const cSite of this.allyCSites) this._allyCSitesByType[cSite.structureType].push(cSite)
+
+            return this._allyCSitesByType
+        },
+    },
     spawningStructures: {
         get() {
             if (this._spawningStructures) return this._spawningStructures

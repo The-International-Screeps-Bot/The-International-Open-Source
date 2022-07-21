@@ -236,6 +236,6 @@ AllyVanguard.prototype.buildRoom = function () {
     // Convert the construction target ID into a game object, stopping if it's undefined
 
     constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
-
+    
     this.advancedBuildCSite(constructionTarget)
 }
