@@ -1170,7 +1170,7 @@ declare global {
         /**
          *
          */
-        attackRequest: string[]
+        attackRequests: string[]
 
         /**
          * The room name of the room's ally creep target

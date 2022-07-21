@@ -7,9 +7,9 @@ Room.prototype.claimRequestManager = function () {
 
      if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-     for (let index = 0; index < this.memory.attackRequest.length; index++) {
+     for (let index = 0; index < this.memory.attackRequests.length; index++) {
 
-          const roomName = this.memory.attackRequest[index]
+          const roomName = this.memory.attackRequests[index]
 
           Memory.attackRequests[roomName].needs[attackRequestNeedsIndex.ranged] = 10
 
@@ -23,7 +23,7 @@ Room.prototype.claimRequestManager = function () {
               Memory.attackRequests[roomName].abandon = 1500
               Memory.attackRequests[roomName].needs[attackRequestNeedsIndex.ranged] = 0
 
-              this.memory.attackRequest.splice(index, 1)
+              this.memory.attackRequests.splice(index, 1)
           }
 
           if (!request.enemyCreeps.length) {
@@ -31,7 +31,7 @@ Room.prototype.claimRequestManager = function () {
                Memory.attackRequests[roomName].abandon = 1500
                Memory.attackRequests[roomName].needs[attackRequestNeedsIndex.ranged] = 0
 
-               this.memory.attackRequest.splice(index, 1)
+               this.memory.attackRequests.splice(index, 1)
           }
      }
 

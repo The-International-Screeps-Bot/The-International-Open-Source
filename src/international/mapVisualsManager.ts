@@ -62,6 +62,22 @@ InternationalManager.prototype.mapVisualsManager = function () {
                     )
                }
 
+               if (roomMemory.attackRequests.length) {
+                    for (const requestName of roomMemory.attackRequests) {
+
+                         Game.map.visual.line(
+                              room.anchor || new RoomPosition(25, 25, roomName),
+                              new RoomPosition(25, 25, requestName),
+                              {
+                                   color: myColors.red,
+                                   width: 1.2,
+                                   opacity: 0.5,
+                                   lineStyle: 'dashed',
+                              },
+                         )
+                    }
+               }
+
                continue
           }
 

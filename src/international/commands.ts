@@ -141,7 +141,7 @@ global.attack = function (request, communeName) {
         const roomMemory = Memory.rooms[communeName]
         if (!roomMemory) return `No memory for ${communeName}`
 
-        roomMemory.attackRequest.push(request)
+        roomMemory.attackRequests.push(request)
     }
 
     return `${communeName ? `${communeName} is responding to the` : `created`} attackRequest for ${request}`

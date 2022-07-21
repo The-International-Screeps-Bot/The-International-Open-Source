@@ -76,7 +76,7 @@ InternationalManager.prototype.tickConfig = function () {
 
         //
 
-        if (!room.memory.attackRequest) room.memory.attackRequest = []
+        if (!room.memory.attackRequests) room.memory.attackRequests = []
 
         room.spawnRequests = {}
 
@@ -115,7 +115,7 @@ InternationalManager.prototype.tickConfig = function () {
         return request.responder
     }).length
 
-    // Decrease abandonment for abandoned claimRequests
+    // Assign and abandon claimRequests, in order of score
 
     for (const roomName of internationalManager.claimRequestsByScore) {
         const request = Memory.claimRequests[roomName]
@@ -209,6 +209,52 @@ InternationalManager.prototype.tickConfig = function () {
 
         Memory.rooms[communeName].allyCreepRequest = roomName
         Memory.allyCreepRequests[roomName].responder = communeName
+    }
+
+    // Assign and decrease abandon for attackRequests
+
+    for (const roomName in Memory.attackRequests) {
+
+        const request = Memory.attackRequests[roomName]
+
+        if (request.abandon > 0) {
+
+            request.abandon -= 1
+            continue
+        }
+
+        if (request.responder) continue
+
+        // Filter communes that don't have the attackRequest target already
+
+        const communes = Memory.communes.filter(roomName => {
+
+            return !Memory.rooms[roomName].attackRequests.includes(roomName)
+        })
+
+        const communeName = findClosestRoomName(roomName, communes)
+        if (!communeName) break
+
+        const maxRange = 15
+
+        // Run a more simple and less expensive check, then a more complex and expensive to confirm
+
+        if (
+            Game.map.getRoomLinearDistance(communeName, roomName) > maxRange ||
+            advancedFindDistance(communeName, roomName, {
+                keeper: Infinity,
+                enemy: Infinity,
+                ally: Infinity,
+            }) > maxRange
+        ) {
+            Memory.attackRequests[roomName].abandon = 20000
+            continue
+        }
+
+        // Otherwise assign the request to the room, and record as such in Memory
+
+        Memory.rooms[communeName].attackRequests.push(roomName)
+        Memory.attackRequests[roomName].responder = communeName
     }
 
     if (Memory.cpuLogging)
