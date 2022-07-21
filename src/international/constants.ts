@@ -43,7 +43,7 @@ export const allyList = [
     'Morningtea',
     'LittleBitBlue',
     'Raggy',
-    'DefaultO
+    'DefaultO',
 ]
 
 /**

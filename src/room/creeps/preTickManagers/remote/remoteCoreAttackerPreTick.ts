@@ -6,12 +6,21 @@ RemoteCoreAttacker.prototype.preTickManager = function () {
 
     const role = this.role as 'remoteCoreAttacker'
 
+    // If the creep's remote no longer is managed by its commune
+
+    if (!Memory.rooms[this.commune].remotes.includes(this.memory.remote)) {
+
+        // Delete it from memory and try to find a new one
+
+        delete this.memory.remote
+        if (!this.findRemote()) return
+    }
+
     // Reduce remote need
 
     if (Memory.rooms[this.memory.remote].needs) Memory.rooms[this.memory.remote].needs[remoteNeedsIndex[role]] -= 1
 
     const commune = Game.rooms[this.commune]
-    if (!commune) return
 
     // Add the creep to creepsFromRoomWithRemote relative to its remote
 

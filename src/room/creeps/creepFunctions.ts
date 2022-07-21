@@ -1463,12 +1463,18 @@ Creep.prototype.reservationManager = function () {
         }
 
         if (reservation.type === 'transfer') {
-            this.room.visual.text(`${target.store[reservation.resourceType]}`, target.pos.x, target.pos.y + 1)
-            target.store[reservation.resourceType] = Math.min(
+
+            let amount = Math.min(
                 reservation.amount,
-                target.freeStore(reservation.resourceType) + reservation.amount,
+                target.freeStore(reservation.resourceType),
             )
-            this.room.visual.text(`${target.store[reservation.resourceType]}`, target.pos.x, target.pos.y + 2)
+
+            this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1)
+            target.store[reservation.resourceType] = amount
+            this.room.visual.text(`${target.store[reservation.resourceType]}`, this.pos.x, this.pos.y + 2)
+
+            if (amount === 0) this.deleteReservation(0)
+
             continue
         }
 
