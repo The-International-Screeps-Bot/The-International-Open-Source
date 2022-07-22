@@ -651,3 +651,5 @@ export const controllerDowngradeUpgraderNeed = 10000
  * Used to modify the remaining bucket amount, resulting in the default cacheAmount for moveRequests
  */
 export const cacheAmountModifier = 25
+
+export const minHarvestWorkRatio = 1.66666666667

@@ -4,6 +4,7 @@ import {
     builderSpawningWhenStorageThreshold,
     claimRequestNeedsIndex,
     controllerDowngradeUpgraderNeed,
+    minHarvestWorkRatio,
     myColors,
     remoteHarvesterRoles,
     remoteNeedsIndex,
@@ -859,7 +860,7 @@ Room.prototype.spawnRequester = function () {
 
             const income =
                 (possibleReservation ? 10 : 5) -
-                Math.floor(remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] * 1.66666666667)
+                Math.floor(remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] * minHarvestWorkRatio)
 
             // Find the number of carry parts required for the source, and add it to the remoteHauler need
 

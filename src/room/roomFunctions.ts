@@ -2,6 +2,7 @@ import {
     allStructureTypes,
     allyList,
     impassibleStructureTypes,
+    minHarvestWorkRatio,
     myColors,
     prefferedCommuneRange,
     remoteNeedsIndex,
@@ -2130,7 +2131,7 @@ Room.prototype.estimateIncome = function () {
 
         // Add the number of work parts owned by the creep at a max of 5, times harvest power
 
-        income += Math.min(5, creep.parts.work) * HARVEST_POWER
+        income += Math.min(6, creep.parts.work) * minHarvestWorkRatio
     }
 
     // Inform income
