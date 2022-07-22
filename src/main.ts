@@ -1566,6 +1566,11 @@ declare global {
          * Attack Request, the name of the room the creep should
          */
         AR: string | undefined
+
+        /**
+         * Recycle Target, the spawn ID the creep is going to recycle
+         */
+        RecT: Id<StructureSpawn>
     }
 
     // PowerCreeps

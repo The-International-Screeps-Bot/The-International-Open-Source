@@ -1143,9 +1143,25 @@ Creep.prototype.advancedRecycle = function () {
 
     this.say('♻️')
 
-    // Otherwise, find the closest spawn to the creep
+    let closestSpawn: StructureSpawn
 
-    const closestSpawn = findClosestObject(this.pos, room.structures.spawn)
+    // If the spawn is recorded as a Recycle Target
+
+    if (this.memory.RecT) {
+
+        closestSpawn = findObjectWithID(this.memory.RecT)
+    }
+
+    // If there is no closestSpawn yet, find the closest spawn to the creep
+
+    if (!closestSpawn) closestSpawn = this.pos.findClosestByPath(room.structures.spawn, {
+        ignoreCreeps: true,
+        ignoreRoads: this.memory.roads,
+    })
+
+    if (!closestSpawn) return
+
+    this.memory.RecT = closestSpawn.id
 
     const fastFillerContainers = [room.fastFillerContainerLeft, room.fastFillerContainerRight].filter(function (
         container,
