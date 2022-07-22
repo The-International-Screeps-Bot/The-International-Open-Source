@@ -140,7 +140,7 @@ VanguardDefender.prototype.advancedAttackEnemies = function () {
 
     // If the creep is out matched, try to always stay in range 3
 
-    if (this.strength < enemyAttacker.strength) {
+    if (this.healStrength < enemyAttacker.attackStrength) {
         if (range === 3) return true
 
         if (range >= 3) {
@@ -163,7 +163,7 @@ VanguardDefender.prototype.advancedAttackEnemies = function () {
 
     // If the creep has less heal power than the enemyAttacker's attack power
 
-    if (this.strength < enemyAttacker.strength) {
+    if (this.healStrength < enemyAttacker.attackStrength) {
         // If the range is less or equal to 2
 
         if (range <= 2) {

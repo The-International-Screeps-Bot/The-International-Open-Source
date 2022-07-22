@@ -101,7 +101,7 @@ Room.prototype.remotesManager = function () {
 
             // If we don't reserve the controller
 
-            if (this.controller.reservation.username !== Memory.me) {
+            if (this.controller.reservation && this.controller.reservation.username !== Memory.me) {
 
                 remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 0
                 remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = 0
