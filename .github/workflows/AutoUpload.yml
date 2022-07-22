@@ -7,6 +7,9 @@ on:
      push:
         branches:
           - Typescript
+     pull_request:
+        branches:
+          - Typescript
 jobs:
      VerifyUpload:
           timeout-minutes: 10000
