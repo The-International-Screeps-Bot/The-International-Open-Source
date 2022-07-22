@@ -90,15 +90,23 @@ Room.prototype.remotesManager = function () {
 
         for (const enemyCreep of remote.enemyCreeps) {
 
-            remoteMemory.needs[remoteNeedsIndex.minDamage] -= enemyCreep.attackStrength
-            remoteMemory.needs[remoteNeedsIndex.minHeal] -= enemyCreep.healStrength
+            remoteMemory.needs[remoteNeedsIndex.minDamage] += enemyCreep.attackStrength
+            remoteMemory.needs[remoteNeedsIndex.minHeal] += enemyCreep.healStrength
         }
+
+        // If there is an invader core
 
         if (remote.structures.invaderCore.length) {
             remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = 1
-            remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 0
-            remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = 0
-            remoteMemory.needs[remoteNeedsIndex.remoteHauler] = 0
+
+            // If we don't reserve the controller
+
+            if (this.controller.reservation.username !== Memory.me) {
+
+                remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 0
+                remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = 0
+                remoteMemory.needs[remoteNeedsIndex.remoteHauler] = 0
+            }
         } else remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = 0
 
         // If there are walls or enemyStructures, set dismantler need

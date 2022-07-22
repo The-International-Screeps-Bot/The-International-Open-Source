@@ -855,10 +855,11 @@ Room.prototype.spawnRequester = function () {
 
         for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
             // Get the income based on the reservation of the this and remoteHarvester need
+            // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
 
             const income =
                 (possibleReservation ? 10 : 5) -
-                (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (possibleReservation ? 4 : 2))
+                Math.floor(remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] * 1.66666666667)
 
             // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
