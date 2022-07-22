@@ -882,9 +882,11 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
 
         if (avoidPackedPositions.has(packedPos)) continue
 
-        let pos = unpackAsRoomPos(packedPos, room.name)
+        let coord = unpackAsPos(packedPos)
 
-        if (pos.x < 1 || pos.x >= roomDimensions - 1 || pos.y < 1 || pos.y >= roomDimensions - 1) continue
+        if (coord.x < 1 || coord.x >= roomDimensions - 1 || coord.y < 1 || coord.y >= roomDimensions - 1) continue
+
+        let pos = new RoomPosition(coord.x, coord.y, room.name)
 
         if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
