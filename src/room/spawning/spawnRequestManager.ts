@@ -13,7 +13,6 @@ import {
     customLog,
     findCarryPartsRequired,
     findRemoteSourcesByEfficacy,
-    findStrengthOfParts,
     getRange,
 } from 'international/generalFunctions'
 
@@ -835,9 +834,10 @@ Room.prototype.spawnRequester = function () {
             Math.max(remoteNeeds[remoteNeedsIndex.source2RemoteHarvester], 0) +
             Math.max(remoteNeeds[remoteNeedsIndex.remoteHauler], 0) +
             Math.max(remoteNeeds[remoteNeedsIndex.remoteReserver], 0) +
-            Math.max(remoteNeeds[remoteNeedsIndex.remoteDefender], 0) +
             Math.max(remoteNeeds[remoteNeedsIndex.remoteCoreAttacker], 0) +
-            Math.max(remoteNeeds[remoteNeedsIndex.remoteDismantler], 0)
+            Math.max(remoteNeeds[remoteNeedsIndex.remoteDismantler], 0) +
+            Math.max(remoteNeeds[remoteNeedsIndex.minDamage], 0) +
+            Math.max(remoteNeeds[remoteNeedsIndex.minHeal], 0)
 
         // If there is a need for any econ creep, inform the index
 
@@ -1000,12 +1000,13 @@ Room.prototype.spawnRequester = function () {
             ((): SpawnRequestOpts | false => {
                 // If there are no related needs
 
-                if (remoteNeeds[remoteNeedsIndex.remoteDefender] <= 0) return false
+                if (remoteNeeds[remoteNeedsIndex.minDamage] + remoteNeeds[remoteNeedsIndex.minHeal] <= 0) return false
 
                 const minCost = 400
                 const cost = 900
                 const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
-                const strengthOfParts = findStrengthOfParts(extraParts)
+                const rangedAttackStrength = RANGED_ATTACK_POWER * 3
+                const healStrength = HEAL_POWER
 
                 // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
 
@@ -1013,15 +1014,18 @@ Room.prototype.spawnRequester = function () {
 
                 // If max spawnable strength is less that needed
 
-                if (strengthOfParts * (spawnEnergyCapacity / cost) < remoteNeeds[remoteNeedsIndex.remoteDefender]) {
+                if (
+                    rangedAttackStrength * (spawnEnergyCapacity / cost) < remoteNeeds[remoteNeedsIndex.minDamage] ||
+                    healStrength * (spawnEnergyCapacity / cost) < remoteNeeds[remoteNeedsIndex.minHeal]
+                ) {
                     // Abandon the this for some time
 
-                    Memory.rooms[remoteName].abandoned = 1000
+                    Memory.rooms[remoteName].abandoned = 1500
                     return false
                 }
 
                 const partsMultiplier = Math.max(
-                    Math.floor(remoteNeeds[remoteNeedsIndex.remoteDefender] / strengthOfParts) * 1.2,
+                    Math.floor(remoteNeeds[remoteNeedsIndex.minDamage] / rangedAttackStrength + remoteNeeds[remoteNeedsIndex.minHeal] / healStrength),
                     1,
                 )
 
@@ -1221,11 +1225,10 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-
                 const minCost = 400
                 const cost = 900
                 const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
-                const strengthOfParts = findStrengthOfParts(extraParts)
+                const strengthOfParts = RANGED_ATTACK_POWER * 3 + HEAL_POWER * 1
 
                 // If there isn't enough spawnEnergyCapacity to spawn a vanguardDefender, inform false
 
@@ -1274,7 +1277,6 @@ Room.prototype.spawnRequester = function () {
     }
 
     if (this.memory.allyCreepRequest) {
-
         const allyCreepRequestNeeds = Memory.allyCreepRequests[this.memory.allyCreepRequest].needs
 
         // Requests for vanguard

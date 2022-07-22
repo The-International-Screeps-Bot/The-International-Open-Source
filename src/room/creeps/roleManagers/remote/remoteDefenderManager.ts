@@ -84,12 +84,13 @@ RemoteDefender.prototype.findRemote = function () {
 
         // If the needs of this remote are met, iterate
 
-        if (roomMemory.needs[remoteNeedsIndex[role]] <= 0) continue
+        if (roomMemory.needs[remoteNeedsIndex.minDamage] + roomMemory.needs[remoteNeedsIndex.minHeal] <= 0) continue
 
         // Otherwise assign the remote to the creep and inform true
 
         creep.memory.remote = roomName
-        roomMemory.needs[remoteNeedsIndex[role]] -= creep.strength
+        roomMemory.needs[remoteNeedsIndex.minDamage] -= creep.attackStrength
+        roomMemory.needs[remoteNeedsIndex.minHeal] -= creep.healStrength
 
         return true
     }

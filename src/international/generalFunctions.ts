@@ -346,28 +346,6 @@ export function findClosestClaimType(roomName: string) {
      )[0]
 }
 
-export function findStrengthOfParts(body: BodyPartConstant[]) {
-     let strength = 0
-
-     for (const part of body) {
-          switch (part) {
-               case RANGED_ATTACK:
-                    strength += RANGED_ATTACK_POWER
-                    break
-               case ATTACK:
-                    strength += ATTACK_POWER
-                    break
-               case HEAL:
-                    strength += HEAL_POWER
-                    break
-               default:
-                    strength += 1
-          }
-     }
-
-     return strength
-}
-
 export function findClosestRoomName(start: string, targets: string[]) {
 
      let minRange = Infinity

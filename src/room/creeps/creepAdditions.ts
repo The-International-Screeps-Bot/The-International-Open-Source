@@ -59,6 +59,29 @@ Object.defineProperties(Creep.prototype, {
             return this._strength
         },
     },
+    attackStrength: {
+        get() {
+            if (this._attackStrength) return this._attackStrength
+
+            this._attackStrength = 1
+
+            for (const part of this.body) {
+                switch (part.type) {
+                    case RANGED_ATTACK:
+                        this._strength +=
+                            RANGED_ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
+                        break
+                    case ATTACK:
+                        this._strength += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
+                        break
+                    default:
+                        this._strength += 1
+                }
+            }
+
+            return this._attackStrength
+        },
+    },
     healStrength: {
         get() {
             if (this._healStrength) return this._healStrength

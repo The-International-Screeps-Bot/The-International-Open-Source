@@ -117,6 +117,8 @@ AllyVanguard.prototype.findRemote = function () {
 AllyVanguard.prototype.getEnergyFromRemote = function () {
     const { room } = this
 
+    if (!this.findRemote()) return
+
     if (room.name !== this.memory.remote) {
         this.createMoveRequest({
             origin: this.pos,
@@ -126,8 +128,6 @@ AllyVanguard.prototype.getEnergyFromRemote = function () {
 
         return
     }
-
-    if (!this.findRemote()) return
 
     // Define the creep's sourceName
 
@@ -236,6 +236,6 @@ AllyVanguard.prototype.buildRoom = function () {
     // Convert the construction target ID into a game object, stopping if it's undefined
 
     constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
-    
+
     this.advancedBuildCSite(constructionTarget)
 }

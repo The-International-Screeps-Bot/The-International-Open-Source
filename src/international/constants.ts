@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 33
+export const breakingVersion = 34
 
 // Settings
 
@@ -581,10 +581,11 @@ export const remoteNeedsIndex = {
     source2RemoteHarvester: 1,
     remoteHauler: 2,
     remoteReserver: 3,
-    remoteDefender: 4,
-    remoteCoreAttacker: 5,
-    remoteBuilder: 6,
-    remoteDismantler: 7,
+    remoteCoreAttacker: 4,
+    remoteBuilder: 5,
+    remoteDismantler: 6,
+    minDamage: 7,
+    minHeal: 8,
 }
 
 export const claimRequestNeedsIndex = {
@@ -597,8 +598,9 @@ export const attackRequestNeedsIndex = {
     ranged: 0,
     attack: 1,
     dismantle: 2,
-    heal: 3,
-    downgrader: 4,
+    downgrader: 3,
+    minDamage: 4,
+    minHeal: 5,
 }
 
 export const allyCreepRequestNeedsIndex = {

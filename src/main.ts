@@ -1418,8 +1418,18 @@ declare global {
          */
         readonly strength: number
 
+        _attackStrength: number
+
+        /**
+         * The protential damage the creep can intent
+         */
+        readonly attackStrength: number
+
         _healStrength: number
 
+        /**
+         * The potential heal the creep can intent
+         */
         readonly healStrength: number
 
         _parts: Partial<Record<BodyPartConstant, number>>

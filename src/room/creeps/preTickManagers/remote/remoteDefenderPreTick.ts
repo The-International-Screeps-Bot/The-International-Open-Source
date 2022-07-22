@@ -18,8 +18,11 @@ RemoteDefender.prototype.preTickManager = function () {
 
     // Reduce remote need
 
-    if (Memory.rooms[this.memory.remote].needs)
-        Memory.rooms[this.memory.remote].needs[remoteNeedsIndex[role]] -= this.strength
+    if (Memory.rooms[this.memory.remote].needs) {
+
+        Memory.rooms[this.memory.remote].needs[remoteNeedsIndex.minDamage] -= this.attackStrength
+        Memory.rooms[this.memory.remote].needs[remoteNeedsIndex.minHeal] -= this.healStrength
+    }
 
     const commune = Game.rooms[this.commune]
 

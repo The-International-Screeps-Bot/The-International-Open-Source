@@ -83,12 +83,16 @@ Room.prototype.remotesManager = function () {
 
         if (!remote) continue
 
-        remoteMemory.needs[remoteNeedsIndex.remoteDefender] = 0
+        remoteMemory.needs[remoteNeedsIndex.minDamage] = 0
+        remoteMemory.needs[remoteNeedsIndex.minHeal] = 0
 
         // Increase the defenderNeed according to the creep's strength
 
-        for (const enemyCreep of remote.enemyCreeps)
-            remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.strength
+        for (const enemyCreep of remote.enemyCreeps) {
+
+            remoteMemory.needs[remoteNeedsIndex.minDamage] -= enemyCreep.attackStrength
+            remoteMemory.needs[remoteNeedsIndex.minHeal] -= enemyCreep.healStrength
+        }
 
         if (remote.structures.invaderCore.length) {
             remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = 1
