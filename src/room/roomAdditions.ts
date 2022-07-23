@@ -165,18 +165,18 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._enemyCSites) return this._enemyCSites
 
-            return this._enemyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => !Memory.allyList.includes(cSite.owner.username)
-            })
+            return (this._enemyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
+                filter: cSite => !Memory.allyList.includes(cSite.owner.username),
+            }))
         },
     },
     allyCSites: {
         get() {
             if (this._allyCSites) return this._allyCSites
 
-            return this._allyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => Memory.allyList.includes(cSite.owner.username)
-            })
+            return (this._allyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
+                filter: cSite => Memory.allyList.includes(cSite.owner.username),
+            }))
         },
     },
     allyCSitesByType: {
@@ -636,19 +636,6 @@ Object.defineProperties(Room.prototype, {
 
             this._METT = [...this.spawningStructuresByNeed, ...this.structures.tower]
 
-            if (
-                this.fastFillerContainerLeft &&
-                this.fastFillerContainerLeft.store.energy <=
-                    this.fastFillerContainerLeft.store.getCapacity(RESOURCE_ENERGY) * 0.75
-            )
-                this._METT.push(this.fastFillerContainerLeft)
-            if (
-                this.fastFillerContainerRight &&
-                this.fastFillerContainerRight.store.energy <=
-                    this.fastFillerContainerRight.store.getCapacity(RESOURCE_ENERGY) * 0.75
-            )
-                this._METT.push(this.fastFillerContainerRight)
-
             if (!this.fastFillerContainerLeft && !this.fastFillerContainerRight) {
                 // Add builders that need energy
 
@@ -657,13 +644,9 @@ Object.defineProperties(Room.prototype, {
 
                     if (creep.spawning) continue
 
-                    if (creep.store.getCapacity() * 0.5 >= creep.usedStore()) this._METT.push(creep)
+                    if (creep.store.getCapacity() * 0.5 >= creep.usedStore()) this._MOFTT.push(creep)
                 }
             }
-
-            if (this.controllerContainer) this._METT.push(this.controllerContainer)
-
-            if (this.controllerLink && !this.hubLink) this._METT.push(this.controllerLink)
 
             return this._METT
         },
@@ -700,5 +683,29 @@ Object.defineProperties(Room.prototype, {
 
             return this._OATT
         },
+    },
+    MEFTT: {
+        get() {
+            if (this._MEFTT) return this._MEFTT
+
+            this._MEFTT = []
+
+            if (this.controllerContainer) this._MEFTT.push(this.controllerContainer)
+            if (this.controllerLink && !this.hubLink) this._MEFTT.push(this.controllerLink)
+            if (this.fastFillerContainerLeft) this._MEFTT.push(this.fastFillerContainerLeft)
+            if (this.fastFillerContainerRight) this._MEFTT.push(this.fastFillerContainerRight)
+
+            return this._MEFTT
+        },
+    },
+    MOFTT: {
+        get() {
+
+            if (this._MOFTT) return this._MOFTT
+
+            this._MOFTT = []
+
+            return this._MOFTT
+        }
     },
 } as PropertyDescriptorMap & ThisType<Room>)

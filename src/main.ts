@@ -1079,6 +1079,20 @@ declare global {
          * Optional all transfer targets
          */
         readonly OATT: (Creep | AnyStoreStructure | Tombstone)[]
+
+        _MEFTT: (Creep | AnyStoreStructure | Tombstone)[]
+
+        /**
+         * Mandatory Energy Fill Transfer Targets
+         */
+         readonly MEFTT: (Creep | AnyStoreStructure | Tombstone)[]
+
+         _MOFTT: (Creep | AnyStoreStructure | Tombstone)[]
+
+         /**
+          * Mandatory Other Fill Transfer Targets
+          */
+         readonly MOFTT: (Creep | AnyStoreStructure | Tombstone)[]
     }
 
     interface DepositRecord {

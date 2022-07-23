@@ -1150,16 +1150,16 @@ Creep.prototype.advancedRecycle = function () {
     // If the spawn is recorded as a Recycle Target
 
     if (this.memory.RecT) {
-
         closestSpawn = findObjectWithID(this.memory.RecT)
     }
 
     // If there is no closestSpawn yet, find the closest spawn to the creep
 
-    if (!closestSpawn) closestSpawn = this.pos.findClosestByPath(room.structures.spawn, {
-        ignoreCreeps: true,
-        ignoreRoads: this.memory.roads,
-    })
+    if (!closestSpawn)
+        closestSpawn = this.pos.findClosestByPath(room.structures.spawn, {
+            ignoreCreeps: true,
+            ignoreRoads: this.memory.roads,
+        })
 
     if (!closestSpawn) return
 
@@ -1481,16 +1481,11 @@ Creep.prototype.reservationManager = function () {
         }
 
         if (reservation.type === 'transfer') {
-
-            let amount = Math.min(
-                reservation.amount,
-                target.freeStore(reservation.resourceType),
-            )
+            let amount = Math.min(reservation.amount, target.freeStore(reservation.resourceType))
 
             target.store[reservation.resourceType] += amount
 
             if (amount === 0) {
-
                 target.store[reservation.resourceType] -= amount
                 this.deleteReservation(0)
             }
@@ -1539,7 +1534,6 @@ Creep.prototype.fulfillReservation = function () {
     // Pickup
 
     if (target instanceof Resource) {
-
         const pickupResult = this.pickup(target)
         this.message += pickupResult
 
@@ -1674,6 +1668,15 @@ Creep.prototype.reserveTransferEnergy = function () {
     let transferTargets = room.MATT.filter(function (target) {
         return target.freeSpecificStore(RESOURCE_ENERGY) > 0
     })
+
+    transferTargets = transferTargets.concat(
+        room.MEFTT.filter(target => {
+            return (
+                target.freeStore(RESOURCE_ENERGY) >= this.store.energy ||
+                target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.getCapacity()
+            )
+        }),
+    )
 
     let target
     let amount
