@@ -745,12 +745,12 @@ Room.prototype.spawnRequester = function () {
                     return {
                         role,
                         defaultParts: [CARRY],
-                        extraParts: [WORK, WORK, WORK, MOVE, WORK, WORK, WORK],
+                        extraParts: [WORK, MOVE, WORK, WORK, WORK],
                         partsMultiplier,
                         threshold,
                         minCreeps: undefined,
                         maxCreeps,
-                        minCost: 700,
+                        minCost: 750,
                         priority,
                         memoryAdditions: {
                             roads: true,
