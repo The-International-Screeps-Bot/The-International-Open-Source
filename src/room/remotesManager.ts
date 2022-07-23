@@ -90,8 +90,8 @@ Room.prototype.remotesManager = function () {
 
         for (const enemyCreep of remote.enemyCreeps) {
 
-            remoteMemory.needs[remoteNeedsIndex.minDamage] += enemyCreep.attackStrength
-            remoteMemory.needs[remoteNeedsIndex.minHeal] += enemyCreep.healStrength
+            remoteMemory.needs[remoteNeedsIndex.minDamage] += enemyCreep.healStrength
+            remoteMemory.needs[remoteNeedsIndex.minHeal] += enemyCreep.attackStrength
         }
 
         // If there is an invader core

@@ -1490,8 +1490,11 @@ Creep.prototype.reservationManager = function () {
                 this.deleteReservation(0)
             }
 
-            this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1)
-            this.room.visual.text(`${target.store[reservation.resourceType]}`, this.pos.x, this.pos.y + 2)
+            if (Memory.roomVisuals) {
+
+                this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1)
+                this.room.visual.text(`${target.store[reservation.resourceType]}`, this.pos.x, this.pos.y + 2)
+            }
 
             reservation.amount = amount
 
@@ -1672,8 +1675,8 @@ Creep.prototype.reserveTransferEnergy = function () {
     transferTargets = transferTargets.concat(
         room.MEFTT.filter(target => {
             return (
-                target.freeStore(RESOURCE_ENERGY) >= this.store.energy ||
-                target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.getCapacity()
+                (target.freeStore(RESOURCE_ENERGY) >= this.store.energy && this.store.energy > 0) ||
+                target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.energy + this.freeStore(RESOURCE_ENERGY)
             )
         }),
     )

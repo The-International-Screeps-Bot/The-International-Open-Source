@@ -65,8 +65,8 @@ Hauler.prototype.reserve = function () {
         transferTargets = transferTargets.concat(
             room.MEFTT.filter(target => {
                 return (
-                    target.freeStore(RESOURCE_ENERGY) >= this.store.energy ||
-                    target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.getCapacity()
+                    (target.freeStore(RESOURCE_ENERGY) >= this.store.energy && this.store.energy > 0) ||
+                    target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.energy + this.freeStore(RESOURCE_ENERGY)
                 )
             }),
         )
@@ -104,8 +104,8 @@ Hauler.prototype.reserve = function () {
         transferTargets = transferTargets.concat(
             room.MEFTT.filter(target => {
                 return (
-                    target.freeStore(RESOURCE_ENERGY) >= this.store.energy ||
-                    target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.getCapacity()
+                    (target.freeStore(RESOURCE_ENERGY) >= this.store.energy && this.store.energy > 0) ||
+                    target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.energy + this.freeStore(RESOURCE_ENERGY)
                 )
             }),
         )
