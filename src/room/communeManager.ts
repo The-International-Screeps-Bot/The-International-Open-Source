@@ -30,13 +30,13 @@ export function communeManager(room: Room) {
     room.allyCreepRequestManager()
 
     room.spawnManager()
-    /*
+
     let cpu = Game.cpu.getUsed()
 
-    Game.market.getHistory(RESOURCE_ENERGY).length
+   room.cSiteTarget
 
     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
- */
+
     /*
    cpu = Game.cpu.getUsed()
 

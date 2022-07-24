@@ -1,10 +1,12 @@
-import { allStructureTypes, allyList, structureTypesByBuildPriority } from 'international/constants'
+import { allStructureTypes, allyList, myColors, structureTypesByBuildPriority } from 'international/constants'
 import {
     createPackedPosMap,
     customLog,
     findClosestObject,
     findObjectWithID,
     getRange,
+    pack,
+    packXY,
     unpackAsPos,
     unpackAsRoomPos,
 } from 'international/generalFunctions'
@@ -147,18 +149,52 @@ Object.defineProperties(Room.prototype, {
                 if (cSiteTarget) return cSiteTarget
             }
 
+            if (!this.find(FIND_MY_CONSTRUCTION_SITES).length) return false
+
+            let totalX = 0
+            let totalY = 0
+            let count = 1
+
+            if (this.anchor) {
+
+                totalX += this.anchor.x
+                totalY += this.anchor.y
+            }
+            else {
+
+                totalX += 25
+                totalX += 25
+            }
+
+            for (const creepName of this.myCreeps.controllerUpgrader) {
+
+                const pos = Game.creeps[creepName].pos
+
+                totalX += pos.x
+                totalY += pos.y
+                count += 1
+            }
+
+            const searchAnchor = new RoomPosition(Math.floor(totalX / count), Math.floor(totalY / count), this.name)
+
             // Loop through structuretypes of the build priority
 
             for (const structureType of structureTypesByBuildPriority) {
                 const cSitesOfType = this.cSites[structureType]
                 if (!cSitesOfType.length) continue
 
-                const anchor = this.anchor || new RoomPosition(25, 25, this.name)
+                const target = searchAnchor.findClosestByPath(cSitesOfType, {
+                    ignoreCreeps: true,
+                    ignoreDestructibleStructures: true,
+                    ignoreRoads: true,
+                    range: 3,
+                })
 
-                return (this.memory.cSiteTargetID = findClosestObject(anchor, cSitesOfType).id)
+                this.memory.cSiteTargetID = target.id
+                return target
             }
 
-            return undefined
+            return false
         },
     },
     enemyCSites: {
@@ -700,12 +736,11 @@ Object.defineProperties(Room.prototype, {
     },
     MOFTT: {
         get() {
-
             if (this._MOFTT) return this._MOFTT
 
             this._MOFTT = []
 
             return this._MOFTT
-        }
+        },
     },
 } as PropertyDescriptorMap & ThisType<Room>)

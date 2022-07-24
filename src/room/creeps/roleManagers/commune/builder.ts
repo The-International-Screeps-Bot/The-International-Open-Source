@@ -2,29 +2,8 @@ import { findObjectWithID, getRange } from 'international/generalFunctions'
 import { Builder } from '../../creepClasses'
 
 export function builderManager(room: Room, creepsOfRole: string[]) {
-    // If there is no construction target ID
 
-    if (!room.memory.cSiteTargetID) {
-        // Try to find a construction target. If none are found, stop
-
-        room.findCSiteTargetID(Game.creeps[creepsOfRole[0]])
-    }
-
-    // Convert the construction target ID into a game object
-
-    let constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
-
-    // If there is no construction target
-
-    if (!constructionTarget) {
-        // Try to find a construction target. If none are found, stop
-
-        room.findCSiteTargetID(Game.creeps[creepsOfRole[0]])
-    }
-
-    // Convert the construction target ID into a game object, stopping if it's undefined
-
-    constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
+    const cSiteTarget = room.cSiteTarget
 
     // Loop through creep names of creeps of the manager's role
 
@@ -33,7 +12,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
 
         const creep: Builder = Game.creeps[creepName]
 
-        if (!constructionTarget) {
+        if (!cSiteTarget) {
             creep.advancedRecycle()
             continue
         }
@@ -91,6 +70,6 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
 
         // If there is a cSite, try to build it and iterate
 
-        if (creep.advancedBuildCSite(constructionTarget)) continue
+        if (creep.advancedBuildCSite) continue
     }
 }

@@ -719,11 +719,6 @@ declare global {
         /**
          * Finds and records a construction site for builders to target
          */
-        findCSiteTargetID(creep: Creep): boolean
-
-        /**
-         * Finds and records a construction site for builders to target
-         */
         findAllyCSiteTargetID(creep: Creep): boolean
 
         /**
@@ -944,7 +939,7 @@ declare global {
 
         readonly allyCSitesByType: Record<StructureConstant, ConstructionSite[]>
 
-        readonly cSiteTarget: Id<ConstructionSite> | undefined
+        readonly cSiteTarget: ConstructionSite | undefined
 
         _spawningStructures: SpawningStructures
 
@@ -1303,7 +1298,7 @@ declare global {
         /**
          * Attempts multiple methods to build a construction site
          */
-        advancedBuildCSite(cSite: ConstructionSite | undefined): boolean
+        advancedBuildCSite(): boolean
 
         /**
          *

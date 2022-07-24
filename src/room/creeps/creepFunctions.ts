@@ -358,27 +358,27 @@ Creep.prototype.advancedUpgradeController = function () {
     return false
 }
 
-Creep.prototype.advancedBuildCSite = function (cSite) {
+Creep.prototype.advancedBuildCSite = function () {
     const { room } = this
+
+    const cSiteTarget = room.cSiteTarget
 
     // Stop if the cSite is undefined
 
-    if (!cSite) return false
+    if (!cSiteTarget) return false
 
     this.say('ABCS')
 
-    const range = getRange(this.pos.x, cSite.pos.x, this.pos.y, cSite.pos.y)
-
     // If the cSite is out of range
 
-    if (range > 3) {
+    if (getRange(this.pos.x, cSiteTarget.pos.x, this.pos.y, cSiteTarget.pos.y) > 3) {
         this.say('➡️CS')
 
         // Make a move request to it
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: cSite.pos, range: 3 },
+            goal: { pos: cSiteTarget.pos, range: 3 },
             avoidEnemyRanges: true,
         })
 
@@ -389,7 +389,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
     // Try to build the construction site
 
-    const buildResult = this.build(cSite)
+    const buildResult = this.build(cSiteTarget)
 
     // If the build worked
 
@@ -398,7 +398,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
         const energySpentOnConstruction = Math.min(
             this.parts.work * BUILD_POWER,
-            (cSite.progressTotal - cSite.progress) * BUILD_POWER,
+            (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
         )
 
         // Add control points to total controlPoints counter and say the success
@@ -406,7 +406,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
         if (global.roomStats[this.room.name])
             global.roomStats[this.room.name].eob += Math.min(
                 this.parts.work * BUILD_POWER,
-                (cSite.progressTotal - cSite.progress) * BUILD_POWER,
+                (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
             )
 
         this.say(`🚧${energySpentOnConstruction}`)

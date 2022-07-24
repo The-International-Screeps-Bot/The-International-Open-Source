@@ -103,29 +103,5 @@ Vanguard.prototype.buildRoom = function () {
         return
     }
 
-    // If there is no construction target ID
-
-    if (!room.memory.cSiteTargetID) {
-        // Try to find a construction target. If none are found, stop
-
-        room.findCSiteTargetID(this)
-    }
-
-    // Convert the construction target ID into a game object
-
-    let constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
-
-    // If there is no construction target
-
-    if (!constructionTarget) {
-        // Try to find a construction target. If none are found, stop
-
-        room.findCSiteTargetID(this)
-    }
-
-    // Convert the construction target ID into a game object, stopping if it's undefined
-
-    constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
-
-    this.advancedBuildCSite(constructionTarget)
+    this.advancedBuildCSite()
 }
