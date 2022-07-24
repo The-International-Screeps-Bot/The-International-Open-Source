@@ -68,14 +68,14 @@ Object.defineProperties(Creep.prototype, {
             for (const part of this.body) {
                 switch (part.type) {
                     case RANGED_ATTACK:
-                        this._strength +=
+                        this._attackStrength +=
                             RANGED_ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
                         break
                     case ATTACK:
-                        this._strength += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
+                        this._attackStrength += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
                         break
                     default:
-                        this._strength += 1
+                        this._attackStrength += 1
                 }
             }
 

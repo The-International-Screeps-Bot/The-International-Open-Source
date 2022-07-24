@@ -31,12 +31,15 @@ export function communeManager(room: Room) {
 
     room.spawnManager()
 
+    // Testing stuff, feel welcome to use to test CPU usage for specific room things
+
+/*
     let cpu = Game.cpu.getUsed()
 
    room.cSiteTarget
 
     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
-
+ */
     /*
    cpu = Game.cpu.getUsed()
 
