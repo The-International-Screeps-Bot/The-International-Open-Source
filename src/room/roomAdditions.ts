@@ -166,7 +166,7 @@ Object.defineProperties(Room.prototype, {
                 totalX += 25
             }
 
-            for (const creepName of this.myCreeps.controllerUpgrader) {
+            for (const creepName of this.myCreeps.builder) {
 
                 const pos = Game.creeps[creepName].pos
 

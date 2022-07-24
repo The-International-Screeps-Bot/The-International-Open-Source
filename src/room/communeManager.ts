@@ -33,13 +33,6 @@ export function communeManager(room: Room) {
 
     // Testing stuff, feel welcome to use to test CPU usage for specific commune things
 
-    const mostOptimalSource = room.findSourcesByEfficacy()[0]
-
-    room.visual.circle(room.get(mostOptimalSource), {
-        stroke: myColors.green,
-        strokeWidth: 1,
-    })
-
     /*
     let cpu = Game.cpu.getUsed()
 
