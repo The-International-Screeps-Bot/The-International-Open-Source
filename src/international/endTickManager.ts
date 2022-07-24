@@ -14,15 +14,13 @@ InternationalManager.prototype.endTickManager = function () {
 
      for (let i = 0; i < 99; i += 1) console.log()
 
-     const CPU = Game.cpu.getUsed()
-
      // Get the CPU color based on the amount of used CPU
 
-     const CPUColor = findCPUColor(CPU)
+     const CPUColor = findCPUColor()
 
      customLog(
           'Total CPU',
-          `${CPU.toFixed(2)} / ${Game.cpu.limit} CPU Bucket: ${Game.cpu.bucket}`,
+          `${Game.cpu.getUsed().toFixed(2)} / ${Game.cpu.limit} CPU Bucket: ${Game.cpu.bucket}`,
           myColors.white,
           CPUColor,
      )

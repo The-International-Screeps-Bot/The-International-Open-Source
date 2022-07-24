@@ -362,7 +362,7 @@ Creep.prototype.advancedBuildCSite = function () {
     const { room } = this
 
     const cSiteTarget = room.cSiteTarget
-
+    
     // Stop if the cSite is undefined
 
     if (!cSiteTarget) return false

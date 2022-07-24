@@ -205,7 +205,10 @@ export function findClosestPos<T extends RoomPosition | Coord>(target: RoomPosit
      return closest
 }
 
-export function findCPUColor(CPU: number): string {
+export function findCPUColor(): string {
+
+     const CPU = Game.cpu.getUsed()
+
      // Inform color based on percent of cpu used of limit
 
      if (CPU > Game.cpu.limit * 0.6) return myColors.green

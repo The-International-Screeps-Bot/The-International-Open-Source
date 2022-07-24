@@ -1,4 +1,4 @@
-import { findObjectWithID, getRange } from 'international/generalFunctions'
+import { customLog, findObjectWithID, getRange } from 'international/generalFunctions'
 import { Builder } from '../../creepClasses'
 
 export function builderManager(room: Room, creepsOfRole: string[]) {
@@ -11,7 +11,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
         // Get the creep using its name
 
         const creep: Builder = Game.creeps[creepName]
-
+        
         if (!cSiteTarget) {
             creep.advancedRecycle()
             continue
@@ -70,6 +70,6 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
 
         // If there is a cSite, try to build it and iterate
 
-        if (creep.advancedBuildCSite) continue
+        if (creep.advancedBuildCSite()) continue
     }
 }
