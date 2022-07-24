@@ -183,12 +183,13 @@ Object.defineProperties(Room.prototype, {
                 const cSitesOfType = this.cSites[structureType]
                 if (!cSitesOfType.length) continue
 
-                const target = searchAnchor.findClosestByPath(cSitesOfType, {
+                let target = searchAnchor.findClosestByPath(cSitesOfType, {
                     ignoreCreeps: true,
                     ignoreDestructibleStructures: true,
-                    ignoreRoads: true,
                     range: 3,
                 })
+
+                if (!target) target = findClosestObject(searchAnchor, cSitesOfType)
 
                 this.memory.cSiteTargetID = target.id
                 return target
