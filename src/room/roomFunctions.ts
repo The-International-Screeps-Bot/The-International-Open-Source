@@ -2165,7 +2165,7 @@ Room.prototype.findSourcesByEfficacy = function () {
 
     // Sort sourceNames based on their efficacy, informing the result
 
-    return sourceNames.sort((a, b) => this.global[a] - this.global[b])
+    return sourceNames.sort((a, b) => this[`${a}PathLength`] - this[`${b}PathLength`])
 }
 
 Room.prototype.createClaimRequest = function () {
