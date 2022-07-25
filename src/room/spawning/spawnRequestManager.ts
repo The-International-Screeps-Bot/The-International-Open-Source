@@ -35,7 +35,8 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             const sourceIndex = 0
-            const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom.source1Harvester.length
+            const priority =
+                (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom.source1Harvester.length
             const role = 'source1Harvester'
 
             if (spawnEnergyCapacity >= 800) {
@@ -124,7 +125,8 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             const sourceIndex = 1
-            const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom.source1Harvester.length
+            const priority =
+                (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom.source1Harvester.length
             const role = 'source2Harvester'
 
             if (spawnEnergyCapacity >= 800) {
@@ -405,11 +407,9 @@ Room.prototype.spawnRequester = function () {
 
     // Loop through each enemyAttacker
 
-    for (const enemyAttacker of enemyAttackers) {
-        // Increase attackValue by the creep's heal power
+    // Increase attackValue by the creep's heal power
 
-        attackStrength += enemyAttacker.strength
-    }
+    for (const enemyAttacker of enemyAttackers) attackStrength += enemyAttacker.strength
 
     // Construct requests for meleeDefenders
 
