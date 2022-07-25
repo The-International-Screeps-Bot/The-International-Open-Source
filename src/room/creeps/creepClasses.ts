@@ -102,7 +102,7 @@ export class RemoteHarvester extends Creep {
      /**
       *
       */
-     travelToSource?(sourceName: 'source1' | 'source2'): boolean
+     travelToSource?(sourceIndex: number): boolean
 
      constructor(creepID: Id<Creep>) {
           super(creepID)
@@ -225,7 +225,7 @@ export class Vanguard extends Creep {
      /**
       *
       */
-     travelToSource?(sourceName: 'source1' | 'source2'): boolean
+     travelToSource?(sourceIndex: number): boolean
 
      /**
       * Builds a spawn in the creep's commune claimRequest
@@ -249,7 +249,7 @@ export class AllyVanguard extends Creep {
      /**
       *
       */
-     travelToSource?(sourceName: 'source1' | 'source2'): boolean
+     travelToSource?(sourceIndex: number): boolean
 
      /**
       * Builds a spawn in the creep's commune claimRequest

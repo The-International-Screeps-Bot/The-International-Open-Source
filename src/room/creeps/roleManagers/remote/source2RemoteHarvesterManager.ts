@@ -17,15 +17,15 @@ export function source2RemoteHarvesterManager(room: Room, creepsOfRole: string[]
         if (room.name === creep.memory.remote) {
             // Define the creep's sourceName
 
-            const sourceName = 'source2'
+            const sourceIndex = 1
 
             // Try to move to source. If creep moved then iterate
 
-            if (creep.travelToSource(sourceName)) continue
+            if (creep.travelToSource(sourceIndex)) continue
 
             // Try to normally harvest. Iterate if creep harvested
 
-            if (creep.advancedHarvestSource(room.get(sourceName))) continue
+            if (creep.advancedHarvestSource(room.sources[sourceIndex])) continue
 
             continue
         }

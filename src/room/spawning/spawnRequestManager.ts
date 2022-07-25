@@ -26,7 +26,7 @@ Room.prototype.spawnRequester = function () {
 
     const spawnEnergyCapacity = this.energyCapacityAvailable
 
-    const mostOptimalSource = this.findSourcesByEfficacy()[0]
+    const mostOptimalSource = this.sourcesByEfficacy[0]
 
     let partsMultiplier: number
 
@@ -34,8 +34,8 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            const sourceName = 'source1'
-            const priority = (mostOptimalSource === sourceName ? 0 : 1) + this.creepsFromRoom.source1Harvester.length
+            const sourceIndex = 0
+            const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom.source1Harvester.length
             const role = 'source1Harvester'
 
             if (spawnEnergyCapacity >= 800) {
@@ -48,7 +48,7 @@ Room.prototype.spawnRequester = function () {
                     minCost: 200,
                     priority,
                     memoryAdditions: {
-                        sourceName,
+                        SI: sourceIndex,
                         roads: true,
                     },
                 }
@@ -64,7 +64,7 @@ Room.prototype.spawnRequester = function () {
                     minCost: 200,
                     priority,
                     memoryAdditions: {
-                        sourceName,
+                        SI: sourceIndex,
                         roads: true,
                     },
                 }
@@ -80,13 +80,13 @@ Room.prototype.spawnRequester = function () {
                     minCost: 300,
                     priority,
                     memoryAdditions: {
-                        sourceName,
+                        SI: sourceIndex,
                         roads: true,
                     },
                 }
             }
 
-            if (this[`${sourceName}Container`]) {
+            if (this.sourceContainers[sourceIndex]) {
                 return {
                     role,
                     defaultParts: [MOVE],
@@ -96,7 +96,7 @@ Room.prototype.spawnRequester = function () {
                     minCost: 150,
                     priority,
                     memoryAdditions: {
-                        sourceName,
+                        SI: sourceIndex,
                         roads: true,
                     },
                 }
@@ -108,11 +108,11 @@ Room.prototype.spawnRequester = function () {
                 extraParts: [WORK],
                 partsMultiplier: 6,
                 minCreeps: undefined,
-                maxCreeps: Math.min(3, this.get(`${sourceName}HarvestPositions`).length),
+                maxCreeps: Math.min(3, this.sourcePositions[sourceIndex].length),
                 minCost: 200,
                 priority,
                 memoryAdditions: {
-                    sourceName,
+                    SI: sourceIndex,
                     roads: true,
                 },
             }
@@ -123,8 +123,8 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            const sourceName = 'source2'
-            const priority = (mostOptimalSource === sourceName ? 0 : 1) + this.creepsFromRoom.source1Harvester.length
+            const sourceIndex = 1
+            const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom.source1Harvester.length
             const role = 'source2Harvester'
 
             if (spawnEnergyCapacity >= 800) {
@@ -137,7 +137,7 @@ Room.prototype.spawnRequester = function () {
                     minCost: 200,
                     priority,
                     memoryAdditions: {
-                        sourceName,
+                        SI: sourceIndex,
                         roads: true,
                     },
                 }
@@ -153,7 +153,7 @@ Room.prototype.spawnRequester = function () {
                     minCost: 200,
                     priority,
                     memoryAdditions: {
-                        sourceName,
+                        SI: sourceIndex,
                         roads: true,
                     },
                 }
@@ -169,13 +169,13 @@ Room.prototype.spawnRequester = function () {
                     minCost: 300,
                     priority,
                     memoryAdditions: {
-                        sourceName,
+                        SI: sourceIndex,
                         roads: true,
                     },
                 }
             }
 
-            if (this[`${sourceName}Container`]) {
+            if (this.sourceContainers[sourceIndex]) {
                 return {
                     role,
                     defaultParts: [MOVE],
@@ -185,7 +185,7 @@ Room.prototype.spawnRequester = function () {
                     minCost: 150,
                     priority,
                     memoryAdditions: {
-                        sourceName,
+                        SI: sourceIndex,
                         roads: true,
                     },
                 }
@@ -197,11 +197,11 @@ Room.prototype.spawnRequester = function () {
                 extraParts: [WORK],
                 partsMultiplier: 6,
                 minCreeps: undefined,
-                maxCreeps: Math.min(3, this.get(`${sourceName}HarvestPositions`).length),
+                maxCreeps: Math.min(3, this.sourcePositions[sourceIndex].length),
                 minCost: 200,
                 priority,
                 memoryAdditions: {
-                    sourceName,
+                    SI: sourceIndex,
                     roads: true,
                 },
             }
@@ -218,13 +218,13 @@ Room.prototype.spawnRequester = function () {
 
             let requiredCarryParts = 10
 
-            // If there is no source1Link, increase requiredCarryParts using the source's path length
+            // If there is no sourceLink 0, increase requiredCarryParts using the source's path length
 
-            if (!this.source1Link) requiredCarryParts += findCarryPartsRequired(this.source1PathLength * 2, 10)
+            if (!this.sourceLinks[0]) requiredCarryParts += findCarryPartsRequired(this.sourcePaths[0].length * 2, 10)
 
-            // If there is no source2Link, increase requiredCarryParts using the source's path length
+            // If there is no sourceLink 1, increase requiredCarryParts using the source's path length
 
-            if (!this.source2Link) requiredCarryParts += findCarryPartsRequired(this.source2PathLength * 2, 10)
+            if (!this.sourceLinks[1]) requiredCarryParts += findCarryPartsRequired(this.sourcePaths[1].length * 2, 10)
 
             // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
@@ -630,7 +630,7 @@ Room.prototype.spawnRequester = function () {
 
             if (controllerLink) {
                 const hubLink = this.hubLink
-                const sourceLinks = [this.source1Link, this.source2Link]
+                const sourceLinks = this.sourceLinks
 
                 // If there are transfer links, max out partMultiplier to their ability
 
@@ -1005,9 +1005,9 @@ Room.prototype.spawnRequester = function () {
                 if (remoteNeeds[remoteNeedsIndex.minDamage] + remoteNeeds[remoteNeedsIndex.minHeal] <= 0) return false
 
                 const minCost = 400
-                const cost = 900
-                const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
-                const rangedAttackStrength = RANGED_ATTACK_POWER * 3
+                const cost = 700
+                const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
+                const rangedAttackStrength = RANGED_ATTACK_POWER * 2
                 const healStrength = HEAL_POWER
 
                 // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false

@@ -53,10 +53,9 @@ InternationalManager.prototype.tickConfig = function () {
 
         room.roomObjects = {}
 
-        room.creepsOfSourceAmount = {
-            source1: 0,
-            source2: 0,
-        }
+        room.creepsOfSourceAmount = []
+
+        for (const index in room.sources) room.creepsOfSourceAmount.push(0)
 
         if (!room.global.tasksWithoutResponders) room.global.tasksWithoutResponders = {}
         if (!room.global.tasksWithResponders) room.global.tasksWithResponders = {}

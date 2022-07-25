@@ -46,7 +46,7 @@ export function vanguardManager(room: Room, creepsOfRole: string[]) {
     }
 }
 
-Vanguard.prototype.travelToSource = function (sourceName) {
+Vanguard.prototype.travelToSource = function (sourceIndex) {
 
     const { room } = this
 
@@ -54,7 +54,7 @@ Vanguard.prototype.travelToSource = function (sourceName) {
 
     // Try to find a harvestPosition, inform false if it failed
 
-    if (!this.findSourceHarvestPos(sourceName)) return false
+    if (!this.findSourcePos(sourceIndex)) return false
 
     this.say('🚬')
 
@@ -68,7 +68,7 @@ Vanguard.prototype.travelToSource = function (sourceName) {
 
     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-    this.say(`⏩ ${sourceName}`)
+    this.say(`⏩ ${sourceIndex}`)
 
     this.createMoveRequest({
         origin: this.pos,
@@ -91,15 +91,15 @@ Vanguard.prototype.buildRoom = function () {
 
         if (!this.findOptimalSourceName()) return
 
-        const { sourceName } = this.memory
+        const sourceIndex = this.memory.SI
 
         // Try to move to source. If creep moved then iterate
 
-        if (this.travelToSource(sourceName)) return
+        if (this.travelToSource(sourceIndex)) return
 
         // Try to normally harvest. Iterate if creep harvested
 
-        if (this.advancedHarvestSource(room.get(sourceName))) return
+        if (this.advancedHarvestSource(room.sources[sourceIndex])) return
         return
     }
 

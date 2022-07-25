@@ -11,7 +11,7 @@ export function builderManager(room: Room, creepsOfRole: string[]) {
         // Get the creep using its name
 
         const creep: Builder = Game.creeps[creepName]
-        
+
         if (!cSiteTarget) {
             creep.advancedRecycle()
             continue

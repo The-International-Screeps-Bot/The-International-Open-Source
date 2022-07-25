@@ -515,31 +515,30 @@ export function rampartPlanner(room: Room) {
           y2: Math.max(Math.min(centerUpgradePos.y + 3, roomDimensions - 2), 2),
      })
 
-     // Get the source1ClosestHarvestPos
-
-     const source1ClosestHarvestPos: RoomPosition = room.get('source1ClosestHarvestPos')
+     let closestSourcePos = room.sourcePositions[0][0]
 
      // Protect it
 
      protectionRects.push({
-          x1: Math.max(Math.min(source1ClosestHarvestPos.x - 2, roomDimensions - 2), 2),
-          y1: Math.max(Math.min(source1ClosestHarvestPos.y - 2, roomDimensions - 2), 2),
-          x2: Math.max(Math.min(source1ClosestHarvestPos.x + 2, roomDimensions - 2), 2),
-          y2: Math.max(Math.min(source1ClosestHarvestPos.y + 2, roomDimensions - 2), 2),
+          x1: Math.max(Math.min(closestSourcePos.x - 2, roomDimensions - 2), 2),
+          y1: Math.max(Math.min(closestSourcePos.y - 2, roomDimensions - 2), 2),
+          x2: Math.max(Math.min(closestSourcePos.x + 2, roomDimensions - 2), 2),
+          y2: Math.max(Math.min(closestSourcePos.y + 2, roomDimensions - 2), 2),
      })
 
-     // Get the source2ClosestHarvestPos
+     closestSourcePos = room.sourcePositions[1][0]
 
-     const source2ClosestHarvestPos: RoomPosition = room.get('source2ClosestHarvestPos')
+     if (closestSourcePos) {
 
-     // Protect it
+          // Protect it
 
-     protectionRects.push({
-          x1: Math.max(Math.min(source2ClosestHarvestPos.x - 2, roomDimensions - 2), 2),
-          y1: Math.max(Math.min(source2ClosestHarvestPos.y - 2, roomDimensions - 2), 2),
-          x2: Math.max(Math.min(source2ClosestHarvestPos.x + 2, roomDimensions - 2), 2),
-          y2: Math.max(Math.min(source2ClosestHarvestPos.y + 2, roomDimensions - 2), 2),
-     })
+          protectionRects.push({
+               x1: Math.max(Math.min(closestSourcePos.x - 2, roomDimensions - 2), 2),
+               y1: Math.max(Math.min(closestSourcePos.y - 2, roomDimensions - 2), 2),
+               x2: Math.max(Math.min(closestSourcePos.x + 2, roomDimensions - 2), 2),
+               y2: Math.max(Math.min(closestSourcePos.y + 2, roomDimensions - 2), 2),
+          })
+     }
 
      // Get the room's stampAnchors
 

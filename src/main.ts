@@ -128,16 +128,11 @@ declare global {
         | 'source2'
         | 'mineralHarvestPositions'
         | 'closestMineralHarvestPos'
-        | 'source1HarvestPositions'
-        | 'source1ClosestHarvestPos'
-        | 'source2HarvestPositions'
-        | 'source2ClosestHarvestPos'
         | 'centerUpgradePos'
         | 'upgradePositions'
         | 'fastFillerPositions'
         | 'labContainer'
         | 'usedMineralHarvestPositions'
-        | 'usedSourceHarvestPositions'
         | 'usedUpgradePositions'
         | 'usedFastFillerPositions'
         | 'remoteNamesByEfficacy'
@@ -514,8 +509,6 @@ declare global {
 
     type SpawningStructures = (StructureSpawn | StructureExtension)[]
 
-    type SourceHarvestPositions = Map<number, boolean>[]
-
     interface OrganizedStructures {
         spawn: StructureSpawn[]
         extension: StructureExtension[]
@@ -547,7 +540,10 @@ declare global {
 
         stampAnchors: StampAnchors
 
-        sourceHarvestPositions: SourceHarvestPositions
+        /**
+         * packed
+         */
+        sourcePaths: string[]
 
         source1PathLength: number
 
@@ -557,9 +553,9 @@ declare global {
 
         // Containers
 
-        source1Container: Id<StructureContainer> | undefined
+        sourceContainers: Id<StructureContainer>[]
 
-        source2Container: Id<StructureContainer> | undefined
+        sourceLinks: Id<StructureLink>[]
 
         fastFillerContainerLeft: Id<StructureContainer> | undefined
 
@@ -570,10 +566,6 @@ declare global {
         mineralContainer: Id<StructureContainer> | undefined
 
         // Links
-
-        source1Link: Id<StructureLink> | undefined
-
-        source2Link: Id<StructureLink> | undefined
 
         controllerLink: Id<StructureLink> | undefined
 
@@ -586,7 +578,7 @@ declare global {
         /**
          * The amount of creeps with a task of harvesting sources in the room
          */
-        creepsOfSourceAmount: { [key: string]: number }
+        creepsOfSourceAmount: number[]
 
         /**
          * An object with keys of roles with properties of arrays of creep names belonging to the role
@@ -763,8 +755,6 @@ declare global {
 
         getPartsOfRoleAmount(role: CreepRoles, type?: BodyPartConstant): number
 
-        findSourcesByEfficacy(): ('source1' | 'source2')[]
-
         createClaimRequest(): boolean
 
         findSwampPlainsRatio(): number
@@ -776,6 +766,11 @@ declare global {
         allyCreepRequestManager(): void
 
         remotesManager(): void
+
+        /**
+         * Dictates and operates tasks for factories
+         */
+        factoryManager(): void
 
         // Spawn functions
 
@@ -895,6 +890,10 @@ declare global {
 
         readonly sources: Source[]
 
+        _sourcesByEfficacy: Source[]
+
+        readonly sourcesByEfficacy: Source[]
+
         _mineral: Mineral
 
         readonly mineral: Mineral
@@ -957,23 +956,33 @@ declare global {
 
         readonly taskNeedingSpawningStructures: SpawningStructures
 
-        readonly sourceHarvestPositions: SourceHarvestPositions
+        _sourcePositions: RoomPosition[][]
+
+        readonly sourcePositions: RoomPosition[][]
+
+        _usedSourceCoords: Set<number>[]
+
+        readonly usedSourceCoords: Set<number>[]
 
         _rampartPlans: CostMatrix
 
         readonly rampartPlans: CostMatrix
 
-        readonly source1PathLength: number
+        _sourcePaths: RoomPosition[][]
 
-        readonly source2PathLength: number
+        readonly sourcePaths: RoomPosition[][]
 
         readonly upgradePathLength: number
 
         // Container
 
-        readonly source1Container: StructureContainer | undefined
+        _sourceContainers: StructureContainer[]
 
-        readonly source2Container: StructureContainer | undefined
+        readonly sourceContainers: StructureContainer[]
+
+        _sourceLinks: StructureLink[]
+
+        readonly sourceLinks: StructureLink[]
 
         readonly fastFillerContainerLeft: StructureContainer | undefined
 
@@ -984,10 +993,6 @@ declare global {
         readonly mineralContainer: StructureContainer | undefined
 
         // Links
-
-        readonly source1Link: StructureLink | undefined
-
-        readonly source2Link: StructureLink | undefined
 
         readonly controllerLink: StructureLink | undefined
 
@@ -1214,6 +1219,11 @@ declare global {
          * Remote Stamp Anchors
          */
         RSA: Partial<Record<RemoteStampTypes, string>>
+
+        /**
+         * Source Positions, packed positions around sources where harvesters can sit
+         */
+        SP: string[]
     }
 
     // Creeps
@@ -1296,9 +1306,14 @@ declare global {
         advancedUpgradeController(): boolean
 
         /**
-         * Attempts multiple methods to build a construction site
+         * Attempts multiple methods to build one of our construction sites
          */
         advancedBuildCSite(): boolean
+
+        /**
+         * Attempts multiple methods to build an ally construction site
+         */
+         advancedBuildAllyCSite(): boolean
 
         /**
          *
@@ -1312,7 +1327,7 @@ declare global {
 
         findOptimalSourceName(): boolean
 
-        findSourceHarvestPos(sourceName: 'source1' | 'source2'): boolean
+        findSourcePos(sourceName: number): boolean
 
         findMineralHarvestPos(): boolean
 
@@ -1648,6 +1663,13 @@ declare global {
         _reserveAmount: number
 
         reserveAmount: number
+    }
+
+    interface Source {
+        /**
+         * The index of the source in room.sources
+         */
+        index: number
     }
 
     // Global

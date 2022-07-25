@@ -251,50 +251,6 @@ Room.prototype.get = function (roomObjectName) {
         },
     })
 
-    new RoomCacheObject({
-        name: 'source1HarvestPositions',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor() {
-            return findHarvestPositions(room.roomObjects.source1.getValue())
-        },
-    })
-
-    new RoomCacheObject({
-        name: 'source1ClosestHarvestPos',
-        valueType: 'pos',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor() {
-            return findClosestHarvestPos(room.roomObjects.source1HarvestPositions.getValue())
-        },
-    })
-
-    new RoomCacheObject({
-        name: 'source2HarvestPositions',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor() {
-            return findHarvestPositions(room.roomObjects.source2.getValue())
-        },
-    })
-
-    new RoomCacheObject({
-        name: 'source2ClosestHarvestPos',
-        valueType: 'pos',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor() {
-            return findClosestHarvestPos(room.roomObjects.source2HarvestPositions.getValue())
-        },
-    })
-
     // Upgrade positions
 
     function findCenterUpgradePos() {
@@ -510,54 +466,6 @@ Room.prototype.get = function (roomObjectName) {
         cacheAmount: 1,
         room,
         valueConstructor: findUsedMineralHarvestPositions,
-    })
-
-    // usedSourceHarvestPositions
-
-    function findUsedSourceHarvestPositions() {
-        // Construct usedHarvestPositions
-
-        const usedHarvestPositions: Set<number> = new Set()
-
-        // If the room is a commune, use sourceHarvesters. Otherwise use remoteHarvesters
-
-        const harvesterNames =
-            room.memory.type === 'commune'
-                ? room.myCreeps.source1Harvester.concat(room.myCreeps.source2Harvester).concat(room.myCreeps.vanguard)
-                : room.myCreeps.source1RemoteHarvester.concat(room.myCreeps.source2RemoteHarvester)
-
-        for (const creepName of harvesterNames) {
-            // Get the creep using its name
-
-            const creep = Game.creeps[creepName]
-
-            // If the creep is dying, iterate
-
-            if (creep.isDying()) continue
-
-            // Get the creep's sourceName
-
-            const { sourceName } = creep.memory
-
-            if (sourceName) room.creepsOfSourceAmount[sourceName] += 1
-
-            // If the creep has a packedHarvestPos, record it in usedHarvestPositions
-
-            if (creep.memory.packedPos) usedHarvestPositions.add(creep.memory.packedPos)
-        }
-
-        // Inform usedHarvestPositions
-
-        return usedHarvestPositions
-    }
-
-    new RoomCacheObject({
-        name: 'usedSourceHarvestPositions',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: 1,
-        room,
-        valueConstructor: findUsedSourceHarvestPositions,
     })
 
     // usedUpgradePositions
@@ -1030,21 +938,18 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // If avoidStationaryPositions is requested
 
                 if (opts.avoidStationaryPositions) {
-                    // Construct the sourceNames
-
-                    const sources: ('source1' | 'source2')[] = ['source1', 'source2']
 
                     // Loop through them
 
-                    for (const sourceName of sources) {
+                    for (const index in room.sources) {
                         // Find harvestPositions for sourceNames, iterating if there are none
 
-                        const harvestPositions: Coord[] = room.get(`${sourceName}HarvestPositions`)
-                        if (!harvestPositions.length) continue
+                        const sourcePositions = room.sourcePositions[index]
+                        if (!sourcePositions) continue
 
                         // Loop through each position of harvestPositions, have creeps prefer to avoid
 
-                        for (const pos of harvestPositions) cm.set(pos.x, pos.y, 10)
+                        for (const pos of sourcePositions) cm.set(pos.x, pos.y, 10)
                     }
 
                     // If the anchor is defined
@@ -2158,16 +2063,6 @@ Room.prototype.getPartsOfRoleAmount = function (role, type) {
     return partsAmount
 }
 
-Room.prototype.findSourcesByEfficacy = function () {
-    // Get the room's sourceNames
-
-    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
-
-    // Sort sourceNames based on their efficacy, informing the result
-
-    return sourceNames.sort((a, b) => this[`${a}PathLength`] - this[`${b}PathLength`])
-}
-
 Room.prototype.createClaimRequest = function () {
     if (this.sources.length !== 2) return false
 
@@ -2188,8 +2083,8 @@ Room.prototype.createClaimRequest = function () {
 
     score += Math.abs(prefferedCommuneRange - closestCommuneRange)
 
-    score += this.source1PathLength / 10
-    score += this.source2PathLength / 10
+    score += this.sourcePaths[0].length / 10
+    score += this.sourcePaths[1].length / 10
 
     score += this.upgradePathLength / 10
 

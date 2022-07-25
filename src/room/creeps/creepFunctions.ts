@@ -362,7 +362,92 @@ Creep.prototype.advancedBuildCSite = function () {
     const { room } = this
 
     const cSiteTarget = room.cSiteTarget
-    
+
+    // Stop if the cSite is undefined
+
+    if (!cSiteTarget) return false
+
+    this.say('ABCS')
+
+    // If the cSite is out of range
+
+    if (getRange(this.pos.x, cSiteTarget.pos.x, this.pos.y, cSiteTarget.pos.y) > 3) {
+        this.say('➡️CS')
+
+        // Make a move request to it
+
+        this.createMoveRequest({
+            origin: this.pos,
+            goal: { pos: cSiteTarget.pos, range: 3 },
+            avoidEnemyRanges: true,
+        })
+
+        return true
+    }
+
+    // Otherwise
+
+    // Try to build the construction site
+
+    const buildResult = this.build(cSiteTarget)
+
+    // If the build worked
+
+    if (buildResult === OK) {
+        // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
+
+        const energySpentOnConstruction = Math.min(
+            this.parts.work * BUILD_POWER,
+            (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
+        )
+
+        // Add control points to total controlPoints counter and say the success
+
+        if (global.roomStats[this.room.name])
+            global.roomStats[this.room.name].eob += Math.min(
+                this.parts.work * BUILD_POWER,
+                (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
+            )
+
+        this.say(`🚧${energySpentOnConstruction}`)
+
+        // Inform true
+
+        return true
+    }
+
+    // Inform true
+
+    return true
+}
+
+Creep.prototype.advancedBuildAllyCSite = function () {
+    const { room } = this
+
+    // If there is no construction target ID
+
+    if (!room.memory.cSiteTargetID) {
+        // Try to find a construction target. If none are found, stop
+
+        room.findAllyCSiteTargetID(this)
+    }
+
+    // Convert the construction target ID into a game object
+
+    let cSiteTarget = findObjectWithID(room.memory.cSiteTargetID)
+
+    // If there is no construction target
+
+    if (!cSiteTarget) {
+        // Try to find a construction target. If none are found, stop
+
+        room.findAllyCSiteTargetID(this)
+    }
+
+    // Convert the construction target ID into a game object, stopping if it's undefined
+
+    cSiteTarget = findObjectWithID(room.memory.cSiteTargetID)
+
     // Stop if the cSite is undefined
 
     if (!cSiteTarget) return false
@@ -506,25 +591,11 @@ Creep.prototype.findOptimalSourceName = function () {
 
     this.say('FOSN')
 
-    // If the creep already has a sourceName, inform true
-
-    if (this.memory.sourceName) return true
+    if (this.memory.SI) return true
 
     // Get the rooms anchor, if it's undefined inform false
 
     if (!room.anchor) return false
-
-    // Query usedSourceHarvestPositions to get creepsOfSourceAmount
-
-    room.get('usedSourceHarvestPositions')
-
-    // Otherwise, define source names
-
-    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
-
-    // Sort them by their range from the anchor
-
-    sourceNames.sort((a, b) => room.anchor.getRangeTo(room.get(a).pos) - room.anchor.getRangeTo(room.get(b).pos))
 
     // Construct a creep threshold
 
@@ -535,17 +606,17 @@ Creep.prototype.findOptimalSourceName = function () {
     while (creepThreshold < 4) {
         // Then loop through the source names and find the first one with open spots
 
-        for (const sourceName of sourceNames) {
+        for (const source of room.sourcesByEfficacy) {
+            const { index } = source
+
             // If there are still creeps needed to harvest a source under the creepThreshold
 
             if (
-                Math.min(creepThreshold, room.get(`${sourceName}HarvestPositions`).length) -
-                    room.creepsOfSourceAmount[sourceName] >
+                Math.min(creepThreshold, room.sourcePositions[index].length) - room.creepsOfSourceAmount[index] >
                 0
             ) {
-                // Assign the sourceName to the creep's memory and Inform true
 
-                this.memory.sourceName = sourceName
+                this.memory.SI = index
                 return true
             }
         }
@@ -560,7 +631,7 @@ Creep.prototype.findOptimalSourceName = function () {
     return false
 }
 
-Creep.prototype.findSourceHarvestPos = function (sourceName) {
+Creep.prototype.findSourcePos = function (index) {
     const { room } = this
 
     this.say('FSHP')
@@ -569,29 +640,25 @@ Creep.prototype.findSourceHarvestPos = function (sourceName) {
 
     if (this.memory.packedPos) return true
 
-    // Define an anchor
-
-    const anchor: RoomPosition = room.anchor || this.pos
-
     // Get usedSourceHarvestPositions
 
-    const usedSourceHarvestPositions: Set<number> = room.get('usedSourceHarvestPositions')
-
-    const closestHarvestPos: RoomPosition = room.get(`${sourceName}ClosestHarvestPos`)
+    const usedSourceCoords = room.usedSourceCoords[index]
+    
+    const closestSourcePos = room.sourcePositions[index][0]
     let packedPos
 
     // If the closestHarvestPos exists and isn't being used
 
-    if (closestHarvestPos) {
-        packedPos = pack(closestHarvestPos)
+    if (closestSourcePos) {
+        packedPos = pack(closestSourcePos)
 
         // If the position is unused
 
-        if (!usedSourceHarvestPositions.has(packedPos)) {
+        if (!usedSourceCoords.has(packedPos)) {
             // Assign it as the creep's harvest pos and inform true
 
             this.memory.packedPos = packedPos
-            usedSourceHarvestPositions.add(packedPos)
+            usedSourceCoords.add(packedPos)
 
             return true
         }
@@ -599,17 +666,15 @@ Creep.prototype.findSourceHarvestPos = function (sourceName) {
 
     // Otherwise get the harvest positions for the source
 
-    const harvestPositions: Coord[] = room.get(`${sourceName}HarvestPositions`)
+    const sourcePositions = room.sourcePositions[index]
 
-    const openHarvestPositions = harvestPositions.filter(pos => !usedSourceHarvestPositions.has(pack(pos)))
-    if (!openHarvestPositions.length) return false
+    const openSourcePositions = sourcePositions.filter(pos => !usedSourceCoords.has(pack(pos)))
+    if (!openSourcePositions.length) return false
 
-    openHarvestPositions.sort((a, b) => getRange(anchor.x, a.x, anchor.y, a.y) - getRange(anchor.x, anchor.y, b.x, b.y))
-
-    packedPos = pack(openHarvestPositions[0])
+    packedPos = pack(openSourcePositions[0])
 
     this.memory.packedPos = packedPos
-    usedSourceHarvestPositions.add(packedPos)
+    usedSourceCoords.add(packedPos)
 
     return true
 }
@@ -1491,7 +1556,6 @@ Creep.prototype.reservationManager = function () {
             }
 
             if (Memory.roomVisuals) {
-
                 this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1)
                 this.room.visual.text(`${target.store[reservation.resourceType]}`, this.pos.x, this.pos.y + 2)
             }

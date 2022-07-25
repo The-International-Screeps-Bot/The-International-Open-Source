@@ -39,13 +39,13 @@ RemoteHarvester.prototype.findRemote = function () {
     return false
 }
 
-RemoteHarvester.prototype.travelToSource = function (sourceName) {
+RemoteHarvester.prototype.travelToSource = function (sourceIndex) {
     const creep = this
     const { room } = creep
 
     // Try to find a harvestPosition, inform false if it failed
 
-    if (!creep.findSourceHarvestPos(sourceName)) return false
+    if (!creep.findSourcePos(sourceIndex)) return false
 
     creep.say('🚬')
 
@@ -59,7 +59,7 @@ RemoteHarvester.prototype.travelToSource = function (sourceName) {
 
     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-    creep.say(`⏩ ${sourceName}`)
+    creep.say(`⏩ ${sourceIndex}`)
 
     creep.createMoveRequest({
         origin: creep.pos,

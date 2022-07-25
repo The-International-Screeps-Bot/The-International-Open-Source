@@ -15,11 +15,11 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
           // Get the creeps sourceName
 
-          const { sourceName } = creep.memory
+          const sourceIndex = creep.memory.SI
 
           // Try to harvest the designated source
 
-          creep.advancedHarvestSource(room.get(sourceName))
+          creep.advancedHarvestSource(room.sources[sourceIndex])
 
           // Try to transfer to source extensions, iterating if success
 
@@ -31,7 +31,7 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
           // Try to repair the sourceContainer
 
-          creep.repairSourceContainer(room[`${sourceName}Container`])
+          creep.repairSourceContainer(room.sourceContainers[sourceIndex])
      }
 }
 
@@ -48,7 +48,7 @@ SourceHarvester.prototype.isDying = function () {
 
      if (
           this.ticksToLive >
-          this.body.length * CREEP_SPAWN_TIME + (this.room[`${this.memory.sourceName}PathLength`] - 3 || 0)
+          this.body.length * CREEP_SPAWN_TIME + (this.room.sourcePaths[this.memory.SI].length - 3)
      )
           return false
 
@@ -64,11 +64,11 @@ SourceHarvester.prototype.travelToSource = function () {
 
      // Define the creep's designated source
 
-     const { sourceName } = this.memory
+     const sourceIndex = this.memory.SI
 
      // Try to find a harvestPosition, inform false if it failed
 
-     if (!this.findSourceHarvestPos(sourceName)) return false
+     if (!this.findSourcePos(sourceIndex)) return false
 
      this.say('🚬')
 
@@ -85,8 +85,8 @@ SourceHarvester.prototype.travelToSource = function () {
      if (this.memory.getPulled) return true
 
      // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
-     
-     this.say(`⏩${sourceName}`)
+
+     this.say(`⏩${sourceIndex}`)
 
      this.createMoveRequest({
           origin: this.pos,
@@ -163,7 +163,7 @@ SourceHarvester.prototype.transferToSourceLink = function () {
 
      // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
-     const sourceLink = room[`${this.memory.sourceName}Link`]
+     const sourceLink = room.sourceLinks[this.memory.SI]
      if (!sourceLink) return false
 
      // Try to transfer to the sourceLink and inform true

@@ -53,7 +53,7 @@ AllyVanguard.prototype.travelToSource = function (sourceName) {
 
     // Try to find a harvestPosition, inform false if it failed
 
-    if (!this.findSourceHarvestPos(sourceName)) return false
+    if (!this.findSourcePos(sourceName)) return false
 
     this.say('🚬')
 
@@ -133,15 +133,15 @@ AllyVanguard.prototype.getEnergyFromRemote = function () {
 
     if (!this.findOptimalSourceName()) return
 
-    const { sourceName } = this.memory
+    const sourceIndex = this.memory.SI
 
     // Try to move to source. If creep moved then iterate
 
-    if (this.travelToSource(sourceName)) return
+    if (this.travelToSource(sourceIndex)) return
 
     // Try to normally harvest. Iterate if creep harvested
 
-    if (this.advancedHarvestSource(room.get(sourceName))) return
+    if (this.advancedHarvestSource(room.sources[sourceIndex])) return
 }
 
 AllyVanguard.prototype.getEnergyFromRoom = function () {
@@ -170,15 +170,15 @@ AllyVanguard.prototype.getEnergyFromRoom = function () {
 
     if (!this.findOptimalSourceName()) return true
 
-    const { sourceName } = this.memory
+    const sourceIndex = this.memory.SI
 
     // Try to move to source. If creep moved then iterate
 
-    if (this.travelToSource(sourceName)) return true
+    if (this.travelToSource(sourceIndex)) return true
 
     // Try to normally harvest. Iterate if creep harvested
 
-    if (this.advancedHarvestSource(room.get(sourceName))) return true
+    if (this.advancedHarvestSource(room.sources[sourceIndex])) return true
 
     return true
 }
@@ -213,29 +213,5 @@ AllyVanguard.prototype.buildRoom = function () {
         return
     }
 
-    // If there is no construction target ID
-
-    if (!room.memory.cSiteTargetID) {
-        // Try to find a construction target. If none are found, stop
-
-        room.findAllyCSiteTargetID(this)
-    }
-
-    // Convert the construction target ID into a game object
-
-    let constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
-
-    // If there is no construction target
-
-    if (!constructionTarget) {
-        // Try to find a construction target. If none are found, stop
-
-        room.findAllyCSiteTargetID(this)
-    }
-
-    // Convert the construction target ID into a game object, stopping if it's undefined
-
-    constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
-
-    this.advancedBuildCSite(constructionTarget)
+    this.advancedBuildAllyCSite()
 }

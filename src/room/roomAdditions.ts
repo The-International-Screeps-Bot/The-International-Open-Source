@@ -4,12 +4,14 @@ import {
     customLog,
     findClosestObject,
     findObjectWithID,
+    findPositionsInsideRect,
     getRange,
     pack,
     packXY,
     unpackAsPos,
     unpackAsRoomPos,
 } from 'international/generalFunctions'
+import { packCoordList, packPosList, unpackPosList } from 'other/packrat'
 
 Object.defineProperties(Room.prototype, {
     global: {
@@ -38,7 +40,13 @@ Object.defineProperties(Room.prototype, {
             if (!this.memory.sourceIds) {
                 this.memory.sourceIds = []
 
-                for (const source of this.find(FIND_SOURCES)) {
+                const sources = this.find(FIND_SOURCES)
+
+                for (const index in sources) {
+                    const source = sources[index]
+
+                    source.index = parseInt(index)
+
                     this.memory.sourceIds.push(source.id)
                     this._sources.push(source)
                 }
@@ -46,9 +54,23 @@ Object.defineProperties(Room.prototype, {
                 return this._sources
             }
 
-            for (const sourceId of this.memory.sourceIds) this._sources.push(findObjectWithID(sourceId))
+            for (const index in this.memory.sourceIds) {
+                const source = findObjectWithID(this.memory.sourceIds[index])
+
+                source.index = parseInt(index)
+                this._sources.push(source)
+            }
 
             return this._sources
+        },
+    },
+    sourcesByEfficacy: {
+        get() {
+            if (this._sourcesByEfficacy) return this._sourcesByEfficacy
+
+            return (this._sourcesByEfficacy = this.sources.sort((a, b) => {
+                return this.sourcePaths[a.index].length - this.sourcePaths[b.index].length
+            }))
         },
     },
     mineral: {
@@ -156,18 +178,14 @@ Object.defineProperties(Room.prototype, {
             let count = 1
 
             if (this.anchor) {
-
                 totalX += this.anchor.x
                 totalY += this.anchor.y
-            }
-            else {
-
+            } else {
                 totalX += 25
                 totalX += 25
             }
 
             for (const creepName of this.myCreeps.builder) {
-
                 const pos = Game.creeps[creepName].pos
 
                 totalX += pos.x
@@ -263,22 +281,17 @@ Object.defineProperties(Room.prototype, {
 
             this._spawningStructuresByNeed = this.spawningStructures
 
-            const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
-
             // loop through sourceNames
 
-            for (const sourceName of sourceNames) {
+            for (const index in this.sources) {
                 // Get the closestHarvestPos using the sourceName, iterating if undefined
 
-                let closestHarvestPos: RoomPosition = this.get(`${sourceName}ClosestHarvestPos`)
-
-                if (!closestHarvestPos) continue
+                const closestSourcePos = this.sourcePositions[index][0]
 
                 // Assign structuresForSpawning that are not in range of 1 to the closestHarvestPos
 
                 this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
-                    structure =>
-                        getRange(structure.pos.x, closestHarvestPos.x, structure.pos.y, closestHarvestPos.y) > 1,
+                    structure => getRange(structure.pos.x, closestSourcePos.x, structure.pos.y, closestSourcePos.y) > 1,
                 )
             }
 
@@ -296,13 +309,95 @@ Object.defineProperties(Room.prototype, {
             return this._spawningStructuresByNeed
         },
     },
-    sourceHarvestPositions: {
+    sourcePositions: {
         get() {
-            if (this.global.sourceHarvestPositions) return this.global.sourceHarvestPositions
+            if (this._sourcePositions) return this._sourcePositions
 
-            const sourceHarvestPositions = [new Map()]
+            if (this.memory.SP) {
+                this._sourcePositions = []
 
-            return sourceHarvestPositions
+                for (const positions of this.memory.SP) this._sourcePositions.push(unpackPosList(positions))
+
+                return this._sourcePositions
+            }
+
+            this.memory.SP = []
+            this._sourcePositions = []
+
+            let anchor = this.anchor || new RoomPosition(25, 25, this.name)
+
+            if (this.memory.type === 'remote')
+                anchor = Game.rooms[this.memory.commune].anchor || new RoomPosition(25, 25, this.name)
+
+            const terrain = Game.map.getRoomTerrain(this.name)
+
+            for (const source of this.sources) {
+                const positions = []
+
+                // Find positions adjacent to source
+
+                const adjacentPositions = findPositionsInsideRect(
+                    source.pos.x - 1,
+                    source.pos.y - 1,
+                    source.pos.x + 1,
+                    source.pos.y + 1,
+                )
+
+                // Loop through each pos
+
+                for (const coord of adjacentPositions) {
+                    // Iterate if terrain for pos is a wall
+
+                    if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) continue
+
+                    // Add pos to harvestPositions
+
+                    positions.push(new RoomPosition(coord.x, coord.y, this.name))
+                }
+
+                positions.sort((a, b) => {
+                    return anchor.getRangeTo(a) - anchor.getRangeTo(b)
+                })
+
+                this.memory.SP.push(packPosList(positions))
+                this._sourcePositions.push(positions)
+            }
+
+            return this._sourcePositions
+        },
+    },
+    usedSourceCoords: {
+        get() {
+            if (this._usedSourceCoords) return this._usedSourceCoords
+
+            this._usedSourceCoords = []
+
+            for (const index in this.sources) this._usedSourceCoords.push(new Set())
+
+            const harvesterNames =
+                this.memory.type === 'commune'
+                    ? this.myCreeps.source1Harvester
+                          .concat(this.myCreeps.source2Harvester)
+                          .concat(this.myCreeps.vanguard)
+                    : this.myCreeps.source1RemoteHarvester.concat(this.myCreeps.source2RemoteHarvester)
+
+            for (const creepName of harvesterNames) {
+                // Get the creep using its name
+
+                const creep = Game.creeps[creepName]
+
+                // If the creep is dying, iterate
+
+                if (creep.isDying()) continue
+
+                if (!creep.memory.SI) continue
+
+                // If the creep has a packedHarvestPos, record it in usedHarvestPositions
+
+                if (creep.memory.packedPos) this._usedSourceCoords[creep.memory.SI].add(creep.memory.packedPos)
+            }
+
+            return this._usedSourceCoords
         },
     },
     rampartPlans: {
@@ -312,32 +407,31 @@ Object.defineProperties(Room.prototype, {
             return (this._rampartPlans = new PathFinder.CostMatrix())
         },
     },
-    source1PathLength: {
+    sourcePaths: {
         get() {
-            if (this.global.source1PathLength) return this.global.source1PathLength
+            if (this._sourcePaths) return this._sourcePaths
 
-            if (!this.sources[0]) return 0
+            this._sourcePaths = []
 
-            if (!this.anchor) return 0
+            if (this.global.sourcePaths) {
+                for (const path of this.global.sourcePaths) this._sourcePaths.push(unpackPosList(path))
 
-            return (this.global.source1PathLength = this.advancedFindPath({
-                origin: this.sources[0].pos,
-                goal: { pos: this.anchor, range: 3 },
-            }).length)
-        },
-    },
-    source2PathLength: {
-        get() {
-            if (this.global.source2PathLength) return this.global.source2PathLength
+                return this._sourcePaths
+            }
 
-            if (!this.sources[1]) return 0
+            this.global.sourcePaths = []
 
-            if (!this.anchor) return 0
+            for (const source of this.sources) {
+                const path = this.advancedFindPath({
+                    origin: source.pos,
+                    goal: { pos: this.anchor, range: 3 },
+                })
 
-            return (this.global.source2PathLength = this.advancedFindPath({
-                origin: this.sources[1].pos,
-                goal: { pos: this.anchor, range: 3 },
-            }).length)
+                this._sourcePaths.push(path)
+                this.global.sourcePaths.push(packPosList(path))
+            }
+
+            return this._sourcePaths
         },
     },
     upgradePathLength: {
@@ -356,46 +450,83 @@ Object.defineProperties(Room.prototype, {
             }).length)
         },
     },
-    source1Container: {
+    sourceContainers: {
         get() {
-            if (this.global.source1Container) {
-                const container = findObjectWithID(this.global.source1Container)
+            if (this._sourceContainers) return this._sourceContainers
 
-                if (container) return container
+            if (this.global.sourceContainers) {
+                const containers = []
+
+                for (const ID of this.global.sourceContainers) {
+                    const container = findObjectWithID(ID)
+                    if (!container) break
+
+                    containers.push(container)
+                }
+
+                if (containers.length === this.sources.length) return (this._sourceContainers = containers)
             }
 
-            const closestHarvestPos: RoomPosition | undefined = this.get('source1ClosestHarvestPos')
-            if (!closestHarvestPos) return false
+            this.global.sourceContainers = []
+            const containers = []
 
-            for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                if (structure.structureType !== STRUCTURE_CONTAINER) continue
+            for (const positions of this.sourcePositions) {
+                for (let structure of positions[0].lookFor(LOOK_STRUCTURES) as StructureContainer[]) {
+                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
 
-                this.global.source1Container = structure.id as Id<StructureContainer>
-                return structure
+                    this.global.sourceContainers.push(structure.id)
+                    containers.push(structure)
+                    break
+                }
             }
 
-            return false
+            return (this._sourceContainers = containers)
         },
     },
-    source2Container: {
+    sourceLinks: {
         get() {
-            if (this.global.source2Container) {
-                const container = findObjectWithID(this.global.source2Container)
+            if (this._sourceLinks) return this._sourceLinks
 
-                if (container) return container
+            if (this.global.sourceLinks) {
+                const containers = []
+
+                for (const ID of this.global.sourceLinks) {
+                    const link = findObjectWithID(ID)
+                    if (!link) break
+
+                    containers.push(link)
+                }
+
+                if (containers.length === this.sources.length) return (this._sourceLinks = containers)
             }
 
-            const closestHarvestPos: RoomPosition | undefined = this.get('source2ClosestHarvestPos')
-            if (!closestHarvestPos) return false
+            this.global.sourceLinks = []
+            const links = []
 
-            for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                if (structure.structureType !== STRUCTURE_CONTAINER) continue
+            for (const positions of this.sourcePositions) {
+                const anchor = positions[0]
 
-                this.global.source2Container = structure.id as Id<StructureContainer>
-                return structure
+                const adjacentStructures = this.lookForAtArea(
+                    LOOK_STRUCTURES,
+                    anchor.x - 1,
+                    anchor.y - 1,
+                    anchor.x + 1,
+                    anchor.y + 1,
+                    true,
+                )
+
+                for (const posData of adjacentStructures) {
+                    const structure = posData.structure as StructureLink
+
+                    if (structure.structureType !== STRUCTURE_LINK) continue
+
+                    this.global.sourceLinks.push(structure.id)
+                    links.push(structure)
+                    break
+                }
             }
 
-            return false
+            return (this._sourceLinks = links)
         },
     },
     fastFillerContainerLeft: {
@@ -474,50 +605,6 @@ Object.defineProperties(Room.prototype, {
                 if (structure.structureType !== STRUCTURE_CONTAINER) continue
 
                 this.global.mineralContainer = structure.id as Id<StructureContainer>
-                return structure
-            }
-
-            return false
-        },
-    },
-    source1Link: {
-        get() {
-            if (this.global.source1Link) {
-                const container = findObjectWithID(this.global.source1Link)
-
-                if (container) return container
-            }
-
-            const closestHarvestPos = this.get('source1ClosestHarvestPos')
-
-            if (!closestHarvestPos) return false
-
-            for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                if (structure.structureType !== STRUCTURE_LINK) continue
-
-                this.global.source1Link = structure.id as Id<StructureLink>
-                return structure
-            }
-
-            return false
-        },
-    },
-    source2Link: {
-        get() {
-            if (this.global.source2Link) {
-                const container = findObjectWithID(this.global.source2Link)
-
-                if (container) return container
-            }
-
-            const closestHarvestPos = this.get('source2ClosestHarvestPos')
-
-            if (!closestHarvestPos) return false
-
-            for (const structure of closestHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                if (structure.structureType !== STRUCTURE_LINK) continue
-
-                this.global.source2Link = structure.id as Id<StructureLink>
                 return structure
             }
 
@@ -626,10 +713,12 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._MEWT) return this._MEWT
 
-            this._MEWT = [...this.droppedEnergy, ...this.find(FIND_TOMBSTONES), ...this.find(FIND_RUINS)]
-
-            if (this.source1Container) this._MEWT.push(this.source1Container)
-            if (this.source2Container) this._MEWT.push(this.source2Container)
+            this._MEWT = [
+                ...this.droppedEnergy,
+                ...this.find(FIND_TOMBSTONES),
+                ...this.find(FIND_RUINS),
+                ...this.sourceContainers,
+            ]
 
             return this._MEWT
         },

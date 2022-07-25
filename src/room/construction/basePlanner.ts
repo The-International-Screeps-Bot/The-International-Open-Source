@@ -8,6 +8,7 @@ import {
      unpackAsPos,
      unpackAsRoomPos,
 } from 'international/generalFunctions'
+import { packPosList } from 'other/packrat'
 import 'other/RoomVisual'
 import { rampartPlanner } from './rampartPlanner'
 
@@ -340,47 +341,36 @@ export function basePlanner(room: Room) {
           roadCM.set(pos.x, pos.y, 1)
      }
 
-     // Get the room's sourceNames
-
-     const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
-     let closestHarvestPos: RoomPosition
-
      // loop through sourceNames
 
-     for (const sourceName of sourceNames) {
+     for (const index in sources) {
           // Get the closestHarvestPos using the sourceName, iterating if undefined
 
-          closestHarvestPos = room.get(`${sourceName}ClosestHarvestPos`)
-          if (!closestHarvestPos) continue
+          const closestSourcePos = room.sourcePositions[index][0]
 
           // Record the pos in roadCM
 
-          roadCM.set(closestHarvestPos.x, closestHarvestPos.y, 255)
+          roadCM.set(closestSourcePos.x, closestSourcePos.y, 255)
      }
 
      // loop through sourceNames
 
-     for (const sourceName of sourceNames) {
+     for (const index in sources) {
           // get the closestHarvestPos using the sourceName, iterating if undefined
 
-          closestHarvestPos = room.get(`${sourceName}ClosestHarvestPos`)
-          if (!closestHarvestPos) continue
+          const closestSourcePos = room.sourcePositions[index][0]
 
-          if (!room.memory.stampAnchors.container.includes(pack(closestHarvestPos))) {
-               room.memory.stampAnchors.container.push(pack(closestHarvestPos))
+          if (!room.memory.stampAnchors.container.includes(pack(closestSourcePos))) {
+               room.memory.stampAnchors.container.push(pack(closestSourcePos))
           }
 
           // Path from the fastFillerAnchor to the closestHarvestPos
 
           path = room.advancedFindPath({
-               origin: closestHarvestPos,
+               origin: closestSourcePos,
                goal: { pos: room.anchor, range: 3 },
                weightCostMatrixes: [roadCM],
           })
-
-          // Record the path's length in global
-
-          room.global[`${sourceName}PathLength`] = path.length
 
           // Loop through positions of the path
 
@@ -511,22 +501,22 @@ export function basePlanner(room: Room) {
      if (room.memory.stampAnchors.sourceLink.length + room.memory.stampAnchors.sourceExtension.length === 0) {
           // loop through sourceNames
 
-          for (const sourceName of sourceNames) {
+          for (const index in sources) {
                // Record that the source has no link
 
                let sourceHasLink = false
 
                // Get the closestHarvestPos of this sourceName
 
-               closestHarvestPos = room.get(`${sourceName}ClosestHarvestPos`)
+               const closestSourcePos = room.sourcePositions[index][0]
 
                // Find positions adjacent to source
 
                const adjacentPositions = findPositionsInsideRect(
-                    closestHarvestPos.x - 1,
-                    closestHarvestPos.y - 1,
-                    closestHarvestPos.x + 1,
-                    closestHarvestPos.y + 1,
+                    closestSourcePos.x - 1,
+                    closestSourcePos.y - 1,
+                    closestSourcePos.x + 1,
+                    closestSourcePos.y + 1,
                )
 
                // Sort adjacentPositions by range from the anchor

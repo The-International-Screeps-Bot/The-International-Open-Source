@@ -6,9 +6,9 @@ Room.prototype.linkManager = function() {
 
      // Get the sourceLinks
 
-     const sourceLinks: (StructureLink | false)[] = [this.source1Link, this.source2Link]
+     const sourceLinks = this.sourceLinks
 
-     const receiverLinks: (StructureLink | false)[] = [this.fastFillerLink, this.hubLink, this.controllerLink]
+     const receiverLinks = [this.fastFillerLink, this.hubLink, this.controllerLink]
 
      this.sourcesToReceivers(sourceLinks, receiverLinks)
 
