@@ -514,7 +514,8 @@ export function rampartPlanner(room: Room) {
           x2: Math.max(Math.min(centerUpgradePos.x + 3, roomDimensions - 2), 2),
           y2: Math.max(Math.min(centerUpgradePos.y + 3, roomDimensions - 2), 2),
      })
-
+     
+/*
      let closestSourcePos = room.sourcePositions[0][0]
 
      // Protect it
@@ -539,7 +540,7 @@ export function rampartPlanner(room: Room) {
                y2: Math.max(Math.min(closestSourcePos.y + 2, roomDimensions - 2), 2),
           })
      }
-
+ */
      // Get the room's stampAnchors
 
      const { stampAnchors } = room.memory

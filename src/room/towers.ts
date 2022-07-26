@@ -24,7 +24,7 @@ Room.prototype.towersHealCreeps = function () {
     // Construct heal targets from my and allied damaged creeps in the this
 
     const healTargets = this.myDamagedCreeps.concat(this.allyDamagedCreeps).filter(creep => {
-        return creep.hits < creep.hitsMax && !creep.isOnExit()
+        return creep.body.length > 1 && creep.hits < creep.hitsMax && !creep.isOnExit()
     })
 
     if (!healTargets.length) return

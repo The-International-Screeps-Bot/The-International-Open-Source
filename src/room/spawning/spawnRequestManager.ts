@@ -380,24 +380,13 @@ Room.prototype.spawnRequester = function () {
 
     // Get enemyAttackers in the this
 
-    let enemyAttackers: Creep[]
-
-    // If there are no towers
+    let enemyAttackers = this.enemyAttackers
 
     if (!this.structures.tower.length) {
-        // Consider invaders as significant attackers
-
-        enemyAttackers = this.enemyAttackers.filter(function (creep) {
-            return !creep.isOnExit()
-        })
-    }
-
-    // Otherwise
-    else {
         // Don't consider invaders
 
-        enemyAttackers = this.enemyAttackers.filter(function (creep) {
-            return creep.owner.username !== 'Invader' && !creep.isOnExit()
+        enemyAttackers = enemyAttackers.filter(function (creep) {
+            return creep.owner.username !== 'Invader'
         })
     }
 
@@ -429,7 +418,7 @@ Room.prototype.spawnRequester = function () {
                 extraParts: [ATTACK, ATTACK, MOVE],
                 partsMultiplier: attackStrength,
                 minCreeps: undefined,
-                maxCreeps: Math.max(enemyAttackers.length, 5),
+                maxCreeps: 5,
                 minCost: 210,
                 priority: 6 + this.creepsFromRoom.meleeDefender.length,
                 memoryAdditions: {

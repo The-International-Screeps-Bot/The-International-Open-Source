@@ -366,3 +366,11 @@ export function findClosestRoomName(start: string, targets: string[]) {
 
      return closest
 }
+
+/**
+ * Generates a random integer between two thresholds
+ */
+export function randomIntRange(min: number, max: number) {
+
+     return Math.floor(Math.random() * (max - min) + min)
+}

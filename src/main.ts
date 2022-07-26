@@ -1595,6 +1595,11 @@ declare global {
          * Recycle Target, the spawn ID the creep is going to recycle
          */
         RecT: Id<StructureSpawn>
+
+        /**
+         * Ticks Waited for an arbitrary event
+         */
+        TW: number
     }
 
     // PowerCreeps

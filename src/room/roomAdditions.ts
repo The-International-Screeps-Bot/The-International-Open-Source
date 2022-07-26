@@ -488,16 +488,16 @@ Object.defineProperties(Room.prototype, {
             if (this._sourceLinks) return this._sourceLinks
 
             if (this.global.sourceLinks) {
-                const containers = []
+                const links = []
 
                 for (const ID of this.global.sourceLinks) {
                     const link = findObjectWithID(ID)
                     if (!link) break
 
-                    containers.push(link)
+                    links.push(link)
                 }
 
-                if (containers.length === this.sources.length) return (this._sourceLinks = containers)
+                if (links.length === this.sources.length) return (this._sourceLinks = links)
             }
 
             this.global.sourceLinks = []
@@ -508,16 +508,16 @@ Object.defineProperties(Room.prototype, {
 
                 const adjacentStructures = this.lookForAtArea(
                     LOOK_STRUCTURES,
-                    anchor.x - 1,
                     anchor.y - 1,
-                    anchor.x + 1,
+                    anchor.x - 1,
                     anchor.y + 1,
+                    anchor.x + 1,
                     true,
                 )
 
                 for (const posData of adjacentStructures) {
                     const structure = posData.structure as StructureLink
-
+                    
                     if (structure.structureType !== STRUCTURE_LINK) continue
 
                     this.global.sourceLinks.push(structure.id)

@@ -1,5 +1,5 @@
 import { remoteNeedsIndex } from 'international/constants'
-import { findClosestObject, getRange, pack } from 'international/generalFunctions'
+import { findClosestObject, getRange, pack, randomIntRange } from 'international/generalFunctions'
 import { RemoteDefender } from 'room/creeps/creepClasses'
 
 export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
@@ -35,15 +35,30 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
 
         // Try to attack enemyAttackers, iterating if there are none or one was attacked
 
-        if (creep.advancedAttackEnemies()) continue
+        if (creep.advancedAttackEnemies()) {
+            delete creep.memory.TW
+            continue
+        }
 
-        // If the creep is its remote
+        // If the creep is in its remote
 
         if (room.name === creep.memory.remote) {
-            // Otherwise, remove the remote from the creep
 
-            delete creep.memory.remote
-            continue
+            if (!creep.memory.TW) creep.memory.TW = 0
+            else creep.memory.TW += 1
+
+            // If a random range of time has passed, find a new remote
+
+            if (creep.memory.TW > randomIntRange(20, 100)) {
+
+                delete creep.memory.remote
+
+                if (creep.moveRequest) continue
+
+                // Try to find a remote
+
+                if (!creep.findRemote()) continue
+            }
         }
 
         // Otherwise, create a moveRequest to its remote
@@ -99,16 +114,12 @@ RemoteDefender.prototype.findRemote = function () {
 RemoteDefender.prototype.advancedAttackEnemies = function () {
     const { room } = this
 
-    const enemyAttackers = room.enemyAttackers.filter(function (creep) {
-        return !creep.isOnExit()
-    })
+    const enemyAttackers = room.enemyAttackers
 
     // If there are none
 
     if (!enemyAttackers.length) {
-        const enemyCreeps = room.enemyCreeps.filter(function (creep) {
-            return !creep.isOnExit()
-        })
+        const enemyCreeps = room.enemyCreeps
 
         if (!enemyCreeps.length) {
             return this.aggressiveHeal()
