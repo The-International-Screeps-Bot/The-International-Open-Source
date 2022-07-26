@@ -1,5 +1,6 @@
-import { myColors, roomDimensions, stamps } from 'international/constants'
+import { EXIT, myColors, PROTECTED, roomDimensions, stamps, TO_EXIT } from 'international/constants'
 import {
+    arePositionsEqual,
     customLog,
     findAvgBetweenPosotions,
     findPositionsInsideRect,
@@ -512,7 +513,16 @@ export function basePlanner(room: Room) {
 
             // Find the protection status
 
-            let isProtected = room.tileTypes[closestSourcePos.x][closestSourcePos.y] === 1
+            const isProtected = room.tileTypes[closestSourcePos.x][closestSourcePos.y] === PROTECTED
+
+            const OGPositions: Map<RoomPosition, number> = new Map()
+
+            for (const pos of room.sourcePositions[index]) {
+                if (arePositionsEqual(closestSourcePos, pos)) continue
+
+                OGPositions.set(pos, roadCM.get(pos.x, pos.y))
+                roadCM.set(pos.x, pos.y, 0)
+            }
 
             // If the position is not PROTECTED, plan a rampart on it
 
@@ -540,9 +550,15 @@ export function basePlanner(room: Room) {
 
                 if (roadCM.get(pos.x, pos.y) > 0) continue
 
+                if (rampartPlans.get(pos.x, pos.y) > 0) continue
+
                 // Iterate if the pos is a wall
 
                 if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+
+                // Iterate if the position is near an exit
+                /* customLog('POS INFO', room.tileTypes[pos.x][pos.y]) */
+                if (room.tileTypes[pos.x][pos.y] === TO_EXIT) continue
 
                 // Otherwise
 
@@ -576,6 +592,8 @@ export function basePlanner(room: Room) {
                 extraExtensionsAmount -= 1
                 continue
             }
+
+            for (const [pos, value] of OGPositions) roadCM.set(pos.x, pos.y, value)
         }
     }
 

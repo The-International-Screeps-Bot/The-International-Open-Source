@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 45
+export const breakingVersion = 52
 
 // Settings
 
@@ -653,3 +653,9 @@ export const controllerDowngradeUpgraderNeed = 10000
 export const cacheAmountModifier = 25
 
 export const minHarvestWorkRatio = 1.66666666667
+
+export const UNWALKABLE = -1
+export const NORMAL = 0
+export const PROTECTED = 1
+export const TO_EXIT = 2
+export const EXIT = 3

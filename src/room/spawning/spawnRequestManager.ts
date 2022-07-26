@@ -994,7 +994,7 @@ Room.prototype.spawnRequester = function () {
                 if (remoteNeeds[remoteNeedsIndex.minDamage] + remoteNeeds[remoteNeedsIndex.minHeal] <= 0) return false
 
                 const minCost = 400
-                const cost = 700
+                const cost = 900
                 const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
                 const rangedAttackStrength = RANGED_ATTACK_POWER * 2
                 const healStrength = HEAL_POWER
@@ -1313,6 +1313,29 @@ Room.prototype.spawnRequester = function () {
                     maxCreeps: Infinity,
                     minCost: 250,
                     priority: 10 + this.creepsFromRoom.allyVanguard.length,
+                    memoryAdditions: {},
+                }
+            })(),
+        )
+    }
+
+    for (const roomName of this.memory.attackRequests) {
+        const request = Memory.attackRequests[roomName]
+
+        const minCost = 300
+
+        const role = 'antifaAssaulter'
+
+        this.constructSpawnRequests(
+            ((): SpawnRequestOpts | false => {
+                return {
+                    role,
+                    defaultParts: [],
+                    extraParts: [],
+                    partsMultiplier,
+                    minCreeps: 1,
+                    minCost,
+                    priority: 8 + this.creepsFromRoom.antifaAssaulter.length,
                     memoryAdditions: {},
                 }
             })(),

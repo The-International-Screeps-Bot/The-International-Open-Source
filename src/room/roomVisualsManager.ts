@@ -1,4 +1,4 @@
-import { allyList, myColors, stamps } from 'international/constants'
+import { allyList, myColors, NORMAL, PROTECTED, roomDimensions, stamps } from 'international/constants'
 import { customLog, findObjectWithID, unpackAsPos } from 'international/generalFunctions'
 
 Room.prototype.roomVisualsManager = function () {

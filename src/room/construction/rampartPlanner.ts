@@ -1,4 +1,4 @@
-import { roomDimensions, stamps } from 'international/constants'
+import { EXIT, NORMAL, PROTECTED, roomDimensions, stamps, TO_EXIT, UNWALKABLE } from 'international/constants'
 import { customLog, pack, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 
 export function rampartPlanner(room: Room) {
@@ -14,19 +14,6 @@ export function rampartPlanner(room: Room) {
     - Fixed Game.map.getTerrainAt to Game.map.getRoomTerrain method -Shibdib
     */
 
-    const bounds = {
-        x1: 0,
-        x2: roomDimensions - 1,
-        y1: 0,
-        y2: roomDimensions - 1,
-    }
-
-    const UNWALKABLE = -1
-    const NORMAL = 0
-    const PROTECTED = 1
-    const TO_EXIT = 2
-    const EXIT = 3
-
     /**
      * An Array with Terrain information: -1 not usable, 2 Sink (Leads to Exit)
      */
@@ -34,54 +21,61 @@ export function rampartPlanner(room: Room) {
         room.tileTypes = Array(50)
             .fill(0)
             .map(x => Array(50).fill(UNWALKABLE)) // Array for room tiles
-        let i = bounds.x1
-        const imax = bounds.x2
-        let j = bounds.y1
-        const jmax = bounds.y2
+
         const terrain = Game.map.getRoomTerrain(room.name)
 
-        for (; i <= imax; i += 1) {
-            j = bounds.y1
-            for (; j <= jmax; j += 1) {
-                if (terrain.get(i, j) !== TERRAIN_MASK_WALL) {
-                    room.tileTypes[i][j] = NORMAL // mark unwalkable
-                    if (i === bounds.x1 || j === bounds.y1 || i === bounds.x2 || j === bounds.y2)
-                        room.tileTypes[i][j] = TO_EXIT // Sink Tiles mark from given bounds
-                    if (i === 0 || j === 0 || i === 49 || j === 49) room.tileTypes[i][j] = EXIT // Exit Tiles mark
-                }
+        for (let x = 0; x < roomDimensions; x += 1) {
+            for (let y = 0; y < roomDimensions; y += 1) {
+                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+
+                room.tileTypes[x][y] = NORMAL // mark unwalkable
+
+                // Sink Tiles mark from given bounds
+
+                if (x <= 0 || x >= roomDimensions || y <= 0 || y >= roomDimensions) room.tileTypes[x][y] = EXIT
             }
         }
 
         // Marks tiles Near Exits for sink- where you cannot build wall/rampart
+
         let y = 1
-        const max = 49
-        for (; y < max; y += 1) {
+
+        for (; y < roomDimensions - 1; y += 1) {
             if (room.tileTypes[0][y - 1] === EXIT) room.tileTypes[1][y] = TO_EXIT
             if (room.tileTypes[0][y] === EXIT) room.tileTypes[1][y] = TO_EXIT
             if (room.tileTypes[0][y + 1] === EXIT) room.tileTypes[1][y] = TO_EXIT
-            if (room.tileTypes[49][y - 1] === EXIT) room.tileTypes[48][y] = TO_EXIT
-            if (room.tileTypes[49][y] === EXIT) room.tileTypes[48][y] = TO_EXIT
-            if (room.tileTypes[49][y + 1] === EXIT) room.tileTypes[48][y] = TO_EXIT
+
+            if (room.tileTypes[roomDimensions - 1][y - 1] === EXIT) room.tileTypes[roomDimensions - 2][y] = TO_EXIT
+            if (room.tileTypes[roomDimensions - 1][y] === EXIT) room.tileTypes[roomDimensions - 2][y] = TO_EXIT
+            if (room.tileTypes[roomDimensions - 1][y + 1] === EXIT) room.tileTypes[roomDimensions - 2][y] = TO_EXIT
         }
+
         let x = 1
-        for (; x < max; x += 1) {
+
+        for (; x < roomDimensions - 1; x += 1) {
             if (room.tileTypes[x - 1][0] === EXIT) room.tileTypes[x][1] = TO_EXIT
             if (room.tileTypes[x][0] === EXIT) room.tileTypes[x][1] = TO_EXIT
             if (room.tileTypes[x + 1][0] === EXIT) room.tileTypes[x][1] = TO_EXIT
-            if (room.tileTypes[x - 1][49] === EXIT) room.tileTypes[x][48] = TO_EXIT
-            if (room.tileTypes[x][49] === EXIT) room.tileTypes[x][48] = TO_EXIT
-            if (room.tileTypes[x + 1][49] === EXIT) room.tileTypes[x][48] = TO_EXIT
+
+            if (room.tileTypes[x - 1][roomDimensions - 1] === EXIT) room.tileTypes[x][roomDimensions - 2] = TO_EXIT
+            if (room.tileTypes[x][roomDimensions - 1] === EXIT) room.tileTypes[x][roomDimensions - 2] = TO_EXIT
+            if (room.tileTypes[x + 1][roomDimensions - 1] === EXIT) room.tileTypes[x][roomDimensions - 2] = TO_EXIT
         }
+
         // mark Border Tiles as not usable
+
         y = 1
-        for (; y < max; y += 1) {
+
+        for (; y < roomDimensions - 1; y += 1) {
             room.tileTypes[0][y] === UNWALKABLE
-            room.tileTypes[49][y] === UNWALKABLE
+            room.tileTypes[roomDimensions - 1][y] === UNWALKABLE
         }
+
         x = 1
-        for (; x < max; x += 1) {
+
+        for (; x < roomDimensions - 1; x += 1) {
             room.tileTypes[x][0] === UNWALKABLE
-            room.tileTypes[x][49] === UNWALKABLE
+            room.tileTypes[x][roomDimensions - 1] === UNWALKABLE
         }
     }
 
@@ -127,19 +121,26 @@ export function rampartPlanner(room: Room) {
 
     Graph.prototype.Bfs = function (s, t) {
         // calculates Level Graph and if theres a path from s to t
+
         if (t >= this.v) return false
+
         this.level.fill(-1) // reset old levels
         this.level[s] = 0
         const q = [] // queue with s as starting point
+
         q.push(s)
+
         let u = 0
         let edge = null
+
         while (q.length) {
             u = q.splice(0, 1)[0]
             let i = 0
             const imax = this.edges[u].length
+
             for (; i < imax; i += 1) {
                 edge = this.edges[u][i]
+
                 if (this.level[edge.v] < 0 && edge.f < edge.c) {
                     this.level[edge.v] = this.level[u] + 1
                     q.push(edge.v)
@@ -153,19 +154,25 @@ export function rampartPlanner(room: Room) {
     // u vertex, f flow on path, t =Sink , c Array, c[i] saves the count of edges explored from vertex i
 
     Graph.prototype.Dfsflow = function (u, f, t, c) {
-        if (u === t)
-            // Sink reached , aboard recursion
-            return f
+        // Sink reached, abort recursion
+
+        if (u === t) return f
+
         let edge = null
         let flow_till_here = 0
         let flow_to_t = 0
+
         while (c[u] < this.edges[u].length) {
             // Visit all edges of the vertex  one after the other
+
             edge = this.edges[u][c[u]]
+
             if (this.level[edge.v] === this.level[u] + 1 && edge.f < edge.c) {
                 // Edge leads to Vertex with a level one higher, and has flow left
+
                 flow_till_here = Math.min(f, edge.c - edge.f)
                 flow_to_t = this.Dfsflow(edge.v, flow_till_here, t, c)
+
                 if (flow_to_t > 0) {
                     edge.f += flow_to_t // Add Flow to current edge
                     this.edges[edge.v][edge.r].f -= flow_to_t // subtract from reverse Edge -> Residual Graph neg. Flow to use backward direction of BFS/DFS
@@ -184,15 +191,20 @@ export function rampartPlanner(room: Room) {
         this.level.fill(-1)
         this.level[s] = 1
         const q = []
+
         q.push(s)
+
         let u = 0
         let edge = null
+
         while (q.length) {
             u = q.splice(0, 1)[0]
             let i = 0
             const imax = this.edges[u].length
+
             for (; i < imax; i += 1) {
                 edge = this.edges[u][i]
+
                 if (edge.f < edge.c) {
                     if (this.level[edge.v] < 1) {
                         this.level[edge.v] = 1
@@ -206,13 +218,15 @@ export function rampartPlanner(room: Room) {
                 }
             }
         }
+
         const min_cut = []
         let i = 0
         const imax = e_in_cut.length
+
         for (; i < imax; i += 1) {
-            if (this.level[e_in_cut[i].v] === -1)
-                // Only edges which are blocking and lead to from s unreachable vertices are in the min cut
-                min_cut.push(e_in_cut[i].u)
+            // Only edges which are blocking and lead to from s unreachable vertices are in the min cut
+
+            if (this.level[e_in_cut[i].v] === -1) min_cut.push(e_in_cut[i].u)
         }
         return min_cut
     }
@@ -319,12 +333,9 @@ export function rampartPlanner(room: Room) {
         let bot = 0
         let dx = 0
         let dy = 0
-        let x = 1
-        let y = 1
-        const max = 49
-        for (; x < max; x += 1) {
-            y = 1
-            for (; y < max; y += 1) {
+
+        for (let x = 1; x < roomDimensions - 1; x += 1) {
+            for (let y = 1; y < roomDimensions - 1; y += 1) {
                 top = y * 50 + x
                 bot = top + 2500
                 if (room.tileTypes[x][y] === NORMAL) {
@@ -412,8 +423,10 @@ export function rampartPlanner(room: Room) {
                 }
             }
         }
+
         // Remove min-Cut-Tile if there is no TO-EXIT  surrounding it
         let leads_to_exit = false
+
         for (let i = cut_tiles_array.length - 1; i >= 0; i -= 1) {
             leads_to_exit = false
             x = cut_tiles_array[i].x
@@ -422,14 +435,13 @@ export function rampartPlanner(room: Room) {
             for (let i = 0; i < 8; i += 1) {
                 dx = x + surr[i][0]
                 dy = y + surr[i][1]
+
                 if (room.tileTypes[dx][dy] === TO_EXIT) {
                     leads_to_exit = true
                 }
             }
 
-            if (!leads_to_exit) {
-                cut_tiles_array.splice(i, 1)
-            }
+            if (!leads_to_exit) cut_tiles_array.splice(i, 1)
         }
     }
 
