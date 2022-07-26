@@ -938,7 +938,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // If avoidStationaryPositions is requested
 
                 if (opts.avoidStationaryPositions) {
-
                     // Loop through them
 
                     for (const index in room.sources) {
@@ -1106,7 +1105,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
             room.memory.level = controller.level
             room.memory.powerEnabled = controller.isPowerEnabled
             room.memory.terminal = room.terminal !== undefined
-            room.memory.storedEnergy = room.findStoredResourceAmount(RESOURCE_ENERGY)
+            room.memory.energy = room.findStoredResourceAmount(RESOURCE_ENERGY)
             return
         }
 
@@ -1826,7 +1825,6 @@ Room.prototype.pathVisual = function (path, color) {
 }
 
 Room.prototype.findAllyCSiteTargetID = function (creep) {
-
     // If there are no sites inform false
 
     if (!this.allyCSites.length) return false

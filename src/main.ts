@@ -400,6 +400,21 @@ declare global {
         [property: string]: true
     }
 
+    interface PlayerInfo {
+        /**
+         * The enemy's perceived defensive ability
+         */
+        defense: number
+        /**
+         * The enemy's perceived offensive threat towards the bot
+         */
+        offense: number
+        /**
+         * The enemy's Greatest Room Controller Level known by the bot
+         */
+        GRCL: number
+    }
+
     interface Memory {
         /**
          * The name of the user
@@ -501,6 +516,8 @@ declare global {
         communes: string[]
 
         stats: Partial<Stats>
+
+        players: { [playerName: string]: PlayerInfo }
     }
 
     interface RawMemory {
@@ -1085,14 +1102,14 @@ declare global {
         /**
          * Mandatory Energy Fill Transfer Targets
          */
-         readonly MEFTT: (Creep | AnyStoreStructure | Tombstone)[]
+        readonly MEFTT: (Creep | AnyStoreStructure | Tombstone)[]
 
-         _MOFTT: (Creep | AnyStoreStructure | Tombstone)[]
+        _MOFTT: (Creep | AnyStoreStructure | Tombstone)[]
 
-         /**
-          * Mandatory Other Fill Transfer Targets
-          */
-         readonly MOFTT: (Creep | AnyStoreStructure | Tombstone)[]
+        /**
+         * Mandatory Other Fill Transfer Targets
+         */
+        readonly MOFTT: (Creep | AnyStoreStructure | Tombstone)[]
     }
 
     interface DepositRecord {
@@ -1161,14 +1178,9 @@ declare global {
         towers: number
 
         /**
-         * If a terminal is present in the room
-         */
-        hasTerminal: boolean
-
-        /**
          * The amount of stored energy in the room
          */
-        storedEnergy: number
+        energy: number
 
         /**
          * A set of roomNames that portals in this room go to
@@ -1313,7 +1325,7 @@ declare global {
         /**
          * Attempts multiple methods to build an ally construction site
          */
-         advancedBuildAllyCSite(): boolean
+        advancedBuildAllyCSite(): boolean
 
         /**
          *

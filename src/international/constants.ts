@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 37
+export const breakingVersion = 43
 
 // Settings
 
@@ -109,7 +109,7 @@ export const roomTypeProperties: RoomTypeProperties = {
     powerEnabled: true,
     towers: true,
     hasTerminal: true,
-    storedEnergy: true,
+    energy: true,
 
     portalsTo: true,
 }
@@ -144,7 +144,7 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         powerEnabled: true,
         towers: true,
         hasTerminal: true,
-        storedEnergy: true,
+        energy: true,
         notClaimable: true,
     },
     enemyRemote: {
@@ -517,7 +517,7 @@ export const stamps: Record<StampTypes, Stamp> = {
     },
     sourceLink: {
         offset: 0,
-        protectionOffset: 1,
+        protectionOffset: 0,
         size: 1,
         structures: {
             link: [{ x: 0, y: 0 }],
@@ -525,7 +525,7 @@ export const stamps: Record<StampTypes, Stamp> = {
     },
     sourceExtension: {
         offset: 0,
-        protectionOffset: 1,
+        protectionOffset: 0,
         size: 1,
         structures: {
             extension: [{ x: 0, y: 0 }],
