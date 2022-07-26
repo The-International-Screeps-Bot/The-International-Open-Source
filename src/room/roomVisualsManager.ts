@@ -17,7 +17,7 @@ Room.prototype.roomVisualsManager = function () {
             stroke: myColors.lightBlue,
             fill: 'transparent',
         })
-    ;() => {
+    ;(() => {
         // Stop if there is no controller
 
         if (!this.controller) return
@@ -76,8 +76,8 @@ Room.prototype.roomVisualsManager = function () {
                 color: color(),
             })
         }
-    }
-    ;() => {
+    })()
+    ;(() => {
         // Get the spawns in the room
 
         const spawns = this.structures.spawn
@@ -112,8 +112,8 @@ Room.prototype.roomVisualsManager = function () {
                 color: myColors.lightBlue,
             })
         }
-    }
-    ;() => {
+    })()
+    ;(() => {
         // If there is not a cSiteTargetID, stop
 
         if (!this.memory.cSiteTargetID) return
@@ -125,8 +125,8 @@ Room.prototype.roomVisualsManager = function () {
         // If the constructionTarget exists, show visuals for it
 
         if (constructionTarget) this.visual.text('🚧', constructionTarget.pos)
-    }
-    ;() => {
+    })()
+    ;(() => {
         if (!Memory.baseVisuals) return
 
         if (!this.memory.planned) return
@@ -147,7 +147,7 @@ Room.prototype.roomVisualsManager = function () {
                         const y = pos.y + stampAnchor.y - stamp.offset
 
                         this.visual.structure(x, y, structureType as StructureConstant, {
-                            opacity: 0.3,
+                            opacity: structureType === STRUCTURE_ROAD ? 0.1 : 0.3,
                         })
                     }
                 }
@@ -155,7 +155,7 @@ Room.prototype.roomVisualsManager = function () {
         }
 
         this.visual.connectRoads()
-    }
+    })()
 
     // If CPU logging is enabled, log the CPU used by this manager
 

@@ -636,6 +636,11 @@ declare global {
 
         spawnRequests: { [priority: string]: SpawnRequest }
 
+        /**
+         * Tile types as defined by the rampartPlanner
+         */
+        tileTypes: number[][]
+
         // Functions
 
         /**

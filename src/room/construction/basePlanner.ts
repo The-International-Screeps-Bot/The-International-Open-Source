@@ -476,6 +476,8 @@ export function basePlanner(room: Room) {
 
     rampartPlanner(room)
 
+    const rampartPlans = room.rampartPlans
+
     // Iterate through each x and y in the room
 
     for (let x = 0; x < roomDimensions; x += 1) {
@@ -507,6 +509,14 @@ export function basePlanner(room: Room) {
             // Get the closestHarvestPos of this sourceName
 
             const closestSourcePos = room.sourcePositions[index][0]
+
+            // Find the protection status
+
+            let isProtected = room.tileTypes[closestSourcePos.x][closestSourcePos.y] === 1
+
+            // If the position is not PROTECTED, plan a rampart on it
+
+            if (!isProtected) rampartPlans.set(closestSourcePos.x, closestSourcePos.y, 1)
 
             // Find positions adjacent to source
 
@@ -549,6 +559,10 @@ export function basePlanner(room: Room) {
                 if (!sourceHasLink) {
                     room.memory.stampAnchors.sourceLink.push(pack(pos))
 
+                    // If the position is not PROTECTED, plan a rampart on it
+
+                    if (!isProtected) rampartPlans.set(pos.x, pos.y, 1)
+
                     sourceHasLink = true
                     continue
                 }
@@ -561,6 +575,14 @@ export function basePlanner(room: Room) {
 
                 extraExtensionsAmount -= 1
                 continue
+            }
+        }
+    }
+
+    if (!room.memory.stampAnchors.rampart.length) {
+        for (let x = 0; x < roomDimensions; x += 1) {
+            for (let y = 0; y < roomDimensions; y += 1) {
+                if (rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(pack({ x, y }))
             }
         }
     }
