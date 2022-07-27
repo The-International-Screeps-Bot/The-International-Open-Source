@@ -9,13 +9,17 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]) {
 
           const creep: SourceHarvester = Game.creeps[creepName]
 
+          // Define the creep's designated source
+
+          const sourceIndex = creep.memory.SI
+
+          // Try to find a harvestPosition, inform false if it failed
+
+          if (!creep.findSourcePos(sourceIndex)) return false
+
           // Try to move to source. If creep moved then iterate
 
           if (creep.travelToSource()) continue
-
-          // Get the creeps sourceName
-
-          const sourceIndex = creep.memory.SI
 
           // Try to harvest the designated source
 
@@ -62,14 +66,6 @@ SourceHarvester.prototype.travelToSource = function () {
 
      const { room } = this
 
-     // Define the creep's designated source
-
-     const sourceIndex = this.memory.SI
-
-     // Try to find a harvestPosition, inform false if it failed
-
-     if (!this.findSourcePos(sourceIndex)) return false
-
      this.say('🚬')
 
      // Unpack the harvestPos
@@ -86,7 +82,7 @@ SourceHarvester.prototype.travelToSource = function () {
 
      // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-     this.say(`⏩${sourceIndex}`)
+     this.say(`⏩${this.memory.SI}`)
 
      this.createMoveRequest({
           origin: this.pos,

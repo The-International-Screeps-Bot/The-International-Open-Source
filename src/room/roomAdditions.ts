@@ -395,7 +395,7 @@ Object.defineProperties(Room.prototype, {
                 if (!creep.memory.packedPos) continue
 
                 // If the creep has a packedHarvestPos, record it in usedHarvestPositions
-                customLog('MORE SOURCE STUFF', creep.memory.packedPos)
+
                 this._usedSourceCoords[creep.memory.SI].add(creep.memory.packedPos)
             }
 

@@ -149,6 +149,9 @@ Creep.prototype.advancedPickup = function (target) {
 }
 
 Creep.prototype.advancedHarvestSource = function (source) {
+
+    this.say('⛏️')
+
     // Harvest the source, informing the result if it didn't succeed
 
     if (this.harvest(source) !== OK) return false
@@ -162,7 +165,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
     if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eih += energyHarvested
 
-    this.say(`⛏️${energyHarvested}`)
+    this.say(`${energyHarvested}`)
 
     // Inform true
 

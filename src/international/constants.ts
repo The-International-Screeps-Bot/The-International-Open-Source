@@ -110,6 +110,8 @@ export const roomTypeProperties: RoomTypeProperties = {
     towers: true,
     hasTerminal: true,
     energy: true,
+    OT: true,
+    DT: true,
 
     portalsTo: true,
 }
@@ -134,18 +136,22 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         planned: true,
     },
     ally: {
+        owner: true,
         level: true,
     },
     allyRemote: {
         owner: true,
     },
     enemy: {
+        owner: true,
         level: true,
         powerEnabled: true,
         towers: true,
         hasTerminal: true,
         energy: true,
         notClaimable: true,
+        OT: true,
+        DT: true,
     },
     enemyRemote: {
         owner: true,

@@ -1086,26 +1086,83 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             if (controller.my) return
 
+            const owner = controller.owner.username
+
+            room.memory.owner = owner
+
             // If the controller is owned by an ally
 
-            if (Memory.allyList.includes(controller.owner.username)) {
-                // Set the type to ally and stop
+            if (Memory.allyList.includes(owner)) {
 
                 room.memory.type = 'ally'
-                room.memory.owner = controller.owner.username
                 return
             }
 
+            room.memory.type = 'enemy'
+
             // If the controller is not owned by an ally
 
-            // Set the type to enemy and stop
+            const playerInfo = Memory.players[owner]
 
-            room.memory.type = 'enemy'
-            room.memory.owner = controller.owner.username
-            room.memory.level = controller.level
-            room.memory.powerEnabled = controller.isPowerEnabled
-            room.memory.terminal = room.terminal !== undefined
-            room.memory.energy = room.findStoredResourceAmount(RESOURCE_ENERGY)
+            if (!playerInfo) {
+
+                Memory.players[owner] = {
+
+                }
+            }
+
+            const level = controller.level
+
+            if (level > playerInfo.GRCL) Memory.players[owner].GRCL = level
+            room.memory.level = level
+
+            // Offensive threat
+
+            let threat = 0
+
+            threat += Math.pow(level, 2)
+
+            threat += room.structures.spawn.length * 50
+
+            threat += room.structures.nuker.length * 300
+
+            threat += Math.pow(room.structures.lab.length * 10000, 0.4)
+
+            room.memory.OT = threat
+            Memory.players[owner].OT = Math.max(threat, playerInfo.OT)
+
+            // Defensive threat
+
+            threat = 0
+
+            const energy = room.findStoredResourceAmount(RESOURCE_ENERGY)
+
+            room.memory.energy = energy
+            threat += Math.pow(energy, 0.5)
+
+            const ramparts = room.structures.rampart
+            const avgRampartHits = ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
+
+            threat += Math.pow(avgRampartHits, 0.5)
+
+            threat += room.structures.spawn.length * 100
+
+            threat += room.structures.tower.length * 300
+
+            const hasTerminal = room.terminal !== undefined
+            threat += 800
+
+            room.memory.terminal = hasTerminal
+            threat *= 1.2
+
+            const powerEnabled = controller.isPowerEnabled
+
+            room.memory.powerEnabled = powerEnabled
+            threat *= 0.5
+
+            room.memory.DT = threat
+            Memory.players[owner].DT = Math.max(threat, playerInfo.DT)
+
             return
         }
 

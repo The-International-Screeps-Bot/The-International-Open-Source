@@ -402,13 +402,13 @@ declare global {
 
     interface PlayerInfo {
         /**
-         * The enemy's perceived defensive ability
+         * Defensive Threat, the enemy's perceived defensive ability
          */
-        defense: number
+        DT: number
         /**
-         * The enemy's perceived offensive threat towards the bot
+         * Offensive Threat, the enemy's perceived offensive threat towards the bot
          */
-        offense: number
+        OT: number
         /**
          * The enemy's Greatest Room Controller Level known by the bot
          */
@@ -517,7 +517,7 @@ declare global {
 
         stats: Partial<Stats>
 
-        players: { [playerName: string]: PlayerInfo }
+        players: { [playerName: string]: Partial<PlayerInfo> }
     }
 
     interface RawMemory {
@@ -1241,6 +1241,16 @@ declare global {
          * Source Positions, packed positions around sources where harvesters can sit
          */
         SP: string[]
+
+        /**
+         * Defensive Threat
+         */
+        DT: number
+
+        /**
+         * Offensive Threat
+         */
+        OT: number
     }
 
     // Creeps
