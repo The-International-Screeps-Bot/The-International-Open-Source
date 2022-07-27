@@ -459,22 +459,6 @@ Room.prototype.spawnRequester = function () {
 
             // If all RCL 3 extensions are build
 
-            if (spawnEnergyCapacity >= 800) {
-                return {
-                    role,
-                    defaultParts: [],
-                    extraParts: [WORK, WORK, MOVE, CARRY, CARRY, MOVE, CARRY, CARRY, MOVE, CARRY, MOVE, WORK],
-                    partsMultiplier: partsMultiplier / 3,
-                    minCreeps: undefined,
-                    maxCreeps: Infinity,
-                    minCost: 750,
-                    priority,
-                    memoryAdditions: {
-                        roads: true,
-                    },
-                }
-            }
-
             if (!this.fastFillerContainerLeft && !this.fastFillerContainerRight) {
                 return {
                     role,
@@ -494,13 +478,15 @@ Room.prototype.spawnRequester = function () {
             return {
                 role,
                 defaultParts: [],
-                extraParts: [MOVE, CARRY, MOVE, WORK],
-                partsMultiplier,
+                extraParts: [CARRY, MOVE, WORK, MOVE, CARRY, MOVE],
+                partsMultiplier: partsMultiplier,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 250,
                 priority,
-                memoryAdditions: {},
+                memoryAdditions: {
+                    roads: true,
+                },
             }
         })(),
     )
@@ -1225,7 +1211,7 @@ Room.prototype.spawnRequester = function () {
                 return {
                     role,
                     defaultParts: [],
-                    extraParts: [WORK, MOVE, CARRY, MOVE],
+                    extraParts: [CARRY, MOVE, WORK, MOVE, CARRY, MOVE],
                     partsMultiplier: claimRequestNeeds[claimRequestNeedsIndex.vanguard],
                     minCreeps: undefined,
                     maxCreeps: Infinity,
@@ -1307,7 +1293,7 @@ Room.prototype.spawnRequester = function () {
                 return {
                     role,
                     defaultParts: [],
-                    extraParts: [WORK, MOVE, CARRY, MOVE],
+                    extraParts: [CARRY, MOVE, WORK, MOVE, CARRY, MOVE],
                     partsMultiplier: allyCreepRequestNeeds[allyCreepRequestNeedsIndex.allyVanguard],
                     minCreeps: undefined,
                     maxCreeps: Infinity,
