@@ -40,12 +40,12 @@ jobs:
                - name: Get IP
                  run: hostname -I
                - name: Start Grafana instance
-                 run: node server/grafana/index
+                 run: cd server/grafana && node index
                - name: Execute server
                  env:
                     STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                     STEAM_ID: ${{ secrets.STEAM_ID }}
-                 run: node server/index.js 250000
+                 run: cd server && node index.js 250000
                - name: Upload code
                  env:
                     PANDAMASTER_TOKEN: ${{ secrets.PANDAMASTER_TOKEN }}
