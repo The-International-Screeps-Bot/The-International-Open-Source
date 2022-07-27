@@ -3,9 +3,9 @@ const q = require('q')
 const _ = require('lodash')
 require('dotenv').config()
 
-const { setPassword, sleep, initServer, startServer, spawnBots, helpers, logConsole, followLog } = require('./helper')
+const { setPassword, sleep, initServer, startServer, spawnBots, helpers, logConsole, followLog, handleStats } = require('./helper')
 
-const { cliPort, verbose, tickDuration, playerRoom, players, rooms, milestones } = require('./config')
+const { cliPort, verbose, tickDuration, playerRooms, rooms, milestones } = require('./config')
 
 const controllerRooms = {}
 const status = {}
@@ -61,8 +61,8 @@ class Tester {
                }
                console.log(`> Start the simulation${appendix}`)
                if (this.maxTicks > 0) {
-                    // await sleep(this.maxRuntime);
                     while (lastTick === undefined || lastTick < this.maxTicks) {
+                         // if (lastTick % 50 === 0) handleStats();
                          await sleep(1)
                     }
                     console.log(`${lastTick} End of simulation`)
@@ -106,12 +106,12 @@ class Tester {
           socket.on('data', async raw => {
                const data = raw.toString('utf8')
                const line = data.replace(/^< /, '').replace(/\n< /, '')
-               if (await spawnBots(line, socket, rooms, players, tickDuration)) {
+               if (await spawnBots(line, socket, rooms, tickDuration)) {
                     botsSpawned = true
                     return
                }
 
-               if (setPassword(line, socket, rooms, this.roomsSeen, playerRoom)) {
+               if (setPassword(line, socket, rooms, this.roomsSeen, playerRooms)) {
                     if (rooms.length === Object.keys(this.roomsSeen).length) {
                          console.log('> Listen to the log')
                          followLog(rooms, logConsole, statusUpdater)
@@ -188,7 +188,7 @@ const statusUpdater = event => {
           for (const milestone of milestones) {
                const failedRooms = []
                if (typeof milestone.success === 'undefined' || milestone.success === null) {
-                    let success = Object.keys(status).length === Object.keys(players).length
+                    let success = Object.keys(status).length === rooms.length
                     for (const room of Object.keys(status)) {
                          for (const key of Object.keys(milestone.check)) {
                               if (status[room][key] < milestone.check[key]) {
