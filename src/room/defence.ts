@@ -1,4 +1,4 @@
-import { allyList, myColors } from 'international/constants'
+import { allyList, myColors, safemodeTargets } from 'international/constants'
 import { customLog, findObjectWithID } from 'international/generalFunctions'
 
 Room.prototype.defenceManager = function () {
@@ -99,13 +99,7 @@ Room.prototype.advancedActivateSafeMode = function () {
 
         if (!(attackTarget instanceof Structure)) continue
 
-        if (
-            attackTarget.structureType === STRUCTURE_SPAWN ||
-            attackTarget.structureType === STRUCTURE_TOWER ||
-            attackTarget.structureType === STRUCTURE_EXTENSION ||
-            attackTarget.structureType === STRUCTURE_STORAGE ||
-            attackTarget.structureType === STRUCTURE_TERMINAL
-        ) {
+        if (safemodeTargets.includes(attackTarget.structureType)) {
             this.controller.activateSafeMode()
             return
         }

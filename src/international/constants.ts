@@ -665,3 +665,11 @@ export const NORMAL = 0
 export const PROTECTED = 1
 export const TO_EXIT = 2
 export const EXIT = 3
+
+export const safemodeTargets: StructureConstant[] = [
+    STRUCTURE_SPAWN,
+    STRUCTURE_TOWER,
+    STRUCTURE_EXTENSION,
+    STRUCTURE_STORAGE,
+    STRUCTURE_TERMINAL,
+]

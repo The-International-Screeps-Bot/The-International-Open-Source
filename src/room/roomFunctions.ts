@@ -1093,7 +1093,6 @@ Room.prototype.findType = function (scoutingRoom: Room) {
             // If the controller is owned by an ally
 
             if (Memory.allyList.includes(owner)) {
-
                 room.memory.type = 'ally'
                 return
             }
@@ -1104,16 +1103,11 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             const playerInfo = Memory.players[owner]
 
-            if (!playerInfo) {
-
-                Memory.players[owner] = {
-
-                }
-            }
+            if (!playerInfo) Memory.players[owner] = {}
 
             const level = controller.level
 
-            if (level > playerInfo.GRCL) Memory.players[owner].GRCL = level
+            if (level) Memory.players[owner].GRCL = Math.max(level, playerInfo.GRCL)
             room.memory.level = level
 
             // Offensive threat
