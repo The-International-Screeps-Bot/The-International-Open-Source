@@ -372,7 +372,7 @@ Object.defineProperties(Room.prototype, {
 
             this._usedSourceCoords = []
 
-            for (const index in this.sources) this._usedSourceCoords.push(new Set())
+            for (const source of this.sources) this._usedSourceCoords.push(new Set())
 
             const harvesterNames =
                 this.memory.type === 'commune'
@@ -390,11 +390,13 @@ Object.defineProperties(Room.prototype, {
 
                 if (creep.isDying()) continue
 
-                if (!creep.memory.SI) continue
+                if (creep.memory.SI === undefined) continue
+
+                if (!creep.memory.packedPos) continue
 
                 // If the creep has a packedHarvestPos, record it in usedHarvestPositions
-
-                if (creep.memory.packedPos) this._usedSourceCoords[creep.memory.SI].add(creep.memory.packedPos)
+                customLog('MORE SOURCE STUFF', creep.memory.packedPos)
+                this._usedSourceCoords[creep.memory.SI].add(creep.memory.packedPos)
             }
 
             return this._usedSourceCoords
@@ -517,7 +519,7 @@ Object.defineProperties(Room.prototype, {
 
                 for (const posData of adjacentStructures) {
                     const structure = posData.structure as StructureLink
-                    
+
                     if (structure.structureType !== STRUCTURE_LINK) continue
 
                     this.global.sourceLinks.push(structure.id)

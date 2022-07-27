@@ -18,10 +18,9 @@ export function rampartPlanner(room: Room) {
      * An Array with Terrain information: -1 not usable, 2 Sink (Leads to Exit)
      */
     function generadeRoomMatrix() {
-
-     /**
-      * Creates an array where tileTypes[x][y] = value
-      */
+        /**
+         * Creates an array where tileTypes[x][y] = value
+         */
         room.tileTypes = Array(50)
             .fill(0)
             .map(x => Array(50).fill(UNWALKABLE))

@@ -643,38 +643,14 @@ Creep.prototype.findSourcePos = function (index) {
     // Get usedSourceHarvestPositions
 
     const usedSourceCoords = room.usedSourceCoords[index]
-    
-    const closestSourcePos = room.sourcePositions[index][0]
-    let packedPos
 
-    // If the closestHarvestPos exists and isn't being used
-
-    if (closestSourcePos) {
-        packedPos = pack(closestSourcePos)
-
-        // If the position is unused
-
-        if (!usedSourceCoords.has(packedPos)) {
-            // Assign it as the creep's harvest pos and inform true
-
-            this.memory.packedPos = packedPos
-            usedSourceCoords.add(packedPos)
-
-            return true
-        }
-    }
-
-    // Otherwise get the harvest positions for the source
-
-    const sourcePositions = room.sourcePositions[index]
-
-    const openSourcePositions = sourcePositions.filter(pos => !usedSourceCoords.has(pack(pos)))
+    const openSourcePositions = room.sourcePositions[index].filter(pos => !usedSourceCoords.has(pack(pos)))
     if (!openSourcePositions.length) return false
 
-    packedPos = pack(openSourcePositions[0])
+    const packedPos = pack(openSourcePositions[0])
 
     this.memory.packedPos = packedPos
-    usedSourceCoords.add(packedPos)
+    room._usedSourceCoords[index].add(packedPos)
 
     return true
 }
