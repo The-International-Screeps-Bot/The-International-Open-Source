@@ -18,9 +18,13 @@ export function rampartPlanner(room: Room) {
      * An Array with Terrain information: -1 not usable, 2 Sink (Leads to Exit)
      */
     function generadeRoomMatrix() {
+
+     /**
+      * Creates an array where tileTypes[x][y] = value
+      */
         room.tileTypes = Array(50)
             .fill(0)
-            .map(x => Array(50).fill(UNWALKABLE)) // Array for room tiles
+            .map(x => Array(50).fill(UNWALKABLE))
 
         const terrain = Game.map.getRoomTerrain(room.name)
 
@@ -28,11 +32,10 @@ export function rampartPlanner(room: Room) {
             for (let y = 0; y < roomDimensions; y += 1) {
                 if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
 
-                room.tileTypes[x][y] = NORMAL // mark unwalkable
+                room.tileTypes[x][y] = NORMAL
 
-                // Sink Tiles mark from given bounds
-
-                if (x <= 0 || x >= roomDimensions || y <= 0 || y >= roomDimensions) room.tileTypes[x][y] = EXIT
+                if (x === 0 || y === 0 || x === roomDimensions - 1 || y === roomDimensions - 1)
+                    room.tileTypes[x][y] = EXIT
             }
         }
 
@@ -327,39 +330,53 @@ export function rampartPlanner(room: Room) {
         // source is at  pos 2*50*50, sink at 2*50*50+1 as first tile is 0,0 => pos 0
         // top vertices <-> x,y : v=y*50+x   and x= v % 50  y=v/50 (math.floor?)
         // bot vertices <-> top + 2500
+
         const source = 2 * 50 * 50
         const sink = 2 * 50 * 50 + 1
-        let top = 0
-        let bot = 0
+
         let dx = 0
         let dy = 0
 
         for (let x = 1; x < roomDimensions - 1; x += 1) {
             for (let y = 1; y < roomDimensions - 1; y += 1) {
-                top = y * 50 + x
-                bot = top + 2500
+                const top = y * 50 + x
+                const bot = top + 2500
+
                 if (room.tileTypes[x][y] === NORMAL) {
                     // normal Tile
                     g.New_edge(top, bot, 1)
+
                     for (let i = 0; i < 8; i += 1) {
                         dx = x + surr[i][0]
                         dy = y + surr[i][1]
+
                         if (room.tileTypes[dx][dy] === NORMAL || room.tileTypes[dx][dy] === TO_EXIT)
                             g.New_edge(bot, dy * 50 + dx, infini)
                     }
-                } else if (room.tileTypes[x][y] === PROTECTED) {
+
+                    continue
+                }
+
+                if (room.tileTypes[x][y] === PROTECTED) {
                     // protected Tile
                     g.New_edge(source, top, infini)
                     g.New_edge(top, bot, 1)
+
                     for (let i = 0; i < 8; i += 1) {
                         dx = x + surr[i][0]
                         dy = y + surr[i][1]
+
                         if (room.tileTypes[dx][dy] === NORMAL || room.tileTypes[dx][dy] === TO_EXIT)
                             g.New_edge(bot, dy * 50 + dx, infini)
                     }
-                } else if (room.tileTypes[x][y] === TO_EXIT) {
+
+                    continue
+                }
+
+                if (room.tileTypes[x][y] === TO_EXIT) {
                     // near Exit
                     g.New_edge(top, sink, infini)
+                    continue
                 }
             }
         }
@@ -371,24 +388,22 @@ export function rampartPlanner(room: Room) {
     // Removes unneccary cut-tiles if bounds are set to include some 	dead ends
 
     function deleteTilesToDeadEnds(cut_tiles_array: Coord[]) {
-        for (let i = cut_tiles_array.length - 1; i >= 0; i -= 1) {
+        for (let i = cut_tiles_array.length - 1; i >= 0; i -= 1)
             room.tileTypes[cut_tiles_array[i].x][cut_tiles_array[i].y] = UNWALKABLE
-        }
 
         // Floodfill from exits: save exit tiles in array and do a bfs-like search
 
         const unvisited_pos = []
         let y = 0
-        const max = 49
 
-        for (; y < max; y += 1) {
+        for (; y < roomDimensions - 1; y += 1) {
             if (room.tileTypes[1][y] === TO_EXIT) unvisited_pos.push(50 * y + 1)
             if (room.tileTypes[48][y] === TO_EXIT) unvisited_pos.push(50 * y + 48)
         }
 
         let x = 0
 
-        for (; x < max; x += 1) {
+        for (; x < roomDimensions - 1; x += 1) {
             if (room.tileTypes[x][1] === TO_EXIT) unvisited_pos.push(50 + x)
             if (room.tileTypes[x][48] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
         }
@@ -417,6 +432,7 @@ export function rampartPlanner(room: Room) {
             for (let i = 0; i < 8; i += 1) {
                 dx = x + surr[i][0]
                 dy = y + surr[i][1]
+
                 if (room.tileTypes[dx][dy] === NORMAL) {
                     unvisited_pos.push(50 * dy + dx)
                     room.tileTypes[dx][dy] = TO_EXIT
