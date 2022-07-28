@@ -1305,6 +1305,10 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
             room.memory.commune = scoutingRoom.name
 
+            // Query source positions
+
+            room.sourcePositions
+
             // Add the room's name to the scoutingRoom's remotes list
 
             scoutingRoom.memory.remotes.push(room.name)
@@ -1330,6 +1334,10 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         // Assign the room's commune as the scoutingRoom
 
         room.memory.commune = scoutingRoom.name
+
+        // Query source positions
+
+        room.sourcePositions
 
         // Add the room's name to the scoutingRoom's remotes list
 
