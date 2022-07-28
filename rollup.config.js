@@ -4,18 +4,17 @@ import commonjs from '@rollup/plugin-commonjs'
 import clear from 'rollup-plugin-clear'
 import screeps from 'rollup-plugin-screeps'
 import { terser } from "rollup-plugin-terser";
-if (!process.env.MODE) process.env.MODE = 'development'
+import configs from './screeps.json'
 
 let cfg
 const dest = process.env.DEST
-const token = process.env.TOKEN
-if (!dest && !token) {
+if (!dest) {
      console.log('No destination specified - code will be compiled but not uploaded')
-} else if (token && (cfg = require('./example.screeps.json')["mmo"])) {
-     if (cfg  == null) throw new Error('Invalid upload destination')
-     else cfg.token = token;
-} else if ((cfg = require('./screeps.json')[dest]) == null) {
+} else if ((cfg = configs[dest]) == null) {
      throw new Error('Invalid upload destination')
+}
+if (cfg) {
+console.log(cfg.uglify)
 }
 
 export default {
@@ -30,7 +29,7 @@ export default {
           clear({ targets: ['dist'] }),
           resolve({ rootDir: 'src' }),
           commonjs(),
-          (process.env.MODE === "production" && terser()),
+          (cfg && cfg.uglify && terser()),
           typescript({ tsconfig: './tsconfig.json' }),
           screeps({ config: cfg, dryRun: cfg == null  }),
      ],
