@@ -1143,16 +1143,18 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             threat += room.structures.tower.length * 300
 
+            threat += Math.pow(room.structures.extension.length * 400, 0.8)
+
             const hasTerminal = room.terminal !== undefined
-            threat += 800
 
-            room.memory.terminal = hasTerminal
-            threat *= 1.2
+            if (hasTerminal) {
 
-            const powerEnabled = controller.isPowerEnabled
+                threat += 800
 
-            room.memory.powerEnabled = powerEnabled
-            threat *= 0.5
+                room.memory.terminal = true
+            }
+
+            room.memory.powerEnabled = controller.isPowerEnabled
 
             room.memory.DT = threat
             Memory.players[owner].DT = Math.max(threat, playerInfo.DT)
@@ -1229,7 +1231,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             // Find creeps that I don't own that aren't invaders
 
-            const creepsNotMine: Creep[] = room.enemyCreeps.concat(room.allyCreeps)
+            const creepsNotMine = room.enemyCreeps.concat(room.allyCreeps)
 
             // Iterate through them
 

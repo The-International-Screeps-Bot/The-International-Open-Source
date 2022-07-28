@@ -141,7 +141,7 @@ Object.defineProperties(Room.prototype, {
 
             for (const structure of this.find(FIND_STRUCTURES))
                 this._structures[structure.structureType].push(structure as any)
-
+            
             return this._structures
         },
     },
