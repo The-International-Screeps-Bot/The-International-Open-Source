@@ -852,7 +852,8 @@ Room.prototype.spawnRequester = function () {
 
                 if (remoteNeeds[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
 
-                const sourcePositionsAmount = remoteMemory.SP[0].length
+                const sourceIndex = 0
+                const sourcePositionsAmount = remoteMemory.SP[sourceIndex].length
 
                 const role = 'source1RemoteHarvester'
 
@@ -871,6 +872,7 @@ Room.prototype.spawnRequester = function () {
                         priority: remotePriority - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                         memoryAdditions: {
                             roads: true,
+                            SI: sourceIndex,
                         },
                     }
                 }
@@ -889,6 +891,7 @@ Room.prototype.spawnRequester = function () {
                     priority: remotePriority - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
                     memoryAdditions: {
                         roads: true,
+                        SI: sourceIndex,
                     },
                 }
             })(),
@@ -902,7 +905,8 @@ Room.prototype.spawnRequester = function () {
 
                 if (remoteNeeds[remoteNeedsIndex.source2RemoteHarvester] <= 0) return false
 
-                const sourcePositionsAmount = remoteMemory.SP[1].length
+                const sourceIndex = 0
+                const sourcePositionsAmount = remoteMemory.SP[sourceIndex].length
 
                 const role = 'source2RemoteHarvester'
 
@@ -921,6 +925,7 @@ Room.prototype.spawnRequester = function () {
                         priority: remotePriority - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                         memoryAdditions: {
                             roads: true,
+                            SI: sourceIndex,
                         },
                     }
                 }
@@ -939,6 +944,7 @@ Room.prototype.spawnRequester = function () {
                     priority: remotePriority - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
                     memoryAdditions: {
                         roads: true,
+                        SI: sourceIndex,
                     },
                 }
             })(),
