@@ -124,8 +124,6 @@ declare global {
         | 'terrainCM'
         | 'baseCM'
         | 'roadCM'
-        | 'source1'
-        | 'source2'
         | 'mineralHarvestPositions'
         | 'closestMineralHarvestPos'
         | 'centerUpgradePos'

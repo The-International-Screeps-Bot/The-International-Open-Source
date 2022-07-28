@@ -1077,7 +1077,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
     // If the creepAtPos has a moveRequest and it's valid
 
-    if (creepAtPos.moveRequest && room.moveRequests[pack(creepAtPos.pos)]) {
+    if (creepAtPos.moveRequest && room.moveRequests[pack(creepAtPos.pos)].length) {
         // If the creep's pos and the creepAtPos's moveRequests are aligned
 
         if (pack(this.pos) === creepAtPos.moveRequest) {
@@ -1574,6 +1574,7 @@ Creep.prototype.fulfillReservation = function () {
             goal: { pos: target.pos, range: 1 },
             avoidEnemyRanges: true,
         })
+
         return false
     }
 

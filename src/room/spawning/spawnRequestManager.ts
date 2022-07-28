@@ -852,6 +852,8 @@ Room.prototype.spawnRequester = function () {
 
                 if (remoteNeeds[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
 
+                const sourcePositionsAmount = remoteMemory.SP[0].length
+
                 const role = 'source1RemoteHarvester'
 
                 if (spawnEnergyCapacity >= 950) {
@@ -863,7 +865,7 @@ Room.prototype.spawnRequester = function () {
                         groupComparator: this.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
                         threshold: 0.1,
                         minCreeps: 1,
-                        maxCreeps: Infinity,
+                        maxCreeps: sourcePositionsAmount,
                         maxCostPerCreep: 50 + 150 * 6,
                         minCost: 200,
                         priority: remotePriority - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
@@ -881,7 +883,7 @@ Room.prototype.spawnRequester = function () {
                     groupComparator: this.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
                     threshold: 0.1,
                     minCreeps: undefined,
-                    maxCreeps: global[remoteName]?.source1HarvestPositions?.length || Infinity,
+                    maxCreeps: sourcePositionsAmount,
                     maxCostPerCreep: 50 + 250 * 3,
                     minCost: 300,
                     priority: remotePriority - (sourcesByEfficacy[0] === 'source1' ? 0.1 : 0),
@@ -900,6 +902,8 @@ Room.prototype.spawnRequester = function () {
 
                 if (remoteNeeds[remoteNeedsIndex.source2RemoteHarvester] <= 0) return false
 
+                const sourcePositionsAmount = remoteMemory.SP[1].length
+
                 const role = 'source2RemoteHarvester'
 
                 if (spawnEnergyCapacity >= 950) {
@@ -911,7 +915,7 @@ Room.prototype.spawnRequester = function () {
                         groupComparator: this.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
                         threshold: 0.1,
                         minCreeps: 1,
-                        maxCreeps: Infinity,
+                        maxCreeps: sourcePositionsAmount,
                         maxCostPerCreep: 50 + 150 * 6,
                         minCost: 200,
                         priority: remotePriority - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),
@@ -929,7 +933,7 @@ Room.prototype.spawnRequester = function () {
                     groupComparator: this.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
                     threshold: 0.1,
                     minCreeps: undefined,
-                    maxCreeps: global[remoteName]?.source2HarvestPositions?.length || Infinity,
+                    maxCreeps: sourcePositionsAmount,
                     maxCostPerCreep: 50 + 250 * 3,
                     minCost: 300,
                     priority: remotePriority - (sourcesByEfficacy[0] === 'source2' ? 0.1 : 0),

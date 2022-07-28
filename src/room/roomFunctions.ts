@@ -127,44 +127,6 @@ Room.prototype.get = function (roomObjectName) {
 
     // Resources
 
-    // Source 1
-
-    new RoomCacheObject({
-        name: 'source1',
-        valueType: 'id',
-        cacheType: 'memory',
-        room,
-        valueConstructor() {
-            // Get the first source
-
-            const source = room.find(FIND_SOURCES)[0]
-
-            // If the source exists, inform its id. Otherwise inform false
-
-            if (source) return source.id
-            return false
-        },
-    })
-
-    // Source 2
-
-    new RoomCacheObject({
-        name: 'source2',
-        valueType: 'id',
-        cacheType: 'memory',
-        room,
-        valueConstructor() {
-            // Get the second source
-
-            const source = room.find(FIND_SOURCES)[1]
-
-            // If the source exists, inform its id. Otherwise inform false
-
-            if (source) return source.id
-            return false
-        },
-    })
-
     // Harvest positions
 
     /**
@@ -1304,17 +1266,9 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
         // Get base planning data
 
-        // Get the room's sourceNames
-
-        const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
-
         // loop through sourceNames
 
-        for (const sourceName of sourceNames) {
-            // Get the source using sourceName, stopping the loop if undefined
-
-            const source: Source = room.get(sourceName)
-            if (!source) break
+        for (const source of room.sources) {
 
             const path = room.advancedFindPath({
                 origin: source.pos,
