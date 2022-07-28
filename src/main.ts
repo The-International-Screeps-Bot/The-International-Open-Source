@@ -787,6 +787,8 @@ declare global {
 
         remotesManager(): void
 
+        haulerSizeManager(): void
+
         /**
          * Dictates and operates tasks for factories
          */
@@ -1141,9 +1143,6 @@ declare global {
          */
         notClaimable: boolean
 
-        source1: Id<Source>
-        source2: Id<Source>
-
         sourceIds: Id<Source>[]
 
         commune: string
@@ -1249,6 +1248,16 @@ declare global {
          * Offensive Threat
          */
         OT: number
+
+        /**
+         * Hauler Size, what the maxCost of a hauler should be to accomidate for CPU usage
+         */
+        HS: number
+
+        /**
+         * Hauler Update, how many ticks ago the hauler size was updated
+         */
+        HU: number
     }
 
     // Creeps

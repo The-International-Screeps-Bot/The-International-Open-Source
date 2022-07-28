@@ -35,7 +35,7 @@ Room.prototype.remotesManager = function () {
         }
 
         remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 3
-        remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = remoteMemory.source2 ? 3 : 0
+        remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = remoteMemory.sourceIds[1] ? 3 : 0
         remoteMemory.needs[remoteNeedsIndex.remoteHauler] = 0
         remoteMemory.needs[remoteNeedsIndex.remoteReserver] = 1
 
@@ -51,7 +51,7 @@ Room.prototype.remotesManager = function () {
             // Increase the remoteHarvester need accordingly
 
             remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] += 3
-            remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.source2 ? 3 : 0
+            remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.sourceIds[1] ? 3 : 0
 
             const isReserved =
                 remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me

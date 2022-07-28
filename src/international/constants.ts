@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 62
+export const breakingVersion = 63
 
 // Settings
 
@@ -97,6 +97,8 @@ export const roomTypeProperties: RoomTypeProperties = {
     powerBanks: true,
     notClaimable: true,
     planned: true,
+    HS: true,
+    HU: true,
 
     commune: true,
     needs: true,
@@ -124,6 +126,8 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         deposits: true,
         powerBanks: true,
         planned: true,
+        HS: true,
+        HU: true,
     },
     remote: {
         commune: true,
@@ -673,3 +677,5 @@ export const safemodeTargets: StructureConstant[] = [
     STRUCTURE_STORAGE,
     STRUCTURE_TERMINAL,
 ]
+
+export const haulerUpdateDefault = 1500
