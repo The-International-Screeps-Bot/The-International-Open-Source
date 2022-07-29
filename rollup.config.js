@@ -4,13 +4,12 @@ import commonjs from '@rollup/plugin-commonjs'
 import clear from 'rollup-plugin-clear'
 import screeps from 'rollup-plugin-screeps'
 import { terser } from "rollup-plugin-terser";
-import configs from './screeps.json'
 
 let cfg
 const dest = process.env.DEST
 if (!dest) {
      console.log('No destination specified - code will be compiled but not uploaded')
-} else if ((cfg = configs[dest]) == null) {
+} else if ((cfg = require('./screeps.json')[dest]) == null) {
      throw new Error('Invalid upload destination')
 }
 
