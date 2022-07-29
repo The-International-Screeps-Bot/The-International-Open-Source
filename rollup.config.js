@@ -13,9 +13,9 @@ if (!dest) {
 } else if ((cfg = configs[dest]) == null) {
      throw new Error('Invalid upload destination')
 }
-if (cfg) {
-console.log(cfg.uglify)
-}
+
+const shouldUglify = cfg && cfg.uglify;
+if (cfg) delete cfg.uglify
 
 export default {
      input: 'src/main.ts',
@@ -29,7 +29,7 @@ export default {
           clear({ targets: ['dist'] }),
           resolve({ rootDir: 'src' }),
           commonjs(),
-          (cfg && cfg.uglify && terser()),
+          (shouldUglify && terser()),
           typescript({ tsconfig: './tsconfig.json' }),
           screeps({ config: cfg, dryRun: cfg == null  }),
      ],
