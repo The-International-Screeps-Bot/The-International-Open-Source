@@ -1,5 +1,5 @@
-const { logConsole, followLog, setHostname } = require("./testHelpers");
-const { playerRoom, rooms } = require("./testConfig");
+const { logConsole, followLog, setHostname } = require("./helper");
+const { playerRoom, rooms } = require("./config");
 
 async function main() {
   if (process.argv.length > 2) {

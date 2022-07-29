@@ -1,0 +1,36 @@
+listen: ":8080"
+concurrency: 20
+cache:
+   type: "mem"
+   size_mb: 0
+   defaultTimeoutSec: 60
+cpus: 0
+tz: ""
+sendGlobsAsIs: false
+maxBatchSize: 100
+graphite:
+  host: relay:2003
+  interval: "10s"
+  prefix: "openmetric.api"
+  pattern: "{prefix}.{fqdn}"
+idleConnections: 10
+pidFile: ""
+upstreams:
+  buckets: 10
+  timeouts:
+    global: "10s"
+    afterStarted: "2s"
+    connect: "200ms"
+  concurrencyLimit: 0
+  keepAliveInterval: "30s"
+  maxIdleConnsPerHost: 100
+  backends:
+    - "http://carbon:8080"
+  graphite09compat: false
+logger:
+  - logger: ""
+    file: "stdout"
+    level: "info"
+    encoding: "console"
+    encodingTime: "iso8601"
+    encodingDuration: "seconds"

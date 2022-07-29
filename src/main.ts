@@ -338,6 +338,7 @@ declare global {
         es: number // energyStored
         cc: number // creepCount
         cu: number // cpuUsage
+        rt: number // roomType
     }
 
     interface Stats {
@@ -368,7 +369,7 @@ declare global {
         gcl: ControllerLevel
 
         gpl: ControllerLevel
-        rooms: { [key: string]: RoomStats }
+        rooms: { commune: { [key: string]: RoomStats }; remote: { [key: string]: RoomStats } }
         constructionSiteCount: number
         debugCpu11: number
         debugCpu12: number
@@ -1805,26 +1806,4 @@ export const loop = function () {
     internationalManager.advancedSellPixels()
 
     internationalManager.endTickManager()
-    // console.log('Stats cpu logging')
-    // console.log(
-    //      `Non stats room count: ${Memory.stats.debugRoomCount1} - Pre: ${Memory.stats.debugCpu11} - End: ${
-    //           Memory.stats.debugCpu12
-    //      } - Per room: ${((Memory.stats.debugCpu11 + Memory.stats.debugCpu12) / Memory.stats.debugRoomCount1).toFixed(
-    //           4,
-    //      )}`,
-    // )
-    // console.log(
-    //      `Commune stats room count: ${Memory.stats.debugRoomCount2} - Pre: ${Memory.stats.debugCpu21} - End: ${
-    //           Memory.stats.debugCpu22
-    //      } - Per room: ${((Memory.stats.debugCpu21 + Memory.stats.debugCpu22) / Memory.stats.debugRoomCount2).toFixed(
-    //           4,
-    //      )}`,
-    // )
-    // console.log(
-    //      `Remote stats room count: ${Memory.stats.debugRoomCount3} - Pre: ${Memory.stats.debugCpu31} - End: ${
-    //           Memory.stats.debugCpu32
-    //      } - Per room: ${((Memory.stats.debugCpu31 + Memory.stats.debugCpu32) / Memory.stats.debugRoomCount3).toFixed(
-    //           4,
-    //      )}`,
-    // )
 }

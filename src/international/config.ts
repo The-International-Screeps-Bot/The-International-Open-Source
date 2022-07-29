@@ -1,74 +1,73 @@
 import {
-     allyList,
-     allyTrading,
-     autoClaim,
-     baseVisuals,
-     breakingVersion,
-     cpuLogging,
-     mapVisuals,
-     pixelGeneration,
-     pixelSelling,
-     publicRamparts,
-     roomVisuals,
-     tradeBlacklist,
-     roomStats,
+    allyList,
+    allyTrading,
+    autoClaim,
+    baseVisuals,
+    breakingVersion,
+    cpuLogging,
+    mapVisuals,
+    pixelGeneration,
+    pixelSelling,
+    publicRamparts,
+    roomVisuals,
+    tradeBlacklist,
+    roomStats,
 } from './constants'
 import { InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
 
 InternationalManager.prototype.config = function () {
-     if (Memory.breakingVersion < breakingVersion) {
-          global.clearMemory()
+    if (Memory.breakingVersion < breakingVersion) {
+        global.clearMemory()
 
-          global.killAllCreeps()
-     }
+        global.killAllCreeps()
+    }
 
-     // Construct Memory if it isn't constructed yet
+    // Construct Memory if it isn't constructed yet
 
-     // Check if Memory is constructed
+    // Check if Memory is constructed
 
-     if (!Memory.breakingVersion) {
-          Memory.breakingVersion = breakingVersion
+    if (!Memory.breakingVersion) {
+        Memory.breakingVersion = breakingVersion
 
-          Memory.me =
-               (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
-               Object.values(Game.creeps)[0]?.owner?.username ||
-               'username'
-          Memory.isMainShard = Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
-          // Memory.isMainShard = Game.shard.name.search('shard[0-3]') === -1
+        Memory.me =
+            (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
+            Object.values(Game.creeps)[0]?.owner?.username ||
+            'username'
+        Memory.isMainShard = Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
+        // Memory.isMainShard = Game.shard.name.search('shard[0-3]') === -1
 
-          // Settings
+        // Settings
 
-          Memory.roomVisuals = roomVisuals
-          Memory.baseVisuals = baseVisuals
-          Memory.mapVisuals = mapVisuals
-          Memory.cpuLogging = cpuLogging
-          Memory.roomStats = roomStats
-          Memory.allyList = allyList
-          Memory.pixelSelling = pixelSelling
-          Memory.pixelGeneration = pixelGeneration
-          Memory.tradeBlacklist = tradeBlacklist
-          Memory.autoClaim = autoClaim
-          Memory.publicRamparts = publicRamparts
-          Memory.allyTrading = allyTrading
+        Memory.roomVisuals = roomVisuals
+        Memory.baseVisuals = baseVisuals
+        Memory.mapVisuals = mapVisuals
+        Memory.cpuLogging = cpuLogging
+        Memory.roomStats = Game.shard.name !== 'performanceServer' ? roomStats : 2
+        Memory.allyList = allyList
+        Memory.pixelSelling = pixelSelling
+        Memory.pixelGeneration = pixelGeneration
+        Memory.tradeBlacklist = tradeBlacklist
+        Memory.autoClaim = autoClaim
+        Memory.publicRamparts = publicRamparts
+        Memory.allyTrading = allyTrading
 
-          // Construct foundation
+        // Construct foundation
 
-          Memory.ID = 0
-          Memory.constructionSites = {}
+        Memory.ID = 0
+        Memory.constructionSites = {}
+        Memory.players = {}
+        Memory.claimRequests = {}
+        Memory.attackRequests = {}
+        Memory.allyCreepRequests = {}
+        statsManager.internationalConfig()
+   }
 
-          Memory.players = {}
-          Memory.claimRequests = {}
-          Memory.attackRequests = {}
-          Memory.allyCreepRequests = {}
-          statsManager.internationalConfig()
-     }
+    if (!global.constructed) {
+        RawMemory.setActiveSegments([98])
+        global.constructed = true
 
-     if (!global.constructed) {
-          RawMemory.setActiveSegments([98])
-          global.constructed = true
-
-          global.packedRoomNames = {}
-          global.unpackedRoomNames = {}
-     }
+        global.packedRoomNames = {}
+        global.unpackedRoomNames = {}
+    }
 }

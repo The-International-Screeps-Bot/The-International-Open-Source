@@ -7,9 +7,6 @@ on:
      push:
         branches:
           - Typescript
-     pull_request:
-        branches:
-          - Typescript
 jobs:
      VerifyUpload:
           timeout-minutes: 10000
@@ -34,16 +31,21 @@ jobs:
                  env:
                     PYTHON_VERSION: 2.7
                - name: Install dependencies
-                 run: npm ci
+                 run: |
+                    npm install
+                    cd server && npm install
+                    cd grafana && npm install
                - name: Run build
                  run: npm run build
                - name: Get IP
                  run: hostname -I
+               - name: Start Grafana instance
+                 run: cd server/grafana && node index
                - name: Execute server
                  env:
                     STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                     STEAM_ID: ${{ secrets.STEAM_ID }}
-                 run: node server/index.js 250000
+                 run: cd server && node index.js 250000
                - name: Upload code
                  env:
                     PANDAMASTER_TOKEN: ${{ secrets.PANDAMASTER_TOKEN }}

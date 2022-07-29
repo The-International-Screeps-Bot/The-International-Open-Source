@@ -1,0 +1,55 @@
+version: '3.5'
+
+services:
+     push-stats:
+          build: .
+          restart: unless-stopped
+     relay:
+          image: openmetric/carbon-c-relay:latest
+          volumes:
+               - ./conf/relay.conf:/openmetric/conf/relay.conf:ro
+          depends_on:
+               - carbon
+          ports:
+               - '2003:2003'
+          healthcheck:
+               test: nc -zv localhost 2003
+               interval: 10s
+               timeout: 1s
+               retries: 3
+     carbon:
+          image: openmetric/go-carbon:latest
+          volumes:
+               - ./conf/carbon.conf:/openmetric/conf/carbon.conf:ro
+               - ./conf/schemas.conf:/openmetric/conf/schemas.conf:ro
+          healthcheck:
+               test: "curl -fsSL -o /dev/null 'http://localhost:8080/metrics/find/?query=*&format=json'"
+               interval: 10s
+               timeout: 1s
+               retries: 3
+     api:
+          image: openmetric/carbonapi:latest
+          volumes:
+               - ./conf/api.yaml:/openmetric/conf/api.yaml:ro
+          depends_on:
+               - relay
+          healthcheck:
+               test: 'curl -fsSL -o /dev/null http://localhost:8080/lb_check'
+               interval: 10s
+               timeout: 1s
+               retries: 3
+     grafana:
+          image: grafana/grafana-enterprise:9.0.4-ubuntu
+          ports:
+               - '3000:3000'
+          depends_on:
+               - relay
+          environment:
+               - GF_AUTH_ANONYMOUS_ENABLED=true
+               - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+               - GF_SECURITY_ADMIN_PASSWORD=password
+          healthcheck:
+               test: 'curl -fsSL -o /dev/null http://localhost:3000/login'
+               interval: 10s
+               timeout: 1s
+               retries: 3
