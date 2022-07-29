@@ -1,6 +1,7 @@
 import { allyManager } from 'international/simpleAllies'
 import {
     creepRoles,
+    haulerUpdateDefault,
     myColors,
     remoteHarvesterRoles,
     remoteNeedsIndex,
@@ -16,6 +17,7 @@ import {
 } from './generalFunctions'
 import { internationalManager, InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
+import '../room/haulerSize'
 
 InternationalManager.prototype.tickConfig = function () {
     // If CPU logging is enabled, get the CPU used at the start
@@ -57,9 +59,6 @@ InternationalManager.prototype.tickConfig = function () {
 
         for (const index in room.sources) room.creepsOfSourceAmount.push(0)
 
-        if (!room.global.tasksWithoutResponders) room.global.tasksWithoutResponders = {}
-        if (!room.global.tasksWithResponders) room.global.tasksWithResponders = {}
-
         if (!controller) continue
 
         if (controller.my) room.memory.type = 'commune'
@@ -82,6 +81,16 @@ InternationalManager.prototype.tickConfig = function () {
         if (!room.memory.remotes) room.memory.remotes = []
 
         room.creepsFromRoomWithRemote = {}
+
+        // If there is no Hauler Size
+
+        if (!room.memory.HS) {
+
+            room.memory.HS = 0
+            room.memory.HU = 0
+        }
+
+        room.haulerSizeManager()
 
         room.remotesManager()
 

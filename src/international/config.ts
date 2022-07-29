@@ -56,12 +56,12 @@ InternationalManager.prototype.config = function () {
 
         Memory.ID = 0
         Memory.constructionSites = {}
-
+        Memory.players = {}
         Memory.claimRequests = {}
         Memory.attackRequests = {}
         Memory.allyCreepRequests = {}
         statsManager.internationalConfig()
-    }
+   }
 
     if (!global.constructed) {
         RawMemory.setActiveSegments([98])

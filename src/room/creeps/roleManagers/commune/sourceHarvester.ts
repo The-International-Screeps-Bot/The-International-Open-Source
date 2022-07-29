@@ -15,7 +15,7 @@ export function sourceHarvesterManager(room: Room, creepsOfRole: string[]): void
 
         // Try to find a harvestPosition, inform false if it failed
 
-        if (!creep.findSourcePos(sourceIndex)) return false
+        if (!creep.findSourcePos(sourceIndex)) continue
 
         // Try to move to source. If creep moved then iterate
 

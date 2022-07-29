@@ -127,44 +127,6 @@ Room.prototype.get = function (roomObjectName) {
 
     // Resources
 
-    // Source 1
-
-    new RoomCacheObject({
-        name: 'source1',
-        valueType: 'id',
-        cacheType: 'memory',
-        room,
-        valueConstructor() {
-            // Get the first source
-
-            const source = room.find(FIND_SOURCES)[0]
-
-            // If the source exists, inform its id. Otherwise inform false
-
-            if (source) return source.id
-            return false
-        },
-    })
-
-    // Source 2
-
-    new RoomCacheObject({
-        name: 'source2',
-        valueType: 'id',
-        cacheType: 'memory',
-        room,
-        valueConstructor() {
-            // Get the second source
-
-            const source = room.find(FIND_SOURCES)[1]
-
-            // If the source exists, inform its id. Otherwise inform false
-
-            if (source) return source.id
-            return false
-        },
-    })
-
     // Harvest positions
 
     /**
@@ -1143,16 +1105,18 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             threat += room.structures.tower.length * 300
 
+            threat += Math.pow(room.structures.extension.length * 400, 0.8)
+
             const hasTerminal = room.terminal !== undefined
-            threat += 800
 
-            room.memory.terminal = hasTerminal
-            threat *= 1.2
+            if (hasTerminal) {
 
-            const powerEnabled = controller.isPowerEnabled
+                threat += 800
 
-            room.memory.powerEnabled = powerEnabled
-            threat *= 0.5
+                room.memory.terminal = true
+            }
+
+            room.memory.powerEnabled = controller.isPowerEnabled
 
             room.memory.DT = threat
             Memory.players[owner].DT = Math.max(threat, playerInfo.DT)
@@ -1229,7 +1193,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             // Find creeps that I don't own that aren't invaders
 
-            const creepsNotMine: Creep[] = room.enemyCreeps.concat(room.allyCreeps)
+            const creepsNotMine = room.enemyCreeps.concat(room.allyCreeps)
 
             // Iterate through them
 
@@ -1302,17 +1266,9 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
         // Get base planning data
 
-        // Get the room's sourceNames
-
-        const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
-
         // loop through sourceNames
 
-        for (const sourceName of sourceNames) {
-            // Get the source using sourceName, stopping the loop if undefined
-
-            const source: Source = room.get(sourceName)
-            if (!source) break
+        for (const source of room.sources) {
 
             const path = room.advancedFindPath({
                 origin: source.pos,
@@ -1349,6 +1305,10 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
             room.memory.commune = scoutingRoom.name
 
+            // Query source positions
+
+            room.sourcePositions
+
             // Add the room's name to the scoutingRoom's remotes list
 
             scoutingRoom.memory.remotes.push(room.name)
@@ -1374,6 +1334,10 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         // Assign the room's commune as the scoutingRoom
 
         room.memory.commune = scoutingRoom.name
+
+        // Query source positions
+
+        room.sourcePositions
 
         // Add the room's name to the scoutingRoom's remotes list
 
