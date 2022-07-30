@@ -1,6 +1,6 @@
 module.exports.cliPort = 21026
 
-module.exports.tickDuration = 500
+module.exports.tickDuration = 10
 
 module.exports.playerRooms = {"W2N2":'user1',"W1N1":"user2","W2N5":"user3"}
 module.exports.rooms =[
