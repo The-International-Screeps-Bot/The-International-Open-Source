@@ -61,7 +61,7 @@ module.exports.followLog = followLog
  */
 const setPassword = function (line, socket, rooms, roomsSeen, playerRooms) {
      for (const room of rooms) {
-          if (line.startsWith(`'User ${room} with bot AI "my-bot" spawned in ${room}'`)) {
+          if (line.startsWith(`'User ${room} with bot AI "bot" spawned in ${room}'`)) {
                roomsSeen[room] = true
                console.log(`> Set password for ${room}`)
                /* eslint max-len: ["error", 1300] */

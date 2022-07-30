@@ -18,15 +18,13 @@ const dashboards = dashboardHelper.getDashboards()
                noProfile: true,
           })
 
-     const preStartDockerCommands = [
+     const commands = [
           'docker-compose down',
           'docker-compose build',
           'docker volume rm $(docker volume ls -q)',
+          'docker network create grafana_default',
+          'docker-compose up -d'
      ]
-
-     const commands = preStartDockerCommands.concat([
-          'docker-compose up -d',
-     ])
 
      if (!fs.existsSync("./users.js")) {
           fs.copyFileSync("./users.js.example", "./users.js")
