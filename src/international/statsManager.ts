@@ -1,4 +1,4 @@
-import { roomTypesUsedForStats, roomStats as roomStatsLevel } from './constants'
+import { roomTypesUsedForStats } from './constants'
 export class StatsManager {
     roomConfig(roomName: string, roomType: string) {
         if (roomType === 'commune') {
@@ -18,6 +18,7 @@ export class StatsManager {
                 cc: 0,
                 cu: -1,
                 rt: 0,
+                su: 0,
             }
 
             global.roomStats[roomName] = communeStats
@@ -42,13 +43,25 @@ export class StatsManager {
     roomPreTick(roomName: string, roomType: string) {
         this.roomConfig(roomName, roomType)
 
-        console.log(roomName, global.roomStats[roomName].cu)
         global.roomStats[roomName].cu = Game.cpu.getUsed()
     }
 
     roomEndTick(roomName: string, roomType: 'commune' | 'remote', room?: Room) {
         const roomStats = Memory.stats.rooms[roomType][roomName]
         const globalStats = global.roomStats[roomName]
+
+        if (roomType === 'commune') {
+            roomStats.cc = room.myCreepsAmount
+
+            let spawnUsage = 0
+            if (room) {
+                const spawns = room.structures.spawn
+                const spawnLength = spawns.length
+                if (spawnLength > 0)
+                    spawnUsage = spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawnLength
+            }
+            roomStats.su = this.average(roomStats.su, spawnUsage, 500)
+        }
 
         if (Game.time % 250 === 0 && room) {
             if (roomType === 'commune') {
@@ -61,27 +74,27 @@ export class StatsManager {
                         : undefined
                 roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY)
             }
-            roomStats.cc = this.average(roomStats.cc, room.myCreepsAmount, 1000)
         }
-        if (roomStatsLevel >= 2) {
-            roomStats.mh = this.average(roomStats.mh, globalStats.mh, 10000)
+
+        if (Memory.roomStats >= 2) {
+            roomStats.mh = this.average(roomStats.mh, globalStats.mh, 500)
             if (roomType === 'commune') {
-                // roomStats.eib = this.average(roomStats.eib, globalStats.eib, 1000)
-                // roomStats.eoso = this.average(roomStats.eoso, globalStats.eoso, 1000)
+                // roomStats.eib = this.average(roomStats.eib, globalStats.eib, 500)
+                // roomStats.eoso = this.average(roomStats.eoso, globalStats.eoso, 500)
 
-                // roomStats.eiet = this.average(roomStats.eiet, globalStats.eiet, 1000)
-                roomStats.eou = this.round(this.average(roomStats.eou, globalStats.eou, 1000), 2)
-                roomStats.eorwr = this.round(this.average(roomStats.eorwr, globalStats.eorwr, 1000), 2)
-                roomStats.eosp = this.round(this.average(roomStats.eosp, globalStats.eosp, 1000), 2)
+                // roomStats.eiet = this.average(roomStats.eiet, globalStats.eiet, 500)
+                roomStats.eou = this.round(this.average(roomStats.eou, globalStats.eou, 500), 2)
+                roomStats.eorwr = this.round(this.average(roomStats.eorwr, globalStats.eorwr, 500), 2)
+                roomStats.eosp = this.round(this.average(roomStats.eosp, globalStats.eosp, 500), 2)
             }
-            roomStats.eih = this.round(this.average(roomStats.eih, globalStats.eih, 1000), 2)
+            roomStats.eih = this.round(this.average(roomStats.eih, globalStats.eih, 500), 2)
 
-            roomStats.eob = this.round(this.average(roomStats.eob, globalStats.eob, 1000), 2)
-            roomStats.eoro = this.round(this.average(roomStats.eoro, globalStats.eoro, 1000), 2)
+            roomStats.eob = this.round(this.average(roomStats.eob, globalStats.eob, 500), 2)
+            roomStats.eoro = this.round(this.average(roomStats.eoro, globalStats.eoro, 500), 2)
         }
 
         roomStats.cu = this.round(
-            this.average(roomStats.cu, globalStats.cu >= 0 ? Game.cpu.getUsed() - globalStats.cu : 0, 1000),
+            this.average(roomStats.cu, globalStats.cu >= 0 ? Game.cpu.getUsed() - globalStats.cu : 0, 500),
         )
     }
 
@@ -123,9 +136,7 @@ export class StatsManager {
     }
 
     internationalPreTick() {
-        console.log(global.roomStats)
         global.roomStats = {}
-        console.log(Object.keys(global.roomStats).length)
     }
 
     internationalEndTick() {
@@ -143,7 +154,7 @@ export class StatsManager {
         }
         Memory.stats.cpu = {
             bucket: Game.cpu.bucket,
-            usage: this.round(this.average(Memory.stats.cpu.usage, Game.cpu.getUsed(), 1000)),
+            usage: this.round(this.average(Memory.stats.cpu.usage, Game.cpu.getUsed(), 500)),
         }
         Memory.stats.memory.usage = Math.floor(RawMemory.get().length / 1000)
         Memory.stats.gcl = {

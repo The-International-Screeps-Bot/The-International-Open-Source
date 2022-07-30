@@ -5,27 +5,28 @@ import { InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
 
 InternationalManager.prototype.endTickManager = function () {
-     allyManager.endTickManager()
-     statsManager.internationalEndTick()
+    allyManager.endTickManager()
+    statsManager.internationalEndTick()
 
-     if (!Memory.isMainShard) return
+    if (!Memory.isMainShard) return
 
-     // Fill up the console with empty logs
+    // Fill up the console with empty logs
 
-     for (let i = 0; i < 99; i += 1) console.log()
+    return
+    for (let i = 0; i < 99; i += 1) console.log()
 
-     // Get the CPU color based on the amount of used CPU
+    // Get the CPU color based on the amount of used CPU
 
-     const CPUColor = findCPUColor()
+    const CPUColor = findCPUColor()
 
-     customLog(
-          'Total CPU',
-          `${Game.cpu.getUsed().toFixed(2)} / ${Game.cpu.limit} CPU Bucket: ${Game.cpu.bucket}`,
-          myColors.white,
-          CPUColor,
-     )
+    customLog(
+        'Total CPU',
+        `${Game.cpu.getUsed().toFixed(2)} / ${Game.cpu.limit} CPU Bucket: ${Game.cpu.bucket}`,
+        myColors.white,
+        CPUColor,
+    )
 
-     // Log the accumilated global logs
+    // Log the accumilated global logs
 
-     console.log(global.logs)
+    console.log(global.logs)
 }

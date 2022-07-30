@@ -339,6 +339,7 @@ declare global {
         cc: number // creepCount
         cu: number // cpuUsage
         rt: number // roomType
+        su?: number // spawnUsage
     }
 
     interface Stats {
