@@ -12,7 +12,7 @@ module.exports.rooms =[
 ]
 
 module.exports.milestones = [
-     { tick: 10000, check: { level: 2 }, required:true },
+     { tick: 10000, check: { level: 2 }, required:false },
      { tick: 15000, check: { level: 3 }, required:false },
      { tick: 45000, check: { level: 4 }, required:false },
 ]
