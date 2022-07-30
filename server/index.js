@@ -3,7 +3,7 @@ const q = require('q')
 const _ = require('lodash')
 require('dotenv').config()
 
-const { setPassword, sleep, initServer, startServer, spawnBots, helpers, logConsole, followLog } = require('./helper')
+const { setPassword, sleep, initServer, startServer, spawnBots, helpers, followLog } = require('./helper')
 
 const { cliPort, tickDuration, playerRooms, rooms, milestones } = require('./config')
 
@@ -114,7 +114,7 @@ class Tester {
                if (setPassword(line, socket, rooms, this.roomsSeen, playerRooms)) {
                     if (rooms.length === Object.keys(this.roomsSeen).length) {
                          console.log('> Listen to the log')
-                         followLog(rooms, logConsole, statusUpdater)
+                         followLog(rooms, statusUpdater)
                          await sleep(5)
                          console.log(`> system.resumeSimulation()`)
                          socket.write(`system.resumeSimulation()\r\n`)
