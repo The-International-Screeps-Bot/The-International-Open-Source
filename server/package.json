@@ -3,6 +3,7 @@
         "axios": "^0.27.2",
         "dotenv": "^16.0.1",
         "fs": "0.0.1-security",
+        "lodash": "^4.17.21",
         "ncp": "^2.0.0",
         "node-powershell": "^5.0.1",
         "q": "^1.5.1",

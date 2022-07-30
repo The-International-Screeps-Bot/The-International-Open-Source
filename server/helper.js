@@ -22,11 +22,10 @@ module.exports.setHostname = setHostname
  * are available
  *
  * @param {list} rooms - The rooms
- * @param {function} logConsole - Function to handle console logging
  * @param {function} statusUpdater - Function to handle status updates
  * @return {undefined}
  */
-async function followLog(rooms, logConsole, statusUpdater, restrictToRoom) {
+async function followLog(rooms, statusUpdater, restrictToRoom) {
      for (const room of rooms) {
           if (restrictToRoom && room !== restrictToRoom) {
                continue
@@ -45,7 +44,6 @@ async function followLog(rooms, logConsole, statusUpdater, restrictToRoom) {
           api.socket.connect()
           api.socket.on('connected', () => {})
           api.socket.on('auth', event => {})
-          // api.socket.subscribe("console", logConsole(room));
           api.socket.subscribe(`room:${room}`, statusUpdater)
      }
 }
@@ -169,45 +167,6 @@ async function startServer() {
 module.exports.startServer = startServer
 
 /**
- * logs event
- *
- * @param {string} room
- * @return {void}
- */
-const logConsole = function (room) {
-     return event => {
-          if (event.channel !== 'console') {
-               console.log(room, `logConsole channel not console: ${JSON.stringify(event)}`)
-          }
-          if (event.type !== 'user') {
-               console.log(room, `logConsole channel not user: ${JSON.stringify(event)}`)
-          }
-          if (!event.data) {
-               console.log(room, `logConsole no data: ${JSON.stringify(event)}`)
-               return
-          }
-          if (event.data.error) {
-               console.log(room, event.data.error)
-          }
-          if (event.data.messages) {
-               if (event.data.messages.results.length > 0) {
-                    console.log(
-                         room,
-                         `logConsole event.data.messages.results: ${JSON.stringify(event.data.messages.results)}`,
-                    )
-               }
-
-               if (event.data.messages.log.length > 0) {
-                    for (let logIndex = 0; logIndex < event.data.messages.log.length; logIndex++) {
-                         console.log(room, event.data.messages.log[logIndex])
-                    }
-               }
-          }
-     }
-}
-module.exports.logConsole = logConsole
-
-/**
  * spawns Bot
  *
  * @param {string} line
@@ -237,17 +196,9 @@ const spawnBots = async function (line, socket, rooms, tickDuration) {
           console.log(`> utils.setShardName("performanceServer")`)
           socket.write(`utils.setShardName("performanceServer")\r\n`)
 
-          // Setup NPC terminals
-          for (const room of ['W0N0', 'W10N0', 'W10N10', 'W0N10']) {
-               console.log(`> storage.db['rooms.objects'].insert({ type: 'terminal', room: '${room}', x: 0, y:0 })`)
-               socket.write(`storage.db['rooms.objects'].insert({ type: 'terminal', room: '${room}', x: 0, y:0 })\r\n`)
-               await sleep(1)
-          }
-          await sleep(5)
-
           for (const room of rooms) {
-               console.log(`> Spawn bot ${room} as Carson AI`)
-               socket.write(`bots.spawn('my-bot', '${room}', {username: '${room}', auto:'true'})\r\n`)
+               console.log(`> Spawn bot ${room} as International AI`)
+               socket.write(`bots.spawn('bot', '${room}', {username: '${room}', auto:'true'})\r\n`)
                await sleep(5)
           }
           return true
