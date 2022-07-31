@@ -33,34 +33,36 @@ Object.defineProperties(Room.prototype, {
     },
     sources: {
         get() {
+            if (this._sources) customLog('CACHED SOURCES', this._sources)
             if (this._sources) return this._sources
 
             this._sources = []
+            customLog('SOURCE TEST', this.memory.sourceIds + ', ' + !this.memory.sourceIds)
+            if (this.memory.sourceIds) {
 
-            if (!this.memory.sourceIds) {
-                this.memory.sourceIds = []
-
-                const sources = this.find(FIND_SOURCES)
-
-                for (const index in sources) {
-                    const source = sources[index]
+                for (const index in this.memory.sourceIds) {
+                    const source = findObjectWithID(this.memory.sourceIds[index])
 
                     source.index = parseInt(index)
-
-                    this.memory.sourceIds.push(source.id)
                     this._sources.push(source)
                 }
-
+                customLog('SOURCES2', this._sources + ', ' + this.memory.sourceIds)
                 return this._sources
             }
 
-            for (const index in this.memory.sourceIds) {
-                const source = findObjectWithID(this.memory.sourceIds[index])
+            this.memory.sourceIds = []
+
+            const sources = this.find(FIND_SOURCES)
+
+            for (const index in sources) {
+                const source = sources[index]
 
                 source.index = parseInt(index)
+
+                this.memory.sourceIds.push(source.id)
                 this._sources.push(source)
             }
-
+            customLog('SOURCES1', this._sources + ', ' + this.memory.sourceIds)
             return this._sources
         },
     },
@@ -68,9 +70,12 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._sourcesByEfficacy) return this._sourcesByEfficacy
 
-            return (this._sourcesByEfficacy = this.sources.sort((a, b) => {
+            this._sourcesByEfficacy = [].concat(this.sources)
+
+            return (this._sourcesByEfficacy.sort((a, b) => {
                 return this.sourcePaths[a.index].length - this.sourcePaths[b.index].length
             }))
+
         },
     },
     mineral: {
@@ -141,7 +146,7 @@ Object.defineProperties(Room.prototype, {
 
             for (const structure of this.find(FIND_STRUCTURES))
                 this._structures[structure.structureType].push(structure as any)
-            
+
             return this._structures
         },
     },

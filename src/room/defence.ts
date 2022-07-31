@@ -99,9 +99,9 @@ Room.prototype.advancedActivateSafeMode = function () {
 
         if (!(attackTarget instanceof Structure)) continue
 
-        if (safemodeTargets.includes(attackTarget.structureType)) {
-            this.controller.activateSafeMode()
-            return
-        }
+        if (!safemodeTargets.includes(attackTarget.structureType)) continue
+        
+        this.controller.activateSafeMode()
+        return
     }
 }

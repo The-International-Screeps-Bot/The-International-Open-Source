@@ -459,7 +459,25 @@ Room.prototype.spawnRequester = function () {
 
             const role = 'builder'
 
-            // If all RCL 3 extensions are build
+            // If there is a storage or terminal
+
+            if (this.storage || this.terminal) {
+                return {
+                    role,
+                    defaultParts: [],
+                    extraParts: [WORK, CARRY, MOVE],
+                    partsMultiplier: partsMultiplier,
+                    minCreeps: undefined,
+                    maxCreeps: Infinity,
+                    minCost: 200,
+                    priority,
+                    memoryAdditions: {
+                        roads: true,
+                    },
+                }
+            }
+
+            // There are no fastFiller containers
 
             if (!this.fastFillerContainerLeft && !this.fastFillerContainerRight) {
                 return {

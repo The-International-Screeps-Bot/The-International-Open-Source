@@ -150,11 +150,17 @@ Creep.prototype.advancedPickup = function (target) {
 
 Creep.prototype.advancedHarvestSource = function (source) {
 
-    this.say('⛏️')
+    this.room.visual.line(this.pos, source.pos, { color: myColors.lightBlue})
+
+    const harvestResult = this.harvest(source)
 
     // Harvest the source, informing the result if it didn't succeed
 
-    if (this.harvest(source) !== OK) return false
+    if (harvestResult !== OK) {
+
+        this.say(`⛏️${harvestResult} ${source.index}`)
+        return false
+    }
 
     // Record that the creep has worked
 
@@ -165,10 +171,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
     if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eih += energyHarvested
 
-    this.say(`${energyHarvested}`)
-
-    // Inform true
-
+    this.say(`⛏️${energyHarvested}`)
     return true
 }
 

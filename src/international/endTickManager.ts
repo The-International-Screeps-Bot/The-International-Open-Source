@@ -12,7 +12,6 @@ InternationalManager.prototype.endTickManager = function () {
 
     // Fill up the console with empty logs
 
-    return
     for (let i = 0; i < 99; i += 1) console.log()
 
     // Get the CPU color based on the amount of used CPU
