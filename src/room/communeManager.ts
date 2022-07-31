@@ -8,7 +8,7 @@ import './defence'
 import './links'
 import './allyCreepRequestManager'
 import './claimRequestManager'
-import { myColors } from 'international/constants'
+import { myColors, safemodeTargets } from 'international/constants'
 import { packCoord, packCoordList, packPosList } from 'other/packrat'
 
 /**

@@ -149,15 +149,13 @@ Creep.prototype.advancedPickup = function (target) {
 }
 
 Creep.prototype.advancedHarvestSource = function (source) {
-
-    this.room.visual.line(this.pos, source.pos, { color: myColors.lightBlue})
+    this.room.visual.line(this.pos, source.pos, { color: myColors.lightBlue })
 
     const harvestResult = this.harvest(source)
 
     // Harvest the source, informing the result if it didn't succeed
 
     if (harvestResult !== OK) {
-
         this.say(`⛏️${harvestResult} ${source.index}`)
         return false
     }
@@ -617,11 +615,7 @@ Creep.prototype.findOptimalSourceName = function () {
 
             // If there are still creeps needed to harvest a source under the creepThreshold
 
-            if (
-                Math.min(creepThreshold, room.sourcePositions[index].length) - room.creepsOfSourceAmount[index] >
-                0
-            ) {
-
+            if (Math.min(creepThreshold, room.sourcePositions[index].length) - room.creepsOfSourceAmount[index] > 0) {
                 this.memory.SI = index
                 return true
             }
@@ -1021,6 +1015,10 @@ Creep.prototype.runMoveRequest = function () {
 
     if (this.move(this.pos.getDirectionTo(unpackAsRoomPos(this.moveRequest, room.name))) !== OK) return false
 
+    // Record where the creep is tying to move
+
+    this.moved = this.moveRequest
+
     // Remove all moveRequests to the position
 
     room.moveRequests[this.moveRequest] = []
@@ -1028,15 +1026,12 @@ Creep.prototype.runMoveRequest = function () {
 
     // Remove record of the creep being on its current position
 
-    room.creepPositions[pack(this.pos)] = undefined
+    /* room.creepPositions[pack(this.pos)] = undefined */
 
     // Record the creep at its new position
 
-    room.creepPositions[this.moveRequest] = this.name
+    /* room.creepPositions[this.moveRequest] = this.name */
 
-    // Record that the creep has moved this tick
-
-    this.moved = true
     return true
 }
 
@@ -1044,6 +1039,8 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     const { room } = this
 
     if (!this.moveRequest) return
+
+    if (!room.moveRequests[pack(this.pos)].length) return
 
     queue.push(this.name)
 
@@ -1057,26 +1054,27 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         // Otherwise, loop through each index of the queue
 
         for (let index = 0; index < queue.length; index++)
-            // Have the creep run its moveRequest
+            // Have the creep run its moveRequesat
 
             Game.creeps[queue[index]].runMoveRequest()
 
         return
     }
 
-    // Otherwise
-
     // Get the creepAtPos with the name
 
     const creepAtPos = Game.creeps[creepNameAtPos]
 
-    // If the creep has already acted on a moveRequest, stop
+    if (creepAtPos.moved) {
 
-    if (creepAtPos.moved) return
+        // Otherwise, loop through each index of the queue
 
-    // Otherwise if creepAtPos is fatigued, stop
+        for (let index = 0; index < queue.length; index++)
+            // Have the creep run its moveRequest
 
-    if (creepAtPos.fatigue > 0) return
+            Game.creeps[queue[index]].runMoveRequest()
+        return
+    }
 
     // If the creepAtPos has a moveRequest and it's valid
 
@@ -1087,16 +1085,14 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             // Have the creep move to its moveRequest
 
             this.runMoveRequest()
-
-            // Have the creepAtPos move to the creepAtPos and stop
-
-            creepAtPos.runMoveRequest()
+            creepAtPos.recurseMoveRequest()
             return
         }
 
-        // If the creep's moveRequests aren't aligned
+        // If the creepAtPos is in the queue
 
         if (queue.includes(creepAtPos.name)) {
+
             // Otherwise, loop through each index of the queue
 
             for (let index = 0; index < queue.length; index++)
@@ -1107,11 +1103,14 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             return
         }
 
-        // Otherwise add the creep to the traffic queue and stop
-
+        this.runMoveRequest()
         creepAtPos.recurseMoveRequest(queue)
         return
     }
+
+    // Otherwise if creepAtPos is fatigued, stop
+
+    if (creepAtPos.fatigue > 0) return
 
     // Otherwise the creepAtPos has no moveRequest
 

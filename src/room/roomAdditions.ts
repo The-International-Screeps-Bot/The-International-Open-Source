@@ -33,7 +33,6 @@ Object.defineProperties(Room.prototype, {
     },
     sources: {
         get() {
-            if (this._sources) customLog('CACHED SOURCES', this._sources)
             if (this._sources) return this._sources
 
             this._sources = []
@@ -46,7 +45,7 @@ Object.defineProperties(Room.prototype, {
                     source.index = parseInt(index)
                     this._sources.push(source)
                 }
-                customLog('SOURCES2', this._sources + ', ' + this.memory.sourceIds)
+
                 return this._sources
             }
 
@@ -62,7 +61,7 @@ Object.defineProperties(Room.prototype, {
                 this.memory.sourceIds.push(source.id)
                 this._sources.push(source)
             }
-            customLog('SOURCES1', this._sources + ', ' + this.memory.sourceIds)
+
             return this._sources
         },
     },

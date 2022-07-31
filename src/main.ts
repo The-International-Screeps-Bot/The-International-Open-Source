@@ -1276,9 +1276,9 @@ declare global {
         movedResource: boolean
 
         /**
-         * Wether the creep moved this tick
+         * The packed coord the creep is trying to act upon, if it exists
          */
-        moved: boolean
+        moved?: number
 
         /**
          * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
