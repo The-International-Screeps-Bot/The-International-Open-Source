@@ -925,7 +925,7 @@ Room.prototype.spawnRequester = function () {
 
                 if (remoteNeeds[remoteNeedsIndex.source2RemoteHarvester] <= 0) return false
 
-                const sourceIndex = 0
+                const sourceIndex = 1
                 const sourcePositionsAmount = remoteMemory.SP[sourceIndex].length
 
                 const role = 'source2RemoteHarvester'
