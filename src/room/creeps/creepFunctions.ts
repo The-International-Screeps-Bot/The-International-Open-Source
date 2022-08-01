@@ -1040,7 +1040,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
     if (!this.moveRequest) return
 
-    if (!room.moveRequests[pack(this.pos)].length) return
+    if (!room.moveRequests[this.moveRequest].length) return
 
     queue.push(this.name)
 
@@ -1078,7 +1078,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
     // If the creepAtPos has a moveRequest and it's valid
 
-    if (creepAtPos.moveRequest && room.moveRequests[pack(creepAtPos.pos)].length) {
+    if (creepAtPos.moveRequest && room.moveRequests[creepAtPos.moveRequest].length) {
         // If the creep's pos and the creepAtPos's moveRequests are aligned
 
         if (pack(this.pos) === creepAtPos.moveRequest) {

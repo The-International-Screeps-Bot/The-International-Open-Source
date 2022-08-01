@@ -36,7 +36,7 @@ Object.defineProperties(Room.prototype, {
             if (this._sources) return this._sources
 
             this._sources = []
-            customLog('SOURCE TEST', this.memory.sourceIds + ', ' + !this.memory.sourceIds)
+
             if (this.memory.sourceIds) {
 
                 for (const index in this.memory.sourceIds) {
