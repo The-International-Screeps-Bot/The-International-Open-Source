@@ -51,14 +51,15 @@ export class StatsManager {
         const globalStats = global.roomStats[roomName]
 
         if (roomType === 'commune') {
-            roomStats.cc = room.myCreepsAmount
-
             let spawnUsage = 0
             if (room) {
+                roomStats.cc = room.myCreepsAmount
+
                 const spawns = room.structures.spawn
-                const spawnLength = spawns.length
-                if (spawnLength > 0)
-                    spawnUsage = spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawnLength
+
+                if (spawns.length > 0)
+                    spawnUsage =
+                        spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawns.length
             }
             roomStats.su = this.average(roomStats.su, spawnUsage, 500)
         }

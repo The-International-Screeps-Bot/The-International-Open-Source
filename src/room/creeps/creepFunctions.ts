@@ -149,8 +149,6 @@ Creep.prototype.advancedPickup = function (target) {
 }
 
 Creep.prototype.advancedHarvestSource = function (source) {
-    this.room.visual.line(this.pos, source.pos, { color: myColors.lightBlue })
-
     const harvestResult = this.harvest(source)
 
     // Harvest the source, informing the result if it didn't succeed
@@ -933,11 +931,12 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
 
         let hasImpassibleStructure
 
-        for (const structure of pos.lookFor(LOOK_STRUCTURES))
-            if (impassibleStructureTypes.includes(structure.structureType)) {
-                hasImpassibleStructure = true
-                break
-            }
+        for (const structure of pos.lookFor(LOOK_STRUCTURES)) {
+            if (!impassibleStructureTypes.includes(structure.structureType)) continue
+
+            hasImpassibleStructure = true
+            break
+        }
 
         if (hasImpassibleStructure) continue
 
@@ -951,6 +950,19 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
         }
 
         if (hasImpassibleStructure) continue
+
+        if (this.role === 'meleeDefender') {
+            let hasRampart
+
+            for (const structure of pos.lookFor(LOOK_STRUCTURES)) {
+                if (structure.structureType !== STRUCTURE_RAMPART) continue
+
+                hasRampart = true
+                break
+            }
+
+            if (!hasRampart) continue
+        }
 
         shovePositions.push(pos)
     }
@@ -1039,7 +1051,6 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     const { room } = this
 
     if (!this.moveRequest) return
-
     if (!room.moveRequests[this.moveRequest].length) return
 
     queue.push(this.name)
@@ -1051,9 +1062,26 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     // If there is no creep at the pos
 
     if (!creepNameAtPos) {
+        // loop through each index of the queue, drawing visuals
+
+        if (Memory.roomVisuals) {
+            const moveRequestPos = unpackAsRoomPos(this.moveRequest, room.name)
+
+            room.visual.rect(moveRequestPos.x - 0.5, moveRequestPos.y - 0.5, 1, 1, {
+                fill: myColors.green,
+                opacity: 0.2,
+            })
+
+            for (let index = queue.length - 1; index >= 0; index--)
+                room.visual.line(Game.creeps[queue[index]].pos, this.pos, {
+                    color: myColors.yellow,
+                    opacity: 0.2,
+                })
+        }
+
         // Otherwise, loop through each index of the queue
 
-        for (let index = 0; index < queue.length; index++)
+        for (let index = queue.length - 1; index >= 0; index--)
             // Have the creep run its moveRequesat
 
             Game.creeps[queue[index]].runMoveRequest()
@@ -1066,13 +1094,21 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     const creepAtPos = Game.creeps[creepNameAtPos]
 
     if (creepAtPos.moved) {
-
         // Otherwise, loop through each index of the queue
 
-        for (let index = 0; index < queue.length; index++)
+        for (let index = queue.length - 1; index >= 0; index--)
             // Have the creep run its moveRequest
 
             Game.creeps[queue[index]].runMoveRequest()
+
+        // loop through each index of the queue, drawing visuals
+
+        if (Memory.roomVisuals)
+            for (let index = queue.length - 1; index >= 0; index--)
+                room.visual.line(Game.creeps[queue[index]].pos, this.pos, {
+                    color: myColors.yellow,
+                    opacity: 0.2,
+                })
         return
     }
 
@@ -1092,13 +1128,21 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         // If the creepAtPos is in the queue
 
         if (queue.includes(creepAtPos.name)) {
+            // loop through each index of the queue
 
-            // Otherwise, loop through each index of the queue
-
-            for (let index = 0; index < queue.length; index++)
+            for (let index = queue.length - 1; index >= 0; index--)
                 // Have the creep run its moveRequest
 
                 Game.creeps[queue[index]].runMoveRequest()
+
+            // loop through each index of the queue, drawing visuals
+
+            if (Memory.roomVisuals)
+                for (let index = queue.length - 1; index >= 0; index--)
+                    room.visual.line(Game.creeps[queue[index]].pos, this.pos, {
+                        color: myColors.yellow,
+                        opacity: 0.2,
+                    })
 
             return
         }
@@ -1566,6 +1610,7 @@ Creep.prototype.fulfillReservation = function () {
         room.visual.line(this.pos, target.pos, {
             color: myColors.lightBlue,
             width: 0.15,
+            opacity: 0.2,
         })
 
     this.message += '📲'
@@ -1682,7 +1727,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
     if (withdrawTargets.length) {
         target = findClosestObject(this.pos, withdrawTargets)
 
-        if (target instanceof Resource) amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
+        if (target instanceof Resource) amount = target.reserveAmount
         else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
 
         this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
@@ -1703,7 +1748,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
 
     target = findClosestObject(this.pos, withdrawTargets)
 
-    if (target instanceof Resource) amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.reserveAmount)
+    if (target instanceof Resource) amount = target.reserveAmount
     else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
 
     this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
