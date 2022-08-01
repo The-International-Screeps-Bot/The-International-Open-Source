@@ -1147,7 +1147,6 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             return
         }
 
-        this.runMoveRequest()
         creepAtPos.recurseMoveRequest(queue)
         return
     }
@@ -1158,7 +1157,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
     // Otherwise the creepAtPos has no moveRequest
 
-    if (creepAtPos.shove(this.pos)) {
+    if (!creepAtPos.moveRequest && creepAtPos.shove(this.pos)) {
         this.runMoveRequest()
         return
     }
