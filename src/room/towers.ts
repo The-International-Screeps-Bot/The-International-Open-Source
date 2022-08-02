@@ -7,7 +7,7 @@ Room.prototype.towerManager = function() {
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
     if (!this.structures.tower.length) return
-    
+
     this.towersAttackCreeps()
 
     this.towersHealCreeps()
@@ -49,9 +49,6 @@ Room.prototype.towersHealCreeps = function () {
         // Otherwise record that the tower is no longer inactionable
 
         tower.inactionable = true
-
-        // And iterate
-
         continue
     }
 }
@@ -78,6 +75,10 @@ Room.prototype.towersAttackCreeps = function () {
     // If the strongest enemy can be damaged, record that the tower can remove all threats
 
     if (attackTargets[attackTargets.length - 1].towerDamage > 0) this.towerSuperiority = true
+
+    // If we seem to be under attack from a swarm, record that the tower needs help
+
+    if (attackTargets.length >= 15) this.towerSuperiority = false
 
     // Loop through the this's towers
 

@@ -643,6 +643,8 @@ declare global {
 
         /**
          * Wether the towers can deal sufficient damage to out-damage enemy creeps in the room
+         *
+         * Should influence if maintainers and defenders are needed to fend off the attack
          */
         towerSuperiority: boolean
 
