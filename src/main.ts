@@ -641,6 +641,11 @@ declare global {
          */
         tileTypes: number[][]
 
+        /**
+         * Wether the towers can deal sufficient damage to out-damage enemy creeps in the room
+         */
+        towerSuperiority: boolean
+
         // Functions
 
         /**

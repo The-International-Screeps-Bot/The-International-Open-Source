@@ -257,8 +257,6 @@ InternationalManager.prototype.getBuyOrders = function (resourceType, minPrice =
 InternationalManager.prototype.advancedSellPixels = function () {
      if (!Memory.pixelSelling) return
 
-     if (Game.cpu.bucket < CPUBucketCapacity) return
-
      const orders = Game.market.getAllOrders({ type: PIXEL })
 
      for (const order of orders) {

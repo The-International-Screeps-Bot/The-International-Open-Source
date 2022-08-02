@@ -7,7 +7,7 @@ Room.prototype.towerManager = function() {
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
     if (!this.structures.tower.length) return
-
+    
     this.towersAttackCreeps()
 
     this.towersHealCreeps()
@@ -74,6 +74,10 @@ Room.prototype.towersAttackCreeps = function () {
     })[attackTargets.length - 1]
 
     if (attackTarget.towerDamage <= 0) return
+
+    // If the strongest enemy can be damaged, record that the tower can remove all threats
+
+    if (attackTargets[attackTargets.length - 1].towerDamage > 0) this.towerSuperiority = true
 
     // Loop through the this's towers
 

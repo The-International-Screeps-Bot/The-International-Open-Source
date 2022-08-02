@@ -382,45 +382,69 @@ Room.prototype.spawnRequester = function () {
 
     // Get enemyAttackers in the this
 
-    let enemyAttackers = this.enemyAttackers
-
-    if (!this.structures.tower.length) {
-        // Don't consider invaders
-
-        enemyAttackers = enemyAttackers.filter(function (creep) {
-            return creep.owner.username !== 'Invader'
-        })
-    }
+    const enemyAttackers = this.enemyAttackers
 
     // Get the attackValue of the attackers
 
     let attackStrength = 0
+    let healStrength = 0
 
     // Loop through each enemyAttacker
 
     // Increase attackValue by the creep's heal power
 
-    for (const enemyAttacker of enemyAttackers) attackStrength += enemyAttacker.strength
+    for (const enemyAttacker of enemyAttackers) {
+
+        attackStrength += enemyAttacker.attackStrength
+        healStrength += enemyAttacker.healStrength
+    }
 
     // Construct requests for meleeDefenders
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
+
             // Inform false if there are no enemyAttackers
 
             if (!enemyAttackers.length) return false
 
             if (this.controller.safeMode) return false
 
+            if (this.towerSuperiority) return false
+
             const role = 'meleeDefender'
+
+            // If all RCL 3 extensions are build
+
+            if (spawnEnergyCapacity >= 800) {
+
+                const extraParts = [ATTACK, ATTACK, MOVE]
+                const strength = 2 * ATTACK_POWER + 1
+
+                return {
+                    role,
+                    defaultParts: [],
+                    extraParts,
+                    partsMultiplier: Math.max(attackStrength / strength, 1),
+                    minCreeps: undefined,
+                    maxCreeps: 5,
+                    minCost: 210,
+                    priority: 6 + this.creepsFromRoom.meleeDefender.length,
+                    memoryAdditions: {
+                        roads: true,
+                    },
+                }
+            }
+
+            const extraParts = [ATTACK, MOVE]
+            const strength = ATTACK_POWER + 1
 
             return {
                 role,
                 defaultParts: [],
-                extraParts: [ATTACK, ATTACK, MOVE],
-                partsMultiplier: attackStrength,
+                extraParts,
+                partsMultiplier: Math.max(attackStrength / strength, 1),
                 minCreeps: undefined,
-                maxCreeps: 5,
                 minCost: 210,
                 priority: 6 + this.creepsFromRoom.meleeDefender.length,
                 memoryAdditions: {
@@ -458,14 +482,33 @@ Room.prototype.spawnRequester = function () {
             else partsMultiplier += Math.floor(estimatedIncome / 3)
 
             const role = 'builder'
-
+            /*
             // If there is a storage or terminal
 
             if (this.storage || this.terminal) {
                 return {
                     role,
                     defaultParts: [],
-                    extraParts: [WORK, CARRY, MOVE],
+                    extraParts: [CARRY, WORK, MOVE],
+                    partsMultiplier: partsMultiplier,
+                    minCreeps: undefined,
+                    maxCreeps: Infinity,
+                    minCost: 200,
+                    priority,
+                    memoryAdditions: {
+                        roads: true,
+                    },
+                }
+            }
+            */
+
+            // If all RCL 3 extensions are build
+
+            if (spawnEnergyCapacity >= 800) {
+                return {
+                    role,
+                    defaultParts: [],
+                    extraParts: [CARRY, WORK, MOVE],
                     partsMultiplier: partsMultiplier,
                     minCreeps: undefined,
                     maxCreeps: Infinity,
@@ -548,7 +591,7 @@ Room.prototype.spawnRequester = function () {
 
             // For every attackValue, add a multiplier
 
-            partsMultiplier += attackStrength * 0.5
+            partsMultiplier += attackStrength / (REPAIR_POWER / 2)
 
             // For every x energy in storage, add 1 multiplier
 
@@ -598,7 +641,11 @@ Room.prototype.spawnRequester = function () {
 
             // If there are enemyAttackers and the controller isn't soon to downgrade
 
-            if (enemyAttackers.length && this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed)
+            if (
+                enemyAttackers.length &&
+                this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed &&
+                !this.towerSuperiority
+            )
                 return false
 
             // If there is a storage

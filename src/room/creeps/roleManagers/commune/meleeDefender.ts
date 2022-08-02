@@ -1,108 +1,112 @@
 import { impassibleStructureTypes, myColors } from 'international/constants'
-import { getRange, pack } from 'international/generalFunctions'
+import { arePositionsEqual, findClosestObject, findClosestObjectEuc, getRange, getRangeEuc, pack } from 'international/generalFunctions'
 import { creepClasses, MeleeDefender } from '../../creepClasses'
 
 export function meleeDefenderManager(room: Room, creepsOfRole: string[]) {
-     for (const creepName of creepsOfRole) {
-          const creep: MeleeDefender = Game.creeps[creepName]
+    for (const creepName of creepsOfRole) {
+        const creep: MeleeDefender = Game.creeps[creepName]
 
-          creep.advancedDefend()
-     }
+        if (creep.spawning) continue
+
+        creep.advancedDefend()
+    }
 }
 
 MeleeDefender.prototype.advancedDefend = function () {
-     const { room } = this
+    const { room } = this
 
-     // Get enemyAttackers in the room, informing false if there are none
+    // Get enemyAttackers in the room, informing false if there are none
 
-     const enemyAttackers = room.enemyAttackers.filter(function (enemyAttacker) {
-          return !enemyAttacker.isOnExit()
-     })
+    const enemyAttackers = room.enemyAttackers.filter(function (enemyAttacker) {
+        return !enemyAttacker.isOnExit()
+    })
 
-     if (!enemyAttackers.length) return false
+    if (!enemyAttackers.length) return false
 
-     // Get the closest enemyAttacker
+    // Get the closest enemyAttacker
 
-     const enemyAttacker = this.pos.findClosestByPath(enemyAttackers, {
-          ignoreCreeps: true,
-     })
+    const enemyAttacker = this.pos.findClosestByPath(enemyAttackers, {
+        ignoreCreeps: true,
+        ignoreRoads: true,
+    })
 
-     // Get the room's ramparts, filtering for those and informing false if there are none
+    // Get the room's ramparts, filtering for those and informing false if there are none
 
-     const ramparts = room.structures.rampart.filter(rampart => {
-          // Get structures at the rampart's pos
+    const ramparts = room.structures.rampart.filter(rampart => {
+        // Allow the rampart the creep is currently standing on
 
-          const structuresAtPos = room.lookForAt(LOOK_STRUCTURES, rampart.pos)
+        if (arePositionsEqual(this.pos, rampart.pos)) return true
 
-          // Loop through each structure
+        const structuresAtPos = room.lookForAt(LOOK_STRUCTURES, rampart.pos)
 
-          for (const structure of structuresAtPos) {
-               // If the structure is impassible, inform false
+        // Loop through each structure
+        // If the structure is impassible, inform false
 
-               if (impassibleStructureTypes.includes(structure.structureType)) return false
-          }
+        for (const structure of structuresAtPos)
+            if (impassibleStructureTypes.includes(structure.structureType)) return false
 
-          // Allow the rampart the creep is currently standing on
+        // Inform wether there is a creep at the pos
 
-          if (rampart.pos === this.pos) return true
+        return !room.creepPositions[pack(rampart.pos)]
+    })
 
-          // Inform wether there is a creep at the pos
+    if (!ramparts.length) {
+        delete this.memory.ROS
 
-          return room.creepPositions[pack(rampart.pos)]
-     })
+        if (getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y) > 1) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goal: { pos: enemyAttacker.pos, range: 1 },
+            })
 
-     if (!ramparts.length) {
+            return true
+        }
 
-          delete this.memory.ROS
+        this.attack(enemyAttacker)
 
-          if (getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y) > 1) {
-               this.createMoveRequest({
-                    origin: this.pos,
-                    goal: { pos: enemyAttacker.pos, range: 1 },
-               })
+        if (enemyAttacker.getActiveBodyparts(MOVE) > 0) this.moveRequest = pack(enemyAttacker.pos)
+        return true
+    }
 
-               return true
-          }
+    this.memory.ROS = true
 
-          this.attack(enemyAttacker)
+    // Attack the enemyAttacker
 
-          if (enemyAttacker.getActiveBodyparts(MOVE) > 0) this.move(this.pos.getDirectionTo(enemyAttacker))
+    this.attack(enemyAttacker)
 
-          return true
-     }
+    // Find the closest rampart to the enemyAttacker
 
-     this.memory.ROS = true
+    for (const rampart of ramparts)
+        room.visual.text(
+            getRangeEuc(enemyAttacker.pos.x, rampart.pos.x, enemyAttacker.pos.y, rampart.pos.y).toString(),
+            rampart.pos,
+            { font: 0.5 },
+        )
 
-     // Attack the enemyAttacker
+    const closestRampart = findClosestObjectEuc(enemyAttacker.pos, ramparts)
 
-     this.attack(enemyAttacker)
+    room.visual.circle(enemyAttacker.pos, { fill: myColors.yellow })
+    room.visual.circle(closestRampart.pos, { fill: myColors.red })
+    // Visualize the targeting, if roomVisuals are enabled
 
-     // Find the closest rampart to the enemyAttacker
+    if (Memory.roomVisuals)
+        room.visual.line(this.pos, closestRampart.pos, {
+            color: myColors.lightBlue,
+            opacity: 0.2,
+        })
 
-     const closestRampart = enemyAttacker.pos.findClosestByPath(ramparts, {
-          ignoreCreeps: true,
-          ignoreRoads: true
-     })
+    // If the creep is range 0 to the closestRampart, inform false
 
-     // Visualize the targeting, if roomVisuals are enabled
+    if (getRange(this.pos.x, closestRampart.pos.x, this.pos.y, closestRampart.pos.y) === 0) return false
 
-     if (Memory.roomVisuals)
-          room.visual.line(this.pos, closestRampart.pos, {
-               color: myColors.lightBlue,
-          })
+    // Otherwise move to the rampart preffering ramparts and inform true
 
-     // If the creep is range 0 to the closestRampart, inform false
+    this.createMoveRequest({
+        origin: this.pos,
+        goal: { pos: closestRampart.pos, range: 0 },
+        plainCost: 20,
+        swampCost: 80,
+    })
 
-     if (this.pos.getRangeTo(closestRampart.pos) === 0) return false
-
-     // Otherwise move to the rampart preffering ramparts and inform true
-
-     this.createMoveRequest({
-          origin: this.pos,
-          goal: { pos: closestRampart.pos, range: 0 },
-          plainCost: 20,
-          swampCost: 80,
-     })
-
-     return true
+    return true
 }
