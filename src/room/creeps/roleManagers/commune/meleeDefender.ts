@@ -1,6 +1,6 @@
 import { impassibleStructureTypes, myColors } from 'international/constants'
 import { getRange, pack } from 'international/generalFunctions'
-import { MeleeDefender } from '../../creepClasses'
+import { creepClasses, MeleeDefender } from '../../creepClasses'
 
 export function meleeDefenderManager(room: Room, creepsOfRole: string[]) {
      for (const creepName of creepsOfRole) {
@@ -52,6 +52,9 @@ MeleeDefender.prototype.advancedDefend = function () {
      })
 
      if (!ramparts.length) {
+
+          delete this.memory.ROS
+
           if (getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y) > 1) {
                this.createMoveRequest({
                     origin: this.pos,
@@ -67,6 +70,8 @@ MeleeDefender.prototype.advancedDefend = function () {
 
           return true
      }
+
+     this.memory.ROS = true
 
      // Attack the enemyAttacker
 

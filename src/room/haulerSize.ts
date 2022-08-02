@@ -8,12 +8,12 @@ Room.prototype.haulerSizeManager = function () {
 
     memory.HU = haulerUpdateDefault
 
-    memory.HS =
-        Math.min(
+    memory.HS = Number.MAX_SAFE_INTEGER
+        /* Math.min(
             Math.max(
                 Math.floor(((CPUBucketCapacity - CPUBucketCapacity * 0.3 - Game.cpu.bucket) / CPUBucketCapacity) * 50),
                 1,
             ),
             48,
-        ) * BODYPART_COST[MOVE]
+        ) * BODYPART_COST[MOVE] */
 }

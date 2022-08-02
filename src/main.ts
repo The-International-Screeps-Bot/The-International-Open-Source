@@ -1636,6 +1636,11 @@ declare global {
          * Ticks Waited for an arbitrary event
          */
         TW: number
+
+        /**
+         * Rampart Only Shoving, informs wether the creep must be shoved to viable ramparts or not
+         */
+        ROS: boolean
     }
 
     // PowerCreeps

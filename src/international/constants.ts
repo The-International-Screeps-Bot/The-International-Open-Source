@@ -207,6 +207,15 @@ export const creepRoles: CreepRoles[] = [
     'antifaSupporter',
 ]
 
+const trafficPriorities: Map<Partial<CreepRoles>, number> = new Map()
+
+trafficPriorities.set('meleeDefender', Infinity)
+
+trafficPriorities.set('source1RemoteHarvester', 1)
+trafficPriorities.set('source2RemoteHarvester', 1)
+
+export { trafficPriorities }
+
 // Set of messages to randomly apply to commune rooms
 
 export const communeSigns = ['A commune of the proletariat. Bourgeoisie not welcome here!']

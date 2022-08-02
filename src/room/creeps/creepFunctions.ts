@@ -951,7 +951,9 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
 
         if (hasImpassibleStructure) continue
 
-        if (this.role === 'meleeDefender') {
+        // If the shove positions must have viable ramparts
+
+        if (this.memory.ROS) {
             let hasRampart
 
             for (const structure of pos.lookFor(LOOK_STRUCTURES)) {
