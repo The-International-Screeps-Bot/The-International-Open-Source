@@ -92,6 +92,8 @@ Room.prototype.remotesManager = function () {
                 remoteMemory.needs[remoteNeedsIndex.minHeal] += enemyCreep.attackStrength
             }
 
+            remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = remote.structures.invaderCore.length
+
             // If there are walls or enemyStructures, set dismantler need
 
             const enemyStructures = remote.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
