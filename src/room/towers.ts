@@ -92,9 +92,6 @@ Room.prototype.towersAttackCreeps = function () {
         // Otherwise record that the tower is no longer inactionable
 
         tower.inactionable = true
-
-        // And iterate
-
         continue
     }
 }

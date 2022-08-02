@@ -35,9 +35,10 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             const sourceIndex = 0
-            const priority =
-                (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom.source1Harvester.length
             const role = 'source1Harvester'
+
+            const priority =
+                (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
             if (spawnEnergyCapacity >= 800) {
                 return {
@@ -125,9 +126,10 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             const sourceIndex = 1
-            const priority =
-                (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom.source1Harvester.length
             const role = 'source2Harvester'
+
+            const priority =
+                (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
             if (spawnEnergyCapacity >= 800) {
                 return {
@@ -214,7 +216,7 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            const priority = 0.5 + this.creepsFromRoom.hauler.length * 1.5
+            const priority = 0.5 + this.creepsFromRoom.hauler.length
 
             // Construct the required carry parts
 
