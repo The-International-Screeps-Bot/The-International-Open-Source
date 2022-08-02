@@ -1,4 +1,4 @@
-import { allyList } from 'international/constants'
+import { allyList, roomDimensions } from 'international/constants'
 import { getRange } from 'international/generalFunctions'
 
 Object.defineProperties(Creep.prototype, {
@@ -21,7 +21,7 @@ Object.defineProperties(Creep.prototype, {
             if (this._commune) return this._commune
 
             return (this._commune = this.name.split(' ')[2])
-        }
+        },
     },
     reservation: {
         get() {
@@ -109,9 +109,9 @@ Object.defineProperties(Creep.prototype, {
 
             this._parts = {}
 
-            for (const part of this.body) {
-                this._parts[part.type] ? (this._parts[part.type] += 1) : (this._parts[part.type] = 1)
-            }
+            for (const partType of BODYPARTS_ALL) this._parts[partType] = 0
+
+            for (const part of this.body) this._parts[part.type] += 1
 
             return this._parts
         },
@@ -161,14 +161,14 @@ Object.defineProperties(Creep.prototype, {
 
             // Find adjacent creeps
 
-            const adjacentCreeps = room.lookForAtArea(
-                LOOK_CREEPS,
-                this.pos.y - 3,
-                this.pos.x - 3,
-                this.pos.y + 3,
-                this.pos.x + 3,
-                true,
-            )
+            let top = Math.max(Math.min(this.pos.y - 3, roomDimensions - 1), 0)
+            let left = Math.max(Math.min(this.pos.x - 3, roomDimensions - 1), 0)
+            let bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 1), 0)
+            let right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 1), 0)
+
+            // Find adjacent creeps
+
+            const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
 
             // Loop through each adjacentCreep
 

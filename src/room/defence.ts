@@ -69,13 +69,10 @@ Room.prototype.advancedActivateSafeMode = function () {
 
     if (this.controller.upgradeBlocked > 0) return
 
-    const enemyAttackers = this.enemyAttackers.filter(function (creep) {
-        return !creep.isOnExit()
-    })
-
     // Filter attackers that are not invaders. If there are none, stop
 
-    const nonInvaderAttackers = enemyAttackers.filter(enemyAttacker => enemyAttacker.owner.username !== 'Invader')
+    const nonInvaderAttackers = this.enemyAttackers.filter(enemyCreep => !enemyCreep.isOnExit() && enemyCreep.owner.username /* !== 'Invader' */ )
+
     if (!nonInvaderAttackers.length) return
 
     // Otherwise if safeMode can be activated
@@ -100,7 +97,7 @@ Room.prototype.advancedActivateSafeMode = function () {
         if (!(attackTarget instanceof Structure)) continue
 
         if (!safemodeTargets.includes(attackTarget.structureType)) continue
-        
+
         this.controller.activateSafeMode()
         return
     }

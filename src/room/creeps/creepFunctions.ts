@@ -1112,9 +1112,14 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         return
     }
 
-    // If the creepAtPos has a moveRequest and it's valid
+    // If the creepAtPos has a moveRequest
 
-    if (creepAtPos.moveRequest && room.moveRequests[creepAtPos.moveRequest].length) {
+    if (creepAtPos.moveRequest) {
+
+        // If it's not valid
+
+        if (!room.moveRequests[creepAtPos.moveRequest].length) return
+
         // If the creep's pos and the creepAtPos's moveRequests are aligned
 
         if (pack(this.pos) === creepAtPos.moveRequest) {
@@ -1157,7 +1162,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
     // Otherwise the creepAtPos has no moveRequest
 
-    if (!creepAtPos.moveRequest && creepAtPos.shove(this.pos)) {
+    if (creepAtPos.shove(this.pos)) {
         this.runMoveRequest()
         return
     }
@@ -1399,10 +1404,10 @@ Creep.prototype.passiveHeal = function () {
             return false
         }
 
-        let top = Math.max(Math.min(this.pos.y - 1, roomDimensions - 2), 2)
-        let left = Math.max(Math.min(this.pos.x - 1, roomDimensions - 2), 2)
-        let bottom = Math.max(Math.min(this.pos.y + 1, roomDimensions - 2), 2)
-        let right = Math.max(Math.min(this.pos.x + 1, roomDimensions - 2), 2)
+        let top = Math.max(Math.min(this.pos.y - 1, roomDimensions - 1), 0)
+        let left = Math.max(Math.min(this.pos.x - 1, roomDimensions - 1), 0)
+        let bottom = Math.max(Math.min(this.pos.y + 1, roomDimensions - 1), 0)
+        let right = Math.max(Math.min(this.pos.x + 1, roomDimensions - 1), 0)
 
         // Find adjacent creeps
 
@@ -1565,7 +1570,21 @@ Creep.prototype.reservationManager = function () {
         }
 
         if (target instanceof Resource) {
-            target.reserveAmount -= reservation.amount
+
+            let { amount } = reservation
+
+            target.reserveAmount -= amount
+
+            if (amount === 0) {
+                target.reserveAmount += amount
+                this.deleteReservation(0)
+            }
+
+            if (Memory.roomVisuals) {
+                this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1, { font: 0.5, })
+                this.room.visual.text(`${target.reserveAmount}`, this.pos.x, this.pos.y + 2, { font: 0.5, })
+            }
+
             continue
         }
 
@@ -1580,8 +1599,8 @@ Creep.prototype.reservationManager = function () {
             }
 
             if (Memory.roomVisuals) {
-                this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1)
-                this.room.visual.text(`${target.store[reservation.resourceType]}`, this.pos.x, this.pos.y + 2)
+                this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1, { font: 0.5, })
+                this.room.visual.text(`${target.store[reservation.resourceType]}`, this.pos.x, this.pos.y + 2, { font: 0.5, })
             }
 
             reservation.amount = amount
@@ -1636,7 +1655,7 @@ Creep.prototype.fulfillReservation = function () {
         }
 
         if (pickupResult === OK) {
-            target.reserveAmount -= reservation.amount
+
             this.store[reservation.resourceType] += reservation.amount
 
             this.deleteReservation(0)

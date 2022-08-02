@@ -766,7 +766,7 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._METT) return this._METT
 
-            this._METT = [...this.spawningStructuresByNeed, ...this.structures.tower]
+            this._METT = [...this.spawningStructuresByNeed]
 
             if (!this.fastFillerContainerLeft && !this.fastFillerContainerRight) {
                 // Add builders that need energy
@@ -779,6 +779,13 @@ Object.defineProperties(Room.prototype, {
                     if (creep.store.getCapacity() * 0.5 >= creep.usedStore()) this._METT.push(creep)
                 }
             }
+
+            // Add towers below half capacity
+
+            this._METT = this._METT.concat(this.structures.tower.filter(tower => {
+
+                return tower.store.energy <= tower.store.getCapacity(RESOURCE_ENERGY) * 0.5
+            }))
 
             return this._METT
         },
