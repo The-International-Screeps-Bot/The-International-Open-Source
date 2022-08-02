@@ -737,9 +737,6 @@ Object.defineProperties(Room.prototype, {
 
             if (this.storage) this._OEWT.push(this.storage)
             if (this.terminal) this._OEWT.push(this.terminal)
-            if (this.structures.factory[0]) this._OEWT.push(this.structures.factory[0])
-            if (this.structures.nuker[0]) this._OEWT.push(this.structures.nuker[0])
-            if (this.structures.powerSpawn[0]) this._OEWT.push(this.structures.powerSpawn[0])
 
             return this._OEWT
         },
@@ -798,9 +795,6 @@ Object.defineProperties(Room.prototype, {
 
             if (this.storage) this._OETT.push(this.storage)
             if (this.terminal) this._OETT.push(this.terminal)
-            if (this.structures.factory[0]) this._OETT.push(this.structures.factory[0])
-            if (this.structures.nuker[0]) this._OETT.push(this.structures.nuker[0])
-            if (this.structures.powerSpawn[0]) this._OETT.push(this.structures.powerSpawn[0])
 
             return this._OETT
         },
