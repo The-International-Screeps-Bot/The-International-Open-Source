@@ -387,21 +387,17 @@ Creep.prototype.advancedBuildCSite = function () {
         return true
     }
 
-    // Otherwise
+    // Buld the cSite
 
-    // Try to build the construction site
-
-    const buildResult = this.build(cSiteTarget)
-
-    // If the build worked
-
-    if (buildResult === OK) {
+    if (this.build(cSiteTarget) === OK) {
         // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
         const energySpentOnConstruction = Math.min(
             this.parts.work * BUILD_POWER,
             (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
         )
+
+        if (this.store.energy - energySpentOnConstruction <= 0) this.memory.NR = true
 
         // Add control points to total controlPoints counter and say the success
 
@@ -412,8 +408,6 @@ Creep.prototype.advancedBuildCSite = function () {
             )
 
         this.say(`🚧${energySpentOnConstruction}`)
-
-        // Inform true
 
         return true
     }
@@ -487,6 +481,8 @@ Creep.prototype.advancedBuildAllyCSite = function () {
             this.parts.work * BUILD_POWER,
             (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
         )
+
+        this.store.energy -= energySpentOnConstruction
 
         // Add control points to total controlPoints counter and say the success
 
@@ -1117,7 +1113,6 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     // If the creepAtPos has a moveRequest
 
     if (creepAtPos.moveRequest) {
-
         // If it's not valid
 
         if (!room.moveRequests[creepAtPos.moveRequest].length) return
@@ -1182,7 +1177,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 Creep.prototype.needsResources = function () {
     // If the creep is empty
 
-    if (this.usedStore() === 0)
+    if (this.usedStore() <= 0)
         // Record and inform that the creep needs resources
 
         return (this.memory.NR = true)
@@ -1525,7 +1520,7 @@ Creep.prototype.passiveRangedAttack = function () {
 }
 
 Creep.prototype.deleteReservation = function (index) {
-    this.memory.reservations.splice(index)
+    this.memory.reservations.splice(index, 1)
 
     this.message += '❌'
 }
@@ -1572,7 +1567,6 @@ Creep.prototype.reservationManager = function () {
         }
 
         if (target instanceof Resource) {
-
             let { amount } = reservation
 
             target.reserveAmount -= amount
@@ -1583,8 +1577,8 @@ Creep.prototype.reservationManager = function () {
             }
 
             if (Memory.roomVisuals) {
-                this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1, { font: 0.5, })
-                this.room.visual.text(`${target.reserveAmount}`, this.pos.x, this.pos.y + 2, { font: 0.5, })
+                this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1, { font: 0.5 })
+                this.room.visual.text(`${target.reserveAmount}`, this.pos.x, this.pos.y + 2, { font: 0.5 })
             }
 
             continue
@@ -1601,8 +1595,10 @@ Creep.prototype.reservationManager = function () {
             }
 
             if (Memory.roomVisuals) {
-                this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1, { font: 0.5, })
-                this.room.visual.text(`${target.store[reservation.resourceType]}`, this.pos.x, this.pos.y + 2, { font: 0.5, })
+                this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1, { font: 0.5 })
+                this.room.visual.text(`${target.store[reservation.resourceType]}`, this.pos.x, this.pos.y + 2, {
+                    font: 0.5,
+                })
             }
 
             reservation.amount = amount
@@ -1610,7 +1606,16 @@ Creep.prototype.reservationManager = function () {
             continue
         }
 
-        target.store[reservation.resourceType] -= reservation.amount
+        let amount = reservation.amount
+
+        target.store[reservation.resourceType] -= amount
+
+        if (Memory.roomVisuals) {
+            this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1, { font: 0.5 })
+            this.room.visual.text(`${target.store[reservation.resourceType]}`, this.pos.x, this.pos.y + 2, {
+                font: 0.5,
+            })
+        }
     }
 }
 
@@ -1657,7 +1662,6 @@ Creep.prototype.fulfillReservation = function () {
         }
 
         if (pickupResult === OK) {
-
             this.store[reservation.resourceType] += reservation.amount
 
             this.deleteReservation(0)
@@ -1696,13 +1700,17 @@ Creep.prototype.fulfillReservation = function () {
         return false
     }
 
-    amount = Math.min(reservation.amount, target.store[reservation.resourceType] + reservation.amount)
+    amount = Math.min(
+        Math.min(amount, this.store.getFreeCapacity(reservation.resourceType)),
+        target.store[reservation.resourceType] + reservation.amount,
+    )
 
     // Withdraw
 
     target.store[reservation.resourceType] += amount
 
     const withdrawResult = this.withdraw(target as any, reservation.resourceType, amount)
+    this.message += withdrawResult
 
     if (withdrawResult === ERR_FULL) {
         this.deleteReservation(0)

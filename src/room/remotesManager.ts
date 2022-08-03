@@ -81,36 +81,34 @@ Room.prototype.remotesManager = function () {
             )
         }
 
-        if (remote) {
-            remoteMemory.needs[remoteNeedsIndex.minDamage] = 0
-            remoteMemory.needs[remoteNeedsIndex.minHeal] = 0
+        if (!remote) continue
+        remoteMemory.needs[remoteNeedsIndex.minDamage] = 0
+        remoteMemory.needs[remoteNeedsIndex.minHeal] = 0
 
-            // Increase the defenderNeed according to the creep's strength
+        // Increase the defenderNeed according to the creep's strength
 
-            for (const enemyCreep of remote.enemyCreeps) {
-                remoteMemory.needs[remoteNeedsIndex.minDamage] += enemyCreep.healStrength
-                remoteMemory.needs[remoteNeedsIndex.minHeal] += enemyCreep.attackStrength
-            }
-
-            remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = remote.structures.invaderCore.length
-
-            // If there are walls or enemyStructures, set dismantler need
-
-            const enemyStructures = remote.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
-                return structure.structureType != STRUCTURE_INVADER_CORE
-            })
-
-            remoteMemory.needs[remoteNeedsIndex.remoteDismantler] =
-                remote.actionableWalls.length || enemyStructures.length ? 1 : 0
+        for (const enemyCreep of remote.enemyCreeps) {
+            remoteMemory.needs[remoteNeedsIndex.minDamage] += enemyCreep.healStrength
+            remoteMemory.needs[remoteNeedsIndex.minHeal] += enemyCreep.attackStrength
         }
 
-        if (
-            (this.controller.reservation && this.controller.reservation.username !== Memory.me) ||
-            remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] > 0
-        ) {
+        // If the controller is reserved and not by me
+
+        if (remote.controller.reservation && remote.controller.reservation.username !== Memory.me) {
             remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 0
             remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = 0
             remoteMemory.needs[remoteNeedsIndex.remoteHauler] = 0
         }
+
+        remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = remote.structures.invaderCore.length
+
+        // If there are walls or enemyStructures, set dismantler need
+
+        const enemyStructures = remote.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
+            return structure.structureType != STRUCTURE_INVADER_CORE
+        })
+
+        remoteMemory.needs[remoteNeedsIndex.remoteDismantler] =
+            remote.actionableWalls.length || enemyStructures.length ? 1 : 0
     }
 }

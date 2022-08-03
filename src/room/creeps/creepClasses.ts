@@ -34,6 +34,9 @@ export class ControllerUpgrader extends Creep {
 creepClasses.controllerUpgrader = ControllerUpgrader
 
 export class Builder extends Creep {
+
+     getEnergy?(): boolean
+
      constructor(creepID: Id<Creep>) {
           super(creepID)
      }
