@@ -3,11 +3,14 @@ import {
     allyList,
     builderSpawningWhenStorageThreshold,
     claimRequestNeedsIndex,
+    containerUpkeepCost,
     controllerDowngradeUpgraderNeed,
     minHarvestWorkRatio,
     myColors,
+    rampartUpkeepCost,
     remoteHarvesterRoles,
     remoteNeedsIndex,
+    roadUpkeepCost,
     upgraderSpawningWhenStorageThreshold,
 } from 'international/constants'
 import {
@@ -581,15 +584,15 @@ Room.prototype.spawnRequester = function () {
 
             // For each road, add a multiplier
 
-            partsMultiplier += this.structures.road.length * 0.01
+            partsMultiplier += this.structures.road.length * roadUpkeepCost * 1.2
 
             // For each container, add a multiplier
 
-            partsMultiplier += this.structures.container.length * 0.2
+            partsMultiplier += this.structures.container.length * containerUpkeepCost * 1.2
 
             // For each rampart, add a multiplier
 
-            partsMultiplier += ramparts.length * 0.05
+            partsMultiplier += ramparts.length * rampartUpkeepCost * 1.2
 
             // For every attackValue, add a multiplier
 

@@ -315,9 +315,9 @@ Object.defineProperties(Room.prototype, {
     },
     sourcePositions: {
         get() {
-            if (this._sourcePositions) return this._sourcePositions
+            if (this._sourcePositions?.length) return this._sourcePositions
 
-            if (this.memory.SP) {
+            if (this.memory.SP?.length) {
                 this._sourcePositions = []
 
                 for (const positions of this.memory.SP) this._sourcePositions.push(unpackPosList(positions))
@@ -330,8 +330,13 @@ Object.defineProperties(Room.prototype, {
 
             let anchor = this.anchor || new RoomPosition(25, 25, this.name)
 
-            if (this.memory.type === 'remote')
-                anchor = Game.rooms[this.memory.commune].anchor || new RoomPosition(25, 25, this.name)
+            if (this.memory.type === 'remote') {
+
+                const commune = Game.rooms[this.memory.commune]
+                if (!commune) return []
+
+                anchor = commune.anchor || new RoomPosition(25, 25, commune.name)
+            }
 
             const terrain = Game.map.getRoomTerrain(this.name)
 
@@ -415,17 +420,35 @@ Object.defineProperties(Room.prototype, {
     },
     sourcePaths: {
         get() {
-            if (this._sourcePaths) return this._sourcePaths
+            if (this._sourcePaths?.length) return this._sourcePaths
 
             this._sourcePaths = []
 
-            if (this.global.sourcePaths) {
+            if (this.global.sourcePaths?.length) {
                 for (const path of this.global.sourcePaths) this._sourcePaths.push(unpackPosList(path))
 
                 return this._sourcePaths
             }
 
             this.global.sourcePaths = []
+
+            if (this.memory.type === 'remote') {
+
+                const commune = Game.rooms[this.memory.commune]
+                if (!commune) return []
+
+                for (const source of this.sources) {
+                    const path = this.advancedFindPath({
+                        origin: source.pos,
+                        goal: { pos: commune.anchor, range: 3 },
+                    })
+
+                    this._sourcePaths.push(path)
+                    this.global.sourcePaths.push(packPosList(path))
+                }
+
+                return this._sourcePaths
+            }
 
             for (const source of this.sources) {
                 const path = this.advancedFindPath({
