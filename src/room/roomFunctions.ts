@@ -4,6 +4,7 @@ import {
     impassibleStructureTypes,
     minHarvestWorkRatio,
     myColors,
+    numbersByStructureTypes,
     prefferedCommuneRange,
     remoteNeedsIndex,
     roomDimensions,
@@ -15,115 +16,24 @@ import {
 import {
     advancedFindDistance,
     arePositionsEqual,
+    createPosMap,
     customLog,
     findClosestClaimType,
     findClosestCommuneName,
     findPositionsInsideRect,
     getRange,
     pack,
+    packXY,
     unpackAsPos,
     unpackAsRoomPos,
 } from 'international/generalFunctions'
+import { internationalManager } from 'international/internationalManager'
+import { unpackCoordAsPos, unpackPos } from 'other/packrat'
 import { basePlanner } from './construction/basePlanner'
 import { RoomCacheObject } from './roomObject'
 
 Room.prototype.get = function (roomObjectName) {
     const room = this
-
-    // Cost matrixes
-
-    function generateTerrainCM() {
-        const terrain = room.getTerrain()
-
-        // Create a CostMatrix for terrain types
-
-        const terrainCM = new PathFinder.CostMatrix()
-
-        // Loop through each x and y in the room
-
-        for (let x = 0; x < roomDimensions; x += 1) {
-            for (let y = 0; y < roomDimensions; y += 1) {
-                // Try to find the terrainValue
-
-                const terrainValue = terrain.get(x, y)
-
-                // If terrain is a wall
-
-                if (terrainValue === TERRAIN_MASK_WALL) {
-                    // Set this positions as 1 in the terrainCM
-
-                    terrainCM.set(x, y, 255)
-                }
-            }
-        }
-
-        return terrainCM
-    }
-
-    new RoomCacheObject({
-        name: 'terrainCM',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor: generateTerrainCM,
-    })
-
-    function generateBaseCM() {
-        // Construct a cost matrix based off terrain cost matrix
-
-        const baseCM = room.roomObjects.terrainCM.getValue().clone()
-
-        // Get the room's exits
-
-        const exits = room.find(FIND_EXIT)
-
-        // Loop through each exit of exits
-
-        for (const pos of exits) {
-            // Record the exit as a pos to avoid
-
-            baseCM.set(pos.x, pos.y, 255)
-
-            // Construct a rect and get the positions in a range of 2
-
-            const adjacentPositions = findPositionsInsideRect(pos.x - 2, pos.y - 2, pos.x + 2, pos.y + 2)
-
-            // Loop through adjacent positions
-
-            for (const adjacentPos of adjacentPositions) {
-                // Otherwise record the position as a wall
-
-                baseCM.set(adjacentPos.x, adjacentPos.y, 255)
-            }
-        }
-
-        // Inform the baseCM
-
-        return baseCM
-    }
-
-    new RoomCacheObject({
-        name: 'baseCM',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor: generateBaseCM,
-    })
-
-    // roadCM
-
-    new RoomCacheObject({
-        name: 'roadCM',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: Infinity,
-        room,
-        valueConstructor: () => {
-            return new PathFinder.CostMatrix()
-        },
-    })
 
     // Resources
 
@@ -222,7 +132,7 @@ Room.prototype.get = function (roomObjectName) {
 
         // Get the open areas in a range of 3 to the controller
 
-        const distanceCM = room.distanceTransform(
+        const distanceCoords = room.distanceTransform(
             undefined,
             false,
             room.controller.pos.x - 2,
@@ -234,7 +144,7 @@ Room.prototype.get = function (roomObjectName) {
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
         return room.findClosestPosOfValue({
-            CM: distanceCM,
+            coordMap: distanceCoords,
             startPos: room.anchor,
             requiredValue: 2,
             reduceIterations: 1,
@@ -760,6 +670,19 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
+                if (opts.weightCoordMaps) {
+
+                    for (const coordMap of opts.weightCoordMaps) {
+
+                        for (const packedCoord of coordMap) {
+
+                            const coord = unpackAsPos(packedCoord)
+
+                            cm.set(coord.x, coord.y, coordMap[packedCoord])
+                        }
+                    }
+                }
+
                 // If there is no vision in the room, inform the costMatrix
 
                 if (!room) return cm
@@ -1110,7 +1033,6 @@ Room.prototype.findType = function (scoutingRoom: Room) {
             const hasTerminal = room.terminal !== undefined
 
             if (hasTerminal) {
-
                 threat += 800
 
                 room.memory.terminal = true
@@ -1269,7 +1191,6 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         // loop through sourceNames
 
         for (const source of room.sources) {
-
             const path = room.advancedFindPath({
                 origin: source.pos,
                 goal: { pos: scoutingRoom.anchor, range: 3 },
@@ -1420,7 +1341,7 @@ Room.prototype.findStoredResourceAmount = function (resourceType) {
 }
 
 Room.prototype.distanceTransform = function (
-    initialCM,
+    initialCoords,
     enableVisuals,
     x1 = 0,
     y1 = 0,
@@ -1431,16 +1352,18 @@ Room.prototype.distanceTransform = function (
 
     // Use a costMatrix to record distances
 
-    const distanceCM = new PathFinder.CostMatrix()
+    const distanceCoords = createPosMap()
 
-    if (!initialCM) initialCM = room.get('terrainCM')
+    if (!initialCoords) initialCoords = internationalManager.getTerrainCoords(this.name)
 
     let x
     let y
+    let packedCoord
 
     for (x = Math.max(x1 - 1, 0); x <= Math.min(x2 + 1, roomDimensions); x += 1) {
         for (y = Math.max(y1 - 1, 0); y <= Math.min(y2 + 1, roomDimensions); y += 1) {
-            distanceCM.set(x, y, initialCM.get(x, y) === 255 ? 0 : 255)
+            packedCoord = packXY(x, y)
+            distanceCoords[packedCoord] = initialCoords[packedCoord] === 255 ? 0 : 255
         }
     }
 
@@ -1454,13 +1377,16 @@ Room.prototype.distanceTransform = function (
 
     for (x = x1; x <= x2; x += 1) {
         for (y = y1; y <= y2; y += 1) {
-            top = distanceCM.get(x, y - 1)
-            left = distanceCM.get(x - 1, y)
-            topLeft = distanceCM.get(x - 1, y - 1)
-            topRight = distanceCM.get(x + 1, y - 1)
-            bottomLeft = distanceCM.get(x - 1, y + 1)
+            top = distanceCoords[packXY(x, y - 1)]
+            left = distanceCoords[packXY(x - 1, y - 1)]
+            topLeft = distanceCoords[packXY(x - 1, y - 1)]
+            topRight = distanceCoords[packXY(x + 1, y - 1)]
+            bottomLeft = distanceCoords[packXY(x - 1, y + 1)]
 
-            distanceCM.set(x, y, Math.min(Math.min(top, left, topLeft, topRight, bottomLeft) + 1, distanceCM.get(x, y)))
+            distanceCoords[packedCoord] = Math.min(
+                Math.min(top, left, topLeft, topRight, bottomLeft) + 1,
+                distanceCoords[packedCoord],
+            )
         }
     }
 
@@ -1472,16 +1398,15 @@ Room.prototype.distanceTransform = function (
 
     for (x = x2; x >= x1; x -= 1) {
         for (y = y2; y >= y1; y -= 1) {
-            bottom = distanceCM.get(x, y + 1)
-            right = distanceCM.get(x + 1, y)
-            bottomRight = distanceCM.get(x + 1, y + 1)
-            topRight = distanceCM.get(x + 1, y - 1)
-            bottomLeft = distanceCM.get(x - 1, y + 1)
+            bottom = distanceCoords[packXY(x, y + 1)]
+            right = distanceCoords[packXY(x + 1, y)]
+            bottomRight = distanceCoords[packXY(x + 1, y + 1)]
+            topRight = distanceCoords[packXY(x + 1, y - 1)]
+            bottomLeft = distanceCoords[packXY(x - 1, y + 1)]
 
-            distanceCM.set(
-                x,
-                y,
-                Math.min(Math.min(bottom, right, bottomRight, topRight, bottomLeft) + 1, distanceCM.get(x, y)),
+            distanceCoords[packedCoord] = Math.min(
+                Math.min(bottom, right, bottomRight, topRight, bottomLeft) + 1,
+                distanceCoords[packedCoord],
             )
         }
     }
@@ -1492,18 +1417,18 @@ Room.prototype.distanceTransform = function (
         for (x = x1; x <= x2; x += 1) {
             for (y = y1; y <= y2; y += 1) {
                 room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${distanceCM.get(x, y) * 10}, 100%, 60%)`,
+                    fill: `hsl(${200}${distanceCoords[packXY(x, y)] * 10}, 100%, 60%)`,
                     opacity: 0.4,
                 })
             }
         }
     }
 
-    return distanceCM
+    return distanceCoords
 }
 
 Room.prototype.diagonalDistanceTransform = function (
-    initialCM,
+    initialCoords,
     enableVisuals,
     x1 = 0,
     y1 = 0,
@@ -1514,16 +1439,18 @@ Room.prototype.diagonalDistanceTransform = function (
 
     // Use a costMatrix to record distances
 
-    const distanceCM = new PathFinder.CostMatrix()
+    const distanceCoords = createPosMap()
 
-    if (!initialCM) initialCM = room.get('terrainCM')
+    if (!initialCoords) initialCoords = internationalManager.getTerrainCoords(this.name)
 
     let x
     let y
+    let packedCoord
 
     for (x = x1; x <= x2; x += 1) {
         for (y = y1; y <= y2; y += 1) {
-            distanceCM.set(x, y, initialCM.get(x, y) === 255 ? 0 : 255)
+            packedCoord = packXY(x, y)
+            distanceCoords[packedCoord] = initialCoords[packedCoord] === 255 ? 0 : 255
         }
     }
 
@@ -1534,10 +1461,12 @@ Room.prototype.diagonalDistanceTransform = function (
 
     for (x = x1; x <= x2; x += 1) {
         for (y = y1; y <= y2; y += 1) {
-            top = distanceCM.get(x, y - 1)
-            left = distanceCM.get(x - 1, y)
+            top = distanceCoords[packXY(x, y - 1)]
+            left = distanceCoords[packXY(x - 1, y)]
 
-            distanceCM.set(x, y, Math.min(Math.min(top, left) + 1, distanceCM.get(x, y)))
+            packedCoord = packXY(x, y)
+
+            distanceCoords[packedCoord] = Math.min(Math.min(top, left) + 1, distanceCoords[packedCoord])
         }
     }
 
@@ -1548,10 +1477,12 @@ Room.prototype.diagonalDistanceTransform = function (
 
     for (x = x2; x >= x1; x -= 1) {
         for (y = y2; y >= y1; y -= 1) {
-            bottom = distanceCM.get(x, y + 1)
-            right = distanceCM.get(x + 1, y)
+            bottom = distanceCoords[packXY(x, y + 1)]
+            right = distanceCoords[packXY(x + 1, y)]
 
-            distanceCM.set(x, y, Math.min(Math.min(bottom, right) + 1, distanceCM.get(x, y)))
+            packedCoord = packXY(x, y)
+
+            distanceCoords[packedCoord] = Math.min(Math.min(bottom, right) + 1, distanceCoords[packedCoord])
         }
     }
 
@@ -1561,28 +1492,22 @@ Room.prototype.diagonalDistanceTransform = function (
         for (x = x1; x <= x2; x += 1) {
             for (y = y1; y <= y2; y += 1) {
                 room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${distanceCM.get(x, y) * 10}, 100%, 60%)`,
+                    fill: `hsl(${200}${distanceCoords[packXY(x, y)] * 10}, 100%, 60%)`,
                     opacity: 0.4,
                 })
             }
         }
     }
 
-    return distanceCM
+    return distanceCoords
 }
 
-Room.prototype.floodFill = function (seeds) {
-    const room = this
-
+Room.prototype.floodFill = function (seeds, coordMap = []) {
     // Construct a cost matrix for the flood
 
-    const floodCM = new PathFinder.CostMatrix()
-    // Get the terrain cost matrix
-
-    const terrain = room.getTerrain()
-    // Construct a cost matrix for visited tiles and add seeds to it
-
-    const visitedCM = new PathFinder.CostMatrix()
+    const floodCoords = createPosMap()
+    const terrainCoords = internationalManager.getTerrainCoords(this.name)
+    const visitedCoords = createPosMap()
 
     // Construct values for the flood
 
@@ -1590,18 +1515,9 @@ Room.prototype.floodFill = function (seeds) {
     let thisGeneration = seeds
     let nextGeneration: Coord[] = []
 
-    let pos
-
     // Loop through positions of seeds
 
-    for (pos of seeds) {
-        // Record the seedsPos as visited
-
-        visitedCM.set(pos.x, pos.y, 1)
-    }
-
-    let adjacentPositions
-    let adjacentPos
+    for (const coord of seeds) visitedCoords[pack(coord)] = 1
 
     // So long as there are positions in this gen
 
@@ -1612,45 +1528,47 @@ Room.prototype.floodFill = function (seeds) {
 
         // Iterate through positions of this gen
 
-        for (pos of thisGeneration) {
+        for (const coord1 of thisGeneration) {
             // If the depth isn't 0
 
             if (depth > 0) {
+                const packedCoord1 = pack(coord1)
+
                 // Iterate if the terrain is a wall
 
-                if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+                if (terrainCoords[packedCoord1] === TERRAIN_MASK_WALL) continue
+
+                if (coordMap[pack(coord1)] > 0) continue
 
                 // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
 
-                floodCM.set(pos.x, pos.y, depth)
+                floodCoords[packedCoord1] = depth
 
                 // If visuals are enabled, show the depth on the pos
 
                 if (Memory.roomVisuals)
-                    room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, {
+                    this.visual.rect(coord1.x - 0.5, coord1.y - 0.5, 1, 1, {
                         fill: `hsl(${200}${depth * 2}, 100%, 60%)`,
                         opacity: 0.4,
                     })
             }
 
-            // Construct a rect and get the positions in a range of 1
-
-            adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
-
             // Loop through adjacent positions
 
-            for (adjacentPos of adjacentPositions) {
+            for (const coord2 of findPositionsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+                const packedCoord2 = pack(coord2)
+
                 // Iterate if the adjacent pos has been visited or isn't a tile
 
-                if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
+                if (visitedCoords[packedCoord2] === 1) continue
 
                 // Otherwise record that it has been visited
 
-                visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+                visitedCoords[packedCoord2] = 1
 
                 // Add it to the next gen
 
-                nextGeneration.push(adjacentPos)
+                nextGeneration.push(coord2)
             }
         }
 
@@ -1663,7 +1581,7 @@ Room.prototype.floodFill = function (seeds) {
         depth += 1
     }
 
-    return floodCM
+    return floodCoords
 }
 
 Room.prototype.findClosestPosOfValue = function (opts) {
@@ -1672,10 +1590,10 @@ Room.prototype.findClosestPosOfValue = function (opts) {
     /**
      *
      */
-    function isViableAnchor(pos: Coord): boolean {
+    function isViableAnchor(coord1: Coord): boolean {
         // Get the value of the pos
 
-        const posValue = opts.CM.get(pos.x, pos.y)
+        const posValue = opts.coordMap[pack(coord1)]
 
         // If the value is to avoid, inform false
 
@@ -1689,40 +1607,29 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
         if (!opts.adjacentToRoads) return true
 
-        // Construct a rect and get the positions in a range of 1
-
-        const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
-
-        // Construct a default no for nearby roads
-
-        let nearbyRoad = false
-
         // Loop through adjacent positions
 
-        for (const adjacentPos of adjacentPositions) {
+        for (const coord2 of findPositionsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
             // If the adjacentPos isn't a roadPosition, iterate
 
-            if (opts.roadCM.get(adjacentPos.x, adjacentPos.y) !== 1) continue
+            if (opts.roadCoords[pack(coord2)] !== 1) continue
 
             // Otherwise set nearbyRoad to true and stop the loop
 
-            return (nearbyRoad = true)
+            return true
         }
 
         return false
     }
 
-    let pos
-    let adjacentPos
-
     while ((opts.reduceIterations || 0) >= 0) {
         // Construct a cost matrix for visited tiles and add seeds to it
 
-        const visitedCM = new PathFinder.CostMatrix()
+        const visitedCoords = createPosMap()
 
         // Record startPos as visited
 
-        visitedCM.set(opts.startPos.x, opts.startPos.y, 1)
+        visitedCoords[pack(opts.startPos)] = 1
 
         // Construct values for the check
 
@@ -1739,60 +1646,55 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
             // Iterate through positions of this gen
 
-            for (pos of thisGeneration) {
+            for (const coord1 of thisGeneration) {
                 // If the pos can be an anchor, inform it
 
-                if (isViableAnchor(pos)) return new RoomPosition(pos.x, pos.y, room.name)
+                if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
 
                 // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                const adjacentPositions = [
+                const adjacentCoords = [
                     {
-                        x: pos.x - 1,
-                        y: pos.y,
+                        x: coord1.x - 1,
+                        y: coord1.y,
                     },
                     {
-                        x: pos.x + 1,
-                        y: pos.y,
+                        x: coord1.x + 1,
+                        y: coord1.y,
                     },
                     {
-                        x: pos.x,
-                        y: pos.y - 1,
+                        x: coord1.x,
+                        y: coord1.y - 1,
                     },
                     {
-                        x: pos.x,
-                        y: pos.y + 1,
+                        x: coord1.x,
+                        y: coord1.y + 1,
                     },
                 ]
 
                 // Loop through adjacent positions
 
-                for (adjacentPos of adjacentPositions) {
+                for (const coord2 of adjacentCoords) {
                     // Iterate if the pos doesn't map onto a room
 
-                    if (
-                        adjacentPos.x < 0 ||
-                        adjacentPos.x >= roomDimensions ||
-                        adjacentPos.y < 0 ||
-                        adjacentPos.y >= roomDimensions
-                    )
+                    if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
                         continue
 
                     // Iterate if the adjacent pos has been visited or isn't a tile
 
-                    if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
+                    if (visitedCoords[pack(coord2)] === 1) continue
 
                     // Otherwise record that it has been visited
 
-                    visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+                    visitedCoords[pack(coord2)] = 1
 
                     // If canUseWalls is enabled and the terrain isnt' a wall, disable canUseWalls
 
-                    if (canUseWalls && opts.CM.get(adjacentPos.x, adjacentPos.y) !== 255) canUseWalls = false
+                    if (canUseWalls && opts.coordMap[(coord2.x, coord2.y)] !== 255) canUseWalls = false
 
                     // Add it tofastFillerSide the next gen
 
-                    nextGeneration.push(adjacentPos)
+                    nextGeneration.push(coord2)
                 }
             }
 
@@ -1878,7 +1780,7 @@ Room.prototype.findAllyCSiteTargetID = function (creep) {
     return false
 }
 
-Room.prototype.groupRampartPositions = function (rampartPositions, rampartPlans) {
+Room.prototype.groupRampartPositions = function (rampartPositions) {
     const room = this
 
     // Construct a costMatrix to store visited positions
@@ -1953,7 +1855,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions, rampartPlans)
 
                     // If a rampart is not planned for this position, iterate
 
-                    if (rampartPlans.get(adjacentPos.x, adjacentPos.y) !== 1) continue
+                    if (this.rampartCoords[pack(adjacentPos)] !== 1) continue
 
                     // Add it to the next gen and this group
 

@@ -1,6 +1,12 @@
-import { allStructureTypes, allyList, myColors, structureTypesByBuildPriority } from 'international/constants'
 import {
-    createPackedPosMap,
+    allStructureTypes,
+    allyList,
+    myColors,
+    roomDimensions,
+    structureTypesByBuildPriority,
+} from 'international/constants'
+import {
+    createPosMap,
     customLog,
     findClosestObject,
     findObjectWithID,
@@ -11,6 +17,7 @@ import {
     unpackAsPos,
     unpackAsRoomPos,
 } from 'international/generalFunctions'
+import { internationalManager } from 'international/internationalManager'
 import { packCoordList, packPosList, unpackPosList } from 'other/packrat'
 
 Object.defineProperties(Room.prototype, {
@@ -453,11 +460,56 @@ Object.defineProperties(Room.prototype, {
             return this._usedSourceCoords
         },
     },
-    rampartPlans: {
+    baseCoords: {
         get() {
-            if (this._rampartPlans) return this._rampartPlans
+            if (this._baseCoords) return this._baseCoords
 
-            return (this._rampartPlans = new PathFinder.CostMatrix())
+            this._baseCoords = [].concat(internationalManager.getTerrainCoords(this.name))
+
+            // Loop through each exit of exits
+
+            for (const pos of this.find(FIND_EXIT)) {
+                // Record the exit as a pos to avoid
+
+                this._baseCoords[pack(pos)] = 255
+
+                // Loop through adjacent positions
+
+                for (const coord of findPositionsInsideRect(pos.x - 2, pos.y - 2, pos.x + 2, pos.y + 2))
+                    this._baseCoords[pack(coord)] = 255
+            }
+
+            return (this._baseCoords = createPosMap())
+        },
+    },
+    rampartCoords: {
+        get() {
+            if (this._rampartCoords) return this._rampartCoords
+
+            return (this._rampartCoords = createPosMap())
+        },
+    },
+    roadCoords: {
+        get() {
+            if (this._roadCoords) return this._roadCoords
+
+            return (this._roadCoords = createPosMap())
+        },
+    },
+    terrainCoords: {
+        get() {
+            if (this.global.terrainCoords) return this.global.terrainCoords
+
+            this.global.terrainCoords = []
+            const terrain = this.getTerrain()
+
+            for (let x = 0; x < roomDimensions; x += 1) {
+                for (let y = 0; y < roomDimensions; y += 1) {
+                    this.global.terrainCoords[packXY(x, y)] = terrain.get(x, y)
+                }
+            }
+
+            return this.global.terrainCoords
         },
     },
     sourcePaths: {
@@ -751,14 +803,14 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._creepPositions) return this._creepPositions
 
-            return (this._creepPositions = createPackedPosMap())
+            return (this._creepPositions = createPosMap())
         },
     },
     moveRequests: {
         get() {
             if (this._moveRequests) return this._moveRequests
 
-            return (this._moveRequests = createPackedPosMap(true))
+            return (this._moveRequests = createPosMap(true))
         },
     },
     droppedEnergy: {

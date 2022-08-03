@@ -203,49 +203,49 @@ export function findClosestPos<T extends RoomPosition | Coord>(target: RoomPosit
  * @param x2 the second position's x
  * @param y2 the second position's y
  */
- export function getRangeEuc(x1: number, x2: number, y1: number, y2: number) {
-     // Find the range using Chebyshev's formula
+export function getRangeEuc(x1: number, x2: number, y1: number, y2: number) {
+    // Find the range using Chebyshev's formula
 
-     return Math.round(Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) * 10) / 10
- }
+    return Math.round(Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) * 10) / 10
+}
 
- /**
-  * Finds the closest object with a position to a given target (Euclidean)
-  */
- export function findClosestObjectEuc<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[]) {
-     let minRange = Infinity
-     let closest = undefined
+/**
+ * Finds the closest object with a position to a given target (Euclidean)
+ */
+export function findClosestObjectEuc<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[]) {
+    let minRange = Infinity
+    let closest = undefined
 
-     for (const object of objects) {
-         const range = getRangeEuc(target.x, object.pos.x, target.y, object.pos.y)
+    for (const object of objects) {
+        const range = getRangeEuc(target.x, object.pos.x, target.y, object.pos.y)
 
-         if (range > minRange) continue
+        if (range > minRange) continue
 
-         minRange = range
-         closest = object
-     }
+        minRange = range
+        closest = object
+    }
 
-     return closest
- }
+    return closest
+}
 
- /**
-  * Finds the closest position to a given target (Euclidean)
-  */
- export function findClosestPosEuc<T extends RoomPosition | Coord>(target: RoomPosition | Coord, positions: T[]) {
-     let minRange = Infinity
-     let closest = undefined
+/**
+ * Finds the closest position to a given target (Euclidean)
+ */
+export function findClosestPosEuc<T extends RoomPosition | Coord>(target: RoomPosition | Coord, positions: T[]) {
+    let minRange = Infinity
+    let closest = undefined
 
-     for (const pos of positions) {
-         const range = getRangeEuc(target.x, pos.x, target.y, pos.y)
+    for (const pos of positions) {
+        const range = getRangeEuc(target.x, pos.x, target.y, pos.y)
 
-         if (range > minRange) continue
+        if (range > minRange) continue
 
-         minRange = range
-         closest = pos
-     }
+        minRange = range
+        closest = pos
+    }
 
-     return closest
- }
+    return closest
+}
 
 export function findCPUColor(): string {
     const CPU = Game.cpu.getUsed()
@@ -257,10 +257,10 @@ export function findCPUColor(): string {
     return myColors.green
 }
 
-export function createPackedPosMap(innerArray?: boolean) {
+export function createPosMap(innerArray?: boolean) {
     // Construct the position map
 
-    const packedPosMap: PackedPosMap<any> = []
+    const packedPosMap: PosMap<any> = []
 
     // Loop through each x and y in the room
 

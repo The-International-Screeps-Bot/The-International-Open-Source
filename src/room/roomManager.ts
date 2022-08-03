@@ -9,7 +9,7 @@ import { creepRoleManager } from './creeps/creepRoleManager'
 import { powerCreepManager } from './powerCreeps/powerCreepManager'
 import { trafficManager } from './trafficManager'
 import './roomVisualsManager'
-import { createPackedPosMap, customLog } from 'international/generalFunctions'
+import { createPosMap, customLog } from 'international/generalFunctions'
 import { statsManager } from 'international/statsManager'
 
 const specificRoomManagers: { [key: string]: Function } = {

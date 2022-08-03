@@ -1,5 +1,5 @@
 import { EXIT, myColors, NORMAL, PROTECTED, roomDimensions, stamps, TO_EXIT, UNWALKABLE } from 'international/constants'
-import { customLog, pack, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
+import { customLog, pack, packXY, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 
 export function rampartPlanner(room: Room) {
     if (room.memory.stampAnchors.rampart.length) return false
@@ -601,11 +601,6 @@ export function rampartPlanner(room: Room) {
         ? room.memory.stampAnchors.rampart
         : GetCutTiles(protectionRects)
 
-    // Get base planning data
-
-    const roadCM: CostMatrix = room.get('roadCM')
-    const rampartPlans = room.rampartPlans
-
     // Plan the positions
 
     for (const packedPos of rampartPositions) {
@@ -613,9 +608,8 @@ export function rampartPlanner(room: Room) {
 
         // Record the pos in roadCM
 
-        roadCM.set(pos.x, pos.y, 1)
-
-        rampartPlans.set(pos.x, pos.y, 1)
+        room.roadCoords[pack(pos)] = 1
+        room.rampartCoords[pack(pos)] = 1
     }
 
     // Get the hubAnchor
@@ -624,7 +618,7 @@ export function rampartPlanner(room: Room) {
 
     // Group rampart positions
 
-    const groupedRampartPositions = room.groupRampartPositions(rampartPositions, rampartPlans)
+    const groupedRampartPositions = room.groupRampartPositions(rampartPositions)
 
     // Loop through each group
 
@@ -642,12 +636,12 @@ export function rampartPlanner(room: Room) {
         const path = room.advancedFindPath({
             origin: closestPosToAnchor,
             goal: { pos: hubAnchor, range: 2 },
-            weightCostMatrixes: [roadCM],
+            weightCoordMaps: [room.roadCoords],
         })
 
         // Loop through positions of the path
 
-        for (const pos of path) roadCM.set(pos.x, pos.y, 1)
+        for (const pos of path) room.roadCoords[pack(pos)] = 1
 
         // Construct the onboardingIndex
 
@@ -662,7 +656,7 @@ export function rampartPlanner(room: Room) {
 
             // If there are already rampart plans at this pos
 
-            if (rampartPlans.get(onboardingPos.x, onboardingPos.y) === 1) {
+            if (room.rampartCoords[pack(onboardingPos)] === 1) {
                 // Increase the onboardingIndex and iterate
 
                 onboardingIndex += 1
@@ -671,9 +665,8 @@ export function rampartPlanner(room: Room) {
 
             // Record the pos in roadCM
 
-            roadCM.set(onboardingPos.x, onboardingPos.y, 1)
-
-            rampartPlans.set(onboardingPos.x, onboardingPos.y, 1)
+            room.roadCoords[pack(onboardingPos)] = 1
+            room.rampartCoords[pack(onboardingPos)] = 1
 
             break
         }
@@ -684,22 +677,19 @@ export function rampartPlanner(room: Room) {
     for (const packedStampAnchor of stampAnchors.tower) {
         const stampAnchor = unpackAsPos(packedStampAnchor)
 
-        rampartPlans.set(stampAnchor.x, stampAnchor.y, 1)
+        room.rampartCoords[pack(stampAnchor)] = 1
     }
 
     // Protect fastFiller spawns
 
-    rampartPlans.set(room.anchor.x - 2, room.anchor.y - 1, 1)
-
-    rampartPlans.set(room.anchor.x + 2, room.anchor.y - 1, 1)
-
-    rampartPlans.set(room.anchor.x, room.anchor.y + 2, 1)
+    room.rampartCoords[packXY(room.anchor.x - 2, room.anchor.y - 1)] = 1
+    room.rampartCoords[packXY(room.anchor.x + 2, room.anchor.y - 1)] = 1
+    room.rampartCoords[packXY(room.anchor.x, room.anchor.y + 2)] = 1
 
     // Protect useful hub structures
 
-    rampartPlans.set(hubAnchor.x + 1, hubAnchor.y - 1, 1)
-
-    rampartPlans.set(hubAnchor.x - 1, hubAnchor.y + 1, 1)
+    room.rampartCoords[packXY(hubAnchor.x + 1, hubAnchor.y - 1)] = 1
+    room.rampartCoords[packXY(hubAnchor.x - 1, hubAnchor.y + 1)] = 1
 
     // Inform true
 

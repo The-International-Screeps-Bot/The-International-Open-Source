@@ -10,7 +10,7 @@ import {
 } from './constants'
 import {
     advancedFindDistance,
-    createPackedPosMap,
+    createPosMap,
     customLog,
     findCarryPartsRequired,
     findClosestRoomName,
@@ -85,7 +85,6 @@ InternationalManager.prototype.tickConfig = function () {
         // If there is no Hauler Size
 
         if (!room.memory.HS) {
-
             room.memory.HS = 0
             room.memory.HU = 0
         }
@@ -222,11 +221,9 @@ InternationalManager.prototype.tickConfig = function () {
     // Assign and decrease abandon for attackRequests
 
     for (const roomName in Memory.attackRequests) {
-
         const request = Memory.attackRequests[roomName]
 
         if (request.abandon > 0) {
-
             request.abandon -= 1
             continue
         }
@@ -236,7 +233,6 @@ InternationalManager.prototype.tickConfig = function () {
         // Filter communes that don't have the attackRequest target already
 
         const communes = Memory.communes.filter(roomName => {
-
             return !Memory.rooms[roomName].attackRequests.includes(roomName)
         })
 

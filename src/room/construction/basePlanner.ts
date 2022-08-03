@@ -1,5 +1,15 @@
 import { link } from 'fs'
-import { EXIT, myColors, NORMAL, PROTECTED, roomDimensions, stamps, TO_EXIT, UNWALKABLE } from 'international/constants'
+import {
+    EXIT,
+    myColors,
+    NORMAL,
+    PROTECTED,
+    roadUpkeepCost,
+    roomDimensions,
+    stamps,
+    TO_EXIT,
+    UNWALKABLE,
+} from 'international/constants'
 import {
     arePositionsEqual,
     customLog,
@@ -7,9 +17,11 @@ import {
     findPositionsInsideRect,
     getRange,
     pack,
+    packXY,
     unpackAsPos,
     unpackAsRoomPos,
 } from 'international/generalFunctions'
+import { internationalManager } from 'international/internationalManager'
 import { packPosList } from 'other/packrat'
 import 'other/RoomVisual'
 import { rampartPlanner } from './rampartPlanner'
@@ -18,12 +30,7 @@ import { rampartPlanner } from './rampartPlanner'
  * Checks if a room can be planner. If it can, it informs information on how to build the room
  */
 export function basePlanner(room: Room) {
-    // Get a cost matrix of walls and exit areas
-
-    const baseCM: CostMatrix = room.get('baseCM')
-    const roadCM: CostMatrix = room.get('roadCM')
-
-    const terrain = room.getTerrain()
+    const terrainCoords = internationalManager.getTerrainCoords(room.name)
 
     if (!room.memory.stampAnchors) {
         room.memory.stampAnchors = {}
@@ -32,20 +39,12 @@ export function basePlanner(room: Room) {
     }
 
     function recordAdjacentPositions(x: number, y: number, range: number, weight?: number) {
-        // Construct a rect and get the positions in a range of 1
-
-        const adjacentPositions = findPositionsInsideRect(x - range, y - range, x + range, y + range)
-
         // Loop through adjacent positions
 
-        for (const adjacentPos of adjacentPositions) {
-            // Iterate if the adjacent pos is to avoid
-
-            if (baseCM.get(adjacentPos.x, adjacentPos.y) > 0) continue
-
+        for (const coord of findPositionsInsideRect(x - range, y - range, x + range, y + range)) {
             // Otherwise record the position in the base cost matrix as avoid
 
-            baseCM.set(adjacentPos.x, adjacentPos.y, weight || 255)
+            room.baseCoords[pack(coord)] = Math.max(weight, room.baseCoords[pack(coord)]) || 255
         }
     }
 
@@ -55,8 +54,8 @@ export function basePlanner(room: Room) {
 
     // Get and record the mineralHarvestPos as avoid
 
-    for (const pos of room.get('mineralHarvestPositions') as RoomPosition[]) {
-        baseCM.set(pos.x, pos.y, 255)
+    for (const coord of room.get('mineralHarvestPositions') as RoomPosition[]) {
+        room.baseCoords[pack(coord)] = 255
     }
 
     // Record the positions around sources as unusable
@@ -75,14 +74,14 @@ export function basePlanner(room: Room) {
 
     const avgControllerSourcePos = findAvgBetweenPosotions(room.controller.pos, avgSourcePos)
 
-    const controllerAdjacentPositions = findPositionsInsideRect(
+    const controllerAdjacentCoords = findPositionsInsideRect(
         room.controller.pos.x - 3,
         room.controller.pos.y - 3,
         room.controller.pos.x + 3,
         room.controller.pos.y + 3,
     )
 
-    for (const pos of controllerAdjacentPositions) baseCM.set(pos.x, pos.y, 255)
+    for (const coord of controllerAdjacentCoords) room.baseCoords[pack(coord)] = 255
 
     interface PlanStampOpts {
         stampType: StampTypes
@@ -135,12 +134,12 @@ export function basePlanner(room: Room) {
                             if (structureType === STRUCTURE_ROAD) {
                                 // Record the position in roadCM and iterate
 
-                                roadCM.set(x, y, 1)
+                                room.roadCoords[packXY(x, y)] = 1
                                 continue
                             }
 
-                            baseCM.set(x, y, 255)
-                            roadCM.set(x, y, 255)
+                            room.baseCoords[packXY(x, y)] = 255
+                            room.roadCoords[packXY(x, y)] = 255
                         }
                     }
                 }
@@ -150,17 +149,19 @@ export function basePlanner(room: Room) {
 
             // Run distance transform with the baseCM
 
-            const distanceCM = opts.normalDT ? room.distanceTransform(baseCM) : room.diagonalDistanceTransform(baseCM)
+            const distanceCoords = opts.normalDT
+                ? room.distanceTransform(room.baseCoords)
+                : room.diagonalDistanceTransform(room.baseCoords)
 
             // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 
             stampAnchor = room.findClosestPosOfValue({
-                CM: distanceCM,
+                coordMap: distanceCoords,
                 startPos: opts.anchorOrient,
                 requiredValue: stamp.size,
                 initialWeight: opts.initialWeight || 0,
                 adjacentToRoads: opts.adjacentToRoads,
-                roadCM: opts.adjacentToRoads ? roadCM : undefined,
+                roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
             })
 
             // Inform false if no anchor was generated
@@ -185,12 +186,12 @@ export function basePlanner(room: Room) {
                     if (structureType === STRUCTURE_ROAD) {
                         // Record the position in roadCM and iterate
 
-                        roadCM.set(x, y, 1)
+                        room.roadCoords[packXY(x, y)] = 1
                         continue
                     }
 
-                    baseCM.set(x, y, 255)
-                    roadCM.set(x, y, 255)
+                    room.baseCoords[packXY(x, y)] = 255
+                    room.roadCoords[packXY(x, y)] = 255
                 }
             }
         }
@@ -220,10 +221,10 @@ export function basePlanner(room: Room) {
         return false
     }
 
-    for (const pos of controllerAdjacentPositions) {
-        if (terrain.get(pos.x, pos.y) == TERRAIN_MASK_WALL) continue
+    for (const coord of controllerAdjacentCoords) {
+        if (terrainCoords[pack(coord)] === TERRAIN_MASK_WALL) continue
 
-        baseCM.set(pos.x, pos.y, 0)
+        room.baseCoords[packXY(x, y)] = 0
     }
 
     // Get the centerUpgradePos, informing false if it's undefined
@@ -240,8 +241,8 @@ export function basePlanner(room: Room) {
     for (const upgradePos of upgradePositions) {
         // Mark as avoid in road and base cost matrixes
 
-        baseCM.set(upgradePos.x, upgradePos.y, 255)
-        roadCM.set(upgradePos.x, upgradePos.y, 20)
+        room.baseCoords[pack(upgradePos)] = 255
+        room.roadCoords[pack(upgradePos)] = 20
     }
 
     // Try to plan the stamp
@@ -261,7 +262,7 @@ export function basePlanner(room: Room) {
     // Get the closest upgrade pos and mark it as fair use in roadCM
 
     const closestUpgradePos = upgradePositions[0]
-    roadCM.set(closestUpgradePos.x, closestUpgradePos.y, 5)
+    room.roadCoords[pack(closestUpgradePos)] = 1
 
     // Construct path
 
@@ -286,16 +287,12 @@ export function basePlanner(room: Room) {
         path = room.advancedFindPath({
             origin: unpackAsRoomPos(extensionsAnchor, room.name),
             goal: { pos: hubAnchor, range: 2 },
-            weightCostMatrixes: [roadCM],
+            weightCoordMaps: [room.roadCoords],
         })
 
         // Loop through positions of the path
 
-        for (const pos of path) {
-            // Record the pos in roadCM
-
-            roadCM.set(pos.x, pos.y, 1)
-        }
+        for (const pos of path) room.roadCoords[pack(pos)] = 1
     }
 
     // Try to plan the stamp
@@ -316,7 +313,7 @@ export function basePlanner(room: Room) {
     path = room.advancedFindPath({
         origin: hubAnchor,
         goal: { pos: room.anchor, range: 3 },
-        weightCostMatrixes: [roadCM],
+        weightCoordMaps: [room.roadCoords],
     })
 
     // Loop through positions of the path
@@ -324,7 +321,7 @@ export function basePlanner(room: Room) {
     for (const pos of path) {
         // Record the pos in roadCM
 
-        roadCM.set(pos.x, pos.y, 1)
+        room.roadCoords[pack(pos)] = 1
     }
 
     // Plan for a container at the pos
@@ -336,16 +333,12 @@ export function basePlanner(room: Room) {
     path = room.advancedFindPath({
         origin: centerUpgadePos,
         goal: { pos: hubAnchor, range: 2 },
-        weightCostMatrixes: [roadCM],
+        weightCoordMaps: [room.roadCoords],
     })
 
     // Loop through positions of the path
 
-    for (const pos of path) {
-        // Record the pos in roadCM
-
-        roadCM.set(pos.x, pos.y, 1)
-    }
+    for (const pos of path) room.roadCoords[pack(pos)] = 1
 
     // loop through sourceNames
 
@@ -356,7 +349,7 @@ export function basePlanner(room: Room) {
 
         // Record the pos in roadCM
 
-        roadCM.set(closestSourcePos.x, closestSourcePos.y, 255)
+        room.roadCoords[pack(closestSourcePos)] = 255
     }
 
     // loop through sourceNames
@@ -370,14 +363,10 @@ export function basePlanner(room: Room) {
             room.memory.stampAnchors.container.push(pack(closestSourcePos))
         }
 
-        // Add up source positions that aren't for this source
-
-        let otherSourcePositions: RoomPosition[] = []
-
         for (const index2 in room.sources) {
             if (index === index2) continue
 
-            for (const pos of room.sourcePositions[index2]) roadCM.set(pos.x, pos.y, 10)
+            for (const pos of room.sourcePositions[index2]) room.roadCoords[pack(pos)] = 10
         }
 
         // Path from the fastFillerAnchor to the closestHarvestPos
@@ -385,26 +374,26 @@ export function basePlanner(room: Room) {
         path = room.advancedFindPath({
             origin: closestSourcePos,
             goal: { pos: room.anchor, range: 3 },
-            weightCostMatrixes: [roadCM],
+            weightCoordMaps: [room.roadCoords],
         })
 
         // Record the path positions in roadCM
 
-        for (const pos of path) roadCM.set(pos.x, pos.y, 1)
+        for (const pos of path) room.roadCoords[pack(pos)] = 1
 
         // Path from the centerUpgradePos to the closestHarvestPos
 
         path = room.advancedFindPath({
             origin: closestSourcePos,
             goal: { pos: closestUpgradePos, range: 1 },
-            weightCostMatrixes: [roadCM],
+            weightCoordMaps: [room.roadCoords],
         })
 
         // Loop through positions of the path
 
         // Record the pos in roadCM
 
-        for (const pos of path) roadCM.set(pos.x, pos.y, 1)
+        for (const pos of path) room.roadCoords[pack(pos)] = 1
     }
 
     // Path from the hubAnchor to the labsAnchor
@@ -412,20 +401,20 @@ export function basePlanner(room: Room) {
     path = room.advancedFindPath({
         origin: unpackAsRoomPos(room.memory.stampAnchors.labs[0], room.name),
         goal: { pos: hubAnchor, range: 2 },
-        weightCostMatrixes: [roadCM],
+        weightCoordMaps: [room.roadCoords],
     })
 
     // Loop through positions of the path
 
     // Record the pos in roadCM
 
-    for (const pos of path) roadCM.set(pos.x, pos.y, 1)
+    for (const pos of path) room.roadCoords[pack(pos)] = 1
 
     const mineralHarvestPos: RoomPosition = room.get('closestMineralHarvestPos')
 
     // Record the pos in roadCM
 
-    roadCM.set(mineralHarvestPos.x, mineralHarvestPos.y, 255)
+    room.roadCoords[pack(mineralHarvestPos)] = 255
     /*
 
     structurePlans.set(mineralHarvestPos.x, mineralHarvestPos.y, structureTypesByNumber[STRUCTURE_CONTAINER])
@@ -435,14 +424,14 @@ export function basePlanner(room: Room) {
     path = room.advancedFindPath({
         origin: mineralHarvestPos,
         goal: { pos: hubAnchor, range: 2 },
-        weightCostMatrixes: [roadCM],
+        weightCoordMaps: [room.roadCoords],
     })
 
     // Loop through positions of the path
 
     // Record the pos in roadCM
 
-    for (const pos of path) roadCM.set(pos.x, pos.y, 1)
+    for (const pos of path) room.roadCoords[pack(pos)] = 1
 
     // Plan for a road at the mineral's pos
 
@@ -456,13 +445,13 @@ export function basePlanner(room: Room) {
         for (let y = 0; y < roomDimensions; y += 1) {
             // If there is road at the pos, assign it as avoid in baseCM
 
-            if (roadCM.get(x, y) === 1) baseCM.set(x, y, 255)
+            if (room.roadCoords[pack(pos)] === 1) room.baseCoords[pack(pos)] = 255
         }
     }
 
     // Mark the closestUpgradePos as avoid in the CM
 
-    baseCM.set(closestUpgradePos.x, closestUpgradePos.y, 255)
+    room.baseCoords[pack(closestUpgradePos)] = 255
 
     // Try to plan the stamp
 
@@ -478,15 +467,13 @@ export function basePlanner(room: Room) {
 
     rampartPlanner(room)
 
-    const rampartPlans = room.rampartPlans
-
     // Iterate through each x and y in the room
 
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
             // If there is road at the pos, assign it as avoid in baseCM
 
-            if (roadCM.get(x, y) === 1) baseCM.set(x, y, 255)
+            if (room.roadCoords[packXY(x, y)] === 1) room.baseCoords[packXY(x, y)] = 255
         }
     }
 
@@ -521,13 +508,13 @@ export function basePlanner(room: Room) {
             for (const pos of room.sourcePositions[index]) {
                 if (arePositionsEqual(closestSourcePos, pos)) continue
 
-                OGPositions.set(pos, roadCM.get(pos.x, pos.y))
-                roadCM.set(pos.x, pos.y, 0)
+                OGPositions.set(pos, room.roadCoords[packXY(x, y)])
+                room.roadCoords[packXY(x, y)] = 0
             }
 
             // If the position is not PROTECTED, plan a rampart on it
 
-            if (!isProtected) rampartPlans.set(closestSourcePos.x, closestSourcePos.y, 1)
+            if (!isProtected) room.rampartCoords[pack(closestSourcePos)] = 1
             // Otherwise, check if it's in range of an unprotected tile
             else {
                 const adjacentCoords = findPositionsInsideRect(
@@ -542,7 +529,7 @@ export function basePlanner(room: Room) {
 
                     if (room.tileTypes[coord.x][coord.y] !== NORMAL) continue
 
-                    rampartPlans.set(closestSourcePos.x, closestSourcePos.y, 1)
+                    room.rampartCoords[pack(closestSourcePos)] = 1
                     break
                 }
             }
@@ -564,51 +551,53 @@ export function basePlanner(room: Room) {
 
             // Loop through each pos
 
-            for (const pos of adjacentPositions) {
+            for (const coord of adjacentPositions) {
                 // Iterate if plan for pos is in use
 
-                if (roadCM.get(pos.x, pos.y) > 0) continue
+                if (room.roadCoords[pack(coord)] > 0) continue
 
-                if (rampartPlans.get(pos.x, pos.y) > 0) continue
+                if (room.rampartCoords[pack(coord)] > 0) continue
 
                 // Iterate if the pos is a wall
 
-                if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+                if (terrainCoords[pack(coord)] === TERRAIN_MASK_WALL) continue
 
                 // Iterate if the position is near an exit
 
-                if (room.tileTypes[pos.x][pos.y] === TO_EXIT) continue
+                if (room.tileTypes[coord.x][coord.y] === TO_EXIT) continue
 
                 // Otherwise
 
                 // Assign 255 to this pos in baseCM
 
-                baseCM.set(pos.x, pos.y, 255)
-
-                // Assign 255 to this pos in roadCM
-
-                roadCM.set(pos.x, pos.y, 255)
+                room.baseCoords[pack(coord)] = 255
+                room.roadCoords[pack(coord)] = 255
 
                 // If there is no planned link for this source, plan one
 
                 if (!sourceHasLink) {
                     room.memory.stampAnchors.sourceLink.push(pack(pos))
 
-                    isProtected = room.tileTypes[pos.x][pos.y] !== NORMAL
+                    isProtected = room.tileTypes[coord.x][coord.y] !== NORMAL
 
                     // If the position is not PROTECTED, plan a rampart on it
 
-                    if (!isProtected) rampartPlans.set(pos.x, pos.y, 1)
+                    if (!isProtected) room.rampartCoords[pack(coord)] = 1
                     // Otherwise, check if it's in range of an unprotected tile
                     else {
-                        const adjacentCoords = findPositionsInsideRect(pos.x - 3, pos.y - 3, pos.x + 3, pos.y + 3)
+                        const adjacentCoords = findPositionsInsideRect(
+                            coord.x - 3,
+                            coord.y - 3,
+                            coord.x + 3,
+                            coord.y + 3,
+                        )
 
                         for (const coord of adjacentCoords) {
                             // If the coord is probably not protected
 
                             if (room.tileTypes[coord.x][coord.y] !== NORMAL) continue
 
-                            rampartPlans.set(pos.x, pos.y, 1)
+                            room.rampartCoords[pack(coord)] = 1
                             break
                         }
                     }
@@ -627,14 +616,14 @@ export function basePlanner(room: Room) {
                 continue
             }
 
-            for (const [pos, value] of OGPositions) roadCM.set(pos.x, pos.y, value)
+            for (const [pos, value] of OGPositions) room.roadCoords[pack(pos)] = value
         }
     }
 
     if (!room.memory.stampAnchors.rampart.length) {
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
-                if (rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(pack({ x, y }))
+                if (room.rampartCoords[packXY(x, y)] === 1) room.memory.stampAnchors.rampart.push(pack({ x, y }))
             }
         }
     }
@@ -668,9 +657,9 @@ export function basePlanner(room: Room) {
         for (let y = 0; y < roomDimensions; y += 1) {
             const packedPos = x * roomDimensions + y
 
-            if (room.rampartPlans.get(x, y) === 1) room.memory.stampAnchors.rampart.push(packedPos)
+            if (room.rampartCoords[packXY(x, y)] === 1) room.memory.stampAnchors.rampart.push(packedPos)
 
-            if (!room.memory.stampAnchors.road.includes(packedPos) && roadCM.get(x, y) === 1)
+            if (!room.memory.stampAnchors.road.includes(packedPos) && room.roadCoords[packXY(x, y)] === 1)
                 room.memory.stampAnchors.road.push(packedPos)
         }
     }

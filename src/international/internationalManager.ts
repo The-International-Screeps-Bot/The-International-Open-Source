@@ -1,7 +1,7 @@
 import { allyManager } from 'international/simpleAllies'
-import { customLog, getAvgPrice } from './generalFunctions'
+import { customLog, getAvgPrice, packXY } from './generalFunctions'
 import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
-import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames, myColors } from './constants'
+import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames, myColors, roomDimensions } from './constants'
 import { statsManager, StatsManager } from './statsManager'
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
@@ -68,6 +68,24 @@ export class InternationalManager {
           // Try to generate a pixel
 
           Game.cpu.generatePixel()
+     }
+
+     getTerrainCoords(roomName: string) {
+
+          if (!global.terrainCoords) global.terrainCoords = {}
+
+          if (global.terrainCoords[roomName]) return global.terrainCoords[roomName]
+
+          const terrain = Game.map.getRoomTerrain(roomName)
+
+          for (let x = 0; x < roomDimensions; x += 1) {
+              for (let y = 0; y < roomDimensions; y += 1) {
+
+                  global.terrainCoords[roomName][packXY(x, y)] = terrain.get(x, y)
+              }
+          }
+
+          return global.terrainCoords[roomName]
      }
 
      /**

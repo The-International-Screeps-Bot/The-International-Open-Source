@@ -32,7 +32,7 @@ import { RoomCacheObject } from 'room/roomObject'
 import { ErrorMapper } from 'other/ErrorMapper'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
-import { createPackedPosMap, customLog } from 'international/generalFunctions'
+import { createPosMap, customLog } from 'international/generalFunctions'
 import { myColors } from 'international/constants'
 
 // Type declareations for global
@@ -92,7 +92,7 @@ declare global {
 
     type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
 
-    type PackedPosMap<T> = T[]
+    type PosMap<T> = T[]
 
     type CreepRoles =
         | 'source1Harvester'
@@ -121,9 +121,6 @@ declare global {
         | 'antifaSupporter'
 
     type RoomObjectName =
-        | 'terrainCM'
-        | 'baseCM'
-        | 'roadCM'
         | 'mineralHarvestPositions'
         | 'closestMineralHarvestPos'
         | 'centerUpgradePos'
@@ -165,6 +162,9 @@ declare global {
          *
          */
         weightCostMatrixes?: CostMatrix[]
+
+        weightCoordMaps?: PosMap<number>[]
+
         /**
          *
          */
@@ -189,13 +189,13 @@ declare global {
     }
 
     interface FindClosestPosOfValueOpts {
-        CM: CostMatrix
+        coordMap: PosMap<number>
         startPos: Coord
         requiredValue: number
         reduceIterations?: number
         initialWeight?: number
         adjacentToRoads?: boolean
-        roadCM?: CostMatrix
+        roadCoords?: PosMap<number>
     }
 
     interface MoveRequestOpts extends PathOpts {
@@ -702,30 +702,30 @@ declare global {
          * Finds open spaces in a room and records them in a cost matrix
          */
         distanceTransform(
-            initialCM?: CostMatrix,
+            initialCoords?: PosMap<number>,
             enableVisuals?: boolean,
             x1?: number,
             y1?: number,
             x2?: number,
             y2?: number,
-        ): CostMatrix
+        ): PosMap<number>
 
         /**
          * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix
          */
         diagonalDistanceTransform(
-            initialCM?: CostMatrix,
+            initialCoords?: PosMap<number>,
             enableVisuals?: boolean,
             x1?: number,
             y1?: number,
             x2?: number,
             y2?: number,
-        ): CostMatrix
+        ): PosMap<number>
 
         /**
          * Gets ranges from for each position from a certain point
          */
-        floodFill(seeds: Coord[]): CostMatrix
+        floodFill(seeds: Coord[], coordMap: PosMap<number>): PosMap<number>
 
         /**
          * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
@@ -745,7 +745,7 @@ declare global {
         /**
          * Groups positions with contigiousness, structured similarily to a flood fill
          */
-        groupRampartPositions(rampartPositions: number[], rampartPlans: CostMatrix): RoomPosition[][]
+        groupRampartPositions(rampartPositions: number[]): RoomPosition[][]
 
         /**
          *
@@ -995,9 +995,17 @@ declare global {
 
         readonly usedSourceCoords: Set<number>[]
 
-        _rampartPlans: CostMatrix
+        _baseCoords: PosMap<number>
 
-        readonly rampartPlans: CostMatrix
+        readonly baseCoords: PosMap<number>
+
+        _rampartCoords: PosMap<number>
+
+        readonly rampartCoords: PosMap<number>
+
+        _roadCoords: PosMap<number>
+
+        readonly roadCoords: PosMap<number>
 
         _sourcePaths: RoomPosition[][]
 
@@ -1039,19 +1047,19 @@ declare global {
 
         readonly actionableWalls: StructureWall[]
 
-        _creepPositions: PackedPosMap<string>
+        _creepPositions: PosMap<string>
 
         /**
          * A matrix with indexes of packed positions and values of creep names
          */
-        readonly creepPositions: PackedPosMap<string>
+        readonly creepPositions: PosMap<string>
 
-        _moveRequests: PackedPosMap<string[]>
+        _moveRequests: PosMap<string[]>
 
         /**
          * A matrix with indexes of packed positions and values of creep names
          */
-        readonly moveRequests: PackedPosMap<string[]>
+        readonly moveRequests: PosMap<string[]>
 
         // Target finding
 
@@ -1746,10 +1754,12 @@ declare global {
              */
             constructionSitesCount: number
 
-            packedRoomNames: { [roomManager: string]: string }
+            packedRoomNames: { [roomName: string]: string }
 
-            unpackedRoomNames: { [key: string]: string }
-            roomStats: { [key: string]: RoomStats }
+            unpackedRoomNames: { [roomName: string]: string }
+            roomStats: { [roomName: string]: RoomStats }
+
+            terrainCoords: {[roomName: string]: PosMap<number> }
 
             // Command functions
 
