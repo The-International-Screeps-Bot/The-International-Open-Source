@@ -1,4 +1,4 @@
-import { EXIT, NORMAL, PROTECTED, roomDimensions, stamps, TO_EXIT, UNWALKABLE } from 'international/constants'
+import { EXIT, myColors, NORMAL, PROTECTED, roomDimensions, stamps, TO_EXIT, UNWALKABLE } from 'international/constants'
 import { customLog, pack, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 
 export function rampartPlanner(room: Room) {
@@ -283,22 +283,33 @@ export function rampartPlanner(room: Room) {
 
         // If roomVisuals are enabled
 
-        if (Memory.roomVisuals) {
+        if (Memory.baseVisuals) {
             // Visualize position values
 
             for (let x = 0; x < roomDimensions; x += 1) {
                 for (let y = 0; y < roomDimensions; y += 1) {
-                    if (room.tileTypes[x][y] === NORMAL) {
+
+                    const tileType = room.tileTypes[x][y]
+
+                    if (tileType === NORMAL) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                            fill: '#e8e863',
+                            fill: myColors.yellow,
                             opacity: 0.3,
                         })
                         continue
                     }
 
-                    if (room.tileTypes[x][y] === PROTECTED) {
+                    if (tileType === PROTECTED) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                            fill: '#61975E',
+                            fill: myColors.green,
+                            opacity: 0.3,
+                        })
+                        continue
+                    }
+
+                    if (tileType === UNWALKABLE) {
+                        room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+                            fill: myColors.red,
                             opacity: 0.3,
                         })
                         continue

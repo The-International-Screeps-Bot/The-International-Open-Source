@@ -38,7 +38,6 @@ Object.defineProperties(Room.prototype, {
             this._sources = []
 
             if (this.memory.sourceIds) {
-
                 for (const index in this.memory.sourceIds) {
                     const source = findObjectWithID(this.memory.sourceIds[index])
 
@@ -71,10 +70,9 @@ Object.defineProperties(Room.prototype, {
 
             this._sourcesByEfficacy = [].concat(this.sources)
 
-            return (this._sourcesByEfficacy.sort((a, b) => {
+            return this._sourcesByEfficacy.sort((a, b) => {
                 return this.sourcePaths[a.index].length - this.sourcePaths[b.index].length
-            }))
-
+            })
         },
     },
     mineral: {
@@ -331,11 +329,55 @@ Object.defineProperties(Room.prototype, {
             let anchor = this.anchor || new RoomPosition(25, 25, this.name)
 
             if (this.memory.type === 'remote') {
-
                 const commune = Game.rooms[this.memory.commune]
                 if (!commune) return []
 
+                const terrain = Game.map.getRoomTerrain(this.name)
+
                 anchor = commune.anchor || new RoomPosition(25, 25, commune.name)
+
+                for (const source of this.sources) {
+                    const positions = []
+
+                    // Find positions adjacent to source
+
+                    const adjacentPositions = findPositionsInsideRect(
+                        source.pos.x - 1,
+                        source.pos.y - 1,
+                        source.pos.x + 1,
+                        source.pos.y + 1,
+                    )
+
+                    // Loop through each pos
+
+                    for (const coord of adjacentPositions) {
+                        // Iterate if terrain for pos is a wall
+
+                        if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) continue
+
+                        // Add pos to harvestPositions
+
+                        positions.push(new RoomPosition(coord.x, coord.y, this.name))
+                    }
+
+                    positions.sort((a, b) => {
+                        return (
+                            this.advancedFindPath({
+                                origin: a,
+                                goal: { pos: anchor, range: 3 },
+                            }).length -
+                            this.advancedFindPath({
+                                origin: b,
+                                goal: { pos: anchor, range: 3 },
+                            }).length
+                        )
+                    })
+
+                    this.memory.SP.push(packPosList(positions))
+                    this._sourcePositions.push(positions)
+                }
+
+                return this._sourcePositions
             }
 
             const terrain = Game.map.getRoomTerrain(this.name)
@@ -433,7 +475,6 @@ Object.defineProperties(Room.prototype, {
             this.global.sourcePaths = []
 
             if (this.memory.type === 'remote') {
-
                 const commune = Game.rooms[this.memory.commune]
                 if (!commune) return []
 
@@ -802,10 +843,11 @@ Object.defineProperties(Room.prototype, {
 
             // Add towers below half capacity
 
-            this._METT = this._METT.concat(this.structures.tower.filter(tower => {
-
-                return tower.store.energy <= tower.store.getCapacity(RESOURCE_ENERGY) * 0.5
-            }))
+            this._METT = this._METT.concat(
+                this.structures.tower.filter(tower => {
+                    return tower.store.energy <= tower.store.getCapacity(RESOURCE_ENERGY) * 0.5
+                }),
+            )
 
             return this._METT
         },

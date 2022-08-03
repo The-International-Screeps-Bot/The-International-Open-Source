@@ -2,13 +2,45 @@ import { allyList, myColors, NORMAL, PROTECTED, roomDimensions, stamps } from 'i
 import { customLog, findObjectWithID, unpackAsPos } from 'international/generalFunctions'
 
 Room.prototype.roomVisualsManager = function () {
-    // Stop if roomVisuals are disabled
-
-    if (!Memory.roomVisuals) return
-
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    ;(() => {
+        if (!Memory.baseVisuals) return
+
+        if (!this.memory.planned) return
+
+        for (const stampType in stamps) {
+            const stamp = stamps[stampType as StampTypes]
+
+            for (const packedStampAnchor of this.memory.stampAnchors[stampType as StampTypes]) {
+                const stampAnchor = unpackAsPos(packedStampAnchor)
+
+                for (const structureType in stamp.structures) {
+                    if (structureType === 'empty') continue
+
+                    for (const pos of stamp.structures[structureType]) {
+                        // Re-assign the pos's x and y to align with the offset
+
+                        const x = pos.x + stampAnchor.x - stamp.offset
+                        const y = pos.y + stampAnchor.y - stamp.offset
+
+                        this.visual.structure(x, y, structureType as StructureConstant, {
+                            opacity: 0.3,
+                        })
+                    }
+                }
+            }
+        }
+
+        this.visual.connectRoads({
+            opacity: 0.3,
+        })
+    })()
+
+    // Stop if roomVisuals are disabled
+
+    if (!Memory.roomVisuals) return
 
     // If there is an anchor, show a rectangle around it
 
@@ -125,36 +157,6 @@ Room.prototype.roomVisualsManager = function () {
         // If the constructionTarget exists, show visuals for it
 
         if (constructionTarget) this.visual.text('🚧', constructionTarget.pos)
-    })()
-    ;(() => {
-        if (!Memory.baseVisuals) return
-
-        if (!this.memory.planned) return
-
-        for (const stampType in stamps) {
-            const stamp = stamps[stampType as StampTypes]
-
-            for (const packedStampAnchor of this.memory.stampAnchors[stampType as StampTypes]) {
-                const stampAnchor = unpackAsPos(packedStampAnchor)
-
-                for (const structureType in stamp.structures) {
-                    if (structureType === 'empty') continue
-
-                    for (const pos of stamp.structures[structureType]) {
-                        // Re-assign the pos's x and y to align with the offset
-
-                        const x = pos.x + stampAnchor.x - stamp.offset
-                        const y = pos.y + stampAnchor.y - stamp.offset
-
-                        this.visual.structure(x, y, structureType as StructureConstant, {
-                            opacity: structureType === STRUCTURE_ROAD ? 0.1 : 0.3,
-                        })
-                    }
-                }
-            }
-        }
-
-        this.visual.connectRoads()
     })()
 
     // If CPU logging is enabled, log the CPU used by this manager

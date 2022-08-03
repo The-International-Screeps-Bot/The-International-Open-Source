@@ -1,4 +1,5 @@
-import { EXIT, myColors, PROTECTED, roomDimensions, stamps, TO_EXIT } from 'international/constants'
+import { link } from 'fs'
+import { EXIT, myColors, NORMAL, PROTECTED, roomDimensions, stamps, TO_EXIT, UNWALKABLE } from 'international/constants'
 import {
     arePositionsEqual,
     customLog,
@@ -513,7 +514,7 @@ export function basePlanner(room: Room) {
 
             // Find the protection status
 
-            const isProtected = room.tileTypes[closestSourcePos.x][closestSourcePos.y] === PROTECTED
+            let isProtected = room.tileTypes[closestSourcePos.x][closestSourcePos.y] !== NORMAL
 
             const OGPositions: Map<RoomPosition, number> = new Map()
 
@@ -527,6 +528,24 @@ export function basePlanner(room: Room) {
             // If the position is not PROTECTED, plan a rampart on it
 
             if (!isProtected) rampartPlans.set(closestSourcePos.x, closestSourcePos.y, 1)
+            // Otherwise, check if it's in range of an unprotected tile
+            else {
+                const adjacentCoords = findPositionsInsideRect(
+                    closestSourcePos.x - 3,
+                    closestSourcePos.y - 3,
+                    closestSourcePos.x + 3,
+                    closestSourcePos.y + 3,
+                )
+
+                for (const coord of adjacentCoords) {
+                    // If the coord is probably not protected
+
+                    if (room.tileTypes[coord.x][coord.y] !== NORMAL) continue
+
+                    rampartPlans.set(closestSourcePos.x, closestSourcePos.y, 1)
+                    break
+                }
+            }
 
             // Find positions adjacent to source
 
@@ -575,9 +594,24 @@ export function basePlanner(room: Room) {
                 if (!sourceHasLink) {
                     room.memory.stampAnchors.sourceLink.push(pack(pos))
 
+                    isProtected = room.tileTypes[pos.x][pos.y] !== NORMAL
+
                     // If the position is not PROTECTED, plan a rampart on it
 
                     if (!isProtected) rampartPlans.set(pos.x, pos.y, 1)
+                    // Otherwise, check if it's in range of an unprotected tile
+                    else {
+                        const adjacentCoords = findPositionsInsideRect(pos.x - 3, pos.y - 3, pos.x + 3, pos.y + 3)
+
+                        for (const coord of adjacentCoords) {
+                            // If the coord is probably not protected
+
+                            if (room.tileTypes[coord.x][coord.y] !== NORMAL) continue
+
+                            rampartPlans.set(pos.x, pos.y, 1)
+                            break
+                        }
+                    }
 
                     sourceHasLink = true
                     continue

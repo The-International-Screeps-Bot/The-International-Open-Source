@@ -31,8 +31,36 @@ export function communeManager(room: Room) {
 
     room.spawnManager()
 
-    // Testing stuff, feel welcome to use to test CPU usage for specific commune things
+    // Testing stuff, feel welcome to use to test CPU usage for specific commune things\
+/*
+    for (const remoteName of room.memory.remotes) {
 
+         const remote = Game.rooms[remoteName]
+         if (!remote) continue
+
+         for (const positions of remote.sourcePaths) {
+
+            let previousPos
+
+            for (const pos of positions) {
+
+               const posRoom = Game.rooms[pos.roomName]
+               if (!posRoom) continue
+
+               if (!previousPos || pos.roomName !== previousPos.roomName) {
+
+                  posRoom.visual.circle(pos, { fill: myColors.lightBlue, opacity: 0.2 })
+                  previousPos = pos
+
+                  continue
+               }
+
+               posRoom.visual.line(pos, previousPos, { color: myColors.lightBlue, opacity: 0.2 })
+               previousPos = pos
+            }
+         }
+    }
+ */
     /*
     let cpu = Game.cpu.getUsed()
 

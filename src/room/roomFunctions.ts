@@ -1307,6 +1307,9 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
             // Query source positions
 
+            delete room.memory.SP
+            delete room._sourcePositions
+
             room.sourcePositions
 
             // Add the room's name to the scoutingRoom's remotes list
