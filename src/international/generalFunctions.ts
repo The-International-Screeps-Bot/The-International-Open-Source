@@ -257,7 +257,7 @@ export function findCPUColor(): string {
     return myColors.green
 }
 
-export function createPosMap(innerArray?: boolean) {
+export function createPosMap(innerArray?: boolean, initialValue?: string | number) {
     // Construct the position map
 
     const packedPosMap: PosMap<any> = []
@@ -268,7 +268,7 @@ export function createPosMap(innerArray?: boolean) {
         for (let y = 0; y < roomDimensions; y += 1) {
             // Add an element for this pos
 
-            packedPosMap.push(innerArray ? [] : undefined)
+            packedPosMap.push(innerArray ? [] : initialValue ? initialValue : undefined)
         }
     }
 

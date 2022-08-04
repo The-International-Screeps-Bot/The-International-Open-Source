@@ -1,5 +1,6 @@
 import { EXIT, myColors, NORMAL, PROTECTED, roomDimensions, stamps, TO_EXIT, UNWALKABLE } from 'international/constants'
-import { customLog, pack, packXY, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
+import { createPosMap, customLog, pack, packXY, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
+import { internationalManager } from 'international/internationalManager'
 
 export function rampartPlanner(room: Room) {
     if (room.memory.stampAnchors.rampart.length) return false
@@ -19,22 +20,24 @@ export function rampartPlanner(room: Room) {
      */
     function generadeRoomMatrix() {
         /**
-         * Creates an array where tileTypes[x][y] = value
+         * Creates an array where tileCoords[x][y] = value
          */
-        room.tileTypes = Array(50)
-            .fill(0)
-            .map(x => Array(50).fill(UNWALKABLE))
+        room.tileCoords = createPosMap()
 
-        const terrain = Game.map.getRoomTerrain(room.name)
+        const terrainCoords = internationalManager.getTerrainCoords(room.name)
 
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
-                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+                const packedCoord = packXY(x, y)
 
-                room.tileTypes[x][y] = NORMAL
+                room.tileCoords[packedCoord] = UNWALKABLE
+
+                if (terrainCoords[packXY(x, y)] === TERRAIN_MASK_WALL) continue
+
+                room.tileCoords[packedCoord] = NORMAL
 
                 if (x === 0 || y === 0 || x === roomDimensions - 1 || y === roomDimensions - 1)
-                    room.tileTypes[x][y] = EXIT
+                    room.tileCoords[packedCoord] = EXIT
             }
         }
 
@@ -43,25 +46,26 @@ export function rampartPlanner(room: Room) {
         let y = 1
 
         for (; y < roomDimensions - 1; y += 1) {
-            if (room.tileTypes[0][y - 1] === EXIT) room.tileTypes[1][y] = TO_EXIT
-            if (room.tileTypes[0][y] === EXIT) room.tileTypes[1][y] = TO_EXIT
-            if (room.tileTypes[0][y + 1] === EXIT) room.tileTypes[1][y] = TO_EXIT
 
-            if (room.tileTypes[roomDimensions - 1][y - 1] === EXIT) room.tileTypes[roomDimensions - 2][y] = TO_EXIT
-            if (room.tileTypes[roomDimensions - 1][y] === EXIT) room.tileTypes[roomDimensions - 2][y] = TO_EXIT
-            if (room.tileTypes[roomDimensions - 1][y + 1] === EXIT) room.tileTypes[roomDimensions - 2][y] = TO_EXIT
+            if (room.tileCoords[packXY(0, y - 1)] === EXIT) room.tileCoords[packXY(1, y)] = TO_EXIT
+            if (room.tileCoords[packXY(0, y)] === EXIT) room.tileCoords[packXY(1, y)] = TO_EXIT
+            if (room.tileCoords[packXY(0, y + 1)] === EXIT) room.tileCoords[packXY(1, y)] = TO_EXIT
+
+            if (room.tileCoords[packXY(roomDimensions - 1, y - 1)] === EXIT) room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
+            if (room.tileCoords[packXY(roomDimensions - 1, y)] === EXIT) room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
+            if (room.tileCoords[packXY(roomDimensions - 1, y + 1)] === EXIT) room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
         }
 
         let x = 1
 
         for (; x < roomDimensions - 1; x += 1) {
-            if (room.tileTypes[x - 1][0] === EXIT) room.tileTypes[x][1] = TO_EXIT
-            if (room.tileTypes[x][0] === EXIT) room.tileTypes[x][1] = TO_EXIT
-            if (room.tileTypes[x + 1][0] === EXIT) room.tileTypes[x][1] = TO_EXIT
+            if (room.tileCoords[packXY(x - 1, 0)] === EXIT) room.tileCoords[packXY(x, 1)] = TO_EXIT
+            if (room.tileCoords[packXY(x, 0)] === EXIT) room.tileCoords[packXY(x, 1)] = TO_EXIT
+            if (room.tileCoords[packXY(x + 1, 0)] === EXIT) room.tileCoords[packXY(x, 1)] = TO_EXIT
 
-            if (room.tileTypes[x - 1][roomDimensions - 1] === EXIT) room.tileTypes[x][roomDimensions - 2] = TO_EXIT
-            if (room.tileTypes[x][roomDimensions - 1] === EXIT) room.tileTypes[x][roomDimensions - 2] = TO_EXIT
-            if (room.tileTypes[x + 1][roomDimensions - 1] === EXIT) room.tileTypes[x][roomDimensions - 2] = TO_EXIT
+            if (room.tileCoords[packXY(x - 1, roomDimensions - 1)] === EXIT) room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
+            if (room.tileCoords[packXY(x, roomDimensions - 1)] === EXIT) room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
+            if (room.tileCoords[packXY(x + 1, roomDimensions - 1)] === EXIT) room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
         }
 
         // mark Border Tiles as not usable
@@ -69,15 +73,15 @@ export function rampartPlanner(room: Room) {
         y = 1
 
         for (; y < roomDimensions - 1; y += 1) {
-            room.tileTypes[0][y] === UNWALKABLE
-            room.tileTypes[roomDimensions - 1][y] === UNWALKABLE
+            room.tileCoords[packXY(0, y)] === UNWALKABLE
+            room.tileCoords[packXY(roomDimensions - 1, y)] === UNWALKABLE
         }
 
         x = 1
 
         for (; x < roomDimensions - 1; x += 1) {
-            room.tileTypes[x][0] === UNWALKABLE
-            room.tileTypes[x][roomDimensions - 1] === UNWALKABLE
+            room.tileCoords[packXY(x, 0)] === UNWALKABLE
+            room.tileCoords[packXY(x, roomDimensions - 1)] === UNWALKABLE
         }
     }
 
@@ -270,13 +274,13 @@ export function rampartPlanner(room: Room) {
                     if (x === rect.x1 || x === rect.x2 || y === rect.y1 || y === rect.y2) {
                         // Set the pos to protected, and iterate
 
-                        if (room.tileTypes[x][y] === NORMAL) room.tileTypes[x][y] = PROTECTED
+                        if (room.tileCoords[packXY(x, y)] === NORMAL) room.tileCoords[packXY(x, y)] = PROTECTED
                         continue
                     }
 
                     // Otherwise set the pos as unwalkable
 
-                    room.tileTypes[x][y] = UNWALKABLE
+                    room.tileCoords[packXY(x, y)] = UNWALKABLE
                 }
             }
         }
@@ -288,8 +292,7 @@ export function rampartPlanner(room: Room) {
 
             for (let x = 0; x < roomDimensions; x += 1) {
                 for (let y = 0; y < roomDimensions; y += 1) {
-
-                    const tileType = room.tileTypes[x][y]
+                    const tileType = room.tileCoords[packXY(x, y)]
 
                     if (tileType === NORMAL) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
@@ -352,7 +355,7 @@ export function rampartPlanner(room: Room) {
                 const top = y * 50 + x
                 const bot = top + 2500
 
-                if (room.tileTypes[x][y] === NORMAL) {
+                if (room.tileCoords[packXY(x, y)] === NORMAL) {
                     // normal Tile
                     g.New_edge(top, bot, 1)
 
@@ -360,14 +363,14 @@ export function rampartPlanner(room: Room) {
                         dx = x + surr[i][0]
                         dy = y + surr[i][1]
 
-                        if (room.tileTypes[dx][dy] === NORMAL || room.tileTypes[dx][dy] === TO_EXIT)
+                        if (room.tileCoords[packXY(dx, dy)] === NORMAL || room.tileCoords[packXY(dx, dy)] === TO_EXIT)
                             g.New_edge(bot, dy * 50 + dx, infini)
                     }
 
                     continue
                 }
 
-                if (room.tileTypes[x][y] === PROTECTED) {
+                if (room.tileCoords[packXY(x, y)] === PROTECTED) {
                     // protected Tile
                     g.New_edge(source, top, infini)
                     g.New_edge(top, bot, 1)
@@ -376,14 +379,14 @@ export function rampartPlanner(room: Room) {
                         dx = x + surr[i][0]
                         dy = y + surr[i][1]
 
-                        if (room.tileTypes[dx][dy] === NORMAL || room.tileTypes[dx][dy] === TO_EXIT)
+                        if (room.tileCoords[packXY(dx, dy)] === NORMAL || room.tileCoords[packXY(dx, dy)] === TO_EXIT)
                             g.New_edge(bot, dy * 50 + dx, infini)
                     }
 
                     continue
                 }
 
-                if (room.tileTypes[x][y] === TO_EXIT) {
+                if (room.tileCoords[packXY(x, y)] === TO_EXIT) {
                     // near Exit
                     g.New_edge(top, sink, infini)
                     continue
@@ -397,9 +400,9 @@ export function rampartPlanner(room: Room) {
 
     // Removes unneccary cut-tiles if bounds are set to include some 	dead ends
 
-    function deleteTilesToDeadEnds(cut_tiles_array: Coord[]) {
-        for (let i = cut_tiles_array.length - 1; i >= 0; i -= 1)
-            room.tileTypes[cut_tiles_array[i].x][cut_tiles_array[i].y] = UNWALKABLE
+    function deleteTilesToDeadEnds(cutCoords: Coord[]) {
+        for (let i = cutCoords.length - 1; i >= 0; i -= 1)
+            room.tileCoords[packXY(cutCoords[i].x, cutCoords[i].y)] = UNWALKABLE
 
         // Floodfill from exits: save exit tiles in array and do a bfs-like search
 
@@ -407,15 +410,15 @@ export function rampartPlanner(room: Room) {
         let y = 0
 
         for (; y < roomDimensions - 1; y += 1) {
-            if (room.tileTypes[1][y] === TO_EXIT) unvisited_pos.push(50 * y + 1)
-            if (room.tileTypes[48][y] === TO_EXIT) unvisited_pos.push(50 * y + 48)
+            if (room.tileCoords[packXY(1, y)] === TO_EXIT) unvisited_pos.push(50 * y + 1)
+            if (room.tileCoords[packXY(48, y)] === TO_EXIT) unvisited_pos.push(50 * y + 48)
         }
 
         let x = 0
 
         for (; x < roomDimensions - 1; x += 1) {
-            if (room.tileTypes[x][1] === TO_EXIT) unvisited_pos.push(50 + x)
-            if (room.tileTypes[x][48] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
+            if (room.tileCoords[packXY(x, 1)] === TO_EXIT) unvisited_pos.push(50 + x)
+            if (room.tileCoords[packXY(x, 48)] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
         }
 
         // Iterate over all unvisited TO_EXIT- Tiles and mark neigbours as TO_EXIT tiles, if walkable (NORMAL), and add to unvisited
@@ -443,9 +446,9 @@ export function rampartPlanner(room: Room) {
                 dx = x + surr[i][0]
                 dy = y + surr[i][1]
 
-                if (room.tileTypes[dx][dy] === NORMAL) {
+                if (room.tileCoords[packXY(dx, dy)] === NORMAL) {
                     unvisited_pos.push(50 * dy + dx)
-                    room.tileTypes[dx][dy] = TO_EXIT
+                    room.tileCoords[packXY(dx, dy)] = TO_EXIT
                 }
             }
         }
@@ -453,21 +456,21 @@ export function rampartPlanner(room: Room) {
         // Remove min-Cut-Tile if there is no TO-EXIT  surrounding it
         let leads_to_exit = false
 
-        for (let i = cut_tiles_array.length - 1; i >= 0; i -= 1) {
+        for (let i = cutCoords.length - 1; i >= 0; i -= 1) {
             leads_to_exit = false
-            x = cut_tiles_array[i].x
-            y = cut_tiles_array[i].y
+            x = cutCoords[i].x
+            y = cutCoords[i].y
 
             for (let i = 0; i < 8; i += 1) {
                 dx = x + surr[i][0]
                 dy = y + surr[i][1]
 
-                if (room.tileTypes[dx][dy] === TO_EXIT) {
+                if (room.tileCoords[packXY(dx, dy)] === TO_EXIT) {
                     leads_to_exit = true
                 }
             }
 
-            if (!leads_to_exit) cut_tiles_array.splice(i, 1)
+            if (!leads_to_exit) cutCoords.splice(i, 1)
         }
     }
 

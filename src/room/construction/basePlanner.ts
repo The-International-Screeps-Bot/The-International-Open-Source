@@ -12,6 +12,7 @@ import {
 } from 'international/constants'
 import {
     arePositionsEqual,
+    createPosMap,
     customLog,
     findAvgBetweenPosotions,
     findPositionsInsideRect,
@@ -30,7 +31,26 @@ import { rampartPlanner } from './rampartPlanner'
  * Checks if a room can be planner. If it can, it informs information on how to build the room
  */
 export function basePlanner(room: Room) {
+
     const terrainCoords = internationalManager.getTerrainCoords(room.name)
+
+    room.baseCoords = [].concat(terrainCoords)
+
+    // Loop through each exit of exits
+
+    for (const pos of room.find(FIND_EXIT)) {
+        // Record the exit as a pos to avoid
+
+        room.baseCoords[pack(pos)] = 255
+
+        // Loop through adjacent positions
+
+        for (const coord of findPositionsInsideRect(pos.x - 2, pos.y - 2, pos.x + 2, pos.y + 2))
+            room.baseCoords[pack(coord)] = 255
+    }
+
+    room.roadCoords = createPosMap(false, 0)
+    room.rampartCoords = createPosMap(false, 0)
 
     if (!room.memory.stampAnchors) {
         room.memory.stampAnchors = {}
@@ -150,7 +170,7 @@ export function basePlanner(room: Room) {
             // Run distance transform with the baseCM
 
             const distanceCoords = opts.normalDT
-                ? room.distanceTransform(room.baseCoords)
+                ? room.distanceTransform(room.baseCoords, opts.stampType === 'fastFiller' ? true : false)
                 : room.diagonalDistanceTransform(room.baseCoords)
 
             // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
@@ -501,7 +521,7 @@ export function basePlanner(room: Room) {
 
             // Find the protection status
 
-            let isProtected = room.tileTypes[closestSourcePos.x][closestSourcePos.y] !== NORMAL
+            let isProtected = room.tileCoords[pack(closestSourcePos)] !== NORMAL
 
             const OGPositions: Map<RoomPosition, number> = new Map()
 
@@ -527,7 +547,7 @@ export function basePlanner(room: Room) {
                 for (const coord of adjacentCoords) {
                     // If the coord is probably not protected
 
-                    if (room.tileTypes[coord.x][coord.y] !== NORMAL) continue
+                    if (room.tileCoords[pack(coord)] !== NORMAL) continue
 
                     room.rampartCoords[pack(closestSourcePos)] = 1
                     break
@@ -564,7 +584,7 @@ export function basePlanner(room: Room) {
 
                 // Iterate if the position is near an exit
 
-                if (room.tileTypes[coord.x][coord.y] === TO_EXIT) continue
+                if (room.tileCoords[pack(coord)] === TO_EXIT) continue
 
                 // Otherwise
 
@@ -578,7 +598,7 @@ export function basePlanner(room: Room) {
                 if (!sourceHasLink) {
                     room.memory.stampAnchors.sourceLink.push(pack(pos))
 
-                    isProtected = room.tileTypes[coord.x][coord.y] !== NORMAL
+                    isProtected = room.tileCoords[pack(coord)] !== NORMAL
 
                     // If the position is not PROTECTED, plan a rampart on it
 
@@ -595,7 +615,7 @@ export function basePlanner(room: Room) {
                         for (const coord of adjacentCoords) {
                             // If the coord is probably not protected
 
-                            if (room.tileTypes[coord.x][coord.y] !== NORMAL) continue
+                            if (room.tileCoords[pack(coord)] !== NORMAL) continue
 
                             room.rampartCoords[pack(coord)] = 1
                             break
@@ -655,11 +675,11 @@ export function basePlanner(room: Room) {
 
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
-            const packedPos = x * roomDimensions + y
+            const packedPos = packXY(x, y)
 
-            if (room.rampartCoords[packXY(x, y)] === 1) room.memory.stampAnchors.rampart.push(packedPos)
+            if (room.rampartCoords[packedPos] === 1) room.memory.stampAnchors.rampart.push(packedPos)
 
-            if (!room.memory.stampAnchors.road.includes(packedPos) && room.roadCoords[packXY(x, y)] === 1)
+            if (!room.memory.stampAnchors.road.includes(packedPos) && room.roadCoords[packedPos] === 1)
                 room.memory.stampAnchors.road.push(packedPos)
         }
     }

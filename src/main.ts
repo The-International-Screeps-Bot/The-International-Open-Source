@@ -186,6 +186,8 @@ declare global {
          * Weight my ramparts by this value
          */
         myRampartWeight?: number
+
+        weightStampAnchors?: boolean
     }
 
     interface FindClosestPosOfValueOpts {
@@ -639,7 +641,7 @@ declare global {
         /**
          * Tile types as defined by the rampartPlanner
          */
-        tileTypes: number[][]
+        tileCoords: PosMap<number>
 
         /**
          * Wether the towers can deal sufficient damage to out-damage enemy creeps in the room
@@ -647,6 +649,12 @@ declare global {
          * Should influence if maintainers and defenders are needed to fend off the attack
          */
         towerSuperiority: boolean
+
+        baseCoords: PosMap<number>
+
+        rampartCoords: PosMap<number>
+
+        roadCoords: PosMap<number>
 
         // Functions
 
@@ -994,18 +1002,6 @@ declare global {
         _usedSourceCoords: Set<number>[]
 
         readonly usedSourceCoords: Set<number>[]
-
-        _baseCoords: PosMap<number>
-
-        readonly baseCoords: PosMap<number>
-
-        _rampartCoords: PosMap<number>
-
-        readonly rampartCoords: PosMap<number>
-
-        _roadCoords: PosMap<number>
-
-        readonly roadCoords: PosMap<number>
 
         _sourcePaths: RoomPosition[][]
 

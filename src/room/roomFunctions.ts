@@ -671,11 +671,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 }
 
                 if (opts.weightCoordMaps) {
-
                     for (const coordMap of opts.weightCoordMaps) {
-
                         for (const packedCoord of coordMap) {
-
                             const coord = unpackAsPos(packedCoord)
 
                             cm.set(coord.x, coord.y, coordMap[packedCoord])
@@ -1354,7 +1351,7 @@ Room.prototype.distanceTransform = function (
 
     const distanceCoords = createPosMap()
 
-    if (!initialCoords) initialCoords = internationalManager.getTerrainCoords(this.name)
+    if (!initialCoords) initialCoords = [].concat(internationalManager.getTerrainCoords(this.name))
 
     let x
     let y
@@ -1383,6 +1380,8 @@ Room.prototype.distanceTransform = function (
             topRight = distanceCoords[packXY(x + 1, y - 1)]
             bottomLeft = distanceCoords[packXY(x - 1, y + 1)]
 
+            packedCoord = packXY(x, y)
+
             distanceCoords[packedCoord] = Math.min(
                 Math.min(top, left, topLeft, topRight, bottomLeft) + 1,
                 distanceCoords[packedCoord],
@@ -1403,6 +1402,8 @@ Room.prototype.distanceTransform = function (
             bottomRight = distanceCoords[packXY(x + 1, y + 1)]
             topRight = distanceCoords[packXY(x + 1, y - 1)]
             bottomLeft = distanceCoords[packXY(x - 1, y + 1)]
+
+            packedCoord = packXY(x, y)
 
             distanceCoords[packedCoord] = Math.min(
                 Math.min(bottom, right, bottomRight, topRight, bottomLeft) + 1,
@@ -1441,7 +1442,7 @@ Room.prototype.diagonalDistanceTransform = function (
 
     const distanceCoords = createPosMap()
 
-    if (!initialCoords) initialCoords = internationalManager.getTerrainCoords(this.name)
+    if (!initialCoords) initialCoords = [].concat(internationalManager.getTerrainCoords(this.name))
 
     let x
     let y
@@ -1505,9 +1506,9 @@ Room.prototype.diagonalDistanceTransform = function (
 Room.prototype.floodFill = function (seeds, coordMap = []) {
     // Construct a cost matrix for the flood
 
-    const floodCoords = createPosMap()
-    const terrainCoords = internationalManager.getTerrainCoords(this.name)
-    const visitedCoords = createPosMap()
+    const floodCoords = createPosMap(false, 0)
+    const terrainCoords = [].concat(internationalManager.getTerrainCoords(this.name))
+    const visitedCoords = createPosMap(false, 0)
 
     // Construct values for the flood
 
@@ -1625,7 +1626,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
     while ((opts.reduceIterations || 0) >= 0) {
         // Construct a cost matrix for visited tiles and add seeds to it
 
-        const visitedCoords = createPosMap()
+        const visitedCoords = createPosMap(false, 0)
 
         // Record startPos as visited
 
@@ -1690,7 +1691,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                     // If canUseWalls is enabled and the terrain isnt' a wall, disable canUseWalls
 
-                    if (canUseWalls && opts.coordMap[(coord2.x, coord2.y)] !== 255) canUseWalls = false
+                    if (canUseWalls && opts.coordMap[pack(coord2)] !== 255) canUseWalls = false
 
                     // Add it tofastFillerSide the next gen
 
