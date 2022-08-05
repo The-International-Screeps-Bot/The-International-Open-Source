@@ -268,7 +268,7 @@ export function createPosMap(innerArray?: boolean, initialValue?: string | numbe
         for (let y = 0; y < roomDimensions; y += 1) {
             // Add an element for this pos
 
-            packedPosMap.push(innerArray ? [] : initialValue ? initialValue : undefined)
+            packedPosMap.push(innerArray ? [] : initialValue)
         }
     }
 

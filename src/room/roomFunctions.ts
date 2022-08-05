@@ -28,7 +28,7 @@ import {
     unpackAsRoomPos,
 } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
-import { unpackCoordAsPos, unpackPos } from 'other/packrat'
+import { packCoord, unpackCoordAsPos, unpackPos } from 'other/packrat'
 import { basePlanner } from './construction/basePlanner'
 import { RoomCacheObject } from './roomObject'
 
@@ -678,13 +678,12 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 if (opts.weightCoordMaps) {
                     for (const coordMap of opts.weightCoordMaps) {
-                        for (const packedCoord of coordMap) {
+                        for (const index in coordMap) {
+
+                            const packedCoord = parseInt(index)
                             const coord = unpackAsPos(packedCoord)
 
-                            const coordValue = coordMap[packedCoord]
-                            /* if (coordValue <= 0) continue */
-
-                            cm.set(coord.x, coord.y, coordValue)
+                            cm.set(coord.x, coord.y, coordMap[packedCoord])
                         }
                     }
                 }
@@ -1354,18 +1353,11 @@ Room.prototype.distanceTransform = function (
     x2 = roomDimensions,
     y2 = roomDimensions,
 ) {
-
     // Use a costMatrix to record distances
 
-    const distanceCoords = []
+    const distanceCoords = createPosMap(false, 0)
 
-    let t
-
-    if (!initialCoords) {
-
-        initialCoords = [].concat(internationalManager.getTerrainCoords(this.name))
-        t = true
-    }
+    if (!initialCoords) initialCoords = [].concat(internationalManager.getTerrainCoords(this.name))
 
     let x
     let y
@@ -1377,8 +1369,6 @@ Room.prototype.distanceTransform = function (
             distanceCoords[packedCoord] = initialCoords[packedCoord] === 255 ? 0 : 255
         }
     }
-
-    if (t) console.log(distanceCoords)
 
     let top
     let left
@@ -1452,10 +1442,9 @@ Room.prototype.diagonalDistanceTransform = function (
     x2 = roomDimensions,
     y2 = roomDimensions,
 ) {
-
     // Use a costMatrix to record distances
 
-    const distanceCoords = []
+    const distanceCoords = createPosMap(false, 0)
 
     if (!initialCoords) initialCoords = [].concat(internationalManager.getTerrainCoords(this.name))
 
@@ -1832,7 +1821,6 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
         // So long as there are positions in this gen
 
         while (thisGeneration.length) {
-
             // Reset next gen
 
             nextGeneration = []
@@ -1840,7 +1828,6 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
             // Iterate through positions of this gen
 
             for (const pos of thisGeneration) {
-
                 // Construct a rect and get the positions in a range of 1 (not diagonals)
 
                 const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)

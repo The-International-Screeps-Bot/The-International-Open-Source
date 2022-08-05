@@ -1,4 +1,4 @@
-import { customLog, findClosestObject, getRange } from 'international/generalFunctions'
+import { customLog, findClosestObject, getRange, unpackAsPos } from 'international/generalFunctions'
 import { marketManager } from './market/marketManager'
 import './spawning/spawnManager'
 
@@ -10,6 +10,7 @@ import './allyCreepRequestManager'
 import './claimRequestManager'
 import { myColors, safemodeTargets } from 'international/constants'
 import { packCoord, packCoordList, packPosList } from 'other/packrat'
+import { internationalManager } from 'international/internationalManager'
 
 /**
  * Handles managers for exclusively commune-related actions
@@ -31,7 +32,15 @@ export function communeManager(room: Room) {
 
     room.spawnManager()
 
-    // Testing stuff, feel welcome to use to test CPU usage for specific commune things\
+    // Testing stuff, feel welcome to use to test CPU usage for specific commune things
+
+   for (const packedCoord in internationalManager.getTerrainCoords(room.name)) {
+
+      const coord = unpackAsPos(parseInt(packedCoord))
+
+      customLog('COORD', coord.x, + ', ' + coord.y + ',  ' + packedCoord)
+   }
+
 /*
     for (const remoteName of room.memory.remotes) {
 

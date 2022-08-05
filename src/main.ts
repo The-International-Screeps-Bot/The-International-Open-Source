@@ -15,7 +15,7 @@ import './international/endTickManager'
 // Room
 
 import './room/remotesManager'
-import { roomManager } from 'room/roomManager'
+import { roomManager } from 'room/roomsManager'
 import './room/roomAdditions'
 
 import './room/resourceAdditions'
