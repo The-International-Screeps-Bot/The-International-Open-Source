@@ -31,7 +31,6 @@ import { rampartPlanner } from './rampartPlanner'
  * Checks if a room can be planner. If it can, it informs information on how to build the room
  */
 export function basePlanner(room: Room) {
-
     const terrainCoords = internationalManager.getTerrainCoords(room.name)
 
     room.baseCoords = [].concat(terrainCoords)
@@ -49,7 +48,7 @@ export function basePlanner(room: Room) {
             room.baseCoords[pack(coord)] = 255
     }
 
-    room.roadCoords = createPosMap(false, 0)
+    room.roadCoords = [].concat(terrainCoords)
     room.rampartCoords = createPosMap(false, 0)
 
     if (!room.memory.stampAnchors) {
@@ -64,7 +63,7 @@ export function basePlanner(room: Room) {
         for (const coord of findPositionsInsideRect(x - range, y - range, x + range, y + range)) {
             // Otherwise record the position in the base cost matrix as avoid
 
-            room.baseCoords[pack(coord)] = Math.max(weight, room.baseCoords[pack(coord)]) || 255
+            room.baseCoords[pack(coord)] = Math.max(weight || 255, room.baseCoords[pack(coord)])
         }
     }
 
@@ -74,9 +73,7 @@ export function basePlanner(room: Room) {
 
     // Get and record the mineralHarvestPos as avoid
 
-    for (const coord of room.get('mineralHarvestPositions') as RoomPosition[]) {
-        room.baseCoords[pack(coord)] = 255
-    }
+    for (const coord of room.get('mineralHarvestPositions') as RoomPosition[]) room.baseCoords[pack(coord)] = 255
 
     // Record the positions around sources as unusable
 
@@ -170,7 +167,7 @@ export function basePlanner(room: Room) {
             // Run distance transform with the baseCM
 
             const distanceCoords = opts.normalDT
-                ? room.distanceTransform(room.baseCoords, opts.stampType === 'fastFiller' ? true : false)
+                ? room.distanceTransform(room.baseCoords /* , opts.stampType === 'fastFiller' ? true : false */)
                 : room.diagonalDistanceTransform(room.baseCoords)
 
             // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
@@ -573,14 +570,14 @@ export function basePlanner(room: Room) {
 
             for (const coord of adjacentPositions) {
                 // Iterate if plan for pos is in use
-
+                room.visual.text(room.roadCoords[pack(coord)].toString(), coord.x, coord.y)
                 if (room.roadCoords[pack(coord)] > 0) continue
 
                 if (room.rampartCoords[pack(coord)] > 0) continue
 
                 // Iterate if the pos is a wall
 
-                if (terrainCoords[pack(coord)] === TERRAIN_MASK_WALL) continue
+                if (terrainCoords[pack(coord)] === 255) continue
 
                 // Iterate if the position is near an exit
 
@@ -683,7 +680,11 @@ export function basePlanner(room: Room) {
                 room.memory.stampAnchors.road.push(packedPos)
         }
     }
-
+    for (let x = 0; x < roomDimensions; x += 1) {
+        for (let y = 0; y < roomDimensions; y += 1) {
+            room.visual.text(room.roadCoords[packXY(x, y)].toString(), x, y, { font: 0.5 })
+        }
+    }
     // Record planning results in the room's global and inform true
 
     room.memory.planned = true

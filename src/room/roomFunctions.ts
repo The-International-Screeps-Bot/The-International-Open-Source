@@ -6,6 +6,7 @@ import {
     myColors,
     numbersByStructureTypes,
     prefferedCommuneRange,
+    rampartMaxGroupSize,
     remoteNeedsIndex,
     roomDimensions,
     roomTypeProperties,
@@ -675,7 +676,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                         for (const packedCoord of coordMap) {
                             const coord = unpackAsPos(packedCoord)
 
-                            cm.set(coord.x, coord.y, coordMap[packedCoord])
+                            const coordValue = coordMap[packedCoord]
+                            /* if (coordValue <= 0) continue */
+
+                            cm.set(coord.x, coord.y, coordValue)
                         }
                     }
                 }
@@ -1374,11 +1378,11 @@ Room.prototype.distanceTransform = function (
 
     for (x = x1; x <= x2; x += 1) {
         for (y = y1; y <= y2; y += 1) {
-            top = distanceCoords[packXY(x, y - 1)]
-            left = distanceCoords[packXY(x - 1, y - 1)]
-            topLeft = distanceCoords[packXY(x - 1, y - 1)]
-            topRight = distanceCoords[packXY(x + 1, y - 1)]
-            bottomLeft = distanceCoords[packXY(x - 1, y + 1)]
+            top = distanceCoords[packXY(x, y - 1)] || 0
+            left = distanceCoords[packXY(x - 1, y)] || 0
+            topLeft = distanceCoords[packXY(x - 1, y - 1)] || 0
+            topRight = distanceCoords[packXY(x + 1, y - 1)] || 0
+            bottomLeft = distanceCoords[packXY(x - 1, y + 1)] || 0
 
             packedCoord = packXY(x, y)
 
@@ -1397,11 +1401,11 @@ Room.prototype.distanceTransform = function (
 
     for (x = x2; x >= x1; x -= 1) {
         for (y = y2; y >= y1; y -= 1) {
-            bottom = distanceCoords[packXY(x, y + 1)]
-            right = distanceCoords[packXY(x + 1, y)]
-            bottomRight = distanceCoords[packXY(x + 1, y + 1)]
-            topRight = distanceCoords[packXY(x + 1, y - 1)]
-            bottomLeft = distanceCoords[packXY(x - 1, y + 1)]
+            bottom = distanceCoords[packXY(x, y + 1)] || 0
+            right = distanceCoords[packXY(x + 1, y)] || 0
+            bottomRight = distanceCoords[packXY(x + 1, y + 1)] || 0
+            topRight = distanceCoords[packXY(x + 1, y - 1)] || 0
+            bottomLeft = distanceCoords[packXY(x - 1, y + 1)] || 0
 
             packedCoord = packXY(x, y)
 
@@ -1462,8 +1466,8 @@ Room.prototype.diagonalDistanceTransform = function (
 
     for (x = x1; x <= x2; x += 1) {
         for (y = y1; y <= y2; y += 1) {
-            top = distanceCoords[packXY(x, y - 1)]
-            left = distanceCoords[packXY(x - 1, y)]
+            top = distanceCoords[packXY(x, y - 1)] || 0
+            left = distanceCoords[packXY(x - 1, y)] || 0
 
             packedCoord = packXY(x, y)
 
@@ -1478,8 +1482,8 @@ Room.prototype.diagonalDistanceTransform = function (
 
     for (x = x2; x >= x1; x -= 1) {
         for (y = y2; y >= y1; y -= 1) {
-            bottom = distanceCoords[packXY(x, y + 1)]
-            right = distanceCoords[packXY(x + 1, y)]
+            bottom = distanceCoords[packXY(x, y + 1)] || 0
+            right = distanceCoords[packXY(x + 1, y)] || 0
 
             packedCoord = packXY(x, y)
 
@@ -1786,14 +1790,9 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
 
     // Construct a costMatrix to store visited positions
 
-    const visitedCM = new PathFinder.CostMatrix()
-
-    // Construct storage of position groups
+    const visitedCoords = createPosMap(false, 0)
 
     const groupedPositions = []
-
-    // Construct the groupIndex
-
     let groupIndex = 0
 
     // Loop through each pos of positions
@@ -1803,11 +1802,11 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
 
         // If the pos has already been visited, iterate
 
-        if (visitedCM.get(pos.x, pos.y) === 1) continue
+        if (visitedCoords[pack(pos)] === 1) continue
 
         // Record that this pos has been visited
 
-        visitedCM.set(pos.x, pos.y, 1)
+        visitedCoords[pack(pos)] = 1
 
         // Construct the group for this index with the pos in it the group
 
@@ -1818,10 +1817,14 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
         let thisGeneration = [pos]
 
         let nextGeneration: Coord[] = []
+        let groupSize = 0
 
         // So long as there are positions in this gen
 
         while (thisGeneration.length) {
+
+            if (groupSize >= rampartMaxGroupSize) break
+
             // Reset next gen
 
             nextGeneration = []
@@ -1829,6 +1832,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
             // Iterate through positions of this gen
 
             for (const pos of thisGeneration) {
+
                 // Construct a rect and get the positions in a range of 1 (not diagonals)
 
                 const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
@@ -1848,11 +1852,11 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
 
                     // Iterate if the adjacent pos has been visited or isn't a tile
 
-                    if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
+                    if (visitedCoords[pack(adjacentPos)] === 1) continue
 
                     // Otherwise record that it has been visited
 
-                    visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+                    visitedCoords[pack(adjacentPos)] = 1
 
                     // If a rampart is not planned for this position, iterate
 
@@ -1860,9 +1864,10 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
 
                     // Add it to the next gen and this group
 
-                    nextGeneration.push(adjacentPos)
-
                     groupedPositions[groupIndex].push(new RoomPosition(adjacentPos.x, adjacentPos.y, room.name))
+
+                    nextGeneration.push(adjacentPos)
+                    groupSize += 1
                 }
             }
 

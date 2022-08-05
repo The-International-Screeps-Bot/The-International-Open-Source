@@ -32,7 +32,7 @@ export function rampartPlanner(room: Room) {
 
                 room.tileCoords[packedCoord] = UNWALKABLE
 
-                if (terrainCoords[packXY(x, y)] === TERRAIN_MASK_WALL) continue
+                if (terrainCoords[packXY(x, y)] === 255) continue
 
                 room.tileCoords[packedCoord] = NORMAL
 
