@@ -1599,9 +1599,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
         // Get the value of the pos
 
         const posValue = opts.coordMap[pack(coord1)]
-
-        // If the value is to avoid, inform false
-
         if (posValue === 255) return false
 
         // If the posValue is less than the requiredValue, inform false
@@ -1611,6 +1608,8 @@ Room.prototype.findClosestPosOfValue = function (opts) {
         // If adjacentToRoads is a requirement
 
         if (!opts.adjacentToRoads) return true
+
+        if (opts.roadCoords[pack(coord1)] !== 0) return false
 
         // Loop through adjacent positions
 
