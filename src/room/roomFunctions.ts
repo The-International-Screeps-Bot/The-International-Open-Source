@@ -6,7 +6,6 @@ import {
     myColors,
     numbersByStructureTypes,
     prefferedCommuneRange,
-    rampartMaxGroupSize,
     remoteNeedsIndex,
     roomDimensions,
     roomTypeProperties,
@@ -141,6 +140,12 @@ Room.prototype.get = function (roomObjectName) {
             room.controller.pos.x + 2,
             room.controller.pos.y + 2,
         )
+
+        for (let x = 0; x < roomDimensions; x += 1) {
+            for (let y = 0; y < roomDimensions; y += 1) {
+                room.visual.text(distanceCoords[packXY(x, y)].toString(), x, y, { font: 0.5 })
+            }
+        }
 
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
@@ -1349,24 +1354,31 @@ Room.prototype.distanceTransform = function (
     x2 = roomDimensions,
     y2 = roomDimensions,
 ) {
-    const room = this
 
     // Use a costMatrix to record distances
 
-    const distanceCoords = createPosMap()
+    const distanceCoords = []
 
-    if (!initialCoords) initialCoords = [].concat(internationalManager.getTerrainCoords(this.name))
+    let t
+
+    if (!initialCoords) {
+
+        initialCoords = [].concat(internationalManager.getTerrainCoords(this.name))
+        t = true
+    }
 
     let x
     let y
     let packedCoord
 
-    for (x = Math.max(x1 - 1, 0); x <= Math.min(x2 + 1, roomDimensions); x += 1) {
-        for (y = Math.max(y1 - 1, 0); y <= Math.min(y2 + 1, roomDimensions); y += 1) {
+    for (x = Math.max(x1 - 1, 0); x <= Math.min(x2, roomDimensions - 1); x += 1) {
+        for (y = Math.max(y1 - 1, 0); y <= Math.min(y2, roomDimensions - 1); y += 1) {
             packedCoord = packXY(x, y)
             distanceCoords[packedCoord] = initialCoords[packedCoord] === 255 ? 0 : 255
         }
     }
+
+    if (t) console.log(distanceCoords)
 
     let top
     let left
@@ -1421,7 +1433,7 @@ Room.prototype.distanceTransform = function (
 
         for (x = x1; x <= x2; x += 1) {
             for (y = y1; y <= y2; y += 1) {
-                room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+                this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                     fill: `hsl(${200}${distanceCoords[packXY(x, y)] * 10}, 100%, 60%)`,
                     opacity: 0.4,
                 })
@@ -1440,11 +1452,10 @@ Room.prototype.diagonalDistanceTransform = function (
     x2 = roomDimensions,
     y2 = roomDimensions,
 ) {
-    const room = this
 
     // Use a costMatrix to record distances
 
-    const distanceCoords = createPosMap()
+    const distanceCoords = []
 
     if (!initialCoords) initialCoords = [].concat(internationalManager.getTerrainCoords(this.name))
 
@@ -1496,7 +1507,7 @@ Room.prototype.diagonalDistanceTransform = function (
 
         for (x = x1; x <= x2; x += 1) {
             for (y = y1; y <= y2; y += 1) {
-                room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+                this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                     fill: `hsl(${200}${distanceCoords[packXY(x, y)] * 10}, 100%, 60%)`,
                     opacity: 0.4,
                 })
@@ -1817,13 +1828,10 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
         let thisGeneration = [pos]
 
         let nextGeneration: Coord[] = []
-        let groupSize = 0
 
         // So long as there are positions in this gen
 
         while (thisGeneration.length) {
-
-            if (groupSize >= rampartMaxGroupSize) break
 
             // Reset next gen
 
@@ -1867,7 +1875,6 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
                     groupedPositions[groupIndex].push(new RoomPosition(adjacentPos.x, adjacentPos.y, room.name))
 
                     nextGeneration.push(adjacentPos)
-                    groupSize += 1
                 }
             }
 

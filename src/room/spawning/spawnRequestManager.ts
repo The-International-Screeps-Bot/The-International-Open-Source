@@ -430,9 +430,8 @@ Room.prototype.spawnRequester = function () {
                     role,
                     defaultParts: [],
                     extraParts,
-                    partsMultiplier: Math.max(attackStrength / strength, 1),
+                    partsMultiplier: Math.max(healStrength * 1.2 / strength, 1),
                     minCreeps: undefined,
-                    maxCreeps: 5,
                     minCost: 210,
                     priority: 6 + this.creepsFromRoom.meleeDefender.length,
                     memoryAdditions: {

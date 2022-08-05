@@ -247,7 +247,6 @@ export function basePlanner(room: Room) {
     // Get the centerUpgradePos, informing false if it's undefined
 
     const centerUpgadePos: RoomPosition = room.get('centerUpgradePos')
-    if (!centerUpgadePos) return false
 
     // Get the upgradePositions
 
@@ -255,11 +254,11 @@ export function basePlanner(room: Room) {
 
     // Loop through each upgradePos
 
-    for (const upgradePos of upgradePositions) {
+    for (const pos of upgradePositions) {
         // Mark as avoid in road and base cost matrixes
 
-        room.baseCoords[pack(upgradePos)] = 255
-        room.roadCoords[pack(upgradePos)] = 20
+        room.baseCoords[pack(pos)] = 255
+        room.roadCoords[pack(pos)] = 20
     }
 
     // Try to plan the stamp
@@ -570,7 +569,7 @@ export function basePlanner(room: Room) {
 
             for (const coord of adjacentPositions) {
                 // Iterate if plan for pos is in use
-                room.visual.text(room.roadCoords[pack(coord)].toString(), coord.x, coord.y)
+
                 if (room.roadCoords[pack(coord)] > 0) continue
 
                 if (room.rampartCoords[pack(coord)] > 0) continue
@@ -680,11 +679,13 @@ export function basePlanner(room: Room) {
                 room.memory.stampAnchors.road.push(packedPos)
         }
     }
+/*
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
             room.visual.text(room.roadCoords[packXY(x, y)].toString(), x, y, { font: 0.5 })
         }
     }
+ */
     // Record planning results in the room's global and inform true
 
     room.memory.planned = true

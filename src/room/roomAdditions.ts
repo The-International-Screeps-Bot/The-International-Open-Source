@@ -333,15 +333,13 @@ Object.defineProperties(Room.prototype, {
             this.memory.SP = []
             this._sourcePositions = []
 
-            let anchor = this.anchor || new RoomPosition(25, 25, this.name)
-
             if (this.memory.type === 'remote') {
                 const commune = Game.rooms[this.memory.commune]
                 if (!commune) return []
 
                 const terrain = Game.map.getRoomTerrain(this.name)
 
-                anchor = commune.anchor || new RoomPosition(25, 25, commune.name)
+                const anchor = commune.anchor || new RoomPosition(25, 25, commune.name)
 
                 for (const source of this.sources) {
                     const positions = []
@@ -387,6 +385,8 @@ Object.defineProperties(Room.prototype, {
                 return this._sourcePositions
             }
 
+            const anchor = this.anchor || new RoomPosition(25, 25, this.name)
+
             const terrain = Game.map.getRoomTerrain(this.name)
 
             for (const source of this.sources) {
@@ -414,7 +414,16 @@ Object.defineProperties(Room.prototype, {
                 }
 
                 positions.sort((a, b) => {
-                    return anchor.getRangeTo(a) - anchor.getRangeTo(b)
+                    return (
+                        this.advancedFindPath({
+                            origin: a,
+                            goal: { pos: anchor, range: 3 },
+                        }).length -
+                        this.advancedFindPath({
+                            origin: b,
+                            goal: { pos: anchor, range: 3 },
+                        }).length
+                    )
                 })
 
                 this.memory.SP.push(packPosList(positions))

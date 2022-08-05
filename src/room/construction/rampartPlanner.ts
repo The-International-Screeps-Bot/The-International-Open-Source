@@ -595,14 +595,10 @@ export function rampartPlanner(room: Room) {
         }
     }
 
-    const recordRamparts = !room.memory.stampAnchors.rampart.length
-
     // Get Min cut
     // Positions is an array where to build walls/ramparts
 
-    const rampartPositions = room.memory.stampAnchors.rampart.length
-        ? room.memory.stampAnchors.rampart
-        : GetCutTiles(protectionRects)
+    const rampartPositions = GetCutTiles(protectionRects)
 
     // Plan the positions
 

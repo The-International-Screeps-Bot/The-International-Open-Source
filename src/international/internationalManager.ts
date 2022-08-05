@@ -7,52 +7,87 @@ import { statsManager, StatsManager } from './statsManager'
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
 export class InternationalManager {
-    // Functions
+    run() {
+        // If CPU logging is enabled, get the CPU used at the start
 
-    run?(): void
+        if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
 
-    /**
-     * Configures features like Memory, global and object prototypes required to run the bot
-     */
-    config?(): void
+        // Run prototypes
 
-    /**
-     * Configures tick important or tick-only pre-roomManager settings required to run the bot
-     */
-    tickConfig?(): void
+        this.config()
+        this.tickConfig()
+        this.creepOrganizer()
+        this.constructionSiteManager()
 
-    /**
-     * Organizes creeps into properties for their communeName, and tracks total creep count
-     */
-    creepOrganizer?(): void
+        // Handle ally requests
 
-    /**
-     * Tracks and records constructionSites and thier age, deleting old sites
-     */
-    constructionSiteManager?(): void
+        allyManager.tickConfig()
+        allyManager.getAllyRequests()
+        ExecutePandaMasterCode()
 
-    /**
-     * Adds colours and annotations to the map if mapVisuals are enabled
-     */
-    mapVisualsManager?(): void
+        if (Memory.cpuLogging)
+            customLog(
+                'International Manager',
+                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+                myColors.white,
+                myColors.lightBlue,
+            )
+    }
 
-    /**
-     * Handles logging, stat recording, and more at the end of the tick
-     */
-    endTickManager?(): void
+    getSellOrder(resourceType: ResourceConstant, maxPrice = getAvgPrice(resourceType) * 1.2) {
+        const orders = this.orders[ORDER_SELL]?.[resourceType] || []
 
-    // Market functions
-    /**
-     * Gets sell orders for a resourceType below a specified price
-     */
-    getSellOrders?(resourceType: MarketResourceConstant, maxPrice?: number): Order[]
+        // Find the cheapest under maxPrice
 
-    /**
-     * Gets buy orders for a resourceType above a specified price
-     */
-    getBuyOrders?(resourceType: MarketResourceConstant, minPrice?: number): Order[]
+        let highestOrder: Order
 
-    advancedSellPixels?(): void
+        for (const order of orders) {
+
+            if (order.remainingAmount === 0) continue
+
+            if (order.price >= maxPrice) continue
+
+            if (order.price >= (highestOrder ? highestOrder.price : Infinity)) continue
+
+            highestOrder = order
+        }
+
+        return highestOrder
+    }
+
+    getBuyOrder(resourceType: ResourceConstant, minPrice = getAvgPrice(resourceType) * 0.8) {
+        const orders = this.orders[ORDER_BUY]?.[resourceType] || []
+
+        // FInd the most epensive orders over minPrice
+
+        let cheapestOrder: Order
+
+        for (const order of orders) {
+
+            if (order.remainingAmount === 0) continue
+
+            if (order.price <= minPrice) continue
+
+            if (order.price <= (cheapestOrder ? cheapestOrder.price : Infinity)) continue
+
+            cheapestOrder = order
+        }
+
+        return cheapestOrder
+    }
+
+    advancedSellPixels() {
+        if (!Memory.pixelSelling) return
+
+        const orders = Game.market.getAllOrders({ type: PIXEL })
+
+        for (const order of orders) {
+            if (order.price > getAvgPrice(PIXEL)) continue
+
+            Game.market.deal(order.id, Math.min(order.amount, Game.resources[PIXEL]))
+            return
+        }
+    }
 
     advancedGeneratePixel() {
         if (!Memory.pixelGeneration) return
@@ -87,6 +122,36 @@ export class InternationalManager {
 
         return global.terrainCoords[roomName]
     }
+
+    /**
+     * Configures features like Memory, global and object prototypes required to run the bot
+     */
+    config?(): void
+
+    /**
+     * Configures tick important or tick-only pre-roomManager settings required to run the bot
+     */
+    tickConfig?(): void
+
+    /**
+     * Organizes creeps into properties for their communeName, and tracks total creep count
+     */
+    creepOrganizer?(): void
+
+    /**
+     * Tracks and records constructionSites and thier age, deleting old sites
+     */
+    constructionSiteManager?(): void
+
+    /**
+     * Adds colours and annotations to the map if mapVisuals are enabled
+     */
+    mapVisualsManager?(): void
+
+    /**
+     * Handles logging, stat recording, and more at the end of the tick
+     */
+    endTickManager?(): void
 
     /**
      * My outgoing orders organized by room, order type and resourceType
@@ -218,70 +283,6 @@ export class InternationalManager {
         if (this._marketIsFunctional !== undefined) return this._marketIsFunctional
 
         return (this._marketIsFunctional = Game.market.getHistory(RESOURCE_ENERGY).length)
-    }
-}
-
-InternationalManager.prototype.run = function () {
-    // If CPU logging is enabled, get the CPU used at the start
-
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
-
-    // Run prototypes
-
-    this.config()
-    this.tickConfig()
-    this.creepOrganizer()
-    this.constructionSiteManager()
-
-    // Handle ally requests
-
-    allyManager.tickConfig()
-    allyManager.getAllyRequests()
-    ExecutePandaMasterCode()
-
-    if (Memory.cpuLogging)
-        customLog(
-            'International Manager',
-            (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-            myColors.white,
-            myColors.lightBlue,
-        )
-}
-
-InternationalManager.prototype.getSellOrders = function (resourceType, maxPrice = getAvgPrice(resourceType) * 1.2) {
-    const orders = this.orders[ORDER_SELL]?.[resourceType] || []
-    customLog(resourceType, maxPrice)
-    // Filter orders
-
-    return orders.filter(function (order) {
-        // Inform if the price is below or equal to the maxPrice
-
-        return order.price <= maxPrice
-    })
-}
-
-InternationalManager.prototype.getBuyOrders = function (resourceType, minPrice = getAvgPrice(resourceType) * 0.8) {
-    const orders = this.orders[ORDER_BUY]?.[resourceType] || []
-
-    // Filter orders
-
-    return orders.filter(function (order) {
-        // Inform if the price is more or equal to the minPrice
-
-        return order.price >= minPrice
-    })
-}
-
-InternationalManager.prototype.advancedSellPixels = function () {
-    if (!Memory.pixelSelling) return
-
-    const orders = Game.market.getAllOrders({ type: PIXEL })
-
-    for (const order of orders) {
-        if (order.price > getAvgPrice(PIXEL)) continue
-
-        Game.market.deal(order.id, Math.min(order.amount, Game.resources[PIXEL]))
-        return
     }
 }
 
