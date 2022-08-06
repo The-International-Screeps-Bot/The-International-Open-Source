@@ -685,6 +685,18 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
+                if (opts.weightStampAnchors) {
+
+                    if (room.memory.type === 'commune') {
+
+
+                    }
+                    else if (room.memory.type === 'remote') {
+
+                        
+                    }
+                }
+
                 // If there is no vision in the room, inform the costMatrix
 
                 if (!room) return cm
