@@ -44,6 +44,7 @@ export const allyList = [
     'LittleBitBlue',
     'Raggy',
     'DefaultO',
+    'Allorrian',
 ]
 
 /**
