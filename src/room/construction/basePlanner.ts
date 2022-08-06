@@ -50,7 +50,7 @@ export function basePlanner(room: Room) {
     }
 
     room.roadCoords = new Uint8Array(terrainCoords)
-    room.rampartCoords = new Uint8Array(2500)
+    room.rampartCoords = new Uint8Array(terrainCoords)
 
     if (!room.memory.stampAnchors) {
         room.memory.stampAnchors = {}
@@ -83,7 +83,6 @@ export function basePlanner(room: Room) {
     // Loop through each source, marking nearby positions as avoid
 
     for (const sourceIndex in sources) {
-
         const sourcePositions = room.sourcePositions[sourceIndex]
 
         recordAdjacentPositions(sourcePositions[0].x, sourcePositions[0].y, 1)
@@ -248,7 +247,6 @@ export function basePlanner(room: Room) {
     }
 
     for (const coord of controllerAdjacentCoords) {
-
         if (room.roadCoords[pack(coord)] > 0) continue
 
         room.baseCoords[pack(coord)] = 0
@@ -491,6 +489,7 @@ export function basePlanner(room: Room) {
         return false
 
     rampartPlanner(room)
+    const unprotectedCoords = room.findUnprotectedCoords()
 
     // Iterate through each x and y in the room
 
@@ -524,10 +523,6 @@ export function basePlanner(room: Room) {
 
             const closestSourcePos = room.sourcePositions[sourceIndex][0]
 
-            // Find the protection status
-            /*
-            let isProtected = room.tileCoords[pack(closestSourcePos)] !== NORMAL
- */
             const OGPositions: Map<RoomPosition, number> = new Map()
 
             for (let posIndex = 1; posIndex < room.sourcePositions[sourceIndex].length; posIndex += 1) {
@@ -536,32 +531,26 @@ export function basePlanner(room: Room) {
                 OGPositions.set(pos, room.roadCoords[pack(pos)])
                 room.roadCoords[pack(pos)] = 0
             }
-            /*
-            // If the position is not PROTECTED, plan a rampart on it
 
-            if (!isProtected) room.rampartCoords[pack(closestSourcePos)] = 1
-            // Otherwise, check if it's in range of an unprotected tile
-            else {
-                const adjacentCoords = findCoordsInsideRect(
-                    closestSourcePos.x - 3,
-                    closestSourcePos.y - 3,
-                    closestSourcePos.x + 3,
-                    closestSourcePos.y + 3,
-                )
+            let adjacentCoords = findCoordsInsideRect(
+                closestSourcePos.x - 3,
+                closestSourcePos.y - 3,
+                closestSourcePos.x + 3,
+                closestSourcePos.y + 3,
+            )
 
-                for (const coord of adjacentCoords) {
-                    // If the coord is probably not protected
+            for (const coord of adjacentCoords) {
+                // If the coord is probably not protected
 
-                    if (room.tileCoords[pack(coord)] !== NORMAL) continue
+                if (unprotectedCoords[pack(coord)] === 0) continue
 
-                    room.rampartCoords[pack(closestSourcePos)] = 1
-                    break
-                }
+                room.rampartCoords[pack(closestSourcePos)] = 1
+                break
             }
- */
+
             // Find positions adjacent to source
 
-            const adjacentCoords = findCoordsInsideRect(
+            adjacentCoords = findCoordsInsideRect(
                 closestSourcePos.x - 1,
                 closestSourcePos.y - 1,
                 closestSourcePos.x + 1,
@@ -576,59 +565,46 @@ export function basePlanner(room: Room) {
 
             // Loop through each pos
 
-            for (const coord of adjacentCoords) {
+            for (const coord1 of adjacentCoords) {
                 // Iterate if plan for pos is in use
 
-                if (room.roadCoords[pack(coord)] > 0) continue
+                if (room.roadCoords[pack(coord1)] > 0) continue
 
-                if (room.rampartCoords[pack(coord)] > 0) continue
+                if (room.rampartCoords[pack(coord1)] > 0) continue
 
-                if (coord.x < 2 || coord.x >= roomDimensions - 2 || coord.y < 2 || coord.y >= roomDimensions - 2)
+                if (coord1.x < 2 || coord1.x >= roomDimensions - 2 || coord1.y < 2 || coord1.y >= roomDimensions - 2)
                     continue
 
                 // Otherwise
 
                 // Assign 255 to this pos in baseCM
 
-                room.baseCoords[pack(coord)] = 255
-                room.roadCoords[pack(coord)] = 255
+                room.baseCoords[pack(coord1)] = 255
+                room.roadCoords[pack(coord1)] = 255
 
                 // If there is no planned link for this source, plan one
 
                 if (!sourceHasLink) {
-                    room.memory.stampAnchors.sourceLink.push(pack(coord))
-                    /*
-                    isProtected = room.tileCoords[pack(coord)] !== NORMAL
-
-                    // If the position is not PROTECTED, plan a rampart on it
-
-                    if (!isProtected) room.rampartCoords[pack(coord)] = 1
-                    // Otherwise, check if it's in range of an unprotected tile
-                    else {
-                        const adjacentCoords = findCoordsInsideRect(
-                            coord.x - 3,
-                            coord.y - 3,
-                            coord.x + 3,
-                            coord.y + 3,
-                        )
-
-                        for (const coord of adjacentCoords) {
-                            // If the coord is probably not protected
-
-                            if (room.tileCoords[pack(coord)] !== NORMAL) continue
-
-                            room.rampartCoords[pack(coord)] = 1
-                            break
-                        }
-                    }
- */
                     sourceHasLink = true
+                    room.memory.stampAnchors.sourceLink.push(pack(coord1))
+
+                    const adjacentCoords = findCoordsInsideRect(coord1.x - 3, coord1.y - 3, coord1.x + 3, coord1.y + 3)
+
+                    for (const coord2 of adjacentCoords) {
+                        // If the coord is probably not protected
+
+                        if (unprotectedCoords[pack(coord2)] === 0) continue
+
+                        room.rampartCoords[pack(coord1)] = 1
+                        break
+                    }
+
                     continue
                 }
 
                 // Otherwise plan for an extension
 
-                room.memory.stampAnchors.sourceExtension.push(pack(coord))
+                room.memory.stampAnchors.sourceExtension.push(pack(coord1))
 
                 // Decrease the extraExtensionsAmount and iterate
 

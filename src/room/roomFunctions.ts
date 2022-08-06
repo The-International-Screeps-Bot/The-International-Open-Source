@@ -1536,7 +1536,7 @@ Room.prototype.floodFill = function (seeds, coordMap, visuals) {
 
                 // Iterate if the terrain is a wall
 
-                if (terrainCoords[packedCoord1] === TERRAIN_MASK_WALL) continue
+                if (terrainCoords[packedCoord1] === 255) continue
 
                 if (coordMap && coordMap[pack(coord1)] > 0) continue
 
@@ -1882,6 +1882,88 @@ Room.prototype.findAllyCSiteTargetID = function (creep) {
     // If no cSiteTarget was found, inform false
 
     return false
+}
+
+Room.prototype.findUnprotectedCoords = function (visuals) {
+
+    // Construct a cost matrix for the flood
+
+    const floodCoords = new Uint8Array(2500)
+    const visitedCoords = new Uint8Array(2500)
+
+    // Construct values for the flood
+
+    let depth = 0
+    let thisGeneration: Coord[] = this.find(FIND_EXIT)
+    let nextGeneration: Coord[] = []
+
+    // Loop through positions of seeds
+
+    for (const coord of thisGeneration) visitedCoords[pack(coord)] = 1
+
+    // So long as there are positions in this gen
+
+    while (thisGeneration.length) {
+        // Reset next gen
+
+        nextGeneration = []
+
+        // Iterate through positions of this gen
+
+        for (const coord1 of thisGeneration) {
+            // If the depth isn't 0
+
+            if (depth > 0) {
+                const packedCoord1 = pack(coord1)
+
+                // Iterate if the terrain is a wall
+
+                if (this.rampartCoords[packedCoord1] > 0) continue
+
+                // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
+
+                floodCoords[packedCoord1] = depth
+
+                // If visuals are enabled, show the depth on the pos
+/*
+                if (visuals)
+                    this.visual.rect(coord1.x - 0.5, coord1.y - 0.5, 1, 1, {
+                        fill: `hsl(${200}${depth * 2}, 100%, 60%)`,
+                        opacity: 0.4,
+                    })
+                    this.visual.text(depth.toString(), coord1.x, coord1.y)
+ */
+            }
+
+            // Loop through adjacent positions
+
+            for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+                const packedCoord2 = pack(coord2)
+
+                // Iterate if the adjacent pos has been visited or isn't a tile
+
+                if (visitedCoords[packedCoord2] === 1) continue
+
+                // Otherwise record that it has been visited
+
+                visitedCoords[packedCoord2] = 1
+
+                // Add it to the next gen
+
+                nextGeneration.push(coord2)
+            }
+        }
+
+        // Set this gen to next gen
+
+        thisGeneration = nextGeneration
+
+        // Increment depth
+
+        depth += 1
+    }
+
+    return floodCoords
 }
 
 Room.prototype.groupRampartPositions = function (rampartPositions) {

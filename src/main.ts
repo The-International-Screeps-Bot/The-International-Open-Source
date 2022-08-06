@@ -758,6 +758,8 @@ declare global {
          */
         groupRampartPositions(rampartPositions: number[]): RoomPosition[][]
 
+        findUnprotectedCoords(visuals?: boolean): CoordMap
+
         /**
          *
          */
