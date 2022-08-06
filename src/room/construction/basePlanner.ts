@@ -82,7 +82,14 @@ export function basePlanner(room: Room) {
 
     // Loop through each source, marking nearby positions as avoid
 
-    for (const source of sources) recordAdjacentPositions(source.pos.x, source.pos.y, 2)
+    for (const sourceIndex in sources) {
+
+        const sourcePositions = room.sourcePositions[sourceIndex]
+
+        recordAdjacentPositions(sourcePositions[0].x, sourcePositions[0].y, 2)
+
+        for (const pos of sourcePositions) recordAdjacentPositions(pos.x, pos.y, 1)
+    }
 
     // Find the average pos between the sources
 
@@ -168,7 +175,7 @@ export function basePlanner(room: Room) {
             // Run distance transform with the baseCM
 
             const distanceCoords = opts.normalDT
-                ? room.distanceTransform(room.baseCoords)
+                ? room.distanceTransform(room.baseCoords, opts.stampType === 'hub' ? true : false)
                 : room.diagonalDistanceTransform(room.baseCoords)
 
             // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
@@ -180,7 +187,7 @@ export function basePlanner(room: Room) {
                 initialWeight: opts.initialWeight || 0,
                 adjacentToRoads: opts.adjacentToRoads,
                 roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
-                visuals: opts.stampType === 'hub' ? true : false
+                /* visuals: opts.stampType === 'hub' ? true : false */
             })
 
             // Inform false if no anchor was generated
@@ -241,9 +248,10 @@ export function basePlanner(room: Room) {
     }
 
     for (const coord of controllerAdjacentCoords) {
-        if (terrainCoords[pack(coord)] === TERRAIN_MASK_WALL) continue
 
-        room.baseCoords[packXY(x, y)] = 0
+        if (room.roadCoords[pack(coord)] > 0) continue
+
+        room.baseCoords[pack(coord)] = 0
     }
 
     // Get the centerUpgradePos, informing false if it's undefined
@@ -262,6 +270,8 @@ export function basePlanner(room: Room) {
         room.baseCoords[pack(pos)] = 255
         room.roadCoords[pack(pos)] = 20
     }
+
+    /* room.visualizeCoordMap(room.baseCoords) */
 
     // Try to plan the stamp
 
@@ -287,7 +297,7 @@ export function basePlanner(room: Room) {
     let path: RoomPosition[] = []
 
     // Try to plan the stamp
-
+    room.visual.circle(fastFillerHubAnchor.x, fastFillerHubAnchor.y)
     if (
         !planStamp({
             stampType: 'extensions',
@@ -573,7 +583,8 @@ export function basePlanner(room: Room) {
 
                 if (room.rampartCoords[pack(coord)] > 0) continue
 
-                if (coord.x < 2 || coord.x >= roomDimensions - 2 || coord.y < 2 || coord.y >= roomDimensions - 2) continue
+                if (coord.x < 2 || coord.x >= roomDimensions - 2 || coord.y < 2 || coord.y >= roomDimensions - 2)
+                    continue
 
                 // Otherwise
 

@@ -1593,12 +1593,12 @@ Room.prototype.findClosestPosOfValue = function (opts) {
         // Get the value of the pos
 
         const posValue = opts.coordMap[pack(coord1)]
-        if (posValue === 255) return false
+        if (posValue === 0) return false
 
         // If the posValue is less than the requiredValue, inform false
 
         if (posValue < opts.requiredValue) return false
-
+        if (opts.requiredValue === 4) room.visual.text(opts.coordMap[pack(coord1)].toString(), coord1.x, coord1.y - 1)
         // If adjacentToRoads is a requirement
 
         if (!opts.adjacentToRoads) return true
@@ -1623,7 +1623,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
     while ((opts.reduceIterations || 0) >= 0) {
         // Construct a cost matrix for visited tiles and add seeds to it
 
-        const visitedCoords = new Uint8Array(2500)
+        let visitedCoords = new Uint8Array(2500)
 
         // Record startPos as visited
 
@@ -1662,24 +1662,12 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                 // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                const adjacentCoords = [
-                    {
-                        x: coord1.x - 1,
-                        y: coord1.y,
-                    },
-                    {
-                        x: coord1.x + 1,
-                        y: coord1.y,
-                    },
-                    {
-                        x: coord1.x,
-                        y: coord1.y - 1,
-                    },
-                    {
-                        x: coord1.x,
-                        y: coord1.y + 1,
-                    },
-                ]
+                const adjacentCoords = findCoordsInsideRect(
+                    coord1.x - 1,
+                    coord1.y - 1,
+                    coord1.x + 1,
+                    coord1.y + 1,
+                )
 
                 // Loop through adjacent positions
 
@@ -1726,25 +1714,12 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                     // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                    const adjacentCoords = [
-                        {
-                            x: coord1.x - 1,
-                            y: coord1.y,
-                        },
-                        {
-                            x: coord1.x + 1,
-                            y: coord1.y,
-                        },
-                        {
-                            x: coord1.x,
-                            y: coord1.y - 1,
-                        },
-                        {
-                            x: coord1.x,
-                            y: coord1.y + 1,
-                        },
-                    ]
-
+                    const adjacentCoords = findCoordsInsideRect(
+                        coord1.x - 1,
+                        coord1.y - 1,
+                        coord1.x + 1,
+                        coord1.y + 1,
+                    )
                     // Loop through adjacent positions
 
                     for (const coord2 of adjacentCoords) {
@@ -1770,6 +1745,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
             // Set this gen to next gen
 
+            visitedCoords = new Uint8Array(localVisited)
             thisGeneration = nextGeneration
         }
 
@@ -2093,4 +2069,15 @@ Room.prototype.findSwampPlainsRatio = function () {
     }
 
     return terrainAmounts[TERRAIN_MASK_SWAMP] / terrainAmounts[0]
+}
+
+Room.prototype.visualizeCoordMap = function(coordMap) {
+    for (let x = 0; x < roomDimensions; x += 1) {
+        for (let y = 0; y < roomDimensions; y += 1) {
+
+            this.visual.text(coordMap[packXY(x, y)].toString(), x, y, {
+                font: 0.5
+            })
+        }
+    }
 }

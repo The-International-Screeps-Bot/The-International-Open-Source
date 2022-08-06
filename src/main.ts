@@ -788,6 +788,8 @@ declare global {
          */
         createWithdrawTasks(creator: Structure | Creep | Resource): void
 
+        visualizeCoordMap(coordMap: CoordMap): void
+
         /**
          * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
          */
