@@ -200,6 +200,7 @@ declare global {
         initialWeight?: number
         adjacentToRoads?: boolean
         roadCoords?: CoordMap
+        visuals?: boolean
     }
 
     interface MoveRequestOpts extends PathOpts {
@@ -713,7 +714,7 @@ declare global {
          */
         distanceTransform(
             initialCoords?: CoordMap,
-            enableVisuals?: boolean,
+            visuals?: boolean,
             x1?: number,
             y1?: number,
             x2?: number,
@@ -725,7 +726,7 @@ declare global {
          */
         diagonalDistanceTransform(
             initialCoords?: CoordMap,
-            enableVisuals?: boolean,
+            visuals?: boolean,
             x1?: number,
             y1?: number,
             x2?: number,
@@ -735,7 +736,7 @@ declare global {
         /**
          * Gets ranges from for each position from a certain point
          */
-        floodFill(seeds: Coord[], coordMap: CoordMap): CoordMap
+        floodFill(seeds: Coord[], coordMap: CoordMap, visuals?: boolean): CoordMap
 
         /**
          * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified

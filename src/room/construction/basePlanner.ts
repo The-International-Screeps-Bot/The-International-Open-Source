@@ -168,7 +168,7 @@ export function basePlanner(room: Room) {
             // Run distance transform with the baseCM
 
             const distanceCoords = opts.normalDT
-                ? room.distanceTransform(room.baseCoords /* , opts.stampType === 'fastFiller' ? true : false */)
+                ? room.distanceTransform(room.baseCoords)
                 : room.diagonalDistanceTransform(room.baseCoords)
 
             // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
@@ -180,6 +180,7 @@ export function basePlanner(room: Room) {
                 initialWeight: opts.initialWeight || 0,
                 adjacentToRoads: opts.adjacentToRoads,
                 roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
+                visuals: opts.stampType === 'hub' ? true : false
             })
 
             // Inform false if no anchor was generated

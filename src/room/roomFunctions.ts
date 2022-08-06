@@ -1340,7 +1340,7 @@ Room.prototype.findStoredResourceAmount = function (resourceType) {
 
 Room.prototype.distanceTransform = function (
     initialCoords,
-    enableVisuals,
+    visuals,
     x1 = 0,
     y1 = 0,
     x2 = roomDimensions,
@@ -1411,7 +1411,7 @@ Room.prototype.distanceTransform = function (
         }
     }
 
-    if (enableVisuals && Memory.roomVisuals) {
+    if (visuals) {
         // Loop through the xs and ys inside the bounds
 
         for (x = x1; x <= x2; x += 1) {
@@ -1429,7 +1429,7 @@ Room.prototype.distanceTransform = function (
 
 Room.prototype.diagonalDistanceTransform = function (
     initialCoords,
-    enableVisuals,
+    visuals,
     x1 = 0,
     y1 = 0,
     x2 = roomDimensions,
@@ -1484,7 +1484,7 @@ Room.prototype.diagonalDistanceTransform = function (
         }
     }
 
-    if (enableVisuals && Memory.roomVisuals) {
+    if (visuals) {
         // Loop through the xs and ys inside the bounds
 
         for (x = x1; x <= x2; x += 1) {
@@ -1500,7 +1500,7 @@ Room.prototype.diagonalDistanceTransform = function (
     return distanceCoords
 }
 
-Room.prototype.floodFill = function (seeds, coordMap) {
+Room.prototype.floodFill = function (seeds, coordMap, visuals) {
     // Construct a cost matrix for the flood
 
     const floodCoords = new Uint8Array(2500)
@@ -1543,12 +1543,13 @@ Room.prototype.floodFill = function (seeds, coordMap) {
                 floodCoords[packedCoord1] = depth
 
                 // If visuals are enabled, show the depth on the pos
-
-                if (Memory.roomVisuals)
+                /*
+                if (visuals)
                     this.visual.rect(coord1.x - 0.5, coord1.y - 0.5, 1, 1, {
                         fill: `hsl(${200}${depth * 2}, 100%, 60%)`,
                         opacity: 0.4,
                     })
+                     */
             }
 
             // Loop through adjacent positions
@@ -1602,7 +1603,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
         if (!opts.adjacentToRoads) return true
 
-        if (opts.roadCoords[pack(coord1)] !== 0) return false
+        if (opts.roadCoords[pack(coord1)] > 0) return false
 
         // Loop through adjacent positions
 
@@ -1632,7 +1633,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
         let thisGeneration = [opts.startPos]
         let nextGeneration: Coord[] = []
-        let canUseWalls = true
 
         // So long as there are positions in this gen
 
@@ -1640,10 +1640,22 @@ Room.prototype.findClosestPosOfValue = function (opts) {
             // Reset nextGeneration
 
             nextGeneration = []
+            const localVisited = new Uint8Array(visitedCoords)
+
+            // Try without using impassibles
 
             // Iterate through positions of this gen
 
             for (const coord1 of thisGeneration) {
+                // If the coord is impassible
+
+                if (opts.coordMap[pack(coord1)] === 0) continue
+
+                if (opts.visuals)
+                    this.visual.text(opts.coordMap[pack(coord1)].toString(), coord1.x, coord1.y, {
+                        font: 0.5,
+                    })
+
                 // If the pos can be an anchor, inform it
 
                 if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
@@ -1679,19 +1691,80 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                     // Iterate if the adjacent pos has been visited or isn't a tile
 
-                    if (visitedCoords[pack(coord2)] === 1) continue
+                    if (localVisited[pack(coord2)] === 1) continue
 
                     // Otherwise record that it has been visited
 
-                    visitedCoords[pack(coord2)] = 1
+                    localVisited[pack(coord2)] = 1
 
-                    // If canUseWalls is enabled and the terrain isnt' a wall, disable canUseWalls
-
-                    if (canUseWalls && opts.coordMap[pack(coord2)] !== 255) canUseWalls = false
+                    if (opts.coordMap[pack(coord2)] === 0) continue
 
                     // Add it tofastFillerSide the next gen
 
                     nextGeneration.push(coord2)
+                }
+            }
+
+            // If no positions are found, try again using impassibles
+
+            if (!nextGeneration.length) {
+
+                const localVisited = new Uint8Array(visitedCoords)
+
+                // Iterate through positions of this gen
+
+                for (const coord1 of thisGeneration) {
+
+                    if (opts.visuals)
+                        this.visual.text(opts.coordMap[pack(coord1)].toString(), coord1.x, coord1.y, {
+                            font: 0.5,
+                        })
+
+                    // If the pos can be an anchor, inform it
+
+                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+
+                    // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+
+                    const adjacentCoords = [
+                        {
+                            x: coord1.x - 1,
+                            y: coord1.y,
+                        },
+                        {
+                            x: coord1.x + 1,
+                            y: coord1.y,
+                        },
+                        {
+                            x: coord1.x,
+                            y: coord1.y - 1,
+                        },
+                        {
+                            x: coord1.x,
+                            y: coord1.y + 1,
+                        },
+                    ]
+
+                    // Loop through adjacent positions
+
+                    for (const coord2 of adjacentCoords) {
+                        // Iterate if the pos doesn't map onto a room
+
+                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                            continue
+
+                        // Iterate if the adjacent pos has been visited or isn't a tile
+
+                        if (localVisited[pack(coord2)] === 1) continue
+
+                        // Otherwise record that it has been visited
+
+                        localVisited[pack(coord2)] = 1
+
+                        // Add it tofastFillerSide the next gen
+
+                        nextGeneration.push(coord2)
+                    }
                 }
             }
 
