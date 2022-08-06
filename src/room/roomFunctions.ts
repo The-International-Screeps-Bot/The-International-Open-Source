@@ -140,15 +140,14 @@ Room.prototype.get = function (roomObjectName) {
             room.controller.pos.x + 2,
             room.controller.pos.y + 2,
         )
-        room.visualizeCoordMap(distanceCoords)
+
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
         return room.findClosestPosOfValue({
             coordMap: distanceCoords,
             startPos: room.anchor,
             requiredValue: 2,
-            reduceIterations: 1,
-            visuals: true,
+            reduceIterations: 1
         })
     }
 
@@ -1344,8 +1343,8 @@ Room.prototype.distanceTransform = function (
     visuals,
     x1 = 0,
     y1 = 0,
-    x2 = roomDimensions,
-    y2 = roomDimensions,
+    x2 = roomDimensions - 1,
+    y2 = roomDimensions - 1,
 ) {
     // Use a costMatrix to record distances
 
@@ -1357,8 +1356,8 @@ Room.prototype.distanceTransform = function (
     let y
     let packedCoord
 
-    for (x = Math.max(x1 - 1, 0); x <= Math.min(x2 + 1, roomDimensions - 1); x += 1) {
-        for (y = Math.max(y1 - 1, 0); y <= Math.min(y2 + 1, roomDimensions - 1); y += 1) {
+    for (x = Math.max(x1 - 1, 0); x < Math.min(x2 + 1, roomDimensions - 1); x += 1) {
+        for (y = Math.max(y1 - 1, 0); y < Math.min(y2 + 1, roomDimensions - 1); y += 1) {
             packedCoord = packXY(x, y)
             distanceCoords[packedCoord] = initialCoords[packedCoord] === 255 ? 0 : 255
         }
@@ -1434,8 +1433,8 @@ Room.prototype.diagonalDistanceTransform = function (
     visuals,
     x1 = 0,
     y1 = 0,
-    x2 = roomDimensions,
-    y2 = roomDimensions,
+    x2 = roomDimensions - 1,
+    y2 = roomDimensions - 1,
 ) {
     // Use a costMatrix to record distances
 
@@ -1589,6 +1588,13 @@ Room.prototype.floodFill = function (seeds, coordMap, visuals) {
 Room.prototype.findClosestPosOfValue = function (opts) {
     const room = this
 
+    if (opts.visuals) {
+
+        this.visual.circle(opts.startPos.x, opts.startPos.y, {
+            stroke: myColors.yellow,
+        })
+    }
+
     /**
      *
      */
@@ -1602,7 +1608,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
         // If the posValue is less than the requiredValue, inform false
 
         if (posValue < opts.requiredValue) return false
-        if (opts.requiredValue === 4) room.visual.text(opts.coordMap[pack(coord1)].toString(), coord1.x, coord1.y - 1)
+
         // If adjacentToRoads is a requirement
 
         if (!opts.adjacentToRoads) return true
@@ -1652,6 +1658,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                 if (opts.visuals)
                     this.visual.text(opts.coordMap[pack(coord1)].toString(), coord1.x, coord1.y, {
                         font: 0.5,
+                        color: myColors.green,
                     })
 
                 // If the pos can be an anchor, inform it
@@ -1714,6 +1721,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                     if (opts.visuals)
                         this.visual.text(opts.coordMap[pack(coord1)].toString(), coord1.x, coord1.y, {
                             font: 0.5,
+                            color: myColors.yellow,
                         })
 
                     // If the pos can be an anchor, inform it
@@ -1760,6 +1768,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                     if (opts.visuals)
                         this.visual.text(opts.coordMap[pack(coord1)].toString(), coord1.x, coord1.y, {
                             font: 0.5,
+                            color: myColors.red,
                         })
 
                     // If the pos can be an anchor, inform it

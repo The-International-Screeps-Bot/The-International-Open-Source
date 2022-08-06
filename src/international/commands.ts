@@ -34,7 +34,7 @@ global.removeAllCSites = function (types?) {
     return `Removed a total of ${removedCSCount} construction sites ${types ? `with the types ${types}` : ''}`
 }
 
-global.destroyAllStructures = function (roomName, types?) {
+global.destroyStructures = function (roomName, types?) {
     // Get the room with the roomName
 
     const room = Game.rooms[roomName]

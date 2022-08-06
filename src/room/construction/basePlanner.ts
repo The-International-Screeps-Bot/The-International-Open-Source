@@ -86,9 +86,9 @@ export function basePlanner(room: Room) {
 
         const sourcePositions = room.sourcePositions[sourceIndex]
 
-        recordAdjacentPositions(sourcePositions[0].x, sourcePositions[0].y, 2)
+        recordAdjacentPositions(sourcePositions[0].x, sourcePositions[0].y, 1)
 
-        for (const pos of sourcePositions) recordAdjacentPositions(pos.x, pos.y, 1)
+        for (const pos of sourcePositions) room.baseCoords[pack(pos)] = 255
     }
 
     // Find the average pos between the sources
@@ -186,7 +186,8 @@ export function basePlanner(room: Room) {
                 requiredValue: stamp.size,
                 initialWeight: opts.initialWeight || 0,
                 adjacentToRoads: opts.adjacentToRoads,
-                roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined
+                roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
+                /* visuals: opts.stampType === 'fastFiller' */
             })
 
             // Inform false if no anchor was generated

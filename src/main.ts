@@ -1782,7 +1782,7 @@ declare global {
             /**
              * Destroys all specified structures owned by the bot
              */
-            destroyAllStructures(roomName: string, types?: StructureConstant[]): string
+            destroyStructures(roomName: string, types?: StructureConstant[]): string
 
             /**
              * Destroys all specified structures in communes
