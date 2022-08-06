@@ -17,7 +17,7 @@ import {
     findClosestPos,
     findCreepInQueueMatchingRequest,
     findObjectWithID,
-    findPositionsInsideRect,
+    findCoordsInsideRect,
     getRange,
     pack,
     packXY,

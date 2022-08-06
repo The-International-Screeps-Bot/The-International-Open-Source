@@ -20,7 +20,7 @@ import {
     customLog,
     findClosestClaimType,
     findClosestCommuneName,
-    findPositionsInsideRect,
+    findCoordsInsideRect,
     getRange,
     pack,
     packXY,
@@ -59,7 +59,7 @@ Room.prototype.get = function (roomObjectName) {
 
         // Find positions adjacent to source
 
-        const adjacentPositions = findPositionsInsideRect(
+        const adjacentPositions = findCoordsInsideRect(
             source.pos.x - 1,
             source.pos.y - 1,
             source.pos.x + 1,
@@ -178,7 +178,7 @@ Room.prototype.get = function (roomObjectName) {
 
         // Find positions adjacent to source
 
-        const adjacentPositions = findPositionsInsideRect(
+        const adjacentPositions = findCoordsInsideRect(
             centerUpgradePos.x - 1,
             centerUpgradePos.y - 1,
             centerUpgradePos.x + 1,
@@ -673,7 +673,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 if (opts.weightCoordMaps) {
                     for (const coordMap of opts.weightCoordMaps) {
                         for (const index in coordMap) {
-
                             const packedCoord = parseInt(index)
                             const coord = unpackAsPos(packedCoord)
 
@@ -738,7 +737,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     for (const enemyAttacker of enemyAttackers) {
                         // Construct rect and get positions inside
 
-                        const positions = findPositionsInsideRect(
+                        const positions = findCoordsInsideRect(
                             enemyAttacker.pos.x - 2,
                             enemyAttacker.pos.y - 2,
                             enemyAttacker.pos.x + 2,
@@ -753,7 +752,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     for (const enemyAttacker of enemyRangedAttackers) {
                         // Construct rect and get positions inside
 
-                        const positions = findPositionsInsideRect(
+                        const positions = findCoordsInsideRect(
                             enemyAttacker.pos.x - 3,
                             enemyAttacker.pos.y - 3,
                             enemyAttacker.pos.x + 3,
@@ -1554,7 +1553,7 @@ Room.prototype.floodFill = function (seeds, coordMap) {
 
             // Loop through adjacent positions
 
-            for (const coord2 of findPositionsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+            for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
                 const packedCoord2 = pack(coord2)
 
                 // Iterate if the adjacent pos has been visited or isn't a tile
@@ -1607,7 +1606,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
         // Loop through adjacent positions
 
-        for (const coord2 of findPositionsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+        for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
             // If the adjacentPos isn't a roadPosition, iterate
 
             if (opts.roadCoords[pack(coord2)] !== 1) continue
@@ -1823,7 +1822,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
             for (const pos of thisGeneration) {
                 // Construct a rect and get the positions in a range of 1 (not diagonals)
 
-                const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
+                const adjacentPositions = findCoordsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
 
                 // Loop through adjacent positions
 

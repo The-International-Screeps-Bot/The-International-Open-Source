@@ -10,7 +10,7 @@ import {
     customLog,
     findClosestObject,
     findObjectWithID,
-    findPositionsInsideRect,
+    findCoordsInsideRect,
     getRange,
     pack,
     packXY,
@@ -346,7 +346,7 @@ Object.defineProperties(Room.prototype, {
 
                     // Find positions adjacent to source
 
-                    const adjacentPositions = findPositionsInsideRect(
+                    const adjacentPositions = findCoordsInsideRect(
                         source.pos.x - 1,
                         source.pos.y - 1,
                         source.pos.x + 1,
@@ -394,7 +394,7 @@ Object.defineProperties(Room.prototype, {
 
                 // Find positions adjacent to source
 
-                const adjacentPositions = findPositionsInsideRect(
+                const adjacentPositions = findCoordsInsideRect(
                     source.pos.x - 1,
                     source.pos.y - 1,
                     source.pos.x + 1,

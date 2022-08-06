@@ -15,7 +15,7 @@ import {
     createPosMap,
     customLog,
     findAvgBetweenPosotions,
-    findPositionsInsideRect,
+    findCoordsInsideRect,
     getRange,
     pack,
     packXY,
@@ -25,6 +25,7 @@ import {
 import { internationalManager } from 'international/internationalManager'
 import { packPosList } from 'other/packrat'
 import 'other/RoomVisual'
+import { toASCII } from 'punycode'
 import { rampartPlanner } from './rampartPlanner'
 
 /**
@@ -44,7 +45,7 @@ export function basePlanner(room: Room) {
 
         // Loop through adjacent positions
 
-        for (const coord of findPositionsInsideRect(pos.x - 2, pos.y - 2, pos.x + 2, pos.y + 2))
+        for (const coord of findCoordsInsideRect(pos.x - 2, pos.y - 2, pos.x + 2, pos.y + 2))
             room.baseCoords[pack(coord)] = 255
     }
 
@@ -60,7 +61,7 @@ export function basePlanner(room: Room) {
     function recordAdjacentPositions(x: number, y: number, range: number, weight?: number) {
         // Loop through adjacent positions
 
-        for (const coord of findPositionsInsideRect(x - range, y - range, x + range, y + range)) {
+        for (const coord of findCoordsInsideRect(x - range, y - range, x + range, y + range)) {
             // Otherwise record the position in the base cost matrix as avoid
 
             room.baseCoords[pack(coord)] = Math.max(weight || 255, room.baseCoords[pack(coord)])
@@ -91,7 +92,7 @@ export function basePlanner(room: Room) {
 
     const avgControllerSourcePos = findAvgBetweenPosotions(room.controller.pos, avgSourcePos)
 
-    const controllerAdjacentCoords = findPositionsInsideRect(
+    const controllerAdjacentCoords = findCoordsInsideRect(
         room.controller.pos.x - 3,
         room.controller.pos.y - 3,
         room.controller.pos.x + 3,
@@ -503,34 +504,34 @@ export function basePlanner(room: Room) {
     if (room.memory.stampAnchors.sourceLink.length + room.memory.stampAnchors.sourceExtension.length === 0) {
         // loop through sourceNames
 
-        for (const index in sources) {
+        for (const sourceIndex in sources) {
             // Record that the source has no link
 
             let sourceHasLink = false
 
             // Get the closestHarvestPos of this sourceName
 
-            const closestSourcePos = room.sourcePositions[index][0]
+            const closestSourcePos = room.sourcePositions[sourceIndex][0]
 
             // Find the protection status
-
+            /*
             let isProtected = room.tileCoords[pack(closestSourcePos)] !== NORMAL
-
+ */
             const OGPositions: Map<RoomPosition, number> = new Map()
 
-            for (const pos of room.sourcePositions[index]) {
-                if (arePositionsEqual(closestSourcePos, pos)) continue
+            for (let posIndex = 1; posIndex < room.sourcePositions[sourceIndex].length; posIndex += 1) {
+                const pos = room.sourcePositions[sourceIndex][posIndex]
 
-                OGPositions.set(pos, room.roadCoords[packXY(x, y)])
-                room.roadCoords[packXY(x, y)] = 0
+                OGPositions.set(pos, room.roadCoords[pack(pos)])
+                room.roadCoords[pack(pos)] = 0
             }
-
+            /*
             // If the position is not PROTECTED, plan a rampart on it
 
             if (!isProtected) room.rampartCoords[pack(closestSourcePos)] = 1
             // Otherwise, check if it's in range of an unprotected tile
             else {
-                const adjacentCoords = findPositionsInsideRect(
+                const adjacentCoords = findCoordsInsideRect(
                     closestSourcePos.x - 3,
                     closestSourcePos.y - 3,
                     closestSourcePos.x + 3,
@@ -546,10 +547,10 @@ export function basePlanner(room: Room) {
                     break
                 }
             }
-
+ */
             // Find positions adjacent to source
 
-            const adjacentPositions = findPositionsInsideRect(
+            const adjacentCoords = findCoordsInsideRect(
                 closestSourcePos.x - 1,
                 closestSourcePos.y - 1,
                 closestSourcePos.x + 1,
@@ -558,26 +559,20 @@ export function basePlanner(room: Room) {
 
             // Sort adjacentPositions by range from the anchor
 
-            adjacentPositions.sort(function (a, b) {
+            adjacentCoords.sort(function (a, b) {
                 return getRange(a.x, hubAnchor.x, a.y, hubAnchor.y) - getRange(b.x, hubAnchor.x, b.y, hubAnchor.y)
             })
 
             // Loop through each pos
 
-            for (const coord of adjacentPositions) {
+            for (const coord of adjacentCoords) {
                 // Iterate if plan for pos is in use
 
                 if (room.roadCoords[pack(coord)] > 0) continue
 
                 if (room.rampartCoords[pack(coord)] > 0) continue
 
-                // Iterate if the pos is a wall
-
-                if (terrainCoords[pack(coord)] === 255) continue
-
-                // Iterate if the position is near an exit
-
-                if (room.tileCoords[pack(coord)] === TO_EXIT) continue
+                if (coord.x < 2 || coord.x >= roomDimensions - 2 || coord.y < 2 || coord.y >= roomDimensions - 2) continue
 
                 // Otherwise
 
@@ -589,8 +584,8 @@ export function basePlanner(room: Room) {
                 // If there is no planned link for this source, plan one
 
                 if (!sourceHasLink) {
-                    room.memory.stampAnchors.sourceLink.push(pack(pos))
-
+                    room.memory.stampAnchors.sourceLink.push(pack(coord))
+                    /*
                     isProtected = room.tileCoords[pack(coord)] !== NORMAL
 
                     // If the position is not PROTECTED, plan a rampart on it
@@ -598,7 +593,7 @@ export function basePlanner(room: Room) {
                     if (!isProtected) room.rampartCoords[pack(coord)] = 1
                     // Otherwise, check if it's in range of an unprotected tile
                     else {
-                        const adjacentCoords = findPositionsInsideRect(
+                        const adjacentCoords = findCoordsInsideRect(
                             coord.x - 3,
                             coord.y - 3,
                             coord.x + 3,
@@ -614,14 +609,14 @@ export function basePlanner(room: Room) {
                             break
                         }
                     }
-
+ */
                     sourceHasLink = true
                     continue
                 }
 
                 // Otherwise plan for an extension
 
-                room.memory.stampAnchors.sourceExtension.push(pack(pos))
+                room.memory.stampAnchors.sourceExtension.push(pack(coord))
 
                 // Decrease the extraExtensionsAmount and iterate
 
