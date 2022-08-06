@@ -605,11 +605,13 @@ export function rampartPlanner(room: Room) {
     for (const packedPos of rampartPositions) {
         const pos = unpackAsPos(packedPos)
 
-        // Record the pos in roadCM
+        // Record the pos
 
         room.roadCoords[pack(pos)] = 1
         room.rampartCoords[pack(pos)] = 1
     }
+
+    room.findUnprotectedCoords()
 
     // Get the hubAnchor
 
@@ -620,7 +622,7 @@ export function rampartPlanner(room: Room) {
     // Group rampart positions
 
     const groupedRampartPositions = room.groupRampartPositions(rampartPositions)
-    room.visualizeCoordMap(room.roadCoords)
+
     // Loop through each group
 
     for (const group of groupedRampartPositions) {
@@ -630,12 +632,12 @@ export function rampartPlanner(room: Room) {
             return room.advancedFindPath({
                 origin: a,
                 goal: { pos: room.anchor, range: 3 },
-                weightCoordMaps: [room.roadCoords],
+                weightCoordMaps: [room.roadCoords, room.unprotectedCoords],
             }).length -
             room.advancedFindPath({
                 origin: b,
                 goal: { pos: room.anchor, range: 3 },
-                weightCoordMaps: [room.roadCoords],
+                weightCoordMaps: [room.roadCoords, room.unprotectedCoords],
             }).length
         })[0]
 
@@ -644,7 +646,7 @@ export function rampartPlanner(room: Room) {
         const path = room.advancedFindPath({
             origin: closestPosToAnchor,
             goal: { pos: hubAnchor, range: 2 },
-            weightCoordMaps: [room.roadCoords],
+            weightCoordMaps: [room.roadCoords, room.unprotectedCoords],
         })
 
         // Loop through positions of the path

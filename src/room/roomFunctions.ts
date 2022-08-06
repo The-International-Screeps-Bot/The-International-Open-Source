@@ -674,7 +674,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 if (opts.weightCoordMaps) {
                     for (const coordMap of opts.weightCoordMaps) {
                         for (const index in coordMap) {
+
                             const packedCoord = parseInt(index)
+                            if (coordMap[packedCoord] === 0) continue
+
                             const coord = unpackAsPos(packedCoord)
 
                             cm.set(coord.x, coord.y, coordMap[packedCoord])
@@ -1889,7 +1892,7 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
 
     // Construct a cost matrix for the flood
 
-    const floodCoords = new Uint8Array(2500)
+    this.unprotectedCoords = new Uint8Array(2500)
     const visitedCoords = new Uint8Array(2500)
 
     // Construct values for the flood
@@ -1923,7 +1926,7 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
 
                 // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
 
-                floodCoords[packedCoord1] = depth
+                this.unprotectedCoords[packedCoord1] = depth + 10
 
                 // If visuals are enabled, show the depth on the pos
 /*
@@ -1964,7 +1967,7 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
         depth += 1
     }
 
-    return floodCoords
+    return this.unprotectedCoords
 }
 
 Room.prototype.groupRampartPositions = function (rampartPositions) {

@@ -646,6 +646,8 @@ declare global {
          */
         tileCoords: CoordMap
 
+        unprotectedCoords: CoordMap
+
         /**
          * Wether the towers can deal sufficient damage to out-damage enemy creeps in the room
          *

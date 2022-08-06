@@ -489,7 +489,6 @@ export function basePlanner(room: Room) {
         return false
 
     rampartPlanner(room)
-    const unprotectedCoords = room.findUnprotectedCoords()
 
     // Iterate through each x and y in the room
 
@@ -542,7 +541,7 @@ export function basePlanner(room: Room) {
             for (const coord of adjacentCoords) {
                 // If the coord is probably not protected
 
-                if (unprotectedCoords[pack(coord)] === 0) continue
+                if (room.unprotectedCoords[pack(coord)] === 0) continue
 
                 room.rampartCoords[pack(closestSourcePos)] = 1
                 break
@@ -593,7 +592,7 @@ export function basePlanner(room: Room) {
                     for (const coord2 of adjacentCoords) {
                         // If the coord is probably not protected
 
-                        if (unprotectedCoords[pack(coord2)] === 0) continue
+                        if (room.unprotectedCoords[pack(coord2)] === 0) continue
 
                         room.rampartCoords[pack(coord1)] = 1
                         break
