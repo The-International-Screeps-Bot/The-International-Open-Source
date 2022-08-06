@@ -605,6 +605,8 @@ export const remoteNeedsIndex = {
     remoteDismantler: 6,
     minDamage: 7,
     minHeal: 8,
+    enemyReserved: 9,
+    invaderCore: 10,
 }
 
 export const claimRequestNeedsIndex = {

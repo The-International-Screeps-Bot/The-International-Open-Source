@@ -427,10 +427,7 @@ export function basePlanner(room: Room) {
     for (const pos of path) room.roadCoords[pack(pos)] = 1
 
     const mineralHarvestPos: RoomPosition = room.get('closestMineralHarvestPos')
-
-    // Record the pos in roadCM
-
-    room.roadCoords[pack(mineralHarvestPos)] = 255
+    if (mineralHarvestPos) room.roadCoords[pack(mineralHarvestPos)] = 255
     /*
 
     structurePlans.set(mineralHarvestPos.x, mineralHarvestPos.y, structureTypesByNumber[STRUCTURE_CONTAINER])
