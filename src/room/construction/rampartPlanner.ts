@@ -22,7 +22,7 @@ export function rampartPlanner(room: Room) {
         /**
          * Creates an array where tileCoords[x][y] = value
          */
-        room.tileCoords = createPosMap()
+        room.tileCoords = new Uint8Array(2500)
 
         const terrainCoords = internationalManager.getTerrainCoords(room.name)
 

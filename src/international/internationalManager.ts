@@ -110,7 +110,7 @@ export class InternationalManager {
 
         if (global.terrainCoords[roomName]) return global.terrainCoords[roomName]
 
-        global.terrainCoords[roomName] = createPosMap()
+        global.terrainCoords[roomName] = new Uint8Array(2500)
 
         const terrain = Game.map.getRoomTerrain(roomName)
 

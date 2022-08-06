@@ -33,7 +33,7 @@ import { rampartPlanner } from './rampartPlanner'
 export function basePlanner(room: Room) {
     const terrainCoords = internationalManager.getTerrainCoords(room.name)
 
-    room.baseCoords = [].concat(terrainCoords)
+    room.baseCoords = new Uint8Array(terrainCoords)
 
     // Loop through each exit of exits
 
@@ -48,8 +48,8 @@ export function basePlanner(room: Room) {
             room.baseCoords[pack(coord)] = 255
     }
 
-    room.roadCoords = [].concat(terrainCoords)
-    room.rampartCoords = createPosMap(false, 0)
+    room.roadCoords = new Uint8Array(terrainCoords)
+    room.rampartCoords = new Uint8Array(2500)
 
     if (!room.memory.stampAnchors) {
         room.memory.stampAnchors = {}
@@ -679,13 +679,7 @@ export function basePlanner(room: Room) {
                 room.memory.stampAnchors.road.push(packedPos)
         }
     }
-/*
-    for (let x = 0; x < roomDimensions; x += 1) {
-        for (let y = 0; y < roomDimensions; y += 1) {
-            room.visual.text(room.roadCoords[packXY(x, y)].toString(), x, y, { font: 0.5 })
-        }
-    }
- */
+
     // Record planning results in the room's global and inform true
 
     room.memory.planned = true

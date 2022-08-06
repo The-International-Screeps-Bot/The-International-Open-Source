@@ -141,12 +141,6 @@ Room.prototype.get = function (roomObjectName) {
             room.controller.pos.y + 2,
         )
 
-        for (let x = 0; x < roomDimensions; x += 1) {
-            for (let y = 0; y < roomDimensions; y += 1) {
-                room.visual.text(distanceCoords[packXY(x, y)].toString(), x, y, { font: 0.5 })
-            }
-        }
-
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
         return room.findClosestPosOfValue({
@@ -1355,9 +1349,9 @@ Room.prototype.distanceTransform = function (
 ) {
     // Use a costMatrix to record distances
 
-    const distanceCoords = createPosMap(false, 0)
+    const distanceCoords = new Uint8Array(2500)
 
-    if (!initialCoords) initialCoords = [].concat(internationalManager.getTerrainCoords(this.name))
+    if (!initialCoords) initialCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
 
     let x
     let y
@@ -1444,9 +1438,9 @@ Room.prototype.diagonalDistanceTransform = function (
 ) {
     // Use a costMatrix to record distances
 
-    const distanceCoords = createPosMap(false, 0)
+    const distanceCoords = new Uint8Array(2500)
 
-    if (!initialCoords) initialCoords = [].concat(internationalManager.getTerrainCoords(this.name))
+    if (!initialCoords) initialCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
 
     let x
     let y
@@ -1507,12 +1501,12 @@ Room.prototype.diagonalDistanceTransform = function (
     return distanceCoords
 }
 
-Room.prototype.floodFill = function (seeds, coordMap = []) {
+Room.prototype.floodFill = function (seeds, coordMap) {
     // Construct a cost matrix for the flood
 
-    const floodCoords = createPosMap(false, 0)
-    const terrainCoords = [].concat(internationalManager.getTerrainCoords(this.name))
-    const visitedCoords = createPosMap(false, 0)
+    const floodCoords = new Uint8Array(2500)
+    const terrainCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
+    const visitedCoords = new Uint8Array(2500)
 
     // Construct values for the flood
 
@@ -1543,7 +1537,7 @@ Room.prototype.floodFill = function (seeds, coordMap = []) {
 
                 if (terrainCoords[packedCoord1] === TERRAIN_MASK_WALL) continue
 
-                if (coordMap[pack(coord1)] > 0) continue
+                if (coordMap && coordMap[pack(coord1)] > 0) continue
 
                 // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
 
@@ -1629,7 +1623,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
     while ((opts.reduceIterations || 0) >= 0) {
         // Construct a cost matrix for visited tiles and add seeds to it
 
-        const visitedCoords = createPosMap(false, 0)
+        const visitedCoords = new Uint8Array(2500)
 
         // Record startPos as visited
 
@@ -1789,7 +1783,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
 
     // Construct a costMatrix to store visited positions
 
-    const visitedCoords = createPosMap(false, 0)
+    const visitedCoords = new Uint8Array(2500)
 
     const groupedPositions = []
     let groupIndex = 0

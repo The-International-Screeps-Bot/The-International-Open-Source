@@ -1,4 +1,12 @@
-import { customLog, findClosestObject, getRange, unpackAsPos } from 'international/generalFunctions'
+import {
+    createPosMap,
+    customLog,
+    findClosestObject,
+    getRange,
+    pack,
+    packXY,
+    unpackAsPos,
+} from 'international/generalFunctions'
 import { marketManager } from './market/marketManager'
 import './spawning/spawnManager'
 
@@ -8,7 +16,7 @@ import './defence'
 import './links'
 import './allyCreepRequestManager'
 import './claimRequestManager'
-import { myColors, safemodeTargets } from 'international/constants'
+import { myColors, roomDimensions, safemodeTargets } from 'international/constants'
 import { packCoord, packCoordList, packPosList } from 'other/packrat'
 import { internationalManager } from 'international/internationalManager'
 
@@ -34,14 +42,7 @@ export function communeManager(room: Room) {
 
     // Testing stuff, feel welcome to use to test CPU usage for specific commune things
 
-   for (const packedCoord in internationalManager.getTerrainCoords(room.name)) {
-
-      const coord = unpackAsPos(parseInt(packedCoord))
-
-      customLog('COORD', coord.x, + ', ' + coord.y + ',  ' + packedCoord)
-   }
-
-/*
+    /*
     for (const remoteName of room.memory.remotes) {
 
          const remote = Game.rooms[remoteName]
@@ -70,18 +71,18 @@ export function communeManager(room: Room) {
          }
     }
  */
-    /*
+/*
     let cpu = Game.cpu.getUsed()
 
-   room.cSiteTarget
+
 
     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
  */
-    /*
-   cpu = Game.cpu.getUsed()
+/*
+    cpu = Game.cpu.getUsed()
 
 
 
-   customLog('CPU USED FOR TEST 2', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
-   */
+    customLog('CPU USED FOR TEST 2', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
+     */
 }

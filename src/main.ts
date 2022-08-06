@@ -94,6 +94,8 @@ declare global {
 
     type PosMap<T> = T[]
 
+    type CoordMap = Uint8Array
+
     type CreepRoles =
         | 'source1Harvester'
         | 'source2Harvester'
@@ -163,7 +165,7 @@ declare global {
          */
         weightCostMatrixes?: CostMatrix[]
 
-        weightCoordMaps?: PosMap<number>[]
+        weightCoordMaps?: CoordMap[]
 
         /**
          *
@@ -191,13 +193,13 @@ declare global {
     }
 
     interface FindClosestPosOfValueOpts {
-        coordMap: PosMap<number>
+        coordMap: CoordMap
         startPos: Coord
         requiredValue: number
         reduceIterations?: number
         initialWeight?: number
         adjacentToRoads?: boolean
-        roadCoords?: PosMap<number>
+        roadCoords?: CoordMap
     }
 
     interface MoveRequestOpts extends PathOpts {
@@ -641,7 +643,7 @@ declare global {
         /**
          * Tile types as defined by the rampartPlanner
          */
-        tileCoords: PosMap<number>
+        tileCoords: CoordMap
 
         /**
          * Wether the towers can deal sufficient damage to out-damage enemy creeps in the room
@@ -650,11 +652,11 @@ declare global {
          */
         towerSuperiority: boolean
 
-        baseCoords: PosMap<number>
+        baseCoords: CoordMap
 
-        rampartCoords: PosMap<number>
+        rampartCoords: CoordMap
 
-        roadCoords: PosMap<number>
+        roadCoords: CoordMap
 
         // Functions
 
@@ -710,30 +712,30 @@ declare global {
          * Finds open spaces in a room and records them in a cost matrix
          */
         distanceTransform(
-            initialCoords?: PosMap<number>,
+            initialCoords?: CoordMap,
             enableVisuals?: boolean,
             x1?: number,
             y1?: number,
             x2?: number,
             y2?: number,
-        ): PosMap<number>
+        ): CoordMap
 
         /**
          * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix
          */
         diagonalDistanceTransform(
-            initialCoords?: PosMap<number>,
+            initialCoords?: CoordMap,
             enableVisuals?: boolean,
             x1?: number,
             y1?: number,
             x2?: number,
             y2?: number,
-        ): PosMap<number>
+        ): CoordMap
 
         /**
          * Gets ranges from for each position from a certain point
          */
-        floodFill(seeds: Coord[], coordMap: PosMap<number>): PosMap<number>
+        floodFill(seeds: Coord[], coordMap: CoordMap): CoordMap
 
         /**
          * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
@@ -1755,7 +1757,7 @@ declare global {
             unpackedRoomNames: { [roomName: string]: string }
             roomStats: { [roomName: string]: RoomStats }
 
-            terrainCoords: {[roomName: string]: PosMap<number> }
+            terrainCoords: {[roomName: string]: CoordMap }
 
             // Command functions
 
