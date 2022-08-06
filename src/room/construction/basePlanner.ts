@@ -295,7 +295,7 @@ export function basePlanner(room: Room) {
     let path: RoomPosition[] = []
 
     // Try to plan the stamp
-    room.visual.circle(fastFillerHubAnchor.x, fastFillerHubAnchor.y)
+
     if (
         !planStamp({
             stampType: 'extensions',
@@ -327,7 +327,7 @@ export function basePlanner(room: Room) {
         !planStamp({
             stampType: 'labs',
             count: 1,
-            anchorOrient: fastFillerHubAnchor,
+            anchorOrient: hubAnchor,
         })
     )
         return false

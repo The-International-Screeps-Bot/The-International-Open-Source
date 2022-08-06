@@ -1,4 +1,4 @@
-import { EXIT, myColors, NORMAL, PROTECTED, roomDimensions, stamps, TO_EXIT, UNWALKABLE } from 'international/constants'
+import { EXIT, minOnboardingRamparts, myColors, NORMAL, PROTECTED, roomDimensions, stamps, TO_EXIT, UNWALKABLE } from 'international/constants'
 import { createPosMap, customLog, pack, packXY, unpackAsPos, unpackAsRoomPos } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 
@@ -615,20 +615,29 @@ export function rampartPlanner(room: Room) {
 
     const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
 
+    const onboardingRampartCoords = new Uint8Array(2500)
+
     // Group rampart positions
 
     const groupedRampartPositions = room.groupRampartPositions(rampartPositions)
-
+    room.visualizeCoordMap(room.roadCoords)
     // Loop through each group
 
     for (const group of groupedRampartPositions) {
         // Get the closest pos of the group by range to the anchor
 
-        const closestPosToAnchor = hubAnchor.findClosestByPath(group, {
-            ignoreCreeps: true,
-            ignoreDestructibleStructures: true,
-            ignoreRoads: true,
-        })
+        const closestPosToAnchor = group.sort((a, b) => {
+            return room.advancedFindPath({
+                origin: a,
+                goal: { pos: room.anchor, range: 3 },
+                weightCoordMaps: [room.roadCoords],
+            }).length -
+            room.advancedFindPath({
+                origin: b,
+                goal: { pos: room.anchor, range: 3 },
+                weightCoordMaps: [room.roadCoords],
+            }).length
+        })[0]
 
         // Path from the hubAnchor to the cloestPosToAnchor
 
@@ -645,17 +654,18 @@ export function rampartPlanner(room: Room) {
         // Construct the onboardingIndex
 
         let onboardingIndex = 0
+        let onboardingCount = 0
 
         // So long as there is a pos in path with an index of onboardingIndex
 
         while (path[onboardingIndex]) {
             // Get the pos in path with an index of onboardingIndex
 
-            const onboardingPos = path[onboardingIndex]
+            const packedPos = pack(path[onboardingIndex])
 
             // If there are already rampart plans at this pos
 
-            if (room.rampartCoords[pack(onboardingPos)] === 1) {
+            if (room.rampartCoords[packedPos] === 1) {
                 // Increase the onboardingIndex and iterate
 
                 onboardingIndex += 1
@@ -664,10 +674,12 @@ export function rampartPlanner(room: Room) {
 
             // Record the pos in roadCM
 
-            room.roadCoords[pack(onboardingPos)] = 1
-            room.rampartCoords[pack(onboardingPos)] = 1
+            room.roadCoords[packedPos] = 1
+            room.rampartCoords[packedPos] = 1
+            onboardingRampartCoords[packedPos] = 1
 
-            break
+            onboardingCount += 1
+            if (onboardingCount === minOnboardingRamparts) break
         }
     }
 

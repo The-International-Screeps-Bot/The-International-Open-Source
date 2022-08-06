@@ -2,6 +2,7 @@ import {
     allStructureTypes,
     allyList,
     impassibleStructureTypes,
+    maxRampartGroupSize,
     minHarvestWorkRatio,
     myColors,
     numbersByStructureTypes,
@@ -1996,8 +1997,8 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
         // Construct values for floodFilling
 
         let thisGeneration = [pos]
-
         let nextGeneration: Coord[] = []
+        let groupSize = 0
 
         // So long as there are positions in this gen
 
@@ -2009,6 +2010,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
             // Iterate through positions of this gen
 
             for (const pos of thisGeneration) {
+
                 // Construct a rect and get the positions in a range of 1 (not diagonals)
 
                 const adjacentPositions = findCoordsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
@@ -2042,9 +2044,12 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
 
                     groupedPositions[groupIndex].push(new RoomPosition(adjacentPos.x, adjacentPos.y, room.name))
 
+                    groupSize += 1
                     nextGeneration.push(adjacentPos)
                 }
             }
+
+            if (groupSize >= maxRampartGroupSize) break
 
             // Set this gen to next gen
 
