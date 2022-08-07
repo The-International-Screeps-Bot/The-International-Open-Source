@@ -16,11 +16,13 @@ import './defence'
 import './links'
 import './allyCreepRequestManager'
 import './claimRequestManager'
+import { myColors, roomDimensions } from 'international/constants'
+import './factory'
 
 /**
  * Handles managers for exclusively commune-related actions
  */
-Room.prototype.communeManager = function() {
+Room.prototype.communeManager = function () {
     constructionManager(this)
 
     this.defenceManager()
@@ -73,15 +75,28 @@ Room.prototype.communeManager = function() {
 /*
     let cpu = Game.cpu.getUsed()
 
+    const coordMap1 = createPosMap(true)
 
+    for (let x = 0; x < roomDimensions; x += 1) {
+      for (let y = 0; y < roomDimensions; y += 1) {
+
+         coordMap1[packXY(x, y)] = []
+      }
+   }
 
     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
- */
-/*
+
     cpu = Game.cpu.getUsed()
 
+    const coordMap2 = new Map()
 
+    for (let x = 0; x < roomDimensions; x += 1) {
+      for (let y = 0; y < roomDimensions; y += 1) {
+
+         coordMap2.set(packXY(x, y), [])
+      }
+   }
 
     customLog('CPU USED FOR TEST 2', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
-     */
+ */
 }

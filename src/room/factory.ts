@@ -1,8 +1,11 @@
-StructureFactory.prototype.manager = function() {
+Room.prototype.factoryManager = function() {
 
-    if (this.createEnergy()) return
+    const factory = this.structures.factory[0]
+    if (!factory) return
 
-    if (this.createBatteries()) return
+    if (factory.createEnergy()) return
+
+    if (factory.createBatteries()) return
 }
 
 StructureFactory.prototype.createBatteries = function() {
