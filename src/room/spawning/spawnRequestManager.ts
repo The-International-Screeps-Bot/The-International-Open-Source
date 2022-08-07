@@ -680,7 +680,7 @@ Room.prototype.spawnRequester = function () {
 
                 // If there are transfer links, max out partMultiplier to their ability
 
-                if (hubLink && sourceLinks.length) {
+                if (hubLink || sourceLinks.length) {
                     let maxPartsMultiplier = 0
 
                     if (hubLink) {
