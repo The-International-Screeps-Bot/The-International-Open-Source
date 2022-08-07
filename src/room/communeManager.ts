@@ -16,36 +16,35 @@ import './defence'
 import './links'
 import './allyCreepRequestManager'
 import './claimRequestManager'
-import { myColors, roomDimensions, safemodeTargets } from 'international/constants'
-import { packCoord, packCoordList, packPosList } from 'other/packrat'
-import { internationalManager } from 'international/internationalManager'
 
 /**
  * Handles managers for exclusively commune-related actions
  */
-export function communeManager(room: Room) {
-    constructionManager(room)
+Room.prototype.communeManager = function() {
+    constructionManager(this)
 
-    room.defenceManager()
+    this.defenceManager()
 
-    room.towerManager()
+    this.towerManager()
 
-    marketManager(room)
+    marketManager(this)
 
-    room.linkManager()
+    this.linkManager()
 
-    room.claimRequestManager()
+    this.claimRequestManager()
 
-    room.allyCreepRequestManager()
+    this.allyCreepRequestManager()
 
-    room.spawnManager()
+    this.spawnManager()
+
+    this.factoryManager()
 
     // Testing stuff, feel welcome to use to test CPU usage for specific commune things
 
     /*
-    for (const remoteName of room.memory.remotes) {
+    for (const remoteName of this.memory.remotes) {
 
-         const remote = Game.rooms[remoteName]
+         const remote = Game.thiss[remoteName]
          if (!remote) continue
 
          for (const positions of remote.sourcePaths) {
@@ -54,10 +53,10 @@ export function communeManager(room: Room) {
 
             for (const pos of positions) {
 
-               const posRoom = Game.rooms[pos.roomName]
+               const posRoom = Game.thiss[pos.thisName]
                if (!posRoom) continue
 
-               if (!previousPos || pos.roomName !== previousPos.roomName) {
+               if (!previousPos || pos.thisName !== previousPos.thisName) {
 
                   posRoom.visual.circle(pos, { fill: myColors.lightBlue, opacity: 0.2 })
                   previousPos = pos

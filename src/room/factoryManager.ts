@@ -1,4 +1,0 @@
-Room.prototype.factoryManager = function() {
-
-
-}

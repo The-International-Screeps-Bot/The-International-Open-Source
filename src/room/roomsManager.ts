@@ -2,7 +2,7 @@ import { myColors, roomTypesUsedForStats } from '../international/constants'
 
 import './roomFunctions'
 
-import { communeManager } from './communeManager'
+import './communeManager'
 
 import { creepRoleManager } from './creeps/creepRoleManager'
 
@@ -11,10 +11,6 @@ import { trafficManager } from './trafficManager'
 import './roomVisualsManager'
 import { createPosMap, customLog } from 'international/generalFunctions'
 import { statsManager } from 'international/statsManager'
-
-const specificRoomManagers: { [key: string]: Function } = {
-    commune: communeManager,
-}
 
 export function roomManager() {
     // If CPU logging is enabled, get the CPU used at the start
@@ -38,7 +34,7 @@ export function roomManager() {
 
         // If there is a specific manager for this room's type, run it
 
-        if (specificRoomManagers[roomType]) specificRoomManagers[roomType](room)
+        if (room.memory.type === 'commune') room.communeManager()
 
         //
 

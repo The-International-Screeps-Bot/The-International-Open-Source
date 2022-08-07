@@ -29,11 +29,8 @@ import './room/creeps/creepAdditions'
 
 import { memHack } from 'other/memHack'
 import { RoomCacheObject } from 'room/roomObject'
-import { ErrorMapper } from 'other/ErrorMapper'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
-import { createPosMap, customLog } from 'international/generalFunctions'
-import { myColors } from 'international/constants'
 
 // Type declareations for global
 
@@ -848,6 +845,10 @@ declare global {
         spawnRequestIndividually(opts: SpawnRequestOpts): void
 
         spawnRequestByGroup(opts: SpawnRequestOpts): void
+
+        // Commune
+
+        communeManager(): void
 
         // Market functions
 
@@ -1700,6 +1701,20 @@ declare global {
 
     interface StructureTower {
         inactionable: boolean
+    }
+
+    interface StructureFactory {
+        manager(): void
+
+        /**
+         * Converts energy into batteries given conditions
+         */
+        createBatteries(): boolean
+
+        /**
+         * Converts batteries into energy, given conditions
+         */
+        createEnergy(): boolean
     }
 
     interface RoomObject {
