@@ -62,7 +62,7 @@ FastFiller.prototype.fillFastFiller = function () {
           }
      }
 
-     const fastFillerContainers: (StructureContainer)[] = [
+     const fastFillerContainers = [
           room.fastFillerContainerLeft,
           room.fastFillerContainerRight,
      ]
@@ -76,10 +76,10 @@ FastFiller.prototype.fillFastFiller = function () {
      if (this.needsResources()) {
           // Get the sourceLinks
 
-          const fastFillerStoringStructures: (StructureContainer | StructureLink)[] = [
+          let fastFillerStoringStructures: (StructureContainer | StructureLink)[] = [
                room.fastFillerLink,
-               ...fastFillerContainers
           ]
+          fastFillerStoringStructures = fastFillerStoringStructures.concat(fastFillerContainers)
 
           let structures = fastFillerStoringStructures.length
 
@@ -104,12 +104,17 @@ FastFiller.prototype.fillFastFiller = function () {
                     structure.structureType != STRUCTURE_LINK &&
                     this.usedStore() > structure.store.energy
                ) {
-                    for (const resourceType in structure.store) {
-                         if (resourceType == RESOURCE_ENERGY) continue
+                    for (const key in structure.store) {
+
+                         const resourceType = key as ResourceConstant
+
+                         if (resourceType === RESOURCE_ENERGY) continue
 
                          this.say('WCR')
 
                          this.withdraw(structure, resourceType as ResourceConstant)
+                         structure.store[resourceType] -= Math.min(structure.store[resourceType], this.freeStore(resourceType))
+
                          return true
                     }
                }
@@ -129,7 +134,7 @@ FastFiller.prototype.fillFastFiller = function () {
 
           if (structures === 0) {
 
-               this.suicide()
+               this.advancedRecycle()
                return false
           }
 
