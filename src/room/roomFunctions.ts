@@ -1772,7 +1772,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
             if (!nextGeneration.length) {
 
-                localVisitedCoords = new Uint8Array(2500)
+                localVisitedCoords = new Uint8Array(visitedCoords)
 
                 // Iterate through positions of this gen
 
@@ -1817,6 +1817,8 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                         color: myColors.yellow,
                     })
             }
+
+            console.log(i, JSON.stringify(nextGeneration))
 
             // Set this gen to next gen
 
