@@ -7,6 +7,7 @@ global.clearMemory = function () {
 
     return 'Cleared all of Memory'
 }
+global.CR = global.clearMemory
 
 global.killAllCreeps = function (roles?) {
     const filteredCreeps = Object.values(Game.creeps).filter(creep => {
@@ -19,6 +20,8 @@ global.killAllCreeps = function (roles?) {
 
     return `Killed an total of ${killedCreepCount} creeps ${roles ? `with the roles ${roles}` : ''}`
 }
+global.marxistLeninism = global.killAllCreeps
+global.genocide = global.killAllCreeps
 
 global.removeAllCSites = function (types?) {
     let removedCSCount = 0
@@ -164,3 +167,4 @@ global.allyCreepRequest = function (request, communeName?) {
 
     return `${communeName ? `${communeName} is responding to the` : `created`} allyCreepRequest for ${request}`
 }
+global.ACR = global.allyCreepRequest

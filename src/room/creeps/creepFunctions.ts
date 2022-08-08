@@ -414,7 +414,7 @@ Creep.prototype.advancedBuildCSite = function () {
 
     // Inform true
 
-    return true
+    return false
 }
 
 Creep.prototype.advancedBuildAllyCSite = function () {
