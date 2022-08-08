@@ -193,7 +193,7 @@ declare global {
         coordMap: CoordMap
         startCoords: Coord[]
         requiredValue: number
-        reduceIterations?: number
+        reduceIterations: number
         initialWeight?: number
         adjacentToRoads?: boolean
         roadCoords?: CoordMap

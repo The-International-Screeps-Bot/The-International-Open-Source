@@ -1648,7 +1648,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
         return false
     }
 
-    while ((opts.reduceIterations || 0) >= 0) {
+    while (opts.reduceIterations >= 0) {
         // Construct a cost matrix for visited tiles and add seeds to it
 
         let visitedCoords = new Uint8Array(2500)
@@ -1661,22 +1661,20 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
         let thisGeneration = opts.startCoords
         let nextGeneration: Coord[] = []
-
+        let i = 0
         // So long as there are positions in this gen
 
         while (thisGeneration.length) {
             // Reset nextGeneration
 
             nextGeneration = []
+            i++
+
+            let localVisitedCoords = new Uint8Array(visitedCoords)
 
             // Iterate through positions of this gen
 
             for (const coord1 of thisGeneration) {
-                if (opts.visuals)
-                    this.visual.text(opts.coordMap[pack(coord1)].toString(), coord1.x, coord1.y, {
-                        font: 0.5,
-                        color: myColors.green,
-                    })
 
                 // If the pos can be an anchor, inform it
 
@@ -1713,11 +1711,11 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                     // Iterate if the adjacent pos has been visited or isn't a tile
 
-                    if (visitedCoords[pack(coord2)] === 1) continue
+                    if (localVisitedCoords[pack(coord2)] === 1) continue
 
                     // Otherwise record that it has been visited
 
-                    visitedCoords[pack(coord2)] = 1
+                    localVisitedCoords[pack(coord2)] = 1
 
                     if (opts.coordMap[pack(coord2)] === 0) continue
 
@@ -1731,14 +1729,11 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
             if (!nextGeneration.length) {
 
+                localVisitedCoords = new Uint8Array(visitedCoords)
+
                 // Iterate through positions of this gen
 
                 for (const coord1 of thisGeneration) {
-                    if (opts.visuals)
-                        this.visual.text(opts.coordMap[pack(coord1)].toString(), coord1.x, coord1.y, {
-                            font: 0.5,
-                            color: myColors.yellow,
-                        })
 
                     // If the pos can be an anchor, inform it
 
@@ -1758,11 +1753,11 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
-                        if (visitedCoords[pack(coord2)] === 1) continue
+                        if (localVisitedCoords[pack(coord2)] === 1) continue
 
                         // Otherwise record that it has been visited
 
-                        visitedCoords[pack(coord2)] = 1
+                        localVisitedCoords[pack(coord2)] = 1
 
                         if (opts.coordMap[pack(coord2)] === 0) continue
 
@@ -1777,14 +1772,11 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
             if (!nextGeneration.length) {
 
+                localVisitedCoords = new Uint8Array(2500)
+
                 // Iterate through positions of this gen
 
                 for (const coord1 of thisGeneration) {
-                    if (opts.visuals)
-                        this.visual.text(opts.coordMap[pack(coord1)].toString(), coord1.x, coord1.y, {
-                            font: 0.5,
-                            color: myColors.red,
-                        })
 
                     // If the pos can be an anchor, inform it
 
@@ -1796,18 +1788,25 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                     // Loop through adjacent positions
 
                     for (const coord2 of adjacentCoords) {
+
                         // Iterate if the pos doesn't map onto a room
 
                         if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
                             continue
 
+                            if (opts.visuals)
+                            this.visual.text(opts.coordMap[pack(coord2)].toString() + ', ' + visitedCoords[pack(coord2)].toString(), coord2.x, coord2.y, {
+                                font: 0.5,
+                                color: myColors.red,
+                            })
+
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
-                        if (visitedCoords[pack(coord2)] === 1) continue
+                        if (localVisitedCoords[pack(coord2)] === 1) continue
 
                         // Otherwise record that it has been visited
 
-                        visitedCoords[pack(coord2)] = 1
+                        localVisitedCoords[pack(coord2)] = 1
 
                         // Add it tofastFillerSide the next gen
 
@@ -1816,8 +1815,21 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                 }
             }
 
+            if (opts.visuals) {
+
+                for (const coord of nextGeneration)
+                    this.visual.text(opts.coordMap[pack(coord)].toString(), coord.x, coord.y, {
+                        font: 0.5,
+                        color: myColors.yellow,
+                    })
+            }
+
+
+            console.log(opts.startCoords, i, opts.reduceIterations, nextGeneration)
+
             // Set this gen to next gen
 
+            visitedCoords = new Uint8Array(localVisitedCoords)
             thisGeneration = nextGeneration
         }
 

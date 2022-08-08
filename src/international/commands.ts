@@ -3,18 +3,43 @@ import { allStructureTypes } from './constants'
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN, STRUCTURE_STORAGE, STRUCTURE_TERMINAL]
 
 global.clearGlobal = function () {
+
+    // Clear global and stop CPU usage for a tick
+
     Game.cpu?.halt()
 }
 global.CG = global.clearGlobal
 
 global.clearMemory = function () {
+
+    // Clear all properties in memory
+
     for (const key in Memory) delete Memory[key as keyof typeof Memory]
 
     return 'Cleared all of Memory'
 }
-global.CR = global.clearMemory
+global.CM = global.clearMemory
 
 global.killAllCreeps = function (roles?) {
+
+    // Cancel spawning
+
+    for (const roomName of Memory.communes) {
+
+        const room = Game.rooms[roomName]
+
+        for (const spawn of room.structures.spawn) {
+
+            if (!spawn.spawning) continue
+
+            // If there are specific role requirements and the creep doesn't meet them
+
+            if (roles && !roles.includes(Game.creeps[spawn.spawning.name].role)) continue
+
+            spawn.spawning.cancel()
+        }
+    }
+
     const filteredCreeps = Object.values(Game.creeps).filter(creep => {
         return !roles || roles.includes(creep.role)
     })

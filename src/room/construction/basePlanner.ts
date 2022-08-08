@@ -187,10 +187,11 @@ export function basePlanner(room: Room) {
                 coordMap: distanceCoords,
                 startCoords: opts.startCoords,
                 requiredValue: stamp.size,
+                reduceIterations: 0,
                 initialWeight: opts.initialWeight || 0,
                 adjacentToRoads: opts.adjacentToRoads,
                 roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
-                /* visuals: opts.stampType === 'fastFiller' */
+                visuals: opts.stampType === 'hub'
             })
 
             // Inform false if no anchor was generated
