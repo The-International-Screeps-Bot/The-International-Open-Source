@@ -862,15 +862,15 @@ Creep.prototype.createMoveRequest = function (opts) {
 
     // Pack the first pos in the path
 
-    const packedPos = pack(path[0])
+    const packedCoord = pack(path[0])
 
     // Add the creep's name to its moveRequest position
 
-    room.moveRequests[packedPos].push(this.name)
+    room.moveRequests.get(packedCoord) ? room.moveRequests.get(packedCoord).push(this.name) : room.moveRequests.set(packedCoord, [this.name])
 
     // Make moveRequest true to inform a moveRequest has been made
 
-    this.moveRequest = packedPos
+    this.moveRequest = packedCoord
 
     // Set the creep's pathOpts to reflect this moveRequest's opts
 
@@ -984,10 +984,10 @@ Creep.prototype.shove = function (shoverPos) {
         })[0]
     } else goalPos = shovePositions[0]
 
-    const packedPos = pack(goalPos)
+    const packedCoord = pack(goalPos)
 
-    room.moveRequests[packedPos].push(this.name)
-    this.moveRequest = packedPos
+    room.moveRequests.get(packedCoord) ? room.moveRequests.get(packedCoord).push(this.name) : room.moveRequests.set(packedCoord, [this.name])
+    this.moveRequest = packedCoord
 
     if (Memory.roomVisuals)
         room.visual.circle(this.pos, {
@@ -1021,7 +1021,7 @@ Creep.prototype.runMoveRequest = function () {
 
     // If requests are not allowed for this pos, inform false
 
-    if (!room.moveRequests[this.moveRequest]) return false
+    if (!room.moveRequests.get(this.moveRequest)?.length) return false
 
     if (this.move(this.pos.getDirectionTo(unpackAsRoomPos(this.moveRequest, room.name))) !== OK) return false
 
@@ -1031,7 +1031,7 @@ Creep.prototype.runMoveRequest = function () {
 
     // Remove all moveRequests to the position
 
-    room.moveRequests[this.moveRequest] = []
+    room.moveRequests.delete(this.moveRequest)
     delete this.moveRequest
 
     // Remove record of the creep being on its current position
@@ -1049,7 +1049,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     const { room } = this
 
     if (!this.moveRequest) return
-    if (!room.moveRequests[this.moveRequest].length) return
+    if (!room.moveRequests.get(this.moveRequest)?.length) return
 
     queue.push(this.name)
 
@@ -1115,7 +1115,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     if (creepAtPos.moveRequest) {
         // If it's not valid
 
-        if (!room.moveRequests[creepAtPos.moveRequest].length) return
+        if (!room.moveRequests.get(creepAtPos.moveRequest)?.length) return
 
         // If the creep's pos and the creepAtPos's moveRequests are aligned
 

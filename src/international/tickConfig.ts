@@ -41,6 +41,7 @@ InternationalManager.prototype.tickConfig = function () {
     for (const roomName in Game.rooms) {
         const room = Game.rooms[roomName]
 
+        room.moveRequests = new Map()
         room.creepPositions = new Map()
 
         // Single tick properties

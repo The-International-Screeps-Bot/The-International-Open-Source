@@ -75,13 +75,15 @@ Room.prototype.communeManager = function () {
 /*
     let cpu = Game.cpu.getUsed()
 
-    const coordMap1 = createPosMap(true)
+    const coordMap = createPosMap(true)
+    console.log(coordMap)
 
     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
 
     cpu = Game.cpu.getUsed()
 
-    new Map()
+    const map = new Map()
+    map.set(1, 1)
 
     customLog('CPU USED FOR TEST 2', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
  */

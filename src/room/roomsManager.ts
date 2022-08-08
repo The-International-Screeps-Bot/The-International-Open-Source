@@ -7,10 +7,10 @@ import './communeManager'
 import { creepRoleManager } from './creeps/creepRoleManager'
 
 import { powerCreepManager } from './powerCreeps/powerCreepManager'
-import { trafficManager } from './trafficManager'
 import './roomVisualsManager'
 import { createPosMap, customLog } from 'international/generalFunctions'
 import { statsManager } from 'international/statsManager'
+import './trafficManager'
 
 export function roomManager() {
     // If CPU logging is enabled, get the CPU used at the start
@@ -42,7 +42,7 @@ export function roomManager() {
 
         //
 
-        trafficManager(room)
+        room.trafficManager()
 
         //
 

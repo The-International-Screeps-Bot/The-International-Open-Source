@@ -663,6 +663,11 @@ declare global {
          */
         creepPositions: Map<number, string>
 
+        /**
+         * A matrix with indexes of packed positions and values of creep names
+         */
+        moveRequests: Map<number, string[]>
+
         // Functions
 
         /**
@@ -816,6 +821,8 @@ declare global {
         remotesManager(): void
 
         haulerSizeManager(): void
+
+        trafficManager(): void
 
         /**
          * Dictates and operates tasks for factories
@@ -1057,13 +1064,6 @@ declare global {
         _actionableWalls: StructureWall[]
 
         readonly actionableWalls: StructureWall[]
-
-        _moveRequests: PosMap<string[]>
-
-        /**
-         * A matrix with indexes of packed positions and values of creep names
-         */
-        readonly moveRequests: PosMap<string[]>
 
         // Target finding
 

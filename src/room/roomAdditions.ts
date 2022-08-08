@@ -756,13 +756,6 @@ Object.defineProperties(Room.prototype, {
             return false
         },
     },
-    moveRequests: {
-        get() {
-            if (this._moveRequests) return this._moveRequests
-
-            return (this._moveRequests = createPosMap(true))
-        },
-    },
     droppedEnergy: {
         get() {
             if (this._droppedEnergy) return this._droppedEnergy
