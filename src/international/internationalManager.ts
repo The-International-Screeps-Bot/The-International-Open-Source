@@ -77,14 +77,25 @@ export class InternationalManager {
     advancedSellPixels() {
         if (!Memory.pixelSelling) return
 
+        let maxPrice = getAvgPrice(PIXEL) * 0.8
+
         const orders = Game.market.getAllOrders({ type: PIXEL })
+        let highestOrder: Order
 
         for (const order of orders) {
-            if (order.price > getAvgPrice(PIXEL)) continue
+            if (order.remainingAmount === 0) continue
 
-            Game.market.deal(order.id, Math.min(order.amount, Game.resources[PIXEL]))
-            return
+            if (order.price >= maxPrice) continue
+
+            if (order.price >= (highestOrder ? highestOrder.price : Infinity)) continue
+
+            highestOrder = order
         }
+
+        if (!highestOrder) return
+
+        Game.market.deal(highestOrder.id, Math.min(highestOrder.amount, Game.resources[PIXEL]))
+        return
     }
 
     advancedGeneratePixel() {
