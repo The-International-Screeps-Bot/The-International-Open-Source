@@ -756,13 +756,6 @@ Object.defineProperties(Room.prototype, {
             return false
         },
     },
-    creepPositions: {
-        get() {
-            if (this._creepPositions) return this._creepPositions
-
-            return (this._creepPositions = createPosMap())
-        },
-    },
     moveRequests: {
         get() {
             if (this._moveRequests) return this._moveRequests

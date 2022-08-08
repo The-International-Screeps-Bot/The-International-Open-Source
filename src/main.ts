@@ -658,6 +658,11 @@ declare global {
 
         roadCoords: CoordMap
 
+        /**
+         * A matrix with indexes of packed positions and values of creep names
+         */
+        creepPositions: Map<number, string>
+
         // Functions
 
         /**
@@ -1052,13 +1057,6 @@ declare global {
         _actionableWalls: StructureWall[]
 
         readonly actionableWalls: StructureWall[]
-
-        _creepPositions: Map<number, string>
-
-        /**
-         * A matrix with indexes of packed positions and values of creep names
-         */
-        readonly creepPositions: Map<number, string>
 
         _moveRequests: PosMap<string[]>
 
@@ -1779,7 +1777,7 @@ declare global {
             unpackedRoomNames: { [roomName: string]: string }
             roomStats: { [roomName: string]: RoomStats }
 
-            terrainCoords: {[roomName: string]: CoordMap }
+            terrainCoords: { [roomName: string]: CoordMap }
 
             // Command functions
 

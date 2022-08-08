@@ -47,7 +47,7 @@ MeleeDefender.prototype.advancedDefend = function () {
 
         // Inform wether there is a creep at the pos
 
-        return !room.creepPositions[pack(rampart.pos)]
+        return !room.creepPositions.get(pack(rampart.pos))
     })
 
     if (!ramparts.length) {

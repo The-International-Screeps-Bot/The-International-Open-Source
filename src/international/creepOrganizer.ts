@@ -62,7 +62,10 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         // Add the creep's name to the position in its room
 
-        if (!creep.spawning) room.creepPositions[pack(creep.pos)] = creep.name
+        if (!creep.spawning) {
+            if (!room.creepPositions) room.creepPositions = new Map()
+            room.creepPositions.set(pack(creep.pos), creep.name)
+        }
 
         // Get the commune the creep is from
 

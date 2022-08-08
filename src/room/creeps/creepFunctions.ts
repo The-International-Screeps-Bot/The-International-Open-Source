@@ -913,7 +913,7 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
     for (let index = 0; index < adjacentPackedPositions.length; index++) {
         const packedPos = adjacentPackedPositions[index]
 
-        if (room.creepPositions[packedPos]) continue
+        if (room.creepPositions.get(packedPos)) continue
 
         if (avoidPackedPositions.has(packedPos)) continue
 
@@ -1055,7 +1055,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
     // Try to find the name of the creep at pos
 
-    const creepNameAtPos = room.creepPositions[this.moveRequest]
+    const creepNameAtPos = room.creepPositions.get(this.moveRequest)
 
     // If there is no creep at the pos
 
