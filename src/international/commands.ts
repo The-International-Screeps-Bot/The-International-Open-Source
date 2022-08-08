@@ -2,6 +2,11 @@ import { allStructureTypes } from './constants'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN, STRUCTURE_STORAGE, STRUCTURE_TERMINAL]
 
+global.clearGlobal = function () {
+    Game.cpu?.halt()
+}
+global.CG = global.clearGlobal
+
 global.clearMemory = function () {
     for (const key in Memory) delete Memory[key as keyof typeof Memory]
 

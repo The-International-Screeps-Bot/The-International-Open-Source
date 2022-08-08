@@ -1782,6 +1782,11 @@ declare global {
             // Command functions
 
             /**
+             * Deletes all properties of global
+             */
+            clearGlobal(): void
+
+            /**
              * Deletes all properties of Memory
              */
             clearMemory(): string
