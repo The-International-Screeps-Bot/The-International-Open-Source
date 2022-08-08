@@ -742,8 +742,9 @@ Object.defineProperties(Room.prototype, {
 
             if (!this.memory.stampAnchors.hub) return false
 
-            let hubAnchor = unpackAsPos(this.memory.stampAnchors.hub[0])
-
+            const hubAnchor = unpackAsPos(this.memory.stampAnchors.hub[0])
+            if (!hubAnchor) return false
+            console.log(JSON.stringify(hubAnchor))
             for (const structure of new RoomPosition(hubAnchor.x - 1, hubAnchor.y - 1, this.name).lookFor(
                 LOOK_STRUCTURES,
             )) {

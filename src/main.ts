@@ -191,7 +191,7 @@ declare global {
 
     interface FindClosestPosOfValueOpts {
         coordMap: CoordMap
-        startPos: Coord
+        startCoords: Coord[]
         requiredValue: number
         reduceIterations?: number
         initialWeight?: number

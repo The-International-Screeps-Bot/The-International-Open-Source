@@ -146,7 +146,7 @@ Room.prototype.get = function (roomObjectName) {
 
         return room.findClosestPosOfValue({
             coordMap: distanceCoords,
-            startPos: room.anchor,
+            startCoords: [room.anchor],
             requiredValue: 2,
             reduceIterations: 1
         })
@@ -693,7 +693,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                     else if (room.memory.type === 'remote') {
 
-                        
+
                     }
                 }
 
@@ -1603,19 +1603,21 @@ Room.prototype.floodFill = function (seeds, coordMap, visuals) {
 
 Room.prototype.findClosestPosOfValue = function (opts) {
     const room = this
+    console.log(room.name)
 
     if (opts.visuals) {
 
-        this.visual.circle(opts.startPos.x, opts.startPos.y, {
-            stroke: myColors.yellow,
-        })
+        for (const coord of opts.startCoords)
+            this.visual.circle(coord.x, coord.y, {
+                stroke: myColors.yellow,
+            })
     }
 
     /**
      *
      */
     function isViableAnchor(coord1: Coord): boolean {
-        // Get the value of the pos
+        // Get the value of the pos4271
 
         const posValue = opts.coordMap[pack(coord1)]
         if (posValue === 255) return false
@@ -1653,11 +1655,11 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
         // Record startPos as visited
 
-        visitedCoords[pack(opts.startPos)] = 1
+        for (const coord of opts.startCoords) visitedCoords[pack(coord)] = 1
 
         // Construct values for the check
 
-        let thisGeneration = [opts.startPos]
+        let thisGeneration = opts.startCoords
         let nextGeneration: Coord[] = []
 
         // So long as there are positions in this gen
@@ -1666,7 +1668,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
             // Reset nextGeneration
 
             nextGeneration = []
-            const localVisited = new Uint8Array(visitedCoords)
 
             // Iterate through positions of this gen
 
@@ -1712,11 +1713,11 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                     // Iterate if the adjacent pos has been visited or isn't a tile
 
-                    if (localVisited[pack(coord2)] === 1) continue
+                    if (visitedCoords[pack(coord2)] === 1) continue
 
                     // Otherwise record that it has been visited
 
-                    localVisited[pack(coord2)] = 1
+                    visitedCoords[pack(coord2)] = 1
 
                     if (opts.coordMap[pack(coord2)] === 0) continue
 
@@ -1729,7 +1730,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
             // Try without using impassibles
 
             if (!nextGeneration.length) {
-                const localVisited = new Uint8Array(visitedCoords)
 
                 // Iterate through positions of this gen
 
@@ -1758,11 +1758,11 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
-                        if (localVisited[pack(coord2)] === 1) continue
+                        if (visitedCoords[pack(coord2)] === 1) continue
 
                         // Otherwise record that it has been visited
 
-                        localVisited[pack(coord2)] = 1
+                        visitedCoords[pack(coord2)] = 1
 
                         if (opts.coordMap[pack(coord2)] === 0) continue
 
@@ -1776,7 +1776,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
             // If no positions are found, try again using impassibles
 
             if (!nextGeneration.length) {
-                const localVisited = new Uint8Array(visitedCoords)
 
                 // Iterate through positions of this gen
 
@@ -1804,11 +1803,11 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
-                        if (localVisited[pack(coord2)] === 1) continue
+                        if (visitedCoords[pack(coord2)] === 1) continue
 
                         // Otherwise record that it has been visited
 
-                        localVisited[pack(coord2)] = 1
+                        visitedCoords[pack(coord2)] = 1
 
                         // Add it tofastFillerSide the next gen
 
@@ -1819,7 +1818,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
             // Set this gen to next gen
 
-            visitedCoords = new Uint8Array(localVisited)
             thisGeneration = nextGeneration
         }
 
@@ -2189,9 +2187,7 @@ Room.prototype.createClaimRequest = function () {
 
     if (Memory.claimRequests[this.name]) return false
 
-    basePlanner(this)
-
-    if (!this.memory.planned) return false
+    if (basePlanner(this) === 'failed') return false
 
     let score = 0
 

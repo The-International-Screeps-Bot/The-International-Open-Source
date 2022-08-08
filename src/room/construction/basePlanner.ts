@@ -15,7 +15,7 @@ import {
     arePositionsEqual,
     createPosMap,
     customLog,
-    findAvgBetweenPosotions,
+    findAvgBetweenPositions,
     findCoordsInsideRect,
     getRange,
     pack,
@@ -33,11 +33,9 @@ import { rampartPlanner } from './rampartPlanner'
  * Checks if a room can be planner. If it can, it informs information on how to build the room
  */
 export function basePlanner(room: Room) {
-
     // Stop if there isn't sufficient CPU
 
     if (Game.cpu.bucket < CPUMaxPerTick) return false
-
     const terrainCoords = internationalManager.getTerrainCoords(room.name)
 
     room.baseCoords = new Uint8Array(terrainCoords)
@@ -98,11 +96,11 @@ export function basePlanner(room: Room) {
 
     // Find the average pos between the sources
 
-    const avgSourcePos = sources.length > 1 ? findAvgBetweenPosotions(sources[0].pos, sources[1].pos) : sources[0].pos
+    const avgSourcePos = sources.length > 1 ? findAvgBetweenPositions(sources[0].pos, sources[1].pos) : sources[0].pos
 
     // Find the average pos between the two sources and the controller
 
-    const avgControllerSourcePos = findAvgBetweenPosotions(room.controller.pos, avgSourcePos)
+    const avgControllerSourcePos = findAvgBetweenPositions(room.controller.pos, avgSourcePos)
 
     const controllerAdjacentCoords = findCoordsInsideRect(
         room.controller.pos.x - 3,
@@ -116,7 +114,7 @@ export function basePlanner(room: Room) {
     interface PlanStampOpts {
         stampType: StampTypes
         count: number
-        anchorOrient: Coord
+        startCoords: Coord[]
         initialWeight?: number
         adjacentToRoads?: boolean
         normalDT?: boolean
@@ -187,7 +185,7 @@ export function basePlanner(room: Room) {
 
             stampAnchor = room.findClosestPosOfValue({
                 coordMap: distanceCoords,
-                startPos: opts.anchorOrient,
+                startCoords: opts.startCoords,
                 requiredValue: stamp.size,
                 initialWeight: opts.initialWeight || 0,
                 adjacentToRoads: opts.adjacentToRoads,
@@ -237,11 +235,11 @@ export function basePlanner(room: Room) {
         !planStamp({
             stampType: 'fastFiller',
             count: 1,
-            anchorOrient: avgControllerSourcePos,
+            startCoords: [avgControllerSourcePos],
             normalDT: true,
         })
     )
-        return false
+        return 'failed'
 
     // If the stamp failed to be planned
 
@@ -249,7 +247,7 @@ export function basePlanner(room: Room) {
         // Record that the room is not claimable and stop
 
         room.memory.notClaimable = true
-        return false
+        return 'failed'
     }
 
     for (const coord of controllerAdjacentCoords) {
@@ -283,17 +281,29 @@ export function basePlanner(room: Room) {
         !planStamp({
             stampType: 'hub',
             count: 1,
-            anchorOrient: room.anchor,
+            startCoords: [room.anchor],
             normalDT: true,
         })
     )
-        return false
+        return 'failed'
 
     const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
-    const fastFillerHubAnchor = findAvgBetweenPosotions(room.anchor, hubAnchor)
+    const hubAnchors = [
+        {
+            x: hubAnchor.x - 1,
+            y: hubAnchor.y + 1,
+        },
+        {
+            x: hubAnchor.x + 1,
+            y: hubAnchor.y - 1,
+        },
+    ]
+    const fastFillerHubAnchor = findAvgBetweenPositions(room.anchor, hubAnchor)
     // Get the closest upgrade pos and mark it as fair use in roadCM
 
     const closestUpgradePos = upgradePositions[0]
+    if (!closestUpgradePos) return 'failed'
+
     room.roadCoords[pack(closestUpgradePos)] = 1
 
     // Construct path
@@ -306,10 +316,10 @@ export function basePlanner(room: Room) {
         !planStamp({
             stampType: 'extensions',
             count: 7,
-            anchorOrient: hubAnchor,
+            startCoords: hubAnchors,
         })
     )
-        return false
+        return 'failed'
 
     // Plan the stamp x times
 
@@ -333,10 +343,10 @@ export function basePlanner(room: Room) {
         !planStamp({
             stampType: 'labs',
             count: 1,
-            anchorOrient: hubAnchor,
+            startCoords: hubAnchors,
         })
     )
-        return false
+        return 'failed'
 
     // Plan roads
 
@@ -488,11 +498,11 @@ export function basePlanner(room: Room) {
         !planStamp({
             stampType: 'tower',
             count: 6,
-            anchorOrient: fastFillerHubAnchor,
+            startCoords: [fastFillerHubAnchor],
             adjacentToRoads: true,
         })
     )
-        return false
+        return 'failed'
 
     rampartPlanner(room)
 
@@ -635,11 +645,11 @@ export function basePlanner(room: Room) {
         !planStamp({
             stampType: 'extension',
             count: extraExtensionsAmount,
-            anchorOrient: hubAnchor,
+            startCoords: hubAnchors,
             adjacentToRoads: true,
         })
     )
-        return false
+        return 'failed'
 
     // Try to plan the stamp
 
@@ -647,10 +657,10 @@ export function basePlanner(room: Room) {
         !planStamp({
             stampType: 'observer',
             count: 1,
-            anchorOrient: fastFillerHubAnchor,
+            startCoords: [fastFillerHubAnchor],
         })
     )
-        return false
+        return 'failed'
 
     // Iterate through each x and y in the room
 

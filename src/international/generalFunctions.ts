@@ -136,7 +136,7 @@ export function findCarryPartsRequired(distance: number, income: number) {
 /**
  * Finds a position equally between two positions
  */
-export function findAvgBetweenPosotions(pos1: Coord, pos2: Coord) {
+export function findAvgBetweenPositions(pos1: Coord, pos2: Coord) {
     // Inform the rounded average of the two positions
 
     return {
