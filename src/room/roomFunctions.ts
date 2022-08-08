@@ -1794,12 +1794,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                         if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
                             continue
 
-                            if (opts.visuals)
-                            this.visual.text(opts.coordMap[pack(coord2)].toString() + ', ' + visitedCoords[pack(coord2)].toString(), coord2.x, coord2.y, {
-                                font: 0.5,
-                                color: myColors.red,
-                            })
-
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
                         if (localVisitedCoords[pack(coord2)] === 1) continue
@@ -1823,9 +1817,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                         color: myColors.yellow,
                     })
             }
-
-
-            console.log(opts.startCoords, i, opts.reduceIterations, nextGeneration)
 
             // Set this gen to next gen
 
