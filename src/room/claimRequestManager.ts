@@ -45,6 +45,11 @@ Room.prototype.claimRequestManager = function () {
         // Get enemyCreeps in the room and loop through them
 
         for (const enemyCreep of claimTarget.enemyCreeps) {
+
+            // If the enemy is an invader
+
+            if (enemyCreep.owner.username === 'Invader') continue
+
             // Increase the defenderNeed according to the creep's strength
 
             Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] +=
