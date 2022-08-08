@@ -22,7 +22,7 @@ import '../room/haulerSize'
 InternationalManager.prototype.tickConfig = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
     // General
 
@@ -41,7 +41,7 @@ InternationalManager.prototype.tickConfig = function () {
     for (const roomName in Game.rooms) {
         const room = Game.rooms[roomName]
 
-        const { controller } = room
+        room.creepPositions = new Map()
 
         // Single tick properties
 
@@ -59,6 +59,7 @@ InternationalManager.prototype.tickConfig = function () {
 
         for (const index in room.sources) room.creepsOfSourceAmount.push(0)
 
+        const { controller } = room
         if (!controller) continue
 
         if (controller.my) room.memory.type = 'commune'
@@ -261,6 +262,6 @@ InternationalManager.prototype.tickConfig = function () {
         Memory.attackRequests[roomName].responder = communeName
     }
 
-    if (Memory.cpuLogging)
+    if (Memory.CPULogging)
         customLog('Tick Config', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.midGrey)
 }

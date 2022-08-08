@@ -4,7 +4,7 @@ import { customLog, findObjectWithID, unpackAsPos } from 'international/generalF
 Room.prototype.roomVisualsManager = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
     ;(() => {
         if (!Memory.baseVisuals) return
 
@@ -161,7 +161,7 @@ Room.prototype.roomVisualsManager = function () {
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.cpuLogging)
+    if (Memory.CPULogging)
         customLog(
             'Room Visuals Manager',
             (Game.cpu.getUsed() - managerCPUStart).toFixed(2),

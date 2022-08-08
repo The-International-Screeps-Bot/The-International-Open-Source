@@ -2,18 +2,18 @@ import { myColors } from 'international/constants'
 import { customLog, pack, packXY } from 'international/generalFunctions'
 
 export function trafficManager(room: Room) {
-     if (!room.myCreepsAmount) return
+    if (!room.myCreepsAmount) return
 
-     // If CPU logging is enabled, get the CPU used at the start
+    // If CPU logging is enabled, get the CPU used at the start
 
-     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-     for (const role in room.myCreeps) {
-          for (const creepName of room.myCreeps[role]) Game.creeps[creepName].recurseMoveRequest()
-     }
+    for (const role in room.myCreeps) {
+        for (const creepName of room.myCreeps[role]) Game.creeps[creepName].recurseMoveRequest()
+    }
 
-     // If CPU logging is enabled, log the CPU used by this manager
+    // If CPU logging is enabled, log the CPU used by this manager
 
-     if (Memory.cpuLogging)
-          customLog('Traffic Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
+    if (Memory.CPULogging)
+        customLog('Traffic Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
 }

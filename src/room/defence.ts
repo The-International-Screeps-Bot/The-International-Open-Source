@@ -4,14 +4,14 @@ import { customLog, findObjectWithID } from 'international/generalFunctions'
 Room.prototype.defenceManager = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
     this.advancedActivateSafeMode()
     this.manageRampartPublicity()
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.cpuLogging)
+    if (Memory.CPULogging)
         customLog('Defence Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
 }
 
@@ -71,7 +71,9 @@ Room.prototype.advancedActivateSafeMode = function () {
 
     // Filter attackers that are not invaders. If there are none, stop
 
-    const nonInvaderAttackers = this.enemyAttackers.filter(enemyCreep => !enemyCreep.isOnExit() && enemyCreep.owner.username /* !== 'Invader' */ )
+    const nonInvaderAttackers = this.enemyAttackers.filter(
+        enemyCreep => !enemyCreep.isOnExit() && enemyCreep.owner.username /* !== 'Invader' */,
+    )
 
     if (!nonInvaderAttackers.length) return
 

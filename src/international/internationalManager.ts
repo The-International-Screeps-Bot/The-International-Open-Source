@@ -10,7 +10,7 @@ export class InternationalManager {
     run() {
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
         // Run prototypes
 
@@ -25,7 +25,7 @@ export class InternationalManager {
         allyManager.getAllyRequests()
         ExecutePandaMasterCode()
 
-        if (Memory.cpuLogging)
+        if (Memory.CPULogging)
             customLog(
                 'International Manager',
                 (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
@@ -42,7 +42,6 @@ export class InternationalManager {
         let highestOrder: Order
 
         for (const order of orders) {
-
             if (order.remainingAmount === 0) continue
 
             if (order.price >= maxPrice) continue
@@ -63,7 +62,6 @@ export class InternationalManager {
         let cheapestOrder: Order
 
         for (const order of orders) {
-
             if (order.remainingAmount === 0) continue
 
             if (order.price <= minPrice) continue

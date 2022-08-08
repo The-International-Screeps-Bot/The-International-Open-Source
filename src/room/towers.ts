@@ -1,10 +1,10 @@
 import { myColors } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 
-Room.prototype.towerManager = function() {
+Room.prototype.towerManager = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
     if (!this.structures.tower.length) return
 
@@ -16,7 +16,7 @@ Room.prototype.towerManager = function() {
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.cpuLogging)
+    if (Memory.CPULogging)
         customLog('Tower Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
 }
 

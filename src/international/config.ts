@@ -4,7 +4,7 @@ import {
     autoClaim,
     baseVisuals,
     breakingVersion,
-    cpuLogging,
+    CPULogging,
     mapVisuals,
     pixelGeneration,
     pixelSelling,
@@ -42,7 +42,7 @@ InternationalManager.prototype.config = function () {
         Memory.roomVisuals = roomVisuals
         Memory.baseVisuals = baseVisuals
         Memory.mapVisuals = mapVisuals
-        Memory.cpuLogging = cpuLogging
+        Memory.CPULogging = CPULogging
         Memory.roomStats = Game.shard.name !== 'performanceServer' ? roomStats : 2
         Memory.allyList = allyList
         Memory.pixelSelling = pixelSelling
@@ -61,7 +61,7 @@ InternationalManager.prototype.config = function () {
         Memory.attackRequests = {}
         Memory.allyCreepRequests = {}
         statsManager.internationalConfig()
-   }
+    }
 
     if (!global.constructed) {
         RawMemory.setActiveSegments([98])

@@ -451,7 +451,7 @@ declare global {
         /**
          * Wether the bot should log CPU data
          */
-        cpuLogging: boolean
+        CPULogging: boolean
 
         /**
          * Wether the bot save RoomStats data

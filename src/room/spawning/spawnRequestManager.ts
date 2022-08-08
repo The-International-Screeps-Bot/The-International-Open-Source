@@ -23,7 +23,7 @@ import {
 Room.prototype.spawnRequester = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
     // Structure info about the this's spawn energy
 
@@ -40,8 +40,7 @@ Room.prototype.spawnRequester = function () {
             const sourceIndex = 0
             const role = 'source1Harvester'
 
-            const priority =
-                (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
+            const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
             if (spawnEnergyCapacity >= 800) {
                 return {
@@ -131,8 +130,7 @@ Room.prototype.spawnRequester = function () {
             const sourceIndex = 1
             const role = 'source2Harvester'
 
-            const priority =
-                (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
+            const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
             if (spawnEnergyCapacity >= 800) {
                 return {
@@ -399,7 +397,6 @@ Room.prototype.spawnRequester = function () {
     // Increase attackValue by the creep's heal power
 
     for (const enemyAttacker of enemyAttackers) {
-
         attackStrength += enemyAttacker.attackStrength
         healStrength += enemyAttacker.healStrength
     }
@@ -408,7 +405,6 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-
             // Inform false if there are no enemyAttackers
 
             if (!enemyAttackers.length) return false
@@ -422,7 +418,6 @@ Room.prototype.spawnRequester = function () {
             // If all RCL 3 extensions are build
 
             if (spawnEnergyCapacity >= 800) {
-
                 const extraParts = [ATTACK, ATTACK, MOVE]
                 const strength = 2 * ATTACK_POWER + 1
 
@@ -430,7 +425,7 @@ Room.prototype.spawnRequester = function () {
                     role,
                     defaultParts: [],
                     extraParts,
-                    partsMultiplier: Math.max(healStrength * 1.2 / strength, 1),
+                    partsMultiplier: Math.max((healStrength * 1.2) / strength, 1),
                     minCreeps: undefined,
                     minCost: 210,
                     priority: 6 + this.creepsFromRoom.meleeDefender.length,
@@ -1413,5 +1408,5 @@ Room.prototype.spawnRequester = function () {
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.cpuLogging) customLog('Spawn Request Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2))
+    if (Memory.CPULogging) customLog('Spawn Request Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2))
 }

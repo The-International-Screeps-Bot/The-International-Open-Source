@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 72
+export const breakingVersion = 73
 
 // Settings
 
@@ -23,7 +23,7 @@ export const mapVisuals = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const cpuLogging = false
+export const CPULogging = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead

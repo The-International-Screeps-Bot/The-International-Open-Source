@@ -15,7 +15,7 @@ import '../room/creeps/preTickManagers/remote/remoteDismantlerPreTick'
 InternationalManager.prototype.creepOrganizer = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
     // Construct counter for creeps
 
@@ -62,10 +62,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         // Add the creep's name to the position in its room
 
-        if (!creep.spawning) {
-            if (!room.creepPositions) room.creepPositions = new Map()
-            room.creepPositions.set(pack(creep.pos), creep.name)
-        }
+        if (!creep.spawning) room.creepPositions.set(pack(creep.pos), creep.name)
 
         // Get the commune the creep is from
 
@@ -93,6 +90,6 @@ InternationalManager.prototype.creepOrganizer = function () {
         commune.creepsFromRoomAmount += 1
     }
 
-    if (Memory.cpuLogging)
+    if (Memory.CPULogging)
         customLog('Creep Organizer', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.midGrey)
 }

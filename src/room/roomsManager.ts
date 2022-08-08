@@ -15,7 +15,7 @@ import { statsManager } from 'international/statsManager'
 export function roomManager() {
     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
     // Loop through room names in Game.rooms
 
@@ -52,7 +52,7 @@ export function roomManager() {
 
         let logMessage = `Creeps: ${room.myCreepsAmount}`
 
-        if (Memory.cpuLogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
+        if (Memory.CPULogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
 
         if (saveStats) statsManager.roomEndTick(room.name, roomType as 'commune' | 'remote', room)
         customLog(room.name + ' ' + roomType, logMessage, undefined, myColors.midGrey)
@@ -60,6 +60,6 @@ export function roomManager() {
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.cpuLogging)
+    if (Memory.CPULogging)
         customLog('Room Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), myColors.white, myColors.lightBlue)
 }
