@@ -1053,12 +1053,12 @@ declare global {
 
         readonly actionableWalls: StructureWall[]
 
-        _creepPositions: PosMap<string>
+        _creepPositions: Map<number, string>
 
         /**
          * A matrix with indexes of packed positions and values of creep names
          */
-        readonly creepPositions: PosMap<string>
+        readonly creepPositions: Map<number, string>
 
         _moveRequests: PosMap<string[]>
 

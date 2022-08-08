@@ -1,5 +1,6 @@
 import { link } from 'fs'
 import {
+    CPUMaxPerTick,
     EXIT,
     myColors,
     NORMAL,
@@ -32,6 +33,11 @@ import { rampartPlanner } from './rampartPlanner'
  * Checks if a room can be planner. If it can, it informs information on how to build the room
  */
 export function basePlanner(room: Room) {
+
+    // Stop if there isn't sufficient CPU
+
+    if (Game.cpu.bucket < CPUMaxPerTick) return false
+
     const terrainCoords = internationalManager.getTerrainCoords(room.name)
 
     room.baseCoords = new Uint8Array(terrainCoords)

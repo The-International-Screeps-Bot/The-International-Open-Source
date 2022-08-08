@@ -660,6 +660,7 @@ export const builderSpawningWhenStorageThreshold = 40000
 export const upgraderSpawningWhenStorageThreshold = 60000
 
 export const CPUBucketCapacity = 10000
+export const CPUMaxPerTick = 500
 
 export const CPUBucketRenewThreshold = 5000
 export const prefferedCommuneRange = 6

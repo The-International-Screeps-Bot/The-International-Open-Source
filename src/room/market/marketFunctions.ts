@@ -35,7 +35,7 @@ Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
 
     // If there are too many existing orders, inform false
 
-    if (internationalManager.myOrdersCount === 300) return false
+    if (internationalManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
     // Otherwise, create a new market order and inform true
 
@@ -84,7 +84,7 @@ Room.prototype.advancedBuy = function (resourceType, amount, targetAmount) {
 
     // If there are too many existing orders, inform false
 
-    if (internationalManager.myOrdersCount === 300) return false
+    if (internationalManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
     // Otherwise, create a new market order and inform true
 

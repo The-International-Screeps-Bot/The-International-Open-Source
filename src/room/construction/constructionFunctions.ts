@@ -24,7 +24,7 @@ Room.prototype.communeConstructionPlacement = function () {
 
      // If the construction site count is at its limit, stop
 
-     if (global.constructionSitesCount === 100) return
+     if (global.constructionSitesCount === MAX_CONSTRUCTION_SITES) return
 
      // If the this is above 1 construction site, stop
 

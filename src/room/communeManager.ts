@@ -77,25 +77,11 @@ Room.prototype.communeManager = function () {
 
     const coordMap1 = createPosMap(true)
 
-    for (let x = 0; x < roomDimensions; x += 1) {
-      for (let y = 0; y < roomDimensions; y += 1) {
-
-         coordMap1[packXY(x, y)] = []
-      }
-   }
-
     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
 
     cpu = Game.cpu.getUsed()
 
-    const coordMap2 = new Map()
-
-    for (let x = 0; x < roomDimensions; x += 1) {
-      for (let y = 0; y < roomDimensions; y += 1) {
-
-         coordMap2.set(packXY(x, y), [])
-      }
-   }
+    new Map()
 
     customLog('CPU USED FOR TEST 2', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
  */
