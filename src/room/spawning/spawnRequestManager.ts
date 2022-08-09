@@ -478,7 +478,7 @@ Room.prototype.spawnRequester = function () {
             }
 
             // Otherwise if there is no storage
-            else partsMultiplier += Math.floor(estimatedIncome / 3)
+            else partsMultiplier += Math.floor(estimatedIncome / 2.5)
 
             const role = 'builder'
             /*
