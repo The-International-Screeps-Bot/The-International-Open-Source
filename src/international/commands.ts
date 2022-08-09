@@ -3,7 +3,6 @@ import { allStructureTypes } from './constants'
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN, STRUCTURE_STORAGE, STRUCTURE_TERMINAL]
 
 global.clearGlobal = function () {
-
     // Clear global and stop CPU usage for a tick
 
     Game.cpu?.halt()
@@ -11,7 +10,6 @@ global.clearGlobal = function () {
 global.CG = global.clearGlobal
 
 global.clearMemory = function () {
-
     // Clear all properties in memory
 
     for (const key in Memory) delete Memory[key as keyof typeof Memory]
@@ -20,16 +18,13 @@ global.clearMemory = function () {
 }
 global.CM = global.clearMemory
 
-global.killAllCreeps = function (roles?) {
-
+global.killCreeps = function (roles?) {
     // Cancel spawning
 
     for (const roomName of Memory.communes) {
-
         const room = Game.rooms[roomName]
 
         for (const spawn of room.structures.spawn) {
-
             if (!spawn.spawning) continue
 
             // If there are specific role requirements and the creep doesn't meet them
@@ -50,10 +45,10 @@ global.killAllCreeps = function (roles?) {
 
     return `Killed an total of ${killedCreepCount} creeps ${roles ? `with the roles ${roles}` : ''}`
 }
-global.marxistLeninism = global.killAllCreeps
-global.genocide = global.killAllCreeps
+global.marxistLeninism = global.killCreeps
+global.genocide = global.killCreeps
 
-global.removeAllCSites = function (types?) {
+global.removeCSites = function (types?) {
     let removedCSCount = 0
 
     for (const cSiteID in Game.constructionSites) {

@@ -20,7 +20,9 @@ InternationalManager.prototype.config = function () {
     if (Memory.breakingVersion < breakingVersion) {
         global.clearMemory()
 
-        global.killAllCreeps()
+        global.killCreeps()
+
+        global.removeCSites()
     }
 
     // Construct Memory if it isn't constructed yet
