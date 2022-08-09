@@ -26,9 +26,11 @@ Room.prototype.communeConstructionPlacement = function () {
 
      if (global.constructionSitesCount === MAX_CONSTRUCTION_SITES) return
 
-     // If the this is above 1 construction site, stop
+     // If there are some construction sites
 
      if (this.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
+
+     let placed = 0
 
      for (const stampType in stamps) {
           const stamp = stamps[stampType as StampTypes]
@@ -67,7 +69,10 @@ Room.prototype.communeConstructionPlacement = function () {
                          const x = pos.x + stampAnchor.x - stamp.offset
                          const y = pos.y + stampAnchor.y - stamp.offset
 
-                         this.createConstructionSite(x, y, structureType as BuildableStructureConstant)
+                         if (placed > 10) return
+
+                         if (this.createConstructionSite(x, y, structureType as BuildableStructureConstant) === OK) placed += 1
+                         else return
                     }
                }
           }

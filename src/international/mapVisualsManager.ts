@@ -19,7 +19,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
         const roomMemory = Memory.rooms[roomName]
 
         Game.map.visual.text(roomMemory.type, new RoomPosition(2, 40, roomName), {
-            align: 'right',
+            align: 'left',
             fontSize: 5,
         })
 
