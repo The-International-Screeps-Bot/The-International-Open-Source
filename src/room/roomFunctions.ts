@@ -1941,7 +1941,7 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
 
                 // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
 
-                this.unprotectedCoords[packedCoord1] = depth + 10
+                this.unprotectedCoords[packedCoord1] = depth * 10 + 10
 
                 // If visuals are enabled, show the depth on the pos
 /*
