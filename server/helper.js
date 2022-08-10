@@ -60,8 +60,11 @@ module.exports.followLog = followLog
  * @return {boolean}
  */
 const setPassword = function (line, socket, rooms, roomsSeen, playerRooms) {
-     for (const room of rooms) {
-          if (line.startsWith(`'User ${room} with bot AI "bot" spawned in ${room}'`)) {
+     const roomsObject = Object.entries(rooms);
+     for (let i = 0; i < roomsObject.length; i++) {
+          const room = roomsObject[i][0]
+          const botName = roomsObject[i][1]
+          if (line.startsWith(`'User ${room} with bot AI "${botName}" spawned in ${room}'`)) {
                roomsSeen[room] = true
                console.log(`> Set password for ${room}`)
                /* eslint max-len: ["error", 1300] */
@@ -196,9 +199,12 @@ const spawnBots = async function (line, socket, rooms, tickDuration) {
           console.log(`> utils.setShardName("performanceServer")`)
           socket.write(`utils.setShardName("performanceServer")\r\n`)
 
-          for (const room of rooms) {
-               console.log(`> Spawn bot ${room} as International AI`)
-               socket.write(`bots.spawn('bot', '${room}', {username: '${room}', auto:'true'})\r\n`)
+          const roomsObject = Object.entries(rooms);
+          for (let i = 0; i < roomsObject.length; i++) {
+               const room = roomsObject[i][0]
+               const botName = roomsObject[i][1]
+               console.log(`> Spawn as ${botName}`)
+               socket.write(`bots.spawn('${botName}', '${room}', {username: '${room}', auto:'true'})\r\n`)
                await sleep(5)
           }
           return true

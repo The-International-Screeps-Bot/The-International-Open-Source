@@ -9,6 +9,8 @@ const { cliPort, tickDuration, playerRooms, rooms, milestones } = require('./con
 
 const controllerRooms = {}
 const status = {}
+const roomNames = Object.keys(rooms)
+const roomsCount = roomNames.length
 let lastTick = 0
 
 process.once('SIGINT', code => {
@@ -21,7 +23,7 @@ process.once('SIGINT', code => {
      process.exit()
 })
 
-for (const room of rooms) {
+for (const room of roomNames) {
      status[room] = {
           controller: null,
           creeps: 0,
@@ -112,9 +114,9 @@ class Tester {
                }
 
                if (setPassword(line, socket, rooms, this.roomsSeen, playerRooms)) {
-                    if (rooms.length === Object.keys(this.roomsSeen).length) {
+                    if (roomsCount === Object.keys(this.roomsSeen).length) {
                          console.log('> Listen to the log')
-                         followLog(rooms, statusUpdater)
+                         followLog(roomNames, statusUpdater)
                          await sleep(5)
                          console.log(`> system.resumeSimulation()`)
                          socket.write(`system.resumeSimulation()\r\n`)
@@ -165,7 +167,7 @@ const statusUpdater = event => {
           for (const milestone of milestones) {
                const failedRooms = []
                if (typeof milestone.success === 'undefined' || milestone.success === null) {
-                    let success = Object.keys(status).length === rooms.length
+                    let success = Object.keys(status).length === roomsCount
                     for (const room of Object.keys(status)) {
                          for (const key of Object.keys(milestone.check)) {
                               if (status[room][key] < milestone.check[key]) {
