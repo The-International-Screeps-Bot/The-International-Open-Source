@@ -61,11 +61,11 @@ export function rampartPlanner(room: Room) {
             if (room.tileCoords[packXY(0, y + 1)] === EXIT) room.tileCoords[packXY(1, y)] = TO_EXIT
 
             if (room.tileCoords[packXY(roomDimensions - 1, y - 1)] === EXIT)
-                room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
+                room.tileCoords[packXY(roomDimensions - 3, y)] = TO_EXIT
             if (room.tileCoords[packXY(roomDimensions - 1, y)] === EXIT)
-                room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
+                room.tileCoords[packXY(roomDimensions - 3, y)] = TO_EXIT
             if (room.tileCoords[packXY(roomDimensions - 1, y + 1)] === EXIT)
-                room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
+                room.tileCoords[packXY(roomDimensions - 3, y)] = TO_EXIT
         }
 
         let x = 1
@@ -76,11 +76,11 @@ export function rampartPlanner(room: Room) {
             if (room.tileCoords[packXY(x + 1, 0)] === EXIT) room.tileCoords[packXY(x, 1)] = TO_EXIT
 
             if (room.tileCoords[packXY(x - 1, roomDimensions - 1)] === EXIT)
-                room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
+                room.tileCoords[packXY(x, roomDimensions - 3)] = TO_EXIT
             if (room.tileCoords[packXY(x, roomDimensions - 1)] === EXIT)
-                room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
+                room.tileCoords[packXY(x, roomDimensions - 3)] = TO_EXIT
             if (room.tileCoords[packXY(x + 1, roomDimensions - 1)] === EXIT)
-                room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
+                room.tileCoords[packXY(x, roomDimensions - 3)] = TO_EXIT
         }
 
         // mark Border Tiles as not usable
@@ -538,10 +538,10 @@ export function rampartPlanner(room: Room) {
     // Protect it
 
     protectionRects.push({
-        x1: Math.max(Math.min(controller.pos.x - 1, roomDimensions - 2), 2),
-        y1: Math.max(Math.min(controller.pos.y - 1, roomDimensions - 2), 2),
-        x2: Math.max(Math.min(controller.pos.x + 1, roomDimensions - 2), 2),
-        y2: Math.max(Math.min(controller.pos.y + 1, roomDimensions - 2), 2),
+        x1: Math.max(Math.min(controller.pos.x - 1, roomDimensions - 3), 2),
+        y1: Math.max(Math.min(controller.pos.y - 1, roomDimensions - 3), 2),
+        x2: Math.max(Math.min(controller.pos.x + 1, roomDimensions - 3), 2),
+        y2: Math.max(Math.min(controller.pos.y + 1, roomDimensions - 3), 2),
     })
 
     // Get the centerUpgradePos
@@ -551,10 +551,10 @@ export function rampartPlanner(room: Room) {
     // Protect it
 
     protectionRects.push({
-        x1: Math.max(Math.min(centerUpgradePos.x - 3, roomDimensions - 2), 2),
-        y1: Math.max(Math.min(centerUpgradePos.y - 3, roomDimensions - 2), 2),
-        x2: Math.max(Math.min(centerUpgradePos.x + 3, roomDimensions - 2), 2),
-        y2: Math.max(Math.min(centerUpgradePos.y + 3, roomDimensions - 2), 2),
+        x1: Math.max(Math.min(centerUpgradePos.x - 3, roomDimensions - 3), 2),
+        y1: Math.max(Math.min(centerUpgradePos.y - 3, roomDimensions - 3), 2),
+        x2: Math.max(Math.min(centerUpgradePos.x + 3, roomDimensions - 3), 2),
+        y2: Math.max(Math.min(centerUpgradePos.y + 3, roomDimensions - 3), 2),
     })
 
     /*
@@ -563,10 +563,10 @@ export function rampartPlanner(room: Room) {
      // Protect it
 
      protectionRects.push({
-          x1: Math.max(Math.min(closestSourcePos.x - 2, roomDimensions - 2), 2),
-          y1: Math.max(Math.min(closestSourcePos.y - 2, roomDimensions - 2), 2),
-          x2: Math.max(Math.min(closestSourcePos.x + 2, roomDimensions - 2), 2),
-          y2: Math.max(Math.min(closestSourcePos.y + 2, roomDimensions - 2), 2),
+          x1: Math.max(Math.min(closestSourcePos.x - 2, roomDimensions - 3), 2),
+          y1: Math.max(Math.min(closestSourcePos.y - 2, roomDimensions - 3), 2),
+          x2: Math.max(Math.min(closestSourcePos.x + 2, roomDimensions - 3), 2),
+          y2: Math.max(Math.min(closestSourcePos.y + 2, roomDimensions - 3), 2),
      })
 
      closestSourcePos = room.sourcePositions[1][0]
@@ -576,10 +576,10 @@ export function rampartPlanner(room: Room) {
           // Protect it
 
           protectionRects.push({
-               x1: Math.max(Math.min(closestSourcePos.x - 2, roomDimensions - 2), 2),
-               y1: Math.max(Math.min(closestSourcePos.y - 2, roomDimensions - 2), 2),
-               x2: Math.max(Math.min(closestSourcePos.x + 2, roomDimensions - 2), 2),
-               y2: Math.max(Math.min(closestSourcePos.y + 2, roomDimensions - 2), 2),
+               x1: Math.max(Math.min(closestSourcePos.x - 2, roomDimensions - 3), 2),
+               y1: Math.max(Math.min(closestSourcePos.y - 2, roomDimensions - 3), 2),
+               x2: Math.max(Math.min(closestSourcePos.x + 2, roomDimensions - 3), 2),
+               y2: Math.max(Math.min(closestSourcePos.y + 2, roomDimensions - 3), 2),
           })
      }
  */
@@ -602,10 +602,10 @@ export function rampartPlanner(room: Room) {
             // Protect the stamp
 
             protectionRects.push({
-                x1: Math.max(Math.min(stampAnchor.x - protectionOffset, roomDimensions - 2), 2),
-                y1: Math.max(Math.min(stampAnchor.y - protectionOffset, roomDimensions - 2), 2),
-                x2: Math.max(Math.min(stampAnchor.x + protectionOffset, roomDimensions - 2), 2),
-                y2: Math.max(Math.min(stampAnchor.y + protectionOffset, roomDimensions - 2), 2),
+                x1: Math.max(Math.min(stampAnchor.x - protectionOffset, roomDimensions - 3), 2),
+                y1: Math.max(Math.min(stampAnchor.y - protectionOffset, roomDimensions - 3), 2),
+                x2: Math.max(Math.min(stampAnchor.x + protectionOffset, roomDimensions - 3), 2),
+                y2: Math.max(Math.min(stampAnchor.y + protectionOffset, roomDimensions - 3), 2),
             })
         }
     }
