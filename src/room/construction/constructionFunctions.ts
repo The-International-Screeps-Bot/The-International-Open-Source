@@ -72,7 +72,6 @@ Room.prototype.communeConstructionPlacement = function () {
                          if (placed > 10) return
 
                          if (this.createConstructionSite(x, y, structureType as BuildableStructureConstant) === OK) placed += 1
-                         else return
                     }
                }
           }
