@@ -8,7 +8,9 @@ export function hubHaulerManager(room: Room, creepsOfRole: string[]) {
           // Try to travel to the hub, iterate if there was movement
 
           if (creep.travelToHub()) continue
-
+/*
+          if (!creep.reserveTargets()) continue
+ */
           // Try balancing storing structures, iterating if there were resources moved
 
           if (creep.balanceStoringStructures()) continue
@@ -22,8 +24,8 @@ export function hubHaulerManager(room: Room, creepsOfRole: string[]) {
 }
 
 HubHauler.prototype.travelToHub = function () {
-    const creep = this
-    const { room } = creep
+
+    const { room } = this
 
     // Get the hub, informing false if it's undefined
 
@@ -32,20 +34,51 @@ HubHauler.prototype.travelToHub = function () {
 
     // Otherwise if the creep is on the hub, inform false
 
-    if (creep.pos.getRangeTo(hubAnchor) === 0) return false
+    if (this.pos.getRangeTo(hubAnchor) === 0) return false
 
     // Otherwise move to the hub and inform true
 
-    creep.say('⏩H')
+    this.say('⏩H')
 
-    creep.createMoveRequest({
-         origin: creep.pos,
+    this.createMoveRequest({
+         origin: this.pos,
          goal: { pos: hubAnchor, range: 0 },
     })
 
     return true
 }
+/*
+HubHauler.prototype.reserveTargets = function() {
 
+    if (this.memory.reservations?.length) return true
+
+    const { room } = this
+
+    const { storage } = room
+    const { terminal } = room
+
+    if (!storage && !terminal) return false
+
+    const { hubLink } = room
+
+    if (hubLink && hubLink.cooldown <= 4 && hubLink.store.energy < hubLink.store.getCapacity(RESOURCE_ENERGY)) {
+
+        let provider
+        if (storage && storage.store.energy >= hubLink.store.getCapacity(RESOURCE_ENERGY)) provider = storage
+        else if (terminal && terminal.store.energy >= hubLink.store.getCapacity(RESOURCE_ENERGY)) provider = terminal
+
+        if (provider) {
+
+            let amount = hubLink.freeSpecificStore(RESOURCE_ENERGY)
+
+            this.createReservation('withdraw', provider, amount, RESOURCE_ENERGY)
+            this.createReservation('transfer', hubLink, amount, RESOURCE_ENERGY)
+        }
+    }
+
+    return false
+}
+ */
 HubHauler.prototype.balanceStoringStructures = function () {
     const creep = this
     const { room } = creep

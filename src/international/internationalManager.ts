@@ -77,9 +77,9 @@ export class InternationalManager {
     advancedSellPixels() {
         if (!Memory.pixelSelling) return
 
-        let maxPrice = getAvgPrice(PIXEL) * 0.8
+        let maxPrice = getAvgPrice(PIXEL) * 1.2
 
-        const orders = Game.market.getAllOrders({ type: PIXEL })
+        const orders = Game.market.getAllOrders({ type: ORDER_BUY, resourceType: PIXEL })
         let highestOrder: Order
 
         for (const order of orders) {
