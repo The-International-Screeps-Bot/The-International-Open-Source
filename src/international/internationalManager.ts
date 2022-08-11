@@ -18,6 +18,7 @@ export class InternationalManager {
         this.tickConfig()
         this.creepOrganizer()
         this.constructionSiteManager()
+        this.orderManager()
 
         // Handle ally requests
 
@@ -32,6 +33,23 @@ export class InternationalManager {
                 myColors.white,
                 myColors.lightBlue,
             )
+    }
+
+    /**
+     * Removes inactive orders if the bot is reaching max orders
+     */
+    orderManager() {
+        // If there is sufficiently few orders
+
+        if (MARKET_MAX_ORDERS * 0.8 > this.myOrdersCount) return
+
+        // Loop through my orders
+
+        for (const ID in Game.market.orders) {
+            // If the order is inactive (it likely has no remaining resources), delete it
+
+            if (!Game.market.orders[ID].active) Game.market.cancelOrder(ID)
+        }
     }
 
     /**
