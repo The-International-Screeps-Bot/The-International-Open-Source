@@ -77,6 +77,10 @@ export class InternationalManager {
     advancedSellPixels() {
         if (!Memory.pixelSelling) return
 
+        // If there are no pixels to sell
+
+        if (!Game.resources[PIXEL]) return
+
         let maxPrice = getAvgPrice(PIXEL) * 1.2
 
         const orders = Game.market.getAllOrders({ type: ORDER_BUY, resourceType: PIXEL })
