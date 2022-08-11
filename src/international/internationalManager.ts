@@ -68,33 +68,30 @@ export class InternationalManager {
         return bestOrder
     }
 
+    /**
+     * Find the highest order and sell pixels to it
+     */
     advancedSellPixels() {
         if (!Memory.pixelSelling) return
 
-        // If there are no pixels to sell
-
-        if (!Game.resources[PIXEL]) return
+        if (Game.resources[PIXEL] === 0) return
 
         const minPrice = getAvgPrice(PIXEL, 7) * 0.8
 
         const orders = Game.market.getAllOrders({ type: ORDER_BUY, resourceType: PIXEL })
-        let highestOrder: Order
+        let bestOrder: Order
 
         for (const order of orders) {
-            // If the order is inactive (it likely has 0 remaining amount)
-
-            if (!order.active) continue
+            if (order.remainingAmount === 0) continue
 
             if (order.price <= minPrice) continue
 
-            if (order.price <= (highestOrder ? highestOrder.price : 0)) continue
-
-            highestOrder = order
+            if (order.price > (bestOrder ? bestOrder.price : 0)) bestOrder = order
         }
 
-        if (!highestOrder) return
+        if (!bestOrder) return
 
-        Game.market.deal(highestOrder.id, Math.min(highestOrder.amount, Game.resources[PIXEL]))
+        Game.market.deal(bestOrder.id, Math.min(bestOrder.amount, Game.resources[PIXEL]))
     }
 
     advancedGeneratePixel() {
