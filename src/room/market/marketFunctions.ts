@@ -37,6 +37,18 @@ Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
 
     if (internationalManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
+    const orders = Game.market.getAllOrders({ type: ORDER_BUY, resourceType })
+    const minSellOrderPrice = Math.min.apply(
+        Math,
+        orders.map(o => o.price),
+    )
+    const sellPrice = minSellOrderPrice - 0.001
+
+    if (sellPrice < getAvgPrice(resourceType) * 0.8) {
+        return false
+    }
+    const price = sellPrice
+
     // Otherwise, create a new market order and inform true
 
     return (
@@ -44,7 +56,7 @@ Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
             roomName: this.name,
             type: ORDER_SELL,
             resourceType,
-            price: getAvgPrice(resourceType) * 0.8,
+            price,
             totalAmount: amount,
         }) == OK
     )
@@ -86,6 +98,20 @@ Room.prototype.advancedBuy = function (resourceType, amount, targetAmount) {
 
     if (internationalManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
+    // Get all market buy orders for resource
+
+    const orders = Game.market.getAllOrders({ type: ORDER_BUY, resourceType })
+    const maxBuyOrderPrice = Math.max.apply(
+        Math,
+        orders.map(o => o.price),
+    )
+    const buyPrice = maxBuyOrderPrice + 0.001
+
+    if (buyPrice > getAvgPrice(resourceType) * 1.2) {
+        return false
+    }
+    const price = buyPrice
+
     // Otherwise, create a new market order and inform true
 
     return (
@@ -93,7 +119,7 @@ Room.prototype.advancedBuy = function (resourceType, amount, targetAmount) {
             roomName: this.name,
             type: ORDER_BUY,
             resourceType,
-            price: getAvgPrice(resourceType) * 1.2,
+            price,
             totalAmount: amount,
         }) == OK
     )
