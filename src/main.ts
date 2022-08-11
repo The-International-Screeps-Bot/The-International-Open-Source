@@ -3,7 +3,7 @@
 // International
 
 import './international/commands'
-import { internationalManager } from './international/internationalManager'
+import { InternationalManager, internationalManager } from './international/internationalManager'
 import './international/config'
 import './international/tickConfig'
 import './international/creepOrganizer'
@@ -31,6 +31,8 @@ import { memHack } from 'other/memHack'
 import { RoomCacheObject } from 'room/roomObject'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
+import { customLog } from 'international/generalFunctions'
+import { myColors } from 'international/constants'
 
 // Type declareations for global
 
@@ -1836,11 +1838,12 @@ declare global {
 export const loop = function () {
     memHack.modifyMemory()
 
+    internationalManager.tickReset()
     internationalManager.run()
-    /*
+/*
     let cpu = Game.cpu.getUsed()
 
-    Game.market.getHistory(RESOURCE_ENERGY).length
+    console.log(new InternationalManager())
 
     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
  */

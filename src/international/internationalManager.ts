@@ -163,6 +163,17 @@ export class InternationalManager {
     endTickManager?(): void
 
     /**
+     * Resets certain cached variables each tick
+     */
+    tickReset() {
+        delete this._myOrders
+        delete this._orders
+        delete this._myOrdersCount
+        delete this._claimRequestsByScore
+        delete this._defaultCacheAmount
+    }
+
+    /**
      * My outgoing orders organized by room, order type and resourceType
      */
     _myOrders: {
