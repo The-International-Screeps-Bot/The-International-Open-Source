@@ -34,44 +34,38 @@ export class InternationalManager {
             )
     }
 
+    /**
+     * Finds the cheapest sell order
+     */
     getSellOrder(resourceType: ResourceConstant, maxPrice = getAvgPrice(resourceType) * 1.2) {
-        const orders = this.orders[ORDER_SELL]?.[resourceType] || []
+        const orders = this.orders.sell?.[resourceType] || []
 
-        // Find the cheapest under maxPrice
-
-        let highestOrder: Order
+        let bestOrder: Order
 
         for (const order of orders) {
-            if (order.remainingAmount === 0) continue
-
             if (order.price >= maxPrice) continue
 
-            if (order.price >= (highestOrder ? highestOrder.price : Infinity)) continue
-
-            highestOrder = order
+            if (order.price < (bestOrder ? bestOrder.price : Infinity)) bestOrder = order
         }
 
-        return highestOrder
+        return bestOrder
     }
 
+    /**
+     * Finds the most expensive buy order
+     */
     getBuyOrder(resourceType: ResourceConstant, minPrice = getAvgPrice(resourceType) * 0.8) {
-        const orders = this.orders[ORDER_BUY]?.[resourceType] || []
+        const orders = this.orders.buy?.[resourceType] || []
 
-        // FInd the most epensive orders over minPrice
-
-        let cheapestOrder: Order
+        let bestOrder: Order
 
         for (const order of orders) {
-            if (order.remainingAmount === 0) continue
-
             if (order.price <= minPrice) continue
 
-            if (order.price <= (cheapestOrder ? cheapestOrder.price : Infinity)) continue
-
-            cheapestOrder = order
+            if (order.price > (bestOrder ? bestOrder.price : Infinity)) bestOrder = order
         }
 
-        return cheapestOrder
+        return bestOrder
     }
 
     advancedSellPixels() {
@@ -87,7 +81,9 @@ export class InternationalManager {
         let highestOrder: Order
 
         for (const order of orders) {
-            if (order.remainingAmount === 0) continue
+            // If the order is inactive (it likely has 0 remaining amount)
+
+            if (!order.active) continue
 
             if (order.price >= maxPrice) continue
 
@@ -200,6 +196,10 @@ export class InternationalManager {
             // Get the order using its ID
 
             const order = Game.market.orders[orderID]
+
+            // If the order is inactive (it likely has 0 remaining amount)
+
+            if (!order.active) continue
 
             // If there is foundation for this structure, create it
 
