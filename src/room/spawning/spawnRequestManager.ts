@@ -385,7 +385,7 @@ Room.prototype.spawnRequester = function () {
 
     // Get enemyAttackers in the this
 
-    const enemyAttackers = this.enemyAttackers
+    const { enemyAttackers } = this
 
     // Get the attackValue of the attackers
 
@@ -409,9 +409,13 @@ Room.prototype.spawnRequester = function () {
 
             if (!enemyAttackers.length) return false
 
-            if (this.controller.safeMode) return false
+            /* if (this.controller.safeMode) return false */
 
             if (this.towerSuperiority) return false
+
+            // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
+
+            let requiredStrength = (healStrength + this.structures.tower.length ? 0 : attackStrength) * 1.2
 
             const role = 'meleeDefender'
 
@@ -425,8 +429,7 @@ Room.prototype.spawnRequester = function () {
                     role,
                     defaultParts: [],
                     extraParts,
-                    partsMultiplier: Math.max((healStrength * 1.2) / strength, 1),
-                    minCreeps: undefined,
+                    partsMultiplier: Math.max(requiredStrength / strength / 2, 1),
                     minCost: 210,
                     priority: 6 + this.creepsFromRoom.meleeDefender.length,
                     memoryAdditions: {
@@ -442,13 +445,10 @@ Room.prototype.spawnRequester = function () {
                 role,
                 defaultParts: [],
                 extraParts,
-                partsMultiplier: Math.max(attackStrength / strength, 1),
-                minCreeps: undefined,
-                minCost: 210,
+                partsMultiplier: Math.max(requiredStrength / strength, 1),
+                minCost: 260,
                 priority: 6 + this.creepsFromRoom.meleeDefender.length,
-                memoryAdditions: {
-                    roads: true,
-                },
+                memoryAdditions: {},
             }
         })(),
     )
@@ -478,7 +478,7 @@ Room.prototype.spawnRequester = function () {
             }
 
             // Otherwise if there is no storage
-            else partsMultiplier += Math.floor(estimatedIncome / 2.5)
+            else partsMultiplier += estimatedIncome / 2.5
 
             const role = 'builder'
             /*
@@ -1078,10 +1078,8 @@ Room.prototype.spawnRequester = function () {
                 }
 
                 const partsMultiplier = Math.max(
-                    Math.floor(
-                        remoteNeeds[remoteNeedsIndex.minDamage] / rangedAttackStrength +
-                            remoteNeeds[remoteNeedsIndex.minHeal] / healStrength,
-                    ),
+                    remoteNeeds[remoteNeedsIndex.minDamage] / rangedAttackStrength +
+                        remoteNeeds[remoteNeedsIndex.minHeal] / healStrength,
                     1,
                 )
 

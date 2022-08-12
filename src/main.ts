@@ -1425,7 +1425,7 @@ declare global {
 
         advancedRecycle(): void
 
-        advancedRenew(): boolean
+        advancedRenew(): void
 
         advancedReserveController(): boolean
 

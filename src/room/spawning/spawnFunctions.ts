@@ -232,6 +232,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
     // Subtract maxCreeps by the existing number of creeps of this role
 
+    if (!opts.maxCreeps) opts.maxCreeps = Infinity
     opts.maxCreeps -= opts.groupComparator
         ? opts.groupComparator.length
         : this.creepsFromRoom[opts.role].length

@@ -866,7 +866,9 @@ Creep.prototype.createMoveRequest = function (opts) {
 
     // Add the creep's name to its moveRequest position
 
-    room.moveRequests.get(packedCoord) ? room.moveRequests.get(packedCoord).push(this.name) : room.moveRequests.set(packedCoord, [this.name])
+    room.moveRequests.get(packedCoord)
+        ? room.moveRequests.get(packedCoord).push(this.name)
+        : room.moveRequests.set(packedCoord, [this.name])
 
     // Make moveRequest true to inform a moveRequest has been made
 
@@ -986,7 +988,9 @@ Creep.prototype.shove = function (shoverPos) {
 
     const packedCoord = pack(goalPos)
 
-    room.moveRequests.get(packedCoord) ? room.moveRequests.get(packedCoord).push(this.name) : room.moveRequests.set(packedCoord, [this.name])
+    room.moveRequests.get(packedCoord)
+        ? room.moveRequests.get(packedCoord).push(this.name)
+        : room.moveRequests.set(packedCoord, [this.name])
     this.moveRequest = packedCoord
 
     if (Memory.roomVisuals)
@@ -1292,49 +1296,38 @@ Creep.prototype.advancedRecycle = function () {
 Creep.prototype.advancedRenew = function () {
     const { room } = this
 
-    if (this.body.length > 8) return false
+    if (this.body.length > 8) return
 
     // If there is insufficient CPU to renew, inform false
 
-    if (Game.cpu.bucket < CPUBucketRenewThreshold) return false
+    if (Game.cpu.bucket < CPUBucketRenewThreshold) return
 
-    if (!room.myCreeps.fastFiller.length) return false
+    if (!room.myCreeps.fastFiller.length) return
 
-    //
-
-    if (this.isDying()) return false
+    if (this.isDying()) return
 
     // If the creep's age is less than the benefit from renewing, inform false
 
-    if (CREEP_LIFE_TIME - this.ticksToLive < Math.ceil(this.findCost() / 2.5 / this.body.length)) return false
+    if (CREEP_LIFE_TIME - this.ticksToLive < Math.ceil(this.findCost() / 2.5 / this.body.length)) return
 
     // Get the room's spawns, stopping if there are none
 
     const spawns = room.structures.spawn
-    if (!spawns.length) return false
 
     // Get a spawn in range of 1, informing false if there are none
 
-    const spawn = spawns.find(spawn => this.pos.getRangeTo(spawn.pos) === 1)
-    if (!spawn) return false
+    const spawn = spawns.find(spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1)
+    if (!spawn) return
 
     // If the spawn has already renewed this tick, inform false
 
-    if (spawn.hasRenewed) return false
+    if (spawn.hasRenewed) return
 
     // If the spawn is spawning, inform false
 
-    if (spawn.spawning) return false
+    if (spawn.spawning) return
 
-    // Otherwise
-
-    // Record the spawn has renewed
-
-    spawn.hasRenewed = true
-
-    // And try to renew the creep, informing the result
-
-    return spawn.renewCreep(this) === OK
+    if (spawn.renewCreep(this) === OK) spawn.hasRenewed = true
 }
 
 Creep.prototype.advancedReserveController = function () {
