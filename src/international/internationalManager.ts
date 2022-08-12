@@ -100,7 +100,6 @@ export class InternationalManager {
         let bestOrder: Order
 
         for (const order of orders) {
-            if (order.remainingAmount === 0) continue
 
             if (order.price <= minPrice) continue
 
