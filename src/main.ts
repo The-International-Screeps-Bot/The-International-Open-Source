@@ -1653,7 +1653,7 @@ declare global {
         /**
          * Recycle Target, the spawn ID the creep is going to recycle
          */
-        RecT: Id<StructureSpawn> | undefined
+        RecT: Id<StructureSpawn | StructureContainer> | undefined
 
         /**
          * Ticks Waited for an arbitrary event

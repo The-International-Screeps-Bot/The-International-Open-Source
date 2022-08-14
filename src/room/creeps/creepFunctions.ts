@@ -1250,13 +1250,14 @@ Creep.prototype.findRecycleTarget = function () {
     for (const container of fastFillerContainers) {
         if (!container) continue
 
-        const spawn = findClosestObject(container.pos, spawns)
+        // FInd a spawn adjacent to the container
 
-        // If the closest spawn to the container is not adjacent
+        const spawn = spawns.find(spawn => {
+            return getRange(container.pos.x, spawn.pos.x, container.pos.y, spawn.pos.y) === 1
+        })
+        if (!spawn) continue
 
-        if (getRange(container.pos.x, spawn.pos.x, container.pos.y, spawn.pos.y) > 1) continue
-
-        return findObjectWithID((this.memory.RecT = spawn.id))
+        return findObjectWithID((this.memory.RecT = container.id))
     }
 
     // Find the closest spawn to the creep
@@ -1277,9 +1278,31 @@ Creep.prototype.advancedRecycle = function () {
 
     if (!recycleTarget) return false
 
+    // If the target is a spawn
+
+    if (recycleTarget instanceof StructureSpawn) {
+        // If the recycleTarget is out of actionable range, move to it
+
+        if (getRange(this.pos.x, recycleTarget.pos.x, this.pos.y, recycleTarget.pos.y) > 1) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goal: { pos: recycleTarget.pos, range: 1 },
+                avoidEnemyRanges: true,
+            })
+
+            return true
+        }
+
+        // If the recycleTarget is a spawn, directly recycle
+
+        if (recycleTarget instanceof Spawn) return recycleTarget.recycleCreep(this) === OK
+    }
+
+    // Otherwise if the target is a container
+
     // If the recycleTarget is out of actionable range, move to it
 
-    if (getRange(this.pos.x, recycleTarget.pos.x, this.pos.y, recycleTarget.pos.y) > 1) {
+    if (getRange(this.pos.x, recycleTarget.pos.x, this.pos.y, recycleTarget.pos.y) > 0) {
         this.createMoveRequest({
             origin: this.pos,
             goal: { pos: recycleTarget.pos, range: 1 },
@@ -1288,10 +1311,6 @@ Creep.prototype.advancedRecycle = function () {
 
         return true
     }
-
-    // If the recycleTarget is a spawn, directly recycle
-
-    if (recycleTarget instanceof Spawn) return recycleTarget.recycleCreep(this) === OK
 
     // Otherwise recycleTarget must be a container, so find the closest spawn and recycle
 
