@@ -92,7 +92,7 @@ Room.prototype.advancedActivateSafeMode = function () {
 
         // Otherwise get the target of the attack
 
-        const attackTarget = findObjectWithID(eventItem.data.targetId as Id<Structure | Creep>)
+        const attackTarget = findObjectWithID(eventItem.data.targetId as Id<Structure | any>)
 
         // If the attackTarget isn't a structure, iterate
 

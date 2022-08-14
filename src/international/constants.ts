@@ -686,7 +686,6 @@ export const EXIT = 3
 export const safemodeTargets: StructureConstant[] = [
     STRUCTURE_SPAWN,
     STRUCTURE_TOWER,
-    STRUCTURE_EXTENSION,
     STRUCTURE_STORAGE,
     STRUCTURE_TERMINAL,
 ]
