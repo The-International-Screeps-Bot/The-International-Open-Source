@@ -18,6 +18,7 @@ export class InternationalManager {
         this.tickConfig()
         this.creepOrganizer()
         this.constructionSiteManager()
+        this.orderManager()
 
         // Handle ally requests
 
@@ -34,68 +35,79 @@ export class InternationalManager {
             )
     }
 
+    /**
+     * Removes inactive orders if the bot is reaching max orders
+     */
+    orderManager() {
+        // If there is sufficiently few orders
+
+        if (MARKET_MAX_ORDERS * 0.8 > this.myOrdersCount) return
+
+        // Loop through my orders
+
+        for (const ID in Game.market.orders) {
+            // If the order is inactive (it likely has no remaining resources), delete it
+
+            if (!Game.market.orders[ID].active) Game.market.cancelOrder(ID)
+        }
+    }
+
+    /**
+     * Finds the cheapest sell order
+     */
     getSellOrder(resourceType: ResourceConstant, maxPrice = getAvgPrice(resourceType) * 1.2) {
-        const orders = this.orders[ORDER_SELL]?.[resourceType] || []
+        const orders = this.orders.sell?.[resourceType] || []
 
-        // Find the cheapest under maxPrice
-
-        let highestOrder: Order
+        let bestOrder: Order
 
         for (const order of orders) {
-            if (order.remainingAmount === 0) continue
-
             if (order.price >= maxPrice) continue
 
-            if (order.price >= (highestOrder ? highestOrder.price : Infinity)) continue
-
-            highestOrder = order
+            if (order.price < (bestOrder ? bestOrder.price : Infinity)) bestOrder = order
         }
 
-        return highestOrder
+        return bestOrder
     }
 
+    /**
+     * Finds the most expensive buy order
+     */
     getBuyOrder(resourceType: ResourceConstant, minPrice = getAvgPrice(resourceType) * 0.8) {
-        const orders = this.orders[ORDER_BUY]?.[resourceType] || []
+        const orders = this.orders.buy?.[resourceType] || []
 
-        // FInd the most epensive orders over minPrice
-
-        let cheapestOrder: Order
+        let bestOrder: Order
 
         for (const order of orders) {
-            if (order.remainingAmount === 0) continue
-
             if (order.price <= minPrice) continue
 
-            if (order.price <= (cheapestOrder ? cheapestOrder.price : Infinity)) continue
-
-            cheapestOrder = order
+            if (order.price > (bestOrder ? bestOrder.price : Infinity)) bestOrder = order
         }
 
-        return cheapestOrder
+        return bestOrder
     }
 
+    /**
+     * Find the highest order and sell pixels to it
+     */
     advancedSellPixels() {
         if (!Memory.pixelSelling) return
 
-        let maxPrice = getAvgPrice(PIXEL) * 0.8
+        if (Game.resources[PIXEL] === 0) return
 
-        const orders = Game.market.getAllOrders({ type: PIXEL })
-        let highestOrder: Order
+        const minPrice = getAvgPrice(PIXEL, 7) * 0.8
+
+        const orders = Game.market.getAllOrders({ type: ORDER_BUY, resourceType: PIXEL })
+        let bestOrder: Order
 
         for (const order of orders) {
-            if (order.remainingAmount === 0) continue
+            if (order.price <= minPrice) continue
 
-            if (order.price >= maxPrice) continue
-
-            if (order.price >= (highestOrder ? highestOrder.price : Infinity)) continue
-
-            highestOrder = order
+            if (order.price > (bestOrder ? bestOrder.price : 0)) bestOrder = order
         }
 
-        if (!highestOrder) return
+        if (!bestOrder) return
 
-        Game.market.deal(highestOrder.id, Math.min(highestOrder.amount, Game.resources[PIXEL]))
-        return
+        Game.market.deal(bestOrder.id, Math.min(bestOrder.amount, Game.resources[PIXEL]))
     }
 
     advancedGeneratePixel() {
@@ -163,6 +175,17 @@ export class InternationalManager {
     endTickManager?(): void
 
     /**
+     * Resets certain cached variables each tick
+     */
+    tickReset() {
+        delete this._myOrders
+        delete this._orders
+        delete this._myOrdersCount
+        delete this._claimRequestsByScore
+        delete this._defaultCacheAmount
+    }
+
+    /**
      * My outgoing orders organized by room, order type and resourceType
      */
     _myOrders: {
@@ -185,6 +208,10 @@ export class InternationalManager {
             // Get the order using its ID
 
             const order = Game.market.orders[orderID]
+
+            // If the order is inactive (it likely has 0 remaining amount)
+
+            if (order.remainingAmount == 0) continue
 
             // If there is foundation for this structure, create it
 

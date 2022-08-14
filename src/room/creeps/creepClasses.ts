@@ -66,6 +66,8 @@ creepClasses.mineralHarvester = MineralHarvester
 export class HubHauler extends Creep {
      travelToHub?(): boolean
 
+     reserveTargets?(): boolean
+
      balanceStoringStructures?(): boolean
 
      fillHubLink?(): boolean
