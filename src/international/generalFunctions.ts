@@ -159,7 +159,7 @@ export function getRange(x1: number, x2: number, y1: number, y2: number) {
 }
 
 /**
- * Finds the closest object with a position to a given target (Half Manhattan)
+ * Finds the closest object with a position to a given target, by range (Half Manhattan)
  */
 export function findClosestObject<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[]) {
     let minRange = Infinity
@@ -175,6 +175,28 @@ export function findClosestObject<T extends _HasRoomPosition>(target: RoomPositi
     }
 
     return closest
+}
+
+/**
+ * Finds the closest object with a position to a given target, by range, in a specified range (Half Manhattan)
+ */
+ export function findClosestObjectInRange<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[], range: number) {
+    let minRange = Infinity
+    let closest = undefined
+
+    for (const object of objects) {
+        const range = getRange(target.x, object.pos.x, target.y, object.pos.y)
+
+        if (range > minRange) continue
+
+        minRange = range
+        closest = object
+    }
+
+    // Inform the closest object, if within range
+
+    if (minRange <= range) return closest
+    return false
 }
 
 /**

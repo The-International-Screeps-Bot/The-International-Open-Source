@@ -23,6 +23,7 @@ import {
     packXY,
     unpackAsPos,
     unpackAsRoomPos,
+    findClosestObjectInRange,
 } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 import { pick, repeat } from 'lodash'
@@ -1252,9 +1253,7 @@ Creep.prototype.findRecycleTarget = function () {
 
         // FInd a spawn adjacent to the container
 
-        const spawn = spawns.find(spawn => {
-            return getRange(container.pos.x, spawn.pos.x, container.pos.y, spawn.pos.y) === 1
-        })
+        const spawn = findClosestObjectInRange(this.pos, spawns, 1)
         if (!spawn) continue
 
         return findObjectWithID((this.memory.RecT = container.id))
