@@ -1251,10 +1251,9 @@ Creep.prototype.findRecycleTarget = function () {
     for (const container of fastFillerContainers) {
         if (!container) continue
 
-        // FInd a spawn adjacent to the container
+        // If there is no spawn adjacent to the container
 
-        const spawn = findClosestObjectInRange(this.pos, spawns, 1)
-        if (!spawn) continue
+        if (!findClosestObjectInRange(container.pos, spawns, 1)) continue
 
         return findObjectWithID((this.memory.RecT = container.id))
     }
