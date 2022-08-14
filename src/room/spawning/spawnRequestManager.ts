@@ -396,9 +396,9 @@ Room.prototype.spawnRequester = function () {
 
     // Increase attackValue by the creep's heal power
 
-    for (const enemyAttacker of enemyAttackers) {
-        attackStrength += enemyAttacker.attackStrength
-        healStrength += enemyAttacker.healStrength
+    for (const enemyCreep of this.enemyCreeps) {
+        attackStrength += enemyCreep.attackStrength
+        healStrength += enemyCreep.healStrength
     }
 
     // Construct requests for meleeDefenders
@@ -415,8 +415,8 @@ Room.prototype.spawnRequester = function () {
 
             // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
-            let requiredStrength = (healStrength + this.structures.tower.length ? 0 : attackStrength) * 1.2
-
+            let requiredStrength = (healStrength + (this.structures.tower.length ? 0 : attackStrength)) * 1.2
+            customLog('DEFENDER STUFF', requiredStrength + ', ' + (requiredStrength / 2) * ATTACK_POWER + 1)
             const role = 'meleeDefender'
 
             // If all RCL 3 extensions are build

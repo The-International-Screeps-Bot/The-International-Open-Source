@@ -5,7 +5,7 @@ Room.prototype.towerManager = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
-    
+    return
     if (!this.structures.tower.length) return
 
     this.towersAttackCreeps()
