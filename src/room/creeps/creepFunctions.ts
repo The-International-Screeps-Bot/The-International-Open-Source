@@ -1233,64 +1233,71 @@ Creep.prototype.findTotalHealPower = function (range = 1) {
     return heal
 }
 
+Creep.prototype.findRecycleTarget = function () {
+    const { room } = this
+
+    const spawns = room.structures.spawn
+
+    if (!spawns.length) return false
+
+    if (this.memory.RecT) {
+        const spawn = findObjectWithID(this.memory.RecT)
+        if (spawn) return spawn
+    }
+
+    const fastFillerContainers = [room.fastFillerContainerLeft, room.fastFillerContainerRight]
+
+    for (const container of fastFillerContainers) {
+        if (!container) continue
+
+        const spawn = findClosestObject(container.pos, spawns)
+
+        // If the closest spawn to the container is not adjacent
+
+        if (getRange(container.pos.x, spawn.pos.x, container.pos.y, spawn.pos.y) > 1) continue
+
+        return findObjectWithID((this.memory.RecT = spawn.id))
+    }
+
+    // Find the closest spawn to the creep
+
+    const spawn = findClosestObject(this.pos, spawns)
+
+    return findObjectWithID((this.memory.RecT = spawn.id))
+}
+
 Creep.prototype.advancedRecycle = function () {
     const { room } = this
 
-    if (!room.structures.spawn.length) return
-
     this.say('♻️')
 
-    let closestSpawn: StructureSpawn
+    const recycleTarget = this.findRecycleTarget()
 
-    // If the spawn is recorded as a Recycle Target
+    // If the creep could not find a recycle target
 
-    if (this.memory.RecT) {
-        closestSpawn = findObjectWithID(this.memory.RecT)
-    }
+    if (!recycleTarget) return false
 
-    // If there is no closestSpawn yet, find the closest spawn to the creep
+    // If the recycleTarget is out of actionable range, move to it
 
-    if (!closestSpawn)
-        closestSpawn = this.pos.findClosestByPath(room.structures.spawn, {
-            ignoreCreeps: true,
-            ignoreRoads: this.memory.roads,
-        })
-
-    if (!closestSpawn) return
-
-    this.memory.RecT = closestSpawn.id
-
-    const fastFillerContainers = [room.fastFillerContainerLeft, room.fastFillerContainerRight].filter(function (
-        container,
-    ) {
-        return container && getRange(container.pos.x, closestSpawn.pos.x, container.pos.y, closestSpawn.pos.y) == 1
-    })
-
-    if (fastFillerContainers.length) {
-        const closestContainer = findClosestObject(closestSpawn.pos, fastFillerContainers)
-
-        // If the creep is in range of 1
-
-        if (getRange(this.pos.x, closestContainer.pos.x, this.pos.y, closestContainer.pos.y) > 0) {
-            this.createMoveRequest({
-                origin: this.pos,
-                goal: { pos: closestContainer.pos, range: 0 },
-                avoidEnemyRanges: true,
-            })
-
-            return
-        }
-    } else if (this.pos.getRangeTo(closestSpawn.pos) > 1) {
+    if (getRange(this.pos.x, recycleTarget.pos.x, this.pos.y, recycleTarget.pos.y) > 1) {
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: closestSpawn.pos, range: 1 },
+            goal: { pos: recycleTarget.pos, range: 1 },
             avoidEnemyRanges: true,
         })
 
-        return
+        return true
     }
 
-    closestSpawn.recycleCreep(this)
+    // If the recycleTarget is a spawn, directly recycle
+
+    if (recycleTarget instanceof Spawn) return recycleTarget.recycleCreep(this) === OK
+
+    // Otherwise recycleTarget must be a container, so find the closest spawn and recycle
+
+    const spawn = findClosestObject(this.pos, room.structures.spawn)
+
+    return spawn.recycleCreep(this) === OK
 }
 
 Creep.prototype.advancedRenew = function () {

@@ -1423,7 +1423,9 @@ declare global {
 
         findTotalHealPower(range?: number): number
 
-        advancedRecycle(): void
+        findRecycleTarget(): StructureSpawn | StructureContainer | false
+
+        advancedRecycle(): boolean
 
         advancedRenew(): void
 
@@ -1651,7 +1653,7 @@ declare global {
         /**
          * Recycle Target, the spawn ID the creep is going to recycle
          */
-        RecT: Id<StructureSpawn>
+        RecT: Id<StructureSpawn> | undefined
 
         /**
          * Ticks Waited for an arbitrary event
