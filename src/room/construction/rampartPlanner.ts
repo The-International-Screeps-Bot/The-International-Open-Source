@@ -61,11 +61,11 @@ export function rampartPlanner(room: Room) {
             if (room.tileCoords[packXY(0, y + 1)] === EXIT) room.tileCoords[packXY(1, y)] = TO_EXIT
 
             if (room.tileCoords[packXY(roomDimensions - 1, y - 1)] === EXIT)
-                room.tileCoords[packXY(roomDimensions - 3, y)] = TO_EXIT
+                room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
             if (room.tileCoords[packXY(roomDimensions - 1, y)] === EXIT)
-                room.tileCoords[packXY(roomDimensions - 3, y)] = TO_EXIT
+                room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
             if (room.tileCoords[packXY(roomDimensions - 1, y + 1)] === EXIT)
-                room.tileCoords[packXY(roomDimensions - 3, y)] = TO_EXIT
+                room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
         }
 
         let x = 1
@@ -76,11 +76,11 @@ export function rampartPlanner(room: Room) {
             if (room.tileCoords[packXY(x + 1, 0)] === EXIT) room.tileCoords[packXY(x, 1)] = TO_EXIT
 
             if (room.tileCoords[packXY(x - 1, roomDimensions - 1)] === EXIT)
-                room.tileCoords[packXY(x, roomDimensions - 3)] = TO_EXIT
+                room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
             if (room.tileCoords[packXY(x, roomDimensions - 1)] === EXIT)
-                room.tileCoords[packXY(x, roomDimensions - 3)] = TO_EXIT
+                room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
             if (room.tileCoords[packXY(x + 1, roomDimensions - 1)] === EXIT)
-                room.tileCoords[packXY(x, roomDimensions - 3)] = TO_EXIT
+                room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
         }
 
         // mark Border Tiles as not usable
@@ -678,7 +678,6 @@ export function rampartPlanner(room: Room) {
         // So long as there is a pos in path with an index of onboardingIndex
 
         while (path[onboardingIndex]) {
-
             // Get the pos in path with an index of onboardingIndex
 
             const packedPos = pack(path[onboardingIndex])
