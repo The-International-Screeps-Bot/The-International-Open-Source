@@ -3,28 +3,11 @@ const cron = require('node-cron')
 require('dotenv').config({ path: `.env.grafana` })
 const statsUsers = require('./users.js').users
 const modifyRoomObjects = require('./modifyRoomObjects.js')
-
+const handleServerStats = require('./handleServerStats.js')
 var graphite = require('graphite')
 var client = graphite.createClient('plaintext://relay:2003/')
 
 let groupedStats = {}
-
-function objectFilter(obj, predicate) {
-     return Object.keys(obj)
-          .filter(key => predicate(obj[key]))
-          .reduce((res, key) => ((res[key] = obj[key]), res), {})
-}
-
-function groupObjectByKey(object, key) {
-     return Object.entries(object).reduce((hash, obj) => {
-          if (obj[1][key] === undefined) return hash
-          // return Object.assign(hash, { [obj[1][key]]: (hash[obj[1][key]] || {}).concat(obj) })
-          if (hash[obj[1][key]] === undefined) {
-               hash[obj[1][key]] = {}
-          }
-          return Object.assign(hash, { [obj[1][key]]: Object.assign(hash[obj[1][key]], { [obj[0]]: obj[1] }) })
-     }, {})
-}
 
 async function getLoginInfo(userinfo) {
      return userinfo.type === 'mmo'
@@ -84,7 +67,7 @@ function shouldContinue(shardsCount) {
      }
 }
 
-cron.schedule('*/15 * * * * *', async () => {
+cron.schedule('*/5 * * * * *', async () => {
      console.log('----------------------------------------------------------------')
      groupedStats = {}
      for (let i = 0; i < statsUsers.length; i++) {
@@ -105,51 +88,12 @@ cron.schedule('*/15 * * * * *', async () => {
      }
 
      try {
-          const timeStamp = new Date().getTime()
           const users = (await apiFunc.getUsers()).filter(u => u.active === 10000)
           let roomsObjects = await apiFunc.getRoomsObjects()
-          const modifiedRoomsObjects = modifyRoomObjects(roomsObjects,timeStamp)
-          roomsObjects = modifiedRoomsObjects.objects
+          const modifiedRoomsObjects = modifyRoomObjects(roomsObjects)
+          const serverStats = handleServerStats(users,modifiedRoomsObjects)
 
-          const ownedControllers = objectFilter(roomsObjects, c => c.type === 'controller' && c.user)
-          const reservedControllers = objectFilter(roomsObjects, c => c.type === 'controller' && c.reservation)
-
-          const serverStats = {}
-          for (let i = 0; i < users.length; i++) {
-               const user = users[i]
-               const ownedRoomNames = Object.values(objectFilter(ownedControllers, c => c.user === user._id)).map(
-                    c => c.room,
-               )
-               const reservedRoomNames = Object.values(
-                    objectFilter(reservedControllers, c => c.reservation.user === user._id),
-               ).map(c => c.room)
-
-               const ownedObjects = objectFilter(roomsObjects, o => ownedRoomNames.includes(o.room))
-               const reservedObjects = objectFilter(roomsObjects, o => reservedRoomNames.includes(o.room))
-
-               const groupedOwnedObjects = groupObjectByKey(ownedObjects, 'room')
-               const groupedReservedObjects = groupObjectByKey(reservedObjects, 'room')
-
-               for (const room in groupedOwnedObjects) {
-                    if (Object.hasOwnProperty.call(groupedOwnedObjects, room)) {
-                         groupedOwnedObjects[room] = groupObjectByKey(groupedOwnedObjects[room], 'type')
-                    }
-               }
-               for (const room in groupedReservedObjects) {
-                    if (Object.hasOwnProperty.call(groupedReservedObjects, room)) {
-                         groupedReservedObjects[room] = groupObjectByKey(groupedReservedObjects[room], 'type')
-                    }
-               }
-
-               serverStats[user.username] = {
-                    user: user,
-                    owned: groupedOwnedObjects,
-                    reserved: groupedReservedObjects,
-                    overviewStats: modifiedRoomsObjects.overviewStats[user._id],
-               }
-          }
-
-          reportStats({ stats: groupedStats, serverStats: serverStats })
+          reportStats({ stats: groupedStats,serverStats })
           console.log('Pushed all stats to graphite')
      } catch (e) {
           console.log(e)

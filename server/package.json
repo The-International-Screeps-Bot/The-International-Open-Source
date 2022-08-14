@@ -14,6 +14,6 @@
         "screepsmod-server-stats": "^1.0.0"
     },
     "scripts": {
-        "server": "node index.js 100000"
+        "server": "node index.js"
     }
 }
