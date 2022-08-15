@@ -320,9 +320,9 @@ Object.defineProperties(Room.prototype, {
     },
     sourcePositions: {
         get() {
-            if (this._sourcePositions?.length) return this._sourcePositions
+            if (this._sourcePositions && this._sourcePositions.length) return this._sourcePositions
 
-            if (this.memory.SP?.length) {
+            if (this.memory.SP && this.memory.SP.length) {
                 this._sourcePositions = []
 
                 for (const positions of this.memory.SP) this._sourcePositions.push(unpackPosList(positions))

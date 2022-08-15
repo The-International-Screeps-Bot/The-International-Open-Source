@@ -148,7 +148,7 @@ Room.prototype.get = function (roomObjectName) {
             coordMap: distanceCoords,
             startCoords: [room.anchor],
             requiredValue: 2,
-            reduceIterations: 1
+            reduceIterations: 1,
         })
     }
 
@@ -674,7 +674,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 if (opts.weightCoordMaps) {
                     for (const coordMap of opts.weightCoordMaps) {
                         for (const index in coordMap) {
-
                             const packedCoord = parseInt(index)
                             if (coordMap[packedCoord] === 0) continue
 
@@ -686,14 +685,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 }
 
                 if (opts.weightStampAnchors) {
-
                     if (room.memory.type === 'commune') {
-
-
-                    }
-                    else if (room.memory.type === 'remote') {
-
-
+                    } else if (room.memory.type === 'remote') {
                     }
                 }
 
@@ -1275,6 +1268,9 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
         // Query source positions
 
+        delete room.memory.SP
+        delete room._sourcePositions
+
         room.sourcePositions
 
         // Add the room's name to the scoutingRoom's remotes list
@@ -1606,7 +1602,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
     console.log(room.name)
 
     if (opts.visuals) {
-
         for (const coord of opts.startCoords)
             this.visual.circle(coord.x, coord.y, {
                 stroke: myColors.yellow,
@@ -1675,7 +1670,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
             // Iterate through positions of this gen
 
             for (const coord1 of thisGeneration) {
-
                 // If the pos can be an anchor, inform it
 
                 if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
@@ -1728,13 +1722,11 @@ Room.prototype.findClosestPosOfValue = function (opts) {
             // Try without using impassibles
 
             if (!nextGeneration.length) {
-
                 localVisitedCoords = new Uint8Array(visitedCoords)
 
                 // Iterate through positions of this gen
 
                 for (const coord1 of thisGeneration) {
-
                     // If the pos can be an anchor, inform it
 
                     if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
@@ -1771,13 +1763,11 @@ Room.prototype.findClosestPosOfValue = function (opts) {
             // If no positions are found, try again using impassibles
 
             if (!nextGeneration.length) {
-
                 localVisitedCoords = new Uint8Array(visitedCoords)
 
                 // Iterate through positions of this gen
 
                 for (const coord1 of thisGeneration) {
-
                     // If the pos can be an anchor, inform it
 
                     if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
@@ -1788,7 +1778,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                     // Loop through adjacent positions
 
                     for (const coord2 of adjacentCoords) {
-
                         // Iterate if the pos doesn't map onto a room
 
                         if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
@@ -1810,7 +1799,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
             }
 
             if (opts.visuals) {
-
                 for (const coord of nextGeneration)
                     this.visual.text(opts.coordMap[pack(coord)].toString(), coord.x, coord.y, {
                         font: 0.5,
@@ -1904,7 +1892,6 @@ Room.prototype.findAllyCSiteTargetID = function (creep) {
 }
 
 Room.prototype.findUnprotectedCoords = function (visuals) {
-
     // Construct a cost matrix for the flood
 
     this.unprotectedCoords = new Uint8Array(2500)
@@ -1944,7 +1931,7 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
                 this.unprotectedCoords[packedCoord1] = depth * 10 + 10
 
                 // If visuals are enabled, show the depth on the pos
-/*
+                /*
                 if (visuals)
                     this.visual.rect(coord1.x - 0.5, coord1.y - 0.5, 1, 1, {
                         fill: `hsl(${200}${depth * 2}, 100%, 60%)`,
@@ -2028,7 +2015,6 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
             // Iterate through positions of this gen
 
             for (const pos of thisGeneration) {
-
                 // Construct a rect and get the positions in a range of 1 (not diagonals)
 
                 const adjacentPositions = findCoordsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)

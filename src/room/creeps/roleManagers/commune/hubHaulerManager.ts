@@ -91,7 +91,7 @@ HubHauler.prototype.reserveStorageTransfer = function () {
 
     // If the terminal exists and isn't power disabled
 
-    if (terminal && !terminal.effects?.[PWR_DISRUPT_TERMINAL]) {
+    if (terminal && (!terminal.effects || !terminal.effects[PWR_DISRUPT_TERMINAL])) {
         for (const key in terminal.store) {
             const resourceType = key as ResourceConstant
 
