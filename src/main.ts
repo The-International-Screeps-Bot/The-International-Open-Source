@@ -1458,7 +1458,7 @@ declare global {
             type: Reservations,
             target: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>,
             amount: number,
-            resourceType: ResourceConstant,
+            resourceType?: ResourceConstant,
         ): void
 
         /**
@@ -1733,12 +1733,12 @@ declare global {
          * Finds the total free store capacity of this RoomObject
          * @param resourceType A resourceConstant to ensure proper querying of limit store RoomObjects
          */
-        freeStore(resourceType: ResourceConstant): number
+        freeStore(resourceType?: ResourceConstant): number
 
         /**
          * Finds the total free store capacity of a specific resource for this RoomObject
          */
-        freeSpecificStore(resourceType: ResourceConstant): number
+        freeSpecificStore(resourceType?: ResourceConstant): number
     }
 
     interface Resource {

@@ -1542,7 +1542,7 @@ Creep.prototype.deleteReservation = function (index) {
     this.message += '❌'
 }
 
-Creep.prototype.createReservation = function (type, targetID, amount, resourceType) {
+Creep.prototype.createReservation = function (type, targetID, amount, resourceType = RESOURCE_ENERGY) {
     if (!this.memory.reservations) this.memory.reservations = []
 
     this.memory.reservations.push({
@@ -1667,6 +1667,8 @@ Creep.prototype.fulfillReservation = function () {
         return false
     }
 
+    if (this.movedResource) return false
+
     // Pickup
 
     if (target instanceof Resource) {
@@ -1681,6 +1683,7 @@ Creep.prototype.fulfillReservation = function () {
         if (pickupResult === OK) {
             this.store[reservation.resourceType] += reservation.amount
 
+            this.movedResource = true
             this.deleteReservation(0)
             return true
         }
@@ -1710,6 +1713,7 @@ Creep.prototype.fulfillReservation = function () {
             target.store[reservation.resourceType] += amount
             this.store[reservation.resourceType] -= amount
 
+            this.movedResource = true
             this.deleteReservation(0)
             return true
         }
@@ -1738,6 +1742,7 @@ Creep.prototype.fulfillReservation = function () {
         target.store[reservation.resourceType] -= amount
         this.store[reservation.resourceType] += amount
 
+        this.movedResource = true
         this.deleteReservation(0)
         return true
     }
