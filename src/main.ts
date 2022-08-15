@@ -364,6 +364,7 @@ declare global {
         cpu: {
             bucket: number
             usage: number
+            limit: number
         }
 
         memory: {
@@ -1842,7 +1843,7 @@ export const loop = function () {
 
     internationalManager.tickReset()
     internationalManager.run()
-/*
+    /*
     let cpu = Game.cpu.getUsed()
 
     console.log(new InternationalManager())

@@ -113,6 +113,7 @@ export class StatsManager {
             cpu: {
                 bucket: 0,
                 usage: 0,
+                limit: 0,
             },
             memory: {
                 usage: 0,
@@ -155,6 +156,7 @@ export class StatsManager {
         }
         Memory.stats.cpu = {
             bucket: Game.cpu.bucket,
+            limit: Game.cpu.limit,
             usage: this.round(this.average(Memory.stats.cpu.usage, Game.cpu.getUsed(), 500)),
         }
         Memory.stats.memory.usage = Math.floor(RawMemory.get().length / 1000)
