@@ -416,7 +416,7 @@ Room.prototype.spawnRequester = function () {
             // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
             let requiredStrength = (healStrength + (this.structures.tower.length ? 0 : attackStrength)) * 1.2
-            customLog('DEFENDER STUFF', requiredStrength + ', ' + (requiredStrength / 2) * ATTACK_POWER + 1)
+
             const role = 'meleeDefender'
 
             // If all RCL 3 extensions are build

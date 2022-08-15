@@ -1,5 +1,5 @@
 import { customLog, findClosestObject, getRange } from 'international/generalFunctions'
-import { Hauler } from '../../creepClasses'
+import { creepClasses, Hauler } from '../../creepClasses'
 
 export function haulerManager(room: Room, creepsOfRole: string[]) {
     // Loop through creep names of this role
@@ -11,7 +11,7 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 
         creep.advancedRenew()
 
-        if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserve()
+        creep.reserve()
 
         if (!creep.fulfillReservation()) {
             creep.say(creep.message)
@@ -30,6 +30,9 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 }
 
 Hauler.prototype.reserve = function () {
+
+    if (this.memory.reservations?.length) return
+
     const { room } = this
 
     let withdrawTargets = room.MAWT.filter(target => {

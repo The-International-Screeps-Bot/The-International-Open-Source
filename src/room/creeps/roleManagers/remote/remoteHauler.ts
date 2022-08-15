@@ -13,7 +13,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
             // If the creep is in the remote
 
             if (room.name === creep.memory.remote) {
-                if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveWithdrawEnergy()
+                creep.reserveWithdrawEnergy()
 
                 if (!creep.fulfillReservation()) {
                     creep.say(creep.message)
@@ -73,7 +73,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
                 delete creep.memory.remote
             }
 
-            if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveTransferEnergy()
+            creep.reserveTransferEnergy()
 
             if (!creep.fulfillReservation()) {
                 creep.say(creep.message)

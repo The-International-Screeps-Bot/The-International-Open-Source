@@ -1746,6 +1746,9 @@ Creep.prototype.fulfillReservation = function () {
 }
 
 Creep.prototype.reserveWithdrawEnergy = function () {
+
+    if (this.memory.reservations?.length) return
+
     const { room } = this
 
     if (!this.needsResources()) return
@@ -1800,6 +1803,9 @@ Creep.prototype.reserveWithdrawEnergy = function () {
 }
 
 Creep.prototype.reserveTransferEnergy = function () {
+
+    if (this.memory.reservations?.length) return
+
     const { room } = this
 
     if (this.usedStore() === 0) return
