@@ -90,7 +90,7 @@ Room.prototype.hubToController = function (hubLink, controllerLink) {
 
      // If the hubLink is not sufficiently full, stop
 
-     if (hubLink.store.getCapacity(RESOURCE_ENERGY) - hubLink.store.energy > 100) return
+     if (hubLink.store.getCapacity(RESOURCE_ENERGY) - Math.min(hubLink.store.energy, hubLink.store.getCapacity(RESOURCE_ENERGY)) > 100) return
 
      // If the controllerLink is more than 25% full, stop
 

@@ -10,7 +10,7 @@ Room.prototype.factoryManager = function () {
 StructureFactory.prototype.createBatteries = function () {
     // If there is some energy
 
-    if (this.store.energy >= 1000) {
+    if (this.store.energy >= 600) {
         this.room.visual.text('CB', this.pos)
 
         // Convert energy into batteries
