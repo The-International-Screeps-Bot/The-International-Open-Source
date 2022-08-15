@@ -833,7 +833,7 @@ Object.defineProperties(Room.prototype, {
 
                     if (creep.spawning) continue
 
-                    if (creep.store.getCapacity() * 0.5 >= creep.usedStore()) this._METT.push(creep)
+                    if (creep.store.getCapacity() * 0.5 >= creep.store.getUsedCapacity()) this._METT.push(creep)
                 }
             }
 

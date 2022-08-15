@@ -117,7 +117,7 @@ HubHauler.prototype.reserveStorageTransfer = function () {
 
             // If the terminal is sufficiently balanced compared to the storage
 
-            if (storage.store[resourceType] * 3 + this.store.getCapacity() > terminal.store[resourceType]) continue
+            if (terminal.store[resourceType] < storage.store[resourceType] * 0.3 + this.store.getCapacity()) continue
 
             this.message += 'RST'
 
@@ -153,7 +153,7 @@ HubHauler.prototype.reserveTerminalTransfer = function () {
 
             // If the storage is sufficiently balanced compared to the storage
 
-            if (terminal.store[resourceType] < storage.store[resourceType] * 3 + this.store.getCapacity()) continue
+            if (storage.store[resourceType] * 0.3 < terminal.store[resourceType] + this.store.getCapacity()) continue
 
             this.message += 'RTT'
 
@@ -197,7 +197,11 @@ HubHauler.prototype.reserverHubLinkTransfer = function () {
     this.message += 'RHT'
 
     this.createReservation('withdraw', provider.id, amount)
-    this.createReservation('transfer', hubLink.id, Math.min(this.freeStore() + this.store.energy, hubLink.freeSpecificStore()))
+    this.createReservation(
+        'transfer',
+        hubLink.id,
+        Math.min(this.freeStore() + this.store.energy, hubLink.freeSpecificStore()),
+    )
     return true
 }
 
@@ -244,21 +248,14 @@ HubHauler.prototype.reserveFactoryTransfer = function () {
 
     // If the ratio of stored batteries to energy is sufficiently high
     // 100 : 1
-    if (room.findStoredResourceAmount(RESOURCE_BATTERY) * 100 > room.findStoredResourceAmount(RESOURCE_ENERGY)) return false
+    if (room.findStoredResourceAmount(RESOURCE_BATTERY) * 100 > room.findStoredResourceAmount(RESOURCE_ENERGY))
+        return false
 
     // Find a provider
 
     let provider
-    if (
-        storage &&
-        storage.store.energy > this.store.getCapacity()
-    )
-        provider = storage
-    else if (
-        terminal &&
-        terminal.store.energy > this.store.getCapacity()
-    )
-        provider = terminal
+    if (storage && storage.store.energy > this.store.getCapacity()) provider = storage
+    else if (terminal && terminal.store.energy > this.store.getCapacity()) provider = terminal
 
     if (!provider) return false
 
