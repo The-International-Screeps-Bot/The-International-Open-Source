@@ -795,8 +795,27 @@ Object.defineProperties(Room.prototype, {
 
             this._OEWT = []
 
-            if (this.storage) this._OEWT.push(this.storage)
-            if (this.terminal) this._OEWT.push(this.terminal)
+            if (this.storage) {
+                if (this.controller.my) this._OEWT.push(this.storage)
+                // If it's not my controller but there are no enemy ramparts on the structure
+                else if (
+                    !this.storage.pos
+                        .lookFor(LOOK_STRUCTURES)
+                        .find(structure => structure instanceof StructureRampart && !structure.my)
+                )
+                    this._OEWT.push(this.storage)
+            }
+
+            if (this.terminal) {
+                if (this.controller.my) this._OEWT.push(this.terminal)
+                // If it's not my controller but there are no enemy ramparts on the structure
+                else if (
+                    !this.terminal.pos
+                        .lookFor(LOOK_STRUCTURES)
+                        .find(structure => structure instanceof StructureRampart && !structure.my)
+                )
+                    this._OEWT.push(this.terminal)
+            }
 
             return this._OEWT
         },

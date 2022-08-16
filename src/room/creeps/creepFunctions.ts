@@ -1268,17 +1268,20 @@ Creep.prototype.findRecycleTarget = function () {
 Creep.prototype.advancedRecycle = function () {
     const { room } = this
 
-    this.say('♻️')
-
     const recycleTarget = this.findRecycleTarget()
     if (!recycleTarget) return false
+
+    const range = getRange(this.pos.x, recycleTarget.pos.x, this.pos.y, recycleTarget.pos.y)
 
     // If the target is a spawn
 
     if (recycleTarget instanceof StructureSpawn) {
+
+        this.say('♻️ S')
+
         // If the recycleTarget is out of actionable range, move to it
 
-        if (getRange(this.pos.x, recycleTarget.pos.x, this.pos.y, recycleTarget.pos.y) > 1) {
+        if (range > 1) {
             this.createMoveRequest({
                 origin: this.pos,
                 goal: { pos: recycleTarget.pos, range: 1 },
@@ -1295,23 +1298,32 @@ Creep.prototype.advancedRecycle = function () {
 
     // Otherwise if the target is a container
 
-    // If the recycleTarget is out of actionable range, move to it
+    this.say('♻️ C')
 
-    if (getRange(this.pos.x, recycleTarget.pos.x, this.pos.y, recycleTarget.pos.y) > 0) {
+    if (range <= 1) {
+
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: recycleTarget.pos, range: 1 },
+            goal: { pos: recycleTarget.pos, range: 0 },
             avoidEnemyRanges: true,
         })
 
-        return true
+        // Otherwise recycleTarget must be a container, so find the closest spawn and recycle
+
+        const spawn = findClosestObject(this.pos, room.structures.spawn)
+
+        return spawn.recycleCreep(this) === OK
     }
 
-    // Otherwise recycleTarget must be a container, so find the closest spawn and recycle
+    // If the recycleTarget is out of actionable range, move to it
 
-    const spawn = findClosestObject(this.pos, room.structures.spawn)
+    this.createMoveRequest({
+        origin: this.pos,
+        goal: { pos: recycleTarget.pos, range: 0 },
+        avoidEnemyRanges: true,
+    })
 
-    return spawn.recycleCreep(this) === OK
+    return true
 }
 
 Creep.prototype.advancedRenew = function () {
