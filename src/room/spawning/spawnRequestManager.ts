@@ -1218,7 +1218,7 @@ Room.prototype.spawnRequester = function () {
                 defaultParts: [MOVE],
                 extraParts: [],
                 partsMultiplier: 1,
-                minCreeps: 2,
+                minCreeps: this.controller.level === 8 ? 1 : 2,
                 maxCreeps: Infinity,
                 minCost: 100,
                 priority: 6,

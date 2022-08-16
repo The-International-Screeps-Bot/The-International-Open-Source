@@ -666,6 +666,7 @@ export function rampartPlanner(room: Room) {
             weightCoordMaps: [room.unprotectedCoords, room.roadCoords],
         })
 
+
         // Loop through positions of the path
 
         for (const pos of path) room.roadCoords[pack(pos)] = 1
