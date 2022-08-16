@@ -648,12 +648,12 @@ export function rampartPlanner(room: Room) {
                 room.advancedFindPath({
                     origin: a,
                     goal: { pos: hubAnchor, range: 3 },
-                    weightCoordMaps: [room.roadCoords, room.unprotectedCoords],
+                    weightCoordMaps: [room.unprotectedCoords, room.roadCoords],
                 }).length -
                 room.advancedFindPath({
                     origin: b,
                     goal: { pos: hubAnchor, range: 3 },
-                    weightCoordMaps: [room.roadCoords, room.unprotectedCoords],
+                    weightCoordMaps: [room.unprotectedCoords, room.roadCoords],
                 }).length
             )
         })[0]
@@ -663,7 +663,7 @@ export function rampartPlanner(room: Room) {
         const path = room.advancedFindPath({
             origin: closestPosToAnchor,
             goal: { pos: hubAnchor, range: 2 },
-            weightCoordMaps: [room.roadCoords, room.unprotectedCoords],
+            weightCoordMaps: [room.unprotectedCoords, room.roadCoords],
         })
 
         // Loop through positions of the path
