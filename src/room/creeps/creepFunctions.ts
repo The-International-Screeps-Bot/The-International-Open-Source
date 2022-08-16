@@ -1271,9 +1271,6 @@ Creep.prototype.advancedRecycle = function () {
     this.say('♻️')
 
     const recycleTarget = this.findRecycleTarget()
-
-    // If the creep could not find a recycle target
-
     if (!recycleTarget) return false
 
     // If the target is a spawn
@@ -1293,7 +1290,7 @@ Creep.prototype.advancedRecycle = function () {
 
         // If the recycleTarget is a spawn, directly recycle
 
-        if (recycleTarget instanceof Spawn) return recycleTarget.recycleCreep(this) === OK
+        return recycleTarget.recycleCreep(this) === OK
     }
 
     // Otherwise if the target is a container
