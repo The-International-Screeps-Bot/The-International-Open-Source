@@ -1085,27 +1085,6 @@ Room.prototype.spawnRequester = function () {
 
                 const role = 'remoteDefender'
 
-                customLog(
-                    'REMOTE DEFENDER FUNCTIONS',
-                    partsMultiplier +
-                        ', ' +
-                        remoteNeeds[remoteNeedsIndex.minDamage] +
-                        ', ' +
-                        remoteNeeds[remoteNeedsIndex.minHeal] +
-                        ', ' +
-                        remoteName +
-                        ', ' +
-                        rangedAttackStrength * (spawnEnergyCapacity / cost) +
-                        ', ' +
-                        healStrength * (spawnEnergyCapacity / cost) +
-                        ', ' +
-                        cost *
-                            (remoteNeeds[remoteNeedsIndex.minDamage] / rangedAttackStrength +
-                                remoteNeeds[remoteNeedsIndex.minHeal] / healStrength) +
-                        ', ' +
-                        this.creepsFromRoomWithRemote[remoteName].remoteDefender,
-                )
-
                 return {
                     role,
                     defaultParts: [],
