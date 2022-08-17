@@ -1823,6 +1823,244 @@ Room.prototype.findClosestPosOfValue = function (opts) {
     return false
 }
 
+Room.prototype.findClosestPosOfValueAsym = function (opts) {
+    const room = this
+    console.log(room.name)
+
+    if (opts.visuals) {
+        for (const coord of opts.startCoords)
+            this.visual.circle(coord.x, coord.y, {
+                stroke: myColors.yellow,
+            })
+    }
+
+    /**
+     *
+     */
+    function isViableAnchor(coord1: Coord): boolean {
+        // Get the value of the pos4271
+
+        const posValue = opts.coordMap[pack(coord1)]
+        if (posValue === 255) return false
+        if (posValue === 0) return false
+
+        // If the posValue is less than the requiredValue, inform false
+
+        if (posValue < opts.requiredValue) return false
+
+        // Loop through adjacent positions
+
+        for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+            // If the adjacentPos isn't a roadPosition, iterate
+
+            if (opts.roadCoords[pack(coord2)] !== 1) continue
+
+            // Otherwise set nearbyRoad to true and stop the loop
+
+            return true
+        }
+
+        // If adjacentToRoads is a requirement
+
+        if (!opts.adjacentToRoads) return true
+
+        if (opts.roadCoords[pack(coord1)] > 0) return false
+
+        // Loop through adjacent positions
+
+        for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+            // If the adjacentPos isn't a roadPosition, iterate
+
+            if (opts.roadCoords[pack(coord2)] !== 1) continue
+
+            // Otherwise set nearbyRoad to true and stop the loop
+
+            return true
+        }
+
+        return false
+    }
+
+    while (opts.reduceIterations >= 0) {
+        // Construct a cost matrix for visited tiles and add seeds to it
+
+        let visitedCoords = new Uint8Array(2500)
+
+        // Record startPos as visited
+
+        for (const coord of opts.startCoords) visitedCoords[pack(coord)] = 1
+
+        // Construct values for the check
+
+        let thisGeneration = opts.startCoords
+        let nextGeneration: Coord[] = []
+        let i = 0
+        // So long as there are positions in this gen
+
+        while (thisGeneration.length) {
+            // Reset nextGeneration
+
+            nextGeneration = []
+            i++
+
+            let localVisitedCoords = new Uint8Array(visitedCoords)
+
+            // Iterate through positions of this gen
+
+            for (const coord1 of thisGeneration) {
+                // If the pos can be an anchor, inform it
+
+                if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+
+                // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+
+                const adjacentCoords = [
+                    {
+                        x: coord1.x - 1,
+                        y: coord1.y,
+                    },
+                    {
+                        x: coord1.x + 1,
+                        y: coord1.y,
+                    },
+                    {
+                        x: coord1.x,
+                        y: coord1.y - 1,
+                    },
+                    {
+                        x: coord1.x,
+                        y: coord1.y + 1,
+                    },
+                ]
+
+                // Loop through adjacent positions
+
+                for (const coord2 of adjacentCoords) {
+                    // Iterate if the pos doesn't map onto a room
+
+                    if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                        continue
+
+                    // Iterate if the adjacent pos has been visited or isn't a tile
+
+                    if (localVisitedCoords[pack(coord2)] === 1) continue
+
+                    // Otherwise record that it has been visited
+
+                    localVisitedCoords[pack(coord2)] = 1
+
+                    if (opts.coordMap[pack(coord2)] === 0) continue
+
+                    // Add it tofastFillerSide the next gen
+
+                    nextGeneration.push(coord2)
+                }
+            }
+
+            // Try without using impassibles
+
+            if (!nextGeneration.length) {
+                localVisitedCoords = new Uint8Array(visitedCoords)
+
+                // Iterate through positions of this gen
+
+                for (const coord1 of thisGeneration) {
+                    // If the pos can be an anchor, inform it
+
+                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+
+                    // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+
+                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
+
+                    // Loop through adjacent positions
+
+                    for (const coord2 of adjacentCoords) {
+                        // Iterate if the pos doesn't map onto a room
+
+                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                            continue
+
+                        // Iterate if the adjacent pos has been visited or isn't a tile
+
+                        if (localVisitedCoords[pack(coord2)] === 1) continue
+
+                        // Otherwise record that it has been visited
+
+                        localVisitedCoords[pack(coord2)] = 1
+
+                        if (opts.coordMap[pack(coord2)] === 0) continue
+
+                        // Add it tofastFillerSide the next gen
+
+                        nextGeneration.push(coord2)
+                    }
+                }
+            }
+
+            // If no positions are found, try again using impassibles
+
+            if (!nextGeneration.length) {
+                localVisitedCoords = new Uint8Array(visitedCoords)
+
+                // Iterate through positions of this gen
+
+                for (const coord1 of thisGeneration) {
+                    // If the pos can be an anchor, inform it
+
+                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+
+                    // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+
+                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
+                    // Loop through adjacent positions
+
+                    for (const coord2 of adjacentCoords) {
+                        // Iterate if the pos doesn't map onto a room
+
+                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                            continue
+
+                        // Iterate if the adjacent pos has been visited or isn't a tile
+
+                        if (localVisitedCoords[pack(coord2)] === 1) continue
+
+                        // Otherwise record that it has been visited
+
+                        localVisitedCoords[pack(coord2)] = 1
+
+                        // Add it tofastFillerSide the next gen
+
+                        nextGeneration.push(coord2)
+                    }
+                }
+            }
+
+            if (opts.visuals) {
+                for (const coord of nextGeneration)
+                    this.visual.text(opts.coordMap[pack(coord)].toString(), coord.x, coord.y, {
+                        font: 0.5,
+                        color: myColors.yellow,
+                    })
+            }
+
+            console.log(i, JSON.stringify(nextGeneration))
+
+            // Set this gen to next gen
+
+            visitedCoords = new Uint8Array(localVisitedCoords)
+            thisGeneration = nextGeneration
+        }
+
+        opts.reduceIterations -= 1
+        opts.requiredValue -= 1
+    }
+
+    // Inform false if no value was found
+
+    return false
+}
+
 Room.prototype.pathVisual = function (path, color) {
     const room = this
 
