@@ -18,10 +18,9 @@ import { statsManager } from './statsManager'
 
 InternationalManager.prototype.config = function () {
     if (Memory.breakingVersion < breakingVersion) {
-        global.clearMemory()
 
         global.killCreeps()
-
+        global.clearMemory()
         global.removeCSites()
     }
 
