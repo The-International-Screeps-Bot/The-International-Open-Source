@@ -721,6 +721,7 @@ export function rampartPlanner(room: Room) {
 
     room.rampartCoords[packXY(hubAnchor.x + 1, hubAnchor.y - 1)] = 1
     room.rampartCoords[packXY(hubAnchor.x - 1, hubAnchor.y + 1)] = 1
+    room.rampartCoords[packXY(hubAnchor.x, hubAnchor.y - 1)] = 1
 
     // Protect labs
 
