@@ -590,9 +590,12 @@ export function rampartPlanner(room: Room) {
     // Loop through types in stampAnchors
 
     for (const stampType in stampAnchors) {
+
+        const stamp = stamps[stampType as StampTypes]
+
         // Get the protectionOffset using the stampType
 
-        const { protectionOffset } = stamps[stampType as StampTypes]
+        const { protectionOffset } = stamp
 
         // Loop through stampAnchor of this stampType's stampAnchors
 
@@ -604,8 +607,8 @@ export function rampartPlanner(room: Room) {
             protectionRects.push({
                 x1: Math.max(Math.min(stampAnchor.x - protectionOffset, roomDimensions - 3), 2),
                 y1: Math.max(Math.min(stampAnchor.y - protectionOffset, roomDimensions - 3), 2),
-                x2: Math.max(Math.min(stampAnchor.x + protectionOffset, roomDimensions - 3), 2),
-                y2: Math.max(Math.min(stampAnchor.y + protectionOffset, roomDimensions - 3), 2),
+                x2: Math.max(Math.min(stampAnchor.x + protectionOffset + (stamp.asymmetry || 0), roomDimensions - 3), 2),
+                y2: Math.max(Math.min(stampAnchor.y + protectionOffset + (stamp.asymmetry || 0), roomDimensions - 3), 2),
             })
         }
     }
@@ -666,6 +669,7 @@ export function rampartPlanner(room: Room) {
             weightCoordMaps: [room.unprotectedCoords, room.roadCoords],
         })
 
+
         // Loop through positions of the path
 
         for (const pos of path) room.roadCoords[pack(pos)] = 1
@@ -717,6 +721,16 @@ export function rampartPlanner(room: Room) {
 
     room.rampartCoords[packXY(hubAnchor.x + 1, hubAnchor.y - 1)] = 1
     room.rampartCoords[packXY(hubAnchor.x - 1, hubAnchor.y + 1)] = 1
+    room.rampartCoords[packXY(hubAnchor.x, hubAnchor.y - 1)] = 1
+
+    // Protect labs
+
+    const labAnchor = unpackAsRoomPos(room.memory.stampAnchors.labs[0], room.name)
+
+    for (const coord of stamps.labs.structures.lab) {
+
+        room.rampartCoords[packXY(coord.x + labAnchor.x - stamps.labs.offset, coord.y + labAnchor.y - stamps.labs.offset)] = 1
+    }
 
     // Inform true
 

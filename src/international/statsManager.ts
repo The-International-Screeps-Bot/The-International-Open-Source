@@ -142,7 +142,8 @@ export class StatsManager {
     }
 
     internationalEndTick() {
-        Memory.stats.lastReset = (Memory.stats.lastReset || 0) + 1
+        global.lastReset = (global.lastReset || 0) + 1
+        Memory.stats.lastReset = global.lastReset
         const timestamp = Date.now()
         Memory.stats.tickLength = timestamp - Memory.stats.lastTickTimestamp
         Memory.stats.lastTickTimestamp = timestamp

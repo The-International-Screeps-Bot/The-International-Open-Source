@@ -87,6 +87,7 @@ declare global {
         protectionOffset: number
         size: number
         structures: { [structureType: string]: Coord[] }
+        asymmetry?: number
     }
 
     type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
@@ -200,6 +201,17 @@ declare global {
         adjacentToRoads?: boolean
         roadCoords?: CoordMap
         visuals?: boolean
+    }
+
+    interface FindClosestPosOfValueOptsAsym extends FindClosestPosOfValueOpts {
+        /**
+         * The x and y offset from the top left of the stamp
+         */
+        offset: number
+        /**
+         * The asymmetrical x and y offset from the top left of the stamp
+         */
+        asymOffset: number
     }
 
     interface MoveRequestOpts extends PathOpts {
@@ -754,6 +766,11 @@ declare global {
          * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
          */
         findClosestPosOfValue(opts: FindClosestPosOfValueOpts): RoomPosition | false
+
+        /**
+         * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified, that does not infringe on disabled tiles
+         */
+        findClosestPosOfValueAsym(opts: FindClosestPosOfValueOptsAsym): RoomPosition | false
 
         /**
          *
@@ -1783,6 +1800,8 @@ declare global {
             roomStats: { [roomName: string]: RoomStats }
 
             terrainCoords: { [roomName: string]: CoordMap }
+
+            lastReset: number
 
             // Command functions
 
