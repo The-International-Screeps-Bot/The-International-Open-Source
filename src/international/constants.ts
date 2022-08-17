@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 75
+export const breakingVersion = 76
 
 // Settings
 
