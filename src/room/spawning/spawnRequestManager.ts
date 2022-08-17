@@ -423,7 +423,7 @@ Room.prototype.spawnRequester = function () {
 
             if (spawnEnergyCapacity >= 800) {
                 const extraParts = [ATTACK, ATTACK, MOVE]
-                const strength = 2 * ATTACK_POWER + 1
+                const strength = ATTACK_POWER * 2
 
                 return {
                     role,
@@ -440,7 +440,7 @@ Room.prototype.spawnRequester = function () {
             }
 
             const extraParts = [ATTACK, MOVE]
-            const strength = ATTACK_POWER + 1
+            const strength = ATTACK_POWER
 
             return {
                 role,
