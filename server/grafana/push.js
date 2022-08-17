@@ -47,7 +47,7 @@ function reportStats(stats) {
 }
 
 function pushStats(userinfo, stats, shard) {
-     groupedStats[userinfo.username] = userinfo.type === 'mmo' ? { [shard]: stats } : stats
+     groupedStats[userinfo.username] = userinfo.type === 'mmo' ? { [shard]: stats } : { "shard": stats }
      console.log(`${userinfo.type}: Added stats object for ${userinfo.username} in ${shard}`)
 }
 
@@ -67,7 +67,7 @@ function shouldContinue(shardsCount) {
      }
 }
 
-cron.schedule('*/5 * * * * *', async () => {
+cron.schedule('* * * * *', async () => {
      console.log('----------------------------------------------------------------')
      groupedStats = {}
      for (let i = 0; i < statsUsers.length; i++) {
