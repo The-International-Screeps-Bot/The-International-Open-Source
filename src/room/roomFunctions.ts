@@ -1853,7 +1853,12 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
 
             if (opts.coordMap[pack(coord2)] === 0) return false
         }
-
+/*
+        for (const coord2 of findCoordsInsideRect(coord1.x - opts.offset, coord1.y - opts.offset, coord1.x + opts.offset + opts.asymOffset, coord1.y + opts.offset + opts.asymOffset)) {
+            // If the adjacentPos isn't walkable, iterate
+            room.visual.text(opts.coordMap[pack(coord2)].toString(), coord2.x, coord2.y)
+        }
+ */
         // If adjacentToRoads is a requirement
 
         if (!opts.adjacentToRoads) return true

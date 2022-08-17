@@ -120,10 +120,10 @@ export function basePlanner(room: Room) {
         adjacentToRoads?: boolean
         normalDT?: boolean
         asymmetrical?: boolean
+        coordMap?: CoordMap
     }
 
     let stamp
-    let newStampAnchors
     let packedStampAnchor
     let stampAnchor
     let structureType
@@ -134,12 +134,13 @@ export function basePlanner(room: Room) {
     /**
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
      */
-    function planStamp(opts: PlanStampOpts): boolean {
+    function planStamp(opts: PlanStampOpts): false | RoomPosition[] {
         // Define the stamp using the stampType
 
         stamp = stamps[opts.stampType]
 
-        newStampAnchors = []
+        const newStampAnchors: RoomPosition[] = []
+        const newStampAnchorsPacked: number[] = []
 
         // So long as the count is more than 0
 
@@ -180,8 +181,8 @@ export function basePlanner(room: Room) {
             // Run distance transform with the baseCM
 
             const distanceCoords = opts.normalDT
-                ? room.distanceTransform(room.baseCoords)
-                : room.diagonalDistanceTransform(room.baseCoords)
+                ? room.distanceTransform(opts.coordMap || room.baseCoords)
+                : room.diagonalDistanceTransform(opts.coordMap || room.baseCoords)
 
             // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 
@@ -214,7 +215,8 @@ export function basePlanner(room: Room) {
 
             // Add the anchor to stampAnchors based on its type
 
-            newStampAnchors.push(pack(stampAnchor))
+            newStampAnchors.push(stampAnchor)
+            newStampAnchorsPacked.push(pack(stampAnchor))
 
             for (structureType in stamp.structures) {
                 // Loop through positions
@@ -240,8 +242,8 @@ export function basePlanner(room: Room) {
             }
         }
 
-        room.memory.stampAnchors[opts.stampType] = room.memory.stampAnchors[opts.stampType].concat(newStampAnchors)
-        return true
+        room.memory.stampAnchors[opts.stampType] = room.memory.stampAnchors[opts.stampType].concat(newStampAnchorsPacked)
+        return newStampAnchors
     }
 
     // Try to plan the stamp
@@ -329,6 +331,29 @@ export function basePlanner(room: Room) {
 
     if (
         !planStamp({
+            stampType: 'labs',
+            count: 1,
+            startCoords: hubAnchors,
+            asymmetrical: true,
+            normalDT: true,
+        })
+    )
+        return 'failed'
+
+    // Plan roads
+
+    // Path from the fastFillerAnchor to the hubAnchor
+
+    path = room.advancedFindPath({
+        origin: hubAnchor,
+        goal: { pos: room.anchor, range: 3 },
+        weightCoordMaps: [room.roadCoords],
+    })
+
+    // Try to plan the stamp
+
+    if (
+        !planStamp({
             stampType: 'extensions',
             count: 7,
             startCoords: hubAnchors,
@@ -351,28 +376,6 @@ export function basePlanner(room: Room) {
 
         for (const pos of path) room.roadCoords[pack(pos)] = 1
     }
-
-    // Try to plan the stamp
-
-    if (
-        !planStamp({
-            stampType: 'labs',
-            count: 1,
-            startCoords: hubAnchors,
-            asymmetrical: true,
-        })
-    )
-        return 'failed'
-
-    // Plan roads
-
-    // Path from the fastFillerAnchor to the hubAnchor
-
-    path = room.advancedFindPath({
-        origin: hubAnchor,
-        goal: { pos: room.anchor, range: 3 },
-        weightCoordMaps: [room.roadCoords],
-    })
 
     // Loop through positions of the path
 
@@ -669,14 +672,31 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    if (
-        !planStamp({
-            stampType: 'observer',
-            count: 1,
-            startCoords: [fastFillerHubAnchor],
-        })
+    const observerAnchors = planStamp({
+        stampType: 'observer',
+        count: 1,
+        startCoords: [fastFillerHubAnchor],
+    })
+
+    if (!observerAnchors) return 'failed'
+
+    const observerAnchor = observerAnchors[0]
+
+    let adjacentCoords = findCoordsInsideRect(
+        observerAnchor.x - 3,
+        observerAnchor.y - 3,
+        observerAnchor.x + 3,
+        observerAnchor.y + 3,
     )
-        return 'failed'
+
+    for (const coord of adjacentCoords) {
+        // If the coord is probably not protected
+
+        if (room.unprotectedCoords[pack(coord)] === 0) continue
+
+        room.rampartCoords[pack(observerAnchor)] = 1
+        break
+    }
 
     // Iterate through each x and y in the room
 

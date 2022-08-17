@@ -722,6 +722,15 @@ export function rampartPlanner(room: Room) {
     room.rampartCoords[packXY(hubAnchor.x + 1, hubAnchor.y - 1)] = 1
     room.rampartCoords[packXY(hubAnchor.x - 1, hubAnchor.y + 1)] = 1
 
+    // Protect labs
+
+    const labAnchor = unpackAsRoomPos(room.memory.stampAnchors.labs[0], room.name)
+
+    for (const coord of stamps.labs.structures.lab) {
+
+        room.rampartCoords[packXY(coord.x + labAnchor.x - stamps.labs.offset, coord.y + labAnchor.y - stamps.labs.offset)] = 1
+    }
+
     // Inform true
 
     return true
