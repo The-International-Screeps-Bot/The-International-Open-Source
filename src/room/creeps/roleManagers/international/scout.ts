@@ -203,8 +203,10 @@ Scout.prototype.advancedSignController = function () {
             plainCost: 1,
             swampCost: 1,
         })
-        this.say(this.moveRequest.toString())
+
         if (!this.moveRequest) return true
+
+        this.say(this.moveRequest.toString())
 
         return false
     }
