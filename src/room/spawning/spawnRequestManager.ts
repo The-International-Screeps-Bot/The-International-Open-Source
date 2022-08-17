@@ -415,7 +415,7 @@ Room.prototype.spawnRequester = function () {
 
             // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
-            let requiredStrength = (healStrength + (this.structures.tower.length ? 0 : attackStrength)) * 1.2
+            let requiredStrength = (healStrength + (this.structures.tower.length ? 0 : attackStrength)) * 1.5
 
             const role = 'meleeDefender'
 
@@ -435,6 +435,7 @@ Room.prototype.spawnRequester = function () {
                     memoryAdditions: {
                         roads: true,
                     },
+                    threshold: 0,
                 }
             }
 
@@ -449,6 +450,7 @@ Room.prototype.spawnRequester = function () {
                 minCost: 260,
                 priority: 6 + this.creepsFromRoom.meleeDefender.length,
                 memoryAdditions: {},
+                threshold: 0,
             }
         })(),
     )
@@ -590,7 +592,7 @@ Room.prototype.spawnRequester = function () {
 
             // For every attackValue, add a multiplier
 
-            partsMultiplier += attackStrength / (REPAIR_POWER / 2)
+            partsMultiplier += attackStrength / (REPAIR_POWER / 3)
 
             // For every x energy in storage, add 1 multiplier
 
