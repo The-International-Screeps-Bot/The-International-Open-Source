@@ -1797,7 +1797,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                     }
                 }
             }
-
+/*
             if (opts.visuals) {
                 for (const coord of nextGeneration)
                     this.visual.text(opts.coordMap[pack(coord)].toString(), coord.x, coord.y, {
@@ -1805,7 +1805,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                         color: myColors.yellow,
                     })
             }
-
+ */
             // Set this gen to next gen
 
             visitedCoords = new Uint8Array(localVisitedCoords)

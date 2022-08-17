@@ -205,7 +205,7 @@ export function basePlanner(room: Room) {
                       initialWeight: opts.initialWeight || 0,
                       adjacentToRoads: opts.adjacentToRoads,
                       roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
-                      visuals: opts.stampType === 'extensions'
+                      /* visuals: opts.stampType === 'extensions' */
                   })
 
             // Inform false if no anchor was generated
