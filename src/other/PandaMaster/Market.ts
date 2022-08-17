@@ -1,7 +1,7 @@
 export default class Market {
     private _minCpuUnlockSellPrice: number = 50 * 1000 * 1000
 
-    private _maxPixelBuyPrice: number = 40 * 1000
+    private _maxPixelBuyPrice: number = 30 * 1000
 
     private _mainShard: string
 
