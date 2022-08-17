@@ -16,6 +16,7 @@ import {
     createPosMap,
     customLog,
     findAvgBetweenPositions,
+    findClosestPos,
     findCoordsInsideRect,
     getRange,
     pack,
@@ -118,6 +119,7 @@ export function basePlanner(room: Room) {
         initialWeight?: number
         adjacentToRoads?: boolean
         normalDT?: boolean
+        asymmetrical?: boolean
     }
 
     let stamp
@@ -183,16 +185,28 @@ export function basePlanner(room: Room) {
 
             // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 
-            stampAnchor = room.findClosestPosOfValue({
-                coordMap: distanceCoords,
-                startCoords: opts.startCoords,
-                requiredValue: stamp.size,
-                reduceIterations: 0,
-                initialWeight: opts.initialWeight || 0,
-                adjacentToRoads: opts.adjacentToRoads,
-                roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
-                /* visuals: opts.stampType === 'hub' */
-            })
+            stampAnchor = opts.asymmetrical
+                ? room.findClosestPosOfValueAsym({
+                      coordMap: distanceCoords,
+                      startCoords: opts.startCoords,
+                      requiredValue: stamp.size,
+                      reduceIterations: 0,
+                      initialWeight: opts.initialWeight || 0,
+                      adjacentToRoads: opts.adjacentToRoads,
+                      roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
+                      offset: stamp.offset,
+                      asymOffset: stamp.asymmetry,
+                  })
+                : room.findClosestPosOfValue({
+                      coordMap: distanceCoords,
+                      startCoords: opts.startCoords,
+                      requiredValue: stamp.size,
+                      reduceIterations: 0,
+                      initialWeight: opts.initialWeight || 0,
+                      adjacentToRoads: opts.adjacentToRoads,
+                      roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
+                      visuals: opts.stampType === 'extensions'
+                  })
 
             // Inform false if no anchor was generated
 
@@ -345,6 +359,7 @@ export function basePlanner(room: Room) {
             stampType: 'labs',
             count: 1,
             startCoords: hubAnchors,
+            asymmetrical: true,
         })
     )
         return 'failed'

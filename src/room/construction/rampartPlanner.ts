@@ -590,9 +590,12 @@ export function rampartPlanner(room: Room) {
     // Loop through types in stampAnchors
 
     for (const stampType in stampAnchors) {
+
+        const stamp = stamps[stampType as StampTypes]
+
         // Get the protectionOffset using the stampType
 
-        const { protectionOffset } = stamps[stampType as StampTypes]
+        const { protectionOffset } = stamp
 
         // Loop through stampAnchor of this stampType's stampAnchors
 
@@ -604,8 +607,8 @@ export function rampartPlanner(room: Room) {
             protectionRects.push({
                 x1: Math.max(Math.min(stampAnchor.x - protectionOffset, roomDimensions - 3), 2),
                 y1: Math.max(Math.min(stampAnchor.y - protectionOffset, roomDimensions - 3), 2),
-                x2: Math.max(Math.min(stampAnchor.x + protectionOffset, roomDimensions - 3), 2),
-                y2: Math.max(Math.min(stampAnchor.y + protectionOffset, roomDimensions - 3), 2),
+                x2: Math.max(Math.min(stampAnchor.x + protectionOffset + (stamp.asymmetry || 0), roomDimensions - 3), 2),
+                y2: Math.max(Math.min(stampAnchor.y + protectionOffset + (stamp.asymmetry || 0), roomDimensions - 3), 2),
             })
         }
     }

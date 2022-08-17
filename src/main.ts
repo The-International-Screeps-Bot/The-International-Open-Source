@@ -87,6 +87,7 @@ declare global {
         protectionOffset: number
         size: number
         structures: { [structureType: string]: Coord[] }
+        asymmetry?: number
     }
 
     type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>

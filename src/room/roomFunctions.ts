@@ -1806,8 +1806,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                     })
             }
 
-            console.log(i, JSON.stringify(nextGeneration))
-
             // Set this gen to next gen
 
             visitedCoords = new Uint8Array(localVisitedCoords)
@@ -1850,14 +1848,10 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
 
         // Loop through adjacent positions
 
-        for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
-            // If the adjacentPos isn't a roadPosition, iterate
+        for (const coord2 of findCoordsInsideRect(coord1.x - opts.offset, coord1.y - opts.offset, coord1.x + opts.offset + opts.asymOffset, coord1.y + opts.offset + opts.asymOffset)) {
+            // If the adjacentPos isn't walkable, iterate
 
-            if (opts.roadCoords[pack(coord2)] !== 1) continue
-
-            // Otherwise set nearbyRoad to true and stop the loop
-
-            return true
+            if (opts.coordMap[pack(coord2)] === 0) return false
         }
 
         // If adjacentToRoads is a requirement
@@ -2035,7 +2029,7 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
                     }
                 }
             }
-
+/*
             if (opts.visuals) {
                 for (const coord of nextGeneration)
                     this.visual.text(opts.coordMap[pack(coord)].toString(), coord.x, coord.y, {
@@ -2043,8 +2037,7 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
                         color: myColors.yellow,
                     })
             }
-
-            console.log(i, JSON.stringify(nextGeneration))
+ */
 
             // Set this gen to next gen
 

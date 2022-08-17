@@ -1276,7 +1276,6 @@ Creep.prototype.advancedRecycle = function () {
     // If the target is a spawn
 
     if (recycleTarget instanceof StructureSpawn) {
-
         this.say('♻️ S')
 
         // If the recycleTarget is out of actionable range, move to it
@@ -1300,8 +1299,15 @@ Creep.prototype.advancedRecycle = function () {
 
     this.say('♻️ C')
 
-    if (range <= 1) {
+    if (range === 0) {
+        // Otherwise recycleTarget must be a container, so find the closest spawn and recycle
 
+        const spawn = findClosestObject(this.pos, room.structures.spawn)
+
+        return spawn.recycleCreep(this) === OK
+    }
+
+    if (range <= 1) {
         this.createMoveRequest({
             origin: this.pos,
             goal: { pos: recycleTarget.pos, range: 0 },
@@ -1760,7 +1766,6 @@ Creep.prototype.fulfillReservation = function () {
 }
 
 Creep.prototype.reserveWithdrawEnergy = function () {
-
     if (this.memory.reservations?.length) return
 
     const { room } = this
@@ -1817,7 +1822,6 @@ Creep.prototype.reserveWithdrawEnergy = function () {
 }
 
 Creep.prototype.reserveTransferEnergy = function () {
-
     if (this.memory.reservations?.length) return
 
     const { room } = this
