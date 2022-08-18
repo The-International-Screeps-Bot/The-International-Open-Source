@@ -87,3 +87,11 @@ I'd also suggest using this less-laggy tool [steamless-client](https://github.co
 We're a huge fan of teamwork, and many useful features of this bot have been added by contributors.
 
 If you want to join us in development for this bot, please join our [discord server](https://discord.gg/5QubDsB786) and share what you're working on, or hoping to add. We're happy to review issues, merge pull requests, and add collaborators!
+
+## Support
+
+If you'd like to support the project, Carson Burke (AKA MarvinTMB) is happy to accept single time or monthly donations through the following links.
+
+[Paypal](https://paypal.me/carsonburke22)
+
+[Patreon](https://www.patreon.com/Marvin22)
