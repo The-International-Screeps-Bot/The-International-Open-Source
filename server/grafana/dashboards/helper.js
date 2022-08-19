@@ -21,7 +21,7 @@ function setupDashboard(dashboard) {
                 delete subPanel.datasource.type;
             }
         }
-        else {
+        else if (panel.type !== 'row') {
             delete panel.datasource.uid;
             delete panel.datasource.type;
         }
