@@ -66,13 +66,13 @@ export class StatsManager {
 
         if (Game.time % 250 === 0 && room) {
             if (roomType === 'commune') {
-                roomStats.cl =
-                    room.controller && room.controller.owner && room.controller.owner.username === Memory.me
-                        ? this.round(
-                              room.controller.level + room.controller.progress / room.controller.progressTotal,
-                              2,
-                          )
-                        : undefined
+                if (room.controller && room.controller.owner && room.controller.owner.username === Memory.me) {
+                    const progressPercentage = room.controller.progress / room.controller.progressTotal
+                    roomStats.cl = this.round(
+                        room.controller.level + progressPercentage < 1 ? progressPercentage : 0,
+                        2,
+                    )
+                } else roomStats.cl = 0
                 roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY)
             }
         }
