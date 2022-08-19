@@ -13,5 +13,6 @@ package-lock.json
 
 # Other Stuff
 .env
+log.log
 /.VSCodeCounter
 tmp-test-server

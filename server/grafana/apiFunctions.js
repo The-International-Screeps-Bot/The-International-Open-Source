@@ -5,6 +5,17 @@ const util = require('util')
 const zlib = require('zlib')
 const gunzipAsync = util.promisify(zlib.gunzip)
 
+const { createLogger, format, transports } = require('winston');
+const { combine, timestamp, prettyPrint } = format;
+
+const logger = createLogger({
+  format: combine(
+    timestamp(),
+    prettyPrint()
+  ),
+  transports: [new transports.File({ filename: "log.log" })]
+})
+
 async function gz(data) {
      const buf = Buffer.from(data.slice(3), 'base64')
      const ret = await gunzipAsync(buf)
@@ -97,13 +108,16 @@ async function req(options) {
      return await Promise.race([executeReq, maxTime])
           .then(result => {
                if (result === 'Timeout') {
-                    console.log('Timeout hit!', new Date(), JSON.stringify(options), reqBody)
+                    logger.log('info','Timeout hit!', new Date(), JSON.stringify(options), reqBody)
                     return
                }
+               // is result string
+               if (typeof result === 'string' && result.startsWith("Rate limit exceeded")) logger.log('error',{data:result,options})
+               else logger.log('info',{data:`${JSON.stringify(result).length/1000} MB`,options})
                return result
           })
           .catch(result => {
-               console.log('Failed:', result)
+               logger.log('error', {data:result,options})
           })
 }
 
@@ -113,7 +127,6 @@ module.exports.getPrivateServerToken = async (username, password) => {
           password,
      })
      const res = await req(options)
-     if (!res) return
      return res.token
 }
 
@@ -126,25 +139,21 @@ module.exports.getMemory = async (info, shard, statsPath = "stats") => {
 module.exports.getUserinfo = async info => {
      const options = await getRequestOptions(info, `/api/auth/me`, 'GET')
      const res = await req(options)
-     if (!res) return
      return res
 }
 module.exports.getLeaderboard = async info => {
      const options = await getRequestOptions(info, `/api/leaderboard/find?username=${info.username}&mode=world`, 'GET')
      const res = await req(options)
-     if (!res) return
      return res
 }
 
 module.exports.getUsers = async () => {
      const options = await getRequestOptions({}, `/api/stats/users`, 'GET')
      const res = await req(options)
-     if (!res) return []
      return res
 }
 module.exports.getRoomsObjects = async () => {
      const options = await getRequestOptions({}, `/api/stats/rooms/objects`, 'GET')
      const res = await req(options)
-     if (!res) return []
      return res
 }
