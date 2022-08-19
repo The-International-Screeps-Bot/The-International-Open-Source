@@ -588,7 +588,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
         const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost || 2,
             swampCost: opts.swampCost || 8,
-            maxRooms: route ? 100 : 1,
+            maxRooms: 100,
             maxOps: 100000,
             flee: opts.flee,
 
