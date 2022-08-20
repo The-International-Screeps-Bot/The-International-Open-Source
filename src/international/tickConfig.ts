@@ -118,9 +118,9 @@ InternationalManager.prototype.tickConfig = function () {
         if (!room.memory.deposits) room.memory.deposits = {}
     }
 
-    let reservedGCL = Game.gcl.level
+    let gclLeft = Game.gcl.level
 
-    reservedGCL += Object.values(Memory.claimRequests).filter(request => {
+    gclLeft -= Object.values(Memory.claimRequests).filter(request => {
         return request.responder
     }).length
 
@@ -144,7 +144,7 @@ InternationalManager.prototype.tickConfig = function () {
 
         // If there are enough communes for the GCL
 
-        if (Memory.communes.length >= reservedGCL) continue
+        if (Memory.communes.length >= gclLeft) continue
 
         const communes = Memory.communes.filter(roomName => {
             return !Memory.rooms[roomName].claimRequest && Game.rooms[roomName].energyCapacityAvailable >= 750
@@ -174,7 +174,7 @@ InternationalManager.prototype.tickConfig = function () {
         Memory.rooms[communeName].claimRequest = roomName
         Memory.claimRequests[roomName].responder = communeName
 
-        reservedGCL += 1
+        gclLeft += 1
     }
 
     // Decrease abandonment for abandoned allyCreepRequests, and find those that aren't abandoned responders
