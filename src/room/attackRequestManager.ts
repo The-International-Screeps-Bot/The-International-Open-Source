@@ -2,7 +2,7 @@ import { attackRequestNeedsIndex, claimRequestNeedsIndex, myColors } from 'inter
 import { advancedFindDistance, customLog } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 
-Room.prototype.claimRequestManager = function () {
+Room.prototype.attackRequestManager = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
@@ -37,7 +37,7 @@ Room.prototype.claimRequestManager = function () {
 
     if (Memory.CPULogging)
         customLog(
-            'Claim Request Manager',
+            'Attack Request Manager',
             (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
             undefined,
             myColors.lightGrey,

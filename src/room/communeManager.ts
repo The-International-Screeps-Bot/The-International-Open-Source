@@ -16,6 +16,7 @@ import './defence'
 import './links'
 import './allyCreepRequestManager'
 import './claimRequestManager'
+import './attackRequestManager'
 import { myColors, roomDimensions } from 'international/constants'
 import './factory'
 
@@ -34,6 +35,7 @@ Room.prototype.communeManager = function () {
     this.linkManager()
 
     this.claimRequestManager()
+    this.attackRequestManager()
 
     this.allyCreepRequestManager()
 

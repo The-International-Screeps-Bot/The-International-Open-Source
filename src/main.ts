@@ -835,6 +835,7 @@ declare global {
         // General roomFunctions
 
         claimRequestManager(): void
+        attackRequestManager(): void
 
         allyCreepRequestManager(): void
 
@@ -1797,7 +1798,7 @@ declare global {
             packedRoomNames: { [roomName: string]: string }
 
             unpackedRoomNames: { [roomName: string]: string }
-            roomStats: { [roomName: string]: RoomStats }
+            roomStats: { [roomType in StatsRoomTypes]: { [roomName: string]: RoomStats | RoomCommuneStats } }
 
             terrainCoords: { [roomName: string]: CoordMap }
 
