@@ -1798,7 +1798,7 @@ declare global {
             packedRoomNames: { [roomName: string]: string }
 
             unpackedRoomNames: { [roomName: string]: string }
-            roomStats: { [roomType in StatsRoomTypes]: { [roomName: string]: RoomStats | RoomCommuneStats } }
+            roomStats: { [roomName: string]: RoomStats }
 
             terrainCoords: { [roomName: string]: CoordMap }
 
