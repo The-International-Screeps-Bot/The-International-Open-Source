@@ -35,7 +35,7 @@ Room.prototype.decideMaxCostPerCreep = function (maxCostPerCreep) {
     // If there are no sourceHarvesters or haulers
 
     if (
-        (this.myCreeps.source1Harvester?.length || 0) + (this.myCreeps.source2Harvester?.length || 0) === 0 ||
+        this.myCreeps.source1Harvester.length + (this.myCreeps.source2Harvester?.length || 0) === 0 ||
         this.myCreeps.hauler.length === 0
     ) {
         // Inform the smaller of the following

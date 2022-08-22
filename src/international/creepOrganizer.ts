@@ -101,7 +101,12 @@ InternationalManager.prototype.creepOrganizer = function () {
         try {
             processSingleCreep(creepName);
         } catch (err) {
-            console.log('Exception processing creep named: ' + creepName + '. ' + err + err)
+            customLog(
+                'Exception processing creep: ' + creepName,
+                err,
+                myColors.white,
+                myColors.red,
+            )
         }
     }
 

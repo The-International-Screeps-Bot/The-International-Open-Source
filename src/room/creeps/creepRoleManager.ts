@@ -95,7 +95,12 @@ export function creepRoleManager(room: Room) {
         try {
             processSingleRole(role)
         } catch (err) {
-            console.log('Exception processing creep role: ' + role + ' in ' + room.name + '. ' + err)
+            customLog(
+                'Exception processing creep role: ' + role + ' in ' + room.name + '. ',
+                err,
+                myColors.white,
+                myColors.red,
+            )
         }
     }
 
