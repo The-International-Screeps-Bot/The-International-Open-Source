@@ -340,22 +340,31 @@ declare global {
         progressTotal: number
     }
     interface RoomStats {
-        cl?: number // controllerLevel
+        rc: number // remoteCount
+        rcu: number // remoteCPUUsage
+        rcc: number // remoteCreepCount
+        res: number // remoteEnergyStored
+        reih: number // remoteEnergyInputHarvest
+        reoro: number // remoteEnergyOutputRepairOther
+        reob: number // remoteEnergyOutputBuild
+    }
+
+    interface RoomCommuneStats extends RoomStats {
+        cl: number // controllerLevel
         eih: number // energyInputHarvest
-        eiet?: number // energyInputExternalTransferred
-        eib?: number // energyInputBought
-        eou?: number // energyOutputUpgrade
+        // eiet: number // energyInputExternalTransferred
+        // eib?: number // energyInputBought
+        eou: number // energyOutputUpgrade
         eoro: number // energyOutputRepairOther
-        eorwr?: number // energyOutputRepairWallOrRampart
+        eorwr: number // energyOutputRepairWallOrRampart
         eob: number // energyOutputBuild
-        eoso?: number // energyOutputSold
-        eosp?: number // energyOutputSpawn
-        mh?: number // mineralsHarvested
+        // eoso: number // energyOutputSold
+        eosp: number // energyOutputSpawn
+        mh: number // mineralsHarvested
         es: number // energyStored
         cc: number // creepCount
         cu: number // cpuUsage
-        rt: number // roomType
-        su?: number // spawnUsage
+        su: number // spawnUsage
     }
 
     interface Stats {
@@ -387,18 +396,11 @@ declare global {
         gcl: ControllerLevel
 
         gpl: ControllerLevel
-        rooms: { commune: { [key: string]: RoomStats }; remote: { [key: string]: RoomStats } }
+        rooms: { [key: string]: RoomCommuneStats }
         constructionSiteCount: number
-        debugCpu11: number
-        debugCpu12: number
-        debugCpu21: number
-        debugCpu22: number
-        debugCpu31: number
-        debugCpu32: number
-        debugRoomCount1: number
-        debugRoomCount2: number
-        debugRoomCount3: number
     }
+
+    type StatsRoomTypes = 'commune' | 'remote'
 
     type RoomTypes =
         | 'commune'
@@ -739,6 +741,10 @@ declare global {
         distanceTransform(
             initialCoords?: CoordMap,
             visuals?: boolean,
+            /**
+             * The smallest number to convert into an avoid value
+             */
+             minAvoid?: number,
             x1?: number,
             y1?: number,
             x2?: number,
@@ -751,6 +757,10 @@ declare global {
         diagonalDistanceTransform(
             initialCoords?: CoordMap,
             visuals?: boolean,
+            /**
+             * The smallest number to convert into an avoid value
+             */
+             minAvoid?: number,
             x1?: number,
             y1?: number,
             x2?: number,
@@ -1798,7 +1808,7 @@ declare global {
             packedRoomNames: { [roomName: string]: string }
 
             unpackedRoomNames: { [roomName: string]: string }
-            roomStats: { [roomName: string]: RoomStats }
+            roomStats: { [roomType in StatsRoomTypes]: { [roomName: string]: RoomStats | RoomCommuneStats } }
 
             terrainCoords: { [roomName: string]: CoordMap }
 
@@ -1878,4 +1888,5 @@ export const loop = function () {
     internationalManager.advancedSellPixels()
 
     internationalManager.endTickManager()
+
 }

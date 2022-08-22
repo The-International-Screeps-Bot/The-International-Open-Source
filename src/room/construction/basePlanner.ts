@@ -119,8 +119,8 @@ export function basePlanner(room: Room) {
         initialWeight?: number
         adjacentToRoads?: boolean
         normalDT?: boolean
-        asymmetrical?: boolean
         coordMap?: CoordMap
+        minAvoid?: number
     }
 
     let stamp
@@ -135,6 +135,22 @@ export function basePlanner(room: Room) {
      * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
      */
     function planStamp(opts: PlanStampOpts): false | RoomPosition[] {
+        if (!opts.coordMap) opts.coordMap = room.baseCoords
+        else {
+            // Loop through each exit of exits
+
+            for (const pos of room.find(FIND_EXIT)) {
+                // Record the exit as a pos to avoid
+
+                opts.coordMap[pack(pos)] = 255
+
+                // Loop through adjacent positions
+
+                for (const coord of findCoordsInsideRect(pos.x - 2, pos.y - 2, pos.x + 2, pos.y + 2))
+                    opts.coordMap[pack(coord)] = 255
+            }
+        }
+
         // Define the stamp using the stampType
 
         stamp = stamps[opts.stampType]
@@ -181,12 +197,12 @@ export function basePlanner(room: Room) {
             // Run distance transform with the baseCM
 
             const distanceCoords = opts.normalDT
-                ? room.distanceTransform(opts.coordMap || room.baseCoords)
-                : room.diagonalDistanceTransform(opts.coordMap || room.baseCoords)
+                ? room.distanceTransform(opts.coordMap, false, opts.minAvoid)
+                : room.diagonalDistanceTransform(opts.coordMap, false, opts.minAvoid)
 
             // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
 
-            stampAnchor = opts.asymmetrical
+            stampAnchor = stamp.asymmetry
                 ? room.findClosestPosOfValueAsym({
                       coordMap: distanceCoords,
                       startCoords: opts.startCoords,
@@ -197,6 +213,7 @@ export function basePlanner(room: Room) {
                       roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
                       offset: stamp.offset,
                       asymOffset: stamp.asymmetry,
+                      /* visuals: opts.stampType === 'labs', */
                   })
                 : room.findClosestPosOfValue({
                       coordMap: distanceCoords,
@@ -242,7 +259,8 @@ export function basePlanner(room: Room) {
             }
         }
 
-        room.memory.stampAnchors[opts.stampType] = room.memory.stampAnchors[opts.stampType].concat(newStampAnchorsPacked)
+        room.memory.stampAnchors[opts.stampType] =
+            room.memory.stampAnchors[opts.stampType].concat(newStampAnchorsPacked)
         return newStampAnchors
     }
 
@@ -334,8 +352,8 @@ export function basePlanner(room: Room) {
             stampType: 'labs',
             count: 1,
             startCoords: hubAnchors,
-            asymmetrical: true,
             normalDT: true,
+            coordMap: room.roadCoords,
         })
     )
         return 'failed'
@@ -557,13 +575,13 @@ export function basePlanner(room: Room) {
 
             const closestSourcePos = room.sourcePositions[sourceIndex][0]
 
-            const OGPositions: Map<RoomPosition, number> = new Map()
+            const OGCoords: Map<number, number> = new Map()
 
             for (let posIndex = 1; posIndex < room.sourcePositions[sourceIndex].length; posIndex += 1) {
-                const pos = room.sourcePositions[sourceIndex][posIndex]
+                const packedCoord = pack(room.sourcePositions[sourceIndex][posIndex])
 
-                OGPositions.set(pos, room.roadCoords[pack(pos)])
-                room.roadCoords[pack(pos)] = 0
+                OGCoords.set(packedCoord, room.roadCoords[packedCoord])
+                room.roadCoords[packedCoord] = 0
             }
 
             let adjacentCoords = findCoordsInsideRect(
@@ -600,11 +618,13 @@ export function basePlanner(room: Room) {
             // Loop through each pos
 
             for (const coord1 of adjacentCoords) {
+                const packedCoord1 = pack(coord1)
+
                 // Iterate if plan for pos is in use
 
-                if (room.roadCoords[pack(coord1)] > 0) continue
+                if (room.roadCoords[packedCoord1] > 0) continue
 
-                if (room.rampartCoords[pack(coord1)] > 0) continue
+                if (room.rampartCoords[packedCoord1] > 0) continue
 
                 if (coord1.x < 2 || coord1.x >= roomDimensions - 2 || coord1.y < 2 || coord1.y >= roomDimensions - 2)
                     continue
@@ -613,14 +633,15 @@ export function basePlanner(room: Room) {
 
                 // Assign 255 to this pos in baseCM
 
-                room.baseCoords[pack(coord1)] = 255
-                room.roadCoords[pack(coord1)] = 255
+                room.baseCoords[packedCoord1] = 255
+                room.roadCoords[packedCoord1] = 255
+                OGCoords.set(packedCoord1, 255)
 
                 // If there is no planned link for this source, plan one
 
                 if (!sourceHasLink) {
                     sourceHasLink = true
-                    room.memory.stampAnchors.sourceLink.push(pack(coord1))
+                    room.memory.stampAnchors.sourceLink.push(packedCoord1)
 
                     const adjacentCoords = findCoordsInsideRect(coord1.x - 3, coord1.y - 3, coord1.x + 3, coord1.y + 3)
 
@@ -629,7 +650,7 @@ export function basePlanner(room: Room) {
 
                         if (room.unprotectedCoords[pack(coord2)] === 0) continue
 
-                        room.rampartCoords[pack(coord1)] = 1
+                        room.rampartCoords[packedCoord1] = 1
                         break
                     }
 
@@ -638,7 +659,7 @@ export function basePlanner(room: Room) {
 
                 // Otherwise plan for an extension
 
-                room.memory.stampAnchors.sourceExtension.push(pack(coord1))
+                room.memory.stampAnchors.sourceExtension.push(packedCoord1)
 
                 // Decrease the extraExtensionsAmount and iterate
 
@@ -646,7 +667,7 @@ export function basePlanner(room: Room) {
                 continue
             }
 
-            for (const [pos, value] of OGPositions) room.roadCoords[pack(pos)] = value
+            for (const [coord, value] of OGCoords) room.roadCoords[coord] = value
         }
     }
 
