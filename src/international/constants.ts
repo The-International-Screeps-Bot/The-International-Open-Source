@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 77
+export const breakingVersion = 78
 
 // Settings
 
@@ -509,7 +509,18 @@ export const stamps: Record<StampTypes, Stamp> = {
                 { x: 3, y: 1 },
                 { x: 3, y: 2 },
             ], */
-            lab: [{ x: 0, y: 1 }, { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 1 }, { x: 3, y: 2 }]
+            lab: [
+                { x: 0, y: 1 },
+                { x: 0, y: 2 },
+                { x: 1, y: 2 },
+                { x: 1, y: 3 },
+                { x: 2, y: 3 },
+                { x: 1, y: 0 },
+                { x: 2, y: 0 },
+                { x: 2, y: 1 },
+                { x: 3, y: 1 },
+                { x: 3, y: 2 },
+            ],
         },
     },
     tower: {

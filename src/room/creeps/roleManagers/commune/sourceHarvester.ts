@@ -201,9 +201,12 @@ SourceHarvester.prototype.repairSourceContainer = function (sourceContainer) {
             (sourceContainer.hitsMax - sourceContainer.hits) / REPAIR_POWER,
         )
 
-        // Add control points to total controlPoints counter and say the success
+        // Add repair points to total repairPoints counter and say the success
 
-        if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eoro += energySpentOnRepairs
+        if (global.roomStats.commune[this.room.name])
+            (global.roomStats.commune[this.room.name] as RoomCommuneStats).eoro += energySpentOnRepairs
+        else if (global.roomStats.remote[this.room.name])
+            global.roomStats.remote[this.room.name].reoro += energySpentOnRepairs
         this.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
 
         // Inform success

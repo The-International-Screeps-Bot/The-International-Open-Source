@@ -166,7 +166,9 @@ Creep.prototype.advancedHarvestSource = function (source) {
     // Find amount of energy harvested and record it in data
 
     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
-    if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eih += energyHarvested
+    if (global.roomStats.commune[this.room.name])
+        (global.roomStats.commune[this.room.name] as RoomCommuneStats).eih += energyHarvested
+    else if (global.roomStats.remote[this.room.name]) global.roomStats.remote[this.room.name].reih += energyHarvested
 
     this.say(`⛏️${energyHarvested}`)
     return true
@@ -243,7 +245,8 @@ Creep.prototype.advancedUpgradeController = function () {
 
                 const controlPoints = workPartCount * UPGRADE_CONTROLLER_POWER
 
-                if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eou += controlPoints
+                if (global.roomStats.commune[this.room.name])
+                    (global.roomStats.commune[this.room.name] as RoomCommuneStats).eou += controlPoints
                 this.message += `🔋${controlPoints}`
             }
         }
@@ -277,7 +280,10 @@ Creep.prototype.advancedUpgradeController = function () {
 
                     // Add control points to total controlPoints counter and say the success
 
-                    if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eoro += energySpentOnRepairs
+                    if (global.roomStats.commune[this.room.name])
+                        (global.roomStats.commune[this.room.name] as RoomCommuneStats).eoro += energySpentOnRepairs
+                    else if (global.roomStats.remote[this.room.name])
+                        global.roomStats.remote[this.room.name].reoro += energySpentOnRepairs
                     this.message += `🔧${energySpentOnRepairs * REPAIR_POWER}`
                 }
             }
@@ -348,7 +354,8 @@ Creep.prototype.advancedUpgradeController = function () {
     if (this.upgradeController(room.controller) === OK) {
         // Add control points to total controlPoints counter and say the success
 
-        if (global.roomStats[this.room.name]) global.roomStats[this.room.name].eou += this.parts.work
+        if (global.roomStats.commune[this.room.name])
+            (global.roomStats.commune[this.room.name] as RoomCommuneStats).eou += this.parts.work
         this.say(`🔋${this.parts.work}`)
 
         // Inform true
@@ -402,11 +409,10 @@ Creep.prototype.advancedBuildCSite = function () {
 
         // Add control points to total controlPoints counter and say the success
 
-        if (global.roomStats[this.room.name])
-            global.roomStats[this.room.name].eob += Math.min(
-                this.parts.work * BUILD_POWER,
-                (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
-            )
+        if (global.roomStats.commune[this.room.name])
+            (global.roomStats.commune[this.room.name] as RoomCommuneStats).eob += energySpentOnConstruction
+        else if (global.roomStats.remote[this.room.name])
+            global.roomStats.remote[this.room.name].reob += energySpentOnConstruction
 
         this.say(`🚧${energySpentOnConstruction}`)
 
@@ -487,11 +493,10 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
         // Add control points to total controlPoints counter and say the success
 
-        if (global.roomStats[this.room.name])
-            global.roomStats[this.room.name].eob += Math.min(
-                this.parts.work * BUILD_POWER,
-                (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
-            )
+        if (global.roomStats.commune[this.room.name])
+            (global.roomStats.commune[this.room.name] as RoomCommuneStats).eob += energySpentOnConstruction
+        else if (global.roomStats.remote[this.room.name])
+            global.roomStats.remote[this.room.name].reob += energySpentOnConstruction
 
         this.say(`🚧${energySpentOnConstruction}`)
 

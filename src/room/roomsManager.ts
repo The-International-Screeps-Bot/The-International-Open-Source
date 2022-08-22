@@ -29,8 +29,8 @@ export function roomManager() {
         const room = Game.rooms[roomName]
         const roomType = room.memory.type
 
-        const saveStats = Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType)
-        if (saveStats) statsManager.roomPreTick(room.name, roomType)
+        const statsActive = Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType)
+        if (statsActive) statsManager.roomPreTick(room.name, roomType)
 
         // If there is a specific manager for this room's type, run it
 
@@ -54,8 +54,8 @@ export function roomManager() {
 
         if (Memory.CPULogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
 
-        if (saveStats) statsManager.roomEndTick(room.name, roomType as 'commune' | 'remote', room)
         customLog(room.name + ' ' + roomType, logMessage, undefined, myColors.midGrey)
+        if (statsActive) statsManager.roomEndTick(room.name, roomType)
     }
 
     // If CPU logging is enabled, log the CPU used by this manager
