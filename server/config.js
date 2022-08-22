@@ -4,11 +4,11 @@ module.exports.tickDuration = 10
 
 module.exports.playerRooms = {"W2N2":'user1',"W1N1":"user2","W2N5":"user3"}
 module.exports.rooms ={
-     "W8N3":'bot',
-     "W2N5":'bot',
      "W1N1":'bot',
      "W2N2":'bot',
+     "W2N5":'bot',
      "W5N8":'bot',
+     "W8N3":'bot',
      "W7N7":'bot',
 }
 
