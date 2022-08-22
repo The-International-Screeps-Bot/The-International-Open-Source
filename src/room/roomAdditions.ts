@@ -441,12 +441,17 @@ Object.defineProperties(Room.prototype, {
 
             for (const source of this.sources) this._usedSourceCoords.push(new Set())
 
-            const harvesterNames =
-                this.memory.type === 'commune'
-                    ? this.myCreeps.source1Harvester
-                          .concat(this.myCreeps.source2Harvester)
-                          .concat(this.myCreeps.vanguard)
-                    : this.myCreeps.source1RemoteHarvester.concat(this.myCreeps.source2RemoteHarvester)
+            let harvesterNames;
+            if (this.memory.type === 'commune') {
+                harvesterNames = this.myCreeps.source1Harvester;
+                if (this.sources.length >= 2)
+                    harvesterNames = harvesterNames.concat(this.myCreeps.source2Harvester)
+                harvesterNames = harvesterNames.concat(this.myCreeps.vanguard);
+            } else {
+                harvesterNames = this.myCreeps.source1RemoteHarvester;
+                if (this.sources.length >= 2)
+                    harvesterNames = harvesterNames.concat(this.myCreeps.source2RemoteHarvester);
+            }
 
             for (const creepName of harvesterNames) {
                 // Get the creep using its name
@@ -744,7 +749,7 @@ Object.defineProperties(Room.prototype, {
 
             const hubAnchor = unpackAsPos(this.memory.stampAnchors.hub[0])
             if (!hubAnchor) return false
-            console.log(JSON.stringify(hubAnchor))
+            //console.log(JSON.stringify(hubAnchor))
             for (const structure of new RoomPosition(hubAnchor.x - 1, hubAnchor.y - 1, this.name).lookFor(
                 LOOK_STRUCTURES,
             )) {

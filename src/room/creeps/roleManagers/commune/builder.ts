@@ -39,7 +39,7 @@ Builder.prototype.getEnergy = function () {
 
     // If there are no sourceHarvesters in the room, harvest a source
 
-    if (!(room.myCreeps.source1Harvester.length + room.myCreeps.source2Harvester.length)) {
+    if (!((room.myCreeps.source1Harvester?.length) || 0 + (room.myCreeps.source2Harvester?.length) || 0)) {
         const sources = room.find(FIND_SOURCES_ACTIVE)
         if (!sources.length) return true
 
