@@ -299,8 +299,7 @@ export function rampartPlanner(room: Room) {
                 }
             }
         }
-
-        // If roomVisuals are enabled
+/*
 
         if (Memory.baseVisuals) {
             // Visualize position values
@@ -335,7 +334,7 @@ export function rampartPlanner(room: Room) {
                 }
             }
         }
-
+ */
         // initialise graph
         // possible 2*50*50 +2 (st) Vertices (Walls etc set to unused later)
 

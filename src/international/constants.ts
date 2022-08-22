@@ -488,7 +488,7 @@ export const stamps: Record<StampTypes, Stamp> = {
     labs: {
         offset: 1,
         protectionOffset: 3,
-        size: 3,
+        size: 2,
         asymmetry: 1,
         structures: {
             road: [

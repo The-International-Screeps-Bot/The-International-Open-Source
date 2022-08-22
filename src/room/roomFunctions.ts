@@ -136,6 +136,7 @@ Room.prototype.get = function (roomObjectName) {
         const distanceCoords = room.distanceTransform(
             undefined,
             false,
+            255,
             room.controller.pos.x - 2,
             room.controller.pos.y - 2,
             room.controller.pos.x + 2,
@@ -147,8 +148,9 @@ Room.prototype.get = function (roomObjectName) {
         return room.findClosestPosOfValue({
             coordMap: distanceCoords,
             startCoords: [room.anchor],
-            requiredValue: 2,
-            reduceIterations: 1,
+            requiredValue: 3,
+            reduceIterations: 2,
+            visuals: false,
         })
     }
 
@@ -539,10 +541,11 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     // Construct route
 
     function generateRoute(): Route | undefined {
+        /*
         // If the goal is in the same room as the origin, inform that no route is needed
 
         if (opts.origin.roomName === opts.goal.pos.roomName) return undefined
-
+ */
         // Construct route by searching through rooms
 
         const route = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
@@ -611,7 +614,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // Create a costMatrix for the room
 
                 const cm = new PathFinder.CostMatrix()
-
+                /*
                 // If there is no route
 
                 if (!route) {
@@ -637,7 +640,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     x = 49
                     for (y = 0; y < 50; y += 1) cm.set(x, y, 255)
                 }
-
+ */
                 // Weight positions
 
                 for (const weight in opts.weightPositions) {
@@ -1353,6 +1356,7 @@ Room.prototype.findStoredResourceAmount = function (resourceType) {
 Room.prototype.distanceTransform = function (
     initialCoords,
     visuals,
+    minAvoid = 1,
     x1 = 0,
     y1 = 0,
     x2 = roomDimensions - 1,
@@ -1366,12 +1370,16 @@ Room.prototype.distanceTransform = function (
 
     let x
     let y
+    let minX = Math.max(x1 - 1, 0)
+    let minY = Math.max(y1 - 1, 0)
+    let maxX = Math.min(x2 + 1, roomDimensions - 1)
+    let maxY = Math.min(y2 + 1, roomDimensions - 1)
     let packedCoord
 
-    for (x = Math.max(x1 - 1, 0); x < Math.min(x2 + 1, roomDimensions - 1); x += 1) {
-        for (y = Math.max(y1 - 1, 0); y < Math.min(y2 + 1, roomDimensions - 1); y += 1) {
+    for (x = minX; x <= maxX; x += 1) {
+        for (y = minY; y <= maxY; y += 1) {
             packedCoord = packXY(x, y)
-            distanceCoords[packedCoord] = initialCoords[packedCoord] === 255 ? 0 : 255
+            distanceCoords[packedCoord] = initialCoords[packedCoord] >= minAvoid ? 0 : 255
         }
     }
 
@@ -1443,6 +1451,7 @@ Room.prototype.distanceTransform = function (
 Room.prototype.diagonalDistanceTransform = function (
     initialCoords,
     visuals,
+    minAvoid = 1,
     x1 = 0,
     y1 = 0,
     x2 = roomDimensions - 1,
@@ -1461,7 +1470,7 @@ Room.prototype.diagonalDistanceTransform = function (
     for (x = x1; x <= x2; x += 1) {
         for (y = y1; y <= y2; y += 1) {
             packedCoord = packXY(x, y)
-            distanceCoords[packedCoord] = initialCoords[packedCoord] === 255 ? 0 : 255
+            distanceCoords[packedCoord] = initialCoords[packedCoord] >= minAvoid ? 0 : 255
         }
     }
 
@@ -1676,24 +1685,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                 // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                const adjacentCoords = [
-                    {
-                        x: coord1.x - 1,
-                        y: coord1.y,
-                    },
-                    {
-                        x: coord1.x + 1,
-                        y: coord1.y,
-                    },
-                    {
-                        x: coord1.x,
-                        y: coord1.y - 1,
-                    },
-                    {
-                        x: coord1.x,
-                        y: coord1.y + 1,
-                    },
-                ]
+                const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
 
                 // Loop through adjacent positions
 
@@ -1716,47 +1708,6 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                     // Add it tofastFillerSide the next gen
 
                     nextGeneration.push(coord2)
-                }
-            }
-
-            // Try without using impassibles
-
-            if (!nextGeneration.length) {
-                localVisitedCoords = new Uint8Array(visitedCoords)
-
-                // Iterate through positions of this gen
-
-                for (const coord1 of thisGeneration) {
-                    // If the pos can be an anchor, inform it
-
-                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
-
-                    // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
-
-                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
-
-                    // Loop through adjacent positions
-
-                    for (const coord2 of adjacentCoords) {
-                        // Iterate if the pos doesn't map onto a room
-
-                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
-                            continue
-
-                        // Iterate if the adjacent pos has been visited or isn't a tile
-
-                        if (localVisitedCoords[pack(coord2)] === 1) continue
-
-                        // Otherwise record that it has been visited
-
-                        localVisitedCoords[pack(coord2)] = 1
-
-                        if (opts.coordMap[pack(coord2)] === 0) continue
-
-                        // Add it tofastFillerSide the next gen
-
-                        nextGeneration.push(coord2)
-                    }
                 }
             }
 
@@ -1797,7 +1748,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                     }
                 }
             }
-/*
+
             if (opts.visuals) {
                 for (const coord of nextGeneration)
                     this.visual.text(opts.coordMap[pack(coord)].toString(), coord.x, coord.y, {
@@ -1805,7 +1756,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                         color: myColors.yellow,
                     })
             }
- */
+
             // Set this gen to next gen
 
             visitedCoords = new Uint8Array(localVisitedCoords)
@@ -1848,12 +1799,17 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
 
         // Loop through adjacent positions
 
-        for (const coord2 of findCoordsInsideRect(coord1.x - opts.offset, coord1.y - opts.offset, coord1.x + opts.offset + opts.asymOffset, coord1.y + opts.offset + opts.asymOffset)) {
+        for (const coord2 of findCoordsInsideRect(
+            coord1.x - opts.offset,
+            coord1.y - opts.offset,
+            coord1.x + opts.offset + opts.asymOffset,
+            coord1.y + opts.offset + opts.asymOffset,
+        )) {
             // If the adjacentPos isn't walkable, iterate
 
             if (opts.coordMap[pack(coord2)] === 0) return false
         }
-/*
+        /*
         for (const coord2 of findCoordsInsideRect(coord1.x - opts.offset, coord1.y - opts.offset, coord1.x + opts.offset + opts.asymOffset, coord1.y + opts.offset + opts.asymOffset)) {
             // If the adjacentPos isn't walkable, iterate
             room.visual.text(opts.coordMap[pack(coord2)].toString(), coord2.x, coord2.y)
@@ -1902,6 +1858,8 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
             nextGeneration = []
             i++
 
+            // Try without using impassibles
+
             let localVisitedCoords = new Uint8Array(visitedCoords)
 
             // Iterate through positions of this gen
@@ -1913,24 +1871,7 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
 
                 // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                const adjacentCoords = [
-                    {
-                        x: coord1.x - 1,
-                        y: coord1.y,
-                    },
-                    {
-                        x: coord1.x + 1,
-                        y: coord1.y,
-                    },
-                    {
-                        x: coord1.x,
-                        y: coord1.y - 1,
-                    },
-                    {
-                        x: coord1.x,
-                        y: coord1.y + 1,
-                    },
-                ]
+                const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
 
                 // Loop through adjacent positions
 
@@ -1953,47 +1894,6 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
                     // Add it tofastFillerSide the next gen
 
                     nextGeneration.push(coord2)
-                }
-            }
-
-            // Try without using impassibles
-
-            if (!nextGeneration.length) {
-                localVisitedCoords = new Uint8Array(visitedCoords)
-
-                // Iterate through positions of this gen
-
-                for (const coord1 of thisGeneration) {
-                    // If the pos can be an anchor, inform it
-
-                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
-
-                    // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
-
-                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
-
-                    // Loop through adjacent positions
-
-                    for (const coord2 of adjacentCoords) {
-                        // Iterate if the pos doesn't map onto a room
-
-                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
-                            continue
-
-                        // Iterate if the adjacent pos has been visited or isn't a tile
-
-                        if (localVisitedCoords[pack(coord2)] === 1) continue
-
-                        // Otherwise record that it has been visited
-
-                        localVisitedCoords[pack(coord2)] = 1
-
-                        if (opts.coordMap[pack(coord2)] === 0) continue
-
-                        // Add it tofastFillerSide the next gen
-
-                        nextGeneration.push(coord2)
-                    }
                 }
             }
 
@@ -2034,7 +1934,7 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
                     }
                 }
             }
-/*
+            /*
             if (opts.visuals) {
                 for (const coord of nextGeneration)
                     this.visual.text(opts.coordMap[pack(coord)].toString(), coord.x, coord.y, {

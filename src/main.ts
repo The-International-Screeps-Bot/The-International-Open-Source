@@ -739,6 +739,10 @@ declare global {
         distanceTransform(
             initialCoords?: CoordMap,
             visuals?: boolean,
+            /**
+             * The smallest number to convert into an avoid value
+             */
+             minAvoid?: number,
             x1?: number,
             y1?: number,
             x2?: number,
@@ -751,6 +755,10 @@ declare global {
         diagonalDistanceTransform(
             initialCoords?: CoordMap,
             visuals?: boolean,
+            /**
+             * The smallest number to convert into an avoid value
+             */
+             minAvoid?: number,
             x1?: number,
             y1?: number,
             x2?: number,
