@@ -15,9 +15,12 @@ const logger = createLogger({
     timestamp(),
     prettyPrint()
   ),
-  transports: [new transports.File({ filename: "log.log" })]
+  transports: [new transports.File({ filename: "push.log" }, new transports.Console())],
 })
-
+function logInfo(message) {
+    logger.log('info', message)
+    console.log(message)
+}
 let groupedStats = {}
 
 async function getLoginInfo(userinfo) {
@@ -58,7 +61,7 @@ function reportStats(stats) {
 
 function pushStats(userinfo, stats, shard) {
     groupedStats[userinfo.username] = userinfo.type === 'mmo' ? { [shard]: stats } : { shard: stats }
-    console.log(`${userinfo.type}: Added stats object for ${userinfo.username} in ${shard}`)
+    logInfo(`${userinfo.type}: Added stats object for ${userinfo.username} in ${shard}`)
 }
 
 function shouldContinue(shardsCount) {
@@ -95,7 +98,7 @@ cron.schedule('* * * * *', async () => {
     const hasRunningPrivateServer = statsUsers.some(u => u.type === 'private')
     if (!hasRunningPrivateServer) {
         reportStats({ stats: groupedStats })
-        logger.log('Pushed stats to graphite')
+        logInfo('Pushed stats to graphite')
         return
     }
 
@@ -105,11 +108,12 @@ cron.schedule('* * * * *', async () => {
         const modifiedRoomsObjects = modifyRoomObjects(roomsObjects)
         const serverStats = handleServerStats(users, modifiedRoomsObjects)
 
+
         reportStats({ stats: groupedStats, serverStats })
-        logger.log('Pushed stats AND serverStats to graphite')
+        logInfo(Object.keys(groupedStats) > 0 ? 'Pushed stats AND serverStats to graphite' : 'Pushed serverStats to graphite')
     } catch (e) {
         console.log(e)
         reportStats({ stats: groupedStats })
-        logger.log('Pushed stats to graphite')
+        logInfo('Pushed stats to graphite')
     }
 })
