@@ -10,6 +10,8 @@ module.exports.rooms ={
      "W5N8":'bot',
      "W8N3":'bot',
      "W9N9":'bot',
+     "W3N9":'bot',
+     "W8N6":'bot',
 }
 
 module.exports.milestones = [

@@ -35,4 +35,16 @@ module.exports.users = [
           shards: ['screeps'],
           password: 'tooangel',
      },
+     {
+          username: 'W3N9',
+          type: 'private',
+          shards: ['screeps'],
+          password: 'tooangel',
+     },
+     {
+          username: 'W8N6',
+          type: 'private',
+          shards: ['screeps'],
+          password: 'tooangel',
+     }
 ]
