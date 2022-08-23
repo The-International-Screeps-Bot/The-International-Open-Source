@@ -132,12 +132,6 @@ FastFiller.prototype.fillFastFiller = function () {
                return true
           }
 
-          if (structures === 0) {
-
-               this.advancedRecycle()
-               return false
-          }
-
           // Inform false
 
           return false
