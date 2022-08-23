@@ -118,7 +118,7 @@ InternationalManager.prototype.tickConfig = function () {
         if (!room.memory.deposits) room.memory.deposits = {}
     }
 
-    let reservedGCL = Game.gcl.level
+    let reservedGCL = Game.gcl.level - Memory.communes.length
 
     reservedGCL -= Object.values(Memory.claimRequests).filter(request => {
         return request.responder
