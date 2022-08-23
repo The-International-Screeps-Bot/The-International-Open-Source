@@ -225,11 +225,11 @@ Room.prototype.spawnRequester = function () {
 
             // If there is no sourceLink 0, increase requiredCarryParts using the source's path length
 
-            if (this.sourcePaths[0] && !this.sourceLinks[0]) requiredCarryParts += findCarryPartsRequired(this.sourcePaths[0].length * 2, 10)
+            if (this.sourcePaths[0] && !this.sourceLinks[0]) requiredCarryParts += findCarryPartsRequired(this.sourcePaths[0].length, 10)
 
             // If there is no sourceLink 1, increase requiredCarryParts using the source's path length
 
-            if (this.sourcePaths[1] && !this.sourceLinks[1]) requiredCarryParts += findCarryPartsRequired(this.sourcePaths[1].length * 2, 10)
+            if (this.sourcePaths[1] && !this.sourceLinks[1]) requiredCarryParts += findCarryPartsRequired(this.sourcePaths[1].length, 10)
 
             // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
@@ -244,7 +244,7 @@ Room.prototype.spawnRequester = function () {
                         this.sources.length * 0.75,
                     )
 
-                requiredCarryParts += findCarryPartsRequired(this.upgradePathLength * 2, income)
+                requiredCarryParts += findCarryPartsRequired(this.upgradePathLength, income)
             }
 
             const role = 'hauler'
