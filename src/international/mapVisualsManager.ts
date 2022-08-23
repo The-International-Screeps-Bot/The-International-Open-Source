@@ -18,12 +18,12 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
         const roomMemory = Memory.rooms[roomName]
 
-        Game.map.visual.text(roomMemory.type, new RoomPosition(2, 40, roomName), {
+        Game.map.visual.text(roomMemory.T, new RoomPosition(2, 40, roomName), {
             align: 'left',
             fontSize: 5,
         })
 
-        if (roomMemory.type === 'commune') {
+        if (roomMemory.T === 'commune') {
             const room = Game.rooms[roomName]
             if (!room) continue
 
@@ -80,7 +80,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
             continue
         }
 
-        if (roomMemory.type === 'remote') {
+        if (roomMemory.T === 'remote') {
             const commune = Game.rooms[roomMemory.commune]
 
             if (commune) {

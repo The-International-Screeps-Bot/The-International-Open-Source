@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 78
+export const breakingVersion = 79
 
 // Settings
 
@@ -97,7 +97,7 @@ export const roomTypeProperties: RoomTypeProperties = {
     deposits: true,
     powerBanks: true,
     notClaimable: true,
-    planned: true,
+    PC: true,
     HS: true,
     HU: true,
 
@@ -126,7 +126,7 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         remotes: true,
         deposits: true,
         powerBanks: true,
-        planned: true,
+        PC: true,
         HS: true,
         HU: true,
     },
@@ -138,7 +138,7 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         sourceEfficacies: true,
         abandoned: true,
         notClaimable: true,
-        planned: true,
+        PC: true,
     },
     ally: {
         owner: true,
@@ -164,7 +164,7 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
     },
     neutral: {
         notClaimable: true,
-        planned: true,
+        PC: true,
     },
     keeper: {
         owner: true,

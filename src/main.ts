@@ -744,7 +744,7 @@ declare global {
             /**
              * The smallest number to convert into an avoid value
              */
-             minAvoid?: number,
+            minAvoid?: number,
             x1?: number,
             y1?: number,
             x2?: number,
@@ -760,7 +760,7 @@ declare global {
             /**
              * The smallest number to convert into an avoid value
              */
-             minAvoid?: number,
+            minAvoid?: number,
             x1?: number,
             y1?: number,
             x2?: number,
@@ -1181,9 +1181,9 @@ declare global {
         anchor: number
 
         /**
-         * A description of the room's defining properties that can be used to assume other properties
+         * Type of a room that generally describes properties of the room
          */
-        type: RoomTypes
+        T: RoomTypes
 
         /**
          * A set of names of remotes controlled by this room
@@ -1195,7 +1195,10 @@ declare global {
          */
         notClaimable: boolean
 
-        sourceIds: Id<Source>[]
+        /**
+         * Source IDs of the sources in the room
+         */
+        SIDs: Id<Source>[]
 
         commune: string
 
@@ -1242,9 +1245,9 @@ declare global {
         portalsTo: string[]
 
         /**
-         * The last tick the room was scouted at
+         * Last Scouted Tick, the last tick the room was scouted at
          */
-        lastScout: number | undefined
+        LST: number | undefined
 
         /**
          * The room name of the commune's claim target
@@ -1272,9 +1275,9 @@ declare global {
         deposits: Record<Id<Deposit>, DepositRecord>
 
         /**
-         * Wether or not commune planning has been completed for the room
+         * Planning Completed, Wether or not commune planning has been completed for the room
          */
-        planned: boolean
+        PC: boolean
 
         /**
          * Remote Planned, wether or not remote planning has been completed for the room
@@ -1888,5 +1891,4 @@ export const loop = function () {
     internationalManager.advancedSellPixels()
 
     internationalManager.endTickManager()
-
 }

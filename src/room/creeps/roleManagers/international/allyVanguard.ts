@@ -16,8 +16,9 @@ export function allyVanguardManager(room: Room, creepsOfRole: string[]) {
 
         if (!request) return
 
-        Memory.allyCreepRequests[Memory.rooms[creep.commune].allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] -=
-            creep.parts.work
+        Memory.allyCreepRequests[Memory.rooms[creep.commune].allyCreepRequest].needs[
+            allyCreepRequestNeedsIndex.allyVanguard
+        ] -= creep.parts.work
 
         creep.say(request)
 
@@ -97,11 +98,11 @@ AllyVanguard.prototype.findRemote = function () {
 
         if (
             !roomMemory ||
-            roomMemory.type === 'enemy' ||
-            roomMemory.type === 'enemyRemote' ||
-            roomMemory.type === 'keeper' ||
-            roomMemory.type === 'ally' ||
-            roomMemory.type === 'allyRemote'
+            roomMemory.T === 'enemy' ||
+            roomMemory.T === 'enemyRemote' ||
+            roomMemory.T === 'keeper' ||
+            roomMemory.T === 'ally' ||
+            roomMemory.T === 'allyRemote'
         )
             continue
 

@@ -107,7 +107,7 @@ export function advancedFindDistance(
 
             // If the type is in typeWeights, inform the weight for the type
 
-            if (typeWeights[roomMemory.type]) return typeWeights[roomMemory.type]
+            if (typeWeights[roomMemory.T]) return typeWeights[roomMemory.T]
 
             // Inform to consider this room
 
@@ -180,7 +180,11 @@ export function findClosestObject<T extends _HasRoomPosition>(target: RoomPositi
 /**
  * Finds the closest object with a position to a given target, by range, in a specified range (Half Manhattan)
  */
- export function findClosestObjectInRange<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[], range: number) {
+export function findClosestObjectInRange<T extends _HasRoomPosition>(
+    target: RoomPosition | Coord,
+    objects: T[],
+    range: number,
+) {
     let minRange = Infinity
     let closest = undefined
 
