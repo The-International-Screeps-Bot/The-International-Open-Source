@@ -8,7 +8,7 @@ Room.prototype.roomVisualsManager = function () {
     ;(() => {
         if (!Memory.baseVisuals) return
 
-        if (!this.memory.planned) return
+        if (!this.memory.PC) return
 
         for (const stampType in stamps) {
             const stamp = stamps[stampType as StampTypes]

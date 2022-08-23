@@ -566,7 +566,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 // If the type is in typeWeights, inform the weight for the type
 
-                if (opts.typeWeights && opts.typeWeights[roomMemory.type]) return opts.typeWeights[roomMemory.type]
+                if (opts.typeWeights && opts.typeWeights[roomMemory.T]) return opts.typeWeights[roomMemory.T]
 
                 // Inform to consider this room
 
@@ -607,7 +607,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 if (
                     opts.typeWeights &&
                     Memory.rooms[roomName] &&
-                    opts.typeWeights[Memory.rooms[roomName].type] === Infinity
+                    opts.typeWeights[Memory.rooms[roomName].T] === Infinity
                 )
                     return false
 
@@ -688,8 +688,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 }
 
                 if (opts.weightStampAnchors) {
-                    if (room.memory.type === 'commune') {
-                    } else if (room.memory.type === 'remote') {
+                    if (room.memory.T === 'commune') {
+                    } else if (room.memory.T === 'remote') {
                     }
                 }
 
@@ -938,7 +938,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
     // Record that the room was scouted this tick
 
-    room.memory.lastScout = Game.time
+    room.memory.LST = Game.time
 
     // Find the numbers in the room's name
 
@@ -952,22 +952,22 @@ Room.prototype.findType = function (scoutingRoom: Room) {
     // Use the numbers to deduce some room types - quickly!
 
     if (EW % 10 === 0 && NS % 10 === 0) {
-        room.memory.type = 'intersection'
+        room.memory.T = 'intersection'
         return
     }
 
     if (EW % 10 === 0 || NS % 10 === 0) {
-        room.memory.type = 'highway'
+        room.memory.T = 'highway'
         return
     }
 
     if (EW % 5 === 0 && NS % 5 === 0) {
-        room.memory.type = 'keeperCenter'
+        room.memory.T = 'keeperCenter'
         return
     }
 
     if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1) {
-        room.memory.type = 'keeper'
+        room.memory.T = 'keeper'
         return
     }
 
@@ -988,11 +988,11 @@ Room.prototype.findType = function (scoutingRoom: Room) {
             // If the controller is owned by an ally
 
             if (Memory.allyList.includes(owner)) {
-                room.memory.type = 'ally'
+                room.memory.T = 'ally'
                 return
             }
 
-            room.memory.type = 'enemy'
+            room.memory.T = 'enemy'
 
             // If the controller is not owned by an ally
 
@@ -1092,7 +1092,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
             if (!Memory.allyList.includes(controller.reservation.username)) {
                 // Set type to enemyRemote and inform true
 
-                room.memory.type = 'enemyRemote'
+                room.memory.T = 'enemyRemote'
                 room.memory.owner = controller.reservation.username
                 return true
             }
@@ -1101,7 +1101,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             // Set type to allyRemote and inform true
 
-            room.memory.type = 'allyRemote'
+            room.memory.T = 'allyRemote'
             room.memory.owner = controller.reservation.username
             return true
         }
@@ -1142,7 +1142,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
                     if (Memory.allyList.includes(creep.owner.username)) {
                         // Set type to allyRemote and stop
 
-                        room.memory.type = 'allyRemote'
+                        room.memory.T = 'allyRemote'
                         room.memory.owner = creep.owner.username
                         return true
                     }
@@ -1151,7 +1151,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
                     // Set type to enemyRemote and stop
 
-                    room.memory.type = 'enemyRemote'
+                    room.memory.T = 'enemyRemote'
                     room.memory.owner = creep.owner.username
                     return true
                 }
@@ -1162,7 +1162,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
         if (room.makeRemote(scoutingRoom)) return
 
-        room.memory.type = 'neutral'
+        room.memory.T = 'neutral'
 
         room.createClaimRequest()
     }
@@ -1188,7 +1188,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
     if (distance < 4) {
         // If the room is already a remote of the scoutingRoom
 
-        if (room.memory.type === 'remote' && scoutingRoom.name === room.memory.commune) return true
+        if (room.memory.T === 'remote' && scoutingRoom.name === room.memory.commune) return true
 
         // Get the anchor from the scoutingRoom, stopping if it's undefined
 
@@ -1229,8 +1229,8 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
         // If the room isn't already a remote
 
-        if (room.memory.type !== 'remote' || !Memory.communes.includes(room.memory.commune)) {
-            room.memory.type = 'remote'
+        if (room.memory.T !== 'remote' || !Memory.communes.includes(room.memory.commune)) {
+            room.memory.T = 'remote'
 
             // Assign the room's commune as the scoutingRoom
 
@@ -1263,7 +1263,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
         if (newAvgSourceEfficacy >= currentAvgSourceEfficacy) return true
 
-        room.memory.type = 'remote'
+        room.memory.T = 'remote'
 
         // Assign the room's commune as the scoutingRoom
 
@@ -1288,7 +1288,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         return true
     }
 
-    if (room.memory.type !== 'remote') return false
+    if (room.memory.T !== 'remote') return false
 
     if (!Memory.communes.includes(room.memory.commune)) return false
 
@@ -1300,7 +1300,7 @@ Room.prototype.cleanMemory = function () {
 
     // Stop if the room doesn't have a type
 
-    if (!room.memory.type) return
+    if (!room.memory.T) return
 
     // Loop through keys in the room's memory
 
@@ -1311,7 +1311,7 @@ Room.prototype.cleanMemory = function () {
 
         // Iterate if key part of this roomType's properties
 
-        if (roomTypes[room.memory.type][key]) continue
+        if (roomTypes[room.memory.T][key]) continue
 
         // Delete the property
 

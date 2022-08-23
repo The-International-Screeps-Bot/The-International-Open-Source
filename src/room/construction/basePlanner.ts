@@ -734,6 +734,6 @@ export function basePlanner(room: Room) {
 
     // Record planning results in the room's global and inform true
 
-    room.memory.planned = true
+    room.memory.PC = true
     return true
 }

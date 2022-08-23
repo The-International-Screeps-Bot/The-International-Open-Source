@@ -44,9 +44,9 @@ Object.defineProperties(Room.prototype, {
 
             this._sources = []
 
-            if (this.memory.sourceIds) {
-                for (const index in this.memory.sourceIds) {
-                    const source = findObjectWithID(this.memory.sourceIds[index])
+            if (this.memory.SIDs) {
+                for (const index in this.memory.SIDs) {
+                    const source = findObjectWithID(this.memory.SIDs[index])
 
                     source.index = parseInt(index)
                     this._sources.push(source)
@@ -55,7 +55,7 @@ Object.defineProperties(Room.prototype, {
                 return this._sources
             }
 
-            this.memory.sourceIds = []
+            this.memory.SIDs = []
 
             const sources = this.find(FIND_SOURCES)
 
@@ -64,7 +64,7 @@ Object.defineProperties(Room.prototype, {
 
                 source.index = parseInt(index)
 
-                this.memory.sourceIds.push(source.id)
+                this.memory.SIDs.push(source.id)
                 this._sources.push(source)
             }
 
@@ -333,7 +333,7 @@ Object.defineProperties(Room.prototype, {
             this.memory.SP = []
             this._sourcePositions = []
 
-            if (this.memory.type === 'remote') {
+            if (this.memory.T === 'remote') {
                 const commune = Game.rooms[this.memory.commune]
                 if (!commune) return []
 
@@ -442,7 +442,7 @@ Object.defineProperties(Room.prototype, {
             for (const source of this.sources) this._usedSourceCoords.push(new Set())
 
             let harvesterNames;
-            if (this.memory.type === 'commune') {
+            if (this.memory.T === 'commune') {
                 harvesterNames = this.myCreeps.source1Harvester;
                 if (this.sources.length >= 2)
                     harvesterNames = harvesterNames.concat(this.myCreeps.source2Harvester)
@@ -488,7 +488,7 @@ Object.defineProperties(Room.prototype, {
 
             this.global.sourcePaths = []
 
-            if (this.memory.type === 'remote') {
+            if (this.memory.T === 'remote') {
                 const commune = Game.rooms[this.memory.commune]
                 if (!commune) return []
 

@@ -12,7 +12,7 @@ export function constructionManager(room: Room) {
 
     if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-    if (!room.memory.planned) basePlanner(room)
+    if (!room.memory.PC) basePlanner(room)
 
     manageControllerStructures()
 

@@ -27,14 +27,14 @@ export function roomManager() {
         // Get the room using the roomName
 
         const room = Game.rooms[roomName]
-        const roomType = room.memory.type
+        const roomType = room.memory.T
 
         const statsActive = Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType)
         if (statsActive) statsManager.roomPreTick(room.name, roomType)
 
         // If there is a specific manager for this room's type, run it
 
-        if (room.memory.type === 'commune') room.communeManager()
+        if (room.memory.T === 'commune') room.communeManager()
 
         //
 

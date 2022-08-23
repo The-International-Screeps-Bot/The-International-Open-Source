@@ -63,14 +63,14 @@ InternationalManager.prototype.tickConfig = function () {
         const { controller } = room
         if (!controller) continue
 
-        if (controller.my) room.memory.type = 'commune'
+        if (controller.my) room.memory.T = 'commune'
 
-        if (room.memory.type != 'commune') continue
+        if (room.memory.T != 'commune') continue
 
         // Iterate if the controller is not mine
 
         if (!controller.my) {
-            room.memory.type = 'neutral'
+            room.memory.T = 'neutral'
             continue
         }
 

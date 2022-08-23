@@ -88,9 +88,9 @@ Scout.prototype.findScoutTarget = function () {
 
         if (commune.scoutTargets.has(roomName)) continue
 
-        // If the room has memory and a lastScout
+        // If the room has memory and a LST
 
-        if (Memory.rooms[roomName] && Memory.rooms[roomName].lastScout) {
+        if (Memory.rooms[roomName] && Memory.rooms[roomName].LST) {
             // Add it to scoutedRooms and iterate
 
             scoutedRooms.push(roomName)
@@ -107,7 +107,7 @@ Scout.prototype.findScoutTarget = function () {
               (a, b) =>
                   Game.map.getRoomLinearDistance(this.commune, a) - Game.map.getRoomLinearDistance(this.commune, b),
           )[0]
-        : scoutedRooms.sort((a, b) => Memory.rooms[a].lastScout - Memory.rooms[b].lastScout)[0]
+        : scoutedRooms.sort((a, b) => Memory.rooms[a].LST - Memory.rooms[b].LST)[0]
 
     if (!scoutTarget) return false
 
@@ -120,7 +120,7 @@ Scout.prototype.findScoutTarget = function () {
 Scout.prototype.recordDeposits = function () {
     const { room } = this
 
-    if (room.memory.type != 'highway') return
+    if (room.memory.T != 'highway') return
 
     // Make sure the room has a commune
 
@@ -164,13 +164,13 @@ Scout.prototype.advancedSignController = function () {
 
     // If the room is owned by an enemy or an ally
 
-    if (room.memory.type === 'ally' || room.memory.type === 'enemy') return true
+    if (room.memory.T === 'ally' || room.memory.T === 'enemy') return true
 
     if (controller.reservation && controller.reservation.username != Memory.me) return true
 
     // If the room is a commune
 
-    if (room.memory.type === 'commune') {
+    if (room.memory.T === 'commune') {
         // If the room already has a correct sign
 
         if (controller.sign && communeSigns.includes(controller.sign.text)) return true
