@@ -122,6 +122,7 @@ async function initServer() {
      })
      const configFilename = path.resolve(dir, '.screepsrc')
      let config = fs.readFileSync(configFilename, { encoding: 'utf8' })
+     console.log(process.env.STEAM_API_KEY)
      config = config
           .replace('{{STEAM_KEY}}', process.env.STEAM_API_KEY)
           .replace('runner_threads = 2', 'runner_threads =4')
