@@ -465,6 +465,11 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
+
+            // If there are enemy attackers in the room
+
+            if (attackStrength > 0) return false
+
             // Stop if there are no construction sites
 
             if (this.find(FIND_MY_CONSTRUCTION_SITES).length === 0) return false
