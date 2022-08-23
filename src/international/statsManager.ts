@@ -90,6 +90,8 @@ export class StatsManager {
             // roomStats.eiet = this.average(roomStats.eiet, globalStats.eiet)
 
             roomStats.eou = this.average(roomStats.eou, globalCommuneStats.eou)
+            roomStats.eob = this.average(roomStats.eob, globalCommuneStats.eob)
+            roomStats.eoro = this.average(roomStats.eoro, globalCommuneStats.eoro)
             roomStats.eorwr = this.average(roomStats.eorwr, globalCommuneStats.eorwr)
             roomStats.eosp = this.average(roomStats.eosp, globalCommuneStats.eosp)
 
@@ -189,6 +191,7 @@ export class StatsManager {
         const globalRoomKeys = Object.keys(global.roomStats.commune)
         const notCheckedCommuneRooms = Object.keys(Memory.stats.rooms).filter(room => !globalRoomKeys.includes(room))
         globalRoomKeys.forEach(roomName => {
+            console.log(roomName)
             this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName])
         })
 
