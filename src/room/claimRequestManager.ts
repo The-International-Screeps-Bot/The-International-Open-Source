@@ -11,11 +11,15 @@ Room.prototype.claimRequestManager = function () {
 
     if (this.memory.claimRequest) {
         if (Memory.claimRequests[this.memory.claimRequest].abandon > 0) {
+
+            delete Memory.claimRequests[this.memory.claimRequest].responder
             delete this.memory.claimRequest
             return
         }
 
         if (this.energyCapacityAvailable < 750) {
+
+            delete Memory.claimRequests[this.memory.claimRequest].responder
             delete this.memory.claimRequest
             return
         }
