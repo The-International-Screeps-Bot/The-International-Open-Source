@@ -18,6 +18,7 @@ import {
 import { internationalManager, InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
 import '../room/haulerSize'
+import { indexOf } from 'lodash'
 
 InternationalManager.prototype.tickConfig = function () {
     // If CPU logging is enabled, get the CPU used at the start
@@ -26,7 +27,7 @@ InternationalManager.prototype.tickConfig = function () {
 
     // General
 
-    Memory.communes = []
+    global.communes = new Set()
     statsManager.internationalPreTick()
 
     // global
@@ -97,7 +98,7 @@ InternationalManager.prototype.tickConfig = function () {
 
         // Add roomName to commune list
 
-        Memory.communes.push(roomName)
+        global.communes.add(roomName)
 
         room.creepsFromRoom = {}
 
@@ -118,11 +119,22 @@ InternationalManager.prototype.tickConfig = function () {
         if (!room.memory.deposits) room.memory.deposits = {}
     }
 
-    let reservedGCL = Game.gcl.level - Memory.communes.length
+    let reservedGCL = Game.gcl.level - global.communes.size
 
     reservedGCL -= Object.values(Memory.claimRequests).filter(request => {
         return request.responder
     }).length
+
+    const communesForResponding = []
+
+    for (const roomName of global.communes) {
+
+        if (Memory.rooms[roomName].claimRequest) continue
+
+        if (Game.rooms[roomName].energyCapacityAvailable < 750) continue
+
+        communesForResponding.push(roomName)
+    }
 
     // Assign and abandon claimRequests, in order of score
 
@@ -138,7 +150,7 @@ InternationalManager.prototype.tickConfig = function () {
 
         request.abandon = undefined
 
-        if (request.responder) continue
+        if (request.responder && global.communes.has(request.responder)) continue
 
         if (!Memory.autoClaim) continue
 
@@ -146,11 +158,17 @@ InternationalManager.prototype.tickConfig = function () {
 
         if (reservedGCL <= 0) continue
 
-        const communes = Memory.communes.filter(roomName => {
-            return !Memory.rooms[roomName].claimRequest && Game.rooms[roomName].energyCapacityAvailable >= 750
-        })
+        // If the requested room is no longer neutral
 
-        const communeName = findClosestRoomName(roomName, communes)
+        if (Memory.rooms[roomName].T != 'neutral') {
+
+            // Delete the request
+
+            delete Memory.claimRequests[roomName]
+            continue
+        }
+
+        const communeName = findClosestRoomName(roomName, communesForResponding)
         if (!communeName) break
 
         const maxRange = 10
@@ -175,6 +193,8 @@ InternationalManager.prototype.tickConfig = function () {
         Memory.claimRequests[roomName].responder = communeName
 
         reservedGCL -= 1
+
+        communesForResponding.splice(indexOf(communesForResponding, communeName), 1)
     }
 
     // Decrease abandonment for abandoned allyCreepRequests, and find those that aren't abandoned responders
@@ -191,9 +211,14 @@ InternationalManager.prototype.tickConfig = function () {
 
         if (request.responder) continue
 
-        const communes = Memory.communes.filter(roomName => {
-            return !Memory.rooms[roomName].allyCreepRequest
-        })
+        const communes = []
+
+        for (const roomName of global.communes) {
+
+            if (Memory.rooms[roomName].allyCreepRequest) continue
+
+            communes.push(roomName)
+        }
 
         const communeName = findClosestRoomName(roomName, communes)
         if (!communeName) break
@@ -234,9 +259,14 @@ InternationalManager.prototype.tickConfig = function () {
 
         // Filter communes that don't have the attackRequest target already
 
-        const communes = Memory.communes.filter(roomName => {
-            return !Memory.rooms[roomName].attackRequests.includes(roomName)
-        })
+        const communes = []
+
+        for (const roomName of global.communes) {
+
+            if (Memory.rooms[roomName].attackRequests.includes(roomName)) continue
+
+            communes.push(roomName)
+        }
 
         const communeName = findClosestRoomName(roomName, communes)
         if (!communeName) break

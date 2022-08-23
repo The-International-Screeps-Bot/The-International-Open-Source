@@ -121,6 +121,7 @@ export function basePlanner(room: Room) {
         normalDT?: boolean
         coordMap?: CoordMap
         minAvoid?: number
+        cardinalFlood?: boolean
     }
 
     let stamp
@@ -213,6 +214,7 @@ export function basePlanner(room: Room) {
                       roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
                       offset: stamp.offset,
                       asymOffset: stamp.asymmetry,
+                      cardinalFlood: opts.cardinalFlood,
                       /* visuals: opts.stampType === 'labs', */
                   })
                 : room.findClosestPosOfValue({
@@ -223,7 +225,8 @@ export function basePlanner(room: Room) {
                       initialWeight: opts.initialWeight || 0,
                       adjacentToRoads: opts.adjacentToRoads,
                       roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
-                      /* visuals: opts.stampType === 'extensions' */
+                      cardinalFlood: opts.cardinalFlood,
+                      /* visuals: opts.stampType === 'extension' */
                   })
 
             // Inform false if no anchor was generated
@@ -272,6 +275,7 @@ export function basePlanner(room: Room) {
             count: 1,
             startCoords: [avgControllerSourcePos],
             normalDT: true,
+            cardinalFlood: true,
         })
     )
         return 'failed'
@@ -318,6 +322,7 @@ export function basePlanner(room: Room) {
             count: 1,
             startCoords: [room.anchor],
             normalDT: true,
+            cardinalFlood: true,
         })
     )
         return 'failed'
@@ -354,6 +359,7 @@ export function basePlanner(room: Room) {
             startCoords: hubAnchors,
             normalDT: true,
             coordMap: room.roadCoords,
+            cardinalFlood: true,
         })
     )
         return 'failed'
@@ -373,7 +379,7 @@ export function basePlanner(room: Room) {
     if (
         !planStamp({
             stampType: 'extensions',
-            count: 7,
+            count: 5,
             startCoords: hubAnchors,
         })
     )
@@ -537,6 +543,8 @@ export function basePlanner(room: Room) {
             count: 6,
             startCoords: [fastFillerHubAnchor],
             adjacentToRoads: true,
+            coordMap: room.roadCoords,
+            minAvoid: 255,
         })
     )
         return 'failed'
@@ -687,6 +695,8 @@ export function basePlanner(room: Room) {
             count: extraExtensionsAmount,
             startCoords: hubAnchors,
             adjacentToRoads: true,
+            coordMap: room.roadCoords,
+            minAvoid: 255,
         })
     )
         return 'failed'
@@ -697,6 +707,8 @@ export function basePlanner(room: Room) {
         stampType: 'observer',
         count: 1,
         startCoords: [fastFillerHubAnchor],
+        coordMap: room.roadCoords,
+        minAvoid: 255,
     })
 
     if (!observerAnchors) return 'failed'

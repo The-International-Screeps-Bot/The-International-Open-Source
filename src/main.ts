@@ -201,6 +201,10 @@ declare global {
         adjacentToRoads?: boolean
         roadCoords?: CoordMap
         visuals?: boolean
+        /**
+         * Wether or not to attempt a cardinal flood
+         */
+        cardinalFlood?: boolean
     }
 
     interface FindClosestPosOfValueOptsAsym extends FindClosestPosOfValueOpts {
@@ -528,11 +532,6 @@ declare global {
         attackRequests: { [roomName: string]: AttackRequest }
 
         allyCreepRequests: { [roomName: string]: AllyCreepRequest }
-
-        /**
-         * An array of roomNames that have controllers we own
-         */
-        communes: string[]
 
         stats: Partial<Stats>
 
@@ -1816,6 +1815,11 @@ declare global {
             terrainCoords: { [roomName: string]: CoordMap }
 
             lastReset: number
+
+            /**
+             * Room names that have controllers we own
+             */
+            communes: Set<string>
 
             // Command functions
 

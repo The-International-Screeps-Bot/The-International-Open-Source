@@ -910,8 +910,11 @@ Object.defineProperties(Room.prototype, {
 
             if (this.controllerContainer) this._MEFTT.push(this.controllerContainer)
             if (this.controllerLink && !this.hubLink) this._MEFTT.push(this.controllerLink)
-            if (this.fastFillerContainerLeft) this._MEFTT.push(this.fastFillerContainerLeft)
-            if (this.fastFillerContainerRight) this._MEFTT.push(this.fastFillerContainerRight)
+            if (!this.storage && !this.terminal) {
+
+                if (this.fastFillerContainerLeft) this._MEFTT.push(this.fastFillerContainerLeft)
+                if (this.fastFillerContainerRight) this._MEFTT.push(this.fastFillerContainerRight)
+            }
 
             return this._MEFTT
         },
