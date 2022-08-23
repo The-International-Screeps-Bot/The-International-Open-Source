@@ -158,6 +158,16 @@ InternationalManager.prototype.tickConfig = function () {
 
         if (reservedGCL <= 0) continue
 
+        // If the requested room is no longer neutral
+
+        if (Memory.rooms[roomName].T != 'neutral') {
+
+            // Delete the request
+
+            delete Memory.claimRequests[roomName]
+            continue
+        }
+
         const communeName = findClosestRoomName(roomName, communesForResponding)
         if (!communeName) break
 
