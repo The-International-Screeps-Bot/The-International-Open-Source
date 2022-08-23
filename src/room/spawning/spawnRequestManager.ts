@@ -236,7 +236,7 @@ Room.prototype.spawnRequester = function () {
             if (this.controllerContainer) {
                 let income
 
-                if (this.storage && this.controller.level > 4) {
+                if (this.storage && this.controller.level >= 4) {
                     income = this.getPartsOfRoleAmount('controllerUpgrader', WORK)
                 } else
                     income = Math.min(
@@ -603,7 +603,7 @@ Room.prototype.spawnRequester = function () {
 
             // For every x energy in storage, add 1 multiplier
 
-            if (this.storage && this.controller.level > 4) partsMultiplier += this.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000
+            if (this.storage && this.controller.level >= 4) partsMultiplier += this.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000
 
             const role = 'maintainer'
 
@@ -658,7 +658,7 @@ Room.prototype.spawnRequester = function () {
 
             // If there is a storage
 
-            if (this.storage && this.controller.level > 4) {
+            if (this.storage && this.controller.level >= 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
                 if (this.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold)
