@@ -201,6 +201,10 @@ declare global {
         adjacentToRoads?: boolean
         roadCoords?: CoordMap
         visuals?: boolean
+        /**
+         * Wether or not to attempt a cardinal flood
+         */
+        cardinalFlood?: boolean
     }
 
     interface FindClosestPosOfValueOptsAsym extends FindClosestPosOfValueOpts {
