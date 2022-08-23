@@ -151,6 +151,7 @@ Room.prototype.get = function (roomObjectName) {
             requiredValue: 3,
             reduceIterations: 2,
             visuals: false,
+            cardinalFlood: true,
         })
     }
 
