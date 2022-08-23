@@ -34,8 +34,10 @@ InternationalManager.prototype.config = function () {
             (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
             Object.values(Game.creeps)[0]?.owner?.username ||
             'username'
-        Memory.isMainShard = Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
-        // Memory.isMainShard = Game.shard.name.search('shard[0-3]') === -1
+        Memory.isMainShard =
+            Game.shard.name !== 'performanceServer'
+                ? Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
+                : false
 
         // Settings
 
