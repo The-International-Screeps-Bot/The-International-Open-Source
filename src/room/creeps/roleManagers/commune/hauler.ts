@@ -38,11 +38,11 @@ Hauler.prototype.reserve = function () {
     let withdrawTargets = room.MAWT.filter(target => {
         if (target instanceof Resource)
             return (
-                target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
-                target.reserveAmount >= this.freeStore(RESOURCE_ENERGY)
+                target.reserveAmount >= this.store.getCapacity() * 0.2 ||
+                target.reserveAmount >= this.freeStore()
             )
 
-        return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
+        return target.store.energy >= this.freeStore()
     })
 
     let transferTargets
@@ -55,21 +55,21 @@ Hauler.prototype.reserve = function () {
             target = findClosestObject(this.pos, withdrawTargets)
 
             if (target instanceof Resource) amount = target.reserveAmount
-            else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
+            else amount = Math.min(this.freeStore(), target.store.energy)
 
-            this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
+            this.createReservation('withdraw', target.id, amount)
             return
         }
 
         transferTargets = room.MATT.filter(function (target) {
-            return target.freeStore(RESOURCE_ENERGY) > 0
+            return target.freeStore() > 0
         })
 
         transferTargets = transferTargets.concat(
             room.MEFTT.filter(target => {
                 return (
-                    (target.freeStore(RESOURCE_ENERGY) >= this.store.energy && this.store.energy > 0) ||
-                    target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.energy + this.freeStore(RESOURCE_ENERGY)
+                    (target.freeStore() >= this.store.energy && this.store.energy > 0) ||
+                    target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.energy + this.freeStore()
                 )
             }),
         )
@@ -78,11 +78,11 @@ Hauler.prototype.reserve = function () {
             withdrawTargets = room.OAWT.filter(target => {
                 if (target instanceof Resource)
                     return (
-                        target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
-                        target.reserveAmount >= this.freeStore(RESOURCE_ENERGY)
+                        target.reserveAmount >= this.store.getCapacity() * 0.2 ||
+                        target.reserveAmount >= this.freeStore()
                     )
 
-                return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
+                return target.store.energy >= this.freeStore()
             })
 
             if (!withdrawTargets.length) return
@@ -90,9 +90,9 @@ Hauler.prototype.reserve = function () {
             target = findClosestObject(this.pos, withdrawTargets)
 
             if (target instanceof Resource) amount = target.reserveAmount
-            else amount = Math.min(this.freeStore(RESOURCE_ENERGY), target.store.energy)
+            else amount = Math.min(this.freeStore(), target.store.energy)
 
-            this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
+            this.createReservation('withdraw', target.id, amount)
             return
         }
 
@@ -107,8 +107,8 @@ Hauler.prototype.reserve = function () {
         transferTargets = transferTargets.concat(
             room.MEFTT.filter(target => {
                 return (
-                    (target.freeStore(RESOURCE_ENERGY) >= this.store.energy && this.store.energy > 0) ||
-                    target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.energy + this.freeStore(RESOURCE_ENERGY)
+                    (target.freeStore() >= this.store.energy && this.store.energy > 0) ||
+                    target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.energy + this.freeStore()
                 )
             }),
         )
@@ -125,20 +125,20 @@ Hauler.prototype.reserve = function () {
 
         amount = Math.min(Math.max(this.store.energy, 0), target.freeSpecificStore(RESOURCE_ENERGY))
 
-        this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
+        this.createReservation('transfer', target.id, amount)
         return
     }
 
     transferTargets = room.OATT.filter(target => {
-        return target.freeStore(RESOURCE_ENERGY) >= this.store.energy
+        return target.freeStore() >= this.store.energy
     })
 
     if (!transferTargets.length) return
 
     target = findClosestObject(this.pos, transferTargets)
 
-    amount = Math.min(Math.max(this.store.energy, 0), target.freeStore(RESOURCE_ENERGY))
+    amount = Math.min(Math.max(this.store.energy, 0), target.freeStore())
 
-    this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
+    this.createReservation('transfer', target.id, amount)
     return
 }
