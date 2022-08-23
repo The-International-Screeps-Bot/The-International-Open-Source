@@ -46,6 +46,10 @@ class Tester {
                     console.log(`Cannot parse runtime argument ${process.argv} ${e}`)
                }
           }
+
+          if (process.env.STEAM_API_KEY !== undefined &&process.env.STEAM_API_KEY.length === 0) {
+               process.env.STEAM_API_KEY = undefined
+          }
      }
 
      /**

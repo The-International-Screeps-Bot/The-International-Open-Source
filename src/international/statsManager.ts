@@ -76,20 +76,22 @@ export class StatsManager {
         if (Game.time % 250 === 0) {
             if (room && room.controller && room.controller.owner && room.controller.owner.username === Memory.me) {
                 const progressPercentage = room.controller.progress / room.controller.progressTotal
-                roomStats.cl = room.controller.level + progressPercentage < 1 ? progressPercentage : 0
+                roomStats.cl =
+                    progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
             } else roomStats.cl = 0
             roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY)
         }
 
         if (Memory.roomStats >= 2) {
             roomStats.mh = this.average(roomStats.mh, globalCommuneStats.mh)
-            console.log(roomName, roomStats.eih, globalCommuneStats.eih)
             roomStats.eih = this.average(roomStats.eih, globalCommuneStats.eih)
             // roomStats.eib = this.average(roomStats.eib, globalStats.eib)
             // roomStats.eoso = this.average(roomStats.eoso, globalStats.eoso)
             // roomStats.eiet = this.average(roomStats.eiet, globalStats.eiet)
 
             roomStats.eou = this.average(roomStats.eou, globalCommuneStats.eou)
+            roomStats.eob = this.average(roomStats.eob, globalCommuneStats.eob)
+            roomStats.eoro = this.average(roomStats.eoro, globalCommuneStats.eoro)
             roomStats.eorwr = this.average(roomStats.eorwr, globalCommuneStats.eorwr)
             roomStats.eosp = this.average(roomStats.eosp, globalCommuneStats.eosp)
 

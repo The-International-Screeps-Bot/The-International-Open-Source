@@ -1608,7 +1608,6 @@ Room.prototype.floodFill = function (seeds, coordMap, visuals) {
 
 Room.prototype.findClosestPosOfValue = function (opts) {
     const room = this
-    console.log(room.name)
 
     if (opts.visuals) {
         for (const coord of opts.startCoords)

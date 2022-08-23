@@ -24,7 +24,7 @@ global.killCreeps = function (roles?) {
     for (const roomName in Game.rooms) {
         const room = Game.rooms[roomName]
 
-        if (!room.controller.my) continue
+        if (!room.controller || !room.controller.my) continue
 
         for (const spawn of room.structures.spawn) {
             if (!spawn.spawning) continue
