@@ -76,14 +76,14 @@ export class StatsManager {
         if (Game.time % 250 === 0) {
             if (room && room.controller && room.controller.owner && room.controller.owner.username === Memory.me) {
                 const progressPercentage = room.controller.progress / room.controller.progressTotal
-                roomStats.cl = room.controller.level + progressPercentage < 1 ? progressPercentage : 0
+                roomStats.cl =
+                    progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
             } else roomStats.cl = 0
             roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY)
         }
 
         if (Memory.roomStats >= 2) {
             roomStats.mh = this.average(roomStats.mh, globalCommuneStats.mh)
-            console.log(roomName, roomStats.eih, globalCommuneStats.eih)
             roomStats.eih = this.average(roomStats.eih, globalCommuneStats.eih)
             // roomStats.eib = this.average(roomStats.eib, globalStats.eib)
             // roomStats.eoso = this.average(roomStats.eoso, globalStats.eoso)
@@ -191,7 +191,6 @@ export class StatsManager {
         const globalRoomKeys = Object.keys(global.roomStats.commune)
         const notCheckedCommuneRooms = Object.keys(Memory.stats.rooms).filter(room => !globalRoomKeys.includes(room))
         globalRoomKeys.forEach(roomName => {
-            console.log(roomName)
             this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName])
         })
 
