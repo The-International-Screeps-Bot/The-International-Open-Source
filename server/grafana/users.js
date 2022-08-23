@@ -30,7 +30,7 @@ module.exports.users = [
           password: 'tooangel',
      },
      {
-          username: 'W7N7',
+          username: 'W9N9',
           type: 'private',
           shards: ['screeps'],
           password: 'tooangel',
