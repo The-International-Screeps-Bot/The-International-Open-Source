@@ -529,11 +529,6 @@ declare global {
 
         allyCreepRequests: { [roomName: string]: AllyCreepRequest }
 
-        /**
-         * An array of roomNames that have controllers we own
-         */
-        communes: string[]
-
         stats: Partial<Stats>
 
         players: { [playerName: string]: Partial<PlayerInfo> }
@@ -1816,6 +1811,11 @@ declare global {
             terrainCoords: { [roomName: string]: CoordMap }
 
             lastReset: number
+
+            /**
+             * Room names that have controllers we own
+             */
+            communes: Set<string>
 
             // Command functions
 

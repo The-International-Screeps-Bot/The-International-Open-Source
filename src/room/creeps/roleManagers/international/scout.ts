@@ -125,7 +125,7 @@ Scout.prototype.recordDeposits = function () {
     // Make sure the room has a commune
 
     if (room.memory.commune) {
-        if (!Memory.communes.includes(room.memory.commune)) {
+        if (!global.communes.has(room.memory.commune)) {
             room.memory.commune = findClosestCommuneName(room.name)
         }
     } else {

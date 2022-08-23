@@ -1229,7 +1229,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
         // If the room isn't already a remote
 
-        if (room.memory.T !== 'remote' || !Memory.communes.includes(room.memory.commune)) {
+        if (room.memory.T !== 'remote' || !global.communes.has(room.memory.commune)) {
             room.memory.T = 'remote'
 
             // Assign the room's commune as the scoutingRoom
@@ -1290,7 +1290,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
     if (room.memory.T !== 'remote') return false
 
-    if (!Memory.communes.includes(room.memory.commune)) return false
+    if (!global.communes.has(room.memory.commune)) return false
 
     return true
 }

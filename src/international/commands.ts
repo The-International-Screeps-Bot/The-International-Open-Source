@@ -21,7 +21,7 @@ global.CM = global.clearMemory
 global.killCreeps = function (roles?) {
     // Cancel spawning
 
-    for (const roomName of Memory.communes) {
+    for (const roomName of global.communes) {
         const room = Game.rooms[roomName]
 
         for (const spawn of room.structures.spawn) {
@@ -103,7 +103,7 @@ global.destroyCommuneStructures = function (types?) {
     let log = ``
     let destroyedStructureCount: number
 
-    for (const roomName of Memory.communes) {
+    for (const roomName of global.communes) {
         // Get the room with the roomName
 
         const room = Game.rooms[roomName]
