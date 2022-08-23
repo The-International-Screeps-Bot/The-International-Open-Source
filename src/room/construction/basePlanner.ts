@@ -226,7 +226,7 @@ export function basePlanner(room: Room) {
                       adjacentToRoads: opts.adjacentToRoads,
                       roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
                       cardinalFlood: opts.cardinalFlood,
-                     /* visuals: opts.stampType === 'fastFiller' */
+                      /* visuals: opts.stampType === 'extension' */
                   })
 
             // Inform false if no anchor was generated
@@ -379,7 +379,7 @@ export function basePlanner(room: Room) {
     if (
         !planStamp({
             stampType: 'extensions',
-            count: 7,
+            count: 5,
             startCoords: hubAnchors,
         })
     )
@@ -543,6 +543,8 @@ export function basePlanner(room: Room) {
             count: 6,
             startCoords: [fastFillerHubAnchor],
             adjacentToRoads: true,
+            coordMap: room.roadCoords,
+            minAvoid: 255,
         })
     )
         return 'failed'
@@ -693,6 +695,8 @@ export function basePlanner(room: Room) {
             count: extraExtensionsAmount,
             startCoords: hubAnchors,
             adjacentToRoads: true,
+            coordMap: room.roadCoords,
+            minAvoid: 255,
         })
     )
         return 'failed'
@@ -703,6 +707,8 @@ export function basePlanner(room: Room) {
         stampType: 'observer',
         count: 1,
         startCoords: [fastFillerHubAnchor],
+        coordMap: room.roadCoords,
+        minAvoid: 255,
     })
 
     if (!observerAnchors) return 'failed'
