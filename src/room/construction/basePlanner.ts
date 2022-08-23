@@ -566,7 +566,7 @@ export function basePlanner(room: Room) {
     let extraExtensionsAmount =
         CONTROLLER_STRUCTURES.extension[8] -
         stamps.fastFiller.structures.extension.length -
-        stamps.hub.structures.extension.length -
+        /* stamps.hub.structures.extension.length - */
         room.memory.stampAnchors.extensions.length * stamps.extensions.structures.extension.length -
         room.memory.stampAnchors.extension.length -
         room.memory.stampAnchors.sourceExtension.length
@@ -708,7 +708,6 @@ export function basePlanner(room: Room) {
         count: 1,
         startCoords: [fastFillerHubAnchor],
         coordMap: room.roadCoords,
-        minAvoid: 255,
     })
 
     if (!observerAnchors) return 'failed'
