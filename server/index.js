@@ -47,7 +47,7 @@ class Tester {
                }
           }
 
-          if (process.env.STEAM_API_KEY&&process.env.STEAM_API_KEY.length === 0) {
+          if (process.env.STEAM_API_KEY !== undefined &&process.env.STEAM_API_KEY.length === 0) {
                process.env.STEAM_API_KEY = undefined
           }
      }
