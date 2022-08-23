@@ -148,8 +148,8 @@ Room.prototype.get = function (roomObjectName) {
         return room.findClosestPosOfValue({
             coordMap: distanceCoords,
             startCoords: [room.anchor],
-            requiredValue: 3,
-            reduceIterations: 2,
+            requiredValue: 2,
+            reduceIterations: 1,
             visuals: false,
             cardinalFlood: true,
         })

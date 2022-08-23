@@ -5,7 +5,7 @@ Room.prototype.towerManager = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
-    
+
     if (!this.structures.tower.length) return
 
     this.towersAttackCreeps()
@@ -37,6 +37,8 @@ Room.prototype.towersHealCreeps = function () {
         // Iterate if the tower is inactionable
 
         if (tower.inactionable) continue
+
+        if (tower.store.energy < TOWER_ENERGY_COST) continue
 
         // If tower is below or equal to 50% capacity
 
@@ -87,6 +89,8 @@ Room.prototype.towersAttackCreeps = function () {
 
         if (tower.inactionable) continue
 
+        if (tower.store.energy < TOWER_ENERGY_COST) continue
+
         if (tower.attack(attackTarget) !== OK) continue
 
         // Otherwise record that the tower is no longer inactionable
@@ -112,6 +116,8 @@ Room.prototype.towersRepairRamparts = function () {
 
         if (tower.inactionable) continue
 
+        if (tower.store.energy < TOWER_ENERGY_COST) continue
+
         // Try to get the last element of ramparts, iterating if it's undefined
 
         const target = ramparts[ramparts.length - 1]
@@ -122,12 +128,14 @@ Room.prototype.towersRepairRamparts = function () {
 
         if (tower.repair(target) !== OK) continue
 
-        // Otherwise record that the tower is no longer inactionable
+        // Otherwise the repair worked
+
+        // Record the tower energy spent in stats
+
+        if (global.roomStats.commune[this.name])
+            (global.roomStats.commune[this.name] as RoomCommuneStats).eorwr += TOWER_ENERGY_COST
 
         tower.inactionable = true
-
-        // And remove the rampart from ramparts
-
         ramparts.pop()
 
         // And iterate
