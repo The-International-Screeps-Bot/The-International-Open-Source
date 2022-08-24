@@ -30,7 +30,7 @@ import { pick, repeat } from 'lodash'
 import { packCoord, packPos, packPosList, unpackPos, unpackPosList } from 'other/packrat'
 import { creepClasses } from './creepClasses'
 
-Creep.prototype.preTickManager = function () {}
+Creep.prototype.preTickManager = function () { }
 
 Creep.prototype.isDying = function () {
     // Inform as dying if creep is already recorded as dying
@@ -1305,7 +1305,6 @@ Creep.prototype.advancedRecycle = function () {
     this.say('♻️ C')
 
     if (range === 0) {
-
         const spawn = findClosestObject(this.pos, room.structures.spawn)
 
         return spawn.recycleCreep(this) === OK
@@ -1337,7 +1336,8 @@ Creep.prototype.advancedRenew = function () {
 
     // If the creep's age is less than the benefit from renewing, inform false
 
-    if (CREEP_LIFE_TIME - this.ticksToLive < Math.ceil(this.findCost() / 2.5 / this.body.length)) return
+    const energyCost = Math.ceil(this.findCost() / 2.5 / this.body.length)
+    if (CREEP_LIFE_TIME - this.ticksToLive < energyCost) return
 
     // Get the room's spawns, stopping if there are none
 
@@ -1356,7 +1356,11 @@ Creep.prototype.advancedRenew = function () {
 
     if (spawn.spawning) return
 
-    if (spawn.renewCreep(this) === OK) spawn.hasRenewed = true
+    const result = spawn.renewCreep(this)
+    if (result === OK) {
+        ; (global.roomStats.commune[this.room.name] as RoomCommuneStats).eosp += energyCost
+        spawn.hasRenewed = true
+    }
 }
 
 Creep.prototype.advancedReserveController = function () {
@@ -1773,7 +1777,6 @@ Creep.prototype.reserveWithdrawEnergy = function () {
     })
 
     if (!room.storage && !room.terminal) {
-
         withdrawTargets = withdrawTargets.concat(
             [room.fastFillerContainerLeft, room.fastFillerContainerRight, room.controllerContainer].filter(target => {
                 return target && target.store.energy >= target.store.getCapacity(RESOURCE_ENERGY) * 0.5
