@@ -361,7 +361,7 @@ declare global {
         eoro: number // energyOutputRepairOther
         eorwr: number // energyOutputRepairWallOrRampart
         eob: number // energyOutputBuild
-        eoso: number // energyOutputSold
+        eos: number // energyOutputSold
         eosp: number // energyOutputSpawn
         mh: number // mineralsHarvested
         es: number // energyStored

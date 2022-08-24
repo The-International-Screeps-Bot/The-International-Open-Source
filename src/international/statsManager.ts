@@ -9,7 +9,7 @@ export class StatsManager {
                 eoro: 0,
                 eorwr: 0,
                 eob: 0,
-                eoso: 0,
+                eos: 0,
                 eosp: 0,
                 mh: 0,
                 es: 0,
@@ -87,8 +87,8 @@ export class StatsManager {
         if (Memory.roomStats >= 2) {
             roomStats.mh = this.average(roomStats.mh, globalCommuneStats.mh)
             roomStats.eih = this.average(roomStats.eih, globalCommuneStats.eih)
-            roomStats.eib = this.average(roomStats.eib, globalStats.eib)
-            roomStats.eos = this.average(roomStats.eos, globalStats.eos)
+            roomStats.eib = this.average(roomStats.eib, globalCommuneStats.eib)
+            roomStats.eos = this.average(roomStats.eos, globalCommuneStats.eos)
 
             roomStats.eou = this.average(roomStats.eou, globalCommuneStats.eou)
             roomStats.eob = this.average(roomStats.eob, globalCommuneStats.eob)
