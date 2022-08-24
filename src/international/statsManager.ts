@@ -207,12 +207,13 @@ export class StatsManager {
         delete global.roomStats
     }
 
-    average(originalNumber: number, newNumber: number, averagedOverTickCount: number = 10, digits: number = 3) {
+    average(originalNumber: number, newNumber: number, averagedOverTickCount: number = 10, digits: number = 5) {
         const newWeight = 1 / averagedOverTickCount
         const originalWeight = 1 - newWeight
 
-        const result =
-            (originalNumber * originalWeight * 1000 * 1000 + newNumber * newWeight * 1000 * 1000) / 1000 / 1000
+        const originalNumberResult = originalNumber * originalWeight
+        const newNumberResult = newNumber * newWeight
+        const result = (originalNumberResult || 0) + (newNumberResult || 0)
         return parseFloat(result.toFixed(digits))
     }
 }
