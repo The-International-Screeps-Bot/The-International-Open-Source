@@ -68,11 +68,15 @@ export class StatsManager {
         let spawnUsage = 0
 
         roomStats.cu = this.average(roomStats.cu, globalCommuneStats.cu >= 0 ? globalCommuneStats.cu : 0)
-        roomStats.cc = room.myCreepsAmount
+        if (room) {
+            roomStats.cc = room.myCreepsAmount
 
-        const spawns = room.structures.spawn
-        if (spawns.length > 0)
-            spawnUsage = spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawns.length
+            const spawns = room.structures.spawn
+            if (spawns.length > 0)
+                spawnUsage = spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawns.length
+        } else {
+            roomStats.cc = 0
+        }
         roomStats.su = this.average(roomStats.su, spawnUsage)
 
         if (Game.time % 250 === 0 && room) {
