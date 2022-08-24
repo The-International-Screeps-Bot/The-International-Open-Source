@@ -103,8 +103,9 @@ cron.schedule('* * * * *', async () => {
     }
 
     try {
-        const users = (await apiFunc.getUsers()).filter(u => u.active === 10000)
-        let roomsObjects = await apiFunc.getRoomsObjects()
+        const unfilteredUsers = await apiFunc.getUsers();
+        const users = unfilteredUsers.filter(u => u.active === 10000)
+        const roomsObjects = await apiFunc.getRoomsObjects()
         const modifiedRoomsObjects = modifyRoomObjects(roomsObjects)
         const serverStats = handleServerStats(users, modifiedRoomsObjects)
 
@@ -112,7 +113,6 @@ cron.schedule('* * * * *', async () => {
         reportStats({ stats: groupedStats, serverStats })
         logInfo(Object.keys(groupedStats) > 0 ? 'Pushed stats AND serverStats to graphite' : 'Pushed serverStats to graphite')
     } catch (e) {
-        console.log(e)
         reportStats({ stats: groupedStats })
         logInfo('Pushed stats to graphite')
     }
