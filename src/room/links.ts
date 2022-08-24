@@ -1,4 +1,5 @@
-import { upgraderSpawningWhenStorageThreshold } from 'international/constants'
+import { linkReceiveTreshold, linkSendThreshold, upgraderSpawningWhenStorageThreshold } from 'international/constants'
+import { customLog } from 'international/generalFunctions'
 
 Room.prototype.linkManager = function() {
 
@@ -19,7 +20,7 @@ Room.prototype.linkManager = function() {
 
 Room.prototype.sourcesToReceivers = function (sourceLinks, receiverLinks) {
      // Loop through each sourceLink
-
+     customLog('RECEIVER LINKS', receiverLinks)
      for (const sourceLink of sourceLinks) {
           // If the sourceLink is undefined, iterate
 
@@ -27,7 +28,7 @@ Room.prototype.sourcesToReceivers = function (sourceLinks, receiverLinks) {
 
           // If the link is not nearly full, iterate
 
-          if (sourceLink.store.getCapacity(RESOURCE_ENERGY) - sourceLink.store.energy > 100) continue
+          if (sourceLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > sourceLink.store.energy) continue
 
           // Otherwise, loop through each receiverLink
 
@@ -36,9 +37,9 @@ Room.prototype.sourcesToReceivers = function (sourceLinks, receiverLinks) {
 
                if (!receiverLink) continue
 
-               // If the link is more than 25% full, iterate
+               // If the link is more than x% full, iterate
 
-               if (receiverLink.store.energy > receiverLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) continue
+               if (receiverLink.store.energy > receiverLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold) continue
 
                // Otherwise, have the sourceLink transfer to the receiverLink
 
@@ -61,11 +62,11 @@ Room.prototype.hubToFastFiller = function (hubLink, fastFillerLink) {
 
      // If the hubLink is not sufficiently full, stop
 
-     if (hubLink.store.getCapacity(RESOURCE_ENERGY) - hubLink.store.energy > 100) return
+     if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > hubLink.store.energy) return
 
-     // If the fastFillerLink is more than 25% full, stop
+     // If the fastFillerLink is more than x% full, stop
 
-     if (fastFillerLink.store.energy > fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) return
+     if (fastFillerLink.store.energy > fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold) return
 
      // Otherwise, have the sourceLink transfer to the recieverLink
 
@@ -90,11 +91,11 @@ Room.prototype.hubToController = function (hubLink, controllerLink) {
 
      // If the hubLink is not sufficiently full, stop
 
-     if (hubLink.store.getCapacity(RESOURCE_ENERGY) - Math.min(hubLink.store.energy, hubLink.store.getCapacity(RESOURCE_ENERGY)) > 100) return
+     if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > hubLink.store.energy) return
 
-     // If the controllerLink is more than 25% full, stop
+     // If the controllerLink is more than x% full, stop
 
-     if (controllerLink.store.energy > controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.25) return
+     if (controllerLink.store.energy > controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold) return
 
      // Otherwise, have the sourceLink transfer to the recieverLink
 

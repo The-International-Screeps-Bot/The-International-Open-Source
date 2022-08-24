@@ -740,9 +740,9 @@ Object.defineProperties(Room.prototype, {
     hubLink: {
         get() {
             if (this.global.hubLink) {
-                const container = findObjectWithID(this.global.hubLink)
+                const structure = findObjectWithID(this.global.hubLink)
 
-                if (container) return container
+                if (structure) return structure
             }
 
             if (!this.memory.stampAnchors.hub) return false
@@ -750,7 +750,7 @@ Object.defineProperties(Room.prototype, {
             const hubAnchor = unpackAsPos(this.memory.stampAnchors.hub[0])
             if (!hubAnchor) return false
             //console.log(JSON.stringify(hubAnchor))
-            for (const structure of new RoomPosition(hubAnchor.x - 1, hubAnchor.y - 1, this.name).lookFor(
+            for (const structure of new RoomPosition(hubAnchor.x, hubAnchor.y + 1, this.name).lookFor(
                 LOOK_STRUCTURES,
             )) {
                 if (structure.structureType !== STRUCTURE_LINK) continue
@@ -910,11 +910,8 @@ Object.defineProperties(Room.prototype, {
 
             if (this.controllerContainer) this._MEFTT.push(this.controllerContainer)
             if (this.controllerLink && !this.hubLink) this._MEFTT.push(this.controllerLink)
-            if (!this.storage && !this.terminal) {
-
-                if (this.fastFillerContainerLeft) this._MEFTT.push(this.fastFillerContainerLeft)
-                if (this.fastFillerContainerRight) this._MEFTT.push(this.fastFillerContainerRight)
-            }
+            if (this.fastFillerContainerLeft) this._MEFTT.push(this.fastFillerContainerLeft)
+            if (this.fastFillerContainerRight) this._MEFTT.push(this.fastFillerContainerRight)
 
             return this._MEFTT
         },

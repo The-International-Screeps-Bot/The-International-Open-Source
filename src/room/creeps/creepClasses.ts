@@ -82,7 +82,12 @@ export class HubHauler extends Creep {
     /**
      * @returns If a reservation was made or not
      */
-    reserverHubLinkTransfer?(): boolean
+     reserveHubLinkWithdraw?(): boolean
+
+    /**
+     * @returns If a reservation was made or not
+     */
+    reserveHubLinkTransfer?(): boolean
 
     /**
      * @returns If a reservation was made or not

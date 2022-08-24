@@ -1305,21 +1305,6 @@ Creep.prototype.advancedRecycle = function () {
     this.say('♻️ C')
 
     if (range === 0) {
-        // Otherwise recycleTarget must be a container, so find the closest spawn and recycle
-
-        const spawn = findClosestObject(this.pos, room.structures.spawn)
-
-        return spawn.recycleCreep(this) === OK
-    }
-
-    if (range <= 1) {
-        this.createMoveRequest({
-            origin: this.pos,
-            goal: { pos: recycleTarget.pos, range: 0 },
-            avoidEnemyRanges: true,
-        })
-
-        // Otherwise recycleTarget must be a container, so find the closest spawn and recycle
 
         const spawn = findClosestObject(this.pos, room.structures.spawn)
 
@@ -1787,11 +1772,14 @@ Creep.prototype.reserveWithdrawEnergy = function () {
         return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
     })
 
-    withdrawTargets = withdrawTargets.concat(
-        [room.fastFillerContainerLeft, room.fastFillerContainerRight, room.controllerContainer].filter(target => {
-            return target && target.store.energy >= target.store.getCapacity(RESOURCE_ENERGY) * 0.5
-        }),
-    )
+    if (!room.storage && !room.terminal) {
+
+        withdrawTargets = withdrawTargets.concat(
+            [room.fastFillerContainerLeft, room.fastFillerContainerRight, room.controllerContainer].filter(target => {
+                return target && target.store.energy >= target.store.getCapacity(RESOURCE_ENERGY) * 0.5
+            }),
+        )
+    }
 
     let target
     let amount

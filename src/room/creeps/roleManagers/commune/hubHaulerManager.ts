@@ -1,3 +1,4 @@
+import { linkReceiveTreshold, linkSendThreshold } from 'international/constants'
 import { findObjectWithID, unpackAsRoomPos } from 'international/generalFunctions'
 import { HubHauler } from '../../creepClasses'
 
@@ -89,7 +90,10 @@ HubHauler.prototype.reserve = function () {
 
     if (this.reserveStorageTransfer()) return
     if (this.reserveTerminalTransfer()) return
-    if (this.reserverHubLinkTransfer()) return
+
+    if (this.reserveHubLinkWithdraw()) return
+    if (this.reserveHubLinkTransfer()) return
+
     if (this.reserveFactoryWithdraw()) return
     if (this.reserveFactoryTransfer()) return
 }
@@ -168,7 +172,46 @@ HubHauler.prototype.reserveTerminalTransfer = function () {
     return false
 }
 
-HubHauler.prototype.reserverHubLinkTransfer = function () {
+HubHauler.prototype.reserveHubLinkWithdraw = function () {
+    const { room } = this
+    const { storage } = room
+    const { terminal } = room
+    const { hubLink } = room
+
+    if (!hubLink) return false
+
+    // If there is unsufficient space to justify a fill
+
+    if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > hubLink.store.energy) return false
+
+    // If the controllerLink is less than x% full
+
+    const { controllerLink } = room
+    if (controllerLink && controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > controllerLink.store.energy) return false
+
+    // If the fastFillerLink is less than x% full
+
+    const { fastFillerLink } = room
+    if (fastFillerLink && fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > fastFillerLink.store.energy) return false
+
+    // FInd a target
+
+    let target
+    if (storage && storage.freeStore() > this.store.getCapacity()) target = storage
+    else if (terminal && terminal.freeStore() > this.store.getCapacity()) target = terminal
+
+    if (!target) return false
+
+    this.message += 'RHLW'
+
+    let amount = Math.min(this.freeStore(), hubLink.store.energy)
+
+    this.createReservation('withdraw', hubLink.id, amount)
+    this.createReservation('transfer', target.id, amount + this.store.energy)
+    return true
+}
+
+HubHauler.prototype.reserveHubLinkTransfer = function () {
     const { room } = this
     const { storage } = room
     const { terminal } = room
@@ -182,7 +225,19 @@ HubHauler.prototype.reserverHubLinkTransfer = function () {
 
     // If there is unsufficient space to justify a fill
 
-    if (hubLink.store.getCapacity(RESOURCE_ENERGY) - hubLink.store.energy < 100) return false
+    if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold < hubLink.store.energy) return false
+
+    const { controllerLink } = room
+    const { fastFillerLink } = room
+
+    // If a link is less than x% full
+
+    if (controllerLink && controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > controllerLink.store.energy) {}
+    else if (fastFillerLink && fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > fastFillerLink.store.energy) {}
+
+    // There are no needy links
+
+    else return false
 
     const amount = Math.min(this.freeStore(), hubLink.freeSpecificStore())
 
@@ -194,7 +249,7 @@ HubHauler.prototype.reserverHubLinkTransfer = function () {
 
     if (!provider) return false
 
-    this.message += 'RHT'
+    this.message += 'RHLT'
 
     this.createReservation('withdraw', provider.id, amount)
     this.createReservation(

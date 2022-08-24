@@ -709,3 +709,6 @@ export const remoteContainerUpkeepCost = CONTAINER_DECAY / REPAIR_POWER / CONTAI
 
 export const minOnboardingRamparts = 1
 export const maxRampartGroupSize = 12
+
+export const linkSendThreshold = 0.9
+export const linkReceiveTreshold = 0.25
