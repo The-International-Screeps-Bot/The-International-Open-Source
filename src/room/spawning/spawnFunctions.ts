@@ -326,7 +326,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
                 if (cost - partCost < opts.minCost) break
 
                 // And remove the part's cost to the cost
-
+                customLog('PART COST' + part, cost)
                 cost -= partCost
 
                 // Remove the last part in the body

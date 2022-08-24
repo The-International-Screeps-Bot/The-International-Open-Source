@@ -60,7 +60,7 @@ Room.prototype.remotesManager = function () {
 
             if (
                 isReserved &&
-                remote.controller.reservation.ticksToEnd >= remoteMemory.sourceEfficacies.reduce((a, b) => a + b) * 2
+                remote.controller.reservation.ticksToEnd >= Math.min(remoteMemory.sourceEfficacies.reduce((a, b) => a + b) * 3, 1000)
             ) {
                 remoteMemory.needs[remoteNeedsIndex.remoteReserver] = 0
             }

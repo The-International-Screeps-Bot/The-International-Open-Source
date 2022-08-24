@@ -20,7 +20,7 @@ Room.prototype.linkManager = function() {
 
 Room.prototype.sourcesToReceivers = function (sourceLinks, receiverLinks) {
      // Loop through each sourceLink
-     customLog('RECEIVER LINKS', receiverLinks)
+
      for (const sourceLink of sourceLinks) {
           // If the sourceLink is undefined, iterate
 

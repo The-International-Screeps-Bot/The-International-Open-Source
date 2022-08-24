@@ -541,12 +541,12 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
     // Construct route
 
-    function generateRoute(): Route | undefined {
-        /*
+    function generateRoute(): number | undefined {
+
         // If the goal is in the same room as the origin, inform that no route is needed
 
-        if (opts.origin.roomName === opts.goal.pos.roomName) return undefined
- */
+        if (opts.origin.roomName === opts.goal.pos.roomName) return 1
+
         // Construct route by searching through rooms
 
         const route = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
@@ -577,11 +577,11 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
         // If route doesn't work inform undefined
 
-        if (route === ERR_NO_PATH) return undefined
+        if (route === ERR_NO_PATH) return 1
 
         // Otherwise inform the route
 
-        return route
+        return route.length
     }
 
     // Construct path
@@ -592,7 +592,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
         const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost || 2,
             swampCost: opts.swampCost || 8,
-            maxRooms: 100,
+            maxRooms: route,
             maxOps: 100000,
             flee: opts.flee,
 
@@ -615,7 +615,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // Create a costMatrix for the room
 
                 const cm = new PathFinder.CostMatrix()
-                /*
+
                 // If there is no route
 
                 if (!route) {
@@ -641,7 +641,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     x = 49
                     for (y = 0; y < 50; y += 1) cm.set(x, y, 255)
                 }
- */
+
                 // Weight positions
 
                 for (const weight in opts.weightPositions) {
