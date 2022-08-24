@@ -1553,6 +1553,7 @@ Creep.prototype.deleteReservation = function (index) {
 
 Creep.prototype.createReservation = function (type, targetID, amount, resourceType = RESOURCE_ENERGY) {
     if (!this.memory.reservations) this.memory.reservations = []
+    if(amount == 0) return;
 
     this.memory.reservations.push({
         type,
@@ -1705,7 +1706,15 @@ Creep.prototype.fulfillReservation = function () {
     // Transfer
 
     if (reservation.type === 'transfer') {
-        amount = Math.min(reservation.amount, target.freeStore(RESOURCE_ENERGY) + reservation.amount)
+        //If we get a bad reservation, delete it.
+        if (reservation.amount <= 0) {
+            this.message += "??"
+            this.deleteReservation(0)
+            return true
+        }
+
+        //This needs to use the direct functions to calculate free space, not the reserved amount.
+        amount = Math.min(reservation.amount, target.store.getFreeCapacity(reservation.resourceType), this.store[reservation.resourceType])
 
         target.store[reservation.resourceType] -= amount
         this.message += amount

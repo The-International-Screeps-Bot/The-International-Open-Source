@@ -10,6 +10,8 @@ export function scoutManager(room: Room, creepsOfRole: string[]) {
 
         const creep: Scout = Game.creeps[creepName]
 
+        if(creep.ticksToLive == CREEP_LIFE_TIME - 1) creep.notifyWhenAttacked(false)
+
         const commune = Game.rooms[creep.commune]
 
         if (!commune) continue
