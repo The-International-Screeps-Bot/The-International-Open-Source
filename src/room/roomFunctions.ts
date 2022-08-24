@@ -539,13 +539,16 @@ type Route = RoutePart[]
 Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     const room = this
 
+    const allowedRoomNames = new Set()
+    allowedRoomNames.add(opts.origin.roomName)
+
     // Construct route
 
-    function generateRoute(): number | undefined {
+    function generateRoute(): void {
 
-        // If the goal is in the same room as the origin, inform that no route is needed
+        // If the goal is in the same room as the origin
 
-        if (opts.origin.roomName === opts.goal.pos.roomName) return 1
+        if (opts.origin.roomName === opts.goal.pos.roomName) return
 
         // Construct route by searching through rooms
 
@@ -575,24 +578,26 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             },
         })
 
-        // If route doesn't work inform undefined
+        // If a route can't be found
 
-        if (route === ERR_NO_PATH) return 1
+        if (route === ERR_NO_PATH) return
 
-        // Otherwise inform the route
+        for (const roomRoute of route) allowedRoomNames.add(roomRoute.room)
 
-        return route.length
+        return
     }
+
+    generateRoute()
 
     // Construct path
 
     function generatePath() {
-        const route = generateRoute()
-
+        const routeDistance = generateRoute()
+        if (opts.creep) opts.creep.say(routeDistance.toString() + opts.goal.pos.roomName)
         const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost || 2,
             swampCost: opts.swampCost || 8,
-            maxRooms: route,
+            maxRooms: allowedRoomNames.size,
             maxOps: 100000,
             flee: opts.flee,
 
@@ -603,13 +608,9 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 const room = Game.rooms[roomName]
 
-                // If the type is in typeWeights, inform the weight for the type
+                // If the room is not allowed
 
-                if (
-                    opts.typeWeights &&
-                    Memory.rooms[roomName] &&
-                    opts.typeWeights[Memory.rooms[roomName].T] === Infinity
-                )
+                if (!allowedRoomNames.has(roomName))
                     return false
 
                 // Create a costMatrix for the room
@@ -618,7 +619,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 // If there is no route
 
-                if (!route) {
+                if (allowedRoomNames.size <= 1) {
                     let x
 
                     // Configure y and loop through top exits
