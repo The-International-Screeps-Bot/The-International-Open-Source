@@ -592,8 +592,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     // Construct path
 
     function generatePath() {
-        const routeDistance = generateRoute()
-        if (opts.creep) opts.creep.say(routeDistance.toString() + opts.goal.pos.roomName)
+
         const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost || 2,
             swampCost: opts.swampCost || 8,
