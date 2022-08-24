@@ -75,12 +75,12 @@ export class StatsManager {
             spawnUsage = spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawns.length
         roomStats.su = this.average(roomStats.su, spawnUsage)
 
-        if (Game.time % 250 === 0) {
-            if (room && room.controller && room.controller.owner && room.controller.owner.username === Memory.me) {
+        if (Game.time % 250 === 0 && room) {
+            if (room.controller && room.controller.my) {
                 const progressPercentage = room.controller.progress / room.controller.progressTotal
                 roomStats.cl =
                     progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
-            } else roomStats.cl = 0
+            } else roomStats.cl = null
             roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY)
         }
 
