@@ -3,11 +3,13 @@ export class StatsManager {
         if (roomType === 'commune') {
             const communeStats: RoomCommuneStats = {
                 cl: 0,
+                eib: 0,
                 eih: 0,
                 eou: 0,
                 eoro: 0,
                 eorwr: 0,
                 eob: 0,
+                eoso: 0,
                 eosp: 0,
                 mh: 0,
                 es: 0,
@@ -85,9 +87,8 @@ export class StatsManager {
         if (Memory.roomStats >= 2) {
             roomStats.mh = this.average(roomStats.mh, globalCommuneStats.mh)
             roomStats.eih = this.average(roomStats.eih, globalCommuneStats.eih)
-            // roomStats.eib = this.average(roomStats.eib, globalStats.eib)
-            // roomStats.eoso = this.average(roomStats.eoso, globalStats.eoso)
-            // roomStats.eiet = this.average(roomStats.eiet, globalStats.eiet)
+            roomStats.eib = this.average(roomStats.eib, globalStats.eib)
+            roomStats.eos = this.average(roomStats.eos, globalStats.eos)
 
             roomStats.eou = this.average(roomStats.eou, globalCommuneStats.eou)
             roomStats.eob = this.average(roomStats.eob, globalCommuneStats.eob)

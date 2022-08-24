@@ -356,13 +356,12 @@ declare global {
     interface RoomCommuneStats extends RoomStats {
         cl: number // controllerLevel
         eih: number // energyInputHarvest
-        // eiet: number // energyInputExternalTransferred
-        // eib?: number // energyInputBought
+        eib?: number // energyInputBought
         eou: number // energyOutputUpgrade
         eoro: number // energyOutputRepairOther
         eorwr: number // energyOutputRepairWallOrRampart
         eob: number // energyOutputBuild
-        // eoso: number // energyOutputSold
+        eoso: number // energyOutputSold
         eosp: number // energyOutputSpawn
         mh: number // mineralsHarvested
         es: number // energyStored
@@ -1699,9 +1698,9 @@ declare global {
 
     // PowerCreeps
 
-    interface PowerCreep {}
+    interface PowerCreep { }
 
-    interface PowerCreepMemory {}
+    interface PowerCreepMemory { }
 
     // Structures
 

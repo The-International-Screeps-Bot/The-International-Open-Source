@@ -25,8 +25,12 @@ Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
             this.name,
             order.roomName,
         )
+        const result = Game.market.deal(order.id, Math.min(dealAmount, order.remainingAmount), this.name)
+        if (result === OK && resourceType === "energy") {
+            global.roomStats.commune[this.name].eos += amount
+        }
 
-        return Game.market.deal(order.id, Math.min(dealAmount, order.remainingAmount), this.name) == OK
+        return result == OK
     }
 
     // If there is already an order in this room for the resourceType, inform true
@@ -47,14 +51,18 @@ Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
 
     // Otherwise, create a new market order and inform true
 
+    const result = Game.market.createOrder({
+        roomName: this.name,
+        type: ORDER_SELL,
+        resourceType,
+        price,
+        totalAmount: amount,
+    });
+    if (result === OK && resourceType === "energy") {
+        global.roomStats.commune[this.name].eos += amount
+    }
     return (
-        Game.market.createOrder({
-            roomName: this.name,
-            type: ORDER_SELL,
-            resourceType,
-            price,
-            totalAmount: amount,
-        }) == OK
+        result == OK
     )
 }
 
@@ -83,7 +91,11 @@ Room.prototype.advancedBuy = function (resourceType, amount, targetAmount) {
             order.roomName,
         )
 
-        return Game.market.deal(order.id, Math.min(dealAmount, order.remainingAmount), this.name) == OK
+        const result = Game.market.deal(order.id, Math.min(dealAmount, order.remainingAmount), this.name);
+        if (result === OK && resourceType === "energy") {
+            global.roomStats.commune[this.name].eib += amount
+        }
+        return result == OK
     }
 
     // If there is already an order in this room for the resourceType, inform true
@@ -104,13 +116,17 @@ Room.prototype.advancedBuy = function (resourceType, amount, targetAmount) {
 
     // Otherwise, create a new market order and inform true
 
+    const result = Game.market.createOrder({
+        roomName: this.name,
+        type: ORDER_BUY,
+        resourceType,
+        price,
+        totalAmount: amount,
+    });
+    if (result === OK && resourceType === "energy") {
+        global.roomStats.commune[this.name].eib += amount
+    }
     return (
-        Game.market.createOrder({
-            roomName: this.name,
-            type: ORDER_BUY,
-            resourceType,
-            price,
-            totalAmount: amount,
-        }) == OK
+        result == OK
     )
 }
