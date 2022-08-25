@@ -346,7 +346,6 @@ declare global {
     interface RoomStats {
         rc: number // remoteCount
         rcu: number // remoteCPUUsage
-        rcc: number // remoteCreepCount
         res: number // remoteEnergyStored
         reih: number // remoteEnergyInputHarvest
         reoro: number // remoteEnergyOutputRepairOther
@@ -366,6 +365,7 @@ declare global {
         mh: number // mineralsHarvested
         es: number // energyStored
         cc: number // creepCount
+        tcc: number // totalCreepCount
         cu: number // cpuUsage
         su: number // spawnUsage
     }
