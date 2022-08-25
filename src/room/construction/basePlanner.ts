@@ -138,6 +138,9 @@ export function basePlanner(room: Room) {
     function planStamp(opts: PlanStampOpts): false | RoomPosition[] {
         if (!opts.coordMap) opts.coordMap = room.baseCoords
         else {
+
+            opts.coordMap = new Uint8Array(opts.coordMap)
+
             // Loop through each exit of exits
 
             for (const pos of room.find(FIND_EXIT)) {
@@ -525,7 +528,7 @@ export function basePlanner(room: Room) {
     // Record road plans in the baseCM
 
     // Iterate through each x and y in the room
-
+/*
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
             // If there is road at the pos, assign it as avoid in baseCM
@@ -533,7 +536,7 @@ export function basePlanner(room: Room) {
             if (room.roadCoords[pack(pos)] === 1) room.baseCoords[pack(pos)] = 255
         }
     }
-
+ */
     // Mark the closestUpgradePos as avoid in the CM
 
     room.baseCoords[pack(closestUpgradePos)] = 255
@@ -568,12 +571,13 @@ export function basePlanner(room: Room) {
 
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
+            const packedCoord = packXY(x, y)
             // If there is road at the pos, assign it as avoid in baseCM
 
-            if (room.roadCoords[packXY(x, y)] === 1) room.baseCoords[packXY(x, y)] = 255
+            if (room.roadCoords[packedCoord] === 1) room.baseCoords[packedCoord] = 255
         }
     }
-
+    room.visualizeCoordMap(room.roadCoords)
     if (room.memory.stampAnchors.sourceLink.length + room.memory.stampAnchors.sourceExtension.length === 0) {
         // loop through sourceNames
 
@@ -681,7 +685,7 @@ export function basePlanner(room: Room) {
             for (const [coord, value] of OGCoords) room.roadCoords[coord] = value
         }
     }
-
+    /*
     if (!room.memory.stampAnchors.rampart.length) {
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
@@ -689,7 +693,7 @@ export function basePlanner(room: Room) {
             }
         }
     }
-
+ */
     // Try to plan the stamp
 
     if (

@@ -2289,13 +2289,15 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
                     )
                         continue
 
+                    const packedAdjacentCoord = pack(adjacentPos)
+
                     // Iterate if the adjacent pos has been visited or isn't a tile
 
-                    if (visitedCoords[pack(adjacentPos)] === 1) continue
+                    if (visitedCoords[packedAdjacentCoord] === 1) continue
 
                     // Otherwise record that it has been visited
 
-                    visitedCoords[pack(adjacentPos)] = 1
+                    visitedCoords[packedAdjacentCoord] = 1
 
                     // If a rampart is not planned for this position, iterate
 
