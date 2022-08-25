@@ -209,7 +209,7 @@ export class StatsManager {
         delete global.roomStats
     }
 
-    average(originalNumber: number, newNumber: number, averagedOverTickCount: number = 10, digits: number = 5) {
+    average(originalNumber: number, newNumber: number, averagedOverTickCount: number = 500, digits: number = 5) {
         const newWeight = 1 / averagedOverTickCount
         const originalWeight = 1 - newWeight
 
