@@ -7,15 +7,31 @@ export class LabManager {
         this.commune = commune
     }
 
+    outputRsc = RESOURCE_GHODIUM
+    input1Rsc = RESOURCE_ZYNTHIUM_KEANITE
+    input2Rsc = RESOURCE_UTRIUM_LEMERGITE
+    isReverse = false
+
+    lab1Id = '6300bba6fa5d294c1e1763a1'
+    lab2Id = '6300838274ce72369e571442'
+
+    public get input1(): StructureLab {
+        return _.find(this.commune.structures.lab, lab => lab.id == this.lab1Id)
+    }
+
+    public get input2(): StructureLab {
+        return _.find(this.commune.structures.lab, lab => lab.id == this.lab2Id)
+    }
+
+    public get outputs(): StructureLab[] {
+        return _.filter(this.commune.structures.lab, lab => lab.id != this.lab1Id && lab.id != this.lab2Id)
+    }
+
     run() {
         if (this.commune.room.name == 'W21N8') {
-            const input1 = _.find(this.commune.structures.lab, lab => lab.id == '6300bba6fa5d294c1e1763a1')
-            const input2 = _.find(this.commune.structures.lab, lab => lab.id == '6300838274ce72369e571442')
-            const outputs = _.filter(this.commune.structures.lab, lab => lab != input1 && lab != input2)
-
-            for (const output of outputs) {
+            for (const output of this.outputs) {
                 if (output.cooldown) continue
-                output.runReaction(input1, input2)
+                output.runReaction(this.input1, this.input2)
             }
         }
     }
@@ -24,7 +40,6 @@ export class LabManager {
         creep: Hauler,
         inputLab: StructureLab,
         inputRsc: MineralConstant | MineralCompoundConstant,
-        isReverse: boolean,
     ): boolean {
         if (inputLab.mineralType == inputRsc || inputLab.mineralType == null) {
             let source =
@@ -64,15 +79,10 @@ export class LabManager {
         return false
     }
 
-    private setupOutputLab(
-        creep: Hauler,
-        outputLab: StructureLab,
-        outputRsc: MineralConstant | MineralCompoundConstant,
-        isReverse: boolean,
-    ): boolean {
+    private setupOutputLab(creep: Hauler, outputLab: StructureLab): boolean {
         if (
-            (outputLab.mineralType != null && outputLab.mineralType != outputRsc) ||
-            outputLab.usedStore(outputRsc) >= creep.freeStore()
+            (outputLab.mineralType != null && outputLab.mineralType != this.outputRsc) ||
+            outputLab.usedStore(this.outputRsc) >= creep.freeStore()
         ) {
             let amount = Math.min(creep.freeStore(), outputLab.store[outputLab.mineralType])
 
@@ -92,25 +102,15 @@ export class LabManager {
 
     generateHaulingReservation(creep: Hauler) {
         if (this.commune.room.name == 'W21N8') {
-            const outputRsc = RESOURCE_GHODIUM
-            const input1Rsc = RESOURCE_ZYNTHIUM_KEANITE
-            const input2Rsc = RESOURCE_UTRIUM_LEMERGITE
-            const isReverse = false
-
-            const room = this.commune.room
-            const input1 = _.find(room.structures.lab, lab => lab.id == '6300bba6fa5d294c1e1763a1')
-            const input2 = _.find(room.structures.lab, lab => lab.id == '6300838274ce72369e571442')
-            const outputs = _.filter(room.structures.lab, lab => lab != input1 && lab != input2)
-
             //Priortize the worstly loaded lab.
-            if (input2.store[input2Rsc] > input1.store[input1Rsc]) {
-                if (this.setupInputLab(creep, input1, input1Rsc, isReverse)) return
-                if (this.setupInputLab(creep, input2, input2Rsc, isReverse)) return
+            if (this.input2.store[this.input2Rsc] > this.input1.store[this.input1Rsc]) {
+                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
+                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
             } else {
-                if (this.setupInputLab(creep, input2, input2Rsc, isReverse)) return
-                if (this.setupInputLab(creep, input1, input1Rsc, isReverse)) return
+                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
+                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
             }
-            for (const output of outputs) if (this.setupOutputLab(creep, output, outputRsc, isReverse)) return
+            for (const output of this.outputs) if (this.setupOutputLab(creep, output)) return
         }
     }
 }
