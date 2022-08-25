@@ -20,11 +20,41 @@ import './attackRequestManager'
 import { myColors, roomDimensions } from 'international/constants'
 import './factory'
 import './lab'
+import { LabManager } from './lab'
+
+export class Commune {
+    name: string
+    constructor(name: string) {
+        this.name = name
+    }
+
+    labManager: LabManager
+    structures: OrganizedStructures
+    room: Room
+
+    refresh(room: Room) {
+        this.structures = room.structures
+        this.room = room
+        this.labManager = new LabManager(this)
+    }
+
+    runManagers() {
+        this.labManager.run()
+    }
+}
 
 /**
  * Handles managers for exclusively commune-related actions
  */
 Room.prototype.communeManager = function () {
+    this.commune = global.communeObjects.find(com => com.name == this.name)
+    if (!this.commune) {
+        this.commune = new Commune(this.name)
+        global.communeObjects.push(this.commune)
+    }
+
+    this.commune.refresh(this)
+
     constructionManager(this)
 
     this.defenceManager()
@@ -43,7 +73,7 @@ Room.prototype.communeManager = function () {
     this.spawnManager()
 
     this.factoryManager()
-    this.labManager()
+    this.commune.runManagers()
 
     // Testing stuff, feel welcome to use to test CPU usage for specific commune things
 
@@ -76,7 +106,7 @@ Room.prototype.communeManager = function () {
          }
     }
  */
-/*
+    /*
     let cpu = Game.cpu.getUsed()
 
     const coordMap = createPosMap(true)

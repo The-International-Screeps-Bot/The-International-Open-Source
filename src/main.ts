@@ -33,6 +33,8 @@ import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { customLog } from 'international/generalFunctions'
 import { myColors } from 'international/constants'
+import { LabManager } from 'room/lab'
+import { Commune } from 'room/communeManager'
 
 // Type declareations for global
 
@@ -857,7 +859,6 @@ declare global {
          * Dictates and operates tasks for factories
          */
         factoryManager(): void
-        labManager(): void
 
         // Spawn functions
 
@@ -1166,6 +1167,8 @@ declare global {
          * Mandatory Other Fill Transfer Targets
          */
         readonly MOFTT: (Creep | AnyStoreStructure | Tombstone)[]
+
+        commune: Commune
     }
 
     interface DepositRecord {
@@ -1313,8 +1316,8 @@ declare global {
          */
         HU: number
 
-        factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM;
-        factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[];
+        factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
+        factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
     }
 
     // Creeps
@@ -1702,9 +1705,9 @@ declare global {
 
     // PowerCreeps
 
-    interface PowerCreep { }
+    interface PowerCreep {}
 
-    interface PowerCreepMemory { }
+    interface PowerCreepMemory {}
 
     // Structures
 
@@ -1823,6 +1826,8 @@ declare global {
              * Room names that have controllers we own
              */
             communes: Set<string>
+
+            communeObjects: Commune[]
 
             // Command functions
 
