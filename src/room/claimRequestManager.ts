@@ -9,16 +9,23 @@ Room.prototype.claimRequestManager = function () {
 
     // If there is an existing claimRequest and it's valid, check if there is claimer need
 
-    if (this.memory && this.memory.claimRequest) {
-        if (!Memory.claimRequests[this.memory.claimRequest] || Memory.claimRequests[this.memory.claimRequest].abandon > 0) {
-            if(Memory.claimRequests[this.memory.claimRequest])
-                delete Memory.claimRequests[this.memory.claimRequest].responder
+    if (this.memory.claimRequest) {
+        // If the claimRequest doesn't exist anymore somehow, stop trying to do anything with it
+
+        if (!Memory.claimRequests[this.memory.claimRequest]) {
+            delete this.memory.claimRequest
+            return
+        }
+
+        // If the request has been abandoned, have the commune abandon it too
+
+        if (Memory.claimRequests[this.memory.claimRequest].abandon > 0) {
+            delete Memory.claimRequests[this.memory.claimRequest].responder
             delete this.memory.claimRequest
             return
         }
 
         if (this.energyCapacityAvailable < 750) {
-
             delete Memory.claimRequests[this.memory.claimRequest].responder
             delete this.memory.claimRequest
             return
@@ -49,7 +56,6 @@ Room.prototype.claimRequestManager = function () {
         // Get enemyCreeps in the room and loop through them
 
         for (const enemyCreep of claimTarget.enemyCreeps) {
-
             // If the enemy is an invader
 
             if (enemyCreep.owner.username === 'Invader') continue

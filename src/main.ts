@@ -1762,7 +1762,7 @@ declare global {
          * Finds the total free store capacity of this RoomObject
          * @param resourceType A resourceConstant to ensure proper querying of limit store RoomObjects
          */
-        freeStore(resourceType?: ResourceConstant): number
+        freeStore(): number
 
         /**
          * Finds the total free store capacity of a specific resource for this RoomObject

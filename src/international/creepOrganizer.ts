@@ -12,8 +12,6 @@ import '../room/creeps/preTickManagers/remote/remoteDefenderPreTick'
 import '../room/creeps/preTickManagers/remote/remoteCoreAttackerPreTick'
 import '../room/creeps/preTickManagers/remote/remoteDismantlerPreTick'
 
-
-
 InternationalManager.prototype.creepOrganizer = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
@@ -46,11 +44,9 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         // Assign creep a class based on role
 
-        const creepClass = creepClasses[role];
-        function isConstructor(obj: any) {
-            return !!obj && !!obj.prototype && !!obj.prototype.constructor.name;
-        }
-        if (!isConstructor(creepClass)) { customLog('Creep Organizer', "bad creep " + role, myColors.midGrey); return; }
+        const creepClass = creepClasses[role]
+        if (!creepClass) return
+
         creep = Game.creeps[creepName] = new creepClass(creep.id)
 
         // Get the creep's current room and the room it's from
@@ -99,14 +95,9 @@ InternationalManager.prototype.creepOrganizer = function () {
 
     for (const creepName in Memory.creeps) {
         try {
-            processSingleCreep(creepName);
+            processSingleCreep(creepName)
         } catch (err) {
-            customLog(
-                'Exception processing creep: ' + creepName,
-                err,
-                myColors.white,
-                myColors.red,
-            )
+            customLog('Exception processing creep: ' + creepName, err, myColors.white, myColors.red)
         }
     }
 
