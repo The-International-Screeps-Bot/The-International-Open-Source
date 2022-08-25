@@ -2,179 +2,173 @@ import { getRange, unpackAsRoomPos } from 'international/generalFunctions'
 import { FastFiller } from '../../creepClasses'
 
 export function fastFillerManager(room: Room, creepsOfRole: string[]) {
-     for (const creepName of creepsOfRole) {
-          const creep: FastFiller = Game.creeps[creepName]
+    for (const creepName of creepsOfRole) {
+        const creep: FastFiller = Game.creeps[creepName]
 
-          if (creep.travelToFastFiller()) continue
+        if (creep.travelToFastFiller()) continue
 
-          if (creep.fillFastFiller()) continue
+        if (creep.fillFastFiller()) continue
 
-          creep.advancedRenew()
+        creep.advancedRenew()
 
-          /* creep.say('🚬') */
-     }
+        /* creep.say('🚬') */
+    }
 }
 
 FastFiller.prototype.travelToFastFiller = function () {
-     const { room } = this
+    const { room } = this
 
-     // Try to find a fastFillerPos, inform true if it failed
+    // Try to find a fastFillerPos, inform true if it failed
 
-     if (!this.findFastFillerPos()) return true
+    if (!this.findFastFillerPos()) return true
 
-     // Unpack the this's packedFastFillerPos
+    // Unpack the this's packedFastFillerPos
 
-     const fastFillerPos = unpackAsRoomPos(this.memory.packedPos, room.name)
+    const fastFillerPos = unpackAsRoomPos(this.memory.packedPos, room.name)
 
-     // If the this is standing on the fastFillerPos, inform false
+    // If the this is standing on the fastFillerPos, inform false
 
-     if (getRange(this.pos.x, fastFillerPos.x, this.pos.y, fastFillerPos.y) === 0) return false
+    if (getRange(this.pos.x, fastFillerPos.x, this.pos.y, fastFillerPos.y) === 0) return false
 
-     // Otherwise, make a move request to it
+    // Otherwise, make a move request to it
 
-     this.say('⏩F')
+    this.say('⏩F')
 
-     this.createMoveRequest({
-          origin: this.pos,
-          goal: { pos: fastFillerPos, range: 0 },
-     })
+    this.createMoveRequest({
+        origin: this.pos,
+        goal: { pos: fastFillerPos, range: 0 },
+    })
 
-     // And inform true
+    // And inform true
 
-     return true
+    return true
 }
 
 FastFiller.prototype.fillFastFiller = function () {
-     const { room } = this
+    const { room } = this
 
-     this.say('💁')
+    this.say('💁')
 
-     // If the creep has a non-energy resource
+    // If the creep has a non-energy resource
 
-     if (this.usedStore() > this.store.energy) {
-          for (const resourceType in this.store) {
-               if (resourceType == RESOURCE_ENERGY) continue
+    if (this.usedStore() > this.store.energy) {
+        for (const resourceType in this.store) {
+            if (resourceType == RESOURCE_ENERGY) continue
 
-               this.say('WR')
+            this.say('WR')
 
-               this.drop(resourceType as ResourceConstant)
-               return true
-          }
-     }
+            this.drop(resourceType as ResourceConstant)
+            return true
+        }
+    }
 
-     const fastFillerContainers = [
-          room.fastFillerContainerLeft,
-          room.fastFillerContainerRight,
-     ]
+    const fastFillerContainers = [room.fastFillerContainerLeft, room.fastFillerContainerRight]
 
-     // If all spawningStructures are filled, inform false
+    // If all spawningStructures are filled, inform false
 
-     if (room.energyAvailable === room.energyCapacityAvailable) return false
+    if (room.energyAvailable === room.energyCapacityAvailable) return false
 
-     // If the this needs resources
+    // If the this needs resources
 
-     if (this.needsResources()) {
-          // Get the sourceLinks
+    if (this.needsResources()) {
+        // Get the sourceLinks
 
-          let fastFillerStoringStructures: (StructureContainer | StructureLink)[] = [
-               room.fastFillerLink,
-          ]
-          fastFillerStoringStructures = fastFillerStoringStructures.concat(fastFillerContainers)
+        let fastFillerStoringStructures: (StructureContainer | StructureLink)[] = [room.fastFillerLink]
+        fastFillerStoringStructures = fastFillerStoringStructures.concat(fastFillerContainers)
 
-          let structures = fastFillerStoringStructures.length
+        let structures = fastFillerStoringStructures.length
 
-          // Loop through each fastFillerStoringStructure
+        // Loop through each fastFillerStoringStructure
 
-          for (const structure of fastFillerStoringStructures) {
-               // If the structure is undefined, iterate
+        for (const structure of fastFillerStoringStructures) {
+            // If the structure is undefined, iterate
 
-               if (!structure) {
+            if (!structure) {
+                structures -= 1
+                continue
+            }
 
-                    structures -= 1
-                    continue
-               }
+            // Otherwise, if the structure is not in range 1 to the this
 
-               // Otherwise, if the structure is not in range 1 to the this
+            if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) continue
 
-               if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) continue
+            // If there is a non-energy resource in the structure
 
-               // If there is a non-energy resource in the structure
+            if (structure.structureType != STRUCTURE_LINK && this.usedStore() > structure.store.energy) {
+                for (const key in structure.store) {
+                    const resourceType = key as ResourceConstant
 
-               if (
-                    structure.structureType != STRUCTURE_LINK &&
-                    this.usedStore() > structure.store.energy
-               ) {
-                    for (const key in structure.store) {
+                    if (resourceType === RESOURCE_ENERGY) continue
 
-                         const resourceType = key as ResourceConstant
+                    this.say('WCR')
 
-                         if (resourceType === RESOURCE_ENERGY) continue
+                    this.withdraw(structure, resourceType as ResourceConstant)
+                    structure.store[resourceType] -= Math.min(structure.store[resourceType], this.freeStore())
 
-                         this.say('WCR')
+                    return true
+                }
+            }
 
-                         this.withdraw(structure, resourceType as ResourceConstant)
-                         structure.store[resourceType] -= Math.min(structure.store[resourceType], this.freeStore(resourceType))
+            // Otherwise, if there is insufficient energy in the structure, iterate
 
-                         return true
-                    }
-               }
+            if (
+                structure.store.energy < this.freeSpecificStore(RESOURCE_ENERGY) ||
+                structure.store.getUsedCapacity(RESOURCE_ENERGY) < this.freeSpecificStore(RESOURCE_ENERGY)
+            )
+                continue
 
-               // Otherwise, if there is insufficient energy in the structure, iterate
+            // Otherwise, withdraw from the structure and inform true
 
-               if (structure.store.energy < this.freeSpecificStore(RESOURCE_ENERGY) || structure.store.getUsedCapacity(RESOURCE_ENERGY) < this.freeSpecificStore(RESOURCE_ENERGY)) continue
+            this.say('W')
 
-               // Otherwise, withdraw from the structure and inform true
+            this.withdraw(structure, RESOURCE_ENERGY)
+            structure.store.energy -= this.store.getCapacity() - this.store.energy
+            return true
+        }
 
-               this.say('W')
+        // Inform false
 
-               this.withdraw(structure, RESOURCE_ENERGY)
-               structure.store.energy -= this.store.getCapacity() - this.store.energy
-               return true
-          }
+        return false
+    }
 
-          // Inform false
+    // Otherwise if the this doesn't need energy, get adjacent extensions and spawns to the this
 
-          return false
-     }
+    const adjacentStructures = room.lookForAtArea(
+        LOOK_STRUCTURES,
+        this.pos.y - 1,
+        this.pos.x - 1,
+        this.pos.y + 1,
+        this.pos.x + 1,
+        true,
+    )
 
-     // Otherwise if the this doesn't need energy, get adjacent extensions and spawns to the this
+    // For each structure of adjacentStructures
 
-     const adjacentStructures = room.lookForAtArea(
-          LOOK_STRUCTURES,
-          this.pos.y - 1,
-          this.pos.x - 1,
-          this.pos.y + 1,
-          this.pos.x + 1,
-          true,
-     )
+    for (const adjacentPosData of adjacentStructures) {
+        // Get the structure at the adjacentPos
 
-     // For each structure of adjacentStructures
+        const structure = adjacentPosData.structure as StructureSpawn | StructureExtension
 
-     for (const adjacentPosData of adjacentStructures) {
-          // Get the structure at the adjacentPos
+        // If the structure has no store property, iterate
 
-          const structure = adjacentPosData.structure as StructureSpawn | StructureExtension
+        if (!structure.store) continue
 
-          // If the structure has no store property, iterate
+        // If the structureType is an extension or spawn, iterate
 
-          if (!structure.store) continue
+        if (structure.structureType !== STRUCTURE_SPAWN && structure.structureType !== STRUCTURE_EXTENSION) continue
 
-          // If the structureType is an extension or spawn, iterate
+        if (structure.store.energy >= structure.store.getCapacity(RESOURCE_ENERGY)) continue
 
-          if (structure.structureType !== STRUCTURE_SPAWN && structure.structureType !== STRUCTURE_EXTENSION) continue
+        // Otherwise, transfer to the structure record the action and inform true
 
-          if (structure.store.energy >= structure.store.getCapacity(RESOURCE_ENERGY)) continue
+        this.say('T')
 
-          // Otherwise, transfer to the structure record the action and inform true
+        this.transfer(structure, RESOURCE_ENERGY).toString()
+        structure.store.energy += this.store.energy
 
-          this.say('T')
-
-          this.transfer(structure, RESOURCE_ENERGY).toString()
-          structure.store.energy += this.store.energy
-
-          return true
-     }
-/*
+        return true
+    }
+    /*
      if (this.store.energy === 0) return false
 
      for (const container of fastFillerContainers) {
@@ -188,7 +182,7 @@ FastFiller.prototype.fillFastFiller = function () {
           return true
      }
  */
-     // Otherwise inform false
+    // Otherwise inform false
 
-     return false
+    return false
 }

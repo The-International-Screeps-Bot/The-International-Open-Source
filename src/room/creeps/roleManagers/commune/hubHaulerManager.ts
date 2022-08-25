@@ -12,10 +12,7 @@ export function hubHaulerManager(room: Room, creepsOfRole: string[]) {
 
         // If the creep has no reservations but is full
 
-        if (
-            (!creep.memory.reservations || !creep.memory.reservations.length) &&
-            creep.freeStore(RESOURCE_ENERGY) === 0
-        ) {
+        if ((!creep.memory.reservations || !creep.memory.reservations.length) && creep.freeStore() === 0) {
             for (const key in creep.store) {
                 const resourceType = key as ResourceConstant
 
@@ -187,12 +184,20 @@ HubHauler.prototype.reserveHubLinkWithdraw = function () {
     // If the controllerLink is less than x% full
 
     const { controllerLink } = room
-    if (controllerLink && controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > controllerLink.store.energy) return false
+    if (
+        controllerLink &&
+        controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > controllerLink.store.energy
+    )
+        return false
 
     // If the fastFillerLink is less than x% full
 
     const { fastFillerLink } = room
-    if (fastFillerLink && fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > fastFillerLink.store.energy) return false
+    if (
+        fastFillerLink &&
+        fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > fastFillerLink.store.energy
+    )
+        return false
 
     // FInd a target
 
@@ -232,11 +237,17 @@ HubHauler.prototype.reserveHubLinkTransfer = function () {
 
     // If a link is less than x% full
 
-    if (controllerLink && controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > controllerLink.store.energy) {}
-    else if (fastFillerLink && fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > fastFillerLink.store.energy) {}
+    if (
+        controllerLink &&
+        controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > controllerLink.store.energy
+    ) {
+    } else if (
+        fastFillerLink &&
+        fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > fastFillerLink.store.energy
+    ) {
+    }
 
     // There are no needy links
-
     else return false
 
     const amount = Math.min(this.freeStore(), hubLink.freeSpecificStore())
