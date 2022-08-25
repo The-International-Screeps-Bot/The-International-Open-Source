@@ -548,56 +548,6 @@ export function basePlanner(room: Room) {
         room.memory.stampAnchors.extension.length -
         room.memory.stampAnchors.sourceExtension.length
 
-    let expectedSourceExtensionsCount = 0
-
-    if (room.memory.stampAnchors.sourceExtension.length === 0) {
-        // loop through sourceNames
-
-        for (const sourceIndex in sources) {
-            // Get the closestHarvestPos of this sourceName
-
-            const closestSourcePos = room.sourcePositions[sourceIndex][0]
-
-            const OGCoords: Map<number, number> = new Map()
-
-            for (let posIndex = 1; posIndex < room.sourcePositions[sourceIndex].length; posIndex += 1) {
-                const packedCoord = pack(room.sourcePositions[sourceIndex][posIndex])
-
-                OGCoords.set(packedCoord, room.roadCoords[packedCoord])
-                room.roadCoords[packedCoord] = 0
-            }
-
-            // Find positions adjacent to source
-
-            const adjacentCoords = findCoordsInsideRect(
-                closestSourcePos.x - 1,
-                closestSourcePos.y - 1,
-                closestSourcePos.x + 1,
-                closestSourcePos.y + 1,
-            )
-
-            // Loop through each pos
-
-            for (let index = 0; index < adjacentCoords.length; index++) {
-                const coord = adjacentCoords[index]
-                const packedCoord = pack(coord)
-
-                // Iterate if plan for pos is in use
-
-                if (room.roadCoords[packedCoord] > 0) continue
-
-                if (room.rampartCoords[packedCoord] > 0) continue
-
-                if (coord.x < 2 || coord.x >= roomDimensions - 2 || coord.y < 2 || coord.y >= roomDimensions - 2)
-                    continue
-
-                expectedSourceExtensionsCount += 1
-            }
-
-            for (const [coord, value] of OGCoords) room.roadCoords[coord] = value
-        }
-    }
-
     // Try to plan the stamp
 
     if (
@@ -611,22 +561,6 @@ export function basePlanner(room: Room) {
         })
     )
         return 'failed'
-
-    // Try to plan the stamp
-
-    if (
-        !planStamp({
-            stampType: 'extension',
-            count: extraExtensionsAmount - expectedSourceExtensionsCount,
-            startCoords: [hubAnchor],
-            adjacentToRoads: true,
-            coordMap: room.roadCoords,
-            minAvoid: 255,
-        })
-    )
-        return 'failed'
-
-    extraExtensionsAmount = expectedSourceExtensionsCount
 
     rampartPlanner(room)
 
