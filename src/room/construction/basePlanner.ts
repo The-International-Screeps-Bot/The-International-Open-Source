@@ -577,7 +577,7 @@ export function basePlanner(room: Room) {
             if (room.roadCoords[packedCoord] === 1) room.baseCoords[packedCoord] = 255
         }
     }
-    room.visualizeCoordMap(room.roadCoords)
+
     if (room.memory.stampAnchors.sourceLink.length + room.memory.stampAnchors.sourceExtension.length === 0) {
         // loop through sourceNames
 
