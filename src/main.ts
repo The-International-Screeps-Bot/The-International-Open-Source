@@ -3,6 +3,7 @@
 // International
 
 import './international/commands'
+import './international/respawnHandler'
 import { InternationalManager, internationalManager } from './international/internationalManager'
 import './international/config'
 import './international/tickConfig'
