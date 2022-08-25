@@ -1,3 +1,4 @@
+// Credit to @SemperRabbit for this nice piece of code!
 export default class RespawnHandler {
     static HasRespawned(): boolean {
         if (Game.time === 0) {
