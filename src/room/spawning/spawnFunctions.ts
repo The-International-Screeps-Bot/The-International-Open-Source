@@ -347,7 +347,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
             tier -= 1
         }
-
+        customLog('TOTAL COST', cost)
         // Create a spawnRequest using previously constructed information
 
         this.createSpawnRequest(opts.priority, opts.role, body, tier, cost, opts.memoryAdditions)

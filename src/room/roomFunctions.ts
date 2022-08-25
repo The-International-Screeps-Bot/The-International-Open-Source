@@ -624,24 +624,24 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     // Configure y and loop through top exits
 
                     let y = 0
-                    for (x = 0; x < 50; x += 1) cm.set(x, y, 255)
+                    for (x = 0; x < roomDimensions; x += 1) cm.set(x, y, 255)
 
                     // Configure x and loop through left exits
 
                     x = 0
-                    for (y = 0; y < 50; y += 1) cm.set(x, y, 255)
+                    for (y = 0; y < roomDimensions; y += 1) cm.set(x, y, 255)
 
                     // Configure y and loop through bottom exits
 
-                    y = 49
-                    for (x = 0; x < 50; x += 1) cm.set(x, y, 255)
+                    y = roomDimensions - 1
+                    for (x = 0; x < roomDimensions; x += 1) cm.set(x, y, 255)
 
                     // Configure x and loop through right exits
 
-                    x = 49
-                    for (y = 0; y < 50; y += 1) cm.set(x, y, 255)
+                    x = roomDimensions - 1
+                    for (y = 0; y < roomDimensions; y += 1) cm.set(x, y, 255)
                 }
-
+                /* if (room) room.visualizeCostMatrix(cm) */
                 // Weight positions
 
                 for (const weight in opts.weightPositions) {
@@ -2479,6 +2479,16 @@ Room.prototype.visualizeCoordMap = function (coordMap) {
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
             this.visual.text(coordMap[packXY(x, y)].toString(), x, y, {
+                font: 0.5,
+            })
+        }
+    }
+}
+
+Room.prototype.visualizeCostMatrix = function (cm) {
+    for (let x = 0; x < roomDimensions; x += 1) {
+        for (let y = 0; y < roomDimensions; y += 1) {
+            this.visual.text(cm.get(x, y).toString(), x, y, {
                 font: 0.5,
             })
         }
