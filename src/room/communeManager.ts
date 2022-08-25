@@ -47,7 +47,8 @@ export class Commune {
  * Handles managers for exclusively commune-related actions
  */
 Room.prototype.communeManager = function () {
-    this.commune = global.communeObjects.find(com => com.name == this.name)
+   if(!global.communeObjects) global.communeObjects = [];
+    this.commune = _.find(global.communeObjects, com => com.name == this.name)
     if (!this.commune) {
         this.commune = new Commune(this.name)
         global.communeObjects.push(this.commune)
