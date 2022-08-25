@@ -27,12 +27,22 @@ export class LabManager {
         return _.filter(this.commune.structures.lab, lab => lab.id != this.lab1Id && lab.id != this.lab2Id)
     }
 
+    private isProperlyLoaded(): boolean {
+        if (
+            (this.input1.mineralType == this.input1Rsc || this.input1.mineralType == null) &&
+            (this.input2.mineralType == this.input2Rsc || this.input2.mineralType == null)
+        )
+            return true
+        return false
+    }
+
     run() {
         if (this.commune.room.name == 'W21N8') {
-            for (const output of this.outputs) {
-                if (output.cooldown) continue
-                output.runReaction(this.input1, this.input2)
-            }
+            if (this.isProperlyLoaded)
+                for (const output of this.outputs) {
+                    if (output.cooldown) continue
+                    output.runReaction(this.input1, this.input2)
+                }
         }
     }
 
