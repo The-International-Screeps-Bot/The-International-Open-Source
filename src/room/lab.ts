@@ -3,17 +3,24 @@ import { Hauler } from './creeps/creepClasses'
 
 export class LabManager {
     commune: Commune
+    outputRsc: MineralConstant | MineralCompoundConstant
+    input1Rsc: MineralConstant | MineralCompoundConstant
+    input2Rsc: MineralConstant | MineralCompoundConstant
+    isReverse: boolean
+    lab1Id: string
+    lab2Id: string
+
     constructor(commune: Commune) {
         this.commune = commune
+
+        this.outputRsc = RESOURCE_GHODIUM
+        this.input1Rsc = RESOURCE_ZYNTHIUM_KEANITE
+        this.input2Rsc = RESOURCE_UTRIUM_LEMERGITE
+        this.isReverse = false
+
+        this.lab1Id = '6300bba6fa5d294c1e1763a1'
+        this.lab2Id = '6300838274ce72369e571442'
     }
-
-    outputRsc = RESOURCE_GHODIUM
-    input1Rsc = RESOURCE_ZYNTHIUM_KEANITE
-    input2Rsc = RESOURCE_UTRIUM_LEMERGITE
-    isReverse = false
-
-    lab1Id = '6300bba6fa5d294c1e1763a1'
-    lab2Id = '6300838274ce72369e571442'
 
     public get input1(): StructureLab {
         return _.find(this.commune.structures.lab, lab => lab.id == this.lab1Id)
