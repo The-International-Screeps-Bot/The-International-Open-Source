@@ -857,6 +857,7 @@ declare global {
          * Dictates and operates tasks for factories
          */
         factoryManager(): void
+        labManager(): void
 
         // Spawn functions
 
@@ -1311,6 +1312,9 @@ declare global {
          * Hauler Update, how many ticks ago the hauler size was updated
          */
         HU: number
+
+        factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM;
+        factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[];
     }
 
     // Creeps

@@ -268,9 +268,33 @@ HubHauler.prototype.reserveFactoryWithdraw = function () {
     const factory = room.structures.factory[0]
     if (!factory) return false
 
-    // If there are not enough batteries to justify a withdrawl
+    for (let resource in factory.store) {
+        //if it's needed for production, we need it.
+        if (room.memory.factoryUsableResources.includes(resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY))
+            continue;
 
-    if (factory.store.battery < this.store.getCapacity()) return false
+        //Batteries are handled elsewhere in the code.
+        if (resource == RESOURCE_BATTERY) continue;
+
+        //We don't want to remove the output if there's less then a full creep's worth.
+        if (resource == room.memory.factoryProduct && factory.store[resource] < this.freeStore())
+            continue;
+
+        //I'm favoring the terminal here because it's likely going to get sold, or shipped out in late game.
+        let target;
+        if (terminal && terminal.freeStore() > this.store.getCapacity()) target = terminal
+        else if (storage && storage.freeStore() > this.store.getCapacity()) target = storage;
+        if (!target) return false;
+
+        let amount = Math.min(this.freeStore(), target.freeStore(), factory.store[resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY]);
+
+        this.createReservation('withdraw', factory.id, amount, resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)
+        this.createReservation('transfer', target.id, amount + this.store[resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY], resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)
+        return true;
+    }
+
+    // If there are not enough batteries to justify a withdrawl
+    if (factory.store.battery < this.store.getCapacity()) return false;
 
     // Find a target
 
@@ -300,6 +324,27 @@ HubHauler.prototype.reserveFactoryTransfer = function () {
     // If there is not enough free store in the factory
 
     if (factory.freeStore() < this.store.getCapacity()) return false
+
+    if (room.memory.factoryProduct && room.memory.factoryUsableResources) {
+        for (let component of room.memory.factoryUsableResources) {
+            //If there's enough of the component, for now it's just checking for 1000, but 1000 of a T3 resource is a lot, 1000 of a mineral isn't much...
+            if (factory.store[component] >= 1000)
+                continue;
+
+            let provider;
+            if (storage && storage.store[component] > 0) provider = storage;
+            else if (terminal && terminal.store[component] > 0) provider = terminal;
+            if (!provider) continue;
+
+            let amount = Math.min(this.freeStore(), provider.store[component], 2000 - factory.store[component]);
+
+            //If it doesn't need any of this resource...
+            if (amount <= 0) continue;
+
+            this.createReservation('withdraw', provider.id, amount, component);
+            this.createReservation('transfer', factory.id, amount + this.store[component], component);
+        }
+    }
 
     // If the ratio of stored batteries to energy is sufficiently high
     // 100 : 1

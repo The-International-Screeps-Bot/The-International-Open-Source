@@ -457,7 +457,7 @@ Room.prototype.get = function (roomObjectName) {
         cacheType: 'global',
         cacheAmount: Infinity,
         room,
-        valueConstructor() {},
+        valueConstructor() { },
     })
 
     new RoomCacheObject({
@@ -1335,7 +1335,7 @@ Room.prototype.findStoredResourceAmount = function (resourceType) {
 
     // Create array of room and terminal
 
-    const storageStructures = [room.storage, room.terminal]
+    const storageStructures = [room.storage, room.terminal, ...room.structures.factory];
 
     // Iterate through storageStructures
 

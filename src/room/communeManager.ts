@@ -19,6 +19,7 @@ import './claimRequestManager'
 import './attackRequestManager'
 import { myColors, roomDimensions } from 'international/constants'
 import './factory'
+import './lab'
 
 /**
  * Handles managers for exclusively commune-related actions
@@ -42,6 +43,7 @@ Room.prototype.communeManager = function () {
     this.spawnManager()
 
     this.factoryManager()
+    this.labManager()
 
     // Testing stuff, feel welcome to use to test CPU usage for specific commune things
 
