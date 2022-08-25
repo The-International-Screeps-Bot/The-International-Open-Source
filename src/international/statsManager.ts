@@ -16,9 +16,9 @@ export class StatsManager {
                 cc: 0,
                 cu: Game.cpu.getUsed(),
                 su: 0,
+                tcc: 0,
                 rc: 0,
                 rcu: 0,
-                rcc: 0,
                 res: 0,
                 reih: 0,
                 reoro: 0,
@@ -33,7 +33,6 @@ export class StatsManager {
         const remoteStats: RoomStats = {
             rc: 0,
             rcu: Game.cpu.getUsed(),
-            rcc: 0,
             res: 0,
             reih: 0,
             reoro: 0,
@@ -54,7 +53,6 @@ export class StatsManager {
         } else if (roomType === 'remote') {
             const globalStats = global.roomStats.remote[roomName] as RoomStats
             globalStats.rcu = globalStats.rcu >= 0 ? Game.cpu.getUsed() - globalStats.rcu : 0
-            globalStats.rcc = Game.rooms[roomName].myCreepsAmount
         }
     }
 
@@ -70,6 +68,7 @@ export class StatsManager {
         roomStats.cu = this.average(roomStats.cu, globalCommuneStats.cu >= 0 ? globalCommuneStats.cu : 0)
         if (room) {
             roomStats.cc = room.myCreepsAmount
+            roomStats.tcc = room.creepsFromRoomAmount
 
             const spawns = room.structures.spawn
             if (spawns.length > 0)
@@ -103,16 +102,15 @@ export class StatsManager {
             allGlobalRemoteStats.forEach(([remoteRoomName, remoteRoomStats]) => {
                 globalCommuneStats.rc += 1
                 globalCommuneStats.rcu += remoteRoomStats.rcu
-                globalCommuneStats.rcc += remoteRoomStats.rcc
                 globalCommuneStats.res += remoteRoomStats.res
                 globalCommuneStats.reih += remoteRoomStats.reih
                 globalCommuneStats.reoro += remoteRoomStats.reoro
                 globalCommuneStats.reob += remoteRoomStats.reob
             })
+            roomStats.tcc = this.average(globalCommuneStats.tcc, roomStats.tcc)
 
             roomStats.rc = this.average(globalCommuneStats.rc, roomStats.rc)
             roomStats.rcu = this.average(globalCommuneStats.rcu, roomStats.rcu)
-            roomStats.rcc = this.average(globalCommuneStats.rcc, roomStats.rcc)
             roomStats.res = this.average(globalCommuneStats.res, roomStats.res)
             roomStats.reih = this.average(globalCommuneStats.reih, roomStats.reih)
             roomStats.reoro = this.average(globalCommuneStats.reoro, roomStats.reoro)
@@ -211,7 +209,7 @@ export class StatsManager {
         delete global.roomStats
     }
 
-    average(originalNumber: number, newNumber: number, averagedOverTickCount: number = 10, digits: number = 5) {
+    average(originalNumber: number, newNumber: number, averagedOverTickCount: number = 500, digits: number = 5) {
         const newWeight = 1 / averagedOverTickCount
         const originalWeight = 1 - newWeight
 

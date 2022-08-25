@@ -15,7 +15,7 @@ import {
     arePositionsEqual,
     createPosMap,
     customLog,
-    findAvgBetweenPositions,
+    findAvgBetweenCoords,
     findClosestPos,
     findCoordsInsideRect,
     getRange,
@@ -97,11 +97,11 @@ export function basePlanner(room: Room) {
 
     // Find the average pos between the sources
 
-    const avgSourcePos = sources.length > 1 ? findAvgBetweenPositions(sources[0].pos, sources[1].pos) : sources[0].pos
+    const avgSourcePos = sources.length > 1 ? findAvgBetweenCoords(sources[0].pos, sources[1].pos) : sources[0].pos
 
     // Find the average pos between the two sources and the controller
 
-    const avgControllerSourcePos = findAvgBetweenPositions(room.controller.pos, avgSourcePos)
+    const avgControllerSourcePos = findAvgBetweenCoords(room.controller.pos, avgSourcePos)
 
     const controllerAdjacentCoords = findCoordsInsideRect(
         room.controller.pos.x - 3,
@@ -138,6 +138,9 @@ export function basePlanner(room: Room) {
     function planStamp(opts: PlanStampOpts): false | RoomPosition[] {
         if (!opts.coordMap) opts.coordMap = room.baseCoords
         else {
+
+            opts.coordMap = new Uint8Array(opts.coordMap)
+
             // Loop through each exit of exits
 
             for (const pos of room.find(FIND_EXIT)) {
@@ -314,13 +317,29 @@ export function basePlanner(room: Room) {
 
     /* room.visualizeCoordMap(room.baseCoords) */
 
+    const closestSource = room.anchor.findClosestByPath(sources, {
+        ignoreRoads: true,
+        ignoreDestructibleStructures: true,
+        ignoreCreeps: true,
+    })
+
+    // Construct path
+
+    let path = room.advancedFindPath({
+        origin: closestSource.pos,
+        goal: { pos: room.anchor, range: 3 },
+        weightCoordMaps: [room.roadCoords],
+    })
+
+    const hubStartCoord = path[path.length - 1]
+
     // Try to plan the stamp
 
     if (
         !planStamp({
             stampType: 'hub',
             count: 1,
-            startCoords: [room.anchor],
+            startCoords: [hubStartCoord],
             normalDT: true,
             cardinalFlood: true,
         })
@@ -328,17 +347,8 @@ export function basePlanner(room: Room) {
         return 'failed'
 
     const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
-    const hubAnchors = [
-        {
-            x: hubAnchor.x - 1,
-            y: hubAnchor.y + 1,
-        },
-        {
-            x: hubAnchor.x + 1,
-            y: hubAnchor.y - 1,
-        },
-    ]
-    const fastFillerHubAnchor = findAvgBetweenPositions(room.anchor, hubAnchor)
+
+    const fastFillerHubAnchor = findAvgBetweenCoords(room.anchor, hubAnchor)
     // Get the closest upgrade pos and mark it as fair use in roadCM
 
     const closestUpgradePos = upgradePositions[0]
@@ -346,17 +356,13 @@ export function basePlanner(room: Room) {
 
     room.roadCoords[pack(closestUpgradePos)] = 1
 
-    // Construct path
-
-    let path: RoomPosition[] = []
-
     // Try to plan the stamp
 
     if (
         !planStamp({
             stampType: 'labs',
             count: 1,
-            startCoords: hubAnchors,
+            startCoords: [hubAnchor],
             normalDT: true,
             coordMap: room.roadCoords,
             cardinalFlood: true,
@@ -379,8 +385,8 @@ export function basePlanner(room: Room) {
     if (
         !planStamp({
             stampType: 'extensions',
-            count: 5,
-            startCoords: hubAnchors,
+            count: 3,
+            startCoords: [hubAnchor],
         })
     )
         return 'failed'
@@ -417,7 +423,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: centerUpgadePos,
-        goal: { pos: hubAnchor, range: 2 },
+        goal: { pos: hubAnchor, range: 1 },
         weightCoordMaps: [room.roadCoords],
     })
 
@@ -485,7 +491,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: unpackAsRoomPos(room.memory.stampAnchors.labs[0], room.name),
-        goal: { pos: hubAnchor, range: 2 },
+        goal: { pos: hubAnchor, range: 1 },
         weightCoordMaps: [room.roadCoords],
     })
 
@@ -505,7 +511,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: mineralHarvestPos,
-        goal: { pos: hubAnchor, range: 2 },
+        goal: { pos: hubAnchor, range: 1 },
         weightCoordMaps: [room.roadCoords],
     })
 
@@ -522,7 +528,7 @@ export function basePlanner(room: Room) {
     // Record road plans in the baseCM
 
     // Iterate through each x and y in the room
-
+/*
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
             // If there is road at the pos, assign it as avoid in baseCM
@@ -530,10 +536,20 @@ export function basePlanner(room: Room) {
             if (room.roadCoords[pack(pos)] === 1) room.baseCoords[pack(pos)] = 255
         }
     }
-
+ */
     // Mark the closestUpgradePos as avoid in the CM
 
     room.baseCoords[pack(closestUpgradePos)] = 255
+
+    // Construct extraExtensions count
+
+    let extraExtensionsAmount =
+        CONTROLLER_STRUCTURES.extension[8] -
+        stamps.fastFiller.structures.extension.length -
+        /* stamps.hub.structures.extension.length - */
+        room.memory.stampAnchors.extensions.length * stamps.extensions.structures.extension.length -
+        room.memory.stampAnchors.extension.length -
+        room.memory.stampAnchors.sourceExtension.length
 
     // Try to plan the stamp
 
@@ -555,21 +571,12 @@ export function basePlanner(room: Room) {
 
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
+            const packedCoord = packXY(x, y)
             // If there is road at the pos, assign it as avoid in baseCM
 
-            if (room.roadCoords[packXY(x, y)] === 1) room.baseCoords[packXY(x, y)] = 255
+            if (room.roadCoords[packedCoord] === 1) room.baseCoords[packedCoord] = 255
         }
     }
-
-    // Construct extraExtensions count
-
-    let extraExtensionsAmount =
-        CONTROLLER_STRUCTURES.extension[8] -
-        stamps.fastFiller.structures.extension.length -
-        /* stamps.hub.structures.extension.length - */
-        room.memory.stampAnchors.extensions.length * stamps.extensions.structures.extension.length -
-        room.memory.stampAnchors.extension.length -
-        room.memory.stampAnchors.sourceExtension.length
 
     if (room.memory.stampAnchors.sourceLink.length + room.memory.stampAnchors.sourceExtension.length === 0) {
         // loop through sourceNames
@@ -678,7 +685,7 @@ export function basePlanner(room: Room) {
             for (const [coord, value] of OGCoords) room.roadCoords[coord] = value
         }
     }
-
+    /*
     if (!room.memory.stampAnchors.rampart.length) {
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
@@ -686,14 +693,14 @@ export function basePlanner(room: Room) {
             }
         }
     }
-
+ */
     // Try to plan the stamp
 
     if (
         !planStamp({
             stampType: 'extension',
             count: extraExtensionsAmount,
-            startCoords: hubAnchors,
+            startCoords: [hubAnchor],
             adjacentToRoads: true,
             coordMap: room.roadCoords,
             minAvoid: 255,

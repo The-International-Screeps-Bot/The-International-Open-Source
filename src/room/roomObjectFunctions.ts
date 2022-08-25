@@ -10,8 +10,8 @@ RoomObject.prototype.usedStore = function (this: RoomObject & { store?: StoreDef
     return amount
 }
 
-RoomObject.prototype.freeStore = function (this: RoomObject & { store?: StoreDefinition }, resourceType = RESOURCE_ENERGY) {
-    return this.store.getCapacity(resourceType) - this.usedStore(resourceType)
+RoomObject.prototype.freeStore = function (this: RoomObject & { store?: StoreDefinition }) {
+    return this.store.getCapacity() - this.usedStore()
 }
 
 RoomObject.prototype.freeSpecificStore = function (this: RoomObject & { store?: StoreDefinition }, resourceType = RESOURCE_ENERGY) {

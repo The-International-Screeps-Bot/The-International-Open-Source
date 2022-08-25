@@ -326,7 +326,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
                 if (cost - partCost < opts.minCost) break
 
                 // And remove the part's cost to the cost
-                customLog('PART COST' + part, cost)
+                customLog('PART COST ' + opts.role + ', ' + part, cost)
                 cost -= partCost
 
                 // Remove the last part in the body
@@ -347,7 +347,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
             tier -= 1
         }
-
+        customLog('TOTAL COST ' + opts.role, cost)
         // Create a spawnRequest using previously constructed information
 
         this.createSpawnRequest(opts.priority, opts.role, body, tier, cost, opts.memoryAdditions)

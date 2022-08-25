@@ -136,7 +136,7 @@ export function findCarryPartsRequired(distance: number, income: number) {
 /**
  * Finds a position equally between two positions
  */
-export function findAvgBetweenPositions(pos1: Coord, pos2: Coord) {
+export function findAvgBetweenCoords(pos1: Coord, pos2: Coord) {
     // Inform the rounded average of the two positions
 
     return {
@@ -395,11 +395,9 @@ export function findLargestTransactionAmount(budget: number, amount: number, roo
  * Finds the name of the closest commune, exluding the specified roomName
  */
 export function findClosestCommuneName(roomName: string) {
-
     const communesNotThis = []
 
     for (const communeName of global.communes) {
-
         if (roomName == communeName) continue
 
         communesNotThis.push(communeName)

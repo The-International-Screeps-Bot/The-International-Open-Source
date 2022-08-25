@@ -348,7 +348,6 @@ declare global {
     interface RoomStats {
         rc: number // remoteCount
         rcu: number // remoteCPUUsage
-        rcc: number // remoteCreepCount
         res: number // remoteEnergyStored
         reih: number // remoteEnergyInputHarvest
         reoro: number // remoteEnergyOutputRepairOther
@@ -368,6 +367,7 @@ declare global {
         mh: number // mineralsHarvested
         es: number // energyStored
         cc: number // creepCount
+        tcc: number // totalCreepCount
         cu: number // cpuUsage
         su: number // spawnUsage
     }
@@ -830,6 +830,8 @@ declare global {
         createWithdrawTasks(creator: Structure | Creep | Resource): void
 
         visualizeCoordMap(coordMap: CoordMap): void
+
+        visualizeCostMatrix(cm: CostMatrix): void
 
         /**
          * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
@@ -1769,7 +1771,7 @@ declare global {
          * Finds the total free store capacity of this RoomObject
          * @param resourceType A resourceConstant to ensure proper querying of limit store RoomObjects
          */
-        freeStore(resourceType?: ResourceConstant): number
+        freeStore(): number
 
         /**
          * Finds the total free store capacity of a specific resource for this RoomObject
