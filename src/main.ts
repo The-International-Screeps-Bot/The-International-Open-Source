@@ -7,7 +7,6 @@ import { InternationalManager, internationalManager } from './international/inte
 import './international/config'
 import './international/tickConfig'
 import './international/creepOrganizer'
-import './room/remotesManager'
 import './international/constructionSiteManager'
 import './international/mapVisualsManager'
 import './international/endTickManager'
@@ -260,7 +259,7 @@ declare global {
         /**
          * The specific group of which to compare the creep amount to
          */
-        groupComparator?: string[]
+        spawningGroup?: string[]
         /**
          *
          */

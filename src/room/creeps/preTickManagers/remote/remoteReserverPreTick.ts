@@ -1,5 +1,5 @@
 import { remoteNeedsIndex } from 'international/constants'
-import { RemoteCoreAttacker, RemoteReserver } from 'room/creeps/creepClasses'
+import { creepClasses, RemoteCoreAttacker, RemoteReserver } from 'room/creeps/creepClasses'
 
 RemoteReserver.prototype.preTickManager = function () {
     if (!this.memory.remote) return
@@ -18,7 +18,7 @@ RemoteReserver.prototype.preTickManager = function () {
 
     // Reduce remote need
 
-    if (Memory.rooms[this.memory.remote].needs) Memory.rooms[this.memory.remote].needs[remoteNeedsIndex[role]] -= 1
+    if (Memory.rooms[this.memory.remote].needs && !this.isDying()) Memory.rooms[this.memory.remote].needs[remoteNeedsIndex[role]] -= 1
 
     const commune = Game.rooms[this.commune]
 

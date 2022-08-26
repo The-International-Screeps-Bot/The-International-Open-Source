@@ -66,7 +66,7 @@ RemoteReserver.prototype.isDying = function () {
 
     // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
-    if (this.ticksToLive > this.body.length * CREEP_CLAIM_LIFE_TIME) return false
+    if (this.ticksToLive > this.body.length * CREEP_CLAIM_LIFE_TIME + (Memory.rooms[this.memory.remote].RE - 1)) return false
 
     // Record creep as dying
 
