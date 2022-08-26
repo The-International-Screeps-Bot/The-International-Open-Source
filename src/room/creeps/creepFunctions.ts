@@ -1574,12 +1574,8 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
     }
 
     if (reservation.type === 'transfer') {
-
-        target.store[reservation.resourceType] += reservation.amount
         return
     }
-
-    target.store[reservation.resourceType] -= reservation.amount
 }
 
 Creep.prototype.reservationManager = function () {
@@ -1613,12 +1609,9 @@ Creep.prototype.reservationManager = function () {
         }
 
         if (reservation.type === 'transfer') {
-            let amount = Math.min(reservation.amount, target.freeStore())
-
-            target.store[reservation.resourceType] += amount
+            let amount = Math.min(reservation.amount, target.store.getFreeCapacity(reservation.resourceType))
 
             if (amount <= 0) {
-                target.store[reservation.resourceType] -= amount
                 this.deleteReservation(0)
             }
 
@@ -1635,8 +1628,6 @@ Creep.prototype.reservationManager = function () {
         }
 
         let amount = reservation.amount
-
-        target.store[reservation.resourceType] -= amount
 
         if (Memory.roomVisuals) {
             this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1, { font: 0.5 })
@@ -1692,8 +1683,6 @@ Creep.prototype.fulfillReservation = function () {
         }
 
         if (pickupResult === OK) {
-            this.store[reservation.resourceType] += reservation.amount
-
             this.movedResource = true
             this.deleteReservation(0)
             return true
@@ -1707,7 +1696,6 @@ Creep.prototype.fulfillReservation = function () {
     // Transfer
 
     if (reservation.type === 'transfer') {
-
         // This needs to use the direct functions to calculate free space, not the reserved amount
 
         amount = Math.min(
@@ -1716,7 +1704,6 @@ Creep.prototype.fulfillReservation = function () {
             this.store[reservation.resourceType],
         )
 
-        target.store[reservation.resourceType] -= amount
         this.message += amount
 
         const transferResult = this.transfer(target as any, reservation.resourceType, amount)
@@ -1728,9 +1715,6 @@ Creep.prototype.fulfillReservation = function () {
         }
 
         if (transferResult === OK) {
-            target.store[reservation.resourceType] += amount
-            this.store[reservation.resourceType] -= amount
-
             this.movedResource = true
             this.deleteReservation(0)
             return true
@@ -1746,8 +1730,6 @@ Creep.prototype.fulfillReservation = function () {
 
     // Withdraw
 
-    target.store[reservation.resourceType] += amount
-
     const withdrawResult = this.withdraw(target as any, reservation.resourceType, amount)
     this.message += withdrawResult
 
@@ -1757,9 +1739,6 @@ Creep.prototype.fulfillReservation = function () {
     }
 
     if (withdrawResult === OK) {
-        target.store[reservation.resourceType] -= amount
-        this.store[reservation.resourceType] += amount
-
         this.movedResource = true
         this.deleteReservation(0)
         return true

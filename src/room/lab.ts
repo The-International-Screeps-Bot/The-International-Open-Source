@@ -9,17 +9,66 @@ export class LabManager {
     isReverse: boolean
     lab1Id: string
     lab2Id: string
+    lastLayoutCheck: number
 
     constructor(commune: Commune) {
         this.commune = commune
 
-        this.outputRsc = RESOURCE_GHODIUM
-        this.input1Rsc = RESOURCE_ZYNTHIUM_KEANITE
-        this.input2Rsc = RESOURCE_UTRIUM_LEMERGITE
+        // this.outputRsc = RESOURCE_GHODIUM
+        // this.input1Rsc = RESOURCE_ZYNTHIUM_KEANITE
+        // this.input2Rsc = RESOURCE_UTRIUM_LEMERGITE
+        this.outputRsc = RESOURCE_ZYNTHIUM_KEANITE
+        this.input1Rsc = RESOURCE_ZYNTHIUM
+        this.input2Rsc = RESOURCE_KEANIUM
         this.isReverse = false
+    }
 
-        this.lab1Id = '6300bba6fa5d294c1e1763a1'
-        this.lab2Id = '6300838274ce72369e571442'
+    private labsInRange(thisLab: StructureLab, otherLab: StructureLab = null): number {
+        return _.filter(
+            this.commune.structures.lab,
+            lab => lab != thisLab && lab != otherLab && lab.pos.getRangeTo(thisLab.pos) <= 2,
+        ).length
+    }
+
+    // Checks to ensure all of the internal data is valid, populate it if it's not.
+    private doLayoutCheck(): void {
+        if (this.lastLayoutCheck + 1000 > Game.time) return
+
+        if (!this.lab1Id || !this.lab2Id || !this.input1 || !this.input2) {
+            this.lab1Id = null
+            this.lab2Id = null
+
+            if (this.commune.structures.lab.length >= 3) {
+                //Sort the labs by the distance to the terminal, so that labs on the side of the hub are favored.
+                let sorted = _.sortBy(this.commune.structures.lab, lab =>
+                    lab.pos.getRangeTo(this.commune.room.terminal?.pos),
+                )
+                let bestLab = sorted[0]
+                //Starting at 2 intentally, to skip the first two records, which will be the default best labs...
+                //  then we see if there's a lab that's better.
+                //I'm not 100% sure this logic is perfect, but it's decent, but I think there may be an error in here.
+                for (let i = 2; i < sorted.length; i++) {
+                    let thisLab = sorted[i]
+                    if (this.labsInRange(thisLab) > this.labsInRange(bestLab)) bestLab = thisLab
+                }
+                this.lab1Id = bestLab.id
+                let lab1 = bestLab
+
+                bestLab = sorted[1]
+                for (let i = 2; i < sorted.length; i++) {
+                    let thisLab = sorted[i]
+                    if (this.labsInRange(thisLab, lab1) > this.labsInRange(bestLab, lab1)) bestLab = thisLab
+                }
+                this.lab2Id = bestLab.id
+                //Make sure that both the sending labs are valid.... technically this should check to see how many labs overlap both labs.
+                if (this.labsInRange(bestLab) == 0 || this.labsInRange(lab1) == 0) {
+                    this.lab1Id = null
+                    this.lab2Id = null
+                }
+            }
+        }
+
+        this.lastLayoutCheck = Game.time
     }
 
     public get input1(): StructureLab {
@@ -44,6 +93,9 @@ export class LabManager {
     }
 
     run() {
+        if (!this.commune.room.storage || !this.commune.room.terminal) return
+
+        this.doLayoutCheck()
         if (this.commune.room.name == 'W21N8') {
             if (this.isProperlyLoaded)
                 for (const output of this.outputs) {
@@ -73,16 +125,12 @@ export class LabManager {
                 inputLab.store.getFreeCapacity(inputRsc),
             )
             amount = Math.max(amount, 0)
-            if (
-                inputLab.store.getFreeCapacity(inputRsc) >= creep.store.getCapacity() &&
-                amount - creep.store[inputRsc] > 0
-            )
+            if (amount == creep.store.getCapacity()) {
                 creep.createReservation('withdraw', source.id, amount, inputRsc)
-            if (amount + creep.store[inputRsc] > 0)
-                creep.createReservation('transfer', inputLab.id, amount + creep.store[inputRsc], inputRsc)
+                creep.createReservation('transfer', inputLab.id, amount, inputRsc)
+            }
         } else {
             let amount = Math.min(creep.store.getFreeCapacity(), inputLab.store[inputLab.mineralType])
-            console.log(inputRsc + ': ' + amount)
             creep.createReservation('withdraw', inputLab.id, amount, inputLab.mineralType)
             creep.createReservation(
                 'transfer',
@@ -99,7 +147,7 @@ export class LabManager {
     private setupOutputLab(creep: Hauler, outputLab: StructureLab): boolean {
         if (
             (outputLab.mineralType != null && outputLab.mineralType != this.outputRsc) ||
-            outputLab.usedStore(this.outputRsc) >= creep.freeStore()
+            outputLab.usedStore(this.outputRsc) >= creep.store.getFreeCapacity()
         ) {
             let amount = Math.min(creep.freeStore(), outputLab.store[outputLab.mineralType])
 
@@ -118,16 +166,16 @@ export class LabManager {
     }
 
     generateHaulingReservation(creep: Hauler) {
-        if (this.commune.room.name == 'W21N8') {
-            //Priortize the worstly loaded lab.
-            if (this.input2.store[this.input2Rsc] > this.input1.store[this.input1Rsc]) {
-                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
-                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
-            } else {
-                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
-                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
-            }
-            for (const output of this.outputs) if (this.setupOutputLab(creep, output)) return
+        if (!this.lab1Id || !this.lab2Id) return
+
+        //Priortize the worstly loaded lab.
+        if (this.input2.store[this.input2Rsc] > this.input1.store[this.input1Rsc]) {
+            if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
+            if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
+        } else {
+            if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
+            if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
         }
+        for (const output of this.outputs) if (this.setupOutputLab(creep, output)) return
     }
 }
