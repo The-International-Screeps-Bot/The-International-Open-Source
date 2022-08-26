@@ -48,7 +48,7 @@ Room.prototype.spawnManager = function () {
 
         // If creep can't be spawned
 
-        if (testSpawnResult !== OK || spawnRequest.cost === NaN) {
+        if (testSpawnResult !== OK) {
             // Log the error and stop the loop
 
             customLog(

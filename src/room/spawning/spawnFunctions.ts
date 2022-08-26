@@ -140,7 +140,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
             }
 
             // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
-
+            
             if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
                 // So long as partIndex is above 0
 
@@ -150,7 +150,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
 
                 let partIndex = opts.extraParts.length - 1
 
-                while (partIndex > 0) {
+                while (partIndex >= 0) {
                     // Get the part using the partIndex
 
                     part = opts.extraParts[partIndex]
@@ -164,7 +164,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
                     if (cost - partCost < opts.minCost) break
 
                     // And remove the part's cost to the cost
-                    customLog('PART COST ' + opts.role + ', ' + part, cost)
+
                     cost -= partCost
 
                     // Remove the last part in the body
@@ -185,7 +185,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
                 tier -= 1
             }
         }
-        customLog('TOTAL COST ' + opts.role, cost)
+
         // Create a spawnRequest using previously constructed information
 
         this.createSpawnRequest(opts.priority, opts.role, body, tier, cost, opts.memoryAdditions)

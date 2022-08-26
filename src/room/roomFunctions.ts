@@ -470,17 +470,15 @@ Room.prototype.get = function (roomObjectName) {
             // Filter rooms that have some sourceEfficacies recorded
 
             const remotesWithEfficacies = room.memory.remotes.filter(function (roomName) {
-                return Memory.rooms[roomName].sourceEfficacies.length
+                return Memory.rooms[roomName].SE.length
             })
 
             // Sort the remotes based on the average source efficacy
 
             return remotesWithEfficacies.sort(function (a1, b1) {
                 return (
-                    Memory.rooms[a1].sourceEfficacies.reduce((a2, b2) => a2 + b2) /
-                        Memory.rooms[a1].sourceEfficacies.length -
-                    Memory.rooms[b1].sourceEfficacies.reduce((a2, b2) => a2 + b2) /
-                        Memory.rooms[b1].sourceEfficacies.length
+                    Memory.rooms[a1].SE.reduce((a2, b2) => a2 + b2) / Memory.rooms[a1].SE.length -
+                    Memory.rooms[b1].SE.reduce((a2, b2) => a2 + b2) / Memory.rooms[b1].SE.length
                 )
             })
         },
@@ -545,7 +543,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     // Construct route
 
     function generateRoute(): void {
-
         // If the goal is in the same room as the origin
 
         if (opts.origin.roomName === opts.goal.pos.roomName) return
@@ -592,7 +589,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     // Construct path
 
     function generatePath() {
-
         const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost || 2,
             swampCost: opts.swampCost || 8,
@@ -609,8 +605,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 // If the room is not allowed
 
-                if (!allowedRoomNames.has(roomName))
-                    return false
+                if (!allowedRoomNames.has(roomName)) return false
 
                 // Create a costMatrix for the room
 
@@ -1204,8 +1199,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         for (const source of room.sources) {
             const path = room.advancedFindPath({
                 origin: source.pos,
-                goal: { pos: scoutingRoom.anchor, range: 3 },
-                /* weightCostMatrixes: [roadCM] */
+                goal: { pos: scoutingRoom.anchor, range: 3 }
             })
 
             // Record the length of the path in the room's memory
@@ -1228,6 +1222,11 @@ Room.prototype.makeRemote = function (scoutingRoom) {
             */
         }
 
+        const newReservationEfficacy = room.advancedFindPath({
+            origin: room.controller.pos,
+            goal: { pos: scoutingRoom.anchor, range: 3 }
+        }).length
+
         // If the room isn't already a remote
 
         if (room.memory.T !== 'remote' || !global.communes.has(room.memory.commune)) {
@@ -1248,7 +1247,8 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
             scoutingRoom.memory.remotes.push(room.name)
 
-            room.memory.sourceEfficacies = newSourceEfficacies
+            room.memory.SE = newSourceEfficacies
+            room.memory.RE = newReservationEfficacy
 
             room.memory.needs = []
             for (const key in remoteNeedsIndex) room.memory.needs[parseInt(key)] = 0
@@ -1256,13 +1256,12 @@ Room.prototype.makeRemote = function (scoutingRoom) {
             return true
         }
 
-        const currentAvgSourceEfficacy =
-            room.memory.sourceEfficacies.reduce((sum, el) => sum + el) / room.memory.sourceEfficacies.length
-        const newAvgSourceEfficacy = newSourceEfficacies.reduce((sum, el) => sum + el) / newSourceEfficacies.length
+        const currentRemoteEfficacy = room.memory.SE.reduce((sum, el) => sum + el) / room.memory.SE.length + room.memory.RE
+        const newRemoteEfficacy = newSourceEfficacies.reduce((sum, el) => sum + el) / newSourceEfficacies.length + newReservationEfficacy
 
         // If the new average source efficacy is above the current, stop
 
-        if (newAvgSourceEfficacy >= currentAvgSourceEfficacy) return true
+        if (newRemoteEfficacy >= currentRemoteEfficacy) return false
 
         room.memory.T = 'remote'
 
@@ -1281,7 +1280,8 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
         scoutingRoom.memory.remotes.push(room.name)
 
-        room.memory.sourceEfficacies = newSourceEfficacies
+        room.memory.SE = newSourceEfficacies
+        room.memory.RE = newReservationEfficacy
 
         room.memory.needs = []
         for (const key in remoteNeedsIndex) room.memory.needs[parseInt(key)] = 0

@@ -13,7 +13,6 @@ export class InternationalManager {
 
         // Run prototypes
 
-        this.config()
         this.tickConfig()
         this.creepOrganizer()
         this.constructionSiteManager()
@@ -142,11 +141,6 @@ export class InternationalManager {
 
         return global.terrainCoords[roomName]
     }
-
-    /**
-     * Configures features like Memory, global and object prototypes required to run the bot
-     */
-    config?(): void
 
     /**
      * Configures tick important or tick-only pre-roomManager settings required to run the bot

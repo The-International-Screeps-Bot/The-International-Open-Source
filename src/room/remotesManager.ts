@@ -58,27 +58,20 @@ Room.prototype.remotesManager = function () {
 
             // If the reservation isn't soon to run out, relative to the room's sourceEfficacy average
 
-            if (
-                isReserved &&
-                remote.controller.reservation.ticksToEnd >= Math.min(remoteMemory.sourceEfficacies.reduce((a, b) => a + b) * 3, 1000)
-            ) {
+            if (isReserved && remote.controller.reservation.ticksToEnd >= Math.min(remoteMemory.RE * 5, 2500))
                 remoteMemory.needs[remoteNeedsIndex.remoteReserver] = 0
-            }
         }
 
         // Loop through each index of sourceEfficacies
 
-        for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
+        for (let index = 0; index < remoteMemory.SE.length; index += 1) {
             // Get the income based on the reservation of the room and remoteHarvester need
 
             const income = possibleReservation ? 10 : 5
 
             // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-            remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(
-                remoteMemory.sourceEfficacies[index],
-                income,
-            )
+            remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(remoteMemory.SE[index], income)
         }
 
         if (remote) {

@@ -99,7 +99,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
             }
 
             Game.map.visual.text(
-                `⛏️${roomMemory.sourceEfficacies.reduce((sum, el) => sum + el, 0).toString()}`,
+                `⛏️${roomMemory.SE.reduce((sum, el) => sum + el, 0).toString()}`,
                 new RoomPosition(2, 8, roomName),
                 {
                     align: 'left',

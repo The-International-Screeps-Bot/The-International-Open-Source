@@ -225,11 +225,13 @@ Room.prototype.spawnRequester = function () {
 
             // If there is no sourceLink 0, increase requiredCarryParts using the source's path length
 
-            if (this.sourcePaths[0] && !this.sourceLinks[0]) requiredCarryParts += findCarryPartsRequired(this.sourcePaths[0].length, 10)
+            if (this.sourcePaths[0] && !this.sourceLinks[0])
+                requiredCarryParts += findCarryPartsRequired(this.sourcePaths[0].length, 10)
 
             // If there is no sourceLink 1, increase requiredCarryParts using the source's path length
 
-            if (this.sourcePaths[1] && !this.sourceLinks[1]) requiredCarryParts += findCarryPartsRequired(this.sourcePaths[1].length, 10)
+            if (this.sourcePaths[1] && !this.sourceLinks[1])
+                requiredCarryParts += findCarryPartsRequired(this.sourcePaths[1].length, 10)
 
             // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
@@ -317,7 +319,7 @@ Room.prototype.spawnRequester = function () {
                 role,
                 defaultParts: [],
                 extraParts: [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, MOVE, CARRY, CARRY, MOVE, WORK],
-                partsMultiplier: this.get('mineralHarvestPositions')?.length * 4,
+                partsMultiplier: 4 /* this.get('mineralHarvestPositions')?.length * 4 */,
                 minCreeps: 1,
                 minCost,
                 priority: 10 + this.creepsFromRoom.mineralHarvester.length * 3,
@@ -465,7 +467,6 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-
             // If there are enemy attackers in the room
 
             if (attackStrength > 0) return false
@@ -603,7 +604,8 @@ Room.prototype.spawnRequester = function () {
 
             // For every x energy in storage, add 1 multiplier
 
-            if (this.storage && this.controller.level >= 4) partsMultiplier += this.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000
+            if (this.storage && this.controller.level >= 4)
+                partsMultiplier += this.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000
 
             const role = 'maintainer'
 
@@ -904,7 +906,7 @@ Room.prototype.spawnRequester = function () {
 
         // Loop through each index of sourceEfficacies
 
-        for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
+        for (let index = 0; index < remoteMemory.SE.length; index += 1) {
             // Get the income based on the reservation of the this and remoteHarvester need
             // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
 
@@ -914,7 +916,7 @@ Room.prototype.spawnRequester = function () {
 
             // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-            remoteHaulerNeed += findCarryPartsRequired(remoteMemory.sourceEfficacies[index], income)
+            remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SE[index], income)
         }
 
         const remotePriority = minRemotePriority + index
@@ -1088,7 +1090,7 @@ Room.prototype.spawnRequester = function () {
 
                 const partsMultiplier = Math.max(
                     remoteNeeds[remoteNeedsIndex.minDamage] / rangedAttackStrength +
-                    remoteNeeds[remoteNeedsIndex.minHeal] / healStrength,
+                        remoteNeeds[remoteNeedsIndex.minHeal] / healStrength,
                     1,
                 )
 
