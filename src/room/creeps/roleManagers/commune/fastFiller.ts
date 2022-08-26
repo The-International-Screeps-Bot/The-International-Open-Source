@@ -94,7 +94,7 @@ FastFiller.prototype.fillFastFiller = function () {
 
             // If there is a non-energy resource in the structure
 
-            if (structure.structureType != STRUCTURE_LINK && this.usedStore() > structure.store.energy) {
+            if (structure.structureType != STRUCTURE_LINK && structure.usedStore() > structure.store.energy) {
                 for (const key in structure.store) {
                     const resourceType = key as ResourceConstant
 
