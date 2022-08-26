@@ -1171,7 +1171,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
     // Find distance from scoutingRoom
 
-    if (distance < 4)
+    if (distance <= 5)
         distance = advancedFindDistance(scoutingRoom.name, room.name, {
             keeper: Infinity,
             enemy: Infinity,
@@ -1181,7 +1181,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
             highway: Infinity,
         })
 
-    if (distance < 4) {
+    if (distance <= 5) {
         // If the room is already a remote of the scoutingRoom
 
         if (room.memory.T === 'remote' && scoutingRoom.name === room.memory.commune) return true
@@ -1191,6 +1191,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         if (!scoutingRoom.anchor) return true
 
         const newSourceEfficacies = []
+        let newSourceEfficaciesTotal = 0
 
         // Get base planning data
 
@@ -1202,9 +1203,14 @@ Room.prototype.makeRemote = function (scoutingRoom) {
                 goal: { pos: scoutingRoom.anchor, range: 3 }
             })
 
+            // Stop if there is a source inefficient enough
+
+            if (path.length >= 300) return true
+
             // Record the length of the path in the room's memory
 
             newSourceEfficacies.push(path.length)
+            newSourceEfficaciesTotal += path.length
 
             /*
             // Loop through positions of the path
@@ -1257,11 +1263,11 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         }
 
         const currentRemoteEfficacy = room.memory.SE.reduce((sum, el) => sum + el) / room.memory.SE.length + room.memory.RE
-        const newRemoteEfficacy = newSourceEfficacies.reduce((sum, el) => sum + el) / newSourceEfficacies.length + newReservationEfficacy
+        const newRemoteEfficacy = newSourceEfficaciesTotal / newSourceEfficacies.length + newReservationEfficacy
 
         // If the new average source efficacy is above the current, stop
 
-        if (newRemoteEfficacy >= currentRemoteEfficacy) return false
+        if (newRemoteEfficacy >= currentRemoteEfficacy) return true
 
         room.memory.T = 'remote'
 
