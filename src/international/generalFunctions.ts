@@ -353,7 +353,7 @@ export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'sou
 
     // Get the remote's sourceEfficacies
 
-    const { sourceEfficacies } = Memory.rooms[roomName]
+    const sourceEfficacies = Memory.rooms[roomName].SE
 
     // Limit sourceNames to the number of sourceEfficacies
 
@@ -363,8 +363,8 @@ export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'sou
 
     return sourceNames.sort(function (a, b) {
         return (
-            Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(a)] -
-            Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(b)]
+            Memory.rooms[roomName].SE[sourceNames.indexOf(a)] -
+            Memory.rooms[roomName].SE[sourceNames.indexOf(b)]
         )
     })
 }

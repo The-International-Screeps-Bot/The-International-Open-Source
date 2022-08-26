@@ -37,11 +37,10 @@ Room.prototype.decideMaxCostPerCreep = function (maxCostPerCreep) {
     if (
         this.myCreeps.source1Harvester.length + (this.myCreeps.source2Harvester?.length || 0) === 0 ||
         this.myCreeps.hauler.length === 0
-    ) {
+    )
         // Inform the smaller of the following
 
         return Math.min(maxCostPerCreep, this.energyAvailable)
-    }
 
     // Otherwise the smaller of the following
 
@@ -49,7 +48,6 @@ Room.prototype.decideMaxCostPerCreep = function (maxCostPerCreep) {
 }
 
 Room.prototype.createSpawnRequest = function (priority, role, body, tier, cost, memory) {
-
     // Add the components to spawnRequests
 
     this.spawnRequests[priority] = {
@@ -73,8 +71,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
     // So long as minCreeps is more than the current number of creeps
 
     while (
-        opts.minCreeps >
-        (opts.groupComparator ? opts.groupComparator.length : this.creepsFromRoom[opts.role].length)
+        opts.minCreeps > (opts.groupComparator ? opts.groupComparator.length : this.creepsFromRoom[opts.role].length)
     ) {
         // Construct important imformation for the spawnRequest
 
@@ -98,17 +95,13 @@ Room.prototype.spawnRequestIndividually = function (opts) {
 
                 partCost = BODYPART_COST[part]
 
-                // If the cost of the creep plus the part is more than or equal to the maxCostPerCreep, stop the loop
-
-                if (cost + partCost > maxCostPerCreep) break
-
-                // Otherwise add the part the the body
-
-                body.push(part)
-
                 // And add the partCost to the cost
 
                 cost += partCost
+
+                // Add the part the the body
+
+                body.push(part)
             }
         }
 
@@ -146,18 +139,18 @@ Room.prototype.spawnRequestIndividually = function (opts) {
                 tier += 1
             }
 
-            // Assign partIndex as the length of extraParts
-
-            let partIndex = opts.extraParts.length
-
             // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
-
+            
             if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
                 // So long as partIndex is above 0
 
                 let part
 
-                while (partIndex > 0) {
+                // Assign partIndex as the length of extraParts
+
+                let partIndex = opts.extraParts.length - 1
+
+                while (partIndex >= 0) {
                     // Get the part using the partIndex
 
                     part = opts.extraParts[partIndex]
@@ -233,9 +226,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
     // Subtract maxCreeps by the existing number of creeps of this role
 
     if (!opts.maxCreeps) opts.maxCreeps = Infinity
-    opts.maxCreeps -= opts.groupComparator
-        ? opts.groupComparator.length
-        : this.creepsFromRoom[opts.role].length
+    opts.maxCreeps -= opts.groupComparator ? opts.groupComparator.length : this.creepsFromRoom[opts.role].length
 
     // So long as there are totalExtraParts left to assign
 
@@ -326,7 +317,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
                 if (cost - partCost < opts.minCost) break
 
                 // And remove the part's cost to the cost
-                customLog('PART COST ' + opts.role + ', ' + part, cost)
+
                 cost -= partCost
 
                 // Remove the last part in the body
@@ -347,7 +338,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
             tier -= 1
         }
-        customLog('TOTAL COST ' + opts.role, cost)
+
         // Create a spawnRequest using previously constructed information
 
         this.createSpawnRequest(opts.priority, opts.role, body, tier, cost, opts.memoryAdditions)

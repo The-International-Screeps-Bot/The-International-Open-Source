@@ -35,6 +35,7 @@ import { customLog } from 'international/generalFunctions'
 import { myColors } from 'international/constants'
 import { LabManager } from 'room/lab'
 import { Commune } from 'room/communeManager'
+import { configManager } from './international/config'
 
 // Type declareations for global
 
@@ -1207,9 +1208,14 @@ declare global {
         commune: string
 
         /**
-         * A list of the efficacies of each source in the room
+         * Source Efficacies, An array of path distances from the remote's sources to its commune
          */
-        sourceEfficacies: number[]
+        SE: number[]
+
+        /**
+         * Reservation Efficacy, the path distance from the remote's sources to its commune
+         */
+        RE: number
 
         /**
          * A list of needs the remote wants met
@@ -1889,6 +1895,9 @@ export const loop = function () {
     memHack.modifyMemory()
 
     internationalManager.tickReset()
+
+    configManager.run()
+
     internationalManager.run()
     /*
     let cpu = Game.cpu.getUsed()

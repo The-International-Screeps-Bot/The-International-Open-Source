@@ -166,6 +166,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
     // Find amount of energy harvested and record it in data
 
     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
+    
     if (global.roomStats.commune[this.room.name])
         (global.roomStats.commune[this.room.name] as RoomCommuneStats).eih += energyHarvested
     else if (global.roomStats.remote[this.room.name]) global.roomStats.remote[this.room.name].reih += energyHarvested

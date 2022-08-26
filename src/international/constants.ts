@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 81
+export const breakingVersion = 82
 
 // Settings
 
@@ -103,7 +103,8 @@ export const roomTypeProperties: RoomTypeProperties = {
 
     commune: true,
     needs: true,
-    sourceEfficacies: true,
+    SE: true,
+    RE: true,
     abandoned: true,
 
     owner: true,
@@ -135,7 +136,8 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         source1: true,
         source2: true,
         needs: true,
-        sourceEfficacies: true,
+        SE: true,
+        RE: true,
         abandoned: true,
         notClaimable: true,
         PC: true,
@@ -657,13 +659,13 @@ export const spawnByRoomRemoteRoles: (
     | 'remoteCoreAttacker'
     | 'remoteDismantler'
 )[] = [
-        'source1RemoteHarvester',
-        'source2RemoteHarvester',
-        'remoteReserver',
-        'remoteDefender',
-        'remoteCoreAttacker',
-        'remoteDismantler',
-    ]
+    'source1RemoteHarvester',
+    'source2RemoteHarvester',
+    'remoteReserver',
+    'remoteDefender',
+    'remoteCoreAttacker',
+    'remoteDismantler',
+]
 
 export const builderSpawningWhenStorageThreshold = 40000
 
