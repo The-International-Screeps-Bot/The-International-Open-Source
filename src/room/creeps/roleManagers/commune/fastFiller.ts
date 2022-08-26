@@ -103,7 +103,6 @@ FastFiller.prototype.fillFastFiller = function () {
                     this.say('WCR')
 
                     this.withdraw(structure, resourceType as ResourceConstant)
-                    structure.store[resourceType] -= Math.min(structure.store[resourceType], this.freeStore())
 
                     return true
                 }
@@ -122,7 +121,6 @@ FastFiller.prototype.fillFastFiller = function () {
             this.say('W')
 
             this.withdraw(structure, RESOURCE_ENERGY)
-            structure.store.energy -= this.store.getCapacity() - this.store.energy
             return true
         }
 
@@ -164,7 +162,6 @@ FastFiller.prototype.fillFastFiller = function () {
         this.say('T')
 
         this.transfer(structure, RESOURCE_ENERGY).toString()
-        structure.store.energy += this.store.energy
 
         return true
     }

@@ -166,7 +166,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
     // Find amount of energy harvested and record it in data
 
     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
-    
+
     if (global.roomStats.commune[this.room.name])
         (global.roomStats.commune[this.room.name] as RoomCommuneStats).eih += energyHarvested
     else if (global.roomStats.remote[this.room.name]) global.roomStats.remote[this.room.name].reih += energyHarvested
@@ -242,8 +242,6 @@ Creep.prototype.advancedUpgradeController = function () {
 
         if (controllerRange <= 3 && this.store.energy > 0) {
             if (this.upgradeController(room.controller) === OK) {
-                this.store.energy -= workPartCount
-
                 const controlPoints = workPartCount * UPGRADE_CONTROLLER_POWER
 
                 if (global.roomStats.commune[this.room.name])
@@ -277,8 +275,6 @@ Creep.prototype.advancedUpgradeController = function () {
                         (controllerStructure.hitsMax - controllerStructure.hits) / REPAIR_POWER,
                     )
 
-                    this.store.energy -= workPartCount
-
                     // Add control points to total controlPoints counter and say the success
 
                     if (global.roomStats.commune[this.room.name])
@@ -293,9 +289,6 @@ Creep.prototype.advancedUpgradeController = function () {
                 // Withdraw from the controllerContainer, informing false if the withdraw failed
 
                 if (this.withdraw(controllerStructure, RESOURCE_ENERGY) !== OK) return false
-
-                this.store.energy += Math.min(this.store.getCapacity(), controllerStructure.store.energy)
-                controllerStructure.store.energy -= this.store.energy
 
                 this.message += `⚡`
             }
@@ -489,8 +482,6 @@ Creep.prototype.advancedBuildAllyCSite = function () {
             this.parts.work * BUILD_POWER,
             (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
         )
-
-        this.store.energy -= energySpentOnConstruction
 
         // Add control points to total controlPoints counter and say the success
 
