@@ -72,3 +72,25 @@ RemoteHarvester.prototype.travelToSource = function (sourceIndex) {
 
     return true
 }
+
+RemoteHarvester.prototype.isDying = function () {
+    // Inform as dying if creep is already recorded as dying
+
+    if (this.memory.dying) return true
+
+    // Stop if creep is spawning
+
+    if (!this.ticksToLive) return false
+
+    let sourceIndex = 0
+    if (this.role === 'source2RemoteHarvester') sourceIndex = 1
+
+    if (this.memory.remote) if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.remote].SE[sourceIndex] - 1) return false
+
+    else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
+
+    // Record creep as dying
+
+    this.memory.dying = true
+    return true
+}

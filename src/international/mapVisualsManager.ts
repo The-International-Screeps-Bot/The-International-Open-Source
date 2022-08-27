@@ -1,4 +1,4 @@
-import { myColors } from './constants'
+import { minHarvestWorkRatio, myColors, remoteHarvesterRoles, remoteNeedsIndex } from './constants'
 import { customLog, unpackAsRoomPos } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
@@ -94,6 +94,29 @@ InternationalManager.prototype.mapVisualsManager = function () {
                         width: 1.2,
                         opacity: 0.5,
                         lineStyle: 'dashed',
+                    },
+                )
+
+                const possibleReservation = commune.energyCapacityAvailable >= 650
+                let income = 0
+
+                // Loop through each index of sourceEfficacies
+
+                for (let index = 0; index < roomMemory.SE.length; index += 1) {
+                    // Get the income based on the reservation of the room and remoteHarvester need
+
+                    /* const income = possibleReservation ? 10 : 5 */
+                    income +=
+                        (possibleReservation ? 10 : 5) -
+                        Math.floor(roomMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] * minHarvestWorkRatio)
+                }
+
+                Game.map.visual.text(
+                    `⛏️${income}`,
+                    new RoomPosition(2, 16, roomName),
+                    {
+                        align: 'left',
+                        fontSize: 8,
                     },
                 )
             }

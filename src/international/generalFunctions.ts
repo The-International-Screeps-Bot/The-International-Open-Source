@@ -52,7 +52,7 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
 /**
  * Checks if two positions are equal
  */
-export function arePositionsEqual(pos1: Coord, pos2: Coord) {
+export function areCoordsEqual(pos1: Coord, pos2: Coord) {
     return pos1.x === pos2.x && pos1.y === pos2.y
 }
 
@@ -362,10 +362,7 @@ export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'sou
     // Sort sourceNames by efficacy, informing the result
 
     return sourceNames.sort(function (a, b) {
-        return (
-            Memory.rooms[roomName].SE[sourceNames.indexOf(a)] -
-            Memory.rooms[roomName].SE[sourceNames.indexOf(b)]
-        )
+        return Memory.rooms[roomName].SE[sourceNames.indexOf(a)] - Memory.rooms[roomName].SE[sourceNames.indexOf(b)]
     })
 }
 

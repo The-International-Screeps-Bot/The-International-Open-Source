@@ -19,6 +19,7 @@ import {
     findRemoteSourcesByEfficacy,
     getRange,
 } from 'international/generalFunctions'
+import { unpackPosList } from 'other/packrat'
 
 Room.prototype.spawnRequester = function () {
     // If CPU logging is enabled, get the CPU used at the start
@@ -475,7 +476,7 @@ Room.prototype.spawnRequester = function () {
 
             if (this.find(FIND_MY_CONSTRUCTION_SITES).length === 0) return false
 
-            let priority = 10 + this.creepsFromRoom.builder.length
+            let priority = 10
             let partsMultiplier = 0
 
             // If there is a storage
@@ -488,7 +489,7 @@ Room.prototype.spawnRequester = function () {
             }
 
             // Otherwise if there is no storage
-            else partsMultiplier += estimatedIncome / 2.5
+            else partsMultiplier += estimatedIncome / 8
 
             const role = 'builder'
             /*
@@ -519,7 +520,6 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [],
                     extraParts: [CARRY, WORK, MOVE],
                     partsMultiplier: partsMultiplier,
-                    minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 200,
                     priority,
@@ -537,7 +537,6 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [],
                     extraParts: [WORK, CARRY, CARRY, MOVE],
                     partsMultiplier: partsMultiplier,
-                    minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 250,
                     priority,
@@ -877,7 +876,9 @@ Room.prototype.spawnRequester = function () {
     const remoteNamesByEfficacy: string[] = this.get('remoteNamesByEfficacy')
 
     for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
+
         const remoteName = remoteNamesByEfficacy[index]
+        const remote = Game.rooms[remoteName]
         const remoteNeeds = Memory.rooms[remoteName].needs
 
         // Add up econ needs for this this
@@ -897,29 +898,10 @@ Room.prototype.spawnRequester = function () {
         if (totalRemoteNeed <= 0) continue
 
         const remoteMemory = Memory.rooms[remoteName]
-
-        // Get the sources in order of efficacy
-
         const sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
-
-        const possibleReservation = spawnEnergyCapacity >= 650
-
-        // Loop through each index of sourceEfficacies
-
-        for (let index = 0; index < remoteMemory.SE.length; index += 1) {
-            // Get the income based on the reservation of the this and remoteHarvester need
-            // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
-
-            const income =
-                (possibleReservation ? 10 : 5) -
-                Math.floor(remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] * minHarvestWorkRatio)
-
-            // Find the number of carry parts required for the source, and add it to the remoteHauler need
-
-            remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SE[index], income)
-        }
-
         const remotePriority = minRemotePriority + index
+
+        remoteHaulerNeed += remoteNeeds[remoteNeedsIndex.remoteHauler]
 
         // Construct requests for source1RemoteHarvesters
 
@@ -930,7 +912,7 @@ Room.prototype.spawnRequester = function () {
                 if (remoteNeeds[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
 
                 const sourceIndex = 0
-                const sourcePositionsAmount = remoteMemory.SP[sourceIndex].length
+                const sourcePositionsAmount = remote ? remote.sourcePositions.length : unpackPosList(remoteMemory.SP[sourceIndex]).length
 
                 const role = 'source1RemoteHarvester'
 
@@ -940,7 +922,7 @@ Room.prototype.spawnRequester = function () {
                         defaultParts: [CARRY],
                         extraParts: [WORK, MOVE],
                         partsMultiplier: remoteNeeds[remoteNeedsIndex.source1RemoteHarvester],
-                        groupComparator: this.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
+                        spawningGroup: this.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
                         threshold: 0.1,
                         minCreeps: 1,
                         maxCreeps: sourcePositionsAmount,
@@ -959,7 +941,7 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [CARRY],
                     extraParts: [WORK, WORK, MOVE],
                     partsMultiplier: remoteNeeds[remoteNeedsIndex.source1RemoteHarvester],
-                    groupComparator: this.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
+                    spawningGroup: this.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
                     threshold: 0.1,
                     minCreeps: undefined,
                     maxCreeps: sourcePositionsAmount,
@@ -983,7 +965,7 @@ Room.prototype.spawnRequester = function () {
                 if (remoteNeeds[remoteNeedsIndex.source2RemoteHarvester] <= 0) return false
 
                 const sourceIndex = 1
-                const sourcePositionsAmount = remoteMemory.SP[sourceIndex].length
+                const sourcePositionsAmount = remote ? remote.sourcePositions.length : unpackPosList(remoteMemory.SP[sourceIndex]).length
 
                 const role = 'source2RemoteHarvester'
 
@@ -993,7 +975,7 @@ Room.prototype.spawnRequester = function () {
                         defaultParts: [CARRY],
                         extraParts: [WORK, MOVE],
                         partsMultiplier: remoteNeeds[remoteNeedsIndex.source2RemoteHarvester],
-                        groupComparator: this.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
+                        spawningGroup: this.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
                         threshold: 0.1,
                         minCreeps: 1,
                         maxCreeps: sourcePositionsAmount,
@@ -1012,7 +994,7 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [CARRY],
                     extraParts: [WORK, WORK, MOVE],
                     partsMultiplier: remoteNeeds[remoteNeedsIndex.source2RemoteHarvester],
-                    groupComparator: this.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
+                    spawningGroup: this.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester,
                     threshold: 0.1,
                     minCreeps: undefined,
                     maxCreeps: sourcePositionsAmount,
@@ -1048,7 +1030,7 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [],
                     extraParts: [MOVE, CLAIM],
                     partsMultiplier: 6,
-                    groupComparator: this.creepsFromRoomWithRemote[remoteName].remoteReserver,
+                    spawningGroup: this.creepsFromRoomWithRemote[remoteName].remoteReserver,
                     minCreeps: 1,
                     maxCreeps: Infinity,
                     minCost: cost,
@@ -1101,7 +1083,7 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [],
                     extraParts,
                     partsMultiplier,
-                    groupComparator: this.creepsFromRoomWithRemote[remoteName].remoteDefender,
+                    spawningGroup: this.creepsFromRoomWithRemote[remoteName].remoteDefender,
                     minCreeps: 1,
                     minCost,
                     priority: minRemotePriority - 3,
@@ -1131,7 +1113,7 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [],
                     extraParts,
                     partsMultiplier: 50 / extraParts.length,
-                    groupComparator: this.creepsFromRoomWithRemote[remoteName].remoteCoreAttacker,
+                    spawningGroup: this.creepsFromRoomWithRemote[remoteName].remoteCoreAttacker,
                     minCreeps: 1,
                     minCost,
                     priority: minRemotePriority - 2,
@@ -1160,7 +1142,7 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [],
                     extraParts,
                     partsMultiplier: 50 / extraParts.length,
-                    groupComparator: this.creepsFromRoomWithRemote[remoteName].remoteDismantler,
+                    spawningGroup: this.creepsFromRoomWithRemote[remoteName].remoteDismantler,
                     minCreeps: 1,
                     minCost: cost * 2,
                     priority: minRemotePriority - 1,

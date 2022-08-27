@@ -7,7 +7,6 @@ import { InternationalManager, internationalManager } from './international/inte
 import './international/config'
 import './international/tickConfig'
 import './international/creepOrganizer'
-import './room/remotesManager'
 import './international/constructionSiteManager'
 import './international/mapVisualsManager'
 import './international/endTickManager'
@@ -32,7 +31,7 @@ import { RoomCacheObject } from 'room/roomObject'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { customLog } from 'international/generalFunctions'
-import { myColors } from 'international/constants'
+import { myColors, TrafficPriorities } from 'international/constants'
 import { LabManager } from 'room/lab'
 import { Commune } from 'room/communeManager'
 import { configManager } from './international/config'
@@ -262,7 +261,7 @@ declare global {
         /**
          * The specific group of which to compare the creep amount to
          */
-        groupComparator?: string[]
+        spawningGroup?: string[]
         /**
          *
          */
@@ -347,29 +346,92 @@ declare global {
         progressTotal: number
     }
     interface RoomStats {
-        rc: number // remoteCount
-        rcu: number // remoteCPUUsage
-        res: number // remoteEnergyStored
-        reih: number // remoteEnergyInputHarvest
-        reoro: number // remoteEnergyOutputRepairOther
-        reob: number // remoteEnergyOutputBuild
+        /**
+         * Remote Count
+         */
+        rc: number
+        /**
+         * Remote CPU Usage
+         */
+        rcu: number
+        /**
+         * Remote Energy Stored
+         */
+        res: number
+        /**
+         * Remote Energy Input Harvest
+         */
+        reih: number
+        /**
+         * Remote Energy Output Repair Other (non-barricade structures)
+         */
+        reoro: number
+        /**
+         * Remote Energy Output Build
+         */
+        reob: number
     }
 
     interface RoomCommuneStats extends RoomStats {
-        cl: number // controllerLevel
-        eih: number // energyInputHarvest
-        eib?: number // energyInputBought
-        eou: number // energyOutputUpgrade
-        eoro: number // energyOutputRepairOther
-        eorwr: number // energyOutputRepairWallOrRampart
-        eob: number // energyOutputBuild
-        eos: number // energyOutputSold
-        eosp: number // energyOutputSpawn
-        mh: number // mineralsHarvested
-        es: number // energyStored
-        cc: number // creepCount
-        tcc: number // totalCreepCount
-        cu: number // cpuUsage
+        /**
+         * Controller Leve
+         */
+        cl: number
+        /**
+         * Energy Input Harvest
+         */
+        eih: number
+        /**
+         * Energy Input Bought
+         */
+        eib?: number
+        /**
+         * Energy Output Upgrade
+         */
+        eou: number
+        /**
+         * Energy Output Repair Other (non-barricade structures)
+         */
+        eoro: number
+        /**
+         * Energy Output Repair Wall or Rampart
+         */
+        eorwr: number
+        /**
+         * Energy Output Build
+         */
+        eob: number
+        /**
+         * Energy Output Sold
+         */
+        eos: number
+        /**
+         * Energy Output Spawn
+         */
+        eosp: number
+        /**
+         * Minerals Harvested
+         */
+        mh: number
+        /**
+         * Energy Stored
+         */
+        es: number
+        /**
+         * Creep Count
+         */
+        cc: number
+        /**
+         * Total Creep Count
+         */
+        tcc: number
+        /**
+         * CPU Usage
+         */
+        cu: number
+        /**
+         * Spawn Usage
+         */
         su: number // spawnUsage
     }
 
@@ -1892,6 +1954,7 @@ declare global {
 // Loop
 
 export const loop = function () {
+
     memHack.modifyMemory()
 
     internationalManager.tickReset()

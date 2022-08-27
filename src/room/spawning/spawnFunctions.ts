@@ -70,9 +70,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
 
     // So long as minCreeps is more than the current number of creeps
 
-    while (
-        opts.minCreeps > (opts.groupComparator ? opts.groupComparator.length : this.creepsFromRoom[opts.role].length)
-    ) {
+    while (opts.minCreeps > (opts.spawningGroup ? opts.spawningGroup.length : this.creepsFromRoom[opts.role].length)) {
         // Construct important imformation for the spawnRequest
 
         const body: BodyPartConstant[] = []
@@ -140,7 +138,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
             }
 
             // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
-            
+
             if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
                 // So long as partIndex is above 0
 
@@ -213,7 +211,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
     // Loop through creep names of the requested role
 
-    for (const creepName of opts.groupComparator || this.creepsFromRoom[opts.role]) {
+    for (const creepName of opts.spawningGroup || this.creepsFromRoom[opts.role]) {
         // Take away the amount of parts the creep with the name has from totalExtraParts
 
         totalExtraParts -= Game.creeps[creepName].body.length - opts.defaultParts.length
@@ -226,7 +224,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
     // Subtract maxCreeps by the existing number of creeps of this role
 
     if (!opts.maxCreeps) opts.maxCreeps = Infinity
-    opts.maxCreeps -= opts.groupComparator ? opts.groupComparator.length : this.creepsFromRoom[opts.role].length
+    opts.maxCreeps -= opts.spawningGroup ? opts.spawningGroup.length : this.creepsFromRoom[opts.role].length
 
     // So long as there are totalExtraParts left to assign
 

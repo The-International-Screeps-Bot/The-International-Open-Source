@@ -1,5 +1,10 @@
-import { remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles } from 'international/constants'
-import { findCarryPartsRequired } from 'international/generalFunctions'
+import {
+    minHarvestWorkRatio,
+    remoteHarvesterRoles,
+    remoteNeedsIndex,
+    spawnByRoomRemoteRoles,
+} from 'international/constants'
+import { customLog, findCarryPartsRequired } from 'international/generalFunctions'
 
 Room.prototype.remotesManager = function () {
     // Loop through the commune's remote names
@@ -50,8 +55,8 @@ Room.prototype.remotesManager = function () {
         if (possibleReservation) {
             // Increase the remoteHarvester need accordingly
 
-            remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] += 3
-            remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.SIDs[1] ? 3 : 0
+            remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] *= 2
+            remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] *= remoteMemory.SIDs[1] ? 2 : 1
 
             const isReserved =
                 remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
@@ -67,11 +72,15 @@ Room.prototype.remotesManager = function () {
         for (let index = 0; index < remoteMemory.SE.length; index += 1) {
             // Get the income based on the reservation of the room and remoteHarvester need
 
-            const income = possibleReservation ? 10 : 5
+            /* const income = possibleReservation ? 10 : 5 */
+            const income =
+                (possibleReservation ? 10 : 5) -
+                Math.floor(remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] * minHarvestWorkRatio)
 
             // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-            remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(remoteMemory.SE[index], income)
+            remoteMemory.needs[remoteNeedsIndex.remoteHauler] +=
+                findCarryPartsRequired(remoteMemory.SE[index], income) / 2
         }
 
         if (remote) {
