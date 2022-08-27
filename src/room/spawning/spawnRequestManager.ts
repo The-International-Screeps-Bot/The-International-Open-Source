@@ -369,9 +369,8 @@ Room.prototype.spawnRequester = function () {
 
             let defaultParts = [CARRY, MOVE, CARRY]
 
-            // If the controller level is more or equal to 7, increase the defaultParts
-
-            if (this.controller.level >= 7) defaultParts = [CARRY, CARRY, CARRY, MOVE, CARRY]
+            if (spawnEnergyCapacity >= 650) defaultParts = [CARRY, CARRY, MOVE, CARRY]
+            else if (this.controller.level >= 7) defaultParts = [CARRY, CARRY, CARRY, MOVE, CARRY]
 
             const role = 'fastFiller'
 
