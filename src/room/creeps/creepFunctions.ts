@@ -1120,9 +1120,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
     const creepAtPos = Game.creeps[creepNameAtPos]
 
-
     if (creepAtPos.moved) {
-
         // If the creep is where the creep is trying to move to
 
         if (packedCoord === creepAtPos.moved) {
@@ -1166,11 +1164,11 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         // If it's not valid
 
         if (!room.moveRequests.get(creepAtPos.moveRequest)) {
-
-            room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                fill: myColors.teal,
-                opacity: 0.2,
-            })
+            if (Memory.roomVisuals)
+                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                    fill: myColors.teal,
+                    opacity: 0.2,
+                })
 
             // Have the creep move to its moveRequest
 
@@ -1187,11 +1185,11 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         // If the creep's pos and the creepAtPos's moveRequests are aligned
 
         if (packedCoord === creepAtPos.moveRequest) {
-
-            room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                fill: myColors.teal,
-                opacity: 0.2,
-            })
+            if (Memory.roomVisuals)
+                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                    fill: myColors.teal,
+                    opacity: 0.2,
+                })
 
             // Have the creep move to its moveRequest
 
@@ -1203,11 +1201,11 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         // If both creeps moveRequests are aligned
 
         if (this.moveRequest === creepAtPos.moveRequest) {
-
-            room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                fill: myColors.pink,
-                opacity: 0.2,
-            })
+            if (Memory.roomVisuals)
+                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                    fill: myColors.pink,
+                    opacity: 0.2,
+                })
 
             // Prefer the creep with the higher priority
 
@@ -1223,11 +1221,11 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         }
 
         if (TrafficPriorities[this.role] > TrafficPriorities[creepAtPos.role]) {
-
-            room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                fill: myColors.pink,
-                opacity: 0.2,
-            })
+            if (Memory.roomVisuals)
+                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                    fill: myColors.pink,
+                    opacity: 0.2,
+                })
 
             this.runMoveRequest()
 
@@ -1276,10 +1274,11 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         return
     }
 
-    room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-        fill: myColors.teal,
-        opacity: 0.2,
-    })
+    if (Memory.roomVisuals)
+        room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+            fill: myColors.teal,
+            opacity: 0.2,
+        })
 
     // Have the creep move to its moveRequest
 
