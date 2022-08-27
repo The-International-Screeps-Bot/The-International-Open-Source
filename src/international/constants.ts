@@ -369,6 +369,10 @@ export const myColors = {
     red: '#d10000',
     green: '#00d137',
     brown: '#aa7253',
+    purple: '#8b06a3',
+    pink: '#d60ef9',
+    orange: '#f27602',
+    teal: '#02f2e2',
 }
 
 export const remoteStamps: Record<RemoteStampTypes, Stamp> = {

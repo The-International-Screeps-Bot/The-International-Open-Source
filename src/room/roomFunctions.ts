@@ -2115,7 +2115,6 @@ Room.prototype.pathVisual = function (path, color) {
         stroke: myColors[color],
         strokeWidth: 0.15,
         opacity: 0.3,
-        lineStyle: 'solid',
     })
 }
 
