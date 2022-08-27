@@ -35,7 +35,6 @@ import { myColors, TrafficPriorities } from 'international/constants'
 import { LabManager } from 'room/lab'
 import { Commune } from 'room/communeManager'
 import { configManager } from './international/config'
-import { BlockquoteHTMLAttributes } from 'react'
 
 // Type declareations for global
 

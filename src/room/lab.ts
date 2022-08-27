@@ -1,5 +1,5 @@
 import { Commune } from './communeManager'
-import { Hauler } from './creeps/creepClasses'
+import { Hauler } from './creeps/roleManagers/commune/hauler'
 
 export class LabManager {
     commune: Commune

@@ -1,33 +1,36 @@
-import { ControllerUpgrader } from '../../creepClasses'
+export class ControllerUpgrader extends Creep {
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
 
-export function controllerUpgraderManager(room: Room, creepsOfRole: string[]) {
-     // Loop through creepNames
+    public isDying(): boolean {
+        // Inform as dying if creep is already recorded as dying
 
-     for (const creepName of creepsOfRole) {
-          // Get the creep using its creepName
+        if (this.memory.dying) return true
 
-          const creep: ControllerUpgrader = Game.creeps[creepName]
+        // Stop if creep is spawning
 
-          creep.advancedUpgradeController()
-     }
-}
+        if (!this.ticksToLive) return false
 
-ControllerUpgrader.prototype.isDying = function () {
-     // Inform as dying if creep is already recorded as dying
+        // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
-     if (this.memory.dying) return true
+        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.upgradePathLength - 3)) return false
 
-     // Stop if creep is spawning
+        // Record creep as dying
 
-     if (!this.ticksToLive) return false
+        this.memory.dying = true
+        return true
+    }
 
-     // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
+    public static controllerUpgraderManager(room: Room, creepsOfRole: string[]) {
+        // Loop through creepNames
 
-     if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.upgradePathLength - 3))
-          return false
+        for (const creepName of creepsOfRole) {
+            // Get the creep using its creepName
 
-     // Record creep as dying
+            const creep: ControllerUpgrader = Game.creeps[creepName]
 
-     this.memory.dying = true
-     return true
+            creep.advancedUpgradeController()
+        }
+    }
 }

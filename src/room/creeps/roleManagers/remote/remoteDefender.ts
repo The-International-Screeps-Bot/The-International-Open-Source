@@ -1,285 +1,296 @@
 import { RemoteNeeds } from 'international/constants'
 import { findClosestObject, getRange, pack, randomIntRange } from 'international/generalFunctions'
-import { RemoteDefender } from 'room/creeps/creepClasses'
 
-export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
-    for (const creepName of creepsOfRole) {
-        const creep: RemoteDefender = Game.creeps[creepName]
+export class RemoteDefender extends Creep {
+    /**
+     * Finds a remote to defend
+     */
+    findRemote?(): boolean {
+        const creep = this
 
-        // Try to find a remote
+        // If the creep already has a remote, inform true
 
-        if (!creep.findRemote()) {
-            // If the room is the creep's commune
+        if (creep.memory.remote) return true
 
-            if (room.name === creep.commune) {
-                // Advanced recycle and iterate
+        // Get remotes by their efficacy
 
-                creep.advancedRecycle()
-                continue
-            }
+        const remoteNamesByEfficacy: string[] = Game.rooms[creep.commune]?.get('remoteNamesByEfficacy')
 
-            // Otherwise, have the creep make a moveRequest to its commune and iterate
+        let roomMemory
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goal: {
-                    pos: new RoomPosition(25, 25, creep.commune),
-                    range: 25,
-                },
-            })
+        // Loop through each remote name
 
-            continue
+        for (const roomName of remoteNamesByEfficacy) {
+            // Get the remote's memory using its name
+
+            roomMemory = Memory.rooms[roomName]
+
+            // If the needs of this remote are met, iterate
+
+            if (roomMemory.needs[RemoteNeeds.minDamage] + roomMemory.needs[RemoteNeeds.minHeal] <= 0) continue
+
+            // Otherwise assign the remote to the creep and inform true
+
+            creep.memory.remote = roomName
+            roomMemory.needs[RemoteNeeds.minDamage] -= creep.attackStrength
+            roomMemory.needs[RemoteNeeds.minHeal] -= creep.healStrength
+
+            return true
         }
 
-        creep.say(creep.memory.remote)
+        // Inform false
 
-        // Try to attack enemyAttackers, iterating if there are none or one was attacked
-
-        if (creep.advancedAttackEnemies()) {
-            delete creep.memory.TW
-            continue
-        }
-
-        // If the creep is in its remote
-
-        if (room.name === creep.memory.remote) {
-            if (!creep.memory.TW) creep.memory.TW = 0
-            else creep.memory.TW += 1
-
-            // If a random range of time has passed, find a new remote
-
-            if (creep.memory.TW > randomIntRange(20, 100)) {
-                delete creep.memory.remote
-
-                if (creep.moveRequest) continue
-
-                // Try to find a remote
-
-                if (!creep.findRemote()) continue
-            }
-        }
-
-        // Otherwise, create a moveRequest to its remote
-
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: {
-                pos: new RoomPosition(25, 25, creep.memory.remote),
-                range: 25,
-            },
-        })
-    }
-}
-
-RemoteDefender.prototype.findRemote = function () {
-    const creep = this
-
-    // If the creep already has a remote, inform true
-
-    if (creep.memory.remote) return true
-
-    // Get remotes by their efficacy
-
-    const remoteNamesByEfficacy: string[] = Game.rooms[creep.commune]?.get('remoteNamesByEfficacy')
-
-    let roomMemory
-
-    // Loop through each remote name
-
-    for (const roomName of remoteNamesByEfficacy) {
-        // Get the remote's memory using its name
-
-        roomMemory = Memory.rooms[roomName]
-
-        // If the needs of this remote are met, iterate
-
-        if (roomMemory.needs[RemoteNeeds.minDamage] + roomMemory.needs[RemoteNeeds.minHeal] <= 0) continue
-
-        // Otherwise assign the remote to the creep and inform true
-
-        creep.memory.remote = roomName
-        roomMemory.needs[RemoteNeeds.minDamage] -= creep.attackStrength
-        roomMemory.needs[RemoteNeeds.minHeal] -= creep.healStrength
-
-        return true
+        return false
     }
 
-    // Inform false
+    /**
+     * Find and attack enemyCreeps
+     */
+    advancedAttackEnemies?(): boolean {
+        const { room } = this
 
-    return false
-}
+        const enemyAttackers = room.enemyAttackers
 
-RemoteDefender.prototype.advancedAttackEnemies = function () {
-    const { room } = this
+        // If there are none
 
-    const enemyAttackers = room.enemyAttackers
+        if (!enemyAttackers.length) {
+            const enemyCreeps = room.enemyCreeps
 
-    // If there are none
+            if (!enemyCreeps.length) {
+                return this.aggressiveHeal()
+            }
 
-    if (!enemyAttackers.length) {
-        const enemyCreeps = room.enemyCreeps
+            // Heal nearby creeps
 
-        if (!enemyCreeps.length) {
-            return this.aggressiveHeal()
+            if (this.passiveHeal()) return true
+
+            this.say('EC')
+
+            const enemyCreep = findClosestObject(this.pos, enemyCreeps)
+            // Get the range between the creeps
+
+            const range = getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y)
+
+            // If the range is more than 1
+
+            if (range > 1) {
+                this.rangedAttack(enemyCreep)
+
+                // Have the create a moveRequest to the enemyAttacker and inform true
+
+                this.createMoveRequest({
+                    origin: this.pos,
+                    goal: { pos: enemyCreep.pos, range: 1 },
+                })
+
+                return true
+            }
+
+            this.rangedMassAttack()
+            this.moveRequest = pack(enemyCreep.pos)
+
+            return true
         }
 
-        // Heal nearby creeps
+        // Otherwise, get the closest enemyAttacker
 
-        if (this.passiveHeal()) return true
+        const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
 
-        this.say('EC')
-
-        const enemyCreep = findClosestObject(this.pos, enemyCreeps)
         // Get the range between the creeps
 
-        const range = getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y)
+        const range = getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y)
 
-        // If the range is more than 1
+        // If it's more than range 3
 
-        if (range > 1) {
-            this.rangedAttack(enemyCreep)
+        if (range > 3) {
+            // Heal nearby creeps
 
-            // Have the create a moveRequest to the enemyAttacker and inform true
+            this.passiveHeal()
 
-            this.createMoveRequest({
-                origin: this.pos,
-                goal: { pos: enemyCreep.pos, range: 1 },
-            })
-
-            return true
-        }
-
-        this.rangedMassAttack()
-        this.moveRequest = pack(enemyCreep.pos)
-
-        return true
-    }
-
-    // Otherwise, get the closest enemyAttacker
-
-    const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
-
-    // Get the range between the creeps
-
-    const range = getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y)
-
-    // If it's more than range 3
-
-    if (range > 3) {
-        // Heal nearby creeps
-
-        this.passiveHeal()
-
-        // Make a moveRequest to it and inform true
-
-        this.createMoveRequest({
-            origin: this.pos,
-            goal: { pos: enemyAttacker.pos, range: 1 },
-        })
-
-        return true
-    }
-
-    this.say('AEA')
-
-    // Otherwise, have the creep pre-heal itself
-
-    this.heal(this)
-
-    // If the range is 1, rangedMassAttack
-
-    if (range === 1) {
-        this.rangedMassAttack()
-        this.moveRequest = pack(enemyAttacker.pos)
-    }
-
-    // Otherwise, rangedAttack the enemyAttacker
-    else this.rangedAttack(enemyAttacker)
-
-    // If the creep is out matched, try to always stay in range 3
-
-    if (this.healStrength < enemyAttacker.attackStrength) {
-        if (range === 3) return true
-
-        if (range >= 3) {
-            this.createMoveRequest({
-                origin: this.pos,
-                goal: { pos: enemyAttacker.pos, range: 3 },
-            })
-
-            return true
-        }
-
-        this.createMoveRequest({
-            origin: this.pos,
-            goal: { pos: enemyAttacker.pos, range: 25 },
-            flee: true,
-        })
-
-        return true
-    }
-
-    // If the creep has less heal power than the enemyAttacker's attack power
-
-    if (this.healStrength < enemyAttacker.attackStrength) {
-        // If the range is less or equal to 2
-
-        if (range <= 2) {
-            // Have the creep flee and inform true
+            // Make a moveRequest to it and inform true
 
             this.createMoveRequest({
                 origin: this.pos,
                 goal: { pos: enemyAttacker.pos, range: 1 },
+            })
+
+            return true
+        }
+
+        this.say('AEA')
+
+        // Otherwise, have the creep pre-heal itself
+
+        this.heal(this)
+
+        // If the range is 1, rangedMassAttack
+
+        if (range === 1) {
+            this.rangedMassAttack()
+            this.moveRequest = pack(enemyAttacker.pos)
+        }
+
+        // Otherwise, rangedAttack the enemyAttacker
+        else this.rangedAttack(enemyAttacker)
+
+        // If the creep is out matched, try to always stay in range 3
+
+        if (this.healStrength < enemyAttacker.attackStrength) {
+            if (range === 3) return true
+
+            if (range >= 3) {
+                this.createMoveRequest({
+                    origin: this.pos,
+                    goal: { pos: enemyAttacker.pos, range: 3 },
+                })
+
+                return true
+            }
+
+            this.createMoveRequest({
+                origin: this.pos,
+                goal: { pos: enemyAttacker.pos, range: 25 },
                 flee: true,
             })
 
             return true
         }
-    }
 
-    // If the range is more than 1
+        // If the creep has less heal power than the enemyAttacker's attack power
 
-    if (range > 1) {
-        // Have the create a moveRequest to the enemyAttacker and inform true
+        if (this.healStrength < enemyAttacker.attackStrength) {
+            // If the range is less or equal to 2
 
-        this.createMoveRequest({
-            origin: this.pos,
-            goal: { pos: enemyAttacker.pos, range: 1 },
-        })
+            if (range <= 2) {
+                // Have the creep flee and inform true
+
+                this.createMoveRequest({
+                    origin: this.pos,
+                    goal: { pos: enemyAttacker.pos, range: 1 },
+                    flee: true,
+                })
+
+                return true
+            }
+        }
+
+        // If the range is more than 1
+
+        if (range > 1) {
+            // Have the create a moveRequest to the enemyAttacker and inform true
+
+            this.createMoveRequest({
+                origin: this.pos,
+                goal: { pos: enemyAttacker.pos, range: 1 },
+            })
+
+            return true
+        }
+
+        // Otherwise inform true
 
         return true
     }
 
-    // Otherwise inform true
-
-    return true
-}
-
-RemoteDefender.prototype.preTickManager = function () {
-    if (!this.memory.remote) return
-
-    const role = this.role as 'remoteDefender'
-
-    // If the creep's remote no longer is managed by its commune
-
-    if (!Memory.rooms[this.commune].remotes.includes(this.memory.remote)) {
-        // Delete it from memory and try to find a new one
-
-        delete this.memory.remote
-        if (!this.findRemote()) return
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
     }
 
-    // Reduce remote need
+    static remoteDefenderManager(room: Room, creepsOfRole: string[]) {
+        for (const creepName of creepsOfRole) {
+            const creep: RemoteDefender = Game.creeps[creepName]
 
-    if (Memory.rooms[this.memory.remote].needs) {
-        Memory.rooms[this.memory.remote].needs[RemoteNeeds.minDamage] -= this.attackStrength
-        Memory.rooms[this.memory.remote].needs[RemoteNeeds.minHeal] -= this.healStrength
+            // Try to find a remote
+
+            if (!creep.findRemote()) {
+                // If the room is the creep's commune
+
+                if (room.name === creep.commune) {
+                    // Advanced recycle and iterate
+
+                    creep.advancedRecycle()
+                    continue
+                }
+
+                // Otherwise, have the creep make a moveRequest to its commune and iterate
+
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goal: {
+                        pos: new RoomPosition(25, 25, creep.commune),
+                        range: 25,
+                    },
+                })
+
+                continue
+            }
+
+            creep.say(creep.memory.remote)
+
+            // Try to attack enemyAttackers, iterating if there are none or one was attacked
+
+            if (creep.advancedAttackEnemies()) {
+                delete creep.memory.TW
+                continue
+            }
+
+            // If the creep is in its remote
+
+            if (room.name === creep.memory.remote) {
+                if (!creep.memory.TW) creep.memory.TW = 0
+                else creep.memory.TW += 1
+
+                // If a random range of time has passed, find a new remote
+
+                if (creep.memory.TW > randomIntRange(20, 100)) {
+                    delete creep.memory.remote
+
+                    if (creep.moveRequest) continue
+
+                    // Try to find a remote
+
+                    if (!creep.findRemote()) continue
+                }
+            }
+
+            // Otherwise, create a moveRequest to its remote
+
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goal: {
+                    pos: new RoomPosition(25, 25, creep.memory.remote),
+                    range: 25,
+                },
+            })
+        }
     }
 
-    const commune = Game.rooms[this.commune]
+    preTickManager(): void {
+        if (!this.memory.remote) return
 
-    // Add the creep to creepsFromRoomWithRemote relative to its remote
+        const role = this.role as 'remoteDefender'
 
-    if (commune.creepsFromRoomWithRemote[this.memory.remote])
-        commune.creepsFromRoomWithRemote[this.memory.remote][role].push(this.name)
+        // If the creep's remote no longer is managed by its commune
+
+        if (!Memory.rooms[this.commune].remotes.includes(this.memory.remote)) {
+            // Delete it from memory and try to find a new one
+
+            delete this.memory.remote
+            if (!this.findRemote()) return
+        }
+
+        // Reduce remote need
+
+        if (Memory.rooms[this.memory.remote].needs) {
+            Memory.rooms[this.memory.remote].needs[RemoteNeeds.minDamage] -= this.attackStrength
+            Memory.rooms[this.memory.remote].needs[RemoteNeeds.minHeal] -= this.healStrength
+        }
+
+        const commune = Game.rooms[this.commune]
+
+        // Add the creep to creepsFromRoomWithRemote relative to its remote
+
+        if (commune.creepsFromRoomWithRemote[this.memory.remote])
+            commune.creepsFromRoomWithRemote[this.memory.remote][role].push(this.name)
+    }
 }

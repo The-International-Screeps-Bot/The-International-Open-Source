@@ -1,83 +1,88 @@
 import { getRange, unpackAsRoomPos } from 'international/generalFunctions'
-import { MineralHarvester } from '../../creepClasses'
 
-export function mineralHarvesterManager(room: Room, creepsOfRole: string[]) {
-    for (const creepName of creepsOfRole) {
-        const creep: MineralHarvester = Game.creeps[creepName]
+export class MineralHarvester extends Creep {
+    advancedHarvestMineral?(mineral: Mineral): boolean {
+        const creep = this
+        const { room } = creep
 
-        // Get the mineral
+        // Try to find a harvestPosition, inform false if it failed
 
-        const mineral = room.mineral
+        if (!creep.findMineralHarvestPos()) return false
 
-        if (mineral.mineralAmount === 0) {
-            creep.advancedRecycle()
-            continue
+        creep.say('🚬')
+
+        // Unpack the creep's packedHarvestPos
+
+        const harvestPos = unpackAsRoomPos(creep.memory.packedPos, room.name)
+
+        // If the creep is not standing on the harvestPos
+
+        if (getRange(creep.pos.x, harvestPos.x, creep.pos.y, harvestPos.y) > 0) {
+            creep.say('⏩M')
+
+            // Make a move request to it
+
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goal: { pos: harvestPos, range: 0 },
+                avoidEnemyRanges: true,
+            })
+
+            // And inform false
+
+            return false
         }
 
-        // If the creep needs resources
+        // Harvest the mineral, informing the result if it didn't succeed
 
-        if (creep.needsResources()) {
-            // Harvest the mineral and iterate
+        if (creep.harvest(mineral) !== OK) return false
 
-            creep.advancedHarvestMineral(mineral)
-            continue
-        }
+        // Find amount of minerals harvested and record it in data
 
-        // If there is a terminal
+        const mineralsHarvested = Math.min(this.parts.work * HARVEST_POWER, mineral.mineralAmount)
+        if (global.roomStats.commune[this.room.name])
+            (global.roomStats.commune[this.room.name] as RoomCommuneStats).mh += mineralsHarvested
 
-        if (room.terminal && room.terminal.store.getFreeCapacity() >= 10000) {
-            // Transfer the creep's minerals to it
+        creep.say(`⛏️${mineralsHarvested}`)
 
-            creep.advancedTransfer(room.terminal, mineral.mineralType)
-        }
-    }
-}
+        // Inform true
 
-MineralHarvester.prototype.advancedHarvestMineral = function (mineral) {
-    const creep = this
-    const { room } = creep
-
-    // Try to find a harvestPosition, inform false if it failed
-
-    if (!creep.findMineralHarvestPos()) return false
-
-    creep.say('🚬')
-
-    // Unpack the creep's packedHarvestPos
-
-    const harvestPos = unpackAsRoomPos(creep.memory.packedPos, room.name)
-
-    // If the creep is not standing on the harvestPos
-
-    if (getRange(creep.pos.x, harvestPos.x, creep.pos.y, harvestPos.y) > 0) {
-        creep.say('⏩M')
-
-        // Make a move request to it
-
-        creep.createMoveRequest({
-            origin: creep.pos,
-            goal: { pos: harvestPos, range: 0 },
-            avoidEnemyRanges: true,
-        })
-
-        // And inform false
-
-        return false
+        return true
     }
 
-    // Harvest the mineral, informing the result if it didn't succeed
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
 
-    if (creep.harvest(mineral) !== OK) return false
+    static mineralHarvesterManager(room: Room, creepsOfRole: string[]) {
+        for (const creepName of creepsOfRole) {
+            const creep: MineralHarvester = Game.creeps[creepName]
 
-    // Find amount of minerals harvested and record it in data
+            // Get the mineral
 
-    const mineralsHarvested = Math.min(this.parts.work * HARVEST_POWER, mineral.mineralAmount)
-    if (global.roomStats.commune[this.room.name])
-        (global.roomStats.commune[this.room.name] as RoomCommuneStats).mh += mineralsHarvested
+            const mineral = room.mineral
 
-    creep.say(`⛏️${mineralsHarvested}`)
+            if (mineral.mineralAmount === 0) {
+                creep.advancedRecycle()
+                continue
+            }
 
-    // Inform true
+            // If the creep needs resources
 
-    return true
+            if (creep.needsResources()) {
+                // Harvest the mineral and iterate
+
+                creep.advancedHarvestMineral(mineral)
+                continue
+            }
+
+            // If there is a terminal
+
+            if (room.terminal && room.terminal.store.getFreeCapacity() >= 10000) {
+                // Transfer the creep's minerals to it
+
+                creep.advancedTransfer(room.terminal, mineral.mineralType)
+            }
+        }
+    }
 }

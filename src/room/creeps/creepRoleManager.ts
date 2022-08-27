@@ -2,55 +2,54 @@ import './creepFunctions'
 
 import { creepRoles, myColors } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
-import { controllerUpgraderManager } from './roleManagers/commune/controllerUpgrader'
-import { mineralHarvesterManager } from './roleManagers/commune/mineralHarvester'
-import { maintainerManager } from './roleManagers/commune/maintainer'
-import { builderManager } from './roleManagers/commune/builder'
-import { scoutManager } from './roleManagers/international/scout'
-import { haulerManager } from './roleManagers/commune/hauler'
-import { source2RemoteHarvesterManager } from './roleManagers/remote/source2RemoteHarvesterManager'
-import { remoteHaulerManager } from './roleManagers/remote/remoteHauler'
-import { claimerManager } from './roleManagers/international/claimer'
-import { meleeDefenderManager } from './roleManagers/commune/meleeDefender'
-import { hubHaulerManager } from './roleManagers/commune/hubHaulerManager'
-import { fastFillerManager } from './roleManagers/commune/fastFiller'
-import { source1RemoteHarvesterManager } from './roleManagers/remote/source1RemoteHarvesterManager'
-import { remoteReserverManager } from './roleManagers/remote/remoteReserver'
-import { remoteDefenderManager } from './roleManagers/remote/remoteDefender'
-import { vanguardManager } from './roleManagers/international/vanguard'
-import { sourceHarvesterManager } from './roleManagers/commune/sourceHarvester'
-import { remoteCoreAttackerManager } from './roleManagers/remote/remoteCoreAttacker'
-import { vanguardDefenderManager } from './roleManagers/international/vanguardDefender'
-import { remoteDismantlerManager } from './roleManagers/remote/remoteDismantler'
-import { antifaAssaulterManager } from './roleManagers/antifa/antifaAssaulter'
-import { allyVanguardManager } from './roleManagers/international/allyVanguard'
+import { Maintainer } from './roleManagers/commune/maintainer'
+import { Builder } from './roleManagers/commune/builder'
+import { Hauler } from './roleManagers/commune/hauler'
+import { RemoteHauler } from './roleManagers/remote/remoteHauler'
+import { Claimer } from './roleManagers/international/claimer'
+import { AllyVanguard } from './roleManagers/international/allyVanguard'
+import { HubHauler } from './roleManagers/commune/hubHaulerManager'
+import { ControllerUpgrader } from './roleManagers/commune/controllerUpgrader'
+import { SourceHarvester } from './roleManagers/commune/sourceHarvester'
+import { MineralHarvester } from './roleManagers/commune/mineralHarvester'
+import { FastFiller } from './roleManagers/commune/fastFiller'
+import { MeleeDefender } from './roleManagers/commune/meleeDefender'
+import { RemoteHarvester } from './roleManagers/remote/remoteHarvesterFunctions'
+import { RemoteReserver } from './roleManagers/remote/remoteReserver'
+import { RemoteDefender } from './roleManagers/remote/remoteDefender'
+import { RemoteCoreAttacker } from './roleManagers/remote/remoteCoreAttacker'
+import { RemoteDismantler } from './roleManagers/remote/remoteDismantler'
+import { Scout } from './roleManagers/international/scout'
+import { Vanguard } from './roleManagers/international/vanguard'
+import { AntifaAssaulter } from './roleManagers/antifa/antifaAssaulter'
+import { VanguardDefender } from './roleManagers/international/vanguardDefender'
 
 // Construct managers
 
 const managers: Record<CreepRoles, Function> = {
-    source1Harvester: sourceHarvesterManager,
-    source2Harvester: sourceHarvesterManager,
-    hauler: haulerManager,
-    controllerUpgrader: controllerUpgraderManager,
-    builder: builderManager,
-    maintainer: maintainerManager,
-    mineralHarvester: mineralHarvesterManager,
-    hubHauler: hubHaulerManager,
-    fastFiller: fastFillerManager,
-    meleeDefender: meleeDefenderManager,
-    source1RemoteHarvester: source1RemoteHarvesterManager,
-    source2RemoteHarvester: source2RemoteHarvesterManager,
-    remoteHauler: remoteHaulerManager,
-    remoteReserver: remoteReserverManager,
-    remoteDefender: remoteDefenderManager,
-    remoteCoreAttacker: remoteCoreAttackerManager,
-    remoteDismantler: remoteDismantlerManager,
-    scout: scoutManager,
-    claimer: claimerManager,
-    vanguard: vanguardManager,
-    vanguardDefender: vanguardDefenderManager,
-    allyVanguard: allyVanguardManager,
-    antifaAssaulter: antifaAssaulterManager,
+    source1Harvester: SourceHarvester.sourceHarvesterManager,
+    source2Harvester: SourceHarvester.sourceHarvesterManager,
+    hauler: Hauler.haulerManager,
+    controllerUpgrader: ControllerUpgrader.controllerUpgraderManager,
+    builder: Builder.builderManager,
+    maintainer: Maintainer.maintainerManager,
+    mineralHarvester: MineralHarvester.mineralHarvesterManager,
+    hubHauler: HubHauler.hubHaulerManager,
+    fastFiller: FastFiller.fastFillerManager,
+    meleeDefender: MeleeDefender.meleeDefenderManager,
+    source1RemoteHarvester: RemoteHarvester.source1RemoteHarvesterManager,
+    source2RemoteHarvester: RemoteHarvester.source2RemoteHarvesterManager,
+    remoteHauler: RemoteHauler.remoteHaulerManager,
+    remoteReserver: RemoteReserver.remoteReserverManager,
+    remoteDefender: RemoteDefender.remoteDefenderManager,
+    remoteCoreAttacker: RemoteCoreAttacker.remoteCoreAttackerManager,
+    remoteDismantler: RemoteDismantler.remoteDismantlerManager,
+    scout: Scout.scoutManager,
+    claimer: Claimer.claimerManager,
+    vanguard: Vanguard.vanguardManager,
+    vanguardDefender: VanguardDefender.vanguardDefenderManager,
+    allyVanguard: AllyVanguard.allyVanguardManager,
+    antifaAssaulter: AntifaAssaulter.antifaAssaulterManager,
     antifaSupporter: () => {},
 }
 
@@ -73,7 +72,7 @@ export function creepRoleManager(room: Room) {
 
         // If there are no creeps for this manager, iterate
 
-        if (!room.myCreeps[role].length) return;
+        if (!room.myCreeps[role].length) return
 
         // Run manager
 
