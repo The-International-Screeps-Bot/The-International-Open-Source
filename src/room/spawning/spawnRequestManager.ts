@@ -476,7 +476,7 @@ Room.prototype.spawnRequester = function () {
 
             if (this.find(FIND_MY_CONSTRUCTION_SITES).length === 0) return false
 
-            let priority = 10 + this.creepsFromRoom.builder.length
+            let priority = 10
             let partsMultiplier = 0
 
             // If there is a storage
@@ -489,7 +489,7 @@ Room.prototype.spawnRequester = function () {
             }
 
             // Otherwise if there is no storage
-            else partsMultiplier += estimatedIncome / 2.5
+            else partsMultiplier += estimatedIncome / 8
 
             const role = 'builder'
             /*
@@ -520,7 +520,6 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [],
                     extraParts: [CARRY, WORK, MOVE],
                     partsMultiplier: partsMultiplier,
-                    minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 200,
                     priority,
@@ -538,7 +537,6 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [],
                     extraParts: [WORK, CARRY, CARRY, MOVE],
                     partsMultiplier: partsMultiplier,
-                    minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 250,
                     priority,

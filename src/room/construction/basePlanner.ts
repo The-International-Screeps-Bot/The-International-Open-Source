@@ -12,7 +12,7 @@ import {
     UNWALKABLE,
 } from 'international/constants'
 import {
-    arePositionsEqual,
+    areCoordsEqual,
     createPosMap,
     customLog,
     findAvgBetweenCoords,
@@ -138,7 +138,6 @@ export function basePlanner(room: Room) {
     function planStamp(opts: PlanStampOpts): false | RoomPosition[] {
         if (!opts.coordMap) opts.coordMap = room.baseCoords
         else {
-
             opts.coordMap = new Uint8Array(opts.coordMap)
 
             // Loop through each exit of exits
@@ -528,7 +527,7 @@ export function basePlanner(room: Room) {
     // Record road plans in the baseCM
 
     // Iterate through each x and y in the room
-/*
+    /*
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
             // If there is road at the pos, assign it as avoid in baseCM

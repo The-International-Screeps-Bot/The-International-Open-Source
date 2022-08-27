@@ -9,9 +9,10 @@ import {
     myColors,
     nonCommuneSigns,
     roomDimensions,
+    TrafficPriorities,
 } from 'international/constants'
 import {
-    arePositionsEqual,
+    areCoordsEqual,
     customLog,
     findClosestObject,
     findClosestPos,
@@ -166,7 +167,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
     // Find amount of energy harvested and record it in data
 
     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
-    
+
     if (global.roomStats.commune[this.room.name])
         (global.roomStats.commune[this.room.name] as RoomCommuneStats).eih += energyHarvested
     else if (global.roomStats.remote[this.room.name]) global.roomStats.remote[this.room.name].reih += energyHarvested
@@ -763,7 +764,7 @@ Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
 
     // Inform true if the creep's previous target isn't its current
 
-    if (!arePositionsEqual(unpackPos(this.memory.goalPos), goalPos)) return true
+    if (!areCoordsEqual(unpackPos(this.memory.goalPos), goalPos)) return true
 
     // If next pos in the path is not in range, inform true
 
@@ -802,7 +803,7 @@ Creep.prototype.createMoveRequest = function (opts) {
 
         // So long as the creep isn't standing on the first position in the path
 
-        while (path[0] && arePositionsEqual(this.pos, path[0])) {
+        while (path[0] && areCoordsEqual(this.pos, path[0])) {
             // Remove the first pos of the path
 
             path.shift()
@@ -848,11 +849,12 @@ Creep.prototype.createMoveRequest = function (opts) {
             room.visual.text('NP', path[0], {
                 align: 'center',
                 color: myColors.lightBlue,
+                opacity: 0.3,
             })
 
         // So long as the creep isn't standing on the first position in the path
 
-        while (path[0] && arePositionsEqual(this.pos, path[0])) {
+        while (path[0] && areCoordsEqual(this.pos, path[0])) {
             // Remove the first pos of the path
 
             path.shift()
@@ -1103,6 +1105,23 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     const creepAtPos = Game.creeps[creepNameAtPos]
 
     if (creepAtPos.moved) {
+        if (pack(this.pos) === creepAtPos.moved) {
+            if (Memory.roomVisuals)
+                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                    fill: myColors.yellow,
+                    opacity: 0.2,
+                })
+
+            this.runMoveRequest()
+            return
+        }
+
+        if (Memory.roomVisuals)
+            room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                fill: myColors.white,
+                opacity: 0.2,
+            })
+
         // Otherwise, loop through each index of the queue
 
         for (let index = queue.length - 1; index >= 0; index--)
@@ -1126,7 +1145,17 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     if (creepAtPos.moveRequest) {
         // If it's not valid
 
-        if (!room.moveRequests.get(creepAtPos.moveRequest)?.length) return
+        if (!room.moveRequests.get(creepAtPos.moveRequest)?.length) {
+            // Have the creep move to its moveRequest
+
+            this.runMoveRequest()
+
+            // Have the creepAtPos move to the creep and inform true
+
+            creepAtPos.moveRequest = pack(this.pos)
+            creepAtPos.runMoveRequest()
+            return
+        }
 
         // If the creep's pos and the creepAtPos's moveRequests are aligned
 
@@ -1135,6 +1164,16 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
             this.runMoveRequest()
             creepAtPos.recurseMoveRequest()
+            return
+        }
+
+        if (TrafficPriorities[this.role] > TrafficPriorities[creepAtPos.role]) {
+            this.runMoveRequest()
+
+            // Have the creepAtPos move to the creep and inform true
+
+            creepAtPos.moveRequest = pack(this.pos)
+            creepAtPos.runMoveRequest()
             return
         }
 
@@ -1575,7 +1614,6 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
     }
 
     if (reservation.type === 'transfer') {
-
         target.store[reservation.resourceType] += reservation.amount
         return
     }
@@ -1708,7 +1746,6 @@ Creep.prototype.fulfillReservation = function () {
     // Transfer
 
     if (reservation.type === 'transfer') {
-
         // This needs to use the direct functions to calculate free space, not the reserved amount
 
         amount = Math.min(

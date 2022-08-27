@@ -1,5 +1,12 @@
 import { impassibleStructureTypes, myColors } from 'international/constants'
-import { arePositionsEqual, findClosestObject, findClosestObjectEuc, getRange, getRangeEuc, pack } from 'international/generalFunctions'
+import {
+    areCoordsEqual,
+    findClosestObject,
+    findClosestObjectEuc,
+    getRange,
+    getRangeEuc,
+    pack,
+} from 'international/generalFunctions'
 import { creepClasses, MeleeDefender } from '../../creepClasses'
 
 export function meleeDefenderManager(room: Room, creepsOfRole: string[]) {
@@ -35,7 +42,7 @@ MeleeDefender.prototype.advancedDefend = function () {
     const ramparts = room.structures.rampart.filter(rampart => {
         // Allow the rampart the creep is currently standing on
 
-        if (arePositionsEqual(this.pos, rampart.pos)) return true
+        if (areCoordsEqual(this.pos, rampart.pos)) return true
 
         const structuresAtPos = room.lookForAt(LOOK_STRUCTURES, rampart.pos)
 
