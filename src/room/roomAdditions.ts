@@ -216,6 +216,16 @@ Object.defineProperties(Room.prototype, {
                     range: 3,
                 })
 
+                //Prioritze the CS of containers near the sources first.  Not building those wastes a lot of energy that's needed at medium RCLs.
+                if (structureType == STRUCTURE_CONTAINER) {
+                    let container = _.find(cSitesOfType, cs =>
+                        _.any(this.memory.stampAnchors.container, anchor =>
+                            cs.pos.isEqualTo(unpackAsRoomPos(anchor, this.name)),
+                        ),
+                    )
+                    if (container) target = container
+                }
+
                 if (!target) target = findClosestObject(searchAnchor, cSitesOfType)
 
                 this.memory.cSiteTargetID = target.id
@@ -855,6 +865,20 @@ Object.defineProperties(Room.prototype, {
 
                 this.global.hubLink = structure.id as Id<StructureLink>
                 return structure
+            }
+
+            for (const structure of this.lookForAtArea(
+                LOOK_STRUCTURES,
+                hubAnchor.y - 1,
+                hubAnchor.x - 1,
+                hubAnchor.y + 1,
+                hubAnchor.x + 1,
+                true,
+            )) {
+                if (structure.structure.structureType !== STRUCTURE_LINK) continue
+
+                this.global.hubLink = structure.structure.id as Id<StructureLink>
+                return structure.structure
             }
 
             return false

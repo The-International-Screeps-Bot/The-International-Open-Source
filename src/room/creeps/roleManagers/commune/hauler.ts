@@ -30,17 +30,13 @@ export function haulerManager(room: Room, creepsOfRole: string[]) {
 }
 
 Hauler.prototype.reserve = function () {
-
     if (this.memory.reservations?.length) return
 
     const { room } = this
 
     let withdrawTargets = room.MAWT.filter(target => {
         if (target instanceof Resource)
-            return (
-                target.reserveAmount >= this.store.getCapacity() * 0.2 ||
-                target.reserveAmount >= this.freeStore()
-            )
+            return target.reserveAmount >= this.store.getCapacity() * 0.2 || target.reserveAmount >= this.freeStore()
 
         return target.store.energy >= this.freeStore()
     })
@@ -64,6 +60,12 @@ Hauler.prototype.reserve = function () {
         transferTargets = room.MATT.filter(function (target) {
             return target.freeStore() > 0
         })
+
+        if (transferTargets.length == 0) {
+            transferTargets = room.METT.filter(function (target) {
+                return target.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+            })
+        }
 
         transferTargets = transferTargets.concat(
             room.MEFTT.filter(target => {
@@ -95,8 +97,6 @@ Hauler.prototype.reserve = function () {
             this.createReservation('withdraw', target.id, amount)
             return
         }
-
-        return
     }
 
     if (!transferTargets) {
@@ -125,20 +125,40 @@ Hauler.prototype.reserve = function () {
 
         amount = Math.min(Math.max(this.store.energy, 0), target.freeSpecificStore(RESOURCE_ENERGY))
 
-        this.createReservation('transfer', target.id, amount)
-        return
+        if (amount > 0) {
+            this.createReservation('transfer', target.id, amount)
+            return
+        }
     }
 
     transferTargets = room.OATT.filter(target => {
         return target.freeStore() >= this.store.energy
     })
 
-    if (!transferTargets.length) return
+    if (transferTargets.length) {
+        target = findClosestObject(this.pos, transferTargets)
 
-    target = findClosestObject(this.pos, transferTargets)
+        amount = Math.min(Math.max(this.store.energy, 0), target.freeStore())
 
-    amount = Math.min(Math.max(this.store.energy, 0), target.freeStore())
+        this.createReservation('transfer', target.id, amount)
+    }
 
-    this.createReservation('transfer', target.id, amount)
-    return
+    if (this.memory.reservations?.length == 0) {
+        //Empty out the creep if it has anything left by this point.
+        if (this.store.getUsedCapacity() > 0) {
+            let target = room.OATT[0]
+            if (target)
+                for (let rsc in this.store) {
+                    this.createReservation(
+                        'transfer',
+                        target.id,
+                        this.store[rsc as ResourceConstant],
+                        rsc as ResourceConstant,
+                    )
+                }
+        }
+    }
+
+    if (this.memory.reservations?.length == 0 && room.commune.labManager)
+        room.commune.labManager.generateHaulingReservation(this)
 }
