@@ -219,3 +219,12 @@ Scout.prototype.advancedSignController = function () {
     this.signController(room.controller, signMessage)
     return true
 }
+
+Scout.prototype.preTickManager = function () {
+    if (!this.memory.scoutTarget) return
+
+    const commune = Game.rooms[this.commune]
+    if (!commune) return
+
+    commune.scoutTargets.add(this.memory.scoutTarget)
+}

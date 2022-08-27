@@ -218,3 +218,10 @@ SourceHarvester.prototype.isDying = function () {
     this.memory.dying = true
     return true
 }
+
+SourceHarvester.prototype.preTickManager = function () {
+
+    const { room } = this
+
+    if (this.memory.SI) room.creepsOfSourceAmount[this.memory.SI] += 1
+}

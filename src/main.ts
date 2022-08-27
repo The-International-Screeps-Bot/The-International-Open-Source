@@ -1123,6 +1123,10 @@ declare global {
 
         readonly sourcePaths: RoomPosition[][]
 
+        _controllerPositions: RoomPosition[]
+
+        readonly controllerPositions: RoomPosition[]
+
         readonly upgradePathLength: number
 
         // Container
@@ -1363,6 +1367,11 @@ declare global {
         SP: string[]
 
         /**
+         * Controller Positions, packed positions around the controller where reservers and downgraders can sit
+         */
+        CP: string
+
+        /**
          * Defensive Threat
          */
         DT: number
@@ -1373,9 +1382,9 @@ declare global {
         OT: number
 
         /**
-         * Hauler Size, what the maxCost of a hauler should be to accomidate for CPU usage
+         * Minimum Hauler Cost, what the maxCost of a hauler should be to accomidate for CPU usage
          */
-        HS: number
+        MHC: number
 
         /**
          * Hauler Update, how many ticks ago the hauler size was updated
@@ -1436,6 +1445,8 @@ declare global {
         // Functions
 
         preTickManager(): void
+
+        endTickManager(): void
 
         /**
          * Wether the creep's respawn time is equal to its remaining ticks to live
@@ -1945,7 +1956,6 @@ declare global {
 // Loop
 
 export const loop = function () {
-
     memHack.modifyMemory()
 
     internationalManager.tickReset()

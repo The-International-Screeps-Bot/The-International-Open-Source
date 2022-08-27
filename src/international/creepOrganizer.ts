@@ -3,15 +3,6 @@ import { myColors, spawnByRoomRemoteRoles } from './constants'
 import { customLog, pack } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
-import '../room/creeps/preTickManagers/international/scoutPreTick'
-
-import '../room/creeps/preTickManagers/remote/remoteHarvesterPreTick'
-import '../room/creeps/preTickManagers/remote/remoteHaulerPreTick'
-import '../room/creeps/preTickManagers/remote/remoteReserverPreTick'
-import '../room/creeps/preTickManagers/remote/remoteDefenderPreTick'
-import '../room/creeps/preTickManagers/remote/remoteCoreAttackerPreTick'
-import '../room/creeps/preTickManagers/remote/remoteDismantlerPreTick'
-
 InternationalManager.prototype.creepOrganizer = function () {
     // If CPU logging is enabled, get the CPU used at the start
 

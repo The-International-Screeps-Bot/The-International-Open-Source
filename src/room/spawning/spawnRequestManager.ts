@@ -263,7 +263,7 @@ Room.prototype.spawnRequester = function () {
                     minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 150,
-                    maxCostPerCreep: this.memory.HS,
+                    maxCostPerCreep: this.memory.MHC,
                     priority,
                     memoryAdditions: {
                         roads: true,
@@ -279,7 +279,7 @@ Room.prototype.spawnRequester = function () {
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 100,
-                maxCostPerCreep: this.memory.HS,
+                maxCostPerCreep: this.memory.MHC,
                 priority,
                 memoryAdditions: {},
             }
@@ -1194,7 +1194,7 @@ Room.prototype.spawnRequester = function () {
                          partsMultiplier,
                          maxCreeps: Infinity,
                          minCost: 150,
-                         maxCostPerCreep: this.memory.HS,
+                         maxCostPerCreep: this.memory.MHC,
                          priority: minRemotePriority - 0.2,
                          memoryAdditions: {
                               role: 'remoteHauler',
@@ -1215,7 +1215,7 @@ Room.prototype.spawnRequester = function () {
                 partsMultiplier,
                 maxCreeps: Infinity,
                 minCost: 100,
-                maxCostPerCreep: this.memory.HS,
+                maxCostPerCreep: this.memory.MHC,
                 priority: minRemotePriority - 0.2,
                 memoryAdditions: {},
             }

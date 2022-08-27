@@ -33,6 +33,8 @@ import { creepClasses } from './creepClasses'
 
 Creep.prototype.preTickManager = function () {}
 
+Creep.prototype.endTickManager = function () {}
+
 Creep.prototype.isDying = function () {
     // Inform as dying if creep is already recorded as dying
 
@@ -792,7 +794,7 @@ Creep.prototype.createMoveRequest = function (opts) {
 
     // Assign default opts
 
-    if (!opts.cacheAmount) opts.cacheAmount = internationalManager.defaultCacheAmount
+    if (!opts.cacheAmount) opts.cacheAmount = internationalManager.defaultMinCacheAmount
 
     let path: RoomPosition[]
 
@@ -850,7 +852,7 @@ Creep.prototype.createMoveRequest = function (opts) {
                 align: 'center',
                 color: myColors.lightBlue,
                 opacity: 0.5,
-                font: 0.3,
+                font: 0.5,
             })
 
         // So long as the creep isn't standing on the first position in the path
@@ -1047,10 +1049,11 @@ Creep.prototype.runMoveRequest = function () {
 
     if (this.move(this.pos.getDirectionTo(unpackAsRoomPos(this.moveRequest, room.name))) !== OK) return false
 
-    room.visual.rect(this.pos.x - 0.5, this.pos.y - 0.5, 1, 1, {
-        fill: myColors.lightBlue,
-        opacity: 0.2,
-    })
+    if (Memory.roomVisuals)
+        room.visual.rect(this.pos.x - 0.5, this.pos.y - 0.5, 1, 1, {
+            fill: myColors.lightBlue,
+            opacity: 0.2,
+        })
 
     // Record where the creep is tying to move
 

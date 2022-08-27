@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 82
+export const breakingVersion = 83
 
 // Settings
 
@@ -98,7 +98,7 @@ export const roomTypeProperties: RoomTypeProperties = {
     powerBanks: true,
     notClaimable: true,
     PC: true,
-    HS: true,
+    MHC: true,
     HU: true,
 
     commune: true,
@@ -128,7 +128,7 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         deposits: true,
         powerBanks: true,
         PC: true,
-        HS: true,
+        MHC: true,
         HU: true,
     },
     remote: {

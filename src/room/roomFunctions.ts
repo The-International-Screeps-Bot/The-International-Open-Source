@@ -1242,12 +1242,16 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
             room.memory.commune = scoutingRoom.name
 
-            // Query source positions
+            // Generate new important positions
 
             delete room.memory.SP
             delete room._sourcePositions
-
             room.sourcePositions
+
+
+            delete room.memory.CP
+            delete room._controllerPositions
+            room.controllerPositions
 
             // Add the room's name to the scoutingRoom's remotes list
 
@@ -1276,12 +1280,15 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
         room.memory.commune = scoutingRoom.name
 
-        // Query source positions
+        // Generate new important positions
 
         delete room.memory.SP
         delete room._sourcePositions
-
         room.sourcePositions
+
+        delete room.memory.CP
+        delete room._controllerPositions
+        room.controllerPositions
 
         // Add the room's name to the scoutingRoom's remotes list
 
