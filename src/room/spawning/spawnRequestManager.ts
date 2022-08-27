@@ -875,7 +875,6 @@ Room.prototype.spawnRequester = function () {
     const remoteNamesByEfficacy: string[] = this.get('remoteNamesByEfficacy')
 
     for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
-
         const remoteName = remoteNamesByEfficacy[index]
         const remote = Game.rooms[remoteName]
         const remoteNeeds = Memory.rooms[remoteName].needs
@@ -899,8 +898,28 @@ Room.prototype.spawnRequester = function () {
         const remoteMemory = Memory.rooms[remoteName]
         const sourcesByEfficacy = findRemoteSourcesByEfficacy(remoteName)
         const remotePriority = minRemotePriority + index
-
+        /*
         remoteHaulerNeed += remoteNeeds[remoteNeedsIndex.remoteHauler]
+ */
+
+        if (!remoteMemory.needs[remoteNeedsIndex.enemyReserved]) {
+            const possibleReservation = spawnEnergyCapacity >= 650
+
+            // Loop through each index of sourceEfficacies
+
+            for (let index = 0; index < remoteMemory.SE.length; index += 1) {
+                // Get the income based on the reservation of the this and remoteHarvester need
+                // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
+
+                const income =
+                    (possibleReservation ? 10 : 5) -
+                    Math.floor(remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] * minHarvestWorkRatio)
+
+                // Find the number of carry parts required for the source, and add it to the remoteHauler need
+
+                remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SE[index], income)
+            }
+        }
 
         // Construct requests for source1RemoteHarvesters
 
@@ -911,7 +930,9 @@ Room.prototype.spawnRequester = function () {
                 if (remoteNeeds[remoteNeedsIndex.source1RemoteHarvester] <= 0) return false
 
                 const sourceIndex = 0
-                const sourcePositionsAmount = remote ? remote.sourcePositions.length : unpackPosList(remoteMemory.SP[sourceIndex]).length
+                const sourcePositionsAmount = remote
+                    ? remote.sourcePositions.length
+                    : unpackPosList(remoteMemory.SP[sourceIndex]).length
 
                 const role = 'source1RemoteHarvester'
 
@@ -964,7 +985,9 @@ Room.prototype.spawnRequester = function () {
                 if (remoteNeeds[remoteNeedsIndex.source2RemoteHarvester] <= 0) return false
 
                 const sourceIndex = 1
-                const sourcePositionsAmount = remote ? remote.sourcePositions.length : unpackPosList(remoteMemory.SP[sourceIndex]).length
+                const sourcePositionsAmount = remote
+                    ? remote.sourcePositions.length
+                    : unpackPosList(remoteMemory.SP[sourceIndex]).length
 
                 const role = 'source2RemoteHarvester'
 
