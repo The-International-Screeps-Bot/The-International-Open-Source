@@ -218,7 +218,7 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            const priority = 0.5 + Math.max(this.creepsFromRoom.hauler.length - 1, 0)
+            const priority = 0.5 + this.creepsFromRoom.hauler.length
 
             // Construct the required carry parts
 
