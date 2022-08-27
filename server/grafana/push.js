@@ -64,30 +64,15 @@ function pushStats(userinfo, stats, shard) {
     logInfo(`${userinfo.type}: Added stats object for ${userinfo.username} in ${shard}`)
 }
 
-function shouldContinue(shardsCount) {
-    const seconds = 15 * Math.round(new Date().getSeconds() / 15)
-    switch (shardsCount) {
-        case 1:
-            return true
-        case 2:
-            if (seconds === 0 || seconds === 30 || seconds === 60) return true
-            return false
-        case 3:
-            if (seconds === 0 || seconds === 60) return true
-            return false
-        default:
-            return false
-    }
-}
-
-cron.schedule('* * * * *', async () => {
+cron.schedule('15/* * * * * *', async () => {
     console.log('----------------------------------------------------------------')
     groupedStats = {}
     for (let i = 0; i < statsUsers.length; i++) {
         try {
             const user = statsUsers[i]
             user.token = await getLoginInfo(user)
-            if (user.type === 'mmo' && !shouldContinue(user.shards.length)) continue
+            const shouldContinue = new Date().getMinutes() % user.shards.length === 0
+            if (user.type === 'mmo' && shouldContinue) continue
             for (let y = 0; y < user.shards.length; y++) {
                 const shard = user.shards[y]
                 await getStats(user, shard)
