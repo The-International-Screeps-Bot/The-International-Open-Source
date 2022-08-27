@@ -178,7 +178,7 @@ Room.prototype.get = function (roomObjectName) {
 
         // Find terrain in room
 
-        const terrain = Game.map.getRoomTerrain(room.name)
+        const terrain = internationalManager.getTerrainCoords(room.name)
 
         // Find positions adjacent to source
 
@@ -191,19 +191,21 @@ Room.prototype.get = function (roomObjectName) {
 
         // Loop through each pos
 
-        for (const pos of adjacentPositions) {
+        for (const coord of adjacentPositions) {
             // Iterate if terrain for pos is a wall
 
-            if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+            if (terrain[pack(coord)] === TERRAIN_MASK_WALL) continue
 
             // Add pos to harvestPositions
 
-            upgradePositions.push(new RoomPosition(pos.x, pos.y, room.name))
+            upgradePositions.push(new RoomPosition(coord.x, coord.y, room.name))
         }
 
         upgradePositions.sort(function (a, b) {
             return getRange(a.x, room.anchor.x, a.y, room.anchor.y) - getRange(b.x, room.anchor.x, b.y, room.anchor.y)
         })
+
+        upgradePositions.push(upgradePositions.shift())
 
         // Inform harvestPositions
 
@@ -1178,7 +1180,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
             enemyRemote: Infinity,
             ally: Infinity,
             allyRemote: Infinity,
-            highway: Infinity,
+            /* highway: Infinity, */
         })
 
     if (distance <= 5) {

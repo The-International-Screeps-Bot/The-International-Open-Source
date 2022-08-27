@@ -107,6 +107,7 @@ export class FastFiller extends Creep {
                 this.say('W')
 
                 this.withdraw(structure, RESOURCE_ENERGY)
+            structure.store.energy -= this.store.getCapacity() - this.store.energy
                 return true
             }
 
@@ -147,8 +148,8 @@ export class FastFiller extends Creep {
 
             this.say('T')
 
-            this.transfer(structure, RESOURCE_ENERGY).toString()
-
+        this.transfer(structure, RESOURCE_ENERGY)
+        structure.store.energy += this.store.energy
             return true
         }
         /*

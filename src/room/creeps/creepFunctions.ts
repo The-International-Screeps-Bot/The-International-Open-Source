@@ -245,6 +245,9 @@ Creep.prototype.advancedUpgradeController = function () {
 
         if (controllerRange <= 3 && this.store.energy > 0) {
             if (this.upgradeController(room.controller) === OK) {
+
+                this.store.energy -= workPartCount
+
                 const controlPoints = workPartCount * UPGRADE_CONTROLLER_POWER
 
                 if (global.roomStats.commune[this.room.name])
@@ -278,6 +281,8 @@ Creep.prototype.advancedUpgradeController = function () {
                         (controllerStructure.hitsMax - controllerStructure.hits) / REPAIR_POWER,
                     )
 
+                    this.store.energy -= workPartCount
+
                     // Add control points to total controlPoints counter and say the success
 
                     if (global.roomStats.commune[this.room.name])
@@ -292,6 +297,9 @@ Creep.prototype.advancedUpgradeController = function () {
                 // Withdraw from the controllerContainer, informing false if the withdraw failed
 
                 if (this.withdraw(controllerStructure, RESOURCE_ENERGY) !== OK) return false
+
+                this.store.energy += Math.min(this.store.getCapacity(), controllerStructure.store.energy)
+                controllerStructure.store.energy -= this.store.energy
 
                 this.message += `⚡`
             }
@@ -485,6 +493,8 @@ Creep.prototype.advancedBuildAllyCSite = function () {
             this.parts.work * BUILD_POWER,
             (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
         )
+
+        this.store.energy -= energySpentOnConstruction
 
         // Add control points to total controlPoints counter and say the success
 
@@ -1070,7 +1080,11 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     const { room } = this
 
     if (!this.moveRequest) return
-    if (!room.moveRequests.get(this.moveRequest)) return
+    if (!room.moveRequests.get(this.moveRequest)) {
+
+        this.moved = -1
+        return
+    }
 
     queue.push(this.name)
 
@@ -1115,8 +1129,15 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     const creepAtPos = Game.creeps[creepNameAtPos]
 
     if (creepAtPos.moved) {
-        // If the creep is where the creep is trying to move to
 
+        if (creepAtPos.moved === -1) {
+
+            delete this.moveRequest
+            this.moved = -1
+        }
+
+        // If the creep is where the creepAtPos is trying to move to
+/*
         if (packedCoord === creepAtPos.moved) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
@@ -1127,7 +1148,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             this.runMoveRequest()
             return
         }
-
+ */
         if (Memory.roomVisuals)
             room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
                 fill: myColors.white,
@@ -1158,6 +1179,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         // If it's not valid
 
         if (!room.moveRequests.get(creepAtPos.moveRequest)) {
+            /*
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
                     fill: myColors.teal,
@@ -1173,6 +1195,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             creepAtPos.moveRequest = packedCoord
             room.moveRequests.set(packedCoord, [creepAtPos.name])
             creepAtPos.runMoveRequest()
+ */
             return
         }
 
@@ -1203,18 +1226,23 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
             // Prefer the creep with the higher priority
 
-            if (TrafficPriorities[this.role as any] > TrafficPriorities[creepAtPos.role as any]) {
+            if (TrafficPriorities[this.role] > TrafficPriorities[creepAtPos.role]) {
                 this.runMoveRequest()
+
                 delete creepAtPos.moveRequest
+                creepAtPos.moved = -1
+
                 return
             }
 
             delete this.moveRequest
+            this.moved = -1
+
             creepAtPos.runMoveRequest()
             return
         }
 
-        if (TrafficPriorities[this.role as any] > TrafficPriorities[creepAtPos.role as any]) {
+        if (TrafficPriorities[this.role] > TrafficPriorities[creepAtPos.role]) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
                     fill: myColors.pink,

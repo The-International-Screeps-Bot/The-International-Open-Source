@@ -75,6 +75,7 @@ export class StatsManager {
                 spawnUsage = spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawns.length
         } else {
             roomStats.cc = 0
+            roomStats.tcc = 0
         }
         roomStats.su = this.average(roomStats.su, spawnUsage)
 
@@ -107,8 +108,6 @@ export class StatsManager {
                 globalCommuneStats.reoro += remoteRoomStats.reoro
                 globalCommuneStats.reob += remoteRoomStats.reob
             })
-            roomStats.tcc = this.average(globalCommuneStats.tcc, roomStats.tcc)
-
             roomStats.rc = this.average(globalCommuneStats.rc, roomStats.rc)
             roomStats.rcu = this.average(globalCommuneStats.rcu, roomStats.rcu)
             roomStats.res = this.average(globalCommuneStats.res, roomStats.res)
