@@ -32,6 +32,8 @@ import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { customLog } from 'international/generalFunctions'
 import { myColors, TrafficPriorities } from 'international/constants'
+import { LabManager } from 'room/lab'
+import { Commune } from 'room/communeManager'
 import { configManager } from './international/config'
 
 // Type declareations for global
@@ -1234,6 +1236,8 @@ declare global {
          * Mandatory Other Fill Transfer Targets
          */
         readonly MOFTT: (Creep | AnyStoreStructure | Tombstone)[]
+
+        commune: Commune
     }
 
     interface DepositRecord {
@@ -1390,6 +1394,9 @@ declare global {
          * Hauler Update, how many ticks ago the hauler size was updated
          */
         HU: number
+
+        factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
+        factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
     }
 
     // Creeps
@@ -1399,6 +1406,8 @@ declare global {
          * The packed position of the moveRequest, if one has been made
          */
         moveRequest: number
+
+        freeCapacityAfterTick: number
 
         /**
          * Wether the creep moved a resource this tick
@@ -1900,6 +1909,8 @@ declare global {
              * Room names that have controllers we own
              */
             communes: Set<string>
+
+            communeObjects: Commune[]
 
             // Command functions
 
