@@ -35,6 +35,7 @@ import { myColors, TrafficPriorities } from 'international/constants'
 import { LabManager } from 'room/lab'
 import { Commune } from 'room/communeManager'
 import { configManager } from './international/config'
+import { BlockquoteHTMLAttributes } from 'react'
 
 // Type declareations for global
 
@@ -1415,7 +1416,7 @@ declare global {
         movedResource: boolean
 
         /**
-         * The packed coord the creep is trying to act upon, if it exists
+         * The packed coord the creep is trying to act upon, if it exists. -1 means the move attempt failed
          */
         moved?: number
 

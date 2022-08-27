@@ -1080,7 +1080,11 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     const { room } = this
 
     if (!this.moveRequest) return
-    if (!room.moveRequests.get(this.moveRequest)) return
+    if (!room.moveRequests.get(this.moveRequest)) {
+
+        this.moved = -1
+        return
+    }
 
     queue.push(this.name)
 
@@ -1125,8 +1129,15 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     const creepAtPos = Game.creeps[creepNameAtPos]
 
     if (creepAtPos.moved) {
-        // If the creep is where the creep is trying to move to
 
+        if (creepAtPos.moved === -1) {
+
+            delete this.moveRequest
+            this.moved = -1
+        }
+
+        // If the creep is where the creepAtPos is trying to move to
+/*
         if (packedCoord === creepAtPos.moved) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
@@ -1137,7 +1148,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             this.runMoveRequest()
             return
         }
-
+ */
         if (Memory.roomVisuals)
             room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
                 fill: myColors.white,
@@ -1168,6 +1179,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         // If it's not valid
 
         if (!room.moveRequests.get(creepAtPos.moveRequest)) {
+            /*
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
                     fill: myColors.teal,
@@ -1183,6 +1195,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             creepAtPos.moveRequest = packedCoord
             room.moveRequests.set(packedCoord, [creepAtPos.name])
             creepAtPos.runMoveRequest()
+ */
             return
         }
 
@@ -1215,11 +1228,16 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
             if (TrafficPriorities[this.role] > TrafficPriorities[creepAtPos.role]) {
                 this.runMoveRequest()
+
                 delete creepAtPos.moveRequest
+                creepAtPos.moved = -1
+
                 return
             }
 
             delete this.moveRequest
+            this.moved = -1
+
             creepAtPos.runMoveRequest()
             return
         }
