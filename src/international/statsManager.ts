@@ -87,9 +87,9 @@ export class StatsManager {
             roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY)
         }
 
+        roomStats.eih = this.average(roomStats.eih, globalCommuneStats.eih)
         if (Memory.roomStats >= 2) {
             roomStats.mh = this.average(roomStats.mh, globalCommuneStats.mh)
-            roomStats.eih = this.average(roomStats.eih, globalCommuneStats.eih)
             roomStats.eib = this.average(roomStats.eib, globalCommuneStats.eib)
             roomStats.eos = this.average(roomStats.eos, globalCommuneStats.eos)
 

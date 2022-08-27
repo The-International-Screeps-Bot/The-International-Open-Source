@@ -372,7 +372,7 @@ declare global {
 
     interface RoomCommuneStats extends RoomStats {
         /**
-         * Controller Leve
+         * Controller Level
          */
         cl: number
         /**
@@ -430,7 +430,7 @@ declare global {
         /**
          * Spawn Usage
          */
-        su: number // spawnUsage
+        su: number
     }
 
     interface Stats {
