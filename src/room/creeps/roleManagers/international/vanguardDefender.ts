@@ -1,4 +1,4 @@
-import { allyList, claimRequestNeedsIndex } from 'international/constants'
+import { allyList, ClaimRequestNeeds } from 'international/constants'
 import { findClosestObject, getRange, pack } from 'international/generalFunctions'
 import { VanguardDefender } from 'room/creeps/creepClasses'
 
@@ -16,7 +16,7 @@ export function vanguardDefenderManager(room: Room, creepsOfRole: string[]) {
 
         if (!claimTarget) return
 
-        Memory.claimRequests[Memory.rooms[creep.commune].claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] -=
+        Memory.claimRequests[Memory.rooms[creep.commune].claimRequest].needs[ClaimRequestNeeds.vanguardDefender] -=
             creep.strength
 
         creep.say(claimTarget)

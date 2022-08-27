@@ -1,4 +1,4 @@
-import { remoteNeedsIndex } from 'international/constants'
+import { RemoteNeeds } from 'international/constants'
 import './remoteHarvesterFunctions'
 import { RemoteHarvester } from '../../creepClasses'
 

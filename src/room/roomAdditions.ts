@@ -527,6 +527,105 @@ Object.defineProperties(Room.prototype, {
             return this._sourcePaths
         },
     },
+    controllerPositions: {
+        get() {
+            if (this._controllerPositions) return this._controllerPositions
+
+            if (this.memory.CP) {
+                return (this._controllerPositions = unpackPosList(this.memory.CP))
+            }
+
+            this._controllerPositions = []
+            const { controller } = this
+
+            if (this.memory.T === 'remote') {
+                const commune = Game.rooms[this.memory.commune]
+                if (!commune) return undefined
+
+                const terrain = Game.map.getRoomTerrain(this.name)
+
+                const anchor = commune.anchor || new RoomPosition(25, 25, commune.name)
+
+                // Find positions adjacent to source
+
+                const adjacentPositions = findCoordsInsideRect(
+                    controller.pos.x - 1,
+                    controller.pos.y - 1,
+                    controller.pos.x + 1,
+                    controller.pos.y + 1,
+                )
+
+                // Loop through each pos
+
+                for (const coord of adjacentPositions) {
+                    // Iterate if terrain for pos is a wall
+
+                    if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) continue
+
+                    // Add pos to harvestPositions
+
+                    this._controllerPositions.push(new RoomPosition(coord.x, coord.y, this.name))
+                }
+
+                this._controllerPositions.sort((a, b) => {
+                    return (
+                        this.advancedFindPath({
+                            origin: a,
+                            goal: { pos: anchor, range: 3 },
+                        }).length -
+                        this.advancedFindPath({
+                            origin: b,
+                            goal: { pos: anchor, range: 3 },
+                        }).length
+                    )
+                })
+
+                this.memory.CP = packPosList(this._controllerPositions)
+                return this._controllerPositions
+            }
+
+            const anchor = this.anchor || new RoomPosition(25, 25, this.name)
+
+            const terrain = Game.map.getRoomTerrain(this.name)
+
+            // Find positions adjacent to source
+
+            const adjacentPositions = findCoordsInsideRect(
+                controller.pos.x - 1,
+                controller.pos.y - 1,
+                controller.pos.x + 1,
+                controller.pos.y + 1,
+            )
+
+            // Loop through each pos
+
+            for (const coord of adjacentPositions) {
+                // Iterate if terrain for pos is a wall
+
+                if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) continue
+
+                // Add pos to harvestPositions
+
+                this._controllerPositions.push(new RoomPosition(coord.x, coord.y, this.name))
+            }
+
+            this._controllerPositions.sort((a, b) => {
+                return (
+                    this.advancedFindPath({
+                        origin: a,
+                        goal: { pos: anchor, range: 3 },
+                    }).length -
+                    this.advancedFindPath({
+                        origin: b,
+                        goal: { pos: anchor, range: 3 },
+                    }).length
+                )
+            })
+
+            this.memory.CP = packPosList(this._controllerPositions)
+            return this._controllerPositions
+        },
+    },
     upgradePathLength: {
         get() {
             if (this.global.upgradePathLength) return this.global.upgradePathLength

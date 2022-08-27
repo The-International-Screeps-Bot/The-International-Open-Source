@@ -1,4 +1,4 @@
-import { remoteNeedsIndex } from 'international/constants'
+import { RemoteNeeds } from 'international/constants'
 import { findObjectWithID, getRange } from 'international/generalFunctions'
 import { creepClasses, RemoteCoreAttacker, RemoteDismantler } from 'room/creeps/creepClasses'
 
@@ -78,12 +78,12 @@ RemoteDismantler.prototype.findRemote = function () {
 
         // If the needs of this remote are met, iterate
 
-        if (roomMemory.needs[remoteNeedsIndex[role]] <= 0) continue
+        if (roomMemory.needs[RemoteNeeds[role]] <= 0) continue
 
         // Otherwise assign the remote to the creep and inform true
 
         creep.memory.remote = roomName
-        roomMemory.needs[remoteNeedsIndex[role]] -= 1
+        roomMemory.needs[RemoteNeeds[role]] -= 1
 
         return true
     }
@@ -156,4 +156,30 @@ RemoteDismantler.prototype.advancedDismantle = function () {
     }
 
     return false
+}
+
+RemoteDismantler.prototype.preTickManager = function () {
+    if (!this.memory.remote) return
+
+    const role = this.role as 'remoteDismantler'
+
+    // If the creep's remote no longer is managed by its commune
+
+    if (!Memory.rooms[this.commune].remotes.includes(this.memory.remote)) {
+        // Delete it from memory and try to find a new one
+
+        delete this.memory.remote
+        if (!this.findRemote()) return
+    }
+
+    // Reduce remote need
+
+    if (Memory.rooms[this.memory.remote].needs) Memory.rooms[this.memory.remote].needs[RemoteNeeds[role]] -= 1
+
+    const commune = Game.rooms[this.commune]
+
+    // Add the creep to creepsFromRoomWithRemote relative to its remote
+
+    if (commune.creepsFromRoomWithRemote[this.memory.remote])
+        commune.creepsFromRoomWithRemote[this.memory.remote][role].push(this.name)
 }

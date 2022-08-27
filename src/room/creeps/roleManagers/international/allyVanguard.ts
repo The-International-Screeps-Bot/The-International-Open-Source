@@ -1,4 +1,4 @@
-import { allyCreepRequestNeedsIndex } from 'international/constants'
+import { AllyCreepRequestNeeds } from 'international/constants'
 import { findObjectWithID, getRange, unpackAsPos } from 'international/generalFunctions'
 import { AllyVanguard } from 'room/creeps/creepClasses'
 
@@ -17,7 +17,7 @@ export function allyVanguardManager(room: Room, creepsOfRole: string[]) {
         if (!request) return
 
         Memory.allyCreepRequests[Memory.rooms[creep.commune].allyCreepRequest].needs[
-            allyCreepRequestNeedsIndex.allyVanguard
+            AllyCreepRequestNeeds.allyVanguard
         ] -= creep.parts.work
 
         creep.say(request)

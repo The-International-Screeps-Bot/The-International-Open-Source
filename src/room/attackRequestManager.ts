@@ -1,4 +1,4 @@
-import { attackRequestNeedsIndex, claimRequestNeedsIndex, myColors } from 'international/constants'
+import { AttackRequestNeeds, ClaimRequestNeeds, myColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 
@@ -10,7 +10,7 @@ Room.prototype.attackRequestManager = function () {
     for (let index = 0; index < this.memory.attackRequests.length; index++) {
         const roomName = this.memory.attackRequests[index]
 
-        Memory.attackRequests[roomName].needs[attackRequestNeedsIndex.ranged] = 10
+        Memory.attackRequests[roomName].needs[AttackRequestNeeds.ranged] = 10
 
         const request = Game.rooms[roomName]
 
@@ -20,14 +20,14 @@ Room.prototype.attackRequestManager = function () {
 
         if (request.enemyAttackers.length) {
             Memory.attackRequests[roomName].abandon = 1500
-            Memory.attackRequests[roomName].needs[attackRequestNeedsIndex.ranged] = 0
+            Memory.attackRequests[roomName].needs[AttackRequestNeeds.ranged] = 0
 
             this.memory.attackRequests.splice(index, 1)
         }
 
         if (!request.enemyCreeps.length) {
             Memory.attackRequests[roomName].abandon = 1500
-            Memory.attackRequests[roomName].needs[attackRequestNeedsIndex.ranged] = 0
+            Memory.attackRequests[roomName].needs[AttackRequestNeeds.ranged] = 0
 
             this.memory.attackRequests.splice(index, 1)
         }

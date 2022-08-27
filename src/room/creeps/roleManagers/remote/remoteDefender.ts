@@ -1,4 +1,4 @@
-import { remoteNeedsIndex } from 'international/constants'
+import { RemoteNeeds } from 'international/constants'
 import { findClosestObject, getRange, pack, randomIntRange } from 'international/generalFunctions'
 import { RemoteDefender } from 'room/creeps/creepClasses'
 
@@ -43,14 +43,12 @@ export function remoteDefenderManager(room: Room, creepsOfRole: string[]) {
         // If the creep is in its remote
 
         if (room.name === creep.memory.remote) {
-
             if (!creep.memory.TW) creep.memory.TW = 0
             else creep.memory.TW += 1
 
             // If a random range of time has passed, find a new remote
 
             if (creep.memory.TW > randomIntRange(20, 100)) {
-
                 delete creep.memory.remote
 
                 if (creep.moveRequest) continue
@@ -95,13 +93,13 @@ RemoteDefender.prototype.findRemote = function () {
 
         // If the needs of this remote are met, iterate
 
-        if (roomMemory.needs[remoteNeedsIndex.minDamage] + roomMemory.needs[remoteNeedsIndex.minHeal] <= 0) continue
+        if (roomMemory.needs[RemoteNeeds.minDamage] + roomMemory.needs[RemoteNeeds.minHeal] <= 0) continue
 
         // Otherwise assign the remote to the creep and inform true
 
         creep.memory.remote = roomName
-        roomMemory.needs[remoteNeedsIndex.minDamage] -= creep.attackStrength
-        roomMemory.needs[remoteNeedsIndex.minHeal] -= creep.healStrength
+        roomMemory.needs[RemoteNeeds.minDamage] -= creep.attackStrength
+        roomMemory.needs[RemoteNeeds.minHeal] -= creep.healStrength
 
         return true
     }
@@ -255,4 +253,33 @@ RemoteDefender.prototype.advancedAttackEnemies = function () {
     // Otherwise inform true
 
     return true
+}
+
+RemoteDefender.prototype.preTickManager = function () {
+    if (!this.memory.remote) return
+
+    const role = this.role as 'remoteDefender'
+
+    // If the creep's remote no longer is managed by its commune
+
+    if (!Memory.rooms[this.commune].remotes.includes(this.memory.remote)) {
+        // Delete it from memory and try to find a new one
+
+        delete this.memory.remote
+        if (!this.findRemote()) return
+    }
+
+    // Reduce remote need
+
+    if (Memory.rooms[this.memory.remote].needs) {
+        Memory.rooms[this.memory.remote].needs[RemoteNeeds.minDamage] -= this.attackStrength
+        Memory.rooms[this.memory.remote].needs[RemoteNeeds.minHeal] -= this.healStrength
+    }
+
+    const commune = Game.rooms[this.commune]
+
+    // Add the creep to creepsFromRoomWithRemote relative to its remote
+
+    if (commune.creepsFromRoomWithRemote[this.memory.remote])
+        commune.creepsFromRoomWithRemote[this.memory.remote][role].push(this.name)
 }

@@ -175,7 +175,7 @@ export class InternationalManager {
         delete this._orders
         delete this._myOrdersCount
         delete this._claimRequestsByScore
-        delete this._defaultCacheAmount
+        delete this._defaultMinCacheAmount
     }
 
     /**
@@ -295,12 +295,14 @@ export class InternationalManager {
         ))
     }
 
-    _defaultCacheAmount: number
+    _defaultMinCacheAmount: number
 
-    get defaultCacheAmount() {
-        if (this._defaultCacheAmount) return this._defaultCacheAmount
+    get defaultMinCacheAmount() {
+        if (this._defaultMinCacheAmount) return this._defaultMinCacheAmount
 
-        return Math.floor((CPUBucketCapacity - Game.cpu.bucket) / cacheAmountModifier) + 1
+        const avgCPUUsagePercent = (Memory.stats.cpu.usage || 20) / Game.cpu.limit
+
+        return Math.floor(Math.pow(avgCPUUsagePercent * 10, 2.2)) + 1
     }
 
     _marketIsFunctional: number

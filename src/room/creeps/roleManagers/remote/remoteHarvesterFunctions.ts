@@ -1,5 +1,5 @@
-import { remoteNeedsIndex } from 'international/constants'
-import { getRange, unpackAsPos } from 'international/generalFunctions'
+import { minHarvestWorkRatio, RemoteNeeds } from 'international/constants'
+import { findCarryPartsRequired, getRange, unpackAsPos } from 'international/generalFunctions'
 import { RemoteHarvester } from 'room/creeps/creepClasses'
 
 RemoteHarvester.prototype.findRemote = function () {
@@ -24,12 +24,12 @@ RemoteHarvester.prototype.findRemote = function () {
 
         // If the needs of this remote are met, iterate
 
-        if (roomMemory.needs[remoteNeedsIndex[role]] <= 0) continue
+        if (roomMemory.needs[RemoteNeeds[role]] <= 0) continue
 
         // Otherwise assign the remote to the creep and inform true
 
         creep.memory.remote = roomName
-        roomMemory.needs[remoteNeedsIndex[role]] -= this.parts.work
+        roomMemory.needs[RemoteNeeds[role]] -= this.parts.work
 
         return true
     }
@@ -85,12 +85,57 @@ RemoteHarvester.prototype.isDying = function () {
     let sourceIndex = 0
     if (this.role === 'source2RemoteHarvester') sourceIndex = 1
 
-    if (this.memory.remote) if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.remote].SE[sourceIndex] - 1) return false
-
-    else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
+    if (this.memory.remote)
+        if (
+            this.ticksToLive >
+            this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.remote].SE[sourceIndex] - 1
+        )
+            return false
+        else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
     // Record creep as dying
 
     this.memory.dying = true
     return true
+}
+
+RemoteHarvester.prototype.preTickManager = function () {
+    if (!this.memory.remote) return
+
+    const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+
+    // If the creep's remote no longer is managed by its commune
+
+    if (!Memory.rooms[this.commune].remotes.includes(this.memory.remote)) {
+        // Delete it from memory and try to find a new one
+
+        delete this.memory.remote
+        if (!this.findRemote()) return
+    }
+
+    const commune = Game.rooms[this.commune]
+    const remoteMemory = Memory.rooms[this.memory.remote]
+
+    // Reduce remote need
+
+    if (remoteMemory.needs) {
+        if (!this.isDying()) Memory.rooms[this.memory.remote].needs[RemoteNeeds[role]] -= this.parts.work
+
+        const possibleReservation = commune.energyCapacityAvailable >= 650
+
+        let sourceIndex = 0
+        if (role === 'source2RemoteHarvester') sourceIndex = 1
+
+        const income =
+            (possibleReservation ? 10 : 5) - Math.floor(remoteMemory.needs[RemoteNeeds[role]] * minHarvestWorkRatio)
+
+        // Find the number of carry parts required for the source, and add it to the remoteHauler need
+
+        remoteMemory.needs[RemoteNeeds.remoteHauler] += findCarryPartsRequired(remoteMemory.SE[sourceIndex], income) / 2
+    }
+
+    // Add the creep to creepsFromRoomWithRemote relative to its remote
+
+    if (commune.creepsFromRoomWithRemote[this.memory.remote])
+        commune.creepsFromRoomWithRemote[this.memory.remote][role].push(this.name)
 }

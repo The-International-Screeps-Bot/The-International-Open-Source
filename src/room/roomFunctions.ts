@@ -7,7 +7,7 @@ import {
     myColors,
     numbersByStructureTypes,
     prefferedCommuneRange,
-    remoteNeedsIndex,
+    RemoteNeeds,
     roomDimensions,
     roomTypeProperties,
     roomTypes,
@@ -1242,12 +1242,15 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
             room.memory.commune = scoutingRoom.name
 
-            // Query source positions
+            // Generate new important positions
 
             delete room.memory.SP
             delete room._sourcePositions
-
             room.sourcePositions
+
+            delete room.memory.CP
+            delete room._controllerPositions
+            room.controllerPositions
 
             // Add the room's name to the scoutingRoom's remotes list
 
@@ -1257,7 +1260,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
             room.memory.RE = newReservationEfficacy
 
             room.memory.needs = []
-            for (const key in remoteNeedsIndex) room.memory.needs[parseInt(key)] = 0
+            for (const key in RemoteNeeds) room.memory.needs[parseInt(key)] = 0
 
             return true
         }
@@ -1276,12 +1279,15 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
         room.memory.commune = scoutingRoom.name
 
-        // Query source positions
+        // Generate new important positions
 
         delete room.memory.SP
         delete room._sourcePositions
-
         room.sourcePositions
+
+        delete room.memory.CP
+        delete room._controllerPositions
+        room.controllerPositions
 
         // Add the room's name to the scoutingRoom's remotes list
 
@@ -1291,7 +1297,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         room.memory.RE = newReservationEfficacy
 
         room.memory.needs = []
-        for (const key in remoteNeedsIndex) room.memory.needs[parseInt(key)] = 0
+        for (const key in RemoteNeeds) room.memory.needs[parseInt(key)] = 0
 
         return true
     }

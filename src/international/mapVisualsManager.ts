@@ -1,4 +1,4 @@
-import { minHarvestWorkRatio, myColors, remoteHarvesterRoles, remoteNeedsIndex } from './constants'
+import { minHarvestWorkRatio, myColors, remoteHarvesterRoles, RemoteNeeds } from './constants'
 import { customLog, unpackAsRoomPos } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
@@ -108,17 +108,13 @@ InternationalManager.prototype.mapVisualsManager = function () {
                     /* const income = possibleReservation ? 10 : 5 */
                     income +=
                         (possibleReservation ? 10 : 5) -
-                        Math.floor(roomMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] * minHarvestWorkRatio)
+                        Math.floor(roomMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]] * minHarvestWorkRatio)
                 }
 
-                Game.map.visual.text(
-                    `⛏️${income}`,
-                    new RoomPosition(2, 16, roomName),
-                    {
-                        align: 'left',
-                        fontSize: 8,
-                    },
-                )
+                Game.map.visual.text(`⛏️${income}`, new RoomPosition(2, 16, roomName), {
+                    align: 'left',
+                    fontSize: 8,
+                })
             }
 
             Game.map.visual.text(

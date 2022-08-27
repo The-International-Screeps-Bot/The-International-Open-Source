@@ -1,4 +1,4 @@
-import { claimRequestNeedsIndex } from 'international/constants'
+import { ClaimRequestNeeds } from 'international/constants'
 import { findObjectWithID, getRange, unpackAsPos } from 'international/generalFunctions'
 import { Vanguard } from '../../creepClasses'
 
@@ -16,7 +16,7 @@ export function vanguardManager(room: Room, creepsOfRole: string[]) {
 
         if (!claimTarget) return
 
-        Memory.claimRequests[Memory.rooms[creep.commune].claimRequest].needs[claimRequestNeedsIndex.vanguard] -=
+        Memory.claimRequests[Memory.rooms[creep.commune].claimRequest].needs[ClaimRequestNeeds.vanguard] -=
             creep.parts.work
 
         creep.say(claimTarget)
@@ -47,7 +47,6 @@ export function vanguardManager(room: Room, creepsOfRole: string[]) {
 }
 
 Vanguard.prototype.travelToSource = function (sourceIndex) {
-
     const { room } = this
 
     this.say('FHP')
@@ -83,7 +82,6 @@ Vanguard.prototype.travelToSource = function (sourceIndex) {
 }
 
 Vanguard.prototype.buildRoom = function () {
-
     const { room } = this
 
     if (this.needsResources()) {
