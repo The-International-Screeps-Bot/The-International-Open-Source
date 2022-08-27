@@ -121,6 +121,7 @@ FastFiller.prototype.fillFastFiller = function () {
             this.say('W')
 
             this.withdraw(structure, RESOURCE_ENERGY)
+            structure.store.energy -= this.store.getCapacity() - this.store.energy
             return true
         }
 
@@ -161,8 +162,8 @@ FastFiller.prototype.fillFastFiller = function () {
 
         this.say('T')
 
-        this.transfer(structure, RESOURCE_ENERGY).toString()
-
+        this.transfer(structure, RESOURCE_ENERGY)
+        structure.store.energy += this.store.energy
         return true
     }
     /*
