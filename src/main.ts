@@ -1398,6 +1398,8 @@ declare global {
          */
         moveRequest: number
 
+        freeCapacityAfterTick: number
+
         /**
          * Wether the creep moved a resource this tick
          */

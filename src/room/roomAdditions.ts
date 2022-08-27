@@ -764,6 +764,10 @@ Object.defineProperties(Room.prototype, {
             )) {
                 if (structure.structureType !== STRUCTURE_LINK) continue
 
+                this.global.hubLink = structure.id as Id<StructureLink>
+                return structure
+            }
+
             for (const structure of this.lookForAtArea(
                 LOOK_STRUCTURES,
                 hubAnchor.y - 1,
