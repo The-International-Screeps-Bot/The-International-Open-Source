@@ -1,4 +1,4 @@
-import { remoteNeedsIndex } from 'international/constants'
+import { RemoteNeeds } from 'international/constants'
 import { RemoteHauler } from '../../creepClasses'
 
 export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
@@ -64,7 +64,7 @@ export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
         // If the creep has a remoteName, delete it and delete it's fulfilled needs
 
         if (creep.memory.remote) {
-            Memory.rooms[creep.memory.remote].needs[remoteNeedsIndex.remoteHauler] += creep.parts.carry
+            Memory.rooms[creep.memory.remote].needs[RemoteNeeds.remoteHauler] += creep.parts.carry
             delete creep.memory.remote
         }
 
@@ -130,10 +130,10 @@ RemoteHauler.prototype.findRemote = function () {
     for (const roomName of remoteNamesByEfficacy) {
         roomMemory = Memory.rooms[roomName]
 
-        if (roomMemory.needs[remoteNeedsIndex.remoteHauler] <= 0) continue
+        if (roomMemory.needs[RemoteNeeds.remoteHauler] <= 0) continue
 
         this.memory.remote = roomName
-        roomMemory.needs[remoteNeedsIndex.remoteHauler] -= this.parts.carry
+        roomMemory.needs[RemoteNeeds.remoteHauler] -= this.parts.carry
 
         return true
     }
@@ -149,7 +149,6 @@ RemoteHauler.prototype.preTickManager = function () {
     // If the creep's remote no longer is managed by its commune
 
     if (!Memory.rooms[this.commune].remotes.includes(this.memory.remote)) {
-
         // Delete it from memory and try to find a new one
 
         delete this.memory.remote
@@ -159,5 +158,5 @@ RemoteHauler.prototype.preTickManager = function () {
     // Reduce remote need
 
     if (Memory.rooms[this.memory.remote].needs)
-        Memory.rooms[this.memory.remote].needs[remoteNeedsIndex[role]] -= this.parts.carry
+        Memory.rooms[this.memory.remote].needs[RemoteNeeds[role]] -= this.parts.carry
 }

@@ -1,4 +1,4 @@
-import { allyCreepRequestNeedsIndex, claimRequestNeedsIndex, myColors } from 'international/constants'
+import { AllyCreepRequestNeeds, ClaimRequestNeeds, myColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 
@@ -15,7 +15,7 @@ Room.prototype.allyCreepRequestManager = function () {
         }
         */
 
-        Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] = 20
+        Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[AllyCreepRequestNeeds.allyVanguard] = 20
 
         const request = Game.rooms[this.memory.allyCreepRequest]
 
@@ -28,7 +28,7 @@ Room.prototype.allyCreepRequestManager = function () {
             request.controller.owner &&
             !Memory.allyList.includes(request.controller.owner.username)
         ) {
-            Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] += 1
+            Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[AllyCreepRequestNeeds.allyVanguard] += 1
             return
         }
 
@@ -43,7 +43,7 @@ Room.prototype.allyCreepRequestManager = function () {
 
         if (request.enemyCreeps.length) {
             Memory.allyCreepRequests[this.memory.allyCreepRequest].abandon = 20000
-            Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[allyCreepRequestNeedsIndex.allyVanguard] = 0
+            Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[AllyCreepRequestNeeds.allyVanguard] = 0
 
             delete this.memory.allyCreepRequest
         }

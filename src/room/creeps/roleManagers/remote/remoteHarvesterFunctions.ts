@@ -1,4 +1,4 @@
-import { minHarvestWorkRatio, remoteNeedsIndex } from 'international/constants'
+import { minHarvestWorkRatio, RemoteNeeds } from 'international/constants'
 import { findCarryPartsRequired, getRange, unpackAsPos } from 'international/generalFunctions'
 import { RemoteHarvester } from 'room/creeps/creepClasses'
 
@@ -24,12 +24,12 @@ RemoteHarvester.prototype.findRemote = function () {
 
         // If the needs of this remote are met, iterate
 
-        if (roomMemory.needs[remoteNeedsIndex[role]] <= 0) continue
+        if (roomMemory.needs[RemoteNeeds[role]] <= 0) continue
 
         // Otherwise assign the remote to the creep and inform true
 
         creep.memory.remote = roomName
-        roomMemory.needs[remoteNeedsIndex[role]] -= this.parts.work
+        roomMemory.needs[RemoteNeeds[role]] -= this.parts.work
 
         return true
     }
@@ -85,9 +85,13 @@ RemoteHarvester.prototype.isDying = function () {
     let sourceIndex = 0
     if (this.role === 'source2RemoteHarvester') sourceIndex = 1
 
-    if (this.memory.remote) if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.remote].SE[sourceIndex] - 1) return false
-
-    else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
+    if (this.memory.remote)
+        if (
+            this.ticksToLive >
+            this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.remote].SE[sourceIndex] - 1
+        )
+            return false
+        else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
     // Record creep as dying
 
@@ -115,7 +119,7 @@ RemoteHarvester.prototype.preTickManager = function () {
     // Reduce remote need
 
     if (remoteMemory.needs) {
-        if (!this.isDying()) Memory.rooms[this.memory.remote].needs[remoteNeedsIndex[role]] -= this.parts.work
+        if (!this.isDying()) Memory.rooms[this.memory.remote].needs[RemoteNeeds[role]] -= this.parts.work
 
         const possibleReservation = commune.energyCapacityAvailable >= 650
 
@@ -123,12 +127,11 @@ RemoteHarvester.prototype.preTickManager = function () {
         if (role === 'source2RemoteHarvester') sourceIndex = 1
 
         const income =
-            (possibleReservation ? 10 : 5) -
-            Math.floor(remoteMemory.needs[remoteNeedsIndex[role]] * minHarvestWorkRatio)
+            (possibleReservation ? 10 : 5) - Math.floor(remoteMemory.needs[RemoteNeeds[role]] * minHarvestWorkRatio)
 
         // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-        remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(remoteMemory.SE[sourceIndex], income) / 2
+        remoteMemory.needs[RemoteNeeds.remoteHauler] += findCarryPartsRequired(remoteMemory.SE[sourceIndex], income) / 2
     }
 
     // Add the creep to creepsFromRoomWithRemote relative to its remote

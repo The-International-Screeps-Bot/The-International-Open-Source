@@ -630,42 +630,42 @@ export const minerals: Partial<ResourceConstant[]> = [
 ]
 export const boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
 
-export const remoteNeedsIndex = {
-    source1RemoteHarvester: 0,
-    source2RemoteHarvester: 1,
-    remoteHauler: 2,
-    remoteReserver: 3,
-    remoteCoreAttacker: 4,
-    remoteBuilder: 5,
-    remoteDismantler: 6,
-    minDamage: 7,
-    minHeal: 8,
-    enemyReserved: 9,
-    invaderCore: 10,
+export enum RemoteNeeds {
+    source1RemoteHarvester,
+    source2RemoteHarvester,
+    remoteHauler,
+    remoteReserver,
+    remoteCoreAttacker,
+    remoteBuilder,
+    remoteDismantler,
+    minDamage,
+    minHeal,
+    enemyReserved,
+    invaderCore,
 }
 
-export const claimRequestNeedsIndex = {
-    claimer: 0,
-    vanguard: 1,
-    vanguardDefender: 2,
+export enum ClaimRequestNeeds {
+    claimer,
+    vanguard,
+    vanguardDefender,
 }
 
-export const attackRequestNeedsIndex = {
-    ranged: 0,
-    attack: 1,
-    dismantle: 2,
-    downgrader: 3,
-    minDamage: 4,
-    minHeal: 5,
+export enum AttackRequestNeeds {
+    ranged,
+    attack,
+    dismantle,
+    downgrader,
+    minDamage,
+    minHeal,
 }
 
-export const allyCreepRequestNeedsIndex = {
-    allyVanguard: 0,
+export enum AllyCreepRequestNeeds {
+    allyVanguard
 }
 
-export const depositNeedsIndex = {
-    depositHarvester: 0,
-    depositHauler: 1,
+export enum DepositNeeds {
+    depositHarvester,
+    depositHauler,
 }
 
 export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester')[] = [

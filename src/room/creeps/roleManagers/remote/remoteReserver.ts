@@ -1,4 +1,4 @@
-import { remoteNeedsIndex } from 'international/constants'
+import { RemoteNeeds } from 'international/constants'
 import { RemoteReserver } from '../../creepClasses'
 
 export function remoteReserverManager(room: Room, creepsOfRole: string[]) {
@@ -44,10 +44,10 @@ RemoteReserver.prototype.findRemote = function () {
     for (const roomName of remoteNamesByEfficacy) {
         roomMemory = Memory.rooms[roomName]
 
-        if (roomMemory.needs[remoteNeedsIndex.remoteReserver] <= 0) continue
+        if (roomMemory.needs[RemoteNeeds.remoteReserver] <= 0) continue
 
         this.memory.remote = roomName
-        roomMemory.needs[remoteNeedsIndex.remoteReserver] -= 1
+        roomMemory.needs[RemoteNeeds.remoteReserver] -= 1
 
         return true
     }
@@ -64,9 +64,10 @@ RemoteReserver.prototype.isDying = function () {
 
     if (!this.ticksToLive) return false
 
-    if (this.memory.remote) if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.remote].RE - 1) return false
-
-    else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
+    if (this.memory.remote)
+        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.remote].RE - 1)
+            return false
+        else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
     // Record creep as dying
 
@@ -92,7 +93,7 @@ RemoteReserver.prototype.preTickManager = function () {
 
     // Reduce remote need
 
-    if (remoteMemory.needs && !this.isDying()) remoteMemory.needs[remoteNeedsIndex[role]] -= 1
+    if (remoteMemory.needs && !this.isDying()) remoteMemory.needs[RemoteNeeds[role]] -= 1
 
     const commune = Game.rooms[this.commune]
 

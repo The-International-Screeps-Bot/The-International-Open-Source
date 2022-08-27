@@ -4,7 +4,7 @@ import {
     haulerUpdateDefault,
     myColors,
     remoteHarvesterRoles,
-    remoteNeedsIndex,
+    RemoteNeeds,
     spawnByRoomRemoteRoles,
     stamps,
 } from './constants'

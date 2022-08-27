@@ -18,9 +18,9 @@ Room.prototype.remoteConstructionPlacement = function () {}
 Room.prototype.communeConstructionPlacement = function () {
     if (!this.memory.PC) return
 
-    // Only run the planner every x ticks (temporary fix)
+    // Only run the planner every x ticks or if there are builders (temporary fix)
 
-    if (Game.time % Math.floor(Math.random() * 100) !== 0) return
+    if (!this.myCreeps.builder.length && Game.time % Math.floor(Math.random() * 100) !== 0) return
 
     // If the construction site count is at its limit, stop
 

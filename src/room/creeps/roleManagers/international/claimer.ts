@@ -1,4 +1,4 @@
-import { claimRequestNeedsIndex } from 'international/constants'
+import { ClaimRequestNeeds } from 'international/constants'
 import { Claimer } from '../../creepClasses'
 
 export function claimerManager(room: Room, creepsOfRole: string[]) {
@@ -17,7 +17,7 @@ export function claimerManager(room: Room, creepsOfRole: string[]) {
 
         creep.say(claimTarget)
 
-        Memory.claimRequests[Memory.rooms[creep.commune].claimRequest].needs[claimRequestNeedsIndex.claimer] = 0
+        Memory.claimRequests[Memory.rooms[creep.commune].claimRequest].needs[ClaimRequestNeeds.claimer] = 0
 
         if (room.name === claimTarget) {
             creep.claimRoom()
@@ -51,27 +51,27 @@ Claimer.prototype.claimRoom = function () {
     // If the creep is not in range to claim the controller
 
     if (creep.pos.getRangeTo(room.controller) > 1) {
-         // Move to the controller and stop
+        // Move to the controller and stop
 
-         creep.createMoveRequest({
-              origin: creep.pos,
-              goal: { pos: room.controller.pos, range: 1 },
-              avoidEnemyRanges: true,
-              plainCost: 1,
-              swampCost: 1,
-              typeWeights: {
-                   keeper: Infinity,
-              },
-         })
+        creep.createMoveRequest({
+            origin: creep.pos,
+            goal: { pos: room.controller.pos, range: 1 },
+            avoidEnemyRanges: true,
+            plainCost: 1,
+            swampCost: 1,
+            typeWeights: {
+                keeper: Infinity,
+            },
+        })
 
-         return
+        return
     }
 
     // If the owner or reserver isn't me
 
     if (room.controller.owner || (room.controller.reservation && room.controller.reservation.username !== Memory.me)) {
-         creep.attackController(room.controller)
-         return
+        creep.attackController(room.controller)
+        return
     }
 
     // Otherwise, claim the controller. If the successful, remove claimerNeed
