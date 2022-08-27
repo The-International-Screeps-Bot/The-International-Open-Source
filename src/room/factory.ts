@@ -228,7 +228,7 @@ Room.prototype.factoryManager = function () {
                     room.findStoredResourceAmount(RESOURCE_OXYGEN) > room.findStoredResourceAmount(RESOURCE_OXIDANT)) ||
                 (resource == RESOURCE_REDUCTANT &&
                     room.findStoredResourceAmount(RESOURCE_HYDROGEN) > 10000 &&
-                    room.findStoredResourceAmount(RESOURCE_HYDROGEN) > room.findStoredResourceAmount(RESOURCE_HYDROGEN))
+                    room.findStoredResourceAmount(RESOURCE_HYDROGEN) > room.findStoredResourceAmount(RESOURCE_REDUCTANT))
             ) {
                 let currentlyHaveAllMaterials: boolean = haveAllMaterials(resource)
                 if (!currentlyHaveAllMaterials) continue

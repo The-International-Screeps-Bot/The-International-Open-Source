@@ -14,12 +14,12 @@ export class LabManager {
     constructor(commune: Commune) {
         this.commune = commune
 
-        // this.outputRsc = RESOURCE_GHODIUM
-        // this.input1Rsc = RESOURCE_ZYNTHIUM_KEANITE
-        // this.input2Rsc = RESOURCE_UTRIUM_LEMERGITE
-        this.outputRsc = RESOURCE_ZYNTHIUM_KEANITE
-        this.input1Rsc = RESOURCE_ZYNTHIUM
-        this.input2Rsc = RESOURCE_KEANIUM
+        this.outputRsc = RESOURCE_GHODIUM
+        this.input1Rsc = RESOURCE_ZYNTHIUM_KEANITE
+        this.input2Rsc = RESOURCE_UTRIUM_LEMERGITE
+        // this.outputRsc = RESOURCE_ZYNTHIUM_KEANITE
+        // this.input1Rsc = RESOURCE_ZYNTHIUM
+        // this.input2Rsc = RESOURCE_KEANIUM
         this.isReverse = false
     }
 
@@ -96,12 +96,11 @@ export class LabManager {
         if (!this.commune.room.storage || !this.commune.room.terminal) return
 
         this.doLayoutCheck()
-        if (this.commune.room.name == 'W21N8') {
-            if (this.isProperlyLoaded)
-                for (const output of this.outputs) {
-                    if (output.cooldown) continue
-                    output.runReaction(this.input1, this.input2)
-                }
+        if (this.isProperlyLoaded) {
+            for (const output of this.outputs) {
+                if (output.cooldown) continue
+                output.runReaction(this.input1, this.input2)
+            }
         }
     }
 

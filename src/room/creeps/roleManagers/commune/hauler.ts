@@ -143,15 +143,22 @@ Hauler.prototype.reserve = function () {
         this.createReservation('transfer', target.id, amount)
     }
 
-    if (this.memory.reservations.length == 0) {
+    if (this.memory.reservations?.length == 0) {
         //Empty out the creep if it has anything left by this point.
-        if(this.store.getUsedCapacity() > 0) {
-            let target = room.OATT[0];
-            for(let rsc in this.store) {
-                this.createReservation('transfer', target.id, this.store[rsc as ResourceConstant], rsc as ResourceConstant)
-            }
+        if (this.store.getUsedCapacity() > 0) {
+            let target = room.OATT[0]
+            if (target)
+                for (let rsc in this.store) {
+                    this.createReservation(
+                        'transfer',
+                        target.id,
+                        this.store[rsc as ResourceConstant],
+                        rsc as ResourceConstant,
+                    )
+                }
         }
     }
 
-    if (this.memory.reservations.length == 0) room.commune.labManager.generateHaulingReservation(this)
+    if (this.memory.reservations?.length == 0 && room.commune.labManager)
+        room.commune.labManager.generateHaulingReservation(this)
 }
