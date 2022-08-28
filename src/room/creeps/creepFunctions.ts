@@ -245,7 +245,6 @@ Creep.prototype.advancedUpgradeController = function () {
 
         if (controllerRange <= 3 && this.store.energy > 0) {
             if (this.upgradeController(room.controller) === OK) {
-
                 this.store.energy -= workPartCount
 
                 const controlPoints = workPartCount * UPGRADE_CONTROLLER_POWER
@@ -1081,7 +1080,6 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
     if (!this.moveRequest) return
     if (!room.moveRequests.get(this.moveRequest)) {
-
         this.moved = -1
         return
     }
@@ -1129,15 +1127,13 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     const creepAtPos = Game.creeps[creepNameAtPos]
 
     if (creepAtPos.moved) {
-
         if (creepAtPos.moved === -1) {
-
             delete this.moveRequest
             this.moved = -1
         }
 
         // If the creep is where the creepAtPos is trying to move to
-/*
+        /*
         if (packedCoord === creepAtPos.moved) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
@@ -1315,16 +1311,16 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
 Creep.prototype.needsResources = function () {
     // If the creep is empty
-    if (this.freeCapacityAfterTick === undefined) this.freeCapacityAfterTick = this.store.getFreeCapacity()
+    if (this.freeCapacityNextTick === undefined) this.freeCapacityNextTick = this.store.getFreeCapacity()
 
-    if (this.freeCapacityAfterTick == this.store.getCapacity())
+    if (this.freeCapacityNextTick == this.store.getCapacity())
         // Record and inform that the creep needs resources
 
         return (this.memory.NR = true)
 
     // Otherwise if the creep is full
 
-    if (this.freeCapacityAfterTick == 0) {
+    if (this.freeCapacityNextTick == 0) {
         // Record and inform that the creep does not resources
 
         delete this.memory.NR
@@ -1815,7 +1811,7 @@ Creep.prototype.fulfillReservation = function () {
 
         if (pickupResult === OK) {
             this.movedResource = true
-            this.freeCapacityAfterTick = Math.max(this.store.getFreeCapacity() - target.amount, 0)
+            this.freeCapacityNextTick = Math.max(this.store.getFreeCapacity() - target.amount, 0)
             this.deleteReservation(0)
             return true
         }
@@ -1848,7 +1844,7 @@ Creep.prototype.fulfillReservation = function () {
 
         if (transferResult === OK) {
             this.movedResource = true
-            this.freeCapacityAfterTick = this.store.getFreeCapacity() + amount
+            this.freeCapacityNextTick = this.store.getFreeCapacity() + amount
             this.deleteReservation(0)
             return true
         }
@@ -1878,7 +1874,7 @@ Creep.prototype.fulfillReservation = function () {
 
     if (withdrawResult === OK) {
         this.movedResource = true
-        this.freeCapacityAfterTick = this.store.getFreeCapacity() - amount
+        this.freeCapacityNextTick = this.store.getFreeCapacity() - amount
         this.deleteReservation(0)
         return true
     }
@@ -1892,16 +1888,16 @@ Creep.prototype.reserveWithdrawEnergy = function () {
     const { room } = this
 
     if (!this.needsResources()) return
-    if (this.freeCapacityAfterTick === undefined) this.freeCapacityAfterTick = this.store.getFreeCapacity()
+    if (this.freeCapacityNextTick === undefined) this.freeCapacityNextTick = this.store.getFreeCapacity()
 
     let withdrawTargets = room.MAWT.filter(target => {
         if (target instanceof Resource)
             return (
                 target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
-                target.reserveAmount >= this.freeCapacityAfterTick
+                target.reserveAmount >= this.freeCapacityNextTick
             )
 
-        return target.store.energy >= this.freeCapacityAfterTick
+        return target.store.energy >= this.freeCapacityNextTick
     })
 
     if (!room.storage && !room.terminal) {
@@ -1919,7 +1915,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
         target = findClosestObject(this.pos, withdrawTargets)
 
         if (target instanceof Resource) amount = target.reserveAmount
-        else amount = Math.min(this.freeCapacityAfterTick, target.store.energy)
+        else amount = Math.min(this.freeCapacityNextTick, target.store.energy)
 
         this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
         return
@@ -1929,10 +1925,10 @@ Creep.prototype.reserveWithdrawEnergy = function () {
         if (target instanceof Resource)
             return (
                 target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
-                target.reserveAmount >= this.freeCapacityAfterTick
+                target.reserveAmount >= this.freeCapacityNextTick
             )
 
-        return target.store.energy >= this.freeCapacityAfterTick
+        return target.store.energy >= this.freeCapacityNextTick
     })
 
     if (!withdrawTargets.length) return
@@ -1940,7 +1936,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
     target = findClosestObject(this.pos, withdrawTargets)
 
     if (target instanceof Resource) amount = target.reserveAmount
-    else amount = Math.min(this.freeCapacityAfterTick, target.store.energy)
+    else amount = Math.min(this.freeCapacityNextTick, target.store.energy)
 
     this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
 }

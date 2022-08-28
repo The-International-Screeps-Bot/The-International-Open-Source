@@ -250,7 +250,7 @@ export class RemoteHauler extends Creep {
             // If the creep has a remoteName, delete it and delete it's fulfilled needs
 
             if (creep.memory.remote) {
-                Memory.rooms[creep.memory.remote].needs[RemoteNeeds.remoteHauler] += creep.parts.carry
+                if (!creep.isDying()) Memory.rooms[creep.memory.remote].needs[RemoteNeeds.remoteHauler] += creep.parts.carry
                 delete creep.memory.remote
             }
 
