@@ -120,6 +120,8 @@ class ConfigManager {
         RawMemory.setActiveSegments([98])
         global.constructed = true
 
+        global.communeManagers = {}
+
         global.packedRoomNames = {}
         global.unpackedRoomNames = {}
     }

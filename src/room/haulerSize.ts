@@ -16,7 +16,7 @@ Room.prototype.haulerSizeManager = function () {
         (Math.floor(
             Math.max(Math.pow(avgCPUUsagePercent, 1.5) - 0.4, 0) *
                 Math.min(this.energyCapacityAvailable / BODYPART_COST.move, MAX_CREEP_SIZE),
-        ) || 1) * BODYPART_COST[CARRY]
+        ) + this.structures.spawn.length * 2) * BODYPART_COST[CARRY]
 
     /* memory.MHC = Number.MAX_SAFE_INTEGER */
     /* memory.MHC = Math.min(

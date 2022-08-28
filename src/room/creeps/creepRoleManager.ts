@@ -50,7 +50,6 @@ const managers: Record<CreepRoles, Function> = {
     vanguardDefender: VanguardDefender.vanguardDefenderManager,
     allyVanguard: AllyVanguard.allyVanguardManager,
     antifaAssaulter: AntifaAssaulter.antifaAssaulterManager,
-    antifaSupporter: () => {},
 }
 
 export function creepRoleManager(room: Room) {

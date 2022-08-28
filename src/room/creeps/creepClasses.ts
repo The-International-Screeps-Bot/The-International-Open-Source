@@ -46,11 +46,4 @@ creepClasses.allyVanguard = AllyVanguard
 creepClasses.vanguardDefender = VanguardDefender
 creepClasses.antifaAssaulter = AntifaAssaulter
 
-export class AntifaSupporter extends Creep {
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
-    }
-}
-creepClasses.antifaSupporter = AntifaSupporter
-
 export { creepClasses }

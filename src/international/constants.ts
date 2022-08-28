@@ -207,7 +207,6 @@ export const creepRoles: CreepRoles[] = [
     'allyVanguard',
     'vanguardDefender',
     'antifaAssaulter',
-    'antifaSupporter',
 ]
 
 export enum TrafficPriorities {
@@ -234,7 +233,6 @@ export enum TrafficPriorities {
     remoteDefender,
     meleeDefender,
     antifaAssaulter,
-    antifaSupporter,
 }
 
 // Set of messages to randomly apply to commune rooms

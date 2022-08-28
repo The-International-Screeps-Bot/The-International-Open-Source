@@ -2,6 +2,7 @@ import { link } from 'fs'
 import {
     CPUMaxPerTick,
     EXIT,
+    maxRampartGroupSize,
     myColors,
     NORMAL,
     PROTECTED,
@@ -28,7 +29,125 @@ import { internationalManager } from 'international/internationalManager'
 import { packPosList } from 'other/packrat'
 import 'other/RoomVisual'
 import { toASCII } from 'punycode'
+import { Commune } from 'room/communeManager'
 import { rampartPlanner } from './rampartPlanner'
+
+/**
+ *
+ */
+class CommuneStructurePlanner {
+
+    commune: Commune
+
+    constructor(commune: Commune) {
+        this.commune = commune
+    }
+    public run() {}
+    private rotateStamp() {}
+    private planStamp() {}
+    private planSourceStructures() {}
+    private mincut() {}
+    private planRamparts() {}
+    private groupRamparts(rampartPositions: number[]) {
+        const room = this.commune.name
+
+        // Construct a costMatrix to store visited positions
+
+        const visitedCoords = new Uint8Array(2500)
+
+        const groupedPositions = []
+        let groupIndex = 0
+
+        // Loop through each pos of positions
+
+        for (const packedPos of rampartPositions) {
+            const pos = unpackAsPos(packedPos)
+
+            // If the pos has already been visited, iterate
+
+            if (visitedCoords[pack(pos)] === 1) continue
+
+            // Record that this pos has been visited
+
+            visitedCoords[pack(pos)] = 1
+
+            // Construct the group for this index with the pos in it the group
+
+            groupedPositions[groupIndex] = [pos]
+
+            // Construct values for floodFilling
+
+            let thisGeneration = [pos]
+            let nextGeneration: Coord[] = []
+            let groupSize = 0
+
+            // So long as there are positions in this gen
+
+            while (thisGeneration.length) {
+                // Reset next gen
+
+                nextGeneration = []
+
+                // Iterate through positions of this gen
+
+                for (const pos of thisGeneration) {
+                    // Construct a rect and get the positions in a range of 1 (not diagonals)
+
+                    const adjacentPositions = findCoordsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
+
+                    // Loop through adjacent positions
+
+                    for (const adjacentPos of adjacentPositions) {
+                        // Iterate if adjacentPos is out of room bounds
+
+                        if (
+                            adjacentPos.x <= 0 ||
+                            adjacentPos.x >= roomDimensions ||
+                            adjacentPos.y <= 0 ||
+                            adjacentPos.y >= roomDimensions
+                        )
+                            continue
+
+                        const packedAdjacentCoord = pack(adjacentPos)
+
+                        // Iterate if the adjacent pos has been visited or isn't a tile
+
+                        if (visitedCoords[packedAdjacentCoord] === 1) continue
+
+                        // Otherwise record that it has been visited
+
+                        visitedCoords[packedAdjacentCoord] = 1
+
+                        // If a rampart is not planned for this position, iterate
+
+                        if (this.commune.room.rampartCoords[pack(adjacentPos)] !== 1) continue
+
+                        // Add it to the next gen and this group
+
+                        groupedPositions[groupIndex].push({ x: adjacentPos.x, y: adjacentPos.y })
+
+                        groupSize += 1
+                        nextGeneration.push(adjacentPos)
+                    }
+                }
+
+                if (groupSize >= maxRampartGroupSize) break
+
+                // Set this gen to next gen
+
+                thisGeneration = nextGeneration
+            }
+
+            // Increase the groupIndex
+
+            groupIndex += 1
+        }
+
+        // Inform groupedPositions
+
+        return groupedPositions
+    }
+}
 
 /**
  * Checks if a room can be planner. If it can, it informs information on how to build the room

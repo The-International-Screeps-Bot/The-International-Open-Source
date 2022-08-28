@@ -509,12 +509,10 @@ export function rampartPlanner(room: Room) {
             // Get Positions from Edge
 
             for (let i = 0; i < cutEdges.length; i += 1) {
-                const packedCoord = cutEdges[i] // x= v % 50  y=v/50 (math.floor?)
-                const x = packedCoord % 50
-                const y = Math.floor(packedCoord / 50)
+                const packedCoord = cutEdges[i]
 
-                positions.push({ x, y })
-                packedPositions.push(pack({ x, y }))
+                positions.push(unpackAsPos(packedCoord))
+                packedPositions.push(packedCoord)
             }
         }
 

@@ -31,8 +31,24 @@ export class RemoteHarvester extends Creep {
 
             // Otherwise assign the remote to the creep and inform true
 
-            creep.memory.remote = roomName
-            roomMemory.needs[RemoteNeeds[role]] -= this.parts.work
+        creep.memory.remote = roomName
+
+        if (!creep.isDying()) {
+            Memory.rooms[this.memory.remote].needs[RemoteNeeds[role]] -= this.parts.work
+
+            const commune = Game.rooms[this.commune]
+            const possibleReservation = commune.energyCapacityAvailable >= 650
+
+            let sourceIndex = 0
+            if (role === 'source2RemoteHarvester') sourceIndex = 1
+
+            const income =
+                (possibleReservation ? 10 : 5) - Math.floor(roomMemory.needs[RemoteNeeds[role]] * minHarvestWorkRatio)
+
+            // Find the number of carry parts required for the source, and add it to the remoteHauler need
+
+            roomMemory.needs[RemoteNeeds.remoteHauler] += findCarryPartsRequired(roomMemory.SE[sourceIndex], income) / 2
+        }
 
             return true
         }
@@ -124,8 +140,8 @@ export class RemoteHarvester extends Creep {
 
         // Reduce remote need
 
-        if (remoteMemory.needs) {
-            if (!this.isDying()) Memory.rooms[this.memory.remote].needs[RemoteNeeds[role]] -= this.parts.work
+        if (remoteMemory.needs && !this.isDying()) {
+            Memory.rooms[this.memory.remote].needs[RemoteNeeds[role]] -= this.parts.work
 
             const possibleReservation = commune.energyCapacityAvailable >= 650
 

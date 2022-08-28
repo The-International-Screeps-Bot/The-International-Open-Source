@@ -155,6 +155,8 @@ export class RemoteHauler extends Creep {
 
         // If the creep's remote no longer is managed by its commune
 
+        // If the creep's remote no longer is managed by its commune
+
         if (!Memory.rooms[this.commune].remotes.includes(this.memory.remote)) {
             // Delete it from memory and try to find a new one
 
@@ -164,7 +166,7 @@ export class RemoteHauler extends Creep {
 
         // Reduce remote need
 
-        if (Memory.rooms[this.memory.remote].needs)
+        if (Memory.rooms[this.memory.remote].needs && !this.isDying())
             Memory.rooms[this.memory.remote].needs[RemoteNeeds[role]] -= this.parts.carry
     }
 }

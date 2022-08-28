@@ -122,7 +122,6 @@ declare global {
         | 'allyVanguard'
         | 'vanguardDefender'
         | 'antifaAssaulter'
-        | 'antifaSupporter'
 
     type RoomObjectName =
         | 'mineralHarvestPositions'
@@ -1910,7 +1909,7 @@ declare global {
              */
             communes: Set<string>
 
-            communeObjects: Commune[]
+            communeManagers: {[roomName: string]: Commune}
 
             // Command functions
 
