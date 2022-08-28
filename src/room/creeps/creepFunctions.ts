@@ -1222,7 +1222,10 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
             // Prefer the creep with the higher priority
 
-            if (TrafficPriorities[this.role] > TrafficPriorities[creepAtPos.role]) {
+            if (
+                TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
+                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+            ) {
                 this.runMoveRequest()
 
                 delete creepAtPos.moveRequest
@@ -1238,7 +1241,10 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             return
         }
 
-        if (TrafficPriorities[this.role] > TrafficPriorities[creepAtPos.role]) {
+        if (
+            TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
+            TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+        ) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
                     fill: myColors.pink,
@@ -1311,9 +1317,9 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
 Creep.prototype.needsResources = function () {
     // If the creep is empty
-    if (this.freeCapacityNextTick === undefined) this.freeCapacityNextTick = this.store.getFreeCapacity()
+    if (!this.freeCapacityNextTick) this.freeCapacityNextTick = this.store.getFreeCapacity()
 
-    if (this.freeCapacityNextTick == this.store.getCapacity())
+    if (this.freeCapacityNextTick === this.store.getCapacity())
         // Record and inform that the creep needs resources
 
         return (this.memory.NR = true)

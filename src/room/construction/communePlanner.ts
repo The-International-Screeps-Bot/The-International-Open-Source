@@ -737,7 +737,7 @@ export function basePlanner(room: Room) {
     })
 
     if (!observerAnchors) return 'failed'
-
+    console.log(observerAnchors)
     const observerAnchor = observerAnchors[0]
 
     let adjacentCoords = findCoordsInsideRect(

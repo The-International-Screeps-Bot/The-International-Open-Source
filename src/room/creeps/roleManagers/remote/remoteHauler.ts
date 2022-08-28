@@ -26,6 +26,11 @@ export class RemoteHauler extends Creep {
         return false
     }
 
+    updateRemote?() {
+
+        
+    }
+
     getResources?() {
         if (!this.findRemote()) return true
 
@@ -142,7 +147,7 @@ export class RemoteHauler extends Creep {
 
         const creepAtPos = Game.creeps[creepAtPosName]
 
-        if (creepAtPos.role !== 'hauler' && creepAtPos.role !== 'remoteHauler') return false
+        if (creepAtPos.role !== 'remoteHauler') return false
         if (creepAtPos.movedResource) return false
         if (this.store.getFreeCapacity() !== creepAtPos.store.getUsedCapacity(RESOURCE_ENERGY)) return false
 
@@ -169,13 +174,7 @@ export class RemoteHauler extends Creep {
 
         this.deliverResources()
 
-        if (creepAtPos.role === 'hauler') {
-            const hauler = creepAtPos as Hauler
-            return true
-        }
-
         const remoteHauler = creepAtPos as RemoteHauler
-
         remoteHauler.getResources()
 
         return true
@@ -191,7 +190,7 @@ export class RemoteHauler extends Creep {
 
         const creepAtPos = Game.creeps[creepAtPosName]
 
-        if (creepAtPos.role !== 'hauler' && creepAtPos.role !== 'remoteHauler') return false
+        if (creepAtPos.role !== 'remoteHauler') return false
         if (creepAtPos.movedResource) return false
         if (creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY)) return false
 
@@ -218,13 +217,7 @@ export class RemoteHauler extends Creep {
 
         this.getResources()
 
-        if (creepAtPos.role === 'hauler') {
-            const hauler = creepAtPos as Hauler
-            return true
-        }
-
         const remoteHauler = creepAtPos as RemoteHauler
-
         remoteHauler.deliverResources()
 
         return true

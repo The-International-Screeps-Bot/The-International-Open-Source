@@ -1,3 +1,4 @@
+import { unpackPosList } from 'other/packrat'
 import { minHarvestWorkRatio, myColors, remoteHarvesterRoles, RemoteNeeds } from './constants'
 import { customLog, unpackAsRoomPos } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
@@ -18,7 +19,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
         const roomMemory = Memory.rooms[roomName]
 
-        Game.map.visual.text(roomMemory.T, new RoomPosition(2, 40, roomName), {
+        Game.map.visual.text(roomMemory.T, new RoomPosition(2, 45, roomName), {
             align: 'left',
             fontSize: 5,
         })
@@ -43,8 +44,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                     {
                         color: myColors.lightBlue,
                         width: 1.2,
-                        opacity: 0.5,
-                        lineStyle: 'dashed',
+                        opacity: 0.3,
                     },
                 )
             }
@@ -56,8 +56,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                     {
                         color: myColors.green,
                         width: 1.2,
-                        opacity: 0.5,
-                        lineStyle: 'dashed',
+                        opacity: 0.3,
                     },
                 )
             }
@@ -70,8 +69,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                         {
                             color: myColors.red,
                             width: 1.2,
-                            opacity: 0.5,
-                            lineStyle: 'dashed',
+                            opacity: 0.3,
                         },
                     )
                 }
@@ -84,47 +82,36 @@ InternationalManager.prototype.mapVisualsManager = function () {
             const commune = Game.rooms[roomMemory.commune]
 
             if (commune) {
-                // Draw a line from the center of the remote to the center of its commune
-
-                Game.map.visual.line(
-                    new RoomPosition(25, 25, roomName),
-                    commune.anchor || new RoomPosition(25, 25, roomMemory.commune),
-                    {
-                        color: myColors.yellow,
-                        width: 1.2,
-                        opacity: 0.5,
-                        lineStyle: 'dashed',
-                    },
-                )
 
                 const possibleReservation = commune.energyCapacityAvailable >= 650
-                let income = 0
 
-                // Loop through each index of sourceEfficacies
+                for (const sourceIndex in roomMemory.SP) {
+                    const positions = unpackPosList(roomMemory.SP[sourceIndex])
 
-                for (let index = 0; index < roomMemory.SE.length; index += 1) {
+                    // Draw a line from the center of the remote to the best harvest pos
+
+                    Game.map.visual.line(positions[0], commune.anchor || new RoomPosition(25, 25, commune.name), {
+                        color: myColors.yellow,
+                        width: 1.2,
+                        opacity: 0.3,
+                    })
+
                     // Get the income based on the reservation of the room and remoteHarvester need
 
-                    /* const income = possibleReservation ? 10 : 5 */
-                    income +=
+                    const income =
                         (possibleReservation ? 10 : 5) -
-                        Math.floor(roomMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]] * minHarvestWorkRatio)
+                        Math.floor(roomMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio)
+
+                    Game.map.visual.text(
+                        `⛏️${income},🚶‍♀️${roomMemory.SE[sourceIndex]}`,
+                        new RoomPosition(positions[0].x, positions[0].y, roomName),
+                        {
+                            align: 'center',
+                            fontSize: 5,
+                        },
+                    )
                 }
-
-                Game.map.visual.text(`⛏️${income}`, new RoomPosition(2, 16, roomName), {
-                    align: 'left',
-                    fontSize: 8,
-                })
             }
-
-            Game.map.visual.text(
-                `⛏️${roomMemory.SE.reduce((sum, el) => sum + el, 0).toString()}`,
-                new RoomPosition(2, 8, roomName),
-                {
-                    align: 'left',
-                    fontSize: 8,
-                },
-            )
 
             if (roomMemory.abandoned) {
                 Game.map.visual.text(`❌${roomMemory.abandoned.toString()}`, new RoomPosition(2, 16, roomName), {
