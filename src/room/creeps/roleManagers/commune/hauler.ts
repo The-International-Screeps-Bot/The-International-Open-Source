@@ -1,7 +1,26 @@
 import { customLog, findClosestObject, getRange } from 'international/generalFunctions'
 
 export class Hauler extends Creep {
-    reserve?(): void {
+
+    haul?() {
+        this.reserve()
+
+        if (!this.fulfillReservation()) {
+            this.say(this.message)
+            return
+        }
+
+        this.reserve()
+
+        if (!this.fulfillReservation()) {
+            this.say(this.message)
+            return
+        }
+
+        if (this.message.length) this.say(this.message)
+    }
+
+    reserve?() {
         if (this.memory.reservations?.length) return
 
         const { room } = this
@@ -133,8 +152,8 @@ export class Hauler extends Creep {
             }
         }
 
-        if (this.memory.reservations?.length == 0 && room.commune.labManager)
-            room.commune.labManager.generateHaulingReservation(this)
+        if (this.memory.reservations?.length == 0 && room.communeManager.labManager)
+            room.communeManager.labManager.generateHaulingReservation(this)
     }
 
     constructor(creepID: Id<Creep>) {
@@ -151,21 +170,7 @@ export class Hauler extends Creep {
 
             creep.advancedRenew()
 
-            creep.reserve()
-
-            if (!creep.fulfillReservation()) {
-                creep.say(creep.message)
-                continue
-            }
-
-            creep.reserve()
-
-            if (!creep.fulfillReservation()) {
-                creep.say(creep.message)
-                continue
-            }
-
-            if (creep.message.length) creep.say(creep.message)
+            creep.haul()
         }
     }
 }

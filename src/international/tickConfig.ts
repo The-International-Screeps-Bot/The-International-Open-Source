@@ -159,7 +159,7 @@ InternationalManager.prototype.tickConfig = function () {
 
         // If the requested room is no longer neutral
 
-        if (Memory.rooms[roomName].T != 'neutral') {
+        if (Memory.rooms[roomName].T !== 'neutral') {
             // Delete the request
 
             delete Memory.claimRequests[roomName]

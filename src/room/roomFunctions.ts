@@ -30,7 +30,7 @@ import {
 } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 import { packCoord, unpackCoordAsPos, unpackPos } from 'other/packrat'
-import { basePlanner } from './construction/basePlanner'
+import { basePlanner } from './construction/communePlanner'
 import { RoomCacheObject } from './roomObject'
 
 Room.prototype.get = function (roomObjectName) {

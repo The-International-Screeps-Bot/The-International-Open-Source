@@ -1,8 +1,10 @@
-import { Commune } from './communeManager'
+import { CommuneManager } from './communeManager'
 import { Hauler } from './creeps/roleManagers/commune/hauler'
 
 export class LabManager {
-    commune: Commune
+    communeManager: CommuneManager
+    room: Room
+    
     outputRsc: MineralConstant | MineralCompoundConstant
     input1Rsc: MineralConstant | MineralCompoundConstant
     input2Rsc: MineralConstant | MineralCompoundConstant
@@ -11,8 +13,9 @@ export class LabManager {
     lab2Id: string
     lastLayoutCheck: number
 
-    constructor(commune: Commune) {
-        this.commune = commune
+    constructor(communeManager: CommuneManager) {
+        this.communeManager = communeManager
+        this.room = communeManager.room
 
         this.outputRsc = RESOURCE_GHODIUM
         this.input1Rsc = RESOURCE_ZYNTHIUM_KEANITE
@@ -23,9 +26,21 @@ export class LabManager {
         this.isReverse = false
     }
 
+    public run() {
+        if (!this.room.storage || !this.room.terminal) return
+
+        this.doLayoutCheck()
+        if (this.isProperlyLoaded) {
+            for (const output of this.outputs) {
+                if (output.cooldown) continue
+                output.runReaction(this.input1, this.input2)
+            }
+        }
+    }
+
     private labsInRange(thisLab: StructureLab, otherLab: StructureLab = null): number {
         return _.filter(
-            this.commune.structures.lab,
+            this.room.structures.lab,
             lab => lab != thisLab && lab != otherLab && lab.pos.getRangeTo(thisLab.pos) <= 2,
         ).length
     }
@@ -38,10 +53,10 @@ export class LabManager {
             this.lab1Id = null
             this.lab2Id = null
 
-            if (this.commune.structures.lab.length >= 3) {
+            if (this.room.structures.lab.length >= 3) {
                 //Sort the labs by the distance to the terminal, so that labs on the side of the hub are favored.
-                let sorted = _.sortBy(this.commune.structures.lab, lab =>
-                    lab.pos.getRangeTo(this.commune.room.terminal?.pos),
+                let sorted = _.sortBy(this.room.structures.lab, lab =>
+                    lab.pos.getRangeTo(this.room.terminal?.pos),
                 )
                 let bestLab = sorted[0]
                 //Starting at 2 intentally, to skip the first two records, which will be the default best labs...
@@ -72,15 +87,15 @@ export class LabManager {
     }
 
     public get input1(): StructureLab {
-        return _.find(this.commune.structures.lab, lab => lab.id == this.lab1Id)
+        return _.find(this.room.structures.lab, lab => lab.id == this.lab1Id)
     }
 
     public get input2(): StructureLab {
-        return _.find(this.commune.structures.lab, lab => lab.id == this.lab2Id)
+        return _.find(this.room.structures.lab, lab => lab.id == this.lab2Id)
     }
 
     public get outputs(): StructureLab[] {
-        return _.filter(this.commune.structures.lab, lab => lab.id != this.lab1Id && lab.id != this.lab2Id)
+        return _.filter(this.room.structures.lab, lab => lab.id != this.lab1Id && lab.id != this.lab2Id)
     }
 
     private isProperlyLoaded(): boolean {
@@ -92,18 +107,6 @@ export class LabManager {
         return false
     }
 
-    run() {
-        if (!this.commune.room.storage || !this.commune.room.terminal) return
-
-        this.doLayoutCheck()
-        if (this.isProperlyLoaded) {
-            for (const output of this.outputs) {
-                if (output.cooldown) continue
-                output.runReaction(this.input1, this.input2)
-            }
-        }
-    }
-
     private setupInputLab(
         creep: Hauler,
         inputLab: StructureLab,
@@ -111,9 +114,9 @@ export class LabManager {
     ): boolean {
         if (inputLab.mineralType == inputRsc || inputLab.mineralType == null) {
             let source =
-                this.commune.room?.storage.store[inputRsc] > this.commune.room?.terminal.store[inputRsc]
-                    ? this.commune.room.storage
-                    : this.commune.room.terminal
+                this.room?.storage.store[inputRsc] > this.room?.terminal.store[inputRsc]
+                    ? this.room.storage
+                    : this.room.terminal
 
             //This logic isn't quite correct, but it works, but I need to debug this at some point.
             //  If the creep starts with any of the desired resources, send the resources to it to free up the creep.
@@ -133,7 +136,7 @@ export class LabManager {
             creep.createReservation('withdraw', inputLab.id, amount, inputLab.mineralType)
             creep.createReservation(
                 'transfer',
-                this.commune.room.storage?.id,
+                this.room.storage?.id,
                 amount + creep.store[inputLab.mineralType],
                 inputLab.mineralType,
             )
@@ -154,7 +157,7 @@ export class LabManager {
             if (amount + creep.usedStore(outputLab.mineralType) != 0)
                 creep.createReservation(
                     'transfer',
-                    this.commune.room.storage?.id,
+                    this.room.storage?.id,
                     amount + creep.store[outputLab.mineralType],
                     outputLab.mineralType,
                 )
@@ -164,7 +167,7 @@ export class LabManager {
         return false
     }
 
-    generateHaulingReservation(creep: Hauler) {
+    public generateHaulingReservation(creep: Hauler) {
         if (!this.lab1Id || !this.lab2Id) return
 
         //Priortize the worstly loaded lab.

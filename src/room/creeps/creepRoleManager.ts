@@ -23,6 +23,8 @@ import { Scout } from './roleManagers/international/scout'
 import { Vanguard } from './roleManagers/international/vanguard'
 import { AntifaAssaulter } from './roleManagers/antifa/antifaAssaulter'
 import { VanguardDefender } from './roleManagers/international/vanguardDefender'
+import { CommuneManager } from 'room/communeManager'
+import { RoomManager } from 'room/roomManager'
 
 // Construct managers
 
@@ -52,30 +54,59 @@ const managers: Record<CreepRoles, Function> = {
     antifaAssaulter: AntifaAssaulter.antifaAssaulterManager,
 }
 
-export function creepRoleManager(room: Room) {
-    // If CPU logging is enabled, get the CPU used at the start
+export class CreepRoleManager {
+    roomManager: RoomManager
+    room: Room
 
-    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+    constructor(roomManager: RoomManager) {
+        this.roomManager = roomManager
+        this.room = roomManager.room
+    }
 
-    let roleCPUStart
-    let creepsOfRoleAmount
+    public run() {
+        // If CPU logging is enabled, get the CPU used at the start
 
-    // Loop through each role in managers
+        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-    function processSingleRole(role: CreepRoles) {
-        roleCPUStart = Game.cpu.getUsed()
+        for (const role of creepRoles) this.runManager(role)
+
+        // If CPU logging is enabled, log the CPU used by this manager
+
+        if (Memory.CPULogging)
+            customLog(
+                'Role Manager',
+                `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}, CPU Per Creep: ${(this.room.myCreepsAmount
+                    ? (Game.cpu.getUsed() - managerCPUStart) / this.room.myCreepsAmount
+                    : 0
+                ).toFixed(2)}`,
+                undefined,
+                myColors.lightGrey,
+            )
+    }
+
+    private runManager(role: CreepRoles) {
+        const roleCPUStart = Game.cpu.getUsed()
 
         // Get the amount of creeps with the role
 
-        creepsOfRoleAmount = room.myCreeps[role].length
+        const creepsOfRoleAmount = this.room.myCreeps[role].length
 
         // If there are no creeps for this manager, iterate
 
-        if (!room.myCreeps[role].length) return
+        if (!this.room.myCreeps[role].length) return
 
         // Run manager
 
-        managers[role](room, room.myCreeps[role])
+        try {
+            managers[role](this.room, this.room.myCreeps[role])
+        } catch (err) {
+            customLog(
+                'Exception processing creep role: ' + role + ' in ' + this.room.name + '. ',
+                err + '\n' + (err as any).stack,
+                myColors.white,
+                myColors.red,
+            )
+        }
 
         // Log role stats
 
@@ -88,30 +119,4 @@ export function creepRoleManager(room: Room) {
             undefined,
         )
     }
-
-    for (const role of creepRoles) {
-        try {
-            processSingleRole(role)
-        } catch (err) {
-            customLog(
-                'Exception processing creep role: ' + role + ' in ' + room.name + '. ',
-                err + '\n' + (err as any).stack,
-                myColors.white,
-                myColors.red,
-            )
-        }
-    }
-
-    // If CPU logging is enabled, log the CPU used by this manager
-
-    if (Memory.CPULogging)
-        customLog(
-            'Role Manager',
-            `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}, CPU Per Creep: ${(room.myCreepsAmount
-                ? (Game.cpu.getUsed() - managerCPUStart) / room.myCreepsAmount
-                : 0
-            ).toFixed(2)}`,
-            undefined,
-            myColors.lightGrey,
-        )
 }

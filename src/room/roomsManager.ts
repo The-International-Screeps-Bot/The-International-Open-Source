@@ -4,15 +4,17 @@ import './roomFunctions'
 
 import './communeManager'
 
-import { creepRoleManager } from './creeps/creepRoleManager'
+import { CreepRoleManager } from './creeps/creepRoleManager'
 
 import { powerCreepManager } from './powerCreeps/powerCreepManager'
 import './roomVisualsManager'
 import { createPosMap, customLog } from 'international/generalFunctions'
 import { statsManager } from 'international/statsManager'
-import './trafficManager'
+import './creeps/endTickCreepManager'
+import { CommuneManager } from './communeManager'
+import { RoomManager } from './roomManager'
 
-export function roomManager() {
+export function roomsManager() {
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
@@ -32,21 +34,31 @@ export function roomManager() {
         const statsActive = Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType)
         if (statsActive) statsManager.roomPreTick(room.name, roomType)
 
+        room.roomManager = global.roomManagers[room.name]
+
+        if (!room.roomManager) {
+            room.roomManager = new RoomManager()
+            global.roomManagers[room.name] = room.roomManager
+        }
+
+        room.roomManager.update(room)
+
         // If there is a specific manager for this room's type, run it
 
-        if (room.memory.T === 'commune') room.communeManager()
+        if (room.memory.T === 'commune') {
+            room.communeManager = global.communeManagers[room.name]
 
-        //
+            if (!room.communeManager) {
+                room.communeManager = new CommuneManager()
+                global.communeManagers[room.name] = room.communeManager
+            }
 
-        creepRoleManager(room)
+            room.communeManager.update(room)
 
-        //
+            room.communeManager.run()
+        }
 
-        room.trafficManager()
-
-        //
-
-        room.roomVisualsManager()
+        room.roomManager.run()
 
         // Log room stats
 

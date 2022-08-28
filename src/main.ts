@@ -14,7 +14,7 @@ import './international/endTickManager'
 // Room
 
 import './room/remotesManager'
-import { roomManager } from 'room/roomsManager'
+import { roomsManager } from 'room/roomsManager'
 import './room/roomAdditions'
 
 import './room/resourceAdditions'
@@ -33,8 +33,9 @@ import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { customLog } from 'international/generalFunctions'
 import { myColors, TrafficPriorities } from 'international/constants'
 import { LabManager } from 'room/lab'
-import { Commune } from 'room/communeManager'
+import { CommuneManager } from 'room/communeManager'
 import { configManager } from './international/config'
+import { RoomManager } from 'room/roomManager'
 
 // Type declareations for global
 
@@ -747,6 +748,10 @@ declare global {
          */
         moveRequests: Map<number, string[]>
 
+        roomManager: RoomManager
+
+        communeManager: CommuneManager
+
         // Functions
 
         /**
@@ -952,10 +957,6 @@ declare global {
         spawnRequestIndividually(opts: SpawnRequestOpts): void
 
         spawnRequestByGroup(opts: SpawnRequestOpts): void
-
-        // Commune
-
-        communeManager(): void
 
         // Market functions
 
@@ -1235,8 +1236,6 @@ declare global {
          * Mandatory Other Fill Transfer Targets
          */
         readonly MOFTT: (Creep | AnyStoreStructure | Tombstone)[]
-
-        commune: Commune
     }
 
     interface DepositRecord {
@@ -1909,7 +1908,9 @@ declare global {
              */
             communes: Set<string>
 
-            communeManagers: {[roomName: string]: Commune}
+            roomManagers: { [roomName: string]: RoomManager }
+
+            communeManagers: { [roomName: string]: CommuneManager }
 
             // Command functions
 
@@ -1980,7 +1981,7 @@ export const loop = function () {
 
     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
  */
-    roomManager()
+    roomsManager()
 
     internationalManager.mapVisualsManager()
 
