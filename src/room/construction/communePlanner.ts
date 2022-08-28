@@ -729,16 +729,14 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    const observerAnchors = planStamp({
+    if (!planStamp({
         stampType: 'observer',
         count: 1,
         startCoords: [fastFillerHubAnchor],
         coordMap: room.roadCoords,
-    })
+    })) return 'failed'
 
-    if (!observerAnchors) return 'failed'
-    console.log(observerAnchors)
-    const observerAnchor = observerAnchors[0]
+    const observerAnchor = unpackAsRoomPos(room.memory.stampAnchors.observer[0], room.name)
 
     let adjacentCoords = findCoordsInsideRect(
         observerAnchor.x - 3,
@@ -746,7 +744,7 @@ export function basePlanner(room: Room) {
         observerAnchor.x + 3,
         observerAnchor.y + 3,
     )
-
+    
     for (const coord of adjacentCoords) {
         // If the coord is probably not protected
 

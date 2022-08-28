@@ -2239,8 +2239,6 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
 
         depth += 1
     }
-
-    return this.unprotectedCoords
 }
 
 Room.prototype.groupRampartPositions = function (rampartPositions) {

@@ -22,7 +22,14 @@ import {
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from 'room/communeManager'
 
-class RampartPlanner {
+/*
+- Posted 10 may 2018 by @saruss
+- Code for calculating the minCut in a room, written by Saruss
+- some readability added by Chobobobo for typescript
+- Fixed Game.map.getTerrainAt to Game.map.getRoomTerrain method -Shibdib
+- Formatted, optimized, added readability, structurally improved and modified for typescript by Carson Burke
+*/
+export class RampartPlanner {
     communeManager: CommuneManager
     room: Room
 
@@ -670,7 +677,9 @@ class RampartPlanner {
 
                         // Add it to the next gen and this group
 
-                        groupedPositions[groupIndex].push(new RoomPosition(adjacentPos.x, adjacentPos.y, this.room.name))
+                        groupedPositions[groupIndex].push(
+                            new RoomPosition(adjacentPos.x, adjacentPos.y, this.room.name),
+                        )
 
                         groupSize += 1
                         nextGeneration.push(adjacentPos)
@@ -695,7 +704,6 @@ class RampartPlanner {
     }
 
     private generateRampartPaths(groupedRampartPositions: RoomPosition[][]) {
-
         this.room.findUnprotectedCoords()
 
         // Get the hubAnchor
@@ -766,13 +774,9 @@ class RampartPlanner {
         }
     }
 }
-/*
-export const rampartPlanner = new RampartPlanner()
- */
+
 export function rampartPlanner(room: Room) {
     if (room.memory.stampAnchors.rampart.length) return false
-
-    // require('util.min_cut').test('W5N9');
 
     /*
     - Posted 10 may 2018 by @saruss
@@ -893,13 +897,8 @@ export function rampartPlanner(room: Room) {
     // Adds new edge from u to v
 
     Graph.prototype.New_edge = function (u, v, c) {
-        // Normal forward Edge
-
-        this.edges[u].push({ v, r: this.edges[v].length, c, f: 0 })
-
-        // reverse Edge for Residal Graph
-
-        this.edges[v].push({ v: u, r: this.edges[u].length - 1, c: 0, f: 0 })
+        this.edges[u].push({ v, r: this.edges[v].length, c, f: 0 }) // Normal forward Edge
+        this.edges[v].push({ v: u, r: this.edges[u].length - 1, c: 0, f: 0 }) // reverse Edge for Residal Graph
     }
 
     Graph.prototype.Bfs = function (s, t) {
@@ -930,10 +929,7 @@ export function rampartPlanner(room: Room) {
                 }
             }
         }
-
-        // return if theres a path to t -> no level, no path!
-
-        return this.level[t] >= 0
+        return this.level[t] >= 0 // return if theres a path to t -> no level, no path!
     }
 
     // DFS like: send flow at along path from s->t recursivly while increasing the level of the visited vertices by one
@@ -1065,14 +1061,11 @@ export function rampartPlanner(room: Room) {
             }
         }
         /*
-
         if (Memory.baseVisuals) {
             // Visualize position values
-
             for (let x = 0; x < roomDimensions; x += 1) {
                 for (let y = 0; y < roomDimensions; y += 1) {
                     const tileType = room.tileCoords[packXY(x, y)]
-
                     if (tileType === NORMAL) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                             fill: myColors.yellow,
@@ -1080,7 +1073,6 @@ export function rampartPlanner(room: Room) {
                         })
                         continue
                     }
-
                     if (tileType === PROTECTED) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                             fill: myColors.green,
@@ -1088,7 +1080,6 @@ export function rampartPlanner(room: Room) {
                         })
                         continue
                     }
-
                     if (tileType === UNWALKABLE) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                             fill: myColors.red,
@@ -1274,10 +1265,12 @@ export function rampartPlanner(room: Room) {
             // Get Positions from Edge
 
             for (let i = 0; i < cutEdges.length; i += 1) {
-                const packedCoord = cutEdges[i]
+                const packedCoord = cutEdges[i] // x= v % 50  y=v/50 (math.floor?)
+                const x = packedCoord % 50
+                const y = Math.floor(packedCoord / 50)
 
-                positions.push(unpackAsPos(packedCoord))
-                packedPositions.push(packedCoord)
+                positions.push({ x, y })
+                packedPositions.push(pack({ x, y }))
             }
         }
 
@@ -1321,22 +1314,16 @@ export function rampartPlanner(room: Room) {
 
     /*
      let closestSourcePos = room.sourcePositions[0][0]
-
      // Protect it
-
      protectionRects.push({
           x1: Math.max(Math.min(closestSourcePos.x - 2, roomDimensions - 3), 2),
           y1: Math.max(Math.min(closestSourcePos.y - 2, roomDimensions - 3), 2),
           x2: Math.max(Math.min(closestSourcePos.x + 2, roomDimensions - 3), 2),
           y2: Math.max(Math.min(closestSourcePos.y + 2, roomDimensions - 3), 2),
      })
-
      closestSourcePos = room.sourcePositions[1][0]
-
      if (closestSourcePos) {
-
           // Protect it
-
           protectionRects.push({
                x1: Math.max(Math.min(closestSourcePos.x - 2, roomDimensions - 3), 2),
                y1: Math.max(Math.min(closestSourcePos.y - 2, roomDimensions - 3), 2),
