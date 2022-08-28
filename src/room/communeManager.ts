@@ -23,13 +23,18 @@ import './lab'
 import { LabManager } from './lab'
 
 export class CommuneManager {
-
     labManager: LabManager
+
+    constructor() {
+        this.labManager = new LabManager(this)
+    }
+
     room: Room
+    structures: OrganizedStructures
 
     public update(room: Room) {
         this.room = room
-        this.labManager = new LabManager(this)
+        this.structures = room.structures
     }
 
     public run() {
