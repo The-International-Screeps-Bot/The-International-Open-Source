@@ -1477,13 +1477,28 @@ export function rampartPlanner(room: Room) {
     room.rampartCoords[packXY(hubAnchor.x, hubAnchor.y - 1)] = 1
 
     // Protect labs
-
+/*
     const labAnchor = unpackAsRoomPos(room.memory.stampAnchors.labs[0], room.name)
+ */
+    for (const packedCoord1 of stampAnchors.labs) {
 
-    for (const coord of stamps.labs.structures.lab) {
+        const coord1 = unpackAsPos(packedCoord1)
+
+        const adjacentCoords = findCoordsInsideRect(coord1.x - 3, coord1.y - 3, coord1.x + 3, coord1.y + 3)
+
+        for (const coord2 of adjacentCoords) {
+            // If the coord is probably not protected
+
+            if (room.unprotectedCoords[pack(coord2)] === 0) continue
+
+            room.rampartCoords[packedCoord1] = 1
+            break
+        }
+/*
         room.rampartCoords[
             packXY(coord.x + labAnchor.x - stamps.labs.offset, coord.y + labAnchor.y - stamps.labs.offset)
         ] = 1
+ */
     }
 
     // Inform true
