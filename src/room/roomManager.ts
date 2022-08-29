@@ -3,14 +3,18 @@ import { EndTickCreepManager } from "./creeps/endTickCreepManager"
 
 export class RoomManager {
 
-    room: Room
     creepRoleManager: CreepRoleManager
     endTickCreepManager: EndTickCreepManager
 
-    public update(room: Room) {
-        this.room = room
+    constructor() {
         this.creepRoleManager = new CreepRoleManager(this)
         this.endTickCreepManager = new EndTickCreepManager(this)
+    }
+
+    room: Room
+
+    public update(room: Room) {
+        this.room = room
     }
 
     public run() {

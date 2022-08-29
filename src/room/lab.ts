@@ -1,10 +1,10 @@
+import { minerals } from 'international/constants'
 import { CommuneManager } from './communeManager'
 import { Hauler } from './creeps/roleManagers/commune/hauler'
 
 const reactionCycleAmount = 5000
 
-const MINERALS: MineralConstant[] = ['U', 'L', 'Z', 'K', 'O', 'H', 'X']
-const DECOMPOSITIONS: {
+const reverseReactions: {
     [key in MineralCompoundConstant]?: (MineralConstant | MineralCompoundConstant)[]
 } = {
     G: ['ZK', 'UL'],
@@ -40,13 +40,13 @@ const DECOMPOSITIONS: {
     XZHO2: ['X', 'ZHO2'],
 }
 
-const allCompounds: (MineralConstant | MineralCompoundConstant)[] = [...Object.keys(DECOMPOSITIONS), ...MINERALS] as (
+const allCompounds: (MineralConstant | MineralCompoundConstant)[] = [...Object.keys(reverseReactions), ...minerals] as (
     | MineralConstant
     | MineralCompoundConstant
 )[]
 
 function decompose(compound: MineralConstant | MineralCompoundConstant): (MineralConstant | MineralCompoundConstant)[] {
-    return DECOMPOSITIONS[compound as MineralCompoundConstant]
+    return reverseReactions[compound as MineralCompoundConstant]
 }
 
 export class LabManager {
@@ -57,7 +57,7 @@ export class LabManager {
 
     deficits: { [key in MineralConstant | MineralCompoundConstant]?: number } = {}
 
-    commune: CommuneManager
+    communeManager: CommuneManager
     outputRsc: MineralConstant | MineralCompoundConstant
     input1Rsc: MineralConstant | MineralCompoundConstant
     input2Rsc: MineralConstant | MineralCompoundConstant
@@ -67,13 +67,13 @@ export class LabManager {
     lab2Id: string
     lastLayoutCheck: number
 
-    constructor(commune: CommuneManager) {
-        this.commune = commune
+    constructor(communeManager: CommuneManager) {
+        this.communeManager = communeManager
     }
 
     private labsInRange(thisLab: StructureLab, otherLab: StructureLab = null): number {
         return _.filter(
-            this.commune.structures.lab,
+            this.communeManager.structures.lab,
             lab => lab != thisLab && lab != otherLab && lab.pos.getRangeTo(thisLab.pos) <= 2,
         ).length
     }
@@ -86,10 +86,10 @@ export class LabManager {
             this.lab1Id = null
             this.lab2Id = null
 
-            if (this.commune.structures.lab.length >= 3) {
+            if (this.communeManager.structures.lab.length >= 3) {
                 //Sort the labs by the distance to the terminal, so that labs on the side of the hub are favored.
-                let sorted = _.sortBy(this.commune.structures.lab, lab =>
-                    lab.pos.getRangeTo(this.commune.room.terminal?.pos),
+                let sorted = _.sortBy(this.communeManager.structures.lab, lab =>
+                    lab.pos.getRangeTo(this.communeManager.room.terminal?.pos),
                 )
                 let bestLab = sorted[0]
                 //Starting at 2 intentally, to skip the first two records, which will be the default best labs...
@@ -120,19 +120,19 @@ export class LabManager {
     }
 
     public get input1(): StructureLab {
-        return _.find(this.commune.structures.lab, lab => lab.id == this.lab1Id)
+        return _.find(this.communeManager.structures.lab, lab => lab.id == this.lab1Id)
     }
 
     public get input2(): StructureLab {
-        return _.find(this.commune.structures.lab, lab => lab.id == this.lab2Id)
+        return _.find(this.communeManager.structures.lab, lab => lab.id == this.lab2Id)
     }
 
     public get outputs(): StructureLab[] {
-        return _.filter(this.commune.structures.lab, lab => lab.id != this.lab1Id && lab.id != this.lab2Id)
+        return _.filter(this.communeManager.structures.lab, lab => lab.id != this.lab1Id && lab.id != this.lab2Id)
     }
 
     public get all(): StructureLab[] {
-        return this.commune.structures.lab
+        return this.communeManager.structures.lab
     }
 
     private isProperlyLoaded(): boolean {
@@ -145,7 +145,7 @@ export class LabManager {
     }
 
     run() {
-        if (!this.commune.room.storage || !this.commune.room.terminal) return
+        if (!this.communeManager.room.storage || !this.communeManager.room.terminal) return
 
         this.doLayoutCheck()
         if (this.lab1Id) {
@@ -234,7 +234,7 @@ export class LabManager {
             )
         }
         for (let compound in this.targetCompounds) {
-            var amount = Math.max(0, 10000) // this.commune.roomai.trading.maxStorageAmount(compound))
+            var amount = Math.max(0, 10000) // this.communeManager.roomai.trading.maxStorageAmount(compound))
 
             this.chainDecompose(compound as MineralConstant | MineralCompoundConstant, amount)
         }
@@ -251,8 +251,8 @@ export class LabManager {
             this.input1Rsc = null
             this.input2Rsc = null
         } else {
-            this.input1Rsc = DECOMPOSITIONS[outputRsc][0]
-            this.input2Rsc = DECOMPOSITIONS[outputRsc][1]
+            this.input1Rsc = reverseReactions[outputRsc][0]
+            this.input2Rsc = reverseReactions[outputRsc][1]
         }
         this.isReverse = reverse
         this.targetAmount = targetAmount
@@ -276,9 +276,9 @@ export class LabManager {
                 this.amount(nextReaction.type) + Math.min(reactionCycleAmount, nextReaction.amount),
                 false,
             )
-        } else if (this.commune.room.storage.store['GO'] > 1000) {
+        } else if (this.communeManager.room.storage.store['GO'] > 1000) {
             this.setupReaction('GO', 1000, true)
-        } else if (this.commune.room.storage.store['LO'] > 500) {
+        } else if (this.communeManager.room.storage.store['LO'] > 500) {
             this.setupReaction('LO', 500, true)
         } else {
             this.setupReaction(null, 0, false)
@@ -344,9 +344,9 @@ export class LabManager {
     ): boolean {
         if (inputLab.mineralType == inputRsc || inputLab.mineralType == null) {
             let source =
-                this.commune.room?.storage.store[inputRsc] > this.commune.room?.terminal.store[inputRsc]
-                    ? this.commune.room.storage
-                    : this.commune.room.terminal
+                this.communeManager.room?.storage.store[inputRsc] > this.communeManager.room?.terminal.store[inputRsc]
+                    ? this.communeManager.room.storage
+                    : this.communeManager.room.terminal
 
             //This logic isn't quite correct, but it works, but I need to debug this at some point.
             //  If the creep starts with any of the desired resources, send the resources to it to free up the creep.
@@ -368,7 +368,7 @@ export class LabManager {
             creep.createReservation('withdraw', inputLab.id, amount, inputLab.mineralType)
             creep.createReservation(
                 'transfer',
-                this.commune.room.storage?.id,
+                this.communeManager.room.storage?.id,
                 amount + creep.store[inputLab.mineralType],
                 inputLab.mineralType,
             )
@@ -389,7 +389,7 @@ export class LabManager {
             if (amount + creep.usedStore(outputLab.mineralType) != 0)
                 creep.createReservation(
                     'transfer',
-                    this.commune.room.storage?.id,
+                    this.communeManager.room.storage?.id,
                     amount + creep.store[outputLab.mineralType],
                     outputLab.mineralType,
                 )
@@ -401,15 +401,15 @@ export class LabManager {
 
     private amount(resource: MineralConstant | MineralCompoundConstant): number {
         if (!resource) return 0
-        let storageAmount = this.commune.room.storage.store[resource] || 0
-        let terminalAmount = (this.commune.room.terminal && this.commune.room.terminal.store[resource]) || 0
+        let storageAmount = this.communeManager.room.storage.store[resource] || 0
+        let terminalAmount = (this.communeManager.room.terminal && this.communeManager.room.terminal.store[resource]) || 0
         let labAmount = _.sum(
             _.filter(this.all, l => l.mineralType == resource),
             l => l.mineralAmount,
         )
 
         //Sum of haulers as well.
-        let haulerAmount = _.sum(this.commune.room.myCreeps.hauler, crName => Game.creeps[crName]?.store[resource] || 0)
+        let haulerAmount = _.sum(this.communeManager.room.myCreeps.hauler, crName => Game.creeps[crName]?.store[resource] || 0)
 
         return storageAmount + terminalAmount + labAmount + haulerAmount
     }

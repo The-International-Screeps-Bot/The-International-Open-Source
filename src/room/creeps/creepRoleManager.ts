@@ -56,11 +56,9 @@ const managers: Record<CreepRoles, Function> = {
 
 export class CreepRoleManager {
     roomManager: RoomManager
-    room: Room
 
     constructor(roomManager: RoomManager) {
         this.roomManager = roomManager
-        this.room = roomManager.room
     }
 
     public run() {
@@ -75,8 +73,8 @@ export class CreepRoleManager {
         if (Memory.CPULogging)
             customLog(
                 'Role Manager',
-                `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}, CPU Per Creep: ${(this.room.myCreepsAmount
-                    ? (Game.cpu.getUsed() - managerCPUStart) / this.room.myCreepsAmount
+                `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}, CPU Per Creep: ${(this.roomManager.room.myCreepsAmount
+                    ? (Game.cpu.getUsed() - managerCPUStart) / this.roomManager.room.myCreepsAmount
                     : 0
                 ).toFixed(2)}`,
                 undefined,
@@ -89,19 +87,19 @@ export class CreepRoleManager {
 
         // Get the amount of creeps with the role
 
-        const creepsOfRoleAmount = this.room.myCreeps[role].length
+        const creepsOfRoleAmount = this.roomManager.room.myCreeps[role].length
 
         // If there are no creeps for this manager, iterate
 
-        if (!this.room.myCreeps[role].length) return
+        if (!this.roomManager.room.myCreeps[role].length) return
 
         // Run manager
 
         try {
-            managers[role](this.room, this.room.myCreeps[role])
+            managers[role](this.roomManager.room, this.roomManager.room.myCreeps[role])
         } catch (err) {
             customLog(
-                'Exception processing creep role: ' + role + ' in ' + this.room.name + '. ',
+                'Exception processing creep role: ' + role + ' in ' + this.roomManager.room.name + '. ',
                 err + '\n' + (err as any).stack,
                 myColors.white,
                 myColors.red,

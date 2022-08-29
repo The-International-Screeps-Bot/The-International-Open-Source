@@ -4,23 +4,21 @@ import { RoomManager } from '../roomManager'
 
 export class EndTickCreepManager {
     roomManager: RoomManager
-    room: Room
 
     constructor(roomManager: RoomManager) {
         this.roomManager = roomManager
-        this.room = roomManager.room
     }
 
     public run() {
 
-        if (!this.room.myCreepsAmount) return
+        if (!this.roomManager.room.myCreepsAmount) return
 
         // If CPU logging is enabled, get the CPU used at the start
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        for (const role in this.room.myCreeps)
-            for (const creepName of this.room.myCreeps[role]) {
+        for (const role in this.roomManager.room.myCreeps)
+            for (const creepName of this.roomManager.room.myCreeps[role]) {
 
                 const creep = Game.creeps[creepName]
 
