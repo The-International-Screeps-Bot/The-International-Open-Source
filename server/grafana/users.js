@@ -24,7 +24,7 @@ module.exports.users = [
           password: 'tooangel',
      },
      {
-          username: 'W8N3',
+          username: 'W7N3',
           type: 'private',
           shards: ['screeps'],
           password: 'tooangel',
