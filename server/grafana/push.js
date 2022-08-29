@@ -64,7 +64,7 @@ function pushStats(userinfo, stats, shard) {
     logInfo(`${userinfo.type}: Added stats object for ${userinfo.username} in ${shard}`)
 }
 
-cron.schedule('15/* * * * * *', async () => {
+cron.schedule('*/15 * * * * *', async () => {
     console.log('----------------------------------------------------------------')
     groupedStats = {}
     for (let i = 0; i < statsUsers.length; i++) {
