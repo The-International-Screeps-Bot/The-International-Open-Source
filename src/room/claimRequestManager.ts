@@ -46,19 +46,6 @@ Room.prototype.claimRequestManager = function () {
             return
         }
 
-        // If there is an invader core
-
-        const invaderCores = claimTarget.structures.invaderCore
-        if (invaderCores.length) {
-
-            // Abandon for its remaining existance plus the estimated reservation time
-
-            Memory.claimRequests[this.memory.claimRequest].abandon = invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX
-            delete Memory.claimRequests[this.memory.claimRequest].responder
-            delete this.memory.claimRequest
-            return
-        }
-
         Memory.claimRequests[this.memory.claimRequest].needs[ClaimRequestNeeds.vanguard] = claimTarget.structures.spawn
             .length
             ? 0

@@ -2,24 +2,6 @@ import { ClaimRequestNeeds } from 'international/constants'
 import { findObjectWithID, getRange, unpackAsPos } from 'international/generalFunctions'
 
 export class Vanguard extends Creep {
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
-    }
-
-    preTickManager() {
-        const { room } = this
-
-        if (this.memory.SI && !this.dying) room.creepsOfSourceAmount[this.memory.SI] += 1
-
-        const claimTarget = Memory.rooms[this.commune.name].claimRequest
-
-        // If the creep has no claim target, stop
-
-        if (claimTarget)
-            Memory.claimRequests[Memory.rooms[this.commune.name].claimRequest].needs[ClaimRequestNeeds.vanguard] -=
-                this.parts.work
-    }
-
     /**
      *
      */
@@ -67,7 +49,7 @@ export class Vanguard extends Creep {
         if (this.needsResources()) {
             // Define the creep's sourceName
 
-            if (!this.findOptimalSourceIndex()) return
+            if (!this.findOptimalSourceName()) return
 
             const sourceIndex = this.memory.SI
 
@@ -84,6 +66,10 @@ export class Vanguard extends Creep {
         this.advancedBuildCSite()
     }
 
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
+
     static vanguardManager(room: Room, creepsOfRole: string[]) {
         // Loop through the names of the creeps of the role
 
@@ -92,11 +78,14 @@ export class Vanguard extends Creep {
 
             const creep: Vanguard = Game.creeps[creepName]
 
-            const claimTarget = Memory.rooms[creep.commune.name].claimRequest
+            const claimTarget = Memory.rooms[creep.commune].claimRequest
 
             // If the creep has no claim target, stop
 
             if (!claimTarget) return
+
+            Memory.claimRequests[Memory.rooms[creep.commune].claimRequest].needs[ClaimRequestNeeds.vanguard] -=
+                creep.parts.work
 
             creep.say(claimTarget)
 

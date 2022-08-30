@@ -20,26 +20,7 @@ Object.defineProperties(Creep.prototype, {
         get() {
             if (this._commune) return this._commune
 
-            return (this._commune = Game.rooms[this.name.split(' ')[2]])
-        },
-    },
-    dying: {
-        get() {
-            // Inform as dying if creep is already recorded as dying
-
-            if (this._dying) return true
-
-            // Stop if creep is spawning
-
-            if (!this.ticksToLive) return false
-
-            // If the creep's remaining ticks are more than the estimated spawn time, inform false
-
-            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
-
-            // Record creep as dying
-
-            return (this._dying = true)
+            return (this._commune = this.name.split(' ')[2])
         },
     },
     reservation: {

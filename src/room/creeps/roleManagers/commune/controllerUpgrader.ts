@@ -3,10 +3,10 @@ export class ControllerUpgrader extends Creep {
         super(creepID)
     }
 
-    public get dying() {
+    public isDying(): boolean {
         // Inform as dying if creep is already recorded as dying
 
-        if (this._dying) return true
+        if (this.memory.dying) return true
 
         // Stop if creep is spawning
 
@@ -18,7 +18,8 @@ export class ControllerUpgrader extends Creep {
 
         // Record creep as dying
 
-        return (this._dying = true)
+        this.memory.dying = true
+        return true
     }
 
     public static controllerUpgraderManager(room: Room, creepsOfRole: string[]) {

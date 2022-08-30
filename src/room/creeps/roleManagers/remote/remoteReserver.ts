@@ -1,30 +1,13 @@
 import { RemoteNeeds } from 'international/constants'
 
 export class RemoteReserver extends Creep {
-    public get dying(): boolean {
-        // Inform as dying if creep is already recorded as dying
-
-        if (this._dying) return true
-
-        // Stop if creep is spawning
-
-        if (!this.ticksToLive) return false
-
-        if (this.memory.remote) {
-            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.remote].RE - 1)
-                return false
-        } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
-
-        return (this._dying = true)
-    }
-
     /**
      * Finds a remote to reserve
      */
     findRemote?(): boolean {
         if (this.memory.remote) return true
 
-        const remoteNamesByEfficacy = this.commune?.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy: string[] = Game.rooms[this.commune]?.get('remoteNamesByEfficacy')
 
         let roomMemory
 
@@ -42,6 +25,26 @@ export class RemoteReserver extends Creep {
         return false
     }
 
+    isDying(): boolean {
+        // Inform as dying if creep is already recorded as dying
+
+        if (this.memory.dying) return true
+
+        // Stop if creep is spawning
+
+        if (!this.ticksToLive) return false
+
+        if (this.memory.remote)
+            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.remote].RE - 1)
+                return false
+            else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
+
+        // Record creep as dying
+
+        this.memory.dying = true
+        return true
+    }
+
     preTickManager() {
         if (!this.memory.remote) return
 
@@ -49,7 +52,7 @@ export class RemoteReserver extends Creep {
 
         // If the creep's remote no longer is managed by its commune
 
-        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.remote)) {
+        if (!Memory.rooms[this.commune].remotes.includes(this.memory.remote)) {
             // Delete it from memory and try to find a new one
 
             delete this.memory.remote
@@ -60,9 +63,9 @@ export class RemoteReserver extends Creep {
 
         // Reduce remote need
 
-        if (remoteMemory.needs && !this.dying) remoteMemory.needs[RemoteNeeds[role]] -= 1
+        if (remoteMemory.needs && !this.isDying()) remoteMemory.needs[RemoteNeeds[role]] -= 1
 
-        const commune = this.commune
+        const commune = Game.rooms[this.commune]
 
         // Add the creep to creepsFromRoomWithRemote relative to its remote
 

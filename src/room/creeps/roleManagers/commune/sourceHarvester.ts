@@ -1,35 +1,6 @@
 import { getRange, unpackAsPos } from 'international/generalFunctions'
 
 export class SourceHarvester extends Creep {
-
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
-    }
-
-    public get dying() {
-        // Inform as dying if creep is already recorded as dying
-
-        if (this._dying) return true
-
-        // Stop if creep is spawning
-
-        if (!this.ticksToLive) return false
-
-        // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
-
-        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.sourcePaths[this.memory.SI].length - 1)) return false
-
-        // Record creep as dying
-
-        return (this._dying = true)
-    }
-
-    preTickManager() {
-        const { room } = this
-
-        if (this.memory.SI && !this.dying) room.creepsOfSourceAmount[this.memory.SI] += 1
-    }
-
     travelToSource?(): boolean {
         const { room } = this
 
@@ -188,6 +159,36 @@ export class SourceHarvester extends Creep {
         // Inform failure
 
         return false
+    }
+
+    isDying(): boolean {
+        // Inform as dying if creep is already recorded as dying
+
+        if (this.memory.dying) return true
+
+        // Stop if creep is spawning
+
+        if (!this.ticksToLive) return false
+
+        // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
+
+        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.sourcePaths[this.memory.SI].length - 1))
+            return false
+
+        // Record creep as dying
+
+        this.memory.dying = true
+        return true
+    }
+
+    preTickManager() {
+        const { room } = this
+
+        if (this.memory.SI) room.creepsOfSourceAmount[this.memory.SI] += 1
+    }
+
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
     }
 
     static sourceHarvesterManager(room: Room, creepsOfRole: string[]): void | boolean {

@@ -52,7 +52,7 @@ export class AllyVanguard extends Creep {
 
         // Define the creep's sourceName
 
-        if (!this.findOptimalSourceIndex()) return
+        if (!this.findOptimalSourceName()) return
 
         const sourceIndex = this.memory.SI
 
@@ -89,7 +89,7 @@ export class AllyVanguard extends Creep {
 
         // Define the creep's sourceName
 
-        if (!this.findOptimalSourceIndex()) return true
+        if (!this.findOptimalSourceName()) return true
 
         const sourceIndex = this.memory.SI
 
@@ -163,7 +163,7 @@ export class AllyVanguard extends Creep {
             return
         }
 
-        const request = Memory.rooms[this.commune.name].allyCreepRequest
+        const request = Memory.rooms[this.commune].allyCreepRequest
 
         if (room.name !== request) {
             this.createMoveRequest({
@@ -190,13 +190,13 @@ export class AllyVanguard extends Creep {
 
             const creep: AllyVanguard = Game.creeps[creepName]
 
-            const request = Memory.rooms[creep.commune.name].allyCreepRequest
+            const request = Memory.rooms[creep.commune].allyCreepRequest
 
             // If the creep has no claim target, stop
 
             if (!request) return
 
-            Memory.allyCreepRequests[Memory.rooms[creep.commune.name].allyCreepRequest].needs[
+            Memory.allyCreepRequests[Memory.rooms[creep.commune].allyCreepRequest].needs[
                 AllyCreepRequestNeeds.allyVanguard
             ] -= creep.parts.work
 

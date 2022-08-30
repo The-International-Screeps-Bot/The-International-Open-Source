@@ -35,6 +35,24 @@ Creep.prototype.preTickManager = function () {}
 
 Creep.prototype.endTickManager = function () {}
 
+Creep.prototype.isDying = function () {
+    // Inform as dying if creep is already recorded as dying
+
+    if (this.memory.dying) return true
+
+    // Stop if creep is spawning
+
+    if (!this.ticksToLive) return false
+
+    // If the creep's remaining ticks are more than the estimated spawn time, inform false
+
+    if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
+
+    // Record creep as dying
+
+    return (this.memory.dying = true)
+}
+
 Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENERGY, amount) {
     // If creep isn't in transfer range
 
@@ -576,7 +594,7 @@ Creep.prototype.findRepairTarget = function (excludedIDs = new Set()) {
     })
 }
 
-Creep.prototype.findOptimalSourceIndex = function () {
+Creep.prototype.findOptimalSourceName = function () {
     const { room } = this
 
     this.say('FOSN')
@@ -597,7 +615,7 @@ Creep.prototype.findOptimalSourceIndex = function () {
         // Then loop through the source names and find the first one with open spots
 
         for (const source of room.sourcesByEfficacy) {
-            const index = source.index as 0 | 1
+            const { index } = source
 
             // If there are still creeps needed to harvest a source under the creepThreshold
 
@@ -1446,7 +1464,7 @@ Creep.prototype.advancedRenew = function () {
 
     if (!room.myCreeps.fastFiller.length) return
 
-    if (this.dying) return
+    if (this.isDying()) return
 
     // If the creep's age is less than the benefit from renewing, inform false
 

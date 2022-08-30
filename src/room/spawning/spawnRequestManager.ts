@@ -475,7 +475,7 @@ Room.prototype.spawnRequester = function () {
 
             if (this.find(FIND_MY_CONSTRUCTION_SITES).length === 0) return false
 
-            let priority = 9
+            let priority = 10
             let partsMultiplier = 0
 
             // If there is a storage
@@ -872,7 +872,7 @@ Room.prototype.spawnRequester = function () {
 
     const minRemotePriority = 10
 
-    const remoteNamesByEfficacy = this.remoteNamesBySourceEfficacy
+    const remoteNamesByEfficacy: string[] = this.get('remoteNamesByEfficacy')
 
     for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
         const remoteName = remoteNamesByEfficacy[index]
@@ -884,8 +884,7 @@ Room.prototype.spawnRequester = function () {
         const totalRemoteNeed =
             Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
             Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0) +
-            Math.max(remoteNeeds[RemoteNeeds.remoteHauler0], 0) +
-            Math.max(remoteNeeds[RemoteNeeds.remoteHauler1], 0) +
+            Math.max(remoteNeeds[RemoteNeeds.remoteHauler], 0) +
             Math.max(remoteNeeds[RemoteNeeds.remoteReserver], 0) +
             Math.max(remoteNeeds[RemoteNeeds.remoteCoreAttacker], 0) +
             Math.max(remoteNeeds[RemoteNeeds.remoteDismantler], 0) +
@@ -1258,11 +1257,11 @@ Room.prototype.spawnRequester = function () {
 
                 return {
                     role,
-                    defaultParts: [CLAIM, MOVE],
-                    extraParts: [MOVE, MOVE, MOVE, MOVE],
+                    defaultParts: [MOVE, MOVE, CLAIM, MOVE],
+                    extraParts: [],
                     partsMultiplier: 1,
                     minCreeps: 1,
-                    minCost: 650,
+                    minCost: 750,
                     priority: 8.1,
                     memoryAdditions: {},
                 }

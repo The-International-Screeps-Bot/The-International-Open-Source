@@ -2,84 +2,13 @@ import { RemoteNeeds } from 'international/constants'
 import { Hauler } from '../commune/hauler'
 
 export class RemoteHauler extends Creep {
-
-    public get dying() {
-        // Inform as dying if creep is already recorded as dying
-
-        if (this._dying) return true
-
-        // Stop if creep is spawning
-
-        if (!this.ticksToLive) return false
-
-        // If the creep's remaining ticks are more than the estimated spawn time, inform false
-
-        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
-
-        // Record creep as dying
-
-        return (this._dying = true)
-    }
-
-    preTickManager() {
-        if (!this.memory.remote) return
-
-        const role = this.role as 'remoteHauler'
-
-        // If the creep's remote no longer is managed by its commune
-
-        // If the creep's remote no longer is managed by its commune
-
-        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.remote)) {
-            // Delete it from memory and try to find a new one
-
-            delete this.memory.remote
-            if (!this.findRemote()) return
-        }
-
-        // Reduce remote need
-
-        if (Memory.rooms[this.memory.remote].needs && !this.dying)
-            Memory.rooms[this.memory.remote].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
-    }
-
     /**
      * Finds a remote to haul from
      */
     findRemote?(): boolean {
         if (this.memory.remote) return true
 
-        const remoteNamesByEfficacy = this.commune?.remoteNamesBySourceEfficacy
-
-        let roomMemory
-
-        for (const roomName of remoteNamesByEfficacy) {
-            roomMemory = Memory.rooms[roomName]
-
-            if (roomMemory.needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] <= 0) continue
-
-            this.memory.remote = roomName
-            roomMemory.needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
-
-            return true
-        }
-
-        return false
-    }
-
-    assignRemote?() {
-        if (this.dying) return
-    }
-
-    removeRemote?() {}
-/*
-    updateRemote?() {
-        if (this.memory.remote) {
-
-            return true
-        }
-
-        const remoteNamesByEfficacy = this.commune?.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy: string[] = Game.rooms[this.commune]?.get('remoteNamesByEfficacy')
 
         let roomMemory
 
@@ -96,7 +25,12 @@ export class RemoteHauler extends Creep {
 
         return false
     }
- */
+
+    updateRemote?() {
+
+        
+    }
+
     getResources?() {
         if (!this.findRemote()) return true
 
@@ -125,7 +59,7 @@ export class RemoteHauler extends Creep {
             this.createMoveRequest({
                 origin: this.pos,
                 goal: {
-                    pos: new RoomPosition(25, 25, this.commune.name),
+                    pos: new RoomPosition(25, 25, this.commune),
                     range: 20,
                 },
                 avoidEnemyRanges: true,
@@ -150,7 +84,7 @@ export class RemoteHauler extends Creep {
     }
 
     deliverResources?() {
-        if (this.room.name === this.commune.name) {
+        if (this.room.name === this.commune) {
             // Try to renew the creep
 
             this.advancedRenew()
@@ -194,7 +128,7 @@ export class RemoteHauler extends Creep {
         this.createMoveRequest({
             origin: this.pos,
             goal: {
-                pos: new RoomPosition(25, 25, this.commune.name),
+                pos: new RoomPosition(25, 25, this.commune),
                 range: 20,
             },
             avoidEnemyRanges: true,
@@ -309,7 +243,7 @@ export class RemoteHauler extends Creep {
             // If the creep has a remoteName, delete it and delete it's fulfilled needs
 
             if (creep.memory.remote) {
-                if (!creep.dying) Memory.rooms[creep.memory.remote].needs[RemoteNeeds[`remoteHauler${creep.memory.SI}`]] += creep.parts.carry
+                if (!creep.isDying()) Memory.rooms[creep.memory.remote].needs[RemoteNeeds.remoteHauler] += creep.parts.carry
                 delete creep.memory.remote
             }
 
@@ -317,4 +251,56 @@ export class RemoteHauler extends Creep {
             creep.relayAsFull()
         }
     }
+
+    preTickManager() {
+        if (!this.memory.remote) return
+
+        const role = this.role as 'remoteHauler'
+
+        // If the creep's remote no longer is managed by its commune
+
+        // If the creep's remote no longer is managed by its commune
+
+        if (!Memory.rooms[this.commune].remotes.includes(this.memory.remote)) {
+            // Delete it from memory and try to find a new one
+
+            delete this.memory.remote
+            if (!this.findRemote()) return
+        }
+
+        // Reduce remote need
+
+        if (Memory.rooms[this.memory.remote].needs && !this.isDying())
+            Memory.rooms[this.memory.remote].needs[RemoteNeeds[role]] -= this.parts.carry
+    }
+
+    /*
+    endTickManager() {
+        if (!this.moveRequest) return
+        if (this.movedResource) return
+        if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return
+
+        const creepAtPosName = this.room.creepPositions.get(this.moveRequest)
+        if (!creepAtPosName) return
+
+        const creepAtPos = Game.creeps[creepAtPosName]
+
+        if (creepAtPos.role != 'hauler' && creepAtPos.role != 'remoteHauler') return
+        if (creepAtPos.movedResource) return
+        if (creepAtPos.store.getFreeCapacity() < this.store.getUsedCapacity(RESOURCE_ENERGY)) return
+
+        this.transfer(creepAtPos, RESOURCE_ENERGY)
+
+        this.movedResource = true
+        creepAtPos.movedResource = true
+
+        const newCreepAtPosMemory = {...this.memory}
+
+        this.memory = creepAtPos.memory
+        creepAtPos.memory = newCreepAtPosMemory
+
+        delete this.moveRequest
+        delete creepAtPos.moveRequest
+    }
+ */
 }
