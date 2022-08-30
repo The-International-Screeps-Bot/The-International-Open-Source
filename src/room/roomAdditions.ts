@@ -459,7 +459,7 @@ Object.defineProperties(Room.prototype, {
 
                 // If the creep is dying, iterate
 
-                if (creep.isDying()) continue
+                if (creep.dying) continue
 
                 if (creep.memory.SI === undefined) continue
 
@@ -630,6 +630,51 @@ Object.defineProperties(Room.prototype, {
                 origin: centerUpgradePos,
                 goal: { pos: this.anchor, range: 3 },
             }).length)
+        },
+    },
+    remoteNamesBySourceEfficacy: {
+        get() {
+            if (this._remoteNamesBySourceEfficacy) return this._remoteNamesBySourceEfficacy
+
+            // Filter rooms that have some sourceEfficacies recorded
+
+            this._remoteNamesBySourceEfficacy = this.memory.remotes.filter(function (roomName) {
+                return Memory.rooms[roomName].SE.length
+            })
+
+            // Sort the remotes based on the average source efficacy
+
+            return this._remoteNamesBySourceEfficacy.sort(function (a1, b1) {
+                return (
+                    Memory.rooms[a1].SE.reduce((a2, b2) => a2 + b2) / Memory.rooms[a1].SE.length -
+                    Memory.rooms[b1].SE.reduce((a2, b2) => a2 + b2) / Memory.rooms[b1].SE.length
+                )
+            })
+        },
+    },
+    remoteSourceIDsByEfficacy: {
+        get() {
+            if (this._remoteSourceIDsByEfficacy) return this._remoteSourceIDsByEfficacy
+
+            this._remoteSourceIDsByEfficacy = []
+            const sourceIDsWithIndex: { [sourceID: string]: number } = {}
+
+            for (let i = 0; i < this.memory.remotes.length; i++) {
+                for (const sourceIndex of this.memory.SE) {
+                    this._remoteSourceIDsByEfficacy.push(this.memory.SIDs[sourceIndex])
+                    sourceIDsWithIndex[this.memory.SIDs[sourceIndex]] = sourceIndex
+                }
+            }
+
+            return this._remoteSourceIDsByEfficacy.sort(function (aID, bID) {
+                const a = findObjectWithID(aID)
+                const b = findObjectWithID(bID)
+
+                return (
+                    Memory.rooms[a.pos.roomName].SE[sourceIDsWithIndex[aID]] -
+                    Memory.rooms[b.pos.roomName].SE[sourceIDsWithIndex[bID]]
+                )
+            })
         },
     },
     sourceContainers: {
@@ -899,8 +944,21 @@ Object.defineProperties(Room.prototype, {
             this._MEWT = [
                 ...this.droppedEnergy,
                 ...this.find(FIND_TOMBSTONES),
-                ...this.find(FIND_RUINS),
+                //Priortize ruins that have short-ish life remaining over source containers
+                //  So that we get all the resources out of the ruins
+                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay < 10000),
                 ...this.sourceContainers,
+                //But we still want to pull from ruins if the source containers are empty.
+                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay >= 10000),
+                ...this.find(FIND_HOSTILE_STRUCTURES).filter(structure => {
+                    return (
+                        (structure as any).store &&
+                        //And there's not a rampart on top of it...
+                        !structure.pos
+                            .lookFor(LOOK_STRUCTURES)
+                            .filter(structure2 => structure2.structureType === STRUCTURE_RAMPART && !(structure2 as StructureRampart).my)
+                    )
+                }) as AnyStoreStructure[],
             ]
 
             return this._MEWT
@@ -918,7 +976,7 @@ Object.defineProperties(Room.prototype, {
                 else if (
                     !this.storage.pos
                         .lookFor(LOOK_STRUCTURES)
-                        .find(structure => structure instanceof StructureRampart && !structure.my)
+                        .find(structure => structure.structureType === STRUCTURE_RAMPART && !(structure as StructureRampart).my)
                 )
                     this._OEWT.push(this.storage)
             }
@@ -929,7 +987,7 @@ Object.defineProperties(Room.prototype, {
                 else if (
                     !this.terminal.pos
                         .lookFor(LOOK_STRUCTURES)
-                        .find(structure => structure instanceof StructureRampart && !structure.my)
+                        .find(structure => structure.structureType === STRUCTURE_RAMPART && !(structure as StructureRampart).my)
                 )
                     this._OEWT.push(this.terminal)
             }

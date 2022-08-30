@@ -121,16 +121,20 @@ InternationalManager.prototype.tickConfig = function () {
 
     let reservedGCL = Game.gcl.level - global.communes.size
 
-    reservedGCL -= Object.values(Memory.claimRequests).filter(request => {
-        return request.responder
-    }).length
+    // Subtract the number of claimRequests with responders
+
+    for (const roomName in Memory.claimRequests) {
+        if (!Memory.claimRequests[roomName].responder) continue
+
+        reservedGCL -= 1
+    }
 
     const communesForResponding = []
 
     for (const roomName of global.communes) {
         if (Memory.rooms[roomName].claimRequest) continue
 
-        if (Game.rooms[roomName].energyCapacityAvailable < 750) continue
+        if (Game.rooms[roomName].energyCapacityAvailable < 650) continue
 
         communesForResponding.push(roomName)
     }
@@ -147,7 +151,7 @@ InternationalManager.prototype.tickConfig = function () {
             continue
         }
 
-        request.abandon = undefined
+        delete request.abandon
 
         if (request.responder && global.communes.has(request.responder)) continue
 
@@ -171,7 +175,7 @@ InternationalManager.prototype.tickConfig = function () {
 
         const maxRange = 10
 
-        // Run a more simple and less expensive check, then a more complex and expensive to confirm
+        // Run a more simple and less expensive check, then a more complex and expensive to confirm. If the check fails, abandon the room for some time
 
         if (
             Game.map.getRoomLinearDistance(communeName, roomName) > maxRange ||

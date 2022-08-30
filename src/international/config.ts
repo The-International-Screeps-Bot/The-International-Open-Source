@@ -60,6 +60,20 @@ class ConfigManager {
 
             Memory.breakingVersion = 83
         }
+        if (Memory.breakingVersion === 83) {
+            global.killCreeps()
+
+            for (const roomName in Memory.rooms) {
+                const type = Memory.rooms[roomName].T
+                if (type === 'commune' || type === 'remote') {
+
+                    delete Memory.rooms[roomName]
+                    continue
+                }
+            }
+
+            Memory.breakingVersion = 84
+        }
 
         if (Memory.breakingVersion < breakingVersion) {
             global.killCreeps()

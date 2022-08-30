@@ -58,7 +58,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         // Get the commune the creep is from
 
-        const commune = Game.rooms[creep.commune]
+        const commune = creep.commune
 
         // If there is not vision in the commune, stop
 
@@ -75,7 +75,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         // If the creep isn't dying, organize by its roomFrom and role
 
-        if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
+        if (!creep.dying) commune.creepsFromRoom[role].push(creepName)
 
         // Record that the creep's existence in its roomFrom
 

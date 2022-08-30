@@ -8,7 +8,7 @@ export class Scout extends Creep {
     findScoutTarget?(): boolean {
         if (this.memory.scoutTarget) return true
 
-        const commune = Game.rooms[this.commune]
+        const commune = this.commune
 
         // Construct storage of exit information
 
@@ -51,7 +51,7 @@ export class Scout extends Creep {
         const scoutTarget = unscoutedRooms.length
             ? unscoutedRooms.sort(
                   (a, b) =>
-                      Game.map.getRoomLinearDistance(this.commune, a) - Game.map.getRoomLinearDistance(this.commune, b),
+                      Game.map.getRoomLinearDistance(this.commune.name, a) - Game.map.getRoomLinearDistance(this.commune.name, b),
               )[0]
             : scoutedRooms.sort((a, b) => Memory.rooms[a].LST - Memory.rooms[b].LST)[0]
 
@@ -169,7 +169,7 @@ export class Scout extends Creep {
     preTickManager() {
         if (!this.memory.scoutTarget) return
 
-        const commune = Game.rooms[this.commune]
+        const commune = this.commune
         if (!commune) return
 
         commune.scoutTargets.add(this.memory.scoutTarget)
@@ -191,7 +191,7 @@ export class Scout extends Creep {
 
             if (creep.ticksToLive === CREEP_LIFE_TIME - 1) creep.notifyWhenAttacked(false)
 
-            const commune = Game.rooms[creep.commune]
+            const commune = creep.commune
             if (!commune) continue
 
             // If the creep is in the scoutTarget

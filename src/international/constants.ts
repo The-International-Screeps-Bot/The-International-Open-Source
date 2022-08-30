@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 83
+export const breakingVersion = 84
 
 // Settings
 
@@ -631,7 +631,8 @@ export const boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
 export enum RemoteNeeds {
     source1RemoteHarvester,
     source2RemoteHarvester,
-    remoteHauler,
+    remoteHauler0,
+    remoteHauler1,
     remoteReserver,
     remoteCoreAttacker,
     remoteBuilder,
@@ -658,7 +659,7 @@ export enum AttackRequestNeeds {
 }
 
 export enum AllyCreepRequestNeeds {
-    allyVanguard
+    allyVanguard,
 }
 
 export enum DepositNeeds {
