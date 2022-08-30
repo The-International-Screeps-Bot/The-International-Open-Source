@@ -7,7 +7,7 @@ import {
     packXY,
     unpackAsPos,
 } from 'international/generalFunctions'
-import { marketManager } from './market/marketManager'
+import { MarketManager } from './market/marketManager'
 import './spawning/spawnManager'
 
 import './towers'
@@ -24,9 +24,11 @@ import { LabManager } from './lab'
 
 export class CommuneManager {
     labManager: LabManager
+    marketManager: MarketManager
 
     constructor() {
         this.labManager = new LabManager(this)
+        this.marketManager = new MarketManager(this)
     }
 
     room: Room
@@ -44,7 +46,7 @@ export class CommuneManager {
 
         this.room.towerManager()
 
-        marketManager(this.room)
+        this.marketManager.run()
 
         this.room.linkManager()
 
