@@ -600,6 +600,8 @@ declare global {
         stats: Partial<Stats>
 
         players: { [playerName: string]: Partial<PlayerInfo> }
+
+        masterPlan: { resources?: { [key in ResourceConstant]?: number } }
     }
 
     interface RawMemory {
@@ -1395,6 +1397,13 @@ declare global {
 
         factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
         factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
+
+        marketData: {
+            [RESOURCE_ENERGY]?: number
+            sellAvg?: { [key in ResourceConstant]?: number }
+            buyAvg?: { [key in ResourceConstant]?: number }
+            aquire?: { [key in ResourceConstant]?: number }
+        }
     }
 
     // Creeps
