@@ -2,7 +2,7 @@ module.exports.cliPort = 21026
 
 module.exports.tickDuration = 10
 
-module.exports.playerRooms = {"W2N2":'user1',"W1N1":"user2","W2N5":"user3"}
+module.exports.playerRooms = {"W3N3":'user1',"W1N1":"user2","W2N5":"user3"}
 module.exports.rooms ={
      "W1N1":'bot',
      "W6N1":'bot',
@@ -15,7 +15,7 @@ module.exports.rooms ={
      "W3N3":'bot',
 }
 module.exports.trackedRooms= [
-     "W2N2",
+     "W3N3",
      "W5N8",
      "W7N3",
      "W5N8"
