@@ -24,7 +24,7 @@
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 5,
+    "id": 2,
     "links": [],
     "liveNow": false,
     "panels": [
@@ -42,10 +42,7 @@
             "type": "row"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -163,10 +160,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -327,10 +321,7 @@
             "type": "piechart"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -384,10 +375,7 @@
             "type": "stat"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -441,10 +429,7 @@
             "type": "stat"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -548,10 +533,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -645,10 +627,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "qM1fZaZ4k"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -747,10 +726,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -832,10 +808,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -916,10 +889,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1022,7 +992,7 @@
         {
             "datasource": {
                 "type": "graphite",
-                "uid": "qM1fZaZ4k"
+                "uid": "qdSgUQW4z"
             },
             "fieldConfig": {
                 "defaults": {
@@ -1104,17 +1074,14 @@
                         "uid": "utjUeLRVz"
                     },
                     "refId": "A",
-                    "target": "aliasByNode(movingAverage(stats.$Users.$Shards.constructionSiteCount, 5), 1)"
+                    "target": "aliasByNode(stats.$Users.$Shards.constructionSiteCount, 1)"
                 }
             ],
             "title": "Construction site count",
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1194,10 +1161,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1366,10 +1330,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1468,10 +1429,7 @@
             "type": "row"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1559,10 +1517,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1660,10 +1615,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1781,10 +1733,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1952,10 +1901,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "qM1fZaZ4k"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -2045,10 +1991,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -2146,10 +2089,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "qM1fZaZ4k"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -2613,10 +2553,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "qM1fZaZ4k"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -2716,10 +2653,7 @@
             "type": "row"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -2890,10 +2824,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -2978,10 +2909,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "graphite",
-                "uid": "h3Co8Pm4z"
-            },
+            "datasource": {},
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -3252,10 +3180,7 @@
             "id": 59,
             "panels": [
                 {
-                    "datasource": {
-                        "type": "graphite",
-                        "uid": "h3Co8Pm4z"
-                    },
+                    "datasource": {},
                     "fieldConfig": {
                         "defaults": {
                             "color": {
@@ -3294,8 +3219,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -3381,8 +3305,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -3427,10 +3350,7 @@
                     "type": "timeseries"
                 },
                 {
-                    "datasource": {
-                        "type": "graphite",
-                        "uid": "qM1fZaZ4k"
-                    },
+                    "datasource": {},
                     "fieldConfig": {
                         "defaults": {
                             "color": {
@@ -3470,8 +3390,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -3578,8 +3497,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -3664,8 +3582,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -3749,8 +3666,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -3834,8 +3750,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -3933,8 +3848,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -4018,8 +3932,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -4156,8 +4069,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -4241,8 +4153,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -4326,8 +4237,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -4411,8 +4321,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -4496,8 +4405,7 @@
                                 "mode": "absolute",
                                 "steps": [
                                     {
-                                        "color": "green",
-                                        "value": null
+                                        "color": "green"
                                     },
                                     {
                                         "color": "red",
@@ -4546,7 +4454,7 @@
             "type": "row"
         }
     ],
-    "refresh": "5s",
+    "refresh": "30m",
     "schemaVersion": 36,
     "style": "dark",
     "tags": [],
@@ -4555,13 +4463,13 @@
             {
                 "allValue": "",
                 "current": {
-                    "selected": false,
+                    "selected": true,
                     "text": ["All"],
                     "value": ["$__all"]
                 },
                 "datasource": {
                     "type": "graphite",
-                    "uid": "h3Co8Pm4z"
+                    "uid": "qdSgUQW4z"
                 },
                 "definition": "stats.*",
                 "hide": 0,
@@ -4578,13 +4486,13 @@
             },
             {
                 "current": {
-                    "selected": false,
+                    "selected": true,
                     "text": ["All"],
                     "value": ["$__all"]
                 },
                 "datasource": {
                     "type": "graphite",
-                    "uid": "h3Co8Pm4z"
+                    "uid": "qdSgUQW4z"
                 },
                 "definition": "stats.$Users.*",
                 "hide": 0,
@@ -4601,13 +4509,13 @@
             },
             {
                 "current": {
-                    "selected": false,
+                    "selected": true,
                     "text": ["All"],
                     "value": ["$__all"]
                 },
                 "datasource": {
                     "type": "graphite",
-                    "uid": "h3Co8Pm4z"
+                    "uid": "qdSgUQW4z"
                 },
                 "definition": "stats.$Users.$Shards.rooms.*",
                 "hide": 0,
@@ -4625,13 +4533,13 @@
         ]
     },
     "time": {
-        "from": "now-7d",
+        "from": "now-6h",
         "to": "now"
     },
     "timepicker": {},
     "timezone": "",
     "title": "Stats",
-    "uid": "Xu6BZ-WVz",
-    "version": 5,
+    "uid": "pkER8wZ4k",
+    "version": 2,
     "weekStart": ""
 }
