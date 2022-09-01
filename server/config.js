@@ -14,6 +14,12 @@ module.exports.rooms ={
      "W8N6":'bot',
      "W3N3":'bot',
 }
+module.exports.trackedRooms= [
+     "W2N2",
+     "W5N8",
+     "W7N3",
+     "W5N8"
+]
 
 module.exports.milestones = [
      { tick: 10000, check: { level: 2 }, required:false },

@@ -5,12 +5,10 @@ require('dotenv').config()
 
 const { setPassword, sleep, initServer, startServer, spawnBots, helpers, followLog } = require('./helper')
 
-const { cliPort, tickDuration, playerRooms, rooms, milestones } = require('./config')
+const { cliPort, tickDuration, playerRooms, rooms, trackedRooms, milestones } = require('./config')
 
 const controllerRooms = {}
 const status = {}
-const roomNames = Object.keys(rooms)
-const roomsCount = roomNames.length
 let lastTick = 0
 
 process.once('SIGINT', code => {
@@ -23,7 +21,7 @@ process.once('SIGINT', code => {
      process.exit()
 })
 
-for (const room of roomNames) {
+trackedRooms.forEach(room => {
      status[room] = {
           controller: null,
           creeps: 0,
@@ -31,7 +29,7 @@ for (const room of roomNames) {
           level: 0,
           structures: 0,
      }
-}
+})
 
 let botsSpawned = false
 
@@ -118,9 +116,9 @@ class Tester {
                }
 
                if (setPassword(line, socket, rooms, this.roomsSeen, playerRooms)) {
-                    if (roomsCount === Object.keys(this.roomsSeen).length) {
+                    if (Object.keys(rooms).length === Object.keys(this.roomsSeen).length) {
                          console.log('> Listen to the log')
-                         followLog(roomNames, statusUpdater)
+                         followLog(trackedRooms, statusUpdater)
                          await sleep(5)
                          console.log(`> system.resumeSimulation()`)
                          socket.write(`system.resumeSimulation()\r\n`)
@@ -171,7 +169,7 @@ const statusUpdater = event => {
           for (const milestone of milestones) {
                const failedRooms = []
                if (typeof milestone.success === 'undefined' || milestone.success === null) {
-                    let success = Object.keys(status).length === roomsCount
+                    let success = Object.keys(status).length === trackedRooms.length
                     for (const room of Object.keys(status)) {
                          for (const key of Object.keys(milestone.check)) {
                               if (status[room][key] < milestone.check[key]) {
