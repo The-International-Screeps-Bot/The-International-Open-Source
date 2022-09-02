@@ -1,4 +1,4 @@
-import { stamps } from 'international/constants'
+import { impassibleStructureTypes, stamps } from 'international/constants'
 import { unpackAsPos } from 'international/generalFunctions'
 
 Room.prototype.remotePlanner = function (commune) {
@@ -55,8 +55,9 @@ Room.prototype.communeConstructionPlacement = function () {
                 if (
                     structureType === STRUCTURE_RAMPART &&
                     (!this.storage || this.controller.level < 4 || this.storage.store.energy < 30000)
-                )
+                ) {
                     continue
+                }
 
                 // If the structureType is a road and RCL 3 extensions aren't built, stop
 
@@ -69,6 +70,15 @@ Room.prototype.communeConstructionPlacement = function () {
                     const y = pos.y + stampAnchor.y - stamp.offset
 
                     if (placed > 10) return
+
+                    //Don't build roads if there's already an impassable structure there.  This is mostly to deal
+                    //  with existing rooms that are being built.
+                    if (structureType == STRUCTURE_ROAD) {
+                        const impassableStructure = this.lookForAt(LOOK_STRUCTURES, x, y).find(str =>
+                            impassibleStructureTypes.includes(str.structureType),
+                        )
+                        if (impassableStructure) continue
+                    }
 
                     if (this.createConstructionSite(x, y, structureType as BuildableStructureConstant) === OK)
                         placed += 1
