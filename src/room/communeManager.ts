@@ -46,7 +46,10 @@ export class CommuneManager {
 
         this.room.towerManager()
 
-        this.marketManager.run()
+
+        try { this.marketManager.run(); } catch (err) {
+            customLog('Exception processing marketManager in ' + this.room.name + '. ', err + '\n' + (err as any).stack, myColors.white, myColors.red);
+          }
 
         this.room.linkManager()
 

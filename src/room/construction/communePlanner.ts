@@ -744,6 +744,8 @@ export function basePlanner(room: Room) {
         observerAnchor.x + 3,
         observerAnchor.y + 3,
     )
+
+    if(!room.unprotectedCoords) room.findUnprotectedCoords()
     
     for (const coord of adjacentCoords) {
         // If the coord is probably not protected

@@ -87,6 +87,32 @@ Room.prototype.communeConstructionPlacement = function () {
         }
     }
 
+    if (this.storage && this.storage.store.energy > 30000) {
+        //Build ramparts on important structures:
+        for (const structureType of [
+            STRUCTURE_TOWER,
+            STRUCTURE_SPAWN,
+            STRUCTURE_STORAGE,
+            STRUCTURE_TERMINAL,
+            STRUCTURE_FACTORY,
+            STRUCTURE_LAB,
+        ]) {
+            const structures = this.find(FIND_MY_STRUCTURES, { filter: { structureType: structureType } })
+            for (const structure of structures) {
+                if (placed > 10) continue
+
+                let rampart = structure.pos.lookFor(LOOK_STRUCTURES).filter(st => st.structureType == STRUCTURE_RAMPART)
+                let rampartc = structure.pos
+                    .lookFor(LOOK_CONSTRUCTION_SITES)
+                    .filter(st => st.structureType == STRUCTURE_RAMPART)
+                if (rampart.length == 0 && rampartc.length == 0) {
+                    if (this.createConstructionSite(structure.pos.x, structure.pos.y, STRUCTURE_RAMPART) === OK)
+                        placed += 1
+                }
+            }
+        }
+    }
+
     // If visuals are enabled, visually connect roads
 
     if (Memory.roomVisuals) this.visual.connectRoads()
