@@ -207,6 +207,14 @@ Room.prototype.get = function (roomObjectName) {
 
         upgradePositions.push(upgradePositions.shift())
 
+        let i = 0
+
+        for (const upgradePos of upgradePositions) {
+
+            i++
+            room.visual.text(i.toString(), upgradePos)
+        }
+
         // Inform harvestPositions
 
         return upgradePositions
@@ -325,7 +333,7 @@ Room.prototype.get = function (roomObjectName) {
 
             // If the creep is dying, iterate
 
-            if (creep.isDying()) continue
+            if (creep.dying) continue
 
             // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 
@@ -397,7 +405,7 @@ Room.prototype.get = function (roomObjectName) {
 
             // If the creep is dying, iterate
 
-            if (creep.isDying()) continue
+            if (creep.dying) continue
 
             // If the creep has a packedUpgradePos, record it in usedUpgradePositions
 
@@ -432,7 +440,7 @@ Room.prototype.get = function (roomObjectName) {
 
             // If the creep is dying, iterate
 
-            if (creep.isDying()) continue
+            if (creep.dying) continue
 
             // If the creep has a packedFastFillerPos, record it in usedFastFillerPositions
 
@@ -459,31 +467,7 @@ Room.prototype.get = function (roomObjectName) {
         cacheType: 'global',
         cacheAmount: Infinity,
         room,
-        valueConstructor() { },
-    })
-
-    new RoomCacheObject({
-        name: 'remoteNamesByEfficacy',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: 1,
-        room,
-        valueConstructor() {
-            // Filter rooms that have some sourceEfficacies recorded
-
-            const remotesWithEfficacies = room.memory.remotes.filter(function (roomName) {
-                return Memory.rooms[roomName].SE.length
-            })
-
-            // Sort the remotes based on the average source efficacy
-
-            return remotesWithEfficacies.sort(function (a1, b1) {
-                return (
-                    Memory.rooms[a1].SE.reduce((a2, b2) => a2 + b2) / Memory.rooms[a1].SE.length -
-                    Memory.rooms[b1].SE.reduce((a2, b2) => a2 + b2) / Memory.rooms[b1].SE.length
-                )
-            })
-        },
+        valueConstructor() {},
     })
 
     // Get the roomObject using it's name
@@ -1350,7 +1334,7 @@ Room.prototype.findStoredResourceAmount = function (resourceType) {
 
     // Create array of room and terminal
 
-    const storageStructures = [room.storage, room.terminal, ...room.structures.factory];
+    const storageStructures = [room.storage, room.terminal, ...room.structures.factory]
 
     // Iterate through storageStructures
 

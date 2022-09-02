@@ -36,10 +36,31 @@ import { LabManager } from 'room/lab'
 import { CommuneManager } from 'room/communeManager'
 import { configManager } from './international/config'
 import { RoomManager } from 'room/roomManager'
+import { initProfiler } from 'other/profiler'
 
 // Type declareations for global
 
 declare global {
+    interface ProfilerMemory {
+        data: { [name: string]: ProfilerData }
+        start?: number
+        total: number
+    }
+
+    interface ProfilerData {
+        calls: number
+        time: number
+    }
+
+    interface Profiler {
+        clear(): void
+        output(): void
+        start(): void
+        status(): void
+        stop(): void
+        toString(): string
+    }
+
     interface Coord {
         x: number
         y: number
@@ -134,7 +155,6 @@ declare global {
         | 'usedMineralHarvestPositions'
         | 'usedUpgradePositions'
         | 'usedFastFillerPositions'
-        | 'remoteNamesByEfficacy'
 
     interface PathGoal {
         pos: RoomPosition
@@ -602,6 +622,10 @@ declare global {
         players: { [playerName: string]: Partial<PlayerInfo> }
 
         masterPlan: { resources?: { [key in ResourceConstant]?: number } }
+
+        // Other
+
+        profiler: ProfilerMemory
     }
 
     interface RawMemory {
@@ -1037,13 +1061,15 @@ declare global {
          */
         roomVisualsManager(): void
 
-        // Getters
+        // Room Getters
 
         readonly global: Partial<RoomGlobal>
 
         _anchor: RoomPosition | undefined
 
         readonly anchor: RoomPosition | undefined
+
+        // Resources
 
         _sources: Source[]
 
@@ -1056,6 +1082,8 @@ declare global {
         _mineral: Mineral
 
         readonly mineral: Mineral
+
+        // Creeps
 
         _enemyCreeps: Creep[]
 
@@ -1076,6 +1104,8 @@ declare global {
         _allyDamagedCreeps: Creep[]
 
         readonly allyDamagedCreeps: Creep[]
+
+        // Buildings
 
         _structures: Partial<OrganizedStructures>
 
@@ -1115,6 +1145,8 @@ declare global {
 
         readonly taskNeedingSpawningStructures: SpawningStructures
 
+        // Resource info
+
         _sourcePositions: RoomPosition[][]
 
         readonly sourcePositions: RoomPosition[][]
@@ -1132,6 +1164,14 @@ declare global {
         readonly controllerPositions: RoomPosition[]
 
         readonly upgradePathLength: number
+
+        _remoteNamesBySourceEfficacy: string[]
+
+        readonly remoteNamesBySourceEfficacy: string[]
+
+        _remoteSourceIDsByEfficacy: Id<Source>[]
+
+        readonly remoteSourceIDsByEfficacy: Id<Source>[]
 
         // Container
 
@@ -1464,11 +1504,6 @@ declare global {
 
         endTickManager(): void
 
-        /**
-         * Wether the creep's respawn time is equal to its remaining ticks to live
-         */
-        isDying(): boolean
-
         advancedPickup(target: Resource): boolean
 
         advancedTransfer(target: Creep | AnyStoreStructure, resourceType?: ResourceConstant, amount?: number): boolean
@@ -1509,7 +1544,7 @@ declare global {
          */
         findRepairTarget(excluded?: Set<Id<Structure<StructureConstant>>>): Structure | false
 
-        findOptimalSourceName(): boolean
+        findOptimalSourceIndex(): boolean
 
         findSourcePos(sourceName: number): boolean
 
@@ -1610,12 +1645,19 @@ declare global {
          */
         readonly cost: number
 
-        _commune: string
+        _commune: Room | undefined
 
         /**
          * The name of the room the creep is from
          */
-        readonly commune: string
+        readonly commune: Room | undefined
+
+        _dying: boolean
+
+        /**
+         * Wether the creep is as old as the time it takes to respawn, or is past a role-based threshold
+         */
+        readonly dying: boolean
 
         _reservation: Reservation | false
 
@@ -1685,7 +1727,7 @@ declare global {
         /**
          * The Source Index of recorded sources in the room
          */
-        SI: number
+        SI: 0 | 1
 
         /**
          * The creep's packedPos for a designated target
@@ -1972,6 +2014,8 @@ declare global {
         }
     }
 }
+
+global.profiler = initProfiler()
 
 // Loop
 

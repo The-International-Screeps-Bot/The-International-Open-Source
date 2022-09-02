@@ -29,8 +29,9 @@ Room.prototype.spawnRequester = function () {
     // Structure info about the this's spawn energy
 
     const spawnEnergyCapacity = this.energyCapacityAvailable
-
     const mostOptimalSource = this.sourcesByEfficacy[0]
+    const { storage } = this
+    const { terminal } = this
 
     let partsMultiplier: number
 
@@ -239,7 +240,7 @@ Room.prototype.spawnRequester = function () {
             if (this.controllerContainer) {
                 let income
 
-                if (this.storage && this.controller.level >= 4) {
+                if (storage && this.controller.level >= 4) {
                     income = this.getPartsOfRoleAmount('controllerUpgrader', WORK)
                 } else
                     income = Math.min(
@@ -248,6 +249,10 @@ Room.prototype.spawnRequester = function () {
                     )
 
                 requiredCarryParts += findCarryPartsRequired(this.upgradePathLength, income)
+            }
+
+            if (this.controller.level >= 4 && storage && storage.store.energy >= 1000) {
+            } else if (this.controller.level >= 6 && terminal && terminal.store.energy >= 1000) {
             }
 
             const role = 'hauler'
@@ -296,15 +301,15 @@ Room.prototype.spawnRequester = function () {
 
             if (this.controller.level < 6) return false
 
-            if (!this.storage) return false
+            if (!storage) return false
 
-            if (this.storage.store.energy < 40000) return false
+            if (storage.store.energy < 40000) return false
 
             // If there is no terminal, inform false
 
-            if (!this.terminal) return false
+            if (!terminal) return false
 
-            if (this.terminal.store.getFreeCapacity() <= 10000) return false
+            if (terminal.store.getFreeCapacity() <= 10000) return false
 
             // Get the mineral. If it's out of resources, inform false
 
@@ -337,11 +342,11 @@ Room.prototype.spawnRequester = function () {
         ((): SpawnRequestOpts | false => {
             // If there is no storage, inform false
 
-            if (!this.storage || this.controller.level < 4) return false
+            if (!storage || this.controller.level < 4) return false
 
             // Otherwise if there is no hubLink or terminal, inform false
 
-            if (!this.hubLink && (!this.terminal || this.controller.level < 6)) return false
+            if (!this.hubLink && (!terminal || this.controller.level < 6)) return false
 
             const role = 'hubHauler'
 
@@ -475,16 +480,16 @@ Room.prototype.spawnRequester = function () {
 
             if (this.find(FIND_MY_CONSTRUCTION_SITES).length === 0) return false
 
-            let priority = 10
+            let priority = 9
             let partsMultiplier = 0
 
             // If there is a storage
 
-            if (this.storage && this.controller.level < 4) {
+            if (storage && this.controller.level < 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-                if (this.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= builderSpawningWhenStorageThreshold)
-                    partsMultiplier += this.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 8000
+                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) >= builderSpawningWhenStorageThreshold)
+                    partsMultiplier += storage.store.getUsedCapacity(RESOURCE_ENERGY) / 8000
             }
 
             // Otherwise if there is no storage
@@ -494,7 +499,7 @@ Room.prototype.spawnRequester = function () {
             /*
             // If there is a storage or terminal
 
-            if (this.storage || this.terminal) {
+            if (storage || terminal) {
                 return {
                     role,
                     defaultParts: [],
@@ -602,8 +607,8 @@ Room.prototype.spawnRequester = function () {
 
             // For every x energy in storage, add 1 multiplier
 
-            if (this.storage && this.controller.level >= 4)
-                partsMultiplier += this.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000
+            if (storage && this.controller.level >= 4)
+                partsMultiplier += storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000
 
             const role = 'maintainer'
 
@@ -658,11 +663,11 @@ Room.prototype.spawnRequester = function () {
 
             // If there is a storage
 
-            if (this.storage && this.controller.level >= 4) {
+            if (storage && this.controller.level >= 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-                if (this.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold)
-                    partsMultiplier = Math.pow(this.storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000, 2)
+                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold)
+                    partsMultiplier = Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000, 2)
                 // Otherwise, set partsMultiplier to 0
                 else partsMultiplier = 0
             }
@@ -872,7 +877,7 @@ Room.prototype.spawnRequester = function () {
 
     const minRemotePriority = 10
 
-    const remoteNamesByEfficacy: string[] = this.get('remoteNamesByEfficacy')
+    const remoteNamesByEfficacy = this.remoteNamesBySourceEfficacy
 
     for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
         const remoteName = remoteNamesByEfficacy[index]
@@ -884,7 +889,8 @@ Room.prototype.spawnRequester = function () {
         const totalRemoteNeed =
             Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
             Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0) +
-            Math.max(remoteNeeds[RemoteNeeds.remoteHauler], 0) +
+            Math.max(remoteNeeds[RemoteNeeds.remoteHauler0], 0) +
+            Math.max(remoteNeeds[RemoteNeeds.remoteHauler1], 0) +
             Math.max(remoteNeeds[RemoteNeeds.remoteReserver], 0) +
             Math.max(remoteNeeds[RemoteNeeds.remoteCoreAttacker], 0) +
             Math.max(remoteNeeds[RemoteNeeds.remoteDismantler], 0) +
@@ -1257,11 +1263,11 @@ Room.prototype.spawnRequester = function () {
 
                 return {
                     role,
-                    defaultParts: [MOVE, MOVE, CLAIM, MOVE],
-                    extraParts: [],
+                    defaultParts: [CLAIM, MOVE],
+                    extraParts: [MOVE, MOVE, MOVE, MOVE],
                     partsMultiplier: 1,
                     minCreeps: 1,
-                    minCost: 750,
+                    minCost: 650,
                     priority: 8.1,
                     memoryAdditions: {},
                 }

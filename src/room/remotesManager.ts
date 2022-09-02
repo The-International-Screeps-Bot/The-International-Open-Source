@@ -36,7 +36,8 @@ Room.prototype.remotesManager = function () {
 
         remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] = 3
         remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] = remoteMemory.SIDs[1] ? 3 : 0
-        remoteMemory.needs[RemoteNeeds.remoteHauler] = 0
+        remoteMemory.needs[RemoteNeeds.remoteHauler0] = 0
+        remoteMemory.needs[RemoteNeeds.remoteHauler1] = 0
         remoteMemory.needs[RemoteNeeds.remoteReserver] = 1
 
         // Get the remote
@@ -61,22 +62,21 @@ Room.prototype.remotesManager = function () {
             if (isReserved && remote.controller.reservation.ticksToEnd >= Math.min(remoteMemory.RE * 5, 2500))
                 remoteMemory.needs[RemoteNeeds.remoteReserver] = 0
         }
-
+/*
         // Loop through each index of sourceEfficacies
 
-        for (let index = 0; index < remoteMemory.SE.length; index += 1) {
+        for (let sourceIndex = 0; sourceIndex < remoteMemory.SE.length; sourceIndex += 1) {
             // Get the income based on the reservation of the room and remoteHarvester need
 
-            /* const income = possibleReservation ? 10 : 5 */
             const income =
                 (possibleReservation ? 10 : 5) -
-                Math.floor(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]] * minHarvestWorkRatio)
+                Math.floor(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio)
 
             // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-            remoteMemory.needs[RemoteNeeds.remoteHauler] += findCarryPartsRequired(remoteMemory.SE[index], income) / 2
+            remoteMemory.needs[RemoteNeeds[`remoteHauler${sourceIndex as 0 | 1}`]] += findCarryPartsRequired(remoteMemory.SE[sourceIndex], income) / 2
         }
-
+ */
         if (remote) {
             remoteMemory.needs[RemoteNeeds.minDamage] = 0
             remoteMemory.needs[RemoteNeeds.minHeal] = 0
@@ -115,7 +115,8 @@ Room.prototype.remotesManager = function () {
         if (remoteMemory.needs[RemoteNeeds.enemyReserved]) {
             remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] = 0
             remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] = 0
-            remoteMemory.needs[RemoteNeeds.remoteHauler] = 0
+            remoteMemory.needs[RemoteNeeds.remoteHauler0] = 0
+            remoteMemory.needs[RemoteNeeds.remoteHauler1] = 0
         }
 
         // If there is assumed to be an invader core
@@ -123,7 +124,8 @@ Room.prototype.remotesManager = function () {
         if (remoteMemory.needs[RemoteNeeds.invaderCore]) {
             remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] = 0
             remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] = 0
-            remoteMemory.needs[RemoteNeeds.remoteHauler] = 0
+            remoteMemory.needs[RemoteNeeds.remoteHauler0] = 0
+            remoteMemory.needs[RemoteNeeds.remoteHauler1] = 0
         }
     }
 }

@@ -1,6 +1,11 @@
 import { ClaimRequestNeeds } from 'international/constants'
 
 export class Claimer extends Creep {
+
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
+
     /**
      * Claims a room specified in the creep's commune claimRequest
      */
@@ -44,10 +49,6 @@ export class Claimer extends Creep {
         creep.claimController(room.controller)
     }
 
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
-    }
-
     static claimerManager(room: Room, creepsOfRole: string[]) {
         // Loop through the names of the creeps of the role
 
@@ -56,7 +57,7 @@ export class Claimer extends Creep {
 
             const creep: Claimer = Game.creeps[creepName]
 
-            const claimTarget = Memory.rooms[creep.commune].claimRequest
+            const claimTarget = Memory.rooms[creep.commune.name].claimRequest
 
             // If the creep has no claim target, stop
 
@@ -64,7 +65,7 @@ export class Claimer extends Creep {
 
             creep.say(claimTarget)
 
-            Memory.claimRequests[Memory.rooms[creep.commune].claimRequest].needs[ClaimRequestNeeds.claimer] = 0
+            Memory.claimRequests[Memory.rooms[creep.commune.name].claimRequest].needs[ClaimRequestNeeds.claimer] = 0
 
             if (room.name === claimTarget) {
                 creep.claimRoom()

@@ -167,14 +167,15 @@ export class VanguardDefender extends Creep {
 
             const creep: VanguardDefender = Game.creeps[creepName]
 
-            const claimTarget = Memory.rooms[creep.commune].claimRequest
+            const claimTarget = Memory.rooms[creep.commune.name].claimRequest
 
             // If the creep has no claim target, stop
 
             if (!claimTarget) return
 
-            Memory.claimRequests[Memory.rooms[creep.commune].claimRequest].needs[ClaimRequestNeeds.vanguardDefender] -=
-                creep.strength
+            Memory.claimRequests[Memory.rooms[creep.commune.name].claimRequest].needs[
+                ClaimRequestNeeds.vanguardDefender
+            ] -= creep.strength
 
             creep.say(claimTarget)
 

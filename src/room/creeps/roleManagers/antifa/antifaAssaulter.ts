@@ -41,7 +41,7 @@ export class AntifaAssaulter extends Creep {
 
         // In the commune
 
-        if (this.commune === this.name) {
+        if (this.commune?.name === this.name) {
             // Go to the attackTarget
 
             this.createMoveRequest({
