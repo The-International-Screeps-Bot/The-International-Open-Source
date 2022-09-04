@@ -98,7 +98,7 @@ global.destroyStructures = function (roomName, types?) {
 
     return `Destroyed a total of ${destroyedStructureCount} structures in ${roomName} ${
         types ? `with the types ${types}` : ''
-    }`
+        }`
 }
 
 global.destroyCommuneStructures = function (types?) {
@@ -195,3 +195,12 @@ global.allyCreepRequest = function (request, communeName?) {
     return `${communeName ? `${communeName} is responding to the` : `created`} allyCreepRequest for ${request}`
 }
 global.ACR = global.allyCreepRequest
+
+global.renderVisuals = function (enable) {
+    if (enable !== true && enable !== false) {
+        return;
+    }
+    Memory.roomVisuals = enable;
+    Memory.baseVisuals = enable;
+    Memory.mapVisuals = enable;
+}

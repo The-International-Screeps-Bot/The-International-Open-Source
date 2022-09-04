@@ -2011,6 +2011,11 @@ declare global {
              * Creates an allyCreepRequest for a specified room, that can optionally be assigned to a specified commune
              */
             allyCreepRequest(request: string, communeName?: string): string
+
+            /**
+             * Toggles visuals
+             */
+            renderVisuals(enable: boolean): void
         }
     }
 }
