@@ -66,11 +66,11 @@ export function areCoordsEqual(pos1: Coord, pos2: Coord) {
 export function customLog(title: any, message: any, color: string = myColors.black, bgColor: string = myColors.white) {
     // Create the title
 
-    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${bgColor};'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ${color};'>${title}:</div>`
+    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${bgColor};'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${color};'>${title}:</div>`
 
     // Create the content
 
-    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ${color};'>${message}</div></div>`
+    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${color};'>${message}</div></div>`
 }
 
 /**
