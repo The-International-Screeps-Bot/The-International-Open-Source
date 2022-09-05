@@ -62,7 +62,7 @@ Room.prototype.remotesManager = function () {
             if (isReserved && remote.controller.reservation.ticksToEnd >= Math.min(remoteMemory.RE * 5, 2500))
                 remoteMemory.needs[RemoteNeeds.remoteReserver] = 0
         }
-/*
+        /*
         // Loop through each index of sourceEfficacies
 
         for (let sourceIndex = 0; sourceIndex < remoteMemory.SE.length; sourceIndex += 1) {

@@ -1169,9 +1169,9 @@ declare global {
 
         readonly remoteNamesBySourceEfficacy: string[]
 
-        _remoteSourceIDsByEfficacy: Id<Source>[]
+        _remoteSourceIndexesByEfficacy: string[]
 
-        readonly remoteSourceIDsByEfficacy: Id<Source>[]
+        readonly remoteSourceIndexesByEfficacy: string[]
 
         // Container
 
@@ -1717,7 +1717,7 @@ declare global {
         /**
          * Wether the creep is old enough to need a replacement
          */
-        dying: boolean
+        D: boolean
 
         /**
          * A name of the creep's designated source
@@ -1770,9 +1770,9 @@ declare global {
         signTarget: string
 
         /**
-         * The name of the room the creep is remoting for
+         * Remote Name of the room the creep is remoting for
          */
-        remote: string
+        RN: string
 
         /**
          * The target ID of the task (for hubHaulers)
@@ -1795,9 +1795,9 @@ declare global {
         NR: boolean
 
         /**
-         * Wether or not the creep should Use Roads
+         * Roads, wether or not the creep should use roads
          */
-        roads: boolean
+        R: boolean
 
         /**
          * The rampart repair quota the creep currently has decided on

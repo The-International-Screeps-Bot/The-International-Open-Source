@@ -205,15 +205,9 @@ Room.prototype.get = function (roomObjectName) {
             return getRange(a.x, room.anchor.x, a.y, room.anchor.y) - getRange(b.x, room.anchor.x, b.y, room.anchor.y)
         })
 
+        // Make the closest pos the least to be chosen
+
         upgradePositions.push(upgradePositions.shift())
-
-        let i = 0
-
-        for (const upgradePos of upgradePositions) {
-
-            i++
-            room.visual.text(i.toString(), upgradePos)
-        }
 
         // Inform harvestPositions
 
@@ -679,7 +673,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 if (!room) return cm
 
-                if (opts.creep && opts.creep.memory.roads)
+                if (opts.creep && opts.creep.memory.R)
                     for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, 1)
 
                 // Weight structures

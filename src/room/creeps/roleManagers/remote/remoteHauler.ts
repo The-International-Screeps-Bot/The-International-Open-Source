@@ -1,6 +1,7 @@
 import { RemoteNeeds } from 'international/constants'
-import { findObjectWithID } from 'international/generalFunctions'
+import { customLog, findObjectWithID } from 'international/generalFunctions'
 import { indexOf } from 'lodash'
+import { unpackPosList } from 'other/packrat'
 import { Hauler } from '../commune/hauler'
 
 export class RemoteHauler extends Creep {
@@ -23,40 +24,41 @@ export class RemoteHauler extends Creep {
     }
 
     preTickManager() {
-        if (!this.memory.remote) return
+        if (!this.memory.RN) return
 
         // If the creep's remote no longer is managed by its commune
 
         // If the creep's remote no longer is managed by its commune
 
-        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.remote)) {
+        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
             // Delete it from memory and try to find a new one
 
-            delete this.memory.remote
+            this.removeRemote()
             if (!this.findRemote()) return
         }
 
         if (this.dying) return
 
-        Memory.rooms[this.memory.remote].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
+        Memory.rooms[this.memory.RN].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
     }
 
     /**
      * Finds a remote to haul from
      */
     findRemote?(): boolean {
-        if (this.memory.remote) return true
+        if (this.memory.RN) return true
 
-        for (const sourceID of this.commune?.remoteSourceIDsByEfficacy) {
-            const source = findObjectWithID(sourceID)
-            const remoteMemory = Memory.rooms[source.pos.roomName]
-            const sourceIndex = remoteMemory.SIDs.indexOf(sourceID) as 0 | 1
+        for (const remoteInfo of this.commune?.remoteSourceIndexesByEfficacy) {
+            const splitRemoteInfo = remoteInfo.split(' ')
+            const remoteName = splitRemoteInfo[0]
+            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
+            const remoteMemory = Memory.rooms[remoteName]
 
             // If there is no need
 
             if (remoteMemory.needs[RemoteNeeds[`remoteHauler${sourceIndex}`]] <= 0) continue
 
-            this.assignRemote(source.pos.roomName, sourceIndex)
+            this.assignRemote(remoteName, sourceIndex)
             return true
         }
 
@@ -64,7 +66,7 @@ export class RemoteHauler extends Creep {
     }
 
     assignRemote?(remoteName: string, sourceIndex: 0 | 1) {
-        this.memory.remote = remoteName
+        this.memory.RN = remoteName
         this.memory.SI = sourceIndex
 
         if (this.dying) return
@@ -73,17 +75,17 @@ export class RemoteHauler extends Creep {
     }
 
     removeRemote?() {
-        delete this.memory.remote
+        if (!this.dying) {
+            Memory.rooms[this.memory.RN].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] += this.parts.carry
+        }
+
+        delete this.memory.RN
         delete this.memory.SI
-
-        if (this.dying) return
-
-        Memory.rooms[this.memory.remote].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] += this.parts.carry
     }
 
     /*
     updateRemote?() {
-        if (this.memory.remote) {
+        if (this.memory.RN) {
 
             return true
         }
@@ -97,7 +99,7 @@ export class RemoteHauler extends Creep {
 
             if (roomMemory.needs[RemoteNeeds.remoteHauler] <= 0) continue
 
-            this.memory.remote = roomName
+            this.memory.RN = roomName
             roomMemory.needs[RemoteNeeds.remoteHauler] -= this.parts.carry
 
             return true
@@ -111,7 +113,7 @@ export class RemoteHauler extends Creep {
 
         // If the creep is in the remote
 
-        if (this.room.name === this.memory.remote) {
+        if (this.room.name === this.memory.RN) {
             this.reserveWithdrawEnergy()
 
             if (!this.fulfillReservation()) {
@@ -143,15 +145,16 @@ export class RemoteHauler extends Creep {
             return true
         }
 
-        this.message += this.memory.remote
+        this.message += this.memory.RN
         this.say(this.message)
 
-        const source = findObjectWithID(Memory.rooms[this.memory.remote].SIDs[this.memory.SI])
+        customLog('REMOTE BUG', Memory.rooms[this.memory.RN] + ', ' + this.memory.SI + ', ' + Memory.rooms[this.memory.RN].SP)
+        const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
 
         this.createMoveRequest({
             origin: this.pos,
             goal: {
-                pos: source.pos,
+                pos: sourcePos,
                 range: 1,
             },
             avoidEnemyRanges: true,
@@ -184,13 +187,13 @@ export class RemoteHauler extends Creep {
 
             if (!this.findRemote()) return true
 
-            this.message += this.memory.remote
+            this.message += this.memory.RN
             this.say(this.message)
 
             this.createMoveRequest({
                 origin: this.pos,
                 goal: {
-                    pos: new RoomPosition(25, 25, this.memory.remote),
+                    pos: new RoomPosition(25, 25, this.memory.RN),
                     range: 20,
                 },
                 avoidEnemyRanges: true,
@@ -236,18 +239,20 @@ export class RemoteHauler extends Creep {
         this.store.energy += creepAtPos.store.getUsedCapacity(RESOURCE_ENERGY)
         creepAtPos.store.energy -= this.store.getFreeCapacity()
 
-        const newCreepAtPosMemory = { ...this.memory }
-
-        this.memory = creepAtPos.memory
-        creepAtPos.memory = newCreepAtPosMemory
+        // Stop previously attempted moveRequests as they do not account for a relay
 
         delete this.moveRequest
         delete creepAtPos.moveRequest
 
-        const newCreepAtPosRemote = this.memory.remote || creepAtPos.memory.remote
+        // Trade remotes and sourceIndexes
 
-        this.memory.remote = creepAtPos.memory.remote || this.memory.remote
-        creepAtPos.memory.remote = newCreepAtPosRemote
+        const newCreepAtPosRemote = this.memory.RN || creepAtPos.memory.RN
+        const newCreepAtPosSourceIndex = this.memory.SI !== undefined ? this.memory.SI : creepAtPos.memory.SI
+
+        this.memory.RN = creepAtPos.memory.RN || this.memory.RN
+        this.memory.SI = creepAtPos.memory.SI !== undefined ?  creepAtPos.memory.SI : this.memory.SI
+        creepAtPos.memory.RN = newCreepAtPosRemote
+        creepAtPos.memory.SI = newCreepAtPosSourceIndex
 
         this.deliverResources()
 
@@ -279,18 +284,20 @@ export class RemoteHauler extends Creep {
         this.store.energy -= creepAtPos.store.getFreeCapacity()
         creepAtPos.store.energy += this.store.getUsedCapacity(RESOURCE_ENERGY)
 
-        const newCreepAtPosMemory = { ...this.memory }
-
-        this.memory = creepAtPos.memory
-        creepAtPos.memory = newCreepAtPosMemory
+        // Stop previously attempted moveRequests as they do not account for a relay
 
         delete this.moveRequest
         delete creepAtPos.moveRequest
 
-        const newCreepAtPosRemote = this.memory.remote || creepAtPos.memory.remote
+        // Trade remotes and sourceIndexes
 
-        this.memory.remote = creepAtPos.memory.remote || this.memory.remote
-        creepAtPos.memory.remote = newCreepAtPosRemote
+        const newCreepAtPosRemote = this.memory.RN || creepAtPos.memory.RN
+        const newCreepAtPosSourceIndex = this.memory.SI !== undefined ? this.memory.SI : creepAtPos.memory.SI
+
+        this.memory.RN = creepAtPos.memory.RN || this.memory.RN
+        this.memory.SI = creepAtPos.memory.SI !== undefined ?  creepAtPos.memory.SI : this.memory.SI
+        creepAtPos.memory.RN = newCreepAtPosRemote
+        creepAtPos.memory.SI = newCreepAtPosSourceIndex
 
         this.getResources()
 
@@ -319,7 +326,7 @@ export class RemoteHauler extends Creep {
 
             // If the creep has a remoteName, delete it and delete it's fulfilled needs
 
-            if (creep.memory.remote) creep.removeRemote()
+            if (creep.memory.RN) creep.removeRemote()
 
             if (creep.deliverResources()) continue
             creep.relayAsFull()

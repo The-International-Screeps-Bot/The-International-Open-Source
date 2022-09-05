@@ -244,10 +244,14 @@ export const communeSigns = ['A commune of the proletariat. Bourgeoisie not welc
 export const nonCommuneSigns = [
     'The top 1% have more money than the poorest 4.5 billion',
     'McDonalds workers in the US make $10/hour. In Denmark, as a result of unions, they make $22/hour',
-    'We have democracy in our policial system, why do we not have it in our companies?',
+    'We have democracy in our policial system, should we not have it in our companies too?',
     'Workers of the world, unite!',
     'Real democracy requires democracy in the workplace - Richard Wolff',
     'Adults spend a combined 13 years of their life under a dictatorship: the workplace',
+    'Socialism is about worker ownership over the workplace',
+    'Trans rights.',
+    'Advancing the LGBTQ+ agenda <3',
+    'Does Jeff Bezos work 56,000 times harder than his average worker? Because he gets paid like it'
 ]
 
 export const roomDimensions = 50
@@ -671,6 +675,11 @@ export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHar
     'source1RemoteHarvester',
     'source2RemoteHarvester',
 ]
+
+export enum RemoteHarvesterRolesBySourceIndex {
+    source1RemoteHarvester,
+    source2RemoteHarvester,
+}
 
 export const spawnByRoomRemoteRoles: (
     | 'source1RemoteHarvester'

@@ -3,7 +3,7 @@ import { findObjectWithID, getRange, unpackAsPos } from 'international/generalFu
 
 export class AllyVanguard extends Creep {
     findRemote?(): boolean {
-        if (this.memory.remote) return true
+        if (this.memory.RN) return true
 
         const { room } = this
 
@@ -26,7 +26,7 @@ export class AllyVanguard extends Creep {
             )
                 continue
 
-            this.memory.remote = roomName
+            this.memory.RN = roomName
             return true
         }
 
@@ -40,10 +40,10 @@ export class AllyVanguard extends Creep {
 
         if (!this.findRemote()) return
 
-        if (room.name !== this.memory.remote) {
+        if (room.name !== this.memory.RN) {
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: new RoomPosition(25, 25, this.memory.remote), range: 25 },
+                goal: { pos: new RoomPosition(25, 25, this.memory.RN), range: 25 },
                 avoidEnemyRanges: true,
             })
 
@@ -149,7 +149,7 @@ export class AllyVanguard extends Creep {
         const { room } = this
 
         if (this.needsResources()) {
-            if (this.memory.remote) {
+            if (this.memory.RN) {
                 this.getEnergyFromRemote()
                 return
             }
@@ -202,7 +202,7 @@ export class AllyVanguard extends Creep {
 
             creep.say(request)
 
-            if (room.name === request || (creep.memory.remote && room.name === creep.memory.remote)) {
+            if (room.name === request || (creep.memory.RN && room.name === creep.memory.RN)) {
                 creep.buildRoom()
                 continue
             }
