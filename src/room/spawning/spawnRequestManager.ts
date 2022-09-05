@@ -1036,7 +1036,7 @@ Room.prototype.spawnRequester = function () {
                     minCreeps: 1,
                     maxCreeps: Infinity,
                     minCost: cost,
-                    priority: remotePriority + 1,
+                    priority: minRemotePriority + 1,
                     memoryAdditions: {},
                 }
             })(),
