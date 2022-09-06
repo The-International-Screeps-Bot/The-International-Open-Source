@@ -3,6 +3,7 @@ import {
     customLog,
     findClosestObject,
     findCoordsInsideRect,
+    findFunctionCPU,
     findObjectWithID,
     getRange,
     pack,
@@ -304,9 +305,7 @@ export class RemoteHauler extends Creep {
     relayCoord?(coord: Coord) {
         if (Memory.roomVisuals) this.room.visual.circle(coord.x, coord.y, { fill: myColors.lightBlue })
 
-        const packedCoord = pack(coord)
-
-        const creepAtPosName = this.room.creepPositions.get(packedCoord)
+        const creepAtPosName = this.room.creepPositions.get(pack(coord))
         if (!creepAtPosName) return false
 
         const creepAtPos = Game.creeps[creepAtPosName]
@@ -367,7 +366,10 @@ export class RemoteHauler extends Creep {
                 y: moveRequestCoord.y + offset.y,
             }
 
-            if (this.relayCoord(coord)) return true
+            if (this.relayCoord(coord)) {
+                customLog('RELAY CARDINAL', 'cardinal')
+                return true
+            }
         }
 
         return false
@@ -381,7 +383,10 @@ export class RemoteHauler extends Creep {
 
             if (coord.x !== moveRequestCoord.x && coord.y !== moveRequestCoord.y) continue
 
-            if (this.relayCoord(coord)) return true
+            if (this.relayCoord(coord)) {
+                customLog('RELAY DIAGONAL', 'diagonal')
+                return true
+            }
         }
 
         return false
@@ -423,7 +428,7 @@ export class RemoteHauler extends Creep {
 
             if (creep.memory.RN) creep.removeRemote()
 
-            if (creep.deliverResources()) creep.relayAsFull()
+            if (creep.deliverResources()) findFunctionCPU(() => creep.relayAsFull())
         }
     }
 }

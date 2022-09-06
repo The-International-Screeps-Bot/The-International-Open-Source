@@ -60,7 +60,7 @@ export class RemoteReserver extends Creep {
 
         // Reduce remote need
 
-        if (remoteMemory.needs && !this.dying) remoteMemory.needs[RemoteNeeds[role]] -= 1
+        if (!this.dying) remoteMemory.needs[RemoteNeeds[role]] -= 1
 
         const commune = this.commune
 

@@ -925,7 +925,7 @@ Room.prototype.spawnRequester = function () {
                         memoryAdditions: {
                             R: true,
                             SI: sourceIndex,
-                            RN: remoteName,
+                            /* RN: remoteName, */
                         },
                     }
                 }
@@ -945,7 +945,7 @@ Room.prototype.spawnRequester = function () {
                     memoryAdditions: {
                         R: true,
                         SI: sourceIndex,
-                        RN: remoteName,
+                        /* RN: remoteName, */
                     },
                 }
             })(),
@@ -976,7 +976,6 @@ Room.prototype.spawnRequester = function () {
         if (totalRemoteNeed <= 0) continue
 
         const remoteMemory = Memory.rooms[remoteName]
-        const remotePriority = minRemotePriority + index
         /*
         remoteHaulerNeed += remoteNeeds[RemoteNeeds.remoteHauler]
  */
@@ -1005,15 +1004,6 @@ Room.prototype.spawnRequester = function () {
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
                 // If there are insufficient harvesters for the remote's sources
-                customLog(
-                    remoteName,
-                    Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
-                        Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0) +
-                        ' ' +
-                        (Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
-                            Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0) >
-                            0),
-                )
 
                 if (
                     Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
@@ -1044,7 +1034,9 @@ Room.prototype.spawnRequester = function () {
                     maxCreeps: Infinity,
                     minCost: cost,
                     priority: minRemotePriority + 1,
-                    memoryAdditions: {},
+                    memoryAdditions: {
+                        RN: remoteName
+                    },
                 }
             })(),
         )
@@ -1126,7 +1118,9 @@ Room.prototype.spawnRequester = function () {
                     minCreeps: 1,
                     minCost,
                     priority: minRemotePriority - 2,
-                    memoryAdditions: {},
+                    memoryAdditions: {
+                        RN: remoteName
+                    },
                 }
             })(),
         )
@@ -1155,7 +1149,9 @@ Room.prototype.spawnRequester = function () {
                     minCreeps: 1,
                     minCost: cost * 2,
                     priority: minRemotePriority - 1,
-                    memoryAdditions: {},
+                    memoryAdditions: {
+                        RN: remoteName
+                    },
                 }
             })(),
         )
