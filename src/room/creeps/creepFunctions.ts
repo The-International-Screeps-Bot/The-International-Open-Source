@@ -1855,6 +1855,11 @@ Creep.prototype.fulfillReservation = function () {
         return true
     }
 
+    if (withdrawResult === ERR_INVALID_TARGET) {
+        this.deleteReservation(0)
+        return true
+    }
+
     if (withdrawResult === ERR_FULL) {
         this.deleteReservation(0)
         return true
