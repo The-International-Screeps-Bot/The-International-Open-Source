@@ -1,5 +1,13 @@
-import { RemoteNeeds } from 'international/constants'
-import { customLog, findObjectWithID } from 'international/generalFunctions'
+import { myColors, RemoteNeeds } from 'international/constants'
+import {
+    customLog,
+    findClosestObject,
+    findCoordsInsideRect,
+    findObjectWithID,
+    getRange,
+    pack,
+    unpackAsPos,
+} from 'international/generalFunctions'
 import { indexOf } from 'lodash'
 import { unpackPosList } from 'other/packrat'
 import { Hauler } from '../commune/hauler'
@@ -109,16 +117,24 @@ export class RemoteHauler extends Creep {
     }
  */
     getResources?() {
-        if (!this.findRemote()) return true
+        if (!this.findRemote()) return false
+
+        const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
 
         // If the creep is in the remote
 
         if (this.room.name === this.memory.RN) {
-            this.reserveWithdrawEnergy()
+            if (getRange(this.pos.x, sourcePos.x, this.pos.y, sourcePos.y) > 1) {
+                this.createMoveRequest({
+                    origin: this.pos,
+                    goal: {
+                        pos: sourcePos,
+                        range: 1,
+                    },
+                    avoidEnemyRanges: true,
+                })
 
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return false
+                return true
             }
 
             this.reserveWithdrawEnergy()
@@ -128,16 +144,28 @@ export class RemoteHauler extends Creep {
                 return false
             }
 
-            if (this.needsResources()) return false
+            this.reserveWithdrawEnergy()
 
-            this.message += this.commune
+            if (!this.fulfillReservation()) {
+                this.say(this.message)
+                return false
+            }
+
+            if (this.needsResources()) {
+                /* this.moved = pack(sourcePos) */
+                return false
+            }
+
+            if (!this.commune) return false
+
+            this.message += this.commune.name
             this.say(this.message)
 
             this.createMoveRequest({
                 origin: this.pos,
                 goal: {
-                    pos: new RoomPosition(25, 25, this.commune.name),
-                    range: 20,
+                    pos: this.commune.anchor,
+                    range: 3,
                 },
                 avoidEnemyRanges: true,
             })
@@ -148,9 +176,6 @@ export class RemoteHauler extends Creep {
         this.message += this.memory.RN
         this.say(this.message)
 
-        customLog('REMOTE BUG', Memory.rooms[this.memory.RN] + ', ' + this.memory.SI + ', ' + Memory.rooms[this.memory.RN].SP)
-        const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
-
         this.createMoveRequest({
             origin: this.pos,
             goal: {
@@ -160,7 +185,61 @@ export class RemoteHauler extends Creep {
             avoidEnemyRanges: true,
         })
 
-        return false
+        return true
+    }
+
+    reserveWithdrawEnergy() {
+        if (this.memory.reservations && this.memory.reservations?.length) return
+        if (!this.needsResources()) return
+
+        const { room } = this
+        const sourcePos = room.sources[this.memory.SI].pos
+
+        if (this.freeCapacityNextTick === undefined) this.freeCapacityNextTick = this.store.getFreeCapacity()
+
+        let withdrawTargets = room.MAWT.filter(target => {
+            if (target instanceof Resource)
+                return (
+                    getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) <= 1 &&
+                    (target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) ||
+                        target.reserveAmount >= this.freeCapacityNextTick)
+                )
+
+            return target.store.energy >= this.freeCapacityNextTick
+        })
+
+        let target
+        let amount
+
+        if (withdrawTargets.length) {
+            target = findClosestObject(this.pos, withdrawTargets)
+
+            if (target instanceof Resource) amount = target.reserveAmount
+            else amount = Math.min(this.freeCapacityNextTick, target.store.energy)
+
+            this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
+            return
+        }
+
+        withdrawTargets = room.OAWT.filter(target => {
+            if (target instanceof Resource)
+                return (
+                    getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) <= 1 &&
+                    (target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) ||
+                        target.reserveAmount >= this.freeCapacityNextTick)
+                )
+
+            return target.store.energy >= this.freeCapacityNextTick
+        })
+
+        if (!withdrawTargets.length) return
+
+        target = findClosestObject(this.pos, withdrawTargets)
+
+        if (target instanceof Resource) amount = target.reserveAmount
+        else amount = Math.min(this.freeCapacityNextTick, target.store.energy)
+
+        this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
     }
 
     deliverResources?() {
@@ -190,11 +269,13 @@ export class RemoteHauler extends Creep {
             this.message += this.memory.RN
             this.say(this.message)
 
+            const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
+
             this.createMoveRequest({
                 origin: this.pos,
                 goal: {
-                    pos: new RoomPosition(25, 25, this.memory.RN),
-                    range: 20,
+                    pos: sourcePos,
+                    range: 1,
                 },
                 avoidEnemyRanges: true,
             })
@@ -202,62 +283,19 @@ export class RemoteHauler extends Creep {
             return true
         }
 
-        this.message += this.commune
+        if (!this.commune) return false
+
+        this.message += this.commune.name
         this.say(this.message)
 
         this.createMoveRequest({
             origin: this.pos,
             goal: {
-                pos: new RoomPosition(25, 25, this.commune.name),
-                range: 20,
+                pos: this.commune.anchor,
+                range: 3,
             },
             avoidEnemyRanges: true,
         })
-
-        return false
-    }
-
-    relayAsEmpty?() {
-        if (!this.moveRequest) return false
-        if (this.movedResource) return false
-        if (this.store.getFreeCapacity(RESOURCE_ENERGY) === 0) return false
-
-        const creepAtPosName = this.room.creepPositions.get(this.moveRequest)
-        if (!creepAtPosName) return false
-
-        const creepAtPos = Game.creeps[creepAtPosName]
-
-        if (creepAtPos.role !== 'remoteHauler') return false
-        if (creepAtPos.movedResource) return false
-        if (this.store.getFreeCapacity() !== creepAtPos.store.getUsedCapacity(RESOURCE_ENERGY)) return false
-
-        creepAtPos.transfer(this, RESOURCE_ENERGY)
-
-        this.movedResource = true
-        creepAtPos.movedResource = true
-
-        this.store.energy += creepAtPos.store.getUsedCapacity(RESOURCE_ENERGY)
-        creepAtPos.store.energy -= this.store.getFreeCapacity()
-
-        // Stop previously attempted moveRequests as they do not account for a relay
-
-        delete this.moveRequest
-        delete creepAtPos.moveRequest
-
-        // Trade remotes and sourceIndexes
-
-        const newCreepAtPosRemote = this.memory.RN || creepAtPos.memory.RN
-        const newCreepAtPosSourceIndex = this.memory.SI !== undefined ? this.memory.SI : creepAtPos.memory.SI
-
-        this.memory.RN = creepAtPos.memory.RN || this.memory.RN
-        this.memory.SI = creepAtPos.memory.SI !== undefined ?  creepAtPos.memory.SI : this.memory.SI
-        creepAtPos.memory.RN = newCreepAtPosRemote
-        creepAtPos.memory.SI = newCreepAtPosSourceIndex
-
-        this.deliverResources()
-
-        const remoteHauler = creepAtPos as RemoteHauler
-        remoteHauler.getResources()
 
         return true
     }
@@ -267,44 +305,63 @@ export class RemoteHauler extends Creep {
         if (this.movedResource) return false
         if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return false
 
-        const creepAtPosName = this.room.creepPositions.get(this.moveRequest)
-        if (!creepAtPosName) return false
+        const moveRequestCoord = unpackAsPos(this.moveRequest)
+        const adjacentCoords = findCoordsInsideRect(
+            this.pos.x - 1,
+            this.pos.y - 1,
+            this.pos.x + 1,
+            this.pos.y + 1,
+        )
 
-        const creepAtPos = Game.creeps[creepAtPosName]
+        for (const coord of adjacentCoords) {
 
-        if (creepAtPos.role !== 'remoteHauler') return false
-        if (creepAtPos.movedResource) return false
-        if (creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY)) return false
+            // If the x and y are dissimilar
 
-        this.transfer(creepAtPos, RESOURCE_ENERGY)
+            if (coord.x !== moveRequestCoord.x && coord.y !== moveRequestCoord.y) continue
+            this.room.visual.circle(coord.x, coord.y, { fill: myColors.lightBlue })
+            const packedCoord = pack(coord)
 
-        this.movedResource = true
-        creepAtPos.movedResource = true
+            const creepAtPosName = this.room.creepPositions.get(packedCoord)
+            if (!creepAtPosName) continue
 
-        this.store.energy -= creepAtPos.store.getFreeCapacity()
-        creepAtPos.store.energy += this.store.getUsedCapacity(RESOURCE_ENERGY)
+            const creepAtPos = Game.creeps[creepAtPosName]
 
-        // Stop previously attempted moveRequests as they do not account for a relay
+            if (creepAtPos.role !== 'remoteHauler') return false
+            if (creepAtPos.movedResource) return false
+            if (creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY)) return false
 
-        delete this.moveRequest
-        delete creepAtPos.moveRequest
+            this.transfer(creepAtPos, RESOURCE_ENERGY)
 
-        // Trade remotes and sourceIndexes
+            this.movedResource = true
+            creepAtPos.movedResource = true
 
-        const newCreepAtPosRemote = this.memory.RN || creepAtPos.memory.RN
-        const newCreepAtPosSourceIndex = this.memory.SI !== undefined ? this.memory.SI : creepAtPos.memory.SI
+            this.store.energy -= creepAtPos.store.getFreeCapacity()
+            creepAtPos.store.energy += this.store.getUsedCapacity(RESOURCE_ENERGY)
 
-        this.memory.RN = creepAtPos.memory.RN || this.memory.RN
-        this.memory.SI = creepAtPos.memory.SI !== undefined ?  creepAtPos.memory.SI : this.memory.SI
-        creepAtPos.memory.RN = newCreepAtPosRemote
-        creepAtPos.memory.SI = newCreepAtPosSourceIndex
+            // Stop previously attempted moveRequests as they do not account for a relay
 
-        this.getResources()
+            delete this.moveRequest
+            delete creepAtPos.moveRequest
 
-        const remoteHauler = creepAtPos as RemoteHauler
-        remoteHauler.deliverResources()
+            // Trade remotes and sourceIndexes
 
-        return true
+            const newCreepAtPosRemote = this.memory.RN || creepAtPos.memory.RN
+            const newCreepAtPosSourceIndex = this.memory.SI !== undefined ? this.memory.SI : creepAtPos.memory.SI
+
+            this.memory.RN = creepAtPos.memory.RN || this.memory.RN
+            this.memory.SI = creepAtPos.memory.SI !== undefined ? creepAtPos.memory.SI : this.memory.SI
+            creepAtPos.memory.RN = newCreepAtPosRemote
+            creepAtPos.memory.SI = newCreepAtPosSourceIndex
+
+            this.getResources()
+
+            const remoteHauler = creepAtPos as RemoteHauler
+            remoteHauler.deliverResources()
+
+            return true
+        }
+
+        return false
     }
 
     constructor(creepID: Id<Creep>) {
@@ -328,8 +385,7 @@ export class RemoteHauler extends Creep {
 
             if (creep.memory.RN) creep.removeRemote()
 
-            if (creep.deliverResources()) continue
-            creep.relayAsFull()
+            if (creep.deliverResources()) creep.relayAsFull()
         }
     }
 }
