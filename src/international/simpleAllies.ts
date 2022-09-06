@@ -2,7 +2,7 @@ import { allyList, simpleAlliesSegment } from 'international/constants'
 
 const allyArray = [...allyList]
 
-enum RequestTypes {
+export enum RequestTypes {
      RESOURCE,
      DEFENSE,
      ATTACK,

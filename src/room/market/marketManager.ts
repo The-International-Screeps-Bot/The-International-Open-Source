@@ -1,7 +1,7 @@
 import { minerals } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import './marketFunctions'
-import { allyManager } from '../../international/simpleAllies'
+import { allyManager, RequestTypes } from '../../international/simpleAllies'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from 'room/communeManager'
 
@@ -87,7 +87,7 @@ export class MarketManager {
         // Filter out allyRequests that are requesting resources
 
         const resourceRequests = allyManager.allyRequests.filter(
-            request => request.requestType === allyManager.requestTypes.RESOURCE,
+            request => request.requestType === RequestTypes.RESOURCE,
         )
 
         // Filter resourceRequests by priority, highest to lowest
