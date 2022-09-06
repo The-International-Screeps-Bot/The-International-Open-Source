@@ -744,3 +744,25 @@ export const maxRampartGroupSize = 12
 
 export const linkSendThreshold = 0.9
 export const linkReceiveTreshold = 0.25
+
+export const horitontalRelayOffsets = [
+    {
+        x: -1,
+        y: 0,
+    },
+    {
+        x: 1,
+        y: 0,
+    },
+]
+
+export const verticalRelayOffsets = [
+    {
+        x: 0,
+        y: -1,
+    },
+    {
+        x: 0,
+        y: 1,
+    },
+]

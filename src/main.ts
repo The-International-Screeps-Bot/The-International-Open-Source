@@ -1454,8 +1454,6 @@ declare global {
          */
         moveRequest: number
 
-        freeCapacityNextTick: number
-
         /**
          * Wether the creep moved a resource this tick
          */
@@ -1629,7 +1627,7 @@ declare global {
 
         fulfillReservation(): boolean
 
-        // Getters
+        // Creep Getters
 
         _role: CreepRoles
 
@@ -1711,6 +1709,13 @@ declare global {
          * The cumulative message to present in say()
          */
         message: string
+
+        _freeCapacityNextTick: number
+
+        /**
+         * The estimated total free capacity the creep will have next tick
+         */
+        freeCapacityNextTick: number
     }
 
     interface CreepMemory {
