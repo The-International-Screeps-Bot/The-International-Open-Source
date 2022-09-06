@@ -495,7 +495,6 @@ Room.prototype.spawnRequester = function () {
 
             // Otherwise if there is no storage
             else {
-
                 partsMultiplier += estimatedIncome / 5
 
                 // Spawn some extra builders to handle the primarily road building RCL 3 and needy storage building
@@ -522,7 +521,6 @@ Room.prototype.spawnRequester = function () {
                     },
                 }
             }
-
 
             // If all RCL 3 extensions are build
 
@@ -1006,12 +1004,17 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-
                 // If there are insufficient harvesters for the remote's sources
+                customLog(
+                    remoteName,
+                    Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
+                        Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0),
+                )
 
                 if (
-                    Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
-                        Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0) > 0
+                    (Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
+                        Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0)) >
+                    0
                 )
                     return false
 

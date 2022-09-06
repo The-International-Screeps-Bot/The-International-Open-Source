@@ -2020,26 +2020,29 @@ global.profiler = initProfiler()
 // Loop
 
 export const loop = function () {
-    memHack.modifyMemory()
+    try {
+        memHack.run()
 
-    internationalManager.tickReset()
+        internationalManager.tickReset()
 
-    configManager.run()
+        configManager.run()
 
-    internationalManager.run()
-    /*
+        internationalManager.run()
+        /*
     let cpu = Game.cpu.getUsed()
 
     console.log(new InternationalManager())
 
     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
  */
-    roomsManager()
+        roomsManager()
 
-    internationalManager.mapVisualsManager()
+        internationalManager.mapVisualsManager()
 
-    internationalManager.advancedGeneratePixel()
-    internationalManager.advancedSellPixels()
-
+        internationalManager.advancedGeneratePixel()
+        internationalManager.advancedSellPixels()
+    } catch (error) {
+        customLog('ERROR', error, undefined, myColors.red)
+    }
     internationalManager.endTickManager()
 }
