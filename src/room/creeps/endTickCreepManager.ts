@@ -10,7 +10,6 @@ export class EndTickCreepManager {
     }
 
     public run() {
-
         if (!this.roomManager.room.myCreepsAmount) return
 
         // If CPU logging is enabled, get the CPU used at the start
@@ -18,8 +17,7 @@ export class EndTickCreepManager {
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
         for (const role in this.roomManager.room.myCreeps)
-            for (const creepName of this.roomManager.room.myCreeps[role]) {
-
+            for (const creepName of this.roomManager.room.myCreeps[role as CreepRoles]) {
                 const creep = Game.creeps[creepName]
 
                 creep.endTickManager()
@@ -29,6 +27,11 @@ export class EndTickCreepManager {
         // If CPU logging is enabled, log the CPU used by this manager
 
         if (Memory.CPULogging)
-            customLog('End Tick Creep Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
+            customLog(
+                'End Tick Creep Manager',
+                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+                undefined,
+                myColors.lightGrey,
+            )
     }
 }
