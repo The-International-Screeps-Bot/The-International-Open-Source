@@ -1008,12 +1008,16 @@ Room.prototype.spawnRequester = function () {
                 customLog(
                     remoteName,
                     Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
-                        Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0),
+                        Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0) +
+                        ' ' +
+                        (Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
+                            Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0) >
+                            0),
                 )
 
                 if (
-                    (Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
-                        Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0)) >
+                    Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
+                        Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0) >
                     0
                 )
                     return false

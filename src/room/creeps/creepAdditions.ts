@@ -220,4 +220,14 @@ Object.defineProperties(Creep.prototype, {
             this._message = newMessage
         },
     },
+    freeCapacityNextTick: {
+        get() {
+            if (this._freeCapacityNextTick !== undefined) return this._freeCapacityNextTick
+
+            return (this._freeCapacityNextTick = this.store.getFreeCapacity())
+        },
+        set(newFreeCapacityNextNext) {
+            this._freeCapacityNextTick = newFreeCapacityNextNext
+        },
+    }
 } as PropertyDescriptorMap & ThisType<Creep>)
