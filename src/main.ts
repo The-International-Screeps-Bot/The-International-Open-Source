@@ -708,7 +708,7 @@ declare global {
         /**
          * An object with keys of roles with properties of arrays of creep names belonging to the role
          */
-        myCreeps: { [key: string]: string[] }
+        myCreeps: { [key in CreepRoles]?: string[] }
 
         /**
          * The number of my creeps in the room
