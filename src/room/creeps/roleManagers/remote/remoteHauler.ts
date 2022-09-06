@@ -1,4 +1,4 @@
-import { horitontalRelayOffsets, myColors, RemoteNeeds, verticalRelayOffsets } from 'international/constants'
+import { myColors, relayOffsets, RemoteNeeds } from 'international/constants'
 import {
     customLog,
     findClosestObject,
@@ -200,11 +200,12 @@ export class RemoteHauler extends Creep {
         if (this.freeCapacityNextTick === undefined) this.freeCapacityNextTick = this.store.getFreeCapacity()
 
         let withdrawTargets = room.MAWT.filter(target => {
+            if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
+
             if (target instanceof Resource)
                 return (
-                    getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) <= 1 &&
-                    (target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) ||
-                        target.reserveAmount >= this.freeCapacityNextTick)
+                    target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) ||
+                    target.reserveAmount >= this.freeCapacityNextTick
                 )
 
             return target.store.energy >= this.freeCapacityNextTick
@@ -224,11 +225,12 @@ export class RemoteHauler extends Creep {
         }
 
         withdrawTargets = room.OAWT.filter(target => {
+            if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
+
             if (target instanceof Resource)
                 return (
-                    getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) <= 1 &&
-                    (target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) ||
-                        target.reserveAmount >= this.freeCapacityNextTick)
+                    target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) ||
+                    target.reserveAmount >= this.freeCapacityNextTick
                 )
 
             return target.store.energy >= this.freeCapacityNextTick
@@ -346,19 +348,8 @@ export class RemoteHauler extends Creep {
     }
 
     relayCardinal?(moveRequestCoord: Coord) {
-        let offsets = horitontalRelayOffsets
-        if (this.pos.y === moveRequestCoord.y) offsets = verticalRelayOffsets
-
-        offsets.push(
-            {
-                x: 0,
-                y: 0,
-            },
-            {
-                x: 0,
-                y: 0,
-            },
-        )
+        let offsets = relayOffsets.horizontal
+        if (this.pos.y === moveRequestCoord.y) offsets = relayOffsets.vertical
 
         for (const offset of offsets) {
             const coord = {
@@ -376,9 +367,27 @@ export class RemoteHauler extends Creep {
     }
 
     relayDiagonal?(moveRequestCoord: Coord) {
-        const adjacentCoords = findCoordsInsideRect(this.pos.x - 1, this.pos.y - 1, this.pos.x + 1, this.pos.y + 1)
 
-        for (const coord of adjacentCoords) {
+        let offsets
+
+        if (this.pos.y > moveRequestCoord.y) {
+
+            offsets = relayOffsets.topLeft
+            if (this.pos.x < moveRequestCoord.x) offsets = relayOffsets.topRight
+        }
+        else {
+
+            offsets = relayOffsets.bottomLeft
+            if (this.pos.x < moveRequestCoord.x) offsets = relayOffsets.bottomRight
+        }
+
+        for (const offset of offsets) {
+
+            const coord = {
+                x: moveRequestCoord.x + offset.x,
+                y: moveRequestCoord.y + offset.y,
+            }
+
             // If the x and y are dissimilar
 
             if (coord.x !== moveRequestCoord.x && coord.y !== moveRequestCoord.y) continue

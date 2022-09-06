@@ -925,7 +925,7 @@ Room.prototype.spawnRequester = function () {
                         memoryAdditions: {
                             R: true,
                             SI: sourceIndex,
-                            /* RN: remoteName, */
+                            RN: remoteName,
                         },
                     }
                 }
@@ -945,7 +945,7 @@ Room.prototype.spawnRequester = function () {
                     memoryAdditions: {
                         R: true,
                         SI: sourceIndex,
-                        /* RN: remoteName, */
+                        RN: remoteName,
                     },
                 }
             })(),
