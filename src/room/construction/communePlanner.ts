@@ -2,6 +2,7 @@ import { link } from 'fs'
 import {
     CPUMaxPerTick,
     EXIT,
+    maxRampartGroupSize,
     myColors,
     NORMAL,
     PROTECTED,
@@ -12,7 +13,7 @@ import {
     UNWALKABLE,
 } from 'international/constants'
 import {
-    arePositionsEqual,
+    areCoordsEqual,
     createPosMap,
     customLog,
     findAvgBetweenCoords,
@@ -28,7 +29,26 @@ import { internationalManager } from 'international/internationalManager'
 import { packPosList } from 'other/packrat'
 import 'other/RoomVisual'
 import { toASCII } from 'punycode'
+import { CommuneManager } from 'room/communeManager'
 import { rampartPlanner } from './rampartPlanner'
+
+/**
+ *
+ */
+export class CommunePlanner {
+    communeManager: CommuneManager
+    room: Room
+
+    constructor(communeManager: CommuneManager) {
+        this.communeManager = communeManager
+        this.room = communeManager.room
+    }
+    public run() {}
+    private flipStampVertical() {}
+    private flipStampHorizontal() {}
+    private planStamp() {}
+    private planSourceStructures() {}
+}
 
 /**
  * Checks if a room can be planner. If it can, it informs information on how to build the room
@@ -138,7 +158,6 @@ export function basePlanner(room: Room) {
     function planStamp(opts: PlanStampOpts): false | RoomPosition[] {
         if (!opts.coordMap) opts.coordMap = room.baseCoords
         else {
-
             opts.coordMap = new Uint8Array(opts.coordMap)
 
             // Loop through each exit of exits
@@ -528,7 +547,7 @@ export function basePlanner(room: Room) {
     // Record road plans in the baseCM
 
     // Iterate through each x and y in the room
-/*
+    /*
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
             // If there is road at the pos, assign it as avoid in baseCM
@@ -710,16 +729,14 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    const observerAnchors = planStamp({
+    if (!planStamp({
         stampType: 'observer',
         count: 1,
         startCoords: [fastFillerHubAnchor],
         coordMap: room.roadCoords,
-    })
+    })) return 'failed'
 
-    if (!observerAnchors) return 'failed'
-
-    const observerAnchor = observerAnchors[0]
+    const observerAnchor = unpackAsRoomPos(room.memory.stampAnchors.observer[0], room.name)
 
     let adjacentCoords = findCoordsInsideRect(
         observerAnchor.x - 3,
@@ -728,6 +745,8 @@ export function basePlanner(room: Room) {
         observerAnchor.y + 3,
     )
 
+    if(!room.unprotectedCoords) room.findUnprotectedCoords()
+    
     for (const coord of adjacentCoords) {
         // If the coord is probably not protected
 

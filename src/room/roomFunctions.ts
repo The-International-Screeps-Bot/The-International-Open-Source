@@ -7,7 +7,7 @@ import {
     myColors,
     numbersByStructureTypes,
     prefferedCommuneRange,
-    remoteNeedsIndex,
+    RemoteNeeds,
     roomDimensions,
     roomTypeProperties,
     roomTypes,
@@ -16,7 +16,7 @@ import {
 } from 'international/constants'
 import {
     advancedFindDistance,
-    arePositionsEqual,
+    areCoordsEqual,
     createPosMap,
     customLog,
     findClosestClaimType,
@@ -30,7 +30,7 @@ import {
 } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 import { packCoord, unpackCoordAsPos, unpackPos } from 'other/packrat'
-import { basePlanner } from './construction/basePlanner'
+import { basePlanner } from './construction/communePlanner'
 import { RoomCacheObject } from './roomObject'
 
 Room.prototype.get = function (roomObjectName) {
@@ -178,7 +178,7 @@ Room.prototype.get = function (roomObjectName) {
 
         // Find terrain in room
 
-        const terrain = Game.map.getRoomTerrain(room.name)
+        const terrain = internationalManager.getTerrainCoords(room.name)
 
         // Find positions adjacent to source
 
@@ -191,19 +191,23 @@ Room.prototype.get = function (roomObjectName) {
 
         // Loop through each pos
 
-        for (const pos of adjacentPositions) {
+        for (const coord of adjacentPositions) {
             // Iterate if terrain for pos is a wall
 
-            if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+            if (terrain[pack(coord)] === TERRAIN_MASK_WALL) continue
 
             // Add pos to harvestPositions
 
-            upgradePositions.push(new RoomPosition(pos.x, pos.y, room.name))
+            upgradePositions.push(new RoomPosition(coord.x, coord.y, room.name))
         }
 
         upgradePositions.sort(function (a, b) {
             return getRange(a.x, room.anchor.x, a.y, room.anchor.y) - getRange(b.x, room.anchor.x, b.y, room.anchor.y)
         })
+
+        // Make the closest pos the least to be chosen
+
+        upgradePositions.push(upgradePositions.shift())
 
         // Inform harvestPositions
 
@@ -323,7 +327,7 @@ Room.prototype.get = function (roomObjectName) {
 
             // If the creep is dying, iterate
 
-            if (creep.isDying()) continue
+            if (creep.dying) continue
 
             // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 
@@ -395,7 +399,7 @@ Room.prototype.get = function (roomObjectName) {
 
             // If the creep is dying, iterate
 
-            if (creep.isDying()) continue
+            if (creep.dying) continue
 
             // If the creep has a packedUpgradePos, record it in usedUpgradePositions
 
@@ -430,7 +434,7 @@ Room.prototype.get = function (roomObjectName) {
 
             // If the creep is dying, iterate
 
-            if (creep.isDying()) continue
+            if (creep.dying) continue
 
             // If the creep has a packedFastFillerPos, record it in usedFastFillerPositions
 
@@ -458,32 +462,6 @@ Room.prototype.get = function (roomObjectName) {
         cacheAmount: Infinity,
         room,
         valueConstructor() {},
-    })
-
-    new RoomCacheObject({
-        name: 'remoteNamesByEfficacy',
-        valueType: 'object',
-        cacheType: 'global',
-        cacheAmount: 1,
-        room,
-        valueConstructor() {
-            // Filter rooms that have some sourceEfficacies recorded
-
-            const remotesWithEfficacies = room.memory.remotes.filter(function (roomName) {
-                return Memory.rooms[roomName].sourceEfficacies.length
-            })
-
-            // Sort the remotes based on the average source efficacy
-
-            return remotesWithEfficacies.sort(function (a1, b1) {
-                return (
-                    Memory.rooms[a1].sourceEfficacies.reduce((a2, b2) => a2 + b2) /
-                        Memory.rooms[a1].sourceEfficacies.length -
-                    Memory.rooms[b1].sourceEfficacies.reduce((a2, b2) => a2 + b2) /
-                        Memory.rooms[b1].sourceEfficacies.length
-                )
-            })
-        },
     })
 
     // Get the roomObject using it's name
@@ -545,7 +523,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     // Construct route
 
     function generateRoute(): void {
-
         // If the goal is in the same room as the origin
 
         if (opts.origin.roomName === opts.goal.pos.roomName) return
@@ -592,7 +569,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     // Construct path
 
     function generatePath() {
-
         const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
             plainCost: opts.plainCost || 2,
             swampCost: opts.swampCost || 8,
@@ -609,8 +585,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 // If the room is not allowed
 
-                if (!allowedRoomNames.has(roomName))
-                    return false
+                if (!allowedRoomNames.has(roomName)) return false
 
                 // Create a costMatrix for the room
 
@@ -698,7 +673,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 if (!room) return cm
 
-                if (opts.creep && opts.creep.memory.roads)
+                if (opts.creep && opts.creep.memory.R)
                     for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, 1)
 
                 // Weight structures
@@ -864,7 +839,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                         for (const pos of upgradePositions) {
                             // If the pos and deliverUpgradePos are the same, iterate
 
-                            if (arePositionsEqual(pos, deliverUpgradePos)) continue
+                            if (areCoordsEqual(pos, deliverUpgradePos)) continue
 
                             // Otherwise have the creep prefer to avoid the pos
 
@@ -1176,17 +1151,17 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
     // Find distance from scoutingRoom
 
-    if (distance < 4)
+    if (distance <= 5)
         distance = advancedFindDistance(scoutingRoom.name, room.name, {
             keeper: Infinity,
             enemy: Infinity,
             enemyRemote: Infinity,
             ally: Infinity,
             allyRemote: Infinity,
-            highway: Infinity,
+            /* highway: Infinity, */
         })
 
-    if (distance < 4) {
+    if (distance <= 5) {
         // If the room is already a remote of the scoutingRoom
 
         if (room.memory.T === 'remote' && scoutingRoom.name === room.memory.commune) return true
@@ -1196,6 +1171,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         if (!scoutingRoom.anchor) return true
 
         const newSourceEfficacies = []
+        let newSourceEfficaciesTotal = 0
 
         // Get base planning data
 
@@ -1205,12 +1181,16 @@ Room.prototype.makeRemote = function (scoutingRoom) {
             const path = room.advancedFindPath({
                 origin: source.pos,
                 goal: { pos: scoutingRoom.anchor, range: 3 },
-                /* weightCostMatrixes: [roadCM] */
             })
+
+            // Stop if there is a source inefficient enough
+
+            if (path.length >= 300) return true
 
             // Record the length of the path in the room's memory
 
             newSourceEfficacies.push(path.length)
+            newSourceEfficaciesTotal += path.length
 
             /*
             // Loop through positions of the path
@@ -1228,6 +1208,11 @@ Room.prototype.makeRemote = function (scoutingRoom) {
             */
         }
 
+        const newReservationEfficacy = room.advancedFindPath({
+            origin: room.controller.pos,
+            goal: { pos: scoutingRoom.anchor, range: 3 },
+        }).length
+
         // If the room isn't already a remote
 
         if (room.memory.T !== 'remote' || !global.communes.has(room.memory.commune)) {
@@ -1237,32 +1222,36 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
             room.memory.commune = scoutingRoom.name
 
-            // Query source positions
+            // Generate new important positions
 
             delete room.memory.SP
             delete room._sourcePositions
-
             room.sourcePositions
+
+            delete room.memory.CP
+            delete room._controllerPositions
+            room.controllerPositions
 
             // Add the room's name to the scoutingRoom's remotes list
 
             scoutingRoom.memory.remotes.push(room.name)
 
-            room.memory.sourceEfficacies = newSourceEfficacies
+            room.memory.SE = newSourceEfficacies
+            room.memory.RE = newReservationEfficacy
 
             room.memory.needs = []
-            for (const key in remoteNeedsIndex) room.memory.needs[parseInt(key)] = 0
+            for (const key in RemoteNeeds) room.memory.needs[parseInt(key)] = 0
 
             return true
         }
 
-        const currentAvgSourceEfficacy =
-            room.memory.sourceEfficacies.reduce((sum, el) => sum + el) / room.memory.sourceEfficacies.length
-        const newAvgSourceEfficacy = newSourceEfficacies.reduce((sum, el) => sum + el) / newSourceEfficacies.length
+        const currentRemoteEfficacy =
+            room.memory.SE.reduce((sum, el) => sum + el) / room.memory.SE.length + room.memory.RE
+        const newRemoteEfficacy = newSourceEfficaciesTotal / newSourceEfficacies.length + newReservationEfficacy
 
         // If the new average source efficacy is above the current, stop
 
-        if (newAvgSourceEfficacy >= currentAvgSourceEfficacy) return true
+        if (newRemoteEfficacy >= currentRemoteEfficacy) return true
 
         room.memory.T = 'remote'
 
@@ -1270,21 +1259,25 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
         room.memory.commune = scoutingRoom.name
 
-        // Query source positions
+        // Generate new important positions
 
         delete room.memory.SP
         delete room._sourcePositions
-
         room.sourcePositions
+
+        delete room.memory.CP
+        delete room._controllerPositions
+        room.controllerPositions
 
         // Add the room's name to the scoutingRoom's remotes list
 
         scoutingRoom.memory.remotes.push(room.name)
 
-        room.memory.sourceEfficacies = newSourceEfficacies
+        room.memory.SE = newSourceEfficacies
+        room.memory.RE = newReservationEfficacy
 
         room.memory.needs = []
-        for (const key in remoteNeedsIndex) room.memory.needs[parseInt(key)] = 0
+        for (const key in RemoteNeeds) room.memory.needs[parseInt(key)] = 0
 
         return true
     }
@@ -1335,7 +1328,7 @@ Room.prototype.findStoredResourceAmount = function (resourceType) {
 
     // Create array of room and terminal
 
-    const storageStructures = [room.storage, room.terminal]
+    const storageStructures = [room.storage, room.terminal, ...room.structures.factory]
 
     // Iterate through storageStructures
 
@@ -2108,7 +2101,6 @@ Room.prototype.pathVisual = function (path, color) {
         stroke: myColors[color],
         strokeWidth: 0.15,
         opacity: 0.3,
-        lineStyle: 'solid',
     })
 }
 
@@ -2225,8 +2217,6 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
 
         depth += 1
     }
-
-    return this.unprotectedCoords
 }
 
 Room.prototype.groupRampartPositions = function (rampartPositions) {

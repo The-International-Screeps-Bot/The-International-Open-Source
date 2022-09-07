@@ -52,7 +52,7 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
 /**
  * Checks if two positions are equal
  */
-export function arePositionsEqual(pos1: Coord, pos2: Coord) {
+export function areCoordsEqual(pos1: Coord, pos2: Coord) {
     return pos1.x === pos2.x && pos1.y === pos2.y
 }
 
@@ -66,11 +66,11 @@ export function arePositionsEqual(pos1: Coord, pos2: Coord) {
 export function customLog(title: any, message: any, color: string = myColors.black, bgColor: string = myColors.white) {
     // Create the title
 
-    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${bgColor};'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ${color};'>${title}:</div>`
+    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${bgColor};'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${color};'>${title}:</div>`
 
     // Create the content
 
-    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ${color};'>${message}</div></div>`
+    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${color};'>${message}</div></div>`
 }
 
 /**
@@ -353,7 +353,7 @@ export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'sou
 
     // Get the remote's sourceEfficacies
 
-    const { sourceEfficacies } = Memory.rooms[roomName]
+    const sourceEfficacies = Memory.rooms[roomName].SE
 
     // Limit sourceNames to the number of sourceEfficacies
 
@@ -362,10 +362,7 @@ export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'sou
     // Sort sourceNames by efficacy, informing the result
 
     return sourceNames.sort(function (a, b) {
-        return (
-            Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(a)] -
-            Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(b)]
-        )
+        return Memory.rooms[roomName].SE[sourceNames.indexOf(a)] - Memory.rooms[roomName].SE[sourceNames.indexOf(b)]
     })
 }
 
@@ -435,8 +432,17 @@ export function findClosestRoomName(start: string, targets: string[]) {
 }
 
 /**
- * Generates a random integer between two thresholds
+ * Generatesa a random integer between two thresholds
  */
 export function randomIntRange(min: number, max: number) {
     return Math.floor(Math.random() * (max - min) + min)
+}
+
+export function findFunctionCPU(func: Function) {
+
+    const CPU = Game.cpu.getUsed()
+
+    func()
+
+    customLog('CPU for ' + func, Game.cpu.getUsed() - CPU)
 }

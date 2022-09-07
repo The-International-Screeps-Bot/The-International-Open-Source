@@ -6,7 +6,7 @@ module.exports.users = [
           password: 'tooangel',
      },
      {
-          username: 'W2N2',
+          username: 'W6N1',
           type: 'private',
           shards: ['screeps'],
           password: 'tooangel',
@@ -24,7 +24,7 @@ module.exports.users = [
           password: 'tooangel',
      },
      {
-          username: 'W8N3',
+          username: 'W7N3',
           type: 'private',
           shards: ['screeps'],
           password: 'tooangel',
@@ -43,6 +43,12 @@ module.exports.users = [
      },
      {
           username: 'W8N6',
+          type: 'private',
+          shards: ['screeps'],
+          password: 'tooangel',
+     },
+     {
+          username: 'W3N3',
           type: 'private',
           shards: ['screeps'],
           password: 'tooangel',

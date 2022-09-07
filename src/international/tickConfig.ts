@@ -4,7 +4,7 @@ import {
     haulerUpdateDefault,
     myColors,
     remoteHarvesterRoles,
-    remoteNeedsIndex,
+    RemoteNeeds,
     spawnByRoomRemoteRoles,
     stamps,
 } from './constants'
@@ -87,8 +87,8 @@ InternationalManager.prototype.tickConfig = function () {
 
         // If there is no Hauler Size
 
-        if (!room.memory.HS) {
-            room.memory.HS = 0
+        if (!room.memory.MHC) {
+            room.memory.MHC = 0
             room.memory.HU = 0
         }
 
@@ -121,17 +121,20 @@ InternationalManager.prototype.tickConfig = function () {
 
     let reservedGCL = Game.gcl.level - global.communes.size
 
-    reservedGCL -= Object.values(Memory.claimRequests).filter(request => {
-        return request.responder
-    }).length
+    // Subtract the number of claimRequests with responders
+
+    for (const roomName in Memory.claimRequests) {
+        if (!Memory.claimRequests[roomName].responder) continue
+
+        reservedGCL -= 1
+    }
 
     const communesForResponding = []
 
     for (const roomName of global.communes) {
-
         if (Memory.rooms[roomName].claimRequest) continue
 
-        if (Game.rooms[roomName].energyCapacityAvailable < 750) continue
+        if (Game.rooms[roomName].energyCapacityAvailable < 650) continue
 
         communesForResponding.push(roomName)
     }
@@ -148,7 +151,7 @@ InternationalManager.prototype.tickConfig = function () {
             continue
         }
 
-        request.abandon = undefined
+        delete request.abandon
 
         if (request.responder && global.communes.has(request.responder)) continue
 
@@ -160,8 +163,7 @@ InternationalManager.prototype.tickConfig = function () {
 
         // If the requested room is no longer neutral
 
-        if (Memory.rooms[roomName].T != 'neutral') {
-
+        if (Memory.rooms[roomName].T !== 'neutral') {
             // Delete the request
 
             delete Memory.claimRequests[roomName]
@@ -173,7 +175,7 @@ InternationalManager.prototype.tickConfig = function () {
 
         const maxRange = 10
 
-        // Run a more simple and less expensive check, then a more complex and expensive to confirm
+        // Run a more simple and less expensive check, then a more complex and expensive to confirm. If the check fails, abandon the room for some time
 
         if (
             Game.map.getRoomLinearDistance(communeName, roomName) > maxRange ||
@@ -214,7 +216,6 @@ InternationalManager.prototype.tickConfig = function () {
         const communes = []
 
         for (const roomName of global.communes) {
-
             if (Memory.rooms[roomName].allyCreepRequest) continue
 
             communes.push(roomName)
@@ -262,7 +263,6 @@ InternationalManager.prototype.tickConfig = function () {
         const communes = []
 
         for (const roomName of global.communes) {
-
             if (Memory.rooms[roomName].attackRequests.includes(roomName)) continue
 
             communes.push(roomName)

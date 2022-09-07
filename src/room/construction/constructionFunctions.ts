@@ -1,4 +1,4 @@
-import { stamps } from 'international/constants'
+import { impassibleStructureTypes, stamps } from 'international/constants'
 import { unpackAsPos } from 'international/generalFunctions'
 
 Room.prototype.remotePlanner = function (commune) {
@@ -18,9 +18,9 @@ Room.prototype.remoteConstructionPlacement = function () {}
 Room.prototype.communeConstructionPlacement = function () {
     if (!this.memory.PC) return
 
-    // Only run the planner every x ticks (temporary fix)
+    // Only run the planner every x ticks or if there are builders (temporary fix)
 
-    if (Game.time % Math.floor(Math.random() * 100) !== 0) return
+    if (!this.myCreeps.builder.length && Game.time % Math.floor(Math.random() * 100) !== 0) return
 
     // If the construction site count is at its limit, stop
 
@@ -55,8 +55,9 @@ Room.prototype.communeConstructionPlacement = function () {
                 if (
                     structureType === STRUCTURE_RAMPART &&
                     (!this.storage || this.controller.level < 4 || this.storage.store.energy < 30000)
-                )
+                ) {
                     continue
+                }
 
                 // If the structureType is a road and RCL 3 extensions aren't built, stop
 
@@ -70,7 +71,42 @@ Room.prototype.communeConstructionPlacement = function () {
 
                     if (placed > 10) return
 
+                    //Don't build roads if there's already an impassable structure there.  This is mostly to deal
+                    //  with existing rooms that are being built.
+                    if (structureType == STRUCTURE_ROAD) {
+                        const impassableStructure = this.lookForAt(LOOK_STRUCTURES, x, y).find(str =>
+                            impassibleStructureTypes.includes(str.structureType),
+                        )
+                        if (impassableStructure) continue
+                    }
+
                     if (this.createConstructionSite(x, y, structureType as BuildableStructureConstant) === OK)
+                        placed += 1
+                }
+            }
+        }
+    }
+
+    if (this.storage && this.storage.store.energy > 30000) {
+        //Build ramparts on important structures:
+        for (const structureType of [
+            STRUCTURE_TOWER,
+            STRUCTURE_SPAWN,
+            STRUCTURE_STORAGE,
+            STRUCTURE_TERMINAL,
+            STRUCTURE_FACTORY,
+            STRUCTURE_LAB,
+        ]) {
+            const structures = this.find(FIND_MY_STRUCTURES, { filter: { structureType: structureType } })
+            for (const structure of structures) {
+                if (placed > 10) continue
+
+                let rampart = structure.pos.lookFor(LOOK_STRUCTURES).filter(st => st.structureType == STRUCTURE_RAMPART)
+                let rampartc = structure.pos
+                    .lookFor(LOOK_CONSTRUCTION_SITES)
+                    .filter(st => st.structureType == STRUCTURE_RAMPART)
+                if (rampart.length == 0 && rampartc.length == 0) {
+                    if (this.createConstructionSite(structure.pos.x, structure.pos.y, STRUCTURE_RAMPART) === OK)
                         placed += 1
                 }
             }

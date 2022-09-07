@@ -1,4 +1,4 @@
-import { claimRequestNeedsIndex, myColors } from 'international/constants'
+import { ClaimRequestNeeds, myColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 
@@ -33,7 +33,7 @@ Room.prototype.claimRequestManager = function () {
 
         const claimTarget = Game.rooms[this.memory.claimRequest]
         if (!claimTarget || !claimTarget.controller.my) {
-            Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.claimer] += 1
+            Memory.claimRequests[this.memory.claimRequest].needs[ClaimRequestNeeds.claimer] += 1
             return
         }
 
@@ -46,12 +46,25 @@ Room.prototype.claimRequestManager = function () {
             return
         }
 
-        Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguard] = claimTarget.structures
-            .spawn.length
+        // If there is an invader core
+
+        const invaderCores = claimTarget.structures.invaderCore
+        if (invaderCores.length) {
+
+            // Abandon for its remaining existance plus the estimated reservation time
+
+            Memory.claimRequests[this.memory.claimRequest].abandon = invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX
+            delete Memory.claimRequests[this.memory.claimRequest].responder
+            delete this.memory.claimRequest
+            return
+        }
+
+        Memory.claimRequests[this.memory.claimRequest].needs[ClaimRequestNeeds.vanguard] = claimTarget.structures.spawn
+            .length
             ? 0
             : 20
 
-        Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] = 0
+        Memory.claimRequests[this.memory.claimRequest].needs[ClaimRequestNeeds.vanguardDefender] = 0
 
         // Get enemyCreeps in the room and loop through them
 
@@ -62,7 +75,7 @@ Room.prototype.claimRequestManager = function () {
 
             // Increase the defenderNeed according to the creep's strength
 
-            Memory.claimRequests[this.memory.claimRequest].needs[claimRequestNeedsIndex.vanguardDefender] +=
+            Memory.claimRequests[this.memory.claimRequest].needs[ClaimRequestNeeds.vanguardDefender] +=
                 enemyCreep.strength
         }
 

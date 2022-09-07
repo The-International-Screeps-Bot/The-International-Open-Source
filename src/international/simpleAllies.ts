@@ -2,6 +2,14 @@ import { allyList, simpleAlliesSegment } from 'international/constants'
 
 const allyArray = [...allyList]
 
+export enum RequestTypes {
+     RESOURCE,
+     DEFENSE,
+     ATTACK,
+     EXECUTE,
+     HATE,
+}
+
 /**
  * Contains functions and methods useful for ally trading. Ensure allyTrading in Memory is enabled, as well as no other values or in the designated simpleAlliesSegment before usage
  */
@@ -17,19 +25,7 @@ class AllyManager {
       */
      allyRequests: Request[]
 
-     /**
-      * An enumerator with keys of requestType names and values of number references
-      */
-     requestTypes: RequestTypes
-
      constructor() {
-          this.requestTypes = {
-               RESOURCE: 0,
-               DEFENSE: 1,
-               ATTACK: 2,
-               EXECUTE: 3,
-               HATE: 4,
-          }
      }
      /**
       * Gets allyRequests, sets up requirements to use the foreign segment
@@ -88,7 +84,7 @@ class AllyManager {
       */
      requestAttack (roomName: string, playerName: string, priority: number = 0) {
           this.myRequests.push({
-               requestType: this.requestTypes.ATTACK,
+               requestType: RequestTypes.ATTACK,
                roomName,
                playerName,
                priority,
@@ -99,7 +95,7 @@ class AllyManager {
       */
      requestHelp  (roomName: string, priority: number = 0) {
           this.myRequests.push({
-               requestType: this.requestTypes.DEFENSE,
+               requestType: RequestTypes.DEFENSE,
                roomName,
                priority,
           })
@@ -109,7 +105,7 @@ class AllyManager {
       */
      requestHate (playerName: string, priority: number = 0) {
           this.myRequests.push({
-               requestType: this.requestTypes.HATE,
+               requestType: RequestTypes.HATE,
                playerName,
                priority,
           })
@@ -119,7 +115,7 @@ class AllyManager {
       */
      requestResource (roomName: string, resourceType: ResourceConstant, maxAmount: number, priority: number = 0) {
           this.myRequests.push({
-               requestType: this.requestTypes.RESOURCE,
+               requestType: RequestTypes.RESOURCE,
                resourceType,
                maxAmount,
                roomName,

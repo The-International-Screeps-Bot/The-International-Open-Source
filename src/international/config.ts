@@ -13,21 +13,81 @@ import {
     tradeBlacklist,
     roomStats,
 } from './constants'
-import { InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
 
-InternationalManager.prototype.config = function () {
-    if (Memory.breakingVersion < breakingVersion) {
-        global.killCreeps()
-        global.clearMemory()
-        global.removeCSites()
+/**
+ * Configures variables to align with the bot's expectations, to ensure proper function
+ */
+class ConfigManager {
+    public run() {
+
+        this.migrate()
+        this.configMemory()
+        this.configGlobal()
     }
+    /**
+     * Migrate version by performing actions, if required
+     */
+    private migrate() {
 
-    // Construct Memory if it isn't constructed yet
+        if (Memory.breakingVersion === breakingVersion) return
 
-    // Check if Memory is constructed
+        if (Memory.breakingVersion === 81) {
+            global.killCreeps()
 
-    if (!Memory.breakingVersion) {
+            for (const roomName in Memory.rooms) {
+                const type = Memory.rooms[roomName].T
+                if (type === 'commune' || type === 'remote') {
+
+                    delete Memory.rooms[roomName]
+                    continue
+                }
+            }
+
+            Memory.breakingVersion = 82
+        }
+        if (Memory.breakingVersion === 82) {
+            global.killCreeps()
+
+            for (const roomName in Memory.rooms) {
+                const type = Memory.rooms[roomName].T
+                if (type === 'commune' || type === 'remote') {
+
+                    delete Memory.rooms[roomName]
+                    continue
+                }
+            }
+
+            Memory.breakingVersion = 83
+        }
+        if (Memory.breakingVersion === 83) {
+            global.killCreeps()
+
+            for (const roomName in Memory.rooms) {
+                const type = Memory.rooms[roomName].T
+                if (type === 'commune' || type === 'remote') {
+
+                    delete Memory.rooms[roomName]
+                    continue
+                }
+            }
+
+            Memory.breakingVersion = 84
+        }
+
+        if (Memory.breakingVersion < breakingVersion) {
+            global.killCreeps()
+            global.clearMemory()
+            global.removeCSites()
+        }
+    }
+    /**
+     * Construct Memory if it isn't constructed yet
+     */
+    private configMemory() {
+
+        if (Memory.breakingVersion) return
+
         Memory.breakingVersion = breakingVersion
 
         Memory.me =
@@ -64,12 +124,22 @@ InternationalManager.prototype.config = function () {
         Memory.allyCreepRequests = {}
         statsManager.internationalConfig()
     }
+    /**
+     * Construct global if it isn't constructed yet
+     */
+    private configGlobal() {
 
-    if (!global.constructed) {
+        if (global.constructed) return
+
         RawMemory.setActiveSegments([98])
         global.constructed = true
+
+        global.roomManagers = {}
+        global.communeManagers = {}
 
         global.packedRoomNames = {}
         global.unpackedRoomNames = {}
     }
 }
+
+export const configManager = new ConfigManager()

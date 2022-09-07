@@ -441,16 +441,15 @@ Object.defineProperties(Room.prototype, {
 
             for (const source of this.sources) this._usedSourceCoords.push(new Set())
 
-            let harvesterNames;
+            let harvesterNames
             if (this.memory.T === 'commune') {
-                harvesterNames = this.myCreeps.source1Harvester;
-                if (this.sources.length >= 2)
-                    harvesterNames = harvesterNames.concat(this.myCreeps.source2Harvester)
-                harvesterNames = harvesterNames.concat(this.myCreeps.vanguard);
+                harvesterNames = this.myCreeps.source1Harvester
+                if (this.sources.length >= 2) harvesterNames = harvesterNames.concat(this.myCreeps.source2Harvester)
+                harvesterNames = harvesterNames.concat(this.myCreeps.vanguard)
             } else {
-                harvesterNames = this.myCreeps.source1RemoteHarvester;
+                harvesterNames = this.myCreeps.source1RemoteHarvester
                 if (this.sources.length >= 2)
-                    harvesterNames = harvesterNames.concat(this.myCreeps.source2RemoteHarvester);
+                    harvesterNames = harvesterNames.concat(this.myCreeps.source2RemoteHarvester)
             }
 
             for (const creepName of harvesterNames) {
@@ -460,7 +459,7 @@ Object.defineProperties(Room.prototype, {
 
                 // If the creep is dying, iterate
 
-                if (creep.isDying()) continue
+                if (creep.dying) continue
 
                 if (creep.memory.SI === undefined) continue
 
@@ -518,6 +517,105 @@ Object.defineProperties(Room.prototype, {
             return this._sourcePaths
         },
     },
+    controllerPositions: {
+        get() {
+            if (this._controllerPositions) return this._controllerPositions
+
+            if (this.memory.CP) {
+                return (this._controllerPositions = unpackPosList(this.memory.CP))
+            }
+
+            this._controllerPositions = []
+            const { controller } = this
+
+            if (this.memory.T === 'remote') {
+                const commune = Game.rooms[this.memory.commune]
+                if (!commune) return undefined
+
+                const terrain = Game.map.getRoomTerrain(this.name)
+
+                const anchor = commune.anchor || new RoomPosition(25, 25, commune.name)
+
+                // Find positions adjacent to source
+
+                const adjacentPositions = findCoordsInsideRect(
+                    controller.pos.x - 1,
+                    controller.pos.y - 1,
+                    controller.pos.x + 1,
+                    controller.pos.y + 1,
+                )
+
+                // Loop through each pos
+
+                for (const coord of adjacentPositions) {
+                    // Iterate if terrain for pos is a wall
+
+                    if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) continue
+
+                    // Add pos to harvestPositions
+
+                    this._controllerPositions.push(new RoomPosition(coord.x, coord.y, this.name))
+                }
+
+                this._controllerPositions.sort((a, b) => {
+                    return (
+                        this.advancedFindPath({
+                            origin: a,
+                            goal: { pos: anchor, range: 3 },
+                        }).length -
+                        this.advancedFindPath({
+                            origin: b,
+                            goal: { pos: anchor, range: 3 },
+                        }).length
+                    )
+                })
+
+                this.memory.CP = packPosList(this._controllerPositions)
+                return this._controllerPositions
+            }
+
+            const anchor = this.anchor || new RoomPosition(25, 25, this.name)
+
+            const terrain = Game.map.getRoomTerrain(this.name)
+
+            // Find positions adjacent to source
+
+            const adjacentPositions = findCoordsInsideRect(
+                controller.pos.x - 1,
+                controller.pos.y - 1,
+                controller.pos.x + 1,
+                controller.pos.y + 1,
+            )
+
+            // Loop through each pos
+
+            for (const coord of adjacentPositions) {
+                // Iterate if terrain for pos is a wall
+
+                if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) continue
+
+                // Add pos to harvestPositions
+
+                this._controllerPositions.push(new RoomPosition(coord.x, coord.y, this.name))
+            }
+
+            this._controllerPositions.sort((a, b) => {
+                return (
+                    this.advancedFindPath({
+                        origin: a,
+                        goal: { pos: anchor, range: 3 },
+                    }).length -
+                    this.advancedFindPath({
+                        origin: b,
+                        goal: { pos: anchor, range: 3 },
+                    }).length
+                )
+            })
+
+            this.memory.CP = packPosList(this._controllerPositions)
+            return this._controllerPositions
+        },
+    },
     upgradePathLength: {
         get() {
             if (this.global.upgradePathLength) return this.global.upgradePathLength
@@ -532,6 +630,51 @@ Object.defineProperties(Room.prototype, {
                 origin: centerUpgradePos,
                 goal: { pos: this.anchor, range: 3 },
             }).length)
+        },
+    },
+    remoteNamesBySourceEfficacy: {
+        get() {
+            if (this._remoteNamesBySourceEfficacy) return this._remoteNamesBySourceEfficacy
+
+            // Filter rooms that have some sourceEfficacies recorded
+
+            this._remoteNamesBySourceEfficacy = this.memory.remotes.filter(function (roomName) {
+                return Memory.rooms[roomName].SE.length
+            })
+
+            // Sort the remotes based on the average source efficacy
+
+            return this._remoteNamesBySourceEfficacy.sort(function (a1, b1) {
+                return (
+                    Memory.rooms[a1].SE.reduce((a2, b2) => a2 + b2) / Memory.rooms[a1].SE.length -
+                    Memory.rooms[b1].SE.reduce((a2, b2) => a2 + b2) / Memory.rooms[b1].SE.length
+                )
+            })
+        },
+    },
+    remoteSourceIndexesByEfficacy: {
+        get() {
+            if (this._remoteSourceIndexesByEfficacy) return this._remoteSourceIndexesByEfficacy
+
+            this._remoteSourceIndexesByEfficacy = []
+
+            for (let remoteIndex = 0; remoteIndex < this.memory.remotes.length; remoteIndex++) {
+                const remoteName = this.memory.remotes[remoteIndex]
+                const remoteMemory = Memory.rooms[remoteName]
+
+                for (let sourceIndex = 0; sourceIndex < remoteMemory.SIDs.length; sourceIndex++) {
+
+                    this._remoteSourceIndexesByEfficacy.push(remoteName + ' ' + sourceIndex)
+                }
+            }
+
+            return this._remoteSourceIndexesByEfficacy.sort(function(a, b) {
+
+                const aSplit = a.split(' ')
+                const bSplit = b.split(' ')
+
+                return Memory.rooms[aSplit[0]].SE[parseInt(aSplit[1])] - Memory.rooms[bSplit[0]].SE[parseInt(bSplit[1])]
+            })
         },
     },
     sourceContainers: {
@@ -759,6 +902,20 @@ Object.defineProperties(Room.prototype, {
                 return structure
             }
 
+            for (const structure of this.lookForAtArea(
+                LOOK_STRUCTURES,
+                hubAnchor.y - 1,
+                hubAnchor.x - 1,
+                hubAnchor.y + 1,
+                hubAnchor.x + 1,
+                true,
+            )) {
+                if (structure.structure.structureType !== STRUCTURE_LINK) continue
+
+                this.global.hubLink = structure.structure.id as Id<StructureLink>
+                return structure.structure
+            }
+
             return false
         },
     },
@@ -787,8 +944,25 @@ Object.defineProperties(Room.prototype, {
             this._MEWT = [
                 ...this.droppedEnergy,
                 ...this.find(FIND_TOMBSTONES),
-                ...this.find(FIND_RUINS),
+                //Priortize ruins that have short-ish life remaining over source containers
+                //  So that we get all the resources out of the ruins
+                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay < 10000),
                 ...this.sourceContainers,
+                //But we still want to pull from ruins if the source containers are empty.
+                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay >= 10000),
+                ...(this.find(FIND_HOSTILE_STRUCTURES).filter(structure => {
+                    return (
+                        (structure as any).store &&
+                        //And there's not a rampart on top of it...
+                        !structure.pos
+                            .lookFor(LOOK_STRUCTURES)
+                            .filter(
+                                structure2 =>
+                                    structure2.structureType === STRUCTURE_RAMPART &&
+                                    !(structure2 as StructureRampart).my,
+                            )
+                    )
+                }) as AnyStoreStructure[]),
             ]
 
             return this._MEWT
@@ -806,7 +980,10 @@ Object.defineProperties(Room.prototype, {
                 else if (
                     !this.storage.pos
                         .lookFor(LOOK_STRUCTURES)
-                        .find(structure => structure instanceof StructureRampart && !structure.my)
+                        .find(
+                            structure =>
+                                structure.structureType === STRUCTURE_RAMPART && !(structure as StructureRampart).my,
+                        )
                 )
                     this._OEWT.push(this.storage)
             }
@@ -817,7 +994,10 @@ Object.defineProperties(Room.prototype, {
                 else if (
                     !this.terminal.pos
                         .lookFor(LOOK_STRUCTURES)
-                        .find(structure => structure instanceof StructureRampart && !structure.my)
+                        .find(
+                            structure =>
+                                structure.structureType === STRUCTURE_RAMPART && !(structure as StructureRampart).my,
+                        )
                 )
                     this._OEWT.push(this.terminal)
             }

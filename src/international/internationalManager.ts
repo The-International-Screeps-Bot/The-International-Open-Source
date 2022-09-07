@@ -2,6 +2,7 @@ import { allyManager } from 'international/simpleAllies'
 import { createPosMap, customLog, getAvgPrice, packXY } from './generalFunctions'
 import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
 import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames, myColors, roomDimensions } from './constants'
+
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
@@ -13,7 +14,6 @@ export class InternationalManager {
 
         // Run prototypes
 
-        this.config()
         this.tickConfig()
         this.creepOrganizer()
         this.constructionSiteManager()
@@ -54,7 +54,7 @@ export class InternationalManager {
     /**
      * Finds the cheapest sell order
      */
-    getSellOrder(resourceType: ResourceConstant, maxPrice = getAvgPrice(resourceType) * 1.2) {
+    getSellOrder(resourceType: MarketResourceConstant, maxPrice = getAvgPrice(resourceType) * 1.2) {
         const orders = this.orders.sell?.[resourceType] || []
 
         let bestOrder: Order
@@ -71,7 +71,7 @@ export class InternationalManager {
     /**
      * Finds the most expensive buy order
      */
-    getBuyOrder(resourceType: ResourceConstant, minPrice = getAvgPrice(resourceType) * 0.8) {
+    getBuyOrder(resourceType: MarketResourceConstant, minPrice = getAvgPrice(resourceType) * 0.8) {
         const orders = this.orders.buy?.[resourceType] || []
 
         let bestOrder: Order
@@ -79,7 +79,7 @@ export class InternationalManager {
         for (const order of orders) {
             if (order.price <= minPrice) continue
 
-            if (order.price > (bestOrder ? bestOrder.price : Infinity)) bestOrder = order
+            if (order.price > (bestOrder ? bestOrder.price : 0)) bestOrder = order
         }
 
         return bestOrder
@@ -93,20 +93,52 @@ export class InternationalManager {
 
         if (Game.resources[PIXEL] === 0) return
 
-        const minPrice = getAvgPrice(PIXEL, 7) * 0.8
+        const avgPrice = getAvgPrice(PIXEL, 7)
 
-        const orders = Game.market.getAllOrders({ type: ORDER_BUY, resourceType: PIXEL })
-        let bestOrder: Order
+        const minPrice = avgPrice * 0.8
+        customLog('minPixelPrice', minPrice)
+        customLog('avgPixelPrice', avgPrice)
 
-        for (const order of orders) {
-            if (order.price <= minPrice) continue
+        const buyOrder = this.getBuyOrder(PIXEL, minPrice)
 
-            if (order.price > (bestOrder ? bestOrder.price : 0)) bestOrder = order
+        if (buyOrder) {
+            Game.market.deal(buyOrder.id, Math.min(buyOrder.amount, Game.resources[PIXEL]))
+            return
         }
 
-        if (!bestOrder) return
+        const myPixelOrder = _.filter(Game.market.orders, o => (o.type == "sell" && o.resourceType == PIXEL))[0]
 
-        Game.market.deal(bestOrder.id, Math.min(bestOrder.amount, Game.resources[PIXEL]))
+        const sellOrder = this.getSellOrder(PIXEL, Infinity)
+        let price: number
+
+        if (sellOrder.price < avgPrice) {
+            price = avgPrice;
+        } else {
+            price = sellOrder.price
+        }
+
+        if (myPixelOrder) {
+            if (Game.time % 100 == 0) {
+                if (myPixelOrder.remainingAmount < Game.resources[PIXEL]) {
+                    Game.market.extendOrder(myPixelOrder.id, Game.resources[PIXEL] - myPixelOrder.remainingAmount)
+                    return
+                } else {
+                    if (myPixelOrder.price == price) return
+                    Game.market.changeOrderPrice(myPixelOrder.id, price - 0.001)
+                    return
+                }
+            } else {
+                return
+            }
+
+        }
+
+        Game.market.createOrder({
+            type: ORDER_SELL,
+            resourceType: PIXEL,
+            price: price - 0.001,
+            totalAmount: Game.resources[PIXEL],
+        })
     }
 
     advancedGeneratePixel() {
@@ -144,11 +176,6 @@ export class InternationalManager {
     }
 
     /**
-     * Configures features like Memory, global and object prototypes required to run the bot
-     */
-    config?(): void
-
-    /**
      * Configures tick important or tick-only pre-roomManager settings required to run the bot
      */
     tickConfig?(): void
@@ -181,7 +208,7 @@ export class InternationalManager {
         delete this._orders
         delete this._myOrdersCount
         delete this._claimRequestsByScore
-        delete this._defaultCacheAmount
+        delete this._defaultMinCacheAmount
     }
 
     /**
@@ -301,12 +328,14 @@ export class InternationalManager {
         ))
     }
 
-    _defaultCacheAmount: number
+    _defaultMinCacheAmount: number
 
-    get defaultCacheAmount() {
-        if (this._defaultCacheAmount) return this._defaultCacheAmount
+    get defaultMinCacheAmount() {
+        if (this._defaultMinCacheAmount) return this._defaultMinCacheAmount
 
-        return Math.floor((CPUBucketCapacity - Game.cpu.bucket) / cacheAmountModifier) + 1
+        const avgCPUUsagePercent = (Memory.stats.cpu.usage || 20) / Game.cpu.limit
+
+        return Math.floor(Math.pow(avgCPUUsagePercent * 10, 2.2)) + 1
     }
 
     _marketIsFunctional: number

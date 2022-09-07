@@ -75,6 +75,7 @@ export class StatsManager {
                 spawnUsage = spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawns.length
         } else {
             roomStats.cc = 0
+            roomStats.tcc = 0
         }
         roomStats.su = this.average(roomStats.su, spawnUsage)
 
@@ -87,9 +88,9 @@ export class StatsManager {
             roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY)
         }
 
+        roomStats.eih = this.average(roomStats.eih, globalCommuneStats.eih)
         if (Memory.roomStats >= 2) {
             roomStats.mh = this.average(roomStats.mh, globalCommuneStats.mh)
-            roomStats.eih = this.average(roomStats.eih, globalCommuneStats.eih)
             roomStats.eib = this.average(roomStats.eib, globalCommuneStats.eib)
             roomStats.eos = this.average(roomStats.eos, globalCommuneStats.eos)
 
@@ -107,8 +108,6 @@ export class StatsManager {
                 globalCommuneStats.reoro += remoteRoomStats.reoro
                 globalCommuneStats.reob += remoteRoomStats.reob
             })
-            roomStats.tcc = this.average(globalCommuneStats.tcc, roomStats.tcc)
-
             roomStats.rc = this.average(globalCommuneStats.rc, roomStats.rc)
             roomStats.rcu = this.average(globalCommuneStats.rcu, roomStats.rcu)
             roomStats.res = this.average(globalCommuneStats.res, roomStats.res)
@@ -209,7 +208,7 @@ export class StatsManager {
         delete global.roomStats
     }
 
-    average(originalNumber: number, newNumber: number, averagedOverTickCount: number = 10, digits: number = 5) {
+    average(originalNumber: number, newNumber: number, averagedOverTickCount: number = 500, digits: number = 5) {
         const newWeight = 1 / averagedOverTickCount
         const originalWeight = 1 - newWeight
 

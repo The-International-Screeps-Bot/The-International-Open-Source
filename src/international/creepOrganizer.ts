@@ -3,15 +3,6 @@ import { myColors, spawnByRoomRemoteRoles } from './constants'
 import { customLog, pack } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
-import '../room/creeps/preTickManagers/international/scoutPreTick'
-
-import '../room/creeps/preTickManagers/remote/remoteHarvesterPreTick'
-import '../room/creeps/preTickManagers/remote/remoteHaulerPreTick'
-import '../room/creeps/preTickManagers/remote/remoteReserverPreTick'
-import '../room/creeps/preTickManagers/remote/remoteDefenderPreTick'
-import '../room/creeps/preTickManagers/remote/remoteCoreAttackerPreTick'
-import '../room/creeps/preTickManagers/remote/remoteDismantlerPreTick'
-
 InternationalManager.prototype.creepOrganizer = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
@@ -67,7 +58,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         // Get the commune the creep is from
 
-        const commune = Game.rooms[creep.commune]
+        const commune = creep.commune
 
         // If there is not vision in the commune, stop
 
@@ -84,7 +75,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         // If the creep isn't dying, organize by its roomFrom and role
 
-        if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
+        if (!creep.dying) commune.creepsFromRoom[role].push(creepName)
 
         // Record that the creep's existence in its roomFrom
 

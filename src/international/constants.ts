@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 81
+export const breakingVersion = 84
 
 // Settings
 
@@ -98,12 +98,13 @@ export const roomTypeProperties: RoomTypeProperties = {
     powerBanks: true,
     notClaimable: true,
     PC: true,
-    HS: true,
+    MHC: true,
     HU: true,
 
     commune: true,
     needs: true,
-    sourceEfficacies: true,
+    SE: true,
+    RE: true,
     abandoned: true,
 
     owner: true,
@@ -127,7 +128,7 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         deposits: true,
         powerBanks: true,
         PC: true,
-        HS: true,
+        MHC: true,
         HU: true,
     },
     remote: {
@@ -135,7 +136,8 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         source1: true,
         source2: true,
         needs: true,
-        sourceEfficacies: true,
+        SE: true,
+        RE: true,
         abandoned: true,
         notClaimable: true,
         PC: true,
@@ -205,17 +207,33 @@ export const creepRoles: CreepRoles[] = [
     'allyVanguard',
     'vanguardDefender',
     'antifaAssaulter',
-    'antifaSupporter',
 ]
 
-const trafficPriorities: Map<Partial<CreepRoles>, number> = new Map()
-
-trafficPriorities.set('meleeDefender', Infinity)
-
-trafficPriorities.set('source1RemoteHarvester', 1)
-trafficPriorities.set('source2RemoteHarvester', 1)
-
-export { trafficPriorities }
+export enum TrafficPriorities {
+    hauler,
+    remoteHauler,
+    scout,
+    hubHauler,
+    fastFiller,
+    source1Harvester,
+    source2Harvester,
+    mineralHarvester,
+    source1RemoteHarvester,
+    source2RemoteHarvester,
+    remoteReserver,
+    remoteDismantler,
+    remoteCoreAttacker,
+    vanguard,
+    allyVanguard,
+    controllerUpgrader,
+    builder,
+    maintainer,
+    claimer,
+    vanguardDefender,
+    remoteDefender,
+    meleeDefender,
+    antifaAssaulter,
+}
 
 // Set of messages to randomly apply to commune rooms
 
@@ -226,10 +244,14 @@ export const communeSigns = ['A commune of the proletariat. Bourgeoisie not welc
 export const nonCommuneSigns = [
     'The top 1% have more money than the poorest 4.5 billion',
     'McDonalds workers in the US make $10/hour. In Denmark, as a result of unions, they make $22/hour',
-    'We have democracy in our policial system, why do we not have it in our companies?',
+    'We have democracy in our policial system, should we not have it in our companies too?',
     'Workers of the world, unite!',
     'Real democracy requires democracy in the workplace - Richard Wolff',
     'Adults spend a combined 13 years of their life under a dictatorship: the workplace',
+    'Socialism is about worker ownership over the workplace',
+    'Trans rights.',
+    'Advancing the LGBTQ+ agenda <3',
+    'Does Jeff Bezos work 56,000 times harder than his average worker? Because he gets paid like it'
 ]
 
 export const roomDimensions = 50
@@ -349,6 +371,10 @@ export const myColors = {
     red: '#d10000',
     green: '#00d137',
     brown: '#aa7253',
+    purple: '#8b06a3',
+    pink: '#d60ef9',
+    orange: '#f27602',
+    teal: '#02f2e2',
 }
 
 export const remoteStamps: Record<RemoteStampTypes, Stamp> = {
@@ -606,48 +632,54 @@ export const minerals: Partial<ResourceConstant[]> = [
 ]
 export const boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
 
-export const remoteNeedsIndex = {
-    source1RemoteHarvester: 0,
-    source2RemoteHarvester: 1,
-    remoteHauler: 2,
-    remoteReserver: 3,
-    remoteCoreAttacker: 4,
-    remoteBuilder: 5,
-    remoteDismantler: 6,
-    minDamage: 7,
-    minHeal: 8,
-    enemyReserved: 9,
-    invaderCore: 10,
+export enum RemoteNeeds {
+    source1RemoteHarvester,
+    source2RemoteHarvester,
+    remoteHauler0,
+    remoteHauler1,
+    remoteReserver,
+    remoteCoreAttacker,
+    remoteBuilder,
+    remoteDismantler,
+    minDamage,
+    minHeal,
+    enemyReserved,
+    invaderCore,
 }
 
-export const claimRequestNeedsIndex = {
-    claimer: 0,
-    vanguard: 1,
-    vanguardDefender: 2,
+export enum ClaimRequestNeeds {
+    claimer,
+    vanguard,
+    vanguardDefender,
 }
 
-export const attackRequestNeedsIndex = {
-    ranged: 0,
-    attack: 1,
-    dismantle: 2,
-    downgrader: 3,
-    minDamage: 4,
-    minHeal: 5,
+export enum AttackRequestNeeds {
+    ranged,
+    attack,
+    dismantle,
+    downgrader,
+    minDamage,
+    minHeal,
 }
 
-export const allyCreepRequestNeedsIndex = {
-    allyVanguard: 0,
+export enum AllyCreepRequestNeeds {
+    allyVanguard,
 }
 
-export const depositNeedsIndex = {
-    depositHarvester: 0,
-    depositHauler: 1,
+export enum DepositNeeds {
+    depositHarvester,
+    depositHauler,
 }
 
 export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester')[] = [
     'source1RemoteHarvester',
     'source2RemoteHarvester',
 ]
+
+export enum RemoteHarvesterRolesBySourceIndex {
+    source1RemoteHarvester,
+    source2RemoteHarvester,
+}
 
 export const spawnByRoomRemoteRoles: (
     | 'source1RemoteHarvester'
@@ -657,13 +689,13 @@ export const spawnByRoomRemoteRoles: (
     | 'remoteCoreAttacker'
     | 'remoteDismantler'
 )[] = [
-        'source1RemoteHarvester',
-        'source2RemoteHarvester',
-        'remoteReserver',
-        'remoteDefender',
-        'remoteCoreAttacker',
-        'remoteDismantler',
-    ]
+    'source1RemoteHarvester',
+    'source2RemoteHarvester',
+    'remoteReserver',
+    'remoteDefender',
+    'remoteCoreAttacker',
+    'remoteDismantler',
+]
 
 export const builderSpawningWhenStorageThreshold = 40000
 
@@ -712,3 +744,90 @@ export const maxRampartGroupSize = 12
 
 export const linkSendThreshold = 0.9
 export const linkReceiveTreshold = 0.25
+
+export const relayOffsets = {
+    horizontal: [
+        {
+            x: 0,
+            y: 0,
+        },
+        {
+            x: -1,
+            y: 0,
+        },
+        {
+            x: 1,
+            y: 0,
+        },
+    ],
+    vertical: [
+        {
+            x: 0,
+            y: 0,
+        },
+        {
+            x: 0,
+            y: -1,
+        },
+        {
+            x: 0,
+            y: 1,
+        },
+    ],
+    topLeft: [
+        {
+            x: 0,
+            y: 0,
+        },
+        {
+            x: 1,
+            y: 0,
+        },
+        {
+            x: 0,
+            y: 1,
+        },
+    ],
+    topRight: [
+        {
+            x: 0,
+            y: 0,
+        },
+        {
+            x: -1,
+            y: 0,
+        },
+        {
+            x: 0,
+            y: 1,
+        },
+    ],
+    bottomLeft: [
+        {
+            x: 0,
+            y: 0,
+        },
+        {
+            x: 1,
+            y: 0,
+        },
+        {
+            x: 0,
+            y: -1,
+        },
+    ],
+    bottomRight: [
+        {
+            x: 0,
+            y: 0,
+        },
+        {
+            x: -1,
+            y: 0,
+        },
+        {
+            x: 0,
+            y: -1,
+        },
+    ],
+}

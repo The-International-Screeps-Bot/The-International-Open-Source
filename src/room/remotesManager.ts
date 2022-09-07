@@ -1,5 +1,5 @@
-import { remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles } from 'international/constants'
-import { findCarryPartsRequired } from 'international/generalFunctions'
+import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteNeeds, spawnByRoomRemoteRoles } from 'international/constants'
+import { customLog, findCarryPartsRequired } from 'international/generalFunctions'
 
 Room.prototype.remotesManager = function () {
     // Loop through the commune's remote names
@@ -34,10 +34,11 @@ Room.prototype.remotesManager = function () {
             continue
         }
 
-        remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 3
-        remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = remoteMemory.SIDs[1] ? 3 : 0
-        remoteMemory.needs[remoteNeedsIndex.remoteHauler] = 0
-        remoteMemory.needs[remoteNeedsIndex.remoteReserver] = 1
+        remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] = 3
+        remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] = remoteMemory.SIDs[1] ? 3 : 0
+        remoteMemory.needs[RemoteNeeds.remoteHauler0] = 0
+        remoteMemory.needs[RemoteNeeds.remoteHauler1] = 0
+        remoteMemory.needs[RemoteNeeds.remoteReserver] = 1
 
         // Get the remote
 
@@ -50,61 +51,56 @@ Room.prototype.remotesManager = function () {
         if (possibleReservation) {
             // Increase the remoteHarvester need accordingly
 
-            remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] += 3
-            remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.SIDs[1] ? 3 : 0
+            remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] *= 2
+            remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] *= remoteMemory.SIDs[1] ? 2 : 1
 
             const isReserved =
                 remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
 
             // If the reservation isn't soon to run out, relative to the room's sourceEfficacy average
 
-            if (
-                isReserved &&
-                remote.controller.reservation.ticksToEnd >= Math.min(remoteMemory.sourceEfficacies.reduce((a, b) => a + b) * 3, 1000)
-            ) {
-                remoteMemory.needs[remoteNeedsIndex.remoteReserver] = 0
-            }
+            if (isReserved && remote.controller.reservation.ticksToEnd >= Math.min(remoteMemory.RE * 5, 2500))
+                remoteMemory.needs[RemoteNeeds.remoteReserver] = 0
         }
-
+        /*
         // Loop through each index of sourceEfficacies
 
-        for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
+        for (let sourceIndex = 0; sourceIndex < remoteMemory.SE.length; sourceIndex += 1) {
             // Get the income based on the reservation of the room and remoteHarvester need
 
-            const income = possibleReservation ? 10 : 5
+            const income =
+                (possibleReservation ? 10 : 5) -
+                Math.floor(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio)
 
             // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-            remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(
-                remoteMemory.sourceEfficacies[index],
-                income,
-            )
+            remoteMemory.needs[RemoteNeeds[`remoteHauler${sourceIndex as 0 | 1}`]] += findCarryPartsRequired(remoteMemory.SE[sourceIndex], income) / 2
         }
-
+ */
         if (remote) {
-            remoteMemory.needs[remoteNeedsIndex.minDamage] = 0
-            remoteMemory.needs[remoteNeedsIndex.minHeal] = 0
+            remoteMemory.needs[RemoteNeeds.minDamage] = 0
+            remoteMemory.needs[RemoteNeeds.minHeal] = 0
 
             // Increase the defenderNeed according to the enemy attackers' combined strength
 
             for (const enemyCreep of remote.enemyCreeps) {
-                remoteMemory.needs[remoteNeedsIndex.minDamage] += enemyCreep.healStrength
-                remoteMemory.needs[remoteNeedsIndex.minHeal] += enemyCreep.attackStrength
+                remoteMemory.needs[RemoteNeeds.minDamage] += enemyCreep.healStrength
+                remoteMemory.needs[RemoteNeeds.minHeal] += enemyCreep.attackStrength
             }
 
             // If the controller is reserved and not by me
 
             if (remote.controller.reservation && remote.controller.reservation.username !== Memory.me)
-                remoteMemory.needs[remoteNeedsIndex.enemyReserved] = 1
+                remoteMemory.needs[RemoteNeeds.enemyReserved] = 1
             // If the controller is not reserved or is by us
-            else remoteMemory.needs[remoteNeedsIndex.enemyReserved] = 0
+            else remoteMemory.needs[RemoteNeeds.enemyReserved] = 0
 
-            remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = remote.structures.invaderCore.length
-            remoteMemory.needs[remoteNeedsIndex.invaderCore] = remote.structures.invaderCore.length
+            remoteMemory.needs[RemoteNeeds.remoteCoreAttacker] = remote.structures.invaderCore.length
+            remoteMemory.needs[RemoteNeeds.invaderCore] = remote.structures.invaderCore.length
 
             // Create need if there are any walls or enemy owner structures (not including invader cores)
 
-            remoteMemory.needs[remoteNeedsIndex.remoteDismantler] =
+            remoteMemory.needs[RemoteNeeds.remoteDismantler] =
                 Math.min(remote.actionableWalls.length, 1) ||
                 Math.min(
                     remote.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
@@ -116,18 +112,20 @@ Room.prototype.remotesManager = function () {
 
         // If the remote is assumed to be reserved by an enemy
 
-        if (remoteMemory.needs[remoteNeedsIndex.enemyReserved]) {
-            remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 0
-            remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = 0
-            remoteMemory.needs[remoteNeedsIndex.remoteHauler] = 0
+        if (remoteMemory.needs[RemoteNeeds.enemyReserved]) {
+            remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] = 0
+            remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] = 0
+            remoteMemory.needs[RemoteNeeds.remoteHauler0] = 0
+            remoteMemory.needs[RemoteNeeds.remoteHauler1] = 0
         }
 
         // If there is assumed to be an invader core
 
-        if (remoteMemory.needs[remoteNeedsIndex.invaderCore]) {
-            remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 0
-            remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = 0
-            remoteMemory.needs[remoteNeedsIndex.remoteHauler] = 0
+        if (remoteMemory.needs[RemoteNeeds.invaderCore]) {
+            remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] = 0
+            remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] = 0
+            remoteMemory.needs[RemoteNeeds.remoteHauler0] = 0
+            remoteMemory.needs[RemoteNeeds.remoteHauler1] = 0
         }
     }
 }

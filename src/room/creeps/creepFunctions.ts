@@ -9,9 +9,10 @@ import {
     myColors,
     nonCommuneSigns,
     roomDimensions,
+    TrafficPriorities,
 } from 'international/constants'
 import {
-    arePositionsEqual,
+    areCoordsEqual,
     customLog,
     findClosestObject,
     findClosestPos,
@@ -32,23 +33,7 @@ import { creepClasses } from './creepClasses'
 
 Creep.prototype.preTickManager = function () {}
 
-Creep.prototype.isDying = function () {
-    // Inform as dying if creep is already recorded as dying
-
-    if (this.memory.dying) return true
-
-    // Stop if creep is spawning
-
-    if (!this.ticksToLive) return false
-
-    // If the creep's remaining ticks are more than the estimated spawn time, inform false
-
-    if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
-
-    // Record creep as dying
-
-    return (this.memory.dying = true)
-}
+Creep.prototype.endTickManager = function () {}
 
 Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENERGY, amount) {
     // If creep isn't in transfer range
@@ -166,6 +151,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
     // Find amount of energy harvested and record it in data
 
     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
+
     if (global.roomStats.commune[this.room.name])
         (global.roomStats.commune[this.room.name] as RoomCommuneStats).eih += energyHarvested
     else if (global.roomStats.remote[this.room.name]) global.roomStats.remote[this.room.name].reih += energyHarvested
@@ -590,7 +576,7 @@ Creep.prototype.findRepairTarget = function (excludedIDs = new Set()) {
     })
 }
 
-Creep.prototype.findOptimalSourceName = function () {
+Creep.prototype.findOptimalSourceIndex = function () {
     const { room } = this
 
     this.say('FOSN')
@@ -611,7 +597,7 @@ Creep.prototype.findOptimalSourceName = function () {
         // Then loop through the source names and find the first one with open spots
 
         for (const source of room.sourcesByEfficacy) {
-            const { index } = source
+            const index = source.index as 0 | 1
 
             // If there are still creeps needed to harvest a source under the creepThreshold
 
@@ -762,7 +748,7 @@ Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
 
     // Inform true if the creep's previous target isn't its current
 
-    if (!arePositionsEqual(unpackPos(this.memory.goalPos), goalPos)) return true
+    if (!areCoordsEqual(unpackPos(this.memory.goalPos), goalPos)) return true
 
     // If next pos in the path is not in range, inform true
 
@@ -790,7 +776,7 @@ Creep.prototype.createMoveRequest = function (opts) {
 
     // Assign default opts
 
-    if (!opts.cacheAmount) opts.cacheAmount = internationalManager.defaultCacheAmount
+    if (!opts.cacheAmount) opts.cacheAmount = internationalManager.defaultMinCacheAmount
 
     let path: RoomPosition[]
 
@@ -801,7 +787,7 @@ Creep.prototype.createMoveRequest = function (opts) {
 
         // So long as the creep isn't standing on the first position in the path
 
-        while (path[0] && arePositionsEqual(this.pos, path[0])) {
+        while (path[0] && areCoordsEqual(this.pos, path[0])) {
             // Remove the first pos of the path
 
             path.shift()
@@ -847,11 +833,13 @@ Creep.prototype.createMoveRequest = function (opts) {
             room.visual.text('NP', path[0], {
                 align: 'center',
                 color: myColors.lightBlue,
+                opacity: 0.5,
+                font: 0.5,
             })
 
         // So long as the creep isn't standing on the first position in the path
 
-        while (path[0] && arePositionsEqual(this.pos, path[0])) {
+        while (path[0] && areCoordsEqual(this.pos, path[0])) {
             // Remove the first pos of the path
 
             path.shift()
@@ -864,7 +852,13 @@ Creep.prototype.createMoveRequest = function (opts) {
 
     // If visuals are enabled, visualize the path
 
-    if (Memory.roomVisuals) room.pathVisual(path, 'lightBlue')
+    if (Memory.roomVisuals)
+        path.length > 1
+            ? room.pathVisual(path, 'lightBlue')
+            : room.visual.line(this.pos, path[0], {
+                  color: myColors.lightBlue,
+                  opacity: 0.3,
+              })
 
     // Pack the first pos in the path
 
@@ -1023,7 +1017,9 @@ Creep.prototype.shove = function (shoverPos) {
     }
 
     this.recurseMoveRequest()
-    return true
+    if (this.moved) return true
+
+    return false
 }
 
 Creep.prototype.runMoveRequest = function () {
@@ -1031,9 +1027,15 @@ Creep.prototype.runMoveRequest = function () {
 
     // If requests are not allowed for this pos, inform false
 
-    if (!room.moveRequests.get(this.moveRequest)?.length) return false
+    if (!room.moveRequests.get(this.moveRequest)) return false
 
     if (this.move(this.pos.getDirectionTo(unpackAsRoomPos(this.moveRequest, room.name))) !== OK) return false
+
+    if (Memory.roomVisuals)
+        room.visual.rect(this.pos.x - 0.5, this.pos.y - 0.5, 1, 1, {
+            fill: myColors.lightBlue,
+            opacity: 0.2,
+        })
 
     // Record where the creep is tying to move
 
@@ -1059,7 +1061,10 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     const { room } = this
 
     if (!this.moveRequest) return
-    if (!room.moveRequests.get(this.moveRequest)?.length) return
+    if (!room.moveRequests.get(this.moveRequest)) {
+        this.moved = -1
+        return
+    }
 
     queue.push(this.name)
 
@@ -1081,8 +1086,8 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             })
 
             for (let index = queue.length - 1; index >= 0; index--)
-                room.visual.line(Game.creeps[queue[index]].pos, this.pos, {
-                    color: myColors.yellow,
+                room.visual.rect(Game.creeps[queue[index]].pos.x - 0.5, Game.creeps[queue[index]].pos.y - 0.5, 1, 1, {
+                    fill: myColors.yellow,
                     opacity: 0.2,
                 })
         }
@@ -1097,11 +1102,37 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         return
     }
 
+    const packedCoord = pack(this.pos)
+
     // Get the creepAtPos with the name
 
     const creepAtPos = Game.creeps[creepNameAtPos]
 
     if (creepAtPos.moved) {
+        if (creepAtPos.moved === -1) {
+            delete this.moveRequest
+            this.moved = -1
+        }
+
+        // If the creep is where the creepAtPos is trying to move to
+        /*
+        if (packedCoord === creepAtPos.moved) {
+            if (Memory.roomVisuals)
+                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                    fill: myColors.purple,
+                    opacity: 0.2,
+                })
+
+            this.runMoveRequest()
+            return
+        }
+ */
+        if (Memory.roomVisuals)
+            room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                fill: myColors.white,
+                opacity: 0.2,
+            })
+
         // Otherwise, loop through each index of the queue
 
         for (let index = queue.length - 1; index >= 0; index--)
@@ -1113,8 +1144,8 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
         if (Memory.roomVisuals)
             for (let index = queue.length - 1; index >= 0; index--)
-                room.visual.line(Game.creeps[queue[index]].pos, this.pos, {
-                    color: myColors.yellow,
+                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                    fill: myColors.yellow,
                     opacity: 0.2,
                 })
         return
@@ -1125,15 +1156,90 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
     if (creepAtPos.moveRequest) {
         // If it's not valid
 
-        if (!room.moveRequests.get(creepAtPos.moveRequest)?.length) return
+        if (!room.moveRequests.get(creepAtPos.moveRequest)) {
+            /*
+            if (Memory.roomVisuals)
+                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                    fill: myColors.teal,
+                    opacity: 0.2,
+                })
 
-        // If the creep's pos and the creepAtPos's moveRequests are aligned
-
-        if (pack(this.pos) === creepAtPos.moveRequest) {
             // Have the creep move to its moveRequest
 
             this.runMoveRequest()
-            creepAtPos.recurseMoveRequest()
+
+            // Have the creepAtPos move to the creep and inform true
+
+            creepAtPos.moveRequest = packedCoord
+            room.moveRequests.set(packedCoord, [creepAtPos.name])
+            creepAtPos.runMoveRequest()
+ */
+            return
+        }
+
+        // If the creep's pos and the creepAtPos's moveRequests are aligned
+
+        if (packedCoord === creepAtPos.moveRequest) {
+            if (Memory.roomVisuals)
+                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                    fill: myColors.teal,
+                    opacity: 0.2,
+                })
+
+            // Have the creep move to its moveRequest
+
+            this.runMoveRequest()
+            creepAtPos.runMoveRequest()
+            return
+        }
+
+        // If both creeps moveRequests are aligned
+
+        if (this.moveRequest === creepAtPos.moveRequest) {
+            if (Memory.roomVisuals)
+                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                    fill: myColors.pink,
+                    opacity: 0.2,
+                })
+
+            // Prefer the creep with the higher priority
+
+            if (
+                TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
+                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+            ) {
+                this.runMoveRequest()
+
+                delete creepAtPos.moveRequest
+                creepAtPos.moved = -1
+
+                return
+            }
+
+            delete this.moveRequest
+            this.moved = -1
+
+            creepAtPos.runMoveRequest()
+            return
+        }
+
+        if (
+            TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
+            TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+        ) {
+            if (Memory.roomVisuals)
+                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                    fill: myColors.pink,
+                    opacity: 0.2,
+                })
+
+            this.runMoveRequest()
+
+            // Have the creepAtPos move to the creep and inform true
+
+            creepAtPos.moveRequest = packedCoord
+            room.moveRequests.set(packedCoord, [creepAtPos.name])
+            creepAtPos.runMoveRequest()
             return
         }
 
@@ -1151,8 +1257,8 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
             if (Memory.roomVisuals)
                 for (let index = queue.length - 1; index >= 0; index--)
-                    room.visual.line(Game.creeps[queue[index]].pos, this.pos, {
-                        color: myColors.yellow,
+                    room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+                        fill: myColors.yellow,
                         opacity: 0.2,
                     })
 
@@ -1174,27 +1280,35 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         return
     }
 
+    if (Memory.roomVisuals)
+        room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+            fill: myColors.teal,
+            opacity: 0.2,
+        })
+
     // Have the creep move to its moveRequest
 
     this.runMoveRequest()
 
     // Have the creepAtPos move to the creep and inform true
 
-    creepAtPos.moveRequest = pack(this.pos)
+    creepAtPos.moveRequest = packedCoord
+    room.moveRequests.set(packedCoord, [creepAtPos.name])
     creepAtPos.runMoveRequest()
 }
 
 Creep.prototype.needsResources = function () {
     // If the creep is empty
+    if (!this.freeCapacityNextTick) this.freeCapacityNextTick = this.store.getFreeCapacity()
 
-    if (this.usedStore() <= 0)
+    if (this.freeCapacityNextTick === this.store.getCapacity())
         // Record and inform that the creep needs resources
 
         return (this.memory.NR = true)
 
     // Otherwise if the creep is full
 
-    if (this.freeStore() <= 0) {
+    if (this.freeCapacityNextTick == 0) {
         // Record and inform that the creep does not resources
 
         delete this.memory.NR
@@ -1332,7 +1446,7 @@ Creep.prototype.advancedRenew = function () {
 
     if (!room.myCreeps.fastFiller.length) return
 
-    if (this.isDying()) return
+    if (this.dying) return
 
     // If the creep's age is less than the benefit from renewing, inform false
 
@@ -1574,12 +1688,8 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
     }
 
     if (reservation.type === 'transfer') {
-
-        target.store[reservation.resourceType] += reservation.amount
         return
     }
-
-    target.store[reservation.resourceType] -= reservation.amount
 }
 
 Creep.prototype.reservationManager = function () {
@@ -1603,32 +1713,29 @@ Creep.prototype.reservationManager = function () {
                 target.reserveAmount += amount
                 this.deleteReservation(0)
             }
-
+            /*
             if (Memory.roomVisuals) {
                 this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1, { font: 0.5 })
                 this.room.visual.text(`${target.reserveAmount}`, this.pos.x, this.pos.y + 2, { font: 0.5 })
-            }
+            } */
 
             continue
         }
 
         if (reservation.type === 'transfer') {
-            let amount = Math.min(reservation.amount, target.freeStore())
-
-            target.store[reservation.resourceType] += amount
+            let amount = Math.min(reservation.amount, target.store.getFreeCapacity(reservation.resourceType))
 
             if (amount <= 0) {
-                target.store[reservation.resourceType] -= amount
                 this.deleteReservation(0)
             }
-
+            /*
             if (Memory.roomVisuals) {
                 this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1, { font: 0.5 })
                 this.room.visual.text(`${target.store[reservation.resourceType]}`, this.pos.x, this.pos.y + 2, {
                     font: 0.5,
                 })
             }
-
+ */
             reservation.amount = amount
 
             continue
@@ -1636,14 +1743,14 @@ Creep.prototype.reservationManager = function () {
 
         let amount = reservation.amount
 
-        target.store[reservation.resourceType] -= amount
-
+        /*
         if (Memory.roomVisuals) {
             this.room.visual.text(`${amount}`, this.pos.x, this.pos.y + 1, { font: 0.5 })
             this.room.visual.text(`${target.store[reservation.resourceType]}`, this.pos.x, this.pos.y + 2, {
                 font: 0.5,
             })
         }
+         */
     }
 }
 
@@ -1661,8 +1768,7 @@ Creep.prototype.fulfillReservation = function () {
 
     if (Memory.roomVisuals)
         room.visual.line(this.pos, target.pos, {
-            color: myColors.lightBlue,
-            width: 0.15,
+            color: myColors.green,
             opacity: 0.2,
         })
 
@@ -1692,9 +1798,8 @@ Creep.prototype.fulfillReservation = function () {
         }
 
         if (pickupResult === OK) {
-            this.store[reservation.resourceType] += reservation.amount
-
             this.movedResource = true
+            this.freeCapacityNextTick = Math.max(this.store.getFreeCapacity() - target.amount, 0)
             this.deleteReservation(0)
             return true
         }
@@ -1707,7 +1812,6 @@ Creep.prototype.fulfillReservation = function () {
     // Transfer
 
     if (reservation.type === 'transfer') {
-
         // This needs to use the direct functions to calculate free space, not the reserved amount
 
         amount = Math.min(
@@ -1716,7 +1820,6 @@ Creep.prototype.fulfillReservation = function () {
             this.store[reservation.resourceType],
         )
 
-        target.store[reservation.resourceType] -= amount
         this.message += amount
 
         const transferResult = this.transfer(target as any, reservation.resourceType, amount)
@@ -1728,10 +1831,8 @@ Creep.prototype.fulfillReservation = function () {
         }
 
         if (transferResult === OK) {
-            target.store[reservation.resourceType] += amount
-            this.store[reservation.resourceType] -= amount
-
             this.movedResource = true
+            this.freeCapacityNextTick = this.store.getFreeCapacity() + amount
             this.deleteReservation(0)
             return true
         }
@@ -1746,10 +1847,18 @@ Creep.prototype.fulfillReservation = function () {
 
     // Withdraw
 
-    target.store[reservation.resourceType] += amount
-
     const withdrawResult = this.withdraw(target as any, reservation.resourceType, amount)
     this.message += withdrawResult
+
+    if (withdrawResult === ERR_NOT_ENOUGH_RESOURCES) {
+        this.deleteReservation(0)
+        return true
+    }
+
+    if (withdrawResult === ERR_INVALID_TARGET) {
+        this.deleteReservation(0)
+        return true
+    }
 
     if (withdrawResult === ERR_FULL) {
         this.deleteReservation(0)
@@ -1757,10 +1866,8 @@ Creep.prototype.fulfillReservation = function () {
     }
 
     if (withdrawResult === OK) {
-        target.store[reservation.resourceType] -= amount
-        this.store[reservation.resourceType] += amount
-
         this.movedResource = true
+        this.freeCapacityNextTick = this.store.getFreeCapacity() - amount
         this.deleteReservation(0)
         return true
     }
@@ -1769,20 +1876,21 @@ Creep.prototype.fulfillReservation = function () {
 }
 
 Creep.prototype.reserveWithdrawEnergy = function () {
-    if (this.memory.reservations?.length) return
+    if (this.memory.reservations && this.memory.reservations?.length) return
 
     const { room } = this
 
     if (!this.needsResources()) return
+    if (this.freeCapacityNextTick === undefined) this.freeCapacityNextTick = this.store.getFreeCapacity()
 
     let withdrawTargets = room.MAWT.filter(target => {
         if (target instanceof Resource)
             return (
                 target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
-                target.reserveAmount >= this.freeStore()
+                target.reserveAmount >= this.freeCapacityNextTick
             )
 
-        return target.store.energy >= this.freeStore()
+        return target.store.energy >= this.freeCapacityNextTick
     })
 
     if (!room.storage && !room.terminal) {
@@ -1800,7 +1908,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
         target = findClosestObject(this.pos, withdrawTargets)
 
         if (target instanceof Resource) amount = target.reserveAmount
-        else amount = Math.min(this.freeStore(), target.store.energy)
+        else amount = Math.min(this.freeCapacityNextTick, target.store.energy)
 
         this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
         return
@@ -1810,10 +1918,10 @@ Creep.prototype.reserveWithdrawEnergy = function () {
         if (target instanceof Resource)
             return (
                 target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
-                target.reserveAmount >= this.freeStore()
+                target.reserveAmount >= this.freeCapacityNextTick
             )
 
-        return target.store.energy >= this.freeStore()
+        return target.store.energy >= this.freeCapacityNextTick
     })
 
     if (!withdrawTargets.length) return
@@ -1821,7 +1929,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
     target = findClosestObject(this.pos, withdrawTargets)
 
     if (target instanceof Resource) amount = target.reserveAmount
-    else amount = Math.min(this.freeStore(), target.store.energy)
+    else amount = Math.min(this.freeCapacityNextTick, target.store.energy)
 
     this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
 }
