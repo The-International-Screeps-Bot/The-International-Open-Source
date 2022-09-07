@@ -6,5 +6,4 @@ export default function () {
 
      new ShardVision().Handle()
      new Market().HandleOrderEveryTick()
-     RawMemory.segments[98] = JSON.stringify(Memory.stats)
 }
