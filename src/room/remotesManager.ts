@@ -1,5 +1,7 @@
 import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteNeeds, spawnByRoomRemoteRoles } from 'international/constants'
 import { customLog, findCarryPartsRequired } from 'international/generalFunctions'
+import { RemoteHarvester } from './creeps/roleManagers/remote/remoteHarvesterFunctions'
+import { RemoteHauler } from './creeps/roleManagers/remote/remoteHauler'
 
 Room.prototype.remotesManager = function () {
     // Loop through the commune's remote names
@@ -17,14 +19,6 @@ Room.prototype.remotesManager = function () {
             this.memory.remotes.splice(index, 1)
             continue
         }
-
-        // Intialize an array for this room's creepsFromRoomWithRemote
-
-        this.creepsFromRoomWithRemote[remoteName] = {}
-
-        // For each role, construct an array for the role in creepsFromWithRemote
-
-        for (const role of spawnByRoomRemoteRoles) this.creepsFromRoomWithRemote[remoteName][role] = []
 
         if (remoteMemory.abandoned > 0) {
             remoteMemory.abandoned -= 1
@@ -52,7 +46,7 @@ Room.prototype.remotesManager = function () {
             // Increase the remoteHarvester need accordingly
 
             remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] *= 2
-            remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] *= remoteMemory.SIDs[1] ? 2 : 1
+            remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] *= 2
 
             const isReserved =
                 remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
@@ -62,7 +56,16 @@ Room.prototype.remotesManager = function () {
             if (isReserved && remote.controller.reservation.ticksToEnd >= Math.min(remoteMemory.RE * 5, 2500))
                 remoteMemory.needs[RemoteNeeds.remoteReserver] = 0
         }
-        /*
+
+        for (const creepName of [
+            ...this.creepsFromRoom.source1RemoteHarvester,
+            ...this.creepsFromRoom.source2RemoteHarvester,
+        ]) {
+            //this.creepsFromRoomWithRemote[remoteName][role] hasn't been setup yet, so do the filtering manually.
+            let creep = Game.creeps[creepName] as RemoteHarvester
+            if (creep.memory.RN == remoteName) creep.updateNeeds()
+        }
+
         // Loop through each index of sourceEfficacies
 
         for (let sourceIndex = 0; sourceIndex < remoteMemory.SE.length; sourceIndex += 1) {
@@ -74,9 +77,16 @@ Room.prototype.remotesManager = function () {
 
             // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-            remoteMemory.needs[RemoteNeeds[`remoteHauler${sourceIndex as 0 | 1}`]] += findCarryPartsRequired(remoteMemory.SE[sourceIndex], income) / 2
+            remoteMemory.needs[RemoteNeeds[`remoteHauler${sourceIndex as 0 | 1}`]] += findCarryPartsRequired(
+                remoteMemory.SE[sourceIndex],
+                income,
+            )
         }
- */
+
+        // for (const creepName of this.creepsFromRoom.remoteHauler) {
+        //     ;(Game.creeps[creepName] as RemoteHauler).updateNeeds()
+        // }
+
         if (remote) {
             remoteMemory.needs[RemoteNeeds.minDamage] = 0
             remoteMemory.needs[RemoteNeeds.minHeal] = 0
