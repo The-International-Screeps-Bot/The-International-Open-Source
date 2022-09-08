@@ -1,13 +1,5 @@
 import { allyManager } from 'international/simpleAllies'
-import {
-    creepRoles,
-    haulerUpdateDefault,
-    myColors,
-    remoteHarvesterRoles,
-    RemoteNeeds,
-    spawnByRoomRemoteRoles,
-    stamps,
-} from './constants'
+import { creepRoles, haulerUpdateDefault, myColors, RemoteNeeds, spawnByRoomRemoteRoles, stamps } from './constants'
 import {
     advancedFindDistance,
     createPosMap,
@@ -94,13 +86,17 @@ InternationalManager.prototype.tickConfig = function () {
 
         room.haulerSizeManager()
 
-        room.remotesManager()
-
         // Add roomName to commune list
 
         global.communes.add(roomName)
 
         room.creepsFromRoom = {}
+
+        for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
+            const remoteName = room.memory.remotes[index]
+            room.creepsFromRoomWithRemote[remoteName] = {}
+            for (const role of spawnByRoomRemoteRoles) room.creepsFromRoomWithRemote[remoteName][role] = []
+        }
 
         // For each role, construct an array for creepsFromRoom
 

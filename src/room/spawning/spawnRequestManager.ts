@@ -21,6 +21,7 @@ import {
     getRange,
 } from 'international/generalFunctions'
 import { unpackPosList } from 'other/packrat'
+import { RemoteHarvester } from 'room/creeps/roleManagers/remote/remoteHarvesterFunctions'
 
 Room.prototype.spawnRequester = function () {
     // If CPU logging is enabled, get the CPU used at the start
@@ -225,6 +226,9 @@ Room.prototype.spawnRequester = function () {
             // Construct the required carry parts
 
             let requiredCarryParts = 10
+
+            //If the FF isn't setup, add more carrying.
+            requiredCarryParts += 10
 
             // If there is no sourceLink 0, increase requiredCarryParts using the source's path length
 
@@ -914,8 +918,8 @@ Room.prototype.spawnRequester = function () {
                         role,
                         defaultParts: [CARRY],
                         extraParts: [WORK, MOVE],
-                        partsMultiplier: remoteNeeds[RemoteNeeds.source1RemoteHarvester],
-                        spawningGroup: this.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
+                        partsMultiplier: remoteNeeds[RemoteNeeds[role]],
+                        spawningGroup: this.creepsFromRoomWithRemote[remoteName][role],
                         threshold: 0.1,
                         minCreeps: 1,
                         maxCreeps: sourcePositionsAmount,
@@ -934,8 +938,8 @@ Room.prototype.spawnRequester = function () {
                     role,
                     defaultParts: [CARRY],
                     extraParts: [WORK, WORK, MOVE],
-                    partsMultiplier: remoteNeeds[RemoteNeeds.source1RemoteHarvester],
-                    spawningGroup: this.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester,
+                    partsMultiplier: remoteNeeds[RemoteNeeds[role]],
+                    spawningGroup: this.creepsFromRoomWithRemote[remoteName][role],
                     threshold: 0.1,
                     minCreeps: undefined,
                     maxCreeps: sourcePositionsAmount,
@@ -951,8 +955,6 @@ Room.prototype.spawnRequester = function () {
             })(),
         )
     }
-
-    let remoteHaulerNeed = 0
 
     const remoteNamesByEfficacy = this.remoteNamesBySourceEfficacy
 
@@ -980,6 +982,7 @@ Room.prototype.spawnRequester = function () {
         remoteHaulerNeed += remoteNeeds[RemoteNeeds.remoteHauler]
  */
 
+        let income = 0
         if (!remoteMemory.needs[RemoteNeeds.enemyReserved]) {
             const possibleReservation = spawnEnergyCapacity >= 650
 
@@ -989,13 +992,44 @@ Room.prototype.spawnRequester = function () {
                 // Get the income based on the reservation of the this and remoteHarvester need
                 // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
 
-                const income =
+                income =
                     (possibleReservation ? 10 : 5) -
                     Math.floor(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]] * minHarvestWorkRatio)
 
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-                remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SE[index], income)
+                let remoteHaulerNeed = findCarryPartsRequired(remoteMemory.SE[index], income)
+
+                            // Construct requests for remoteHaulers
+
+                this.constructSpawnRequests(
+                    ((): SpawnRequestOpts | false => {
+                        console.log(this.name + ' needs ' + remoteHaulerNeed)
+                        if (remoteHaulerNeed === 0) return false
+
+                        partsMultiplier = remoteHaulerNeed
+
+                        const role = 'remoteHauler'
+
+                        return {
+                            role,
+                            defaultParts: [],
+                            extraParts: [CARRY, MOVE],
+                            threshold: 0.1,
+                            partsMultiplier,
+                            maxCreeps: Infinity,
+                            minCost: 100,
+                            maxCostPerCreep: this.memory.MHC,
+                            priority: minRemotePriority,
+                            spawningGroup: this.creepsFromRoomWithRemote[remoteName]["remoteHauler" + index],
+                            memoryAdditions: {
+                                RN: remoteName,
+                                SI: index as (0 | 1)
+                            },
+                        }
+                    })(),
+                )
+
             }
         }
 
@@ -1035,7 +1069,7 @@ Room.prototype.spawnRequester = function () {
                     minCost: cost,
                     priority: minRemotePriority + 1,
                     memoryAdditions: {
-                        RN: remoteName
+                        RN: remoteName,
                     },
                 }
             })(),
@@ -1119,7 +1153,7 @@ Room.prototype.spawnRequester = function () {
                     minCost,
                     priority: minRemotePriority - 2,
                     memoryAdditions: {
-                        RN: remoteName
+                        RN: remoteName,
                     },
                 }
             })(),
@@ -1150,60 +1184,13 @@ Room.prototype.spawnRequester = function () {
                     minCost: cost * 2,
                     priority: minRemotePriority - 1,
                     memoryAdditions: {
-                        RN: remoteName
+                        RN: remoteName,
                     },
                 }
             })(),
         )
+
     }
-
-    // Construct requests for remoteHaulers
-
-    this.constructSpawnRequests(
-        ((): SpawnRequestOpts | false => {
-            if (remoteHaulerNeed === 0) return false
-
-            /*
-               // If all RCL 3 extensions are built
-
-               if (spawnEnergyCapacity >= 800) {
-
-                    partsMultiplier = remoteHaulerNeed / 2
-
-                    return {
-                         defaultParts: [],
-                         extraParts: [CARRY, CARRY, MOVE],
-                         threshold: 0.1,
-                         partsMultiplier,
-                         maxCreeps: Infinity,
-                         minCost: 150,
-                         maxCostPerCreep: this.memory.MHC,
-                         priority: minRemotePriority - 0.2,
-                         memoryAdditions: {
-                              role: 'remoteHauler',
-                              R: true,
-                         },
-                    }
-               }
- */
-            partsMultiplier = remoteHaulerNeed
-
-            const role = 'remoteHauler'
-
-            return {
-                role,
-                defaultParts: [],
-                extraParts: [CARRY, MOVE],
-                threshold: 0.1,
-                partsMultiplier,
-                maxCreeps: Infinity,
-                minCost: 100,
-                maxCostPerCreep: this.memory.MHC,
-                priority: minRemotePriority,
-                memoryAdditions: {},
-            }
-        })(),
-    )
 
     // Construct requests for scouts
 

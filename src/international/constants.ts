@@ -647,6 +647,13 @@ export enum RemoteNeeds {
     invaderCore,
 }
 
+export const RemoteNeeds_HaulerByIndex: RemoteNeeds[] = [RemoteNeeds.remoteHauler0, RemoteNeeds.remoteHauler1]
+
+export const RemoteNeeds_HarvesterByIndex: RemoteNeeds[] = [
+    RemoteNeeds.source1RemoteHarvester,
+    RemoteNeeds.source2RemoteHarvester,
+]
+
 export enum ClaimRequestNeeds {
     claimer,
     vanguard,
@@ -688,6 +695,8 @@ export const spawnByRoomRemoteRoles: (
     | 'remoteDefender'
     | 'remoteCoreAttacker'
     | 'remoteDismantler'
+    | 'remoteHauler0'
+    | 'remoteHauler1'
 )[] = [
     'source1RemoteHarvester',
     'source2RemoteHarvester',
@@ -695,6 +704,8 @@ export const spawnByRoomRemoteRoles: (
     'remoteDefender',
     'remoteCoreAttacker',
     'remoteDismantler',
+    'remoteHauler0',
+    'remoteHauler1',
 ]
 
 export const builderSpawningWhenStorageThreshold = 40000

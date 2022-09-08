@@ -8,6 +8,7 @@ import {
     unpackAsRoomPos,
 } from 'international/generalFunctions'
 import { unpackPosList } from 'other/packrat'
+import { RemoteHauler } from './remoteHauler'
 
 export class RemoteHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -36,6 +37,14 @@ export class RemoteHarvester extends Creep {
         return (this._dying = true)
     }
 
+    public updateNeeds() {
+        const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+
+        if (!this.dying) {
+            Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= this.parts.work
+        }
+    }
+
     preTickManager(): void {
         if (!this.memory.RN) return
 
@@ -51,26 +60,6 @@ export class RemoteHarvester extends Creep {
         }
 
         const commune = this.commune
-        const remoteMemory = Memory.rooms[this.memory.RN]
-
-        // Reduce remote need
-
-        if (!this.dying) {
-            Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= this.parts.work
-
-            const possibleReservation = commune.energyCapacityAvailable >= 650
-
-            let sourceIndex = 0
-            if (role === 'source2RemoteHarvester') sourceIndex = 1
-
-            const income =
-                (possibleReservation ? 10 : 5) - Math.floor(remoteMemory.needs[RemoteNeeds[role]] * minHarvestWorkRatio)
-
-            // Find the number of carry parts required for the source, and add it to the remoteHauler need
-
-            remoteMemory.needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] +=
-                findCarryPartsRequired(remoteMemory.SE[sourceIndex], income) / 2
-        }
 
         // Add the creep to creepsFromRoomWithRemote relative to its remote
 
@@ -117,16 +106,6 @@ export class RemoteHarvester extends Creep {
         const needs = Memory.rooms[remoteName].needs
 
         needs[RemoteNeeds[role]] -= this.parts.work
-
-        const commune = this.commune
-        const possibleReservation = commune.energyCapacityAvailable >= 650
-
-        const income = (possibleReservation ? 10 : 5) - Math.floor(needs[RemoteNeeds[role]] * minHarvestWorkRatio)
-
-        // Find the number of carry parts required for the source, and add it to the remoteHauler need
-
-        needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] +=
-            findCarryPartsRequired(Memory.rooms[remoteName].SE[this.memory.SI], income) / 2
     }
 
     removeRemote?() {
@@ -136,16 +115,6 @@ export class RemoteHarvester extends Creep {
             const needs = Memory.rooms[this.memory.RN].needs
 
             needs[RemoteNeeds[role]] += this.parts.work
-
-            const commune = this.commune
-            const possibleReservation = commune.energyCapacityAvailable >= 650
-
-            const income = (possibleReservation ? 10 : 5) - Math.floor(needs[RemoteNeeds[role]] * minHarvestWorkRatio)
-
-            // Find the number of carry parts required for the source, and add it to the remoteHauler need
-
-            needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] -=
-                findCarryPartsRequired(Memory.rooms[this.memory.RN].SE[this.memory.SI], income) / 2
         }
 
         delete this.memory.RN
@@ -157,6 +126,18 @@ export class RemoteHarvester extends Creep {
         if (this.travelToSource(this.memory.SI)) return
 
         // Try to normally harvest. Iterate if creep harvested
+
+        //See if there's a hauler to tranfer to if we're full so we're not drop mining.
+        //   This shouldn't run if we're container mining however.
+        if(this.store.getFreeCapacity() <= this.getActiveBodyparts(WORK)) {
+            let haulers = this.room.myCreeps.remoteHauler?.map(name => Game.creeps[name] as RemoteHauler)
+            if(haulers && haulers.length > 0) {
+                let nearby = haulers.find(haul => haul.pos.isNearTo(this.pos))
+                if(nearby) {
+                    this.transfer(nearby, RESOURCE_ENERGY)
+                }
+            }
+        }
 
         if (this.advancedHarvestSource(this.room.sources[this.memory.SI])) return
     }
@@ -199,7 +180,7 @@ export class RemoteHarvester extends Creep {
 
     static RemoteHarvesterManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
-            const creep: RemoteHarvester = Game.creeps[creepName]
+            const creep: RemoteHarvester = Game.creeps[creepName] as RemoteHarvester
 
             // Try to find a remote. If one couldn't be found, iterate
 

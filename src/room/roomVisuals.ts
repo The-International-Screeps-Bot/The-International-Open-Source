@@ -1,4 +1,14 @@
-import { allyList, myColors, NORMAL, PROTECTED, roomDimensions, stamps } from 'international/constants'
+import {
+    allyList,
+    myColors,
+    NORMAL,
+    PROTECTED,
+    RemoteNeeds,
+    RemoteNeeds_HarvesterByIndex,
+    RemoteNeeds_HaulerByIndex,
+    roomDimensions,
+    stamps,
+} from 'international/constants'
 import { customLog, findObjectWithID, unpackAsPos } from 'international/generalFunctions'
 
 Room.prototype.roomVisualsManager = function () {
@@ -69,6 +79,8 @@ Room.prototype.roomVisualsManager = function () {
                         font: 0.5,
                         opacity: 1,
                         color: myColors.lightBlue,
+                        stroke: myColors.darkBlue,
+                        strokeWidth: 0.04,
                     },
                 )
 
@@ -106,6 +118,8 @@ Room.prototype.roomVisualsManager = function () {
                 font: 0.5,
                 opacity: 0.8,
                 color: color(),
+                stroke: myColors.darkBlue,
+                strokeWidth: 0.04,
             })
         }
     })()
@@ -133,6 +147,8 @@ Room.prototype.roomVisualsManager = function () {
                 font: 0.5,
                 opacity: 1,
                 color: myColors.lightBlue,
+                stroke: myColors.darkBlue,
+                strokeWidth: 0.04,
             })
 
             // And display how many ticks left until spawned
@@ -142,6 +158,8 @@ Room.prototype.roomVisualsManager = function () {
                 font: 0.5,
                 opacity: 1,
                 color: myColors.lightBlue,
+                stroke: myColors.darkBlue,
+                strokeWidth: 0.04,
             })
         }
     })()
@@ -158,6 +176,28 @@ Room.prototype.roomVisualsManager = function () {
 
         if (constructionTarget) this.visual.text('🚧', constructionTarget.pos)
     })()
+
+    for (const source of this.sources) {
+        if (this.memory.T == 'remote') {
+            if (this.memory.needs && this.memory.needs.length > 10) {
+            }
+
+            this.visual.text(
+                `${this.memory.needs[RemoteNeeds_HarvesterByIndex[source.index]]} / ${
+                    this.memory.needs[RemoteNeeds_HaulerByIndex[source.index]]
+                }`,
+                source.pos,
+                {
+                    backgroundColor: 'rgb(255, 0, 0, 0)',
+                    font: 0.5,
+                    opacity: 0.8,
+                    stroke: myColors.darkBlue,
+                    strokeWidth: 0.04,
+                    color: myColors.lightBlue,
+                },
+            )
+        }
+    }
 
     // If CPU logging is enabled, log the CPU used by this manager
 
