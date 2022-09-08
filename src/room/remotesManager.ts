@@ -57,23 +57,19 @@ Room.prototype.remotesManager = function () {
                 remoteMemory.needs[RemoteNeeds.remoteReserver] = 0
         }
 
-        for (const creepName of [
-            ...this.creepsFromRoom.source1RemoteHarvester,
-            ...this.creepsFromRoom.source2RemoteHarvester,
-        ]) {
-            //this.creepsFromRoomWithRemote[remoteName][role] hasn't been setup yet, so do the filtering manually.
-            let creep = Game.creeps[creepName] as RemoteHarvester
-            if (creep.memory.RN == remoteName) creep.updateNeeds()
-        }
-
         // Loop through each index of sourceEfficacies
 
         for (let sourceIndex = 0; sourceIndex < remoteMemory.SE.length; sourceIndex += 1) {
             // Get the income based on the reservation of the room and remoteHarvester need
 
-            const income =
-                (possibleReservation ? 10 : 5) -
-                Math.floor(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio)
+            //this.creepsFromRoomWithRemote[remoteName][role] hasn't been setup yet, so do the filtering manually.
+            let currentWorkPartCount = this.creepsFromRoom[remoteHarvesterRoles[sourceIndex]]
+                .map(cr => Game.creeps[cr])
+                .filter(cr => cr.memory.RN == remoteName && cr.room.name == remoteName)
+                .reduce((previousValue, currentValue) => previousValue + currentValue.parts.work, 0)
+
+            //the amount of the actual harvesting power present, or the theorical most efficent cap.
+            const income = Math.min(possibleReservation ? 10 : 5, currentWorkPartCount * minHarvestWorkRatio)
 
             // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
