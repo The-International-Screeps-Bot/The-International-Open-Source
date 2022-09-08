@@ -683,9 +683,19 @@ export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHar
     'source2RemoteHarvester',
 ]
 
+export const remoteHaulerRoles: ('remoteHauler0' | 'remoteHauler1')[] = [
+    'remoteHauler0',
+    'remoteHauler1',
+]
+
 export enum RemoteHarvesterRolesBySourceIndex {
     source1RemoteHarvester,
     source2RemoteHarvester,
+}
+
+export enum RemoteHaulerRolesBySourceIndex {
+    remoteHauler0,
+    remoteHauler1,
 }
 
 export const spawnByRoomRemoteRoles: (

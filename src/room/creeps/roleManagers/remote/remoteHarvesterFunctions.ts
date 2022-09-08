@@ -27,7 +27,13 @@ export class RemoteHarvester extends Creep {
         if (this.memory.RN) {
             if (
                 this.ticksToLive >
-                this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].SE[this.memory.SI] - 1
+                this.body.length * CREEP_SPAWN_TIME +
+                    Memory.rooms[this.memory.RN].SE[this.memory.SI] -
+                    1 +
+                    //I'm adding 20 to the theoritical value.  I'm frequently seeing the replacement harvesters
+                    // not re-spawn in time because other creeps are spawning, and we end up losing out on a lot of
+                    // energy because we miss a chance to farm.  -PR
+                    20
             )
                 return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false

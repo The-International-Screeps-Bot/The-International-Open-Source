@@ -62,10 +62,8 @@ Room.prototype.remotesManager = function () {
         for (let sourceIndex = 0; sourceIndex < remoteMemory.SE.length; sourceIndex += 1) {
             // Get the income based on the reservation of the room and remoteHarvester need
 
-            //this.creepsFromRoomWithRemote[remoteName][role] hasn't been setup yet, so do the filtering manually.
             let currentWorkPartCount = this.creepsFromRoom[remoteHarvesterRoles[sourceIndex]]
                 .map(cr => Game.creeps[cr])
-                .filter(cr => cr.memory.RN == remoteName && cr.room.name == remoteName)
                 .reduce((previousValue, currentValue) => previousValue + currentValue.parts.work, 0)
 
             //the amount of the actual harvesting power present, or the theorical most efficent cap.
