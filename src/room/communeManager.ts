@@ -10,17 +10,17 @@ import {
 import { MarketManager } from './market/marketManager'
 import './spawning/spawnManager'
 
-import './towers'
+import './structures/towers'
 import { constructionManager } from './construction/constructionManager'
 import './defence'
-import './links'
+import './structures/links'
 import './allyCreepRequestManager'
 import './claimRequestManager'
 import './attackRequestManager'
 import { myColors, roomDimensions } from 'international/constants'
 import './factory'
-import './lab'
-import { LabManager } from './lab'
+import './structures/lab'
+import { LabManager } from './structures/lab'
 
 export class CommuneManager {
     labManager: LabManager

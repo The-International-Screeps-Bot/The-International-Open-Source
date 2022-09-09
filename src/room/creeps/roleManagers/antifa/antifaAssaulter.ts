@@ -46,10 +46,12 @@ export class AntifaAssaulter extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goal: {
-                    pos: new RoomPosition(25, 25, this.memory.AR),
-                    range: 25,
-                },
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, this.memory.AR),
+                        range: 25,
+                    },
+                ],
             })
             return
         }
@@ -60,10 +62,12 @@ export class AntifaAssaulter extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: {
-                pos: new RoomPosition(25, 25, this.memory.AR),
-                range: 25,
-            },
+            goals: [
+                {
+                    pos: new RoomPosition(25, 25, this.memory.AR),
+                    range: 25,
+                },
+            ],
         })
     }
 
@@ -105,7 +109,7 @@ export class AntifaAssaulter extends Creep {
 
                 this.createMoveRequest({
                     origin: this.pos,
-                    goal: { pos: enemyCreep.pos, range: 1 },
+                    goals: [{ pos: enemyCreep.pos, range: 1 }],
                 })
 
                 return true
@@ -136,7 +140,7 @@ export class AntifaAssaulter extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: enemyAttacker.pos, range: 1 },
+                goals: [{ pos: enemyAttacker.pos, range: 1 }],
             })
 
             return true
@@ -166,7 +170,7 @@ export class AntifaAssaulter extends Creep {
             if (range >= 3) {
                 this.createMoveRequest({
                     origin: this.pos,
-                    goal: { pos: enemyAttacker.pos, range: 3 },
+                    goals: [{ pos: enemyAttacker.pos, range: 3 }],
                 })
 
                 return true
@@ -174,7 +178,7 @@ export class AntifaAssaulter extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: enemyAttacker.pos, range: 25 },
+                goals: [{ pos: enemyAttacker.pos, range: 25 }],
                 flee: true,
             })
 
@@ -191,7 +195,7 @@ export class AntifaAssaulter extends Creep {
 
                 this.createMoveRequest({
                     origin: this.pos,
-                    goal: { pos: enemyAttacker.pos, range: 1 },
+                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
                     flee: true,
                 })
 
@@ -206,7 +210,7 @@ export class AntifaAssaulter extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: enemyAttacker.pos, range: 1 },
+                goals: [{ pos: enemyAttacker.pos, range: 1 }],
             })
 
             return true

@@ -1,7 +1,6 @@
 import { ClaimRequestNeeds } from 'international/constants'
 
 export class Claimer extends Creep {
-
     constructor(creepID: Id<Creep>) {
         super(creepID)
     }
@@ -22,7 +21,7 @@ export class Claimer extends Creep {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: room.controller.pos, range: 1 },
+                goals: [{ pos: room.controller.pos, range: 1 }],
                 avoidEnemyRanges: true,
                 plainCost: 1,
                 swampCost: 1,
@@ -78,7 +77,7 @@ export class Claimer extends Creep {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, claimTarget), range: 25 },
+                goals: [{ pos: new RoomPosition(25, 25, claimTarget), range: 25 }],
                 avoidEnemyRanges: true,
                 swampCost: creep.parts.move >= 5 ? 1 : undefined,
                 typeWeights: {

@@ -523,45 +523,45 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     // Construct route
 
     function generateRoute(): void {
-        // If the goal is in the same room as the origin
+        for (const goal of opts.goals) {
+            // If the goal is in the same room as the origin
 
-        if (opts.origin.roomName === opts.goal.pos.roomName) return
+            if (opts.origin.roomName === goal.pos.roomName) continue
 
-        // Construct route by searching through rooms
+            // Construct route by searching through rooms
 
-        const route = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
-            // Essentially a costMatrix for the rooms, priority is for the lower values. Infinity is impassible
+            const route = Game.map.findRoute(opts.origin.roomName, goal.pos.roomName, {
+                // Essentially a costMatrix for the rooms, priority is for the lower values. Infinity is impassible
 
-            routeCallback(roomName: string) {
-                // If the goal is in the room, inform 1
+                routeCallback(roomName: string) {
+                    // If the goal is in the room, inform 1
 
-                if (roomName === opts.goal.pos.roomName) return 1
+                    if (roomName === goal.pos.roomName) return 1
 
-                // Get the room's memory
+                    // Get the room's memory
 
-                const roomMemory = Memory.rooms[roomName]
+                    const roomMemory = Memory.rooms[roomName]
 
-                // If there is no memory for the room, inform impassible
+                    // If there is no memory for the room, inform impassible
 
-                if (!roomMemory) return Infinity
+                    if (!roomMemory) return Infinity
 
-                // If the type is in typeWeights, inform the weight for the type
+                    // If the type is in typeWeights, inform the weight for the type
 
-                if (opts.typeWeights && opts.typeWeights[roomMemory.T]) return opts.typeWeights[roomMemory.T]
+                    if (opts.typeWeights && opts.typeWeights[roomMemory.T]) return opts.typeWeights[roomMemory.T]
 
-                // Inform to consider this room
+                    // Inform to consider this room
 
-                return 2
-            },
-        })
+                    return 2
+                },
+            })
 
-        // If a route can't be found
+            // If a route can't be found
 
-        if (route === ERR_NO_PATH) return
+            if (route === ERR_NO_PATH) continue
 
-        for (const roomRoute of route) allowedRoomNames.add(roomRoute.room)
-
-        return
+            for (const roomRoute of route) allowedRoomNames.add(roomRoute.room)
+        }
     }
 
     generateRoute()
@@ -569,7 +569,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     // Construct path
 
     function generatePath() {
-        const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
+        const pathFinderResult = PathFinder.search(opts.origin, opts.goals, {
             plainCost: opts.plainCost || 2,
             swampCost: opts.swampCost || 8,
             maxRooms: allowedRoomNames.size,
@@ -882,18 +882,26 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
         if (pathFinderResult.incomplete) {
             customLog(
                 'Incomplete Path',
-                `${pathFinderResult.path}, ${JSON.stringify(opts.goal.pos)}`,
+                `${pathFinderResult.path}, ${JSON.stringify(opts.goals)}`,
                 myColors.white,
                 myColors.red,
             )
 
             room.pathVisual(pathFinderResult.path, 'red')
-            room.visual.line(opts.origin, opts.goal.pos, {
-                color: myColors.red,
-                width: 0.15,
-                opacity: 0.3,
-                lineStyle: 'solid',
-            })
+
+            let lastPos = opts.origin
+
+            for (const goal of opts.goals) {
+
+                room.visual.line(lastPos, goal.pos, {
+                    color: myColors.red,
+                    width: 0.15,
+                    opacity: 0.3,
+                    lineStyle: 'solid',
+                })
+
+                lastPos = goal.pos
+            }
 
             return []
         }
@@ -1180,7 +1188,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         for (const source of room.sources) {
             const path = room.advancedFindPath({
                 origin: source.pos,
-                goal: { pos: scoutingRoom.anchor, range: 3 },
+                goals: [{ pos: scoutingRoom.anchor, range: 3 }],
             })
 
             // Stop if there is a source inefficient enough
@@ -1210,7 +1218,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
         const newReservationEfficacy = room.advancedFindPath({
             origin: room.controller.pos,
-            goal: { pos: scoutingRoom.anchor, range: 3 },
+            goals: [{ pos: scoutingRoom.anchor, range: 3 }],
         }).length
 
         // If the room isn't already a remote

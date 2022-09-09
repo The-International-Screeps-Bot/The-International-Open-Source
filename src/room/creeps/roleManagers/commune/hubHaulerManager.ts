@@ -22,7 +22,7 @@ export class HubHauler extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: hubAnchor, range: 0 },
+            goals: [{ pos: hubAnchor, range: 0 }],
         })
 
         return true

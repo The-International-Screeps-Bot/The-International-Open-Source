@@ -346,7 +346,7 @@ export function basePlanner(room: Room) {
 
     let path = room.advancedFindPath({
         origin: closestSource.pos,
-        goal: { pos: room.anchor, range: 3 },
+        goals: [{ pos: room.anchor, range: 3 }],
         weightCoordMaps: [room.roadCoords],
     })
 
@@ -395,7 +395,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: hubAnchor,
-        goal: { pos: room.anchor, range: 3 },
+        goals: [{ pos: room.anchor, range: 3 }],
         weightCoordMaps: [room.roadCoords],
     })
 
@@ -417,7 +417,7 @@ export function basePlanner(room: Room) {
 
         path = room.advancedFindPath({
             origin: unpackAsRoomPos(extensionsAnchor, room.name),
-            goal: { pos: hubAnchor, range: 2 },
+            goals: [{ pos: hubAnchor, range: 2 }],
             weightCoordMaps: [room.roadCoords],
         })
 
@@ -442,7 +442,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: centerUpgadePos,
-        goal: { pos: hubAnchor, range: 1 },
+        goals: [{ pos: hubAnchor, range: 1 }],
         weightCoordMaps: [room.roadCoords],
     })
 
@@ -483,7 +483,7 @@ export function basePlanner(room: Room) {
 
         path = room.advancedFindPath({
             origin: closestSourcePos,
-            goal: { pos: room.anchor, range: 3 },
+            goals: [{ pos: room.anchor, range: 3 }],
             weightCoordMaps: [room.roadCoords],
         })
 
@@ -495,7 +495,7 @@ export function basePlanner(room: Room) {
 
         path = room.advancedFindPath({
             origin: closestSourcePos,
-            goal: { pos: closestUpgradePos, range: 1 },
+            goals: [{ pos: closestUpgradePos, range: 1 }],
             weightCoordMaps: [room.roadCoords],
         })
 
@@ -510,7 +510,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: unpackAsRoomPos(room.memory.stampAnchors.labs[0], room.name),
-        goal: { pos: hubAnchor, range: 1 },
+        goals: [{ pos: hubAnchor, range: 1 }],
         weightCoordMaps: [room.roadCoords],
     })
 
@@ -530,7 +530,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: mineralHarvestPos,
-        goal: { pos: hubAnchor, range: 1 },
+        goals: [{ pos: hubAnchor, range: 1 }],
         weightCoordMaps: [room.roadCoords],
     })
 
@@ -746,7 +746,7 @@ export function basePlanner(room: Room) {
     )
 
     if(!room.unprotectedCoords) room.findUnprotectedCoords()
-    
+
     for (const coord of adjacentCoords) {
         // If the coord is probably not protected
 

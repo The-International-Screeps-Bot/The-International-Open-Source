@@ -251,7 +251,7 @@ export const nonCommuneSigns = [
     'Socialism is about worker ownership over the workplace',
     'Trans rights.',
     'Advancing the LGBTQ+ agenda <3',
-    'Does Jeff Bezos work 56,000 times harder than his average worker? Because he gets paid like it'
+    'Does Jeff Bezos work 56,000 times harder than his average worker? Because he gets paid like it',
 ]
 
 export const roomDimensions = 50

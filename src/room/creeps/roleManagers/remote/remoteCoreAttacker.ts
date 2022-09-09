@@ -91,7 +91,7 @@ export class RemoteCoreAttacker extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: closestCore.pos, range: 1 },
+            goals: [{ pos: closestCore.pos, range: 1 }],
             avoidEnemyRanges: true,
         })
 
@@ -148,10 +148,12 @@ export class RemoteCoreAttacker extends Creep {
 
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goal: {
-                        pos: new RoomPosition(25, 25, creep.commune.name),
-                        range: 25,
-                    },
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.commune.name),
+                            range: 25,
+                        },
+                    ],
                 })
 
                 continue
@@ -172,10 +174,12 @@ export class RemoteCoreAttacker extends Creep {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: {
-                    pos: new RoomPosition(25, 25, creep.memory.RN),
-                    range: 25,
-                },
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, creep.memory.RN),
+                        range: 25,
+                    },
+                ],
             })
         }
     }

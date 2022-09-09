@@ -53,7 +53,7 @@ export class MeleeDefender extends Creep {
             if (getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y) > 1) {
                 this.createMoveRequest({
                     origin: this.pos,
-                    goal: { pos: enemyAttacker.pos, range: 1 },
+                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
                 })
 
                 return true
@@ -100,7 +100,7 @@ export class MeleeDefender extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: closestRampart.pos, range: 0 },
+            goals: [{ pos: closestRampart.pos, range: 0 }],
             plainCost: 20,
             swampCost: 80,
         })

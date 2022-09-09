@@ -95,10 +95,12 @@ export class RemoteReserver extends Creep {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: {
-                    pos: new RoomPosition(25, 25, creep.memory.RN),
-                    range: 25,
-                },
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, creep.memory.RN),
+                        range: 25,
+                    },
+                ],
                 avoidEnemyRanges: true,
                 plainCost: 1,
             })

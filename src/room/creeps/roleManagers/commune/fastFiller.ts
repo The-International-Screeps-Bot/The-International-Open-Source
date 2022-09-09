@@ -1,7 +1,7 @@
 import { getRange, unpackAsRoomPos } from 'international/generalFunctions'
 
 export class FastFiller extends Creep {
-    travelToFastFiller?(): boolean{
+    travelToFastFiller?(): boolean {
         const { room } = this
 
         // Try to find a fastFillerPos, inform true if it failed
@@ -22,7 +22,7 @@ export class FastFiller extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: fastFillerPos, range: 0 },
+            goals: [{ pos: fastFillerPos, range: 0 }],
         })
 
         // And inform true
@@ -30,7 +30,7 @@ export class FastFiller extends Creep {
         return true
     }
 
-    fillFastFiller?(): boolean{
+    fillFastFiller?(): boolean {
         const { room } = this
 
         this.say('💁')
@@ -107,7 +107,7 @@ export class FastFiller extends Creep {
                 this.say('W')
 
                 this.withdraw(structure, RESOURCE_ENERGY)
-            structure.store.energy -= this.store.getCapacity() - this.store.energy
+                structure.store.energy -= this.store.getCapacity() - this.store.energy
                 return true
             }
 
@@ -148,8 +148,8 @@ export class FastFiller extends Creep {
 
             this.say('T')
 
-        this.transfer(structure, RESOURCE_ENERGY)
-        structure.store.energy += this.store.energy
+            this.transfer(structure, RESOURCE_ENERGY)
+            structure.store.energy += this.store.energy
             return true
         }
         /*
@@ -170,7 +170,6 @@ export class FastFiller extends Creep {
 
         return false
     }
-
 
     constructor(creepID: Id<Creep>) {
         super(creepID)

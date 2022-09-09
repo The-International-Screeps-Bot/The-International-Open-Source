@@ -369,11 +369,11 @@ Object.defineProperties(Room.prototype, {
                         return (
                             this.advancedFindPath({
                                 origin: a,
-                                goal: { pos: anchor, range: 3 },
+                                goals: [{ pos: anchor, range: 3 }],
                             }).length -
                             this.advancedFindPath({
                                 origin: b,
-                                goal: { pos: anchor, range: 3 },
+                                goals: [{ pos: anchor, range: 3 }],
                             }).length
                         )
                     })
@@ -417,11 +417,11 @@ Object.defineProperties(Room.prototype, {
                     return (
                         this.advancedFindPath({
                             origin: a,
-                            goal: { pos: anchor, range: 3 },
+                            goals: [{ pos: anchor, range: 3 }],
                         }).length -
                         this.advancedFindPath({
                             origin: b,
-                            goal: { pos: anchor, range: 3 },
+                            goals: [{ pos: anchor, range: 3 }],
                         }).length
                     )
                 })
@@ -494,7 +494,7 @@ Object.defineProperties(Room.prototype, {
                 for (const source of this.sources) {
                     const path = this.advancedFindPath({
                         origin: source.pos,
-                        goal: { pos: commune.anchor, range: 3 },
+                        goals: [{ pos: commune.anchor, range: 3 }],
                     })
 
                     this._sourcePaths.push(path)
@@ -507,7 +507,7 @@ Object.defineProperties(Room.prototype, {
             for (const source of this.sources) {
                 const path = this.advancedFindPath({
                     origin: source.pos,
-                    goal: { pos: this.anchor, range: 3 },
+                    goals: [{ pos: this.anchor, range: 3 }],
                 })
 
                 this._sourcePaths.push(path)
@@ -561,11 +561,11 @@ Object.defineProperties(Room.prototype, {
                     return (
                         this.advancedFindPath({
                             origin: a,
-                            goal: { pos: anchor, range: 3 },
+                            goals: [{ pos: anchor, range: 3 }],
                         }).length -
                         this.advancedFindPath({
                             origin: b,
-                            goal: { pos: anchor, range: 3 },
+                            goals: [{ pos: anchor, range: 3 }],
                         }).length
                     )
                 })
@@ -603,11 +603,11 @@ Object.defineProperties(Room.prototype, {
                 return (
                     this.advancedFindPath({
                         origin: a,
-                        goal: { pos: anchor, range: 3 },
+                        goals: [{ pos: anchor, range: 3 }],
                     }).length -
                     this.advancedFindPath({
                         origin: b,
-                        goal: { pos: anchor, range: 3 },
+                        goals: [{ pos: anchor, range: 3 }],
                     }).length
                 )
             })
@@ -628,7 +628,7 @@ Object.defineProperties(Room.prototype, {
 
             return (this.global.upgradePathLength = this.advancedFindPath({
                 origin: centerUpgradePos,
-                goal: { pos: this.anchor, range: 3 },
+                goals: [{ pos: this.anchor, range: 3 }],
             }).length)
         },
     },

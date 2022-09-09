@@ -48,10 +48,12 @@ export class Vanguard extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: {
-                pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
-                range: 0,
-            },
+            goals: [
+                {
+                    pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
+                    range: 0,
+                },
+            ],
             avoidEnemyRanges: true,
         })
 
@@ -111,7 +113,7 @@ export class Vanguard extends Creep {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, claimTarget), range: 25 },
+                goals: [{ pos: new RoomPosition(25, 25, claimTarget), range: 25 }],
                 avoidEnemyRanges: true,
                 typeWeights: {
                     enemy: Infinity,

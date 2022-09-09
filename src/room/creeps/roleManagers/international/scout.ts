@@ -51,7 +51,8 @@ export class Scout extends Creep {
         const scoutTarget = unscoutedRooms.length
             ? unscoutedRooms.sort(
                   (a, b) =>
-                      Game.map.getRoomLinearDistance(this.commune.name, a) - Game.map.getRoomLinearDistance(this.commune.name, b),
+                      Game.map.getRoomLinearDistance(this.commune.name, a) -
+                      Game.map.getRoomLinearDistance(this.commune.name, b),
               )[0]
             : scoutedRooms.sort((a, b) => Memory.rooms[a].LST - Memory.rooms[b].LST)[0]
 
@@ -147,7 +148,7 @@ export class Scout extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: room.controller.pos, range: 1 },
+                goals: [{ pos: room.controller.pos, range: 1 }],
                 avoidEnemyRanges: true,
                 plainCost: 1,
                 swampCost: 1,
@@ -228,10 +229,12 @@ export class Scout extends Creep {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: {
-                    pos: new RoomPosition(25, 25, creep.memory.scoutTarget),
-                    range: 25,
-                },
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, creep.memory.scoutTarget),
+                        range: 25,
+                    },
+                ],
                 avoidEnemyRanges: true,
                 plainCost: 1,
                 swampCost: 1,

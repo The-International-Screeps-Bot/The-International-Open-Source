@@ -43,7 +43,7 @@ export class AllyVanguard extends Creep {
         if (room.name !== this.memory.RN) {
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: new RoomPosition(25, 25, this.memory.RN), range: 25 },
+                goals: [{ pos: new RoomPosition(25, 25, this.memory.RN), range: 25 }],
                 avoidEnemyRanges: true,
             })
 
@@ -132,10 +132,12 @@ export class AllyVanguard extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: {
-                pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
-                range: 0,
-            },
+            goals: [
+                {
+                    pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
+                    range: 0,
+                },
+            ],
             avoidEnemyRanges: true,
         })
 
@@ -168,7 +170,7 @@ export class AllyVanguard extends Creep {
         if (room.name !== request) {
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: new RoomPosition(25, 25, request), range: 25 },
+                goals: [{ pos: new RoomPosition(25, 25, request), range: 25 }],
                 avoidEnemyRanges: true,
             })
 
@@ -213,7 +215,7 @@ export class AllyVanguard extends Creep {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: new RoomPosition(25, 25, request), range: 25 },
+                goals: [{ pos: new RoomPosition(25, 25, request), range: 25 }],
                 avoidEnemyRanges: true,
                 typeWeights: {
                     enemy: Infinity,

@@ -22,7 +22,7 @@ export class Builder extends Creep {
             if (getRange(this.pos.x, source.pos.x, this.pos.y, source.pos.y) > 1) {
                 this.createMoveRequest({
                     origin: this.pos,
-                    goal: { pos: source.pos, range: 1 },
+                    goals: [{ pos: source.pos, range: 1 }],
                     avoidEnemyRanges: true,
                 })
 

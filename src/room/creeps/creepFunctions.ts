@@ -43,7 +43,7 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: target.pos, range: 1 },
+            goals: [{ pos: target.pos, range: 1 }],
             avoidEnemyRanges: true,
         })
         return false
@@ -76,7 +76,7 @@ Creep.prototype.advancedWithdraw = function (target, resourceType = RESOURCE_ENE
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: target.pos, range: 1 },
+            goals: [{ pos: target.pos, range: 1 }],
             avoidEnemyRanges: true,
         })
 
@@ -110,7 +110,7 @@ Creep.prototype.advancedPickup = function (target) {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: target.pos, range: 1 },
+            goals: [{ pos: target.pos, range: 1 }],
             avoidEnemyRanges: true,
         })
 
@@ -212,10 +212,12 @@ Creep.prototype.advancedUpgradeController = function () {
         if (upgradePosRange > 0) {
             this.createMoveRequest({
                 origin: this.pos,
-                goal: {
-                    pos: upgradePos,
-                    range: 0,
-                },
+                goals: [
+                    {
+                        pos: upgradePos,
+                        range: 0,
+                    },
+                ],
                 avoidEnemyRanges: true,
             })
 
@@ -311,7 +313,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: room.controller.pos, range: 3 },
+            goals: [{ pos: room.controller.pos, range: 3 }],
             avoidEnemyRanges: true,
         })
         return false
@@ -326,7 +328,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: room.controller.pos, range: 3 },
+            goals: [{ pos: room.controller.pos, range: 3 }],
             avoidEnemyRanges: true,
         })
 
@@ -374,7 +376,7 @@ Creep.prototype.advancedBuildCSite = function () {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: cSiteTarget.pos, range: 3 },
+            goals: [{ pos: cSiteTarget.pos, range: 3 }],
             avoidEnemyRanges: true,
         })
 
@@ -452,7 +454,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: cSiteTarget.pos, range: 3 },
+            goals: [{ pos: cSiteTarget.pos, range: 3 }],
             avoidEnemyRanges: true,
         })
 
@@ -796,7 +798,7 @@ Creep.prototype.createMoveRequest = function (opts) {
 
     // See if the creep needs a new path
 
-    const needsNewPathResult = this.needsNewPath(opts.goal.pos, opts.cacheAmount, path)
+    const needsNewPathResult = this.needsNewPath(opts.goals[0].pos, opts.cacheAmount, path)
 
     // If the creep need a new path, make one
 
@@ -880,7 +882,7 @@ Creep.prototype.createMoveRequest = function (opts) {
 
     // Assign the goal's pos to the creep's goalPos
 
-    this.memory.goalPos = packPos(opts.goal.pos)
+    this.memory.goalPos = packPos(opts.goals[0].pos)
 
     // Set the path in the creep's memory
 
@@ -1402,7 +1404,7 @@ Creep.prototype.advancedRecycle = function () {
         if (range > 1) {
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: recycleTarget.pos, range: 1 },
+                goals: [{ pos: recycleTarget.pos, range: 1 }],
                 avoidEnemyRanges: true,
             })
 
@@ -1428,7 +1430,7 @@ Creep.prototype.advancedRecycle = function () {
 
     this.createMoveRequest({
         origin: this.pos,
-        goal: { pos: recycleTarget.pos, range: 0 },
+        goals: [{ pos: recycleTarget.pos, range: 0 }],
         avoidEnemyRanges: true,
     })
 
@@ -1510,7 +1512,7 @@ Creep.prototype.advancedReserveController = function () {
 
     this.createMoveRequest({
         origin: this.pos,
-        goal: { pos: controller.pos, range: 1 },
+        goals: [{ pos: controller.pos, range: 1 }],
         avoidEnemyRanges: true,
         plainCost: 1,
     })
@@ -1640,7 +1642,7 @@ Creep.prototype.aggressiveHeal = function () {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: healTarget.pos, range: 1 },
+            goals: [{ pos: healTarget.pos, range: 1 }],
         })
 
         if (range <= 3) {
@@ -1777,7 +1779,7 @@ Creep.prototype.fulfillReservation = function () {
     if (getRange(this.pos.x, target.pos.x, this.pos.y, target.pos.y) > 1) {
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: target.pos, range: 1 },
+            goals: [{ pos: target.pos, range: 1 }],
             avoidEnemyRanges: true,
         })
 

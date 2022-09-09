@@ -56,7 +56,7 @@ export class Maintainer extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: repairTarget.pos, range: 3 },
+                goals: [{ pos: repairTarget.pos, range: 3 }],
                 avoidEnemyRanges: true,
             })
 
@@ -121,7 +121,7 @@ export class Maintainer extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: { pos: newRepairTarget.pos, range: 3 },
+            goals: [{ pos: newRepairTarget.pos, range: 3 }],
             avoidEnemyRanges: true,
         })
 

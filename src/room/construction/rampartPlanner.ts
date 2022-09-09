@@ -721,12 +721,12 @@ export class RampartPlanner {
                 return (
                     this.room.advancedFindPath({
                         origin: a,
-                        goal: { pos: hubAnchor, range: 3 },
+                        goals: [{ pos: hubAnchor, range: 3 }],
                         weightCoordMaps: [this.room.unprotectedCoords, this.room.roadCoords],
                     }).length -
                     this.room.advancedFindPath({
                         origin: b,
-                        goal: { pos: hubAnchor, range: 3 },
+                        goals: [{ pos: hubAnchor, range: 3 }],
                         weightCoordMaps: [this.room.unprotectedCoords, this.room.roadCoords],
                     }).length
                 )
@@ -736,7 +736,7 @@ export class RampartPlanner {
 
             const path = this.room.advancedFindPath({
                 origin: closestPosToAnchor,
-                goal: { pos: hubAnchor, range: 2 },
+                goals: [{ pos: hubAnchor, range: 2 }],
                 weightCoordMaps: [this.room.unprotectedCoords, this.room.roadCoords],
             })
 
@@ -1404,12 +1404,12 @@ export function rampartPlanner(room: Room) {
             return (
                 room.advancedFindPath({
                     origin: a,
-                    goal: { pos: hubAnchor, range: 3 },
+                    goals: [{ pos: hubAnchor, range: 3 }],
                     weightCoordMaps: [room.unprotectedCoords, room.roadCoords],
                 }).length -
                 room.advancedFindPath({
                     origin: b,
-                    goal: { pos: hubAnchor, range: 3 },
+                    goals: [{ pos: hubAnchor, range: 3 }],
                     weightCoordMaps: [room.unprotectedCoords, room.roadCoords],
                 }).length
             )
@@ -1419,7 +1419,7 @@ export function rampartPlanner(room: Room) {
 
         const path = room.advancedFindPath({
             origin: closestPosToAnchor,
-            goal: { pos: hubAnchor, range: 2 },
+            goals: [{ pos: hubAnchor, range: 2 }],
             weightCoordMaps: [room.unprotectedCoords, room.roadCoords],
         })
 

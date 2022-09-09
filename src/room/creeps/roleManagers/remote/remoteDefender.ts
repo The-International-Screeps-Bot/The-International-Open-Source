@@ -98,7 +98,7 @@ export class RemoteDefender extends Creep {
 
                 this.createMoveRequest({
                     origin: this.pos,
-                    goal: { pos: enemyCreep.pos, range: 1 },
+                    goals: [{ pos: enemyCreep.pos, range: 1 }],
                 })
 
                 return true
@@ -129,7 +129,7 @@ export class RemoteDefender extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: enemyAttacker.pos, range: 1 },
+                goals: [{ pos: enemyAttacker.pos, range: 1 }],
             })
 
             return true
@@ -159,7 +159,7 @@ export class RemoteDefender extends Creep {
             if (range >= 3) {
                 this.createMoveRequest({
                     origin: this.pos,
-                    goal: { pos: enemyAttacker.pos, range: 3 },
+                    goals: [{ pos: enemyAttacker.pos, range: 3 }],
                 })
 
                 return true
@@ -167,7 +167,7 @@ export class RemoteDefender extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: enemyAttacker.pos, range: 25 },
+                goals: [{ pos: enemyAttacker.pos, range: 25 }],
                 flee: true,
             })
 
@@ -184,7 +184,7 @@ export class RemoteDefender extends Creep {
 
                 this.createMoveRequest({
                     origin: this.pos,
-                    goal: { pos: enemyAttacker.pos, range: 1 },
+                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
                     flee: true,
                 })
 
@@ -199,7 +199,7 @@ export class RemoteDefender extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goal: { pos: enemyAttacker.pos, range: 1 },
+                goals: [{ pos: enemyAttacker.pos, range: 1 }],
             })
 
             return true
@@ -234,10 +234,10 @@ export class RemoteDefender extends Creep {
 
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goal: {
+                    goals: [{
                         pos: new RoomPosition(25, 25, creep.commune.name),
                         range: 25,
-                    },
+                    }],
                 })
 
                 continue
@@ -275,10 +275,10 @@ export class RemoteDefender extends Creep {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: {
+                goals: [{
                     pos: new RoomPosition(25, 25, creep.memory.RN),
                     range: 25,
-                },
+                }],
             })
         }
     }

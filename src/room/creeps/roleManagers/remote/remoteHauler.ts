@@ -141,10 +141,12 @@ export class RemoteHauler extends Creep {
             if (getRange(this.pos.x, sourcePos.x, this.pos.y, sourcePos.y) > 1) {
                 this.createMoveRequest({
                     origin: this.pos,
-                    goal: {
-                        pos: sourcePos,
-                        range: 1,
-                    },
+                    goals: [
+                        {
+                            pos: sourcePos,
+                            range: 1,
+                        },
+                    ],
                     avoidEnemyRanges: true,
                 })
 
@@ -177,10 +179,12 @@ export class RemoteHauler extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goal: {
-                    pos: this.commune.anchor,
-                    range: 3,
-                },
+                goals: [
+                    {
+                        pos: this.commune.anchor,
+                        range: 3,
+                    },
+                ],
                 avoidEnemyRanges: true,
             })
 
@@ -192,10 +196,12 @@ export class RemoteHauler extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: {
-                pos: sourcePos,
-                range: 1,
-            },
+            goals: [
+                {
+                    pos: sourcePos,
+                    range: 1,
+                },
+            ],
             avoidEnemyRanges: true,
         })
 
@@ -301,10 +307,12 @@ export class RemoteHauler extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goal: {
-                    pos: sourcePos,
-                    range: 1,
-                },
+                goals: [
+                    {
+                        pos: sourcePos,
+                        range: 1,
+                    },
+                ],
                 avoidEnemyRanges: true,
             })
 
@@ -318,10 +326,12 @@ export class RemoteHauler extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: {
-                pos: this.commune.anchor,
-                range: 3,
-            },
+            goals: [
+                {
+                    pos: this.commune.anchor,
+                    range: 3,
+                },
+            ],
             avoidEnemyRanges: true,
         })
 

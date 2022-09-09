@@ -174,10 +174,12 @@ export class RemoteHarvester extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: {
-                pos: harvestPos,
-                range: 0,
-            },
+            goals: [
+                {
+                    pos: harvestPos,
+                    range: 0,
+                },
+            ],
             avoidEnemyRanges: true,
         })
 
@@ -205,10 +207,12 @@ export class RemoteHarvester extends Creep {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: {
-                    pos: sourcePos,
-                    range: 1,
-                },
+                goals: [
+                    {
+                        pos: sourcePos,
+                        range: 1,
+                    },
+                ],
                 avoidEnemyRanges: true,
             })
         }

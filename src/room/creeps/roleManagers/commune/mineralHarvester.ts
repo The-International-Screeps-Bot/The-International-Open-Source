@@ -24,7 +24,7 @@ export class MineralHarvester extends Creep {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goal: { pos: harvestPos, range: 0 },
+                goals: [{ pos: harvestPos, range: 0 }],
                 avoidEnemyRanges: true,
             })
 

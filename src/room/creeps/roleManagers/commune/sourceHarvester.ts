@@ -1,7 +1,6 @@
 import { getRange, unpackAsPos } from 'international/generalFunctions'
 
 export class SourceHarvester extends Creep {
-
     constructor(creepID: Id<Creep>) {
         super(creepID)
     }
@@ -17,7 +16,8 @@ export class SourceHarvester extends Creep {
 
         // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
-        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.sourcePaths[this.memory.SI].length - 1)) return false
+        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.sourcePaths[this.memory.SI].length - 1))
+            return false
 
         // Record creep as dying
 
@@ -53,10 +53,12 @@ export class SourceHarvester extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goal: {
-                pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
-                range: 0,
-            },
+            goals: [
+                {
+                    pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
+                    range: 0,
+                },
+            ],
             avoidEnemyRanges: true,
         })
 
