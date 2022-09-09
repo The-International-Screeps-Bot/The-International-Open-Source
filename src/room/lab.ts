@@ -1,6 +1,6 @@
 import { minerals } from 'international/constants'
-import { CommuneManager } from '../communeManager'
-import { Hauler } from '../creeps/roleManagers/commune/hauler'
+import { CommuneManager } from './communeManager'
+import { Hauler } from './creeps/roleManagers/commune/hauler'
 
 const reactionCycleAmount = 5000
 

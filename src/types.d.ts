@@ -127,7 +127,7 @@ declare global {
 
     interface PathOpts {
         origin: RoomPosition
-        goal: PathGoal
+        goals: PathGoal[]
         /**
          * room types as keys to weight based on properties
          */
