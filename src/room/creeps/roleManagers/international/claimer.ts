@@ -84,6 +84,8 @@ export class Claimer extends Creep {
                     enemy: Infinity,
                     ally: Infinity,
                     keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity
                 },
             })
         }

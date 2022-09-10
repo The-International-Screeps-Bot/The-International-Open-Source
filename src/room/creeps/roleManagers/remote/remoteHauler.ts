@@ -186,6 +186,13 @@ export class RemoteHauler extends Creep {
                     },
                 ],
                 avoidEnemyRanges: true,
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity
+                },
             })
 
             return true
@@ -203,6 +210,13 @@ export class RemoteHauler extends Creep {
                 },
             ],
             avoidEnemyRanges: true,
+            typeWeights: {
+                enemy: Infinity,
+                ally: Infinity,
+                keeper: Infinity,
+                enemyRemote: Infinity,
+                allyRemote: Infinity
+            },
         })
 
         return true
@@ -314,6 +328,13 @@ export class RemoteHauler extends Creep {
                     },
                 ],
                 avoidEnemyRanges: true,
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity
+                },
             })
 
             return false
@@ -333,6 +354,13 @@ export class RemoteHauler extends Creep {
                 },
             ],
             avoidEnemyRanges: true,
+            typeWeights: {
+                enemy: Infinity,
+                ally: Infinity,
+                keeper: Infinity,
+                enemyRemote: Infinity,
+                allyRemote: Infinity
+            },
         })
 
         return true

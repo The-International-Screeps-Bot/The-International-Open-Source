@@ -18,6 +18,8 @@ import './attackRequestManager'
 import { myColors, roomDimensions } from 'international/constants'
 import './factory'
 import { LabManager } from './lab'
+import './towers'
+import './links'
 
 export class CommuneManager {
     labManager: LabManager

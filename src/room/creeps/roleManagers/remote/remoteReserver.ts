@@ -103,6 +103,13 @@ export class RemoteReserver extends Creep {
                 ],
                 avoidEnemyRanges: true,
                 plainCost: 1,
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity
+                },
             })
 
             continue

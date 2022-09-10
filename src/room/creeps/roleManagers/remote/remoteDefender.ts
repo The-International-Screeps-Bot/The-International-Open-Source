@@ -238,6 +238,13 @@ export class RemoteDefender extends Creep {
                         pos: new RoomPosition(25, 25, creep.commune.name),
                         range: 25,
                     }],
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                        enemyRemote: Infinity,
+                        allyRemote: Infinity
+                    },
                 })
 
                 continue
@@ -279,6 +286,13 @@ export class RemoteDefender extends Creep {
                     pos: new RoomPosition(25, 25, creep.memory.RN),
                     range: 25,
                 }],
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity
+                },
             })
         }
     }

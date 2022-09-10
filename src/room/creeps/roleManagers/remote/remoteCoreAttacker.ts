@@ -180,6 +180,13 @@ export class RemoteCoreAttacker extends Creep {
                         range: 25,
                     },
                 ],
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity
+                },
             })
         }
     }
