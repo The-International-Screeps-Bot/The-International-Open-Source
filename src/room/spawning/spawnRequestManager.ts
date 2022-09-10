@@ -1280,7 +1280,8 @@ Room.prototype.spawnRequester = function () {
                     // Abandon the this for some time
 
                     Memory.claimRequests[this.memory.claimRequest].abandon = 20000
-                    /* Memory.thiss[remoteName].abandoned = 1000 */
+                    delete Memory.claimRequests[this.memory.claimRequest].responder
+                    delete this.memory.claimRequest
                     return false
                 }
 

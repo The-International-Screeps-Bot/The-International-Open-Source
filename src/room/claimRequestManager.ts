@@ -25,7 +25,7 @@ Room.prototype.claimRequestManager = function () {
             return
         }
 
-        if (this.energyCapacityAvailable < 750) {
+        if (this.energyCapacityAvailable < 650) {
             delete Memory.claimRequests[this.memory.claimRequest].responder
             delete this.memory.claimRequest
             return
@@ -42,7 +42,6 @@ Room.prototype.claimRequestManager = function () {
         if (claimTarget.structures.spawn.length) {
             delete Memory.claimRequests[this.memory.claimRequest]
             delete this.memory.claimRequest
-
             return
         }
 
@@ -54,6 +53,7 @@ Room.prototype.claimRequestManager = function () {
             // Abandon for its remaining existance plus the estimated reservation time
 
             Memory.claimRequests[this.memory.claimRequest].abandon = invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX
+
             delete Memory.claimRequests[this.memory.claimRequest].responder
             delete this.memory.claimRequest
             return
