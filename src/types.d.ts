@@ -1843,20 +1843,6 @@ declare global {
         inactionable: boolean
     }
 
-    interface StructureFactory {
-        manager(): void
-
-        /**
-         * Converts energy into batteries given conditions
-         */
-        createBatteries(): boolean
-
-        /**
-         * Converts batteries into energy, given conditions
-         */
-        createEnergy(): boolean
-    }
-
     interface RoomObject {
         // Functions
 
