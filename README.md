@@ -1,9 +1,6 @@
-
-# The International - A Fully Automated Screeps Bot
-
 <div align="center">
   
-<img src="https://user-images.githubusercontent.com/48334001/178613644-a56f9b77-33f1-4951-8833-6ecbabcefd52.png" align="center">
+<img src="https://user-images.githubusercontent.com/48334001/189508073-847f793e-8a82-4c12-8d06-060969e6f7e8.png" align="center">
 
 </div>
 
