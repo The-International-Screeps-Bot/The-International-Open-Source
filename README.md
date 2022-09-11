@@ -1,7 +1,6 @@
 <div align="center">
   
-<img src="https://user-images.githubusercontent.com/48334001/189508073-847f793e-8a82-4c12-8d06-060969e6f7e8.png" align="center">
-
+<img src="https://user-images.githubusercontent.com/48334001/189508568-fb2c91e5-e348-48c7-87ec-6626a81e1330.png" align="center">
 </div>
 
 [![Badge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
