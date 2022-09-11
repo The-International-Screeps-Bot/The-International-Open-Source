@@ -1,5 +1,4 @@
 import { minerals } from 'international/constants'
-import { Delivery } from 'other/PlaidRabbit/DeliveryManager'
 import { CommuneManager } from './communeManager'
 import { Hauler } from './creeps/roleManagers/commune/hauler'
 
@@ -152,17 +151,19 @@ export class LabManager {
 
         if (result == OK) return false
 
-        if(result == ERR_NOT_IN_RANGE) {
+        if (result == ERR_NOT_IN_RANGE) {
             creep.createMoveRequest({
                 origin: creep.pos,
-                goals: [{
-                    pos: lab.pos,
-                    range: 1,
-                }],
+                goals: [
+                    {
+                        pos: lab.pos,
+                        range: 1,
+                    },
+                ],
                 avoidEnemyRanges: true,
             })
         } else {
-            creep.message += "BE" + result
+            creep.message += 'BE' + result
         }
 
         return true
