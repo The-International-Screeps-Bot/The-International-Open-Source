@@ -77,10 +77,6 @@ Room.prototype.remotesManager = function () {
             )
         }
 
-        // for (const creepName of this.creepsFromRoom.remoteHauler) {
-        //     ;(Game.creeps[creepName] as RemoteHauler).updateNeeds()
-        // }
-
         if (remote) {
             remoteMemory.needs[RemoteNeeds.minDamage] = 0
             remoteMemory.needs[RemoteNeeds.minHeal] = 0

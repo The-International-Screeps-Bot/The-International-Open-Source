@@ -172,6 +172,7 @@ Room.prototype.factoryManager = function () {
             RESOURCE_REDUCTANT,
             RESOURCE_OXIDANT,
             RESOURCE_PURIFIER,
+            RESOURCE_GHODIUM_MELT,
             RESOURCE_LEMERGIUM_BAR,
             RESOURCE_UTRIUM_BAR,
             RESOURCE_KEANIUM_BAR,

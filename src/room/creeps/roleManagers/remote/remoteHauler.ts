@@ -33,13 +33,6 @@ export class RemoteHauler extends Creep {
         return (this._dying = true)
     }
 
-    public updateNeeds() {
-        if (this.dying) return
-
-        if(Memory.rooms[this.memory.RN])
-            Memory.rooms[this.memory.RN].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
-    }
-
     preTickManager() {
         if (!this.memory.RN) return
 
@@ -91,15 +84,15 @@ export class RemoteHauler extends Creep {
         this.memory.RN = remoteName
         this.memory.SI = sourceIndex
 
-        if (this.dying) return
+        // if (this.dying) return
 
-        Memory.rooms[remoteName].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
+        // Memory.rooms[remoteName].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
     }
 
     removeRemote?() {
-        if (!this.dying) {
-            Memory.rooms[this.memory.RN].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] += this.parts.carry
-        }
+        // if (!this.dying) {
+        //     Memory.rooms[this.memory.RN].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] += this.parts.carry
+        // }
 
         delete this.memory.RN
         delete this.memory.SI
@@ -236,8 +229,7 @@ export class RemoteHauler extends Creep {
 
             //Pick up any amount laying on the ground, so it doesn't decay.  If there's a harvester creep
             //  It'll transfer the goods to us.
-            if (target instanceof Resource)
-                return true;
+            if (target instanceof Resource) return true
 
             return target.store.energy >= this.freeCapacityNextTick
         })
@@ -260,8 +252,7 @@ export class RemoteHauler extends Creep {
 
             //Pick up any amount laying on the ground, so it doesn't decay.  If there's a harvester creep
             //  It'll transfer the goods to us.
-            if (target instanceof Resource)
-                return true
+            if (target instanceof Resource) return true
 
             return target.store.energy >= this.freeCapacityNextTick
         })
@@ -282,13 +273,12 @@ export class RemoteHauler extends Creep {
 
             this.advancedRenew()
 
-            let store : AnyStoreStructure = this.commune.storage;
-            if(!store)
-                store = this.commune.terminal;
+            let store: AnyStoreStructure = this.commune.storage
+            if (!store) store = this.commune.terminal
 
             //We don't want remote haulers fulfilling reservations all over the place in the commune.
-            if(store) {
-                if(!this.memory.reservations || this.memory.reservations.length == 0)
+            if (store) {
+                if (!this.memory.reservations || this.memory.reservations.length == 0)
                     this.createReservation('transfer', store.id, this.store[RESOURCE_ENERGY], RESOURCE_ENERGY)
                 if (!this.fulfillReservation()) {
                     this.say(this.message)
@@ -482,7 +472,7 @@ export class RemoteHauler extends Creep {
             const creep: RemoteHauler = Game.creeps[creepName] as RemoteHauler
 
             let returnTripTime = 0
-            if(creep.memory.RN && creep.memory.SI !== undefined) {
+            if (creep.memory.RN && creep.memory.SI !== undefined) {
                 const remoteName = creep.memory.RN
                 const remoteMemory = Memory.rooms[remoteName]
                 //the 1.1 is to add some margin for the return trip.
