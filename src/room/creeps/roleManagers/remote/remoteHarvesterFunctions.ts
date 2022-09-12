@@ -59,8 +59,9 @@ export class RemoteHarvester extends Creep {
 
         const commune = this.commune
 
-        // Add the creep to creepsFromRoomWithRemote relative to its remote
+        if (this.dying) return
 
+        // Add the creep to creepsFromRoomWithRemote relative to its remote
         if (commune.creepsFromRoomWithRemote[this.memory.RN])
             commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
     }
