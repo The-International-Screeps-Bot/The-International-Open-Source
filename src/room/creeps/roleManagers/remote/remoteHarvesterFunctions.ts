@@ -43,14 +43,6 @@ export class RemoteHarvester extends Creep {
         return (this._dying = true)
     }
 
-    public updateNeeds() {
-        const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
-
-        if (!this.dying) {
-            Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= this.parts.work
-        }
-    }
-
     preTickManager(): void {
         if (!this.memory.RN) return
 
@@ -67,8 +59,9 @@ export class RemoteHarvester extends Creep {
 
         const commune = this.commune
 
-        // Add the creep to creepsFromRoomWithRemote relative to its remote
+        if (this.dying) return
 
+        // Add the creep to creepsFromRoomWithRemote relative to its remote
         if (commune.creepsFromRoomWithRemote[this.memory.RN])
             commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
     }
@@ -105,23 +98,23 @@ export class RemoteHarvester extends Creep {
     assignRemote?(remoteName: string) {
         this.memory.RN = remoteName
 
-        if (this.dying) return
+        // if (this.dying) return
 
-        const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+        // const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
-        const needs = Memory.rooms[remoteName].needs
+        // const needs = Memory.rooms[remoteName].needs
 
-        needs[RemoteNeeds[role]] -= this.parts.work
+        // needs[RemoteNeeds[role]] -= this.parts.work
     }
 
     removeRemote?() {
-        if (!this.dying) {
-            const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+        // if (!this.dying) {
+        //     const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
-            const needs = Memory.rooms[this.memory.RN].needs
+        //     const needs = Memory.rooms[this.memory.RN].needs
 
-            needs[RemoteNeeds[role]] += this.parts.work
-        }
+        //     needs[RemoteNeeds[role]] += this.parts.work
+        // }
 
         delete this.memory.RN
     }

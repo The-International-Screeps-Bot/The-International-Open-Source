@@ -128,38 +128,31 @@ Room.prototype.factoryManager = function () {
         return null
     }
 
-    function runFactory() {
-        if (!getProduct()) return
-        if (factory.cooldown > 0) return
+    function pickProduct() {
+        setProduct(null)
 
-        let product = nextProduction(null)
-        if (!product) return
-
-        var result = factory.produce(product)
-
-        if (result == ERR_BUSY) {
-            console.log('runfactory: ' + room.name + ' needs activating.')
-        } else if (result != OK) {
-            console.log('runFactory produce error: ' + result)
-        } else {
-            // if(Memory.masterPlan.targetProduction && Memory.masterPlan.targetProduction[product]) {
-            //     Memory.masterPlan.targetProduction[product]--;
-            // }
+        if (
+            room.findStoredResourceAmount(RESOURCE_ENERGY) > 150000 &&
+            //If We're either low in space, or we don't have any in storage.  We put some in storage so we can trade,
+            // but don't make it till we're low-ish on space.
+            (room.storage.store.getFreeCapacity() < 100000 || room.findStoredResourceAmount(RESOURCE_BATTERY) < 5000)
+        ) {
+            // Convert energy into batteries
+            setProduct(RESOURCE_BATTERY)
+            return
         }
-    }
 
-    if (factory.cooldown > 0) return
+        if (
+            room.findStoredResourceAmount(RESOURCE_ENERGY) < 20000 &&
+            room.findStoredResourceAmount(RESOURCE_BATTERY) >= 600
+        ) {
+            setProduct(RESOURCE_ENERGY)
+            return
+        }
 
-    if (factory.createEnergy()) return
-
-    if (factory.createBatteries()) return
-
-    if (Game.time % 10 == 0) {
         //let scheduledItems = [];
         //if(Memory.masterPlan.targetProduction)
         //    scheduledItems = _.keys(Memory.masterPlan.targetProduction).filter(rsc => Memory.masterPlan.targetProduction[rsc] > 0);
-
-        setProduct(null)
 
         //This is what to make, in priorty sequence.  Scheduled items is used for scheduling high-end materials for prodution.
         let stuffToMake = [
@@ -172,6 +165,7 @@ Room.prototype.factoryManager = function () {
             RESOURCE_REDUCTANT,
             RESOURCE_OXIDANT,
             RESOURCE_PURIFIER,
+            RESOURCE_GHODIUM_MELT,
             RESOURCE_LEMERGIUM_BAR,
             RESOURCE_UTRIUM_BAR,
             RESOURCE_KEANIUM_BAR,
@@ -228,7 +222,8 @@ Room.prototype.factoryManager = function () {
                     room.findStoredResourceAmount(RESOURCE_OXYGEN) > room.findStoredResourceAmount(RESOURCE_OXIDANT)) ||
                 (resource == RESOURCE_REDUCTANT &&
                     room.findStoredResourceAmount(RESOURCE_HYDROGEN) > 10000 &&
-                    room.findStoredResourceAmount(RESOURCE_HYDROGEN) > room.findStoredResourceAmount(RESOURCE_REDUCTANT))
+                    room.findStoredResourceAmount(RESOURCE_HYDROGEN) >
+                        room.findStoredResourceAmount(RESOURCE_REDUCTANT))
             ) {
                 let currentlyHaveAllMaterials: boolean = haveAllMaterials(resource)
                 if (!currentlyHaveAllMaterials) continue
@@ -239,29 +234,31 @@ Room.prototype.factoryManager = function () {
         }
     }
 
+    function runFactory() {
+        if (!getProduct()) return
+        if (factory.cooldown > 0) return
+
+        let product = nextProduction(null)
+        if (!product) return
+
+        var result = factory.produce(product)
+
+        if (result == ERR_BUSY) {
+            console.log('runfactory: ' + room.name + ' needs activating.')
+        } else if (result != OK) {
+            console.log('runFactory produce error: ' + result)
+        } else {
+            // if(Memory.masterPlan.targetProduction && Memory.masterPlan.targetProduction[product]) {
+            //     Memory.masterPlan.targetProduction[product]--;
+            // }
+        }
+    }
+
+    if (factory.cooldown > 0) return
+
+    if (Game.time % 10 == 0) {
+        pickProduct()
+    }
+
     runFactory()
-}
-
-StructureFactory.prototype.createBatteries = function () {
-    // If there is some energy
-
-    if (this.store.energy >= 600 && this.room.findStoredResourceAmount(RESOURCE_ENERGY) > 150000) {
-        // Convert energy into batteries
-
-        return this.produce(RESOURCE_BATTERY) === OK
-    }
-
-    return false
-}
-
-StructureFactory.prototype.createEnergy = function () {
-    // If there are some batteries and not much energy
-
-    if (this.store.battery >= 1000 && this.store.energy < 20000) {
-        // Convert batteries into energy
-
-        return this.produce(RESOURCE_ENERGY) === OK
-    }
-
-    return false
 }

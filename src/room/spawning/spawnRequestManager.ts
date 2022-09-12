@@ -992,8 +992,9 @@ Room.prototype.spawnRequester = function () {
         if (!remoteMemory.needs[RemoteNeeds.enemyReserved]) {
             // Loop through each index of sourceEfficacies
 
-            for (let index = 0; index < remoteMemory.SE.length; index += 1) {
-                let remoteHaulerNeed = remoteMemory.needs[RemoteNeeds[remoteHaulerRoles[index]]]
+            for (let sourceIndex = 0; sourceIndex < remoteMemory.SE.length; sourceIndex += 1) {
+                let remoteHaulerNeed = remoteMemory.needs[RemoteNeeds[remoteHaulerRoles[sourceIndex]]]
+                const priority = minRemotePriority + 1 + remoteMemory.SE[sourceIndex] / 100 + 0.01
                 // Construct requests for remoteHaulers
 
                 this.constructSpawnRequests(
@@ -1009,16 +1010,16 @@ Room.prototype.spawnRequester = function () {
                             role,
                             defaultParts: [],
                             extraParts: [CARRY, MOVE],
-                            threshold: 0.1,
+                            threshold: 0.0,
                             partsMultiplier,
                             maxCreeps: Infinity,
                             minCost: 100,
                             maxCostPerCreep: this.memory.MHC,
-                            priority: basePriorityForCurrentRemote,
-                            spawningGroup: this.creepsFromRoomWithRemote[remoteName]['remoteHauler' + index],
+                            priority: priority,
+                            spawningGroup: this.creepsFromRoomWithRemote[remoteName]['remoteHauler' + sourceIndex],
                             memoryAdditions: {
                                 RN: remoteName,
-                                SI: index as 0 | 1,
+                                SI: sourceIndex as 0 | 1,
                             },
                         }
                     })(),

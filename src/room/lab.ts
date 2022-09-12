@@ -14,9 +14,11 @@ const reverseReactions: {
     OH: ['H', 'O'],
     LH: ['L', 'H'],
     LO: ['L', 'O'],
+    KO: ['K', 'O'],
+    KH: ['K', 'H'],
     GH: ['G', 'H'],
     GO: ['G', 'O'],
-    KO: ['K', 'O'],
+    UO: ['U', 'O'],
     UH: ['U', 'H'],
     ZH: ['Z', 'H'],
     ZO: ['Z', 'O'],
@@ -26,7 +28,9 @@ const reverseReactions: {
     GH2O: ['GH', 'OH'],
     GHO2: ['GO', 'OH'],
     KHO2: ['KO', 'OH'],
+    KH2O: ['KH', 'OH'],
     UH2O: ['UH', 'OH'],
+    UHO2: ['UO', 'OH'],
     ZH2O: ['ZH', 'OH'],
     ZHO2: ['ZO', 'OH'],
 
@@ -35,7 +39,9 @@ const reverseReactions: {
     XGH2O: ['X', 'GH2O'],
     XGHO2: ['X', 'GHO2'],
     XKHO2: ['X', 'KHO2'],
+    XKH2O: ['X', 'KH2O'],
     XUH2O: ['X', 'UH2O'],
+    XUHO2: ['X', 'UHO2'],
     XZH2O: ['X', 'ZH2O'],
     XZHO2: ['X', 'ZHO2'],
 }
@@ -49,9 +55,62 @@ function decompose(compound: MineralConstant | MineralCompoundConstant): (Minera
     return reverseReactions[compound as MineralCompoundConstant]
 }
 
+const boostsInOrder: MineralBoostConstant[] = [
+    //fatigue decrease speed
+    RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,
+    RESOURCE_ZYNTHIUM_ALKALIDE,
+    RESOURCE_ZYNTHIUM_OXIDE,
+
+    //damage taken
+    RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
+    RESOURCE_GHODIUM_ALKALIDE,
+    RESOURCE_GHODIUM_OXIDE,
+
+    //heal and rangedHeal effectiveness
+    RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,
+    RESOURCE_LEMERGIUM_ALKALIDE,
+    RESOURCE_LEMERGIUM_OXIDE,
+
+    //attack effectiveness
+    RESOURCE_CATALYZED_UTRIUM_ACID,
+    RESOURCE_UTRIUM_ACID,
+    RESOURCE_UTRIUM_HYDRIDE,
+
+    //rangedAttack and rangedMassAttack effectiveness
+    RESOURCE_CATALYZED_KEANIUM_ALKALIDE,
+    RESOURCE_KEANIUM_ALKALIDE,
+    RESOURCE_KEANIUM_OXIDE,
+
+    //dismantle effectiveness
+    RESOURCE_CATALYZED_ZYNTHIUM_ACID,
+    RESOURCE_ZYNTHIUM_ACID,
+    RESOURCE_ZYNTHIUM_HYDRIDE,
+
+    //upgradeController effectiveness
+    RESOURCE_CATALYZED_GHODIUM_ACID,
+    RESOURCE_GHODIUM_ACID,
+    RESOURCE_GHODIUM_HYDRIDE,
+
+    //capacity
+    RESOURCE_CATALYZED_KEANIUM_ACID,
+    RESOURCE_KEANIUM_ACID,
+    RESOURCE_KEANIUM_HYDRIDE,
+
+    //repair and build effectiveness
+    RESOURCE_CATALYZED_LEMERGIUM_ACID,
+    RESOURCE_LEMERGIUM_ACID,
+    RESOURCE_LEMERGIUM_HYDRIDE,
+
+    //harvest effectiveness
+    RESOURCE_CATALYZED_UTRIUM_ALKALIDE,
+    RESOURCE_UTRIUM_ALKALIDE,
+    RESOURCE_UTRIUM_OXIDE,
+]
+
 export class LabManager {
     targetCompounds: { [key in MineralConstant | MineralCompoundConstant]?: number } = {
-        G: 10000,
+        KH: 5000,
+        G: 20000,
         OH: 5000,
     }
 
@@ -63,12 +122,51 @@ export class LabManager {
     input2Rsc: MineralConstant | MineralCompoundConstant
     isReverse: boolean
     targetAmount: number
-    lab1Id: string
-    lab2Id: string
-    lastLayoutCheck: number
+    lab1Id: Id<StructureLab>
+    lab2Id: Id<StructureLab>
+    private lastLayoutCheck: number
+    private requestedBoosts: MineralBoostConstant[] = []
+    private assignedBoosts: { [key in MineralBoostConstant]?: Id<StructureLab> }
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
+    }
+
+    public demandBoost(creep: Creep, boost: MineralBoostConstant): boolean {
+        if (creep.ticksToLive < CREEP_LIFE_TIME - 100) return false
+
+        if (creep.boosts[boost] > 0) return false
+
+        const labId = this.assignedBoosts[boost]
+        if (!labId) return true
+
+        const lab = this.communeManager.structures.lab.find(lab => lab.id == labId)
+
+        //See if the lab is ready to boost...
+        if (lab.mineralType != boost) return true
+
+        //This needs to see if the lab is fully ready to boost the creep.  This will work
+        //  even if it partially boosts the creep.
+        let result = lab.boostCreep(creep)
+
+        if (result == OK) return false
+
+        if (result == ERR_NOT_IN_RANGE) {
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [
+                    {
+                        pos: lab.pos,
+                        range: 1,
+                    },
+                ],
+                avoidEnemyRanges: true,
+            })
+        } else {
+            creep.message += 'BE' + result
+        }
+
+        return true
     }
 
     private labsInRange(thisLab: StructureLab, otherLab: StructureLab = null): number {
@@ -128,7 +226,11 @@ export class LabManager {
     }
 
     public get outputs(): StructureLab[] {
-        return _.filter(this.communeManager.structures.lab, lab => lab.id != this.lab1Id && lab.id != this.lab2Id)
+        let boostingLabs = Object.values(this.assignedBoosts)
+        return _.filter(
+            this.communeManager.structures.lab,
+            lab => lab.id != this.lab1Id && lab.id != this.lab2Id && !boostingLabs.includes(lab.id),
+        )
     }
 
     public get all(): StructureLab[] {
@@ -148,11 +250,56 @@ export class LabManager {
         if (!this.communeManager.room.storage || !this.communeManager.room.terminal) return
 
         this.doLayoutCheck()
+
+        this.assignBoosts()
+
         if (this.lab1Id) {
             this.updateDeficits()
             this.setCurrentReaction()
             if (this.isProperlyLoaded) {
                 this.react()
+            }
+        }
+    }
+
+    assignBoosts() {
+        this.assignedBoosts = {}
+        for (let compund of boostsInOrder) {
+            if (this.requestedBoosts.includes(compund)) {
+                //Special cases: an input lab can do double-duty as a boosting lab.
+                if (this.input1Rsc === compund) {
+                    this.assignedBoosts[compund] = this.lab1Id
+                    continue
+                }
+                if (this.input2Rsc === compund) {
+                    this.assignedBoosts[compund] = this.lab2Id
+                    continue
+                }
+
+                //Otherwise grab a lab that's not the input labs, and not a boosting lab.
+                let boostingLabs = Object.values(this.assignedBoosts)
+                let freelabs = this.communeManager.structures.lab.filter(
+                    lab => lab.id != this.lab1Id && lab.id != this.lab2Id && !boostingLabs.includes(lab.id),
+                )
+
+                if (freelabs.length == 0 && this.lab1Id && !boostingLabs.includes(this.lab1Id)) {
+                    freelabs = [this.input1]
+                }
+
+                if (freelabs.length == 0 && this.lab2Id && !boostingLabs.includes(this.lab2Id)) {
+                    freelabs = [this.input2]
+                }
+
+                if (freelabs.length > 0) {
+                    //If there's a free lab that already has the correct compound, that'll be our boosting lab.
+                    let pickedLab = freelabs.find(lab => lab.mineralType == compund)
+                    if (!pickedLab) pickedLab = freelabs[0]
+
+                    this.assignedBoosts[compund] = pickedLab.id
+                } else {
+                    //We needed a free lab, and couldn't find one.  Give up on assigning additional boosts.
+                    return
+                }
             }
         }
     }
@@ -399,22 +546,89 @@ export class LabManager {
         return false
     }
 
+    setupBoosterLab(creep: Hauler, lab: StructureLab, compound: MineralBoostConstant): boolean {
+        if (lab.mineralType == compound || lab.mineralType == null) {
+            //The 3*2 below are because it takes 30 compound and 20 energy to boost a creep, so make sure it's loaded
+            //in a reasonably ratioed sequence.
+            if (
+                lab.store[RESOURCE_ENERGY] / 30 < lab.store[compound] / 20 &&
+                lab.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.getCapacity()
+            ) {
+                let source =
+                    this.communeManager.room?.storage.store[RESOURCE_ENERGY] >
+                    this.communeManager.room?.terminal.store[RESOURCE_ENERGY]
+                        ? this.communeManager.room.storage
+                        : this.communeManager.room.terminal
+
+                creep.createReservation('withdraw', source.id, creep.store.getCapacity(), RESOURCE_ENERGY)
+                creep.createReservation('transfer', lab.id, creep.store.getCapacity(), RESOURCE_ENERGY)
+            } else {
+                let source =
+                    this.communeManager.room?.storage.store[compound] >
+                    this.communeManager.room?.terminal.store[compound]
+                        ? this.communeManager.room.storage
+                        : this.communeManager.room.terminal
+
+                let amount = Math.min(
+                    creep.store.getFreeCapacity(),
+                    source.store[compound],
+                    lab.store.getFreeCapacity(compound),
+                )
+                amount = Math.max(amount, 0)
+
+                if (lab.store.getFreeCapacity(compound) >= creep.store.getCapacity()) {
+                    creep.createReservation('withdraw', source.id, amount, compound)
+                    creep.createReservation('transfer', lab.id, amount, compound)
+                }
+            }
+        } else {
+            //Unload the wrong material
+            let amount = Math.min(creep.store.getFreeCapacity(), lab.store[lab.mineralType])
+            creep.createReservation('withdraw', lab.id, amount, lab.mineralType)
+            creep.createReservation(
+                'transfer',
+                this.communeManager.room.storage?.id,
+                amount + creep.store[lab.mineralType],
+                lab.mineralType,
+            )
+        }
+
+        if (creep.memory.reservations?.length > 0) return true
+        return false
+    }
+
     private amount(resource: MineralConstant | MineralCompoundConstant): number {
         if (!resource) return 0
         let storageAmount = this.communeManager.room.storage.store[resource] || 0
-        let terminalAmount = (this.communeManager.room.terminal && this.communeManager.room.terminal.store[resource]) || 0
+        let terminalAmount =
+            (this.communeManager.room.terminal && this.communeManager.room.terminal.store[resource]) || 0
         let labAmount = _.sum(
             _.filter(this.all, l => l.mineralType == resource),
             l => l.mineralAmount,
         )
 
         //Sum of haulers as well.
-        let haulerAmount = _.sum(this.communeManager.room.myCreeps.hauler, crName => Game.creeps[crName]?.store[resource] || 0)
+        let haulerAmount = _.sum(
+            this.communeManager.room.myCreeps.hauler,
+            crName => Game.creeps[crName]?.store[resource] || 0,
+        )
 
         return storageAmount + terminalAmount + labAmount + haulerAmount
     }
 
+    public requestBoost(compound: MineralBoostConstant) {
+        if (!this.requestedBoosts.includes(compound)) this.requestedBoosts.push(compound)
+    }
+
     generateHaulingReservation(creep: Hauler) {
+        if (this.assignedBoosts) {
+            for (const compound in this.assignedBoosts) {
+                const labId = this.assignedBoosts[compound as MineralBoostConstant]
+                const lab = this.communeManager.structures.lab.find(lab => lab.id == labId)
+                if (this.setupBoosterLab(creep, lab, compound as MineralBoostConstant)) return
+            }
+        }
+
         if (!this.lab1Id || !this.lab2Id) return
 
         //Priortize the worstly loaded lab.

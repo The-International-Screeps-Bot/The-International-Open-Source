@@ -1188,17 +1188,32 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         for (const source of room.sources) {
             const path = room.advancedFindPath({
                 origin: source.pos,
-                goals: [{ pos: scoutingRoom.anchor, range: 3 }],
+                goals: [{ pos: scoutingRoom.anchor, range: 1 }],
             })
 
             // Stop if there is a source inefficient enough
 
             if (path.length >= 300) return true
 
-            // Record the length of the path in the room's memory
+            const uniqueRoomNames = [...new Set(path.map(rp => rp.roomName))]
 
-            newSourceEfficacies.push(path.length)
-            newSourceEfficaciesTotal += path.length
+            //Pull the terrain into a dictionary, because creating the object is expensive-ish
+            let terrianDictionary: { [roomName: string]: RoomTerrain } = {}
+            for (let roomName of uniqueRoomNames) {
+                terrianDictionary[roomName] = new Room.Terrain(roomName)
+            }
+
+            let sourceEfficancy = path
+                //Map the Room position to the travel costs
+                .map(roomPos =>
+                    //Swamps
+                    terrianDictionary[roomPos.roomName].get(roomPos.x, roomPos.y) == TERRAIN_MASK_SWAMP ? 5 : 1,
+                )
+                //And sum it
+                .reduce((partialSum, a) => partialSum + a, 0)
+
+            newSourceEfficacies.push(sourceEfficancy)
+            newSourceEfficaciesTotal += sourceEfficancy
 
             /*
             // Loop through positions of the path
