@@ -5,6 +5,7 @@
         "fs": "0.0.1-security",
         "lodash": "^4.17.21",
         "ncp": "^2.0.0",
+        "node-fetch": "^2.6.7",
         "node-powershell": "^5.0.1",
         "q": "^1.5.1",
         "screeps": "4.2.14",

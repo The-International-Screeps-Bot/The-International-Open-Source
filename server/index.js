@@ -1,3 +1,5 @@
+const fetch = require('node-fetch')
+const fs = require('fs')
 const net = require('net')
 const q = require('q')
 const _ = require('lodash')
@@ -45,7 +47,7 @@ class Tester {
                }
           }
 
-          if (process.env.STEAM_API_KEY !== undefined &&process.env.STEAM_API_KEY.length === 0) {
+          if (process.env.STEAM_API_KEY !== undefined && process.env.STEAM_API_KEY.length === 0) {
                process.env.STEAM_API_KEY = undefined
           }
      }
@@ -74,9 +76,21 @@ class Tester {
                     console.log(JSON.stringify(status, null, 2))
                     console.log('Milestones:')
                     console.log(JSON.stringify(milestones, null, 2))
+
                     const fails = milestones.filter(
                          milestone => milestone.required && milestone.tick < lastTick && !milestone.success,
                     )
+                    let commitName = 'localhost'
+                    try {
+                         const file = fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8');
+                         const object = JSON.parse(file);
+                         commitName = object["commits"][0].message;
+                    } catch (error) {}
+                    try {
+                         await fetch('http://localhost:5000', {method: 'POST', body: JSON.stringify({milestones,lastTick,status,commitName}), headers: {        'Accept': 'application/json',
+                         'Content-Type': 'application/json'}});
+                    } catch (error) {}
+
                     if (fails.length > 0) {
                          for (const fail of fails) {
                               console.log(`${lastTick} Milestone failed ${JSON.stringify(fail)}`)
