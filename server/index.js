@@ -85,11 +85,15 @@ class Tester {
                          const file = fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8');
                          const object = JSON.parse(file);
                          commitName = object["commits"][0].message;
-                    } catch (error) {}
+                    } catch (error) { }
                     try {
-                         await fetch('http://localhost:5000', {method: 'POST', body: JSON.stringify({milestones,lastTick,status,commitName}), headers: {        'Accept': 'application/json',
-                         'Content-Type': 'application/json'}});
-                    } catch (error) {}
+                         await fetch('http://localhost:5000', {
+                              method: 'POST', body: JSON.stringify({ milestones, lastTick, status, commitName }), headers: {
+                                   'Accept': 'application/json',
+                                   'Content-Type': 'application/json'
+                              }
+                         });
+                    } catch (error) { }
 
                     if (fails.length > 0) {
                          for (const fail of fails) {

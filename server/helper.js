@@ -42,8 +42,8 @@ async function followLog(rooms, statusUpdater, restrictToRoom) {
           await api.auth()
 
           api.socket.connect()
-          api.socket.on('connected', () => {})
-          api.socket.on('auth', event => {})
+          api.socket.on('connected', () => { })
+          api.socket.on('auth', event => { })
           api.socket.subscribe(`room:${room}`, statusUpdater)
      }
 }
@@ -73,21 +73,10 @@ const setPassword = function (line, socket, rooms, roomsSeen, playerRooms) {
                )
 
                if (
-                    playerRooms[room]               ) {
-                    console.log(`> Set steam id for ${room} for ${playerRooms[room]}`)
-                    let steamId
-                    switch (playerRooms[room]) {
-                         case 'user1':
-                              steamId = process.env.STEAM_ID_USER1
-                              break
-                         case 'user2':
-                              steamId = process.env.STEAM_ID_USER2
-                              break
-                         case 'user3':
-                              steamId = process.env.STEAM_ID_USER3
-                              break
-                    }
-                    if (steamId) socket.write(
+                    playerRooms[room]) {
+                    console.log(`> Set steam id for ${room} for ${room}`)
+                    let steamId = playerRooms[room];
+                    socket.write(
                          `storage.db.users.update({username: '${room}'}, {$set: {steam: {id: '${steamId}'}}})\r\n`,
                     )
                }
