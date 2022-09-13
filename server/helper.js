@@ -1,10 +1,13 @@
 const fs = require('fs')
+const fetch = require('node-fetch')
 const rimraf = require('rimraf')
 const path = require('path')
 const ncp = require('ncp')
 const lib = require('@screeps/launcher/lib/index')
 const _ = require('lodash')
 const { ScreepsAPI } = require('screeps-api')
+
+const { userCpu } = require('./config')
 
 const dir = 'files/tmp-test-server'
 const port = 21025
@@ -69,15 +72,14 @@ const setPassword = function (line, socket, rooms, roomsSeen, playerRooms) {
                console.log(`> Set password for ${room}`)
                /* eslint max-len: ["error", 1300] */
                socket.write(
-                    `storage.db.users.update({username: '${room}'}, {$set: {password: '70dbaf0462458b31ff9b3d184d06824d1de01f6ad59cae7b5b9c01a8b530875ac502c46985b63f0c147cf59936ac1be302edc532abc38236ab59efecb3ec7f64fad7e4544c1c5a5294a8f6f45204deeb009a31dd6e81e879cfb3b7e63f3d937f412734b1a3fa7bc04bf3634d6bc6503bb0068c3f6b44f3a84b5fa421690a7399799e3be95278381ae2ac158c27f31eef99db1f21e75d285802cda983cd8a73a8a85d03ba45dcc7eb2b2ada362887df10bf74cdcca47f911147fd0946fb5119c888f048000044072dcc29b1c428b40b805cadeee7b3afc1e9d9d546c2a878ff8df9fcf805a28cc8b6e4b78051f0adb33642f1097bf0a189f388860302df6173b8e7955a35b278655df2d7615b54da6c63dc501c7914d726bea325c2225f343dff0068ac42300661664ee5611eb623e1efa379f571d46ba6a0e13a9e3e9c5bb7a772b685258f768216a830c5e9af3685898d98a9935cca2ba5efb5e1e4a9f2745c53bff318bda3e376bcd06b06d87a55045a76a1982f6e3b9fb77d39c2ff5c09c76989d1c779655bc2acdf55879b68f6155d14c26bdca3af5c7fd6de9926dbc091da280e6f7e3d727fa68c89aa8ac25b5e50bd14bf2dbcd452975710ef4b8d61a81c8f6ef2d5584eacfcb1ab4202860320f03313d23076a3b3e085af5f0a9e010ddb0ad5af57ed0db459db0d29aa2bcbcd64588d4c54d0c5265bf82f31349d9456', salt: '7eeb813417828682419582da8f997dea3e848ce8293e68b2dbb2f334b1f8949f'}})\r\n`,
+                    `storage.db.users.update({username: '${room}'}, {$set: {password: '552054d48055ed1e16ca31df0aad5d98f5860c0a69074bac119c563e8b4c33815469eea39e4c63269c70c56ada6aa32e557a76826605912e5a5766f8849df8604c576ef57967dfc8f82e2af1d4335973fdc43c61fc06e3e97c9b5305bde30431865eeee34d42b257425fe8b352706efcc89eb4c2d446f24c51103d90bc736e8951b19a4fd0acf16349a67bd5d9c173d2c32963d599588919a8b3277228e12a01c6d90350efddac24f0395ce9666584e714a42e427cc4249e613d761fa39b9d09432e2e3b0d191245d838231a3bcf24dff1e6b50066aa70c048f4e53dce2b631c134a83bc8f8ae9542db2763aba8556285010a35db8882f2ebdb8c3b05b9d32acb4b0eeae036bc82473086fbb47cf838b5179cd2063388da505bd80c0a5bf0cc5b47068a94d1e4f436a2edcbefd4b5d24f6ea0486e17443991f9bcd1aa05f34faa7fa77c71b47b0cc7f7fb352ec36f1f343cba948205005dd55b4aa270d3ea5da4bcff57a58241860365a1e2f4ec15d610ea8bf0ff1898ed342dbb6c7c19ff93b77fd5928782ac96bc554db023bdbe99f51f3ed147c54561ba474c65065713783022d11ba69bea54e3bd42756481e4d68568dde41ce4ffb52216c08085c27594bbea23a0370125c687e931f448d7b5245ebd869450eed6077214c1750a52a359d0d2425b2e689fd456761e8edd4b6c751150ef391e8a5d232ecb50a888adb6169', salt: '857e347a9e3a8fd4e6eb770c9c0ff819de3b006b3faa9fe984f82f36deeba1bd'}})\r\n`,
                )
 
                if (
                     playerRooms[room]) {
-                    console.log(`> Set steam id for ${room} for ${room}`)
-                    let steamId = playerRooms[room];
+                    console.log(`> Set steam id for ${room}`)
                     socket.write(
-                         `storage.db.users.update({username: '${room}'}, {$set: {steam: {id: '${steamId}'}}})\r\n`,
+                         `storage.db.users.update({username: '${room}'}, {$set: {steam: {id: '${playerRooms[room]}'}}})\r\n`,
                     )
                }
                return true
@@ -113,7 +115,7 @@ async function initServer() {
      let config = fs.readFileSync(configFilename, { encoding: 'utf8' })
      config = config
           .replace('{{STEAM_KEY}}', process.env.STEAM_API_KEY)
-          .replace('runner_threads = 2', 'runner_threads =4')
+          .replace('runner_threads = 2', 'runner_threads = 4')
           .replace('processors_cnt = 2', 'processors_cnt = 4')
 
      fs.writeFileSync(configFilename, config)
@@ -131,7 +133,7 @@ async function initServer() {
                path.resolve(dir, 'package.json'),
                JSON.stringify(
                     {
-                         name: 'my-screeps-world',
+                         name: 'screeps-performanceServer',
                          version: '0.0.1',
                          private: true,
                     },
@@ -182,9 +184,6 @@ const spawnBots = async function (line, socket, rooms, tickDuration) {
           console.log(`> utils.removeBots()`)
           socket.write(`utils.removeBots()\r\n`)
           await sleep(5)
-          console.log(`> utils.enableGCLToCPU()`)
-          socket.write(`utils.enableGCLToCPU()\r\n`)
-          await sleep(5)
           console.log(`> utils.setShardName("performanceServer")`)
           socket.write(`utils.setShardName("performanceServer")\r\n`)
 
@@ -193,7 +192,7 @@ const spawnBots = async function (line, socket, rooms, tickDuration) {
                const room = roomsObject[i][0]
                const botName = roomsObject[i][1]
                console.log(`> Spawn as ${botName}`)
-               socket.write(`bots.spawn('${botName}', '${room}', {username: '${room}', auto:'true'})\r\n`)
+               socket.write(`bots.spawn('${botName}', '${room}', {username: '${room}', auto:'true',cpu:'${userCpu}'})\r\n`)
                await sleep(5)
           }
           return true
@@ -261,3 +260,21 @@ const helpers = {
      },
 }
 module.exports.helpers = helpers
+
+async function SendResult(milestones,status) {
+     let commitName = 'localhost'
+     if (process.env.GITHUB_EVENT_PATH) {
+          const file = fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8');
+          const object = JSON.parse(file);
+          commitName = object["commits"][0].message;
+     }
+     try {
+          await fetch('http://localhost:5000', {
+               method: 'POST', body: JSON.stringify({ milestones, lastTick, status, commitName }), headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+               }
+          });
+     } catch (error) { }
+}
+module.exports.sendResult = SendResult

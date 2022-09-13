@@ -1,11 +1,9 @@
-const fetch = require('node-fetch')
-const fs = require('fs')
 const net = require('net')
 const q = require('q')
 const _ = require('lodash')
 require('dotenv').config()
 
-const { setPassword, sleep, initServer, startServer, spawnBots, helpers, followLog } = require('./helper')
+const { setPassword, sleep, initServer, startServer, spawnBots, helpers, followLog,sendResult } = require('./helper')
 
 const { cliPort, tickDuration, playerRooms, rooms, trackedRooms, milestones } = require('./config')
 
@@ -63,12 +61,10 @@ class Tester {
                let appendix = ''
                if (this.maxTicks > 0) {
                     appendix = ` with runtime ${this.maxTicks} ticks`
-                    // appendix = ` with runtime ${this.maxRuntime / 60} minutes`
                }
                console.log(`> Start the simulation${appendix}`)
                if (this.maxTicks > 0) {
                     while (lastTick === undefined || lastTick < this.maxTicks) {
-                         // if (lastTick % 50 === 0) handleStats();
                          await sleep(1)
                     }
                     console.log(`${lastTick} End of simulation`)
@@ -80,20 +76,7 @@ class Tester {
                     const fails = milestones.filter(
                          milestone => milestone.required && milestone.tick < lastTick && !milestone.success,
                     )
-                    let commitName = 'localhost'
-                    try {
-                         const file = fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8');
-                         const object = JSON.parse(file);
-                         commitName = object["commits"][0].message;
-                    } catch (error) { }
-                    try {
-                         await fetch('http://localhost:5000', {
-                              method: 'POST', body: JSON.stringify({ milestones, lastTick, status, commitName }), headers: {
-                                   'Accept': 'application/json',
-                                   'Content-Type': 'application/json'
-                              }
-                         });
-                    } catch (error) { }
+                    await sendResult(status,milestones)
 
                     if (fails.length > 0) {
                          for (const fail of fails) {
@@ -171,7 +154,7 @@ class Tester {
                console.log(`${lastTick} ${e}`)
           }
           const end = Date.now()
-          console.log(`${lastTick} seconds elapsed ${Math.floor((end - start) / 1000)}`)
+          console.log(`${lastTick} ticks elapsed, ${Math.floor((end - start) / 1000)} seconds`)
           process.exit(exitCode)
      }
 }
