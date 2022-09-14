@@ -40,6 +40,10 @@ export class HubHauler extends Creep {
 
         if (!storage && !terminal) return
 
+        //Factory-overfill is at the top of this list because it can be feeding energy to the rest of the base
+        // by breaking down batteries... this is the only case it should have more then 10k energy in the factory.
+        if (this.factoryEnergyOverfillTransfer()) return
+
         if (this.reserveStorageTransfer()) return
         if (this.reserveTerminalTransfer()) return
 
@@ -48,6 +52,22 @@ export class HubHauler extends Creep {
 
         if (this.reserveFactoryWithdraw()) return
         if (this.reserveFactoryTransfer()) return
+    }
+
+    factoryEnergyOverfillTransfer?(): boolean {
+        const { room } = this
+        const { storage } = room
+        const factory = room.structures.factory[0]
+
+        if (!storage || !factory) return false
+
+        if (factory.store.energy > 10000 && storage.store.getFreeCapacity() > 10000) {
+            this.createReservation('withdraw', factory.id, 10000, RESOURCE_ENERGY)
+            this.createReservation('transfer', storage.id, 10000, RESOURCE_ENERGY)
+            return true
+        }
+
+        return false
     }
 
     /**
