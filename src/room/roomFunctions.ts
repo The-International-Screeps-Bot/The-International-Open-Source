@@ -713,16 +713,17 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     const enemyAttackers: Creep[] = []
                     const enemyRangedAttackers: Creep[] = []
 
-                    for (const enemyCreep of room.enemyCreeps) {
+                    for (const enemyCreep of room.enemyAttackers) {
                         if (enemyCreep.parts.ranged_attack > 0) {
                             enemyRangedAttackers.push(enemyCreep)
-                            return
+                            continue
                         }
 
                         if (enemyCreep.parts.attack > 0) enemyAttackers.push(enemyCreep)
                     }
 
                     for (const enemyAttacker of enemyAttackers) {
+
                         // Construct rect and get positions inside
 
                         const positions = findCoordsInsideRect(
