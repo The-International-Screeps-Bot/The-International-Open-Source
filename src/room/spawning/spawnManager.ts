@@ -22,13 +22,13 @@ Room.prototype.spawnManager = function () {
     const requestsByPriority = Object.keys(this.spawnRequests).sort((a, b) => {
         return parseInt(a) - parseInt(b)
     })
-
+/*
     for (const priority in this.spawnRequests) {
 
         const request = this.spawnRequests[priority]
 
         customLog('SPAWN REQUESTS', priority + ', ' + request.role + ', ' + request.extraOpts.memory?.RN + ', ' + request.extraOpts.memory?.SI)
-    }
+    } */
 
     // Track the inactive spawn index
 

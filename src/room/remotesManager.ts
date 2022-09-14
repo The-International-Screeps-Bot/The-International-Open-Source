@@ -144,6 +144,8 @@ export class RemotesManager {
                     Math.max((isReserved ? 10 : 5) -
                     Math.floor(Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]], 0) * minHarvestWorkRatio), 0)
 
+                customLog('NEEDS FOR ' + remoteName, income + ', ' + Math.floor(Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]], 0) * minHarvestWorkRatio) + ', ' + remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]] + ', ' + sourceIndex + ', ' + remoteHarvesterRoles + ', ' +  remoteHarvesterRoles[index] + ', ' + RemoteNeeds[remoteHarvesterRoles[index]])
+
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
                 remoteMemory.needs[RemoteNeeds[`remoteHauler${sourceIndex as 0 | 1}`]] += findCarryPartsRequired(

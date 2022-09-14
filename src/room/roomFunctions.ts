@@ -616,7 +616,9 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     x = roomDimensions - 1
                     for (y = 0; y < roomDimensions; y += 1) cm.set(x, y, 255)
                 }
+
                 /* if (room) room.visualizeCostMatrix(cm) */
+
                 // Weight positions
 
                 for (const weight in opts.weightPositions) {
