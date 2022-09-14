@@ -56,11 +56,11 @@ export class RemoteReserver extends Creep {
             if (!this.findRemote()) return
         }
 
-        const remoteMemory = Memory.rooms[this.memory.RN]
+        if (this.dying) return
 
         // Reduce remote need
 
-        if (!this.dying) remoteMemory.needs[RemoteNeeds[role]] -= 1
+        Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= 1
 
         const commune = this.commune
 

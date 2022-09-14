@@ -810,11 +810,7 @@ Creep.prototype.createMoveRequest = function (opts) {
         // Inform opts to avoid impassible structures
 
         opts.avoidImpassibleStructures = true
-
-        // Inform opts to avoid stationary positions
-
         opts.avoidStationaryPositions = true
-
         opts.avoidNotMyCreeps = true
 
         // Generate a new path
@@ -1114,6 +1110,29 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         if (creepAtPos.moved === -1) {
             delete this.moveRequest
             this.moved = -1
+            return
+        }
+
+        if (creepAtPos.moved === -2) {
+            if (
+                TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
+                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+            ) {
+                // Have the creep move to its moveRequest
+
+                this.runMoveRequest()
+
+                // Have the creepAtPos move to the creep and inform true
+
+                creepAtPos.moveRequest = packedCoord
+                room.moveRequests.set(packedCoord, [creepAtPos.name])
+                creepAtPos.runMoveRequest()
+                return
+            }
+
+            delete this.moveRequest
+            this.moved = -2
+            return
         }
 
         // If the creep is where the creepAtPos is trying to move to
@@ -1849,7 +1868,13 @@ Creep.prototype.fulfillReservation = function () {
 
     // Withdraw
 
-    const withdrawResult = this.withdraw(target as any, reservation.resourceType, amount)
+    let withdrawResult: ScreepsReturnCode
+
+    if (target instanceof Creep) {
+
+        withdrawResult = target.transfer(this, reservation.resourceType, amount)
+    }
+    else withdrawResult = this.withdraw(target, reservation.resourceType, amount)
     this.message += withdrawResult
 
     if (withdrawResult === ERR_NOT_ENOUGH_RESOURCES) {

@@ -755,6 +755,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 if (opts.avoidNotMyCreeps) {
                     for (const creep of room.enemyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
+                    for (const creep of room.allyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
 
                     for (const creep of room.find(FIND_HOSTILE_POWER_CREEPS)) cm.set(creep.pos.x, creep.pos.y, 255)
                 }
@@ -812,14 +813,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     // Loop through them
 
                     for (const index in room.sources) {
-                        // Find harvestPositions for sourceNames, iterating if there are none
-
-                        const sourcePositions = room.sourcePositions[index]
-                        if (!sourcePositions) continue
 
                         // Loop through each position of harvestPositions, have creeps prefer to avoid
 
-                        for (const pos of sourcePositions) cm.set(pos.x, pos.y, 10)
+                        for (const pos of room.sourcePositions[index]) cm.set(pos.x, pos.y, 10)
                     }
 
                     // If the anchor is defined

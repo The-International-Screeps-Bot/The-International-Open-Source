@@ -43,20 +43,9 @@ export function roomsManager() {
 
         room.roomManager.update(room)
 
-        // If there is a specific manager for this room's type, run it
+        // If the room is a commune, run its specific manager
 
-        if (room.memory.T === 'commune') {
-            room.communeManager = global.communeManagers[room.name]
-
-            if (!room.communeManager) {
-                room.communeManager = new CommuneManager()
-                global.communeManagers[room.name] = room.communeManager
-            }
-
-            room.communeManager.update(room)
-
-            room.communeManager.run()
-        }
+        if (room.memory.T === 'commune') room.communeManager.run()
 
         room.roomManager.run()
 

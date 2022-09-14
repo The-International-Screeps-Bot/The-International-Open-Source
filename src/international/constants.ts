@@ -210,8 +210,8 @@ export const creepRoles: CreepRoles[] = [
 ]
 
 export enum TrafficPriorities {
-    hauler,
     remoteHauler,
+    hauler,
     scout,
     hubHauler,
     fastFiller,
@@ -698,6 +698,9 @@ export enum RemoteHaulerRolesBySourceIndex {
     remoteHauler1,
 }
 
+/**
+ * Roles for which to provide spawnGroups for based on their shared remoteName
+ */
 export const spawnByRoomRemoteRoles: (
     | 'source1RemoteHarvester'
     | 'source2RemoteHarvester'
@@ -705,8 +708,6 @@ export const spawnByRoomRemoteRoles: (
     | 'remoteDefender'
     | 'remoteCoreAttacker'
     | 'remoteDismantler'
-    | 'remoteHauler0'
-    | 'remoteHauler1'
 )[] = [
     'source1RemoteHarvester',
     'source2RemoteHarvester',
@@ -714,8 +715,6 @@ export const spawnByRoomRemoteRoles: (
     'remoteDefender',
     'remoteCoreAttacker',
     'remoteDismantler',
-    'remoteHauler0',
-    'remoteHauler1',
 ]
 
 export const builderSpawningWhenStorageThreshold = 40000
@@ -727,7 +726,11 @@ export const CPUMaxPerTick = 500
 
 export const CPUBucketRenewThreshold = 5000
 export const prefferedCommuneRange = 6
-export const relayRoles: Partial<CreepRoles>[] = ['hauler', 'remoteHauler']
+
+/**
+ * Roles that should attempt relaying
+ */
+export const relayRoles: Set<CreepRoles> = new Set(['hauler', 'remoteHauler'])
 
 // The dowwngrade timer for when upgrading the controller is required
 
@@ -746,6 +749,9 @@ export const PROTECTED = 1
 export const TO_EXIT = 2
 export const EXIT = 3
 
+/**
+ * Which structures should be safemoded when attacked
+ */
 export const safemodeTargets: StructureConstant[] = [
     STRUCTURE_SPAWN,
     STRUCTURE_TOWER,
@@ -753,6 +759,9 @@ export const safemodeTargets: StructureConstant[] = [
     STRUCTURE_TERMINAL,
 ]
 
+/**
+ * The number of ticks to wait between hauler size updates
+ */
 export const haulerUpdateDefault = 1500
 
 export const rampartUpkeepCost = RAMPART_DECAY_AMOUNT / REPAIR_POWER / RAMPART_DECAY_TIME
@@ -763,9 +772,19 @@ export const remoteContainerUpkeepCost = CONTAINER_DECAY / REPAIR_POWER / CONTAI
 export const minOnboardingRamparts = 1
 export const maxRampartGroupSize = 12
 
+/**
+ * Links should try to send when their store is more or equal to this multiplier
+ */
 export const linkSendThreshold = 0.9
+
+/**
+ * Links should receive when their store is less or equal to this multiplier
+ */
 export const linkReceiveTreshold = 0.25
 
+/**
+ * Offsets from a creep's moveRequest for which to search for relay targets
+ */
 export const relayOffsets = {
     horizontal: [
         {

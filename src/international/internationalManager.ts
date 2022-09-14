@@ -16,8 +16,6 @@ export class InternationalManager {
 
         this.tickConfig()
         this.creepOrganizer()
-        for(let commune of global.communes)
-            Game.rooms[commune]?.remotesManager()
         this.constructionSiteManager()
         this.orderManager()
 

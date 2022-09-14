@@ -11,6 +11,7 @@ import { internationalManager, InternationalManager } from './internationalManag
 import { statsManager } from './statsManager'
 import '../room/haulerSize'
 import { indexOf } from 'lodash'
+import { CommuneManager } from 'room/communeManager'
 
 InternationalManager.prototype.tickConfig = function () {
     // If CPU logging is enabled, get the CPU used at the start
@@ -56,6 +57,17 @@ InternationalManager.prototype.tickConfig = function () {
         const { controller } = room
         if (!controller) continue
 
+        // The room is a commune
+
+        room.communeManager = global.communeManagers[room.name]
+
+        if (!room.communeManager) {
+            room.communeManager = new CommuneManager()
+            global.communeManagers[room.name] = room.communeManager
+        }
+
+        room.communeManager.update(room)
+
         if (controller.my) room.memory.T = 'commune'
 
         if (room.memory.T != 'commune') continue
@@ -85,6 +97,7 @@ InternationalManager.prototype.tickConfig = function () {
         }
 
         room.haulerSizeManager()
+        room.communeManager.remotesManager.stage1()
 
         // Add roomName to commune list
 

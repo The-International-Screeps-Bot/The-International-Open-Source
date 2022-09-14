@@ -20,6 +20,35 @@ export class RemoteDefender extends Creep {
         return (this._dying = true)
     }
 
+    preTickManager(): void {
+        if (!this.memory.RN) return
+
+        const role = this.role as 'remoteDefender'
+
+        // If the creep's remote no longer is managed by its commune
+
+        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
+            // Delete it from memory and try to find a new one
+
+            delete this.memory.RN
+            if (!this.findRemote()) return
+        }
+
+        if (this.dying) return
+
+        // Reduce remote need
+
+        Memory.rooms[this.memory.RN].needs[RemoteNeeds.minDamage] -= this.attackStrength
+        Memory.rooms[this.memory.RN].needs[RemoteNeeds.minHeal] -= this.healStrength
+
+        const commune = this.commune
+
+        // Add the creep to creepsFromRoomWithRemote relative to its remote
+
+        if (commune.creepsFromRoomWithRemote[this.memory.RN])
+            commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
+    }
+
     /**
      * Finds a remote to defend
      */
@@ -234,16 +263,18 @@ export class RemoteDefender extends Creep {
 
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goals: [{
-                        pos: new RoomPosition(25, 25, creep.commune.name),
-                        range: 25,
-                    }],
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.commune.name),
+                            range: 25,
+                        },
+                    ],
                     typeWeights: {
                         enemy: Infinity,
                         ally: Infinity,
                         keeper: Infinity,
                         enemyRemote: Infinity,
-                        allyRemote: Infinity
+                        allyRemote: Infinity,
                     },
                 })
 
@@ -282,47 +313,20 @@ export class RemoteDefender extends Creep {
 
             creep.createMoveRequest({
                 origin: creep.pos,
-                goals: [{
-                    pos: new RoomPosition(25, 25, creep.memory.RN),
-                    range: 25,
-                }],
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, creep.memory.RN),
+                        range: 25,
+                    },
+                ],
                 typeWeights: {
                     enemy: Infinity,
                     ally: Infinity,
                     keeper: Infinity,
                     enemyRemote: Infinity,
-                    allyRemote: Infinity
+                    allyRemote: Infinity,
                 },
             })
         }
-    }
-
-    preTickManager(): void {
-        if (!this.memory.RN) return
-
-        const role = this.role as 'remoteDefender'
-
-        // If the creep's remote no longer is managed by its commune
-
-        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
-            // Delete it from memory and try to find a new one
-
-            delete this.memory.RN
-            if (!this.findRemote()) return
-        }
-
-        // Reduce remote need
-
-        if (Memory.rooms[this.memory.RN].needs) {
-            Memory.rooms[this.memory.RN].needs[RemoteNeeds.minDamage] -= this.attackStrength
-            Memory.rooms[this.memory.RN].needs[RemoteNeeds.minHeal] -= this.healStrength
-        }
-
-        const commune = this.commune
-
-        // Add the creep to creepsFromRoomWithRemote relative to its remote
-
-        if (commune.creepsFromRoomWithRemote[this.memory.RN])
-            commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
     }
 }

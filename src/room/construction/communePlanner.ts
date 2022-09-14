@@ -46,7 +46,7 @@ export class CommunePlanner {
     public run() {}
     private flipStampVertical() {}
     private flipStampHorizontal() {}
-    private planStamp() {}
+    private planStamp(startPos: Coord) {}
     private planSourceStructures() {}
 }
 
@@ -729,12 +729,15 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
-    if (!planStamp({
-        stampType: 'observer',
-        count: 1,
-        startCoords: [fastFillerHubAnchor],
-        coordMap: room.roadCoords,
-    })) return 'failed'
+    if (
+        !planStamp({
+            stampType: 'observer',
+            count: 1,
+            startCoords: [fastFillerHubAnchor],
+            coordMap: room.roadCoords,
+        })
+    )
+        return 'failed'
 
     const observerAnchor = unpackAsRoomPos(room.memory.stampAnchors.observer[0], room.name)
 
@@ -745,7 +748,7 @@ export function basePlanner(room: Room) {
         observerAnchor.y + 3,
     )
 
-    if(!room.unprotectedCoords) room.findUnprotectedCoords()
+    if (!room.unprotectedCoords) room.findUnprotectedCoords()
 
     for (const coord of adjacentCoords) {
         // If the coord is probably not protected

@@ -955,6 +955,8 @@ Room.prototype.spawnRequester = function () {
         )
     }
 
+    let remoteHaulerNeed = 0
+
     const remoteNamesByEfficacy = this.remoteNamesBySourceEfficacy
 
     for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
@@ -972,60 +974,33 @@ Room.prototype.spawnRequester = function () {
             Math.max(remoteNeeds[RemoteNeeds.minDamage], 0) +
             Math.max(remoteNeeds[RemoteNeeds.minHeal], 0)
 
+        const remoteMemory = Memory.rooms[remoteName]
+
+        if (!remoteMemory.needs[RemoteNeeds.enemyReserved] && !remoteMemory.abandoned) {
+            const remote = Game.rooms[remoteName]
+            const isReserved =
+                remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
+
+            // Loop through each index of sourceEfficacies
+
+            for (let index = 0; index < remoteMemory.SE.length; index += 1) {
+                // Get the income based on the reservation of the this and remoteHarvester need
+                // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
+
+                const income =
+                    Math.max((isReserved ? 10 : 5) -
+                    Math.floor(Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]], 0) * minHarvestWorkRatio), 0)
+
+                // Find the number of carry parts required for the source, and add it to the remoteHauler need
+
+                remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SE[index], income)
+                customLog(remoteName + ' Needs', remoteHaulerNeed + ', ' + income + ', ' + remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]])
+            }
+        }
+
         // If there is a need for any econ creep, inform the index
 
         if (totalRemoteNeed <= 0) continue
-
-        const remoteMemory = Memory.rooms[remoteName]
-
-        //This is the same formula used to calculate the harvester's priorities, plus a smidge, so it'll spawn the
-        //  harvester, then it's supporting items.
-        let bestSe = remoteMemory.SE[0]
-        if (remoteMemory.SE.length > 0) bestSe = Math.min(bestSe, remoteMemory.SE[1])
-
-        const basePriorityForCurrentRemote = minRemotePriority + 1 + bestSe / 100 + 0.01
-
-        /*
-        remoteHaulerNeed += remoteNeeds[RemoteNeeds.remoteHauler]
- */
-
-        if (!remoteMemory.needs[RemoteNeeds.enemyReserved]) {
-            // Loop through each index of sourceEfficacies
-
-            for (let sourceIndex = 0; sourceIndex < remoteMemory.SE.length; sourceIndex += 1) {
-                let remoteHaulerNeed = remoteMemory.needs[RemoteNeeds[remoteHaulerRoles[sourceIndex]]]
-                const priority = minRemotePriority + 1 + remoteMemory.SE[sourceIndex] / 100 + 0.01
-                // Construct requests for remoteHaulers
-
-                this.constructSpawnRequests(
-                    ((): SpawnRequestOpts | false => {
-                        console.log(this.name + ' needs ' + remoteHaulerNeed)
-                        if (remoteHaulerNeed === 0) return false
-
-                        partsMultiplier = remoteHaulerNeed
-
-                        const role = 'remoteHauler'
-
-                        return {
-                            role,
-                            defaultParts: [],
-                            extraParts: [CARRY, MOVE],
-                            threshold: 0.0,
-                            partsMultiplier,
-                            maxCreeps: Infinity,
-                            minCost: 100,
-                            maxCostPerCreep: this.memory.MHC,
-                            priority: priority,
-                            spawningGroup: this.creepsFromRoomWithRemote[remoteName]['remoteHauler' + sourceIndex],
-                            memoryAdditions: {
-                                RN: remoteName,
-                                SI: sourceIndex as 0 | 1,
-                            },
-                        }
-                    })(),
-                )
-            }
-        }
 
         // Construct requests for remoteReservers
 
@@ -1034,8 +1009,8 @@ Room.prototype.spawnRequester = function () {
                 // If there are insufficient harvesters for the remote's sources
 
                 if (
-                    this.creepsFromRoomWithRemote[remoteName].source1RemoteHarvester.length +
-                        this.creepsFromRoomWithRemote[remoteName].source2RemoteHarvester.length ==
+                    Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
+                        Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0) >
                     0
                 )
                     return false
@@ -1061,7 +1036,7 @@ Room.prototype.spawnRequester = function () {
                     minCreeps: 1,
                     maxCreeps: Infinity,
                     minCost: cost,
-                    priority: basePriorityForCurrentRemote + 0.01,
+                    priority: minRemotePriority + 1,
                     memoryAdditions: {
                         RN: remoteName,
                     },
@@ -1115,7 +1090,7 @@ Room.prototype.spawnRequester = function () {
                     spawningGroup: this.creepsFromRoomWithRemote[remoteName].remoteDefender,
                     minCreeps: 1,
                     minCost,
-                    priority: basePriorityForCurrentRemote - 3,
+                    priority: minRemotePriority - 3,
                     memoryAdditions: {},
                 }
             })(),
@@ -1145,7 +1120,7 @@ Room.prototype.spawnRequester = function () {
                     spawningGroup: this.creepsFromRoomWithRemote[remoteName].remoteCoreAttacker,
                     minCreeps: 1,
                     minCost,
-                    priority: basePriorityForCurrentRemote - 2,
+                    priority: minRemotePriority - 2,
                     memoryAdditions: {
                         RN: remoteName,
                     },
@@ -1176,7 +1151,7 @@ Room.prototype.spawnRequester = function () {
                     spawningGroup: this.creepsFromRoomWithRemote[remoteName].remoteDismantler,
                     minCreeps: 1,
                     minCost: cost * 2,
-                    priority: basePriorityForCurrentRemote - 1,
+                    priority: minRemotePriority - 1,
                     memoryAdditions: {
                         RN: remoteName,
                     },
@@ -1184,6 +1159,51 @@ Room.prototype.spawnRequester = function () {
             })(),
         )
     }
+    customLog('REMOTE HAULER NEED', remoteHaulerNeed)
+    // Construct requests for remoteHaulers
+
+    this.constructSpawnRequests(
+        ((): SpawnRequestOpts | false => {
+            if (remoteHaulerNeed === 0) return false
+
+            /*
+               // If all RCL 3 extensions are built
+               if (spawnEnergyCapacity >= 800) {
+                    partsMultiplier = remoteHaulerNeed / 2
+                    return {
+                         defaultParts: [],
+                         extraParts: [CARRY, CARRY, MOVE],
+                         threshold: 0.1,
+                         partsMultiplier,
+                         maxCreeps: Infinity,
+                         minCost: 150,
+                         maxCostPerCreep: this.memory.MHC,
+                         priority: minRemotePriority - 0.2,
+                         memoryAdditions: {
+                              role: 'remoteHauler',
+                              R: true,
+                         },
+                    }
+               }
+ */
+            partsMultiplier = remoteHaulerNeed
+
+            const role = 'remoteHauler'
+
+            return {
+                role,
+                defaultParts: [],
+                extraParts: [CARRY, MOVE],
+                threshold: 0.1,
+                partsMultiplier,
+                maxCreeps: Infinity,
+                minCost: 100,
+                maxCostPerCreep: this.memory.MHC,
+                priority: minRemotePriority,
+                memoryAdditions: {},
+            }
+        })(),
+    )
 
     // Construct requests for scouts
 

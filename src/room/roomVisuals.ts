@@ -10,70 +10,64 @@ import {
     stamps,
 } from 'international/constants'
 import { customLog, findObjectWithID, unpackAsPos } from 'international/generalFunctions'
+import { RoomManager } from './roomManager'
 
-Room.prototype.roomVisualsManager = function () {
-    // If CPU logging is enabled, get the CPU used at the start
+export class RoomVisualsManager {
+    roomManager: RoomManager
 
-    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
-    ;(() => {
-        if (!Memory.baseVisuals) return
+    constructor(roomManager: RoomManager) {
+        this.roomManager = roomManager
+    }
 
-        if (!this.memory.PC) return
+    public run() {
+        // If CPU logging is enabled, get the CPU used at the start
 
-        for (const stampType in stamps) {
-            const stamp = stamps[stampType as StampTypes]
+        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-            for (const packedStampAnchor of this.memory.stampAnchors[stampType as StampTypes]) {
-                const stampAnchor = unpackAsPos(packedStampAnchor)
+        this.roomVisuals()
+        this.baseVisuals()
 
-                for (const structureType in stamp.structures) {
-                    if (structureType === 'empty') continue
+        // If CPU logging is enabled, log the CPU used by this.roomManager.room manager
 
-                    for (const pos of stamp.structures[structureType]) {
-                        // Re-assign the pos's x and y to align with the offset
+        if (Memory.CPULogging)
+            customLog(
+                'Room Visuals Manager',
+                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+                undefined,
+                myColors.lightGrey,
+            )
+    }
 
-                        const x = pos.x + stampAnchor.x - stamp.offset
-                        const y = pos.y + stampAnchor.y - stamp.offset
+    private roomVisuals() {
+        // Stop if roomVisuals are disabled
 
-                        this.visual.structure(x, y, structureType as StructureConstant, {
-                            opacity: 0.3,
-                        })
-                    }
-                }
-            }
-        }
+        if (!Memory.roomVisuals) return
 
-        this.visual.connectRoads({
-            opacity: 0.3,
-        })
-    })()
+        this.controllerVisuals()
+        this.spawnVisuals()
+        this.cSiteTargetVisuals()
+        this.sourceVisuals()
+    }
 
-    // Stop if roomVisuals are disabled
-
-    if (!Memory.roomVisuals) return
-
-    // If there is an anchor, show a rectangle around it
-
-    if (this.anchor)
-        this.visual.rect(this.anchor.x - 0.5, this.anchor.y - 0.5, 1, 1, {
-            stroke: myColors.lightBlue,
-            fill: 'transparent',
-        })
-    ;(() => {
+    private controllerVisuals() {
         // Stop if there is no controller
 
-        if (!this.controller) return
+        if (!this.roomManager.room.controller) return
 
         // If the controller is mine
 
-        if (this.controller.my) {
+        if (this.roomManager.room.controller.my) {
             // If the controller level is less than 8, show percentage to next level
 
-            if (this.controller.level < 8)
-                this.visual.text(
-                    `%${((this.controller.progress / this.controller.progressTotal) * 100).toFixed(2)}`,
-                    this.controller.pos.x,
-                    this.controller.pos.y - 1,
+            if (this.roomManager.room.controller.level < 8)
+                this.roomManager.room.visual.text(
+                    `%${(
+                        (this.roomManager.room.controller.progress /
+                            this.roomManager.room.controller.progressTotal) *
+                        100
+                    ).toFixed(2)}`,
+                    this.roomManager.room.controller.pos.x,
+                    this.roomManager.room.controller.pos.y - 1,
                     {
                         backgroundColor: 'rgb(255, 0, 0, 0)',
                         font: 0.5,
@@ -86,25 +80,29 @@ Room.prototype.roomVisualsManager = function () {
 
             // Show the controller's level
 
-            this.visual.text(`${this.controller.level}`, this.controller.pos, {
-                backgroundColor: 'rgb(255, 0, 0, 0)',
-                font: 0.5,
-                opacity: 0.8,
-            })
+            this.roomManager.room.visual.text(
+                `${this.roomManager.room.controller.level}`,
+                this.roomManager.room.controller.pos,
+                {
+                    backgroundColor: 'rgb(255, 0, 0, 0)',
+                    font: 0.5,
+                    opacity: 0.8,
+                },
+            )
             return
         }
 
         // If the controller is reserved
 
-        if (this.controller.reservation) {
+        if (this.roomManager.room.controller.reservation) {
             // Define the reservationColor based on some conditions
 
             const color = () => {
-                if (this.controller.reservation.username === Memory.me) {
+                if (this.roomManager.room.controller.reservation.username === Memory.me) {
                     return myColors.lightBlue
                 }
 
-                if (Memory.allyList.includes(this.controller.reservation.username)) {
+                if (Memory.allyList.includes(this.roomManager.room.controller.reservation.username)) {
                     return myColors.green
                 }
 
@@ -113,20 +111,25 @@ Room.prototype.roomVisualsManager = function () {
 
             // Show the reservation time
 
-            this.visual.text(`${this.controller.reservation.ticksToEnd}`, this.controller.pos, {
-                backgroundColor: 'rgb(255, 0, 0, 0)',
-                font: 0.5,
-                opacity: 0.8,
-                color: color(),
-                stroke: myColors.darkBlue,
-                strokeWidth: 0.04,
-            })
+            this.roomManager.room.visual.text(
+                `${this.roomManager.room.controller.reservation.ticksToEnd}`,
+                this.roomManager.room.controller.pos,
+                {
+                    backgroundColor: 'rgb(255, 0, 0, 0)',
+                    font: 0.5,
+                    opacity: 0.8,
+                    color: color(),
+                    stroke: myColors.darkBlue,
+                    strokeWidth: 0.04,
+                },
+            )
         }
-    })()
-    ;(() => {
+    }
+
+    private spawnVisuals() {
         // Get the spawns in the room
 
-        const spawns = this.structures.spawn
+        const spawns = this.roomManager.room.structures.spawn
 
         // Loop through them
 
@@ -142,7 +145,7 @@ Room.prototype.roomVisualsManager = function () {
 
             // Otherwise display the role of the creep being spawn
 
-            this.visual.text(creep.role, spawn.pos, {
+            this.roomManager.room.visual.text(creep.role, spawn.pos, {
                 backgroundColor: 'rgb(255, 0, 0, 0)',
                 font: 0.5,
                 opacity: 1,
@@ -153,59 +156,90 @@ Room.prototype.roomVisualsManager = function () {
 
             // And display how many ticks left until spawned
 
-            this.visual.text((spawn.spawning.remainingTime - 1).toString(), spawn.pos.x, spawn.pos.y - 1, {
-                backgroundColor: 'rgb(255, 0, 0, 0)',
-                font: 0.5,
-                opacity: 1,
-                color: myColors.lightBlue,
-                stroke: myColors.darkBlue,
-                strokeWidth: 0.04,
-            })
-        }
-    })()
-    ;(() => {
-        // If there is not a cSiteTargetID, stop
-
-        if (!this.memory.cSiteTargetID) return
-
-        // Convert the construction target ID into a game object
-
-        const constructionTarget = findObjectWithID(this.memory.cSiteTargetID)
-
-        // If the constructionTarget exists, show visuals for it
-
-        if (constructionTarget) this.visual.text('🚧', constructionTarget.pos)
-    })()
-
-    for (const source of this.sources) {
-        if (this.memory.T == 'remote') {
-            if (this.memory.needs && this.memory.needs.length > 10) {
-            }
-
-            this.visual.text(
-                `${this.memory.needs[RemoteNeeds_HarvesterByIndex[source.index]]} / ${
-                    this.memory.needs[RemoteNeeds_HaulerByIndex[source.index]]
-                }`,
-                source.pos,
+            this.roomManager.room.visual.text(
+                (spawn.spawning.remainingTime - 1).toString(),
+                spawn.pos.x,
+                spawn.pos.y - 1,
                 {
                     backgroundColor: 'rgb(255, 0, 0, 0)',
                     font: 0.5,
-                    opacity: 0.8,
+                    opacity: 1,
+                    color: myColors.lightBlue,
                     stroke: myColors.darkBlue,
                     strokeWidth: 0.04,
-                    color: myColors.lightBlue,
                 },
             )
         }
     }
 
-    // If CPU logging is enabled, log the CPU used by this manager
+    private cSiteTargetVisuals() {
+        // If there is not a cSiteTargetID, stop
 
-    if (Memory.CPULogging)
-        customLog(
-            'Room Visuals Manager',
-            (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-            undefined,
-            myColors.lightGrey,
-        )
+        if (!this.roomManager.room.memory.cSiteTargetID) return
+
+        // Convert the construction target ID into a game object
+
+        const constructionTarget = findObjectWithID(this.roomManager.room.memory.cSiteTargetID)
+
+        // If the constructionTarget exists, show visuals for it
+
+        if (constructionTarget) this.roomManager.room.visual.text('🚧', constructionTarget.pos)
+    }
+
+    private sourceVisuals() {
+        for (const source of this.roomManager.room.sources) {
+            if (this.roomManager.room.memory.T == 'remote') {
+                if (this.roomManager.room.memory.needs && this.roomManager.room.memory.needs.length > 10) {
+                }
+
+                this.roomManager.room.visual.text(
+                    `${this.roomManager.room.memory.needs[RemoteNeeds_HarvesterByIndex[source.index]]} / ${
+                        this.roomManager.room.memory.needs[RemoteNeeds_HaulerByIndex[source.index]]
+                    }`,
+                    source.pos,
+                    {
+                        backgroundColor: 'rgb(255, 0, 0, 0)',
+                        font: 0.5,
+                        opacity: 0.8,
+                        stroke: myColors.darkBlue,
+                        strokeWidth: 0.04,
+                        color: myColors.lightBlue,
+                    },
+                )
+            }
+        }
+    }
+
+    private baseVisuals() {
+        if (!Memory.baseVisuals) return
+
+        if (!this.roomManager.room.memory.PC) return
+
+        for (const stampType in stamps) {
+            const stamp = stamps[stampType as StampTypes]
+
+            for (const packedStampAnchor of this.roomManager.room.memory.stampAnchors[stampType as StampTypes]) {
+                const stampAnchor = unpackAsPos(packedStampAnchor)
+
+                for (const structureType in stamp.structures) {
+                    if (structureType === 'empty') continue
+
+                    for (const pos of stamp.structures[structureType]) {
+                        // Re-assign the pos's x and y to align with the offset
+
+                        const x = pos.x + stampAnchor.x - stamp.offset
+                        const y = pos.y + stampAnchor.y - stamp.offset
+
+                        this.roomManager.room.visual.structure(x, y, structureType as StructureConstant, {
+                            opacity: 0.3,
+                        })
+                    }
+                }
+            }
+        }
+
+        this.roomManager.room.visual.connectRoads({
+            opacity: 0.3,
+        })
+    }
 }

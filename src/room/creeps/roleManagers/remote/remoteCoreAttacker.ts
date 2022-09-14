@@ -2,6 +2,11 @@ import { RemoteNeeds } from 'international/constants'
 import { getRange } from 'international/generalFunctions'
 
 export class RemoteCoreAttacker extends Creep {
+
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
+
     public get dying() {
         // Inform as dying if creep is already recorded as dying
 
@@ -18,6 +23,34 @@ export class RemoteCoreAttacker extends Creep {
         // Record creep as dying
 
         return (this._dying = true)
+    }
+
+    preTickManager(): void {
+        if (!this.memory.RN) return
+
+        const role = this.role as 'remoteCoreAttacker'
+
+        // If the creep's remote no longer is managed by its commune
+
+        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
+            // Delete it from memory and try to find a new one
+
+            delete this.memory.RN
+            if (!this.findRemote()) return
+        }
+
+        if (this.dying) return
+
+        // Reduce remote need
+
+        Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= 1
+
+        const commune = this.commune
+
+        // Add the creep to creepsFromRoomWithRemote relative to its remote
+
+        if (commune.creepsFromRoomWithRemote[this.memory.RN])
+            commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
     }
 
     /**
@@ -96,36 +129,6 @@ export class RemoteCoreAttacker extends Creep {
         })
 
         return true
-    }
-
-    preTickManager(): void {
-        if (!this.memory.RN) return
-
-        const role = this.role as 'remoteCoreAttacker'
-
-        // If the creep's remote no longer is managed by its commune
-
-        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
-            // Delete it from memory and try to find a new one
-
-            delete this.memory.RN
-            if (!this.findRemote()) return
-        }
-
-        // Reduce remote need
-
-        if (Memory.rooms[this.memory.RN].needs) Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= 1
-
-        const commune = this.commune
-
-        // Add the creep to creepsFromRoomWithRemote relative to its remote
-
-        if (commune.creepsFromRoomWithRemote[this.memory.RN])
-            commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
-    }
-
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
     }
 
     static remoteCoreAttackerManager(room: Room, creepsOfRole: string[]) {

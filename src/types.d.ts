@@ -908,8 +908,6 @@ declare global {
 
         allyCreepRequestManager(): void
 
-        remotesManager(): void
-
         haulerSizeManager(): void
 
         trafficManager(): void

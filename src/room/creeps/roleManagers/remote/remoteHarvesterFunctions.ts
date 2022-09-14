@@ -44,7 +44,7 @@ export class RemoteHarvester extends Creep {
     }
 
     preTickManager(): void {
-        if (!this.memory.RN) return
+        if (!this.findRemote()) return
 
         const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
@@ -57,12 +57,17 @@ export class RemoteHarvester extends Creep {
             if (!this.findRemote()) return
         }
 
-        const commune = this.commune
-
         if (this.dying) return
 
+        // Reduce remote need
+
+        Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= this.parts.work
+
+        const commune = this.commune
+
         // Add the creep to creepsFromRoomWithRemote relative to its remote
-        if (commune.creepsFromRoomWithRemote[this.memory.RN])
+
+        if (commune && commune.creepsFromRoomWithRemote[this.memory.RN])
             commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
     }
 
@@ -98,23 +103,23 @@ export class RemoteHarvester extends Creep {
     assignRemote?(remoteName: string) {
         this.memory.RN = remoteName
 
-        // if (this.dying) return
+        if (this.dying) return
 
-        // const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+        const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
-        // const needs = Memory.rooms[remoteName].needs
+        const needs = Memory.rooms[remoteName].needs
 
-        // needs[RemoteNeeds[role]] -= this.parts.work
+        needs[RemoteNeeds[role]] -= this.parts.work
     }
 
     removeRemote?() {
-        // if (!this.dying) {
-        //     const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+        if (!this.dying) {
+            const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
-        //     const needs = Memory.rooms[this.memory.RN].needs
+            const needs = Memory.rooms[this.memory.RN].needs
 
-        //     needs[RemoteNeeds[role]] += this.parts.work
-        // }
+            needs[RemoteNeeds[role]] += this.parts.work
+        }
 
         delete this.memory.RN
     }
@@ -125,18 +130,6 @@ export class RemoteHarvester extends Creep {
         if (this.travelToSource(this.memory.SI)) return
 
         // Try to normally harvest. Iterate if creep harvested
-
-        //See if there's a hauler to tranfer to if we're full so we're not drop mining.
-        //   This shouldn't run if we're container mining however.
-        if(this.store.getFreeCapacity() <= this.getActiveBodyparts(WORK)) {
-            let haulers = this.room.myCreeps.remoteHauler?.map(name => Game.creeps[name] as RemoteHauler)
-            if(haulers && haulers.length > 0) {
-                let nearby = haulers.find(haul => haul.pos.isNearTo(this.pos))
-                if(nearby) {
-                    this.transfer(nearby, RESOURCE_ENERGY)
-                }
-            }
-        }
 
         if (this.advancedHarvestSource(this.room.sources[this.memory.SI])) return
     }
@@ -212,7 +205,7 @@ export class RemoteHarvester extends Creep {
                     ally: Infinity,
                     keeper: Infinity,
                     enemyRemote: Infinity,
-                    allyRemote: Infinity
+                    allyRemote: Infinity,
                 },
             })
         }

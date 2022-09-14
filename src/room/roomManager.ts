@@ -1,14 +1,17 @@
 import { CreepRoleManager } from "./creeps/creepRoleManager"
 import { EndTickCreepManager } from "./creeps/endTickCreepManager"
+import { RoomVisualsManager } from "./roomVisuals"
 
 export class RoomManager {
 
     creepRoleManager: CreepRoleManager
     endTickCreepManager: EndTickCreepManager
+    roomVisualsManager: RoomVisualsManager
 
     constructor() {
         this.creepRoleManager = new CreepRoleManager(this)
         this.endTickCreepManager = new EndTickCreepManager(this)
+        this.roomVisualsManager = new RoomVisualsManager(this)
     }
 
     room: Room
@@ -20,6 +23,6 @@ export class RoomManager {
     public run() {
         this.creepRoleManager.run()
         this.endTickCreepManager.run()
-        this.room.roomVisualsManager()
+        this.roomVisualsManager.run()
     }
 }
