@@ -1,8 +1,19 @@
+# Build
 /dist
+
+# User's Push Information
+screeps.json
+
+# Visual Studio cache/options directory
+.vs
+
+# npm
+node_modules
+package-lock.json
+
+# Other Stuff
+.env
+log.log
+push.log
 /.VSCodeCounter
 tmp-test-server
-
-node_modules
-screeps.json
-.env
-.vs

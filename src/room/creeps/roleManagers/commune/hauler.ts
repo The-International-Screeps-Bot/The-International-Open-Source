@@ -1,122 +1,176 @@
-import { customLog } from 'international/generalFunctions'
-import { Hauler } from '../../creepClasses'
+import { customLog, findClosestObject, getRange } from 'international/generalFunctions'
 
-export function haulerManager(room: Room, creepsOfRole: string[]) {
-     // Loop through creep names of this role
+export class Hauler extends Creep {
 
-     for (const creepName of creepsOfRole) {
-          // Get the creep using its name
+    haul?() {
+        this.reserve()
 
-          const creep: Hauler = Game.creeps[creepName]
+        if (!this.fulfillReservation()) {
+            this.say(this.message)
+            return
+        }
 
-          creep.advancedRenew()
+        this.reserve()
 
-          if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserve()
+        if (!this.fulfillReservation()) {
+            this.say(this.message)
+            return
+        }
 
-          if (!creep.fulfillReservation()) {
+        if (this.message.length) this.say(this.message)
+    }
 
-               creep.say(creep.message)
-               continue
-          }
+    reserve?() {
+        if (this.memory.reservations?.length) return
 
-          creep.reserve()
+        const { room } = this
 
-          if (!creep.fulfillReservation()) {
+        let withdrawTargets = room.MAWT.filter(target => {
+            if (target instanceof Resource)
+                return (
+                    target.reserveAmount >= this.store.getCapacity() * 0.2 || target.reserveAmount >= this.freeStore()
+                )
 
-               creep.say(creep.message)
-               continue
-          }
+            return target.store.energy >= this.freeStore()
+        })
 
-          if (creep.message.length) creep.say(creep.message)
-     }
-}
+        let transferTargets
 
-Hauler.prototype.reserve = function () {
-     const { room } = this
+        let target
+        let amount
 
-     let withdrawTargets = room.MAWT.filter(target => {
-          if (target instanceof Resource)
-               return (
-                    target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
-                    target.reserveAmount >= this.freeStore(RESOURCE_ENERGY)
-               )
+        if (this.needsResources()) {
+            if (withdrawTargets.length) {
+                target = findClosestObject(this.pos, withdrawTargets)
 
-          return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
-     })
+                if (target instanceof Resource) amount = target.reserveAmount
+                else amount = Math.min(this.freeStore(), target.store.energy)
 
-     let transferTargets
+                this.createReservation('withdraw', target.id, amount)
+                return
+            }
 
-     let target
-     let amount
+            transferTargets = room.MATT.filter(function (target) {
+                return target.freeStore() > 0
+            })
 
-     if (this.needsResources()) {
+            if (transferTargets.length == 0) {
+                transferTargets = room.METT.filter(function (target) {
+                    return target.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                })
+            }
 
-          if (withdrawTargets.length) {
+            transferTargets = transferTargets.concat(
+                room.MEFTT.filter(target => {
+                    return (
+                        (target.freeStore() >= this.store.energy && this.store.energy > 0) ||
+                        target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.energy + this.freeStore()
+                    )
+                }),
+            )
 
-               target = this.pos.findClosestByRange(withdrawTargets)
-
-               if (target instanceof Resource)
-                    amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.reserveAmount)
-               else amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.store.energy)
-
-               this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
-               return
-          }
-
-          transferTargets = room.MATT.filter(function (target) {
-               return target.freeSpecificStore(RESOURCE_ENERGY) > 0
-          })
-
-          if (transferTargets.length) {
-               withdrawTargets = room.OAWT.filter(target => {
+            if (transferTargets.length) {
+                withdrawTargets = room.OAWT.filter(target => {
                     if (target instanceof Resource)
-                         return (
-                              target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
-                              target.reserveAmount >= this.freeStore(RESOURCE_ENERGY)
-                         )
+                        return (
+                            target.reserveAmount >= this.store.getCapacity() * 0.2 ||
+                            target.reserveAmount >= this.freeStore()
+                        )
 
-                    return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
-               })
+                    return target.store.energy >= this.freeStore()
+                })
 
-               if (!withdrawTargets.length) return
+                if (!withdrawTargets.length) return
 
-               target = this.pos.findClosestByRange(withdrawTargets)
+                target = findClosestObject(this.pos, withdrawTargets)
 
-               if (target instanceof Resource)
-                    amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.reserveAmount)
-               else amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.store.energy)
+                if (target instanceof Resource) amount = target.reserveAmount
+                else amount = Math.min(this.freeStore(), target.store.energy)
 
-               this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
-               return
-          }
+                this.createReservation('withdraw', target.id, amount)
+                return
+            }
+        }
 
-          return
-     }
+        if (!transferTargets) {
+            transferTargets = room.MATT.filter(function (target) {
+                return target.freeSpecificStore(RESOURCE_ENERGY) > 0
+            })
 
-     if (!transferTargets) transferTargets = room.MATT.filter(function (target) {
-          return target.freeSpecificStore(RESOURCE_ENERGY) > 0
-     })
+            transferTargets = transferTargets.concat(
+                room.MEFTT.filter(target => {
+                    return (
+                        (target.freeStore() >= this.store.energy && this.store.energy > 0) ||
+                        target.freeSpecificStore(RESOURCE_ENERGY) >= this.store.energy + this.freeStore()
+                    )
+                }),
+            )
+        }
 
-     if (transferTargets.length) {
+        if (transferTargets.length) {
+            target = transferTargets.sort((a, b) => {
+                return (
+                    getRange(this.pos.x, a.pos.x, this.pos.y, a.pos.y) +
+                    a.store.energy * 0.05 -
+                    (getRange(this.pos.x, b.pos.x, this.pos.y, b.pos.y) + b.store.energy * 0.05)
+                )
+            })[0]
 
-          target = this.pos.findClosestByRange(transferTargets)
+            amount = Math.min(Math.max(this.store.energy, 0), target.freeSpecificStore(RESOURCE_ENERGY))
 
-          amount = Math.min(this.usedStore(), target.freeStore(RESOURCE_ENERGY))
+            if (amount > 0) {
+                this.createReservation('transfer', target.id, amount)
+                return
+            }
+        }
 
-          this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
-          return
-     }
+        transferTargets = room.OATT.filter(target => {
+            return target.freeStore() >= this.store.energy
+        })
 
-     transferTargets = room.OATT.filter(target => {
-          return target.freeStore(RESOURCE_ENERGY) >= this.usedStore()
-     })
+        if (transferTargets.length) {
+            target = findClosestObject(this.pos, transferTargets)
 
-     if (!transferTargets.length) return
+            amount = Math.min(Math.max(this.store.energy, 0), target.freeStore())
 
-     target = this.pos.findClosestByRange(transferTargets)
+            this.createReservation('transfer', target.id, amount)
+        }
 
-     amount = this.usedStore()
+        if (this.memory.reservations?.length == 0) {
+            //Empty out the creep if it has anything left by this point.
+            if (this.store.getUsedCapacity() > 0) {
+                let target = room.OATT[0]
+                if (target)
+                    for (let rsc in this.store) {
+                        this.createReservation(
+                            'transfer',
+                            target.id,
+                            this.store[rsc as ResourceConstant],
+                            rsc as ResourceConstant,
+                        )
+                    }
+            }
+        }
 
-     this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
-     return
+        if (this.memory.reservations?.length == 0 && room.communeManager.labManager)
+            room.communeManager.labManager.generateHaulingReservation(this)
+    }
+
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
+
+    static haulerManager(room: Room, creepsOfRole: string[]) {
+        // Loop through creep names of this role
+
+        for (const creepName of creepsOfRole) {
+            // Get the creep using its name
+
+            const creep: Hauler = Game.creeps[creepName]
+
+            creep.advancedRenew()
+
+            creep.haul()
+        }
+    }
 }

@@ -1,6 +1,6 @@
-import { constants } from 'international/constants'
+import { myColors } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
-import { basePlanner } from './basePlanner'
+import { basePlanner } from './communePlanner'
 import { rampartPlanner } from './rampartPlanner'
 import './constructionFunctions'
 
@@ -8,41 +8,42 @@ import './constructionFunctions'
  * Creates construction sites and deletes structures in a room
  */
 export function constructionManager(room: Room) {
-     // If CPU logging is enabled, get the CPU used at the start
+    // If CPU logging is enabled, get the CPU used at the start
 
-     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-     if (!room.memory.planned) basePlanner(room)
+    if (!room.memory.PC) basePlanner(room)
 
-     manageControllerStructures()
+    manageControllerStructures()
 
-     function manageControllerStructures() {
+    function manageControllerStructures() {
+        const centerUpgradePos: RoomPosition | undefined = room.get('centerUpgradePos')
+        if (!centerUpgradePos) return
 
-          const centerUpgradePos: RoomPosition | undefined = room.get('centerUpgradePos')
-          if (!centerUpgradePos) return
+        if (room.controller.level >= 5) {
+            const controllerContainer = room.controllerContainer
+            if (controllerContainer) controllerContainer.destroy()
 
-          if (room.controller.level >= 5) {
-               const controllerContainer: StructureContainer | undefined = room.get('controllerContainer')
-               if (controllerContainer) controllerContainer.destroy()
+            room.createConstructionSite(centerUpgradePos, STRUCTURE_LINK)
+            return
+        }
 
-               room.createConstructionSite(centerUpgradePos, STRUCTURE_LINK)
-               return
-          }
+        room.createConstructionSite(centerUpgradePos, STRUCTURE_CONTAINER)
+    }
 
-          room.createConstructionSite(centerUpgradePos, STRUCTURE_CONTAINER)
-     }
+    room.clearOtherStructures()
 
-     // Use floodfill from the anchor to plan structures
+    // Use floodfill from the anchor to plan structures
 
-     room.communeConstructionPlacement()
+    room.communeConstructionPlacement()
 
-     // If CPU logging is enabled, log the CPU used by this manager
+    // If CPU logging is enabled, log the CPU used by this manager
 
-     if (Memory.cpuLogging)
-          customLog(
-               'Construction Manager',
-               `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}`,
-               undefined,
-               constants.colors.lightGrey,
-          )
+    if (Memory.CPULogging)
+        customLog(
+            'Construction Manager',
+            `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}`,
+            undefined,
+            myColors.lightGrey,
+        )
 }

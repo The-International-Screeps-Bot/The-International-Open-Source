@@ -3,9 +3,9 @@ const q = require('q')
 const _ = require('lodash')
 require('dotenv').config()
 
-const { setPassword, sleep, initServer, startServer, spawnBots, helpers, logConsole, followLog } = require('./helper')
+const { setPassword, sleep, initServer, startServer, spawnBots, helpers, followLog } = require('./helper')
 
-const { cliPort, verbose, tickDuration, playerRoom, players, rooms, milestones } = require('./config')
+const { cliPort, tickDuration, playerRooms, rooms, trackedRooms, milestones } = require('./config')
 
 const controllerRooms = {}
 const status = {}
@@ -21,7 +21,7 @@ process.once('SIGINT', code => {
      process.exit()
 })
 
-for (const room of rooms) {
+trackedRooms.forEach(room => {
      status[room] = {
           controller: null,
           creeps: 0,
@@ -29,12 +29,12 @@ for (const room of rooms) {
           level: 0,
           structures: 0,
      }
-}
+})
 
 let botsSpawned = false
 
 class Tester {
-     constructor(length) {
+     constructor() {
           this.roomsSeen = {}
           this.maxTicks;
           if (process.argv.length > 2) {
@@ -43,6 +43,10 @@ class Tester {
                } catch (e) {
                     console.log(`Cannot parse runtime argument ${process.argv} ${e}`)
                }
+          }
+
+          if (process.env.STEAM_API_KEY !== undefined &&process.env.STEAM_API_KEY.length === 0) {
+               process.env.STEAM_API_KEY = undefined
           }
      }
 
@@ -61,8 +65,8 @@ class Tester {
                }
                console.log(`> Start the simulation${appendix}`)
                if (this.maxTicks > 0) {
-                    // await sleep(this.maxRuntime);
                     while (lastTick === undefined || lastTick < this.maxTicks) {
+                         // if (lastTick % 50 === 0) handleStats();
                          await sleep(1)
                     }
                     console.log(`${lastTick} End of simulation`)
@@ -106,15 +110,15 @@ class Tester {
           socket.on('data', async raw => {
                const data = raw.toString('utf8')
                const line = data.replace(/^< /, '').replace(/\n< /, '')
-               if (await spawnBots(line, socket, rooms, players, tickDuration)) {
+               if (await spawnBots(line, socket, rooms, tickDuration)) {
                     botsSpawned = true
                     return
                }
 
-               if (setPassword(line, socket, rooms, this.roomsSeen, playerRoom)) {
-                    if (rooms.length === Object.keys(this.roomsSeen).length) {
+               if (setPassword(line, socket, rooms, this.roomsSeen, playerRooms)) {
+                    if (Object.keys(rooms).length === Object.keys(this.roomsSeen).length) {
                          console.log('> Listen to the log')
-                         followLog(rooms, logConsole, statusUpdater)
+                         followLog(trackedRooms, statusUpdater)
                          await sleep(5)
                          console.log(`> system.resumeSimulation()`)
                          socket.write(`system.resumeSimulation()\r\n`)
@@ -150,27 +154,7 @@ class Tester {
           }
           const end = Date.now()
           console.log(`${lastTick} seconds elapsed ${Math.floor((end - start) / 1000)}`)
-          /* eslint no-process-exit: "off" */
           process.exit(exitCode)
-     }
-}
-
-const printCurrentStatus = function (gameTime) {
-     if (!verbose) {
-          return
-     }
-     console.log('-------------------------------')
-     const keys = Object.keys(status)
-     keys.sort((a, b) => {
-          if (status[a].level === status[b].level) {
-               return status[a].progress - status[b].progress
-          }
-          return status[a].level - status[b].level
-     })
-     for (const key of keys) {
-          console.log(
-               `${gameTime} Status: room ${key} level: ${status[key].level} progress: ${status[key].progress} structures: ${status[key].structures} creeps: ${status[key].creeps}`,
-          )
      }
 }
 
@@ -182,13 +166,10 @@ const printCurrentStatus = function (gameTime) {
 const statusUpdater = event => {
      if (event.data.gameTime !== lastTick) {
           lastTick = event.data.gameTime
-          if (event.data.gameTime % 300 === 0) {
-               printCurrentStatus(event.data.gameTime)
-          }
           for (const milestone of milestones) {
                const failedRooms = []
                if (typeof milestone.success === 'undefined' || milestone.success === null) {
-                    let success = Object.keys(status).length === Object.keys(players).length
+                    let success = Object.keys(status).length === trackedRooms.length
                     for (const room of Object.keys(status)) {
                          for (const key of Object.keys(milestone.check)) {
                               if (status[room][key] < milestone.check[key]) {

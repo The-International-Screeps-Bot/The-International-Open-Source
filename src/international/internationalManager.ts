@@ -1,255 +1,353 @@
 import { allyManager } from 'international/simpleAllies'
-import { customLog, getAvgPrice } from './generalFunctions'
+import { createPosMap, customLog, getAvgPrice, packXY } from './generalFunctions'
 import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
-import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames } from './constants'
-import { statsManager, StatsManager } from './statsManager'
+import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames, myColors, roomDimensions } from './constants'
+
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
 export class InternationalManager {
-     // Functions
+    run() {
+        // If CPU logging is enabled, get the CPU used at the start
 
-     run?(): void
+        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-     /**
-      * Configures features like Memory, global and object prototypes required to run the bot
-      */
-     config?(): void
+        // Run prototypes
 
-     /**
-      * Configures tick important or tick-only pre-roomManager settings required to run the bot
-      */
-     tickConfig?(): void
+        this.tickConfig()
+        this.creepOrganizer()
+        this.constructionSiteManager()
+        this.orderManager()
 
-     /**
-      * Organizes creeps into properties for their communeName, and tracks total creep count
-      */
-     creepOrganizer?(): void
+        // Handle ally requests
 
-     /**
-      * Deletes or edits international classes
-      */
-     taskManager?(): void
+        allyManager.tickConfig()
+        allyManager.getAllyRequests()
+        ExecutePandaMasterCode()
 
-     /**
-      * Tracks and records constructionSites and thier age, deleting old sites
-      */
-     constructionSiteManager?(): void
+        if (Memory.CPULogging)
+            customLog(
+                'International Manager',
+                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+                myColors.white,
+                myColors.lightBlue,
+            )
+    }
 
-     /**
-      * Adds colours and annotations to the map if mapVisuals are enabled
-      */
-     mapVisualsManager?(): void
+    /**
+     * Removes inactive orders if the bot is reaching max orders
+     */
+    orderManager() {
+        // If there is sufficiently few orders
 
-     /**
-      * Handles logging, stat recording, and more at the end of the tick
-      */
-     endTickManager?(): void
+        if (MARKET_MAX_ORDERS * 0.8 > this.myOrdersCount) return
 
-     // Market functions
-     /**
-      * Gets sell orders for a resourceType below a specified price
-      */
-     getSellOrders?(resourceType: MarketResourceConstant, maxPrice?: number): Order[]
+        // Loop through my orders
 
-     /**
-      * Gets buy orders for a resourceType above a specified price
-      */
-     getBuyOrders?(resourceType: MarketResourceConstant, minPrice?: number): Order[]
+        for (const ID in Game.market.orders) {
+            // If the order is inactive (it likely has no remaining resources), delete it
 
-     advancedSellPixels?(): void
+            if (!Game.market.orders[ID].active) Game.market.cancelOrder(ID)
+        }
+    }
 
-     advancedGeneratePixel() {
-          if (!Memory.pixelGeneration) return
+    /**
+     * Finds the cheapest sell order
+     */
+    getSellOrder(resourceType: MarketResourceConstant, maxPrice = getAvgPrice(resourceType) * 1.2) {
+        const orders = this.orders.sell?.[resourceType] || []
 
-          // Stop if the bot is not running on MMO
+        let bestOrder: Order
 
-          if (!mmoShardNames.has(Game.shard.name)) return
+        for (const order of orders) {
+            if (order.price >= maxPrice) continue
 
-          // Stop if the cpu bucket isn't full
+            if (order.price < (bestOrder ? bestOrder.price : Infinity)) bestOrder = order
+        }
 
-          if (Game.cpu.bucket !== 10000) return
+        return bestOrder
+    }
 
-          // Try to generate a pixel
+    /**
+     * Finds the most expensive buy order
+     */
+    getBuyOrder(resourceType: MarketResourceConstant, minPrice = getAvgPrice(resourceType) * 0.8) {
+        const orders = this.orders.buy?.[resourceType] || []
 
-          Game.cpu.generatePixel()
-     }
+        let bestOrder: Order
 
-     /**
-      * My outgoing orders organized by room, order type and resourceType
-      */
-     _myOrders?: {
-          [key: string]: Partial<Record<string, Partial<Record<MarketResourceConstant, Order[]>>>>
-     }
+        for (const order of orders) {
+            if (order.price <= minPrice) continue
 
-     /**
-      * Gets my outgoing orders organized by room, order type and resourceType
-      */
-     get myOrders() {
-          // If _myOrders are already defined, inform them
+            if (order.price > (bestOrder ? bestOrder.price : 0)) bestOrder = order
+        }
 
-          if (this._myOrders) return this._myOrders
+        return bestOrder
+    }
 
-          this._myOrders = {}
+    /**
+     * Find the highest order and sell pixels to it
+     */
+    advancedSellPixels() {
+        if (!Memory.pixelSelling) return
 
-          // Loop through each orderID in the market's orders
+        if (Game.resources[PIXEL] === 0) return
 
-          for (const orderID in Game.market.orders) {
-               // Get the order using its ID
+        const avgPrice = getAvgPrice(PIXEL, 7)
 
-               const order = Game.market.orders[orderID]
+        const minPrice = avgPrice * 0.8
+        customLog('minPixelPrice', minPrice)
+        customLog('avgPixelPrice', avgPrice)
 
-               // If there is foundation for this structure, create it
+        const buyOrder = this.getBuyOrder(PIXEL, minPrice)
 
-               if (!this._myOrders[order.roomName]) {
-                    this._myOrders[order.roomName] = {
-                         sell: {},
-                         buy: {},
-                    }
-               }
+        if (buyOrder) {
+            Game.market.deal(buyOrder.id, Math.min(buyOrder.amount, Game.resources[PIXEL]))
+            return
+        }
 
-               // If there is no array for this structure, create one
+        const myPixelOrder = _.filter(Game.market.orders, o => (o.type == "sell" && o.resourceType == PIXEL))[0]
 
-               if (!this._myOrders[order.roomName][order.type][order.resourceType])
-                    this._myOrders[order.roomName][order.type][order.resourceType] = []
+        const sellOrder = this.getSellOrder(PIXEL, Infinity)
+        let price: number
+
+        if (sellOrder.price < avgPrice) {
+            price = avgPrice;
+        } else {
+            price = sellOrder.price
+        }
+
+        if (myPixelOrder) {
+            if (Game.time % 100 == 0) {
+                if (myPixelOrder.remainingAmount < Game.resources[PIXEL]) {
+                    Game.market.extendOrder(myPixelOrder.id, Game.resources[PIXEL] - myPixelOrder.remainingAmount)
+                    return
+                } else {
+                    if (myPixelOrder.price == price) return
+                    Game.market.changeOrderPrice(myPixelOrder.id, price - 0.001)
+                    return
+                }
+            } else {
+                return
+            }
+
+        }
+
+        Game.market.createOrder({
+            type: ORDER_SELL,
+            resourceType: PIXEL,
+            price: price - 0.001,
+            totalAmount: Game.resources[PIXEL],
+        })
+    }
 
-               // Add the order to the structure's array
+    advancedGeneratePixel() {
+        if (!Memory.pixelGeneration) return
 
-               this._myOrders[order.roomName][order.type][order.resourceType].push(order)
-          }
+        // Stop if the bot is not running on MMO
 
-          return this._myOrders
-     }
+        if (!mmoShardNames.has(Game.shard.name)) return
 
-     /**
-      * Existing other-player orders ordered by order type and resourceType
-      */
-     _orders?: Partial<Record<string, Partial<Record<MarketResourceConstant, Order[]>>>>
+        // Stop if the cpu bucket isn't full
 
-     /**
-      * Gets existing other-player orders ordered by order type and resourceType
-      */
-     get orders() {
-          // If _orders are already defined, inform them
+        if (Game.cpu.bucket !== 10000) return
 
-          if (this._orders) return this._orders
+        // Try to generate a pixel
 
-          this._orders = {
-               buy: {},
-               sell: {},
-          }
+        Game.cpu.generatePixel()
+    }
 
-          // Get the market's order and loop through them
+    getTerrainCoords(roomName: string) {
+        if (!global.terrainCoords) global.terrainCoords = {}
 
-          const orders = Game.market.getAllOrders()
+        if (global.terrainCoords[roomName]) return global.terrainCoords[roomName]
 
-          let order
+        global.terrainCoords[roomName] = new Uint8Array(2500)
 
-          for (const orderID in orders) {
-               // Get the order using its ID
+        const terrain = Game.map.getRoomTerrain(roomName)
 
-               order = orders[orderID]
+        for (let x = 0; x < roomDimensions; x += 1) {
+            for (let y = 0; y < roomDimensions; y += 1) {
+                global.terrainCoords[roomName][packXY(x, y)] = terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0
+            }
+        }
 
-               // Assign the order to a resource-ordered location, creating it if undefined
+        return global.terrainCoords[roomName]
+    }
 
-               this._orders[order.type][order.resourceType]
-                    ? this._orders[order.type][order.resourceType].push(order)
-                    : (this._orders[order.type][order.resourceType] = [order])
-          }
+    /**
+     * Configures tick important or tick-only pre-roomManager settings required to run the bot
+     */
+    tickConfig?(): void
 
-          return this._orders
-     }
+    /**
+     * Organizes creeps into properties for their communeName, and tracks total creep count
+     */
+    creepOrganizer?(): void
 
-     /**
-      * The number of orders owned by me
-      */
-     _myOrdersCount?: number
+    /**
+     * Tracks and records constructionSites and thier age, deleting old sites
+     */
+    constructionSiteManager?(): void
 
-     /**
-      * Gets the number of orders owned by me
-      */
-     get myOrdersCount() {
-          // If _myOrdersCount are already defined, inform them
+    /**
+     * Adds colours and annotations to the map if mapVisuals are enabled
+     */
+    mapVisualsManager?(): void
 
-          if (this._myOrdersCount) return this._myOrdersCount
+    /**
+     * Handles logging, stat recording, and more at the end of the tick
+     */
+    endTickManager?(): void
 
-          // Inform and set the number of my orders
+    /**
+     * Resets certain cached variables each tick
+     */
+    tickReset() {
+        delete this._myOrders
+        delete this._orders
+        delete this._myOrdersCount
+        delete this._claimRequestsByScore
+        delete this._defaultMinCacheAmount
+    }
 
-          return (this._myOrdersCount = Object.keys(Game.market.orders).length)
-     }
+    /**
+     * My outgoing orders organized by room, order type and resourceType
+     */
+    _myOrders: {
+        [roomName: string]: Partial<Record<string, Partial<Record<MarketResourceConstant, Order[]>>>>
+    }
 
-     _claimRequestsByScore: (string | undefined)[]
+    /**
+     * Gets my outgoing orders organized by room, order type and resourceType
+     */
+    get myOrders() {
+        // If _myOrders are already defined, inform them
 
-     get claimRequestsByScore(): (string | undefined)[] {
-          if (this._claimRequestsByScore) return this._claimRequestsByScore
+        if (this._myOrders) return this._myOrders
 
-          return (this._claimRequestsByScore = Object.keys(Memory.claimRequests).sort(
-               (a, b) => Memory.claimRequests[a].score - Memory.claimRequests[b].score,
-          ))
-     }
+        this._myOrders = {}
 
-     _defaultCacheAmount: number
+        // Loop through each orderID in the market's orders
 
-     get defaultCacheAmount() {
-          if (this._defaultCacheAmount) return this._defaultCacheAmount
+        for (const orderID in Game.market.orders) {
+            // Get the order using its ID
 
-          return Math.floor((CPUBucketCapacity - Game.cpu.bucket) / cacheAmountModifier) + 1
-     }
-}
+            const order = Game.market.orders[orderID]
 
-InternationalManager.prototype.run = function () {
-     // Run prototypes
+            // If the order is inactive (it likely has 0 remaining amount)
 
-     this.config()
-     this.tickConfig()
-     this.creepOrganizer()
-     this.taskManager()
-     this.constructionSiteManager()
+            if (order.remainingAmount == 0) continue
 
-     // Handle ally requests
+            // If there is foundation for this structure, create it
 
-     allyManager.tickConfig()
-     allyManager.getAllyRequests()
-     ExecutePandaMasterCode()
-}
+            if (!this._myOrders[order.roomName]) {
+                this._myOrders[order.roomName] = {
+                    sell: {},
+                    buy: {},
+                }
+            }
 
-InternationalManager.prototype.getSellOrders = function (resourceType, maxPrice = getAvgPrice(resourceType) * 1.2) {
-     const orders = this.orders[ORDER_SELL]?.[resourceType] || []
-     customLog(resourceType, maxPrice)
-     // Filter orders
+            // If there is no array for this structure, create one
 
-     return orders.filter(function (order) {
-          // Inform if the price is below or equal to the maxPrice
+            if (!this._myOrders[order.roomName][order.type][order.resourceType])
+                this._myOrders[order.roomName][order.type][order.resourceType] = []
 
-          return order.price <= maxPrice
-     })
-}
+            // Add the order to the structure's array
 
-InternationalManager.prototype.getBuyOrders = function (resourceType, minPrice = getAvgPrice(resourceType) * 0.8) {
-     const orders = this.orders[ORDER_BUY]?.[resourceType] || []
+            this._myOrders[order.roomName][order.type][order.resourceType].push(order)
+        }
 
-     // Filter orders
+        return this._myOrders
+    }
 
-     return orders.filter(function (order) {
-          // Inform if the price is more or equal to the minPrice
+    /**
+     * Existing other-player orders ordered by order type and resourceType
+     */
+    _orders?: Partial<Record<string, Partial<Record<MarketResourceConstant, Order[]>>>>
 
-          return order.price >= minPrice
-     })
-}
+    /**
+     * Gets existing other-player orders ordered by order type and resourceType
+     */
+    get orders() {
+        // If _orders are already defined, inform them
 
-InternationalManager.prototype.advancedSellPixels = function () {
-     if (!Memory.pixelSelling) return
+        if (this._orders) return this._orders
 
-     if (Game.cpu.bucket < CPUBucketCapacity) return
+        this._orders = {
+            buy: {},
+            sell: {},
+        }
 
-     const orders = Game.market.getAllOrders({ type: PIXEL })
+        // Get the market's order and loop through them
 
-     for (const order of orders) {
-          if (order.price > getAvgPrice(PIXEL)) continue
+        const orders = Game.market.getAllOrders()
 
-          Game.market.deal(order.id, Math.min(order.amount, Game.resources[PIXEL]))
-          return
-     }
+        let order
+
+        for (const orderID in orders) {
+            // Get the order using its ID
+
+            order = orders[orderID]
+
+            // Assign the order to a resource-ordered location, creating it if undefined
+
+            this._orders[order.type][order.resourceType]
+                ? this._orders[order.type][order.resourceType].push(order)
+                : (this._orders[order.type][order.resourceType] = [order])
+        }
+
+        return this._orders
+    }
+
+    /**
+     * The number of orders owned by me
+     */
+    _myOrdersCount: number
+
+    /**
+     * Gets the number of orders owned by me
+     */
+    get myOrdersCount() {
+        // If _myOrdersCount are already defined, inform them
+
+        if (this._myOrdersCount) return this._myOrdersCount
+
+        // Inform and set the number of my orders
+
+        return (this._myOrdersCount = Object.keys(Game.market.orders).length)
+    }
+
+    _claimRequestsByScore: (string | undefined)[]
+
+    get claimRequestsByScore(): (string | undefined)[] {
+        if (this._claimRequestsByScore) return this._claimRequestsByScore
+
+        return (this._claimRequestsByScore = Object.keys(Memory.claimRequests).sort(
+            (a, b) => Memory.claimRequests[a].score - Memory.claimRequests[b].score,
+        ))
+    }
+
+    _defaultMinCacheAmount: number
+
+    get defaultMinCacheAmount() {
+        if (this._defaultMinCacheAmount) return this._defaultMinCacheAmount
+
+        const avgCPUUsagePercent = (Memory.stats.cpu.usage || 20) / Game.cpu.limit
+
+        return Math.floor(Math.pow(avgCPUUsagePercent * 10, 2.2)) + 1
+    }
+
+    _marketIsFunctional: number
+
+    /**
+     * Determines if there is functional based on history
+     */
+    get marketIsFunctional() {
+        if (this._marketIsFunctional !== undefined) return this._marketIsFunctional
+
+        return (this._marketIsFunctional = Game.market.getHistory(RESOURCE_ENERGY).length)
+    }
 }
 
 export const internationalManager = new InternationalManager()

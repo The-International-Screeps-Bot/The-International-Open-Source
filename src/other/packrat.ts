@@ -164,7 +164,7 @@ export function unpackCoordAsPos(packedCoord: string, roomName: string) {
 
 /**
  * Packs a list of coords as a utf-16 string. This is better than having a list of packed coords, as it avoids
- * extra commas and "" when memroy gets stringified.
+ * extra commas and "" when memory gets stringified.
  *
  * Benchmarking: average of 120ns per coord to execute on shard2 public server, reduce stringified size by 94%
  */

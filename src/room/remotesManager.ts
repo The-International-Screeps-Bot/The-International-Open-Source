@@ -1,117 +1,156 @@
-import { remoteNeedsIndex, spawnByRoomRemoteRoles } from 'international/constants'
-import { findCarryPartsRequired } from 'international/generalFunctions'
+import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteNeeds, spawnByRoomRemoteRoles } from 'international/constants'
+import { customLog, findCarryPartsRequired } from 'international/generalFunctions'
+import { CommuneManager } from './communeManager'
+import { RemoteHarvester } from './creeps/roleManagers/remote/remoteHarvesterFunctions'
+import { RemoteHauler } from './creeps/roleManagers/remote/remoteHauler'
+import { RoomManager } from './roomManager'
 
-Room.prototype.remotesManager = function () {
-     let remoteName
-     let remoteMemory
-     let remote
-     let isReserved
-     let enemyStructures
+export class RemotesManager {
+    communeManager: CommuneManager
 
-     let efficacy
-     let income
+    constructor(communeManager: CommuneManager) {
+        this.communeManager = communeManager
+    }
 
-     // Loop through the commune's remote names
+    public stage1() {
+        // Loop through the commune's remote names
 
-     for (let index = this.memory.remotes.length - 1; index >= 0; index -= 1) {
-          // Get the name of the remote using the index
+        for (let index = this.communeManager.room.memory.remotes.length - 1; index >= 0; index -= 1) {
+            // Get the name of the remote using the index
 
-          remoteName = this.memory.remotes[index]
+            const remoteName = this.communeManager.room.memory.remotes[index]
 
-          remoteMemory = Memory.rooms[remoteName]
+            const remoteMemory = Memory.rooms[remoteName]
 
-          // If the room isn't a remote, remove it from the remotes array
+            // If the room isn't a remote, remove it from the remotes array
 
-          if (remoteMemory.type !== 'remote' || remoteMemory.commune !== this.name) {
-               this.memory.remotes.splice(index, 1)
-               continue
-          }
+            if (remoteMemory.T !== 'remote' || remoteMemory.commune !== this.communeManager.room.name) {
+                this.communeManager.room.memory.remotes.splice(index, 1)
+                continue
+            }
 
-          // Intialize an array for this room's creepsFromRoomWithRemote
+            if (remoteMemory.abandoned > 0) {
+                remoteMemory.abandoned -= 1
 
-          this.creepsFromRoomWithRemote[remoteName] = {}
+                for (const need in remoteMemory.needs) remoteMemory.needs[need] = 0
 
-          // For each role, construct an array for the role in creepsFromWithRemote
+                continue
+            }
 
-          for (const role of spawnByRoomRemoteRoles) this.creepsFromRoomWithRemote[remoteName][role] = []
+            remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] = 3
+            remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] = remoteMemory.SIDs[1] ? 3 : 0
+            remoteMemory.needs[RemoteNeeds.remoteHauler0] = 0
+            remoteMemory.needs[RemoteNeeds.remoteHauler1] = 0
+            remoteMemory.needs[RemoteNeeds.remoteReserver] = 1
 
-          if (remoteMemory.abandoned > 0) {
-               remoteMemory.abandoned -= 1
+            // Get the remote
 
-               for (const need in remoteMemory.needs) remoteMemory.needs[need] = 0
+            const remote = Game.rooms[remoteName]
 
-               continue
-          }
+            const possibleReservation = this.communeManager.room.energyCapacityAvailable >= 650
+            const isReserved =
+                remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
 
-          remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] = 3
+            // If the remote is reserved
 
-          remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] = remoteMemory.source2 ? 3 : 0
+            if (possibleReservation) {
+                // Increase the remoteHarvester need accordingly
 
-          remoteMemory.needs[remoteNeedsIndex.remoteHauler] = 0
+                remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] *= 2
+                remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] *= 2
 
-          remoteMemory.needs[remoteNeedsIndex.remoteReserver] = 1
+                // If the reservation isn't soon to run out, relative to the room's sourceEfficacy average
 
-          // Get the remote
+                if (isReserved && remote.controller.reservation.ticksToEnd >= Math.min(remoteMemory.RE * 5, 2500))
+                    remoteMemory.needs[RemoteNeeds.remoteReserver] = 0
+            }
 
-          remote = Game.rooms[remoteName]
+            if (remote) {
+                remoteMemory.needs[RemoteNeeds.minDamage] = 0
+                remoteMemory.needs[RemoteNeeds.minHeal] = 0
 
-          isReserved = remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
+                // Increase the defenderNeed according to the enemy attackers' combined strength
 
-          // If the remote is reserved
+                for (const enemyCreep of remote.enemyCreeps) {
+                    remoteMemory.needs[RemoteNeeds.minDamage] += enemyCreep.healStrength
+                    remoteMemory.needs[RemoteNeeds.minHeal] += enemyCreep.attackStrength
+                }
 
-          if (isReserved) {
-               // Increase the remoteHarvester need accordingly
+                // If the controller is reserved and not by me
 
-               remoteMemory.needs[remoteNeedsIndex.source1RemoteHarvester] += 3
-               remoteMemory.needs[remoteNeedsIndex.source2RemoteHarvester] += remoteMemory.source2 ? 3 : 0
+                if (remote.controller.reservation && remote.controller.reservation.username !== Memory.me)
+                    remoteMemory.needs[RemoteNeeds.enemyReserved] = 1
+                // If the controller is not reserved or is by us
+                else remoteMemory.needs[RemoteNeeds.enemyReserved] = 0
 
-               // If the reservation isn't soon to run out, relative to the room's sourceEfficacy average
+                remoteMemory.needs[RemoteNeeds.remoteCoreAttacker] = remote.structures.invaderCore.length
+                remoteMemory.needs[RemoteNeeds.invaderCore] = remote.structures.invaderCore.length
 
-               if (
-                    remote.controller.reservation.ticksToEnd >=
-                    remoteMemory.sourceEfficacies.reduce((a, b) => a + b) * 2
-               ) {
-                    remoteMemory.needs[remoteNeedsIndex.remoteReserver] = 0
-               }
-          }
+                // Create need if there are any walls or enemy owner structures (not including invader cores)
 
-          if (remote) {
-               remoteMemory.needs[remoteNeedsIndex.remoteDefender] = 0
+                remoteMemory.needs[RemoteNeeds.remoteDismantler] =
+                    Math.min(remote.actionableWalls.length, 1) ||
+                    Math.min(
+                        remote.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
+                            return structure.structureType != STRUCTURE_INVADER_CORE
+                        }).length,
+                        1,
+                    )
+            }
 
-               for (const enemyCreep of remote.enemyCreeps) {
-                    // Increase the defenderNeed according to the creep's strength
+            // If the remote is assumed to be reserved by an enemy
 
-                    remoteMemory.needs[remoteNeedsIndex.remoteDefender] += enemyCreep.strength
-               }
+            if (remoteMemory.needs[RemoteNeeds.enemyReserved]) {
+                remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] = 0
+                remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] = 0
+                remoteMemory.needs[RemoteNeeds.remoteHauler0] = 0
+                remoteMemory.needs[RemoteNeeds.remoteHauler1] = 0
+            }
 
-               remoteMemory.needs[remoteNeedsIndex.remoteCoreAttacker] = remote.structures.invaderCore.length ? 1 : 0
+            // If there is assumed to be an invader core
 
-               // If there are walls or enemyStructures, set dismantler need
+            if (remoteMemory.needs[RemoteNeeds.invaderCore]) {
+                remoteMemory.needs[RemoteNeeds.source1RemoteHarvester] = 0
+                remoteMemory.needs[RemoteNeeds.source2RemoteHarvester] = 0
+                remoteMemory.needs[RemoteNeeds.remoteHauler0] = 0
+                remoteMemory.needs[RemoteNeeds.remoteHauler1] = 0
+            }
+        }
+    }
 
-               enemyStructures = remote.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
-                    return structure.structureType != STRUCTURE_INVADER_CORE
-               })
+    public stage2() {
+        // Loop through the commune's remote names
 
-               remoteMemory.needs[remoteNeedsIndex.remoteDismantler] =
-                    (remote.actionableWalls.length || enemyStructures.length) ? 1 : 0
-          }
+        for (let index = this.communeManager.room.memory.remotes.length - 1; index >= 0; index -= 1) {
+            // Get the name of the remote using the index
 
-          // Loop through each index of sourceEfficacies
+            const remoteName = this.communeManager.room.memory.remotes[index]
+            const remoteMemory = Memory.rooms[remoteName]
 
-          for (let index = 0; index < remoteMemory.sourceEfficacies.length; index += 1) {
-               // Get the efficacy using the index
+            if (remoteMemory.abandoned) continue
 
-               efficacy = remoteMemory.sourceEfficacies[index]
+            const remote = Game.rooms[remoteName]
+            const isReserved =
+                remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
 
-               // Get the income based on the reservation of the room and remoteHarvester need
+            // Loop through each index of sourceEfficacies
 
-               income = isReserved
-                    ? 10
-                    : 5 /* - (remoteMemory.needs[remoteNeedsIndex[remoteHarvesterRoles[index]]] + (isReserved ? 4 : 2)) */
+            for (let sourceIndex = 0; sourceIndex < remoteMemory.SE.length; sourceIndex += 1) {
 
-               // Find the number of carry parts required for the source, and add it to the remoteHauler need
+                // Get the income based on the reservation of the this and remoteHarvester need
+                // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
 
-               remoteMemory.needs[remoteNeedsIndex.remoteHauler] += findCarryPartsRequired(efficacy, income)
-          }
-     }
+                const income =
+                    Math.max((isReserved ? 10 : 5) -
+                    Math.floor(Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]], 0) * minHarvestWorkRatio), 0)
+
+                // Find the number of carry parts required for the source, and add it to the remoteHauler need
+
+                remoteMemory.needs[RemoteNeeds[`remoteHauler${sourceIndex as 0 | 1}`]] += findCarryPartsRequired(
+                    remoteMemory.SE[sourceIndex],
+                    income,
+                )
+            }
+        }
+    }
 }

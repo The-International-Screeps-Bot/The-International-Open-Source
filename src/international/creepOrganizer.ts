@@ -1,85 +1,102 @@
 import { creepClasses } from 'room/creeps/creepClasses'
-import { claimRequestNeedsIndex, remoteNeedsIndex, spawnByRoomRemoteRoles } from './constants'
+import { myColors, spawnByRoomRemoteRoles } from './constants'
 import { customLog, pack } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 
-import '../room/creeps/preTickManagers/international/scoutPreTick'
-
-import '../room/creeps/preTickManagers/remote/remoteHarvesterPreTick'
-import '../room/creeps/preTickManagers/remote/remoteHaulerPreTick'
-import '../room/creeps/preTickManagers/remote/remoteReserverPreTick'
-import '../room/creeps/preTickManagers/remote/remoteDefenderPreTick'
-import '../room/creeps/preTickManagers/remote/remoteCoreAttackerPreTick'
-import '../room/creeps/preTickManagers/remote/remoteDismantlerPreTick'
-
 InternationalManager.prototype.creepOrganizer = function () {
-     // Construct counter for creeps
+    // If CPU logging is enabled, get the CPU used at the start
 
-     let totalCreepCount = 0
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-     let creep: Creep
+    // Construct counter for creeps
 
-     // Loop through all of my creeps
+    let totalCreepCount = 0
 
-     for (const creepName in Memory.creeps) {
-          creep = Game.creeps[creepName]
+    function processSingleCreep(creepName: string) {
+        let creep = Game.creeps[creepName]
 
-          // If creep doesn't exist
+        // If creep doesn't exist
 
-          if (!creep) {
-               // Delete creep from memory and iterate
+        if (!creep) {
+            // Delete creep from memory and iterate
 
-               delete Memory.creeps[creepName]
-               continue
-          }
+            delete Memory.creeps[creepName]
+            return
+        }
 
-          // Increase total creep counter
+        // Increase total creep counter
 
-          totalCreepCount += 1
+        totalCreepCount += 1
 
-          // Get the creep's current room and the room it's from
+        // Get the creep's role
 
-          const { room } = creep
-          // Get the creep's role
+        const { role } = creep
+        if (!role || role.startsWith('shard')) return
 
-          const { role } = creep.memory
+        // Assign creep a class based on role
 
-          if (!role) continue
+        const creepClass = creepClasses[role]
+        if (!creepClass) return
 
-          // Assign creep proper class
+        creep = Game.creeps[creepName] = new creepClass(creep.id)
 
-          creep = Game.creeps[creepName] = new creepClasses[role](creep.id)
+        // Get the creep's current room and the room it's from
 
-          // Organize creep in its room by its role
+        const { room } = creep
 
-          room.myCreeps[role].push(creepName)
+        // Organize creep in its room by its role
 
-          // Record the creep's presence in the room
+        room.myCreeps[role].push(creepName)
 
-          room.myCreepsAmount += 1
+        // Record the creep's presence in the room
 
-          // Add the creep's name to the position in its room
+        room.myCreepsAmount += 1
 
-          if (!creep.spawning) room.creepPositions[pack(creep.pos)] = creep.name
+        // Add the creep's name to the position in its room
 
-          creep.preTickManager()
+        if (!creep.spawning) room.creepPositions.set(pack(creep.pos), creep.name)
 
-          creep.reservationManager()
+        // Get the commune the creep is from
 
-          // Get the commune the creep is from
+        const commune = creep.commune
 
-          const commune = Game.rooms[creep.memory.communeName]
+        // If there is not vision in the commune, stop
 
-          // If there is not vision in the commune, stop
+        if (!commune) return
 
-          if (!commune) continue
+        if (!commune.controller.my) {
+            creep.suicide()
+            return
+        }
 
-          // If the creep isn't dying, organize by its roomFrom and role
+        creep.preTickManager()
 
-          if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
+        creep.reservationManager()
 
-          // Record that the creep's existence in its roomFrom
+        // If the creep isn't dying, organize by its roomFrom and role
 
-          commune.creepsFromRoomAmount += 1
-     }
+        if (!creep.dying) commune.creepsFromRoom[role].push(creepName)
+
+        // Record that the creep's existence in its roomFrom
+
+        commune.creepsFromRoomAmount += 1
+    }
+
+    // Loop through all of my creeps
+
+    for (const creepName in Memory.creeps) {
+        try {
+            processSingleCreep(creepName)
+        } catch (err) {
+            customLog(
+                'Exception processing creep: ' + creepName + err,
+                (err as any).stack,
+                myColors.white,
+                myColors.red,
+            )
+        }
+    }
+
+    if (Memory.CPULogging)
+        customLog('Creep Organizer', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.midGrey)
 }

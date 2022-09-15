@@ -1,121 +1,307 @@
 import { allyManager } from 'international/simpleAllies'
-import { constants, remoteHarvesterRoles, remoteNeedsIndex, spawnByRoomRemoteRoles, stamps } from './constants'
-import { createPackedPosMap, customLog, findCarryPartsRequired } from './generalFunctions'
-import { InternationalManager } from './internationalManager'
+import { creepRoles, haulerUpdateDefault, myColors, RemoteNeeds, spawnByRoomRemoteRoles, stamps } from './constants'
+import {
+    advancedFindDistance,
+    createPosMap,
+    customLog,
+    findCarryPartsRequired,
+    findClosestRoomName,
+} from './generalFunctions'
+import { internationalManager, InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
+import '../room/haulerSize'
+import { indexOf } from 'lodash'
+import { CommuneManager } from 'room/communeManager'
 
 InternationalManager.prototype.tickConfig = function () {
-     // General
+    // If CPU logging is enabled, get the CPU used at the start
 
-     Memory.communes = []
-     statsManager.internationalPreTick()
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-     // global
+    // General
 
-     global.constructionSitesCount = Object.keys(Game.constructionSites).length
-     global.logs = ``
+    global.communes = new Set()
+    statsManager.internationalPreTick()
 
-     // Other
+    // global
 
-     let room
-     let controller
+    global.constructionSitesCount = Object.keys(Game.constructionSites).length
+    global.logs = ``
 
-     // Configure rooms
+    // Other
 
-     for (const roomName in Game.rooms) {
-          room = Game.rooms[roomName]
+    // Configure rooms
 
-          controller = room.controller
+    for (const roomName in Game.rooms) {
+        const room = Game.rooms[roomName]
 
-          // Single tick properties
+        room.moveRequests = new Map()
+        room.creepPositions = new Map()
 
-          room.myCreeps = {}
+        // Single tick properties
 
-          // For each role, construct an array for myCreeps
+        room.myCreeps = {}
 
-          for (const role of constants.creepRoles) room.myCreeps[role] = []
+        // For each role, construct an array for myCreeps
 
-          room.myCreepsAmount = 0
+        for (const role of creepRoles) room.myCreeps[role] = []
 
-          // Assign a position map
+        room.myCreepsAmount = 0
 
-          room.creepPositions = createPackedPosMap()
+        room.roomObjects = {}
 
-          // Assign a 2d position map
+        room.creepsOfSourceAmount = []
 
-          room.moveRequests = createPackedPosMap(true)
+        for (const index in room.sources) room.creepsOfSourceAmount.push(0)
 
-          room.roomObjects = {}
+        const { controller } = room
+        if (!controller) continue
 
-          room.creepsOfSourceAmount = {
-               source1: 0,
-               source2: 0,
-          }
+        // The room is a commune
 
-          if (!room.global.tasksWithoutResponders) room.global.tasksWithoutResponders = {}
-          if (!room.global.tasksWithResponders) room.global.tasksWithResponders = {}
+        room.communeManager = global.communeManagers[room.name]
 
-          if (!controller) continue
+        if (!room.communeManager) {
+            room.communeManager = new CommuneManager()
+            global.communeManagers[room.name] = room.communeManager
+        }
 
-          if (controller.my) room.memory.type = 'commune'
+        room.communeManager.update(room)
 
-          if (room.memory.type != 'commune') continue
+        if (controller.my) room.memory.T = 'commune'
 
-          // Iterate if the controller is not mine
+        if (room.memory.T != 'commune') continue
 
-          if (!controller.my) {
-               delete room.memory.type
-               continue
-          }
+        // Iterate if the controller is not mine
 
-          //
+        if (!controller.my) {
+            room.memory.T = 'neutral'
+            continue
+        }
 
-          room.spawnRequests = {}
+        //
 
-          if (!room.memory.remotes) room.memory.remotes = []
+        if (!room.memory.attackRequests) room.memory.attackRequests = []
 
-          room.creepsFromRoomWithRemote = {}
+        room.spawnRequests = {}
 
-          room.remotesManager()
+        if (!room.memory.remotes) room.memory.remotes = []
 
-          // Add roomName to commune list
+        room.creepsFromRoomWithRemote = {}
 
-          Memory.communes.push(roomName)
+        // If there is no Hauler Size
 
-          room.creepsFromRoom = {}
+        if (!room.memory.MHC) {
+            room.memory.MHC = 0
+            room.memory.HU = 0
+        }
 
-          // For each role, construct an array for creepsFromRoom
+        room.haulerSizeManager()
+        room.communeManager.remotesManager.stage1()
 
-          for (const role of constants.creepRoles) room.creepsFromRoom[role] = []
+        // Add roomName to commune list
 
-          room.creepsFromRoomAmount = 0
+        global.communes.add(roomName)
 
-          // If there is an existing claimRequest and it's invalid, delete it from the room memory
+        room.creepsFromRoom = {}
 
-          if (room.memory.claimRequest && !Memory.claimRequests[room.memory.claimRequest])
-               delete room.memory.claimRequest
+        for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
+            const remoteName = room.memory.remotes[index]
+            room.creepsFromRoomWithRemote[remoteName] = {}
+            for (const role of spawnByRoomRemoteRoles) room.creepsFromRoomWithRemote[remoteName][role] = []
+        }
 
-          if (!room.memory.stampAnchors) {
-               room.memory.stampAnchors = {}
+        // For each role, construct an array for creepsFromRoom
 
-               for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
-          }
+        for (const role of creepRoles) room.creepsFromRoom[role] = []
 
-          room.scoutTargets = new Set()
+        room.creepsFromRoomAmount = 0
 
-          if (!room.memory.deposits) room.memory.deposits = {}
-     }
+        if (!room.memory.stampAnchors) {
+            room.memory.stampAnchors = {}
 
-     let claimTarget
+            for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
+        }
 
-     for (const roomName in Memory.claimRequests) {
-          claimTarget = Memory.claimRequests[roomName]
+        room.scoutTargets = new Set()
 
-          if (claimTarget.abadon > 0) {
-               claimTarget.abadon -= 1
-               continue
-          }
+        if (!room.memory.deposits) room.memory.deposits = {}
+    }
 
-          claimTarget.abadon = undefined
-     }
+    let reservedGCL = Game.gcl.level - global.communes.size
+
+    // Subtract the number of claimRequests with responders
+
+    for (const roomName in Memory.claimRequests) {
+        if (!Memory.claimRequests[roomName].responder) continue
+
+        reservedGCL -= 1
+    }
+
+    const communesForResponding = []
+
+    for (const roomName of global.communes) {
+        if (Memory.rooms[roomName].claimRequest) continue
+
+        if (Game.rooms[roomName].energyCapacityAvailable < 650) continue
+
+        communesForResponding.push(roomName)
+    }
+
+    // Assign and abandon claimRequests, in order of score
+
+    for (const roomName of internationalManager.claimRequestsByScore) {
+        const request = Memory.claimRequests[roomName]
+
+        if (!request) continue
+
+        if (request.abandon > 0) {
+            request.abandon -= 1
+            continue
+        }
+
+        delete request.abandon
+
+        if (request.responder && global.communes.has(request.responder)) continue
+
+        if (!Memory.autoClaim) continue
+
+        // If there is not enough reserved GCL to make a new request
+
+        if (reservedGCL <= 0) continue
+
+        // If the requested room is no longer neutral
+
+        if (Memory.rooms[roomName].T !== 'neutral') {
+            // Delete the request
+
+            delete Memory.claimRequests[roomName]
+            continue
+        }
+
+        const communeName = findClosestRoomName(roomName, communesForResponding)
+        if (!communeName) break
+
+        const maxRange = 10
+
+        // Run a more simple and less expensive check, then a more complex and expensive to confirm. If the check fails, abandon the room for some time
+
+        if (
+            Game.map.getRoomLinearDistance(communeName, roomName) > maxRange ||
+            advancedFindDistance(communeName, roomName, {
+                keeper: Infinity,
+                enemy: Infinity,
+                ally: Infinity,
+            }) > maxRange
+        ) {
+            Memory.claimRequests[roomName].abandon = 20000
+            continue
+        }
+
+        // Otherwise assign the request to the room, and record as such in Memory
+
+        Memory.rooms[communeName].claimRequest = roomName
+        Memory.claimRequests[roomName].responder = communeName
+
+        reservedGCL -= 1
+
+        communesForResponding.splice(indexOf(communesForResponding, communeName), 1)
+    }
+
+    // Decrease abandonment for abandoned allyCreepRequests, and find those that aren't abandoned responders
+
+    for (const roomName in Memory.allyCreepRequests) {
+        const request = Memory.allyCreepRequests[roomName]
+
+        if (request.abandon > 0) {
+            request.abandon -= 1
+            continue
+        }
+
+        request.abandon = undefined
+
+        if (request.responder) continue
+
+        const communes = []
+
+        for (const roomName of global.communes) {
+            if (Memory.rooms[roomName].allyCreepRequest) continue
+
+            communes.push(roomName)
+        }
+
+        const communeName = findClosestRoomName(roomName, communes)
+        if (!communeName) break
+
+        const maxRange = 25
+
+        // Run a more simple and less expensive check, then a more complex and expensive to confirm
+
+        if (
+            Game.map.getRoomLinearDistance(communeName, roomName) > maxRange ||
+            advancedFindDistance(communeName, roomName, {
+                keeper: Infinity,
+                enemy: Infinity,
+                ally: Infinity,
+            }) > maxRange
+        ) {
+            Memory.allyCreepRequests[roomName].abandon = 20000
+            continue
+        }
+
+        // Otherwise assign the request to the room, and record as such in Memory
+
+        Memory.rooms[communeName].allyCreepRequest = roomName
+        Memory.allyCreepRequests[roomName].responder = communeName
+    }
+
+    // Assign and decrease abandon for attackRequests
+
+    for (const roomName in Memory.attackRequests) {
+        const request = Memory.attackRequests[roomName]
+
+        if (request.abandon > 0) {
+            request.abandon -= 1
+            continue
+        }
+
+        if (request.responder) continue
+
+        // Filter communes that don't have the attackRequest target already
+
+        const communes = []
+
+        for (const roomName of global.communes) {
+            if (Memory.rooms[roomName].attackRequests.includes(roomName)) continue
+
+            communes.push(roomName)
+        }
+
+        const communeName = findClosestRoomName(roomName, communes)
+        if (!communeName) break
+
+        const maxRange = 15
+
+        // Run a more simple and less expensive check, then a more complex and expensive to confirm
+
+        if (
+            Game.map.getRoomLinearDistance(communeName, roomName) > maxRange ||
+            advancedFindDistance(communeName, roomName, {
+                keeper: Infinity,
+                enemy: Infinity,
+                ally: Infinity,
+            }) > maxRange
+        ) {
+            Memory.attackRequests[roomName].abandon = 20000
+            continue
+        }
+
+        // Otherwise assign the request to the room, and record as such in Memory
+
+        Memory.rooms[communeName].attackRequests.push(roomName)
+        Memory.attackRequests[roomName].responder = communeName
+    }
+
+    if (Memory.CPULogging)
+        customLog('Tick Config', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.midGrey)
 }

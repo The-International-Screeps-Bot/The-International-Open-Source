@@ -1,20 +1,20 @@
-import clear from 'rollup-plugin-clear'
+import typescript from 'rollup-plugin-typescript2'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
-import typescript from 'rollup-plugin-typescript2'
+import clear from 'rollup-plugin-clear'
 import screeps from 'rollup-plugin-screeps'
+import { terser } from "rollup-plugin-terser";
 
 let cfg
 const dest = process.env.DEST
-const token = process.env.TOKEN
-if (!dest && !token) {
+if (!dest) {
      console.log('No destination specified - code will be compiled but not uploaded')
-} else if (token && (cfg = require('./example.screeps.json')["mmo"])) {
-     if (cfg  == null) throw new Error('Invalid upload destination')
-     else cfg.token = token;
 } else if ((cfg = require('./screeps.json')[dest]) == null) {
      throw new Error('Invalid upload destination')
 }
+
+const shouldUglify = cfg && cfg.uglify;
+if (cfg) delete cfg.uglify
 
 export default {
      input: 'src/main.ts',
@@ -28,6 +28,7 @@ export default {
           clear({ targets: ['dist'] }),
           resolve({ rootDir: 'src' }),
           commonjs(),
+          (shouldUglify && terser()),
           typescript({ tsconfig: './tsconfig.json' }),
           screeps({ config: cfg, dryRun: cfg == null  }),
      ],

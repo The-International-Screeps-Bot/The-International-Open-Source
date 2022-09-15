@@ -1,1196 +1,476 @@
-import { allyList, constants, prefferedCommuneRange, remoteNeedsIndex, stamps } from 'international/constants'
 import {
-     advancedFindDistance,
-     arePositionsEqual,
-     customLog,
-     findClosestClaimType,
-     findClosestCommuneName,
-     findPositionsInsideRect,
-     getRange,
-     getRangeBetween,
-     pack,
-     unpackAsPos,
-     unpackAsRoomPos,
+    allStructureTypes,
+    allyList,
+    impassibleStructureTypes,
+    maxRampartGroupSize,
+    minHarvestWorkRatio,
+    myColors,
+    numbersByStructureTypes,
+    prefferedCommuneRange,
+    RemoteNeeds,
+    roomDimensions,
+    roomTypeProperties,
+    roomTypes,
+    stamps,
+    structureTypesByBuildPriority,
+} from 'international/constants'
+import {
+    advancedFindDistance,
+    areCoordsEqual,
+    createPosMap,
+    customLog,
+    findClosestClaimType,
+    findClosestCommuneName,
+    findCoordsInsideRect,
+    getRange,
+    pack,
+    packXY,
+    unpackAsPos,
+    unpackAsRoomPos,
 } from 'international/generalFunctions'
-import { basePlanner } from './construction/basePlanner'
-import { ControllerUpgrader, MineralHarvester, SourceHarvester } from './creeps/creepClasses'
+import { internationalManager } from 'international/internationalManager'
+import { packCoord, unpackCoordAsPos, unpackPos } from 'other/packrat'
+import { basePlanner } from './construction/communePlanner'
 import { RoomCacheObject } from './roomObject'
-import { RoomTask } from './roomTasks'
 
 Room.prototype.get = function (roomObjectName) {
-     const room = this
+    const room = this
 
-     // Cost matrixes
+    // Resources
 
-     function generateTerrainCM() {
-          const terrain = room.getTerrain()
+    // Harvest positions
 
-          // Create a CostMatrix for terrain types
+    /**
+     * Finds positions adjacent to a source that a creep can harvest
+     * @param source source of which to find harvestPositions for
+     * @returns source's harvestPositions, a list of positions
+     */
+    function findHarvestPositions(source: Source | Mineral) {
+        // Stop and inform empty array if there is no source
 
-          const terrainCM = new PathFinder.CostMatrix()
+        if (!source) return []
 
-          // Loop through each x and y in the room
+        // Construct harvestPositions
 
-          for (let x = 0; x < constants.roomDimensions; x += 1) {
-               for (let y = 0; y < constants.roomDimensions; y += 1) {
-                    // Try to find the terrainValue
+        const harvestPositions = []
 
-                    const terrainValue = terrain.get(x, y)
+        // Find terrain in room
 
-                    // If terrain is a wall
+        const terrain = Game.map.getRoomTerrain(room.name)
 
-                    if (terrainValue === TERRAIN_MASK_WALL) {
-                         // Set this positions as 1 in the terrainCM
+        // Find positions adjacent to source
+
+        const adjacentPositions = findCoordsInsideRect(
+            source.pos.x - 1,
+            source.pos.y - 1,
+            source.pos.x + 1,
+            source.pos.y + 1,
+        )
+
+        // Loop through each pos
+
+        for (const pos of adjacentPositions) {
+            // Iterate if terrain for pos is a wall
+
+            if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
-                         terrainCM.set(x, y, 255)
-                    }
-               }
-          }
+            // Add pos to harvestPositions
 
-          return terrainCM
-     }
+            harvestPositions.push(new RoomPosition(pos.x, pos.y, room.name))
+        }
 
-     new RoomCacheObject({
-          name: 'terrainCM',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: generateTerrainCM,
-     })
+        // Inform harvestPositions
 
-     function generateBaseCM() {
-          // Construct a cost matrix based off terrain cost matrix
+        return harvestPositions
+    }
 
-          const baseCM = room.roomObjects.terrainCM.getValue().clone()
+    /**
+     * @param harvestPositions array of RoomPositions to filter
+     * @returns the closest harvestPosition to the room's anchor
+     */
+    function findClosestHarvestPos(harvestPositions: RoomPosition[]): void | RoomPosition {
+        // Get the room anchor, stopping if it's undefined
 
-          // Get the room's exits
+        if (!room.anchor) return
 
-          const exits = room.find(FIND_EXIT)
+        // Filter harvestPositions by closest one to anchor
 
-          // Loop through each exit of exits
+        return room.anchor.findClosestByPath(harvestPositions, {
+            ignoreCreeps: true,
+            ignoreDestructibleStructures: true,
+            ignoreRoads: true,
+        })
+    }
 
-          for (const pos of exits) {
-               // Record the exit as a pos to avoid
+    new RoomCacheObject({
+        name: 'mineralHarvestPositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor() {
+            return findHarvestPositions(room.mineral)
+        },
+    })
 
-               baseCM.set(pos.x, pos.y, 255)
+    new RoomCacheObject({
+        name: 'closestMineralHarvestPos',
+        valueType: 'pos',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor() {
+            return findClosestHarvestPos(room.roomObjects.mineralHarvestPositions.getValue())
+        },
+    })
 
-               // Construct a rect and get the positions in a range of 2
+    // Upgrade positions
 
-               const adjacentPositions = findPositionsInsideRect(pos.x - 2, pos.y - 2, pos.x + 2, pos.y + 2)
+    function findCenterUpgradePos() {
+        // Get the anchor, informing false if it's undefined
 
-               // Loop through adjacent positions
+        if (!room.anchor) return false
 
-               for (const adjacentPos of adjacentPositions) {
-                    // Otherwise record the position as a wall
+        // Get the open areas in a range of 3 to the controller
 
-                    baseCM.set(adjacentPos.x, adjacentPos.y, 255)
-               }
-          }
+        const distanceCoords = room.distanceTransform(
+            undefined,
+            false,
+            255,
+            room.controller.pos.x - 2,
+            room.controller.pos.y - 2,
+            room.controller.pos.x + 2,
+            room.controller.pos.y + 2,
+        )
+
+        // Find the closest value greater than two to the centerUpgradePos and inform it
+
+        return room.findClosestPosOfValue({
+            coordMap: distanceCoords,
+            startCoords: [room.anchor],
+            requiredValue: 2,
+            reduceIterations: 1,
+            visuals: false,
+            cardinalFlood: true,
+        })
+    }
+
+    new RoomCacheObject({
+        name: 'centerUpgradePos',
+        valueType: 'pos',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: findCenterUpgradePos,
+    })
 
-          // Inform the baseCM
+    function findUpgradePositions() {
+        // Get the center upgrade pos, stopping if it's undefined
 
-          return baseCM
-     }
+        const centerUpgradePos = room.roomObjects.centerUpgradePos.getValue()
+        if (!centerUpgradePos) return []
 
-     new RoomCacheObject({
-          name: 'baseCM',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: generateBaseCM,
-     })
+        if (!room.anchor) return []
 
-     // roadCM
+        // Construct harvestPositions
 
-     new RoomCacheObject({
-          name: 'roadCM',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: () => {
-               return new PathFinder.CostMatrix()
-          },
-     })
+        const upgradePositions = []
 
-     // Resources
+        // Find terrain in room
 
-     // Mineral
+        const terrain = internationalManager.getTerrainCoords(room.name)
 
-     new RoomCacheObject({
-          name: 'mineral',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return room.find(FIND_MINERALS)[0]?.id
-          },
-     })
+        // Find positions adjacent to source
 
-     // Source 1
+        const adjacentPositions = findCoordsInsideRect(
+            centerUpgradePos.x - 1,
+            centerUpgradePos.y - 1,
+            centerUpgradePos.x + 1,
+            centerUpgradePos.y + 1,
+        )
 
-     new RoomCacheObject({
-          name: 'source1',
-          valueType: 'id',
-          cacheType: 'memory',
-          room,
-          valueConstructor() {
-               // Get the first source
+        // Loop through each pos
 
-               const source = room.find(FIND_SOURCES)[0]
+        for (const coord of adjacentPositions) {
+            // Iterate if terrain for pos is a wall
 
-               // If the source exists, inform its id. Otherwise inform false
+            if (terrain[pack(coord)] === TERRAIN_MASK_WALL) continue
 
-               if (source) return source.id
-               return false
-          },
-     })
+            // Add pos to harvestPositions
 
-     // Source 2
+            upgradePositions.push(new RoomPosition(coord.x, coord.y, room.name))
+        }
 
-     new RoomCacheObject({
-          name: 'source2',
-          valueType: 'id',
-          cacheType: 'memory',
-          room,
-          valueConstructor() {
-               // Get the second source
+        upgradePositions.sort(function (a, b) {
+            return getRange(a.x, room.anchor.x, a.y, room.anchor.y) - getRange(b.x, room.anchor.x, b.y, room.anchor.y)
+        })
 
-               const source = room.find(FIND_SOURCES)[1]
+        // Make the closest pos the least to be chosen
 
-               // If the source exists, inform its id. Otherwise inform false
+        upgradePositions.push(upgradePositions.shift())
 
-               if (source) return source.id
-               return false
-          },
-     })
+        // Inform harvestPositions
 
-     // Sources
+        return upgradePositions
+    }
 
-     new RoomCacheObject({
-          name: 'sources',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               const sources = [room.roomObjects.source1.getValue()]
-               const source2 = room.roomObjects.source2.getValue()
+    new RoomCacheObject({
+        name: 'upgradePositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor: findUpgradePositions,
+    })
 
-               if (source2) sources.push(source2)
+    function findFastFillerPositions() {
+        if (!room.anchor) return []
 
-               return sources
-          },
-     })
+        // Construct fastFillerPositions from the top / bottom and left, right adjacent positions
 
-     // Structures and cSites
-
-     function findStructuresByType() {
-          // Construct storage of structures based on structureType
+        const fastFillerPositions = [
+            {
+                x: room.anchor.x - 1,
+                y: room.anchor.y - 1,
+            },
+            {
+                x: room.anchor.x + 1,
+                y: room.anchor.y - 1,
+            },
+            {
+                x: room.anchor.x - 1,
+                y: room.anchor.y + 1,
+            },
+            {
+                x: room.anchor.x + 1,
+                y: room.anchor.y + 1,
+            },
+        ]
 
-          const structuresByType: Partial<Record<StructureConstant, Structure[]>> = {}
-
-          // Loop through all structres in room
-
-          for (const structure of room.find(FIND_STRUCTURES)) {
-               // If there is no key for the structureType, create it and assign it an empty array
-
-               if (!structuresByType[structure.structureType]) structuresByType[structure.structureType] = []
-
-               // Group structure by structureType
-
-               structuresByType[structure.structureType].push(structure)
-          }
-
-          // Inform structuresByType
-
-          return structuresByType
-     }
-
-     new RoomCacheObject({
-          name: 'structuresByType',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor: findStructuresByType,
-     })
-
-     function findCSitesByType() {
-          // Construct storage of cSites based on structureType
-
-          const cSitesByType: Partial<Record<StructureConstant, ConstructionSite[]>> = {}
-
-          // Loop through all structres in room
-
-          for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
-               // If there is no key for the structureType, create it and assign it an empty array
-
-               if (!cSitesByType[cSite.structureType]) cSitesByType[cSite.structureType] = []
+        let adjacentStructures
+        let adjacentStructuresByType: Partial<Record<StructureConstant, number>>
 
-               // Group cSite by structureType
+        // Loop through each fastFillerPos
 
-               cSitesByType[cSite.structureType].push(cSite)
-          }
-
-          // Inform structuresByType
-
-          return cSitesByType
-     }
-
-     new RoomCacheObject({
-          name: 'cSitesByType',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor: findCSitesByType,
-     })
+        for (let index = fastFillerPositions.length - 1; index >= 0; index -= 1) {
+            // Get the pos using the index
 
-     // Loop through each structureType in the game
+            const pos = fastFillerPositions[index]
 
-     for (const structureType of constants.allStructureTypes) {
-          // Create roomObject for structures with the structureType
+            // Get adjacent structures
 
-          new RoomCacheObject({
-               name: structureType,
-               valueType: 'object',
-               cacheType: 'global',
-               cacheAmount: 1,
-               room,
-               valueConstructor() {
-                    return room.roomObjects.structuresByType.getValue()[structureType] || []
-               },
-          })
+            adjacentStructures = room.lookForAtArea(LOOK_STRUCTURES, pos.y - 1, pos.x - 1, pos.y + 1, pos.x + 1, true)
 
-          // Create a roomObject for sites with the structureType
+            // Construct organized adjacent structures
 
-          new RoomCacheObject({
-               name: `${structureType}CSite`,
-               valueType: 'object',
-               cacheType: 'global',
-               cacheAmount: 1,
-               room,
-               valueConstructor() {
-                    return room.roomObjects.cSitesByType.getValue()[structureType] || []
-               },
-          })
-     }
+            adjacentStructuresByType = {
+                spawn: 0,
+                extension: 0,
+                container: 0,
+                link: 0,
+            }
 
-     new RoomCacheObject({
-          name: 'enemyCSites',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor() {
-               // Inform constuction sites that aren't owned by a member of the allyList
-
-               return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                    filter: cSite => !allyList.has(cSite.owner.username),
-               })
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'allyCSites',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor() {
-               // Inform constuction sites that aren't owned by a member of the allyList
-
-               return room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                    filter: cSite => allyList.has(cSite.owner.username),
-               })
-          },
-     })
-
-     // Harvest positions
-
-     /**
-      * Finds positions adjacent to a source that a creep can harvest
-      * @param source source of which to find harvestPositions for
-      * @returns source's harvestPositions, a list of positions
-      */
-     function findHarvestPositions(source: Source | Mineral) {
-          // Stop and inform empty array if there is no source
-
-          if (!source) return []
-
-          // Construct harvestPositions
-
-          const harvestPositions = []
-
-          // Find terrain in room
-
-          const terrain = Game.map.getRoomTerrain(room.name)
-
-          // Find positions adjacent to source
-
-          const adjacentPositions = findPositionsInsideRect(
-               source.pos.x - 1,
-               source.pos.y - 1,
-               source.pos.x + 1,
-               source.pos.y + 1,
-          )
-
-          // Loop through each pos
-
-          for (const pos of adjacentPositions) {
-               // Iterate if terrain for pos is a wall
-
-               if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
-
-               // Add pos to harvestPositions
-
-               harvestPositions.push(room.newPos(pos))
-          }
-
-          // Inform harvestPositions
-
-          return harvestPositions
-     }
-
-     /**
-      * @param harvestPositions array of RoomPositions to filter
-      * @returns the closest harvestPosition to the room's anchor
-      */
-     function findClosestHarvestPos(harvestPositions: RoomPosition[]): void | RoomPosition {
-          // Get the room anchor, stopping if it's undefined
-
-          if (!room.anchor) return
-
-          // Filter harvestPositions by closest one to anchor
-
-          return room.anchor.findClosestByPath(harvestPositions, {
-               ignoreCreeps: true,
-               ignoreDestructibleStructures: true,
-               ignoreRoads: true,
-          })
-     }
-
-     new RoomCacheObject({
-          name: 'mineralHarvestPositions',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findHarvestPositions(room.roomObjects.mineral.getValue())
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'closestMineralHarvestPos',
-          valueType: 'pos',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findClosestHarvestPos(room.roomObjects.mineralHarvestPositions.getValue())
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'source1HarvestPositions',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findHarvestPositions(room.roomObjects.source1.getValue())
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'source1ClosestHarvestPos',
-          valueType: 'pos',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findClosestHarvestPos(room.roomObjects.source1HarvestPositions.getValue())
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'source2HarvestPositions',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findHarvestPositions(room.roomObjects.source2.getValue())
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'source2ClosestHarvestPos',
-          valueType: 'pos',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findClosestHarvestPos(room.roomObjects.source2HarvestPositions.getValue())
-          },
-     })
-
-     // Upgrade positions
-
-     function findCenterUpgradePos() {
-          // Get the anchor, informing false if it's undefined
-
-          if (!room.anchor) return false
-
-          // Get the open areas in a range of 3 to the controller
-
-          const distanceCM = room.distanceTransform(
-               undefined,
-               false,
-               room.controller.pos.x - 2,
-               room.controller.pos.y - 2,
-               room.controller.pos.x + 2,
-               room.controller.pos.y + 2,
-          )
-
-          // Find the closest value greater than two to the centerUpgradePos and inform it
-
-          return room.findClosestPosOfValue({
-               CM: distanceCM,
-               startPos: room.anchor,
-               requiredValue: 2,
-               reduceIterations: 1,
-          })
-     }
-
-     new RoomCacheObject({
-          name: 'centerUpgradePos',
-          valueType: 'pos',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: findCenterUpgradePos,
-     })
-
-     function findUpgradePositions() {
-          // Get the center upgrade pos, stopping if it's undefined
-
-          const centerUpgradePos = room.roomObjects.centerUpgradePos.getValue()
-          if (!centerUpgradePos) return []
-
-          if (!room.anchor) return []
-
-          // Construct harvestPositions
-
-          const upgradePositions = []
-
-          // Find terrain in room
-
-          const terrain = Game.map.getRoomTerrain(room.name)
-
-          // Find positions adjacent to source
-
-          const adjacentPositions = findPositionsInsideRect(
-               centerUpgradePos.x - 1,
-               centerUpgradePos.y - 1,
-               centerUpgradePos.x + 1,
-               centerUpgradePos.y + 1,
-          )
-
-          // Loop through each pos
-
-          for (const pos of adjacentPositions) {
-               // Iterate if terrain for pos is a wall
-
-               if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
-
-               // Add pos to harvestPositions
-
-               upgradePositions.push(room.newPos(pos))
-          }
-
-          upgradePositions.sort(function (a, b) {
-               return (
-                    getRange(a.x - room.anchor.x, a.y - room.anchor.y) -
-                    getRange(b.x - room.anchor.x, b.y - room.anchor.y)
-               )
-          })
-
-          // Inform harvestPositions
-
-          return upgradePositions
-     }
-
-     new RoomCacheObject({
-          name: 'upgradePositions',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: findUpgradePositions,
-     })
-
-     function findFastFillerPositions() {
-          if (!room.anchor) return []
-
-          // Construct fastFillerPositions from the top / bottom and left, right adjacent positions
-
-          const fastFillerPositions = [
-               {
-                    x: room.anchor.x - 1,
-                    y: room.anchor.y - 1,
-               },
-               {
-                    x: room.anchor.x + 1,
-                    y: room.anchor.y - 1,
-               },
-               {
-                    x: room.anchor.x - 1,
-                    y: room.anchor.y + 1,
-               },
-               {
-                    x: room.anchor.x + 1,
-                    y: room.anchor.y + 1,
-               },
-          ]
-
-          let adjacentStructures
-          let adjacentStructuresByType: Partial<Record<StructureConstant, number>>
-
-          // Loop through each fastFillerPos
-
-          for (let index = fastFillerPositions.length - 1; index >= 0; index -= 1) {
-               // Get the pos using the index
-
-               const pos = fastFillerPositions[index]
-
-               // Get adjacent structures
-
-               adjacentStructures = room.lookForAtArea(
-                    LOOK_STRUCTURES,
-                    pos.y - 1,
-                    pos.x - 1,
-                    pos.y + 1,
-                    pos.x + 1,
-                    true,
-               )
-
-               // Construct organized adjacent structures
-
-               adjacentStructuresByType = {
-                    spawn: 0,
-                    extension: 0,
-                    container: 0,
-                    link: 0,
-               }
-
-               // For each structure of adjacentStructures
-
-               for (const adjacentPosData of adjacentStructures) {
-                    // Get the structureType at the adjacentPos
-
-                    const { structureType } = adjacentPosData.structure
-
-                    if (adjacentStructuresByType[structureType] === undefined) continue
-
-                    // Increase structure amount for this structureType on the adjacentPos
-
-                    adjacentStructuresByType[structureType] += 1
-               }
-
-               // If there is more than one adjacent extension and container, iterate
-
-               if (
-                    adjacentStructuresByType[STRUCTURE_CONTAINER] + adjacentStructuresByType[STRUCTURE_LINK] > 0 &&
-                    (adjacentStructuresByType[STRUCTURE_SPAWN] > 0 || adjacentStructuresByType[STRUCTURE_EXTENSION] > 1)
-               )
-                    continue
-
-               // Otherwise, remove the pos from fastFillePositions
-
-               fastFillerPositions.splice(index, 1)
-          }
-
-          // Inform fastFillerPositions
-
-          return fastFillerPositions
-     }
-
-     new RoomCacheObject({
-          name: 'fastFillerPositions',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor: findFastFillerPositions,
-     })
-
-     // Source containers
-
-     function findSourceContainer(closestHarvestPos: RoomPosition) {
-          // Stop and inform false if no closestHarvestPos
+            // For each structure of adjacentStructures
 
-          if (!closestHarvestPos) return false
+            for (const adjacentPosData of adjacentStructures) {
+                // Get the structureType at the adjacentPos
 
-          // Look at the closestHarvestPos for structures
+                const { structureType } = adjacentPosData.structure
 
-          const structuresAsPos = closestHarvestPos.lookFor(LOOK_STRUCTURES)
+                if (adjacentStructuresByType[structureType] === undefined) continue
 
-          // Loop through structuresAtPos
+                // Increase structure amount for this structureType on the adjacentPos
 
-          for (const structure of structuresAsPos) {
-               // If the structureType is container, inform the container's ID
+                adjacentStructuresByType[structureType] += 1
+            }
 
-               if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
-          }
+            // If there is more than one adjacent extension and container, iterate
 
-          // Otherwise inform false
+            if (
+                adjacentStructuresByType[STRUCTURE_CONTAINER] + adjacentStructuresByType[STRUCTURE_LINK] > 0 &&
+                (adjacentStructuresByType[STRUCTURE_SPAWN] > 0 || adjacentStructuresByType[STRUCTURE_EXTENSION] > 1)
+            )
+                continue
 
-          return false
-     }
+            // Otherwise, remove the pos from fastFillePositions
 
-     new RoomCacheObject({
-          name: 'source1Container',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findSourceContainer(room.roomObjects.source1ClosestHarvestPos.getValue())
-          },
-     })
+            fastFillerPositions.splice(index, 1)
+        }
 
-     new RoomCacheObject({
-          name: 'source2Container',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findSourceContainer(room.roomObjects.source2ClosestHarvestPos.getValue())
-          },
-     })
+        // Inform fastFillerPositions
 
-     // usedMineralHarvestPositions
+        return fastFillerPositions
+    }
 
-     function findUsedMineralHarvestPositions() {
-          // Construct usedHarvestPositions
+    new RoomCacheObject({
+        name: 'fastFillerPositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 1,
+        room,
+        valueConstructor: findFastFillerPositions,
+    })
 
-          const usedHarvestPositions: Set<number> = new Set()
+    // usedMineralHarvestPositions
 
-          // Loop through each sourceHarvester's name in the room
+    function findUsedMineralHarvestPositions() {
+        // Construct usedHarvestPositions
 
-          for (const creepName of room.creepsFromRoom.mineralHarvester) {
-               // Get the creep using its name
+        const usedHarvestPositions: Set<number> = new Set()
 
-               const creep = Game.creeps[creepName]
+        // Loop through each sourceHarvester's name in the room
 
-               // If the creep is dying, iterate
+        for (const creepName of room.creepsFromRoom.mineralHarvester) {
+            // Get the creep using its name
 
-               if (creep.isDying()) continue
+            const creep = Game.creeps[creepName]
 
-               // If the creep has a packedHarvestPos, record it in usedHarvestPositions
+            // If the creep is dying, iterate
 
-               if (creep.memory.packedPos) usedHarvestPositions.add(creep.memory.packedPos)
-          }
+            if (creep.dying) continue
 
-          // Inform usedHarvestPositions
+            // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 
-          return usedHarvestPositions
-     }
+            if (creep.memory.packedPos) usedHarvestPositions.add(creep.memory.packedPos)
+        }
 
-     new RoomCacheObject({
-          name: 'usedMineralHarvestPositions',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor: findUsedMineralHarvestPositions,
-     })
+        // Inform usedHarvestPositions
 
-     // usedSourceHarvestPositions
+        return usedHarvestPositions
+    }
 
-     function findUsedSourceHarvestPositions() {
-          // Construct usedHarvestPositions
+    new RoomCacheObject({
+        name: 'usedMineralHarvestPositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 1,
+        room,
+        valueConstructor: findUsedMineralHarvestPositions,
+    })
 
-          const usedHarvestPositions: Set<number> = new Set()
+    // usedUpgradePositions
 
-          // If the room is a commune, use sourceHarvesters. Otherwise use remoteHarvesters
+    function findUsedUpgradePositions() {
+        // Construct usedUpgradePositions
 
-          const harvesterNames =
-               room.memory.type === 'commune'
-                    ? room.myCreeps.source1Harvester
-                           .concat(room.myCreeps.source2Harvester)
-                           .concat(room.myCreeps.vanguard)
-                    : room.myCreeps.source1RemoteHarvester.concat(room.myCreeps.source2RemoteHarvester)
+        const usedUpgradePositions: Set<number> = new Set()
 
-          for (const creepName of harvesterNames) {
-               // Get the creep using its name
+        // Get the controllerContainer
 
-               const creep = Game.creeps[creepName]
+        const controllerContainer: StructureContainer = room.controllerContainer
 
-               // If the creep is dying, iterate
+        // If there is no controllerContainer
 
-               if (creep.isDying()) continue
+        if (!controllerContainer) {
+            // Get the centerUpgradePos and set it as avoid in usedUpgradePositions
 
-               // Get the creep's sourceName
+            const centerUpgadePos = room.roomObjects.centerUpgradePos.getValue()
+            usedUpgradePositions.add(pack(centerUpgadePos))
+        }
 
-               const { sourceName } = creep.memory
+        // Get the hubAnchor, informing false if it's not defined
 
-               if (sourceName) room.creepsOfSourceAmount[sourceName] += 1
+        const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
+        if (!hubAnchor) return false
 
-               // If the creep has a packedHarvestPos, record it in usedHarvestPositions
+        // Get the upgradePositions, informing false if they're undefined
 
-               if (creep.memory.packedPos) usedHarvestPositions.add(creep.memory.packedPos)
-          }
+        const upgradePositions: RoomPosition[] = room.roomObjects.upgradePositions.getValue()
+        if (!upgradePositions.length) return false
 
-          // Inform usedHarvestPositions
+        // Assign closestUpgradePos in usedUpgradePositions
 
-          return usedHarvestPositions
-     }
+        usedUpgradePositions.add(
+            pack(
+                hubAnchor.findClosestByPath(upgradePositions, {
+                    ignoreCreeps: true,
+                    ignoreDestructibleStructures: true,
+                    ignoreRoads: true,
+                }),
+            ),
+        )
 
-     new RoomCacheObject({
-          name: 'usedSourceHarvestPositions',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor: findUsedSourceHarvestPositions,
-     })
+        // Loop through each controllerUpgrader's name in the room
 
-     // usedUpgradePositions
+        for (const creepName of room.myCreeps.controllerUpgrader) {
+            // Get the creep using its name
 
-     function findUsedUpgradePositions() {
-          // Construct usedUpgradePositions
+            const creep = Game.creeps[creepName]
 
-          const usedUpgradePositions: Set<number> = new Set()
+            // If the creep is dying, iterate
 
-          // Get the controllerContainer
+            if (creep.dying) continue
 
-          const controllerContainer: StructureContainer = room.roomObjects.controllerContainer.getValue()
+            // If the creep has a packedUpgradePos, record it in usedUpgradePositions
 
-          // If there is no controllerContainer
+            if (creep.memory.packedPos) usedUpgradePositions.add(creep.memory.packedPos)
+        }
 
-          if (!controllerContainer) {
-               // Get the centerUpgradePos and set it as avoid in usedUpgradePositions
+        // Inform usedUpgradePositions
 
-               const centerUpgadePos = room.roomObjects.centerUpgradePos.getValue()
-               usedUpgradePositions.add(pack(centerUpgadePos))
-          }
+        return usedUpgradePositions
+    }
 
-          // Get the hubAnchor, informing false if it's not defined
+    new RoomCacheObject({
+        name: 'usedUpgradePositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 1,
+        room,
+        valueConstructor: findUsedUpgradePositions,
+    })
 
-          const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
-          if (!hubAnchor) return false
+    function findUsedFastFillerPositions() {
+        // Construct usedFastFillerPositions
 
-          // Get the upgradePositions, informing false if they're undefined
+        const usedFastFillerPositions: Set<number> = new Set()
 
-          const upgradePositions: RoomPosition[] = room.roomObjects.upgradePositions.getValue()
-          if (!upgradePositions.length) return false
+        // Loop through each sourceHarvester's name in the room
 
-          // Assign closestUpgradePos in usedUpgradePositions
+        for (const creepName of room.creepsFromRoom.fastFiller) {
+            // Get the creep using its name
 
-          usedUpgradePositions.add(
-               pack(
-                    hubAnchor.findClosestByPath(upgradePositions, {
-                         ignoreCreeps: true,
-                         ignoreDestructibleStructures: true,
-                         ignoreRoads: true,
-                    }),
-               ),
-          )
+            const creep = Game.creeps[creepName]
 
-          // Loop through each controllerUpgrader's name in the room
+            // If the creep is dying, iterate
 
-          for (const creepName of room.myCreeps.controllerUpgrader) {
-               // Get the creep using its name
+            if (creep.dying) continue
 
-               const creep = Game.creeps[creepName]
+            // If the creep has a packedFastFillerPos, record it in usedFastFillerPositions
 
-               // If the creep is dying, iterate
+            if (creep.memory.packedPos) usedFastFillerPositions.add(creep.memory.packedPos)
+        }
 
-               if (creep.isDying()) continue
+        // Inform usedFastFillerPositions
 
-               // If the creep has a packedUpgradePos, record it in usedUpgradePositions
+        return usedFastFillerPositions
+    }
 
-               if (creep.memory.packedPos) usedUpgradePositions.add(creep.memory.packedPos)
-          }
+    new RoomCacheObject({
+        name: 'usedFastFillerPositions',
+        valueType: 'object',
+        cacheType: 'global',
+        cacheAmount: 1,
+        room,
+        valueConstructor: findUsedFastFillerPositions,
+    })
 
-          // Inform usedUpgradePositions
+    new RoomCacheObject({
+        name: 'labContainer',
+        valueType: 'id',
+        cacheType: 'global',
+        cacheAmount: Infinity,
+        room,
+        valueConstructor() {},
+    })
 
-          return usedUpgradePositions
-     }
+    // Get the roomObject using it's name
 
-     new RoomCacheObject({
-          name: 'usedUpgradePositions',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor: findUsedUpgradePositions,
-     })
+    const roomObject = room.roomObjects[roomObjectName]
 
-     function findUsedFastFillerPositions() {
-          // Construct usedFastFillerPositions
+    // Inform the roomObject's value
 
-          const usedFastFillerPositions: Set<number> = new Set()
-
-          // Loop through each sourceHarvester's name in the room
-
-          for (const creepName of room.creepsFromRoom.fastFiller) {
-               // Get the creep using its name
-
-               const creep = Game.creeps[creepName]
-
-               // If the creep is dying, iterate
-
-               if (creep.isDying()) continue
-
-               // If the creep has a packedFastFillerPos, record it in usedFastFillerPositions
-
-               if (creep.memory.packedPos) usedFastFillerPositions.add(creep.memory.packedPos)
-          }
-
-          // Inform usedFastFillerPositions
-
-          return usedFastFillerPositions
-     }
-
-     new RoomCacheObject({
-          name: 'usedFastFillerPositions',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor: findUsedFastFillerPositions,
-     })
-
-     // controllerContainer
-
-     function findControllerContainer() {
-          // Get the centerUpgradePos
-
-          const centerUpgradePos: RoomPosition = room.roomObjects.centerUpgradePos.getValue()
-
-          // Stop and inform false if no centerUpgradePos
-
-          if (!centerUpgradePos) return false
-
-          // Look at the centerUpgradePos for structures
-
-          const structuresAsPos = centerUpgradePos.lookFor(LOOK_STRUCTURES)
-
-          // Loop through structuresAtPos
-
-          for (const structure of structuresAsPos) {
-               // If the structureType is container, inform the container's ID
-
-               if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
-          }
-
-          // Otherwise inform false
-
-          return false
-     }
-
-     new RoomCacheObject({
-          name: 'controllerContainer',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: findControllerContainer,
-     })
-
-     // mineralContainer
-
-     function findMineralContainer() {
-          // Get the mineralHarvestPos, informing false if it's undefined
-
-          const mineralHarvestPos: RoomPosition = room.roomObjects.closestMineralHarvestPos.getValue()
-          if (!mineralHarvestPos) return false
-
-          // Look at the mineralHarvestPos for structures
-
-          const structuresAsPos = mineralHarvestPos.lookFor(LOOK_STRUCTURES)
-
-          // Loop through structuresAtPos
-
-          for (const structure of structuresAsPos) {
-               // If the structureType is container, inform the container's ID
-
-               if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
-          }
-
-          // Otherwise inform false
-
-          return false
-     }
-
-     new RoomCacheObject({
-          name: 'mineralContainer',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: findMineralContainer,
-     })
-
-     // base containers
-
-     function findFastFillerContainer(offset: number) {
-          // Get the anchor, stopping if it isn't defined
-
-          if (!room.anchor) return false
-
-          // Otherwise search based on an offset from the anchor's x
-
-          const structuresAsPos = room.lookForAt(LOOK_STRUCTURES, room.anchor.x + offset, room.anchor.y)
-
-          // Loop through structuresAtPos
-
-          for (const structure of structuresAsPos) {
-               // If the structureType is container, inform the container's ID
-
-               if (structure.structureType === STRUCTURE_CONTAINER) return structure.id
-          }
-
-          // Otherwise inform false
-
-          return false
-     }
-
-     new RoomCacheObject({
-          name: 'fastFillerContainerLeft',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: () => {
-               return findFastFillerContainer(-2)
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'fastFillerContainerRight',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor: () => {
-               return findFastFillerContainer(2)
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'labContainer',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {},
-     })
-
-     // Links
-
-     function findLinkNearby(anchor: RoomPosition | undefined): Id<Structure> | false {
-          // If the anchor isn't defined, inform false
-
-          if (!anchor) return false
-
-          // Otherwise get the room's links
-
-          const links: StructureLink[] = room.get('link')
-
-          // Inform a link's id if it's adjacent to the anchor
-
-          return links.find(link => getRangeBetween(anchor.x, anchor.y, link.pos.x, link.pos.y) === 1)?.id
-     }
-
-     new RoomCacheObject({
-          name: 'source1Link',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findLinkNearby(room.roomObjects.source1ClosestHarvestPos.getValue())
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'source2Link',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findLinkNearby(room.roomObjects.source2ClosestHarvestPos.getValue())
-          },
-     })
-
-     function findLinkAtPos(pos: RoomPosition | undefined): Id<Structure> | false {
-          // If the pos isn't defined, inform false
-
-          if (!pos) return false
-
-          // Otherwise search based on an offset from the anchor's x
-
-          const structuresAsPos = pos.lookFor(LOOK_STRUCTURES)
-
-          // Loop through structuresAtPos
-
-          for (const structure of structuresAsPos) {
-               // If the structureType is link, inform the structures's ID
-
-               if (structure.structureType === STRUCTURE_LINK) return structure.id
-          }
-
-          // Otherwise inform false
-
-          return false
-     }
-
-     new RoomCacheObject({
-          name: 'fastFillerLink',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findLinkAtPos(room.anchor)
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'hubLink',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findLinkNearby(unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name))
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'controllerLink',
-          valueType: 'id',
-          cacheType: 'global',
-          cacheAmount: Infinity,
-          room,
-          valueConstructor() {
-               return findLinkAtPos(room.roomObjects.centerUpgradePos.getValue())
-          },
-     })
-
-     // StructuresForSpawning
-
-     function findStructuresForSpawning() {
-          // Get the room anchor. If not defined, inform an empty array
-
-          const anchor = room.anchor || new RoomPosition(25, 25, room.name)
-
-          // Get array of spawns and extensions
-
-          const spawnsAndExtensions: (StructureExtension | StructureSpawn)[] = room.roomObjects.spawn
-               .getValue()
-               .concat(room.roomObjects.extension.getValue())
-
-          // Filter energy structures by distance from anchor
-
-          const filteredSpawnStructures = spawnsAndExtensions.sort(
-               (a, b) => a.pos.getRangeTo(anchor.x, anchor.y) - b.pos.getRangeTo(anchor.x, anchor.y),
-          )
-
-          return filteredSpawnStructures
-     }
-
-     // Creeps
-
-     new RoomCacheObject({
-          name: 'notMyCreeps',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor() {
-               return room.find(FIND_HOSTILE_CREEPS)
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'enemyCreeps',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor() {
-               return room.find(FIND_HOSTILE_CREEPS, {
-                    filter: creep => !allyList.has(creep.owner.username),
-               })
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'allyCreeps',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor() {
-               return room.find(FIND_HOSTILE_CREEPS, {
-                    filter: creep => allyList.has(creep.owner.username),
-               })
-          },
-     })
-
-     new RoomCacheObject({
-          name: 'remoteNamesByEfficacy',
-          valueType: 'object',
-          cacheType: 'global',
-          cacheAmount: 1,
-          room,
-          valueConstructor() {
-               // Filter rooms that have some sourceEfficacies recorded
-
-               const remotesWithEfficacies = room.memory.remotes.filter(function (roomName) {
-                    return Memory.rooms[roomName].sourceEfficacies.length
-               })
-
-               // Sort the remotes based on the average source efficacy
-
-               return remotesWithEfficacies.sort(function (a1, b1) {
-                    return (
-                         Memory.rooms[a1].sourceEfficacies.reduce((a2, b2) => a2 + b2) /
-                              Memory.rooms[a1].sourceEfficacies.length -
-                         Memory.rooms[b1].sourceEfficacies.reduce((a2, b2) => a2 + b2) /
-                              Memory.rooms[b1].sourceEfficacies.length
-                    )
-               })
-          },
-     })
-
-     // Get the roomObject using it's name
-
-     const roomObject = room.roomObjects[roomObjectName]
-
-     // Inform the roomObject's value
-
-     return roomObject.getValue()
-}
-
-Room.prototype.newPos = function (pos: Pos) {
-     const room = this
-
-     // Create an return roomPosition
-
-     return new RoomPosition(pos.x, pos.y, room.name)
+    return roomObject.getValue()
 }
 
 /**
@@ -1199,33 +479,33 @@ Room.prototype.newPos = function (pos: Pos) {
     @param [type] The status of action performed
 */
 Room.prototype.actionVisual = function (pos1, pos2, type?) {
-     const room = this
+    const room = this
 
-     // Stop if roomVisuals are disabled
+    // Stop if roomVisuals are disabled
 
-     if (!Memory.roomVisuals) return
+    if (!Memory.roomVisuals) return
 
-     // Construct colors for each type
+    // Construct colors for each type
 
-     const colorsForTypes: { [key: string]: string } = {
-          success: constants.colors.lightBlue,
-          fail: constants.colors.red,
-     }
+    const colorsForTypes: { [key: string]: string } = {
+        success: myColors.lightBlue,
+        fail: myColors.red,
+    }
 
-     // If no type, type is success. Construct type from color
+    // If no type, type is success. Construct type from color
 
-     if (!type) type = 'success'
-     const color: string = colorsForTypes[type]
+    if (!type) type = 'success'
+    const color: string = colorsForTypes[type]
 
-     // Create visuals
+    // Create visuals
 
-     room.visual.circle(pos2.x, pos2.y, { stroke: color })
-     room.visual.line(pos1, pos2, { color })
+    room.visual.circle(pos2.x, pos2.y, { stroke: color })
+    room.visual.line(pos1, pos2, { color })
 }
 
 interface RoutePart {
-     exit: ExitConstant
-     room: string
+    exit: ExitConstant
+    room: string
 }
 
 type Route = RoutePart[]
@@ -1235,24 +515,28 @@ type Route = RoutePart[]
  * @returns An array of RoomPositions
  */
 Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
-     const room = this
+    const room = this
 
-     // Construct route
+    const allowedRoomNames = new Set()
+    allowedRoomNames.add(opts.origin.roomName)
 
-     function generateRoute(): Route | undefined {
-          // If the goal is in the same room as the origin, inform that no route is needed
+    // Construct route
 
-          if (opts.origin.roomName === opts.goal.pos.roomName) return undefined
+    function generateRoute(): void {
+        for (const goal of opts.goals) {
+            // If the goal is in the same room as the origin
 
-          // Construct route by searching through rooms
+            if (opts.origin.roomName === goal.pos.roomName) continue
 
-          const route = Game.map.findRoute(opts.origin.roomName, opts.goal.pos.roomName, {
-               // Essentially a costMatrix for the rooms, priority is for the lower values. Infinity is impassible
+            // Construct route by searching through rooms
 
-               routeCallback(roomName: string) {
+            const route = Game.map.findRoute(opts.origin.roomName, goal.pos.roomName, {
+                // Essentially a costMatrix for the rooms, priority is for the lower values. Infinity is impassible
+
+                routeCallback(roomName: string) {
                     // If the goal is in the room, inform 1
 
-                    if (roomName === opts.goal.pos.roomName) return 1
+                    if (roomName === goal.pos.roomName) return 1
 
                     // Get the room's memory
 
@@ -1264,629 +548,674 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                     // If the type is in typeWeights, inform the weight for the type
 
-                    if (opts.typeWeights && opts.typeWeights[roomMemory.type]) return opts.typeWeights[roomMemory.type]
+                    if (opts.typeWeights && opts.typeWeights[roomMemory.T]) return opts.typeWeights[roomMemory.T]
 
                     // Inform to consider this room
 
                     return 2
-               },
-          })
+                },
+            })
 
-          // If route doesn't work inform undefined
+            // If a route can't be found
 
-          if (route === ERR_NO_PATH) return undefined
+            if (route === ERR_NO_PATH) continue
 
-          // Otherwise inform the route
+            for (const roomRoute of route) allowedRoomNames.add(roomRoute.room)
+        }
+    }
 
-          return route
-     }
+    generateRoute()
 
-     // Construct path
+    // Construct path
 
-     function generatePath() {
-          const route = generateRoute()
+    function generatePath() {
+        const pathFinderResult = PathFinder.search(opts.origin, opts.goals, {
+            plainCost: opts.plainCost || 2,
+            swampCost: opts.swampCost || 8,
+            maxRooms: allowedRoomNames.size,
+            maxOps: 100000,
+            flee: opts.flee,
 
-          const pathFinderResult = PathFinder.search(opts.origin, opts.goal, {
-               plainCost: opts.plainCost || 2,
-               swampCost: opts.swampCost || 8,
-               maxRooms: route ? 100 : 1,
-               maxOps: 100000,
-               flee: opts.flee,
+            // Create costMatrixes for room tiles, where lower values are priority, and 255 or more is considered impassible
 
-               // Create costMatrixes for room tiles, where lower values are priority, and 255 or more is considered impassible
+            roomCallback(roomName) {
+                // Get the room using the roomName
 
-               roomCallback(roomName) {
-                    // Get the room using the roomName
+                const room = Game.rooms[roomName]
 
-                    const room = Game.rooms[roomName]
+                // If the room is not allowed
 
-                    // If the type is in typeWeights, inform the weight for the type
+                if (!allowedRoomNames.has(roomName)) return false
 
-                    if (
-                         opts.typeWeights &&
-                         Memory.rooms[roomName] &&
-                         opts.typeWeights[Memory.rooms[roomName].type] === Infinity
-                    )
-                         return false
+                // Create a costMatrix for the room
 
-                    // Create a costMatrix for the room
+                const cm = new PathFinder.CostMatrix()
 
-                    const cm = new PathFinder.CostMatrix()
+                // If there is no route
 
-                    // If there is no route
+                if (allowedRoomNames.size <= 1) {
+                    let x
 
-                    if (!route) {
-                         let x
+                    // Configure y and loop through top exits
 
-                         // Configure y and loop through top exits
+                    let y = 0
+                    for (x = 0; x < roomDimensions; x += 1) cm.set(x, y, 255)
 
-                         let y = 0
-                         for (x = 0; x < 50; x += 1) cm.set(x, y, 255)
+                    // Configure x and loop through left exits
 
-                         // Configure x and loop through left exits
+                    x = 0
+                    for (y = 0; y < roomDimensions; y += 1) cm.set(x, y, 255)
 
-                         x = 0
-                         for (y = 0; y < 50; y += 1) cm.set(x, y, 255)
+                    // Configure y and loop through bottom exits
 
-                         // Configure y and loop through bottom exits
+                    y = roomDimensions - 1
+                    for (x = 0; x < roomDimensions; x += 1) cm.set(x, y, 255)
 
-                         y = 49
-                         for (x = 0; x < 50; x += 1) cm.set(x, y, 255)
+                    // Configure x and loop through right exits
 
-                         // Configure x and loop through right exits
+                    x = roomDimensions - 1
+                    for (y = 0; y < roomDimensions; y += 1) cm.set(x, y, 255)
+                }
 
-                         x = 49
-                         for (y = 0; y < 50; y += 1) cm.set(x, y, 255)
+                /* if (room) room.visualizeCostMatrix(cm) */
+
+                // Weight positions
+
+                for (const weight in opts.weightPositions) {
+                    // Use the weight to get the positions
+
+                    const positions = opts.weightPositions[weight]
+
+                    // Get the numeric value of the weight
+
+                    const weightNum = parseInt(weight)
+
+                    // Loop through each gameObject and set their pos to the weight in the cm
+
+                    for (const pos of positions) cm.set(pos.x, pos.y, weightNum)
+                }
+
+                // Weight costMatrixes
+
+                // Stop if there are no cost matrixes to weight
+
+                if (opts.weightCostMatrixes) {
+                    // Otherwise iterate through each x and y in the room
+
+                    for (let x = 0; x < roomDimensions; x += 1) {
+                        for (let y = 0; y < roomDimensions; y += 1) {
+                            // Loop through each costMatrix
+
+                            for (const weightCM of opts.weightCostMatrixes)
+                                if (weightCM) cm.set(x, y, weightCM.get(x, y))
+                        }
+                    }
+                }
+
+                if (opts.weightCoordMaps) {
+                    for (const coordMap of opts.weightCoordMaps) {
+                        for (const index in coordMap) {
+                            const packedCoord = parseInt(index)
+                            if (coordMap[packedCoord] === 0) continue
+
+                            const coord = unpackAsPos(packedCoord)
+
+                            cm.set(coord.x, coord.y, coordMap[packedCoord])
+                        }
+                    }
+                }
+
+                if (opts.weightStampAnchors) {
+                    if (room.memory.T === 'commune') {
+                    } else if (room.memory.T === 'remote') {
+                    }
+                }
+
+                // If there is no vision in the room, inform the costMatrix
+
+                if (!room) return cm
+
+                if (opts.creep && opts.creep.memory.R)
+                    for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, 1)
+
+                // Weight structures
+
+                for (const weight in opts.weightStructures) {
+                    // Get the numeric value of the weight
+
+                    const weightNum = parseInt(weight)
+
+                    for (const structureType of opts.weightStructures[weight]) {
+                        for (const structure of room.structures[structureType])
+                            cm.set(structure.pos.x, structure.pos.y, weightNum)
+                    }
+                }
+
+                for (const portal of room.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
+
+                // Loop trough each construction site belonging to an ally
+
+                for (const cSite of room.allyCSites) cm.set(cSite.pos.x, cSite.pos.y, 255)
+
+                // If there is a request to avoid enemy ranges
+
+                avoidEnemyRanges()
+
+                function avoidEnemyRanges() {
+                    // Stop if avoidEnemyRanges isn't specified
+
+                    if (!opts.avoidEnemyRanges) return
+
+                    // Stop if the is a controller, it's mine, and it's in safemode
+
+                    if (room.controller && room.controller.my && room.controller.safeMode) return
+
+                    // Get enemies and loop through them
+
+                    const enemyAttackers: Creep[] = []
+                    const enemyRangedAttackers: Creep[] = []
+
+                    for (const enemyCreep of room.enemyAttackers) {
+                        if (enemyCreep.parts.ranged_attack > 0) {
+                            enemyRangedAttackers.push(enemyCreep)
+                            continue
+                        }
+
+                        if (enemyCreep.parts.attack > 0) enemyAttackers.push(enemyCreep)
                     }
 
-                    weightStructures()
+                    for (const enemyAttacker of enemyAttackers) {
 
-                    function weightStructures() {
-                         let roomObjects
-                         let weightNum
-                         let roomObj
+                        // Construct rect and get positions inside
 
-                         for (const weight in opts.weightStructures) {
-                              // Use the weight to get the positions
+                        const positions = findCoordsInsideRect(
+                            enemyAttacker.pos.x - 2,
+                            enemyAttacker.pos.y - 2,
+                            enemyAttacker.pos.x + 2,
+                            enemyAttacker.pos.y + 2,
+                        )
 
-                              roomObjects = opts.weightGamebjects[weight]
+                        // Loop through positions and set them as impassible
 
-                              // Get the numeric value of the weight
-
-                              weightNum = parseInt(weight)
-
-                              // Loop through each gameObject and set their pos to the weight in the cm
-
-                              for (roomObj of roomObjects) cm.set(roomObj.pos.x, roomObj.pos.y, weightNum)
-                         }
+                        for (const pos of positions) cm.set(pos.x, pos.y, 255)
                     }
 
-                    weightGamebjects()
+                    for (const enemyAttacker of enemyRangedAttackers) {
+                        // Construct rect and get positions inside
 
-                    function weightGamebjects() {
-                         let roomObjects
-                         let weightNum
-                         let roomObj
+                        const positions = findCoordsInsideRect(
+                            enemyAttacker.pos.x - 3,
+                            enemyAttacker.pos.y - 3,
+                            enemyAttacker.pos.x + 3,
+                            enemyAttacker.pos.y + 3,
+                        )
 
-                         for (const weight in opts.weightGamebjects) {
-                              // Use the weight to get the positions
+                        // Loop through positions and set them as impassible
 
-                              roomObjects = opts.weightGamebjects[weight]
+                        for (const pos of positions) cm.set(pos.x, pos.y, 255)
+                    }
+                }
 
-                              // Get the numeric value of the weight
+                if (opts.avoidNotMyCreeps) {
+                    for (const creep of room.enemyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
+                    for (const creep of room.allyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
 
-                              weightNum = parseInt(weight)
+                    for (const creep of room.find(FIND_HOSTILE_POWER_CREEPS)) cm.set(creep.pos.x, creep.pos.y, 255)
+                }
 
-                              // Loop through each gameObject and set their pos to the weight in the cm
+                // If avoiding structures that can't be walked on is enabled
 
-                              for (roomObj of roomObjects) cm.set(roomObj.pos.x, roomObj.pos.y, weightNum)
-                         }
+                if (opts.avoidImpassibleStructures) {
+                    // Get and loop through ramparts
+
+                    const ramparts = room.structures.rampart
+
+                    for (const rampart of ramparts) {
+                        // If the rampart is mine
+
+                        if (rampart.my) {
+                            // If there is no weight for my ramparts, iterate
+
+                            if (!opts.myRampartWeight) continue
+
+                            // Otherwise, record rampart by the weight and iterate
+
+                            cm.set(rampart.pos.x, rampart.pos.y, opts.myRampartWeight)
+                            continue
+                        }
+
+                        // Otherwise if the rampart is owned by an ally, iterate
+
+                        if (rampart.isPublic) continue
+
+                        // Otherwise set the rampart's pos as impassible
+
+                        cm.set(rampart.pos.x, rampart.pos.y, 255)
                     }
 
-                    weightPositions()
+                    // Loop through structureTypes of impassibleStructureTypes
 
-                    function weightPositions() {
-                         let positions
-                         let weightNum
-                         let pos
+                    for (const structureType of impassibleStructureTypes) {
+                        for (const structure of room.structures[structureType]) {
+                            // Set pos as impassible
 
-                         for (const weight in opts.weightPositions) {
-                              // Use the weight to get the positions
+                            cm.set(structure.pos.x, structure.pos.y, 255)
+                        }
 
-                              positions = opts.weightPositions[weight]
+                        for (const cSite of room.cSites[structureType]) {
+                            // Set pos as impassible
 
-                              // Get the numeric value of the weight
+                            cm.set(cSite.pos.x, cSite.pos.y, 255)
+                        }
+                    }
+                }
 
-                              weightNum = parseInt(weight)
+                // If avoidStationaryPositions is requested
 
-                              // Loop through each gameObject and set their pos to the weight in the cm
+                if (opts.avoidStationaryPositions) {
+                    // Loop through them
 
-                              for (pos of positions) cm.set(pos.x, pos.y, weightNum)
-                         }
+                    for (const index in room.sources) {
+
+                        // Loop through each position of harvestPositions, have creeps prefer to avoid
+
+                        for (const pos of room.sourcePositions[index]) cm.set(pos.x, pos.y, 10)
                     }
 
-                    weightCostMatrixes()
+                    // If the anchor is defined
 
-                    function weightCostMatrixes() {
-                         // Stop if there are no cost matrixes to weight
+                    if (room.anchor) {
+                        // Get the upgradePositions, and use the anchor to find the closest upgradePosition to the anchor
 
-                         if (!opts.weightCostMatrixes) return
+                        const upgradePositions: RoomPosition[] = room.get('upgradePositions')
+                        const deliverUpgradePos = room.anchor.findClosestByPath(upgradePositions, {
+                            ignoreCreeps: true,
+                            ignoreDestructibleStructures: true,
+                            ignoreRoads: true,
+                        })
 
-                         // Otherwise iterate through each x and y in the room
+                        // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
 
-                         for (let x = 0; x < constants.roomDimensions; x += 1) {
-                              for (let y = 0; y < constants.roomDimensions; y += 1) {
-                                   // Loop through each costMatrix
+                        for (const pos of upgradePositions) {
+                            // If the pos and deliverUpgradePos are the same, iterate
 
-                                   for (const weightCM of opts.weightCostMatrixes)
-                                        if (weightCM) cm.set(x, y, weightCM.get(x, y))
-                              }
-                         }
+                            if (areCoordsEqual(pos, deliverUpgradePos)) continue
+
+                            // Otherwise have the creep prefer to avoid the pos
+
+                            cm.set(pos.x, pos.y, 10)
+                        }
                     }
 
-                    // If there is no vision in the room, inform the costMatrix
+                    // Get the hubAnchor
 
-                    if (!room) return cm
+                    const hubAnchor =
+                        room.memory.stampAnchors && room.memory.stampAnchors.hub[0]
+                            ? unpackAsRoomPos(room.memory.stampAnchors.hub[0], roomName)
+                            : undefined
 
-                    for (const portal of room.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
+                    // If the hubAnchor is defined
 
-                    // Loop trough each construction site belonging to an ally
+                    if (hubAnchor) cm.set(hubAnchor.x, hubAnchor.y, 10)
 
-                    for (const cSite of room.get('allyCSites')) cm.set(cSite.x, cSite.y, 255)
+                    // Get fastFillerPositions
 
-                    // If there is a request to avoid enemy ranges
+                    const fastFillerPositions: Coord[] = room.get('fastFillerPositions')
 
-                    avoidEnemyRanges()
+                    // If there are fastFillerPositions
 
-                    function avoidEnemyRanges() {
-                         // Stop if avoidEnemyRanges isn't specified
+                    if (fastFillerPositions.length) {
+                        // Loop through each position of fastFillerPositions, have creeps prefer to avoid
 
-                         if (!opts.avoidEnemyRanges) return
-
-                         // Stop if the is a controller, it's mine, and it's in safemode
-
-                         if (room.controller && room.controller.my && room.controller.safeMode) return
-
-                         // Get enemies and loop through them
-
-                         const enemyAttackers: Creep[] = []
-                         const enemyRangedAttackers: Creep[] = []
-
-                         for (const enemyCreep of room.enemyCreeps) {
-                              if (enemyCreep.parts.ranged_attack > 0) {
-                                   enemyRangedAttackers.push(enemyCreep)
-                                   return
-                              }
-
-                              if (enemyCreep.parts.attack > 0) enemyAttackers.push(enemyCreep)
-                         }
-
-                         for (const enemyAttacker of enemyAttackers) {
-                              // Construct rect and get positions inside
-
-                              const positions = findPositionsInsideRect(
-                                   enemyAttacker.pos.x - 2,
-                                   enemyAttacker.pos.y - 2,
-                                   enemyAttacker.pos.x + 2,
-                                   enemyAttacker.pos.y + 2,
-                              )
-
-                              // Loop through positions and set them as impassible
-
-                              for (const pos of positions) cm.set(pos.x, pos.y, 255)
-                         }
-
-                         for (const enemyAttacker of enemyRangedAttackers) {
-                              // Construct rect and get positions inside
-
-                              const positions = findPositionsInsideRect(
-                                   enemyAttacker.pos.x - 3,
-                                   enemyAttacker.pos.y - 3,
-                                   enemyAttacker.pos.x + 3,
-                                   enemyAttacker.pos.y + 3,
-                              )
-
-                              // Loop through positions and set them as impassible
-
-                              for (const pos of positions) cm.set(pos.x, pos.y, 255)
-                         }
+                        for (const pos of fastFillerPositions) cm.set(pos.x, pos.y, 10)
                     }
+                }
 
-                    if (opts.avoidNotMyCreeps) {
-                         for (const creep of room.find(FIND_HOSTILE_CREEPS)) cm.set(creep.pos.x, creep.pos.y, 255)
+                // Inform the CostMatrix
 
-                         for (const creep of room.find(FIND_HOSTILE_POWER_CREEPS)) cm.set(creep.pos.x, creep.pos.y, 255)
-                    }
+                return cm
+            },
+        })
 
-                    // If avoiding structures that can't be walked on is enabled
+        // If the pathFindResult is incomplete, inform an empty array
 
-                    if (opts.avoidImpassibleStructures) {
-                         // Get and loop through ramparts
+        if (pathFinderResult.incomplete) {
+            customLog(
+                'Incomplete Path',
+                `${pathFinderResult.path}, ${JSON.stringify(opts.goals)}`,
+                myColors.white,
+                myColors.red,
+            )
 
-                         const ramparts = room.structures.rampart
+            room.pathVisual(pathFinderResult.path, 'red')
 
-                         for (const rampart of ramparts) {
-                              // If the rampart is mine
+            let lastPos = opts.origin
 
-                              if (rampart.my) {
-                                   // If there is no weight for my ramparts, iterate
+            for (const goal of opts.goals) {
 
-                                   if (!opts.myRampartWeight) continue
-
-                                   // Otherwise, record rampart by the weight and iterate
-
-                                   cm.set(rampart.pos.x, rampart.pos.y, opts.myRampartWeight)
-                                   continue
-                              }
-
-                              // Otherwise if the rampart is owned by an ally, iterate
-
-                              if (rampart.isPublic) continue
-
-                              // Otherwise set the rampart's pos as impassible
-
-                              cm.set(rampart.pos.x, rampart.pos.y, 255)
-                         }
-
-                         // Loop through structureTypes of impassibleStructureTypes
-
-                         for (const structureType of constants.impassibleStructureTypes) {
-                              for (const structure of room.structures[structureType]) {
-                                   // Set pos as impassible
-
-                                   cm.set(structure.pos.x, structure.pos.y, 255)
-                              }
-
-                              for (const cSite of room.cSites[structureType]) {
-                                   // Set pos as impassible
-
-                                   cm.set(cSite.pos.x, cSite.pos.y, 255)
-                              }
-                         }
-                    }
-
-                    // If avoidStationaryPositions is requested
-
-                    if (opts.avoidStationaryPositions) {
-                         // Construct the sourceNames
-
-                         const sources: ('source1' | 'source2')[] = ['source1', 'source2']
-
-                         // Loop through them
-
-                         for (const sourceName of sources) {
-                              // Find harvestPositions for sourceNames, iterating if there are none
-
-                              const harvestPositions: Pos[] = room.get(`${sourceName}HarvestPositions`)
-                              if (!harvestPositions.length) continue
-
-                              // Loop through each position of harvestPositions, have creeps prefer to avoid
-
-                              for (const pos of harvestPositions) cm.set(pos.x, pos.y, 10)
-                         }
-
-                         // If the anchor is defined
-
-                         if (room.anchor) {
-                              // Get the upgradePositions, and use the anchor to find the closest upgradePosition to the anchor
-
-                              const upgradePositions: RoomPosition[] = room.get('upgradePositions')
-                              const deliverUpgradePos = room.anchor.findClosestByPath(upgradePositions, {
-                                   ignoreCreeps: true,
-                                   ignoreDestructibleStructures: true,
-                                   ignoreRoads: true,
-                              })
-
-                              // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
-
-                              for (const pos of upgradePositions) {
-                                   // If the pos and deliverUpgradePos are the same, iterate
-
-                                   if (arePositionsEqual(pos, deliverUpgradePos)) continue
-
-                                   // Otherwise have the creep prefer to avoid the pos
-
-                                   cm.set(pos.x, pos.y, 10)
-                              }
-                         }
-
-                         // Get the hubAnchor
-
-                         const hubAnchor =
-                              room.memory.stampAnchors && room.memory.stampAnchors.hub[0]
-                                   ? unpackAsRoomPos(room.memory.stampAnchors.hub[0], roomName)
-                                   : undefined
-
-                         // If the hubAnchor is defined
-
-                         if (hubAnchor) cm.set(hubAnchor.x, hubAnchor.y, 10)
-
-                         // Get fastFillerPositions
-
-                         const fastFillerPositions: Pos[] = room.get('fastFillerPositions')
-
-                         // If there are fastFillerPositions
-
-                         if (fastFillerPositions.length) {
-                              // Loop through each position of fastFillerPositions, have creeps prefer to avoid
-
-                              for (const pos of fastFillerPositions) cm.set(pos.x, pos.y, 10)
-                         }
-                    }
-
-                    // Inform the CostMatrix
-
-                    return cm
-               },
-          })
-
-          // If the pathFindResult is incomplete, inform an empty array
-
-          if (pathFinderResult.incomplete) {
-               customLog(
-                    'Incomplete Path',
-                    `${pathFinderResult.path}, ${JSON.stringify(opts.goal.pos)}`,
-                    constants.colors.white,
-                    constants.colors.red,
-               )
-
-               room.pathVisual(pathFinderResult.path, 'red')
-               room.visual.line(opts.origin, opts.goal.pos, {
-                    color: constants.colors.red,
+                room.visual.line(lastPos, goal.pos, {
+                    color: myColors.red,
                     width: 0.15,
                     opacity: 0.3,
                     lineStyle: 'solid',
-               })
+                })
 
-               return []
-          }
+                lastPos = goal.pos
+            }
 
-          // Otherwise inform the path from pathFinderResult
+            return []
+        }
 
-          return pathFinderResult.path
-     }
+        // Otherwise inform the path from pathFinderResult
 
-     // Call path generation and inform the result
+        return pathFinderResult.path
+    }
 
-     return generatePath()
+    // Call path generation and inform the result
+
+    return generatePath()
 }
 
 Room.prototype.findType = function (scoutingRoom: Room) {
-     const room = this
-     const { controller } = room
+    const room = this
+    const { controller } = room
 
-     // Record that the room was scouted this tick
+    // Record that the room was scouted this tick
 
-     room.memory.lastScout = Game.time
+    room.memory.LST = Game.time
 
-     // Find the numbers in the room's name
+    // Find the numbers in the room's name
 
-     const [EWstring, NSstring] = room.name.match(/\d+/g)
+    const [EWstring, NSstring] = room.name.match(/\d+/g)
 
-     // Convert he numbers from strings into actual numbers
+    // Convert he numbers from strings into actual numbers
 
-     const EW = parseInt(EWstring)
-     const NS = parseInt(NSstring)
+    const EW = parseInt(EWstring)
+    const NS = parseInt(NSstring)
 
-     // Use the numbers to deduce some room types - quickly!
+    // Use the numbers to deduce some room types - quickly!
 
-     if (EW % 10 === 0 && NS % 10 === 0) {
-          room.memory.type = 'intersection'
-          return
-     }
+    if (EW % 10 === 0 && NS % 10 === 0) {
+        room.memory.T = 'intersection'
+        return
+    }
 
-     if (EW % 10 === 0 || NS % 10 === 0) {
-          room.memory.type = 'highway'
-          return
-     }
+    if (EW % 10 === 0 || NS % 10 === 0) {
+        room.memory.T = 'highway'
+        return
+    }
 
-     if (EW % 5 === 0 && NS % 5 === 0) {
-          room.memory.type = 'keeperCenter'
-          return
-     }
+    if (EW % 5 === 0 && NS % 5 === 0) {
+        room.memory.T = 'keeperCenter'
+        return
+    }
 
-     if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1) {
-          room.memory.type = 'keeper'
-          return
-     }
+    if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1) {
+        room.memory.T = 'keeper'
+        return
+    }
 
-     // If there is a controller
+    // If there is a controller
 
-     if (controller) {
-          // If the contoller is owned
+    if (controller) {
+        // If the contoller is owned
 
-          if (controller.owner) {
-               // Stop if the controller is owned by me
+        if (controller.owner) {
+            // Stop if the controller is owned by me
 
-               if (controller.my) return
+            if (controller.my) return
 
-               // If the controller is owned by an ally
+            const owner = controller.owner.username
 
-               if (allyList.has(controller.owner.username)) {
-                    // Set the type to ally and stop
+            room.memory.owner = owner
 
-                    room.memory.type = 'ally'
-                    room.memory.owner = controller.owner.username
-                    return
-               }
+            // If the controller is owned by an ally
 
-               // If the controller is not owned by an ally
+            if (Memory.allyList.includes(owner)) {
+                room.memory.T = 'ally'
+                return
+            }
 
-               // Set the type to enemy and stop
+            room.memory.T = 'enemy'
 
-               room.memory.type = 'enemy'
-               room.memory.owner = controller.owner.username
-               room.memory.level = controller.level
-               room.memory.powerEnabled = controller.isPowerEnabled
-               room.memory.terminal = room.terminal !== undefined
-               room.memory.storedEnergy = room.findStoredResourceAmount(RESOURCE_ENERGY)
-               return
-          }
+            // If the controller is not owned by an ally
 
-          // Filter sources that have been harvested
+            const playerInfo = Memory.players[owner]
 
-          const harvestedSources = room.find(FIND_SOURCES).filter(source => source.ticksToRegeneration > 0)
+            if (!playerInfo) Memory.players[owner] = {}
 
-          if (isReservedRemote()) return
+            const level = controller.level
 
-          function isReservedRemote(): boolean {
-               // If there is no reservation inform false
+            if (level) Memory.players[owner].GRCL = Math.max(level, playerInfo.GRCL)
+            room.memory.level = level
 
-               if (!controller.reservation) return false
+            // Offensive threat
 
-               // If I am the reserver, inform false
+            let threat = 0
 
-               if (controller.reservation.username === Memory.me) return false
+            threat += Math.pow(level, 2)
 
-               // If the reserver is an Invader, inform false
+            threat += room.structures.spawn.length * 50
 
-               if (controller.reservation.username === 'Invader') return false
+            threat += room.structures.nuker.length * 300
 
-               // Get roads
+            threat += Math.pow(room.structures.lab.length * 10000, 0.4)
 
-               const roads: StructureRoad[] = room.get('road')
+            room.memory.OT = threat
+            Memory.players[owner].OT = Math.max(threat, playerInfo.OT)
 
-               // Get containers
+            // Defensive threat
 
-               const containers: StructureContainer[] = room.get('container')
+            threat = 0
 
-               // If there are roads or containers or sources harvested, inform false
+            const energy = room.findStoredResourceAmount(RESOURCE_ENERGY)
 
-               if (roads.length === 0 && containers.length === 0 && !harvestedSources) return false
+            room.memory.energy = energy
+            threat += Math.pow(energy, 0.5)
 
-               // If the controller is not reserved by an ally
+            const ramparts = room.structures.rampart
+            const avgRampartHits = ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
 
-               if (!allyList.has(controller.reservation.username)) {
-                    // Set type to enemyRemote and inform true
+            threat += Math.pow(avgRampartHits, 0.5)
 
-                    room.memory.type = 'enemyRemote'
-                    room.memory.owner = controller.reservation.username
-                    return true
-               }
+            threat += room.structures.spawn.length * 100
 
-               // Otherwise if the room is reserved by an ally
+            threat += room.structures.tower.length * 300
 
-               // Set type to allyRemote and inform true
+            threat += Math.pow(room.structures.extension.length * 400, 0.8)
 
-               room.memory.type = 'allyRemote'
-               room.memory.owner = controller.reservation.username
-               return true
-          }
+            const hasTerminal = room.terminal !== undefined
 
-          if (isUnReservedRemote()) return
+            if (hasTerminal) {
+                threat += 800
 
-          function isUnReservedRemote() {
-               if (controller.reservation) {
-                    // If I am the reserver, inform false
+                room.memory.terminal = true
+            }
 
-                    if (controller.reservation.username === Memory.me) return false
+            room.memory.powerEnabled = controller.isPowerEnabled
 
-                    // If the reserver is an Invader, inform false
+            room.memory.DT = threat
+            Memory.players[owner].DT = Math.max(threat, playerInfo.DT)
 
-                    if (controller.reservation.username === 'Invader') return false
-               }
+            return
+        }
 
-               // If there are no sources harvested
+        // Filter sources that have been harvested
 
-               if (harvestedSources.length === 0) return false
+        const harvestedSources = room.find(FIND_SOURCES).filter(source => source.ticksToRegeneration > 0)
 
-               // Find creeps that I don't own that aren't invaders
+        if (isReservedRemote()) return
 
-               const creepsNotMine: Creep[] = room.get('enemyCreeps').concat(room.get('allyCreeps'))
+        function isReservedRemote(): boolean {
+            // If there is no reservation inform false
 
-               // Iterate through them
+            if (!controller.reservation) return false
 
-               for (const creep of creepsNotMine) {
-                    // If the creep is an invdader, iterate
+            // If I am the reserver, inform false
 
-                    if (creep.owner.username === 'Invader') continue
+            if (controller.reservation.username === Memory.me) return false
 
-                    // If the creep has work parts
+            // If the reserver is an Invader, inform false
 
-                    if (creep.parts.work > 0) {
-                         // If the creep is owned by an ally
+            if (controller.reservation.username === 'Invader') return false
 
-                         if (allyList.has(creep.owner.username)) {
-                              // Set type to allyRemote and stop
+            // Get roads
 
-                              room.memory.type = 'allyRemote'
-                              room.memory.owner = creep.owner.username
-                              return true
-                         }
+            const roads = room.structures.road
 
-                         // If the creep is not owned by an ally
+            // Get containers
 
-                         // Set type to enemyRemote and stop
+            const containers = room.structures.container
 
-                         room.memory.type = 'enemyRemote'
-                         room.memory.owner = creep.owner.username
-                         return true
+            // If there are roads or containers or sources harvested, inform false
+
+            if (roads.length === 0 && containers.length === 0 && !harvestedSources) return false
+
+            // If the controller is not reserved by an ally
+
+            if (!Memory.allyList.includes(controller.reservation.username)) {
+                // Set type to enemyRemote and inform true
+
+                room.memory.T = 'enemyRemote'
+                room.memory.owner = controller.reservation.username
+                return true
+            }
+
+            // Otherwise if the room is reserved by an ally
+
+            // Set type to allyRemote and inform true
+
+            room.memory.T = 'allyRemote'
+            room.memory.owner = controller.reservation.username
+            return true
+        }
+
+        if (isUnReservedRemote()) return
+
+        function isUnReservedRemote() {
+            if (controller.reservation) {
+                // If I am the reserver, inform false
+
+                if (controller.reservation.username === Memory.me) return false
+
+                // If the reserver is an Invader, inform false
+
+                if (controller.reservation.username === 'Invader') return false
+            }
+
+            // If there are no sources harvested
+
+            if (harvestedSources.length === 0) return false
+
+            // Find creeps that I don't own that aren't invaders
+
+            const creepsNotMine = room.enemyCreeps.concat(room.allyCreeps)
+
+            // Iterate through them
+
+            for (const creep of creepsNotMine) {
+                // If the creep is an invdader, iterate
+
+                if (creep.owner.username === 'Invader') continue
+
+                // If the creep has work parts
+
+                if (creep.parts.work > 0) {
+                    // If the creep is owned by an ally
+
+                    if (Memory.allyList.includes(creep.owner.username)) {
+                        // Set type to allyRemote and stop
+
+                        room.memory.T = 'allyRemote'
+                        room.memory.owner = creep.owner.username
+                        return true
                     }
-               }
 
-               return false
-          }
+                    // If the creep is not owned by an ally
 
-          if (room.makeRemote(scoutingRoom)) return
+                    // Set type to enemyRemote and stop
 
-          room.memory.type = 'neutral'
+                    room.memory.T = 'enemyRemote'
+                    room.memory.owner = creep.owner.username
+                    return true
+                }
+            }
 
-          room.createClaimRequest()
-     }
+            return false
+        }
+
+        if (room.makeRemote(scoutingRoom)) return
+
+        room.memory.T = 'neutral'
+
+        room.createClaimRequest()
+    }
 }
 
 Room.prototype.makeRemote = function (scoutingRoom) {
-     const room = this
+    const room = this
 
-     let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, room.name)
+    let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, room.name)
 
-     // Find distance from scoutingRoom
+    // Find distance from scoutingRoom
 
-     if (distance < 4) distance = advancedFindDistance(scoutingRoom.name, room.name, {
-          keeper: Infinity,
-          enemy: Infinity,
-          enemyRemote: Infinity,
-          ally: Infinity,
-          allyRemote: Infinity,
-          highway: Infinity,
-     })
+    if (distance <= 5)
+        distance = advancedFindDistance(scoutingRoom.name, room.name, {
+            keeper: Infinity,
+            enemy: Infinity,
+            enemyRemote: Infinity,
+            ally: Infinity,
+            allyRemote: Infinity,
+            /* highway: Infinity, */
+        })
 
-     if (distance < 4) {
-          // If the room is already a remote of the scoutingRoom
+    if (distance <= 5) {
+        // If the room is already a remote of the scoutingRoom
 
-          if (room.memory.type === 'remote' && scoutingRoom.name === room.memory.commune) return true
+        if (room.memory.T === 'remote' && scoutingRoom.name === room.memory.commune) return true
 
-          // Get the anchor from the scoutingRoom, stopping if it's undefined
+        // Get the anchor from the scoutingRoom, stopping if it's undefined
 
-          if (!scoutingRoom.anchor) return true
+        if (!scoutingRoom.anchor) return true
 
-          const newSourceEfficacies = []
+        const newSourceEfficacies = []
+        let newSourceEfficaciesTotal = 0
 
-          // Get base planning data
+        // Get base planning data
 
-          // Get the room's sourceNames
+        // loop through sourceNames
 
-          const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+        for (const source of room.sources) {
+            const path = room.advancedFindPath({
+                origin: source.pos,
+                goals: [{ pos: scoutingRoom.anchor, range: 1 }],
+            })
 
-          // loop through sourceNames
+            // Stop if there is a source inefficient enough
 
-          for (const sourceName of sourceNames) {
-               // Get the source using sourceName, stopping the loop if undefined
+            if (path.length >= 300) return true
 
-               const source: Source = room.get(sourceName)
-               if (!source) break
+            const uniqueRoomNames = [...new Set(path.map(rp => rp.roomName))]
 
-               const path = room.advancedFindPath({
-                    origin: source.pos,
-                    goal: { pos: scoutingRoom.anchor, range: 3 },
-                    /* weightCostMatrixes: [roadCM] */
-               })
+            //Pull the terrain into a dictionary, because creating the object is expensive-ish
+            let terrianDictionary: { [roomName: string]: RoomTerrain } = {}
+            for (let roomName of uniqueRoomNames) {
+                terrianDictionary[roomName] = new Room.Terrain(roomName)
+            }
 
-               // Record the length of the path in the room's memory
+            let sourceEfficancy = path
+                //Map the Room position to the travel costs
+                .map(roomPos =>
+                    //Swamps
+                    terrianDictionary[roomPos.roomName].get(roomPos.x, roomPos.y) == TERRAIN_MASK_SWAMP ? 5 : 1,
+                )
+                //And sum it
+                .reduce((partialSum, a) => partialSum + a, 0)
 
-               newSourceEfficacies.push(path.length)
+            newSourceEfficacies.push(sourceEfficancy)
+            newSourceEfficaciesTotal += sourceEfficancy
 
-               /*
+            /*
             // Loop through positions of the path
 
             for (const pos of path) {
@@ -1897,876 +1226,1286 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
                 // Plan for a road at this position
 
-                structurePlans.set(pos.x, pos.y, constants.structureTypesByNumber[STRUCTURE_ROAD])
+                structurePlans.set(pos.x, pos.y, structureTypesByNumber[STRUCTURE_ROAD])
             }
             */
-          }
+        }
 
-          // If the room isn't already a remote
+        const newReservationEfficacy = room.advancedFindPath({
+            origin: room.controller.pos,
+            goals: [{ pos: scoutingRoom.anchor, range: 3 }],
+        }).length
 
-          if (room.memory.type !== 'remote' || !Memory.communes.includes(room.memory.commune)) {
-               room.memory.type = 'remote'
+        // If the room isn't already a remote
 
-               // Assign the room's commune as the scoutingRoom
+        if (room.memory.T !== 'remote' || !global.communes.has(room.memory.commune)) {
+            room.memory.T = 'remote'
 
-               room.memory.commune = scoutingRoom.name
+            // Assign the room's commune as the scoutingRoom
 
-               // Add the room's name to the scoutingRoom's remotes list
+            room.memory.commune = scoutingRoom.name
 
-               scoutingRoom.memory.remotes.push(room.name)
+            // Generate new important positions
 
-               room.memory.sourceEfficacies = newSourceEfficacies
+            delete room.memory.SP
+            delete room._sourcePositions
+            room.sourcePositions
 
-               room.memory.needs = []
-               for (const key in remoteNeedsIndex) room.memory.needs[parseInt(key)] = 0
+            delete room.memory.CP
+            delete room._controllerPositions
+            room.controllerPositions
 
-               return true
-          }
+            // Add the room's name to the scoutingRoom's remotes list
 
-          const currentAvgSourceEfficacy =
-               room.memory.sourceEfficacies.reduce((sum, el) => sum + el) / room.memory.sourceEfficacies.length
-          const newAvgSourceEfficacy = newSourceEfficacies.reduce((sum, el) => sum + el) / newSourceEfficacies.length
+            scoutingRoom.memory.remotes.push(room.name)
 
-          // If the new average source efficacy is above the current, stop
+            room.memory.SE = newSourceEfficacies
+            room.memory.RE = newReservationEfficacy
 
-          if (newAvgSourceEfficacy >= currentAvgSourceEfficacy) return true
+            room.memory.needs = []
+            for (const key in RemoteNeeds) room.memory.needs[parseInt(key)] = 0
 
-          room.memory.type = 'remote'
+            return true
+        }
 
-          // Assign the room's commune as the scoutingRoom
+        const currentRemoteEfficacy =
+            room.memory.SE.reduce((sum, el) => sum + el) / room.memory.SE.length + room.memory.RE
+        const newRemoteEfficacy = newSourceEfficaciesTotal / newSourceEfficacies.length + newReservationEfficacy
 
-          room.memory.commune = scoutingRoom.name
+        // If the new average source efficacy is above the current, stop
 
-          // Add the room's name to the scoutingRoom's remotes list
+        if (newRemoteEfficacy >= currentRemoteEfficacy) return true
 
-          scoutingRoom.memory.remotes.push(room.name)
+        room.memory.T = 'remote'
 
-          room.memory.sourceEfficacies = newSourceEfficacies
+        // Assign the room's commune as the scoutingRoom
 
-          room.memory.needs = []
-          for (const key in remoteNeedsIndex) room.memory.needs[parseInt(key)] = 0
+        room.memory.commune = scoutingRoom.name
 
-          return true
-     }
+        // Generate new important positions
 
-     if (room.memory.type !== 'remote') return false
+        delete room.memory.SP
+        delete room._sourcePositions
+        room.sourcePositions
 
-     if (!Memory.communes.includes(room.memory.commune)) return false
+        delete room.memory.CP
+        delete room._controllerPositions
+        room.controllerPositions
 
-     return true
+        // Add the room's name to the scoutingRoom's remotes list
+
+        scoutingRoom.memory.remotes.push(room.name)
+
+        room.memory.SE = newSourceEfficacies
+        room.memory.RE = newReservationEfficacy
+
+        room.memory.needs = []
+        for (const key in RemoteNeeds) room.memory.needs[parseInt(key)] = 0
+
+        return true
+    }
+
+    if (room.memory.T !== 'remote') return false
+
+    if (!global.communes.has(room.memory.commune)) return false
+
+    return true
 }
 
 Room.prototype.cleanMemory = function () {
-     const room = this
+    const room = this
 
-     // Stop if the room doesn't have a type
+    // Stop if the room doesn't have a type
 
-     if (!room.memory.type) return
+    if (!room.memory.T) return
 
-     // Loop through keys in the room's memory
+    // Loop through keys in the room's memory
 
-     for (const key in room.memory) {
-          // Iterate if key is not part of roomTypeProperties
+    for (const key in room.memory) {
+        // Iterate if key is not part of roomTypeProperties
 
-          if (!constants.roomTypeProperties[key]) continue
+        if (!roomTypeProperties[key]) continue
 
-          // Iterate if key part of this roomType's properties
+        // Iterate if key part of this roomType's properties
 
-          if (constants.roomTypes[room.memory.type][key]) continue
+        if (roomTypes[room.memory.T][key]) continue
 
-          // Delete the property
+        // Delete the property
 
-          delete room.memory[key]
-     }
+        delete room.memory[key as keyof RoomMemory]
+    }
 }
 
 Room.prototype.findStoredResourceAmount = function (resourceType) {
-     const room = this
+    const room = this
 
-     // If room.storedResources doesn't exist, construct it
+    // If room.storedResources doesn't exist, construct it
 
-     if (!room.storedResources) room.storedResources = {}
-     // Otherwise if there is already data about the storedResources, inform it
-     else if (room.storedResources[resourceType]) return room.storedResources[resourceType]
+    if (!room.storedResources) room.storedResources = {}
+    // Otherwise if there is already data about the storedResources, inform it
+    else if (room.storedResources[resourceType]) return room.storedResources[resourceType]
 
-     // Otherwise construct the number for this stored resource
+    // Otherwise construct the number for this stored resource
 
-     room.storedResources[resourceType] = 0
+    room.storedResources[resourceType] = 0
 
-     // Create array of room and terminal
+    // Create array of room and terminal
 
-     const storageStructures = [room.storage, room.terminal]
+    const storageStructures = [room.storage, room.terminal, ...room.structures.factory]
 
-     // Iterate through storageStructures
+    // Iterate through storageStructures
 
-     for (const storageStructure of storageStructures) {
-          // Iterate if storageStructure isn't defined
+    for (const storageStructure of storageStructures) {
+        // Iterate if storageStructure isn't defined
 
-          if (!storageStructure) continue
+        if (!storageStructure) continue
 
-          // Add the amount of resources in the storageStructure to the rooms storedResources of resourceType
+        // Add the amount of resources in the storageStructure to the rooms storedResources of resourceType
 
-          room.storedResources[resourceType] += storageStructure.store.getUsedCapacity(resourceType)
-     }
+        room.storedResources[resourceType] += storageStructure.store.getUsedCapacity(resourceType)
+    }
 
-     // Inform room's storedResources of resourceType
+    // Inform room's storedResources of resourceType
 
-     return room.storedResources[resourceType]
-}
-
-Room.prototype.findTasksOfTypes = function (createdTaskIDs, types) {
-     const room = this
-
-     // Initialize tasks of types
-
-     const tasksOfTypes = []
-
-     // Iterate through IDs of createdTasks
-
-     for (const taskID in createdTaskIDs) {
-          // Set the task from tasks without responders, or if undefined, from tasksWithResponders
-
-          const task: RoomTask = room.global.tasksWithoutResponders[taskID] || room.global.tasksWithResponders[taskID]
-
-          // If the task isn't defined, iterate
-
-          if (!task) continue
-
-          // If the task is not of the specified types, iterate
-
-          if (!types.has(task.type)) continue
-
-          // Otherwise add the task to tasksOfTypes
-
-          tasksOfTypes.push(task)
-     }
-
-     // Inform false if no tasks had the specified types
-
-     return tasksOfTypes
+    return room.storedResources[resourceType]
 }
 
 Room.prototype.distanceTransform = function (
-     initialCM,
-     enableVisuals,
-     x1 = 0,
-     y1 = 0,
-     x2 = constants.roomDimensions,
-     y2 = constants.roomDimensions,
+    initialCoords,
+    visuals,
+    minAvoid = 1,
+    x1 = 0,
+    y1 = 0,
+    x2 = roomDimensions - 1,
+    y2 = roomDimensions - 1,
 ) {
-     const room = this
+    // Use a costMatrix to record distances
 
-     // Use a costMatrix to record distances
+    const distanceCoords = new Uint8Array(2500)
 
-     const distanceCM = new PathFinder.CostMatrix()
+    if (!initialCoords) initialCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
 
-     if (!initialCM) initialCM = room.get('terrainCM')
+    let x
+    let y
+    let minX = Math.max(x1 - 1, 0)
+    let minY = Math.max(y1 - 1, 0)
+    let maxX = Math.min(x2 + 1, roomDimensions - 1)
+    let maxY = Math.min(y2 + 1, roomDimensions - 1)
+    let packedCoord
 
-     for (let x = Math.max(x1 - 1, 0); x <= Math.min(x2 + 1, constants.roomDimensions); x += 1) {
-          for (let y = Math.max(y1 - 1, 0); y <= Math.min(y2 + 1, constants.roomDimensions); y += 1) {
-               distanceCM.set(x, y, initialCM.get(x, y) === 255 ? 0 : 255)
-          }
-     }
+    for (x = minX; x <= maxX; x += 1) {
+        for (y = minY; y <= maxY; y += 1) {
+            packedCoord = packXY(x, y)
+            distanceCoords[packedCoord] = initialCoords[packedCoord] >= minAvoid ? 0 : 255
+        }
+    }
 
-     let top: number
-     let left: number
-     let topLeft: number
-     let topRight: number
-     let bottomLeft: number
+    let top
+    let left
+    let topLeft
+    let topRight
+    let bottomLeft
 
-     // Loop through the xs and ys inside the bounds
+    // Loop through the xs and ys inside the bounds
 
-     for (let x = x1; x <= x2; x += 1) {
-          for (let y = y1; y <= y2; y += 1) {
-               top = distanceCM.get(x, y - 1)
-               left = distanceCM.get(x - 1, y)
-               topLeft = distanceCM.get(x - 1, y - 1)
-               topRight = distanceCM.get(x + 1, y - 1)
-               bottomLeft = distanceCM.get(x - 1, y + 1)
+    for (x = x1; x <= x2; x += 1) {
+        for (y = y1; y <= y2; y += 1) {
+            top = distanceCoords[packXY(x, y - 1)] || 0
+            left = distanceCoords[packXY(x - 1, y)] || 0
+            topLeft = distanceCoords[packXY(x - 1, y - 1)] || 0
+            topRight = distanceCoords[packXY(x + 1, y - 1)] || 0
+            bottomLeft = distanceCoords[packXY(x - 1, y + 1)] || 0
 
-               distanceCM.set(
-                    x,
-                    y,
-                    Math.min(Math.min(top, left, topLeft, topRight, bottomLeft) + 1, distanceCM.get(x, y)),
-               )
-          }
-     }
+            packedCoord = packXY(x, y)
 
-     let bottom: number
-     let right: number
-     let bottomRight: number
+            distanceCoords[packedCoord] = Math.min(
+                Math.min(top, left, topLeft, topRight, bottomLeft) + 1,
+                distanceCoords[packedCoord],
+            )
+        }
+    }
 
-     // Loop through the xs and ys inside the bounds
+    let bottom
+    let right
+    let bottomRight
 
-     for (let x = x2; x >= x1; x -= 1) {
-          for (let y = y2; y >= y1; y -= 1) {
-               bottom = distanceCM.get(x, y + 1)
-               right = distanceCM.get(x + 1, y)
-               bottomRight = distanceCM.get(x + 1, y + 1)
-               topRight = distanceCM.get(x + 1, y - 1)
-               bottomLeft = distanceCM.get(x - 1, y + 1)
+    // Loop through the xs and ys inside the bounds
 
-               distanceCM.set(
-                    x,
-                    y,
-                    Math.min(Math.min(bottom, right, bottomRight, topRight, bottomLeft) + 1, distanceCM.get(x, y)),
-               )
-          }
-     }
+    for (x = x2; x >= x1; x -= 1) {
+        for (y = y2; y >= y1; y -= 1) {
+            bottom = distanceCoords[packXY(x, y + 1)] || 0
+            right = distanceCoords[packXY(x + 1, y)] || 0
+            bottomRight = distanceCoords[packXY(x + 1, y + 1)] || 0
+            topRight = distanceCoords[packXY(x + 1, y - 1)] || 0
+            bottomLeft = distanceCoords[packXY(x - 1, y + 1)] || 0
 
-     if (enableVisuals && Memory.roomVisuals) {
-          // Loop through the xs and ys inside the bounds
+            packedCoord = packXY(x, y)
 
-          for (let x = x1; x <= x2; x += 1) {
-               for (let y = y1; y <= y2; y += 1) {
-                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                         fill: `hsl(${200}${distanceCM.get(x, y) * 10}, 100%, 60%)`,
-                         opacity: 0.4,
-                    })
-               }
-          }
-     }
+            distanceCoords[packedCoord] = Math.min(
+                Math.min(bottom, right, bottomRight, topRight, bottomLeft) + 1,
+                distanceCoords[packedCoord],
+            )
+        }
+    }
 
-     return distanceCM
+    if (visuals) {
+        // Loop through the xs and ys inside the bounds
+
+        for (x = x1; x <= x2; x += 1) {
+            for (y = y1; y <= y2; y += 1) {
+                this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+                    fill: `hsl(${200}${distanceCoords[packXY(x, y)] * 10}, 100%, 60%)`,
+                    opacity: 0.4,
+                })
+                this.visual.text(distanceCoords[packXY(x, y)].toString(), x, y)
+            }
+        }
+    }
+
+    return distanceCoords
 }
 
-Room.prototype.specialDT = function (
-     initialCM,
-     enableVisuals,
-     x1 = 0,
-     y1 = 0,
-     x2 = constants.roomDimensions,
-     y2 = constants.roomDimensions,
+Room.prototype.diagonalDistanceTransform = function (
+    initialCoords,
+    visuals,
+    minAvoid = 1,
+    x1 = 0,
+    y1 = 0,
+    x2 = roomDimensions - 1,
+    y2 = roomDimensions - 1,
 ) {
-     const room = this
+    // Use a costMatrix to record distances
 
-     // Use a costMatrix to record distances
+    const distanceCoords = new Uint8Array(2500)
 
-     const distanceCM = new PathFinder.CostMatrix()
+    if (!initialCoords) initialCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
 
-     if (!initialCM) initialCM = room.get('terrainCM')
+    let x
+    let y
+    let packedCoord
 
-     for (let x = x1; x <= x2; x += 1) {
-          for (let y = y1; y <= y2; y += 1) {
-               distanceCM.set(x, y, initialCM.get(x, y) === 255 ? 0 : 255)
-          }
-     }
+    for (x = x1; x <= x2; x += 1) {
+        for (y = y1; y <= y2; y += 1) {
+            packedCoord = packXY(x, y)
+            distanceCoords[packedCoord] = initialCoords[packedCoord] >= minAvoid ? 0 : 255
+        }
+    }
 
-     let top: number
-     let left: number
+    let top
+    let left
 
-     // Loop through the xs and ys inside the bounds
+    // Loop through the xs and ys inside the bounds
 
-     for (let x = x1; x <= x2; x += 1) {
-          for (let y = y1; y <= y2; y += 1) {
-               top = distanceCM.get(x, y - 1)
-               left = distanceCM.get(x - 1, y)
+    for (x = x1; x <= x2; x += 1) {
+        for (y = y1; y <= y2; y += 1) {
+            top = distanceCoords[packXY(x, y - 1)] || 0
+            left = distanceCoords[packXY(x - 1, y)] || 0
 
-               distanceCM.set(x, y, Math.min(Math.min(top, left) + 1, distanceCM.get(x, y)))
-          }
-     }
+            packedCoord = packXY(x, y)
 
-     let bottom: number
-     let right: number
+            distanceCoords[packedCoord] = Math.min(Math.min(top, left) + 1, distanceCoords[packedCoord])
+        }
+    }
 
-     // Loop through the xs and ys inside the bounds
+    let bottom
+    let right
 
-     for (let x = x2; x >= x1; x -= 1) {
-          for (let y = y2; y >= y1; y -= 1) {
-               bottom = distanceCM.get(x, y + 1)
-               right = distanceCM.get(x + 1, y)
+    // Loop through the xs and ys inside the bounds
 
-               distanceCM.set(x, y, Math.min(Math.min(bottom, right) + 1, distanceCM.get(x, y)))
-          }
-     }
+    for (x = x2; x >= x1; x -= 1) {
+        for (y = y2; y >= y1; y -= 1) {
+            bottom = distanceCoords[packXY(x, y + 1)] || 0
+            right = distanceCoords[packXY(x + 1, y)] || 0
 
-     if (enableVisuals && Memory.roomVisuals) {
-          // Loop through the xs and ys inside the bounds
+            packedCoord = packXY(x, y)
 
-          for (let x = x1; x <= x2; x += 1) {
-               for (let y = y1; y <= y2; y += 1) {
-                    room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                         fill: `hsl(${200}${distanceCM.get(x, y) * 10}, 100%, 60%)`,
-                         opacity: 0.4,
-                    })
-               }
-          }
-     }
+            distanceCoords[packedCoord] = Math.min(Math.min(bottom, right) + 1, distanceCoords[packedCoord])
+        }
+    }
 
-     return distanceCM
+    if (visuals) {
+        // Loop through the xs and ys inside the bounds
+
+        for (x = x1; x <= x2; x += 1) {
+            for (y = y1; y <= y2; y += 1) {
+                this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+                    fill: `hsl(${200}${distanceCoords[packXY(x, y)] * 10}, 100%, 60%)`,
+                    opacity: 0.4,
+                })
+                this.visual.text(distanceCoords[packXY(x, y)].toString(), x, y)
+            }
+        }
+    }
+
+    return distanceCoords
 }
 
-Room.prototype.floodFill = function (seeds) {
-     const room = this
+Room.prototype.floodFill = function (seeds, coordMap, visuals) {
+    // Construct a cost matrix for the flood
 
-     // Construct a cost matrix for the flood
+    const floodCoords = new Uint8Array(2500)
+    const terrainCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
+    const visitedCoords = new Uint8Array(2500)
 
-     const floodCM = new PathFinder.CostMatrix()
-     // Get the terrain cost matrix
+    // Construct values for the flood
 
-     const terrain = room.getTerrain()
-     // Construct a cost matrix for visited tiles and add seeds to it
+    let depth = 0
+    let thisGeneration = seeds
+    let nextGeneration: Coord[] = []
 
-     const visitedCM = new PathFinder.CostMatrix()
+    // Loop through positions of seeds
 
-     // Construct values for the flood
+    for (const coord of seeds) visitedCoords[pack(coord)] = 1
 
-     let depth = 0
-     let thisGeneration: Pos[] = seeds
-     let nextGeneration: Pos[] = []
+    // So long as there are positions in this gen
 
-     // Loop through positions of seeds
+    while (thisGeneration.length) {
+        // Reset next gen
 
-     for (const pos of seeds) {
-          // Record the seedsPos as visited
+        nextGeneration = []
 
-          visitedCM.set(pos.x, pos.y, 1)
-     }
+        // Iterate through positions of this gen
 
-     // So long as there are positions in this gen
+        for (const coord1 of thisGeneration) {
+            // If the depth isn't 0
 
-     while (thisGeneration.length) {
-          // Reset next gen
+            if (depth > 0) {
+                const packedCoord1 = pack(coord1)
 
-          nextGeneration = []
+                // Iterate if the terrain is a wall
 
-          // Iterate through positions of this gen
+                if (terrainCoords[packedCoord1] === 255) continue
 
-          for (const pos of thisGeneration) {
-               // If the depth isn't 0
+                if (coordMap && coordMap[pack(coord1)] > 0) continue
 
-               if (depth !== 0) {
-                    // Iterate if the terrain is a wall
+                // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
 
-                    if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+                floodCoords[packedCoord1] = depth
 
-                    // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
+                // If visuals are enabled, show the depth on the pos
+                /*
+                if (visuals)
+                    this.visual.rect(coord1.x - 0.5, coord1.y - 0.5, 1, 1, {
+                        fill: `hsl(${200}${depth * 2}, 100%, 60%)`,
+                        opacity: 0.4,
+                    })
+                     */
+            }
 
-                    floodCM.set(pos.x, pos.y, depth)
+            // Loop through adjacent positions
 
-                    // If visuals are enabled, show the depth on the pos
+            for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+                const packedCoord2 = pack(coord2)
 
-                    if (Memory.roomVisuals)
-                         room.visual.rect(pos.x - 0.5, pos.y - 0.5, 1, 1, {
-                              fill: `hsl(${200}${depth * 2}, 100%, 60%)`,
-                              opacity: 0.4,
-                         })
-               }
+                // Iterate if the adjacent pos has been visited or isn't a tile
 
-               // Construct a rect and get the positions in a range of 1
+                if (visitedCoords[packedCoord2] === 1) continue
 
-               const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
+                // Otherwise record that it has been visited
 
-               // Loop through adjacent positions
+                visitedCoords[packedCoord2] = 1
 
-               for (const adjacentPos of adjacentPositions) {
-                    // Iterate if the adjacent pos has been visited or isn't a tile
+                // Add it to the next gen
 
-                    if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
+                nextGeneration.push(coord2)
+            }
+        }
 
-                    // Otherwise record that it has been visited
+        // Set this gen to next gen
 
-                    visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+        thisGeneration = nextGeneration
 
-                    // Add it to the next gen
+        // Increment depth
 
-                    nextGeneration.push(adjacentPos)
-               }
-          }
+        depth += 1
+    }
 
-          // Set this gen to next gen
-
-          thisGeneration = nextGeneration
-
-          // Increment depth
-
-          depth += 1
-     }
-
-     return floodCM
+    return floodCoords
 }
 
 Room.prototype.findClosestPosOfValue = function (opts) {
-     const room = this
+    const room = this
 
-     /**
-      *
-      */
-     function isViableAnchor(pos: Pos): boolean {
-          // Get the value of the pos
+    if (opts.visuals) {
+        for (const coord of opts.startCoords)
+            this.visual.circle(coord.x, coord.y, {
+                stroke: myColors.yellow,
+            })
+    }
 
-          const posValue = opts.CM.get(pos.x, pos.y)
+    /**
+     *
+     */
+    function isViableAnchor(coord1: Coord): boolean {
+        // Get the value of the pos4271
 
-          // If the value is to avoid, inform false
+        const posValue = opts.coordMap[pack(coord1)]
+        if (posValue === 255) return false
+        if (posValue === 0) return false
 
-          if (posValue === 255) return false
+        // If the posValue is less than the requiredValue, inform false
 
-          // If the posValue is less than the requiredValue, inform false
+        if (posValue < opts.requiredValue) return false
 
-          if (posValue < opts.requiredValue) return false
+        // If adjacentToRoads is a requirement
 
-          // If adjacentToRoads is a requirement
+        if (!opts.adjacentToRoads) return true
 
-          if (opts.adjacentToRoads) {
-               // Construct a rect and get the positions in a range of 1
+        if (opts.roadCoords[pack(coord1)] > 0) return false
 
-               const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
+        // Loop through adjacent positions
 
-               // Construct a default no for nearby roads
+        for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+            // If the adjacentPos isn't a roadPosition, iterate
 
-               let nearbyRoad = false
+            if (opts.roadCoords[pack(coord2)] !== 1) continue
 
-               // Loop through adjacent positions
+            // Otherwise set nearbyRoad to true and stop the loop
 
-               for (const adjacentPos of adjacentPositions) {
-                    // If the adjacentPos isn't a roadPosition, iterate
+            return true
+        }
 
-                    if (opts.roadCM.get(adjacentPos.x, adjacentPos.y) !== 1) continue
+        return false
+    }
 
-                    // Otherwise set nearbyRoad to true and stop the loop
+    while (opts.reduceIterations >= 0) {
+        // Construct a cost matrix for visited tiles and add seeds to it
 
-                    nearbyRoad = true
-                    break
-               }
+        let visitedCoords = new Uint8Array(2500)
 
-               // If nearbyRoad is false, inform false
+        // Record startPos as visited
 
-               if (!nearbyRoad) return false
-          }
+        for (const coord of opts.startCoords) visitedCoords[pack(coord)] = 1
 
-          // Inform true
+        // Construct values for the check
 
-          return true
-     }
+        let thisGeneration = opts.startCoords
+        let nextGeneration: Coord[] = []
+        let i = 0
 
-     while ((opts.reduceIterations || 0) >= 0) {
-          // Construct a cost matrix for visited tiles and add seeds to it
+        // So long as there are positions in this gen
 
-          const visitedCM = new PathFinder.CostMatrix()
+        while (thisGeneration.length) {
+            // Reset nextGeneration
 
-          // Record startPos as visited
+            nextGeneration = []
+            i++
 
-          visitedCM.set(opts.startPos.x, opts.startPos.y, 1)
+            let localVisitedCoords = new Uint8Array(visitedCoords)
 
-          // Construct values for the check
+            // Flood cardinal directions, excluding impassibles
 
-          let thisGeneration: Pos[] = [opts.startPos]
-          let nextGeneration: Pos[] = []
-          let canUseWalls = true
+            if (opts.cardinalFlood) {
+                // Iterate through positions of this gen
 
-          // So long as there are positions in this gen
-
-          while (thisGeneration.length) {
-               // Reset nextGeneration
-
-               nextGeneration = []
-
-               // Iterate through positions of this gen
-
-               for (const pos of thisGeneration) {
+                for (const coord1 of thisGeneration) {
                     // If the pos can be an anchor, inform it
 
-                    if (isViableAnchor(pos)) return room.newPos(pos)
+                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
 
                     // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                    const adjacentPositions = [
-                         {
-                              x: pos.x - 1,
-                              y: pos.y,
-                         },
-                         {
-                              x: pos.x + 1,
-                              y: pos.y,
-                         },
-                         {
-                              x: pos.x,
-                              y: pos.y - 1,
-                         },
-                         {
-                              x: pos.x,
-                              y: pos.y + 1,
-                         },
+                    const adjacentCoords = [
+                        {
+                            x: coord1.x - 1,
+                            y: coord1.y,
+                        },
+                        {
+                            x: coord1.x + 1,
+                            y: coord1.y,
+                        },
+                        {
+                            x: coord1.x,
+                            y: coord1.y - 1,
+                        },
+                        {
+                            x: coord1.x,
+                            y: coord1.y + 1,
+                        },
                     ]
 
                     // Loop through adjacent positions
 
-                    for (const adjacentPos of adjacentPositions) {
-                         // Iterate if the pos doesn't map onto a room
+                    for (const coord2 of adjacentCoords) {
+                        // Iterate if the pos doesn't map onto a room
 
-                         if (
-                              adjacentPos.x < 0 ||
-                              adjacentPos.x >= constants.roomDimensions ||
-                              adjacentPos.y < 0 ||
-                              adjacentPos.y >= constants.roomDimensions
-                         )
-                              continue
+                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                            continue
 
-                         // Iterate if the adjacent pos has been visited or isn't a tile
+                        // Iterate if the adjacent pos has been visited or isn't a tile
 
-                         if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
+                        if (localVisitedCoords[pack(coord2)] === 1) continue
 
-                         // Otherwise record that it has been visited
+                        // Otherwise record that it has been visited
 
-                         visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+                        localVisitedCoords[pack(coord2)] = 1
 
-                         // If canUseWalls is enabled and the terrain isnt' a wall, disable canUseWalls
+                        if (opts.coordMap[pack(coord2)] === 0) continue
 
-                         if (canUseWalls && opts.CM.get(adjacentPos.x, adjacentPos.y) !== 255) canUseWalls = false
+                        // Add it tofastFillerSide the next gen
 
-                         // Add it tofastFillerSide the next gen
-
-                         nextGeneration.push(adjacentPos)
+                        nextGeneration.push(coord2)
                     }
-               }
+                }
+            }
 
-               // Set this gen to next gen
+            // Flood all adjacent positions excluding diagonals
 
-               thisGeneration = nextGeneration
-          }
+            if (!nextGeneration.length) {
+                localVisitedCoords = new Uint8Array(visitedCoords)
 
-          opts.reduceIterations -= 1
-          opts.requiredValue -= 1
-     }
+                // Iterate through positions of this gen
 
-     // Inform false if no value was found
+                for (const coord1 of thisGeneration) {
+                    // If the pos can be an anchor, inform it
 
-     return false
-}
+                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
 
-Room.prototype.pathVisual = function (path, color) {
-     const room = this
+                    // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-     // Stop if roomVisuals are disabled
-
-     if (!Memory.roomVisuals) return
-
-     if (!path.length) return
-
-     // Filter only positions in the path that are in the path's starting room
-
-     const currentRoomName = path[0].roomName
-
-     for (let index = 0; index < path.length; index += 1) {
-          const pos = path[index]
-
-          if (pos.roomName === currentRoomName) continue
-
-          path.splice(index, path.length - 1)
-          break
-     }
-
-     // Generate the visual
-
-     room.visual.poly(path, {
-          stroke: constants.colors[color],
-          strokeWidth: 0.15,
-          opacity: 0.3,
-          lineStyle: 'solid',
-     })
-}
-
-Room.prototype.findCSiteTargetID = function (creep) {
-     const room = this
-
-     // Find my construction sites
-
-     const myCSites = room.find(FIND_MY_CONSTRUCTION_SITES)
-
-     // If there are no sites inform false
-
-     if (!myCSites.length) return false
-
-     // Loop through structuretypes of the build priority
-
-     for (const structureType of constants.structureTypesByBuildPriority) {
-          // Get the structures with the relevant type
-
-          const cSitesOfType: ConstructionSite[] = room.get(`${structureType}CSite`)
-
-          // If there are no cSites of this type, iterate
-
-          if (!cSitesOfType.length) continue
-
-          // Ptherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
-
-          const anchor: RoomPosition = room.anchor || creep?.pos || new RoomPosition(25, 25, room.name)
-
-          // Record the closest site to the anchor in the room's global and inform true
-
-          room.memory.cSiteTargetID = anchor.findClosestByPath(cSitesOfType, {
-               ignoreCreeps: true,
-               ignoreDestructibleStructures: true,
-               ignoreRoads: true,
-          }).id
-          return true
-     }
-
-     // If no cSiteTarget was found, inform false
-
-     return false
-}
-
-Room.prototype.groupRampartPositions = function (rampartPositions, rampartPlans) {
-     const room = this
-
-     // Construct a costMatrix to store visited positions
-
-     const visitedCM = new PathFinder.CostMatrix()
-
-     // Construct storage of position groups
-
-     const groupedPositions = []
-
-     // Construct the groupIndex
-
-     let groupIndex = 0
-
-     // Loop through each pos of positions
-
-     for (const packedPos of rampartPositions) {
-          const pos = unpackAsPos(packedPos)
-
-          // If the pos has already been visited, iterate
-
-          if (visitedCM.get(pos.x, pos.y) === 1) continue
-
-          // Record that this pos has been visited
-
-          visitedCM.set(pos.x, pos.y, 1)
-
-          // Construct the group for this index with the pos in it the group
-
-          groupedPositions[groupIndex] = [new RoomPosition(pos.x, pos.y, room.name)]
-
-          // Construct values for floodFilling
-
-          let thisGeneration = [pos]
-
-          let nextGeneration: Pos[] = []
-
-          // So long as there are positions in this gen
-
-          while (thisGeneration.length) {
-               // Reset next gen
-
-               nextGeneration = []
-
-               // Iterate through positions of this gen
-
-               for (const pos of thisGeneration) {
-                    // Construct a rect and get the positions in a range of 1 (not diagonals)
-
-                    const adjacentPositions = findPositionsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
+                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
 
                     // Loop through adjacent positions
 
-                    for (const adjacentPos of adjacentPositions) {
-                         // Iterate if adjacentPos is out of room bounds
+                    for (const coord2 of adjacentCoords) {
+                        // Iterate if the pos doesn't map onto a room
 
-                         if (
-                              adjacentPos.x <= 0 ||
-                              adjacentPos.x >= constants.roomDimensions ||
-                              adjacentPos.y <= 0 ||
-                              adjacentPos.y >= constants.roomDimensions
-                         )
-                              continue
+                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                            continue
 
-                         // Iterate if the adjacent pos has been visited or isn't a tile
+                        // Iterate if the adjacent pos has been visited or isn't a tile
 
-                         if (visitedCM.get(adjacentPos.x, adjacentPos.y) === 1) continue
+                        if (localVisitedCoords[pack(coord2)] === 1) continue
 
-                         // Otherwise record that it has been visited
+                        // Otherwise record that it has been visited
 
-                         visitedCM.set(adjacentPos.x, adjacentPos.y, 1)
+                        localVisitedCoords[pack(coord2)] = 1
 
-                         // If a rampart is not planned for this position, iterate
+                        if (opts.coordMap[pack(coord2)] === 0) continue
 
-                         if (rampartPlans.get(adjacentPos.x, adjacentPos.y) !== 1) continue
+                        // Add it tofastFillerSide the next gen
 
-                         // Add it to the next gen and this group
-
-                         nextGeneration.push(adjacentPos)
-
-                         groupedPositions[groupIndex].push(new RoomPosition(adjacentPos.x, adjacentPos.y, room.name))
+                        nextGeneration.push(coord2)
                     }
-               }
+                }
+            }
 
-               // Set this gen to next gen
+            // Flood all adjacent positions, including diagonals
 
-               thisGeneration = nextGeneration
-          }
+            if (!nextGeneration.length) {
+                localVisitedCoords = new Uint8Array(visitedCoords)
 
-          // Increase the groupIndex
+                // Iterate through positions of this gen
 
-          groupIndex += 1
-     }
+                for (const coord1 of thisGeneration) {
+                    // If the pos can be an anchor, inform it
 
-     // Inform groupedPositions
+                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
 
-     return groupedPositions
+                    // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+
+                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
+                    // Loop through adjacent positions
+
+                    for (const coord2 of adjacentCoords) {
+                        // Iterate if the pos doesn't map onto a room
+
+                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                            continue
+
+                        // Iterate if the adjacent pos has been visited or isn't a tile
+
+                        if (localVisitedCoords[pack(coord2)] === 1) continue
+
+                        // Otherwise record that it has been visited
+
+                        localVisitedCoords[pack(coord2)] = 1
+
+                        // Add it tofastFillerSide the next gen
+
+                        nextGeneration.push(coord2)
+                    }
+                }
+            }
+
+            if (opts.visuals) {
+                for (const coord of nextGeneration)
+                    this.visual.text(opts.coordMap[pack(coord)].toString(), coord.x, coord.y, {
+                        font: 0.5,
+                        color: myColors.yellow,
+                    })
+            }
+
+            // Set this gen to next gen
+
+            visitedCoords = new Uint8Array(localVisitedCoords)
+            thisGeneration = nextGeneration
+        }
+
+        opts.reduceIterations -= 1
+        opts.requiredValue -= 1
+    }
+
+    // Inform false if no value was found
+
+    return false
+}
+
+Room.prototype.findClosestPosOfValueAsym = function (opts) {
+    const room = this
+
+    if (opts.visuals) {
+        for (const coord of opts.startCoords)
+            this.visual.circle(coord.x, coord.y, {
+                stroke: myColors.yellow,
+            })
+    }
+
+    /**
+     *
+     */
+    function isViableAnchor(coord1: Coord): boolean {
+        // Get the value of the pos4271
+
+        const posValue = opts.coordMap[pack(coord1)]
+        if (posValue === 255) return false
+        if (posValue === 0) return false
+
+        // If the posValue is less than the requiredValue, inform false
+
+        if (posValue < opts.requiredValue) return false
+
+        // Loop through adjacent positions
+
+        for (const coord2 of findCoordsInsideRect(
+            coord1.x - opts.offset,
+            coord1.y - opts.offset,
+            coord1.x + opts.offset + opts.asymOffset,
+            coord1.y + opts.offset + opts.asymOffset,
+        )) {
+            // If the adjacentPos isn't walkable, iterate
+
+            if (opts.coordMap[pack(coord2)] === 0) return false
+        }
+        /*
+        for (const coord2 of findCoordsInsideRect(coord1.x - opts.offset, coord1.y - opts.offset, coord1.x + opts.offset + opts.asymOffset, coord1.y + opts.offset + opts.asymOffset)) {
+            // If the adjacentPos isn't walkable, iterate
+            room.visual.text(opts.coordMap[pack(coord2)].toString(), coord2.x, coord2.y)
+        }
+ */
+        // If adjacentToRoads is a requirement
+
+        if (!opts.adjacentToRoads) return true
+
+        if (opts.roadCoords[pack(coord1)] > 0) return false
+
+        // Loop through adjacent positions
+
+        for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+            // If the adjacentPos isn't a roadPosition, iterate
+
+            if (opts.roadCoords[pack(coord2)] !== 1) continue
+
+            // Otherwise set nearbyRoad to true and stop the loop
+
+            return true
+        }
+
+        return false
+    }
+
+    while (opts.reduceIterations >= 0) {
+        // Construct a cost matrix for visited tiles and add seeds to it
+
+        let visitedCoords = new Uint8Array(2500)
+
+        // Record startPos as visited
+
+        for (const coord of opts.startCoords) visitedCoords[pack(coord)] = 1
+
+        // Construct values for the check
+
+        let thisGeneration = opts.startCoords
+        let nextGeneration: Coord[] = []
+        let i = 0
+        // So long as there are positions in this gen
+
+        while (thisGeneration.length) {
+            // Reset nextGeneration
+
+            nextGeneration = []
+            i++
+
+            let localVisitedCoords = new Uint8Array(visitedCoords)
+
+            // Flood cardinal directions, excluding impassibles
+
+            if (opts.cardinalFlood) {
+                // Iterate through positions of this gen
+
+                for (const coord1 of thisGeneration) {
+                    // If the pos can be an anchor, inform it
+
+                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+
+                    // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+
+                    const adjacentCoords = [
+                        {
+                            x: coord1.x - 1,
+                            y: coord1.y,
+                        },
+                        {
+                            x: coord1.x + 1,
+                            y: coord1.y,
+                        },
+                        {
+                            x: coord1.x,
+                            y: coord1.y - 1,
+                        },
+                        {
+                            x: coord1.x,
+                            y: coord1.y + 1,
+                        },
+                    ]
+
+                    // Loop through adjacent positions
+
+                    for (const coord2 of adjacentCoords) {
+                        // Iterate if the pos doesn't map onto a room
+
+                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                            continue
+
+                        // Iterate if the adjacent pos has been visited or isn't a tile
+
+                        if (localVisitedCoords[pack(coord2)] === 1) continue
+
+                        // Otherwise record that it has been visited
+
+                        localVisitedCoords[pack(coord2)] = 1
+
+                        if (opts.coordMap[pack(coord2)] === 0) continue
+
+                        // Add it tofastFillerSide the next gen
+
+                        nextGeneration.push(coord2)
+                    }
+                }
+            }
+
+            // Flood all adjacent positions excluding diagonals
+
+            if (!nextGeneration.length) {
+                localVisitedCoords = new Uint8Array(visitedCoords)
+
+                // Iterate through positions of this gen
+
+                for (const coord1 of thisGeneration) {
+                    // If the pos can be an anchor, inform it
+
+                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+
+                    // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+
+                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
+
+                    // Loop through adjacent positions
+
+                    for (const coord2 of adjacentCoords) {
+                        // Iterate if the pos doesn't map onto a room
+
+                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                            continue
+
+                        // Iterate if the adjacent pos has been visited or isn't a tile
+
+                        if (localVisitedCoords[pack(coord2)] === 1) continue
+
+                        // Otherwise record that it has been visited
+
+                        localVisitedCoords[pack(coord2)] = 1
+
+                        if (opts.coordMap[pack(coord2)] === 0) continue
+
+                        // Add it tofastFillerSide the next gen
+
+                        nextGeneration.push(coord2)
+                    }
+                }
+            }
+
+            // Flood all adjacent positions, including diagonals
+
+            if (!nextGeneration.length) {
+                localVisitedCoords = new Uint8Array(visitedCoords)
+
+                // Iterate through positions of this gen
+
+                for (const coord1 of thisGeneration) {
+                    // If the pos can be an anchor, inform it
+
+                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+
+                    // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+
+                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
+                    // Loop through adjacent positions
+
+                    for (const coord2 of adjacentCoords) {
+                        // Iterate if the pos doesn't map onto a room
+
+                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                            continue
+
+                        // Iterate if the adjacent pos has been visited or isn't a tile
+
+                        if (localVisitedCoords[pack(coord2)] === 1) continue
+
+                        // Otherwise record that it has been visited
+
+                        localVisitedCoords[pack(coord2)] = 1
+
+                        // Add it tofastFillerSide the next gen
+
+                        nextGeneration.push(coord2)
+                    }
+                }
+            }
+
+            if (opts.visuals) {
+                for (const coord of nextGeneration)
+                    this.visual.text(opts.coordMap[pack(coord)].toString(), coord.x, coord.y, {
+                        font: 0.5,
+                        color: myColors.yellow,
+                    })
+            }
+
+            // Set this gen to next gen
+
+            visitedCoords = new Uint8Array(localVisitedCoords)
+            thisGeneration = nextGeneration
+        }
+
+        opts.reduceIterations -= 1
+        opts.requiredValue -= 1
+    }
+
+    // Inform false if no value was found
+
+    return false
+}
+
+Room.prototype.pathVisual = function (path, color) {
+    const room = this
+
+    // Stop if roomVisuals are disabled
+
+    if (!Memory.roomVisuals) return
+
+    if (!path.length) return
+
+    // Filter only positions in the path that are in the path's starting room
+
+    const currentRoomName = path[0].roomName
+
+    for (let index = 0; index < path.length; index += 1) {
+        const pos = path[index]
+
+        if (pos.roomName === currentRoomName) continue
+
+        path.splice(index, path.length - 1)
+        break
+    }
+
+    // Generate the visual
+
+    room.visual.poly(path, {
+        stroke: myColors[color],
+        strokeWidth: 0.15,
+        opacity: 0.3,
+    })
+}
+
+Room.prototype.findAllyCSiteTargetID = function (creep) {
+    // If there are no sites inform false
+
+    if (!this.allyCSites.length) return false
+
+    // Loop through structuretypes of the build priority
+
+    for (const structureType of structureTypesByBuildPriority) {
+        // Get the structures with the relevant type
+
+        const cSitesOfType = this.allyCSitesByType[structureType]
+
+        // If there are no cSites of this type, iterate
+
+        if (!cSitesOfType.length) continue
+
+        // Ptherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
+
+        const anchor = this.anchor || creep?.pos || new RoomPosition(25, 25, this.name)
+
+        // Record the closest site to the anchor in the room's global and inform true
+
+        this.memory.cSiteTargetID = anchor.findClosestByPath(cSitesOfType, {
+            ignoreCreeps: true,
+            ignoreDestructibleStructures: true,
+            ignoreRoads: true,
+            range: 3,
+        }).id
+        return true
+    }
+
+    // If no cSiteTarget was found, inform false
+
+    return false
+}
+
+Room.prototype.findUnprotectedCoords = function (visuals) {
+    // Construct a cost matrix for the flood
+
+    this.unprotectedCoords = new Uint8Array(2500)
+    const visitedCoords = new Uint8Array(2500)
+
+    // Construct values for the flood
+
+    let depth = 0
+    let thisGeneration: Coord[] = this.find(FIND_EXIT)
+    let nextGeneration: Coord[] = []
+
+    // Loop through positions of seeds
+
+    for (const coord of thisGeneration) visitedCoords[pack(coord)] = 1
+
+    // So long as there are positions in this gen
+
+    while (thisGeneration.length) {
+        // Reset next gen
+
+        nextGeneration = []
+
+        // Iterate through positions of this gen
+
+        for (const coord1 of thisGeneration) {
+            // If the depth isn't 0
+
+            if (depth > 0) {
+                const packedCoord1 = pack(coord1)
+
+                // Iterate if the terrain is a wall
+
+                if (this.rampartCoords[packedCoord1] > 0) continue
+
+                // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
+
+                this.unprotectedCoords[packedCoord1] = depth * 10 + 10
+
+                // If visuals are enabled, show the depth on the pos
+                /*
+                if (visuals)
+                    this.visual.rect(coord1.x - 0.5, coord1.y - 0.5, 1, 1, {
+                        fill: `hsl(${200}${depth * 2}, 100%, 60%)`,
+                        opacity: 0.4,
+                    })
+                    this.visual.text(depth.toString(), coord1.x, coord1.y)
+ */
+            }
+
+            // Loop through adjacent positions
+
+            for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+                const packedCoord2 = pack(coord2)
+
+                // Iterate if the adjacent pos has been visited or isn't a tile
+
+                if (visitedCoords[packedCoord2] === 1) continue
+
+                // Otherwise record that it has been visited
+
+                visitedCoords[packedCoord2] = 1
+
+                // Add it to the next gen
+
+                nextGeneration.push(coord2)
+            }
+        }
+
+        // Set this gen to next gen
+
+        thisGeneration = nextGeneration
+
+        // Increment depth
+
+        depth += 1
+    }
+}
+
+Room.prototype.groupRampartPositions = function (rampartPositions) {
+    const room = this
+
+    // Construct a costMatrix to store visited positions
+
+    const visitedCoords = new Uint8Array(2500)
+
+    const groupedPositions = []
+    let groupIndex = 0
+
+    // Loop through each pos of positions
+
+    for (const packedPos of rampartPositions) {
+        const pos = unpackAsPos(packedPos)
+
+        // If the pos has already been visited, iterate
+
+        if (visitedCoords[pack(pos)] === 1) continue
+
+        // Record that this pos has been visited
+
+        visitedCoords[pack(pos)] = 1
+
+        // Construct the group for this index with the pos in it the group
+
+        groupedPositions[groupIndex] = [new RoomPosition(pos.x, pos.y, room.name)]
+
+        // Construct values for floodFilling
+
+        let thisGeneration = [pos]
+        let nextGeneration: Coord[] = []
+        let groupSize = 0
+
+        // So long as there are positions in this gen
+
+        while (thisGeneration.length) {
+            // Reset next gen
+
+            nextGeneration = []
+
+            // Iterate through positions of this gen
+
+            for (const pos of thisGeneration) {
+                // Construct a rect and get the positions in a range of 1 (not diagonals)
+
+                const adjacentPositions = findCoordsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
+
+                // Loop through adjacent positions
+
+                for (const adjacentPos of adjacentPositions) {
+                    // Iterate if adjacentPos is out of room bounds
+
+                    if (
+                        adjacentPos.x <= 0 ||
+                        adjacentPos.x >= roomDimensions ||
+                        adjacentPos.y <= 0 ||
+                        adjacentPos.y >= roomDimensions
+                    )
+                        continue
+
+                    const packedAdjacentCoord = pack(adjacentPos)
+
+                    // Iterate if the adjacent pos has been visited or isn't a tile
+
+                    if (visitedCoords[packedAdjacentCoord] === 1) continue
+
+                    // Otherwise record that it has been visited
+
+                    visitedCoords[packedAdjacentCoord] = 1
+
+                    // If a rampart is not planned for this position, iterate
+
+                    if (this.rampartCoords[pack(adjacentPos)] !== 1) continue
+
+                    // Add it to the next gen and this group
+
+                    groupedPositions[groupIndex].push(new RoomPosition(adjacentPos.x, adjacentPos.y, room.name))
+
+                    groupSize += 1
+                    nextGeneration.push(adjacentPos)
+                }
+            }
+
+            if (groupSize >= maxRampartGroupSize) break
+
+            // Set this gen to next gen
+
+            thisGeneration = nextGeneration
+        }
+
+        // Increase the groupIndex
+
+        groupIndex += 1
+    }
+
+    // Inform groupedPositions
+
+    return groupedPositions
 }
 
 Room.prototype.createPullTask = function (creator) {
-     const room = this
+    const room = this
 }
 
 Room.prototype.createPickupTasks = function (creator) {
-     const room = this
+    const room = this
 }
 
 Room.prototype.createOfferTasks = function (creator) {
-     const room = this
+    const room = this
 }
 
 Room.prototype.createTransferTasks = function (creator) {
-     const room = this
+    const room = this
 }
 
 Room.prototype.createWithdrawTasks = function (creator) {
-     const room = this
+    const room = this
 }
 
 Room.prototype.estimateIncome = function () {
+    const harvesterNames = this.creepsFromRoom.source1Harvester
+        .concat(this.creepsFromRoom.source2Harvester)
+        .concat(this.creepsFromRoom.source1RemoteHarvester)
+        .concat(this.creepsFromRoom.source2RemoteHarvester)
 
-     const harvesterNames = this.creepsFromRoom.source1Harvester
-          .concat(this.creepsFromRoom.source2Harvester)
-          .concat(this.creepsFromRoom.source1RemoteHarvester)
-          .concat(this.creepsFromRoom.source2RemoteHarvester)
+    // Construct income starting at 0
 
-     // Construct income starting at 0
+    let income = 0
 
-     let income = 0
+    for (const creepName of harvesterNames) {
+        // Get the creep using creepName
 
-     for (const creepName of harvesterNames) {
-          // Get the creep using creepName
+        const creep = Game.creeps[creepName]
 
-          const creep = Game.creeps[creepName]
+        // Add the number of work parts owned by the creep at a max of 5, times harvest power
 
-          // Add the number of work parts owned by the creep at a max of 5, times harvest power
+        income += Math.min(6, creep.parts.work) * minHarvestWorkRatio
+    }
 
-          income += Math.min(5, creep.parts.work) * HARVEST_POWER
-     }
+    // Inform income
 
-     // Inform income
-
-     return income
+    return income
 }
 
 Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
+    // Construct positions
 
-     // Construct positions
+    const positions = []
 
-     const positions = []
+    // Loop through coordinates inside the rect
 
-     // Loop through coordinates inside the rect
+    for (let x = x1; x <= x2; x += 1) {
+        for (let y = y1; y <= y2; y += 1) {
+            // Iterate if the pos doesn't map onto a room
 
-     for (let x = x1; x <= x2; x += 1) {
-          for (let y = y1; y <= y2; y += 1) {
-               // Iterate if the pos doesn't map onto a room
+            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
-               if (x < 0 || x >= constants.roomDimensions || y < 0 || y >= constants.roomDimensions) continue
+            // Otherwise ass the x and y to positions
 
-               // Otherwise ass the x and y to positions
+            positions.push(new RoomPosition(x, y, this.name))
+        }
+    }
 
-               positions.push(new RoomPosition(x, y, this.name))
-          }
-     }
+    // Inform positions
 
-     // Inform positions
-
-     return positions
+    return positions
 }
 
 Room.prototype.getPartsOfRoleAmount = function (role, type) {
+    // Intilaize the partsAmount
 
-     // Intilaize the partsAmount
+    let partsAmount = 0
+    let creep
 
-     let partsAmount = 0
-     let creep
+    // Loop through every creepName in the creepsFromRoom of the specified role
 
-     // Loop through every creepName in the creepsFromRoom of the specified role
+    for (const creepName of this.creepsFromRoom[role]) {
+        // Get the creep using creepName
 
-     for (const creepName of this.creepsFromRoom[role]) {
-          // Get the creep using creepName
+        creep = Game.creeps[creepName]
 
-          creep = Game.creeps[creepName]
+        // If there is no specified type
 
-          // If there is no specified type
+        if (!type) {
+            // Increase partsAmount by the creep's body size, and iterate
 
-          if (!type) {
-               // Increase partsAmount by the creep's body size, and iterate
+            partsAmount += creep.body.length
+            continue
+        }
 
-               partsAmount += creep.body.length
-               continue
-          }
+        // Otherwise increase partsAmount by the creep's parts count of the specified type
 
-          // Otherwise increase partsAmount by the creep's parts count of the specified type
+        partsAmount += creep.body.filter(part => part.type === type).length
+    }
 
-          partsAmount += creep.body.filter(part => part.type === type).length
-     }
+    // Inform partsAmount
 
-     // Inform partsAmount
-
-     return partsAmount
-}
-
-Room.prototype.findSourcesByEfficacy = function () {
-
-     // Get the room's sourceNames
-
-     const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
-
-     // Sort sourceNames based on their efficacy, informing the result
-
-     return sourceNames.sort((a, b) => this.global[a] - this.global[b])
+    return partsAmount
 }
 
 Room.prototype.createClaimRequest = function () {
-     if (this.get('sources').length !== 2) return false
+    if (this.sources.length !== 2) return false
 
-     if (this.memory.notClaimable) return false
+    if (this.memory.notClaimable) return false
 
-     if (Memory.claimRequests[this.name]) return false
+    if (Memory.claimRequests[this.name]) return false
 
-     basePlanner(this)
+    if (basePlanner(this) === 'failed') return false
 
-     if (!this.memory.planned) return false
+    let score = 0
 
-     let score = 0
+    // Prefer communes not too close and not too far from the commune
 
-     // Prefer communes not too close and not too far from the commune
+    const closestClaimTypeName = findClosestClaimType(this.name)
+    const closestCommuneRange = Game.map.getRoomLinearDistance(closestClaimTypeName, this.name)
 
-     const closestClaimTypeName = findClosestClaimType(this.name)
-     const closestCommuneRange = Game.map.getRoomLinearDistance(closestClaimTypeName, this.name)
+    score += Math.abs(prefferedCommuneRange - closestCommuneRange)
 
-     score += Math.abs(prefferedCommuneRange - closestCommuneRange)
+    score += this.sourcePaths[0].length / 10
+    score += this.sourcePaths[1].length / 10
 
-     score += this.source1PathLength / 10
-     score += this.source2PathLength / 10
+    score += this.upgradePathLength / 10
 
-     score += this.upgradePathLength / 10
+    score += this.findSwampPlainsRatio() * 10
 
-     score += this.findSwampPlainsRatio() * 10
+    Memory.claimRequests[this.name] = {
+        needs: [1, 20, 0],
+        score,
+    }
 
-     Memory.claimRequests[this.name] = {
-          needs: [1, 20, 0],
-          score,
-     }
-
-     return true
+    return true
 }
 
 Room.prototype.findSwampPlainsRatio = function () {
-     const terrainAmounts = [0, 0, 0]
+    const terrainAmounts = [0, 0, 0]
 
-     const terrain = this.getTerrain()
+    const terrain = this.getTerrain()
 
-     for (let x = 0; x < constants.roomDimensions; x += 1) {
-          for (let y = 0; y < constants.roomDimensions; y += 1) {
-               terrainAmounts[terrain.get(x, y)] += 1
-          }
-     }
+    for (let x = 0; x < roomDimensions; x += 1) {
+        for (let y = 0; y < roomDimensions; y += 1) {
+            terrainAmounts[terrain.get(x, y)] += 1
+        }
+    }
 
-     return terrainAmounts[TERRAIN_MASK_SWAMP] / terrainAmounts[0]
+    return terrainAmounts[TERRAIN_MASK_SWAMP] / terrainAmounts[0]
+}
+
+Room.prototype.visualizeCoordMap = function (coordMap) {
+    for (let x = 0; x < roomDimensions; x += 1) {
+        for (let y = 0; y < roomDimensions; y += 1) {
+            this.visual.text(coordMap[packXY(x, y)].toString(), x, y, {
+                font: 0.5,
+            })
+        }
+    }
+}
+
+Room.prototype.visualizeCostMatrix = function (cm) {
+    for (let x = 0; x < roomDimensions; x += 1) {
+        for (let y = 0; y < roomDimensions; y += 1) {
+            this.visual.text(cm.get(x, y).toString(), x, y, {
+                font: 0.5,
+            })
+        }
+    }
 }

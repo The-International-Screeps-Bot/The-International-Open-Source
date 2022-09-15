@@ -1,0 +1,19 @@
+{
+    "dependencies": {
+        "axios": "^0.27.2",
+        "dotenv": "^16.0.1",
+        "fs": "0.0.1-security",
+        "lodash": "^4.17.21",
+        "ncp": "^2.0.0",
+        "node-powershell": "^5.0.1",
+        "q": "^1.5.1",
+        "screeps": "4.2.14",
+        "screeps-api": "1.16.0",
+        "screepsmod-admin-utils": "1.29.0",
+        "screepsmod-auth": "2.6.2",
+        "screepsmod-server-stats": "^1.0.0"
+    },
+    "scripts": {
+        "server": "node index.js"
+    }
+}

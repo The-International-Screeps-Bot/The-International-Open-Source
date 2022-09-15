@@ -1,39 +1,101 @@
-import { constants } from 'international/constants'
-import { customLog, getRange } from 'international/generalFunctions'
-import { marketManager } from './market/marketManager'
-import { taskManager } from './roomTaskManager'
+import {
+    createPosMap,
+    customLog,
+    findClosestObject,
+    getRange,
+    pack,
+    packXY,
+    unpackAsPos,
+} from 'international/generalFunctions'
+import { MarketManager } from './market/marketManager'
+import './spawning/spawnManager'
 
-import { spawnManager } from './spawning/spawnManager'
-
-import { towerManager } from './towerManager'
 import { constructionManager } from './construction/constructionManager'
-import { droppedResourceManager } from './droppedResourceManager'
-import { defenceManager } from './defenceManager'
-import { storageStructuresManager } from './storingStructuresManager'
-import { linkManager } from './linkManager'
+import './defence'
+import './allyCreepRequestManager'
 import './claimRequestManager'
+import './attackRequestManager'
+import { myColors, roomDimensions } from 'international/constants'
+import './factory'
+import { LabManager } from './lab'
+import './towers'
+import './links'
+import { RoomVisualsManager } from './roomVisuals'
+import { EndTickCreepManager } from './creeps/endTickCreepManager'
+import { CreepRoleManager } from './creeps/creepRoleManager'
+import { RemotesManager } from './remotesManager'
 
-export function communeManager(room: Room) {
-     constructionManager(room)
+export class CommuneManager {
+    labManager: LabManager
+    marketManager: MarketManager
+    remotesManager: RemotesManager
 
-     towerManager(room)
+    constructor() {
+        this.labManager = new LabManager(this)
+        this.marketManager = new MarketManager(this)
+        this.remotesManager = new RemotesManager(this)
+    }
 
-     marketManager(room)
+    room: Room
+    structures: OrganizedStructures
 
-     linkManager(room)
+    public update(room: Room) {
+        this.room = room
+        this.structures = room.structures
+    }
 
-     defenceManager(room)
+    public run() {
+        constructionManager(this.room)
 
-     storageStructuresManager(room)
+        this.room.defenceManager()
 
-     room.claimRequestManager()
+        this.room.towerManager()
 
-     spawnManager(room)
-     /*
-     let cpu = Game.cpu.getUsed()
+        try {
+            this.marketManager.run()
+        } catch (err) {
+            customLog(
+                'Exception processing marketManager in ' + this.room.name + '. ',
+                err + '\n' + (err as any).stack,
+                myColors.white,
+                myColors.red,
+            )
+        }
 
+        this.room.linkManager()
 
+        this.room.claimRequestManager()
+        this.room.attackRequestManager()
 
-     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu)
- */
+        this.room.allyCreepRequestManager()
+
+        this.remotesManager.stage2()
+
+        this.room.spawnManager()
+
+        this.room.factoryManager()
+        this.labManager.run()
+
+        this.test()
+    }
+    private test() {
+        return
+
+        let CPUUsed = Game.cpu.getUsed()
+
+        const cm = new PathFinder.CostMatrix()
+        customLog('SERIALIZED CM', cm.serialize())
+
+        customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed)
+    }
+
+    get storedEnergyUpgradeThreshold() {
+
+        return this.room.controller.level * 10000
+    }
+
+    get storedEnergyBuildThreshold() {
+
+        return this.room.controller.level * 8000
+    }
 }

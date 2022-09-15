@@ -1,22 +1,28 @@
 module.exports.cliPort = 21026
 
-module.exports.verbose = false
-
 module.exports.tickDuration = 10
 
-module.exports.playerRoom = 'W1N1'
-players = {
-     W8N3: { x: 21, y: 28 },
-     W2N5: { x: 33, y: 13 },
-     W1N1: { x: 10, y: 9 },
-     W2N2: { x: 10, y: 9 },
-     W5N8: { x: 10, y: 9 },
+module.exports.playerRooms = {"W6N1":'user1',"W1N7":"user2","W2N5":"user3"}
+module.exports.rooms ={
+     "W1N1":'bot',
+     "W6N1":'bot',
+     "W2N5":'bot',
+     "W5N8":'bot',
+     "W7N3":'bot',
+     "W9N9":'bot',
+     "W3N9":'bot',
+     "W8N6":'bot',
+     "W3N3":'bot',
 }
-module.exports.players = players
-module.exports.rooms = Object.keys(players)
+module.exports.trackedRooms= [
+     "W3N3",
+     "W5N8",
+     "W7N3",
+     "W5N8"
+]
 
 module.exports.milestones = [
-     { tick: 10000, check: { level: 2 }, required:true },
-     { tick: 15000, check: { level: 3 }, required:true },
-     { tick: 45000, check: { level: 4 }, required:true },
+     { tick: 10000, check: { level: 2 }, required:false },
+     { tick: 15000, check: { level: 3 }, required:false },
+     { tick: 45000, check: { level: 4 }, required:false },
 ]

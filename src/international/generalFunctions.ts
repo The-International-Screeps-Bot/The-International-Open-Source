@@ -1,59 +1,59 @@
-import { constants, mmoShardNames } from './constants'
+import { mmoShardNames, myColors, roomDimensions } from './constants'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
  */
 export function getAvgPrice(resourceType: MarketResourceConstant, days = 2) {
-     // Get the market history for the specified resourceType
+    // Get the market history for the specified resourceType
 
-     const history = Game.market.getHistory(resourceType)
+    const history = Game.market.getHistory(resourceType)
 
-     // Init the totalPrice
+    // Init the totalPrice
 
-     let totalPrice = 0
+    let totalPrice = 0
 
-     // Iterate through each index less than days
+    // Iterate through each index less than days
 
-     for (let index = 0; index <= days; index += 1) totalPrice += history[index].avgPrice
+    for (let index = 0; index <= days; index += 1) totalPrice += history[index].avgPrice
 
-     // Inform the totalPrice divided by the days
+    // Inform the totalPrice divided by the days
 
-     return totalPrice / days
+    return totalPrice / days
 }
 
 /**
  * Uses a provided ID to find an object associated with it
  */
 export function findObjectWithID<T extends Id<any>>(ID: T): fromId<T> | undefined {
-     return Game.getObjectById(ID) || undefined
+    return Game.getObjectById(ID) || undefined
 }
 
 /**
  * Takes a rectange and returns the positions inside of it in an array
  */
-export function findPositionsInsideRect(x1: number, y1: number, x2: number, y2: number) {
-     const positions: Coord[] = []
+export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: number) {
+    const positions: Coord[] = []
 
-     for (let x = x1; x <= x2; x += 1) {
-          for (let y = y1; y <= y2; y += 1) {
-               // Iterate if the pos doesn't map onto a room
+    for (let x = x1; x <= x2; x += 1) {
+        for (let y = y1; y <= y2; y += 1) {
+            // Iterate if the pos doesn't map onto a room
 
-               if (x < 0 || x >= constants.roomDimensions || y < 0 || y >= constants.roomDimensions) continue
+            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
-               // Otherwise ass the x and y to positions
+            // Otherwise ass the x and y to positions
 
-               positions.push({ x, y })
-          }
-     }
+            positions.push({ x, y })
+        }
+    }
 
-     return positions
+    return positions
 }
 
 /**
  * Checks if two positions are equal
  */
-export function arePositionsEqual(pos1: Pos, pos2: Pos) {
-     return pos1?.x === pos2?.x && pos1?.y === pos2?.y
+export function areCoordsEqual(pos1: Coord, pos2: Coord) {
+    return pos1.x === pos2.x && pos1.y === pos2.y
 }
 
 /**
@@ -63,19 +63,14 @@ export function arePositionsEqual(pos1: Pos, pos2: Pos) {
  * @param color Colour of the text. Default is black
  * @param bgColor Colour of the background. Default is white
  */
-export function customLog(
-     title: any,
-     message: any,
-     color: string = constants.colors.black,
-     bgColor: string = constants.colors.white,
-) {
-     // Create the title
+export function customLog(title: any, message: any, color: string = myColors.black, bgColor: string = myColors.white) {
+    // Create the title
 
-     global.logs += `<div style='width: 90vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${bgColor};'><div style='padding: 6px; font-size: 16px; font-weigth: 400; color: ${color};'>${title}:</div>`
+    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${bgColor};'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${color};'>${title}:</div>`
 
-     // Create the content
+    // Create the content
 
-     global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 6px; font-size: 14px; font-weight: 200; color: ${color};'>${message}</div></div>`
+    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${color};'>${message}</div></div>`
 }
 
 /**
@@ -83,50 +78,50 @@ export function customLog(
  * @returns an incremented ID
  */
 export function newID() {
-     return (Memory.ID += 1)
+    return (Memory.ID += 1)
 }
 
 /**
  * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
  */
 export function advancedFindDistance(
-     originRoomName: string,
-     goalRoomName: string,
-     typeWeights?: { [key: string]: number },
+    originRoomName: string,
+    goalRoomName: string,
+    typeWeights?: { [key: string]: number },
 ) {
-     // Try to find a route from the origin room to the goal room
+    // Try to find a route from the origin room to the goal room
 
-     const findRouteResult = Game.map.findRoute(originRoomName, goalRoomName, {
-          routeCallback(roomName) {
-               // If the goal is in the room, inform 1
+    const findRouteResult = Game.map.findRoute(originRoomName, goalRoomName, {
+        routeCallback(roomName) {
+            // If the goal is in the room, inform 1
 
-               if (roomName === goalRoomName) return 1
+            if (roomName === goalRoomName) return 1
 
-               // Get the room's memory
+            // Get the room's memory
 
-               const roomMemory = Memory.rooms[roomName]
+            const roomMemory = Memory.rooms[roomName]
 
-               // If there is no memory for the room inform impassible
+            // If there is no memory for the room inform impassible
 
-               if (!roomMemory) return Infinity
+            if (!roomMemory) return Infinity
 
-               // If the type is in typeWeights, inform the weight for the type
+            // If the type is in typeWeights, inform the weight for the type
 
-               if (typeWeights[roomMemory.type]) return typeWeights[roomMemory.type]
+            if (typeWeights[roomMemory.T]) return typeWeights[roomMemory.T]
 
-               // Inform to consider this room
+            // Inform to consider this room
 
-               return 2
-          },
-     })
+            return 2
+        },
+    })
 
-     // If findRouteResult didn't work, inform a path length of Infinity
+    // If findRouteResult didn't work, inform a path length of Infinity
 
-     if (findRouteResult === ERR_NO_PATH) return Infinity
+    if (findRouteResult === ERR_NO_PATH) return Infinity
 
-     // inform the path's length
+    // inform the path's length
 
-     return findRouteResult.length
+    return findRouteResult.length
 }
 
 /**
@@ -135,142 +130,240 @@ export function advancedFindDistance(
  * @param income The number of resources added to the pile each tick
  */
 export function findCarryPartsRequired(distance: number, income: number) {
-     return (distance * 2 * income) / CARRY_CAPACITY
+    return (distance * 2 * income) / CARRY_CAPACITY
 }
 
 /**
  * Finds a position equally between two positions
  */
-export function findAvgBetweenPosotions(pos1: Pos, pos2: Pos) {
-     // Inform the rounded average of the two positions
+export function findAvgBetweenCoords(pos1: Coord, pos2: Coord) {
+    // Inform the rounded average of the two positions
 
-     return {
-          x: Math.floor((pos1.x + pos2.x) / 2),
-          y: Math.floor((pos1.y + pos2.y) / 2),
-     }
+    return {
+        x: Math.floor((pos1.x + pos2.x) / 2),
+        y: Math.floor((pos1.y + pos2.y) / 2),
+    }
 }
 
 /**
- * Gets the range between two positions' x and y
+ * Gets the range between two positions' x and y (Half Manhattan)
  * @param x1 the first position's x
  * @param y1 the first position's y
  * @param x2 the second position's x
  * @param y2 the second position's y
  */
-export function getRangeBetween(x1: number, y1: number, x2: number, y2: number) {
-     // Find the range using Chebyshev's formula
+export function getRange(x1: number, x2: number, y1: number, y2: number) {
+    // Find the range using Chebyshev's formula
 
-     return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2))
+    return Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1))
 }
 
 /**
- * Gets the range between two position's differences
- * @param xDif the difference between the two location's x's
- * @param yDif the difference between the two location's y's
- * @returns The range between the two position's differences
+ * Finds the closest object with a position to a given target, by range (Half Manhattan)
  */
-export function getRange(xDif: number, yDif: number) {
-     // Find the range using Chebyshev's formula
+export function findClosestObject<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[]) {
+    let minRange = Infinity
+    let closest = undefined
 
-     return Math.max(Math.abs(xDif), Math.abs(yDif))
+    for (const object of objects) {
+        const range = getRange(target.x, object.pos.x, target.y, object.pos.y)
+
+        if (range > minRange) continue
+
+        minRange = range
+        closest = object
+    }
+
+    return closest
 }
 
-export function findCPUColor(CPU: number): string {
-     // Inform color based on percent of cpu used of limit
+/**
+ * Finds the closest object with a position to a given target, by range, in a specified range (Half Manhattan)
+ */
+export function findClosestObjectInRange<T extends _HasRoomPosition>(
+    target: RoomPosition | Coord,
+    objects: T[],
+    range: number,
+) {
+    let minRange = Infinity
+    let closest = undefined
 
-     if (CPU > Game.cpu.limit * 0.6) return constants.colors.green
-     if (CPU > Game.cpu.limit * 0.9) return constants.colors.green
-     return constants.colors.green
+    for (const object of objects) {
+        const range = getRange(target.x, object.pos.x, target.y, object.pos.y)
+
+        if (range > minRange) continue
+
+        minRange = range
+        closest = object
+    }
+
+    // Inform the closest object, if within range
+
+    if (minRange <= range) return closest
+    return false
 }
 
-export function createPackedPosMap(innerArray?: boolean) {
-     // Construct the position map
+/**
+ * Finds the closest position to a given target (Half Manhattan)
+ */
+export function findClosestPos<T extends RoomPosition | Coord>(target: RoomPosition | Coord, positions: T[]) {
+    let minRange = Infinity
+    let closest = undefined
 
-     const packedPosMap: PackedPosMap = []
+    for (const pos of positions) {
+        const range = getRange(target.x, pos.x, target.y, pos.y)
 
-     // Loop through each x and y in the room
+        if (range > minRange) continue
 
-     for (let x = 0; x < constants.roomDimensions; x += 1) {
-          for (let y = 0; y < constants.roomDimensions; y += 1) {
-               // Add an element for this pos
+        minRange = range
+        closest = pos
+    }
 
-               packedPosMap.push(innerArray ? [] : undefined)
-          }
-     }
+    return closest
+}
 
-     // Inform the position map
+/**
+ * Gets the range between two positions' x and y (Euclidean)
+ * @param x1 the first position's x
+ * @param y1 the first position's y
+ * @param x2 the second position's x
+ * @param y2 the second position's y
+ */
+export function getRangeEuc(x1: number, x2: number, y1: number, y2: number) {
+    // Find the range using Chebyshev's formula
 
-     return packedPosMap
+    return Math.round(Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) * 10) / 10
+}
+
+/**
+ * Finds the closest object with a position to a given target (Euclidean)
+ */
+export function findClosestObjectEuc<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[]) {
+    let minRange = Infinity
+    let closest = undefined
+
+    for (const object of objects) {
+        const range = getRangeEuc(target.x, object.pos.x, target.y, object.pos.y)
+
+        if (range > minRange) continue
+
+        minRange = range
+        closest = object
+    }
+
+    return closest
+}
+
+/**
+ * Finds the closest position to a given target (Euclidean)
+ */
+export function findClosestPosEuc<T extends RoomPosition | Coord>(target: RoomPosition | Coord, positions: T[]) {
+    let minRange = Infinity
+    let closest = undefined
+
+    for (const pos of positions) {
+        const range = getRangeEuc(target.x, pos.x, target.y, pos.y)
+
+        if (range > minRange) continue
+
+        minRange = range
+        closest = pos
+    }
+
+    return closest
+}
+
+export function findCPUColor(): string {
+    const CPU = Game.cpu.getUsed()
+
+    // Inform color based on percent of cpu used of limit
+
+    if (CPU > Game.cpu.limit * 0.6) return myColors.green
+    if (CPU > Game.cpu.limit * 0.9) return myColors.green
+    return myColors.green
+}
+
+export function createPosMap(innerArray?: boolean, initialValue?: string | number) {
+    // Construct the position map
+
+    const packedPosMap: PosMap<any> = []
+
+    // Loop through each x and y in the room
+
+    for (let x = 0; x < roomDimensions; x += 1) {
+        for (let y = 0; y < roomDimensions; y += 1) {
+            // Add an element for this pos
+
+            packedPosMap.push(innerArray ? [] : initialValue)
+        }
+    }
+
+    // Inform the position map
+
+    return packedPosMap
 }
 
 export function unpackAsPos(packedPos: number) {
-     // Inform an unpacked pos
+    // Inform an unpacked pos
 
-     return {
-          x: Math.floor(packedPos / constants.roomDimensions),
-          y: Math.floor(packedPos % constants.roomDimensions),
-     }
+    return {
+        x: Math.floor(packedPos / roomDimensions),
+        y: Math.floor(packedPos % roomDimensions),
+    }
 }
 
 export function unpackAsRoomPos(packedPos: number, roomName: string) {
-     // Inform an unpacked RoomPosition
+    // Inform an unpacked RoomPosition
 
-     return new RoomPosition(
-          Math.floor(packedPos / constants.roomDimensions),
-          Math.floor(packedPos % constants.roomDimensions),
-          roomName,
-     )
+    return new RoomPosition(Math.floor(packedPos / roomDimensions), Math.floor(packedPos % roomDimensions), roomName)
 }
 
-export function pack(pos: Pos) {
-     // Inform a packed pos
+export function pack(pos: Coord) {
+    // Inform a packed pos
 
-     return pos.x * constants.roomDimensions + pos.y
+    return pos.x * roomDimensions + pos.y
 }
 
 export function packXY(x: number, y: number) {
-     // Inform a packed pos
+    // Inform a packed pos
 
-     return x * constants.roomDimensions + y
+    return x * roomDimensions + y
 }
 
 export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPos: number) {
-     // Loop through each creepName of the queue
+    // Loop through each creepName of the queue
 
-     for (const creepName of queue) {
-          // Get the creep using the creepName
+    for (const creepName of queue) {
+        // Get the creep using the creepName
 
-          const queuedCreep = Game.creeps[creepName]
+        const queuedCreep = Game.creeps[creepName]
 
-          // If the queuedCreep's pos is equal to the moveRequest, inform the creep
+        // If the queuedCreep's pos is equal to the moveRequest, inform the creep
 
-          if (pack(queuedCreep.pos) === requestPackedPos) return queuedCreep
-     }
+        if (pack(queuedCreep.pos) === requestPackedPos) return queuedCreep
+    }
 
-     return undefined
+    return undefined
 }
 
 export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'source2')[] {
-     // Get the room's sourceNames
+    // Get the room's sourceNames
 
-     const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
+    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
 
-     // Get the remote's sourceEfficacies
+    // Get the remote's sourceEfficacies
 
-     const { sourceEfficacies } = Memory.rooms[roomName]
+    const sourceEfficacies = Memory.rooms[roomName].SE
 
-     // Limit sourceNames to the number of sourceEfficacies
+    // Limit sourceNames to the number of sourceEfficacies
 
-     if (sourceNames.length > sourceEfficacies.length) sourceNames.splice(sourceEfficacies.length - 1, 1)
+    if (sourceNames.length > sourceEfficacies.length) sourceNames.splice(sourceEfficacies.length - 1, 1)
 
-     // Sort sourceNames by efficacy, informing the result
+    // Sort sourceNames by efficacy, informing the result
 
-     return sourceNames.sort(function (a, b) {
-          return (
-               Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(a)] -
-               Memory.rooms[roomName].sourceEfficacies[sourceNames.indexOf(b)]
-          )
-     })
+    return sourceNames.sort(function (a, b) {
+        return Memory.rooms[roomName].SE[sourceNames.indexOf(a)] - Memory.rooms[roomName].SE[sourceNames.indexOf(b)]
+    })
 }
 
 /**
@@ -282,58 +375,74 @@ export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'sou
  * @returns
  */
 export function findLargestTransactionAmount(budget: number, amount: number, roomName1: string, roomName2: string) {
-     budget = Math.max(budget, 1)
+    budget = Math.max(budget, 1)
 
-     // So long as the the transactions cost is more than the budget
+    // So long as the the transactions cost is more than the budget
 
-     while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
-          // Decrease amount exponentially
+    while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
+        // Decrease amount exponentially
 
-          amount = (amount - 1) * 0.8
-     }
+        amount = (amount - 1) * 0.8
+    }
 
-     return Math.floor(amount)
+    return Math.floor(amount)
 }
 
 /**
  * Finds the name of the closest commune, exluding the specified roomName
  */
 export function findClosestCommuneName(roomName: string) {
-     const communesNotThis = Memory.communes.filter(communeName => roomName !== communeName)
+    const communesNotThis = []
 
-     return communesNotThis.sort(
-          (a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
-     )[0]
+    for (const communeName of global.communes) {
+        if (roomName == communeName) continue
+
+        communesNotThis.push(communeName)
+    }
+
+    return communesNotThis.sort(
+        (a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
+    )[0]
 }
 
 export function findClosestClaimType(roomName: string) {
-     const claimTypes = Memory.communes
-          .concat(Object.keys(Memory.claimRequests))
-          .filter(claimRoomName => roomName !== claimRoomName)
+    const claimTypes = Array.from(global.communes)
+        .concat(Object.keys(Memory.claimRequests))
+        .filter(claimRoomName => roomName !== claimRoomName)
 
-     return claimTypes.sort(
-          (a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
-     )[0]
+    return claimTypes.sort(
+        (a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
+    )[0]
 }
 
-export function findStrengthOfParts(body: BodyPartConstant[]) {
-     let strength = 0
+export function findClosestRoomName(start: string, targets: string[]) {
+    let minRange = Infinity
+    let closest = undefined
 
-     for (const part of body) {
-          switch (part) {
-               case RANGED_ATTACK:
-                    strength += RANGED_ATTACK_POWER
-                    break
-               case ATTACK:
-                    strength += ATTACK_POWER
-                    break
-               case HEAL:
-                    strength += HEAL_POWER
-                    break
-               default:
-                    strength += 1
-          }
-     }
+    for (const target of targets) {
+        const range = Game.map.getRoomLinearDistance(start, target)
 
-     return strength
+        if (range > minRange) continue
+
+        minRange = range
+        closest = target
+    }
+
+    return closest
+}
+
+/**
+ * Generatesa a random integer between two thresholds
+ */
+export function randomIntRange(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min) + min)
+}
+
+export function findFunctionCPU(func: Function) {
+
+    const CPU = Game.cpu.getUsed()
+
+    func()
+
+    customLog('CPU for ' + func, Game.cpu.getUsed() - CPU)
 }

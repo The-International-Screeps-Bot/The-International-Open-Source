@@ -1,94 +1,95 @@
-import { constants } from 'international/constants'
+import { myColors } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 import './spawnFunctions'
-import { spawnRequester } from './spawnRequestManager'
+import './spawnRequestManager'
 
-export function spawnManager(room: Room) {
-     // If CPU logging is enabled, get the CPU used at the start
+Room.prototype.spawnManager = function () {
+    // If CPU logging is enabled, get the CPU used at the start
 
-     if (Memory.cpuLogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-     // Find spawns that aren't spawning
+    // Find spawns that aren't spawning
 
-     const inactiveSpawns = room.structures.spawn.filter(spawn => !spawn.spawning)
-     if (!inactiveSpawns.length) return
+    const inactiveSpawns = this.structures.spawn.filter(spawn => !spawn.spawning)
+    if (!inactiveSpawns.length) return
 
-     // Construct spawnRequests
+    // Construct spawnRequests
 
-     spawnRequester(room)
+    this.spawnRequester()
 
-     // Sort spawnRequests by their priority
+    // Sort spawnRequests by their priority
 
-     const requestsByPriority = Object.keys(room.spawnRequests).sort(function (a, b) {
-          return parseInt(a) - parseInt(b)
-     })
+    const requestsByPriority = Object.keys(this.spawnRequests).sort((a, b) => {
+        return parseInt(a) - parseInt(b)
+    })
+/*
+    for (const priority in this.spawnRequests) {
 
-     // Track the inactive spawn index
+        const request = this.spawnRequests[priority]
 
-     let spawnIndex = inactiveSpawns.length - 1
+        customLog('SPAWN REQUESTS', priority + ', ' + request.role + ', ' + request.extraOpts.memory?.RN + ', ' + request.extraOpts.memory?.SI)
+    } */
 
-     let spawn
-     let spawnRequest
-     let testSpawnResult
+    // Track the inactive spawn index
 
-     // Loop through priorities inside requestsByPriority
+    let spawnIndex = inactiveSpawns.length - 1
 
-     for (const priority of requestsByPriority) {
-          // Stop if the spawnIndex is negative
+    // Loop through priorities inside requestsByPriority
 
-          if (spawnIndex < 0) break
+    for (const priority of requestsByPriority) {
+        // Stop if the spawnIndex is negative
 
-          // Try to find inactive spawn, if can't, stop the loop
+        if (spawnIndex < 0) break
 
-          spawn = inactiveSpawns[spawnIndex]
+        // Try to find inactive spawn, if can't, stop the loop
 
-          // Otherwise get the spawnRequest using its priority
+        const spawn = inactiveSpawns[spawnIndex]
 
-          spawnRequest = room.spawnRequests[priority]
+        // Otherwise get the spawnRequest using its priority
 
-          // See if creep can be spawned
+        const spawnRequest = this.spawnRequests[priority]
 
-          testSpawnResult = spawn.advancedSpawn(spawnRequest)
+        // See if creep can be spawned
 
-          // If creep can't be spawned
+        const testSpawnResult = spawn.advancedSpawn(spawnRequest)
 
-          if (testSpawnResult !== OK) {
-               // Log the error and stop the loop
+        // If creep can't be spawned
 
-               customLog(
-                    'Failed to spawn',
-                    `error: ${testSpawnResult}, role: ${spawnRequest.extraOpts.memory.role}, cost: ${spawnRequest.cost}, body: (${spawnRequest.body.length}) ${spawnRequest.body}`,
-               )
+        if (testSpawnResult !== OK) {
+            // Log the error and stop the loop
 
-               break
-          }
+            customLog(
+                'Failed to spawn',
+                `error: ${testSpawnResult}, role: ${spawnRequest.role}, cost: ${spawnRequest.cost}, body: (${spawnRequest.body.length}) ${spawnRequest.body}`,
+                myColors.white,
+                myColors.red,
+            )
 
-          // Disable dry run
+            break
+        }
 
-          spawnRequest.extraOpts.dryRun = false
+        // Disable dry run
 
-          // Spawn the creep
+        spawnRequest.extraOpts.dryRun = false
 
-          spawn.advancedSpawn(spawnRequest)
+        // Spawn the creep
 
-          // Record in stats the costs
+        spawn.advancedSpawn(spawnRequest)
 
-          room.energyAvailable -= spawnRequest.cost
+        // Record in stats the costs
 
-          if (global.roomStats[room.name]) global.roomStats[room.name].eosp += spawnRequest.cost
+        this.energyAvailable -= spawnRequest.cost
 
-          // Decrease the spawnIndex
+        if (global.roomStats.commune[this.name])
+            (global.roomStats.commune[this.name] as RoomCommuneStats).eosp += spawnRequest.cost
 
-          spawnIndex -= 1
-     }
+        // Decrease the spawnIndex
 
-     // If CPU logging is enabled, log the CPU used by this manager
+        spawnIndex -= 1
+    }
 
-     if (Memory.cpuLogging)
-          customLog(
-               'Spawn Manager',
-               (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-               undefined,
-               constants.colors.lightGrey,
-          )
+    // If CPU logging is enabled, log the CPU used by this manager
+
+    if (Memory.CPULogging)
+        customLog('Spawn Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
 }

@@ -1,93 +1,94 @@
-import { findObjectWithID, getRange } from 'international/generalFunctions'
-import { RoomTask } from 'room/roomTasks'
-import { Builder } from '../../creepClasses'
+import { customLog, findObjectWithID, getRange } from 'international/generalFunctions'
 
-export function builderManager(room: Room, creepsOfRole: string[]) {
-     // If there is no construction target ID
+export class Builder extends Creep {
+    getEnergy?(): boolean {
+        const { room } = this
 
-     if (!room.memory.cSiteTargetID) {
-          // Try to find a construction target. If none are found, stop
+        if (!this.needsResources()) {
+            this.message += '✨'
+            return false
+        }
 
-          room.findCSiteTargetID(Game.creeps[creepsOfRole[0]])
-     }
+        // If there are no sourceHarvesters in the room, harvest a source
 
-     // Convert the construction target ID into a game object
+        if (!(room.myCreeps.source1Harvester.length + room.myCreeps.source2Harvester?.length || 0)) {
+            const sources = room.find(FIND_SOURCES_ACTIVE)
+            if (!sources.length) return true
 
-     let constructionTarget: ConstructionSite | undefined = findObjectWithID(room.memory.cSiteTargetID)
+            const source = this.pos.findClosestByPath(sources, {
+                ignoreCreeps: true,
+            })
 
-     // If there is no construction target
+            if (getRange(this.pos.x, source.pos.x, this.pos.y, source.pos.y) > 1) {
+                this.createMoveRequest({
+                    origin: this.pos,
+                    goals: [{ pos: source.pos, range: 1 }],
+                    avoidEnemyRanges: true,
+                })
 
-     if (!constructionTarget) {
-          // Try to find a construction target. If none are found, stop
+                return true
+            }
 
-          room.findCSiteTargetID(Game.creeps[creepsOfRole[0]])
-     }
+            this.advancedHarvestSource(source)
+            return true
+        }
 
-     // Convert the construction target ID into a game object, stopping if it's undefined
+        if (!room.fastFillerContainerLeft && !room.fastFillerContainerRight) return false
 
-     constructionTarget = findObjectWithID(room.memory.cSiteTargetID)
+        // If there are fastFiller containers
 
-     // Loop through creep names of creeps of the manager's role
+        if (!this.memory.reservations || !this.memory.reservations.length) this.reserveWithdrawEnergy()
 
-     for (const creepName of creepsOfRole) {
-          // Get the creep using its name
+        if (!this.fulfillReservation()) {
+            this.say(this.message)
+            return true
+        }
 
-          const creep: Builder = Game.creeps[creepName]
+        this.reserveWithdrawEnergy()
 
-          if (!constructionTarget) {
-               creep.advancedRecycle()
-               continue
-          }
+        if (!this.fulfillReservation()) {
+            this.say(this.message)
+            return true
+        }
 
-          // If the creep needs resources
+        /*
+        // I don't think this is needed anymore
+        // If there are no fastFiller containers and not enough energy
 
-          if (creep.needsResources()) {
-               // If there are no sourceHarvesters in the room, harvest a source
+        else if (this.store.energy < this.parts.work * BUILD_POWER)
+        */
+        return false
+    }
 
-               if (!(room.myCreeps.source1Harvester.length + room.myCreeps.source2Harvester.length)) {
-                    const sources = room.find(FIND_SOURCES_ACTIVE)
-                    if (!sources.length) continue
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
 
-                    const source = creep.pos.findClosestByPath(sources, {
-                         ignoreCreeps: true,
-                    })
+    static builderManager(room: Room, creepsOfRole: string[]) {
+        const cSiteTarget = room.cSiteTarget
 
-                    if (getRange(creep.pos.x - source.pos.x, creep.pos.y - source.pos.y) > 1) {
-                         creep.createMoveRequest({
-                              origin: creep.pos,
-                              goal: { pos: source.pos, range: 1 },
-                              avoidEnemyRanges: true,
-                              weightGamebjects: {
-                                   1: room.get('road'),
-                              },
-                         })
+        // Loop through creep names of creeps of the manager's role
 
-                         continue
-                    }
+        for (const creepName of creepsOfRole) {
+            // Get the creep using its name
 
-                    creep.advancedHarvestSource(source)
-                    continue
-               }
+            const creep: Builder = Game.creeps[creepName]
 
-               if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveWithdrawEnergy()
+            if (!cSiteTarget) {
+                creep.advancedRecycle()
+                continue
+            }
 
-               if (!creep.fulfillReservation()) {
-                    creep.say(creep.message)
-                    continue
-               }
+            if (creep.getEnergy()) {
+                creep.say(creep.message)
+                continue
+            }
 
-               creep.reserveWithdrawEnergy()
+            // If there is a cSite, try to build it and iterate
 
-               if (!creep.fulfillReservation()) {
-                    creep.say(creep.message)
-                    continue
-               }
+            if (creep.advancedBuildCSite()) creep.getEnergy()
 
-               continue
-          }
-
-          // If there is a cSite, try to build it and iterate
-
-          if (creep.advancedBuildCSite(constructionTarget)) continue
-     }
+            creep.say(creep.message)
+        }
+    }
 }

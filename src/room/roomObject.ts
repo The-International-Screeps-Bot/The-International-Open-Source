@@ -1,6 +1,5 @@
 // Define roomObject types
 
-import { constants } from 'international/constants'
 import { findObjectWithID } from 'international/generalFunctions'
 
 export type RoomObjectValueTypes = 'pos' | 'id' | 'object'
@@ -71,7 +70,7 @@ RoomCacheObject.prototype.formatValue = function () {
 
           // Otherwise assign its value as a new RoomPosition and stop
 
-          roomObject.value = room.newPos(roomObject.value)
+          roomObject.value = new RoomPosition(roomObject.value.x, roomObject.value.y, room.name)
      }
 }
 
@@ -82,7 +81,7 @@ RoomCacheObject.prototype.getCachedValue = function () {
      if (roomObject.cacheType === 'memory') {
           // Query room memory for cachedRoomObject
 
-          const cachedValue: any = room.memory[roomObject.name]
+          const cachedValue = room.memory[roomObject.name as keyof RoomMemory]
 
           // If cachedRoomObject doesn't exist, and inform false
 
@@ -168,7 +167,7 @@ RoomCacheObject.prototype.cache = function () {
      if (roomObject.cacheType === 'memory') {
           // Store value in room's memory and stop
 
-          room.memory[roomObject.name] = roomObject.value
+          (room.memory[roomObject.name as keyof RoomMemory] as any) = roomObject.value
           return
      }
 

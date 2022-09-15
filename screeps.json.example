@@ -1,0 +1,21 @@
+{
+    "mmo": {
+        "token": "your token",
+        "protocol": "https",
+        "hostname": "screeps.com",
+        "port": 443,
+        "path": "/",
+        "branch": "default",
+        "uglify": false
+    },
+    "pserver": {
+        "email": "your username (case sensitive!)",
+        "password": "your password",
+        "protocol": "http",
+        "hostname": "127.0.0.1",
+        "port": 21025,
+        "path": "/",
+        "branch": "default",
+        "uglify": false
+    }
+}

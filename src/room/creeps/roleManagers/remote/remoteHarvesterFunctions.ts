@@ -1,77 +1,213 @@
-import { constants, remoteNeedsIndex } from 'international/constants'
-import { getRange, getRangeBetween, unpackAsPos } from 'international/generalFunctions'
-import { RemoteHarvester } from 'room/creeps/creepClasses'
+import { minHarvestWorkRatio, RemoteNeeds } from 'international/constants'
+import {
+    customLog,
+    findCarryPartsRequired,
+    findObjectWithID,
+    getRange,
+    unpackAsPos,
+    unpackAsRoomPos,
+} from 'international/generalFunctions'
+import { unpackPosList } from 'other/packrat'
+import { RemoteHauler } from './remoteHauler'
 
-RemoteHarvester.prototype.findRemote = function () {
-     const creep = this
-     // If the creep already has a remote, inform true
+export class RemoteHarvester extends Creep {
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
 
-     if (creep.memory.remoteName) return true
+    public get dying(): boolean {
+        // Inform as dying if creep is already recorded as dying
 
-     // Otherwise, get the creep's role
+        if (this._dying) return true
 
-     const role = creep.memory.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
-     // Get remotes by their efficacy
+        // Stop if creep is spawning
 
-     const remoteNamesByEfficacy: string[] = Game.rooms[creep.memory.communeName]?.get('remoteNamesByEfficacy')
+        if (!this.ticksToLive) return false
 
-     // Loop through each remote name
+        if (this.memory.RN) {
+            if (
+                this.ticksToLive >
+                this.body.length * CREEP_SPAWN_TIME +
+                    Memory.rooms[this.memory.RN].SE[this.memory.SI] -
+                    1 +
+                    //I'm adding 20 to the theoritical value.  I'm frequently seeing the replacement harvesters
+                    // not re-spawn in time because other creeps are spawning, and we end up losing out on a lot of
+                    // energy because we miss a chance to farm.  -PR
+                    20
+            )
+                return false
+        } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
-     for (const roomName of remoteNamesByEfficacy) {
-          // Get the remote's memory using its name
+        // Record creep as dying
 
-          const roomMemory = Memory.rooms[roomName]
+        return (this._dying = true)
+    }
 
-          // If the needs of this remote are met, iterate
+    preTickManager(): void {
+        if (!this.findRemote()) return
 
-          if (roomMemory.needs[remoteNeedsIndex[role]] <= 0) continue
+        const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
-          // Otherwise assign the remote to the creep and inform true
+        // If the creep's remote no longer is managed by its commune
 
-          creep.memory.remoteName = roomName
-          roomMemory.needs[remoteNeedsIndex[role]] -= this.parts.work
+        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
+            // Delete it from memory and try to find a new one
 
-          return true
-     }
+            this.removeRemote()
+            if (!this.findRemote()) return
+        }
 
-     // Inform false
+        if (this.dying) return
 
-     return false
-}
+        // Reduce remote need
 
-RemoteHarvester.prototype.travelToSource = function (sourceName) {
-     const creep = this
-     const { room } = creep
+        Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= this.parts.work
 
-     // Try to find a harvestPosition, inform false if it failed
+        const commune = this.commune
 
-     if (!creep.findSourceHarvestPos(sourceName)) return false
+        // Add the creep to creepsFromRoomWithRemote relative to its remote
 
-     creep.say('🚬')
+        if (commune && commune.creepsFromRoomWithRemote[this.memory.RN])
+            commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
+    }
 
-     // Unpack the harvestPos
+    /**
+     * Finds a remote to harvest in
+     */
+    findRemote?(): boolean {
+        if (this.memory.RN) return true
 
-     const harvestPos = unpackAsPos(creep.memory.packedPos)
+        const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
-     // If the creep is at the creep's packedHarvestPos, inform false
+        for (const remoteInfo of this.commune?.remoteSourceIndexesByEfficacy) {
+            const splitRemoteInfo = remoteInfo.split(' ')
+            const remoteName = splitRemoteInfo[0]
+            const sourceIndex = parseInt(splitRemoteInfo[1])
+            const remoteMemory = Memory.rooms[remoteName]
 
-     if (getRange(creep.pos.x - harvestPos.x, creep.pos.y - harvestPos.y) === 0) return false
+            // If the sourceIndexes aren't aligned
 
-     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
+            if (sourceIndex !== this.memory.SI) continue
 
-     creep.say(`⏩ ${sourceName}`)
+            // If there is no need
 
-     creep.createMoveRequest({
-          origin: creep.pos,
-          goal: {
-               pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
-               range: 0,
-          },
-          avoidEnemyRanges: true,
-          weightGamebjects: {
-               1: room.get('road'),
-          },
-     })
+            if (remoteMemory.needs[RemoteNeeds[role]] <= 0) continue
 
-     return true
+            this.assignRemote(remoteName)
+            return true
+        }
+
+        return false
+    }
+
+    assignRemote?(remoteName: string) {
+        this.memory.RN = remoteName
+
+        if (this.dying) return
+
+        const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+
+        const needs = Memory.rooms[remoteName].needs
+
+        needs[RemoteNeeds[role]] -= this.parts.work
+    }
+
+    removeRemote?() {
+        if (!this.dying) {
+            const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
+
+            const needs = Memory.rooms[this.memory.RN].needs
+
+            needs[RemoteNeeds[role]] += this.parts.work
+        }
+
+        delete this.memory.RN
+    }
+
+    remoteActions?() {
+        // Try to move to source. If creep moved then iterate
+
+        if (this.travelToSource(this.memory.SI)) return
+
+        // Try to normally harvest. Iterate if creep harvested
+
+        if (this.advancedHarvestSource(this.room.sources[this.memory.SI])) return
+    }
+
+    /**
+     *
+     */
+    travelToSource?(sourceIndex: number): boolean {
+        const { room } = this
+
+        // Try to find a harvestPosition, inform false if it failed
+
+        if (!this.findSourcePos(sourceIndex)) return false
+
+        this.say('🚬')
+
+        // Unpack the harvestPos
+
+        const harvestPos = unpackAsRoomPos(this.memory.packedPos, room.name)
+
+        // If the creep is at the creep's packedHarvestPos, inform false
+
+        if (getRange(this.pos.x, harvestPos.x, this.pos.y, harvestPos.y) === 0) return false
+
+        // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
+
+        this.say(`⏩ ${sourceIndex}`)
+
+        this.createMoveRequest({
+            origin: this.pos,
+            goals: [
+                {
+                    pos: harvestPos,
+                    range: 0,
+                },
+            ],
+            avoidEnemyRanges: true,
+        })
+
+        return true
+    }
+
+    static RemoteHarvesterManager(room: Room, creepsOfRole: string[]) {
+        for (const creepName of creepsOfRole) {
+            const creep: RemoteHarvester = Game.creeps[creepName] as RemoteHarvester
+
+            // Try to find a remote. If one couldn't be found, iterate
+
+            if (!creep.findRemote()) continue
+
+            // If the creep needs resources
+
+            if (room.name === creep.memory.RN) {
+                creep.remoteActions()
+                continue
+            }
+
+            creep.say(creep.memory.RN)
+
+            const sourcePos = unpackPosList(Memory.rooms[creep.memory.RN].SP[creep.memory.SI])[0]
+
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [
+                    {
+                        pos: sourcePos,
+                        range: 1,
+                    },
+                ],
+                avoidEnemyRanges: true,
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity,
+                },
+            })
+        }
+    }
 }

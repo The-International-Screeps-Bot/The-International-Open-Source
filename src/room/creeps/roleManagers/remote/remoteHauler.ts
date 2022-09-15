@@ -1,215 +1,513 @@
-import { remoteNeedsIndex } from 'international/constants'
-import { RoomTask } from 'room/roomTasks'
-import { RemoteHauler } from '../../creepClasses'
+import { myColors, relayOffsets, RemoteNeeds } from 'international/constants'
+import {
+    customLog,
+    findClosestObject,
+    findCoordsInsideRect,
+    findFunctionCPU,
+    findObjectWithID,
+    getRange,
+    pack,
+    unpackAsPos,
+} from 'international/generalFunctions'
+import { indexOf } from 'lodash'
+import { unpackPosList } from 'other/packrat'
+import { creepClasses } from 'room/creeps/creepClasses'
+import { Hauler } from '../commune/hauler'
 
-export function remoteHaulerManager(room: Room, creepsOfRole: string[]) {
-     for (const creepName of creepsOfRole) {
-          const creep: RemoteHauler = Game.creeps[creepName]
+export class RemoteHauler extends Creep {
+    public get dying() {
+        // Inform as dying if creep is already recorded as dying
 
-          // If the creep needs resources
+        if (this._dying) return true
 
-          if (creep.needsResources()) {
-               if (!creep.findRemote()) continue
+        // Stop if creep is spawning
 
-               // If the creep is in the remote
+        if (!this.ticksToLive) return false
 
-               if (room.name === creep.memory.remoteName) {
-                    if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveWithdraw()
+        // If the creep's remaining ticks are more than the estimated spawn time, inform false
 
-                    if (!creep.fulfillReservation()) {
-                         creep.say(creep.message)
-                         continue
-                    }
+        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
-                    creep.reserveWithdraw()
+        // Record creep as dying
 
-                    if (!creep.fulfillReservation()) {
-                         creep.say(creep.message)
-                         continue
-                    }
+        return (this._dying = true)
+    }
 
-                    if (creep.needsResources()) continue
+    preTickManager() {
+        if (!this.memory.RN) return
 
-                    creep.message += creep.memory.communeName
-                    creep.say(creep.message)
+        // If the creep's remote no longer is managed by its commune
 
-                    creep.createMoveRequest({
-                         origin: creep.pos,
-                         goal: {
-                              pos: new RoomPosition(25, 25, creep.memory.communeName),
-                              range: 20,
-                         },
-                         avoidEnemyRanges: true,
-                         weightGamebjects: {
-                              1: room.get('road'),
-                         },
-                    })
+        // If the creep's remote no longer is managed by its commune
 
-                    continue
-               }
+        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
+            // Delete it from memory and try to find a new one
 
-               creep.message += creep.memory.remoteName
-               creep.say(creep.message)
+            this.removeRemote()
+            if (!this.findRemote()) return
+        }
 
-               creep.createMoveRequest({
-                    origin: creep.pos,
-                    goal: {
-                         pos: new RoomPosition(25, 25, creep.memory.remoteName),
-                         range: 20,
-                    },
+        if (this.dying) return
+
+        if (Memory.rooms[this.memory.RN])
+            Memory.rooms[this.memory.RN].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
+    }
+
+    /**
+     * Finds a remote to haul from
+     */
+    findRemote?(): boolean {
+        if (this.memory.RN) return true
+
+        for (const remoteInfo of this.commune?.remoteSourceIndexesByEfficacy) {
+            const splitRemoteInfo = remoteInfo.split(' ')
+            const remoteName = splitRemoteInfo[0]
+            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
+            const remoteMemory = Memory.rooms[remoteName]
+
+            // If there is no need
+
+            if (remoteMemory.needs[RemoteNeeds[`remoteHauler${sourceIndex}`]] <= 0) continue
+
+            this.assignRemote(remoteName, sourceIndex)
+            return true
+        }
+
+        return false
+    }
+
+    assignRemote?(remoteName: string, sourceIndex: 0 | 1) {
+        this.memory.RN = remoteName
+        this.memory.SI = sourceIndex
+
+        if (this.dying) return
+
+        Memory.rooms[remoteName].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
+    }
+
+    removeRemote?() {
+        if (!this.dying) {
+            Memory.rooms[this.memory.RN].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] += this.parts.carry
+        }
+
+        delete this.memory.RN
+        delete this.memory.SI
+    }
+
+    /*
+    updateRemote?() {
+        if (this.memory.RN) {
+
+            return true
+        }
+
+        const remoteNamesByEfficacy = this.commune?.remoteNamesBySourceEfficacy
+
+        let roomMemory
+
+        for (const roomName of remoteNamesByEfficacy) {
+            roomMemory = Memory.rooms[roomName]
+
+            if (roomMemory.needs[RemoteNeeds.remoteHauler] <= 0) continue
+
+            this.memory.RN = roomName
+            roomMemory.needs[RemoteNeeds.remoteHauler] -= this.parts.carry
+
+            return true
+        }
+
+        return false
+    }
+ */
+    getDroppedEnergy?() {
+        for (const resource of this.pos.lookFor(LOOK_RESOURCES)) {
+            if (resource.resourceType !== RESOURCE_ENERGY) continue
+
+            if (resource.amount < this.store.getCapacity() * 0.5) return false
+
+            this.pickup(resource)
+            this.movedResource = true
+            return true
+        }
+
+        return false
+    }
+
+    getResources?() {
+        if (!this.findRemote()) return false
+
+        const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
+
+        // If the creep is in the remote
+
+        if (this.room.name === this.memory.RN) {
+            if (getRange(this.pos.x, sourcePos.x, this.pos.y, sourcePos.y) > 1) {
+                this.say('M')
+
+                this.getDroppedEnergy()
+
+                this.createMoveRequest({
+                    origin: this.pos,
+                    goals: [
+                        {
+                            pos: sourcePos,
+                            range: 1,
+                        },
+                    ],
                     avoidEnemyRanges: true,
-                    weightGamebjects: {
-                         1: room.get('road'),
+                })
+
+                return true
+            }
+
+            this.reserveWithdrawEnergy()
+
+            if (!this.fulfillReservation()) {
+                this.say(this.message)
+                return false
+            }
+
+            this.reserveWithdrawEnergy()
+
+            if (!this.fulfillReservation()) {
+                this.say(this.message)
+                return false
+            }
+
+            if (this.needsResources()) {
+                this.moved = -2
+                return false
+            }
+
+            if (!this.commune) return false
+
+            this.message += this.commune.name
+            this.say(this.message)
+
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: this.commune.anchor,
+                        range: 3,
                     },
-               })
+                ],
+                avoidEnemyRanges: true,
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity,
+                },
+            })
 
-               continue
-          }
+            return true
+        }
 
-          // Otherwise if creep doesn't need resources
+        this.message += this.memory.RN
+        this.say(this.message)
 
-          if (room.name === creep.memory.communeName) {
-               // Try to renew the creep
+        this.getDroppedEnergy()
 
-               creep.advancedRenew()
+        this.createMoveRequest({
+            origin: this.pos,
+            goals: [
+                {
+                    pos: sourcePos,
+                    range: 1,
+                },
+            ],
+            avoidEnemyRanges: true,
+            typeWeights: {
+                enemy: Infinity,
+                ally: Infinity,
+                keeper: Infinity,
+                enemyRemote: Infinity,
+                allyRemote: Infinity,
+            },
+        })
 
-               // If the creep has a remoteName, delete it
+        return true
+    }
 
-               if (creep.memory.remoteName) delete creep.memory.remoteName
+    reserveWithdrawEnergy() {
+        if (this.memory.reservations && this.memory.reservations?.length) return
+        if (!this.needsResources()) return
 
-               if (!creep.memory.reservations || !creep.memory.reservations.length) creep.reserveTransfer()
+        const { room } = this
+        const sourcePos = room.sources[this.memory.SI].pos
 
-               if (!creep.fulfillReservation()) {
-                    creep.say(creep.message)
-                    continue
-               }
+        if (this.freeCapacityNextTick === undefined) this.freeCapacityNextTick = this.store.getFreeCapacity()
 
-               creep.reserveTransfer()
+        let withdrawTargets = room.MAWT.filter(target => {
+            if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
 
-               if (!creep.fulfillReservation()) {
-                    creep.say(creep.message)
-                    continue
-               }
+            if (target instanceof Resource) return true
 
-               if (!creep.needsResources()) continue
+            return target.store.energy >= this.freeCapacityNextTick
+        })
 
-               if (!creep.findRemote()) continue
+        for (const creepName of room.myCreeps[`source${(this.memory.SI + 1) as 1 | 2}RemoteHarvester`]) {
+            const harvester = Game.creeps[creepName]
 
-               creep.message += creep.memory.remoteName
-               creep.say(creep.message)
+            // If the harvester isn't nearly full and can't fully fill the hauler
 
-               creep.createMoveRequest({
-                    origin: creep.pos,
-                    goal: {
-                         pos: new RoomPosition(25, 25, creep.memory.remoteName),
-                         range: 20,
+            if (harvester.store.getFreeCapacity(RESOURCE_ENERGY) > harvester.parts.work * HARVEST_POWER || harvester.store.getCapacity(RESOURCE_ENERGY) < this.store.getFreeCapacity()) continue
+
+            withdrawTargets.push(harvester)
+        }
+
+        let target
+        let amount
+
+        if (withdrawTargets.length) {
+            target = findClosestObject(this.pos, withdrawTargets)
+
+            if (target instanceof Resource) amount = target.reserveAmount
+            else amount = Math.min(this.freeCapacityNextTick, target.store.energy)
+
+            this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
+            return
+        }
+
+        withdrawTargets = room.OAWT.filter(target => {
+            if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
+
+            if (target instanceof Resource) return true
+
+            return target.store.energy >= this.freeCapacityNextTick
+        })
+
+        if (!withdrawTargets.length) return
+
+        target = findClosestObject(this.pos, withdrawTargets)
+
+        if (target instanceof Resource) amount = target.reserveAmount
+        else amount = Math.min(this.freeCapacityNextTick, target.store.energy)
+
+        this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
+    }
+
+    deliverResources?() {
+        if (this.room.name === this.commune.name) {
+            // Try to renew the creep
+
+            this.advancedRenew()
+
+            let store: AnyStoreStructure = this.commune.storage
+            if (!store) store = this.commune.terminal
+
+            //We don't want remote haulers fulfilling reservations all over the place in the commune.
+            if (store) {
+                if (!this.memory.reservations || this.memory.reservations.length == 0)
+                    this.createReservation('transfer', store.id, this.store[RESOURCE_ENERGY], RESOURCE_ENERGY)
+                if (!this.fulfillReservation()) {
+                    this.say(this.message)
+                    return true
+                }
+            } else {
+                this.reserveTransferEnergy()
+
+                if (this.fulfillReservation()) {
+                    this.say(this.message)
+                    return true
+                }
+
+                this.reserveTransferEnergy()
+
+                if (!this.fulfillReservation()) {
+                    this.say(this.message)
+                    return true
+                }
+            }
+
+            if (!this.needsResources()) return true
+
+            if (!this.findRemote()) return false
+
+            this.message += this.memory.RN
+            this.say(this.message)
+
+            const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
+
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: sourcePos,
+                        range: 1,
                     },
-                    avoidEnemyRanges: true,
-                    weightGamebjects: {
-                         1: room.get('road'),
-                    },
-               })
+                ],
+                avoidEnemyRanges: true,
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity,
+                },
+            })
 
-               continue
-          }
+            return false
+        }
 
-          creep.message += creep.memory.communeName
-          creep.say(creep.message)
+        if (!this.commune) return false
 
-          creep.createMoveRequest({
-               origin: creep.pos,
-               goal: {
-                    pos: new RoomPosition(25, 25, creep.memory.communeName),
-                    range: 20,
-               },
-               avoidEnemyRanges: true,
-               weightGamebjects: {
-                    1: room.get('road'),
-               },
-          })
-     }
-}
+        this.message += this.commune.name
+        this.say(this.message)
 
-RemoteHauler.prototype.findRemote = function () {
-     if (this.memory.remoteName) return true
+        this.createMoveRequest({
+            origin: this.pos,
+            goals: [
+                {
+                    pos: this.commune.anchor,
+                    range: 3,
+                },
+            ],
+            avoidEnemyRanges: true,
+            typeWeights: {
+                enemy: Infinity,
+                ally: Infinity,
+                keeper: Infinity,
+                enemyRemote: Infinity,
+                allyRemote: Infinity,
+            },
+        })
 
-     const remoteNamesByEfficacy: string[] = Game.rooms[this.memory.communeName]?.get('remoteNamesByEfficacy')
+        return true
+    }
 
-     let roomMemory
+    relayCoord?(coord: Coord) {
+        if (Memory.roomVisuals) this.room.visual.circle(coord.x, coord.y, { fill: myColors.lightBlue })
 
-     for (const roomName of remoteNamesByEfficacy) {
-          roomMemory = Memory.rooms[roomName]
+        const creepAtPosName = this.room.creepPositions.get(pack(coord))
+        if (!creepAtPosName) return false
 
-          if (roomMemory.needs[remoteNeedsIndex.remoteHauler] <= 0) continue
+        const creepAtPos = Game.creeps[creepAtPosName]
 
-          this.memory.remoteName = roomName
-          roomMemory.needs[remoteNeedsIndex.remoteHauler] -= this.parts.work
+        if (creepAtPos.role !== 'remoteHauler') return false
+        if (creepAtPos.movedResource) return false
+        if (creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY)) return false
 
-          return true
-     }
+        this.transfer(creepAtPos, RESOURCE_ENERGY)
 
-     return false
-}
+        this.movedResource = true
+        creepAtPos.movedResource = true
 
-RemoteHauler.prototype.reserveWithdraw = function () {
-     const { room } = this
+        this.store.energy -= creepAtPos.store.getFreeCapacity()
+        creepAtPos.store.energy += this.store.getUsedCapacity(RESOURCE_ENERGY)
 
-     if (!this.needsResources()) return
+        // Stop previously attempted moveRequests as they do not account for a relay
 
-     const withdrawTargets = room.MAWT.filter(target => {
-          if (target instanceof Resource)
-               return (
-                    target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
-                    target.reserveAmount >= this.freeStore(RESOURCE_ENERGY)
-               )
+        delete this.moveRequest
+        delete creepAtPos.moveRequest
 
-          return target.store.energy >= this.freeStore(RESOURCE_ENERGY)
-     })
+        // Trade remotes and sourceIndexes
 
-     if (!withdrawTargets.length) return
+        const newCreepAtPosRemote = this.memory.RN || creepAtPos.memory.RN
+        const newCreepAtPosSourceIndex = this.memory.SI !== undefined ? this.memory.SI : creepAtPos.memory.SI
 
-     let target
-     let amount
+        this.memory.RN = creepAtPos.memory.RN || this.memory.RN
+        this.memory.SI = creepAtPos.memory.SI !== undefined ? creepAtPos.memory.SI : this.memory.SI
+        creepAtPos.memory.RN = newCreepAtPosRemote
+        creepAtPos.memory.SI = newCreepAtPosSourceIndex
 
-     target = this.pos.findClosestByRange(withdrawTargets)
+        this.getResources()
 
-     if (target instanceof Resource)
-          amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.reserveAmount)
-     else amount = Math.min(this.store.getCapacity(RESOURCE_ENERGY) - this.usedStore(), target.store.energy)
+        const remoteHauler = creepAtPos as RemoteHauler
+        remoteHauler.deliverResources()
 
-     this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
-}
+        return true
+    }
 
-RemoteHauler.prototype.reserveTransfer = function () {
-     const { room } = this
+    relayCardinal?(moveCoord: Coord) {
+        let offsets = relayOffsets.horizontal
+        if (this.pos.y === moveCoord.y) offsets = relayOffsets.vertical
 
-     if (this.usedStore() === 0) return
+        for (const offset of offsets) {
+            const coord = {
+                x: moveCoord.x + offset.x,
+                y: moveCoord.y + offset.y,
+            }
 
-     let transferTargets = room.MATT.filter(function (target) {
-          return target.freeSpecificStore(RESOURCE_ENERGY) > 0
-     })
+            if (this.relayCoord(coord)) return true
+        }
 
-     let target
-     let amount
+        return false
+    }
 
-     if (transferTargets.length) {
-          target = this.pos.findClosestByRange(transferTargets)
+    relayDiagonal?(moveCoord: Coord) {
+        let offsets
 
-          amount = Math.min(this.usedStore(), target.freeStore(RESOURCE_ENERGY))
+        if (this.pos.y > moveCoord.y) {
+            offsets = relayOffsets.topLeft
+            if (this.pos.x < moveCoord.x) offsets = relayOffsets.topRight
+        } else {
+            offsets = relayOffsets.bottomLeft
+            if (this.pos.x < moveCoord.x) offsets = relayOffsets.bottomRight
+        }
 
-          this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
-          return
-     }
+        for (const offset of offsets) {
+            const coord = {
+                x: moveCoord.x + offset.x,
+                y: moveCoord.y + offset.y,
+            }
 
-     transferTargets = room.OATT.filter(target => {
-          return target.freeStore(RESOURCE_ENERGY) >= this.usedStore()
-     })
+            // If the x and y are dissimilar
 
-     if (!transferTargets.length) return
+            if (coord.x !== moveCoord.x && coord.y !== moveCoord.y) continue
 
-     target = this.pos.findClosestByRange(transferTargets)
+            if (this.relayCoord(coord)) return true
+        }
 
-     amount = this.usedStore()
+        return false
+    }
 
-     this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
+    relayAsFull?() {
+        // If there is no easy way to know what coord the creep is trying to go to next
+
+        if (!this.moveRequest && (!this.memory.path || !this.memory.path.length)) return
+        if (this.movedResource) return
+        if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return
+
+        const moveCoord = this.moveRequest ? unpackAsPos(this.moveRequest) : unpackPosList(this.memory.path)[0]
+
+        if (this.pos.x === moveCoord.x || this.pos.y === moveCoord.y) {
+            this.relayCardinal(moveCoord)
+            return
+        }
+
+        this.relayDiagonal(moveCoord)
+    }
+
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
+
+    static remoteHaulerManager(room: Room, creepsOfRole: string[]) {
+        for (const creepName of creepsOfRole) {
+            const creep: RemoteHauler = Game.creeps[creepName] as RemoteHauler
+
+            let returnTripTime = 0
+            if (creep.memory.RN && creep.memory.SI !== undefined) {
+                // The 1.1 is to add some margin for the return trip
+
+                returnTripTime = Memory.rooms[creep.memory.RN].SE[creep.memory.SI] * 1.1
+            }
+
+            if (creep.needsResources() && creep.ticksToLive > returnTripTime) {
+                creep.getResources()
+                continue
+            }
+
+            // Otherwise if the creep doesn't need resources
+
+            // If the creep has a remoteName, delete it and delete it's fulfilled needs
+
+            //if (creep.memory.RN) creep.removeRemote()
+
+            if (creep.deliverResources()) creep.relayAsFull()
+        }
+    }
 }
