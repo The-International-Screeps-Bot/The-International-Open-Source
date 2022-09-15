@@ -994,7 +994,6 @@ Room.prototype.spawnRequester = function () {
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
                 remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SE[index], income)
-                customLog(remoteName + ' Needs', remoteHaulerNeed + ', ' + income + ', ' + remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]])
             }
         }
 
@@ -1159,7 +1158,7 @@ Room.prototype.spawnRequester = function () {
             })(),
         )
     }
-    customLog('REMOTE HAULER NEED', remoteHaulerNeed)
+
     // Construct requests for remoteHaulers
 
     this.constructSpawnRequests(
