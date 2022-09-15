@@ -1,4 +1,4 @@
-steamKey: 71148C12ACC4051B2DA04F3739596E80
+steamKey: ID!
 mods:
 - screepsmod-auth
 - screepsmod-admin-utils
@@ -11,5 +11,4 @@ serverConfig: # This section requires screepsmod-admin-utils to work
     <h1 style="text-align: center;">Performance server</h1>
 env:
   backend:
-    cli_host: 0.0.0.0
-    cli_port: 21026
+    CLI_HOST: 0.0.0.0

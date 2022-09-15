@@ -106,11 +106,12 @@ class Tester {
       */
      async execute() {
           const defer = q.defer()
-          const socket = net.connect(cliPort,"0.0.0.0");
+          const socket = net.connect(21026,"localhost");
 
           socket.on('data', async raw => {
                const data = raw.toString('utf8')
                const line = data.replace(/^< /, '').replace(/\n< /, '')
+               console.log(1,line)
                if (await spawnBots(line, socket, rooms, tickDuration)) {
                     botsSpawned = true
                     return
@@ -131,8 +132,8 @@ class Tester {
           })
 
           socket.on('connect', () => {
-               console.log('connected')
-               socket.write('system.setTickDuration(1)\r\n')
+               console.log(1,'connected')
+               socket.write(`system.resumeSimulation()\r\n`)
           })
           socket.on('error', error => {
                defer.reject(error)
@@ -142,13 +143,16 @@ class Tester {
      }
 
      async run() {
+          console.log("Starting slowly...")
           const start = Date.now()
-          await initServer()
-          await startServer()
-          await sleep(10)
+          // await initServer()
+          // await startServer()
+          // await sleep(10)
           let exitCode = 0
           try {
                await this.execute()
+               while (true) {
+               }
                console.log(`${lastTick} Yeah`)
           } catch (e) {
                exitCode = 1

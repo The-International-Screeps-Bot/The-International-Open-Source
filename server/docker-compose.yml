@@ -1,0 +1,23 @@
+version: '3'
+services:
+    # xxscreeps:
+    #     image: nilskri/xxscreeps
+    #     ports:
+    #         - '21025:21025'
+    #         - '21026:21026'
+    #     volumes:
+    #         - ./.screepsrc.yaml:/usr/app/xxscreeps/.screepsrc.yaml
+    screeps:
+        image: screepers/screeps-launcher
+        volumes:
+            - ./config.yml:/screeps/config.yml
+            - screeps-data:/screeps
+        ports:
+            - 21025:21025
+            - 21026:21026
+        restart: unless-stopped
+    handler:
+        build: .
+        restart: unless-stopped
+volumes:
+    screeps-data:
