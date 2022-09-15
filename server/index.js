@@ -67,7 +67,7 @@ class Tester {
                console.log('Milestones:')
                console.log(JSON.stringify(Config.milestones, null, 2))
 
-               const fails = milestones.filter(
+               const fails = Config.milestones.filter(
                     milestone => milestone.required && milestone.tick < lastTick && !milestone.success,
                )
                await Helper.sendResult(status, Config.milestones)
@@ -93,7 +93,7 @@ class Tester {
      statusUpdater = event => {
           if (event.data.gameTime !== lastTick) {
                lastTick = event.data.gameTime
-               for (const milestone of milestones) {
+               for (const milestone of Config.milestones) {
                     const failedRooms = []
                     if (typeof milestone.success === 'undefined' || milestone.success === null) {
                          let success = Object.keys(status).length === trackedRooms.length
@@ -173,8 +173,7 @@ class Tester {
                }
 
                if (Object.keys(Config.rooms).length === Object.keys(this.roomsSeen).length) {
-                    console.log('Follow log')
-                    await Helper.followLog(trackedRooms, statusUpdater)
+                    await Helper.followLog(Config.trackedRooms, this.statusUpdater)
                     await Helper.executeCliCommand(`system.resumeSimulation()`)
                }
                this.checkForSuccess(resolve, reject)
