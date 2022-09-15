@@ -6,10 +6,10 @@ const ncp = require('ncp')
 const lib = require('@screeps/launcher/lib/index')
 const _ = require('lodash')
 const { ScreepsAPI } = require('screeps-api')
+const { exec,execSync } = require('child_process')
 
 const { userCpu } = require('./config')
 
-const dir = 'files/tmp-test-server'
 const port = 21025
 let hostname = '127.0.0.1'
 
@@ -102,49 +102,14 @@ function sleep(seconds) {
 module.exports.sleep = sleep
 
 async function initServer() {
-     if (fs.existsSync(dir)) {
-          rimraf.sync(dir)
-     }
-     fs.mkdirSync(dir, '0744')
-     await new Promise(resolve => {
-          ncp(path.resolve(__dirname, 'node_modules/@screeps/launcher/init_dist'), dir, e => {
-               resolve()
-          })
-     })
-     const configFilename = path.resolve(dir, '.screepsrc')
+     if (!process.env.STEAM_API_KEY) return;
+     const configFilename = path.resolve("files", 'config.yml')
      let config = fs.readFileSync(configFilename, { encoding: 'utf8' })
      config = config
           .replace('{{STEAM_KEY}}', process.env.STEAM_API_KEY)
-          .replace('runner_threads = 2', 'runner_threads = 4')
-          .replace('processors_cnt = 2', 'processors_cnt = 4')
 
      fs.writeFileSync(configFilename, config)
-     fs.chmodSync(path.resolve(dir, 'node_modules/.hooks/install'), '755')
-     fs.chmodSync(path.resolve(dir, 'node_modules/.hooks/uninstall'), '755')
-
-     await new Promise(resolve => {
-          fs.copyFile('files/mods.json', `${dir}/mods.json`, err => {
-               if (err) throw err
-               resolve()
-          })
-     })
-     try {
-          fs.writeFileSync(
-               path.resolve(dir, 'package.json'),
-               JSON.stringify(
-                    {
-                         name: 'screeps-performanceServer',
-                         version: '0.0.1',
-                         private: true,
-                    },
-                    undefined,
-                    '  ',
-               ),
-               { encoding: 'utf8', flag: 'wx' },
-          )
-     } catch (e) {
-          console.log(e)
-     }
+     fs.copyFileSync(path.resolve("files", 'config.yml'), path.resolve("files/server", 'config.yml'))
 }
 module.exports.initServer = initServer
 
@@ -155,8 +120,39 @@ module.exports.initServer = initServer
  * @return {object}
  */
 async function startServer() {
-     process.chdir(dir)
-     return lib.start({}, process.stdout)
+     // if
+     try {
+          execSync("docker stop Screeps-Performance-Server")
+          execSync("docker rm -v Screeps-Performance-Server")
+     } catch (error) {
+          console.log(error)
+     }
+     const folderPath = path.resolve("files/server")
+     const command = `docker run --restart=unless-stopped --name Screeps-Performance-Server -v ${folderPath}:/screeps -p 21025-21026:21025-21026 screepers/screeps-launcher`
+     let maxTime = new Promise((resolve, reject) => {
+          setTimeout(resolve, 300 * 1000, 'Timeout')
+     })
+     const startServer = new Promise((resolve, reject) => {
+          const child = exec(command);
+          child.stderr.on('data', function (data) {
+               if (data.includes('Started')) {
+                    console.log("Started server")
+                    resolve();
+               }
+            });
+
+     })
+     return await Promise.race([startServer, maxTime])
+     .then(result => {
+          if (result === 'Timeout') {
+               console.log("Timeout starting server!")
+               return
+          }
+          return
+     })
+     .catch(result => {
+          logger.log('error', {data:result,options})
+     })
 }
 module.exports.startServer = startServer
 
@@ -171,7 +167,7 @@ module.exports.startServer = startServer
  * @return {boolean}
  */
 const spawnBots = async function (line, socket, rooms, tickDuration) {
-     if (line.startsWith(`Screeps server v`)) {
+     if (line === "Started") {
           console.log(`> system.resetAllData()`)
           socket.write(`system.resetAllData()\r\n`)
           await sleep(5)

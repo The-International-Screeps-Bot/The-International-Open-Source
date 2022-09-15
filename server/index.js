@@ -106,7 +106,7 @@ class Tester {
       */
      async execute() {
           const defer = q.defer()
-          const socket = net.connect(cliPort, '127.0.0.1')
+          const socket = net.connect(cliPort,"0.0.0.0");
 
           socket.on('data', async raw => {
                const data = raw.toString('utf8')
@@ -132,6 +132,7 @@ class Tester {
 
           socket.on('connect', () => {
                console.log('connected')
+               socket.write('system.setTickDuration(1)\r\n')
           })
           socket.on('error', error => {
                defer.reject(error)
@@ -144,7 +145,7 @@ class Tester {
           const start = Date.now()
           await initServer()
           await startServer()
-          await sleep(5)
+          await sleep(10)
           let exitCode = 0
           try {
                await this.execute()
