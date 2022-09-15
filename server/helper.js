@@ -76,7 +76,7 @@ export default class Helper {
       * @param {stringMap} playerRooms
       * @return {boolean}
       */
-     async setPassword(roomName, roomsSeen, playerRooms) {
+     static async setPassword(roomName, roomsSeen, playerRooms) {
           roomsSeen[roomName] = true
           console.log(`Set password for ${roomName}`)
           /* eslint max-len: ["error", 1300] */
@@ -105,14 +105,14 @@ export default class Helper {
      static async initServer() {
           console.log("Initializing server...")
           const dir = "files";
-          const configFilename = path.resolve(dir, 'config.example.yml')
-          let config = fs.readFileSync(configFilename, { encoding: 'utf8' })
-          if (process.env.STEAM_API_KEY) config = config
-               .replace('{{STEAM_KEY}}', process.env.STEAM_API_KEY)
 
-          fs.writeFileSync(configFilename, config)
+          const configFilename = path.resolve(dir, 'config.yml')
           if (fs.existsSync(path.resolve(dir, 'config.yml'))) fs.unlinkSync(path.resolve(dir, 'config.yml'))
           fs.copyFileSync(path.resolve(dir, 'config.example.yml'), path.resolve(dir, 'config.yml'))
+          let config = fs.readFileSync(configFilename, { encoding: 'utf8' })
+          if (process.env.STEAM_API_KEY) config = config
+          .replace('{{STEAM_KEY}}', process.env.STEAM_API_KEY)
+          fs.writeFileSync(configFilename, config)
 
           if (fs.existsSync(path.resolve(dir, 'dist'))) fs.rmdirSync(path.resolve(dir, 'dist'), { recursive: true })
           const distFolder = path.resolve("../dist")

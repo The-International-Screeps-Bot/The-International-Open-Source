@@ -1,4 +1,4 @@
-steamKey: FDD1A37FE89EC402C9E473AE6BF3BEC4
+steamKey: {{STEAM_KEY}}
 mods:
 - screepsmod-auth
 - screepsmod-admin-utils
