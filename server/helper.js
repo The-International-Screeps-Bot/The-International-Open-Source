@@ -1,217 +1,9 @@
-const fs = require('fs')
-const rimraf = require('rimraf')
-const path = require('path')
-const ncp = require('ncp')
-const lib = require('@screeps/launcher/lib/index')
-const _ = require('lodash')
-const { ScreepsAPI } = require('screeps-api')
-
-const dir = 'files/tmp-test-server'
-const port = 21025
-let hostname = '127.0.0.1'
-
-function setHostname(newHostname) {
-     hostname = newHostname
-}
-module.exports.setHostname = setHostname
-
-/**
- * followLog method
- *
- * Connects to the api and reads and prints the console log, if messages
- * are available
- *
- * @param {list} rooms - The rooms
- * @param {function} statusUpdater - Function to handle status updates
- * @return {undefined}
- */
-async function followLog(rooms, statusUpdater, restrictToRoom) {
-     for (const room of rooms) {
-          if (restrictToRoom && room !== restrictToRoom) {
-               continue
-          }
-          const api = new ScreepsAPI({
-               email: room,
-               password: 'tooangel',
-               protocol: 'http',
-               hostname,
-               port,
-               path: '/',
-          })
-
-          await api.auth()
-
-          api.socket.connect()
-          api.socket.on('connected', () => {})
-          api.socket.on('auth', event => {})
-          api.socket.subscribe(`room:${room}`, statusUpdater)
-     }
-}
-module.exports.followLog = followLog
-
-/**
- * sets password for user
- *
- * @param {string} line
- * @param {object} socket
- * @param {list} rooms
- * @param {object} roomsSeen
- * @param {stringMap} playerRooms
- * @return {boolean}
- */
-const setPassword = function (line, socket, rooms, roomsSeen, playerRooms) {
-     const roomsObject = Object.entries(rooms);
-     for (let i = 0; i < roomsObject.length; i++) {
-          const room = roomsObject[i][0]
-          const botName = roomsObject[i][1]
-          if (line.startsWith(`'User ${room} with bot AI "${botName}" spawned in ${room}'`)) {
-               roomsSeen[room] = true
-               console.log(`> Set password for ${room}`)
-               /* eslint max-len: ["error", 1300] */
-               socket.write(
-                    `storage.db.users.update({username: '${room}'}, {$set: {password: '70dbaf0462458b31ff9b3d184d06824d1de01f6ad59cae7b5b9c01a8b530875ac502c46985b63f0c147cf59936ac1be302edc532abc38236ab59efecb3ec7f64fad7e4544c1c5a5294a8f6f45204deeb009a31dd6e81e879cfb3b7e63f3d937f412734b1a3fa7bc04bf3634d6bc6503bb0068c3f6b44f3a84b5fa421690a7399799e3be95278381ae2ac158c27f31eef99db1f21e75d285802cda983cd8a73a8a85d03ba45dcc7eb2b2ada362887df10bf74cdcca47f911147fd0946fb5119c888f048000044072dcc29b1c428b40b805cadeee7b3afc1e9d9d546c2a878ff8df9fcf805a28cc8b6e4b78051f0adb33642f1097bf0a189f388860302df6173b8e7955a35b278655df2d7615b54da6c63dc501c7914d726bea325c2225f343dff0068ac42300661664ee5611eb623e1efa379f571d46ba6a0e13a9e3e9c5bb7a772b685258f768216a830c5e9af3685898d98a9935cca2ba5efb5e1e4a9f2745c53bff318bda3e376bcd06b06d87a55045a76a1982f6e3b9fb77d39c2ff5c09c76989d1c779655bc2acdf55879b68f6155d14c26bdca3af5c7fd6de9926dbc091da280e6f7e3d727fa68c89aa8ac25b5e50bd14bf2dbcd452975710ef4b8d61a81c8f6ef2d5584eacfcb1ab4202860320f03313d23076a3b3e085af5f0a9e010ddb0ad5af57ed0db459db0d29aa2bcbcd64588d4c54d0c5265bf82f31349d9456', salt: '7eeb813417828682419582da8f997dea3e848ce8293e68b2dbb2f334b1f8949f'}})\r\n`,
-               )
-
-               if (
-                    playerRooms[room]               ) {
-                    console.log(`> Set steam id for ${room} for ${playerRooms[room]}`)
-                    let steamId
-                    switch (playerRooms[room]) {
-                         case 'user1':
-                              steamId = process.env.STEAM_ID_USER1
-                              break
-                         case 'user2':
-                              steamId = process.env.STEAM_ID_USER2
-                              break
-                         case 'user3':
-                              steamId = process.env.STEAM_ID_USER3
-                              break
-                    }
-                    if (steamId) socket.write(
-                         `storage.db.users.update({username: '${room}'}, {$set: {steam: {id: '${steamId}'}}})\r\n`,
-                    )
-               }
-               return true
-          }
-     }
-     return false
-}
-module.exports.setPassword = setPassword
-
-/**
- * sleep method
- *
- * Helper method to sleep for amount of seconds.
- * @param {number} seconds Amount of seconds to sleep
- * @return {object}
- */
-function sleep(seconds) {
-     return new Promise(resolve => setTimeout(resolve, seconds * 1000))
-}
-module.exports.sleep = sleep
-
-async function initServer() {
-     if (fs.existsSync(dir)) {
-          rimraf.sync(dir)
-     }
-     fs.mkdirSync(dir, '0744')
-     await new Promise(resolve => {
-          ncp(path.resolve(__dirname, 'node_modules/@screeps/launcher/init_dist'), dir, e => {
-               resolve()
-          })
-     })
-     const configFilename = path.resolve(dir, '.screepsrc')
-     let config = fs.readFileSync(configFilename, { encoding: 'utf8' })
-     config = config
-          .replace('{{STEAM_KEY}}', process.env.STEAM_API_KEY)
-          .replace('runner_threads = 2', 'runner_threads =4')
-          .replace('processors_cnt = 2', 'processors_cnt = 4')
-
-     fs.writeFileSync(configFilename, config)
-     fs.chmodSync(path.resolve(dir, 'node_modules/.hooks/install'), '755')
-     fs.chmodSync(path.resolve(dir, 'node_modules/.hooks/uninstall'), '755')
-
-     await new Promise(resolve => {
-          fs.copyFile('files/mods.json', `${dir}/mods.json`, err => {
-               if (err) throw err
-               resolve()
-          })
-     })
-     try {
-          fs.writeFileSync(
-               path.resolve(dir, 'package.json'),
-               JSON.stringify(
-                    {
-                         name: 'my-screeps-world',
-                         version: '0.0.1',
-                         private: true,
-                    },
-                    undefined,
-                    '  ',
-               ),
-               { encoding: 'utf8', flag: 'wx' },
-          )
-     } catch (e) {
-          console.log(e)
-     }
-}
-module.exports.initServer = initServer
-
-/**
- * startServer method
- *
- * Starts the private server
- * @return {object}
- */
-async function startServer() {
-     process.chdir(dir)
-     return lib.start({}, process.stdout)
-}
-module.exports.startServer = startServer
-
-/**
- * spawns Bot
- *
- * @param {string} line
- * @param {object} socket
- * @param {list} rooms
- * @param {array} players
- * @param {number} tickDuration
- * @return {boolean}
- */
-const spawnBots = async function (line, socket, rooms, tickDuration) {
-     if (line.startsWith(`Screeps server v`)) {
-          console.log(`> system.resetAllData()`)
-          socket.write(`system.resetAllData()\r\n`)
-          await sleep(5)
-          console.log(`> system.pauseSimulation()`)
-          socket.write(`system.pauseSimulation()\r\n`)
-          await sleep(5)
-          console.log(`> system.setTickDuration(${tickDuration})`)
-          socket.write(`system.setTickDuration(${tickDuration})\r\n`)
-          await sleep(5)
-          console.log(`> utils.removeBots()`)
-          socket.write(`utils.removeBots()\r\n`)
-          await sleep(5)
-          console.log(`> utils.enableGCLToCPU()`)
-          socket.write(`utils.enableGCLToCPU()\r\n`)
-          await sleep(5)
-          console.log(`> utils.setShardName("performanceServer")`)
-          socket.write(`utils.setShardName("performanceServer")\r\n`)
-
-          const roomsObject = Object.entries(rooms);
-          for (let i = 0; i < roomsObject.length; i++) {
-               const room = roomsObject[i][0]
-               const botName = roomsObject[i][1]
-               console.log(`> Spawn as ${botName}`)
-               socket.write(`bots.spawn('${botName}', '${room}', {username: '${room}', auto:'true'})\r\n`)
-               await sleep(5)
-          }
-          return true
-     }
-     return false
-}
-module.exports.spawnBots = spawnBots
+import fs from 'fs'
+import fetch from 'node-fetch'
+import path from 'path'
+import _ from 'lodash'
+import { ScreepsAPI } from 'screeps-api'
+import { exec, execSync } from 'child_process'
 
 const filter = {
      controller: o => {
@@ -234,27 +26,157 @@ const filter = {
      },
 }
 
-const helpers = {
-     initControllerID(event, status, controllerRooms) {
+export default class Helper {
+     hostname = '127.0.0.1'
+     port = 21025
+     constructor() {
+     }
+     static setHostname(hostname) {
+          this.hostname = hostname
+     }
+     /**
+      * followLog method
+      *
+      * Connects to the api and reads and prints the console log, if messages
+      * are available
+      *
+      * @param {list} rooms - The rooms
+      * @param {function} statusUpdater - Function to handle status updates
+      * @return {undefined}
+      */
+     static async followLog(rooms, statusUpdater, restrictToRoom) {
+          for (const room of rooms) {
+               if (restrictToRoom && room !== restrictToRoom) {
+                    continue
+               }
+               const api = new ScreepsAPI({
+                    email: room,
+                    password: 'password',
+                    protocol: 'http',
+                    hostname,
+                    port,
+                    path: '/',
+               })
+
+               await api.auth()
+
+               api.socket.connect()
+               api.socket.on('connected', () => { })
+               api.socket.on('auth', event => { })
+               api.socket.subscribe(`room:${room}`, statusUpdater)
+          }
+     }
+     /**
+      * sets password for user
+      *
+      * @param {string} line
+      * @param {object} socket
+      * @param {list} rooms
+      * @param {object} roomsSeen
+      * @param {stringMap} playerRooms
+      * @return {boolean}
+      */
+     async setPassword(roomName, roomsSeen, playerRooms) {
+          roomsSeen[roomName] = true
+          console.log(`Set password for ${roomName}`)
+          /* eslint max-len: ["error", 1300] */
+          await executeCliCommand(
+               `storage.db.users.update({username: '${roomName}'}, {$set: {password: 'd0347d74b308e046b399e151c3674297ddd1aba6d6e380c94ea8ec070393d17297a3407e9c17d3d4a308043e3fd219faecc9d0d4c548a6eab87549ec83fd0688197d14b84fa810935f694c14eadd6eac3b36e19405190b1e216b5c3b0b79f03815670ba8c0eb2e23d00f556b8fdfc35eaa6d3f8f734132196c70c921f29160b1f1a0ac1fe4c196c15aa7c2a5d8358ed89fff3ad4ddbe45f7fc5ecb1b4538940f31188a9a65af59b8481f6aa00fecebf4f8e7a91be877ec8610350a06bac16d666f255a73768a96cd1797c25c68aded637f96c7b0e9ad8e9f85997bced58c288f8df06f78b096750fadc128a345c01b76ab4f0feff6f5b89712ddfe6d9b7a713b05add43bd0c4b1c59b4a72d5b81a42570c0b1f7980a969913ba31baf88ef1213e46cb09577e249688e1d10be958e7c5dae4033a5cc174261b837b29134ea090df426ad9a3624fa2be2dbfd47c6a56d7cda99c30d74c05102b1ee05e09eba4cf3f785d40c94f22b24c4e47409f5ba123b98fa30d23498e07ee26d542487b3be480f7b51f23712aef06630d1ea1a057e44e0bb8fcc1709e457544051730140852e7b493b7d3cd23202405f3d81d605be47c792681ce2d548388feddad94f790d58fb887d89358c4c0b8a6d0148e01f7f2cfd613ac371d3e3bdc606189eafba726df2959c2ac6b4780068713cb79a687e65298a4aeee75a3ef47aab3a9b853407be', salt: '8592666ec92a801874b463ea4c0a0da519936246d54bc4c40391f9ac7c5a8000'}})\r\n`,
+          )
+
+          if (playerRooms[roomName]) {
+               console.log(`Set steam id for ${roomName}`)
+               await executeCliCommand(
+                    `storage.db.users.update({username: '${roomName}'}, {$set: {steam: {id: '${playerRooms[roomName]}'}}})\r\n`,
+               )
+          }
+     }
+     /**
+      * sleep method
+      *
+      * Helper method to sleep for amount of seconds.
+      * @param {number} seconds Amount of seconds to sleep
+      * @return {object}
+      */
+     static sleep(seconds) {
+          return new Promise(resolve => setTimeout(resolve, seconds * 1000))
+     }
+
+     static async initServer() {
+          console.log("Initializing server...")
+          const dir = "files";
+          const configFilename = path.resolve(dir, 'config.example.yml')
+          let config = fs.readFileSync(configFilename, { encoding: 'utf8' })
+          if (process.env.STEAM_API_KEY) config = config
+               .replace('{{STEAM_KEY}}', process.env.STEAM_API_KEY)
+
+          fs.writeFileSync(configFilename, config)
+          if (fs.existsSync(path.resolve(dir, 'config.yml'))) fs.unlinkSync(path.resolve(dir, 'config.yml'))
+          fs.copyFileSync(path.resolve(dir, 'config.example.yml'), path.resolve(dir, 'config.yml'))
+
+          if (fs.existsSync(path.resolve(dir, 'dist'))) fs.rmdirSync(path.resolve(dir, 'dist'), { recursive: true })
+          const distFolder = path.resolve("../dist")
+          if (fs.existsSync(distFolder)) {
+               fs.mkdirSync(path.resolve(dir, 'dist'))
+               fs.copyFileSync(path.resolve(distFolder, 'main.js'), path.resolve(dir + "/dist", 'main.js'))
+          }
+     }
+
+     /**
+      * startServer method
+      *
+      * Starts the private server
+      * @return {object}
+      */
+     static async startServer() {
+          console.log("Starting server...")
+          execSync("cd files && docker-compose down")
+          const command = `cd files && docker-compose up`
+          let maxTime = new Promise((resolve, reject) => {
+               setTimeout(resolve, 300 * 1000, 'Timeout')
+          })
+          const startServer = new Promise((resolve, reject) => {
+               const child = exec(command);
+               child.stdout.on('data', function (data) {
+                    console.log(data)
+                    if (data.includes('Started')) {
+                         console.log("Started server")
+                         resolve();
+                    }
+               });
+          })
+          return await Promise.race([startServer, maxTime])
+               .then(result => {
+                    if (result === 'Timeout') {
+                         console.log("Timeout starting server!")
+                         return false
+                    }
+                    return true
+               })
+               .catch(result => {
+                    logger.log('error', { data: result, options })
+               })
+     }
+     static initControllerID(event, status, controllerRooms) {
           if (status[event.id].controller === null) {
                status[event.id].controller = _.filter(event.data.objects, filter.controller)[0]
                status[event.id].controller = status[event.id].controller._id
                controllerRooms[status[event.id].controller] = event.id
           }
-     },
-     updateCreeps(event, status) {
+     }
+     static updateCreeps(event, status) {
           const creeps = _.filter(event.data.objects, filter.creeps)
           if (_.size(creeps) > 0) {
                status[event.id].creeps += _.size(creeps)
           }
-     },
-     updateStructures(event, status) {
+     }
+     static updateStructures(event, status) {
           const structures = _.filter(event.data.objects, filter.structures)
           if (_.size(structures) > 0) {
                status[event.id].structures += _.size(structures)
           }
-     },
-     updateController(event, status, controllerRooms) {
+     }
+     static updateController(event, status, controllerRooms) {
           const controllers = _.pick(event.data.objects, Object.keys(controllerRooms))
           for (const controllerId of Object.keys(controllers)) {
                const controller = controllers[controllerId]
@@ -269,6 +191,35 @@ const helpers = {
                     status[roomName].level = controller.level
                }
           }
-     },
+     }
+     static async SendResult(milestones, status) {
+          let commitName = 'localhost'
+          if (process.env.GITHUB_EVENT_PATH) {
+               const file = fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8');
+               const object = JSON.parse(file);
+               commitName = object["commits"][0].message;
+          }
+          try {
+               await fetch('http://localhost:5000', {
+                    method: 'POST', body: JSON.stringify({ milestones, lastTick, status, commitName }), headers: {
+                         'Accept': 'application/json',
+                         'Content-Type': 'application/json'
+                    }
+               });
+          } catch (error) { }
+     }
+     static async executeCliCommand(command) {
+          try {
+               await sleep(2);
+               const result = await fetch('http://localhost:21026/cli', {
+                    method: 'POST', body: command, headers: { 'Content-Type': 'text/plain' }
+               });
+               const text = await result.text()
+               console.log(`> ${command}`)
+               console.log(text)
+               return text;
+          } catch (error) {
+               return "error"
+          }
+     }
 }
-module.exports.helpers = helpers
