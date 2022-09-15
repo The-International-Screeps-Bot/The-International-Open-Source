@@ -6,7 +6,7 @@ services:
             - ./config.yml:/screeps/config.yml
             - screeps-data:/screeps
         ports:
-            - 21025:21025/tcp
+            - 21025:21025
             - 21026:21026
         restart: unless-stopped
 volumes:
