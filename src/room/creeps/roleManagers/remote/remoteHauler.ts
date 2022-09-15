@@ -120,9 +120,7 @@ export class RemoteHauler extends Creep {
     }
  */
     getDroppedEnergy?() {
-
         for (const resource of this.pos.lookFor(LOOK_RESOURCES)) {
-
             if (resource.resourceType !== RESOURCE_ENERGY) continue
 
             if (resource.amount < this.store.getCapacity() * 0.5) return false
@@ -144,7 +142,6 @@ export class RemoteHauler extends Creep {
 
         if (this.room.name === this.memory.RN) {
             if (getRange(this.pos.x, sourcePos.x, this.pos.y, sourcePos.y) > 1) {
-
                 this.say('M')
 
                 this.getDroppedEnergy()
@@ -252,12 +249,13 @@ export class RemoteHauler extends Creep {
         })
 
         for (const creepName of room.myCreeps[`source${(this.memory.SI + 1) as 1 | 2}RemoteHarvester`]) {
+            const harvester = Game.creeps[creepName]
 
-            const creep = Game.creeps[creepName]
+            // If the harvester isn't nearly full and can't fully fill the hauler
 
-            if (creep.store.getUsedCapacity() < creep.store.getCapacity() * 0.5) continue
+            if (harvester.store.getFreeCapacity(RESOURCE_ENERGY) > harvester.parts.work * HARVEST_POWER || harvester.store.getCapacity(RESOURCE_ENERGY) < this.store.getFreeCapacity()) continue
 
-            withdrawTargets.push(creep)
+            withdrawTargets.push(harvester)
         }
 
         let target
@@ -493,7 +491,6 @@ export class RemoteHauler extends Creep {
 
             let returnTripTime = 0
             if (creep.memory.RN && creep.memory.SI !== undefined) {
-
                 // The 1.1 is to add some margin for the return trip
 
                 returnTripTime = Memory.rooms[creep.memory.RN].SE[creep.memory.SI] * 1.1

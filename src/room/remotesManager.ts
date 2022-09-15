@@ -142,9 +142,9 @@ export class RemotesManager {
 
                 const income =
                     Math.max((isReserved ? 10 : 5) -
-                    Math.floor(Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]], 0) * minHarvestWorkRatio), 0)
+                    Math.floor(Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]], 0) * minHarvestWorkRatio), 0)
 
-                customLog('NEEDS FOR ' + remoteName, income + ', ' + Math.floor(Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]], 0) * minHarvestWorkRatio) + ', ' + remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]] + ', ' + sourceIndex + ', ' + remoteHarvesterRoles + ', ' +  remoteHarvesterRoles[index] + ', ' + RemoteNeeds[remoteHarvesterRoles[index]])
+                customLog('NEEDS FOR ' + remoteName, income + ', ' + Math.floor(Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]], 0) * minHarvestWorkRatio) + ', ' + remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]] + ', ' + sourceIndex + ', ' + remoteHarvesterRoles + ', ' +  remoteHarvesterRoles[sourceIndex] + ', ' + RemoteNeeds[remoteHarvesterRoles[sourceIndex]])
 
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
