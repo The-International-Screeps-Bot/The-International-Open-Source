@@ -88,4 +88,14 @@ export class CommuneManager {
 
         customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed)
     }
+
+    get storedEnergyUpgradeThreshold() {
+
+        return this.room.controller.level * 10000
+    }
+
+    get storedEnergyBuildThreshold() {
+
+        return this.room.controller.level * 8000
+    }
 }

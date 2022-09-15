@@ -717,10 +717,6 @@ export const spawnByRoomRemoteRoles: (
     'remoteDismantler',
 ]
 
-export const builderSpawningWhenStorageThreshold = 40000
-
-export const upgraderSpawningWhenStorageThreshold = 60000
-
 export const CPUBucketCapacity = 10000
 export const CPUMaxPerTick = 500
 

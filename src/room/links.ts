@@ -1,4 +1,4 @@
-import { linkReceiveTreshold, linkSendThreshold, upgraderSpawningWhenStorageThreshold } from 'international/constants'
+import { linkReceiveTreshold, linkSendThreshold } from 'international/constants'
 import { customLog } from 'international/generalFunctions'
 
 Room.prototype.linkManager = function() {
@@ -81,7 +81,7 @@ Room.prototype.hubToController = function (hubLink, controllerLink) {
 
      if (
           this.controller.ticksToDowngrade > 10000 &&
-          this.storage.store.energy < upgraderSpawningWhenStorageThreshold - 30000
+          this.storage.store.energy < this.communeManager.storedEnergyUpgradeThreshold * 0.5
      )
           return
 

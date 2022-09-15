@@ -1,7 +1,6 @@
 import {
     AllyCreepRequestNeeds,
     allyList,
-    builderSpawningWhenStorageThreshold,
     ClaimRequestNeeds,
     containerUpkeepCost,
     controllerDowngradeUpgraderNeed,
@@ -13,7 +12,6 @@ import {
     remoteHaulerRoles,
     RemoteNeeds,
     roadUpkeepCost,
-    upgraderSpawningWhenStorageThreshold,
 } from 'international/constants'
 import {
     customLog,
@@ -494,7 +492,7 @@ Room.prototype.spawnRequester = function () {
             if (storage && this.controller.level < 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) >= builderSpawningWhenStorageThreshold)
+                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) >= this.communeManager.storedEnergyBuildThreshold)
                     partsMultiplier += storage.store.getUsedCapacity(RESOURCE_ENERGY) / 8000
             }
 
@@ -677,7 +675,7 @@ Room.prototype.spawnRequester = function () {
             if (storage && this.controller.level >= 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) >= upgraderSpawningWhenStorageThreshold)
+                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) >= this.communeManager.storedEnergyUpgradeThreshold)
                     partsMultiplier = Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000, 2)
                 // Otherwise, set partsMultiplier to 0
                 else partsMultiplier = 0
