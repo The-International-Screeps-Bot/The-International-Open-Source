@@ -9,3 +9,6 @@ bots:
 serverConfig: # This section requires screepsmod-admin-utils to work
   welcomeText:  |
     <h1 style="text-align: center;">Performance server</h1>
+env:
+  backend:
+    CLI_HOST: 0.0.0.0
