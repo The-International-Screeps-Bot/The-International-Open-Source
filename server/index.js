@@ -1,9 +1,8 @@
-const q = require('q')
-require('dotenv').config()
+import * as dotenv from "dotenv";
+dotenv.config();
 
-const { setPassword, sleep, initServer, startServer, helpers, followLog, sendResult, executeCliCommand } = require('./helper')
-
-const { tickDuration, playerRooms, rooms, trackedRooms, milestones, userCpu } = require('./config')
+import Helper from './helper.js'
+import Config from './config.js'
 
 const controllerRooms = {}
 const status = {}
@@ -15,11 +14,11 @@ process.once('SIGINT', code => {
      console.log('Status:')
      console.log(JSON.stringify(status, null, 2))
      console.log('Milestones:')
-     console.log(JSON.stringify(milestones, null, 2))
+     console.log(JSON.stringify(Config.milestones, null, 2))
      process.exit()
 })
 
-trackedRooms.forEach(room => {
+Config.trackedRooms.forEach(room => {
      status[room] = {
           controller: null,
           creeps: 0,
@@ -52,7 +51,7 @@ class Tester {
       * @param {object} resolve
       * @return {undefined}
       */
-     async checkForSuccess(resolve,reject) {
+     async checkForSuccess(resolve, reject) {
           let appendix = ''
           if (this.maxTicks > 0) {
                appendix = ` with runtime ${this.maxTicks} ticks`
@@ -60,18 +59,18 @@ class Tester {
           console.log(`> Start the simulation${appendix}`)
           if (this.maxTicks > 0) {
                while (lastTick === undefined || lastTick < this.maxTicks) {
-                    await sleep(1)
+                    await Helper.sleep(1)
                }
                console.log(`${lastTick} End of simulation`)
                console.log('Status:')
                console.log(JSON.stringify(status, null, 2))
                console.log('Milestones:')
-               console.log(JSON.stringify(milestones, null, 2))
+               console.log(JSON.stringify(Config.milestones, null, 2))
 
                const fails = milestones.filter(
                     milestone => milestone.required && milestone.tick < lastTick && !milestone.success,
                )
-               await sendResult(status, milestones)
+               await Helper.sendResult(status, Config.milestones)
 
                if (fails.length > 0) {
                     for (const fail of fails) {
@@ -83,6 +82,67 @@ class Tester {
                }
                console.log(`${lastTick} Status check: passed`)
                resolve()
+          }
+     }
+
+     /**
+      * Updates the status object
+      *
+      * @param {object} event
+      */
+     statusUpdater = event => {
+          if (event.data.gameTime !== lastTick) {
+               lastTick = event.data.gameTime
+               for (const milestone of milestones) {
+                    const failedRooms = []
+                    if (typeof milestone.success === 'undefined' || milestone.success === null) {
+                         let success = Object.keys(status).length === trackedRooms.length
+                         for (const room of Object.keys(status)) {
+                              for (const key of Object.keys(milestone.check)) {
+                                   if (status[room][key] < milestone.check[key]) {
+                                        success = false
+                                        failedRooms.push(room)
+                                        break
+                                   }
+                              }
+                         }
+                         if (success) {
+                              milestone.success = event.data.gameTime < milestone.tick
+                              milestone.tickReached = event.data.gameTime
+                              if (milestone.success) {
+                                   console.log('===============================')
+                                   console.log(`${event.data.gameTime} Milestone: Success ${JSON.stringify(milestone)}`)
+                              } else {
+                                   console.log('===============================')
+                                   console.log(
+                                        `${event.data.gameTime} Milestone: Reached too late ${JSON.stringify(milestone)}`,
+                                   )
+                              }
+                         }
+                    }
+
+                    if (milestone.success) {
+                         continue
+                    }
+
+                    if (milestone.tick === event.data.gameTime) {
+                         milestone.failedRooms = failedRooms
+                         console.log('===============================')
+                         console.log(
+                              `${event.data.gameTime} Milestone: Failed ${JSON.stringify(
+                                   milestone,
+                              )} status: ${JSON.stringify(status)}`,
+                         )
+                         continue
+                    }
+               }
+          }
+
+          Helper.initControllerID(event, status, controllerRooms)
+          if (Object.keys(event.data.objects).length > 0) {
+               Helper.updateCreeps(event, status)
+               Helper.updateStructures(event, status)
+               Helper.updateController(event, status, controllerRooms)
           }
      }
 
@@ -100,24 +160,24 @@ class Tester {
       */
      async execute() {
           const execute = new Promise(async (resolve, reject) => {
-               await executeCliCommand(`system.resetAllData()`)
-               await executeCliCommand('system.pauseSimulation()')
-               await executeCliCommand(`system.setTickDuration(${tickDuration})`)
-               await executeCliCommand(`utils.removeBots()`)
-               await executeCliCommand(`utils.setShardName("performanceServer")`)
+               await Helper.executeCliCommand(`system.resetAllData()`)
+               await Helper.executeCliCommand('system.pauseSimulation()')
+               await Helper.executeCliCommand(`system.setTickDuration(${Config.tickDuration})`)
+               await Helper.executeCliCommand(`utils.removeBots()`)
+               await Helper.executeCliCommand(`utils.setShardName("performanceServer")`)
 
-               for (const [roomName, botName] of Object.entries(rooms)) {
+               for (const [roomName, botName] of Object.entries(Config.rooms)) {
                     console.log(`Spawn ${botName} in ${roomName}`)
-                    await executeCliCommand(`bots.spawn('${botName}', '${roomName}', {username: '${roomName}', auto:'true',cpu:'${userCpu}'})\r\n`)
-                    await setPassword(roomName, this.roomsSeen, playerRooms)
+                    await Helper.executeCliCommand(`bots.spawn('${botName}', '${roomName}', {username: '${roomName}', auto:'true',cpu:'${Config.userCpu}'})\r\n`)
+                    await Helper.setPassword(roomName, this.roomsSeen, Config.playerRooms)
                }
 
-               if (Object.keys(rooms).length === Object.keys(this.roomsSeen).length) {
+               if (Object.keys(Config.rooms).length === Object.keys(this.roomsSeen).length) {
                     console.log('Follow log')
-                    await followLog(trackedRooms, statusUpdater)
-                    await executeCliCommand(`system.resumeSimulation()`)
+                    await Helper.followLog(trackedRooms, statusUpdater)
+                    await Helper.executeCliCommand(`system.resumeSimulation()`)
                }
-               this.checkForSuccess(resolve,reject)
+               this.checkForSuccess(resolve, reject)
           })
           return execute;
      }
@@ -125,10 +185,10 @@ class Tester {
      async run() {
           console.log("Starting...")
           const start = Date.now()
-          await initServer()
-          await startServer()
+          await Helper.initServer()
+          await Helper.startServer()
           console.log("Waiting...")
-          await sleep(10)
+          await Helper.sleep(10)
           console.log("Starting... done")
           let exitCode = 0
           try {
@@ -145,74 +205,12 @@ class Tester {
 }
 
 /**
- * updates the status object
- *
- * @param {object} event
- */
-const statusUpdater = event => {
-     if (event.data.gameTime !== lastTick) {
-          lastTick = event.data.gameTime
-          for (const milestone of milestones) {
-               const failedRooms = []
-               if (typeof milestone.success === 'undefined' || milestone.success === null) {
-                    let success = Object.keys(status).length === trackedRooms.length
-                    for (const room of Object.keys(status)) {
-                         for (const key of Object.keys(milestone.check)) {
-                              if (status[room][key] < milestone.check[key]) {
-                                   success = false
-                                   failedRooms.push(room)
-                                   break
-                              }
-                         }
-                    }
-                    if (success) {
-                         milestone.success = event.data.gameTime < milestone.tick
-                         milestone.tickReached = event.data.gameTime
-                         if (milestone.success) {
-                              console.log('===============================')
-                              console.log(`${event.data.gameTime} Milestone: Success ${JSON.stringify(milestone)}`)
-                         } else {
-                              console.log('===============================')
-                              console.log(
-                                   `${event.data.gameTime} Milestone: Reached too late ${JSON.stringify(milestone)}`,
-                              )
-                         }
-                    }
-               }
-
-               if (milestone.success) {
-                    continue
-               }
-
-               if (milestone.tick === event.data.gameTime) {
-                    milestone.failedRooms = failedRooms
-                    console.log('===============================')
-                    console.log(
-                         `${event.data.gameTime} Milestone: Failed ${JSON.stringify(
-                              milestone,
-                         )} status: ${JSON.stringify(status)}`,
-                    )
-                    continue
-               }
-          }
-     }
-
-     helpers.initControllerID(event, status, controllerRooms)
-     if (Object.keys(event.data.objects).length > 0) {
-          helpers.updateCreeps(event, status)
-          helpers.updateStructures(event, status)
-          helpers.updateController(event, status, controllerRooms)
-     }
-}
-
-/**
- * main method
+ * Main method
  *
  * Start the server and connects via cli
  * @return {undefined}
  */
-async function main() {
+(async () => {
      const tester = new Tester()
      await tester.run()
-}
-main()
+})();

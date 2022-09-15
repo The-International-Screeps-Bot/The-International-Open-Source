@@ -13,5 +13,6 @@
     },
     "scripts": {
         "start": "node index.js"
-    }
+    },
+    "type": "module"
 }
