@@ -3,9 +3,7 @@ const fetch = require('node-fetch')
 const path = require('path')
 const _ = require('lodash')
 const { ScreepsAPI } = require('screeps-api')
-const { exec,execSync } = require('child_process')
-
-const { userCpu } = require('./config')
+const { exec } = require('child_process')
 
 const port = 21025
 let hostname = '127.0.0.1'
@@ -32,7 +30,7 @@ async function followLog(rooms, statusUpdater, restrictToRoom) {
           }
           const api = new ScreepsAPI({
                email: room,
-               password: 'tooangel',
+               password: 'password',
                protocol: 'http',
                hostname,
                port,
@@ -59,30 +57,20 @@ module.exports.followLog = followLog
  * @param {stringMap} playerRooms
  * @return {boolean}
  */
-const setPassword = function (line, socket, rooms, roomsSeen, playerRooms) {
-     const roomsObject = Object.entries(rooms);
-     for (let i = 0; i < roomsObject.length; i++) {
-          const room = roomsObject[i][0]
-          const botName = roomsObject[i][1]
-          if (line.startsWith(`'User ${room} with bot AI "${botName}" spawned in ${room}'`)) {
-               roomsSeen[room] = true
-               console.log(`> Set password for ${room}`)
-               /* eslint max-len: ["error", 1300] */
-               socket.write(
-                    `storage.db.users.update({username: '${room}'}, {$set: {password: '552054d48055ed1e16ca31df0aad5d98f5860c0a69074bac119c563e8b4c33815469eea39e4c63269c70c56ada6aa32e557a76826605912e5a5766f8849df8604c576ef57967dfc8f82e2af1d4335973fdc43c61fc06e3e97c9b5305bde30431865eeee34d42b257425fe8b352706efcc89eb4c2d446f24c51103d90bc736e8951b19a4fd0acf16349a67bd5d9c173d2c32963d599588919a8b3277228e12a01c6d90350efddac24f0395ce9666584e714a42e427cc4249e613d761fa39b9d09432e2e3b0d191245d838231a3bcf24dff1e6b50066aa70c048f4e53dce2b631c134a83bc8f8ae9542db2763aba8556285010a35db8882f2ebdb8c3b05b9d32acb4b0eeae036bc82473086fbb47cf838b5179cd2063388da505bd80c0a5bf0cc5b47068a94d1e4f436a2edcbefd4b5d24f6ea0486e17443991f9bcd1aa05f34faa7fa77c71b47b0cc7f7fb352ec36f1f343cba948205005dd55b4aa270d3ea5da4bcff57a58241860365a1e2f4ec15d610ea8bf0ff1898ed342dbb6c7c19ff93b77fd5928782ac96bc554db023bdbe99f51f3ed147c54561ba474c65065713783022d11ba69bea54e3bd42756481e4d68568dde41ce4ffb52216c08085c27594bbea23a0370125c687e931f448d7b5245ebd869450eed6077214c1750a52a359d0d2425b2e689fd456761e8edd4b6c751150ef391e8a5d232ecb50a888adb6169', salt: '857e347a9e3a8fd4e6eb770c9c0ff819de3b006b3faa9fe984f82f36deeba1bd'}})\r\n`,
-               )
+async function setPassword(roomName, roomsSeen, playerRooms) {
+     roomsSeen[roomName] = true
+     console.log(`Set password for ${roomName}`)
+     /* eslint max-len: ["error", 1300] */
+     await executeCliCommand(
+          `storage.db.users.update({username: '${roomName}'}, {$set: {password: 'd0347d74b308e046b399e151c3674297ddd1aba6d6e380c94ea8ec070393d17297a3407e9c17d3d4a308043e3fd219faecc9d0d4c548a6eab87549ec83fd0688197d14b84fa810935f694c14eadd6eac3b36e19405190b1e216b5c3b0b79f03815670ba8c0eb2e23d00f556b8fdfc35eaa6d3f8f734132196c70c921f29160b1f1a0ac1fe4c196c15aa7c2a5d8358ed89fff3ad4ddbe45f7fc5ecb1b4538940f31188a9a65af59b8481f6aa00fecebf4f8e7a91be877ec8610350a06bac16d666f255a73768a96cd1797c25c68aded637f96c7b0e9ad8e9f85997bced58c288f8df06f78b096750fadc128a345c01b76ab4f0feff6f5b89712ddfe6d9b7a713b05add43bd0c4b1c59b4a72d5b81a42570c0b1f7980a969913ba31baf88ef1213e46cb09577e249688e1d10be958e7c5dae4033a5cc174261b837b29134ea090df426ad9a3624fa2be2dbfd47c6a56d7cda99c30d74c05102b1ee05e09eba4cf3f785d40c94f22b24c4e47409f5ba123b98fa30d23498e07ee26d542487b3be480f7b51f23712aef06630d1ea1a057e44e0bb8fcc1709e457544051730140852e7b493b7d3cd23202405f3d81d605be47c792681ce2d548388feddad94f790d58fb887d89358c4c0b8a6d0148e01f7f2cfd613ac371d3e3bdc606189eafba726df2959c2ac6b4780068713cb79a687e65298a4aeee75a3ef47aab3a9b853407be', salt: '8592666ec92a801874b463ea4c0a0da519936246d54bc4c40391f9ac7c5a8000'}})\r\n`,
+     )
 
-               if (
-                    playerRooms[room]) {
-                    console.log(`> Set steam id for ${room}`)
-                    socket.write(
-                         `storage.db.users.update({username: '${room}'}, {$set: {steam: {id: '${playerRooms[room]}'}}})\r\n`,
-                    )
-               }
-               return true
-          }
+     if (playerRooms[roomName]) {
+          console.log(`Set steam id for ${roomName}`)
+          await executeCliCommand(
+               `storage.db.users.update({username: '${roomName}'}, {$set: {steam: {id: '${playerRooms[roomName]}'}}})\r\n`,
+          )
      }
-     return false
 }
 module.exports.setPassword = setPassword
 
@@ -99,14 +87,23 @@ function sleep(seconds) {
 module.exports.sleep = sleep
 
 async function initServer() {
-     if (!process.env.STEAM_API_KEY) return;
-     const configFilename = path.resolve("files", 'config.yml')
+     console.log("Initializing server...")
+     const dir = "files";
+     const configFilename = path.resolve(dir, 'config.example.yml')
      let config = fs.readFileSync(configFilename, { encoding: 'utf8' })
-     config = config
+     if (process.env.STEAM_API_KEY) config = config
           .replace('{{STEAM_KEY}}', process.env.STEAM_API_KEY)
 
      fs.writeFileSync(configFilename, config)
-     fs.copyFileSync(path.resolve("files", 'config.yml'), path.resolve("files/server", 'config.yml'))
+     if (fs.existsSync(path.resolve(dir, 'config.yml'))) fs.unlinkSync(path.resolve(dir, 'config.yml'))
+     fs.copyFileSync(path.resolve(dir, 'config.example.yml'), path.resolve(dir, 'config.yml'))
+
+     if (fs.existsSync(path.resolve(dir, 'dist'))) fs.rmdirSync(path.resolve(dir, 'dist'), { recursive: true })
+     const distFolder = path.resolve("../dist")
+     if (fs.existsSync(distFolder)) {
+          fs.mkdirSync(path.resolve(dir, 'dist'))
+          fs.copyFileSync(path.resolve(distFolder, 'main.js'), path.resolve(dir+"/dist", 'main.js'))
+     }
 }
 module.exports.initServer = initServer
 
@@ -117,82 +114,34 @@ module.exports.initServer = initServer
  * @return {object}
  */
 async function startServer() {
-     // if
-     try {
-          execSync("docker stop Screeps-Performance-Server")
-          execSync("docker rm -v Screeps-Performance-Server")
-     } catch (error) {
-          console.log(error)
-     }
-     const folderPath = path.resolve("files/server")
-     const command = `docker run --restart=unless-stopped --name Screeps-Performance-Server -v ${folderPath}:/screeps -p 21025-21026:21025-21026 screepers/screeps-launcher`
+     console.log("Starting server...")
+     const command = `cd files && docker-compose down && docker-compose up`
      let maxTime = new Promise((resolve, reject) => {
           setTimeout(resolve, 300 * 1000, 'Timeout')
      })
      const startServer = new Promise((resolve, reject) => {
           const child = exec(command);
-          child.stderr.on('data', function (data) {
+          child.stdout.on('data', function (data) {
+               console.log(data)
                if (data.includes('Started')) {
                     console.log("Started server")
                     resolve();
                }
-            });
-
+          });
      })
      return await Promise.race([startServer, maxTime])
-     .then(result => {
-          if (result === 'Timeout') {
-               console.log("Timeout starting server!")
-               return
-          }
-          return
-     })
-     .catch(result => {
-          logger.log('error', {data:result,options})
-     })
+          .then(result => {
+               if (result === 'Timeout') {
+                    console.log("Timeout starting server!")
+                    return false
+               }
+               return true
+          })
+          .catch(result => {
+               logger.log('error', { data: result, options })
+          })
 }
 module.exports.startServer = startServer
-
-/**
- * spawns Bot
- *
- * @param {string} line
- * @param {object} socket
- * @param {list} rooms
- * @param {array} players
- * @param {number} tickDuration
- * @return {boolean}
- */
-const spawnBots = async function (line, socket, rooms, tickDuration) {
-     if (line === "Started") {
-          console.log(`> system.resetAllData()`)
-          socket.write(`system.resetAllData()\r\n`)
-          await sleep(5)
-          console.log(`> system.pauseSimulation()`)
-          socket.write(`system.pauseSimulation()\r\n`)
-          await sleep(5)
-          console.log(`> system.setTickDuration(${tickDuration})`)
-          socket.write(`system.setTickDuration(${tickDuration})\r\n`)
-          await sleep(5)
-          console.log(`> utils.removeBots()`)
-          socket.write(`utils.removeBots()\r\n`)
-          await sleep(5)
-          console.log(`> utils.setShardName("performanceServer")`)
-          socket.write(`utils.setShardName("performanceServer")\r\n`)
-
-          const roomsObject = Object.entries(rooms);
-          for (let i = 0; i < roomsObject.length; i++) {
-               const room = roomsObject[i][0]
-               const botName = roomsObject[i][1]
-               console.log(`> Spawn as ${botName}`)
-               socket.write(`bots.spawn('${botName}', '${room}', {username: '${room}', auto:'true',cpu:'${userCpu}'})\r\n`)
-               await sleep(5)
-          }
-          return true
-     }
-     return false
-}
-module.exports.spawnBots = spawnBots
 
 const filter = {
      controller: o => {
@@ -254,7 +203,7 @@ const helpers = {
 }
 module.exports.helpers = helpers
 
-async function SendResult(milestones,status) {
+async function SendResult(milestones, status) {
      let commitName = 'localhost'
      if (process.env.GITHUB_EVENT_PATH) {
           const file = fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8');
@@ -271,3 +220,19 @@ async function SendResult(milestones,status) {
      } catch (error) { }
 }
 module.exports.sendResult = SendResult
+
+async function executeCliCommand(command) {
+     try {
+          await sleep(2);
+          console.log(`> ${command}`)
+          const result = await fetch('http://localhost:21026/cli', {
+               method: 'POST', body: command, headers: {'Content-Type': 'text/plain'}
+          });
+          const text = await result.text()
+          console.log(text)
+          return text;
+     } catch (error) {
+          return "ERROR"
+     }
+}
+module.exports.executeCliCommand = executeCliCommand

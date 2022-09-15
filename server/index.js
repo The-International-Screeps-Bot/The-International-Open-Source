@@ -1,11 +1,9 @@
-const net = require('net')
 const q = require('q')
-const _ = require('lodash')
 require('dotenv').config()
 
-const { setPassword, sleep, initServer, startServer, spawnBots, helpers, followLog,sendResult } = require('./helper')
+const { setPassword, sleep, initServer, startServer, helpers, followLog, sendResult, executeCliCommand } = require('./helper')
 
-const { cliPort, tickDuration, playerRooms, rooms, trackedRooms, milestones } = require('./config')
+const { tickDuration, playerRooms, rooms, trackedRooms, milestones, userCpu } = require('./config')
 
 const controllerRooms = {}
 const status = {}
@@ -31,8 +29,6 @@ trackedRooms.forEach(room => {
      }
 })
 
-let botsSpawned = false
-
 class Tester {
      constructor() {
           this.roomsSeen = {}
@@ -53,42 +49,40 @@ class Tester {
      /**
       *
       * @param {string} line
-      * @param {object} defer
+      * @param {object} resolve
       * @return {undefined}
       */
-     async checkForSuccess(line, defer) {
-          if (botsSpawned && line.startsWith(`'OK'`)) {
-               let appendix = ''
-               if (this.maxTicks > 0) {
-                    appendix = ` with runtime ${this.maxTicks} ticks`
+     async checkForSuccess(resolve,reject) {
+          let appendix = ''
+          if (this.maxTicks > 0) {
+               appendix = ` with runtime ${this.maxTicks} ticks`
+          }
+          console.log(`> Start the simulation${appendix}`)
+          if (this.maxTicks > 0) {
+               while (lastTick === undefined || lastTick < this.maxTicks) {
+                    await sleep(1)
                }
-               console.log(`> Start the simulation${appendix}`)
-               if (this.maxTicks > 0) {
-                    while (lastTick === undefined || lastTick < this.maxTicks) {
-                         await sleep(1)
-                    }
-                    console.log(`${lastTick} End of simulation`)
-                    console.log('Status:')
-                    console.log(JSON.stringify(status, null, 2))
-                    console.log('Milestones:')
-                    console.log(JSON.stringify(milestones, null, 2))
+               console.log(`${lastTick} End of simulation`)
+               console.log('Status:')
+               console.log(JSON.stringify(status, null, 2))
+               console.log('Milestones:')
+               console.log(JSON.stringify(milestones, null, 2))
 
-                    const fails = milestones.filter(
-                         milestone => milestone.required && milestone.tick < lastTick && !milestone.success,
-                    )
-                    await sendResult(status,milestones)
+               const fails = milestones.filter(
+                    milestone => milestone.required && milestone.tick < lastTick && !milestone.success,
+               )
+               await sendResult(status, milestones)
 
-                    if (fails.length > 0) {
-                         for (const fail of fails) {
-                              console.log(`${lastTick} Milestone failed ${JSON.stringify(fail)}`)
-                         }
-                         console.log(`${lastTick} Status check: failed`)
-                         defer.reject('Not all milestones are hit.')
-                         return
+               if (fails.length > 0) {
+                    for (const fail of fails) {
+                         console.log(`${lastTick} Milestone failed ${JSON.stringify(fail)}`)
                     }
-                    console.log(`${lastTick} Status check: passed`)
-                    defer.resolve()
+                    console.log(`${lastTick} Status check: failed`)
+                    reject('Not all milestones are hit.')
+                    return
                }
+               console.log(`${lastTick} Status check: passed`)
+               resolve()
           }
      }
 
@@ -105,54 +99,40 @@ class Tester {
       * @return {object}
       */
      async execute() {
-          const defer = q.defer()
-          const socket = net.connect(21026,"localhost");
+          const execute = new Promise(async (resolve, reject) => {
+               await executeCliCommand(`system.resetAllData()`)
+               await executeCliCommand('system.pauseSimulation()')
+               await executeCliCommand(`system.setTickDuration(${tickDuration})`)
+               await executeCliCommand(`utils.removeBots()`)
+               await executeCliCommand(`utils.setShardName("performanceServer")`)
 
-          socket.on('data', async raw => {
-               const data = raw.toString('utf8')
-               const line = data.replace(/^< /, '').replace(/\n< /, '')
-               console.log(1,line)
-               if (await spawnBots(line, socket, rooms, tickDuration)) {
-                    botsSpawned = true
-                    return
+               for (const [roomName, botName] of Object.entries(rooms)) {
+                    console.log(`Spawn ${botName} in ${roomName}`)
+                    await executeCliCommand(`bots.spawn('${botName}', '${roomName}', {username: '${roomName}', auto:'true',cpu:'${userCpu}'})\r\n`)
+                    await setPassword(roomName, this.roomsSeen, playerRooms)
                }
 
-               if (setPassword(line, socket, rooms, this.roomsSeen, playerRooms)) {
-                    if (Object.keys(rooms).length === Object.keys(this.roomsSeen).length) {
-                         console.log('> Listen to the log')
-                         followLog(trackedRooms, statusUpdater)
-                         await sleep(5)
-                         console.log(`> system.resumeSimulation()`)
-                         socket.write(`system.resumeSimulation()\r\n`)
-                    }
-                    return
+               if (Object.keys(rooms).length === Object.keys(this.roomsSeen).length) {
+                    console.log('Follow log')
+                    await followLog(trackedRooms, statusUpdater)
+                    await executeCliCommand(`system.resumeSimulation()`)
                }
-
-               await this.checkForSuccess(line, defer)
+               this.checkForSuccess(resolve,reject)
           })
-
-          socket.on('connect', () => {
-               console.log(1,'connected')
-               socket.write(`system.resumeSimulation()\r\n`)
-          })
-          socket.on('error', error => {
-               defer.reject(error)
-          })
-
-          return defer.promise
+          return execute;
      }
 
      async run() {
-          console.log("Starting slowly...")
+          console.log("Starting...")
           const start = Date.now()
-          // await initServer()
-          // await startServer()
-          // await sleep(10)
+          await initServer()
+          await startServer()
+          console.log("Waiting...")
+          await sleep(10)
+          console.log("Starting... done")
           let exitCode = 0
           try {
                await this.execute()
-               while (true) {
-               }
                console.log(`${lastTick} Yeah`)
           } catch (e) {
                exitCode = 1
@@ -218,7 +198,7 @@ const statusUpdater = event => {
      }
 
      helpers.initControllerID(event, status, controllerRooms)
-     if (_.size(event.data.objects) > 0) {
+     if (Object.keys(event.data.objects).length > 0) {
           helpers.updateCreeps(event, status)
           helpers.updateStructures(event, status)
           helpers.updateController(event, status, controllerRooms)

@@ -1,8 +1,9 @@
 # Build
-/dist
+dist
 
 # User's Push Information
 screeps.json
+config.yml
 
 # Visual Studio cache/options directory
 .vs
