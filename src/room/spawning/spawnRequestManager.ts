@@ -448,7 +448,7 @@ Room.prototype.spawnRequester = function () {
                     memoryAdditions: {
                         R: true,
                     },
-                    threshold: 0,
+                    threshold: 0.1,
                 }
             }
 

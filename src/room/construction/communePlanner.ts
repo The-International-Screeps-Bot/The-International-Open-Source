@@ -32,6 +32,18 @@ import { toASCII } from 'punycode'
 import { CommuneManager } from 'room/communeManager'
 import { rampartPlanner } from './rampartPlanner'
 
+interface PlanStampOpts {
+    stampType: StampTypes
+    count: number
+    startCoords: Coord[]
+    initialWeight?: number
+    adjacentToRoads?: boolean
+    diagonalDT?: boolean
+    coordMap?: CoordMap
+    minAvoid?: number
+    cardinalFlood?: boolean
+}
+
 /**
  *
  */
@@ -46,7 +58,12 @@ export class CommunePlanner {
     public run() {}
     private flipStampVertical() {}
     private flipStampHorizontal() {}
-    private planStamp(startPos: Coord) {}
+    private planStamps(opts: PlanStampOpts) {
+
+    }
+    private planStamp(startPos: Coord) {
+
+    }
     private planSourceStructures() {}
 }
 
