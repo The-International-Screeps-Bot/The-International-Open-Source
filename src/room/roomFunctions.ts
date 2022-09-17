@@ -1189,6 +1189,13 @@ Room.prototype.makeRemote = function (scoutingRoom) {
             const path = room.advancedFindPath({
                 origin: source.pos,
                 goals: [{ pos: scoutingRoom.anchor, range: 1 }],
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity,
+                },
             })
 
             // Stop if there is a source inefficient enough
@@ -1234,6 +1241,13 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         const newReservationEfficacy = room.advancedFindPath({
             origin: room.controller.pos,
             goals: [{ pos: scoutingRoom.anchor, range: 3 }],
+            typeWeights: {
+                enemy: Infinity,
+                ally: Infinity,
+                keeper: Infinity,
+                enemyRemote: Infinity,
+                allyRemote: Infinity,
+            },
         }).length
 
         // If the room isn't already a remote
