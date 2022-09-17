@@ -3,7 +3,7 @@
 // International
 
 import './international/commands'
-import './international/respawnHandler'
+import './international/respawnManager'
 import { internationalManager } from './international/internationalManager'
 import './international/config'
 import './international/tickConfig'
@@ -34,6 +34,7 @@ import { configManager } from './international/config'
 import { initProfiler } from 'other/profiler'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
+import { migrationManager } from 'international/migrationManager'
 
 global.profiler = initProfiler()
 
@@ -43,6 +44,8 @@ export const loop = function () {
 
         internationalManager.tickReset()
 
+        respawnManager.run()
+        migrationManager.run()
         configManager.run()
 
         internationalManager.run()
