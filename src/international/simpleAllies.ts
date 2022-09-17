@@ -70,8 +70,6 @@ class AllyManager {
 
         if (Object.keys(RawMemory.segments).length < 10) {
             // Assign myRequests to the public segment
-
-            console.log(JSON.stringify(this.myRequests || []))
             RawMemory.segments[simpleAlliesSegment] = JSON.stringify(this.myRequests || [])
             RawMemory.setPublicSegments([simpleAlliesSegment])
         }
