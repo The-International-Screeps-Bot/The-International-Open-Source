@@ -20,7 +20,6 @@ import { statsManager } from './statsManager'
  */
 class ConfigManager {
     public run() {
-
         this.migrate()
         this.configMemory()
         this.configGlobal()
@@ -29,7 +28,6 @@ class ConfigManager {
      * Migrate version by performing actions, if required
      */
     private migrate() {
-
         if (Memory.breakingVersion === breakingVersion) return
 
         if (Memory.breakingVersion === 81) {
@@ -38,7 +36,6 @@ class ConfigManager {
             for (const roomName in Memory.rooms) {
                 const type = Memory.rooms[roomName].T
                 if (type === 'commune' || type === 'remote') {
-
                     delete Memory.rooms[roomName]
                     continue
                 }
@@ -52,7 +49,6 @@ class ConfigManager {
             for (const roomName in Memory.rooms) {
                 const type = Memory.rooms[roomName].T
                 if (type === 'commune' || type === 'remote') {
-
                     delete Memory.rooms[roomName]
                     continue
                 }
@@ -66,7 +62,6 @@ class ConfigManager {
             for (const roomName in Memory.rooms) {
                 const type = Memory.rooms[roomName].T
                 if (type === 'commune' || type === 'remote') {
-
                     delete Memory.rooms[roomName]
                     continue
                 }
@@ -85,7 +80,6 @@ class ConfigManager {
      * Construct Memory if it isn't constructed yet
      */
     private configMemory() {
-
         if (Memory.breakingVersion) return
 
         Memory.breakingVersion = breakingVersion
@@ -128,10 +122,8 @@ class ConfigManager {
      * Construct global if it isn't constructed yet
      */
     private configGlobal() {
-
         if (global.constructed) return
 
-        RawMemory.setActiveSegments([98])
         global.constructed = true
 
         global.roomManagers = {}
