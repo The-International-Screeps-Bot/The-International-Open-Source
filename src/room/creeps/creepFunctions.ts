@@ -797,17 +797,12 @@ Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
 Creep.prototype.createMoveRequest = function (opts) {
     const { room } = this
 
-    // If creep can't move, inform false
-
-    if (this.fatigue > 0) return false
-
-    // If creep is spawning, inform false
-
-    if (this.spawning) return false
-
-    // If the creep already has a moveRequest, inform false
+    // Stop if the we know the creep won't move
 
     if (this.moveRequest) return false
+    if (this.moved) return false
+    if (this.fatigue > 0) return false
+    if (this.spawning) return false
 
     // Assign default opts
 

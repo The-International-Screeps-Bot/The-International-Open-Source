@@ -160,12 +160,7 @@ export class RemoteHauler extends Creep {
                 return true
             }
 
-            this.reserveWithdrawEnergy()
-
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return false
-            }
+            this.moved = -2
 
             this.reserveWithdrawEnergy()
 
@@ -174,12 +169,18 @@ export class RemoteHauler extends Creep {
                 return false
             }
 
-            if (this.needsResources()) {
-                this.moved = -2
+            this.reserveWithdrawEnergy()
+
+            if (!this.fulfillReservation()) {
+                this.say(this.message)
                 return false
             }
+
+            if (this.needsResources()) return false
 
             if (!this.commune) return false
+
+            delete this.moved
 
             this.message += this.commune.name
             this.say(this.message)
@@ -243,7 +244,7 @@ export class RemoteHauler extends Creep {
         let withdrawTargets = room.MAWT.filter(target => {
             if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
 
-            if (target instanceof Resource) return true
+            if (target instanceof Resource) return (target.amount >= this.freeCapacityNextTick || target.amount >= this.store.getCapacity() * 0.25)
 
             return target.store.energy >= this.freeCapacityNextTick
         })
@@ -253,8 +254,8 @@ export class RemoteHauler extends Creep {
 
             // If the harvester isn't nearly full and can't fully fill the hauler
 
-            if (harvester.store.getFreeCapacity(RESOURCE_ENERGY) > harvester.parts.work * HARVEST_POWER && harvester.store.getCapacity(RESOURCE_ENERGY) < this.store.getFreeCapacity()) continue
-            room.visual.text((this.memory.SI).toString(), harvester.pos)
+            if (harvester.store.getFreeCapacity(RESOURCE_ENERGY) > harvester.parts.work * HARVEST_POWER && harvester.store.getUsedCapacity(RESOURCE_ENERGY) < this.store.getFreeCapacity()) continue
+
             withdrawTargets.push(harvester)
         }
 
@@ -274,7 +275,7 @@ export class RemoteHauler extends Creep {
         withdrawTargets = room.OAWT.filter(target => {
             if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
 
-            if (target instanceof Resource) return true
+            if (target instanceof Resource) return (target.amount >= this.freeCapacityNextTick || target.amount >= this.store.getCapacity() * 0.25)
 
             return target.store.energy >= this.freeCapacityNextTick
         })
