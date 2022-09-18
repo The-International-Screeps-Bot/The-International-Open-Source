@@ -1,6 +1,6 @@
 import {
     allStructureTypes,
-    allyList,
+    allyPlayers,
     myColors,
     roomDimensions,
     structureTypesByBuildPriority,
@@ -93,8 +93,22 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._enemyCreeps) return this._enemyCreeps
 
+            // If commune, only avoid ally creeps
+
+            if (this.memory.T === 'commune') {
+
+                return (this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
+                    filter: creep =>
+                        !Memory.allyPlayers.has(creep.owner.username),
+                }))
+            }
+
+            // In any other room avoid ally creeps and neutral creeps
+
             return (this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
-                filter: creep => !Memory.allyList.includes(creep.owner.username),
+                filter: creep =>
+                    !Memory.allyPlayers.has(creep.owner.username) &&
+                    !Memory.nonAggressionPlayers.has(creep.owner.username),
             }))
         },
     },
@@ -112,7 +126,7 @@ Object.defineProperties(Room.prototype, {
             if (this._allyCreeps) return this._allyCreeps
 
             return (this._allyCreeps = this.find(FIND_HOSTILE_CREEPS, {
-                filter: creep => Memory.allyList.includes(creep.owner.username),
+                filter: creep => Memory.allyPlayers.has(creep.owner.username),
             }))
         },
     },
@@ -230,7 +244,7 @@ Object.defineProperties(Room.prototype, {
             if (this._enemyCSites) return this._enemyCSites
 
             return (this._enemyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => !Memory.allyList.includes(cSite.owner.username),
+                filter: cSite => !Memory.allyPlayers.has(cSite.owner.username),
             }))
         },
     },
@@ -239,7 +253,7 @@ Object.defineProperties(Room.prototype, {
             if (this._allyCSites) return this._allyCSites
 
             return (this._allyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => Memory.allyList.includes(cSite.owner.username),
+                filter: cSite => Memory.allyPlayers.has(cSite.owner.username),
             }))
         },
     },
@@ -663,13 +677,11 @@ Object.defineProperties(Room.prototype, {
                 const remoteMemory = Memory.rooms[remoteName]
 
                 for (let sourceIndex = 0; sourceIndex < remoteMemory.SIDs.length; sourceIndex++) {
-
                     this._remoteSourceIndexesByEfficacy.push(remoteName + ' ' + sourceIndex)
                 }
             }
 
-            return this._remoteSourceIndexesByEfficacy.sort(function(a, b) {
-
+            return this._remoteSourceIndexesByEfficacy.sort(function (a, b) {
                 const aSplit = a.split(' ')
                 const bSplit = b.split(' ')
 

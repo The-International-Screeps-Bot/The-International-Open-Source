@@ -26,7 +26,7 @@ Room.prototype.allyCreepRequestManager = function () {
         if (
             request.controller &&
             request.controller.owner &&
-            !Memory.allyList.includes(request.controller.owner.username)
+            !Memory.allyPlayers.has(request.controller.owner.username)
         ) {
             Memory.allyCreepRequests[this.memory.allyCreepRequest].needs[AllyCreepRequestNeeds.allyVanguard] += 1
             return

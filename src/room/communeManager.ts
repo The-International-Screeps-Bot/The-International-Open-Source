@@ -14,7 +14,7 @@ import { constructionManager } from './construction/constructionManager'
 import './defence'
 import './allyCreepRequestManager'
 import './claimRequestManager'
-import './attackRequestManager'
+import './combatRequestManager'
 import { myColors, roomDimensions } from 'international/constants'
 import './factory'
 import { LabManager } from './lab'
@@ -65,7 +65,7 @@ export class CommuneManager {
         this.room.linkManager()
 
         this.room.claimRequestManager()
-        this.room.attackRequestManager()
+        this.room.combatRequestManager()
 
         this.room.allyCreepRequestManager()
 
@@ -90,12 +90,10 @@ export class CommuneManager {
     }
 
     get storedEnergyUpgradeThreshold() {
-
         return this.room.controller.level * 10000
     }
 
     get storedEnergyBuildThreshold() {
-
         return this.room.controller.level * 8000
     }
 }

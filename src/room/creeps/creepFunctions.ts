@@ -1,6 +1,6 @@
 import { spawn } from 'child_process'
 import {
-    allyList,
+    allyPlayers,
     cacheAmountModifier,
     communeSigns,
     CPUBucketCapacity,
@@ -507,9 +507,7 @@ Creep.prototype.findRampartRepairTarget = function () {
 
         if (structure.hits / structure.hitsMax > 0.9) continue
 
-        const score =
-            getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) +
-            structure.hits / 500
+        const score = getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) + structure.hits / 500
 
         if (score > minScore) continue
 
@@ -964,7 +962,7 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
         if (hasImpassibleStructure) continue
 
         for (const cSite of pos.lookFor(LOOK_CONSTRUCTION_SITES)) {
-            if (!cSite.my && !Memory.allyList.includes(cSite.owner.username)) continue
+            if (!cSite.my && !Memory.allyPlayers.has(cSite.owner.username)) continue
 
             if (impassibleStructureTypes.includes(cSite.structureType)) {
                 hasImpassibleStructure = true
@@ -1607,7 +1605,7 @@ Creep.prototype.passiveHeal = function () {
 
             // If the creep is not owned and isn't an ally
 
-            if (!posData.creep.my && !Memory.allyList.includes(posData.creep.owner.username)) continue
+            if (!posData.creep.my && !Memory.allyPlayers.has(posData.creep.owner.username)) continue
 
             // If the creep is at full health, iterate
 
@@ -1640,7 +1638,7 @@ Creep.prototype.passiveHeal = function () {
 
         // If the creep is not owned and isn't an ally
 
-        if (!posData.creep.my && !Memory.allyList.includes(posData.creep.owner.username)) continue
+        if (!posData.creep.my && !Memory.allyPlayers.has(posData.creep.owner.username)) continue
 
         // If the creep is at full health, iterate
 

@@ -1,5 +1,5 @@
 import { allyManager } from 'international/simpleAllies'
-import { creepRoles, haulerUpdateDefault, myColors, RemoteNeeds, spawnByRoomRemoteRoles, stamps } from './constants'
+import { CombatRequestData, creepRoles, haulerUpdateDefault, myColors, RemoteNeeds, spawnByRoomRemoteRoles, stamps } from './constants'
 import {
     advancedFindDistance,
     createPosMap,
@@ -81,7 +81,7 @@ InternationalManager.prototype.tickConfig = function () {
 
         //
 
-        if (!room.memory.attackRequests) room.memory.attackRequests = []
+        if (!room.memory.combatRequests) room.memory.combatRequests = []
 
         room.spawnRequests = {}
 
@@ -255,24 +255,24 @@ InternationalManager.prototype.tickConfig = function () {
         Memory.allyCreepRequests[roomName].responder = communeName
     }
 
-    // Assign and decrease abandon for attackRequests
+    // Assign and decrease abandon for combatRequests
 
-    for (const roomName in Memory.attackRequests) {
-        const request = Memory.attackRequests[roomName]
+    for (const roomName in Memory.combatRequests) {
+        const request = Memory.combatRequests[roomName]
 
-        if (request.abandon > 0) {
-            request.abandon -= 1
+        if (request.data[CombatRequestData.abandon] > 0) {
+            request.data[CombatRequestData.abandon] -= 1
             continue
         }
 
         if (request.responder) continue
 
-        // Filter communes that don't have the attackRequest target already
+        // Filter communes that don't have the combatRequest target already
 
         const communes = []
 
         for (const roomName of global.communes) {
-            if (Memory.rooms[roomName].attackRequests.includes(roomName)) continue
+            if (Memory.rooms[roomName].combatRequests.includes(roomName)) continue
 
             communes.push(roomName)
         }
@@ -292,14 +292,14 @@ InternationalManager.prototype.tickConfig = function () {
                 ally: Infinity,
             }) > maxRange
         ) {
-            Memory.attackRequests[roomName].abandon = 20000
+            Memory.combatRequests[roomName].data[CombatRequestData.abandon] = 20000
             continue
         }
 
         // Otherwise assign the request to the room, and record as such in Memory
 
-        Memory.rooms[communeName].attackRequests.push(roomName)
-        Memory.attackRequests[roomName].responder = communeName
+        Memory.rooms[communeName].combatRequests.push(roomName)
+        Memory.combatRequests[roomName].responder = communeName
     }
 
     if (Memory.CPULogging)

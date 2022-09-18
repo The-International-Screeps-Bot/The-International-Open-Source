@@ -287,6 +287,8 @@ declare global {
         targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
     }
 
+    type CombatRequestTypes = 'attack' | 'harass' | 'defend' | 'swarm'
+
     interface ClaimRequest {
         /**
          * The name of the room responding to the request
@@ -303,13 +305,16 @@ declare global {
         abandon?: number
     }
 
-    interface AttackRequest {
+    interface CombatRequest {
+        /**
+         * The Type of attack request
+         */
+        T: CombatRequestTypes
         /**
          * The name of the room responding to the request
          */
         responder?: string
-        needs: number[]
-        abandon?: number
+        data: number[]
     }
 
     interface AllyCreepRequest {
@@ -530,7 +535,12 @@ declare global {
         /**
          * A list of usernames to treat as allies
          */
-        allyList: string[]
+        allyPlayers: Set<string>
+
+        /**
+         * A list of usernames to treat as neutral
+         */
+        nonAggressionPlayers: Set<string>
 
         /**
          * Wether the bot should sell pixels
@@ -577,7 +587,7 @@ declare global {
          */
         claimRequests: { [roomName: string]: ClaimRequest }
 
-        attackRequests: { [roomName: string]: AttackRequest }
+        combatRequests: { [roomName: string]: CombatRequest }
 
         allyCreepRequests: { [roomName: string]: AllyCreepRequest }
 
@@ -904,7 +914,7 @@ declare global {
         // General roomFunctions
 
         claimRequestManager(): void
-        attackRequestManager(): void
+        combatRequestManager(): void
 
         allyCreepRequestManager(): void
 
@@ -1335,7 +1345,7 @@ declare global {
         /**
          *
          */
-        attackRequests: string[]
+        combatRequests: string[]
 
         /**
          * The room name of the room's ally creep target
@@ -1804,9 +1814,9 @@ declare global {
 
     // PowerCreeps
 
-    interface PowerCreep { }
+    interface PowerCreep {}
 
-    interface PowerCreepMemory { }
+    interface PowerCreepMemory {}
 
     // Structures
 
@@ -1957,7 +1967,12 @@ declare global {
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room
              */
-            attack(request: string, communeName?: string): string
+            combat(request: string, communeName?: string, type?: CombatRequestTypes): string
+
+            /**
+             * Deletes combatRequests for a specified room, if there are any
+             */
+             deleteCombatRequest(request: string): string
 
             /**
              * Creates an allyCreepRequest for a specified room, that can optionally be assigned to a specified commune

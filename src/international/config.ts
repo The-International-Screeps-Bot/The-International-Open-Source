@@ -1,5 +1,5 @@
 import {
-    allyList,
+    allyPlayers,
     allyTrading,
     autoClaim,
     baseVisuals,
@@ -12,6 +12,7 @@ import {
     roomVisuals,
     tradeBlacklist,
     roomStats,
+    nonAggressionPlayers,
 } from './constants'
 import { statsManager } from './statsManager'
 
@@ -30,7 +31,7 @@ class ConfigManager {
         if (Memory.breakingVersion) return
 
         Memory.breakingVersion = breakingVersion
-        
+
         Memory.me =
             (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
             Object.values(Game.creeps)[0]?.owner?.username ||
@@ -47,7 +48,8 @@ class ConfigManager {
         Memory.mapVisuals = mapVisuals
         Memory.CPULogging = CPULogging
         Memory.roomStats = Game.shard.name !== 'performanceServer' ? roomStats : 2
-        Memory.allyList = allyList
+        Memory.allyPlayers = allyPlayers
+        Memory.nonAggressionPlayers = nonAggressionPlayers
         Memory.pixelSelling = pixelSelling
         Memory.pixelGeneration = pixelGeneration
         Memory.tradeBlacklist = tradeBlacklist
@@ -61,7 +63,7 @@ class ConfigManager {
         Memory.constructionSites = {}
         Memory.players = {}
         Memory.claimRequests = {}
-        Memory.attackRequests = {}
+        Memory.combatRequests = {}
         Memory.allyCreepRequests = {}
         statsManager.internationalConfig()
     }

@@ -61,8 +61,8 @@ InternationalManager.prototype.mapVisualsManager = function () {
                 )
             }
 
-            if (roomMemory.attackRequests.length) {
-                for (const requestName of roomMemory.attackRequests) {
+            if (roomMemory.combatRequests.length) {
+                for (const requestName of roomMemory.combatRequests) {
                     Game.map.visual.line(
                         room.anchor || new RoomPosition(25, 25, roomName),
                         new RoomPosition(25, 25, requestName),
@@ -82,7 +82,6 @@ InternationalManager.prototype.mapVisualsManager = function () {
             const commune = Game.rooms[roomMemory.commune]
 
             if (commune) {
-
                 const possibleReservation = commune.energyCapacityAvailable >= 650
 
                 for (const sourceIndex in roomMemory.SP) {
@@ -97,10 +96,12 @@ InternationalManager.prototype.mapVisualsManager = function () {
                     })
 
                     // Get the income based on the reservation of the room and remoteHarvester need
-                    
+
                     const income =
                         (possibleReservation ? 10 : 5) -
-                        Math.floor(roomMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio)
+                        Math.floor(
+                            roomMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio,
+                        )
 
                     Game.map.visual.text(
                         `⛏️${income},🚶‍♀️${roomMemory.SE[sourceIndex]}`,

@@ -159,11 +159,12 @@ global.claim = function (request, communeName) {
     return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${request}`
 }
 
-global.attack = function (request, communeName) {
-    if (!Memory.attackRequests[request]) {
-        Memory.attackRequests[request] = {
+global.combat = function (request, communeName, type) {
+    if (!Memory.combatRequests[request]) {
+        Memory.combatRequests[request] = {
+            T: type || 'attack',
             responder: communeName,
-            needs: [0],
+            data: [0],
         }
     }
 
@@ -171,11 +172,25 @@ global.attack = function (request, communeName) {
         const roomMemory = Memory.rooms[communeName]
         if (!roomMemory) return `No memory for ${communeName}`
 
-        roomMemory.attackRequests.push(request)
+        roomMemory.combatRequests.push(request)
     }
 
-    return `${communeName ? `${communeName} is responding to the` : `created`} attackRequest for ${request}`
+    return `${communeName ? `${communeName} is responding to the` : `created`} combatRequest for ${request}`
 }
+
+global.deleteCombatRequest = function (request) {
+    if (!Memory.combatRequests[request]) return 'No combatRequest for that room'
+
+    // If responder, remove from its memory
+
+    const responder = Memory.combatRequests[request].responder
+    if (responder) Memory.rooms[responder].combatRequests.splice(Memory.rooms[responder].combatRequests.indexOf(request), 1)
+
+    delete Memory.combatRequests[request]
+
+    return `deleted combatRequest for ${request}`
+}
+global.DCR = global.deleteCombatRequest
 
 global.allyCreepRequest = function (request, communeName?) {
     if (!Memory.allyCreepRequests[request]) {

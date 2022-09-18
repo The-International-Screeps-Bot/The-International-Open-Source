@@ -1,7 +1,7 @@
 /**
  * Increment by 1 when a change has been made that will break previous versions of the bot
  */
-export const breakingVersion = 84
+export const breakingVersion = 85
 
 // Settings
 
@@ -33,19 +33,9 @@ export const roomStats: 0 | 1 | 2 = 1
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const allyList = [
-    'MarvinTMB',
-    'Q13214',
-    'HerrKai',
-    'clarkok',
-    'PandaMaster',
-    'lokenwow',
-    'Morningtea',
-    'LittleBitBlue',
-    'Raggy',
-    'DefaultO',
-    'Allorrian',
-]
+export const allyPlayers = new Set(['MarvinTMB', 'PandaMaster', 'lokenwow', 'LittleBitBlue', 'DefaultO', 'Allorrian'])
+
+export const nonAggressionPlayers = new Set(['Q13214', 'HerrKai', 'clarkok', 'Raggy'])
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -660,13 +650,15 @@ export enum ClaimRequestNeeds {
     vanguardDefender,
 }
 
-export enum AttackRequestNeeds {
+export enum CombatRequestData {
+    abandon,
     ranged,
     attack,
     dismantle,
     downgrader,
     minDamage,
     minHeal,
+    swarm,
 }
 
 export enum AllyCreepRequestNeeds {
@@ -683,10 +675,7 @@ export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHar
     'source2RemoteHarvester',
 ]
 
-export const remoteHaulerRoles: ('remoteHauler0' | 'remoteHauler1')[] = [
-    'remoteHauler0',
-    'remoteHauler1',
-]
+export const remoteHaulerRoles: ('remoteHauler0' | 'remoteHauler1')[] = ['remoteHauler0', 'remoteHauler1']
 
 export enum RemoteHarvesterRolesBySourceIndex {
     source1RemoteHarvester,

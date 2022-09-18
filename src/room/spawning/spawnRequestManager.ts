@@ -1,6 +1,6 @@
 import {
     AllyCreepRequestNeeds,
-    allyList,
+    allyPlayers,
     ClaimRequestNeeds,
     containerUpkeepCost,
     controllerDowngradeUpgraderNeed,
@@ -20,7 +20,7 @@ import {
     getRange,
 } from 'international/generalFunctions'
 import { unpackPosList } from 'other/packrat'
-import { RemoteHarvester } from 'room/creeps/roleManagers/remote/remoteHarvesterFunctions'
+import { RemoteHarvester } from 'room/creeps/roleManagers/remote/remoteHarvester'
 
 Room.prototype.spawnRequester = function () {
     // If CPU logging is enabled, get the CPU used at the start
@@ -985,9 +985,14 @@ Room.prototype.spawnRequester = function () {
                 // Get the income based on the reservation of the this and remoteHarvester need
                 // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
 
-                const income =
-                    Math.max((isReserved ? 10 : 5) -
-                    Math.floor(Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]], 0) * minHarvestWorkRatio), 0)
+                const income = Math.max(
+                    (isReserved ? 10 : 5) -
+                        Math.floor(
+                            Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]], 0) *
+                                minHarvestWorkRatio,
+                        ),
+                    0,
+                )
 
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
@@ -1356,8 +1361,8 @@ Room.prototype.spawnRequester = function () {
         )
     }
 
-    for (const roomName of this.memory.attackRequests) {
-        const request = Memory.attackRequests[roomName]
+    for (const roomName of this.memory.combatRequests) {
+        const request = Memory.combatRequests[roomName]
 
         const minCost = 300
 

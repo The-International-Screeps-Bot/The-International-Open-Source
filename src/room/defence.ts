@@ -1,4 +1,4 @@
-import { allyList, myColors, safemodeTargets } from 'international/constants'
+import { allyPlayers, myColors, safemodeTargets } from 'international/constants'
 import { customLog, findObjectWithID } from 'international/generalFunctions'
 
 Room.prototype.defenceManager = function () {

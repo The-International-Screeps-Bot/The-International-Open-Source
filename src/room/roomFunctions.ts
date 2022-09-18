@@ -1,6 +1,6 @@
 import {
     allStructureTypes,
-    allyList,
+    allyPlayers,
     impassibleStructureTypes,
     maxRampartGroupSize,
     minHarvestWorkRatio,
@@ -725,7 +725,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
 
                     for (const enemyAttacker of enemyAttackers) {
-
                         // Construct rect and get positions inside
 
                         const positions = findCoordsInsideRect(
@@ -816,7 +815,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     // Loop through them
 
                     for (const index in room.sources) {
-
                         // Loop through each position of harvestPositions, have creeps prefer to avoid
 
                         for (const pos of room.sourcePositions[index]) cm.set(pos.x, pos.y, 10)
@@ -892,7 +890,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             let lastPos = opts.origin
 
             for (const goal of opts.goals) {
-
                 room.visual.line(lastPos, goal.pos, {
                     color: myColors.red,
                     width: 0.15,
@@ -971,7 +968,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             // If the controller is owned by an ally
 
-            if (Memory.allyList.includes(owner)) {
+            if (Memory.allyPlayers.has(owner)) {
                 room.memory.T = 'ally'
                 return
             }
@@ -1073,7 +1070,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             // If the controller is not reserved by an ally
 
-            if (!Memory.allyList.includes(controller.reservation.username)) {
+            if (!Memory.allyPlayers.has(controller.reservation.username)) {
                 // Set type to enemyRemote and inform true
 
                 room.memory.T = 'enemyRemote'
@@ -1123,7 +1120,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
                 if (creep.parts.work > 0) {
                     // If the creep is owned by an ally
 
-                    if (Memory.allyList.includes(creep.owner.username)) {
+                    if (Memory.allyPlayers.has(creep.owner.username)) {
                         // Set type to allyRemote and stop
 
                         room.memory.T = 'allyRemote'

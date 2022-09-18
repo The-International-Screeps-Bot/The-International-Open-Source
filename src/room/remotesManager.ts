@@ -1,7 +1,7 @@
 import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteNeeds, spawnByRoomRemoteRoles } from 'international/constants'
 import { customLog, findCarryPartsRequired } from 'international/generalFunctions'
 import { CommuneManager } from './communeManager'
-import { RemoteHarvester } from './creeps/roleManagers/remote/remoteHarvesterFunctions'
+import { RemoteHarvester } from './creeps/roleManagers/remote/remoteHarvester'
 import { RemoteHauler } from './creeps/roleManagers/remote/remoteHauler'
 import { RoomManager } from './roomManager'
 

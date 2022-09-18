@@ -1,4 +1,4 @@
-import { breakingVersion } from './constants'
+import { allyPlayers, breakingVersion, nonAggressionPlayers } from './constants'
 
 /**
  * Migrate version by performing actions, if required
@@ -51,6 +51,17 @@ class MigrationManager {
             }
 
             Memory.breakingVersion = 84
+        }
+        if (Memory.breakingVersion === 84) {
+            delete (Memory as any).attackRequests
+            Memory.combatRequests = {}
+
+            delete (Memory as any).allyList
+            Memory.allyPlayers = allyPlayers
+
+            Memory.nonAggressionPlayers = nonAggressionPlayers
+
+            Memory.breakingVersion = 85
         }
 
         if (Memory.breakingVersion < breakingVersion) {

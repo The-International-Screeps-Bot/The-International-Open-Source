@@ -1,5 +1,5 @@
 import {
-    allyList,
+    allyPlayers,
     myColors,
     NORMAL,
     PROTECTED,
@@ -62,8 +62,7 @@ export class RoomVisualsManager {
             if (this.roomManager.room.controller.level < 8)
                 this.roomManager.room.visual.text(
                     `%${(
-                        (this.roomManager.room.controller.progress /
-                            this.roomManager.room.controller.progressTotal) *
+                        (this.roomManager.room.controller.progress / this.roomManager.room.controller.progressTotal) *
                         100
                     ).toFixed(2)}`,
                     this.roomManager.room.controller.pos.x,
@@ -102,7 +101,7 @@ export class RoomVisualsManager {
                     return myColors.lightBlue
                 }
 
-                if (Memory.allyList.includes(this.roomManager.room.controller.reservation.username)) {
+                if (Memory.allyPlayers.has(this.roomManager.room.controller.reservation.username)) {
                     return myColors.green
                 }
 

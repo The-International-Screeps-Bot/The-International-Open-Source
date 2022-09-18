@@ -1,6 +1,6 @@
-import { allyList, simpleAlliesSegment } from 'international/constants'
+import { allyPlayers, simpleAlliesSegment } from 'international/constants'
 
-const allyArray = [...allyList]
+const allyArray = Array.from(allyPlayers)
 
 export enum RequestTypes {
     RESOURCE,
