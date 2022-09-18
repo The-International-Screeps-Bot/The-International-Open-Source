@@ -96,10 +96,8 @@ Object.defineProperties(Room.prototype, {
             // If commune, only avoid ally creeps
 
             if (this.memory.T === 'commune') {
-
                 return (this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
-                    filter: creep =>
-                        !Memory.allyPlayers.has(creep.owner.username),
+                    filter: creep => !Memory.allyPlayers.includes(creep.owner.username),
                 }))
             }
 
@@ -107,8 +105,8 @@ Object.defineProperties(Room.prototype, {
 
             return (this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
                 filter: creep =>
-                    !Memory.allyPlayers.has(creep.owner.username) &&
-                    !Memory.nonAggressionPlayers.has(creep.owner.username),
+                    !Memory.allyPlayers.includes(creep.owner.username) &&
+                    !Memory.nonAggressionPlayers.includes(creep.owner.username),
             }))
         },
     },
@@ -126,7 +124,7 @@ Object.defineProperties(Room.prototype, {
             if (this._allyCreeps) return this._allyCreeps
 
             return (this._allyCreeps = this.find(FIND_HOSTILE_CREEPS, {
-                filter: creep => Memory.allyPlayers.has(creep.owner.username),
+                filter: creep => Memory.allyPlayers.includes(creep.owner.username),
             }))
         },
     },
@@ -244,7 +242,7 @@ Object.defineProperties(Room.prototype, {
             if (this._enemyCSites) return this._enemyCSites
 
             return (this._enemyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => !Memory.allyPlayers.has(cSite.owner.username),
+                filter: cSite => !Memory.allyPlayers.includes(cSite.owner.username),
             }))
         },
     },
@@ -253,7 +251,7 @@ Object.defineProperties(Room.prototype, {
             if (this._allyCSites) return this._allyCSites
 
             return (this._allyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => Memory.allyPlayers.has(cSite.owner.username),
+                filter: cSite => Memory.allyPlayers.includes(cSite.owner.username),
             }))
         },
     },

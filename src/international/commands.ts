@@ -159,7 +159,7 @@ global.claim = function (request, communeName) {
     return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${request}`
 }
 
-global.combat = function (request, communeName, type) {
+global.combat = function (type, request, communeName) {
     if (!Memory.combatRequests[request]) {
         Memory.combatRequests[request] = {
             T: type || 'attack',

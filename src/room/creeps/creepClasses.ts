@@ -1,4 +1,4 @@
-import { AntifaAssaulter } from './roleManagers/antifa/antifaAssaulter'
+import { Antifa } from './roleManagers/antifa/antifa'
 import { Builder } from './roleManagers/commune/builder'
 import { ControllerUpgrader } from './roleManagers/commune/controllerUpgrader'
 import { FastFiller } from './roleManagers/commune/fastFiller'
@@ -16,7 +16,7 @@ import { VanguardDefender } from './roleManagers/international/vanguardDefender'
 import { RemoteCoreAttacker } from './roleManagers/remote/remoteCoreAttacker'
 import { RemoteDefender } from './roleManagers/remote/remoteDefender'
 import { RemoteDismantler } from './roleManagers/remote/remoteDismantler'
-import { RemoteHarvester } from './roleManagers/remote/remoteHarvester'
+import { RemoteHarvester } from './roleManagers/remote/remoteHarvesterFunctions'
 import { RemoteHauler } from './roleManagers/remote/remoteHauler'
 import { RemoteReserver } from './roleManagers/remote/remoteReserver'
 
@@ -44,6 +44,10 @@ creepClasses.claimer = Claimer
 creepClasses.vanguard = Vanguard
 creepClasses.allyVanguard = AllyVanguard
 creepClasses.vanguardDefender = VanguardDefender
-creepClasses.antifaAssaulter = AntifaAssaulter
+creepClasses.antifaRangedAttacker = Antifa
+creepClasses.antifaAttacker = Antifa
+creepClasses.antifaHealer = Antifa
+creepClasses.antifaDismantler = Antifa
+creepClasses.antifaDowngrader = Antifa
 
 export { creepClasses }

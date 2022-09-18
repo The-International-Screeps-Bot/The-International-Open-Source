@@ -33,9 +33,12 @@ export const roomStats: 0 | 1 | 2 = 1
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const allyPlayers = new Set(['MarvinTMB', 'PandaMaster', 'lokenwow', 'LittleBitBlue', 'DefaultO', 'Allorrian'])
+export const allyPlayers = ['MarvinTMB', 'PandaMaster', 'lokenwow', 'LittleBitBlue', 'DefaultO', 'Allorrian']
 
-export const nonAggressionPlayers = new Set(['Q13214', 'HerrKai', 'clarkok', 'Raggy'])
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy']
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -196,7 +199,11 @@ export const creepRoles: CreepRoles[] = [
     'vanguard',
     'allyVanguard',
     'vanguardDefender',
-    'antifaAssaulter',
+    'antifaRangedAttacker',
+    'antifaAttacker',
+    'antifaHealer',
+    'antifaDismantler',
+    'antifaDowngrader',
 ]
 
 export enum TrafficPriorities {
@@ -222,7 +229,11 @@ export enum TrafficPriorities {
     vanguardDefender,
     remoteDefender,
     meleeDefender,
-    antifaAssaulter,
+    antifaRangedAttacker,
+    antifaAttacker,
+    antifaHealer,
+    antifaDismantler,
+    antifaDowngrader,
 }
 
 // Set of messages to randomly apply to commune rooms
@@ -652,10 +663,10 @@ export enum ClaimRequestNeeds {
 
 export enum CombatRequestData {
     abandon,
-    ranged,
+    rangedAttack,
     attack,
     dismantle,
-    downgrader,
+    downgrade,
     minDamage,
     minHeal,
     swarm,

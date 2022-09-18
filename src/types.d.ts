@@ -107,7 +107,11 @@ declare global {
         | 'vanguard'
         | 'allyVanguard'
         | 'vanguardDefender'
-        | 'antifaAssaulter'
+        | 'antifaRangedAttacker'
+        | 'antifaAttacker'
+        | 'antifaHealer'
+        | 'antifaDismantler'
+        | 'antifaDowngrader'
 
     type RoomObjectName =
         | 'mineralHarvestPositions'
@@ -287,7 +291,7 @@ declare global {
         targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
     }
 
-    type CombatRequestTypes = 'attack' | 'harass' | 'defend' | 'swarm'
+    type CombatRequestTypes = 'attack' | 'harass' | 'defend'
 
     interface ClaimRequest {
         /**
@@ -535,12 +539,12 @@ declare global {
         /**
          * A list of usernames to treat as allies
          */
-        allyPlayers: Set<string>
+        allyPlayers: string[]
 
         /**
          * A list of usernames to treat as neutral
          */
-        nonAggressionPlayers: Set<string>
+        nonAggressionPlayers: string[]
 
         /**
          * Wether the bot should sell pixels
@@ -1782,19 +1786,19 @@ declare global {
         quota: number
 
         /**
-         * The size of squad the creep is attempting to form
+         * Squad Size of the squad the creep is attempting to form
          */
-        squadSize: 'quad' | 'duo' | undefined
+        SS: 'quad' | 'duo' | undefined
 
         /**
-         * The type of attack the creep's squad is attempting
+         * Squad Type the combat method the creep's squad is attempting
          */
-        squadType: 'rangedAttack' | 'attack' | 'dismantle'
+        ST: 'rangedAttack' | 'attack' | 'dismantle'
 
         /**
-         * Attack Request, the name of the room the creep should
+         * Combat Request, the name of the room the creep should do combat in
          */
-        AR: string | undefined
+        CR: string | undefined
 
         /**
          * Recycle Target, the spawn ID the creep is going to recycle
@@ -1967,12 +1971,12 @@ declare global {
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room
              */
-            combat(request: string, communeName?: string, type?: CombatRequestTypes): string
+            combat(type: CombatRequestTypes, request: string, communeName?: string): string
 
             /**
              * Deletes combatRequests for a specified room, if there are any
              */
-             deleteCombatRequest(request: string): string
+            deleteCombatRequest(request: string): string
 
             /**
              * Creates an allyCreepRequest for a specified room, that can optionally be assigned to a specified commune

@@ -14,14 +14,14 @@ import { SourceHarvester } from './roleManagers/commune/sourceHarvester'
 import { MineralHarvester } from './roleManagers/commune/mineralHarvester'
 import { FastFiller } from './roleManagers/commune/fastFiller'
 import { MeleeDefender } from './roleManagers/commune/meleeDefender'
-import { RemoteHarvester } from './roleManagers/remote/remoteHarvester'
+import { RemoteHarvester } from './roleManagers/remote/remoteHarvesterFunctions'
 import { RemoteReserver } from './roleManagers/remote/remoteReserver'
 import { RemoteDefender } from './roleManagers/remote/remoteDefender'
 import { RemoteCoreAttacker } from './roleManagers/remote/remoteCoreAttacker'
 import { RemoteDismantler } from './roleManagers/remote/remoteDismantler'
 import { Scout } from './roleManagers/international/scout'
 import { Vanguard } from './roleManagers/international/vanguard'
-import { AntifaAssaulter } from './roleManagers/antifa/antifaAssaulter'
+import { Antifa } from './roleManagers/antifa/antifa'
 import { VanguardDefender } from './roleManagers/international/vanguardDefender'
 import { CommuneManager } from 'room/communeManager'
 import { RoomManager } from 'room/roomManager'
@@ -31,7 +31,11 @@ import { RoomManager } from 'room/roomManager'
 const managers: Record<CreepRoles, Function> = {
     meleeDefender: MeleeDefender.meleeDefenderManager,
     allyVanguard: AllyVanguard.allyVanguardManager,
-    antifaAssaulter: AntifaAssaulter.antifaAssaulterManager,
+    antifaRangedAttacker: Antifa.antifaManager,
+    antifaAttacker: Antifa.antifaManager,
+    antifaHealer: Antifa.antifaManager,
+    antifaDismantler: Antifa.antifaManager,
+    antifaDowngrader: Antifa.antifaManager,
     claimer: Claimer.claimerManager,
     vanguardDefender: VanguardDefender.vanguardDefenderManager,
     remoteDefender: RemoteDefender.remoteDefenderManager,
@@ -73,7 +77,8 @@ export class CreepRoleManager {
         if (Memory.CPULogging)
             customLog(
                 'Role Manager',
-                `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}, CPU Per Creep: ${(this.roomManager.room.myCreepsAmount
+                `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}, CPU Per Creep: ${(this.roomManager.room
+                    .myCreepsAmount
                     ? (Game.cpu.getUsed() - managerCPUStart) / this.roomManager.room.myCreepsAmount
                     : 0
                 ).toFixed(2)}`,

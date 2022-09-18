@@ -35,6 +35,7 @@ import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { migrationManager } from 'international/migrationManager'
 import { respawnManager } from './international/respawnManager'
+import { tickConfig } from './international/tickConfig'
 
 global.profiler = initProfiler()
 
@@ -42,10 +43,6 @@ export const loop = function () {
     memHack.run()
 
     internationalManager.tickReset()
-
-    migrationManager.run()
-    respawnManager.run()
-    configManager.run()
 
     internationalManager.run()
     /*

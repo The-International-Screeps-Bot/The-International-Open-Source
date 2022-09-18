@@ -2,7 +2,7 @@ import { findClosestObject, getRange, pack } from 'international/generalFunction
 import { Duo } from './duo'
 import { Quad } from './quad'
 
-export class AntifaAssaulter extends Creep {
+export class Antifa extends Creep {
     /**
      * Tries to find a squad, creating one if none could be found
      */
@@ -18,14 +18,14 @@ export class AntifaAssaulter extends Creep {
         if (!this.memory.AR || this.memory.AR === room.name) {
             // rangedAttack
 
-            if (this.memory.squadType === 'rangedAttack') {
+            if (this.memory.ST === 'rangedAttack') {
                 this.advancedRangedAttack()
                 return
             }
 
             // attack
 
-            if (this.memory.squadType === 'attack') {
+            if (this.memory.ST === 'attack') {
                 this.advancedAttack()
                 return
             }
@@ -229,13 +229,13 @@ export class AntifaAssaulter extends Creep {
         super(creepID)
     }
 
-    static antifaAssaulterManager(room: Room, creepsOfRole: string[]) {
+    static antifaManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
-            const creep: AntifaAssaulter = Game.creeps[creepName]
+            const creep: Antifa = Game.creeps[creepName]
 
             // If no squad, try to make or find one
 
-            if (!creep.squad && creep.memory.squadType) {
+            if (!creep.squad && creep.memory.ST) {
                 if (!creep.findSquad()) continue
             }
 

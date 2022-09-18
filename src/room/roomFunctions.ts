@@ -968,7 +968,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             // If the controller is owned by an ally
 
-            if (Memory.allyPlayers.has(owner)) {
+            if (Memory.allyPlayers.includes(owner)) {
                 room.memory.T = 'ally'
                 return
             }
@@ -1070,7 +1070,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             // If the controller is not reserved by an ally
 
-            if (!Memory.allyPlayers.has(controller.reservation.username)) {
+            if (!Memory.allyPlayers.includes(controller.reservation.username)) {
                 // Set type to enemyRemote and inform true
 
                 room.memory.T = 'enemyRemote'
@@ -1120,7 +1120,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
                 if (creep.parts.work > 0) {
                     // If the creep is owned by an ally
 
-                    if (Memory.allyPlayers.has(creep.owner.username)) {
+                    if (Memory.allyPlayers.includes(creep.owner.username)) {
                         // Set type to allyRemote and stop
 
                         room.memory.T = 'allyRemote'
@@ -2423,33 +2423,20 @@ Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
 }
 
 Room.prototype.getPartsOfRoleAmount = function (role, type) {
-    // Intilaize the partsAmount
-
     let partsAmount = 0
-    let creep
 
     // Loop through every creepName in the creepsFromRoom of the specified role
 
     for (const creepName of this.creepsFromRoom[role]) {
-        // Get the creep using creepName
-
-        creep = Game.creeps[creepName]
-
-        // If there is no specified type
+        const creep = Game.creeps[creepName]
 
         if (!type) {
-            // Increase partsAmount by the creep's body size, and iterate
-
             partsAmount += creep.body.length
             continue
         }
 
-        // Otherwise increase partsAmount by the creep's parts count of the specified type
-
-        partsAmount += creep.body.filter(part => part.type === type).length
+        partsAmount += creep.parts[type]
     }
-
-    // Inform partsAmount
 
     return partsAmount
 }

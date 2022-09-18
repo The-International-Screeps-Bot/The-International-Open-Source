@@ -101,7 +101,7 @@ export class RoomVisualsManager {
                     return myColors.lightBlue
                 }
 
-                if (Memory.allyPlayers.has(this.roomManager.room.controller.reservation.username)) {
+                if (Memory.allyPlayers.includes(this.roomManager.room.controller.reservation.username)) {
                     return myColors.green
                 }
 

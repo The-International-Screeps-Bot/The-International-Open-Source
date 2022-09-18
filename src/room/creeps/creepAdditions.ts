@@ -194,7 +194,7 @@ Object.defineProperties(Creep.prototype, {
             for (const posData of adjacentCreeps) {
                 // If the creep is not owned and isn't an ally
 
-                if (posData.creep.my || Memory.allyPlayers.has(posData.creep.owner.username)) continue
+                if (posData.creep.my || Memory.allyPlayers.includes(posData.creep.owner.username)) continue
 
                 const range = getRange(this.pos.x, posData.creep.pos.x, this.pos.y, posData.creep.pos.y)
 

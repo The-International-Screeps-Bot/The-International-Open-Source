@@ -23,13 +23,16 @@ Room.prototype.spawnManager = function () {
         return parseInt(a) - parseInt(b)
     })
 /*
+
+// Spawn request debug logging
+
     for (const priority in this.spawnRequests) {
 
         const request = this.spawnRequests[priority]
 
-        customLog('SPAWN REQUESTS', priority + ', ' + request.role + ', ' + request.extraOpts.memory?.RN + ', ' + request.extraOpts.memory?.SI)
-    } */
-
+        customLog('SPAWN REQUESTS', priority + ', ' + request.role)
+    }
+ */
     // Track the inactive spawn index
 
     let spawnIndex = inactiveSpawns.length - 1

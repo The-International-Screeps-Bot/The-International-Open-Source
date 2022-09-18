@@ -2,6 +2,10 @@ import { allyManager } from 'international/simpleAllies'
 import { createPosMap, customLog, getAvgPrice, packXY } from './generalFunctions'
 import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
 import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames, myColors, roomDimensions } from './constants'
+import { migrationManager } from './migrationManager'
+import { respawnManager } from './respawnManager'
+import { configManager } from './config'
+import { tickConfig } from './tickConfig'
 
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
@@ -14,7 +18,10 @@ export class InternationalManager {
 
         // Run prototypes
 
-        this.tickConfig()
+        migrationManager.run()
+        respawnManager.run()
+        configManager.run()
+        tickConfig.run()
         this.creepOrganizer()
         this.constructionSiteManager()
         this.orderManager()
@@ -174,11 +181,6 @@ export class InternationalManager {
 
         return global.terrainCoords[roomName]
     }
-
-    /**
-     * Configures tick important or tick-only pre-roomManager settings required to run the bot
-     */
-    tickConfig?(): void
 
     /**
      * Organizes creeps into properties for their communeName, and tracks total creep count

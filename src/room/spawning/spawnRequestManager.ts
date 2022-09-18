@@ -2,6 +2,7 @@ import {
     AllyCreepRequestNeeds,
     allyPlayers,
     ClaimRequestNeeds,
+    CombatRequestData,
     containerUpkeepCost,
     controllerDowngradeUpgraderNeed,
     minHarvestWorkRatio,
@@ -20,7 +21,6 @@ import {
     getRange,
 } from 'international/generalFunctions'
 import { unpackPosList } from 'other/packrat'
-import { RemoteHarvester } from 'room/creeps/roleManagers/remote/remoteHarvester'
 
 Room.prototype.spawnRequester = function () {
     // If CPU logging is enabled, get the CPU used at the start
@@ -1361,24 +1361,130 @@ Room.prototype.spawnRequester = function () {
         )
     }
 
-    for (const roomName of this.memory.combatRequests) {
-        const request = Memory.combatRequests[roomName]
+    for (const requestRoomName of this.memory.combatRequests) {
+        const request = Memory.combatRequests[requestRoomName]
 
-        const minCost = 300
+        let minRangedAttackCost =
+            (request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] * 1.2
+        let rangedAttackAmount = Math.max(
+            minRangedAttackCost / BODYPART_COST[RANGED_ATTACK],
+            request.data[CombatRequestData.rangedAttack],
+        )
+        let minAttackCost = (request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[ATTACK] * 1.2
+        let attackAmount = Math.max(minAttackCost / BODYPART_COST[ATTACK], request.data[CombatRequestData.attack])
+        let minHealCost = request.data[CombatRequestData.minHeal] * BODYPART_COST[HEAL] * 1.2
 
-        const role = 'antifaAssaulter'
+        if (request.T === 'attack') {
+            continue
+        }
+
+        // If the request isn't an attack
+        // Spawn RangedAttack Heal singletons
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
+                const role = 'antifaRangedAttacker'
+                const minCost = Math.min(minRangedAttackCost + minHealCost, spawnEnergyCapacity)
+                const extraParts: BodyPartConstant[] = []
+
+                for (let i = 0; i < rangedAttackAmount; i++) {
+                    extraParts.push(RANGED_ATTACK, MOVE)
+                }
+
+                for (let i = 0; i < request.data[CombatRequestData.minHeal]; i++) {
+                    extraParts.push(HEAL, MOVE)
+                }
+
                 return {
                     role,
                     defaultParts: [],
-                    extraParts: [],
-                    partsMultiplier,
-                    minCreeps: 1,
+                    extraParts,
+                    partsMultiplier: 1,
                     minCost,
-                    priority: 8 + this.creepsFromRoom.antifaAssaulter.length,
-                    memoryAdditions: {},
+                    priority: 8,
+                    memoryAdditions: {
+                        CR: requestRoomName,
+                    },
+                }
+            })(),
+        )
+
+        // Spawn dismantlers
+
+        this.constructSpawnRequests(
+            ((): SpawnRequestOpts | false => {
+                const role = 'antifaDismantler'
+                const minCost = 150
+                let extraParts: BodyPartConstant[] = []
+
+                for (let i = 0; i < request.data[CombatRequestData.dismantle]; i++) {
+                    extraParts.push(WORK, MOVE)
+                }
+
+                return {
+                    role,
+                    defaultParts: [],
+                    extraParts,
+                    partsMultiplier: 1,
+                    minCost,
+                    priority: 8.5,
+                    memoryAdditions: {
+                        CR: requestRoomName,
+                    },
+                }
+            })(),
+        )
+
+        // Spawn Attack Heal duo
+
+        this.constructSpawnRequests(
+            ((): SpawnRequestOpts | false => {
+                const role = 'antifaAttacker'
+                const minCost = Math.min(minAttackCost, spawnEnergyCapacity)
+                let extraParts: BodyPartConstant[] = []
+
+                for (let i = 0; i < attackAmount; i++) {
+                    extraParts.push(ATTACK, MOVE)
+                }
+
+                return {
+                    role,
+                    defaultParts: [],
+                    extraParts,
+                    partsMultiplier: 1,
+                    minCost,
+                    priority: 8,
+                    memoryAdditions: {
+                        SS: 'duo',
+                        ST: 'attack',
+                        CR: requestRoomName,
+                    },
+                }
+            })(),
+        )
+
+        this.constructSpawnRequests(
+            ((): SpawnRequestOpts | false => {
+                const role = 'antifaHealer'
+                const minCost = Math.min(minHealCost, spawnEnergyCapacity)
+                let extraParts: BodyPartConstant[] = []
+
+                for (let i = 0; i < request.data[CombatRequestData.minHeal]; i++) {
+                    extraParts.push(HEAL, MOVE)
+                }
+
+                return {
+                    role,
+                    defaultParts: [],
+                    extraParts,
+                    partsMultiplier: 1,
+                    minCost,
+                    priority: 8,
+                    memoryAdditions: {
+                        SS: 'duo',
+                        ST: 'attack',
+                        CR: requestRoomName,
+                    },
                 }
             })(),
         )

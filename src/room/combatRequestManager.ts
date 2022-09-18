@@ -8,29 +8,36 @@ Room.prototype.combatRequestManager = function () {
     if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
     for (let index = 0; index < this.memory.combatRequests.length; index++) {
-        const roomName = this.memory.combatRequests[index]
+        const requestName = this.memory.combatRequests[index]
+        const request = Memory.combatRequests[requestName]
 
-        Memory.combatRequests[roomName].data[CombatRequestData.ranged] = 10
+        request.data[CombatRequestData.rangedAttack] = 10
+        request.data[CombatRequestData.attack] = 10
+        request.data[CombatRequestData.dismantle] = 5
+        request.data[CombatRequestData.minDamage] = 5
+        request.data[CombatRequestData.minHeal] = 6
 
-        const request = Game.rooms[roomName]
-
-        if (!request) return
-
+        const requestRoom = Game.rooms[requestName]
+        if (!requestRoom) continue
+/*
         // If there are enemyAttackers, abandon and stop the request
 
-        if (request.enemyAttackers.length) {
-            Memory.combatRequests[roomName].data[CombatRequestData.abandon] = 1500
-            Memory.combatRequests[roomName].data[CombatRequestData.ranged] = 0
+        if (requestRoom.enemyAttackers.length) {
+            request.data[CombatRequestData.abandon] = 1500
+            request.data[CombatRequestData.rangedAttack] = 0
 
             this.memory.combatRequests.splice(index, 1)
+            delete request.responder
         }
 
-        if (!request.enemyCreeps.length) {
-            Memory.combatRequests[roomName].data[CombatRequestData.abandon] = 1500
-            Memory.combatRequests[roomName].data[CombatRequestData.ranged] = 0
+        if (!requestRoom.enemyCreeps.length) {
+            request.data[CombatRequestData.abandon] = 1500
+            request.data[CombatRequestData.rangedAttack] = 0
 
             this.memory.combatRequests.splice(index, 1)
+            delete request.responder
         }
+ */
     }
 
     // If CPU logging is enabled, log the CPU used by this manager
