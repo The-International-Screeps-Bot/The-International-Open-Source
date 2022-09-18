@@ -30,7 +30,7 @@ class ConfigManager {
         if (Memory.breakingVersion) return
 
         Memory.breakingVersion = breakingVersion
-
+        
         Memory.me =
             (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
             Object.values(Game.creeps)[0]?.owner?.username ||

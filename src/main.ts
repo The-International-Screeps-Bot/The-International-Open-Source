@@ -3,7 +3,6 @@
 // International
 
 import './international/commands'
-import './international/respawnManager'
 import { internationalManager } from './international/internationalManager'
 import './international/config'
 import './international/tickConfig'
@@ -35,35 +34,32 @@ import { initProfiler } from 'other/profiler'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { migrationManager } from 'international/migrationManager'
+import { respawnManager } from './international/respawnManager'
 
 global.profiler = initProfiler()
 
 export const loop = function () {
-    try {
-        memHack.run()
+    memHack.run()
 
-        internationalManager.tickReset()
+    internationalManager.tickReset()
 
-        respawnManager.run()
-        migrationManager.run()
-        configManager.run()
+    migrationManager.run()
+    respawnManager.run()
+    configManager.run()
 
-        internationalManager.run()
-        /*
+    internationalManager.run()
+    /*
     let cpu = Game.cpu.getUsed()
 
     console.log(new InternationalManager())
 
     customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
  */
-        roomsManager()
+    roomsManager()
 
-        internationalManager.mapVisualsManager()
+    internationalManager.mapVisualsManager()
 
-        internationalManager.advancedGeneratePixel()
-        internationalManager.advancedSellPixels()
-    } catch (error) {
-        customLog('ERROR', error, undefined, myColors.red)
-    }
+    internationalManager.advancedGeneratePixel()
+    internationalManager.advancedSellPixels()
     internationalManager.endTickManager()
 }

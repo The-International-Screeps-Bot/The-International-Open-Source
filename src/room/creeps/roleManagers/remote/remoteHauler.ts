@@ -236,7 +236,7 @@ export class RemoteHauler extends Creep {
         if (!this.needsResources()) return
 
         const { room } = this
-        const sourcePos = room.sources[this.memory.SI].pos
+        const sourcePos = room.sourcePositions[this.memory.SI][0]
 
         if (this.freeCapacityNextTick === undefined) this.freeCapacityNextTick = this.store.getFreeCapacity()
 
@@ -253,8 +253,8 @@ export class RemoteHauler extends Creep {
 
             // If the harvester isn't nearly full and can't fully fill the hauler
 
-            if (harvester.store.getFreeCapacity(RESOURCE_ENERGY) > harvester.parts.work * HARVEST_POWER || harvester.store.getCapacity(RESOURCE_ENERGY) < this.store.getFreeCapacity()) continue
-
+            if (harvester.store.getFreeCapacity(RESOURCE_ENERGY) > harvester.parts.work * HARVEST_POWER && harvester.store.getCapacity(RESOURCE_ENERGY) < this.store.getFreeCapacity()) continue
+            room.visual.text((this.memory.SI).toString(), harvester.pos)
             withdrawTargets.push(harvester)
         }
 

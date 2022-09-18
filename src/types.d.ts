@@ -1502,7 +1502,7 @@ declare global {
         /**
          *
          */
-        findRepairTarget(excluded?: Set<Id<Structure<StructureConstant>>>): Structure | false
+        findRepairTarget(): Structure | false
 
         findOptimalSourceIndex(): boolean
 

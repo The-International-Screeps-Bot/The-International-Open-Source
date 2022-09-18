@@ -1,10 +1,14 @@
+import { roomDimensions } from 'international/constants'
 import { findObjectWithID } from 'international/generalFunctions'
 
 export class Maintainer extends Creep {
+
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
+
     advancedMaintain?(): boolean {
         const { room } = this
-
-        this.say('⏩🔧')
 
         // If the this needs resources
 
@@ -28,21 +32,22 @@ export class Maintainer extends Creep {
 
         // Otherwise if the this doesn't need resources
 
-        // Get the this's work part count
-
         const workPartCount = this.parts.work
 
-        // Find a repair target based on the thiss work parts. If none are found, inform false
+        // Find a repair target based on the creeps work parts. If none are found, inform false
 
         const repairTarget: Structure | false =
             findObjectWithID(this.memory.repairTarget) ||
             this.findRepairTarget() ||
             this.findRampartRepairTarget(workPartCount)
-        if (!repairTarget) return false
 
-        // Add the repair target to memory
+        if (!repairTarget) {
 
-        this.memory.repairTarget = repairTarget.id
+            this.say('❌🔧')
+            return false
+        }
+
+        this.say('⏩🔧')
 
         // If roomVisuals are enabled
 
@@ -98,12 +103,12 @@ export class Maintainer extends Creep {
         // If the structure is a rampart
 
         if (repairTarget.structureType === STRUCTURE_RAMPART) {
-            // If the repairTarget will be below or equal to expectations next tick, inform true
+            // If the repairTarget will be below or equal to expectations next tick
 
             if (repairTarget.realHits <= this.memory.quota + workPartCount * REPAIR_POWER * 25) return true
         }
 
-        // Otherwise if it isn't a rampart and it will be viable to repair next tick, inform true
+        // Otherwise if it isn't a rampart and it will be viable to repair next tick
         else if (repairTarget.hitsMax - repairTarget.realHits >= workPartCount * REPAIR_POWER) return true
 
         // Otherwise
@@ -114,7 +119,7 @@ export class Maintainer extends Creep {
 
         // Find repair targets that don't include the current target, informing true if none were found
 
-        const newRepairTarget = this.findRepairTarget(new Set([repairTarget.id]))
+        const newRepairTarget = this.findRepairTarget()
         if (!newRepairTarget) return true
 
         // Make a move request to it
@@ -137,19 +142,13 @@ export class Maintainer extends Creep {
 
         if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return false
 
-        // Otherwise, look at the this's pos for structures
-
-        const structuresAsPos = this.pos.lookFor(LOOK_STRUCTURES)
-
         // Get the this's work parts
 
         const workPartCount = this.parts.work
 
-        let structure
-
         // Loop through structuresAtPos
 
-        for (structure of structuresAsPos) {
+        for (const structure of this.pos.lookFor(LOOK_STRUCTURES)) {
             // If the structure is not a road, iterate
 
             if (structure.structureType !== STRUCTURE_ROAD && structure.structureType !== STRUCTURE_CONTAINER) continue
@@ -176,15 +175,15 @@ export class Maintainer extends Creep {
 
         const adjacentStructures = room.lookForAtArea(
             LOOK_STRUCTURES,
-            Math.max(Math.min(this.pos.y - 3, -1), 1),
-            Math.max(Math.min(this.pos.x - 3, -1), 1),
-            Math.max(Math.min(this.pos.y + 3, -1), 1),
-            Math.max(Math.min(this.pos.x + 3, -1), 1),
+            Math.max(Math.min(this.pos.y - 3, roomDimensions - 1), 0),
+            Math.max(Math.min(this.pos.x - 3, roomDimensions - 1), 0),
+            Math.max(Math.min(this.pos.y + 3, roomDimensions - 1), 0),
+            Math.max(Math.min(this.pos.x + 3, roomDimensions - 1), 0),
             true,
         )
 
         for (const adjacentPosData of adjacentStructures) {
-            structure = adjacentPosData.structure
+            const structure = adjacentPosData.structure
 
             // If the structure is not a road, iterate
 
@@ -213,10 +212,6 @@ export class Maintainer extends Creep {
         // If no road to repair was found, inform false
 
         return false
-    }
-
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
     }
 
     static maintainerManager(room: Room, creepsOfRole: string[]) {

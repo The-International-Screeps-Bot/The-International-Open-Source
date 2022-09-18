@@ -499,23 +499,32 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 }
 
 Creep.prototype.findRampartRepairTarget = function (workPartCount) {
-    const { room } = this
 
-    // Get the repairTarget using the ID in the creep's memory
+    let minScore = Infinity
+    let bestTarget
 
-    const repairTarget: Structure | false = findObjectWithID(this.memory.repairTarget)
+    for (const structure of this.room.structures.rampart) {
 
-    const rampartRepairExpectation = (workPartCount * REPAIR_POWER * this.store.getCapacity()) / CARRY_CAPACITY
+        // If above 90% of max hits
+        this.room.visual.text((structure.hits / structure.hitsMax).toString(), structure.pos)
+        if (structure.hits / structure.hitsMax > 0.9) continue
 
-    // If the repairTarget exists and it's under the quota, it
+        let score = getRange(structure.pos.x, structure.pos.x, structure.pos.y, structure.pos.y)
+        score += (structure.hits / structure.hitsMax) * 1000
 
-    if (repairTarget && repairTarget.hits < this.memory.quota + rampartRepairExpectation) return repairTarget
+        if (score > minScore) continue
 
-    // Get ramparts in the room, informing false is there are none
+        minScore = score
+        bestTarget = structure
+    }
 
-    const ramparts = room.structures.rampart
-    if (!ramparts.length) return false
+    if (!bestTarget) return false
 
+    this.memory.quota = bestTarget.hits + (workPartCount * REPAIR_POWER * this.store.getCapacity()) / CARRY_CAPACITY
+
+    this.memory.repairTarget = bestTarget.id
+    return bestTarget
+/*
     // Assign the quota to the value of the creep's quota, or its workPartCount times 1000, increasing it each iteration based on the creep's workPartCount
 
     for (
@@ -543,15 +552,38 @@ Creep.prototype.findRampartRepairTarget = function (workPartCount) {
     // If no rampart was found, inform false
 
     return false
+     */
 }
 
-Creep.prototype.findRepairTarget = function (excludedIDs = new Set()) {
+Creep.prototype.findRepairTarget = function () {
     const { room } = this
 
-    // Get roads and containers in the room
+    let possibleRepairTargets: (StructureRoad | StructureContainer)[] = room.structures.road
+    possibleRepairTargets = possibleRepairTargets.concat(room.structures.container)
 
-    const possibleRepairTargets = [...room.structures.road, ...room.structures.container]
+    let minScore = Infinity
+    let bestTarget
 
+    for (const structure of possibleRepairTargets) {
+
+        // If above 30% of max hits
+
+        if (structure.hits / structure.hitsMax > 0.3) continue
+
+        let score = getRange(structure.pos.x, structure.pos.x, structure.pos.y, structure.pos.y)
+        score += (structure.hits / structure.hitsMax) * 100
+
+        if (score > minScore) continue
+
+        minScore = score
+        bestTarget = structure
+    }
+
+    if (!bestTarget) return false
+
+    this.memory.repairTarget = bestTarget.id
+    return bestTarget
+/*
     // Filter viableRepairTargets that are low enough on hits
 
     const viableRepairTargets = possibleRepairTargets.filter(function (structure) {
@@ -576,6 +608,7 @@ Creep.prototype.findRepairTarget = function (excludedIDs = new Set()) {
         ignoreCreeps: true,
         range: 3,
     })
+     */
 }
 
 Creep.prototype.findOptimalSourceIndex = function () {
@@ -1871,10 +1904,8 @@ Creep.prototype.fulfillReservation = function () {
     let withdrawResult: ScreepsReturnCode
 
     if (target instanceof Creep) {
-
         withdrawResult = target.transfer(this, reservation.resourceType, amount)
-    }
-    else withdrawResult = this.withdraw(target, reservation.resourceType, amount)
+    } else withdrawResult = this.withdraw(target, reservation.resourceType, amount)
     this.message += withdrawResult
 
     if (withdrawResult === ERR_NOT_ENOUGH_RESOURCES) {

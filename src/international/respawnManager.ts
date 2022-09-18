@@ -1,11 +1,11 @@
 // Credit to @SemperRabbit for this nice piece of code!
 class RespawnManager {
     public run(): void {
-        if (!this.HasRespawned()) return
+        if (!this.hasRespawned()) return
 
         global.clearMemory()
     }
-    private HasRespawned(): boolean {
+    private hasRespawned(): boolean {
         if (Game.time === 0) return true
 
         if (Object.keys(Game.creeps).length > 0) return false
@@ -31,4 +31,4 @@ class RespawnManager {
     }
 }
 
-const respawnManager = new RespawnManager()
+export const respawnManager = new RespawnManager()
