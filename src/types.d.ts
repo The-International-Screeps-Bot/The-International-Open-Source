@@ -1497,7 +1497,7 @@ declare global {
         /**
          *
          */
-        findRampartRepairTarget(workPartCount: number, excluded?: Set<Id<StructureRampart>>): Structure | false
+        findRampartRepairTarget(): Structure | false
 
         /**
          *

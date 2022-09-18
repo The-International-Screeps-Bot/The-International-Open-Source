@@ -498,19 +498,18 @@ Creep.prototype.advancedBuildAllyCSite = function () {
     return true
 }
 
-Creep.prototype.findRampartRepairTarget = function (workPartCount) {
-
+Creep.prototype.findRampartRepairTarget = function () {
     let minScore = Infinity
     let bestTarget
 
     for (const structure of this.room.structures.rampart) {
-
         // If above 90% of max hits
-        this.room.visual.text((structure.hits / structure.hitsMax).toString(), structure.pos)
+
         if (structure.hits / structure.hitsMax > 0.9) continue
 
-        let score = getRange(structure.pos.x, structure.pos.x, structure.pos.y, structure.pos.y)
-        score += (structure.hits / structure.hitsMax) * 1000
+        const score =
+            getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) +
+            structure.hits / 500
 
         if (score > minScore) continue
 
@@ -520,11 +519,11 @@ Creep.prototype.findRampartRepairTarget = function (workPartCount) {
 
     if (!bestTarget) return false
 
-    this.memory.quota = bestTarget.hits + (workPartCount * REPAIR_POWER * this.store.getCapacity()) / CARRY_CAPACITY
+    this.memory.quota = bestTarget.hits + (this.parts.work * REPAIR_POWER * this.store.getCapacity()) / CARRY_CAPACITY
 
     this.memory.repairTarget = bestTarget.id
     return bestTarget
-/*
+    /*
     // Assign the quota to the value of the creep's quota, or its workPartCount times 1000, increasing it each iteration based on the creep's workPartCount
 
     for (
@@ -565,13 +564,13 @@ Creep.prototype.findRepairTarget = function () {
     let bestTarget
 
     for (const structure of possibleRepairTargets) {
-
         // If above 30% of max hits
 
         if (structure.hits / structure.hitsMax > 0.3) continue
 
-        let score = getRange(structure.pos.x, structure.pos.x, structure.pos.y, structure.pos.y)
-        score += (structure.hits / structure.hitsMax) * 100
+        const score =
+            getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) +
+            (structure.hits / structure.hitsMax) * 1000
 
         if (score > minScore) continue
 
@@ -583,7 +582,7 @@ Creep.prototype.findRepairTarget = function () {
 
     this.memory.repairTarget = bestTarget.id
     return bestTarget
-/*
+    /*
     // Filter viableRepairTargets that are low enough on hits
 
     const viableRepairTargets = possibleRepairTargets.filter(function (structure) {

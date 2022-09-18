@@ -39,7 +39,7 @@ export class Maintainer extends Creep {
         const repairTarget: Structure | false =
             findObjectWithID(this.memory.repairTarget) ||
             this.findRepairTarget() ||
-            this.findRampartRepairTarget(workPartCount)
+            this.findRampartRepairTarget()
 
         if (!repairTarget) {
 
