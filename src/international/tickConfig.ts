@@ -72,80 +72,82 @@ class TickConfig {
 
             for (const index in room.sources) room.creepsOfSourceAmount.push(0)
 
-            const { controller } = room
-            if (!controller) continue
+            room.squadRequests = new Set()
 
-            // The room is a commune
-
-            room.communeManager = global.communeManagers[room.name]
-
-            if (!room.communeManager) {
-                room.communeManager = new CommuneManager()
-                global.communeManagers[room.name] = room.communeManager
-            }
-
-            room.communeManager.update(room)
-
-            if (controller.my) room.memory.T = 'commune'
-
-            if (room.memory.T != 'commune') continue
-
-            // Iterate if the controller is not mine
-
-            if (!controller.my) {
-                room.memory.T = 'neutral'
-                continue
-            }
-
-            //
-
-            if (!room.memory.combatRequests) room.memory.combatRequests = []
-
-            room.spawnRequests = {}
-
-            if (!room.memory.remotes) room.memory.remotes = []
-
-            // If there is no Hauler Size
-
-            if (!room.memory.MHC) {
-                room.memory.MHC = 0
-                room.memory.HU = 0
-            }
-
-            room.haulerSizeManager()
-            room.communeManager.remotesManager.stage1()
-
-            // Add roomName to commune list
-
-            global.communes.add(roomName)
-
-            room.creepsFromRoomWithRemote = {}
-
-            for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
-                const remoteName = room.memory.remotes[index]
-                room.creepsFromRoomWithRemote[remoteName] = {}
-                for (const role of spawnByRoomRemoteRoles) room.creepsFromRoomWithRemote[remoteName][role] = []
-            }
-
-            // For each role, construct an array for creepsFromRoom
-
-            room.creepsFromRoom = {}
-            for (const role of creepRoles) room.creepsFromRoom[role] = []
-
-            room.creepsFromRoomAmount = 0
-
-            if (!room.memory.stampAnchors) {
-                room.memory.stampAnchors = {}
-
-                for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
-            }
-
-            room.scoutTargets = new Set()
-
-            if (!room.memory.deposits) room.memory.deposits = {}
+            this.configCommune(room)
         }
     }
-    private configCommune() {}
+    private configCommune(room: Room) {
+        const { controller } = room
+        if (!controller) return
+
+        room.communeManager = global.communeManagers[room.name]
+
+        if (!room.communeManager) {
+            room.communeManager = new CommuneManager()
+            global.communeManagers[room.name] = room.communeManager
+        }
+
+        room.communeManager.update(room)
+
+        if (controller.my) room.memory.T = 'commune'
+
+        if (room.memory.T != 'commune') return
+
+        // Iterate if the controller is not mine
+
+        if (!controller.my) {
+            room.memory.T = 'neutral'
+            return
+        }
+
+        // The room is a commune
+
+        if (!room.memory.combatRequests) room.memory.combatRequests = []
+
+        room.spawnRequests = {}
+
+        if (!room.memory.remotes) room.memory.remotes = []
+
+        // If there is no Hauler Size
+
+        if (!room.memory.MHC) {
+            room.memory.MHC = 0
+            room.memory.HU = 0
+        }
+
+        room.haulerSizeManager()
+        room.communeManager.remotesManager.stage1()
+
+        // Add roomName to commune list
+
+        global.communes.add(room.name)
+
+        room.creepsFromRoomWithRemote = {}
+
+        for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
+            const remoteName = room.memory.remotes[index]
+            room.creepsFromRoomWithRemote[remoteName] = {}
+            for (const role of spawnByRoomRemoteRoles) room.creepsFromRoomWithRemote[remoteName][role] = []
+        }
+
+        // For each role, construct an array for creepsFromRoom
+
+        room.creepsFromRoom = {}
+        for (const role of creepRoles) room.creepsFromRoom[role] = []
+
+        room.creepsFromRoomAmount = 0
+
+        if (!room.memory.stampAnchors) {
+            room.memory.stampAnchors = {}
+
+            for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
+        }
+
+        room.scoutTargets = new Set()
+
+        if (!room.memory.deposits) room.memory.deposits = {}
+    }
     private configClaimRequests() {
         let reservedGCL = Game.gcl.level - global.communes.size
 

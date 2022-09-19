@@ -1,21 +1,111 @@
-import { findClosestObject, getRange, pack } from 'international/generalFunctions'
+import { allowedSquadCombinations } from 'international/constants'
+import { customLog, findClosestObject, getRange, pack } from 'international/generalFunctions'
 import { Duo } from './duo'
 import { Quad } from './quad'
 
 export class Antifa extends Creep {
-    /**
-     * Tries to find a squad, creating one if none could be found
-     */
-    findSquad?(): boolean {
+    preTickManager() {
+        if (!this.memory.SS) return
+
+        const squadMembers: Creep[] = [this]
+
+        if (this.memory.SMNs) {
+            for (let i = 0; i < this.memory.SMNs.length; i++) {
+                const creep = Game.creeps[this.memory.SMNs[i]]
+
+                if (!creep) {
+                    this.memory.SMNs.splice(i, 1)
+                    break
+                }
+
+                squadMembers.push(creep)
+            }
+
+            if (this.memory.SMNs.length === this.memory.SS) {
+
+                if (this.memory.SS === 2) {
+                    this.squad = new Duo(squadMembers)
+                    return
+                }
+
+                this.squad = new Quad(squadMembers)
+                return
+            }
+        }
+
+        // The creep didn't have enough members to form a squad, so make a request
+
+        this.memory.SMNs = [this.name]
+        this.room.squadRequests.add(this.name)
+    }
+
+    runSquad?() {
+
+        // The creep should be single
+
+        if (!this.memory.SS) return false
+
+        // The creep is in a squad but no the leader
+
+        if (!this.squad && this.memory.SMNs.length === this.memory.SS) return true
+
+        if (!this.createSquad()) return true
+
+        this.squad.run()
         return true
     }
 
-    runSingle?(): void {
+    /**
+     * Tries to find a squad, creating one if none could be found
+     */
+    createSquad?() {
+
+        for (const requestingCreepName of this.room.squadRequests) {
+
+            if (requestingCreepName === this.name) continue
+
+            const requestingCreep = Game.creeps[requestingCreepName]
+
+            if (this.memory.ST !== requestingCreep.memory.ST) continue
+
+            // If the creep is allowed to join the other creep
+
+            if (!allowedSquadCombinations[this.memory.SS][this.role].has(requestingCreep.role)) continue
+
+            this.memory.SMNs.push(requestingCreepName)
+
+            if (this.memory.SMNs.length === this.memory.SS) break
+        }
+
+        if (this.memory.SMNs.length !== this.memory.SS) return false
+
+        const squadMembers: Creep[] = []
+
+        for (const squadCreepName of this.memory.SMNs) {
+
+            this.room.squadRequests.delete(squadCreepName)
+
+            const squadCreep = Game.creeps[squadCreepName]
+
+            squadCreep.memory.SMNs = this.memory.SMNs
+            squadMembers.push(squadCreep)
+        }
+
+        if (this.memory.SS === 2) {
+            this.squad = new Duo(squadMembers)
+            return true
+        }
+
+        this.squad = new Quad(squadMembers)
+        return true
+    }
+
+    runSingle?() {
         const { room } = this
 
         // In attackTarget
 
-        if (!this.memory.AR || this.memory.AR === room.name) {
+        if (this.memory.CRN === room.name) {
             // rangedAttack
 
             if (this.memory.ST === 'rangedAttack') {
@@ -48,7 +138,7 @@ export class Antifa extends Creep {
                 origin: this.pos,
                 goals: [
                     {
-                        pos: new RoomPosition(25, 25, this.memory.AR),
+                        pos: new RoomPosition(25, 25, this.memory.CRN),
                         range: 25,
                     },
                 ],
@@ -64,14 +154,14 @@ export class Antifa extends Creep {
             origin: this.pos,
             goals: [
                 {
-                    pos: new RoomPosition(25, 25, this.memory.AR),
+                    pos: new RoomPosition(25, 25, this.memory.CRN),
                     range: 25,
                 },
             ],
         })
     }
 
-    advancedRangedAttack?(): boolean {
+    advancedRangedAttack?() {
         const { room } = this
 
         const enemyAttackers = room.enemyAttackers.filter(function (creep) {
@@ -221,9 +311,103 @@ export class Antifa extends Creep {
         return true
     }
 
-    advancedAttack?(): void {}
+    advancedAttack?() {
+        const { room } = this
 
-    advancedDismantle?(): void {}
+        const enemyAttackers = room.enemyAttackers.filter(function (creep) {
+            return !creep.isOnExit()
+        })
+
+        // If there are none
+
+        if (!enemyAttackers.length) {
+            const enemyCreeps = room.enemyCreeps.filter(function (creep) {
+                return !creep.isOnExit()
+            })
+
+            this.say('EC')
+
+            const enemyCreep = findClosestObject(this.pos, enemyCreeps)
+
+            // If the range is more than 1
+
+            if (getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
+                // Have the create a moveRequest to the enemyAttacker and inform true
+
+                this.createMoveRequest({
+                    origin: this.pos,
+                    goals: [{ pos: enemyCreep.pos, range: 1 }],
+                })
+
+                return true
+            }
+
+            this.moveRequest = pack(enemyCreep.pos)
+            return true
+        }
+
+        const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
+
+        // If the range is more than 1
+
+        if (getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y) > 1) {
+            // Have the create a moveRequest to the enemyAttacker and inform true
+
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: enemyAttacker.pos, range: 1 }],
+            })
+
+            return true
+        }
+
+        // Otherwise attack
+
+        this.attack(enemyAttacker)
+        return true
+    }
+
+    advancedDismantle?() {
+
+        // Avoid targets we can't dismantle
+
+        const structures = this.room.find(FIND_STRUCTURES, {
+            filter: structure => structure.structureType != STRUCTURE_CONTROLLER && structure.structureType != STRUCTURE_INVADER_CORE
+        })
+
+        if (!structures) return
+
+        let structure = findClosestObject(this.pos, structures)
+
+        if (getRange(this.pos.x, structure.pos.y, this.pos.y, structure.pos.y) > 1) {
+
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: structure.pos, range: 1 }],
+            })
+        }
+
+        if (this.dismantle(structure) !== OK) return
+
+        // See if the structure is destroyed next tick
+
+        structure.realHits = structure.hits - this.parts.work * DISMANTLE_POWER
+        if (structure.realHits > 0) return
+
+        // Try to find a new structure to preemptively move to
+
+        structures.splice(structures.indexOf(structure), 1)
+
+        structure = findClosestObject(this.pos, structures)
+
+        if (getRange(this.pos.x, structure.pos.y, this.pos.y, structure.pos.y) > 1) {
+
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: structure.pos, range: 1 }],
+            })
+        }
+    }
 
     constructor(creepID: Id<Creep>) {
         super(creepID)
@@ -233,29 +417,7 @@ export class Antifa extends Creep {
         for (const creepName of creepsOfRole) {
             const creep: Antifa = Game.creeps[creepName]
 
-            // If no squad, try to make or find one
-
-            if (!creep.squad && creep.memory.ST) {
-                if (!creep.findSquad()) continue
-            }
-
-            // Quad
-
-            if (creep.squad instanceof Quad) {
-                if (creep.name === creep.squad.assaulters[0].name) creep.squad.run()
-                continue
-            }
-
-            // Duo
-
-            if (creep.squad instanceof Duo) {
-                if (creep.name === creep.squad.assaulter.name) creep.squad.run()
-                continue
-            }
-
-            // Single
-
-            creep.runSingle()
+            if (!creep.runSquad()) creep.runSingle()
         }
     }
 }

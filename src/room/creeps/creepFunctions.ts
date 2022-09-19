@@ -507,7 +507,7 @@ Creep.prototype.findRampartRepairTarget = function () {
 
         if (structure.hits / structure.hitsMax > 0.9) continue
 
-        const score = getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) + structure.hits / 500
+        const score = getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) + structure.hits / 1000
 
         if (score > minScore) continue
 

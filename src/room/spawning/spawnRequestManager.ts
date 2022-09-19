@@ -1403,7 +1403,7 @@ Room.prototype.spawnRequester = function () {
                     minCost,
                     priority: 8,
                     memoryAdditions: {
-                        CR: requestRoomName,
+                        CRN: requestRoomName,
                     },
                 }
             })(),
@@ -1429,7 +1429,7 @@ Room.prototype.spawnRequester = function () {
                     minCost,
                     priority: 8.5,
                     memoryAdditions: {
-                        CR: requestRoomName,
+                        CRN: requestRoomName,
                     },
                 }
             })(),
@@ -1455,9 +1455,9 @@ Room.prototype.spawnRequester = function () {
                     minCost,
                     priority: 8,
                     memoryAdditions: {
-                        SS: 'duo',
+                        SS: 2,
                         ST: 'attack',
-                        CR: requestRoomName,
+                        CRN: requestRoomName,
                     },
                 }
             })(),
@@ -1481,9 +1481,9 @@ Room.prototype.spawnRequester = function () {
                     minCost,
                     priority: 8,
                     memoryAdditions: {
-                        SS: 'duo',
+                        SS: 2,
                         ST: 'attack',
-                        CR: requestRoomName,
+                        CRN: requestRoomName,
                     },
                 }
             })(),

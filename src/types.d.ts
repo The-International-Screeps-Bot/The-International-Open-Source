@@ -756,6 +756,11 @@ declare global {
 
         communeManager: CommuneManager
 
+        /**
+         * The names of creeps looking to join a squad
+         */
+        squadRequests: Set<string>
+
         // Functions
 
         /**
@@ -1692,6 +1697,10 @@ declare global {
          * The estimated total free capacity the creep will have next tick
          */
         freeCapacityNextTick: number
+
+        _canMove: boolean
+
+        readonly canMove: boolean
     }
 
     interface CreepMemory {
@@ -1788,7 +1797,7 @@ declare global {
         /**
          * Squad Size of the squad the creep is attempting to form
          */
-        SS: 'quad' | 'duo' | undefined
+        SS: 4 | 2 | undefined
 
         /**
          * Squad Type the combat method the creep's squad is attempting
@@ -1796,9 +1805,14 @@ declare global {
         ST: 'rangedAttack' | 'attack' | 'dismantle'
 
         /**
-         * Combat Request, the name of the room the creep should do combat in
+         * Squad Member Names
          */
-        CR: string | undefined
+        SMNs: string[]
+
+        /**
+         * Combat Request Name, the name of the room the creep should do combat in
+         */
+        CRN: string | undefined
 
         /**
          * Recycle Target, the spawn ID the creep is going to recycle

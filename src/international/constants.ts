@@ -867,3 +867,19 @@ export const relayOffsets = {
         },
     ],
 }
+
+const allowedSquadCombinations: {[squadSize: string]: Partial<Record<CreepRoles, Set<CreepRoles>>>} = {
+    2: {
+        antifaRangedAttacker: new Set(['antifaRangedAttacker']),
+        antifaAttacker: new Set(['antifaHealer']),
+        antifaDismantler: new Set(['antifaHealer']),
+        antifaHealer: new Set(['antifaAttacker', 'antifaDismantler']),
+    },
+    4: {
+        antifaRangedAttacker: new Set(['antifaRangedAttacker', 'antifaAttacker', 'antifaDismantler']),
+        antifaAttacker: new Set(['antifaRangedAttacker', 'antifaAttacker', 'antifaDismantler']),
+        antifaDismantler: new Set(['antifaRangedAttacker', 'antifaAttacker', 'antifaDismantler']),
+    },
+}
+
+export { allowedSquadCombinations }

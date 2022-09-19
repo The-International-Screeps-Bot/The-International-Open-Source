@@ -1,28 +1,21 @@
+import { Antifa } from './antifa'
+
 export class Quad {
-     /**
-      * All squad members
-      */
-     members: Creep[]
+    /**
+     * All squad members, where index 0 is the leader
+     */
+    members: Antifa[]
+    leader: Antifa
+    expectedSize: 4
 
-     /**
-      * Squad assaulters
-      */
-     assaulters: Creep[]
-
-     /**
-      * Leader supporters
-      */
-      supporters: Creep[]
-
-     constructor(members: Creep[], assaulters: Creep[], supporters: Creep[]) {
-          this.members = members
-          this.assaulters = assaulters
-          this.supporters = supporters
-     }
-     run() {}
-     move(opts: MoveRequestOpts) {}
-     advancedRangedAttack() {}
-     advancedAttack() {}
-     advancedDismantle() {}
-     advancedHeal() {}
+    constructor(members: Antifa[]) {
+        this.members = members
+        this.leader = members[0]
+    }
+    run() {}
+    move(opts: MoveRequestOpts) {}
+    advancedRangedAttack() {}
+    advancedAttack() {}
+    advancedDismantle() {}
+    advancedHeal() {}
 }

@@ -230,4 +230,11 @@ Object.defineProperties(Creep.prototype, {
             this._freeCapacityNextTick = newFreeCapacityNextNext
         },
     },
+    canMove: {
+        get() {
+            if (this._canMove !== undefined) return this._canMove
+
+            return (this._canMove = this.fatigue === 0 && !this.spawning)
+        },
+    },
 } as PropertyDescriptorMap & ThisType<Creep>)
