@@ -96,7 +96,7 @@ class Tester {
                for (const milestone of Config.milestones) {
                     const failedRooms = []
                     if (typeof milestone.success === 'undefined' || milestone.success === null) {
-                         let success = Object.keys(status).length === trackedRooms.length
+                         let success = Object.keys(status).length === Config.trackedRooms.length
                          for (const room of Object.keys(status)) {
                               for (const key of Object.keys(milestone.check)) {
                                    if (status[room][key] < milestone.check[key]) {
