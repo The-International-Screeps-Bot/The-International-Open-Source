@@ -6,7 +6,7 @@ name: Auto upload
 on:
      push:
         branches:
-          - Typescript
+          - Main
 jobs:
      VerifyUpload:
           timeout-minutes: 10000
@@ -19,10 +19,10 @@ jobs:
                     rm -rf ./.??* || true
                     ls -la ./
                - uses: actions/checkout@v3
-               - name: Use Node.js 12.x
+               - name: Use Node.js 16.x
                  uses: actions/setup-node@v3
                  with:
-                    node-version: 12.x
+                    node-version: 16.x
                     cache: 'npm'
                - name: Use Python 2.7
                  uses: actions/setup-python@v3
