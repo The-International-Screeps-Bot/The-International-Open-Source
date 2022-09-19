@@ -1372,8 +1372,7 @@ Creep.prototype.isOnExit = function () {
 
     // If the creep is on an exit, inform true. Otherwise inform false
 
-    if (x <= 0 || x >= 49 || y <= 0 || y >= 49) return true
-    return false
+    return (x <= 0 || x >= 49 || y <= 0 || y >= 49)
 }
 
 Creep.prototype.findTotalHealPower = function (range = 1) {

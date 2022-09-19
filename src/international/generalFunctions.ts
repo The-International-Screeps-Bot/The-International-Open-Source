@@ -446,3 +446,8 @@ export function findFunctionCPU(func: Function) {
 
     customLog('CPU for ' + func, Game.cpu.getUsed() - CPU)
 }
+
+export function isExit(x: number, y: number) {
+
+    return (x <= 0 || x >= 49 || y <= 0 || y >= 49)
+}
