@@ -1,4 +1,4 @@
-import { roomDimensions } from 'international/constants'
+import { myColors, roomDimensions } from 'international/constants'
 import { findClosestObject, getRange, pack } from 'international/generalFunctions'
 import { Antifa } from './antifa'
 
@@ -107,6 +107,8 @@ export class Duo {
             this.leader.say('EC')
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
+            if (Memory.roomVisuals) this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
+
             // Get the range between the creeps
 
             const range = getRange(this.leader.pos.x, enemyCreep.pos.x, this.leader.pos.y, enemyCreep.pos.y)
@@ -139,6 +141,7 @@ export class Duo {
         // Otherwise, get the closest enemyAttacker
 
         const enemyAttacker = findClosestObject(this.leader.pos, enemyAttackers)
+        if (Memory.roomVisuals) this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, { color: myColors.green, opacity: 0.3 })
 
         // Get the range between the creeps
 
@@ -249,9 +252,12 @@ export class Duo {
                 return !creep.isOnExit()
             })
 
+            if (!enemyCreeps.length) return false
+
             this.leader.say('EC')
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
+            if (Memory.roomVisuals) this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
 
             // If the range is more than 1
 
@@ -274,6 +280,7 @@ export class Duo {
         }
 
         const enemyAttacker = findClosestObject(this.leader.pos, enemyAttackers)
+        if (Memory.roomVisuals) this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, { color: myColors.green, opacity: 0.3 })
 
         // If the range is more than 1
 
@@ -301,9 +308,10 @@ export class Duo {
                 structure.structureType != STRUCTURE_CONTROLLER && structure.structureType != STRUCTURE_INVADER_CORE,
         })
 
-        if (!structures) return
+        if (!structures.length) return
 
         let structure = findClosestObject(this.leader.pos, structures)
+        if (Memory.roomVisuals) this.leader.room.visual.line(this.leader.pos, structure.pos, { color: myColors.green, opacity: 0.3 })
 
         if (getRange(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
@@ -322,6 +330,7 @@ export class Duo {
         // Try to find a new structure to preemptively move to
 
         structures.splice(structures.indexOf(structure), 1)
+        if (!structures.length) return
 
         structure = findClosestObject(this.leader.pos, structures)
 

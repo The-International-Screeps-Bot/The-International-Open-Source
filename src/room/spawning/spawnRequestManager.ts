@@ -1365,14 +1365,31 @@ Room.prototype.spawnRequester = function () {
         const request = Memory.combatRequests[requestRoomName]
 
         let minRangedAttackCost =
-            (request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] * 1.2
-        let rangedAttackAmount = Math.max(
-            minRangedAttackCost / BODYPART_COST[RANGED_ATTACK],
-            request.data[CombatRequestData.rangedAttack],
+            ((request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+                (request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]) *
+            1.2
+        let rangedAttackAmount = Math.min(
+            minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
+            request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER,
         )
-        let minAttackCost = (request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[ATTACK] * 1.2
-        let attackAmount = Math.max(minAttackCost / BODYPART_COST[ATTACK], request.data[CombatRequestData.attack])
-        let minHealCost = request.data[CombatRequestData.minHeal] * BODYPART_COST[HEAL] * 1.2
+
+        let minAttackCost =
+            ((request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[ATTACK] +
+                (request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[MOVE]) *
+            1.2
+        let attackAmount = Math.min(
+            minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]),
+            request.data[CombatRequestData.minDamage] / ATTACK_POWER,
+        )
+
+        let minHealCost =
+            (request.data[CombatRequestData.minHeal] * BODYPART_COST[HEAL] +
+                (request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
+            1.2
+        let healAmount = Math.min(
+            minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]),
+            request.data[CombatRequestData.minDamage] / HEAL_POWER,
+        )
 
         if (request.T === 'attack') {
             continue
@@ -1391,7 +1408,7 @@ Room.prototype.spawnRequester = function () {
                     extraParts.push(RANGED_ATTACK, MOVE)
                 }
 
-                for (let i = 0; i < request.data[CombatRequestData.minHeal]; i++) {
+                for (let i = 0; i < healAmount; i++) {
                     extraParts.push(HEAL, MOVE)
                 }
 
@@ -1469,7 +1486,7 @@ Room.prototype.spawnRequester = function () {
                 const minCost = Math.min(minHealCost, spawnEnergyCapacity)
                 let extraParts: BodyPartConstant[] = []
 
-                for (let i = 0; i < request.data[CombatRequestData.minHeal]; i++) {
+                for (let i = 0; i < healAmount; i++) {
                     extraParts.push(HEAL, MOVE)
                 }
 
