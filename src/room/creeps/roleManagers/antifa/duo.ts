@@ -1,3 +1,4 @@
+import { roomDimensions } from 'international/constants'
 import { findClosestObject, getRange, pack } from 'international/generalFunctions'
 import { Antifa } from './antifa'
 
@@ -48,17 +49,22 @@ export class Duo {
         })
     }
     getInFormation() {
-        if (getRange(this.leader.pos.x, this.members[1].pos.x, this.leader.pos.y, this.members[1].pos.y) === 1) return true
+        if (this.leader.spawning) return false
 
-     this.members[1].createMoveRequest({
-          origin: this.members[1].pos,
-          goals: [
-              {
-                  pos: this.leader.pos,
-                  range: 1,
-              },
-          ],
-      })
+        if (this.leader.isOnExit()) return true
+
+        if (getRange(this.leader.pos.x, this.members[1].pos.x, this.leader.pos.y, this.members[1].pos.y) === 1)
+            return true
+
+        this.members[1].createMoveRequest({
+            origin: this.members[1].pos,
+            goals: [
+                {
+                    pos: this.leader.pos,
+                    range: 1,
+                },
+            ],
+        })
         return false
     }
     createMoveRequest(opts: MoveRequestOpts) {
@@ -66,7 +72,15 @@ export class Duo {
 
         if (!this.leader.createMoveRequest(opts)) return
 
-        this.members[1].moveRequest = pack(this.leader.pos)
+        // Make a moveRequest for the member to the leader
+
+        const packedCoord = pack(this.leader.pos)
+
+        this.members[1].moveRequest = packedCoord
+
+        this.members[1].room.moveRequests.get(packedCoord)
+        ? this.members[1].room.moveRequests.get(packedCoord).push(this.members[1].name)
+        : this.members[1].room.moveRequests.set(packedCoord, [this.members[1].name])
     }
     advancedRangedAttack() {
         const { room } = this.leader
