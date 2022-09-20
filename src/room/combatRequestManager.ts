@@ -16,13 +16,11 @@ Room.prototype.combatRequestManager = function () {
 
         if (Game.time % Math.floor(Math.random() * 100) === 0) {
 
+            const structures = this.dismantleableStructures
+
             let totalHits = 0
-
-            const structures = requestRoom.find(FIND_STRUCTURES, {
-                filter: structure =>
-                    structure.structureType != STRUCTURE_CONTROLLER && structure.structureType != STRUCTURE_INVADER_CORE && (totalHits += structure.hits),
-            })
-
+            for (const structure of structures) totalHits += structure.hits
+            
             if (structures.length > 0) request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 100), 20)
         }
 

@@ -1343,12 +1343,10 @@ Room.prototype.createHarassCombatRequest = function() {
     request.data[CombatRequestData.minDamage] = 50
     request.data[CombatRequestData.minHeal] = 2
 
-    let totalHits = 0
+    const structures = this.dismantleableStructures
 
-    const structures = this.find(FIND_STRUCTURES, {
-        filter: structure =>
-            structure.structureType != STRUCTURE_CONTROLLER && structure.structureType != STRUCTURE_INVADER_CORE && (totalHits += structure.hits),
-    })
+    let totalHits = 0
+    for (const structure of structures) totalHits += structure.hits
 
     if (structures.length > 0) request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 100), 20)
 }
