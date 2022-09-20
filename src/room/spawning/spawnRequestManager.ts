@@ -1383,7 +1383,7 @@ Room.prototype.spawnRequester = function () {
         )
 
         let minHealCost =
-            (request.data[CombatRequestData.minHeal] * BODYPART_COST[HEAL] +
+            ((request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
                 (request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
             1.2
         let healAmount = Math.min(

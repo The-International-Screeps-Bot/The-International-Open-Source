@@ -567,6 +567,11 @@ declare global {
         autoClaim: boolean
 
         /**
+         * Wether or not to automatically create attack requests for viable targets
+         */
+        autoAttack: boolean
+
+        /**
          * Wether the bot should enable ramparts when there is no enemy present
          */
         publicRamparts: boolean
@@ -805,6 +810,8 @@ declare global {
         findType(scoutingRoom: Room): void
 
         makeRemote(scoutingRoom: Room): boolean
+
+        createHarassCombatRequest(): void
 
         /**
          * Finds the score of rooms for potential communes
@@ -1125,6 +1132,10 @@ declare global {
         _taskNeedingSpawningStructures: SpawningStructures
 
         readonly taskNeedingSpawningStructures: SpawningStructures
+
+        _dismantleableStructures: Structure[]
+
+        readonly dismantleableStructures: Structure[]
 
         // Resource info
 

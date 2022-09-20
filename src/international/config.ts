@@ -13,6 +13,7 @@ import {
     tradeBlacklist,
     roomStats,
     nonAggressionPlayers,
+    autoAttack,
 } from './constants'
 import { statsManager } from './statsManager'
 
@@ -54,6 +55,7 @@ class ConfigManager {
         Memory.pixelGeneration = pixelGeneration
         Memory.tradeBlacklist = tradeBlacklist
         Memory.autoClaim = autoClaim
+        Memory.autoAttack = autoAttack
         Memory.publicRamparts = publicRamparts
         Memory.allyTrading = allyTrading
 

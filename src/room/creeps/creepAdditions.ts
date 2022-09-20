@@ -82,7 +82,7 @@ Object.defineProperties(Creep.prototype, {
         get() {
             if (this._attackStrength) return this._attackStrength
 
-            this._attackStrength = 1
+            this._attackStrength = 0
 
             for (const part of this.body) {
                 switch (part.type) {
@@ -93,8 +93,6 @@ Object.defineProperties(Creep.prototype, {
                     case ATTACK:
                         this._attackStrength += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
                         break
-                    default:
-                        this._attackStrength += 1
                 }
             }
 

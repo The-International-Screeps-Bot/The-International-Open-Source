@@ -1,6 +1,7 @@
 import {
     allStructureTypes,
     allyPlayers,
+    CombatRequestData,
     impassibleStructureTypes,
     maxRampartGroupSize,
     minHarvestWorkRatio,
@@ -1134,6 +1135,9 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
                     room.memory.T = 'enemyRemote'
                     room.memory.owner = creep.owner.username
+
+                    room.createHarassCombatRequest()
+
                     return true
                 }
             }
@@ -1321,6 +1325,31 @@ Room.prototype.makeRemote = function (scoutingRoom) {
     if (!global.communes.has(room.memory.commune)) return false
 
     return true
+}
+
+Room.prototype.createHarassCombatRequest = function() {
+
+    if (Memory.combatRequests[this.name]) return
+    if (!this.enemyCreeps.length) return
+    if (this.enemyAttackers.find(creep => creep.attackStrength > 0)) return
+
+    const request = Memory.combatRequests[this.name] = {
+        T: 'harass',
+        data: [0],
+    }
+
+    request.data[CombatRequestData.attack] = 3
+    request.data[CombatRequestData.minDamage] = 50
+    request.data[CombatRequestData.minHeal] = 2
+
+    let totalHits = 0
+
+    const structures = this.find(FIND_STRUCTURES, {
+        filter: structure =>
+            structure.structureType != STRUCTURE_CONTROLLER && structure.structureType != STRUCTURE_INVADER_CORE && (totalHits += structure.hits),
+    })
+
+    if (structures.length > 0) request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 100), 20)
 }
 
 Room.prototype.cleanMemory = function () {

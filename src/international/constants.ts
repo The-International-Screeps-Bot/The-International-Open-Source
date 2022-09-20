@@ -63,6 +63,11 @@ export const autoClaim = true
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
+export const autoAttack = false
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
 export const publicRamparts = false
 
 /**
@@ -229,11 +234,11 @@ export enum TrafficPriorities {
     vanguardDefender,
     remoteDefender,
     meleeDefender,
-    antifaRangedAttacker,
-    antifaAttacker,
-    antifaHealer,
     antifaDismantler,
     antifaDowngrader,
+    antifaHealer,
+    antifaAttacker,
+    antifaRangedAttacker,
 }
 
 // Set of messages to randomly apply to commune rooms

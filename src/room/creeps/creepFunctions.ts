@@ -25,6 +25,7 @@ import {
     unpackAsPos,
     unpackAsRoomPos,
     findClosestObjectInRange,
+    isExit,
 } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 import { pick, repeat } from 'lodash'
@@ -1664,7 +1665,7 @@ Creep.prototype.aggressiveHeal = function () {
             // Have it heal itself and stop
 
             this.heal(this)
-            return false
+            return true
         }
     }
 

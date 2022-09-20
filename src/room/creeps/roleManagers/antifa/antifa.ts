@@ -4,7 +4,6 @@ import { Duo } from './duo'
 import { Quad } from './quad'
 
 export class Antifa extends Creep {
-
     constructor(creepID: Id<Creep>) {
         super(creepID)
     }
@@ -148,27 +147,32 @@ export class Antifa extends Creep {
     }
 
     runCombat?() {
-        if (this.memory.ST === 'rangedAttack') return this.advancedRangedAttack()
-        if (this.memory.ST === 'attack') return this.advancedAttack()
+        if (this.role === 'antifaRangedAttacker') return this.advancedRangedAttack()
+        if (this.role === 'antifaAttacker') return this.advancedAttack()
         return this.advancedDismantle()
     }
 
     advancedRangedAttack?() {
         const { room } = this
 
-        const enemyAttackers = room.enemyAttackers.filter(function (creep) {
+        let enemyAttackers = room.enemyAttackers.filter(function (creep) {
             return !creep.isOnExit()
         })
+
+        if (!enemyAttackers.length) enemyAttackers = room.enemyAttackers
 
         // If there are none
 
         if (!enemyAttackers.length) {
-            const enemyCreeps = room.enemyCreeps.filter(function (creep) {
+            let enemyCreeps = room.enemyCreeps.filter(function (creep) {
                 return !creep.isOnExit()
             })
 
+            if (!enemyCreeps.length) enemyCreeps = room.enemyCreeps
+
             if (!enemyCreeps.length) {
-                return this.aggressiveHeal()
+                if (this.aggressiveHeal()) return true
+                this.rangedAttackStructures()
             }
 
             // Heal nearby creeps
@@ -308,21 +312,68 @@ export class Antifa extends Creep {
         return true
     }
 
+    rangedAttackStructures?() {
+        this.say('RAS')
+
+        const structures = this.room.dismantleableStructures
+
+        if (!structures.length) return false
+
+        let structure = findClosestObject(this.pos, structures)
+        if (Memory.roomVisuals) this.room.visual.line(this.pos, structure.pos, { color: myColors.green, opacity: 0.3 })
+
+        if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 3) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: structure.pos, range: 3 }],
+            })
+
+            return false
+        }
+
+        if (this.rangedAttack(structure) !== OK) return false
+
+        // See if the structure is destroyed next tick
+
+        structure.realHits = structure.hits - this.parts.ranged_attack * RANGED_ATTACK_POWER
+        if (structure.realHits > 0) return true
+
+        // Try to find a new structure to preemptively move to
+
+        structures.splice(structures.indexOf(structure), 1)
+        if (!structures.length) return true
+
+        structure = findClosestObject(this.pos, structures)
+
+        if (getRange(this.pos.x, structure.pos.y, this.pos.y, structure.pos.y) > 3) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: structure.pos, range: 3 }],
+            })
+        }
+
+        return true
+    }
+
     advancedAttack?() {
         const { room } = this
 
-        const enemyAttackers = room.enemyAttackers.filter(function (creep) {
+        let enemyAttackers = room.enemyAttackers.filter(function (creep) {
             return !creep.isOnExit()
         })
+
+        if (!enemyAttackers.length) enemyAttackers = room.enemyAttackers
 
         // If there are none
 
         if (!enemyAttackers.length) {
-            const enemyCreeps = room.enemyCreeps.filter(function (creep) {
+            let enemyCreeps = room.enemyCreeps.filter(function (creep) {
                 return !creep.isOnExit()
             })
 
-            if (!enemyCreeps) return false
+            if (!enemyCreeps) enemyCreeps = room.enemyCreeps
+
+            if (!enemyCreeps.length) return this.attackStructures()
 
             this.say('EC')
 
@@ -370,20 +421,60 @@ export class Antifa extends Creep {
         return true
     }
 
-    advancedDismantle?() {
-        // Avoid targets we can't dismantle
+    attackStructures?() {
+        this.say('AS')
 
-        const structures = this.room.find(FIND_STRUCTURES, {
-            filter: structure =>
-                structure.structureType != STRUCTURE_CONTROLLER && structure.structureType != STRUCTURE_INVADER_CORE,
-        })
+        const structures = this.room.dismantleableStructures
 
         if (!structures.length) return false
 
         let structure = findClosestObject(this.pos, structures)
         if (Memory.roomVisuals) this.room.visual.line(this.pos, structure.pos, { color: myColors.green, opacity: 0.3 })
 
+        if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: structure.pos, range: 1 }],
+            })
+
+            return false
+        }
+
+        if (this.attack(structure) !== OK) return false
+
+        // See if the structure is destroyed next tick
+
+        structure.realHits = structure.hits - this.parts.attack * ATTACK_POWER
+        if (structure.realHits > 0) return true
+
+        // Try to find a new structure to preemptively move to
+
+        structures.splice(structures.indexOf(structure), 1)
+        if (!structures.length) return true
+
+        structure = findClosestObject(this.pos, structures)
+
         if (getRange(this.pos.x, structure.pos.y, this.pos.y, structure.pos.y) > 1) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: structure.pos, range: 1 }],
+            })
+        }
+
+        return true
+    }
+
+    advancedDismantle?() {
+        // Avoid targets we can't dismantle
+
+        const structures = this.room.dismantleableStructures
+
+        if (!structures.length) return false
+
+        let structure = findClosestObject(this.pos, structures)
+        if (Memory.roomVisuals) this.room.visual.line(this.pos, structure.pos, { color: myColors.green, opacity: 0.3 })
+
+        if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: structure.pos, range: 1 }],

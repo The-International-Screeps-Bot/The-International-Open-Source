@@ -330,6 +330,17 @@ Object.defineProperties(Room.prototype, {
             return this._spawningStructuresByNeed
         },
     },
+    dismantleableStructures: {
+        get() {
+            if (this._dismantleableStructures) return this._dismantleableStructures
+
+            return (this._dismantleableStructures = this.find(FIND_STRUCTURES, {
+                filter: structure =>
+                    structure.structureType !== STRUCTURE_CONTROLLER &&
+                    structure.structureType !== STRUCTURE_INVADER_CORE,
+            }))
+        },
+    },
     sourcePositions: {
         get() {
             if (this._sourcePositions && this._sourcePositions.length) return this._sourcePositions

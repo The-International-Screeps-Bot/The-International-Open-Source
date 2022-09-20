@@ -11,33 +11,39 @@ Room.prototype.combatRequestManager = function () {
         const requestName = this.memory.combatRequests[index]
         const request = Memory.combatRequests[requestName]
 
-        request.data[CombatRequestData.rangedAttack] = 10
-        request.data[CombatRequestData.attack] = 10
-        request.data[CombatRequestData.dismantle] = 5
-        request.data[CombatRequestData.minDamage] = 5
-        request.data[CombatRequestData.minHeal] = 6
-
         const requestRoom = Game.rooms[requestName]
         if (!requestRoom) continue
-/*
-        // If there are enemyAttackers, abandon and stop the request
 
-        if (requestRoom.enemyAttackers.length) {
+        if (Game.time % Math.floor(Math.random() * 100) === 0) {
+
+            let totalHits = 0
+
+            const structures = requestRoom.find(FIND_STRUCTURES, {
+                filter: structure =>
+                    structure.structureType != STRUCTURE_CONTROLLER && structure.structureType != STRUCTURE_INVADER_CORE && (totalHits += structure.hits),
+            })
+
+            if (structures.length > 0) request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 100), 20)
+        }
+
+        // If there are threats to our hegemony, temporarily abandon the request
+
+        const threateningAttacker = requestRoom.enemyAttackers.find(creep => creep.attackStrength > 0)
+
+        if (threateningAttacker) {
             request.data[CombatRequestData.abandon] = 1500
-            request.data[CombatRequestData.rangedAttack] = 0
 
             this.memory.combatRequests.splice(index, 1)
             delete request.responder
         }
+
+        // If there are no enemyCreeps, delete the combatRequest
 
         if (!requestRoom.enemyCreeps.length) {
-            request.data[CombatRequestData.abandon] = 1500
-            request.data[CombatRequestData.rangedAttack] = 0
-
+            delete Memory.combatRequests[requestName]
             this.memory.combatRequests.splice(index, 1)
             delete request.responder
         }
- */
     }
 
     // If CPU logging is enabled, log the CPU used by this manager
