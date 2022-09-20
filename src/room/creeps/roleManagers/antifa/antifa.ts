@@ -172,7 +172,7 @@ export class Antifa extends Creep {
 
             if (!enemyCreeps.length) {
                 if (this.aggressiveHeal()) return true
-                this.rangedAttackStructures()
+                return this.rangedAttackStructures()
             }
 
             // Heal nearby creeps
