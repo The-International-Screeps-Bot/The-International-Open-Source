@@ -41,7 +41,7 @@ export class Duo {
 
         if (this.leader.isOnExit()) return true
 
-        if (getRange(this.leader.pos.x, this.members[1].pos.x, this.leader.pos.y, this.members[1].pos.y) === 1)
+        if (getRange(this.leader.pos.x, this.members[1].pos.x, this.leader.pos.y, this.members[1].pos.y) <= 1)
             return true
 
         this.members[1].createMoveRequest({
@@ -131,10 +131,10 @@ export class Duo {
             this.leader.rangedMassAttack()
 
             if (this.leader.canMove && this.members[1].canMove) {
-                this.leader.moveRequest = pack(enemyCreep.pos)
-                this.members[1].moveRequest = pack(this.leader.pos)
-            }
 
+               this.leader.assignMoveRequest(enemyCreep.pos)
+               this.members[1].assignMoveRequest(this.leader.pos)
+            }
             return true
         }
 
@@ -175,7 +175,11 @@ export class Duo {
 
         if (range === 1) {
             this.leader.rangedMassAttack()
-            this.leader.moveRequest = pack(enemyAttacker.pos)
+            if (this.leader.canMove && this.members[1].canMove) {
+
+               this.leader.assignMoveRequest(enemyAttacker.pos)
+               this.members[1].assignMoveRequest(this.leader.pos)
+            }
         }
 
         // Otherwise, rangedAttack the enemyAttacker
@@ -320,8 +324,9 @@ export class Duo {
             }
 
             if (this.leader.canMove && this.members[1].canMove) {
-                this.leader.moveRequest = pack(enemyCreep.pos)
-                this.members[1].moveRequest = pack(this.leader.pos)
+
+               this.leader.assignMoveRequest(enemyCreep.pos)
+               this.members[1].assignMoveRequest(this.leader.pos)
             }
             return true
         }

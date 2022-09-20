@@ -884,19 +884,7 @@ Creep.prototype.createMoveRequest = function (opts) {
                   opacity: 0.3,
               })
 
-    // Pack the first pos in the path
-
-    const packedCoord = pack(path[0])
-
-    // Add the creep's name to its moveRequest position
-
-    room.moveRequests.get(packedCoord)
-        ? room.moveRequests.get(packedCoord).push(this.name)
-        : room.moveRequests.set(packedCoord, [this.name])
-
-    // Make moveRequest true to inform a moveRequest has been made
-
-    this.moveRequest = packedCoord
+    this.assignMoveRequest(path[0])
 
     // Set the creep's pathOpts to reflect this moveRequest's opts
 
@@ -913,6 +901,17 @@ Creep.prototype.createMoveRequest = function (opts) {
     // Inform success
 
     return true
+}
+
+Creep.prototype.assignMoveRequest = function (coord) {
+    const { room } = this
+    const packedCoord = pack(coord)
+
+    this.moveRequest = packedCoord
+
+    room.moveRequests.get(packedCoord)
+        ? room.moveRequests.get(packedCoord).push(this.name)
+        : room.moveRequests.set(packedCoord, [this.name])
 }
 
 Creep.prototype.findShovePositions = function (avoidPackedPositions) {
@@ -1373,7 +1372,7 @@ Creep.prototype.isOnExit = function () {
 
     // If the creep is on an exit, inform true. Otherwise inform false
 
-    return (x <= 0 || x >= 49 || y <= 0 || y >= 49)
+    return x <= 0 || x >= 49 || y <= 0 || y >= 49
 }
 
 Creep.prototype.findTotalHealPower = function (range = 1) {

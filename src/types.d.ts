@@ -1552,6 +1552,8 @@ declare global {
          */
         createMoveRequest(opts: MoveRequestOpts): boolean
 
+        assignMoveRequest(coord: Coord): void
+
         findShovePositions(avoidPackedPositions: Set<number>): RoomPosition[]
 
         shove(shoverPos: RoomPosition): boolean

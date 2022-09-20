@@ -1331,6 +1331,7 @@ Room.prototype.createHarassCombatRequest = function() {
 
     if (Memory.combatRequests[this.name]) return
     if (!this.enemyCreeps.length) return
+    if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
     if (this.enemyAttackers.find(creep => creep.attackStrength > 0)) return
 
     const request = Memory.combatRequests[this.name] = {
