@@ -132,6 +132,46 @@ export class LabManager {
         this.communeManager = communeManager
     }
 
+    //This is much like demand boost, but will return false if we don't have it, it can't be applied, etc.
+    public acceptBoost(creep: Creep, boost: MineralBoostConstant): boolean {
+        if (creep.ticksToLive < CREEP_LIFE_TIME - 100) return false
+
+        if (creep.boosts[boost] > 0) return false
+
+        const labId = this.assignedBoosts[boost]
+        if (!labId) return false
+
+        const lab = this.communeManager.structures.lab.find(lab => lab.id == labId)
+
+        //See if the lab is ready to boost...
+        if (lab.mineralType != boost) return false
+
+        if (lab.mineralAmount < LAB_BOOST_MINERAL || lab.energy < LAB_BOOST_ENERGY) return false
+
+        //This needs to see if the lab is fully ready to boost the creep.  This will work
+        //  even if it partially boosts the creep.
+        let result = lab.boostCreep(creep)
+
+        if (result == OK) return false
+
+        if (result == ERR_NOT_IN_RANGE) {
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [
+                    {
+                        pos: lab.pos,
+                        range: 1,
+                    },
+                ],
+                avoidEnemyRanges: true,
+            })
+        } else {
+            creep.message += 'BE' + result
+        }
+
+        return true
+    }
+
     public demandBoost(creep: Creep, boost: MineralBoostConstant): boolean {
         if (creep.ticksToLive < CREEP_LIFE_TIME - 100) return false
 
@@ -381,7 +421,7 @@ export class LabManager {
             )
         }
         for (let compound in this.targetCompounds) {
-            var amount = Math.max(0, 10000) // this.communeManager.roomai.trading.maxStorageAmount(compound))
+            var amount = Math.max(0, this.targetCompounds[compound as MineralConstant | MineralCompoundConstant]) // this.communeManager.roomai.trading.maxStorageAmount(compound))
 
             this.chainDecompose(compound as MineralConstant | MineralCompoundConstant, amount)
         }
