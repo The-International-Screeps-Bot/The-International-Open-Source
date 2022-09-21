@@ -123,8 +123,6 @@ export class RemoteHauler extends Creep {
         for (const resource of this.pos.lookFor(LOOK_RESOURCES)) {
             if (resource.resourceType !== RESOURCE_ENERGY) continue
 
-            if (resource.amount < this.store.getCapacity() * 0.5) return false
-
             this.pickup(resource)
             this.movedResource = true
             return true
@@ -142,8 +140,6 @@ export class RemoteHauler extends Creep {
 
         if (this.room.name === this.memory.RN) {
             if (getRange(this.pos.x, sourcePos.x, this.pos.y, sourcePos.y) > 1) {
-                this.say('M')
-
                 this.getDroppedEnergy()
 
                 this.createMoveRequest({
@@ -244,20 +240,11 @@ export class RemoteHauler extends Creep {
         let withdrawTargets = room.MAWT.filter(target => {
             if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
 
-            if (target instanceof Resource) return (target.amount >= this.freeCapacityNextTick || target.amount >= this.store.getCapacity() * 0.25)
+            if (target instanceof Resource)
+                return true
 
             return target.store.energy >= this.freeCapacityNextTick
         })
-
-        for (const creepName of room.myCreeps[`source${(this.memory.SI + 1) as 1 | 2}RemoteHarvester`]) {
-            const harvester = Game.creeps[creepName]
-
-            // If the harvester isn't nearly full and can't fully fill the hauler
-
-            if (harvester.store.getFreeCapacity(RESOURCE_ENERGY) > harvester.parts.work * HARVEST_POWER && harvester.store.getUsedCapacity(RESOURCE_ENERGY) < this.store.getFreeCapacity()) continue
-
-            withdrawTargets.push(harvester)
-        }
 
         let target
         let amount
@@ -275,7 +262,8 @@ export class RemoteHauler extends Creep {
         withdrawTargets = room.OAWT.filter(target => {
             if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
 
-            if (target instanceof Resource) return (target.amount >= this.freeCapacityNextTick || target.amount >= this.store.getCapacity() * 0.25)
+            if (target instanceof Resource)
+                return true
 
             return target.store.energy >= this.freeCapacityNextTick
         })
@@ -486,29 +474,42 @@ export class RemoteHauler extends Creep {
         super(creepID)
     }
 
+    static processSingleCreep(creepName: string) {
+        const creep: RemoteHauler = Game.creeps[creepName] as RemoteHauler
+
+        let returnTripTime = 0
+        if (creep.memory.RN && creep.memory.SI !== undefined) {
+            // The 1.1 is to add some margin for the return trip
+
+            returnTripTime = Memory.rooms[creep.memory.RN].SE[creep.memory.SI] * 1.1
+        }
+
+        if (creep.needsResources() && creep.ticksToLive > returnTripTime) {
+            creep.getResources()
+            return
+        }
+
+        // Otherwise if the creep doesn't need resources
+
+        // If the creep has a remoteName, delete it and delete it's fulfilled needs
+
+        //if (creep.memory.RN) creep.removeRemote()
+
+        if (creep.deliverResources()) creep.relayAsFull()
+    }
+
     static remoteHaulerManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
-            const creep: RemoteHauler = Game.creeps[creepName] as RemoteHauler
-
-            let returnTripTime = 0
-            if (creep.memory.RN && creep.memory.SI !== undefined) {
-                // The 1.1 is to add some margin for the return trip
-
-                returnTripTime = Memory.rooms[creep.memory.RN].SE[creep.memory.SI] * 1.1
+            try {
+                RemoteHauler.processSingleCreep(creepName)
+            } catch (err) {
+                customLog(
+                    'Exception remoteHaulerManager creep: ' + creepName + err,
+                    (err as any).stack,
+                    myColors.white,
+                    myColors.red,
+                )
             }
-
-            if (creep.needsResources() && creep.ticksToLive > returnTripTime) {
-                creep.getResources()
-                continue
-            }
-
-            // Otherwise if the creep doesn't need resources
-
-            // If the creep has a remoteName, delete it and delete it's fulfilled needs
-
-            //if (creep.memory.RN) creep.removeRemote()
-
-            if (creep.deliverResources()) creep.relayAsFull()
         }
     }
 }

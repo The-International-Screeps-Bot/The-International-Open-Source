@@ -31,7 +31,7 @@ export class Hauler extends Creep {
                     target.reserveAmount >= this.store.getCapacity() * 0.2 || target.reserveAmount >= this.freeStore()
                 )
 
-            return target.store.energy >= this.freeStore()
+            return target.store.getUsedCapacity() > 0
         })
 
         let transferTargets

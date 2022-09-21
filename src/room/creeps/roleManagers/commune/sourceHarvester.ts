@@ -1,4 +1,5 @@
 import { getRange, unpackAsPos } from 'international/generalFunctions'
+import { Hauler } from './hauler'
 
 export class SourceHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -192,6 +193,22 @@ export class SourceHarvester extends Creep {
         return false
     }
 
+    transferToNearbyCreep?(): boolean {
+        //See if there's a hauler to tranfer to if we're full so we're not drop mining.
+        //   This shouldn't run if we're container mining however.
+        if (this.store.getFreeCapacity() <= this.getActiveBodyparts(WORK)) {
+            let haulers = this.room.myCreeps.hauler?.map(name => Game.creeps[name] as Hauler)
+            if (haulers && haulers.length > 0) {
+                let nearby = haulers.find(haul => haul.pos.isNearTo(this.pos))
+                if (nearby) {
+                    this.transfer(nearby, RESOURCE_ENERGY)
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     static sourceHarvesterManager(room: Room, creepsOfRole: string[]): void | boolean {
         // Loop through the names of the creeps of the role
 
@@ -227,6 +244,8 @@ export class SourceHarvester extends Creep {
             // Try to repair the sourceContainer
 
             creep.repairSourceContainer(room.sourceContainers[sourceIndex])
+
+            if (creep.transferToNearbyCreep()) continue
         }
     }
 }
