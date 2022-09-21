@@ -126,12 +126,112 @@ export class RemoteHarvester extends Creep {
 
     remoteActions?() {
         // Try to move to source. If creep moved then iterate
-
         if (this.travelToSource(this.memory.SI)) return
 
-        // Try to normally harvest. Iterate if creep harvested
+        const container = this.getContainer()
+        let figuredOutWhatToDoWithTheEnergy = false
 
-        if (this.advancedHarvestSource(this.room.sources[this.memory.SI])) return
+        const source = this.room.sources[this.memory.SI]
+
+        //1) feed remote hauler
+        //2) build if "ahead of the curve"
+        //3) drop mine
+        //4) means you're idle, try building the container.
+
+        //If we're going to be overfilled after the next harvest, figure out what to do with the extra energy.
+        if (this.store.getFreeCapacity() <= this.getActiveBodyparts(WORK) || source.energy == 0) {
+            //See if there's a hauler to tranfer to if we're full so we're not drop mining.
+            //   This shouldn't run if we're container mining however.
+            if (!container) {
+                let haulers = this.room.myCreeps.remoteHauler?.map(name => Game.creeps[name] as RemoteHauler)
+                if (haulers && haulers.length > 0) {
+                    let nearby = haulers.find(haul => haul.pos.isNearTo(this.pos))
+                    if (nearby) {
+                        let transResult = this.transfer(nearby, RESOURCE_ENERGY)
+                        if (transResult == OK) {
+                            this.movedResource = true
+                            //We won't have energy, so don't consider maintenance.
+                            figuredOutWhatToDoWithTheEnergy = true
+                        }
+                    }
+                }
+            }
+
+            //if we're ahead of the curve...  As in we're beating the regen time of the source.
+            //  Aka  source.energy / source.energyCapacity <  source.ticksToRegeneration / 300
+            //  It's rearranged for performance.  This will also repair the container if needed.
+            if (!figuredOutWhatToDoWithTheEnergy && source.energy * 300 < (source.ticksToRegeneration-1) * source.energyCapacity) {
+                let didWork = this.doContainerMaintance()
+                //If we did container maintance, that'll eat our work action.
+                if (didWork) return
+            }
+
+            //If we get here and we still haven't figured out what to do about the energy, see
+            //  If we should drop mine, or transfer.
+            if (!figuredOutWhatToDoWithTheEnergy && container && !container.pos.isEqualTo(this.pos)) {
+                this.transfer(container, RESOURCE_ENERGY)
+            }
+        }
+
+        if (this.advancedHarvestSource(source)) return
+    }
+
+    private obtainEnergyIfNeeded() {
+        let neededEnergy = this.parts.work * BUILD_POWER
+        //We need to check to see if there's enough for the current tick, plus the next tick, otherwise
+        //  We need to pick up on this tick, which is why the *2 is there.
+        if (this.store[RESOURCE_ENERGY] < neededEnergy * 2) {
+            let droppedResource = this.pos
+                .findInRange(FIND_DROPPED_RESOURCES, 1)
+                .find(drop => drop.resourceType == RESOURCE_ENERGY)
+            if (droppedResource) this.pickup(droppedResource)
+        }
+    }
+
+    getContainerPosition(): RoomPosition {
+        return this.room.sourcePositions[this.memory.SI][0]
+    }
+
+    getContainer(): StructureContainer {
+        let containerPosition = this.getContainerPosition()
+        return this.room
+            .lookForAt(LOOK_STRUCTURES, containerPosition)
+            .find(st => st.structureType == STRUCTURE_CONTAINER) as StructureContainer
+    }
+
+    doContainerMaintance(): boolean {
+        let containerPosition = this.getContainerPosition()
+        let container = this.getContainer()
+        if (container) {
+            //If the container is below 80% health, repair it.
+            if (container.hits < container.hitsMax * 0.8) {
+                this.obtainEnergyIfNeeded()
+                this.repair(container)
+                return true
+            }
+            return false
+        }
+
+        //So there's not a container.  Is there a construction site?
+        let constructionSite = this.room
+            .lookForAt(LOOK_CONSTRUCTION_SITES, containerPosition)
+            .find(st => st.structureType == STRUCTURE_CONTAINER)
+        if (constructionSite) {
+            //This needs to check to see how we're doing on energy, and pick it up off the ground if needed.
+            this.obtainEnergyIfNeeded()
+            this.build(constructionSite)
+
+            //The container gets built slowly, so delete the tracking flag each time we build.  We don't want the
+            //   container cancelled.
+            delete Memory.constructionSites[constructionSite.id]
+            return true
+        }
+
+        //So no container, no construction site.  Let's create one...  This probably needs some guards to make sure we're not creating
+        //  too many construction sites.
+        this.room.createConstructionSite(containerPosition, STRUCTURE_CONTAINER)
+
+        return false
     }
 
     /**
