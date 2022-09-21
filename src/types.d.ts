@@ -1195,6 +1195,8 @@ declare global {
 
         readonly droppedEnergy: Resource[]
 
+        readonly droppedResources: Resource[]
+
         _actionableWalls: StructureWall[]
 
         readonly actionableWalls: StructureWall[]

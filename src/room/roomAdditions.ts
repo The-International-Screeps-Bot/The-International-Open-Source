@@ -949,6 +949,13 @@ Object.defineProperties(Room.prototype, {
             }))
         },
     },
+    droppedResources: {
+        get() {
+            if (this._droppedEnergy) return this._droppedEnergy
+
+            return (this._droppedEnergy = this.find(FIND_DROPPED_RESOURCES))
+        },
+    },
     actionableWalls: {
         get() {
             if (this._actionableWalls) return this._actionableWalls
@@ -1030,8 +1037,29 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._MAWT) return this._MAWT
 
-            this._MAWT = this.MEWT
-
+            this._MAWT = [
+                ...this.droppedResources,
+                ...this.find(FIND_TOMBSTONES).filter(cr => cr.store.getUsedCapacity() > 0),
+                //Priortize ruins that have short-ish life remaining over source containers
+                //  So that we get all the resources out of the ruins
+                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay < 10000),
+                ...this.sourceContainers.filter(cr => cr.store.getUsedCapacity() > 0),
+                //But we still want to pull from ruins if the source containers are empty.
+                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay >= 10000),
+                ...(this.find(FIND_HOSTILE_STRUCTURES).filter(structure => {
+                    return (
+                        (structure as any).store &&
+                        //And there's not a rampart on top of it...
+                        !structure.pos
+                            .lookFor(LOOK_STRUCTURES)
+                            .filter(
+                                structure2 =>
+                                    structure2.structureType === STRUCTURE_RAMPART &&
+                                    !(structure2 as StructureRampart).my,
+                            )
+                    )
+                }) as AnyStoreStructure[]),
+            ]
             return this._MAWT
         },
     },
