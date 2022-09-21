@@ -93,7 +93,8 @@ Room.prototype.spawnRequester = function () {
                 }
             }
 
-            if (this.sourceContainers[sourceIndex]) {
+            //Only Spawn one larger creep if we have the ability to mine using one large creep
+            if (this.sourceContainers[sourceIndex] && spawnEnergyCapacity >= 650) {
                 return {
                     role,
                     defaultParts: [MOVE],
