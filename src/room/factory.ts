@@ -8,6 +8,20 @@ Room.prototype.factoryManager = function () {
     ): (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[] {
         let result: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[] = []
 
+        //If we're asked for a base material, it's the reverse reaction that's being requested,
+        //  but we need to hard-code this case, so we don't get into an infinate loop.
+        //  Otherwise we'll get "energy requires batteries requires energy"
+        if (product == RESOURCE_ENERGY) return [RESOURCE_BATTERY]
+        if (product == RESOURCE_GHODIUM) return [RESOURCE_GHODIUM_MELT, RESOURCE_ENERGY]
+        if (product == RESOURCE_OXYGEN) return [RESOURCE_OXIDANT, RESOURCE_ENERGY]
+        if (product == RESOURCE_HYDROGEN) return [RESOURCE_REDUCTANT, RESOURCE_ENERGY]
+        if (product == RESOURCE_CATALYST) return [RESOURCE_PURIFIER, RESOURCE_ENERGY]
+
+        if (product == RESOURCE_UTRIUM) return [RESOURCE_UTRIUM_BAR, RESOURCE_ENERGY]
+        if (product == RESOURCE_LEMERGIUM) return [RESOURCE_LEMERGIUM_BAR, RESOURCE_ENERGY]
+        if (product == RESOURCE_KEANIUM) return [RESOURCE_KEANIUM_BAR, RESOURCE_ENERGY]
+        if (product == RESOURCE_ZYNTHIUM) return [RESOURCE_ZYNTHIUM_BAR, RESOURCE_ENERGY]
+
         //Don't include the product if we can't make it.
         if (factory && COMMODITIES[product].level && COMMODITIES[product].level != factory.level) return []
 
@@ -113,6 +127,10 @@ Room.prototype.factoryManager = function () {
         if (missingComponents.length == 0 && (!receipe.level || receipe.level == factory.level)) {
             return product
         } else {
+            //If we're asked to make a base product, and we're missing the components, that means we don't have the compressed
+            //  version of the uncompressed product.  Bail.
+            if (BASE_RESOURCES.includes(product)) return null
+
             for (let component of missingComponents) {
                 if (
                     !BASE_RESOURCES.includes(component) &&
@@ -162,10 +180,10 @@ Room.prototype.factoryManager = function () {
             RESOURCE_ALLOY,
             RESOURCE_CELL,
 
+            RESOURCE_GHODIUM_MELT,
             RESOURCE_REDUCTANT,
             RESOURCE_OXIDANT,
             RESOURCE_PURIFIER,
-            RESOURCE_GHODIUM_MELT,
             RESOURCE_LEMERGIUM_BAR,
             RESOURCE_UTRIUM_BAR,
             RESOURCE_KEANIUM_BAR,
@@ -217,6 +235,10 @@ Room.prototype.factoryManager = function () {
                     room.findStoredResourceAmount(RESOURCE_KEANIUM) > 10000 &&
                     room.findStoredResourceAmount(RESOURCE_KEANIUM) >
                         room.findStoredResourceAmount(RESOURCE_KEANIUM_BAR)) ||
+                (resource == RESOURCE_GHODIUM_MELT &&
+                    room.findStoredResourceAmount(RESOURCE_GHODIUM) > 10000 &&
+                    room.findStoredResourceAmount(RESOURCE_GHODIUM) >
+                        room.findStoredResourceAmount(RESOURCE_GHODIUM_MELT)) ||
                 (resource == RESOURCE_OXIDANT &&
                     room.findStoredResourceAmount(RESOURCE_OXYGEN) > 10000 &&
                     room.findStoredResourceAmount(RESOURCE_OXYGEN) > room.findStoredResourceAmount(RESOURCE_OXIDANT)) ||
