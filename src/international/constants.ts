@@ -33,7 +33,7 @@ export const roomStats: 0 | 1 | 2 = 1
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const allyPlayers = ['MarvinTMB', 'PandaMaster', 'lokenwow', 'LittleBitBlue', 'DefaultO', 'Allorrian']
+export const allyPlayers = ['MarvinTMB', 'PandaMaster', 'lokenwow', 'LittleBitBlue', 'DefaultO', 'Allorrian', 'Aerics']
 
 /**
  * Default value, do not change. Modify this property in Memory instead
