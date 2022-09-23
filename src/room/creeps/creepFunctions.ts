@@ -1806,6 +1806,10 @@ Creep.prototype.fulfillReservation = function () {
     if (!reservation) return true
 
     const target = findObjectWithID(reservation.targetID)
+    if (!target) {
+        this.deleteReservation(0)
+        return true
+    }
 
     const { room } = this
 
