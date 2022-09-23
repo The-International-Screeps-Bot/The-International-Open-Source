@@ -109,8 +109,8 @@ const boostsInOrder: MineralBoostConstant[] = [
 
 export class LabManager {
     targetCompounds: { [key in MineralConstant | MineralCompoundConstant]?: number } = {
-        KH: 5000,
-        G: 20000,
+        KH: 15000,
+        G: 10000,
         OH: 5000,
     }
 
@@ -421,6 +421,7 @@ export class LabManager {
             )
         }
         for (let compound in this.targetCompounds) {
+            console.log('updateDeficits ' + this.communeManager.room.name + ': ' + compound)
             var amount = Math.max(0, this.targetCompounds[compound as MineralConstant | MineralCompoundConstant]) // this.communeManager.roomai.trading.maxStorageAmount(compound))
 
             this.chainDecompose(compound as MineralConstant | MineralCompoundConstant, amount)
@@ -529,36 +530,55 @@ export class LabManager {
         inputLab: StructureLab,
         inputRsc: MineralConstant | MineralCompoundConstant,
     ): boolean {
-        if (inputLab.mineralType == inputRsc || inputLab.mineralType == null) {
-            let source =
-                this.communeManager.room?.storage.store[inputRsc] > this.communeManager.room?.terminal.store[inputRsc]
-                    ? this.communeManager.room.storage
-                    : this.communeManager.room.terminal
+        if (this.isReverse) {
+            if (
+                (inputLab.mineralType != null && inputLab.mineralType != inputRsc) ||
+                inputLab.usedStore(inputRsc) >= creep.store.getFreeCapacity()
+            ) {
+                let amount = Math.min(creep.freeStore(), inputLab.store[inputLab.mineralType])
 
-            //This logic isn't quite correct, but it works, but I need to debug this at some point.
-            //  If the creep starts with any of the desired resources, send the resources to it to free up the creep.
-            //  Only if we have a creepful, should we withdraw from the source container.  This works, but isn't the minimum code to do it.
-            let amount = Math.min(
-                creep.store.getFreeCapacity(),
-                source.store[inputRsc],
-                inputLab.store.getFreeCapacity(inputRsc),
-            )
-            amount = Math.max(amount, 0)
-            //Do the transfer if there's a bunch of free space in the lab, not necessiarly if there's a bunch in storage, that way
-            //  We react all the resources laying around.
-            if (inputLab.store.getFreeCapacity(inputRsc) >= creep.store.getCapacity()) {
-                creep.createReservation('withdraw', source.id, amount, inputRsc)
-                creep.createReservation('transfer', inputLab.id, amount, inputRsc)
+                if (amount != 0) creep.createReservation('withdraw', inputLab.id, amount, inputLab.mineralType)
+                if (amount + creep.usedStore(inputLab.mineralType) != 0)
+                    creep.createReservation(
+                        'transfer',
+                        this.communeManager.room.storage?.id,
+                        amount + creep.store[inputLab.mineralType],
+                        inputLab.mineralType,
+                    )
             }
         } else {
-            let amount = Math.min(creep.store.getFreeCapacity(), inputLab.store[inputLab.mineralType])
-            creep.createReservation('withdraw', inputLab.id, amount, inputLab.mineralType)
-            creep.createReservation(
-                'transfer',
-                this.communeManager.room.storage?.id,
-                amount + creep.store[inputLab.mineralType],
-                inputLab.mineralType,
-            )
+            if (inputLab.mineralType == inputRsc || inputLab.mineralType == null) {
+                let source =
+                    this.communeManager.room?.storage.store[inputRsc] >
+                    this.communeManager.room?.terminal.store[inputRsc]
+                        ? this.communeManager.room.storage
+                        : this.communeManager.room.terminal
+
+                //This logic isn't quite correct, but it works, but I need to debug this at some point.
+                //  If the creep starts with any of the desired resources, send the resources to it to free up the creep.
+                //  Only if we have a creepful, should we withdraw from the source container.  This works, but isn't the minimum code to do it.
+                let amount = Math.min(
+                    creep.store.getFreeCapacity(),
+                    source.store[inputRsc],
+                    inputLab.store.getFreeCapacity(inputRsc),
+                )
+                amount = Math.max(amount, 0)
+                //Do the transfer if there's a bunch of free space in the lab, not necessiarly if there's a bunch in storage, that way
+                //  We react all the resources laying around.
+                if (inputLab.store.getFreeCapacity(inputRsc) >= creep.store.getCapacity()) {
+                    creep.createReservation('withdraw', source.id, amount, inputRsc)
+                    creep.createReservation('transfer', inputLab.id, amount, inputRsc)
+                }
+            } else {
+                let amount = Math.min(creep.store.getFreeCapacity(), inputLab.store[inputLab.mineralType])
+                creep.createReservation('withdraw', inputLab.id, amount, inputLab.mineralType)
+                creep.createReservation(
+                    'transfer',
+                    this.communeManager.room.storage?.id,
+                    amount + creep.store[inputLab.mineralType],
+                    inputLab.mineralType,
+                )
+            }
         }
 
         if (creep.memory.reservations?.length > 0) return true
@@ -566,20 +586,51 @@ export class LabManager {
     }
 
     private setupOutputLab(creep: Hauler, outputLab: StructureLab): boolean {
-        if (
-            (outputLab.mineralType != null && outputLab.mineralType != this.outputRsc) ||
-            outputLab.usedStore(this.outputRsc) >= creep.store.getFreeCapacity()
-        ) {
-            let amount = Math.min(creep.freeStore(), outputLab.store[outputLab.mineralType])
+        if (this.isReverse) {
+            if (outputLab.mineralType == this.outputRsc || outputLab.mineralType == null) {
+                let source =
+                    this.communeManager.room?.storage.store[this.outputRsc] >
+                    this.communeManager.room?.terminal.store[this.outputRsc]
+                        ? this.communeManager.room.storage
+                        : this.communeManager.room.terminal
 
-            if (amount != 0) creep.createReservation('withdraw', outputLab.id, amount, outputLab.mineralType)
-            if (amount + creep.usedStore(outputLab.mineralType) != 0)
+                let amount = Math.min(
+                    creep.store.getFreeCapacity(),
+                    source.store[this.outputRsc],
+                    outputLab.store.getFreeCapacity(this.outputRsc),
+                )
+                amount = Math.max(amount, 0)
+
+                if (outputLab.store.getFreeCapacity(this.outputRsc) >= creep.store.getCapacity()) {
+                    creep.createReservation('withdraw', source.id, amount, this.outputRsc)
+                    creep.createReservation('transfer', outputLab.id, amount, this.outputRsc)
+                }
+            } else {
+                let amount = Math.min(creep.store.getFreeCapacity(), outputLab.store[outputLab.mineralType])
+                creep.createReservation('withdraw', outputLab.id, amount, outputLab.mineralType)
                 creep.createReservation(
                     'transfer',
                     this.communeManager.room.storage?.id,
                     amount + creep.store[outputLab.mineralType],
                     outputLab.mineralType,
                 )
+            }
+        } else {
+            if (
+                (outputLab.mineralType != null && outputLab.mineralType != this.outputRsc) ||
+                outputLab.usedStore(this.outputRsc) >= creep.store.getFreeCapacity()
+            ) {
+                let amount = Math.min(creep.freeStore(), outputLab.store[outputLab.mineralType])
+
+                if (amount != 0) creep.createReservation('withdraw', outputLab.id, amount, outputLab.mineralType)
+                if (amount + creep.usedStore(outputLab.mineralType) != 0)
+                    creep.createReservation(
+                        'transfer',
+                        this.communeManager.room.storage?.id,
+                        amount + creep.store[outputLab.mineralType],
+                        outputLab.mineralType,
+                    )
+            }
         }
 
         if (creep.memory.reservations?.length > 0) return true
@@ -603,22 +654,28 @@ export class LabManager {
                 creep.createReservation('withdraw', source.id, creep.store.getCapacity(), RESOURCE_ENERGY)
                 creep.createReservation('transfer', lab.id, creep.store.getCapacity(), RESOURCE_ENERGY)
             } else {
-                let source =
+                let source: AnyStoreStructure =
                     this.communeManager.room?.storage.store[compound] >
                     this.communeManager.room?.terminal.store[compound]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
-                let amount = Math.min(
-                    creep.store.getFreeCapacity(),
-                    source.store[compound],
-                    lab.store.getFreeCapacity(compound),
-                )
-                amount = Math.max(amount, 0)
+                if (source.store[compound] == 0) {
+                    source = this.outputs.find(lab => lab.mineralType == compound && lab.mineralAmount > 100)
+                }
 
-                if (lab.store.getFreeCapacity(compound) >= creep.store.getCapacity()) {
-                    creep.createReservation('withdraw', source.id, amount, compound)
-                    creep.createReservation('transfer', lab.id, amount, compound)
+                if (source) {
+                    let amount = Math.min(
+                        creep.store.getFreeCapacity(),
+                        source.store[compound],
+                        lab.store.getFreeCapacity(compound),
+                    )
+                    amount = Math.max(amount, 0)
+
+                    if (lab.store.getFreeCapacity(compound) >= creep.store.getCapacity()) {
+                        creep.createReservation('withdraw', source.id, amount, compound)
+                        creep.createReservation('transfer', lab.id, amount, compound)
+                    }
                 }
             }
         } else {
@@ -673,11 +730,21 @@ export class LabManager {
 
         //Priortize the worstly loaded lab.
         if (this.input2.store[this.input2Rsc] > this.input1.store[this.input1Rsc]) {
-            if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
-            if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
+            if (this.isReverse) {
+                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
+                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
+            } else {
+                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
+                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
+            }
         } else {
-            if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
-            if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
+            if (this.isReverse) {
+                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
+                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
+            } else {
+                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
+                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
+            }
         }
         for (const output of this.outputs) if (this.setupOutputLab(creep, output)) return
     }
