@@ -1364,6 +1364,7 @@ Room.prototype.spawnRequester = function () {
 
     for (const requestRoomName of this.memory.combatRequests) {
         const request = Memory.combatRequests[requestRoomName]
+        if(!request) continue
 
         let minRangedAttackCost =
             ((request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
