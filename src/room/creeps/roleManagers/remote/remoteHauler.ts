@@ -139,7 +139,7 @@ export class RemoteHauler extends Creep {
         // If the creep is in the remote
 
         if (this.room.name === this.memory.RN) {
-            if (getRange(this.pos.x, sourcePos.x, this.pos.y, sourcePos.y) > 1) {
+            if ((this.memory?.reservations?.length || 0 == 0) && getRange(this.pos.x, sourcePos.x, this.pos.y, sourcePos.y) > 1) {
                 this.getDroppedEnergy()
 
                 this.createMoveRequest({
@@ -240,8 +240,7 @@ export class RemoteHauler extends Creep {
         let withdrawTargets = room.MAWT.filter(target => {
             if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
 
-            if (target instanceof Resource)
-                return true
+            if (target instanceof Resource) return true
 
             return target.store.energy >= this.freeCapacityNextTick
         })
@@ -262,8 +261,7 @@ export class RemoteHauler extends Creep {
         withdrawTargets = room.OAWT.filter(target => {
             if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
 
-            if (target instanceof Resource)
-                return true
+            if (target instanceof Resource) return true
 
             return target.store.energy >= this.freeCapacityNextTick
         })
@@ -289,6 +287,44 @@ export class RemoteHauler extends Creep {
 
             //We don't want remote haulers fulfilling reservations all over the place in the commune.
             if (store) {
+                let inRangeTransferTargets = this.pos.findInRange(
+                    this.room.METT.filter(et => et.store.getFreeCapacity(RESOURCE_ENERGY) > 0),
+                    1,
+                )
+                if (inRangeTransferTargets.length > 0) {
+                    const target = inRangeTransferTargets[0]
+                    const transferResult = this.transfer(target, RESOURCE_ENERGY)
+
+                    // If the action can be considered a success
+
+                    if (transferResult === OK) {
+                        this.movedResource = true
+                        this.message += 'ATG'
+                    } else {
+                        this.message += 'ATF'
+                        this.message += transferResult
+                    }
+                }
+
+                inRangeTransferTargets = this.pos.findInRange(
+                    this.room.MEFTT.filter(et => et.store.getFreeCapacity(RESOURCE_ENERGY) > 0),
+                    1,
+                )
+                if (inRangeTransferTargets.length > 0) {
+                    const target = inRangeTransferTargets[0]
+                    const transferResult = this.transfer(target, RESOURCE_ENERGY)
+
+                    // If the action can be considered a success
+
+                    if (transferResult === OK) {
+                        this.movedResource = true
+                        this.message += 'AFTG'
+                    } else {
+                        this.message += 'AFTF'
+                        this.message += transferResult
+                    }
+                }
+
                 if (!this.memory.reservations || this.memory.reservations.length == 0)
                     this.createReservation('transfer', store.id, this.store[RESOURCE_ENERGY], RESOURCE_ENERGY)
                 if (!this.fulfillReservation()) {

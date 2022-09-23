@@ -1231,47 +1231,47 @@ declare global {
          */
         readonly OAWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
 
-        _METT: (Creep | AnyStoreStructure | Tombstone)[]
+        _METT: (Creep | AnyStoreStructure)[]
 
         /**
          * Mandatory energy transfer targets
          */
-        readonly METT: (Creep | AnyStoreStructure | Tombstone)[]
+        readonly METT: (Creep | AnyStoreStructure)[]
 
-        _OETT: (Creep | AnyStoreStructure | Tombstone)[]
+        _OETT: (Creep | AnyStoreStructure)[]
 
         /**
          * Optional energy transfer targets
          */
-        readonly OETT: (Creep | AnyStoreStructure | Tombstone)[]
+        readonly OETT: (Creep | AnyStoreStructure)[]
 
-        _MATT: (Creep | AnyStoreStructure | Tombstone)[]
+        _MATT: (Creep | AnyStoreStructure)[]
 
         /**
          * Mandatory all transfer targets
          */
-        readonly MATT: (Creep | AnyStoreStructure | Tombstone)[]
+        readonly MATT: (Creep | AnyStoreStructure)[]
 
-        _OATT: (Creep | AnyStoreStructure | Tombstone)[]
+        _OATT: (Creep | AnyStoreStructure)[]
 
         /**
          * Optional all transfer targets
          */
-        readonly OATT: (Creep | AnyStoreStructure | Tombstone)[]
+        readonly OATT: (Creep | AnyStoreStructure)[]
 
-        _MEFTT: (Creep | AnyStoreStructure | Tombstone)[]
+        _MEFTT: (Creep | AnyStoreStructure)[]
 
         /**
          * Mandatory Energy Fill Transfer Targets
          */
-        readonly MEFTT: (Creep | AnyStoreStructure | Tombstone)[]
+        readonly MEFTT: (Creep | AnyStoreStructure)[]
 
-        _MOFTT: (Creep | AnyStoreStructure | Tombstone)[]
+        _MOFTT: (Creep | AnyStoreStructure)[]
 
         /**
          * Mandatory Other Fill Transfer Targets
          */
-        readonly MOFTT: (Creep | AnyStoreStructure | Tombstone)[]
+        readonly MOFTT: (Creep | AnyStoreStructure)[]
     }
 
     interface DepositRecord {
