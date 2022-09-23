@@ -52,11 +52,13 @@ export class HubHauler extends Creep {
         // by breaking down batteries... this is the only case it should have more then 10k energy in the factory.
         if (this.factoryEnergyOverfillTransfer()) return
 
-        if (this.reserveStorageTransfer()) return
-        if (this.reserveTerminalTransfer()) return
-
+        //Fill the Link before the storage/terminal because the storage transfers can take a long time,
+        // the link transfers are just 2 or 4 ticks long.
         if (this.reserveHubLinkWithdraw()) return
         if (this.reserveHubLinkTransfer()) return
+
+        if (this.reserveStorageTransfer()) return
+        if (this.reserveTerminalTransfer()) return
 
         if (this.reserveFactoryWithdraw()) return
         if (this.reserveFactoryTransfer()) return
