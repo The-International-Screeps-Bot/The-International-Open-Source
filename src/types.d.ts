@@ -796,7 +796,7 @@ declare global {
         /**
          * Finds the amount of a specified resourceType in the room's storage and teminal
          */
-        findStoredResourceAmount(resourceType: ResourceConstant): number
+        findStoredResourceAmount(resourceType: ResourceConstant, includeContainers?: boolean): number
 
         /**
          * Tries to delete a task with the provided ID and response state
