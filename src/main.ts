@@ -40,6 +40,10 @@ import { tickConfig } from './international/tickConfig'
 global.profiler = initProfiler()
 
 export const loop = function () {
+    if(Game.cpu.bucket < 100) {
+        console.log("SKIPPING TICK due to low bucket:" + Game.cpu.bucket)
+        return;
+    }
     memHack.run()
 
     internationalManager.tickReset()
