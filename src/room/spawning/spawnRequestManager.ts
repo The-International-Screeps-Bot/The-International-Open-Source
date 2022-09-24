@@ -1361,8 +1361,8 @@ Room.prototype.spawnRequester = function () {
         )
     }
 
-    for (const requestRoomName of this.memory.combatRequests) {
-        const request = Memory.combatRequests[requestRoomName]
+    for (const requestName of this.memory.combatRequests) {
+        const request = Memory.combatRequests[requestName]
         if (!request) continue
 
         let minRangedAttackCost =
@@ -1391,6 +1391,9 @@ Room.prototype.spawnRequester = function () {
             minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]),
             request.data[CombatRequestData.minDamage] / HEAL_POWER,
         )
+        let minDismantleCost =
+            (request.data[CombatRequestData.dismantle]) * BODYPART_COST[WORK] +
+            (request.data[CombatRequestData.dismantle]) * BODYPART_COST[MOVE]
 
         if (request.T === 'attack') {
             continue
@@ -1421,7 +1424,7 @@ Room.prototype.spawnRequester = function () {
                     minCost,
                     priority: 8,
                     memoryAdditions: {
-                        CRN: requestRoomName,
+                        CRN: requestName,
                     },
                 }
             })(),
@@ -1432,7 +1435,7 @@ Room.prototype.spawnRequester = function () {
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
                 const role = 'antifaDismantler'
-                const minCost = 150
+                const minCost = Math.min(minDismantleCost, spawnEnergyCapacity)
                 let extraParts: BodyPartConstant[] = []
 
                 for (let i = 0; i < request.data[CombatRequestData.dismantle]; i++) {
@@ -1445,9 +1448,9 @@ Room.prototype.spawnRequester = function () {
                     extraParts,
                     partsMultiplier: 1,
                     minCost,
-                    priority: 8.5,
+                    priority: 8,
                     memoryAdditions: {
-                        CRN: requestRoomName,
+                        CRN: requestName,
                     },
                 }
             })(),
@@ -1475,7 +1478,7 @@ Room.prototype.spawnRequester = function () {
                     memoryAdditions: {
                         SS: 2,
                         ST: 'attack',
-                        CRN: requestRoomName,
+                        CRN: requestName,
                     },
                 }
             })(),
@@ -1501,7 +1504,7 @@ Room.prototype.spawnRequester = function () {
                     memoryAdditions: {
                         SS: 2,
                         ST: 'attack',
-                        CRN: requestRoomName,
+                        CRN: requestName,
                     },
                 }
             })(),

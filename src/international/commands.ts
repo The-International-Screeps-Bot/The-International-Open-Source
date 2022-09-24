@@ -13,7 +13,6 @@ global.clearMemory = function (avoidKeys = []) {
     // Clear all properties in memory
 
     for (const key in Memory) {
-
         if (avoidKeys.includes(key)) continue
 
         delete Memory[key as keyof typeof Memory]
@@ -163,17 +162,15 @@ global.claim = function (request, communeName) {
 
     return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${request}`
 }
-global.deleteClaimRequests = function() {
-
+global.deleteClaimRequests = function () {
     let deleteCount = 0
 
-    for (const requestRoomName in Memory.claimRequests) {
-
-        const request = Memory.claimRequests[requestRoomName]
+    for (const requestName in Memory.claimRequests) {
+        const request = Memory.claimRequests[requestName]
 
         deleteCount += 1
         if (request.responder) delete Memory.rooms[request.responder].claimRequest
-        delete Memory.claimRequests[requestRoomName]
+        delete Memory.claimRequests[requestName]
     }
 
     return `Deleted ${deleteCount} claim requests`
@@ -204,7 +201,8 @@ global.deleteCombatRequest = function (request) {
     // If responder, remove from its memory
 
     const responder = Memory.combatRequests[request].responder
-    if (responder) Memory.rooms[responder].combatRequests.splice(Memory.rooms[responder].combatRequests.indexOf(request), 1)
+    if (responder)
+        Memory.rooms[responder].combatRequests.splice(Memory.rooms[responder].combatRequests.indexOf(request), 1)
 
     delete Memory.combatRequests[request]
 
