@@ -582,6 +582,11 @@ declare global {
         allyTrading: boolean
 
         /**
+         * Wether or not the bot should be using the market
+         */
+        marketUsage: boolean
+
+        /**
          * An ongoing record of the latest ID assigned by the bot
          */
         ID: number

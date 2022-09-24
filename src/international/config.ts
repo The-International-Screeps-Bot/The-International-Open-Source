@@ -14,6 +14,7 @@ import {
     roomStats,
     nonAggressionPlayers,
     autoAttack,
+    marketUsage,
 } from './constants'
 import { statsManager } from './statsManager'
 
@@ -58,6 +59,7 @@ class ConfigManager {
         Memory.autoAttack = autoAttack
         Memory.publicRamparts = publicRamparts
         Memory.allyTrading = allyTrading
+        Memory.marketUsage = marketUsage
 
         // Construct foundation
 

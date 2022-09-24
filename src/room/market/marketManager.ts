@@ -29,7 +29,7 @@ function storeLocalMarketMemory(memory: string) {
     InterShardMemory.setLocal(JSON.stringify(segment))
 }
 
-const tradeBlacklist = [
+const tradeBlacklistRoomNames = [
     //Don't trade with myself.
     'W21N9',
     'W21N8',
@@ -49,7 +49,7 @@ export class MarketManager {
     }
 
     run() {
-        let room = this.communeManager.room
+        const { room } = this.communeManager
         const { terminal } = room
 
         // Stop if there is no terminal
@@ -65,6 +65,8 @@ export class MarketManager {
                 60000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY),
                 0.75,
             )
+
+        if (!Memory.marketUsage) return
 
         // If the market is disabled, stop
 
@@ -661,7 +663,7 @@ export class MarketManager {
             _.sortBy(
                 _.map(
                     this.dataCache[ORDER_BUY][resource]
-                        .filter(ord => !tradeBlacklist.includes(ord.roomName))
+                        .filter(ord => !tradeBlacklistRoomNames.includes(ord.roomName))
                         .filter(ord => ord.remainingAmount > 0 && ord.amount > 0),
                     order => ({
                         orderId: order.id,
@@ -1494,7 +1496,7 @@ export class MarketManager {
             result[ORDER_BUY][resource] = []
         }
         for (let ord of Game.market.getAllOrders()) {
-            if (tradeBlacklist.includes(ord.roomName)) continue
+            if (tradeBlacklistRoomNames.includes(ord.roomName)) continue
             result[ord.type as ORDER_BUY | ORDER_SELL][ord.resourceType].push(ord)
         }
         this.dataCache = result

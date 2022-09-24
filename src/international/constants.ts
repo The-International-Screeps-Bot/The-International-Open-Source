@@ -75,6 +75,11 @@ export const publicRamparts = false
  */
 export const allyTrading = true
 
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const marketUsage = true
+
 // General
 
 /**
