@@ -209,7 +209,7 @@ export class Antifa extends Creep {
             }
 
             this.rangedMassAttack()
-            this.assignMoveRequest(enemyCreep.pos)
+            if (enemyCreep.canMove) this.assignMoveRequest(enemyCreep.pos)
             return true
         }
 
@@ -250,7 +250,7 @@ export class Antifa extends Creep {
 
         if (range === 1) {
             this.rangedMassAttack()
-            this.assignMoveRequest(enemyAttacker.pos)
+            if (enemyAttacker.canMove) this.assignMoveRequest(enemyAttacker.pos)
         }
 
         // Otherwise, rangedAttack the enemyAttacker
@@ -374,7 +374,7 @@ export class Antifa extends Creep {
                 return true
             }
 
-            this.assignMoveRequest(enemyCreep.pos)
+            if (enemyCreep.canMove) this.assignMoveRequest(enemyCreep.pos)
             return true
         }
 
@@ -399,7 +399,7 @@ export class Antifa extends Creep {
 
         this.attack(enemyAttacker)
 
-        this.assignMoveRequest(enemyAttacker.pos)
+        if (enemyAttacker.canMove) this.assignMoveRequest(enemyAttacker.pos)
         return true
     }
 

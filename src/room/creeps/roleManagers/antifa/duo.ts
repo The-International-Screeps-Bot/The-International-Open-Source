@@ -34,6 +34,11 @@ export class Duo {
         return this._attackStrength
     }
 
+    get canMove() {
+        for (const member of this.members) if (!member.canMove) return false
+        return true
+    }
+
     constructor(members: Antifa[]) {
         this.members = members
         this.leader = members[0]
@@ -87,7 +92,7 @@ export class Duo {
     }
 
     createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {
-        for (const member of this.members) if (!member.canMove) return
+        if (!this.canMove) return
 
         if (!moveLeader.createMoveRequest(opts)) return
 
@@ -167,7 +172,7 @@ export class Duo {
 
             this.leader.rangedMassAttack()
 
-            if (this.leader.canMove && this.members[1].canMove) {
+            if (enemyCreep.canMove && this.canMove) {
                 this.leader.assignMoveRequest(enemyCreep.pos)
                 this.members[1].assignMoveRequest(this.leader.pos)
             }
@@ -211,7 +216,7 @@ export class Duo {
 
         if (range === 1) {
             this.leader.rangedMassAttack()
-            if (this.leader.canMove && this.members[1].canMove) {
+            if (enemyAttacker.canMove && this.canMove) {
                 this.leader.assignMoveRequest(enemyAttacker.pos)
                 this.members[1].assignMoveRequest(this.leader.pos)
             }
@@ -228,11 +233,14 @@ export class Duo {
             if (range <= 2) {
                 // Have the creep flee and inform true
 
-                this.createMoveRequest({
-                    origin: this.leader.pos,
-                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
-                    flee: true,
-                }, this.members[1])
+                this.createMoveRequest(
+                    {
+                        origin: this.leader.pos,
+                        goals: [{ pos: enemyAttacker.pos, range: 1 }],
+                        flee: true,
+                    },
+                    this.members[1],
+                )
 
                 return true
             }
@@ -339,7 +347,7 @@ export class Duo {
 
             this.leader.attack(enemyCreep)
 
-            if (this.leader.canMove && this.members[1].canMove) {
+            if (enemyCreep.canMove && this.canMove) {
                 this.leader.assignMoveRequest(enemyCreep.pos)
                 this.members[1].assignMoveRequest(this.leader.pos)
             }
@@ -367,7 +375,7 @@ export class Duo {
 
         this.leader.attack(enemyAttacker)
 
-        if (this.leader.canMove && this.members[1].canMove) {
+        if (enemyAttacker.canMove && this.canMove) {
             this.leader.assignMoveRequest(enemyAttacker.pos)
             this.members[1].assignMoveRequest(this.leader.pos)
         }
