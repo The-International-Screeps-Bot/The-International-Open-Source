@@ -1,5 +1,6 @@
 import { allowedSquadCombinations, myColors } from 'international/constants'
 import { customLog, findClosestObject, getRange, isExit, pack } from 'international/generalFunctions'
+import { internationalManager } from 'international/internationalManager'
 import { Duo } from './duo'
 import { Quad } from './quad'
 
@@ -9,6 +10,9 @@ export class Antifa extends Creep {
     }
 
     preTickManager() {
+
+        internationalManager.creepsByCombatRequest[this.memory.CRN][this.role].push(this.name)
+
         if (!this.memory.SS) return
 
         const squadMembers: Antifa[] = [this]
@@ -252,29 +256,6 @@ export class Antifa extends Creep {
         // Otherwise, rangedAttack the enemyAttacker
         else this.rangedAttack(enemyAttacker)
 
-        // If the creep is out matched, try to always stay in range 3
-
-        if (this.healStrength < enemyAttacker.attackStrength) {
-            if (range === 3) return true
-
-            if (range >= 3) {
-                this.createMoveRequest({
-                    origin: this.pos,
-                    goals: [{ pos: enemyAttacker.pos, range: 3 }],
-                })
-
-                return true
-            }
-
-            this.createMoveRequest({
-                origin: this.pos,
-                goals: [{ pos: enemyAttacker.pos, range: 25 }],
-                flee: true,
-            })
-
-            return true
-        }
-
         // If the creep has less heal power than the enemyAttacker's attack power
 
         if (this.healStrength < enemyAttacker.attackStrength) {
@@ -417,6 +398,8 @@ export class Antifa extends Creep {
         // Otherwise attack
 
         this.attack(enemyAttacker)
+
+        this.assignMoveRequest(enemyAttacker.pos)
         return true
     }
 

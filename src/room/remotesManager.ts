@@ -1,4 +1,4 @@
-import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteNeeds, spawnByRoomRemoteRoles } from 'international/constants'
+import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteNeeds, remoteRoles } from 'international/constants'
 import { customLog, findCarryPartsRequired } from 'international/generalFunctions'
 import { CommuneManager } from './communeManager'
 
@@ -133,13 +133,17 @@ export class RemotesManager {
             // Loop through each index of sourceEfficacies
 
             for (let sourceIndex = 0; sourceIndex < remoteMemory.SE.length; sourceIndex += 1) {
-
                 // Get the income based on the reservation of the this and remoteHarvester need
                 // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
 
-                const income =
-                    Math.max((isReserved ? 10 : 5) -
-                    Math.floor(Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]], 0) * minHarvestWorkRatio), 0)
+                const income = Math.max(
+                    (isReserved ? 10 : 5) -
+                        Math.floor(
+                            Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]], 0) *
+                                minHarvestWorkRatio,
+                        ),
+                    0,
+                )
 
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 

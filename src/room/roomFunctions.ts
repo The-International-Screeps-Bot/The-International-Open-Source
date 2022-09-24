@@ -1340,7 +1340,7 @@ Room.prototype.createHarassCombatRequest = function () {
 
     request.data[CombatRequestData.attack] = 3
     request.data[CombatRequestData.minDamage] = 50
-    request.data[CombatRequestData.minHeal] = 2
+    request.data[CombatRequestData.minHeal] = 20
 
     const structures = this.dismantleableStructures
 

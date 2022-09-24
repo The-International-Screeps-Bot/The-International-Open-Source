@@ -10,11 +10,38 @@ export class Duo {
     leader: Antifa
     expectedSize: 2
 
+    _healStrength: number
+
+    get healStrength() {
+        if (this._healStrength !== undefined) return this._healStrength
+
+        this._healStrength = 0
+
+        for (const member of this.members) this._healStrength += member.healStrength
+
+        return this._healStrength
+    }
+
+    _attackStrength: number
+
+    get attackStrength() {
+        if (this._attackStrength !== undefined) return this._attackStrength
+
+        this._attackStrength = 0
+
+        for (const member of this.members) this._attackStrength += member.attackStrength
+
+        return this._attackStrength
+    }
+
     constructor(members: Antifa[]) {
         this.members = members
         this.leader = members[0]
     }
+
     run() {
+        this.leader.say('Hi')
+
         if (this.leader.room.name === this.leader.memory.CRN) {
             this.getInFormation()
 
@@ -36,6 +63,7 @@ export class Duo {
             ],
         })
     }
+
     getInFormation() {
         if (this.leader.spawning) return false
 
@@ -43,6 +71,8 @@ export class Duo {
 
         if (getRange(this.leader.pos.x, this.members[1].pos.x, this.leader.pos.y, this.members[1].pos.y) <= 1)
             return true
+
+        this.leader.say('GIF')
 
         this.members[1].createMoveRequest({
             origin: this.members[1].pos,
@@ -55,27 +85,34 @@ export class Duo {
         })
         return false
     }
-    createMoveRequest(opts: MoveRequestOpts) {
-        if (this.members[1].fatigue > 0 || this.members[1].spawning) return
 
-        if (!this.leader.createMoveRequest(opts)) return
+    createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {
+        for (const member of this.members) if (!member.canMove) return
+
+        if (!moveLeader.createMoveRequest(opts)) return
 
         // Make a moveRequest for the member to the leader
 
-        const packedCoord = pack(this.leader.pos)
+        const packedCoord = pack(moveLeader.pos)
 
-        this.members[1].moveRequest = packedCoord
+        for (const member of this.members) {
+            if (member.name === moveLeader.name) continue
 
-        this.members[1].room.moveRequests.get(packedCoord)
-            ? this.members[1].room.moveRequests.get(packedCoord).push(this.members[1].name)
-            : this.members[1].room.moveRequests.set(packedCoord, [this.members[1].name])
+            member.moveRequest = packedCoord
+
+            member.room.moveRequests.get(packedCoord)
+                ? member.room.moveRequests.get(packedCoord).push(member.name)
+                : member.room.moveRequests.set(packedCoord, [member.name])
+        }
     }
+
     runCombat() {
         this.advancedHeal()
         if (this.leader.memory.ST === 'rangedAttack') return this.advancedRangedAttack()
         if (this.leader.memory.ST === 'attack') return this.advancedAttack()
         return this.advancedDismantle()
     }
+
     advancedRangedAttack() {
         const { room } = this.leader
 
@@ -131,9 +168,8 @@ export class Duo {
             this.leader.rangedMassAttack()
 
             if (this.leader.canMove && this.members[1].canMove) {
-
-               this.leader.assignMoveRequest(enemyCreep.pos)
-               this.members[1].assignMoveRequest(this.leader.pos)
+                this.leader.assignMoveRequest(enemyCreep.pos)
+                this.members[1].assignMoveRequest(this.leader.pos)
             }
             return true
         }
@@ -176,37 +212,13 @@ export class Duo {
         if (range === 1) {
             this.leader.rangedMassAttack()
             if (this.leader.canMove && this.members[1].canMove) {
-
-               this.leader.assignMoveRequest(enemyAttacker.pos)
-               this.members[1].assignMoveRequest(this.leader.pos)
+                this.leader.assignMoveRequest(enemyAttacker.pos)
+                this.members[1].assignMoveRequest(this.leader.pos)
             }
         }
 
         // Otherwise, rangedAttack the enemyAttacker
         else this.leader.rangedAttack(enemyAttacker)
-
-        // If the creep is out matched, try to always stay in range 3
-
-        if (this.leader.healStrength < enemyAttacker.attackStrength) {
-            if (range === 3) return true
-
-            if (range >= 3) {
-                this.createMoveRequest({
-                    origin: this.leader.pos,
-                    goals: [{ pos: enemyAttacker.pos, range: 3 }],
-                })
-
-                return true
-            }
-
-            this.createMoveRequest({
-                origin: this.leader.pos,
-                goals: [{ pos: enemyAttacker.pos, range: 25 }],
-                flee: true,
-            })
-
-            return true
-        }
 
         // If the creep has less heal power than the enemyAttacker's attack power
 
@@ -220,7 +232,7 @@ export class Duo {
                     origin: this.leader.pos,
                     goals: [{ pos: enemyAttacker.pos, range: 1 }],
                     flee: true,
-                })
+                }, this.members[1])
 
                 return true
             }
@@ -243,6 +255,7 @@ export class Duo {
 
         return true
     }
+
     rangedAttackStructures() {
         const structures = this.leader.room.dismantleableStructures
 
@@ -284,6 +297,7 @@ export class Duo {
 
         return true
     }
+
     advancedAttack() {
         const { room } = this.leader
 
@@ -323,10 +337,11 @@ export class Duo {
                 return true
             }
 
-            if (this.leader.canMove && this.members[1].canMove) {
+            this.leader.attack(enemyCreep)
 
-               this.leader.assignMoveRequest(enemyCreep.pos)
-               this.members[1].assignMoveRequest(this.leader.pos)
+            if (this.leader.canMove && this.members[1].canMove) {
+                this.leader.assignMoveRequest(enemyCreep.pos)
+                this.members[1].assignMoveRequest(this.leader.pos)
             }
             return true
         }
@@ -351,8 +366,14 @@ export class Duo {
         // Otherwise attack
 
         this.leader.attack(enemyAttacker)
+
+        if (this.leader.canMove && this.members[1].canMove) {
+            this.leader.assignMoveRequest(enemyAttacker.pos)
+            this.members[1].assignMoveRequest(this.leader.pos)
+        }
         return true
     }
+
     attackStructures() {
         const structures = this.leader.room.dismantleableStructures
 
@@ -394,6 +415,7 @@ export class Duo {
 
         return true
     }
+
     advancedDismantle() {
         // Avoid targets we can't dismantle
 
@@ -437,6 +459,7 @@ export class Duo {
 
         return true
     }
+
     stompEnemyCSites?() {
         if (this.leader.room.controller && this.leader.room.controller.safeMode) return false
 
@@ -457,6 +480,7 @@ export class Duo {
 
         return true
     }
+
     advancedHeal() {
         if (this.members[1].hits < this.members[1].hitsMax) {
             this.members[1].heal(this.members[1])

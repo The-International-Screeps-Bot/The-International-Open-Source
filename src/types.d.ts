@@ -249,7 +249,7 @@ declare global {
         /**
          * The specific group of which to compare the creep amount to
          */
-        spawningGroup?: string[]
+        spawnGroup?: string[]
         /**
          *
          */
@@ -718,7 +718,7 @@ declare global {
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room
          */
-        creepsFromRoomWithRemote: { [key: string]: { [key: string]: string[] } }
+        creepsOfRemote: { [key: string]: { [key: string]: string[] } }
 
         /**
          * An object, if constructed, containing keys of resource types and values of the number of those resources in the room's terminal and storage

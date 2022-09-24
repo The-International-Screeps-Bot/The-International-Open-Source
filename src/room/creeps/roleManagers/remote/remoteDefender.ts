@@ -43,10 +43,9 @@ export class RemoteDefender extends Creep {
 
         const commune = this.commune
 
-        // Add the creep to creepsFromRoomWithRemote relative to its remote
+        // Add the creep to creepsOfRemote relative to its remote
 
-        if (commune.creepsFromRoomWithRemote[this.memory.RN])
-            commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
+        if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
     }
 
     /**

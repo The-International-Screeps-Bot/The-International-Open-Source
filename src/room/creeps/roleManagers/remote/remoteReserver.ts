@@ -64,10 +64,9 @@ export class RemoteReserver extends Creep {
 
         const commune = this.commune
 
-        // Add the creep to creepsFromRoomWithRemote relative to its remote
+        // Add the creep to creepsOfRemote relative to its remote
 
-        if (commune.creepsFromRoomWithRemote[this.memory.RN])
-            commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
+        if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
     }
 
     constructor(creepID: Id<Creep>) {
@@ -108,7 +107,7 @@ export class RemoteReserver extends Creep {
                     ally: Infinity,
                     keeper: Infinity,
                     enemyRemote: Infinity,
-                    allyRemote: Infinity
+                    allyRemote: Infinity,
                 },
             })
 
