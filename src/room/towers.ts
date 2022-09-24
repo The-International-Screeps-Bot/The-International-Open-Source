@@ -40,10 +40,6 @@ Room.prototype.towersHealCreeps = function () {
 
         if (tower.store.energy < TOWER_ENERGY_COST) continue
 
-        // If tower is below or equal to 50% capacity
-
-        if (tower.store.energy <= tower.store.getCapacity(RESOURCE_ENERGY) * 0.5) continue
-
         // If the heal failed, iterate
 
         if (tower.heal(target) !== OK) continue

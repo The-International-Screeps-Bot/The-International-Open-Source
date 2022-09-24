@@ -20,8 +20,8 @@ Room.prototype.combatRequestManager = function () {
 
             let totalHits = 0
             for (const structure of structures) totalHits += structure.hits
-            
-            if (structures.length > 0) request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 100), 20)
+
+            if (structures.length > 0) request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 10), 20)
         }
 
         // If there are threats to our hegemony, temporarily abandon the request
