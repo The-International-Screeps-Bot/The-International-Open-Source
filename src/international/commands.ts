@@ -9,10 +9,15 @@ global.clearGlobal = function () {
 }
 global.CG = global.clearGlobal
 
-global.clearMemory = function () {
+global.clearMemory = function (avoidKeys = []) {
     // Clear all properties in memory
 
-    for (const key in Memory) delete Memory[key as keyof typeof Memory]
+    for (const key in Memory) {
+
+        if (avoidKeys.includes(key)) continue
+
+        delete Memory[key as keyof typeof Memory]
+    }
 
     return 'Cleared all of Memory'
 }

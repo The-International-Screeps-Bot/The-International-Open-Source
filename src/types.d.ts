@@ -1973,7 +1973,7 @@ declare global {
             /**
              * Deletes all properties of Memory
              */
-            clearMemory(): string
+            clearMemory(avoidKeys?: string[]): string
 
             /**
              * Kills all creeps owned by the bot
