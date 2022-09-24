@@ -1327,17 +1327,16 @@ Room.prototype.makeRemote = function (scoutingRoom) {
     return true
 }
 
-Room.prototype.createHarassCombatRequest = function() {
-
+Room.prototype.createHarassCombatRequest = function () {
     if (Memory.combatRequests[this.name]) return
     if (!this.enemyCreeps.length) return
     if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
     if (this.enemyAttackers.find(creep => creep.attackStrength > 0)) return
 
-    const request = Memory.combatRequests[this.name] = {
+    const request = (Memory.combatRequests[this.name] = {
         T: 'harass',
         data: [0],
-    }
+    })
 
     request.data[CombatRequestData.attack] = 3
     request.data[CombatRequestData.minDamage] = 50
@@ -1348,7 +1347,8 @@ Room.prototype.createHarassCombatRequest = function() {
     let totalHits = 0
     for (const structure of structures) totalHits += structure.hits
 
-    if (structures.length > 0) request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 100), 20)
+    if (structures.length > 0)
+        request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 100), 20)
 }
 
 Room.prototype.cleanMemory = function () {
@@ -1375,7 +1375,7 @@ Room.prototype.cleanMemory = function () {
     }
 }
 
-Room.prototype.findStoredResourceAmount = function (resourceType) {
+Room.prototype.findStoredResourceAmount = function (resourceType, includeContainers = false) {
     const room = this
 
     // If room.storedResources doesn't exist, construct it
@@ -1390,7 +1390,13 @@ Room.prototype.findStoredResourceAmount = function (resourceType) {
 
     // Create array of room and terminal
 
-    const storageStructures = [room.storage, room.terminal, ...room.structures.factory]
+    const storageStructures: AnyStoreStructure[] = [
+        room.storage,
+        room.terminal,
+        ...room.structures.factory,
+        ...room.structures.powerSpawn,
+    ]
+    if (includeContainers) storageStructures.push(...room.structures.container)
 
     // Iterate through storageStructures
 

@@ -56,7 +56,7 @@ export class StatsManager {
         }
     }
 
-    roomCommuneFinalEndTick(roomName: string, room?: Room, force: boolean = false) {
+    roomCommuneFinalEndTick(roomName: string, room?: Room, forceUpdate: boolean = false) {
         const roomMemory = Memory.rooms[roomName]
         const roomStats = Memory.stats.rooms[roomName]
         const globalCommuneStats = global.roomStats.commune[roomName] as RoomCommuneStats
@@ -79,17 +79,17 @@ export class StatsManager {
         }
         roomStats.su = this.average(roomStats.su, spawnUsage)
 
-        if ((Game.time % 250 === 0 && room) || force) {
+        if ((Game.time % 250 === 0 && room) || forceUpdate) {
             if (room.controller && room.controller.my) {
                 const progressPercentage = room.controller.progress / room.controller.progressTotal
                 roomStats.cl =
                     progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
             } else roomStats.cl = null
-            roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY)
+            roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY, true)
         }
 
         roomStats.eih = this.average(roomStats.eih, globalCommuneStats.eih)
-        if (Memory.roomStats >= 2 || force) {
+        if (Memory.roomStats >= 2 || forceUpdate) {
             roomStats.mh = this.average(roomStats.mh, globalCommuneStats.mh)
             roomStats.eib = this.average(roomStats.eib, globalCommuneStats.eib)
             roomStats.eos = this.average(roomStats.eos, globalCommuneStats.eos)
