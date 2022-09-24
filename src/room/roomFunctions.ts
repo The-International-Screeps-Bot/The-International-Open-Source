@@ -2,6 +2,8 @@ import {
     allStructureTypes,
     allyPlayers,
     CombatRequestData,
+    defaultPlainCost,
+    defaultSwampCost,
     impassibleStructureTypes,
     maxRampartGroupSize,
     minHarvestWorkRatio,
@@ -518,6 +520,9 @@ type Route = RoutePart[]
 Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     const room = this
 
+    opts.plainCost = opts.plainCost || defaultPlainCost
+    opts.swampCost = opts.swampCost || defaultSwampCost
+
     const allowedRoomNames = new Set()
     allowedRoomNames.add(opts.origin.roomName)
 
@@ -571,8 +576,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
     function generatePath() {
         const pathFinderResult = PathFinder.search(opts.origin, opts.goals, {
-            plainCost: opts.plainCost || 2,
-            swampCost: opts.swampCost || 8,
+            plainCost: opts.plainCost,
+            swampCost: opts.swampCost,
             maxRooms: allowedRoomNames.size,
             maxOps: 100000,
             flee: opts.flee,
@@ -676,8 +681,13 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 if (!room) return cm
 
-                if (opts.creep && opts.creep.memory.R)
-                    for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, 1)
+                if (opts.creep) {
+
+                    let roadCost = 1
+                    if (!opts.creep.memory.R) roadCost = opts.plainCost
+
+                    for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, roadCost)
+                }
 
                 // Weight structures
 

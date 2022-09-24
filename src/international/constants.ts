@@ -902,3 +902,6 @@ const allowedSquadCombinations: { [squadSize: string]: Partial<Record<CreepRoles
 }
 
 export { allowedSquadCombinations }
+
+export const defaultPlainCost = 2
+export const defaultSwampCost = 8
