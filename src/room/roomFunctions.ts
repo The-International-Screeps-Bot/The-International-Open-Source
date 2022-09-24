@@ -2500,7 +2500,7 @@ Room.prototype.createClaimRequest = function () {
     score += this.findSwampPlainsRatio() * 10
 
     Memory.claimRequests[this.name] = {
-        needs: [1, 20, 0],
+        needs: [],
         score,
     }
 

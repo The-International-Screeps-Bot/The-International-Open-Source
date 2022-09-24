@@ -680,6 +680,7 @@ export enum CombatRequestData {
     minDamage,
     minHeal,
     swarm,
+    priority,
 }
 
 export enum AllyCreepRequestNeeds {

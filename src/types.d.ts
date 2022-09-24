@@ -2002,6 +2002,8 @@ declare global {
              */
             claim(request: string, communeName?: string): string
 
+            deleteClaimRequests(): string
+
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room
              */

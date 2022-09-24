@@ -33,6 +33,7 @@ Room.prototype.combatRequestManager = function () {
 
             this.memory.combatRequests.splice(index, 1)
             delete request.responder
+            continue
         }
 
         // If there are no enemyCreeps, delete the combatRequest
@@ -41,6 +42,7 @@ Room.prototype.combatRequestManager = function () {
             delete Memory.combatRequests[requestName]
             this.memory.combatRequests.splice(index, 1)
             delete request.responder
+            continue
         }
     }
 

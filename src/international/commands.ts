@@ -163,6 +163,21 @@ global.claim = function (request, communeName) {
 
     return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${request}`
 }
+global.deleteClaimRequests = function() {
+
+    let deleteCount = 0
+
+    for (const requestRoomName in Memory.claimRequests) {
+
+        const request = Memory.claimRequests[requestRoomName]
+
+        deleteCount += 1
+        if (request.responder) delete Memory.rooms[request.responder].claimRequest
+        delete Memory.claimRequests[requestRoomName]
+    }
+
+    return `Deleted ${deleteCount} claim requests`
+}
 
 global.combat = function (type, request, communeName) {
     if (!Memory.combatRequests[request]) {
