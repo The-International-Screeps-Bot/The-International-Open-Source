@@ -1,3 +1,4 @@
+import { myColors } from 'international/constants'
 import { customLog, newID } from 'international/generalFunctions'
 
 StructureSpawn.prototype.advancedSpawn = function (spawnRequest) {
@@ -227,6 +228,17 @@ Room.prototype.spawnRequestByGroup = function (opts) {
     opts.maxCreeps -= opts.spawningGroup ? opts.spawningGroup.length : this.creepsFromRoom[opts.role].length
 
     // So long as there are totalExtraParts left to assign
+
+    //Guard against bad arguments, otherwise it can cause the block below to get into an infinate loop and crash.
+    if (opts.extraParts.length == 0) {
+        customLog(
+            'spawnRequestByGroup error',
+            '0 length extraParts?' + JSON.stringify(opts),
+            myColors.white,
+            myColors.red,
+        )
+        return
+    }
 
     while (totalExtraParts >= opts.extraParts.length && opts.maxCreeps > 0) {
         // Construct important imformation for the spawnRequest
