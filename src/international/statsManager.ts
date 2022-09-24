@@ -89,16 +89,16 @@ export class StatsManager {
         }
 
         roomStats.eih = this.average(roomStats.eih, globalCommuneStats.eih)
-        if (Memory.roomStats >= 2 || forceUpdate) {
-            roomStats.mh = this.average(roomStats.mh, globalCommuneStats.mh)
-            roomStats.eib = this.average(roomStats.eib, globalCommuneStats.eib)
-            roomStats.eos = this.average(roomStats.eos, globalCommuneStats.eos)
+        if ((Memory.roomStats && Memory.roomStats >= 2) || forceUpdate) {
+            roomStats.mh = this.average(roomStats.mh, !forceUpdate ? globalCommuneStats.mh : 0)
+            roomStats.eib = this.average(roomStats.eib, !forceUpdate ? globalCommuneStats.eib : 0)
+            roomStats.eos = this.average(roomStats.eos, !forceUpdate ? globalCommuneStats.eos : 0)
 
-            roomStats.eou = this.average(roomStats.eou, globalCommuneStats.eou)
-            roomStats.eob = this.average(roomStats.eob, globalCommuneStats.eob)
-            roomStats.eoro = this.average(roomStats.eoro, globalCommuneStats.eoro)
-            roomStats.eorwr = this.average(roomStats.eorwr, globalCommuneStats.eorwr)
-            roomStats.eosp = this.average(roomStats.eosp, globalCommuneStats.eosp)
+            roomStats.eou = this.average(roomStats.eou, !forceUpdate ? globalCommuneStats.eou : 0)
+            roomStats.eob = this.average(roomStats.eob, !forceUpdate ? globalCommuneStats.eob : 0)
+            roomStats.eoro = this.average(roomStats.eoro, !forceUpdate ? globalCommuneStats.eoro : 0)
+            roomStats.eorwr = this.average(roomStats.eorwr, !forceUpdate ? globalCommuneStats.eorwr : 0)
+            roomStats.eosp = this.average(roomStats.eosp, !forceUpdate ? globalCommuneStats.eosp : 0)
 
             allGlobalRemoteStats.forEach(([remoteRoomName, remoteRoomStats]) => {
                 globalCommuneStats.rc += 1
@@ -108,12 +108,12 @@ export class StatsManager {
                 globalCommuneStats.reoro += remoteRoomStats.reoro
                 globalCommuneStats.reob += remoteRoomStats.reob
             })
-            roomStats.rc = this.average(globalCommuneStats.rc, roomStats.rc)
-            roomStats.rcu = this.average(globalCommuneStats.rcu, roomStats.rcu)
-            roomStats.res = this.average(globalCommuneStats.res, roomStats.res)
-            roomStats.reih = this.average(globalCommuneStats.reih, roomStats.reih)
-            roomStats.reoro = this.average(globalCommuneStats.reoro, roomStats.reoro)
-            roomStats.reob = this.average(globalCommuneStats.reob, roomStats.reob)
+            roomStats.rc = this.average(globalCommuneStats.rc, !forceUpdate ? roomStats.rc : 0)
+            roomStats.rcu = this.average(globalCommuneStats.rcu, !forceUpdate ? roomStats.rcu : 0)
+            roomStats.res = this.average(globalCommuneStats.res, !forceUpdate ? roomStats.res : 0)
+            roomStats.reih = this.average(globalCommuneStats.reih, !forceUpdate ? roomStats.reih : 0)
+            roomStats.reoro = this.average(globalCommuneStats.reoro, !forceUpdate ? roomStats.reoro : 0)
+            roomStats.reob = this.average(globalCommuneStats.reob, !forceUpdate ? roomStats.reob : 0)
         }
     }
     internationalConfig() {
