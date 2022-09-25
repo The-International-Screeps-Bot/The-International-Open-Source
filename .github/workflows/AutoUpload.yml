@@ -24,22 +24,15 @@ jobs:
                  with:
                     node-version: 16.x
                     cache: 'npm'
+               - name: Get IP
+                 run: hostname -I
                - name: Install dependencies
                  run: |
                     npm install
-                    cd server && npm install
-                    cd grafana && npm install
-               - name: Run build
-                 run: npm run build
-               - name: Get IP
-                 run: hostname -I
-               - name: Start Grafana instance
-                 run: cd server/grafana && node index
-               - name: Execute server
+                    npm run server --tickLength=250000
                  env:
                     STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                     STEAM_ID: ${{ secrets.STEAM_ID }}
-                 run: cd server && node index.js 250000
                - name: Upload code
                  env:
                     PANDAMASTER_TOKEN: ${{ secrets.PANDAMASTER_TOKEN }}
