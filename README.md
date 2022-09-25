@@ -65,15 +65,17 @@ For more information, please go to the [wiki](https://github.com/CarsonBurke/The
 
 ### Grafana
 
-You can set up [grafana](https://grafana.com/), a graphing and stat recording tool, using the screepsplus supported tool [hosted agent](https://screepspl.us/services/grafana/). With this, metrics recorded in Memory.stats can be viewed. There is a JSON model in this repository, grafanaModel.json which you can copy and paste to use to instantiate your graphs. 
+You can set up [grafana](https://grafana.com/), a graphing and stat recording tool, using the screepsplus supported tool [hosted agent](https://screepspl.us/services/grafana/). With this, metrics recorded in Memory.stats can be viewed. There is a JSON model in this repository, grafanaModel.json which you can copy and paste to use to instantiate your graphs.
 
 ### Private server
+
+To run the bot on the performance server, run `npm run server` and check out the server and `localhost:3000` in your browser.
 
 If you'd like to use rollup to compile to a private server, you'll need to download and configure [screepsmod-auth](https://github.com/ScreepsMods/screepsmod-auth) to push your code.
 
 I'd also suggest using this less-laggy tool [steamless-client](https://github.com/laverdet/screeps-steamless-client ) to watch your private server run from the comfort of your browser.
 
-## Contribution 
+## Contribution
 
 I'm a huge fan of teamwork, and many useful features of this bot have been added by contributors.
 
