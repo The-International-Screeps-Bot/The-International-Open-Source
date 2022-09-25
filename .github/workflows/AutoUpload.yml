@@ -27,13 +27,9 @@ jobs:
                - name: Get IP
                  run: hostname -I
                - name: Install dependencies
-                 run: |
-                    npm install
-                    npm run server --tickLength=250000
+                 run: npm install
+               - name: Start instances
+                 run: npm run server --tickLength=250000
                  env:
                     STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                     STEAM_ID: ${{ secrets.STEAM_ID }}
-               - name: Upload code
-                 env:
-                    PANDAMASTER_TOKEN: ${{ secrets.PANDAMASTER_TOKEN }}
-                 run: node ./uploadCode.js
