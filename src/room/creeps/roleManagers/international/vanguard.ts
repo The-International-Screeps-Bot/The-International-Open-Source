@@ -7,17 +7,14 @@ export class Vanguard extends Creep {
     }
 
     preTickManager() {
-        const { room } = this
+        if (this.memory.SI && !this.dying) this.room.creepsOfSourceAmount[this.memory.SI] += 1
 
-        if (this.memory.SI && !this.dying) room.creepsOfSourceAmount[this.memory.SI] += 1
+        if (this.dying) return
 
-        const claimTarget = Memory.rooms[this.commune.name].claimRequest
+        if (!Memory.rooms[this.commune.name].claimRequest) return
 
-        // If the creep has no claim target, stop
-
-        if (claimTarget)
-            Memory.claimRequests[Memory.rooms[this.commune.name].claimRequest].needs[ClaimRequestNeeds.vanguard] -=
-                this.parts.work
+        Memory.claimRequests[Memory.rooms[this.commune.name].claimRequest].needs[ClaimRequestNeeds.vanguard] -=
+            this.parts.work
     }
 
     /**

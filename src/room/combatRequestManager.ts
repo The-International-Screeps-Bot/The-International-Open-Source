@@ -14,15 +14,16 @@ Room.prototype.combatRequestManager = function () {
         const requestRoom = Game.rooms[requestName]
         if (!requestRoom) continue
 
-        if (Game.time % Math.floor(Math.random() * 100) === 0) {
+        /* if (Game.time % Math.floor(Math.random() * 100) === 0) { */
 
-            const structures = this.dismantleableStructures
+        const structures = requestRoom.dismantleableStructures
 
-            let totalHits = 0
-            for (const structure of structures) totalHits += structure.hits
-            
-            if (structures.length > 0) request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 100), 20)
-        }
+        let totalHits = 0
+        for (const structure of structures) totalHits += structure.hits
+
+        if (structures.length > 0)
+            request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
+        /* } */
 
         // If there are threats to our hegemony, temporarily abandon the request
 
@@ -33,6 +34,7 @@ Room.prototype.combatRequestManager = function () {
 
             this.memory.combatRequests.splice(index, 1)
             delete request.responder
+            continue
         }
 
         // If there are no enemyCreeps, delete the combatRequest
@@ -41,6 +43,7 @@ Room.prototype.combatRequestManager = function () {
             delete Memory.combatRequests[requestName]
             this.memory.combatRequests.splice(index, 1)
             delete request.responder
+            continue
         }
     }
 

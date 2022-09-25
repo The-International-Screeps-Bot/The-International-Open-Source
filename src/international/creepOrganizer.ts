@@ -1,5 +1,5 @@
 import { creepClasses } from 'room/creeps/creepClasses'
-import { myColors, spawnByRoomRemoteRoles } from './constants'
+import { myColors, remoteRoles } from './constants'
 import { customLog, pack } from './generalFunctions'
 import { InternationalManager } from './internationalManager'
 

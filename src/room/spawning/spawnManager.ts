@@ -22,7 +22,7 @@ Room.prototype.spawnManager = function () {
     const requestsByPriority = Object.keys(this.spawnRequests).sort((a, b) => {
         return parseInt(a) - parseInt(b)
     })
-/*
+    /*
 
 // Spawn request debug logging
 
@@ -49,11 +49,23 @@ Room.prototype.spawnManager = function () {
         const spawn = inactiveSpawns[spawnIndex]
 
         // Otherwise get the spawnRequest using its priority
-
         const spawnRequest = this.spawnRequests[priority]
 
-        // See if creep can be spawned
+        //We want to continue instead of break in this sub-case.  If we're asked to build a creep larger
+        // than what we can possibly build, if we break out, we'll get stuck in a loop where the rest of the
+        // spawns never run.
+        if (spawnRequest.cost > this.energyCapacityAvailable) {
+            customLog(
+                'Failed to spawn',
+                `cost greater then energyCapacityAvailable, role: ${spawnRequest.role}, cost: ${spawnRequest.cost}, body: (${spawnRequest.body.length}) ${spawnRequest.body}`,
+                myColors.white,
+                myColors.red,
+            )
 
+            continue
+        }
+
+        // See if creep can be spawned
         const testSpawnResult = spawn.advancedSpawn(spawnRequest)
 
         // If creep can't be spawned

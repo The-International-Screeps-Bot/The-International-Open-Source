@@ -11,6 +11,31 @@ import { tickConfig } from './tickConfig'
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
 export class InternationalManager {
+    /**
+     * Organizes creeps into properties for their communeName, and tracks total creep count
+     */
+    creepOrganizer?(): void
+
+    /**
+     * Tracks and records constructionSites and thier age, deleting old sites
+     */
+    constructionSiteManager?(): void
+
+    /**
+     * Adds colours and annotations to the map if mapVisuals are enabled
+     */
+    mapVisualsManager?(): void
+
+    /**
+     * Handles logging, stat recording, and more at the end of the tick
+     */
+    endTickManager?(): void
+
+    /**
+     * Antifa creeps by combat request name, then by role with an array of creep names
+     */
+    creepsByCombatRequest: { [key: string]: { [key: string]: string[] } }
+
     run() {
         // If CPU logging is enabled, get the CPU used at the start
 
@@ -39,6 +64,17 @@ export class InternationalManager {
                 myColors.white,
                 myColors.lightBlue,
             )
+    }
+
+    /**
+     * Updates values to be present for this tick
+     */
+    update() {
+        delete this._myOrders
+        delete this._orders
+        delete this._myOrdersCount
+        delete this._claimRequestsByScore
+        delete this._defaultMinCacheAmount
     }
 
     /**
@@ -113,13 +149,13 @@ export class InternationalManager {
             return
         }
 
-        const myPixelOrder = _.filter(Game.market.orders, o => (o.type == "sell" && o.resourceType == PIXEL))[0]
+        const myPixelOrder = _.filter(Game.market.orders, o => o.type == 'sell' && o.resourceType == PIXEL)[0]
 
         const sellOrder = this.getSellOrder(PIXEL, Infinity)
         let price: number
 
         if (sellOrder.price < avgPrice) {
-            price = avgPrice;
+            price = avgPrice
         } else {
             price = sellOrder.price
         }
@@ -137,7 +173,6 @@ export class InternationalManager {
             } else {
                 return
             }
-
         }
 
         Game.market.createOrder({
@@ -180,37 +215,6 @@ export class InternationalManager {
         }
 
         return global.terrainCoords[roomName]
-    }
-
-    /**
-     * Organizes creeps into properties for their communeName, and tracks total creep count
-     */
-    creepOrganizer?(): void
-
-    /**
-     * Tracks and records constructionSites and thier age, deleting old sites
-     */
-    constructionSiteManager?(): void
-
-    /**
-     * Adds colours and annotations to the map if mapVisuals are enabled
-     */
-    mapVisualsManager?(): void
-
-    /**
-     * Handles logging, stat recording, and more at the end of the tick
-     */
-    endTickManager?(): void
-
-    /**
-     * Resets certain cached variables each tick
-     */
-    tickReset() {
-        delete this._myOrders
-        delete this._orders
-        delete this._myOrdersCount
-        delete this._claimRequestsByScore
-        delete this._defaultMinCacheAmount
     }
 
     /**

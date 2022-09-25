@@ -5,6 +5,15 @@ export class Claimer extends Creep {
         super(creepID)
     }
 
+    preTickManager() {
+
+        if (this.dying) return
+
+        if (!Memory.rooms[this.commune.name].claimRequest) return
+
+        Memory.claimRequests[Memory.rooms[this.commune.name].claimRequest].needs[ClaimRequestNeeds.claimer] -= 1
+    }
+
     /**
      * Claims a room specified in the creep's commune claimRequest
      */
@@ -84,8 +93,6 @@ export class Claimer extends Creep {
                     enemy: Infinity,
                     ally: Infinity,
                     keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity
                 },
             })
         }

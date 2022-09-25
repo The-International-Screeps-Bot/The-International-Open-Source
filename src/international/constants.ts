@@ -38,7 +38,7 @@ export const allyPlayers = ['MarvinTMB', 'PandaMaster', 'lokenwow', 'LittleBitBl
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy']
+export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy', 'o4kapuk']
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -74,6 +74,11 @@ export const publicRamparts = false
  * Default value, do not change. Modify this property in Memory instead
  */
 export const allyTrading = true
+
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const marketUsage = true
 
 // General
 
@@ -675,6 +680,7 @@ export enum CombatRequestData {
     minDamage,
     minHeal,
     swarm,
+    priority,
 }
 
 export enum AllyCreepRequestNeeds {
@@ -693,20 +699,18 @@ export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHar
 
 export const remoteHaulerRoles: ('remoteHauler0' | 'remoteHauler1')[] = ['remoteHauler0', 'remoteHauler1']
 
-export enum RemoteHarvesterRolesBySourceIndex {
-    source1RemoteHarvester,
-    source2RemoteHarvester,
-}
-
-export enum RemoteHaulerRolesBySourceIndex {
-    remoteHauler0,
-    remoteHauler1,
-}
+export const antifaRoles: (
+    | 'antifaRangedAttacker'
+    | 'antifaAttacker'
+    | 'antifaHealer'
+    | 'antifaDismantler'
+    | 'antifaDowngrader'
+)[] = ['antifaRangedAttacker', 'antifaAttacker', 'antifaHealer', 'antifaDismantler', 'antifaDowngrader']
 
 /**
  * Roles for which to provide spawnGroups for based on their shared remoteName
  */
-export const spawnByRoomRemoteRoles: (
+export const remoteRoles: (
     | 'source1RemoteHarvester'
     | 'source2RemoteHarvester'
     | 'remoteReserver'
@@ -721,6 +725,16 @@ export const spawnByRoomRemoteRoles: (
     'remoteCoreAttacker',
     'remoteDismantler',
 ]
+
+export enum RemoteHarvesterRolesBySourceIndex {
+    source1RemoteHarvester,
+    source2RemoteHarvester,
+}
+
+export enum RemoteHaulerRolesBySourceIndex {
+    remoteHauler0,
+    remoteHauler1,
+}
 
 export const CPUBucketCapacity = 10000
 export const CPUMaxPerTick = 500
@@ -873,7 +887,7 @@ export const relayOffsets = {
     ],
 }
 
-const allowedSquadCombinations: {[squadSize: string]: Partial<Record<CreepRoles, Set<CreepRoles>>>} = {
+const allowedSquadCombinations: { [squadSize: string]: Partial<Record<CreepRoles, Set<CreepRoles>>> } = {
     2: {
         antifaRangedAttacker: new Set(['antifaRangedAttacker']),
         antifaAttacker: new Set(['antifaHealer']),
@@ -888,3 +902,6 @@ const allowedSquadCombinations: {[squadSize: string]: Partial<Record<CreepRoles,
 }
 
 export { allowedSquadCombinations }
+
+export const defaultPlainCost = 2
+export const defaultSwampCost = 8

@@ -86,7 +86,7 @@ export class RemoteHauler extends Creep {
     }
 
     removeRemote?() {
-        if (!this.dying) {
+        if (!this.dying && Memory.rooms[this.memory.RN].needs) {
             Memory.rooms[this.memory.RN].needs[RemoteNeeds[`remoteHauler${this.memory.SI}`]] += this.parts.carry
         }
 
@@ -514,9 +514,9 @@ export class RemoteHauler extends Creep {
         const creep: RemoteHauler = Game.creeps[creepName] as RemoteHauler
 
         let returnTripTime = 0
-        if (creep.memory.RN && creep.memory.SI !== undefined) {
+        if (creep.memory.RN && creep.memory.SI !== undefined && Memory.rooms[creep.memory.RN]) {
             // The 1.1 is to add some margin for the return trip
-
+            if(Memory.rooms[creep.memory.RN] && Memory.rooms[creep.memory.RN].SE && Memory.rooms[creep.memory.RN].SE.length > creep.memory.SI + 1)
             returnTripTime = Memory.rooms[creep.memory.RN].SE[creep.memory.SI] * 1.1
         }
 

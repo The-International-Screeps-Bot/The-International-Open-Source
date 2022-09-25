@@ -249,7 +249,7 @@ declare global {
         /**
          * The specific group of which to compare the creep amount to
          */
-        spawningGroup?: string[]
+        spawnGroup?: string[]
         /**
          *
          */
@@ -582,6 +582,11 @@ declare global {
         allyTrading: boolean
 
         /**
+         * Wether or not the bot should be using the market
+         */
+        marketUsage: boolean
+
+        /**
          * An ongoing record of the latest ID assigned by the bot
          */
         ID: number
@@ -713,7 +718,7 @@ declare global {
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room
          */
-        creepsFromRoomWithRemote: { [key: string]: { [key: string]: string[] } }
+        creepsOfRemote: { [key: string]: { [key: string]: string[] } }
 
         /**
          * An object, if constructed, containing keys of resource types and values of the number of those resources in the room's terminal and storage
@@ -1968,7 +1973,7 @@ declare global {
             /**
              * Deletes all properties of Memory
              */
-            clearMemory(): string
+            clearMemory(avoidKeys?: string[]): string
 
             /**
              * Kills all creeps owned by the bot
@@ -1996,6 +2001,8 @@ declare global {
              * @param commune The commune to respond to the claimRequest
              */
             claim(request: string, communeName?: string): string
+
+            deleteClaimRequests(): string
 
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room

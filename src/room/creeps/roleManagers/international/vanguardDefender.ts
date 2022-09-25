@@ -19,9 +19,7 @@ export class VanguardDefender extends Creep {
                 return !creep.isOnExit()
             })
 
-            if (!enemyCreeps.length) {
-                return this.aggressiveHeal()
-            }
+            if (!enemyCreeps.length) return this.aggressiveHeal()
 
             // Heal nearby creeps
 
@@ -197,9 +195,6 @@ export class VanguardDefender extends Creep {
                     enemy: Infinity,
                     ally: Infinity,
                     keeper: Infinity,
-                    commune: 1,
-                    neutral: 1,
-                    highway: 1,
                 },
             })
         }
