@@ -1229,7 +1229,7 @@ Room.prototype.spawnRequester = function () {
     )
 
     if (this.memory.claimRequest) {
-        const claimRequestNeeds = Memory.claimRequests[this.memory.claimRequest].needs
+        const request = Memory.claimRequests[this.memory.claimRequest]
 
         // Construct requests for claimers
 
@@ -1237,7 +1237,7 @@ Room.prototype.spawnRequester = function () {
             ((): SpawnRequestOpts | false => {
                 // If there is no claimer need
 
-                if (claimRequestNeeds[ClaimRequestNeeds.claimer] <= 0) return false
+                if (request.needs[ClaimRequestNeeds.claimer] <= 0) return false
 
                 const role = 'claimer'
 
@@ -1260,7 +1260,7 @@ Room.prototype.spawnRequester = function () {
             ((): SpawnRequestOpts | false => {
                 // If there is no vanguard need
 
-                if (claimRequestNeeds[ClaimRequestNeeds.vanguard] <= 0) return false
+                if (request.needs[ClaimRequestNeeds.vanguard] <= 0) return false
 
                 const role = 'vanguard'
 
@@ -1268,7 +1268,7 @@ Room.prototype.spawnRequester = function () {
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE, WORK, MOVE, CARRY, MOVE],
-                    partsMultiplier: claimRequestNeeds[ClaimRequestNeeds.vanguard],
+                    partsMultiplier: request.needs[ClaimRequestNeeds.vanguard],
                     minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 250,
@@ -1282,49 +1282,44 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                const minCost = 400
-                const cost = 900
-                const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
-                const strengthOfParts = RANGED_ATTACK_POWER * 3 + HEAL_POWER * 1
-
-                // If there isn't enough spawnEnergyCapacity to spawn a vanguardDefender, inform false
-
-                if (spawnEnergyCapacity < minCost) return false
-
-                // If there are no related needs
-
-                if (claimRequestNeeds[ClaimRequestNeeds.vanguardDefender] <= 0) return false
-
-                // If max spawnable strength is less that needed
-
-                if (
-                    strengthOfParts * (spawnEnergyCapacity / cost) <
-                    claimRequestNeeds[ClaimRequestNeeds.vanguardDefender]
-                ) {
-                    // Abandon the this for some time
-
-                    Memory.claimRequests[this.memory.claimRequest].abandon = 20000
-                    delete Memory.claimRequests[this.memory.claimRequest].responder
-                    delete this.memory.claimRequest
-                    return false
-                }
-
-                const partsMultiplier = Math.max(
-                    Math.floor(claimRequestNeeds[ClaimRequestNeeds.vanguardDefender] / strengthOfParts) * 1.2,
-                    1,
-                )
-
-                // If there is no vanguardDefender need
-
-                if (claimRequestNeeds[ClaimRequestNeeds.vanguardDefender] <= 0) return false
+                if (request.needs[ClaimRequestNeeds.minDamage] <= 0) return false
 
                 const role = 'vanguardDefender'
+
+                const minRangedAttackCost =
+                    ((request.needs[ClaimRequestNeeds.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+                        (request.needs[ClaimRequestNeeds.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]) *
+                    1.2
+                const rangedAttackAmount = Math.min(
+                    minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
+                    request.needs[ClaimRequestNeeds.minDamage] / RANGED_ATTACK_POWER,
+                )
+
+                const minHealCost =
+                    ((request.needs[ClaimRequestNeeds.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
+                        (request.needs[ClaimRequestNeeds.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
+                    1.2
+                const healAmount = Math.min(
+                    minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]),
+                    request.needs[ClaimRequestNeeds.minDamage] / HEAL_POWER,
+                )
+
+                const minCost = Math.min(minRangedAttackCost + minHealCost, spawnEnergyCapacity)
+                const extraParts: BodyPartConstant[] = []
+
+                for (let i = 0; i < rangedAttackAmount; i++) {
+                    extraParts.push(RANGED_ATTACK, MOVE)
+                }
+
+                for (let i = 0; i < healAmount; i++) {
+                    extraParts.push(HEAL, MOVE)
+                }
 
                 return {
                     role,
                     defaultParts: [],
                     extraParts,
-                    partsMultiplier,
+                    partsMultiplier: 1,
                     minCreeps: 1,
                     minCost,
                     priority: 8 + this.creepsFromRoom.vanguardDefender.length,
@@ -1366,33 +1361,33 @@ Room.prototype.spawnRequester = function () {
         const request = Memory.combatRequests[requestName]
         if (!request) continue
 
-        let minRangedAttackCost =
+        const minRangedAttackCost =
             ((request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
                 (request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]) *
             1.2
-        let rangedAttackAmount = Math.min(
+        const rangedAttackAmount = Math.min(
             minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
             request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER,
         )
 
-        let minAttackCost =
+        const minAttackCost =
             ((request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[ATTACK] +
                 (request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[MOVE]) *
             1.2
-        let attackAmount = Math.min(
+        const attackAmount = Math.min(
             minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]),
             request.data[CombatRequestData.minDamage] / ATTACK_POWER,
         )
 
-        let minHealCost =
+        const minHealCost =
             ((request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
                 (request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
             1.2
-        let healAmount = Math.min(
+        const healAmount = Math.min(
             minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]),
             request.data[CombatRequestData.minDamage] / HEAL_POWER,
         )
-        let minDismantleCost =
+        const minDismantleCost =
             request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
             request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE]
 

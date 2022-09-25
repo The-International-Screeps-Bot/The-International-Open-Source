@@ -32,15 +32,15 @@ Room.prototype.claimRequestManager = function () {
         return
     }
 
-    const claimTarget = Game.rooms[this.memory.claimRequest]
-    if (!claimTarget || !claimTarget.controller.my) {
+    const requestRoom = Game.rooms[this.memory.claimRequest]
+    if (!requestRoom || !requestRoom.controller.my) {
         request.needs[ClaimRequestNeeds.claimer] = 1
         return
     }
 
     // If there is a spawn
 
-    if (claimTarget.structures.spawn.length) {
+    if (requestRoom.structures.spawn.length) {
         delete Memory.claimRequests[this.memory.claimRequest]
         delete this.memory.claimRequest
         return
@@ -48,35 +48,29 @@ Room.prototype.claimRequestManager = function () {
 
     // If there is an invader core
 
-    const invaderCores = claimTarget.structures.invaderCore
+    const invaderCores = requestRoom.structures.invaderCore
     if (invaderCores.length) {
         // Abandon for its remaining existance plus the estimated reservation time
 
-        request.abandon =
-            invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX
+        request.abandon = invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX
 
         delete request.responder
         delete this.memory.claimRequest
         return
     }
 
-    request.needs[ClaimRequestNeeds.vanguard] = claimTarget.structures.spawn
-        .length
-        ? 0
-        : 20
+    request.needs[ClaimRequestNeeds.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
 
-    request.needs[ClaimRequestNeeds.vanguardDefender] = 0
+    request.needs[ClaimRequestNeeds.minDamage] = 0
+    request.needs[ClaimRequestNeeds.minHeal] = 0
 
-    // Get enemyCreeps in the room and loop through them
+    // Increase the defenderNeed according to the enemy attackers' combined strength
 
-    for (const enemyCreep of claimTarget.enemyCreeps) {
-        // If the enemy is an invader
-
+    for (const enemyCreep of requestRoom.enemyCreeps) {
         if (enemyCreep.owner.username === 'Invader') continue
 
-        // Increase the defenderNeed according to the creep's strength
-
-        request.needs[ClaimRequestNeeds.vanguardDefender] += enemyCreep.strength
+        request.needs[ClaimRequestNeeds.minDamage] += 10 + enemyCreep.healStrength
+        request.needs[ClaimRequestNeeds.minHeal] += enemyCreep.attackStrength
     }
 
     // If CPU logging is enabled, log the CPU used by this manager

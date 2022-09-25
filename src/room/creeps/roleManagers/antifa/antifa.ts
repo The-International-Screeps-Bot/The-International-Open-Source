@@ -135,6 +135,11 @@ export class Antifa extends Creep {
                         range: 25,
                     },
                 ],
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                },
             })
             return
         }
@@ -151,6 +156,11 @@ export class Antifa extends Creep {
                     range: 25,
                 },
             ],
+            typeWeights: {
+                enemy: Infinity,
+                ally: Infinity,
+                keeper: Infinity,
+            },
         })
     }
 

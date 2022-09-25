@@ -668,7 +668,8 @@ export const RemoteNeeds_HarvesterByIndex: RemoteNeeds[] = [
 export enum ClaimRequestNeeds {
     claimer,
     vanguard,
-    vanguardDefender,
+    minDamage,
+    minHeal,
 }
 
 export enum CombatRequestData {

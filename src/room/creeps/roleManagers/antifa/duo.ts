@@ -64,18 +64,38 @@ export class Duo {
                     range: 25,
                 },
             ],
+            typeWeights: {
+                enemy: Infinity,
+                ally: Infinity,
+                keeper: Infinity,
+            },
         })
     }
 
     getInFormation() {
         if (this.leader.spawning) return false
 
-        if (this.leader.isOnExit()) return true
+        const range = getRange(this.leader.pos.x, this.members[1].pos.x, this.leader.pos.y, this.members[1].pos.y)
 
-        if (getRange(this.leader.pos.x, this.members[1].pos.x, this.leader.pos.y, this.members[1].pos.y) <= 1)
+        // If squad is in formation
+
+        if (this.leader.room.name === this.members[1].room.name && range <= 1)
             return true
 
         this.leader.say('GIF')
+
+        if (range > 2) {
+
+            this.leader.createMoveRequest({
+                origin: this.leader.pos,
+                goals: [
+                    {
+                        pos: this.members[1].pos,
+                        range: 1,
+                    },
+                ],
+            })
+        }
 
         this.members[1].createMoveRequest({
             origin: this.members[1].pos,
@@ -86,7 +106,8 @@ export class Duo {
                 },
             ],
         })
-        return false
+
+        return this.leader.isOnExit()
     }
 
     createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {

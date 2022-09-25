@@ -33,10 +33,7 @@ export class Claimer extends Creep {
                 goals: [{ pos: room.controller.pos, range: 1 }],
                 avoidEnemyRanges: true,
                 plainCost: 1,
-                swampCost: 1,
-                typeWeights: {
-                    keeper: Infinity,
-                },
+                swampCost: creep.parts.move >= 5 ? 1 : undefined,
             })
 
             return
@@ -88,6 +85,7 @@ export class Claimer extends Creep {
                 origin: creep.pos,
                 goals: [{ pos: new RoomPosition(25, 25, claimTarget), range: 25 }],
                 avoidEnemyRanges: true,
+                plainCost: 1,
                 swampCost: creep.parts.move >= 5 ? 1 : undefined,
                 typeWeights: {
                     enemy: Infinity,

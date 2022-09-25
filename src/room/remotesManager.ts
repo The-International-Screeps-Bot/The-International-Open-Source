@@ -69,7 +69,7 @@ export class RemotesManager {
                 // Increase the defenderNeed according to the enemy attackers' combined strength
 
                 for (const enemyCreep of remote.enemyCreeps) {
-                    remoteMemory.needs[RemoteNeeds.minDamage] += enemyCreep.healStrength
+                    remoteMemory.needs[RemoteNeeds.minDamage] += 10 + enemyCreep.healStrength
                     remoteMemory.needs[RemoteNeeds.minHeal] += enemyCreep.attackStrength
                 }
 
