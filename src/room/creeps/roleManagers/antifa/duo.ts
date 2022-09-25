@@ -79,23 +79,23 @@ export class Duo {
 
         // If squad is in formation
 
-        if (this.leader.room.name === this.members[1].room.name && range <= 1)
-            return true
+        if (this.leader.room.name === this.members[1].room.name) {
+            if (range <= 1) return true
+
+            if (range > 2) {
+                this.leader.createMoveRequest({
+                    origin: this.leader.pos,
+                    goals: [
+                        {
+                            pos: this.members[1].pos,
+                            range: 1,
+                        },
+                    ],
+                })
+            }
+        }
 
         this.leader.say('GIF')
-
-        if (range > 2) {
-
-            this.leader.createMoveRequest({
-                origin: this.leader.pos,
-                goals: [
-                    {
-                        pos: this.members[1].pos,
-                        range: 1,
-                    },
-                ],
-            })
-        }
 
         this.members[1].createMoveRequest({
             origin: this.members[1].pos,
