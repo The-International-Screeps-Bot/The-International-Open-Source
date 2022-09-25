@@ -901,6 +901,11 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             let lastPos = opts.origin
 
             for (const goal of opts.goals) {
+
+                // Ensure no visuals are generated outside of the origin room
+
+                if (lastPos.roomName !== goal.pos.roomName) continue
+
                 room.visual.line(lastPos, goal.pos, {
                     color: myColors.red,
                     width: 0.15,
@@ -2150,12 +2155,9 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
     return false
 }
 
-Room.prototype.pathVisual = function (path, color) {
-    const room = this
+Room.prototype.pathVisual = function (path, color, visualize = Memory.roomVisuals) {
 
-    // Stop if roomVisuals are disabled
-
-    if (!Memory.roomVisuals) return
+    if (!visualize) return
 
     if (!path.length) return
 
@@ -2174,7 +2176,7 @@ Room.prototype.pathVisual = function (path, color) {
 
     // Generate the visual
 
-    room.visual.poly(path, {
+    this.visual.poly(path, {
         stroke: myColors[color],
         strokeWidth: 0.15,
         opacity: 0.3,

@@ -873,7 +873,7 @@ declare global {
         /**
          *
          */
-        pathVisual(path: RoomPosition[], color: keyof Colors): void
+        pathVisual(path: RoomPosition[], color: keyof Colors, visualize?: boolean): void
 
         /**
          * Finds and records a construction site for builders to target

@@ -114,8 +114,16 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._enemyAttackers) return this._enemyAttackers
 
-            return this.enemyCreeps.filter(function (creep) {
-                return creep.parts.attack + creep.parts.ranged_attack + creep.parts.work > 0
+            // If commune, only avoid ally creeps
+
+            if (this.memory.T === 'commune') {
+                return this._enemyAttackers = this.enemyCreeps.filter(function (creep) {
+                    return creep.parts.attack + creep.parts.ranged_attack + creep.parts.work > 0
+                })
+            }
+
+            return this._enemyAttackers = this.enemyCreeps.filter(function (creep) {
+                return creep.parts.attack + creep.parts.ranged_attack > 0
             })
         },
     },

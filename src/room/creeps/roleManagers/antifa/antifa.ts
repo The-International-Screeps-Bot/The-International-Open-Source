@@ -1,4 +1,4 @@
-import { allowedSquadCombinations, myColors } from 'international/constants'
+import { allowedSquadCombinations, antifaRoles, myColors } from 'international/constants'
 import { customLog, findClosestObject, getRange, isExit, pack } from 'international/generalFunctions'
 import { internationalManager } from 'international/internationalManager'
 import { Duo } from './duo'
@@ -10,6 +10,10 @@ export class Antifa extends Creep {
     }
 
     preTickManager() {
+        if (!internationalManager.creepsByCombatRequest[this.memory.CRN]) {
+            internationalManager.creepsByCombatRequest[this.memory.CRN] = {}
+            for (const role of antifaRoles) internationalManager.creepsByCombatRequest[this.memory.CRN][role] = []
+        }
 
         internationalManager.creepsByCombatRequest[this.memory.CRN][this.role].push(this.name)
 
@@ -242,43 +246,34 @@ export class Antifa extends Creep {
 
         this.say('AEA')
 
-        // Otherwise, have the creep pre-heal itself
+        // Have the creep pre-heal itself
 
         this.heal(this)
 
-        // If the range is 1, rangedMassAttack
-
-        if (range === 1) {
-            this.rangedMassAttack()
-            if (enemyAttacker.canMove) this.assignMoveRequest(enemyAttacker.pos)
-        }
-
-        // Otherwise, rangedAttack the enemyAttacker
+        if (range === 1) this.rangedMassAttack()
         else this.rangedAttack(enemyAttacker)
 
         // If the creep has less heal power than the enemyAttacker's attack power
 
         if (this.healStrength < enemyAttacker.attackStrength) {
-            // If the range is less or equal to 2
+            if (range === 3) return true
+
+            // If too close
 
             if (range <= 2) {
-                // Have the creep flee and inform true
+                // Have the creep flee
 
                 this.createMoveRequest({
                     origin: this.pos,
                     goals: [{ pos: enemyAttacker.pos, range: 1 }],
                     flee: true,
                 })
-
-                return true
             }
+
+            return true
         }
 
-        // If the range is more than 1
-
         if (range > 1) {
-            // Have the create a moveRequest to the enemyAttacker and inform true
-
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: enemyAttacker.pos, range: 1 }],
@@ -287,8 +282,7 @@ export class Antifa extends Creep {
             return true
         }
 
-        // Otherwise inform true
-
+        if (enemyAttacker.canMove) this.assignMoveRequest(enemyAttacker.pos)
         return true
     }
 

@@ -45,8 +45,6 @@ export class Duo {
     }
 
     run() {
-        this.leader.say('Hi')
-
         if (this.leader.room.name === this.leader.memory.CRN) {
             this.getInFormation()
 
@@ -208,30 +206,18 @@ export class Duo {
 
         this.leader.say('AEA')
 
-        // Otherwise, have the creep pre-heal itself
-
-        this.leader.heal(this.leader)
-
-        // If the range is 1, rangedMassAttack
-
-        if (range === 1) {
-            this.leader.rangedMassAttack()
-            if (enemyAttacker.canMove && this.canMove) {
-                this.leader.assignMoveRequest(enemyAttacker.pos)
-                this.members[1].assignMoveRequest(this.leader.pos)
-            }
-        }
-
-        // Otherwise, rangedAttack the enemyAttacker
+        if (range === 1) this.leader.rangedMassAttack()
         else this.leader.rangedAttack(enemyAttacker)
 
         // If the creep has less heal power than the enemyAttacker's attack power
 
         if (this.leader.healStrength < enemyAttacker.attackStrength) {
-            // If the range is less or equal to 2
+            if (range === 3) return true
+
+            // If too close
 
             if (range <= 2) {
-                // Have the creep flee and inform true
+                // Have the squad flee
 
                 this.createMoveRequest(
                     {
@@ -241,16 +227,12 @@ export class Duo {
                     },
                     this.members[1],
                 )
-
-                return true
             }
+
+            return true
         }
 
-        // If the range is more than 1
-
         if (range > 1) {
-            // Have the create a moveRequest to the enemyAttacker and inform true
-
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: enemyAttacker.pos, range: 1 }],
@@ -259,8 +241,10 @@ export class Duo {
             return true
         }
 
-        // Otherwise inform true
-
+        if (enemyAttacker.canMove && this.canMove) {
+            this.leader.assignMoveRequest(enemyAttacker.pos)
+            this.members[1].assignMoveRequest(this.leader.pos)
+        }
         return true
     }
 
