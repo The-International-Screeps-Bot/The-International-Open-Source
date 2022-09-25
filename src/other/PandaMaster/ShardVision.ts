@@ -11,7 +11,7 @@ export default class GetShardVision {
         const spawnShardFlag = Game.flags[this._shardNames[0]]
         if (!spawnShardFlag) return
 
-        const roomNames = ['E72N6', 'E73N11', 'E73N13', 'E72N14', 'E69N12', 'E75N11']
+        const roomNames = ['E72N6', 'E74N12', 'E72N14', 'E68N11', 'E68N13']
         const spawns = Object.values(Game.spawns).filter(s => roomNames.includes(s.room.name))
         const spawn = spawns.filter(s => s.spawning === null)[0]
         if (!spawn) return
