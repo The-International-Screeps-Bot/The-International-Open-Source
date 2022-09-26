@@ -2,7 +2,7 @@
     "name": "the-international-screeps-bot",
     "version": "3.0.0",
     "description": "",
-    "main": "dist/main.js",
+    "main": "./dist/main.js",
     "scripts": {
         "build": "rollup -c",
         "lint": "eslint **/*",
