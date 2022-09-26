@@ -1,6 +1,6 @@
 {
-    "name": "the-international-open-source",
-    "version": "3.0.1",
+    "name": "@the-international-screeps-bot/the-international-open-source",
+    "version": "1.0.0",
     "description": "",
     "files": [
         "dist"
