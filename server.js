@@ -11,3 +11,4 @@ function Start() {
     execSync(`npx screeps-performance-server ${process.argv[2]} ${botPath} ${process.env.STEAM_KEY}`, options);
 }
 Start();
+process.exit(0);

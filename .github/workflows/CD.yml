@@ -29,7 +29,7 @@ jobs:
                - name: Install dependencies
                  run: npm install
                - name: Start instances
-                 run: npm run server --tickLength=50000
+                 run: node server 50000
                  env:
                     STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                     STEAM_ID: ${{ secrets.STEAM_ID }}
