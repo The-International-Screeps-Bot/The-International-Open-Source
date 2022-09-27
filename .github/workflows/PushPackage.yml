@@ -17,6 +17,7 @@ jobs:
     - run: npm install
     - run: npm run build --if-present
     - name: Publish Package
+      continue-on-error: true
       id: publish
       uses: JS-DevTools/npm-publish@v1
       with:
