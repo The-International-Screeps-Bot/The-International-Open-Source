@@ -64,15 +64,9 @@ Room.prototype.towersAttackCreeps = function () {
 
     // Find the target the creep can deal the most damage to
 
-    const attackTarget = attackTargets.sort(function (a, b) {
-        return a.towerDamage - b.towerDamage
-    })[attackTargets.length - 1]
+    const attackTarget = attackTargets.find(creep => creep.towerDamage > 0)
 
-    if (attackTarget.towerDamage <= 0) return
-
-    // If the strongest enemy can be damaged, record that the tower can remove all threats
-
-    if (attackTargets[attackTargets.length - 1].towerDamage > 0) this.towerSuperiority = true
+    if (!attackTarget) return
 
     // If we seem to be under attack from a swarm, record that the tower needs help
 

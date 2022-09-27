@@ -1,6 +1,6 @@
 {
     "name": "the-international-screeps-bot",
-    "version": "3.0.0",
+    "version": "3.0.2",
     "description": "",
     "main": "src/main.ts",
     "scripts": {

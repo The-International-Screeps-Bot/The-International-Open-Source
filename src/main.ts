@@ -36,6 +36,8 @@ import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { migrationManager } from 'international/migrationManager'
 import { respawnManager } from './international/respawnManager'
 import { tickConfig } from './international/tickConfig'
+import { allyManager } from 'international/simpleAllies'
+import ExecutePandaMasterCode from './other/PandaMaster/Execute'
 
 global.profiler = initProfiler()
 
@@ -48,7 +50,34 @@ export const loop = function () {
 
     internationalManager.update()
 
-    internationalManager.run()
+    // If CPU logging is enabled, get the CPU used at the start
+
+    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+
+    // Run prototypes
+
+    migrationManager.run()
+    respawnManager.run()
+    configManager.run()
+    tickConfig.run()
+    internationalManager.creepOrganizer()
+    internationalManager.constructionSiteManager()
+    internationalManager.orderManager()
+
+    // Handle ally requests
+
+    allyManager.tickConfig()
+    allyManager.getAllyRequests()
+    ExecutePandaMasterCode()
+
+    if (Memory.CPULogging)
+        customLog(
+            'International Manager',
+            (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+            myColors.white,
+            myColors.lightBlue,
+        )
+
     /*
     let cpu = Game.cpu.getUsed()
 

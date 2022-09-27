@@ -1,11 +1,7 @@
 import { allyManager } from 'international/simpleAllies'
 import { createPosMap, customLog, getAvgPrice, packXY } from './generalFunctions'
-import ExecutePandaMasterCode from '../other/PandaMaster/Execute'
+
 import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames, myColors, roomDimensions } from './constants'
-import { migrationManager } from './migrationManager'
-import { respawnManager } from './respawnManager'
-import { configManager } from './config'
-import { tickConfig } from './tickConfig'
 
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
@@ -35,36 +31,6 @@ export class InternationalManager {
      * Antifa creeps by combat request name, then by role with an array of creep names
      */
     creepsByCombatRequest: { [key: string]: { [key: string]: string[] } }
-
-    run() {
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
-
-        // Run prototypes
-
-        migrationManager.run()
-        respawnManager.run()
-        configManager.run()
-        tickConfig.run()
-        this.creepOrganizer()
-        this.constructionSiteManager()
-        this.orderManager()
-
-        // Handle ally requests
-
-        allyManager.tickConfig()
-        allyManager.getAllyRequests()
-        ExecutePandaMasterCode()
-
-        if (Memory.CPULogging)
-            customLog(
-                'International Manager',
-                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-                myColors.white,
-                myColors.lightBlue,
-            )
-    }
 
     /**
      * Updates values to be present for this tick
