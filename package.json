@@ -1,8 +1,10 @@
 {
-    "name": "the-international-screeps-bot",
-    "version": "3.0.2",
+    "name": "@the-international-screeps-bot/the-international-open-source",
+    "version": "1.0.0",
     "description": "",
-    "main": "src/main.ts",
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "build": "rollup -c",
         "lint": "eslint **/*",
