@@ -2,6 +2,20 @@ import { communeSigns, nonCommuneSigns } from 'international/constants'
 import { findClosestCommuneName, getRange } from 'international/generalFunctions'
 
 export class Scout extends Creep {
+
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
+
+    preTickManager() {
+        if (!this.memory.scoutTarget) return
+
+        const commune = this.commune
+        if (!commune) return
+
+        commune.scoutTargets.add(this.memory.scoutTarget)
+    }
+
     /**
      * Finds a room name for the scout to target
      */
@@ -163,21 +177,7 @@ export class Scout extends Creep {
 
         // Otherwise Try to sign the controller, informing the result
 
-        this.signController(room.controller, signMessage)
-        return true
-    }
-
-    preTickManager() {
-        if (!this.memory.scoutTarget) return
-
-        const commune = this.commune
-        if (!commune) return
-
-        commune.scoutTargets.add(this.memory.scoutTarget)
-    }
-
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
+        return this.signController(room.controller, signMessage) === OK
     }
 
     static scoutManager(room: Room, creepsOfRole: string[]) {

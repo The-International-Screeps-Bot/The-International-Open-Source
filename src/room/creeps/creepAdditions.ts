@@ -160,7 +160,7 @@ Object.defineProperties(Creep.prototype, {
             this._towerDamage = 0
 
             for (const tower of room.structures.tower) {
-                if (tower.store.getUsedCapacity(RESOURCE_ENERGY) <= 0) continue
+                if (tower.store.getUsedCapacity(RESOURCE_ENERGY) < 10) continue
 
                 const range = getRange(this.pos.x, tower.pos.x, this.pos.y, tower.pos.y)
 
@@ -176,6 +176,10 @@ Object.defineProperties(Creep.prototype, {
                 this._towerDamage += Math.floor(TOWER_POWER_ATTACK * (1 - TOWER_FALLOFF * factor))
             }
 
+            if (this.boosts.XGHO2 > 0) this._towerDamage *= BOOSTS.tough.XGHO2.damage
+            else if (this.boosts.GHO2 > 0) this._towerDamage *= BOOSTS.tough.GHO2.damage
+            else if (this.boosts.GO > 0) this._towerDamage *= BOOSTS.tough.GO.damage
+
             // Find adjacent creeps
 
             let top = Math.max(Math.min(this.pos.y - 3, roomDimensions - 1), 0)
@@ -190,20 +194,14 @@ Object.defineProperties(Creep.prototype, {
             // Loop through each adjacentCreep
 
             for (const posData of adjacentCreeps) {
-                // If the creep is not owned and isn't an ally
 
-                if (posData.creep.my || Memory.allyPlayers.includes(posData.creep.owner.username)) continue
+                if (this.owner.username !== posData.creep.owner.username) continue
 
                 const range = getRange(this.pos.x, posData.creep.pos.x, this.pos.y, posData.creep.pos.y)
-
                 if (range > 3) continue
 
                 this._towerDamage -= posData.creep.findTotalHealPower(range)
             }
-
-            if (this.boosts.XGHO2 > 0) this._towerDamage *= BOOSTS.tough.XGHO2.damage
-            else if (this.boosts.GHO2 > 0) this._towerDamage *= BOOSTS.tough.GHO2.damage
-            else if (this.boosts.GO > 0) this._towerDamage *= BOOSTS.tough.GO.damage
 
             return this._towerDamage
         },

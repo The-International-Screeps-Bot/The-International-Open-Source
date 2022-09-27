@@ -118,12 +118,12 @@ Object.defineProperties(Room.prototype, {
 
             if (this.memory.T === 'commune') {
                 return this._enemyAttackers = this.enemyCreeps.filter(function (creep) {
-                    return creep.parts.attack + creep.parts.ranged_attack + creep.parts.work > 0
+                    return creep.parts.attack + creep.parts.ranged_attack + creep.parts.work + creep.parts.heal > 0
                 })
             }
 
             return this._enemyAttackers = this.enemyCreeps.filter(function (creep) {
-                return creep.parts.attack + creep.parts.ranged_attack > 0
+                return creep.parts.attack + creep.parts.ranged_attack + creep.parts.heal > 0
             })
         },
     },

@@ -6,8 +6,8 @@ export class Claimer extends Creep {
     }
 
     preTickManager() {
-
         if (this.dying) return
+        if (!this.commune) return
 
         if (!Memory.rooms[this.commune.name].claimRequest) return
 
@@ -62,37 +62,38 @@ export class Claimer extends Creep {
 
             const creep: Claimer = Game.creeps[creepName]
 
-            const claimTarget = Memory.rooms[creep.commune.name].claimRequest
+            if (!creep.commune) return
+            const claimRequestName = Memory.rooms[creep.commune.name].claimRequest
+            if (!claimRequestName) return
 
-            // If the creep has no claim target, stop
-
-            if (!claimTarget) return
-
-            creep.say(claimTarget)
+            creep.say(claimRequestName)
 
             Memory.claimRequests[Memory.rooms[creep.commune.name].claimRequest].needs[ClaimRequestNeeds.claimer] = 0
 
-            if (room.name === claimTarget) {
+            if (room.name === claimRequestName) {
                 creep.claimRoom()
                 continue
             }
 
             // Otherwise if the creep is not in the claimTarget
 
-            // Move to it
-
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [{ pos: new RoomPosition(25, 25, claimTarget), range: 25 }],
-                avoidEnemyRanges: true,
-                plainCost: 1,
-                swampCost: creep.parts.move >= 5 ? 1 : undefined,
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                },
-            })
+            if (
+                !creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [{ pos: new RoomPosition(25, 25, claimRequestName), range: 25 }],
+                    avoidEnemyRanges: true,
+                    plainCost: 1,
+                    swampCost: creep.parts.move >= 5 ? 1 : undefined,
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                    },
+                })
+            ) {
+                Memory.claimRequests[claimRequestName].abandon = 20000
+                delete Memory.rooms[creep.commune.name].claimRequest
+            }
         }
     }
 }

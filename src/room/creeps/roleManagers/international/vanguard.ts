@@ -91,33 +91,36 @@ export class Vanguard extends Creep {
 
             const creep: Vanguard = Game.creeps[creepName]
 
-            const claimTarget = Memory.rooms[creep.commune.name].claimRequest
+            const claimRequestName = Memory.rooms[creep.commune.name].claimRequest
 
             // If the creep has no claim target, stop
 
-            if (!claimTarget) return
+            if (!claimRequestName) return
 
-            creep.say(claimTarget)
+            creep.say(claimRequestName)
 
-            if (room.name === claimTarget) {
+            if (room.name === claimRequestName) {
                 creep.buildRoom()
                 continue
             }
 
             // Otherwise if the creep is not in the claimTarget
 
-            // Move to it
-
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [{ pos: new RoomPosition(25, 25, claimTarget), range: 25 }],
-                avoidEnemyRanges: true,
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                },
-            })
+            if (
+                !creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [{ pos: new RoomPosition(25, 25, claimRequestName), range: 25 }],
+                    avoidEnemyRanges: true,
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                    },
+                })
+            ) {
+                Memory.claimRequests[claimRequestName].abandon = 20000
+                delete Memory.rooms[creep.commune.name].claimRequest
+            }
         }
     }
 }
