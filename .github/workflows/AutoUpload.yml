@@ -32,3 +32,4 @@ jobs:
                  run: node server 250000
                  env:
                     STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+                    EXPORT_API_BASE_URL: ${{ secrets.EXPORT_API_BASE_URL }}
