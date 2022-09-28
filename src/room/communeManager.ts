@@ -48,7 +48,6 @@ export class CommuneManager {
         constructionManager(this.room)
 
         this.room.defenceManager()
-
         this.room.towerManager()
 
         try {
@@ -62,19 +61,15 @@ export class CommuneManager {
             )
         }
 
-        this.room.linkManager()
-
         this.room.claimRequestManager()
         this.room.combatRequestManager()
-
         this.room.allyCreepRequestManager()
-
         this.remotesManager.stage2()
 
-        this.room.spawnManager()
-
+        this.room.linkManager()
         this.room.factoryManager()
         this.labManager.run()
+        this.room.spawnManager()
 
         this.test()
     }

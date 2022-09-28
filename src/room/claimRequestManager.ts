@@ -66,11 +66,11 @@ Room.prototype.claimRequestManager = function () {
 
     // Increase the defenderNeed according to the enemy attackers' combined strength
 
-    for (const enemyCreep of requestRoom.enemyCreeps) {
-        if (enemyCreep.owner.username === 'Invader') continue
+    for (const enemyAttacker of requestRoom.enemyAttackers) {
+        if (enemyAttacker.owner.username === 'Invader') continue
 
-        request.needs[ClaimRequestNeeds.minDamage] += 10 + enemyCreep.healStrength
-        request.needs[ClaimRequestNeeds.minHeal] += enemyCreep.attackStrength
+        request.needs[ClaimRequestNeeds.minDamage] += 10 + enemyAttacker.healStrength
+        request.needs[ClaimRequestNeeds.minHeal] += enemyAttacker.attackStrength
     }
 
     // If CPU logging is enabled, log the CPU used by this manager

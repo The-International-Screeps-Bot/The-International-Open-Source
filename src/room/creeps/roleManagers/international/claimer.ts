@@ -9,9 +9,10 @@ export class Claimer extends Creep {
         if (this.dying) return
         if (!this.commune) return
 
-        if (!Memory.rooms[this.commune.name].claimRequest) return
+        const claimRequestName = Memory.rooms[this.commune.name].claimRequest
+        if (!claimRequestName) return
 
-        Memory.claimRequests[Memory.rooms[this.commune.name].claimRequest].needs[ClaimRequestNeeds.claimer] -= 1
+        Memory.claimRequests[claimRequestName].needs[ClaimRequestNeeds.claimer] -= 1
     }
 
     /**
@@ -67,8 +68,6 @@ export class Claimer extends Creep {
             if (!claimRequestName) return
 
             creep.say(claimRequestName)
-
-            Memory.claimRequests[Memory.rooms[creep.commune.name].claimRequest].needs[ClaimRequestNeeds.claimer] = 0
 
             if (room.name === claimRequestName) {
                 creep.claimRoom()

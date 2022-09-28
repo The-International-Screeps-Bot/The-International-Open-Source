@@ -245,17 +245,20 @@ Room.prototype.spawnRequester = function () {
             // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
             if (this.controllerContainer) {
-                let income
-
                 if (storage && this.controller.level >= 4) {
-                    income = this.getPartsOfRoleAmount('controllerUpgrader', WORK)
-                } else
-                    income = Math.min(
-                        this.getPartsOfRoleAmount('controllerUpgrader', WORK) * 0.75,
-                        this.sources.length * 0.75,
+                    requiredCarryParts += findCarryPartsRequired(
+                        this.upgradePathLength,
+                        this.getPartsOfRoleAmount('controllerUpgrader', WORK),
                     )
-
-                requiredCarryParts += findCarryPartsRequired(this.upgradePathLength, income)
+                } else {
+                    requiredCarryParts += findCarryPartsRequired(
+                        this.upgradePathLength,
+                        Math.min(
+                            this.getPartsOfRoleAmount('controllerUpgrader', WORK) * 0.75,
+                            this.sources.length * 0.75,
+                        ),
+                    )
+                }
             }
 
             if (this.controller.level >= 4 && storage && storage.store.energy >= 1000) {
@@ -1235,8 +1238,7 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                // If there is no claimer need
-
+                if (!request.needs[ClaimRequestNeeds.claimer]) return false
                 if (request.needs[ClaimRequestNeeds.claimer] <= 0) return false
 
                 const role = 'claimer'
@@ -1258,8 +1260,7 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                // If there is no vanguard need
-
+                if (!request.needs[ClaimRequestNeeds.vanguard]) return false
                 if (request.needs[ClaimRequestNeeds.vanguard] <= 0) return false
 
                 const role = 'vanguard'
@@ -1282,6 +1283,7 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
+                if (!request.needs[ClaimRequestNeeds.minDamage]) return false
                 if (request.needs[ClaimRequestNeeds.minDamage] <= 0) return false
 
                 const role = 'vanguardDefender'
