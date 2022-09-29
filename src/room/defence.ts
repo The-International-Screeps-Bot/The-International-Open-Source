@@ -1,5 +1,5 @@
 import { allyPlayers, myColors, safemodeTargets } from 'international/constants'
-import { customLog, findObjectWithID } from 'international/generalFunctions'
+import { customLog, findObjectWithID } from 'international/utils'
 
 Room.prototype.defenceManager = function () {
     // If CPU logging is enabled, get the CPU used at the start

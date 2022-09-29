@@ -108,7 +108,7 @@ export const roomTypeProperties: RoomTypeProperties = {
     needs: true,
     SE: true,
     RE: true,
-    abandoned: true,
+    abandon: true,
 
     owner: true,
     level: true,
@@ -141,7 +141,7 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         needs: true,
         SE: true,
         RE: true,
-        abandoned: true,
+        abandon: true,
         notClaimable: true,
         PC: true,
     },
@@ -670,6 +670,8 @@ export enum ClaimRequestNeeds {
     vanguard,
     minDamage,
     minHeal,
+    abandon,
+    score,
 }
 
 export enum CombatRequestData {
@@ -686,6 +688,7 @@ export enum CombatRequestData {
 
 export enum AllyCreepRequestNeeds {
     allyVanguard,
+    abandon,
 }
 
 export enum DepositNeeds {

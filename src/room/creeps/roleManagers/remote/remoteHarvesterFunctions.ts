@@ -6,7 +6,7 @@ import {
     getRange,
     unpackAsPos,
     unpackAsRoomPos,
-} from 'international/generalFunctions'
+} from 'international/utils'
 import { unpackPosList } from 'other/packrat'
 import { RemoteHauler } from './remoteHauler'
 

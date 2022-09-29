@@ -1,5 +1,5 @@
 import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteNeeds, remoteRoles } from 'international/constants'
-import { customLog, findCarryPartsRequired } from 'international/generalFunctions'
+import { customLog, findCarryPartsRequired } from 'international/utils'
 import { CommuneManager } from './communeManager'
 
 export class RemotesManager {
@@ -26,8 +26,8 @@ export class RemotesManager {
                 continue
             }
 
-            if (remoteMemory.abandoned > 0) {
-                remoteMemory.abandoned -= 1
+            if (remoteMemory.abandon > 0) {
+                remoteMemory.abandon -= 1
 
                 for (const need in remoteMemory.needs) remoteMemory.needs[need] = 0
 
@@ -124,7 +124,7 @@ export class RemotesManager {
             const remoteName = this.communeManager.room.memory.remotes[index]
             const remoteMemory = Memory.rooms[remoteName]
 
-            if (remoteMemory.abandoned) continue
+            if (remoteMemory.abandon) continue
 
             const remote = Game.rooms[remoteName]
             const isReserved =

@@ -1,5 +1,5 @@
 import { myColors } from 'international/constants'
-import { customLog } from 'international/generalFunctions'
+import { customLog } from 'international/utils'
 import { basePlanner } from './communePlanner'
 import { rampartPlanner } from './rampartPlanner'
 import './constructionFunctions'

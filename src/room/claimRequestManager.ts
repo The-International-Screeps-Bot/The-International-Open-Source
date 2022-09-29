@@ -1,85 +1,96 @@
 import { ClaimRequestNeeds, myColors } from 'international/constants'
-import { advancedFindDistance, customLog } from 'international/generalFunctions'
+import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
+import { CommuneManager } from './communeManager'
 
-Room.prototype.claimRequestManager = function () {
-    if (!this.memory.claimRequest) return
+export class ClaimRequestManager {
+    communeManager: CommuneManager
 
-    // If CPU logging is enabled, get the CPU used at the start
-
-    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
-
-    const request = Memory.claimRequests[this.memory.claimRequest]
-
-    // If the claimRequest doesn't exist anymore somehow, stop trying to do anything with it
-
-    if (!request) {
-        delete this.memory.claimRequest
-        return
+    constructor(communeManager: CommuneManager) {
+        this.communeManager = communeManager
     }
+    public run() {
 
-    // If the request has been abandoned, have the commune abandon it too
+        const { room } = this.communeManager
 
-    if (request.abandon > 0) {
-        delete request.responder
-        delete this.memory.claimRequest
-        return
+        if (!room.memory.claimRequest) return
+
+        // If CPU logging is enabled, get the CPU used at the start
+
+        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+
+        const request = Memory.claimRequests[room.memory.claimRequest]
+
+        // If the claimRequest doesn't exist anymore somehow, stop trying to do anything with it
+
+        if (!request) {
+            delete room.memory.claimRequest
+            return
+        }
+
+        // If the request has been abandoned, have the commune abandon it too
+
+        if (request.needs[ClaimRequestNeeds.abandon] > 0) {
+            delete request.responder
+            delete room.memory.claimRequest
+            return
+        }
+
+        if (room.energyCapacityAvailable < 650) {
+            delete request.responder
+            delete room.memory.claimRequest
+            return
+        }
+
+        const requestRoom = Game.rooms[room.memory.claimRequest]
+        if (!requestRoom || !requestRoom.controller.my) {
+            request.needs[ClaimRequestNeeds.claimer] = 1
+            return
+        }
+
+        // If there is a spawn
+
+        if (requestRoom.structures.spawn.length) {
+            delete Memory.claimRequests[room.memory.claimRequest]
+            delete room.memory.claimRequest
+            return
+        }
+
+        // If there is an invader core
+
+        const invaderCores = requestRoom.structures.invaderCore
+        if (invaderCores.length) {
+            // Abandon for its remaining existance plus the estimated reservation time
+
+            request.needs[ClaimRequestNeeds.abandon] = invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX
+
+            delete request.responder
+            delete room.memory.claimRequest
+            return
+        }
+
+        request.needs[ClaimRequestNeeds.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
+
+        request.needs[ClaimRequestNeeds.minDamage] = 0
+        request.needs[ClaimRequestNeeds.minHeal] = 0
+
+        // Increase the defenderNeed according to the enemy attackers' combined strength
+
+        for (const enemyAttacker of requestRoom.enemyAttackers) {
+            if (enemyAttacker.owner.username === 'Invader') continue
+
+            request.needs[ClaimRequestNeeds.minDamage] += 10 + enemyAttacker.healStrength
+            request.needs[ClaimRequestNeeds.minHeal] += enemyAttacker.attackStrength
+        }
+
+        // If CPU logging is enabled, log the CPU used by this manager
+
+        if (Memory.CPULogging)
+            customLog(
+                'Claim Request Manager',
+                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+                undefined,
+                myColors.lightGrey,
+            )
     }
-
-    if (this.energyCapacityAvailable < 650) {
-        delete request.responder
-        delete this.memory.claimRequest
-        return
-    }
-
-    const requestRoom = Game.rooms[this.memory.claimRequest]
-    if (!requestRoom || !requestRoom.controller.my) {
-        request.needs[ClaimRequestNeeds.claimer] = 1
-        return
-    }
-
-    // If there is a spawn
-
-    if (requestRoom.structures.spawn.length) {
-        delete Memory.claimRequests[this.memory.claimRequest]
-        delete this.memory.claimRequest
-        return
-    }
-
-    // If there is an invader core
-
-    const invaderCores = requestRoom.structures.invaderCore
-    if (invaderCores.length) {
-        // Abandon for its remaining existance plus the estimated reservation time
-
-        request.abandon = invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX
-
-        delete request.responder
-        delete this.memory.claimRequest
-        return
-    }
-
-    request.needs[ClaimRequestNeeds.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
-
-    request.needs[ClaimRequestNeeds.minDamage] = 0
-    request.needs[ClaimRequestNeeds.minHeal] = 0
-
-    // Increase the defenderNeed according to the enemy attackers' combined strength
-
-    for (const enemyAttacker of requestRoom.enemyAttackers) {
-        if (enemyAttacker.owner.username === 'Invader') continue
-
-        request.needs[ClaimRequestNeeds.minDamage] += 10 + enemyAttacker.healStrength
-        request.needs[ClaimRequestNeeds.minHeal] += enemyAttacker.attackStrength
-    }
-
-    // If CPU logging is enabled, log the CPU used by this manager
-
-    if (Memory.CPULogging)
-        customLog(
-            'Claim Request Manager',
-            (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-            undefined,
-            myColors.lightGrey,
-        )
 }

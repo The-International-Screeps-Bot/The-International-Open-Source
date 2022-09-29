@@ -6,7 +6,7 @@ import {
     pack,
     packXY,
     unpackAsPos,
-} from 'international/generalFunctions'
+} from 'international/utils'
 import { MarketManager } from './market/marketManager'
 import './spawning/spawnManager'
 
@@ -24,16 +24,27 @@ import { RoomVisualsManager } from './roomVisuals'
 import { EndTickCreepManager } from './creeps/endTickCreepManager'
 import { CreepRoleManager } from './creeps/creepRoleManager'
 import { RemotesManager } from './remotesManager'
+import { ClaimRequestManager } from './claimRequestManager'
+import { CombatRequestManager } from './combatRequestManager'
+import { AllyCreepRequestManager } from './allyCreepRequestManager'
 
 export class CommuneManager {
     labManager: LabManager
     marketManager: MarketManager
     remotesManager: RemotesManager
 
+    claimRequestManager: ClaimRequestManager
+    combatRequestManager: CombatRequestManager
+    allyCreepRequestManager: AllyCreepRequestManager
+
     constructor() {
         this.labManager = new LabManager(this)
         this.marketManager = new MarketManager(this)
         this.remotesManager = new RemotesManager(this)
+
+        this.claimRequestManager = new ClaimRequestManager(this)
+        this.combatRequestManager = new CombatRequestManager(this)
+        this.allyCreepRequestManager = new AllyCreepRequestManager(this)
     }
 
     room: Room
@@ -61,9 +72,9 @@ export class CommuneManager {
             )
         }
 
-        this.room.claimRequestManager()
-        this.room.combatRequestManager()
-        this.room.allyCreepRequestManager()
+        this.claimRequestManager.run()
+        this.combatRequestManager.run()
+        this.allyCreepRequestManager.run()
         this.remotesManager.stage2()
 
         this.room.linkManager()

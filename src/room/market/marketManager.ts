@@ -1,5 +1,5 @@
 import { minerals } from 'international/constants'
-import { customLog } from 'international/generalFunctions'
+import { customLog } from 'international/utils'
 import './marketFunctions'
 import { allyManager, RequestTypes } from '../../international/simpleAllies'
 import { internationalManager } from 'international/internationalManager'

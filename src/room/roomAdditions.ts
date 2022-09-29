@@ -16,7 +16,7 @@ import {
     packXY,
     unpackAsPos,
     unpackAsRoomPos,
-} from 'international/generalFunctions'
+} from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { packCoordList, packPosList, unpackPosList } from 'other/packrat'
 

@@ -1,6 +1,7 @@
 import {
     allStructureTypes,
     allyPlayers,
+    ClaimRequestNeeds,
     CombatRequestData,
     defaultPlainCost,
     defaultSwampCost,
@@ -30,7 +31,7 @@ import {
     packXY,
     unpackAsPos,
     unpackAsRoomPos,
-} from 'international/generalFunctions'
+} from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { packCoord, unpackCoordAsPos, unpackPos } from 'other/packrat'
 import { basePlanner } from './construction/communePlanner'
@@ -2495,26 +2496,24 @@ Room.prototype.createClaimRequest = function () {
 
     if (basePlanner(this) === 'failed') return false
 
+    const request = Memory.claimRequests[this.name] = {
+        needs: [0],
+    }
+
     let score = 0
 
     // Prefer communes not too close and not too far from the commune
 
     const closestClaimTypeName = findClosestClaimType(this.name)
     const closestCommuneRange = Game.map.getRoomLinearDistance(closestClaimTypeName, this.name)
-
     score += Math.abs(prefferedCommuneRange - closestCommuneRange)
 
     score += this.sourcePaths[0].length / 10
     score += this.sourcePaths[1].length / 10
-
     score += this.upgradePathLength / 10
-
     score += this.findSwampPlainsRatio() * 10
 
-    Memory.claimRequests[this.name] = {
-        needs: [],
-        score,
-    }
+    request.needs[ClaimRequestNeeds.score] = score
 
     return true
 }

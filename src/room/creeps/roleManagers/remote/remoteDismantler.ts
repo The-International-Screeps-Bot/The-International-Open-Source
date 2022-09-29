@@ -1,5 +1,5 @@
 import { RemoteNeeds } from 'international/constants'
-import { findObjectWithID, getRange } from 'international/generalFunctions'
+import { findObjectWithID, getRange } from 'international/utils'
 
 export class RemoteDismantler extends Creep {
     constructor(creepID: Id<Creep>) {

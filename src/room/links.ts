@@ -1,5 +1,5 @@
 import { linkReceiveTreshold, linkSendThreshold } from 'international/constants'
-import { customLog } from 'international/generalFunctions'
+import { customLog } from 'international/utils'
 
 Room.prototype.linkManager = function() {
 

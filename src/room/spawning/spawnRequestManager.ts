@@ -14,12 +14,7 @@ import {
     RemoteNeeds,
     roadUpkeepCost,
 } from 'international/constants'
-import {
-    customLog,
-    findCarryPartsRequired,
-    findRemoteSourcesByEfficacy,
-    getRange,
-} from 'international/generalFunctions'
+import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy, getRange } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { unpackPosList } from 'other/packrat'
 const minRemotePriority = 10
@@ -978,7 +973,7 @@ Room.prototype.spawnRequester = function () {
 
         const remoteMemory = Memory.rooms[remoteName]
 
-        if (!remoteMemory.needs[RemoteNeeds.enemyReserved] && !remoteMemory.abandoned) {
+        if (!remoteMemory.needs[RemoteNeeds.enemyReserved] && !remoteMemory.abandon) {
             const remote = Game.rooms[remoteName]
             const isReserved =
                 remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
@@ -1076,7 +1071,7 @@ Room.prototype.spawnRequester = function () {
                 ) {
                     // Abandon the this for some time
 
-                    Memory.rooms[remoteName].abandoned = 1500
+                    Memory.rooms[remoteName].abandon = 1500
                     return false
                 }
 
@@ -1299,6 +1294,12 @@ Room.prototype.spawnRequester = function () {
                         (request.needs[ClaimRequestNeeds.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
                     1.2
                 const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
+
+                if (minRangedAttackCost + minHealCost > spawnEnergyCapacity) {
+                    request.needs[ClaimRequestNeeds.abandon] = 20000
+                    delete request.responder
+                    delete this.memory.claimRequest
+                }
 
                 const minCost = Math.min(minRangedAttackCost + minHealCost, spawnEnergyCapacity)
                 const extraParts: BodyPartConstant[] = []

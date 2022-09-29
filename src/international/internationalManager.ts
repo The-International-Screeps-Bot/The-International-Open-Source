@@ -1,7 +1,7 @@
 import { allyManager } from 'international/simpleAllies'
-import { createPosMap, customLog, getAvgPrice, packXY } from './generalFunctions'
+import { createPosMap, customLog, getAvgPrice, packXY } from './utils'
 
-import { cacheAmountModifier, CPUBucketCapacity, mmoShardNames, myColors, roomDimensions } from './constants'
+import { cacheAmountModifier, ClaimRequestNeeds, CPUBucketCapacity, mmoShardNames, myColors, roomDimensions } from './constants'
 
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
@@ -296,7 +296,7 @@ export class InternationalManager {
         if (this._claimRequestsByScore) return this._claimRequestsByScore
 
         return (this._claimRequestsByScore = Object.keys(Memory.claimRequests).sort(
-            (a, b) => Memory.claimRequests[a].score - Memory.claimRequests[b].score,
+            (a, b) => Memory.claimRequests[a].needs[ClaimRequestNeeds.score] - Memory.claimRequests[b].needs[ClaimRequestNeeds.score],
         ))
     }
 

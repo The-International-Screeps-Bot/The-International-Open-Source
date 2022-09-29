@@ -8,7 +8,7 @@ import {
     getRange,
     pack,
     unpackAsPos,
-} from 'international/generalFunctions'
+} from 'international/utils'
 import { indexOf } from 'lodash'
 import { unpackPosList } from 'other/packrat'
 import { creepClasses } from 'room/creeps/creepClasses'

@@ -1,5 +1,5 @@
 import { myColors } from 'international/constants'
-import { customLog } from 'international/generalFunctions'
+import { customLog } from 'international/utils'
 
 Room.prototype.towerManager = function () {
     // If CPU logging is enabled, get the CPU used at the start

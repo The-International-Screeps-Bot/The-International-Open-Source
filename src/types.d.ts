@@ -299,14 +299,6 @@ declare global {
          */
         responder?: string
         needs: number[]
-        /**
-         * The weight for which to prefer this room, where higher values are prefered less
-         */
-        score: number
-        /**
-         * The number of ticks to abandon the request for
-         */
-        abandon?: number
     }
 
     interface CombatRequest {
@@ -314,7 +306,7 @@ declare global {
          * The Type of attack request
          */
         T: CombatRequestTypes
-        /**
+        /**request
          * The name of the room responding to the request
          */
         responder?: string
@@ -327,10 +319,6 @@ declare global {
          */
         responder?: string
         needs: number[]
-        /**
-         * The number of ticks to abandon the request for
-         */
-        abandon?: number
     }
 
     interface ControllerLevel {
@@ -1383,7 +1371,7 @@ declare global {
 
         stampAnchors: Partial<Record<StampTypes, number[]>>
 
-        abandoned: number | undefined
+        abandon: number | undefined
 
         powerBanks: { [roomName: string]: number[] }
 
@@ -1997,27 +1985,27 @@ declare global {
 
             /**
              * Responds, or if needed, creates, a claim request for a specified room, by a specified room
-             * @param request The roomName of the claimRequest to respond to
+             * @param requestName The roomName of the claimRequest to respond to
              * @param commune The commune to respond to the claimRequest
              */
-            claim(request: string, communeName?: string): string
+            claim(requestName: string, communeName?: string): string
 
             deleteClaimRequests(): string
 
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room
              */
-            combat(type: CombatRequestTypes, request: string, communeName?: string): string
+            combat(type: CombatRequestTypes, requestName: string, communeName?: string): string
 
             /**
              * Deletes combatRequests for a specified room, if there are any
              */
-            deleteCombatRequest(request: string): string
+            deleteCombatRequest(requestName: string): string
 
             /**
              * Creates an allyCreepRequest for a specified room, that can optionally be assigned to a specified commune
              */
-            allyCreepRequest(request: string, communeName?: string): string
+            allyCreepRequest(requestName: string, communeName?: string): string
         }
     }
 

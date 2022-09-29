@@ -1,5 +1,5 @@
 import { roomDimensions } from 'international/constants'
-import { findObjectWithID } from 'international/generalFunctions'
+import { findObjectWithID } from 'international/utils'
 
 export class Maintainer extends Creep {
 

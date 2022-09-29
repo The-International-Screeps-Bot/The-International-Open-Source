@@ -1,5 +1,5 @@
 import { AllyCreepRequestNeeds } from 'international/constants'
-import { findObjectWithID, getRange, unpackAsPos } from 'international/generalFunctions'
+import { findObjectWithID, getRange, unpackAsPos } from 'international/utils'
 
 export class AllyVanguard extends Creep {
     findRemote?(): boolean {

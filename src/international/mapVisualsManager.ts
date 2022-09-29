@@ -1,6 +1,6 @@
 import { unpackPosList } from 'other/packrat'
-import { minHarvestWorkRatio, myColors, remoteHarvesterRoles, RemoteNeeds } from './constants'
-import { customLog, unpackAsRoomPos } from './generalFunctions'
+import { ClaimRequestNeeds, minHarvestWorkRatio, myColors, remoteHarvesterRoles, RemoteNeeds } from './constants'
+import { customLog, unpackAsRoomPos } from './utils'
 import { InternationalManager } from './internationalManager'
 
 InternationalManager.prototype.mapVisualsManager = function () {
@@ -114,8 +114,8 @@ InternationalManager.prototype.mapVisualsManager = function () {
                 }
             }
 
-            if (roomMemory.abandoned) {
-                Game.map.visual.text(`❌${roomMemory.abandoned.toString()}`, new RoomPosition(2, 16, roomName), {
+            if (roomMemory.abandon) {
+                Game.map.visual.text(`❌${roomMemory.abandon.toString()}`, new RoomPosition(2, 16, roomName), {
                     align: 'left',
                     fontSize: 8,
                 })
@@ -136,7 +136,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
     for (const roomName in Memory.claimRequests) {
         Game.map.visual.text(
-            `💵${Memory.claimRequests[roomName].score.toFixed(2)}`,
+            `💵${(Memory.claimRequests[roomName].needs[ClaimRequestNeeds.abandon] || 0).toFixed(2)}`,
             new RoomPosition(2, 24, roomName),
             {
                 align: 'left',

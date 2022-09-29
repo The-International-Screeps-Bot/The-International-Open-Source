@@ -1,5 +1,5 @@
 import { ClaimRequestNeeds } from 'international/constants'
-import { findObjectWithID, getRange, unpackAsPos } from 'international/generalFunctions'
+import { findObjectWithID, getRange, unpackAsPos } from 'international/utils'
 
 export class Vanguard extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -118,7 +118,7 @@ export class Vanguard extends Creep {
                     },
                 })
             ) {
-                Memory.claimRequests[claimRequestName].abandon = 20000
+                Memory.claimRequests[claimRequestName].needs[ClaimRequestNeeds.score] = 20000
                 delete Memory.rooms[creep.commune.name].claimRequest
             }
         }

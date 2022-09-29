@@ -1,6 +1,6 @@
 import { creepClasses } from 'room/creeps/creepClasses'
 import { myColors, remoteRoles } from './constants'
-import { customLog, pack } from './generalFunctions'
+import { customLog, pack } from './utils'
 import { InternationalManager } from './internationalManager'
 
 InternationalManager.prototype.creepOrganizer = function () {

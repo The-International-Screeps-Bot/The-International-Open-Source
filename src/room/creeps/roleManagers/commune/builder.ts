@@ -1,4 +1,4 @@
-import { customLog, findObjectWithID, getRange } from 'international/generalFunctions'
+import { customLog, findObjectWithID, getRange } from 'international/utils'
 
 export class Builder extends Creep {
     getEnergy?(): boolean {

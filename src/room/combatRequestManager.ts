@@ -1,18 +1,43 @@
 import { CombatRequestData, ClaimRequestNeeds, myColors } from 'international/constants'
-import { advancedFindDistance, customLog } from 'international/generalFunctions'
+import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
+import { CommuneManager } from './communeManager'
 
-Room.prototype.combatRequestManager = function () {
-    // If CPU logging is enabled, get the CPU used at the start
+export class CombatRequestManager {
+    communeManager: CommuneManager
 
-    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+    constructor(communeManager: CommuneManager) {
+        this.communeManager = communeManager
+    }
+    public run() {
 
-    for (let index = 0; index < this.memory.combatRequests.length; index++) {
-        const requestName = this.memory.combatRequests[index]
-        const request = Memory.combatRequests[requestName]
+        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+
+        for (let index = 0; index < this.communeManager.room.memory.combatRequests.length; index++) {
+            const requestName = this.communeManager.room.memory.combatRequests[index]
+            const request = Memory.combatRequests[requestName]
+
+            this[`${request.T}Request`](request, requestName, index)
+        }
+
+        // If CPU logging is enabled, log the CPU used by this manager
+
+        if (Memory.CPULogging)
+            customLog(
+                'Attack Request Manager',
+                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+                undefined,
+                myColors.lightGrey,
+            )
+    }
+    private attackRequest(request: CombatRequest, requestName: string, index: number) {
+
+
+    }
+    private harassRequest(request: CombatRequest, requestName: string, index: number) {
 
         const requestRoom = Game.rooms[requestName]
-        if (!requestRoom) continue
+        if (!requestRoom) return
 
         /* if (Game.time % Math.floor(Math.random() * 100) === 0) { */
 
@@ -32,28 +57,22 @@ Room.prototype.combatRequestManager = function () {
         if (threateningAttacker) {
             request.data[CombatRequestData.abandon] = 1500
 
-            this.memory.combatRequests.splice(index, 1)
+            this.communeManager.room.memory.combatRequests.splice(index, 1)
             delete request.responder
-            continue
+            return
         }
 
         // If there are no enemyCreeps, delete the combatRequest
 
         if (!requestRoom.enemyCreeps.length) {
             delete Memory.combatRequests[requestName]
-            this.memory.combatRequests.splice(index, 1)
+            this.communeManager.room.memory.combatRequests.splice(index, 1)
             delete request.responder
-            continue
+            return
         }
     }
+    private defendRequest(request: CombatRequest, requestName: string, index: number) {
 
-    // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.CPULogging)
-        customLog(
-            'Attack Request Manager',
-            (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-            undefined,
-            myColors.lightGrey,
-        )
+    }
 }

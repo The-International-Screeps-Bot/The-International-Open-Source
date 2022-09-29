@@ -406,11 +406,8 @@ export function findClosestCommuneName(roomName: string) {
 }
 
 export function findClosestClaimType(roomName: string) {
-    const claimTypes = Array.from(global.communes)
-        .concat(Object.keys(Memory.claimRequests))
-        .filter(claimRoomName => roomName !== claimRoomName)
 
-    return claimTypes.sort(
+    return Array.from(global.communes).sort(
         (a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
     )[0]
 }
@@ -439,7 +436,6 @@ export function randomIntRange(min: number, max: number) {
 }
 
 export function findFunctionCPU(func: Function) {
-
     const CPU = Game.cpu.getUsed()
 
     func()
@@ -448,6 +444,5 @@ export function findFunctionCPU(func: Function) {
 }
 
 export function isExit(x: number, y: number) {
-
-    return (x <= 0 || x >= 49 || y <= 0 || y >= 49)
+    return x <= 0 || x >= 49 || y <= 0 || y >= 49
 }

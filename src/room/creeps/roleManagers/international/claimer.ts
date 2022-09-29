@@ -90,7 +90,7 @@ export class Claimer extends Creep {
                     },
                 })
             ) {
-                Memory.claimRequests[claimRequestName].abandon = 20000
+                Memory.claimRequests[claimRequestName].needs[ClaimRequestNeeds.score] = 20000
                 delete Memory.rooms[creep.commune.name].claimRequest
             }
         }

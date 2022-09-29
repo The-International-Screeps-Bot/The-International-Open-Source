@@ -1,5 +1,5 @@
 import { myColors, roomDimensions } from 'international/constants'
-import { findClosestObject, getRange, isExit, pack } from 'international/generalFunctions'
+import { findClosestObject, getRange, isExit, pack } from 'international/utils'
 import { Antifa } from './antifa'
 
 export class Duo {

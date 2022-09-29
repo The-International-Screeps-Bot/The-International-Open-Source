@@ -1,4 +1,4 @@
-import { allStructureTypes } from './constants'
+import { allStructureTypes, ClaimRequestNeeds } from './constants'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN, STRUCTURE_STORAGE, STRUCTURE_TERMINAL]
 
@@ -144,23 +144,25 @@ global.destroyCommuneStructures = function (types?) {
     return log + ` ${types ? `with the types ${types}` : ''}`
 }
 
-global.claim = function (request, communeName) {
-    if (!Memory.claimRequests[request]) {
-        Memory.claimRequests[request] = {
+global.claim = function (requestName, communeName) {
+
+    if (!Memory.claimRequests[requestName]) {
+        const request = Memory.claimRequests[requestName] = {
             responder: communeName,
             needs: [0],
-            score: 0,
         }
+
+        request.needs[ClaimRequestNeeds.score] = 0
     }
 
     if (communeName) {
         const roomMemory = Memory.rooms[communeName]
         if (!roomMemory) return `No memory for ${communeName}`
 
-        roomMemory.claimRequest = request
+        roomMemory.claimRequest = requestName
     }
 
-    return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${request}`
+    return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${requestName}`
 }
 global.deleteClaimRequests = function () {
     let deleteCount = 0
@@ -176,9 +178,9 @@ global.deleteClaimRequests = function () {
     return `Deleted ${deleteCount} claim requests`
 }
 
-global.combat = function (type, request, communeName) {
-    if (!Memory.combatRequests[request]) {
-        Memory.combatRequests[request] = {
+global.combat = function (type, requestName, communeName) {
+    if (!Memory.combatRequests[requestName]) {
+        Memory.combatRequests[requestName] = {
             T: type || 'attack',
             responder: communeName,
             data: [0],
@@ -189,30 +191,30 @@ global.combat = function (type, request, communeName) {
         const roomMemory = Memory.rooms[communeName]
         if (!roomMemory) return `No memory for ${communeName}`
 
-        roomMemory.combatRequests.push(request)
+        roomMemory.combatRequests.push(requestName)
     }
 
-    return `${communeName ? `${communeName} is responding to the` : `created`} combatRequest for ${request}`
+    return `${communeName ? `${communeName} is responding to the` : `created`} combatRequest for ${requestName}`
 }
 
-global.deleteCombatRequest = function (request) {
-    if (!Memory.combatRequests[request]) return 'No combatRequest for that room'
+global.deleteCombatRequest = function (requestName) {
+    if (!Memory.combatRequests[requestName]) return 'No combatRequest for that room'
 
     // If responder, remove from its memory
 
-    const responder = Memory.combatRequests[request].responder
+    const responder = Memory.combatRequests[requestName].responder
     if (responder)
-        Memory.rooms[responder].combatRequests.splice(Memory.rooms[responder].combatRequests.indexOf(request), 1)
+        Memory.rooms[responder].combatRequests.splice(Memory.rooms[responder].combatRequests.indexOf(requestName), 1)
 
-    delete Memory.combatRequests[request]
+    delete Memory.combatRequests[requestName]
 
-    return `deleted combatRequest for ${request}`
+    return `deleted combatRequest for ${requestName}`
 }
 global.DCR = global.deleteCombatRequest
 
-global.allyCreepRequest = function (request, communeName?) {
-    if (!Memory.allyCreepRequests[request]) {
-        Memory.allyCreepRequests[request] = {
+global.allyCreepRequest = function (requestName, communeName?) {
+    if (!Memory.allyCreepRequests[requestName]) {
+        Memory.allyCreepRequests[requestName] = {
             responder: communeName,
             needs: [0],
         }
@@ -222,9 +224,9 @@ global.allyCreepRequest = function (request, communeName?) {
         const roomMemory = Memory.rooms[communeName]
         if (!roomMemory) return `No memory for ${communeName}`
 
-        roomMemory.allyCreepRequest = request
+        roomMemory.allyCreepRequest = requestName
     }
 
-    return `${communeName ? `${communeName} is responding to the` : `created`} allyCreepRequest for ${request}`
+    return `${communeName ? `${communeName} is responding to the` : `created`} allyCreepRequest for ${requestName}`
 }
 global.ACR = global.allyCreepRequest

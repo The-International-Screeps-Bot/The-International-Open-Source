@@ -1,5 +1,5 @@
 import { impassibleStructureTypes, stamps } from 'international/constants'
-import { unpackAsPos } from 'international/generalFunctions'
+import { unpackAsPos } from 'international/utils'
 
 Room.prototype.remotePlanner = function (commune) {
     return true

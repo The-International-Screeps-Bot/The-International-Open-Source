@@ -6,7 +6,7 @@ import {
     getRange,
     getRangeEuc,
     pack,
-} from 'international/generalFunctions'
+} from 'international/utils'
 
 export class MeleeDefender extends Creep {
     advancedDefend?(): boolean {

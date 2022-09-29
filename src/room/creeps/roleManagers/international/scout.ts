@@ -1,5 +1,5 @@
 import { communeSigns, nonCommuneSigns } from 'international/constants'
-import { findClosestCommuneName, getRange } from 'international/generalFunctions'
+import { findClosestCommuneName, getRange } from 'international/utils'
 
 export class Scout extends Creep {
 

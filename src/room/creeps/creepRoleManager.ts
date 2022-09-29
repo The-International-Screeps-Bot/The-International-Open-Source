@@ -1,7 +1,7 @@
 import './creepFunctions'
 
 import { creepRoles, myColors } from 'international/constants'
-import { customLog } from 'international/generalFunctions'
+import { customLog } from 'international/utils'
 import { Maintainer } from './roleManagers/commune/maintainer'
 import { Builder } from './roleManagers/commune/builder'
 import { Hauler } from './roleManagers/commune/hauler'

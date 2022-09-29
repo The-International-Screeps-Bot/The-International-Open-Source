@@ -26,7 +26,7 @@ import {
     unpackAsRoomPos,
     findClosestObjectInRange,
     isExit,
-} from 'international/generalFunctions'
+} from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { pick, repeat } from 'lodash'
 import { packCoord, packPos, packPosList, unpackPos, unpackPosList } from 'other/packrat'

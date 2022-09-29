@@ -26,7 +26,7 @@ import './room/creeps/creepAdditions'
 // Other
 
 import { memHack } from 'other/memHack'
-import { customLog } from 'international/generalFunctions'
+import { customLog } from 'international/utils'
 import { myColors, TrafficPriorities } from 'international/constants'
 import { CommuneManager } from 'room/communeManager'
 import { configManager } from './international/config'

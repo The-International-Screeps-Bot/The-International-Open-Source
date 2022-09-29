@@ -1,4 +1,4 @@
-import { getRange, unpackAsRoomPos } from 'international/generalFunctions'
+import { getRange, unpackAsRoomPos } from 'international/utils'
 
 export class MineralHarvester extends Creep {
     advancedHarvestMineral?(mineral: Mineral): boolean {

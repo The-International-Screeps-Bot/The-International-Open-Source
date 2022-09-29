@@ -1,5 +1,5 @@
 import { allyPlayers, roomDimensions } from 'international/constants'
-import { getRange } from 'international/generalFunctions'
+import { getRange } from 'international/utils'
 
 Object.defineProperties(Creep.prototype, {
     role: {

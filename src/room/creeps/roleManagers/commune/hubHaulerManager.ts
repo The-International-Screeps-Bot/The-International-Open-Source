@@ -1,5 +1,5 @@
 import { linkReceiveTreshold, linkSendThreshold } from 'international/constants'
-import { findObjectWithID, unpackAsRoomPos } from 'international/generalFunctions'
+import { findObjectWithID, unpackAsRoomPos } from 'international/utils'
 
 //import { HubHauler } from '../../creepClasses'
 

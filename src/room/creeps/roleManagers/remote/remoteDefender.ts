@@ -1,5 +1,5 @@
 import { RemoteNeeds } from 'international/constants'
-import { findClosestObject, getRange, pack, randomIntRange } from 'international/generalFunctions'
+import { findClosestObject, getRange, pack, randomIntRange } from 'international/utils'
 
 export class RemoteDefender extends Creep {
     public get dying() {

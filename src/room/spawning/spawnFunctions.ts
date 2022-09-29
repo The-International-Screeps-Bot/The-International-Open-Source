@@ -1,5 +1,5 @@
 import { myColors } from 'international/constants'
-import { customLog, newID } from 'international/generalFunctions'
+import { customLog, newID } from 'international/utils'
 
 StructureSpawn.prototype.advancedSpawn = function (spawnRequest) {
     // Attempt to spawn using the values in the spawnRequest

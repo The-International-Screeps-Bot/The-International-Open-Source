@@ -1,6 +1,8 @@
 import { allyManager } from 'international/simpleAllies'
 import {
+    AllyCreepRequestNeeds,
     antifaRoles,
+    ClaimRequestNeeds,
     CombatRequestData,
     creepRoles,
     haulerUpdateDefault,
@@ -9,13 +11,7 @@ import {
     remoteRoles,
     stamps,
 } from './constants'
-import {
-    advancedFindDistance,
-    createPosMap,
-    customLog,
-    findCarryPartsRequired,
-    findClosestRoomName,
-} from './generalFunctions'
+import { advancedFindDistance, createPosMap, customLog, findCarryPartsRequired, findClosestRoomName } from './utils'
 import { internationalManager, InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
 import '../room/haulerSize'
@@ -39,7 +35,6 @@ class TickConfig {
             customLog('Tick Config', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.midGrey)
     }
     private configGeneral() {
-
         // General
 
         global.communes = new Set()
@@ -180,12 +175,12 @@ class TickConfig {
 
             if (!request) continue
 
-            if (request.abandon > 0) {
-                request.abandon -= 1
+            if (request.needs[ClaimRequestNeeds.score] > 0) {
+                request.needs[ClaimRequestNeeds.score] -= 1
                 continue
             }
 
-            delete request.abandon
+            delete request.needs[ClaimRequestNeeds.score]
 
             if (request.responder && global.communes.has(request.responder)) continue
 
@@ -219,7 +214,7 @@ class TickConfig {
                     ally: Infinity,
                 }) > maxRange
             ) {
-                Memory.claimRequests[roomName].abandon = 20000
+                Memory.claimRequests[roomName].needs[ClaimRequestNeeds.score] = 20000
                 continue
             }
 
@@ -234,17 +229,17 @@ class TickConfig {
         }
     }
     private configAllyCreepRequests() {
-        // Decrease abandonment for abandoned allyCreepRequests, and find those that aren't abandoned responders
+        // Decrease abandonment for abandoned allyCreepRequests, and find those that aren't abandon responders
 
         for (const roomName in Memory.allyCreepRequests) {
             const request = Memory.allyCreepRequests[roomName]
 
-            if (request.abandon > 0) {
-                request.abandon -= 1
+            if (request.needs[AllyCreepRequestNeeds.abandon] > 0) {
+                request.needs[AllyCreepRequestNeeds.abandon] -= 1
                 continue
             }
 
-            request.abandon = undefined
+            request.needs[AllyCreepRequestNeeds.abandon] = undefined
 
             if (request.responder) continue
 
@@ -271,14 +266,14 @@ class TickConfig {
                     ally: Infinity,
                 }) > maxRange
             ) {
-                Memory.allyCreepRequests[roomName].abandon = 20000
+                request.needs[AllyCreepRequestNeeds.abandon] = 20000
                 continue
             }
 
             // Otherwise assign the request to the room, and record as such in Memory
 
             Memory.rooms[communeName].allyCreepRequest = roomName
-            Memory.allyCreepRequests[roomName].responder = communeName
+            request.responder = communeName
         }
     }
     private configCombatRequests() {
@@ -323,14 +318,14 @@ class TickConfig {
                     ally: Infinity,
                 }) > maxRange
             ) {
-                Memory.combatRequests[requestName].data[CombatRequestData.abandon] = 20000
+                request.data[CombatRequestData.abandon] = 20000
                 continue
             }
 
             // Otherwise assign the request to the room, and record as such in Memory
 
             Memory.rooms[communeName].combatRequests.push(requestName)
-            Memory.combatRequests[requestName].responder = communeName
+            request.responder = communeName
 
             internationalManager.creepsByCombatRequest[requestName] = {}
             for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []

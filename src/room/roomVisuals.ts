@@ -9,7 +9,7 @@ import {
     roomDimensions,
     stamps,
 } from 'international/constants'
-import { customLog, findObjectWithID, unpackAsPos } from 'international/generalFunctions'
+import { customLog, findObjectWithID, unpackAsPos } from 'international/utils'
 import { RoomManager } from './roomManager'
 
 export class RoomVisualsManager {

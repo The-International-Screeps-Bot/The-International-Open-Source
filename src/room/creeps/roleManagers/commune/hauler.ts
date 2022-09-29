@@ -1,4 +1,4 @@
-import { customLog, findClosestObject, getRange } from 'international/generalFunctions'
+import { customLog, findClosestObject, getRange } from 'international/utils'
 
 export class Hauler extends Creep {
 

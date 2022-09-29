@@ -1,5 +1,5 @@
 import { allyPlayers, ClaimRequestNeeds } from 'international/constants'
-import { findClosestObject, getRange, pack } from 'international/generalFunctions'
+import { findClosestObject, getRange, pack } from 'international/utils'
 
 export class VanguardDefender extends Creep {
     /**

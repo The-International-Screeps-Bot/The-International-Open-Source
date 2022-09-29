@@ -1,4 +1,4 @@
-import { customLog, findLargestTransactionAmount, getAvgPrice } from 'international/generalFunctions'
+import { customLog, findLargestTransactionAmount, getAvgPrice } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 
 Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {

@@ -1,4 +1,4 @@
-import { getRange, unpackAsPos } from 'international/generalFunctions'
+import { getRange, unpackAsPos } from 'international/utils'
 import { Hauler } from './hauler'
 
 export class SourceHarvester extends Creep {

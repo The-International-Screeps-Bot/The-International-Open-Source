@@ -18,7 +18,7 @@ import {
     packXY,
     unpackAsPos,
     unpackAsRoomPos,
-} from 'international/generalFunctions'
+} from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from 'room/communeManager'
 
