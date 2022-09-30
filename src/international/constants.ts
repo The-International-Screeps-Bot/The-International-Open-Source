@@ -643,6 +643,70 @@ export const minerals: Partial<ResourceConstant[]> = [
 ]
 export const boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
 
+/**
+ * The percent of the terminal to fill with each resource
+ */
+export const terminalResourceTargets: ResourceTarget[] = [
+    {
+        resource: RESOURCE_BATTERY,
+        conditions: function(communeManager) {
+
+            return communeManager.room.structures.factory.length
+        },
+        min: 0.005,
+        max: 0.015
+    },
+    {
+        resource: RESOURCE_ENERGY,
+        min: 0.08,
+        max: 0.2,
+    },
+    {
+        resource: RESOURCE_HYDROGEN,
+        min: 0.01,
+        max: 0.27,
+    },
+    {
+        resource: RESOURCE_OXYGEN,
+        min: 0.01,
+        max: 0.27,
+    },
+    {
+        resource: RESOURCE_UTRIUM,
+        min: 0.01,
+        max: 0.27,
+    },
+    {
+        resource: RESOURCE_KEANIUM,
+        min: 0.01,
+        max: 0.27,
+    },
+    {
+        resource: RESOURCE_LEMERGIUM,
+        min: 0.01,
+        max: 0.27,
+    },
+    {
+        resource: RESOURCE_ZYNTHIUM,
+        min: 0.01,
+        max: 0.27,
+    },
+    {
+        resource: RESOURCE_CATALYST,
+        min: 0.01,
+        max: 0.27,
+    },
+    {
+        resource: RESOURCE_POWER,
+        conditions: function(communeManager) {
+
+            return communeManager.room.structures.powerSpawn.length
+        },
+        min: 0.005,
+        max: 0.015
+    },
+]
+
 export enum RemoteNeeds {
     source1RemoteHarvester,
     source2RemoteHarvester,

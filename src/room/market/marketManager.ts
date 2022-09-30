@@ -1,4 +1,4 @@
-import { minerals } from 'international/constants'
+import { minerals, terminalResourceTargets } from 'international/constants'
 import { customLog } from 'international/utils'
 import './marketFunctions'
 import { allyManager, RequestTypes } from '../../international/simpleAllies'
@@ -56,21 +56,92 @@ export class MarketManager {
 
         if (!terminal) return
 
-        // If the terminal has less than x energy in the terminal, request y
+        this.createAllyRequests()
 
-        if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 50000)
-            allyManager.requestResource(
-                room.name,
-                RESOURCE_ENERGY,
-                60000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY),
-                0.75,
-            )
+        if (terminal.cooldown > 0) return
+
+        this.manageAllyRequests()
 
         if (!Memory.marketUsage) return
 
         // If the market is disabled, stop
 
         if (!internationalManager.marketIsFunctional) return
+
+        this.manageResources()
+
+/*
+        let resourceType: ResourceConstant
+        let min = 0
+        let max = 0
+
+        // Energy
+
+        resourceType = RESOURCE_ENERGY
+        min = 30000
+        max = 70000
+
+        // If there is insufficient energy
+
+        if (terminal.store[resourceType] < min) {
+            min *= 1.2
+
+            // Try to buy some more
+
+            if (room.advancedBuy(resourceType, min - terminal.store[resourceType], min)) return
+        }
+        else if (terminal.store[resourceType] > max) {
+
+            // Sell excess
+
+            if (room.advancedSell(resourceType, terminal.store[resourceType] - max, max)) return
+        }
+
+        // Minerals
+
+        for (resourceType of minerals) {
+
+            min = 4000
+
+            // We don't have enough
+
+            if (terminal.store[resourceType] < min) {
+
+                min *= 1.2
+
+                if (room.advancedBuy(resourceType, min - terminal.store[resourceType], min)) return
+                continue
+            }
+
+            max = 8000
+
+            // We have enough
+
+            if (terminal.store[resourceType] < max) continue
+
+            max *= 0.8
+
+            // Try to sell the excess amount
+
+            if (room.advancedSell(resourceType, terminal.store[resourceType] - max, max)) return
+        }
+         */
+    }
+
+    private createAllyRequests() {
+        const { room } = this.communeManager
+        const { terminal } = room
+
+        // If the terminal has less than x energy in the terminal, request y
+
+        if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 50000) {
+            allyManager.requestResource(
+                room.name,
+                RESOURCE_ENERGY,
+                60000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY),
+                0.75,
+            )
+        }
 
         // For each mineral
 
@@ -81,10 +152,11 @@ export class MarketManager {
 
             allyManager.requestResource(room.name, mineral, 7000 - mineralAmount, 0.25)
         }
+    }
 
-        // If the terminal is on cooldown, stop
-
-        if (terminal.cooldown > 0) return
+    private manageAllyRequests() {
+        const { room } = this.communeManager
+        const { terminal } = room
 
         // Filter out allyRequests that are requesting resources
 
@@ -119,6 +191,7 @@ export class MarketManager {
                 // Otherwise send the resource and stop
 
                 terminal.send(request.resourceType, amount, request.roomName, `Sending ${request} to ally`)
+                terminal.intended = true
                 return
             }
 
@@ -134,6 +207,7 @@ export class MarketManager {
                 // Otherwise send the resource and stop
 
                 terminal.send(request.resourceType, amount, request.roomName, `Sending ${request} to ally`)
+                terminal.intended = true
                 return
             }
 
@@ -141,39 +215,39 @@ export class MarketManager {
 
             continue
         }
+    }
 
-        let resourceType: ResourceConstant
-        let targetAmount = 8000
+    private manageResources() {
+        const { room } = this.communeManager
+        const { terminal } = room
 
-        // Minerals
+        for (const resourceTarget of terminalResourceTargets) {
 
-        // Loop through each mineral
+            if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
 
-        for (resourceType of minerals) {
-            // If there is an acceptable amount of resources, iterate
+            let min = terminal.store.getCapacity() * resourceTarget.min
 
-            if (terminal.store[resourceType] <= targetAmount) continue
+            // We don't have enough
 
-            targetAmount *= 0.75
+            if (terminal.store[resourceTarget.resource] < min) {
 
-            // Otherwise, try to sell the excess amount
+                min *= 1.2
 
-            if (room.advancedSell(resourceType, terminal.store[resourceType] - targetAmount, targetAmount)) return
-        }
+                if (room.advancedBuy(resourceTarget.resource, min - terminal.store[resourceTarget.resource], min)) return
+                continue
+            }
 
-        // Energy
+            let max = terminal.store.getCapacity() * resourceTarget.max
 
-        resourceType = RESOURCE_ENERGY
-        targetAmount = 30000
+            // We have enough
 
-        // If there is insufficient energy
+            if (terminal.store[resourceTarget.resource] < max) continue
 
-        if (terminal.store[resourceType] < targetAmount) {
-            targetAmount *= 1.2
+            max *= 0.8
 
-            // Try to buy some more
+            // Try to sell the excess amount
 
-            if (room.advancedBuy(resourceType, targetAmount - terminal.store[resourceType], targetAmount)) return
+            if (room.advancedSell(resourceTarget.resource, terminal.store[resourceTarget.resource] - max, max)) return
         }
     }
 

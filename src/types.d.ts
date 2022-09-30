@@ -49,6 +49,13 @@ declare global {
         brown: string
     }
 
+    interface ResourceTarget {
+        resource: ResourceConstant
+        conditions?(communeManager: CommuneManager): any
+        min: number
+        max: number
+    }
+
     type RemoteStampTypes = 'road' | 'container'
 
     type StampTypes =
@@ -1874,7 +1881,11 @@ declare global {
     }
 
     interface StructureTower {
-        inactionable: boolean
+        intended: boolean
+    }
+
+    interface StructureTerminal {
+        intended: boolean
     }
 
     interface RoomObject {

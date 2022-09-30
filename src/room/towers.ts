@@ -34,9 +34,9 @@ Room.prototype.towersHealCreeps = function () {
     // Loop through the this's towers
 
     for (const tower of this.structures.tower) {
-        // Iterate if the tower is inactionable
+        // Iterate if the tower is intended
 
-        if (tower.inactionable) continue
+        if (tower.intended) continue
 
         if (tower.store.energy < TOWER_ENERGY_COST) continue
 
@@ -44,9 +44,9 @@ Room.prototype.towersHealCreeps = function () {
 
         if (tower.heal(target) !== OK) continue
 
-        // Otherwise record that the tower is no longer inactionable
+        // Otherwise record that the tower is no longer intended
 
-        tower.inactionable = true
+        tower.intended = true
         continue
     }
 }
@@ -75,17 +75,17 @@ Room.prototype.towersAttackCreeps = function () {
     // Loop through the this's towers
 
     for (const tower of this.structures.tower) {
-        // Iterate if the tower is inactionable
+        // Iterate if the tower is intended
 
-        if (tower.inactionable) continue
+        if (tower.intended) continue
 
         if (tower.store.energy < TOWER_ENERGY_COST) continue
 
         if (tower.attack(attackTarget) !== OK) continue
 
-        // Otherwise record that the tower is no longer inactionable
+        // Otherwise record that the tower is no longer intended
 
-        tower.inactionable = true
+        tower.intended = true
         continue
     }
 }
@@ -102,9 +102,9 @@ Room.prototype.towersRepairRamparts = function () {
     // Loop through the this's towers
 
     for (const tower of this.structures.tower) {
-        // Iterate if the tower is inactionable
+        // Iterate if the tower is intended
 
-        if (tower.inactionable) continue
+        if (tower.intended) continue
 
         if (tower.store.energy < TOWER_ENERGY_COST) continue
 
@@ -125,7 +125,7 @@ Room.prototype.towersRepairRamparts = function () {
         if (global.roomStats.commune[this.name])
             (global.roomStats.commune[this.name] as RoomCommuneStats).eorwr += TOWER_ENERGY_COST
 
-        tower.inactionable = true
+        tower.intended = true
         ramparts.pop()
 
         // And iterate
