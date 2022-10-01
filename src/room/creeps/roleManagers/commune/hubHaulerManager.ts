@@ -225,7 +225,7 @@ export class HubHauler extends Creep {
 
         // If there is a sufficient cooldown (there is no point filling a link that can do nothing)
 
-        if (hubLink.cooldown > 4) return false
+        if (hubLink.cooldown > 5) return false
 
         // If there is unsufficient space to justify a fill
 
@@ -238,7 +238,7 @@ export class HubHauler extends Creep {
 
         if (
             controllerLink &&
-            controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > controllerLink.store.energy
+            controllerLink.store.getCapacity(RESOURCE_ENERGY) * (linkReceiveTreshold * (room.myCreeps.controllerUpgrader.length ? 2 : 1)) > controllerLink.store.energy
         ) {
         } else if (
             fastFillerLink &&
