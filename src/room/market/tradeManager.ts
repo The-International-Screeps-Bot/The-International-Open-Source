@@ -36,7 +36,7 @@ const tradeBlacklistRoomNames = [
     'W17N16',
 ]
 
-export class MarketManager {
+export class TradeManager {
     communeManager: CommuneManager
     room: Room
     terminal: StructureTerminal
@@ -70,7 +70,7 @@ export class MarketManager {
 
         this.manageResources()
 
-/*
+        /*
         let resourceType: ResourceConstant
         let min = 0
         let max = 0
@@ -222,7 +222,6 @@ export class MarketManager {
         const { terminal } = room
 
         for (const resourceTarget of terminalResourceTargets) {
-
             if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
 
             let min = terminal.store.getCapacity() * resourceTarget.min
@@ -230,10 +229,10 @@ export class MarketManager {
             // We don't have enough
 
             if (terminal.store[resourceTarget.resource] < min) {
-
                 min *= 1.2
 
-                if (room.advancedBuy(resourceTarget.resource, min - terminal.store[resourceTarget.resource], min)) return
+                if (room.advancedBuy(resourceTarget.resource, min - terminal.store[resourceTarget.resource], min))
+                    return
                 continue
             }
 

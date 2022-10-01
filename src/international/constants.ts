@@ -865,6 +865,8 @@ export const linkSendThreshold = 0.9
  */
 export const linkReceiveTreshold = 0.25
 
+export const powerSpawnRefillThreshold = 0.1
+
 /**
  * Offsets from a creep's moveRequest for which to search for relay targets
  */

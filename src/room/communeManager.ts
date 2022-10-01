@@ -1,13 +1,5 @@
-import {
-    createPosMap,
-    customLog,
-    findClosestObject,
-    getRange,
-    pack,
-    packXY,
-    unpackAsPos,
-} from 'international/utils'
-import { MarketManager } from './market/marketManager'
+import { createPosMap, customLog, findClosestObject, getRange, pack, packXY, unpackAsPos } from 'international/utils'
+import { TradeManager } from './market/tradeManager'
 import './spawning/spawnManager'
 
 import { constructionManager } from './construction/constructionManager'
@@ -27,10 +19,13 @@ import { RemotesManager } from './remotesManager'
 import { ClaimRequestManager } from './claimRequestManager'
 import { CombatRequestManager } from './combatRequestManager'
 import { AllyCreepRequestManager } from './allyCreepRequestManager'
+import { PowerSpawnManager } from './powerSpawn'
 
 export class CommuneManager {
     labManager: LabManager
-    marketManager: MarketManager
+    powerSpawnManager: PowerSpawnManager
+
+    tradeManager: TradeManager
     remotesManager: RemotesManager
 
     claimRequestManager: ClaimRequestManager
@@ -39,7 +34,9 @@ export class CommuneManager {
 
     constructor() {
         this.labManager = new LabManager(this)
-        this.marketManager = new MarketManager(this)
+        this.powerSpawnManager = new PowerSpawnManager(this)
+
+        this.tradeManager = new TradeManager(this)
         this.remotesManager = new RemotesManager(this)
 
         this.claimRequestManager = new ClaimRequestManager(this)
@@ -62,10 +59,10 @@ export class CommuneManager {
         this.room.towerManager()
 
         try {
-            this.marketManager.run()
+            this.tradeManager.run()
         } catch (err) {
             customLog(
-                'Exception processing marketManager in ' + this.room.name + '. ',
+                'Exception processing tradeManager in ' + this.room.name + '. ',
                 err + '\n' + (err as any).stack,
                 myColors.white,
                 myColors.red,
@@ -80,6 +77,7 @@ export class CommuneManager {
         this.room.linkManager()
         this.room.factoryManager()
         this.labManager.run()
+        this.powerSpawnManager.run()
         this.room.spawnManager()
 
         this.test()

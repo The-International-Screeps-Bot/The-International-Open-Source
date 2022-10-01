@@ -106,7 +106,7 @@ class AllyManager {
         })
     }
     /**
-     * Request resources for a specified room. Handled by the marketManager
+     * Request resources for a specified room. Handled by the tradeManager
      */
     requestResource(roomName: string, resourceType: ResourceConstant, maxAmount: number, priority: number = 0) {
         this.myRequests.push({

@@ -1,4 +1,4 @@
-import { linkReceiveTreshold, linkSendThreshold } from 'international/constants'
+import { linkReceiveTreshold, linkSendThreshold, powerSpawnRefillThreshold } from 'international/constants'
 import { findObjectWithID, unpackAsRoomPos } from 'international/utils'
 
 //import { HubHauler } from '../../creepClasses'
@@ -42,7 +42,7 @@ export class HubHauler extends Creep {
 
         //Whenever we have a reservation, we should have a matching withdraw and transfer, so we should never
         // get here with anything.  If we do, it'll never be gotten rid of, so just transfer anything we have to the store
-        if(this.store.getUsedCapacity() > 0) {
+        if (this.store.getUsedCapacity() > 0) {
             const resource = Object.keys(this.store)[0] as ResourceConstant
             this.createReservation('transfer', storage.id, this.store[resource], resource)
             return
@@ -251,7 +251,7 @@ export class HubHauler extends Creep {
 
         const amount = Math.min(this.freeStore(), hubLink.freeSpecificStore())
 
-        // FInd a provider
+        // Find a provider
 
         let provider
         if (storage && storage.store.energy >= amount) provider = storage
@@ -399,11 +399,87 @@ export class HubHauler extends Creep {
         this.createReservation('transfer', factory.id, amount + this.store.energy)
         return true
     }
-    /*
-    balanceStoringStructures?(): boolean
 
-    fillHubLink?(): boolean
- */
+    /**
+     * @returns If a reservation was made or not
+     */
+    reservePowerSpawnTransferPower?(): boolean {
+        const { room } = this
+        const powerSpawn = room.structures.powerSpawn[0]
+        const resource = RESOURCE_POWER
+
+        if (!powerSpawn) return false
+
+        const { storage } = room
+        const { terminal } = room
+
+        if (!storage && !powerSpawn) return false
+
+        // If there is unsufficient space to justify a fill
+
+        if (powerSpawn.store.getCapacity(resource) * powerSpawnRefillThreshold < powerSpawn.store.energy) return false
+
+        const amount = Math.min(this.freeStore(), powerSpawn.freeSpecificStore(resource))
+
+        // Find a provider
+
+        let provider
+        if (storage && storage.store.energy >= amount) provider = storage
+        else if (terminal && terminal.store.energy >= amount) provider = terminal
+
+        if (!provider) return false
+
+        this.message += 'RHLT'
+
+        this.createReservation('withdraw', provider.id, amount)
+        this.createReservation(
+            'transfer',
+            powerSpawn.id,
+            Math.min(this.freeStore() + this.store.energy, powerSpawn.freeSpecificStore(resource)),
+        )
+        return true
+    }
+
+    /**
+     * @returns If a reservation was made or not
+     */
+     reservePowerSpawnTransferEnergy?(): boolean {
+        const { room } = this
+        const powerSpawn = room.structures.powerSpawn[0]
+        const resource = RESOURCE_ENERGY
+
+        if (!powerSpawn) return false
+
+        const { storage } = room
+        const { terminal } = room
+
+        if (!storage && !powerSpawn) return false
+
+        // If there is unsufficient space to justify a fill
+
+        if (powerSpawn.store.getCapacity(resource) * powerSpawnRefillThreshold < powerSpawn.store.energy) return false
+
+        const amount = Math.min(this.freeStore(), powerSpawn.freeSpecificStore(resource))
+
+        // Find a provider
+
+        let provider
+        if (storage && storage.store.energy >= amount) provider = storage
+        else if (terminal && terminal.store.energy >= amount) provider = terminal
+
+        if (!provider) return false
+
+        this.message += 'RHLT'
+
+        this.createReservation('withdraw', provider.id, amount)
+        this.createReservation(
+            'transfer',
+            powerSpawn.id,
+            Math.min(this.freeStore() + this.store.energy, powerSpawn.freeSpecificStore(resource)),
+        )
+        return true
+    }
+
     constructor(creepID: Id<Creep>) {
         super(creepID)
     }
