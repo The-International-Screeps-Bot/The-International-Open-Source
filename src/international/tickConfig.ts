@@ -175,12 +175,12 @@ class TickConfig {
 
             if (!request) continue
 
-            if (request.data[ClaimRequestData.score] > 0) {
-                request.data[ClaimRequestData.score] -= 1
+            if (request.data[ClaimRequestData.abandon] > 0) {
+                request.data[ClaimRequestData.abandon] -= 1
                 continue
             }
 
-            delete request.data[ClaimRequestData.score]
+            delete request.data[ClaimRequestData.abandon]
 
             if (request.responder && global.communes.has(request.responder)) continue
 
