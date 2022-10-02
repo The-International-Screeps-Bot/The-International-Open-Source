@@ -644,21 +644,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 // Weight costMatrixes
 
-                // Stop if there are no cost matrixes to weight
-
-                if (opts.weightCostMatrixes) {
-                    // Otherwise iterate through each x and y in the room
-
-                    for (let x = 0; x < roomDimensions; x += 1) {
-                        for (let y = 0; y < roomDimensions; y += 1) {
-                            // Loop through each costMatrix
-
-                            for (const weightCM of opts.weightCostMatrixes)
-                                if (weightCM) cm.set(x, y, weightCM.get(x, y))
-                        }
-                    }
-                }
-
                 if (opts.weightCoordMaps) {
                     for (const coordMap of opts.weightCoordMaps) {
                         for (const index in coordMap) {
@@ -681,6 +666,26 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // If there is no vision in the room, inform the costMatrix
 
                 if (!room) return cm
+
+                // Stop if there are no cost matrixes to weight
+
+                if (opts.weightCostMatrixes) {
+                    // Otherwise iterate through each x and y in the room
+
+                    for (let x = 0; x < roomDimensions; x += 1) {
+                        for (let y = 0; y < roomDimensions; y += 1) {
+                            // Loop through each costMatrix
+
+                            for (const weightCMName of opts.weightCostMatrixes) {
+
+                                const weightCM = room[weightCMName as unknown as keyof Room]
+                                if (!weightCM) continue
+
+                                cm.set(x, y, (weightCM as CostMatrix).get(x, y))
+                            }
+                        }
+                    }
+                }
 
                 if (opts.creep) {
                     let roadCost = 1
@@ -897,6 +902,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             )
 
             room.pathVisual(pathFinderResult.path, 'red')
+            room.errorVisual(opts.origin)
 
             let lastPos = opts.origin
 
@@ -2177,6 +2183,16 @@ Room.prototype.pathVisual = function (path, color, visualize = Memory.roomVisual
 
     this.visual.poly(path, {
         stroke: myColors[color],
+        strokeWidth: 0.15,
+        opacity: 0.3,
+    })
+}
+
+Room.prototype.errorVisual = function (coord) {
+    this.visual.circle(coord.x, coord.y, {
+        fill: '',
+        stroke: myColors.red,
+        radius: 0.5,
         strokeWidth: 0.15,
         opacity: 0.3,
     })

@@ -1,4 +1,4 @@
-import { allStructureTypes, ClaimRequestData } from './constants'
+import { allStructureTypes, ClaimRequestData, CombatRequestData } from './constants'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN, STRUCTURE_STORAGE, STRUCTURE_TERMINAL]
 
@@ -177,13 +177,16 @@ global.deleteClaimRequests = function () {
     return `Deleted ${deleteCount} claim requests`
 }
 
-global.combat = function (type, requestName, communeName) {
+global.combat = function (type, requestName, communeName, minDamage, minHeal) {
     if (!Memory.combatRequests[requestName]) {
-        Memory.combatRequests[requestName] = {
+        const request = Memory.combatRequests[requestName] = {
             T: type || 'attack',
             responder: communeName,
             data: [0],
         }
+
+        request.data[CombatRequestData.minDamage] = minDamage
+        request.data[CombatRequestData.minHeal] = minHeal
     }
 
     if (communeName) {

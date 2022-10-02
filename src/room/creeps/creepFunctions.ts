@@ -804,6 +804,7 @@ Creep.prototype.createMoveRequest = function (opts) {
 
     // Assign default opts
 
+    if (!opts.origin) opts.origin = this.pos
     if (!opts.cacheAmount) opts.cacheAmount = internationalManager.defaultMinCacheAmount
 
     let path: RoomPosition[]
@@ -1032,6 +1033,7 @@ Creep.prototype.shove = function (shoverPos) {
             stroke: myColors.yellow,
             radius: 0.5,
             strokeWidth: 0.15,
+            opacity: 0.3,
         })
 
         room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), {

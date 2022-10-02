@@ -50,10 +50,17 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
 }
 
 /**
+ * Checks if two coords are equal
+ */
+export function areCoordsEqual(coord1: Coord, coord2: Coord) {
+    return coord1.x === coord2.x && coord1.y === coord2.y
+}
+
+/**
  * Checks if two positions are equal
  */
-export function areCoordsEqual(pos1: Coord, pos2: Coord) {
-    return pos1.x === pos2.x && pos1.y === pos2.y
+ export function arePositionsEqual(pos1: RoomPosition, pos2: RoomPosition) {
+    return pos1.roomName === pos2.roomName && pos1.x === pos2.x && pos1.y === pos2.y
 }
 
 /**

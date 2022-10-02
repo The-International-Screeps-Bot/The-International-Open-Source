@@ -225,7 +225,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
     // Subtract maxCreeps by the existing number of creeps of this role
 
     if (!opts.maxCreeps) opts.maxCreeps = Infinity
-    opts.maxCreeps -= opts.spawnGroup ? opts.spawnGroup.length : this.creepsFromRoom[opts.role].length
+    else opts.maxCreeps -= opts.spawnGroup ? opts.spawnGroup.length : this.creepsFromRoom[opts.role].length
 
     // So long as there are totalExtraParts left to assign
 
@@ -241,6 +241,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
     }
 
     while (totalExtraParts >= opts.extraParts.length && opts.maxCreeps > 0) {
+
         // Construct important imformation for the spawnRequest
 
         const body: BodyPartConstant[] = []

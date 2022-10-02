@@ -45,16 +45,16 @@ export class Duo {
     }
 
     run() {
+
+        if (!this.getInFormation()) return
+
         if (this.leader.room.name === this.leader.memory.CRN) {
-            this.getInFormation()
 
             if (this.runCombat()) return
 
             this.stompEnemyCSites()
             return
         }
-
-        if (!this.getInFormation()) return
 
         this.createMoveRequest({
             origin: this.leader.pos,
@@ -75,11 +75,9 @@ export class Duo {
     getInFormation() {
         if (this.leader.spawning) return false
 
-        const range = getRange(this.leader.pos.x, this.members[1].pos.x, this.leader.pos.y, this.members[1].pos.y)
-
-        // If squad is in formation
-
         if (this.leader.room.name === this.members[1].room.name) {
+
+            const range = getRange(this.leader.pos.x, this.members[1].pos.x, this.leader.pos.y, this.members[1].pos.y)
             if (range <= 1) return true
 
             if (range > 2) {
@@ -97,6 +95,8 @@ export class Duo {
 
         this.leader.say('GIF')
 
+        if (this.leader.isOnExit()) return true
+
         this.members[1].createMoveRequest({
             origin: this.members[1].pos,
             goals: [
@@ -107,7 +107,7 @@ export class Duo {
             ],
         })
 
-        return this.leader.isOnExit()
+        return false
     }
 
     createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {
@@ -115,18 +115,10 @@ export class Duo {
 
         if (!moveLeader.createMoveRequest(opts)) return
 
-        // Make a moveRequest for the member to the leader
-
-        const packedCoord = pack(moveLeader.pos)
-
         for (const member of this.members) {
             if (member.name === moveLeader.name) continue
 
-            member.moveRequest = packedCoord
-
-            member.room.moveRequests.get(packedCoord)
-                ? member.room.moveRequests.get(packedCoord).push(member.name)
-                : member.room.moveRequests.set(packedCoord, [member.name])
+            member.assignMoveRequest(moveLeader.pos)
         }
     }
 

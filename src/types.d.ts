@@ -137,7 +137,10 @@ declare global {
     }
 
     interface PathOpts {
-        origin: RoomPosition
+        /**
+         * Not required when pathing for creeps
+         */
+        origin?: RoomPosition
         goals: PathGoal[]
         /**
          * room types as keys to weight based on properties
@@ -869,6 +872,8 @@ declare global {
          *
          */
         pathVisual(path: RoomPosition[], color: keyof Colors, visualize?: boolean): void
+
+        errorVisual(coord: Coord): void
 
         /**
          * Finds and records a construction site for builders to target
@@ -2003,7 +2008,7 @@ declare global {
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room
              */
-            combat(type: CombatRequestTypes, requestName: string, communeName?: string): string
+            combat(type: CombatRequestTypes, requestName: string, communeName?: string, minDamage?: number, minHeal?: number): string
 
             /**
              * Deletes combatRequests for a specified room, if there are any

@@ -94,8 +94,8 @@ interface RoomTypeProperties {
 }
 
 export const roomTypeProperties: RoomTypeProperties = {
-    source1: true,
-    source2: true,
+
+
     remotes: true,
     deposits: true,
     powerBanks: true,
@@ -105,10 +105,9 @@ export const roomTypeProperties: RoomTypeProperties = {
     HU: true,
 
     commune: true,
-    needs: true,
     SE: true,
     RE: true,
-    abandon: true,
+    data: true,
 
     owner: true,
     level: true,
@@ -125,8 +124,8 @@ export const roomTypeProperties: RoomTypeProperties = {
 
 export const roomTypes: Record<RoomTypes, RoomType> = {
     commune: {
-        source1: true,
-        source2: true,
+
+
         remotes: true,
         deposits: true,
         powerBanks: true,
@@ -136,12 +135,11 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
     },
     remote: {
         commune: true,
-        source1: true,
-        source2: true,
-        needs: true,
+
+
         SE: true,
         RE: true,
-        abandon: true,
+        data: true,
         NC: true,
         PC: true,
     },
@@ -747,6 +745,7 @@ export enum CombatRequestData {
     minHeal,
     swarm,
     priority,
+    quadCount,
 }
 
 export enum AllyCreepRequestData {
